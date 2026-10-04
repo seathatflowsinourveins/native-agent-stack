@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "path": "<scratchpad>/sota-refresh/impl-wave2/headroom/ws-0.39.0/savings_events.jsonl",
+  "top_model": "unknown",
+  "lifetime": {
+    "tokens_saved": 52335,
+    "tokens_before": 55884,
+    "cost_usd": 0.157005,
+    "cost_effective_usd": 0.157005,
+    "basis": "list",
+    "calls": 2,
+    "savings_percent": 93.6,
+    "new_input_tokens": 0,
+    "new_input_savings_percent": 0.0
+  },
+  "windows": {
+    "today": {
+      "tokens_saved": 52335,
+      "tokens_before": 55884,
+      "cost_usd": 0.157005,
+      "cost_effective_usd": 0.157005,
+      "basis": "list",
+      "calls": 2,
+      "savings_percent": 93.6,
+      "new_input_tokens": 0,
+      "new_input_savings_percent": 0.0
+    },
+    "last_7_days": {
+      "tokens_saved": 52335,
+      "tokens_before": 55884,
+      "cost_usd": 0.157005,
+      "cost_effective_usd": 0.157005,
+      "basis": "list",
+      "calls": 2,
+      "savings_percent": 93.6,
+      "new_input_tokens": 0,
+      "new_input_savings_percent": 0.0
+    },
+    "last_30_days": {
+      "tokens_saved": 52335,
+      "tokens_before": 55884,
+      "cost_usd": 0.157005,
+      "cost_effective_usd": 0.157005,
+      "basis": "list",
+      "calls": 2,
+      "savings_percent": 93.6,
+      "new_input_tokens": 0,
+      "new_input_savings_percent": 0.0
+    }
+  },
+  "by_model": [
+    {
+      "model": "unknown",
+      "tokens_saved": 52335,
+      "tokens_before": 55884,
+      "cost_usd": 0.157005,
+      "cost_effective_usd": 0.157005,
+      "basis": "list",
+      "calls": 2,
+      "savings_percent": 93.6,
+      "new_input_tokens": 0,
+      "new_input_savings_percent": 0.0
+    }
+  ],
+  "by_client": [
+    {
+      "client": "mcp",
+      "tokens_saved": 52335,
+      "tokens_before": 55884,
+      "cost_usd": 0.157005,
+      "cost_effective_usd": 0.157005,
+      "basis": "list",
+      "calls": 2,
+      "savings_percent": 93.6,
+      "new_input_tokens": 0,
+      "new_input_savings_percent": 0.0
+    }
+  ]
+}

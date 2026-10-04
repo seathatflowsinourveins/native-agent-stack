@@ -1,0 +1,87 @@
+{
+ "schema_version": 1,
+ "kind": "token_counter_readings",
+ "edition": "2026-09-27",
+ "evidence_class": "upstream estimate (tool-retained history snapshots that the token-report collector recorded in its private ledger; copied read-only, not measured anew)",
+ "source": {
+  "ledger": "the source host's native-token-report ledger, table snapshots (private, not published)",
+  "copied_at_utc": "2026-09-29T03:24:34Z",
+  "method": "tools/counter_readings.py: sqlite3 read-only (URI mode=ro); one row per cards/*.json native_snapshot entry, matched on tool, scope with the home directory written as $HOME, observed_at to the second and metrics.saved; the kind and session estimate that each entry's basis quotes must equal the row's"
+ },
+ "published_fields": [
+  "ledger_snapshot_id",
+  "tool",
+  "scope",
+  "observed_at",
+  "success",
+  "metrics.saved",
+  "metrics.kind",
+  "metrics.session_estimated_saved (only where the entry's basis quotes it)",
+  "card_entry"
+ ],
+ "withheld": "the evidence column, metrics.raw and every other metric",
+ "readings": [
+  {
+   "ledger_snapshot_id": 67,
+   "tool": "rtk",
+   "scope": "Native / all retained projects",
+   "observed_at": "2026-09-26T22:54:08.316208+00:00",
+   "success": 1,
+   "metrics": {
+    "saved": 42367855,
+    "kind": "upstream estimate"
+   },
+   "card_entry": "cards/rtk.json#/adapted_performance/native_snapshot/0"
+  },
+  {
+   "ledger_snapshot_id": 68,
+   "tool": "rtk",
+   "scope": "Native / project $HOME/code/native-agent-stack",
+   "observed_at": "2026-09-26T22:54:08.432955+00:00",
+   "success": 1,
+   "metrics": {
+    "saved": 26531271,
+    "kind": "upstream estimate"
+   },
+   "card_entry": "cards/rtk.json#/adapted_performance/native_snapshot/1"
+  },
+  {
+   "ledger_snapshot_id": 69,
+   "tool": "headroom",
+   "scope": "Native / last 30 days",
+   "observed_at": "2026-09-26T22:54:08.714497+00:00",
+   "success": 1,
+   "metrics": {
+    "saved": 579411,
+    "kind": "upstream estimate"
+   },
+   "card_entry": "cards/headroom.json#/adapted_performance/native_snapshot/0"
+  },
+  {
+   "ledger_snapshot_id": 71,
+   "tool": "context-mode",
+   "scope": "Claude Code (Context Mode plugin)",
+   "observed_at": "2026-09-26T22:54:09.875257+00:00",
+   "success": 1,
+   "metrics": {
+    "saved": 3244032,
+    "kind": "upstream event/byte estimate",
+    "session_estimated_saved": 27109948
+   },
+   "card_entry": "cards/context-mode.json#/adapted_performance/native_snapshot/0"
+  },
+  {
+   "ledger_snapshot_id": 72,
+   "tool": "context-mode",
+   "scope": "Codex (Context Mode plugin)",
+   "observed_at": "2026-09-26T22:54:09.890775+00:00",
+   "success": 1,
+   "metrics": {
+    "saved": 6311424,
+    "kind": "upstream event/byte estimate",
+    "session_estimated_saved": 157255
+   },
+   "card_entry": "cards/context-mode.json#/adapted_performance/native_snapshot/1"
+  }
+ ]
+}

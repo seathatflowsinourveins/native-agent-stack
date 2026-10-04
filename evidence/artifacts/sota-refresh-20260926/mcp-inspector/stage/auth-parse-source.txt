@@ -1,0 +1,13 @@
+== 2.7.0 clients/web/build/index.js
+1063:  return v === "true" || v === "1";
+1661:  const dangerouslyOmitAuth = !!process.env.DANGEROUSLY_OMIT_AUTH;
+4754:  const dangerouslyOmitAuth = !!options.dangerouslyOmitAuth;
+
+== 2.8.0 clients/web/build/index.js
+1069:function isEnvFlagEnabled(value) {
+1071:  return v === "true" || v === "1";
+1076:  if (isAllInterfacesHost(host) && !isEnvFlagEnabled(env[BIND_ALL_INTERFACES_ENV])) {
+1669:  const dangerouslyOmitAuth = isEnvFlagEnabled(
+1670:    process.env.DANGEROUSLY_OMIT_AUTH
+4907:  const dangerouslyOmitAuth = !!options.dangerouslyOmitAuth;
+

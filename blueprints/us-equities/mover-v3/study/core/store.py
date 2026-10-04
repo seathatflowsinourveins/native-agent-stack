@@ -3,18 +3,38 @@ and normalized read access (core.records). Evaluation code; nothing here is unde
 
 Ledger lines (JSON): {"event": "request", <request record fields>}; {"event": "page", "key", "attempt", "file",
 "status": 200, "sha256", "bytes", "asof", "vintage"}; {"event": "stamp_complete" | "stamp_incomplete", "key",
-"kind", "attempt", "pages", "asof", "vintage", "error"}. The asof (the request's session) and the vintage (the
-fetch time, UTC) are separate fields. A request's latest attempt governs.
+"kind", "attempt", "pages", "asof", "vintage", "error", "elapsed_seconds"}. The asof (the request's session)
+and vintage (the fetch start, UTC) are separate from the complete monotonic duration of each attempt. A request's
+latest attempt governs. Legacy records without a duration remain readable but cannot calibrate throughput.
+An optional leading {"event": "snapshot", "binding": {...}} binds a collection seal to its authorization and
+batch inputs, including its original start time, for recovery before the completion logs are written.
+Every completion stamp's page count equals its attempt's page events. Review round 18 repair (G-H): a recoverable
+seal (the native dry run, a transport-check live sample) also publishes its seal record, seal.json, once and before
+the ledger, and recover_seal adopts such a seal only against that record, never against a digest of the ledger it is
+checking. Second repair (R2-1, R2-3 and its follow-up F1): the record must hold a sha256 of the ledger (a null there
+turned the verification off), and a snapshot path is fetched into only when it is unused: absent under a directory, or
+an empty directory. Anything else without a ledger is refused before any fetch.
 """
 from __future__ import annotations
 
 import gzip
 import json
+import os
+import zlib
 from pathlib import Path
 
 from core import records
 from core.canon import dumps, sha256_bytes
 from core.plan import record
+
+SEAL_RECORD = "seal.json"
+SEAL_RECORD_KIND = "mover_v3_seal_record"
+RUN_IDENTITY_KEYS = ("study_tree", "protocol_sha256", "runtime_lock_sha256")
+# review round 18 repair (L2): every way a damaged or partially written snapshot can fail to read: an unreadable path
+# (a directory, a bad gzip header), a truncated or corrupt gzip page, text that is not UTF-8 JSON, a line that is not
+# an object or lacks a field, an unhashable value, or nesting too deep to parse
+READ_ERRORS = (OSError, EOFError, ValueError, KeyError, IndexError, TypeError, AttributeError, RecursionError,
+               zlib.error)
 
 
 class SealError(Exception):
@@ -26,21 +46,150 @@ def normalized_sha256(parser: str, raw: bytes) -> str:
     return sha256_bytes(dumps(records.normalize_page(parser, raw)).encode("utf-8"))
 
 
+def checked_run_identity(run_identity: dict) -> dict:
+    """The running command's study tree, protocol sha256 and runtime-lock sha256, which a recoverable seal binds like
+    core.holdout.collect's identity (review round 18 repair, H1; core.runner.seal_run_identity builds it from the
+    context). Exactly those three keys, each a non-empty string, so no seal is written or adopted without them."""
+    if not isinstance(run_identity, dict) or sorted(run_identity) != sorted(RUN_IDENTITY_KEYS) or \
+            any(not isinstance(run_identity[k], str) or not run_identity[k] for k in RUN_IDENTITY_KEYS):
+        raise ValueError(f"a recoverable seal binds {', '.join(RUN_IDENTITY_KEYS)}, each a non-empty string")
+    return {k: run_identity[k] for k in RUN_IDENTITY_KEYS}
+
+
+def seal_record_of(store, ledger_sha256: str) -> dict:
+    """The seal record (review round 18 repair, G-H and L1): the ledger's sha256, the binding, every completion stamp
+    in ledger order as [key, attempt, status, page count], every page's sha256, and the attempt and page counts.
+    Store.write(seal_record=True) publishes it once; recover_seal reads the ledger under its ledger_sha256 and
+    requires the snapshot it reads to give this record back exactly."""
+    stamps, pages = [], []
+    for key in sorted(set(store.req) | set(store.state)):
+        for st in store.history.get(key, []) + ([store.state[key]] if key in store.state else []):
+            stamps.append([key, st["attempt"], st["status"], len(st["pages"])])
+            pages.extend(sha256_bytes(raw) for raw in st["pages"])
+    return {"kind": SEAL_RECORD_KIND, "ledger_sha256": ledger_sha256, "binding": store.binding, "stamps": stamps,
+            "attempts": len(stamps), "page_sha256s": pages, "pages": len(pages)}
+
+
+def _publish(directory: Path, name: str, data: bytes) -> None:
+    """canon.atomic_write_results's pattern: an exclusive temporary file, fsync, rename, then the directory's fsync,
+    so a file published first is durable before the next one is renamed into place."""
+    with (directory / f"{name}.tmp").open("xb") as f:
+        f.write(data)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(directory / f"{name}.tmp", directory / name)
+    fd = os.open(directory, os.O_RDONLY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def recover_seal(directory, identity: dict, what: str, extra: tuple = ()):
+    """core.holdout.collect's recover-if-matching pattern for a recoverable seal (count_only.dry_run and
+    transport_check.seal_live_samples; review round 18, R5, and its repairs). None when directory is unused: it does
+    not exist and its nearest existing ancestor is a directory, or it is an empty directory. The caller then fetches
+    and seals. Otherwise the sealed (store, sha256, binding), only when:
+      - the seal record exists and holds a sha256 of the ledger (64 lowercase hexadecimal characters; R2-1: a null
+        there would turn Store.read's comparison off), the ledger reads under that sha256, recorded at seal time,
+        never under a digest of the ledger being checked (G-H), and the snapshot read gives that record back exactly:
+        its binding, every completion stamp with its attempt, status and page count (L1), every page sha256 and the
+        counts;
+      - the binding holds exactly the identity and `extra` (each a non-empty string the caller reads back and never
+        matches, the dry run's utc_start; M1), and the identity equals `identity` apart from its request plan: the
+        running study tree, protocol and runtime lock (H1) and the caller's inputs;
+      - the bound request plan equals identity["requests"] (the plan-change check), and the ledger's request records
+        are exactly the requests the binding names (G-M), each with its completion stamps.
+    A directory with pages or a seal record but no ledger is partially written. Nor is any of these unused: a path
+    that exists and is not a directory (a regular file, a dangling symbolic link; R2-3), a path whose nearest existing
+    ancestor is not a directory, and a directory that holds anything else without a ledger (a stray ledger.jsonl.tmp
+    or seal.json.tmp, any other file; F1, the follow-up on R2-3). Every refusal made here is a SealError naming `what`
+    (L2), made before the caller can fetch; this function neither fetches nor writes."""
+    try:
+        return _recover_seal(Path(directory), identity, tuple(extra))
+    except SealError as exc:
+        raise SealError(f"{what}: {exc}") from exc
+    except READ_ERRORS as exc:
+        raise SealError(f"{what}: the snapshot is invalid or partially written ({type(exc).__name__}: {exc})") \
+            from exc
+
+
+def _nearest_existing(path: Path) -> Path:
+    """path, or its nearest ancestor that exists; a dangling symbolic link exists."""
+    while not os.path.lexists(path) and path != path.parent:
+        path = path.parent
+    return path
+
+
+def _recover_seal(d: Path, identity: dict, extra: tuple):
+    # review round 18, second repair (R2-3): a regular file or a dangling symbolic link at the snapshot path holds no
+    # ledger, pages or seal record, but it is not an unused directory; returning None for it made the caller fetch
+    # again before Store.write failed
+    if os.path.lexists(d) and not d.is_dir():
+        raise SealError("the snapshot path exists and is not a directory: it cannot be overwritten or fetched again")
+    if not (d / "ledger.jsonl").exists():
+        if (d / "pages").exists() or (d / SEAL_RECORD).exists():
+            raise SealError("the snapshot is partially written: it cannot be overwritten or fetched again")
+        # follow-up F1: without a ledger, pages or seal record the path is unused only if it is an empty directory, or
+        # is absent under a directory. Under a regular file or a dangling link, or beside a stray file (a
+        # ledger.jsonl.tmp, a seal.json.tmp, anything else), Store.write would fail after the fetch, or seal beside a
+        # file it did not write
+        if d.is_dir():
+            held = sorted(entry.name for entry in d.iterdir())
+            if held:
+                raise SealError(f"the snapshot directory is not empty and holds no ledger ({held[:5]}): it cannot be "
+                                "overwritten or fetched again")
+        elif not _nearest_existing(d.parent).is_dir():
+            raise SealError("the snapshot path lies under a path that is not a directory: nothing can be sealed there")
+        return None
+    if not (d / SEAL_RECORD).is_file():
+        raise SealError("the snapshot has no seal record, so it cannot be verified and is not adopted")
+    sealed = json.loads((d / SEAL_RECORD).read_bytes())
+    if not isinstance(sealed, dict) or sealed.get("kind") != SEAL_RECORD_KIND:
+        raise SealError("the seal record is invalid")
+    sha = sealed.get("ledger_sha256")      # the digest recorded at seal time, never one of the ledger being checked
+    # review round 18, second repair (R2-1): Store.read compares no digest when it is given None, and seal_record_of
+    # gives a null back, so a record without a sha256 would be adopted with its ledger unverified
+    if not isinstance(sha, str) or len(sha) != 64 or set(sha) - set("0123456789abcdef"):
+        raise SealError("the seal record holds no sha256 of its ledger (64 lowercase hexadecimal characters), so the "
+                        "ledger cannot be verified and is not adopted")
+    store = Store.read(d, sha)
+    # Store.read checked the ledger against that digest; the snapshot must also give back the rest of the record
+    if seal_record_of(store, sha) != sealed:
+        raise SealError("the snapshot differs from its seal record (binding, completion stamps, pages or counts)")
+    binding = store.binding if isinstance(store.binding, dict) else {}
+    bound = binding.get("identity")
+    if sorted(binding) != sorted(("identity",) + extra) or not isinstance(bound, dict) or \
+            any(not isinstance(binding[k], str) or not binding[k] for k in extra):
+        raise SealError("the snapshot binding is missing or malformed")
+    changed = sorted(k for k in set(bound) | set(identity) if k != "requests" and bound.get(k) != identity.get(k))
+    if changed:
+        raise SealError(f"the snapshot was sealed for another {', '.join(changed)}")
+    if bound.get("requests") != identity["requests"]:
+        raise SealError("the snapshot was sealed for another request plan")
+    if store.request_records() != bound["requests"] or set(store.state) != set(store.req):
+        raise SealError("the snapshot's requests or completion stamps differ from the requests its binding names")
+    return store, sha, binding
+
+
 class Store:
     def __init__(self):
         self.req = {}       # key -> request
-        self.state = {}     # key -> {"status", "pages": [bytes], "vintage", "attempt", "error"}
+        self.state = {}     # key -> {"status", "pages": [bytes], "vintage", "attempt", "error", "elapsed_seconds"}
         self.history = {}   # key -> earlier attempts (the ledger is append-only)
         self.page_norm = {}  # (key, attempt) -> sealed normalized sha256 per page (read from a ledger)
+        self.binding = None  # authorization and batch identity, when the caller supplies one
         self._cache = {}
 
     # ------------------------------------------------------------ writing
-    def put(self, req: dict, complete: bool, pages: list, vintage: str, attempt: int = 0, error=None):
+    def put(self, req: dict, complete: bool, pages: list, vintage: str, attempt: int = 0, error=None,
+            elapsed_seconds: float | None = None):
         self.req[req["key"]] = req
         if req["key"] in self.state:
             self.history.setdefault(req["key"], []).append(self.state[req["key"]])
         self.state[req["key"]] = {"status": "complete" if complete else "incomplete", "pages": list(pages),
-                                  "vintage": vintage, "attempt": attempt, "error": error}
+                                  "vintage": vintage, "attempt": attempt, "error": error,
+                                  "elapsed_seconds": elapsed_seconds}
         self._cache.pop(req["key"], None)
 
     # ------------------------------------------------------------ reading
@@ -104,12 +253,21 @@ class Store:
         return sorted(record(r) for r in self.req.values())
 
     # ------------------------------------------------------------ disk
-    def write(self, directory) -> str:
-        """Write the ledger and pages; returns the snapshot sha256 (the ledger's sha256; the ledger carries every
-        page's sha256)."""
+    def write(self, directory, *, binding: dict | None = None, seal_record: bool = False) -> str:
+        """Write once; publish the ledger only after all pages. Returns its sha256, which binds every page and
+        any supplied authorization identity. Existing sealed or partially written snapshots are never overwritten.
+        Publication follows canon.atomic_write_results's temporary-file, fsync, rename pattern. With seal_record
+        (a recoverable seal; review round 18 repair, G-H), the seal record (seal_record_of) is published once, before
+        the ledger, so every published recoverable ledger has the record that recover_seal verifies it against."""
         d = Path(directory)
-        (d / "pages").mkdir(parents=True, exist_ok=True)
-        lines = []
+        if (d / "ledger.jsonl").exists() or (d / SEAL_RECORD).exists():
+            raise SealError("snapshot ledger already exists: cannot overwrite a sealed snapshot")
+        try:
+            (d / "pages").mkdir(parents=True, exist_ok=False)
+        except FileExistsError as exc:
+            raise SealError("snapshot pages already exist: cannot overwrite a snapshot") from exc
+        self.binding = self.binding if binding is None else binding
+        lines = [dumps({"event": "snapshot", "binding": self.binding})] if self.binding is not None else []
         for key in sorted(self.req):
             req = self.req[key]
             lines.append(dumps({"event": "request", **json.loads(record(req))}))
@@ -117,8 +275,11 @@ class Store:
             for st in self.history.get(key, []) + [self.state[key]]:
                 lines.extend(self._attempt_lines(d, key, req, name, st))
         data = ("\n".join(lines) + "\n").encode("utf-8")
-        (d / "ledger.jsonl").write_bytes(data)
-        return sha256_bytes(data)
+        sha = sha256_bytes(data)
+        if seal_record:
+            _publish(d, SEAL_RECORD, (dumps(seal_record_of(self, sha)) + "\n").encode("utf-8"))
+        _publish(d, "ledger.jsonl", data)
+        return sha
 
     @staticmethod
     def _attempt_lines(d, key, req, name, st) -> list:
@@ -132,7 +293,8 @@ class Store:
                                 "asof": req["params"].get("asof"), "vintage": st["vintage"]}))
         lines.append(dumps({"event": "stamp_complete" if st["status"] == "complete" else "stamp_incomplete",
                             "key": key, "kind": req["kind"], "attempt": st["attempt"], "pages": len(st["pages"]),
-                            "asof": req["params"].get("asof"), "vintage": st["vintage"], "error": st["error"]}))
+                            "asof": req["params"].get("asof"), "vintage": st["vintage"], "error": st["error"],
+                            "elapsed_seconds": st.get("elapsed_seconds")}))
         return lines
 
     @classmethod
@@ -141,13 +303,17 @@ class Store:
         data = (d / "ledger.jsonl").read_bytes()
         if expected_sha256 is not None and sha256_bytes(data) != expected_sha256:
             raise SealError("snapshot ledger sha256 differs from the sealed value")
-        store, pages = cls(), {}
+        store, pages, stamped = cls(), {}, {}
         for line in data.decode("utf-8").splitlines():
             if not line.strip():
                 continue   # the ledger of a snapshot that sealed no new request (a later holdout count)
             rec = json.loads(line)
             ev = rec.pop("event")
-            if ev == "request":
+            if ev == "snapshot":
+                if store.binding is not None or store.req or not isinstance(rec.get("binding"), dict):
+                    raise SealError("invalid snapshot binding")
+                store.binding = rec["binding"]
+            elif ev == "request":
                 store.req[rec["key"]] = rec
             elif ev == "page":
                 raw = gzip.decompress((d / rec["file"]).read_bytes())
@@ -156,9 +322,21 @@ class Store:
                 pages.setdefault((rec["key"], rec["attempt"]), []).append(raw)
                 store.page_norm.setdefault((rec["key"], rec["attempt"]), []).append(rec.get("normalized_sha256"))
             else:
+                attempt = (rec["key"], rec["attempt"])
+                if attempt in stamped:
+                    raise SealError(f"{rec['key']} attempt {rec['attempt']}: a second completion stamp")
+                stamped[attempt] = rec["pages"]
                 if rec["key"] in store.state:
                     store.history.setdefault(rec["key"], []).append(store.state[rec["key"]])
                 store.state[rec["key"]] = {"status": "complete" if ev == "stamp_complete" else "incomplete",
                                            "pages": pages.get((rec["key"], rec["attempt"]), []),
-                                           "vintage": rec["vintage"], "attempt": rec["attempt"], "error": rec["error"]}
+                                           "vintage": rec["vintage"], "attempt": rec["attempt"], "error": rec["error"],
+                                           "elapsed_seconds": rec.get("elapsed_seconds")}
+        # review round 18 repair (G-H): every completion stamp's page count equals its attempt's page events, and every
+        # page event belongs to a stamped attempt (Store.write writes an attempt's pages, then its stamp)
+        for attempt in set(stamped) | set(pages):
+            count = stamped.get(attempt)
+            if type(count) is not int or count != len(pages.get(attempt, [])):
+                raise SealError(f"{attempt[0]} attempt {attempt[1]}: the completion stamp's page count differs from "
+                                "its page events")
         return store

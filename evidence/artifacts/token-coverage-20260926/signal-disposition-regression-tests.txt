@@ -1,0 +1,190 @@
+# --pinned-versions signal dispositions: discriminating control (2026-09-26)
+# Python 3.13.15; driver sha256 89ad09ae360886cb4be7233d4721a642053f20004463ae6d4ac105c85a83b6c5
+# first repair's scripts/adoption_status.py sha256 6ad15fb0d3889265c82669bac565e623dba449eae14ce29846cab158912ac3a6
+# fixed scripts/adoption_status.py sha256 3f530026ca977b1effe9f0cf0dc3e4c94ec12caf5b5d0b53b6802d2286e7c74d
+# this repair's tests/test_adoption_status.py sha256 73e497c8aeed8e95f7ef1daed92e9e552386f6343820a72957f75ca4c163301c
+# first repair's tests/test_adoption_status.py sha256 972006349a77442153e4c16d31595e527147a3ba4b439e13b0e807af765059a2
+
+# exit statuses, runs A to G: [1, 0, 0, 0, 1, 1, 0]
+
+===== Part 1: bash reference (the behaviour adoption/bootstrap-linux.sh gets from bash) =====
+# bash -c 'trap "echo EXIT trap ran" EXIT; sleep 2; echo "ran to the end"', sent the signal 0.5 s after it starts
+SIGTERM at its default: ended by the signal (returncode -15), printed: EXIT trap ran (2026-09-26T04:45:51Z to 2026-09-26T04:45:53Z)
+SIGHUP at its default: ended by the signal (returncode -1), printed: EXIT trap ran (2026-09-26T04:45:53Z to 2026-09-26T04:45:55Z)
+SIGTERM ignored on entry: exit 0, printed: ran to the end; EXIT trap ran (2026-09-26T04:45:55Z to 2026-09-26T04:45:57Z)
+SIGHUP ignored on entry: exit 0, printed: ran to the end; EXIT trap ran (2026-09-26T04:45:57Z to 2026-09-26T04:45:59Z)
+
+===== Part 2, run A: the first repair's script, this repair's tests =====
+# tree: <first-repair-tree>
+# runner: default; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# runner dispositions: SIGINT=default_int_handler, SIGTERM=SIG_DFL, SIGHUP=SIG_DFL
+# 2026-09-26T04:45:59Z to 2026-09-26T04:46:01Z, exit 1
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... 
+  test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) (signal='SIGTERM') ... FAIL
+  test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) (signal='SIGHUP') ... FAIL
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... FAIL
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... FAIL
+
+======================================================================
+FAIL: test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) (signal='SIGTERM')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<first-repair-tree>/tests/test_adoption_status.py", line 743, in test_a_signal_ignored_on_entry_leaves_the_check_running
+    self.assertIn(check.returncode, (0, 2), f"{signum.name}, ignored on entry, ended the check")
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 143 not found in (0, 2) : SIGTERM, ignored on entry, ended the check
+
+======================================================================
+FAIL: test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) (signal='SIGHUP')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<first-repair-tree>/tests/test_adoption_status.py", line 743, in test_a_signal_ignored_on_entry_leaves_the_check_running
+    self.assertIn(check.returncode, (0, 2), f"{signum.name}, ignored on entry, ended the check")
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 129 not found in (0, 2) : SIGHUP, ignored on entry, ended the check
+
+======================================================================
+FAIL: test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<first-repair-tree>/tests/test_adoption_status.py", line 797, in test_a_handler_installed_by_someone_else_is_left_in_place
+    self.assertIs(signal.getsignal(signum), theirs, signum.name)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: <function signals_interrupt_probes.<locals>.interrupt at 0x720628732b60> is not <function ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place.<locals>.theirs at 0x720628557a60> : SIGTERM
+
+======================================================================
+FAIL: test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<first-repair-tree>/tests/test_adoption_status.py", line 774, in test_an_ignored_signal_stays_ignored
+    self.assertEqual(signal.getsignal(signum), signal.SIG_IGN, signum.name)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: <function signals_interrupt_probes.<locals>.interrupt at 0x720628557a60> != <Handlers.SIG_IGN: 1> : SIGTERM
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.270s
+
+FAILED (failures=4)
+
+===== Part 2, run B: the fixed script, this repair's tests =====
+# tree: <fixed-tree>
+# runner: default; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# runner dispositions: SIGINT=default_int_handler, SIGTERM=SIG_DFL, SIGHUP=SIG_DFL
+# 2026-09-26T04:46:01Z to 2026-09-26T04:46:02Z, exit 0
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.342s
+
+OK
+
+===== Part 3, run C: the fixed script, this repair's tests, under nohup =====
+# tree: <fixed-tree>
+# runner: nohup; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# runner dispositions: SIGINT=default_int_handler, SIGTERM=SIG_DFL, SIGHUP=SIG_IGN
+# 2026-09-26T04:46:02Z to 2026-09-26T04:46:03Z, exit 0
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.314s
+
+OK
+
+===== Part 3, run D: the fixed script, this repair's tests, as a background job =====
+# tree: <fixed-tree>
+# runner: background; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# runner dispositions: SIGINT=SIG_IGN, SIGTERM=SIG_DFL, SIGHUP=SIG_DFL
+# 2026-09-26T04:46:04Z to 2026-09-26T04:46:05Z, exit 0
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.356s
+
+OK
+
+===== Part 3, run E: the fixed script, the first repair's test, under nohup =====
+# tree: <fixed-tree-first-tests>
+# runner: nohup; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group
+# runner dispositions: SIGINT=default_int_handler, SIGTERM=SIG_DFL, SIGHUP=SIG_IGN
+# 2026-09-26T04:46:05Z to 2026-09-26T04:46:25Z, exit 1
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... 
+  test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) (signal='SIGHUP') ... ERROR
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py:1140: ResourceWarning: subprocess 1840131 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+
+======================================================================
+ERROR: test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) (signal='SIGHUP')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<fixed-tree-first-tests>/tests/test_adoption_status.py", line 680, in test_an_interrupted_check_kills_the_running_probe_s_process_group
+    self.assertIn(check.wait(timeout=20), (-signum, 128 + signum))
+                  ~~~~~~~~~~^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py", line 1280, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py", line 2077, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['<python>', '<fixed-tree-first-tests>/scripts/adoption_status.py', '--manifest', '<tmpdir>/tmp4rns39_r/adoption/manifest.json', '--repo-root', '<tmpdir>/tmp4rns39_r', '--pinned-versions', '--json']' timed out after 20 seconds
+
+----------------------------------------------------------------------
+Ran 1 test in 20.402s
+
+FAILED (errors=1)
+
+===== Part 3, run F: the fixed script, the first repair's test, as a background job =====
+# tree: <fixed-tree-first-tests>
+# runner: background; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group
+# runner dispositions: SIGINT=SIG_IGN, SIGTERM=SIG_DFL, SIGHUP=SIG_DFL
+# 2026-09-26T04:46:26Z to 2026-09-26T04:46:46Z, exit 1
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... 
+  test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) (signal='SIGINT') ... ERROR
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py:1140: ResourceWarning: subprocess 1844632 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+
+======================================================================
+ERROR: test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) (signal='SIGINT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<fixed-tree-first-tests>/tests/test_adoption_status.py", line 680, in test_an_interrupted_check_kills_the_running_probe_s_process_group
+    self.assertIn(check.wait(timeout=20), (-signum, 128 + signum))
+                  ~~~~~~~~~~^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py", line 1280, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py", line 2077, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['<python>', '<fixed-tree-first-tests>/scripts/adoption_status.py', '--manifest', '<tmpdir>/tmp7afj8izv/adoption/manifest.json', '--repo-root', '<tmpdir>/tmp7afj8izv', '--pinned-versions', '--json']' timed out after 20 seconds
+
+----------------------------------------------------------------------
+Ran 1 test in 20.162s
+
+FAILED (errors=1)
+
+===== Part 3, run G: the first repair's script and test, under nohup =====
+# tree: <first-repair-tree-first-tests>
+# runner: nohup; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group
+# runner dispositions: SIGINT=default_int_handler, SIGTERM=SIG_DFL, SIGHUP=SIG_IGN
+# 2026-09-26T04:46:46Z to 2026-09-26T04:46:46Z, exit 0
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.456s
+
+OK
+

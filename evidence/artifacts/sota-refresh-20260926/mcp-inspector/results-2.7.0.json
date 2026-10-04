@@ -1,0 +1,433 @@
+{
+  "inspector_version": "2.7.0",
+  "marker_prefix": "mcpi-qual-",
+  "steps": [
+    {
+      "step": "A0-identity",
+      "pass": true,
+      "version": "2.7.0",
+      "launcher_sha256": "21ca6e6e031713e5ae040ecf71f8fd0b0ef9a4ece4131fd03d3b01aeae5415f4",
+      "note": "package.json version; the launcher has no version flag"
+    },
+    {
+      "step": "A1-qmd-init",
+      "argv": [
+        "~/.local/share/codex-ecosystem/tools/qmd-2.8.3/lib/node_modules/@tobilu/qmd/bin/qmd",
+        "init"
+      ],
+      "exit": 0,
+      "duration_s": 0.176,
+      "stdout_sha256": "6324be048c27f63ffbf28d86aedb6f4435433a1b5c94d3634cb327bc65415646",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "pass": true,
+      "note": "fixture preparation"
+    },
+    {
+      "step": "A1-qmd-collection-add",
+      "argv": [
+        "~/.local/share/codex-ecosystem/tools/qmd-2.8.3/lib/node_modules/@tobilu/qmd/bin/qmd",
+        "collection",
+        "add",
+        "<arm>/work/docs",
+        "--name",
+        "scratch"
+      ],
+      "exit": 0,
+      "duration_s": 0.185,
+      "stdout_sha256": "42ed9f4a3cf0c5ca84c8582cf7a5abafcd6e3ebf505647d92794743ca13bce3d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "pass": true,
+      "note": "fixture preparation"
+    },
+    {
+      "step": "A1-qmd-update",
+      "argv": [
+        "~/.local/share/codex-ecosystem/tools/qmd-2.8.3/lib/node_modules/@tobilu/qmd/bin/qmd",
+        "update"
+      ],
+      "exit": 0,
+      "duration_s": 0.197,
+      "stdout_sha256": "1a2afaeb62e4e27d51070213bcbe9e0a1fe333e5e46027df41843c51fed6bc43",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "pass": true,
+      "note": "fixture preparation"
+    },
+    {
+      "step": "A2-stdio-tools-list",
+      "argv": [
+        "<prefix>/bin/mcp-inspector",
+        "--cli",
+        "--config",
+        "<arm>/work/mcp.json",
+        "--server",
+        "qmd",
+        "--stored-auth-only",
+        "--cwd",
+        "<arm>/work",
+        "--method",
+        "tools/list",
+        "--format",
+        "json"
+      ],
+      "exit": 0,
+      "duration_s": 0.534,
+      "stdout_sha256": "f1d25b8d6121a580bede93137a9d78f10d1b2c770b52148712eafdacfe77ac9a",
+      "stderr_sha256": "730be0b0dc77d385cc320688c95ecbaec7e19e4b2bac42c8356f924f627bb9c5",
+      "tool_names": [
+        "get",
+        "multi_get",
+        "query",
+        "status"
+      ],
+      "pass": true,
+      "note": "tools ['get', 'multi_get', 'query', 'status']"
+    },
+    {
+      "step": "A3-stdio-tools-call-query",
+      "argv": [
+        "<prefix>/bin/mcp-inspector",
+        "--cli",
+        "--config",
+        "<arm>/work/mcp.json",
+        "--server",
+        "qmd",
+        "--stored-auth-only",
+        "--cwd",
+        "<arm>/work",
+        "--method",
+        "tools/call",
+        "--tool-name",
+        "query",
+        "--tool-args-json",
+        "{\"searches\": [{\"type\": \"lex\", \"query\": \"mcpi-qual-27c11a985f91\"}], \"limit\": 5, \"collections\": [\"scratch\"], \"rerank\": false}",
+        "--format",
+        "json"
+      ],
+      "exit": 0,
+      "duration_s": 0.545,
+      "stdout_sha256": "de5935203aaa1343de20cff44210986cccfd086ffd467ad6da4e8f44e616159d",
+      "stderr_sha256": "730be0b0dc77d385cc320688c95ecbaec7e19e4b2bac42c8356f924f627bb9c5",
+      "hits": [
+        {
+          "file": "scratch/note.md",
+          "score": 1
+        }
+      ],
+      "pass": true,
+      "note": "hits [{'file': 'scratch/note.md', 'score': 1}]"
+    },
+    {
+      "step": "A4-stdio-unknown-tool",
+      "argv": [
+        "<prefix>/bin/mcp-inspector",
+        "--cli",
+        "--config",
+        "<arm>/work/mcp.json",
+        "--server",
+        "qmd",
+        "--stored-auth-only",
+        "--cwd",
+        "<arm>/work",
+        "--method",
+        "tools/call",
+        "--tool-name",
+        "does_not_exist_probe",
+        "--tool-args-json",
+        "{}",
+        "--format",
+        "json"
+      ],
+      "exit": 5,
+      "duration_s": 0.533,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "08cf9a6318e009127753513a48429b4c137ab78e44a6d4d8e13c160c10b4ac74",
+      "error_code": "tool_not_found",
+      "pass": true,
+      "note": "exit 5 code tool_not_found"
+    },
+    {
+      "step": "A5-stdio-resources-list",
+      "argv": [
+        "<prefix>/bin/mcp-inspector",
+        "--cli",
+        "--config",
+        "<arm>/work/mcp.json",
+        "--server",
+        "qmd",
+        "--stored-auth-only",
+        "--cwd",
+        "<arm>/work",
+        "--method",
+        "resources/list",
+        "--format",
+        "json"
+      ],
+      "exit": 0,
+      "duration_s": 0.537,
+      "stdout_sha256": "ddfd5165fc6736ee4f7ee65055546fde9b2517ff48eaeb0f8d3bd2bf83c06b69",
+      "stderr_sha256": "730be0b0dc77d385cc320688c95ecbaec7e19e4b2bac42c8356f924f627bb9c5",
+      "result_keys": [
+        "resources"
+      ],
+      "counts": {
+        "resources": 0
+      },
+      "pass": true,
+      "note": "counts {'resources': 0}"
+    },
+    {
+      "step": "A5-stdio-prompts-list",
+      "argv": [
+        "<prefix>/bin/mcp-inspector",
+        "--cli",
+        "--config",
+        "<arm>/work/mcp.json",
+        "--server",
+        "qmd",
+        "--stored-auth-only",
+        "--cwd",
+        "<arm>/work",
+        "--method",
+        "prompts/list",
+        "--format",
+        "json"
+      ],
+      "exit": 0,
+      "duration_s": 0.534,
+      "stdout_sha256": "bd9231f2f8c01ddf6159ee511246c9ddb96191f2f66621f4e8b0c1a7ae153d57",
+      "stderr_sha256": "730be0b0dc77d385cc320688c95ecbaec7e19e4b2bac42c8356f924f627bb9c5",
+      "result_keys": [
+        "prompts"
+      ],
+      "counts": {
+        "prompts": 0
+      },
+      "pass": true,
+      "note": "counts {'prompts': 0}"
+    },
+    {
+      "step": "A6-stdio-tools-list-strict",
+      "argv": [
+        "<prefix>/bin/mcp-inspector",
+        "--cli",
+        "--config",
+        "<arm>/work/mcp.json",
+        "--server",
+        "qmd",
+        "--stored-auth-only",
+        "--cwd",
+        "<arm>/work",
+        "--method",
+        "tools/list",
+        "--format",
+        "json",
+        "--strict"
+      ],
+      "exit": 0,
+      "duration_s": 0.55,
+      "stdout_sha256": "f1d25b8d6121a580bede93137a9d78f10d1b2c770b52148712eafdacfe77ac9a",
+      "stderr_sha256": "730be0b0dc77d385cc320688c95ecbaec7e19e4b2bac42c8356f924f627bb9c5",
+      "stderr_tail": "Shutting down (stdin closed)...\n",
+      "pass": true,
+      "note": "exit 0 (0 clean, 6 error-severity portability findings)"
+    },
+    {
+      "step": "A7-qmd-http-server-start",
+      "pass": true,
+      "note": "qmd mcp --http --port 18181 ready=True"
+    },
+    {
+      "step": "A7-http-default-tools-list",
+      "argv": [
+        "<prefix>/bin/mcp-inspector",
+        "--cli",
+        "http://localhost:18181/mcp",
+        "--transport",
+        "http",
+        "--stored-auth-only",
+        "--method",
+        "tools/list",
+        "--format",
+        "json"
+      ],
+      "exit": 0,
+      "duration_s": 0.357,
+      "stdout_sha256": "f1d25b8d6121a580bede93137a9d78f10d1b2c770b52148712eafdacfe77ac9a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tool_names": [
+        "get",
+        "multi_get",
+        "query",
+        "status"
+      ],
+      "pass": true,
+      "note": "era default tools ['get', 'multi_get', 'query', 'status']"
+    },
+    {
+      "step": "A7-http-default-tools-call-query",
+      "argv": [
+        "<prefix>/bin/mcp-inspector",
+        "--cli",
+        "http://localhost:18181/mcp",
+        "--transport",
+        "http",
+        "--stored-auth-only",
+        "--method",
+        "tools/call",
+        "--tool-name",
+        "query",
+        "--tool-args-json",
+        "{\"searches\": [{\"type\": \"lex\", \"query\": \"mcpi-qual-27c11a985f91\"}], \"limit\": 5, \"collections\": [\"scratch\"], \"rerank\": false}",
+        "--format",
+        "json"
+      ],
+      "exit": 0,
+      "duration_s": 0.315,
+      "stdout_sha256": "de5935203aaa1343de20cff44210986cccfd086ffd467ad6da4e8f44e616159d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hits": [
+        {
+          "file": "scratch/note.md",
+          "score": 1
+        }
+      ],
+      "pass": true,
+      "note": "era default hits [{'file': 'scratch/note.md', 'score': 1}]"
+    },
+    {
+      "step": "A7-http-auto-tools-list",
+      "argv": [
+        "<prefix>/bin/mcp-inspector",
+        "--cli",
+        "http://localhost:18181/mcp",
+        "--transport",
+        "http",
+        "--stored-auth-only",
+        "--protocol-era",
+        "auto",
+        "--method",
+        "tools/list",
+        "--format",
+        "json"
+      ],
+      "exit": 0,
+      "duration_s": 60.356,
+      "stdout_sha256": "4f7d200b2df97e21bf76e4377a6787091115dd12fbfac6d8d5410d84caeeb803",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tool_names": [
+        "get",
+        "multi_get",
+        "query",
+        "status"
+      ],
+      "pass": true,
+      "note": "era auto tools ['get', 'multi_get', 'query', 'status']"
+    },
+    {
+      "step": "A7-http-auto-tools-call-query",
+      "argv": [
+        "<prefix>/bin/mcp-inspector",
+        "--cli",
+        "http://localhost:18181/mcp",
+        "--transport",
+        "http",
+        "--stored-auth-only",
+        "--protocol-era",
+        "auto",
+        "--method",
+        "tools/call",
+        "--tool-name",
+        "query",
+        "--tool-args-json",
+        "{\"searches\": [{\"type\": \"lex\", \"query\": \"mcpi-qual-27c11a985f91\"}], \"limit\": 5, \"collections\": [\"scratch\"], \"rerank\": false}",
+        "--format",
+        "json"
+      ],
+      "exit": 0,
+      "duration_s": 60.398,
+      "stdout_sha256": "4be8e67e3ea73d05eb50f2f0951e76700f4281ceb2021eb6533138ae2810865d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hits": [
+        {
+          "file": "scratch/note.md",
+          "score": 1
+        }
+      ],
+      "pass": true,
+      "note": "era auto hits [{'file': 'scratch/note.md', 'score': 1}]"
+    },
+    {
+      "step": "A8-web-auth-unset",
+      "DANGEROUSLY_OMIT_AUTH": null,
+      "banner_up": true,
+      "auth_line": "Auth token: <redacted>",
+      "opening_browser_line": false,
+      "api_config_no_header": 401,
+      "api_config_scratch_token": 200,
+      "api_config_wrong_token": 401,
+      "duration_s": 0.67,
+      "log_sha256": "aa658ba3845a5b8dd0b87b9ab73f876af37b00087c4e5a335395aacd6834c2d4",
+      "gate": "on"
+    },
+    {
+      "step": "A8-web-auth-false",
+      "DANGEROUSLY_OMIT_AUTH": "false",
+      "banner_up": true,
+      "auth_line": "Auth: disabled (DANGEROUSLY_OMIT_AUTH)",
+      "opening_browser_line": false,
+      "api_config_no_header": 200,
+      "api_config_scratch_token": 200,
+      "api_config_wrong_token": 200,
+      "duration_s": 0.663,
+      "log_sha256": "d4c9e154f20e69d1e8ff3a0d3db3865fac06f6cc79f70f96b3b2898f647e1243",
+      "gate": "off"
+    },
+    {
+      "step": "A8-web-auth-0",
+      "DANGEROUSLY_OMIT_AUTH": "0",
+      "banner_up": true,
+      "auth_line": "Auth: disabled (DANGEROUSLY_OMIT_AUTH)",
+      "opening_browser_line": false,
+      "api_config_no_header": 200,
+      "api_config_scratch_token": 200,
+      "api_config_wrong_token": 200,
+      "duration_s": 0.633,
+      "log_sha256": "d4c9e154f20e69d1e8ff3a0d3db3865fac06f6cc79f70f96b3b2898f647e1243",
+      "gate": "off"
+    },
+    {
+      "step": "A8-web-auth-yes",
+      "DANGEROUSLY_OMIT_AUTH": "yes",
+      "banner_up": true,
+      "auth_line": "Auth: disabled (DANGEROUSLY_OMIT_AUTH)",
+      "opening_browser_line": false,
+      "api_config_no_header": 200,
+      "api_config_scratch_token": 200,
+      "api_config_wrong_token": 200,
+      "duration_s": 0.428,
+      "log_sha256": "d4c9e154f20e69d1e8ff3a0d3db3865fac06f6cc79f70f96b3b2898f647e1243",
+      "gate": "off"
+    },
+    {
+      "step": "A8-web-auth-true",
+      "DANGEROUSLY_OMIT_AUTH": "true",
+      "banner_up": true,
+      "auth_line": "Auth: disabled (DANGEROUSLY_OMIT_AUTH)",
+      "opening_browser_line": false,
+      "api_config_no_header": 200,
+      "api_config_scratch_token": 200,
+      "api_config_wrong_token": 200,
+      "duration_s": 0.646,
+      "log_sha256": "d4c9e154f20e69d1e8ff3a0d3db3865fac06f6cc79f70f96b3b2898f647e1243",
+      "gate": "off"
+    }
+  ],
+  "gated_pass": true,
+  "web_auth_gate": {
+    "unset": "on",
+    "false": "off",
+    "0": "off",
+    "yes": "off",
+    "true": "off"
+  }
+}

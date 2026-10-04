@@ -1,0 +1,19 @@
+# SHA-256 and record/line counts only -- never raw content (real prompts, commands, paths, ids).
+# Source: u6/raw/prove-20260926T234742Z/ (the 2026-09-26T23:47:42Z-23:49:21Z live host proof).
+
+1b59bd7391cb0fb7e9780d0088660ad06e9438a5780e750836dfae864a94806d  forbidden.txt
+f3b6951730865477b3ce8da8751cc86704bf80a40d5c59b4d537cb3621237da8  claude-result.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  claude-stderr.txt
+a192edc9c23927e97369f691e34ca22d0b25b4da2a05fe0c28f9b9cb1130889c  codex-exec.jsonl
+1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721  codex-stderr.txt
+0be20d7b5f630f18b346b0ab85ec9df6f112f25a859db16902c5bf2c0c710e51  deployed-dashboard.json
+e64884f36c6e9b5afd8ae6e2e88ed7211b49fda54ec09cd72ce44573b61399f0  settings-flags.txt
+4d23cfad2490a75018703cefafaf51da36679fc112909b3080e907265f353086  dashboard-compare.txt
+34aa552b8bc5a7ceb3693d299e3408040f8ed6f09e2222a6f3019a4823ac779f  panels.txt
+
+forbidden.txt: 25 lines (the run's own forbidden-string list; see checker-fix/ for the fix)
+claude-result.json: 103534 bytes (claude -p --output-format json transcript; real prompt/output, not committed raw)
+claude-stderr.txt: 0 bytes (empty)
+codex-exec.jsonl: 7947 bytes (codex exec --json transcript; real prompt/output, not committed raw)
+codex-stderr.txt: 39 bytes
+deployed-dashboard.json: 28862 bytes (the live Grafana dashboard JSON at proof time; not sensitive, but reproduces observability/backends/templates/ecosystem-dashboard.json.example verbatim so it is not duplicated here)

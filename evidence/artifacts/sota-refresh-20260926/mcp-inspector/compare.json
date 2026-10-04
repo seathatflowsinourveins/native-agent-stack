@@ -1,0 +1,496 @@
+{
+  "summary": {
+    "gated_pass": {
+      "2.7.0": true,
+      "2.8.0": true
+    },
+    "gated_steps": {
+      "2.7.0": 15,
+      "2.8.0": 15
+    },
+    "gated_steps_passed": {
+      "2.7.0": 15,
+      "2.8.0": 15
+    },
+    "web_auth_gate": {
+      "2.7.0": {
+        "unset": "on",
+        "false": "off",
+        "0": "off",
+        "yes": "off",
+        "true": "off"
+      },
+      "2.8.0": {
+        "unset": "on",
+        "false": "on",
+        "0": "on",
+        "yes": "on",
+        "true": "off"
+      }
+    },
+    "steps_with_differences": [
+      "A8-web-auth-false",
+      "A8-web-auth-0",
+      "A8-web-auth-yes"
+    ]
+  },
+  "rows": [
+    {
+      "step": "A0-identity",
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "differs_in": []
+    },
+    {
+      "step": "A1-qmd-init",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "stdout_identical": true,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A1-qmd-collection-add",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "stdout_identical": false,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A1-qmd-update",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "stdout_identical": false,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A2-stdio-tools-list",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "tool_names": {
+        "2.7.0": [
+          "get",
+          "multi_get",
+          "query",
+          "status"
+        ],
+        "2.8.0": [
+          "get",
+          "multi_get",
+          "query",
+          "status"
+        ]
+      },
+      "stdout_identical": true,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A3-stdio-tools-call-query",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "hits": {
+        "2.7.0": [
+          {
+            "file": "scratch/note.md",
+            "score": 1
+          }
+        ],
+        "2.8.0": [
+          {
+            "file": "scratch/note.md",
+            "score": 1
+          }
+        ]
+      },
+      "stdout_identical": false,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A4-stdio-unknown-tool",
+      "exit": {
+        "2.7.0": 5,
+        "2.8.0": 5
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "error_code": {
+        "2.7.0": "tool_not_found",
+        "2.8.0": "tool_not_found"
+      },
+      "stdout_identical": true,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A5-stdio-resources-list",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "counts": {
+        "2.7.0": {
+          "resources": 0
+        },
+        "2.8.0": {
+          "resources": 0
+        }
+      },
+      "stdout_identical": true,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A5-stdio-prompts-list",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "counts": {
+        "2.7.0": {
+          "prompts": 0
+        },
+        "2.8.0": {
+          "prompts": 0
+        }
+      },
+      "stdout_identical": true,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A6-stdio-tools-list-strict",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "stdout_identical": true,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A7-qmd-http-server-start",
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "differs_in": []
+    },
+    {
+      "step": "A7-http-default-tools-list",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "tool_names": {
+        "2.7.0": [
+          "get",
+          "multi_get",
+          "query",
+          "status"
+        ],
+        "2.8.0": [
+          "get",
+          "multi_get",
+          "query",
+          "status"
+        ]
+      },
+      "stdout_identical": true,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A7-http-default-tools-call-query",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "hits": {
+        "2.7.0": [
+          {
+            "file": "scratch/note.md",
+            "score": 1
+          }
+        ],
+        "2.8.0": [
+          {
+            "file": "scratch/note.md",
+            "score": 1
+          }
+        ]
+      },
+      "stdout_identical": false,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A7-http-auto-tools-list",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "tool_names": {
+        "2.7.0": [
+          "get",
+          "multi_get",
+          "query",
+          "status"
+        ],
+        "2.8.0": [
+          "get",
+          "multi_get",
+          "query",
+          "status"
+        ]
+      },
+      "stdout_identical": true,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A7-http-auto-tools-call-query",
+      "exit": {
+        "2.7.0": 0,
+        "2.8.0": 0
+      },
+      "pass": {
+        "2.7.0": true,
+        "2.8.0": true
+      },
+      "hits": {
+        "2.7.0": [
+          {
+            "file": "scratch/note.md",
+            "score": 1
+          }
+        ],
+        "2.8.0": [
+          {
+            "file": "scratch/note.md",
+            "score": 1
+          }
+        ]
+      },
+      "stdout_identical": false,
+      "stderr_identical": true,
+      "differs_in": []
+    },
+    {
+      "step": "A8-web-auth-unset",
+      "gate": {
+        "2.7.0": "on",
+        "2.8.0": "on"
+      },
+      "auth_line": {
+        "2.7.0": "Auth token: <redacted>",
+        "2.8.0": "Auth token: <redacted>"
+      },
+      "api_config_no_header": {
+        "2.7.0": 401,
+        "2.8.0": 401
+      },
+      "api_config_wrong_token": {
+        "2.7.0": 401,
+        "2.8.0": 401
+      },
+      "api_config_scratch_token": {
+        "2.7.0": 200,
+        "2.8.0": 200
+      },
+      "opening_browser_line": {
+        "2.7.0": false,
+        "2.8.0": false
+      },
+      "differs_in": []
+    },
+    {
+      "step": "A8-web-auth-false",
+      "gate": {
+        "2.7.0": "off",
+        "2.8.0": "on"
+      },
+      "auth_line": {
+        "2.7.0": "Auth: disabled (DANGEROUSLY_OMIT_AUTH)",
+        "2.8.0": "Auth token: <redacted>"
+      },
+      "api_config_no_header": {
+        "2.7.0": 200,
+        "2.8.0": 401
+      },
+      "api_config_wrong_token": {
+        "2.7.0": 200,
+        "2.8.0": 401
+      },
+      "api_config_scratch_token": {
+        "2.7.0": 200,
+        "2.8.0": 200
+      },
+      "opening_browser_line": {
+        "2.7.0": false,
+        "2.8.0": false
+      },
+      "differs_in": [
+        "gate",
+        "auth_line",
+        "api_config_no_header",
+        "api_config_wrong_token"
+      ]
+    },
+    {
+      "step": "A8-web-auth-0",
+      "gate": {
+        "2.7.0": "off",
+        "2.8.0": "on"
+      },
+      "auth_line": {
+        "2.7.0": "Auth: disabled (DANGEROUSLY_OMIT_AUTH)",
+        "2.8.0": "Auth token: <redacted>"
+      },
+      "api_config_no_header": {
+        "2.7.0": 200,
+        "2.8.0": 401
+      },
+      "api_config_wrong_token": {
+        "2.7.0": 200,
+        "2.8.0": 401
+      },
+      "api_config_scratch_token": {
+        "2.7.0": 200,
+        "2.8.0": 200
+      },
+      "opening_browser_line": {
+        "2.7.0": false,
+        "2.8.0": false
+      },
+      "differs_in": [
+        "gate",
+        "auth_line",
+        "api_config_no_header",
+        "api_config_wrong_token"
+      ]
+    },
+    {
+      "step": "A8-web-auth-yes",
+      "gate": {
+        "2.7.0": "off",
+        "2.8.0": "on"
+      },
+      "auth_line": {
+        "2.7.0": "Auth: disabled (DANGEROUSLY_OMIT_AUTH)",
+        "2.8.0": "Auth token: <redacted>"
+      },
+      "api_config_no_header": {
+        "2.7.0": 200,
+        "2.8.0": 401
+      },
+      "api_config_wrong_token": {
+        "2.7.0": 200,
+        "2.8.0": 401
+      },
+      "api_config_scratch_token": {
+        "2.7.0": 200,
+        "2.8.0": 200
+      },
+      "opening_browser_line": {
+        "2.7.0": false,
+        "2.8.0": false
+      },
+      "differs_in": [
+        "gate",
+        "auth_line",
+        "api_config_no_header",
+        "api_config_wrong_token"
+      ]
+    },
+    {
+      "step": "A8-web-auth-true",
+      "gate": {
+        "2.7.0": "off",
+        "2.8.0": "off"
+      },
+      "auth_line": {
+        "2.7.0": "Auth: disabled (DANGEROUSLY_OMIT_AUTH)",
+        "2.8.0": "Auth: disabled (DANGEROUSLY_OMIT_AUTH)"
+      },
+      "api_config_no_header": {
+        "2.7.0": 200,
+        "2.8.0": 200
+      },
+      "api_config_wrong_token": {
+        "2.7.0": 200,
+        "2.8.0": 200
+      },
+      "api_config_scratch_token": {
+        "2.7.0": 200,
+        "2.8.0": 200
+      },
+      "opening_browser_line": {
+        "2.7.0": false,
+        "2.8.0": false
+      },
+      "differs_in": []
+    }
+  ]
+}

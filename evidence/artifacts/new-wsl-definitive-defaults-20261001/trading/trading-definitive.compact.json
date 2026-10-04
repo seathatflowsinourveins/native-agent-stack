@@ -1,0 +1,1581 @@
+{
+ "schema_version": 1,
+ "catalog": "us-equities",
+ "date_utc": "2026-10-01",
+ "owner": "trading lane (native-agent-stack-ae)",
+ "rule": "Every tool has exactly one owning layer, the layer whose requirement names its primary job; any other layer lists it under 'uses'. Two different tools that do the same job become one comparison owned by one layer. Two tools whose roles differ both stay, each with its role stated.",
+ "trading_rule": "The 12 us-equities layers own only trading-specific capabilities; shared infrastructure (agents, memory, scheduling, observability, storage tooling, CI, evaluation, secrets) is used from the owning foundation layer, not selected again (evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json, accepted by the trading lane owner 2026-10-01). Requirements the user pinned are not judged: the NautilusTrader destination with its IBKR path, and the separate Alpaca adapter path.",
+ "decision_rule": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name (preregistered, round2/preregistration.json)",
+ "no_install_rule": "an option that installs nothing extra is the default unless a measured gain excludes zero",
+ "definitive_now": "none: the Claude family has returned for every judged slot, and the GPT family has not; every slot's 'definitive' stays false until its GPT returns agree",
+ "not_claimed": "no candidate is installed or measured by these rounds; a default decided on documented fit says so",
+ "counts": {
+  "judged_slots": 13,
+  "decisions": 14,
+  "default_rows": 15,
+  "explained": "13 trading-specific slots were judged. analytical-storage has two roles (engine, decided in the first round; snapshot-table-layer, decided in the decision round), so 14 decisions. strategy-qualification-statistics names two tools in two roles (arch, purgedcv), so 15 default rows. Pinned requirements: 3. No blind default today: 2."
+ },
+ "blindness": {
+  "checked": "what the Claude deciders could see, checked on 2026-10-01 after the reviewers of #591 raised it",
+  "packets": "no current-use wording in the 13 first-round packets (grep for today, currently, in use, installed, incumbent, adopted, of record: 0 hits). In the round-two packets the only hit is the Alpaca finalist's 'already installed for the selected broker path', a fact of the user-pinned broker path given for the preregistered no-install rule.",
+  "agent_definitions": "the stack-researcher definition and the SubagentStart token-lanes block name none of the trading candidates (grep on origin/main 85543efe)",
+  "project_instructions": "AGENTS.md, which every Claude agent loads through CLAUDE.md, names NautilusTrader, Alpaca and LEAN ('dated LEAN/Alpaca receipts remain comparison evidence')",
+  "web": "the repository is public, and the deciders had web and GitHub access; the prompts forbade local files, not the web, so reading the lane's record that way is not excluded",
+  "consequence": "nine of the fifteen defaults coincide with the lane's record, and for these freedom from current-use influence is not shown (each slot's lane_record). Six do not coincide: Pointblank (the record names pandera), Qlib, the Dockerized IB Gateway, fincore, arch and purgedcv. The GPT family's agreement is the stronger independence check where its runs load no project document (project_doc_max_bytes=0, as in the foundation round's runner)."
+ },
+ "decision_stages": {
+  "first_round": "one blind judge and one adversarial critic (#589 merit method), a single finalist upheld by the critic; the same stage as the foundation's first-round rows",
+  "decision_round": "two blind deciders with the finalists in seeded orders, then one critic (definitive-defaults method), for slots the first round left contested"
+ },
+ "sources": {
+  "ownership": {
+   "path": "trading-ownership.json",
+   "sha256": "4424d1abb1208518fb27ecec6219bec7f101b25b4d01f4b8d4c3e0ea0e76cf57"
+  },
+  "round1": {
+   "run": "wf_4d2dd504-4a2",
+   "returns": "round1/claude-returns.json",
+   "sha256": "533ea4e25be69ff3fb280cc8b2bf543fa45a650ee66b2515db705a3bd176b4c6",
+   "preregistration_sha256": "de0192442f8317fa97f185974109e1a8835fc5122154f3c77ab4dbd33f00fef4"
+  },
+  "round2": {
+   "run": "wf_01bd02cf-b21",
+   "returns": "round2/claude-returns.json",
+   "sha256": "806218569040f345231a603391a4c65d30e58c4eb517c1a9eb7f27877dcc103d",
+   "preregistration_sha256": "e965175236e0601065c6572e205eaa30671752621e260eca4fe5873bceb69fa5"
+  }
+ },
+ "path_placeholder": "<definitive-20261001>/ is the trading lane's decision directory (packets, preregistrations, returns); its files travel with this document",
+ "kind": "layer-ownership-with-definitive-defaults (compact view of trading-definitive.json)",
+ "layers": [
+  {
+   "layer_id": "market-data-reference",
+   "owns": [
+    "slot market-data-provider (judged): licensed historical and current US-equity bars, trades, quotes and corporate actions for research",
+    "slot sec-filings (judged): SEC EDGAR filing acquisition and parsing",
+    "slot exchange-calendars (judged): exchange session calendars and half days"
+   ],
+   "uses": [
+    "alpaca-py (execution-broker) where the Alpaca market-data API is used",
+    "DuckDB with Parquet (storage-compute) for snapshots",
+    "pandera (data-quality-orchestration) for validation"
+   ],
+   "slots": [
+    {
+     "slot_id": "market-data-provider",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "decision_round",
+     "lane_record": {
+      "coincides": true,
+      "record_component": "alpaca-py",
+      "note": "freedom from current-use influence is not shown; pinned broker path; the default follows from the preregistered no-install rule"
+     },
+     "default": {
+      "name": "Alpaca market data through alpaca-py (already installed for the selected broker path)",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "install_command": "No extra install on the target host: the packet states alpaca-py is already installed for the broker path. On a host without it, the upstream command is: pip install alpaca-py (Python 3.10+).",
+      "installs_nothing_extra": true
+     },
+     "alternatives": [
+      {
+       "name": "Databento (databento-python)",
+       "reason": "Databento leads on criterion 1 documented fit: DBN batch files, nanosecond ts_event/ts_recv, publisher_id venue identity, venue sequence, point-in-time corporate actions and adjustment factors. It is current (v0.87.0, 2026-09-22, main CI passing) and has Linux x86_64 and macOS arm64 wheels. However, it requires an extra install, and no like-for-like measurement shows it ahead of Alpaca on the requ"
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://github.com/alpacahq/alpaca-py/blob/master/README.md",
+       "shows": "F1 installs nothing extra beyond the broker path. The packet marks F1 installs_nothing_extra=true; this lane did not inspect the host. Observed in the alpaca-py README at master c85707ba0a38: line 135 lists StockHistoricalDataClient and StockDataStream among the Market Data API clients. Line 141 say",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://docs.alpaca.markets/us/docs/about-market-data-api.md",
+       "shows": "Documented: the Alpaca Market Data docs (.md, updatedAt 2026-07-16T15:53:31Z) name alpaca-py as the Python SDK for the Market Data API. The plans table gives Basic as Free with real-time IEX, historical data 'Since 2016' and the limitation 'latest 15 minutes'. Algo Trader Plus is $99/month with 'All",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "<definitive-20261001>/round2/packets/market-data-provider.order-1.json",
+       "shows": "No like-for-like measured evidence exists. The packet's comparisons_on_record_where_every_named_arm_ran is []. Two web searches on 2026-10-01 found no benchmark of completeness, timestamp alignment, adjustment correctness or byte-identical re-download that covers both finalists.",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://concretumgroup.com/backtesting-data-quality-can-your-data-provider-be-trusted/",
+       "shows": "One independent comparison was found: Concretum Group, 'Backtesting Data Quality: Can Your Data Provider Be Trusted?'. No explicit date appears in the retrieved text; the figure path is uploads/2026/04 and the caption reads '2016–2026'. Its metric is the ORB strategy's backtest performance. It adds ",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/alpacahq/alpaca-py/tree/master/alpaca/data",
+       "shows": "Observed in alpaca-py at master c85707ba0a38: the DataFeed enum has iex, sip, delayed_sip, otc, boats and overnight. The Adjustment enum has raw, split, dividend and all. StockBarsRequest has feed, adjustment and asof; the trades and quotes requests have feed and asof. Trade has timestamp (datetime)",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://docs.alpaca.markets/us/docs/historical-stock-data-1",
+       "shows": "Documented on the Alpaca historical stock data page: 'You can use the feed parameter on all the stock endpoints to switch between them'. iex 'is the only feed that can be used without a subscription'. sip 'covers all US exchanges' as consolidated by the UTP (Nasdaq) and CTA (NYSE) SIPs.",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/databento/databento-python/blob/main/README.md",
+       "shows": "Documented fit for F2, observed at main 25eef4ee8e66. The README lists live and historical data and the MBO/MBP/top-of-book/OHLCV/last-sale schemas. It describes point-in-time definitions 'free of look-ahead bias and retroactive adjustments', the DBN file format, batch download of flat files, and 'p",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://api.github.com/repos/databento/databento-python/releases/latest ; https://api.github.com/repos/alpacahq/alpaca-py/releases/latest",
+       "shows": "Currency and maintenance (observed 2026-10-01). databento-python: v0.87.0 published 2026-09-22T20:24:37Z, main head 2026-09-22T20:21:00Z, 'test' workflow succeeded on the main push 2026-09-22T20:21:03Z, not archived, open_issues 0 with the tracker enabled. alpaca-py: v0.44.0 published 2026-08-11T10:",
+       "from": "round-two decider, order 1"
+      }
+     ],
+     "evidence_items_in_full_file": 45,
+     "overturn_check": "Run one comparison on a throwaway WSL2 Ubuntu x86_64 instance.\n\n1. Freeze the plan before any pull: one liquid US stock and one US stock with both a split and an ex-dividend date in the same past calendar month. Confirm the dates from issuer or exchange notices.\n2. From each arm, pull daily and 1-minute bars plus the splits and cash dividends twice, at least 24 h apart.\n   - Alpaca arm: alpaca-py StockHistoricalDataClient(raw_data=True) with feed=sip, at adjustment=raw and at adjustment=all, plus CorporateActionsClient.\n   - Databento arm: databento-python Historical ohlcv-1d and ohlcv-1m from a consolidated or full-venue US-equities dataset (not US Equities Mini alone), plus Reference corporate_actions.get_range and adjustment_factors.get_range.\n3. Score both arms against an independent reference:\n   - exchange official daily OHLCV for daily bars;\n   - for 1-minute bars, bars rebuilt from an independent consolidated trade record under one documented bar-boundary convention;\n   - issuer or exchange split and dividend notices for corporate actions.\n4. Count a symbol-day as an error if any of these occurs:\n   - a bar is missing or does not match the reference;\n   - a timestamp is misaligned;\n   - an adjustment factor or corporate-action event is wrong;\n   - the SHA-256 of the canonicalized records differs between the two pulls.\n\nDatabento replaces Alpaca as the default if its per-symbol-day error rate is lower and the 95% bootstrap interval of (Alpaca rate minus Databento rate) lies entirely above zero. Pre-register the resampling unit, or widen the symbol list, because about 42 symbol-days is likely too few for the interval to exclude zero.",
+     "families": {
+      "claude": {
+       "round": 2,
+       "run": "wf_01bd02cf-b21",
+       "method": "two deciders in seeded orders plus one critic (definitive-defaults method)",
+       "defaults_named": [
+        "Alpaca market data through alpaca-py"
+       ],
+       "deciders_agree": true,
+       "critic_verdict": "converged",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "returned",
+       "defaults": [
+        "Alpaca market data through alpaca-py"
+       ],
+       "deciders_agree": true,
+       "critic_verdict": "converged",
+       "default_after_review": {
+        "name": "Alpaca market data through alpaca-py",
+        "repository": "https://github.com/alpacahq/alpaca-py"
+       }
+      }
+     }
+    },
+    {
+     "slot_id": "sec-filings",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "first_round",
+     "lane_record": {
+      "coincides": true,
+      "record_component": "edgartools",
+      "note": "freedom from current-use influence is not shown"
+     },
+     "default": {
+      "name": "EdgarTools",
+      "repository": "https://github.com/dgunning/edgartools",
+      "install_command": "pip install edgartools",
+      "installs_nothing_extra": false
+     },
+     "alternatives": [
+      {
+       "name": "OpenBB",
+       "reason": "Its SEC provider covers the scope and has a 9 req/s limiter (ratelimit.py 9-26), but at develop@6c292746fe9d it sends hard-coded placeholder User-Agents (definitions.py 7-18, form4.py 8-9, latest_financial_reports.py 135-136) and no override was found, so it does not meet the declared-User-Agent requirement without patching code."
+      },
+      {
+       "name": "sec-edgar-downloader",
+       "reason": "excluded (stale_or_archived): Master HEAD 185a5548e49f was committed 2026-02-02T02:06:03Z, 241 days before 2026-10-01 (GitHub API commits?per_page=1). Latest release is 5.1.0 on GitHub and PyPI (2026-02-02), with no release since 2026-07-03. The repo is not archived and has 31 open issues; its pushed_at of 2026-06-22 does not appear in master HEAD."
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://github.com/dgunning/edgartools/blob/main/edgar/httpclient.py",
+       "shows": "Observed 2026-10-01 at main (HEAD 6b525ee94af1). Lines 196-202: EDGAR_RATE_LIMIT_PER_SEC defaults to 9 ('SEC's rate limit'). Lines 205-221: pyrate-limiter bucket. Lines 224-235: HttpxThrottleCache(user_agent_factory=get_identity, cache_mode 'Hishel-File').",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/dgunning/edgartools/blob/main/edgar/settings.py",
+       "shows": "Observed. set_identity (lines 156-171) sets EDGAR_IDENTITY; its docstring quotes the SEC format 'Sample Company Name AdminContact@<sample company domain>.com'. get_identity (lines 222-231) prompts for an identity when none is set.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/dgunning/edgartools/blob/main/edgar/_filings.py",
+       "shows": "Observed. Line 252: source is the SEC full-index form.gz. Line 508: get_filings_for_quarters(index='form'). Line 1244: get_filings(year, quarter, form, ...). Line 1425: Filing is built with accession_no.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/dgunning/edgartools/blob/main/README.md",
+       "shows": "Documented. Line 74: pip install edgartools. Line 81: set_identity. Lines 148-150: XBRL-standardized statements and Company Facts API. Lines 163-164: full-text search and Ticker/CIK lookup. Lines 167-168: configurable rate limiting, caching and '1000+ tests'. Lines 202-243: MCP server (edgartools-mc",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://www.sec.gov/os/accessing-edgar-data",
+       "shows": "SEC fair-access page, dated March 23, 2021: current maximum request rate is 10 requests/second; requesters should declare a User-Agent in the form 'Sample Company Name AdminContact@<sample company domain>.com'.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/dgunning/edgartools/actions/runs?branch=main",
+       "shows": "Observed in the most recent listed runs: 'Build and Test Edgartools' and 'Regression Tests' passed on push 38e41e6c1ddc (2026-09-22). Scheduled 'Build and Test Edgartools' runs failed on 2026-09-21 and 2026-09-22.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://pypi.org/pypi/edgartools/json",
+       "shows": "Observed 2026-10-01: latest version 5.59.1 (2026-09-26); 24 releases since 2026-07-03; requires_python >=3.10.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/dgunning/edgartools",
+       "shows": "Observed 2026-10-01: not archived; MIT (license is information only); 27 open issues; default branch main. HEAD 6b525ee94af1 committed 2026-10-01T20:42:46Z. GitHub release v5.59.1 on 2026-09-26.",
+       "from": "round-one judge"
+      }
+     ],
+     "evidence_items_in_full_file": 16,
+     "overturn_check": "The criteria already separate the candidates. OpenBB's SEC provider sends placeholder User-Agents as shipped, so it fails the declared User-Agent requirement. sec-edgar-downloader is stale on every branch. EdgarTools meets fair access in source, is current, and ships an MCP server. Only the judge's head-to-head on the WSL2 host could overturn the pick: on a frozen list of companies, forms and dates, run EdgarTools 5.59.1 against openbb-sec 2.0.0 with a declared User-Agent patched in. Compare retrieval completeness, parsed XBRL facts against data.sec.gov companyfacts, the User-Agent and request rate observed on the wire, and whether re-runs are byte-identical.",
+     "families": {
+      "claude": {
+       "round": 1,
+       "run": "wf_4d2dd504-4a2",
+       "method": "merit judge plus adversarial critic (#589 method)",
+       "single_finalist": true,
+       "critic_verdict": "upheld",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     }
+    },
+    {
+     "slot_id": "exchange-calendars",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "first_round",
+     "lane_record": {
+      "coincides": true,
+      "record_component": "exchange-calendars",
+      "note": "freedom from current-use influence is not shown"
+     },
+     "default": {
+      "name": "exchange_calendars",
+      "repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "install_command": "pip install exchange_calendars",
+      "installs_nothing_extra": false
+     },
+     "alternatives": [
+      {
+       "name": "pandas_market_calendars",
+       "reason": "excluded (stale_or_archived): Under the frozen rule (no default-branch commit in 90 days), master HEAD 275890784073 was committed 2026-05-27T02:34:37Z, 127 days before 2026-10-01. Context: PyPI 5.4.0 shipped 2026-05-27 with no release since 2026-07-03 (latest GitHub release v4.6.1, 2025-01-25). The dev-branch HEAD a3b3990d4ca8 is from 2026-07-12 (CME 2026 early closes), PR CI ran through 2026-09-3"
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://github.com/gerrymanoim/exchange_calendars/blob/master/README.md",
+       "shows": "Documented. Line 12: pip install exchange_calendars. Line 204: XNYS listed. Line 196: an exchange is treated as open only during regular trading; pre-trading, post-trading and auction periods are treated as closed.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/gerrymanoim/exchange_calendars/blob/master/exchange_calendars/calendar_utils.py",
+       "shows": "Observed. Lines 155-162: NYSE, NASDAQ, BATS, XNAS, ARCX, OOTC and XASE are aliases of XNYS. No extended-hours calendar is registered.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/gerrymanoim/exchange_calendars/blob/master/exchange_calendars/exchange_calendar_xnys.py",
+       "shows": "Observed. Lines 157-165: open 9:30, close 16:00, regular early close 13:00. Lines 140-149 document ad hoc closures for 9/11 2001, Hurricane Sandy 2012, G.H.W. Bush 2018 and Carter 2025-01-09. The Juneteenth rule (us_holidays.py 139-145) is June 19 from 2022, observed on the nearest workday.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/gerrymanoim/exchange_calendars/tree/master/tests",
+       "shows": "Observed: test_xnys_calendar.py and the answers file tests/resources/xnys.csv (541,094 bytes; 8,324 sessions from 1990-01-02 to 2023-01-13).",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/gerrymanoim/exchange_calendars/actions/runs?branch=master",
+       "shows": "Observed: 'On Master Merge' and 'Benchmark' passed on bbda29fed902 (2026-09-15). The scheduled 'Dependencies Update (monthly)' run failed on 2026-10-01.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/gerrymanoim/exchange_calendars",
+       "shows": "Observed 2026-10-01: not archived; Apache-2.0 (license is information only); 31 open issues. Master HEAD bbda29fed902 committed 2026-09-15T09:27:58Z. The issue search API finds 0 open issues matching XNYS.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://pypi.org/pypi/exchange-calendars/json",
+       "shows": "Observed 2026-10-01: latest version 4.13.2 (2026-03-10), with no release since 2026-07-03; requires_python <4,>=3.10.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/gerrymanoim/exchange_calendars/commits?per_page=1",
+       "shows": "exchange_calendars master HEAD bbda29fed902 was committed 2026-09-15T09:27:58Z",
+       "from": "round-one critic, checked"
+      }
+     ],
+     "evidence_items_in_full_file": 17,
+     "overturn_check": "Under the stale gate the judge applied across layers, only exchange_calendars is eligible, and nothing in the packet decides further. If the gate became a weighed criterion, or counted any branch or a release, the deciding head-to-head runs on the WSL2 host. Generate XNYS sessions, holidays and early closes for 2000-2026 from exchange_calendars 4.13.2 and pandas_market_calendars 5.4.0, and count disagreements with NYSE's published holiday and early-close calendars. Score extended-hours coverage separately against the exchange-published pre-market and after-hours schedules, early-close days included. pandas_market_calendars has fixed 04:00/20:00 times; exchange_calendars has none.",
+     "families": {
+      "claude": {
+       "round": 1,
+       "run": "wf_4d2dd504-4a2",
+       "method": "merit judge plus adversarial critic (#589 method)",
+       "single_finalist": true,
+       "critic_verdict": "upheld",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "layer_id": "identity-provenance",
+   "owns": [
+    "slot research-data-versioning (judged): versioned research datasets and pipeline reproduction with exact restore (DVC today)",
+    "slot security-identity (no blind default today): permanent security identity across ticker changes"
+   ],
+   "uses": [
+    "EdgarTools (market-data-reference) for CIK-keyed filings",
+    "DuckDB with Parquet (storage-compute)",
+    "Restic (foundation recovery-portability) for host backup, a different job from dataset versioning"
+   ],
+   "slots": [
+    {
+     "slot_id": "research-data-versioning",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "first_round",
+     "lane_record": {
+      "coincides": true,
+      "record_component": "DVC",
+      "note": "freedom from current-use influence is not shown"
+     },
+     "default": {
+      "name": "DVC",
+      "repository": "https://github.com/treeverse/dvc",
+      "install_command": "pip install dvc",
+      "installs_nothing_extra": false
+     },
+     "alternatives": [
+      {
+       "name": "lakeFS",
+       "reason": "Versions data through a Git-like interface over S3, Azure Blob and GCS (README) and is the most current candidate: v1.88.0 on 2026-10-01, 7 releases and 33 main commits since 2026-07-03, 29 of the last 30 CI runs green. But it documents no pipeline-stage versioning or skipping of unchanged stages, needs a running lakeFS server (pip install lakefs; python -m lakefs.quickstart) and has no run on rec"
+      },
+      {
+       "name": "DuckLake",
+       "reason": "A lakehouse format run as a DuckDB extension (INSTALL ducklake). It is very active (100 or more main commits since 2026-09-16) but has no GitHub releases. Its docs limit a DuckDB catalog to a single client and route multiple local clients to an SQLite catalog. It has no pipeline layer and no run on record."
+      },
+      {
+       "name": "ArcticDB",
+       "reason": "A versioned DataFrame store with time travel and snapshots on LMDB or S3 (README), very active (v6.26.0 on 2026-09-14, 23 releases in 90 days). On the record's fixture it lost whole appends under two concurrent writers on LMDB, and it has no pipeline layer. Its README says production use requires a paid licence, which is information only."
+      },
+      {
+       "name": "Delta Lake (delta-rs)",
+       "reason": "A native Rust Delta Lake library with Python bindings (pip install deltalake), active (python-v1.6.6 on 2026-09-24, rust-v1.0.0 within 90 days). It is a table-format library with no pipeline layer or stage skipping, and has no run on record."
+      },
+      {
+       "name": "Apache Iceberg (PyIceberg)",
+       "reason": "Matched DVC on record: exact row restore, reopen after kill in 5 of 5 trials and no lost appends under two writers. It is active (0.12.0 on 2026-09-01, 100 or more main commits since 2026-08-25). But it versions tables only, with no pipeline layer or stage skipping. Its docs say the local SQLite SqlCatalog 'should not be used in production due to the limited scalability'."
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/treeverse/dvc/main/README.rst",
+       "shows": "Documented in the README on main, read 2026-10-01: 'Version your data and models. Store them in your cloud storage but keep their version info in your Git repo.' and 'Iterate fast with lightweight pipelines. When you make changes, only run the steps impacted by those changes.' Data lives in a cache ",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://doc.dvc.org/command-reference/repro",
+       "shows": "Documented: dvc repro rebuilds the stage dependency graph from dvc.yaml, checks which stages need to run, executes only those and caches the pipeline outputs. dvc.lock is the 'file to record pipeline state'. Options include --no-run-cache and --pull, and the docs nav lists Linux and macOS install pa",
+       "from": "round-one judge"
+      },
+      {
+       "url": "file://<definitive-20261001>/round1/packets/us-equities_research-data-versioning.json",
+       "shows": "Comparison on record (2026-09-23, synthetic fixture of 5 observation rows and 2 universe rows): DVC 3.67.1 restored the canonical rows exactly, reopened after a kill in 5 of 5 trials and lost no appends under two concurrent writers. It was timed through CLI subprocesses.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/treeverse/dvc/commits?sha=main&since=2026-07-03T00:00:00Z&per_page=100",
+       "shows": "Observed 2026-10-01: not archived. 8 default-branch commits since 2026-07-03, the newest on 2026-08-06 (56e5982951), so not stale under the 90-day rule. Latest release is 3.67.1 from 2026-03-31, with none in the last 90 days (releases?per_page=30). The latest completed main CI 'Tests' run failed on ",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/treeverse/dvc/releases?per_page=5",
+       "shows": "DVC latest release is 3.67.1, published 2026-03-31, with no release in the last 90 days",
+       "from": "round-one critic, checked"
+      },
+      {
+       "url": "https://api.github.com/repos/treeverse/dvc/commits?sha=main&since=2026-07-03T00:00:00Z&per_page=100",
+       "shows": "8 default-branch commits since 2026-07-03, newest 56e5982951 on 2026-08-06 (all bot bumps except one docstring fix)",
+       "from": "round-one critic, checked"
+      },
+      {
+       "url": "https://api.github.com/repos/treeverse/dvc/actions/runs/27856564555",
+       "shows": "A scheduled Tests run on main succeeded on 2026-06-20 (head 8131c32c33), before the failures began",
+       "from": "round-one critic, checked"
+      },
+      {
+       "url": "https://doc.dvc.org/command-reference/repro",
+       "shows": "dvc repro checks which stages need to run, executes those and caches outputs; dvc.lock records pipeline state; --pull and --no-run-cache options exist",
+       "from": "round-one critic, checked"
+      }
+     ],
+     "evidence_items_in_full_file": 14,
+     "overturn_check": "Capability fit on the pipeline clause decides, as the judge said. Two things would overturn it. (a) A run on the WSL2 host with a frozen fixture in which DVC fails byte-exact restore after deletion (dvc checkout or dvc pull from cache or remote) or fails to skip unchanged stages on re-run. (b) Further decline in DVC's maintenance: no non-bot commit, the scheduled Tests workflow still failing, or no default-branch commit by 2026-11-04. Either way, the head-to-head to run is DVC against lakeFS plus an external pipeline runner, and against PyIceberg. It should measure sha256 equality after deletion and restore, retention of a corrected version beside the original, stage skipping on re-run, native lineage fields, and two concurrent agent writers, including how DVC's project lock fails or forces a retry.",
+     "families": {
+      "claude": {
+       "round": 1,
+       "run": "wf_4d2dd504-4a2",
+       "method": "merit judge plus adversarial critic (#589 method)",
+       "single_finalist": true,
+       "critic_verdict": "upheld",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     }
+    },
+    {
+     "slot_id": "security-identity",
+     "row_kind": "no_blind_default_today",
+     "definitive": false,
+     "reason": "the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate"
+    }
+   ]
+  },
+  {
+   "layer_id": "storage-compute",
+   "owns": [
+    "slot analytical-storage (judged): exact reproducible analytical snapshots and research queries (DuckDB with Parquet today)"
+   ],
+   "uses": [
+    "Restic (foundation recovery-portability)"
+   ],
+   "slots": [
+    {
+     "slot_id": "analytical-storage",
+     "row_kind": "judged",
+     "definitive": false,
+     "roles": [
+      {
+       "slot_id": "engine",
+       "row_kind": "judged",
+       "definitive": false,
+       "decision_stage": "first_round",
+       "lane_record": {
+        "coincides": true,
+        "record_component": "duckdb",
+        "note": "freedom from current-use influence is not shown"
+       },
+       "default": {
+        "name": "DuckDB",
+        "repository": "https://github.com/duckdb/duckdb",
+        "install_command": "pip install duckdb",
+        "installs_nothing_extra": false
+       },
+       "alternatives": [
+        {
+         "name": "ArcticDB",
+         "reason": "Its built-in versions and library-wide snapshots fit on paper (README; PyPI wheels for Linux x86_64 and macOS arm64; v6.26.0, 2026-09-14). Against it: its FAQ says no SQL and no transactions, with last-writer-wins for concurrent writes to one symbol. On its ClickBench c6a.4xlarge run (2026-08-31, queries finished in pandas) the best hot runs sum to ~1,935 s, against 18-45 s for the SQL engines. It"
+        },
+        {
+         "name": "ClickHouse",
+         "reason": "It has the fastest published ClickBench hot runs here (derived sum 18.09 s, c6a.4xlarge, 2026-09-01) and agreed exactly in the comparison on record. But it is a separate DBMS installed with curl https://clickhouse.com/ | sh: ClickBench does not tag it 'embedded', and the arm on record reached it over HTTP. Native immutable snapshots of its own tables were not verified, so it adds a service without"
+        },
+        {
+         "name": "Polars",
+         "reason": "An in-process DataFrame query engine (README) with no persistent table store of its own: its ClickBench entry 'Polars (Parquet)' is tagged 'stateless'. Snapshots would therefore come from an external table format. Its ClickBench derived hot sum is 45.35 s against DuckDB's 26.25 s, and it had no arm in the comparison on record."
+        },
+        {
+         "name": "QuestDB",
+         "reason": "A time-series server with competitive hot query times (ClickBench derived sum 25.95 s) that agreed exactly in the comparison on record. But its CHECKPOINT is a mode for filesystem backups, not a queryable immutable snapshot, and it runs as a separate Docker or Homebrew service. Its ClickBench load took 5,433 s and 72.9 GB on disk, against DuckDB's 126 s and 20.5 GB."
+        }
+       ],
+       "evidence": [
+        {
+         "url": "https://github.com/duckdb/duckdb",
+         "shows": "Observed now (gh api, 2026-10-01): not archived. Latest release v1.5.6 'DuckDB v1.5.6 Bugfix Release', published 2026-09-28. Default branch v2.0-cyanoptera, last commit 2026-10-01 (2866f801f73d). Head-commit check rollup SUCCESS. 567 issues closed since 2026-07-03; open_issues_count 971.",
+         "from": "round-one judge"
+        },
+        {
+         "url": "https://github.com/duckdb/duckdb-python",
+         "shows": "README: 'pip install duckdb' and 'DuckDB runs on Linux, macOS, Windows, Android, iOS and all popular hardware architectures'. Release v1.5.6 published 2026-09-28; last commit 2026-10-01.",
+         "from": "round-one judge"
+        },
+        {
+         "url": "https://ducklake.select/docs/stable/duckdb/usage/time_travel",
+         "shows": "Documented: every DuckLake snapshot is a consistent database state and is kept until snapshots are expired. A query pins a snapshot by id or by timestamp, e.g. SELECT * FROM tbl AT (VERSION => 3) or ATTACH 'ducklake:metadata.duckdb' (SNAPSHOT_VERSION 3), with a local metadata file.",
+         "from": "round-one judge"
+        },
+        {
+         "url": "https://github.com/duckdb/duckdb-web/blob/HEAD/docs/current/connect/concurrency.md",
+         "shows": "Documented: either one process reads and writes, or many processes read in READ_ONLY mode. Within one process DuckDB uses MVCC with optimistic concurrency, and appends never conflict. Writes from multiple processes need the Quack remote protocol, which is 'in beta stage as of DuckDB v1.5.2' and 'exp",
+         "from": "round-one judge"
+        },
+        {
+         "url": "https://github.com/duckdb/duckdb-web/blob/HEAD/docs/current/operations_manual/non-deterministic_behavior.md",
+         "shows": "Documented reproducibility caveat: result order is not guaranteed, and multi-threaded floating-point aggregates (stddev, corr) can differ between runs. Documented workarounds are SET threads = 1 and ORDER BY ALL.",
+         "from": "round-one judge"
+        },
+        {
+         "url": "https://github.com/ClickHouse/ClickBench/blob/HEAD/duckdb/results/20260511/c6a.4xlarge.json",
+         "shows": "Published ClickBench run (hits table, 43 queries, c6a.4xlarge, 2026-05-11): load_time 126 s, data_size 20,457,467,904 bytes, no failed queries. Summing the faster hot run per query (my derivation, not ClickBench's score) gives 26.25 s. The same derivation on the other c6a.4xlarge files gives ClickHo",
+         "from": "round-one judge"
+        },
+        {
+         "url": "https://duckdblabs.github.io/db-benchmark/",
+         "shows": "db-benchmark (maintained by DuckDB Labs) runs groupby and join at 0.5/5/50 GB (1e7-1e9 rows) on c6id.4xlarge and c6id.metal, includes DuckDB and ClickHouse, and checks that answers match across solutions. Results are published as plots plus time.csv; no numbers were extracted in this run.",
+         "from": "round-one judge"
+        },
+        {
+         "url": "<definitive-20261001>/round1/packets/us-equities_analytical-storage.json",
+         "shows": "Comparison on record (2026-09-23): the DuckDB 1.5.5 arm agreed exactly with ClickHouse, QuestDB and PyIceberg 0.12.0 on four queries over 50M rows (keys and counts exact, floats within 1e-9). Shared, noisy host; no confidence intervals.",
+         "from": "round-one judge"
+        }
+       ],
+       "evidence_items_in_full_file": 25,
+       "overturn_check": "The pick stands on capability fit and on published evidence. Fit: in-process SQL from Python plus Iceberg snapshots. Evidence: ClickBench best-hot sum of 26.25 s for DuckDB against 1,934.56 s for ArcticDB, and exact agreement among four engines on record. One head-to-head could overturn it. Setting: the 48-core WSL2 host, quiet, with a frozen bars-and-events dataset of at least 50M rows. Arms:\n- DuckDB 1.5.6 reading PyIceberg 0.12.0 snapshots (SQLite SqlCatalog, through iceberg_scan with snapshot_from_id or scan(snapshot_id).to_duckdb()).\n- ArcticDB 6.26.0 on LMDB with as_of reads and staged single-symbol writes.\nMeasure bulk load, pinned-snapshot query latency with confidence intervals, exact result agreement (SET threads = 1 for floats), and one appending writer against N readers holding a pinned snapshot. DuckDB plus DuckLake can serve as a reference arm, but it is outside this packet's candidates.",
+       "families": {
+        "claude": {
+         "round": 1,
+         "run": "wf_4d2dd504-4a2",
+         "method": "merit judge plus adversarial critic (#589 method)",
+         "single_finalist": false,
+         "critic_verdict": "upheld",
+         "status": "converged",
+         "note": "engine role settled in round one: DuckDB was selected and upheld; only the snapshot role went to round two"
+        },
+        "gpt": {
+         "status": "pending",
+         "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+         "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+        }
+       }
+      },
+      {
+       "slot_id": "snapshot-table-layer",
+       "row_kind": "judged",
+       "definitive": false,
+       "decision_stage": "decision_round",
+       "lane_record": {
+        "coincides": true,
+        "record_component": "status quo (the record has no snapshot component)",
+        "note": "freedom from current-use influence is not shown; the default follows from the preregistered no-install rule"
+       },
+       "default": {
+        "name": "No additional component: DuckDB tables, with dataset versions kept by the research-data versioning tool",
+        "repository": "",
+        "install_command": "None extra. It uses the settled engine ('pip install duckdb', duckdb-python README line 36) and the versioning slot's DVC ('pip install dvc', treeverse/dvc README.rst line 161; 'brew install dvc' at line 140 covers macOS).",
+        "installs_nothing_extra": true
+       },
+       "alternatives": [
+        {
+         "name": "DuckLake",
+         "reason": "It has the strongest documented fit for snapshots inside the engine (criterion 1): spec v1.0 'production-ready' since 2026-04-13, the extension in DuckDB v1.5.2+ via INSTALL ducklake, AT (VERSION => n), and a SQLite catalog for multiple local clients. It is current (head 2026-10-01) but has no GitHub releases or tags. It adds a component with no measured gain over F3, and the only measurement foun"
+        },
+        {
+         "name": "Apache Iceberg (PyIceberg)",
+         "reason": "It documents snapshot IDs, tags and branches from Python, with scan(snapshot_id).to_duckdb(). It is current (0.12.0 on 2026-09-01, head 2026-10-01) and has Linux x86_64 and macOS arm64 wheels. It matched DuckDB exactly in the 2026-09-23 run, but that run has no intervals and shows agreement, not a gain. Upstream also says its local SQLite SqlCatalog 'should not be used in production due to the lim"
+        }
+       ],
+       "evidence": [
+        {
+         "url": "<definitive-20261001>/round2/packets/snapshot-table-layer.order-1.json",
+         "shows": "The only comparison on record where the named arms ran (2026-09-23; 50M rows in 50 Zstandard Parquet files) had DuckDB 1.5.5 and PyIceberg 0.12.0 agreeing exactly on four queries. It ran on a noisy shared host over three rounds with no confidence intervals and had no DuckLake arm. That is agreement,",
+         "from": "round-two decider, order 1"
+        },
+        {
+         "url": "https://github.com/duckdb/ducklake/discussions/430",
+         "shows": "The one public measurement found that sets DuckLake against native DuckDB tables is a single community run in discussion #430 (2025-09-09, before v1.0). A 7-table join finished in under 2 s on a ~160 GB native DuckDB file (~4.3 GB RAM). The same join took over 14 min on DuckLake Parquet (~106 GB RAM",
+         "from": "round-two decider, order 1"
+        },
+        {
+         "url": "https://ducklake.select/2026/04/13/ducklake-10/",
+         "shows": "DuckLake's vendor post (2026-04-13) declares spec v1.0 'production-ready' with 'guaranteed backward-compatibility', and the ducklake extension ships in DuckDB v1.5.2. In the retrieved sections, performance appears only as per-PR impacts (for example, COUNT(*) served from metadata at '8x-258x speedup",
+         "from": "round-two decider, order 1"
+        },
+        {
+         "url": "https://doc.dvc.org/api-reference/dvcfilesystem",
+         "shows": "F3's pinned-read path is documented. DVCFileSystem is an fsspec-compatible, read-only filesystem for a DVC repo (dvcfilesystem.md lines 4-5). It opens at any Git revision, such as a branch or tag (rev, lines 50-51), and can download tracked directories (line 149). DVC keeps data files in a cache out",
+         "from": "round-two decider, order 1"
+        },
+        {
+         "url": "https://github.com/duckdb/duckdb-python",
+         "shows": "DuckDB, the engine all three finalists query through, is current. Release v1.5.6 'DuckDB v1.5.6 Bugfix Release' was published 2026-09-28. The repo is not archived and its default branch v2.0-cyanoptera was pushed 2026-10-01. The duckdb-python README gives 'pip install duckdb' (line 36) and says Duck",
+         "from": "round-two decider, order 1"
+        },
+        {
+         "url": "https://github.com/duckdb/duckdb-web/blob/main/docs/current/operations_manual/non-deterministic_behavior.md",
+         "shows": "DuckDB documents a reproducibility caveat that applies to every finalist, since each one queries through DuckDB. Floating-point aggregates such as stddev and corr can differ between runs on multiple threads, and the documented workaround is SET threads = 1 (non-deterministic_behavior.md lines 43-71)",
+         "from": "round-two decider, order 1"
+        },
+        {
+         "url": "https://github.com/duckdb/duckdb-web/blob/main/docs/current/connect/concurrency.md",
+         "shows": "DuckDB native files allow either one read-write process or many READ_ONLY processes (concurrency.md lines 15-16), and 'Appends will never conflict' within one process (line 22). Writes from multiple processes need Quack, 'in beta stage as of DuckDB v1.5.2' (line 26). This bounds F3's concurrent writ",
+         "from": "round-two decider, order 1"
+        },
+        {
+         "url": "https://ducklake.select/docs/stable/duckdb/usage/time_travel",
+         "shows": "DuckLake documents time travel through AT (VERSION => 3), AT (TIMESTAMP => ...) and ATTACH 'ducklake:metadata.duckdb' (SNAPSHOT_VERSION 3). It 'keeps a record of all historic snapshots ... unless compaction is triggered and historic snapshots are explicitly deleted'. A DuckDB catalog is 'limited to ",
+         "from": "round-two decider, order 1"
+        }
+       ],
+       "evidence_items_in_full_file": 47,
+       "overturn_check": "Run one paired comparison on the quiet target WSL2 host and record its filesystem, because DVC gets reflinks only on Btrfs or XFS and otherwise copies. Use a frozen bars-and-events dataset of at least 50 million rows and at least 20 rounds. In each round, one writer process appends about 1% new rows and commits a snapshot while at least 4 reader processes stay pinned to the previous snapshot. All arms run on DuckDB 1.5.6 with SET threads = 1 and ORDER BY ALL:\n- F3: Parquet files or a .duckdb file, versioned by DVC 3.67.1 with the default cache.type and one Git tag per snapshot. Pinned reads go through DVCFileSystem(rev=tag) or dvc get --rev, then read_parquet or ATTACH ... (READ_ONLY).\n- F2: ducklake on a SQLite catalog, read with AT (VERSION => n).\n- F1: PyIceberg 0.12.0 on a SqlCatalog, read with scan(snapshot_id).to_duckdb() or iceberg_scan.\n\nGate, every round: the four reference queries return results identical to the frozen expected results at every pinned snapshot. So does the #1485 pattern, a NOT MATERIALIZED CTE referenced twice over a table rebuilt with CREATE OR REPLACE. Results must be unchanged when re-read after later appends, and no append may be lost.\n\nMeasure two things: wall time per round, from the start of the append to the last pinned result, including any F3 copy step; and bytes added per snapshot.\n\nA challenger replaces F3 if it passes the gate in every round and either:\n(a) F3 fails rounds that the challenger passes, with a 95% interval on the pass-rate difference that excludes zero; or\n(b) the 95% bootstrap confidence interval of the paired wall-time difference (challenger minus F3) lies entirely below zero.\nIf both challengers qualify, the one with the larger lower-bound gain replaces F3.",
+       "families": {
+        "claude": {
+         "round": 2,
+         "run": "wf_01bd02cf-b21",
+         "method": "two deciders in seeded orders plus one critic (definitive-defaults method)",
+         "defaults_named": [
+          "No additional component: DuckDB tables, with dataset versions kept by the research-data versioning tool"
+         ],
+         "deciders_agree": true,
+         "critic_verdict": "converged",
+         "status": "converged"
+        },
+        "gpt": {
+         "status": "pending",
+         "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+         "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "layer_id": "data-quality-orchestration",
+   "owns": [
+    "slot market-data-validation (judged): schema and value checks that reject bad market data before promotion (pandera today)"
+   ],
+   "uses": [
+    "Dagu (foundation scheduling-supervision)",
+    "systemd user units (foundation cross:wsl-distro) for the paper units"
+   ],
+   "slots": [
+    {
+     "slot_id": "market-data-validation",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "decision_round",
+     "lane_record": {
+      "coincides": false,
+      "record_component": null,
+      "note": "the record names pandera for this row; the default is Pointblank"
+     },
+     "default": {
+      "name": "Pointblank",
+      "repository": "https://github.com/posit-dev/pointblank",
+      "install_command": "pip install \"pointblank[pd,pl]\"",
+      "installs_nothing_extra": false
+     },
+     "alternatives": [
+      {
+       "name": "pandera",
+       "reason": "Leads on criterion 5 and on upstream CI breadth: pandas 2.3.3 and 3.0.0 on Linux, macOS and Windows, Python 3.10-3.14, Polars 1.20-1.42 and the native Ibis backend. Trails on criterion 1: only four of the six named rule classes are built in. Monotonic timestamps and cross-field rules need custom checks for each library (Check.is_monotonic is xarray-only). No like-for-like measurement separates it "
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://posit-dev.github.io/pointblank/reference/",
+       "shows": "The Pointblank reference index lists these built-in steps. col_schema_match: 'Do columns in the table (and their types) match a predefined schema?' col_vals_gt/lt/ge/le/eq/ne: 'a fixed value or data in another column'. col_vals_between: 'two specified values or data in other columns'. col_vals_incre",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://posit-dev.github.io/pointblank/reference/Validate.col_vals_increasing.html",
+       "shows": "Signature: col_vals_increasing(columns, allow_stationary=False, decreasing_tol=None, na_pass=False, missing=None, pre=None, segments=None, thresholds=None, ...). It checks values 'increasing when moving down a table', with one test unit per row. In the page's Polars example, a stationary value fails",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html",
+       "shows": "Signature: rows_distinct(columns_subset=None, pre=None, segments=None, ...). The page's example uses 'a subset of columns to determine distinctness', which covers a composite (symbol, timestamp) key.",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/posit-dev/pointblank/blob/main/pointblank/_interrogation.py",
+       "shows": "interrogate_increasing is implemented with Narwhals: nw.from_native(tbl), then nw.col(column) - nw.col(column).shift(1) on an nw.DataFrame or nw.LazyFrame (pointblank/_interrogation.py lines 2819-2875 at main head c714100ce4). Row order therefore drives the result.",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/posit-dev/pointblank#readme",
+       "shows": "Pointblank README: 'Pointblank uses Narwhals to work with Polars and Pandas DataFrames, and integrates with Ibis for database and file format support.' It documents the CLI commands `pb validate ... --exit-code` and `pb run validation.yaml --exit-code` (0 = pass, 1 = fail).",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/unionai-oss/pandera/blob/main/pandera/api/checks.py",
+       "shows": "pandera Check.is_monotonic(dim, increasing=True) has the docstring 'Assert a 1-D coordinate is strictly monotonic along ``dim``' (pandera/api/checks.py lines 910-916 at main). The Check reference lists it alongside the xarray methods (cf_*, dim_size, has_coords, has_dims, has_encoding). Monotonic fr",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/unionai-oss/pandera/blob/main/pandera/backends/polars/container.py",
+       "shows": "The pandera Polars backend has built-in composite uniqueness. check_column_values_are_unique iterates schema.unique and reports 'multiple_fields_uniqueness' failures (pandera/backends/polars/container.py lines 663-706).",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://pandera.readthedocs.io/en/stable/supported_libraries.html",
+       "shows": "pandera supports pandas, Polars, Ibis, PyArrow and PySpark SQL. The opt-in Narwhals backend is new in 0.32.0; in it, 'checks are expressed in the native library's API'. The banner says the Pandera CLI is new in 0.33.0.",
+       "from": "round-two decider, order 1"
+      }
+     ],
+     "evidence_items_in_full_file": 58,
+     "overturn_check": "Run the packet's own deciding comparison on the primary WSL2 host, in two clean venvs:\n- `pip install \"pointblank[pd,pl]==0.27.0\"`\n- `pip install \"pandera[pandas,polars]==0.33.1\"`\n\nLet pip resolve current pandas and Polars, and record the resolved versions.\n\nFixtures: frozen good and bad market-data frames, each built as a pandas frame and as a Polars frame, with a real datetime64/Datetime timestamp column and at least the production symbol count. Plant one defect per class:\n- a missing or extra column\n- a wrong dtype\n- an out-of-range price or volume\n- a duplicate (symbol, ts) key\n- a non-increasing ts within one symbol\n- low > high\n\nPointblank uses built-ins only: col_schema_match, col_vals_between, rows_distinct(columns_subset=[\"symbol\",\"ts\"]), col_vals_increasing(\"ts\", segments=\"symbol\") and col_vals_le(\"low\", value=pb.col(\"high\")). pandera uses DataFrameSchema(unique=[...]) plus custom checks.\n\nScoring: count a defect as detected on an input type only when its failing rows can be identified (Pointblank through get_data_extracts; pandera through SchemaErrors.failure_cases from lazy validation). Record wall time. Run col_vals_increasing on the pandas datetime64 ts column first.\n\nPandera replaces Pointblank as the default if two things hold together:\n- Pointblank misses any planted defect on either input type, or raises on the resolved pandas 3.x. A miss includes the pandas datetime case ending in an evaluation error or exception instead of failing units.\n- pandera detects every planted defect on both input types, with failing rows identified.",
+     "families": {
+      "claude": {
+       "round": 2,
+       "run": "wf_01bd02cf-b21",
+       "method": "two deciders in seeded orders plus one critic (definitive-defaults method)",
+       "defaults_named": [
+        "Pointblank"
+       ],
+       "deciders_agree": true,
+       "critic_verdict": "converged",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "layer_id": "research-factors-ml",
+   "owns": [
+    "slot factor-research (judged): factor returns, information coefficients and turnover diagnostics with explicit purging",
+    "slot predictive-ml (no blind default today)"
+   ],
+   "uses": [
+    "EdgarTools (market-data-reference)",
+    "skfolio (portfolio-risk) for chronological evaluation",
+    "NautilusTrader (backtesting-engine) for replays",
+    "MLflow (evaluation-experiments) for run tracking"
+   ],
+   "slots": [
+    {
+     "slot_id": "factor-research",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "first_round",
+     "lane_record": {
+      "coincides": false,
+      "record_component": null,
+      "note": "Qlib is not on the record"
+     },
+     "default": {
+      "name": "Qlib",
+      "repository": "https://github.com/microsoft/qlib",
+      "install_command": "pip install pyqlib",
+      "installs_nothing_extra": false
+     },
+     "alternatives": [
+      {
+       "name": "RD-Agent",
+       "reason": "Active (v1.0.0 on 2026-09-23; ci.yml run 35852489686 succeeded at 484776c211), but it is an LLM-driven factor-mining loop. Its factor evaluation delegates to Qlib's SigAnaRecord/PortAnaRecord (templates default to region cn, market csi300), and it needs an LLM backend, Docker and Linux (README L133-L139). It adds no quantile, turnover or look-ahead diagnostics beyond the selected Qlib."
+      },
+      {
+       "name": "AlphaForge",
+       "reason": "excluded (stale_or_archived): The last commit on the default branch (master) is d0cfc27df2, dated 2024-09-01. There are 0 commits since 2026-07-03 and no releases (GitHub GraphQL, 2026-10-01)."
+      },
+      {
+       "name": "alphalens-reloaded",
+       "reason": "excluded (stale_or_archived): The last commit on the default branch (main) is f0a07c22d5, dated 2025-06-02 (REST commits?per_page=1; activity?ref=main lists that PR merge as the latest push to main). There are 0 commits since 2026-07-03. The latest PyPI release, 0.4.6, was uploaded 2025-06-02. Open PR #49 from a non-member (2026-10-01) is unmerged."
+      },
+      {
+       "name": "Spectre",
+       "reason": "excluded (stale_or_archived): The last commit on the default branch (master) is c0e7fd9742, dated 2025-04-15. The latest GitHub release is v0.4-beta (2020-01-13), and the repository has no .github/workflows."
+      },
+      {
+       "name": "FinanceToolkit",
+       "reason": "excluded (outside_requirement): At 5662be3322 (v2.2.1, 2026-10-01) it has no cross-sectional factor diagnostics. financetoolkit/*.py has zero spearman or rank-IC matches. All 7 files mentioning 'turnover' are ratio, scoring-model, toolkit or MCP-registry modules (for example get_asset_turnover_ratio). The 'Information Coefficient' at performance/performance_controller.py:2775 describes the Informa"
+      },
+      {
+       "name": "AlphaGen",
+       "reason": "excluded (stale_or_archived): The last commit on the default branch (master) is 259687e8f3 ('Update citation'), dated 2026-06-04, 119 days before 2026-10-01. There are 0 commits since 2026-07-03 and no releases."
+      },
+      {
+       "name": "AlphaInspect",
+       "reason": "excluded (stale_or_archived): The last commit on the default branch (main) is 1f53be696a, dated 2025-10-23; release v0.5.9 came out the same day. There are 0 commits since 2026-07-03."
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/contrib/report/analysis_model/analysis_model_performance.py#L21-L78",
+       "shows": "Observed now. _group_return sorts by score on each date and averages the label in N equal-count groups (Group1..GroupN). It adds long-short (Group1 minus GroupN) and long-average, then plots cumulative returns. Each group is len(x)//N names wide (line 42), so the len(x) % N lowest-scored names fall ",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/contrib/report/analysis_model/analysis_model_performance.py#L119-L220",
+       "shows": "Observed now. _pred_ic computes per-date Pearson IC and Spearman Rank IC between score and label, with a monthly IC heatmap, a histogram and a normal Q-Q plot.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/contrib/report/analysis_model/analysis_model_performance.py#L223-L268",
+       "shows": "Observed now. _pred_autocorr is the per-date rank correlation between the score and its lagged value. _pred_turnover is the change in top-1/N and bottom-1/N quantile membership at a lag.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/contrib/eva/alpha.py#L71-L186",
+       "shows": "Observed now. Callable library functions: calc_long_short_return (L71), pred_autocorr (L116), calc_ic, which returns IC and Rank IC series (L160), and calc_all_ic (L186).",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/workflow/task/gen.py#L126-L178",
+       "shows": "Observed now. trunc_segments truncates the non-test segments before the test start, with the docstring 'To avoid the leakage of future information'. RollingGen exposes trunc_days, documented as 'trunc some data to avoid future information leakage'.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/contrib/rolling/base.py#L198",
+       "shows": "Observed now. The contrib rolling driver builds RollingGen(step=self.step, trunc_days=self.horizon + 1), a gap of the label horizon plus one day.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/contrib/data/handler.py#L90",
+       "shows": "Observed now. The Alpha158/Alpha360 label is Ref($close, -2)/Ref($close, -1) - 1, a forward return that starts at the next day's close.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/docs/advanced/PIT.rst#L9-L44",
+       "shows": "Documented. The point-in-time database stores each statement's publication date and period, so a historical query sees only the version that was available then; the stated purpose is to prevent leakage from amended financial reports.",
+       "from": "round-one judge"
+      }
+     ],
+     "evidence_items_in_full_file": 30,
+     "overturn_check": "This is not a close call. Qlib is the only non-stale candidate that computes quantile returns, IC, Rank IC and turnover itself. Keep the judge's design: on a frozen US factor and price panel with a planted one-bar look-ahead, compare Qlib's _group_return, calc_ic, _pred_turnover and _pred_autocorr against an independent pandas reference that uses Qlib's len(x)//N binning, with alphalens-reloaded 0.4.6 as a second reference arm. Record whether the Ref($close,-2)/Ref($close,-1)-1 label and RollingGen trunc_days=horizon+1 neutralize the leak. The pick is overturned if Qlib's diagnostics disagree with the reference or the planted leak shows up as an implausible IC. It is reopened if alphalens-reloaded resumes default-branch commits.",
+     "families": {
+      "claude": {
+       "round": 1,
+       "run": "wf_4d2dd504-4a2",
+       "method": "merit judge plus adversarial critic (#589 method)",
+       "single_finalist": true,
+       "critic_verdict": "upheld",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     }
+    },
+    {
+     "slot_id": "predictive-ml",
+     "row_kind": "no_blind_default_today",
+     "definitive": false,
+     "reason": "no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist"
+    }
+   ]
+  },
+  {
+   "layer_id": "backtesting-engine",
+   "owns": [
+    "pinned: NautilusTrader 2.0.0rc5 (tag v2.0.0rc5 = 1b0a49d2), the destination engine",
+    "slot backtest-oracle (judged): an independent engine that cross-checks the destination's orders, fills and cash on frozen cases (LEAN today)"
+   ],
+   "uses": [],
+   "slots": [
+    {
+     "slot_id": "backtest-oracle",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "decision_round",
+     "lane_record": {
+      "coincides": true,
+      "record_component": "lean",
+      "note": "freedom from current-use influence is not shown"
+     },
+     "default": {
+      "name": "LEAN",
+      "repository": "https://github.com/quantconnect/lean",
+      "install_command": "Route that needs no account (source build, pinned): install the .NET 10 SDK (https://docs.microsoft.com/en-us/dotnet/core/install/linux), then run `git clone https://github.com/QuantConnect/Lean.git && cd Lean && git checkout 18149 && dotnet build QuantConnect.Lean.sln`. For Python algorithms, install Python 3.11 with miniconda, run `conda create -n qc_lean python=3.11.11 pandas=2.2.3 wrapt=1.16.0`, export PYTHONNET_PYDLL=<env>/lib/libpython3.11.so and set \"algorithm-language\": \"Python\" in Launcher/config.json. Then run `cd Launcher/bin/Debug && dotnet QuantConnect.Lean.Launcher.dll`. Second route: `pip install lean` installs the Lean CLI (then `lean login`, `lean init`, `lean backtest`). QuantConnect's docs say that to use the CLI 'you must be a member in an organization on a paid tier'.",
+      "installs_nothing_extra": false
+     },
+     "alternatives": [
+      {
+       "name": "ml4t-backtest",
+       "reason": "Criterion 1: its own LIMITATIONS.md (L15-17, L46-48) says dividends are not modeled and input prices must already carry the corporate-action treatment, so it cannot replay the dividends-and-cash element of the frozen cases. It does better on criteria 5 and 6 (pure-Python wheel, CPython 3.12-3.14 on Linux, macOS and Windows, `uv add ml4t-backtest`) and passes currency (v0.1.12, 2026-09-24). No like"
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/LIMITATIONS.md?plain=1#L15-L48",
+       "shows": "ml4t-backtest documents the gap itself. LIMITATIONS.md L15-17 says 'Input prices must already reflect the corporate-action treatment required by the strategy. The library does not adjust splits, dividends, symbol changes, mergers, bankruptcies, or delistings.' L46-48 says 'The account is single-curr",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/corporate-actions",
+       "shows": "QuantConnect docs, Corporate Actions > Dividends: 'If you backtest with the Adjusted or TotalReturn data normalization mode, the dividends are factored into the price. If you backtest with the other data normalization modes or trade live, when a dividend payment occurs, LEAN automatically adds the p",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/QuantConnect/Lean/blob/33e3945f2faa95308d972dfd3d7b762f7743d1d5/Algorithm.CSharp/DividendRegressionAlgorithm.cs",
+       "shows": "LEAN Algorithm.CSharp/DividendRegressionAlgorithm.cs at 33e3945f implements IRegressionAlgorithmDefinition and adds the equity with DataNormalizationMode.Raw. It throws a RegressionTestException unless Portfolio.TotalProfit == sum(distribution x quantity), TotalNetProfit == that sum minus TotalFees,",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://api.github.com/repos/QuantConnect/Lean/actions/runs?head_sha=33e3945f2faa95308d972dfd3d7b762f7743d1d5",
+       "shows": "LEAN CI on 33e3945f (master head 2026-10-01T14:23:47Z, also tag 18149). Build & Test Lean, Regression Tests (`dotnet test ./Tests/bin/Release/QuantConnect.Tests.dll --filter TestCategory=RegressionTests` in quantconnect/lean:foundation), Research Regression Tests and Syntax Tests succeeded in both r",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/buying-power",
+       "shows": "QuantConnect docs, Buying Power: 'When you place an order, LEAN uses the buying power model to determine whether the order should be submitted so you avoid placing orders that would be rejected by the brokerage.' This covers the over-limit case.",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/validation/README.md?plain=1#L29-L51",
+       "shows": "Parity evidence that ml4t published itself shows agreement, not separation. validation/README.md L51 (US equity panel, LEAN 18001): 'fills equal at declared field precision; 4,027 valuations within $0.01 (max raw gap $0.00000460); terminal within $0.01 (raw gap $0.00000420)'. L31: 'The parity protoc",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/QuantConnect/Lean/blob/33e3945f2faa95308d972dfd3d7b762f7743d1d5/readme.md?plain=1#L125-L182",
+       "shows": "Install path. The LEAN readme documents a source build that needs no account: L160-170 'Linux (Debian, Ubuntu)', dotnet 10, `dotnet build QuantConnect.Lean.sln`, `cd Launcher/bin/Debug`, `dotnet QuantConnect.Lean.Launcher.dll`; Python via Algorithm.Python/readme.md L72-103 (miniconda py311, `conda c",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://www.quantconnect.com/docs/v2/lean-cli/key-concepts/getting-started",
+       "shows": "Lean CLI Getting Started page (fetched 2026-10-01): 'To use the CLI, you must be a member in an organization on a paid tier.' The install flow is `pip install lean`, then `lean login`, then `lean init`.",
+       "from": "round-two decider, order 1"
+      }
+     ],
+     "evidence_items_in_full_file": 46,
+     "overturn_check": "On a throwaway WSL2 x86_64 Ubuntu instance, replay the packet's frozen set: zero-cost and with costs, one and two positions, the adaptive case and the over-limit order. Add one raw-price US-equity case whose window spans an ex-dividend date and its pay date. The arms are LEAN built from source at tag 18149 (33e3945f, dotnet 10, Python 3.11.11 through pythonnet per Algorithm.Python/readme.md L72-107) and the newest ml4t-backtest release. Score both arms with one scorer and one tolerance sheet against hand-derived expected values that neither engine produced. The sheet must state in advance the date on which dividend cash is expected, so that a timing convention is not scored as an accounting error. ml4t-backtest replaces LEAN only if it passes every check, including the dividend-cash checks, while LEAN fails at least one check on the same sheet. Documented precondition: ml4t-backtest can pass the dividend checks only after it ships dividend modeling. LIMITATIONS.md L46-48 at 672804b3 says dividends are not modeled, so until that changes LEAN stands on criterion 1.",
+     "families": {
+      "claude": {
+       "round": 2,
+       "run": "wf_01bd02cf-b21",
+       "method": "two deciders in seeded orders plus one critic (definitive-defaults method)",
+       "defaults_named": [
+        "LEAN"
+       ],
+       "deciders_agree": true,
+       "critic_verdict": "converged",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "layer_id": "execution-broker",
+   "owns": [
+    "pinned: the IBKR execution path through NautilusTrader's in-tree IBKR adapter (a use of the nautilus-trader package owned by backtesting-engine)",
+    "pinned: the separate Alpaca adapter path: alpaca-py 0.44.0 and the in-repository adaptive-paper engine at main dca821cc",
+    "slot ib-gateway-runtime (judged): how the IB Gateway runs headless on the host for the IBKR path"
+   ],
+   "uses": [
+    "NautilusTrader (backtesting-engine)"
+   ],
+   "slots": [
+    {
+     "slot_id": "ib-gateway-runtime",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "first_round",
+     "lane_record": {
+      "coincides": false,
+      "record_component": null,
+      "note": "no IB Gateway runtime is on the record"
+     },
+     "default": {
+      "name": "Dockerized IB Gateway",
+      "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+      "install_command": "docker compose up  (from the upstream docker-compose.yml, with a .env created from the upstream .env-dist and kept outside any repository: TWS_USERID, TWS_PASSWORD_FILE as a Docker secret, TRADING_MODE=paper, TWOFA_TIMEOUT_ACTION=restart, RELOGIN_AFTER_TWOFA_TIMEOUT=yes, AUTO_RESTART_TIME; image ghcr.io/gnzsnz/ib-gateway:stable)",
+      "installs_nothing_extra": false
+     },
+     "alternatives": [
+      {
+       "name": "IBC",
+       "reason": "excluded (stale_or_archived): Observed 2026-10-01: the GitHub API for repos/IbcAlpha/IBC returns archived=true (pushed_at 2026-09-01T00:46:31Z). The README section 'PROJECT RETIREMENT' says: 'This project has been retired, as of 1 September 2026 ... there will be no further development of IBC' and 'This project repository has been archived ... it is read-only'. The exclusion rests on archive statu"
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://github.com/gnzsnz/ib-gateway-docker/blob/master/README.md?plain=1#L7-L34",
+       "shows": "Documented (read 2026-10-01): 'A docker image to run Interactive Brokers Gateway and TWS without any human interaction'. It includes IBC to control IB Gateway (line 16), Xvfb to run without graphics hardware (lines 17-18), socat, secrets support (line 30) and aarch64 support for 'M1,M2,M3' (line 31)",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/gnzsnz/ib-gateway-docker/blob/master/README.md?plain=1#L184-L199",
+       "shows": "Documented configuration: TRADING_MODE defaults to paper (line 184). TWOFA_TIMEOUT_ACTION takes exit or restart, default exit (line 191). AUTO_RESTART_TIME is the 'time to restart IB Gateway, does not require daily 2FA validation' (line 195). TWS_COLD_RESTART is at line 197. RELOGIN_AFTER_TWOFA_TIME",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/gnzsnz/ib-gateway-docker/blob/master/README.md?plain=1#L513-L520",
+       "shows": "Documented credentials handling: 'This image does not contain nor store any user credentials'. From 10.29.1e and 10.19.2m, the *_FILE variables read Docker secrets (TWS_PASSWORD_FILE, VNC_SERVER_PASSWORD_FILE, SSH_PASSPHRASE_FILE).",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/nautechsystems/nautilus_trader/blob/develop/docs/integrations/interactive_brokers.md",
+       "shows": "Documented upstream adapter integration (develop branch, the default, pushed 2026-10-01). Section 'Use a Dockerized IB Gateway': the adapter's DockerizedIBGateway 'can manage the gnzsnz IB Gateway container', the default container is ghcr.io/gnzsnz/ib-gateway:stable, and credentials come from the co",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/gnzsnz/ib-gateway-docker",
+       "shows": "Observed 2026-10-01 through the GitHub API. Status: archived=false, default branch master, pushed_at 2026-10-01T10:57:43Z, license MIT (information only). Latest release ibgateway-latest@10.51.1b (2026-09-30); ibgateway-stable@10.50.1e (2026-09-23). 23 default-branch commits since 2026-07-03, the ne",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/gnzsnz/ib-gateway-docker/blob/master/.github/workflows/build.yml",
+       "shows": "Observed CI scope. 'Docker Image CI' (on-push-n-pr.yml calling build.yml) builds the stable and latest channels for linux/amd64 and linux/arm64 on every push and PR. It sets push:false and load:false, so it is a build-only check with no runtime or login test. The latest master run (2026-10-01T10:20:",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/IbcAlpha/IBC/blob/master/userguide.md?plain=1#L54-L59",
+       "shows": "Documented behaviour of the bundled IBC. Lines 54-56: daily restart 'without need for repeated authentication: authentication is only required the first time during the week that TWS or Gateway run after 01:00 ET on Sunday'. Lines 58-59: IBKR Mobile 2FA with repeated alerts. Lines 598-601: the Sunda",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/gnzsnz/ib-gateway-docker/issues/366",
+       "shows": "Observed risk. Issue 'IBC deprecation' has been open since 2026-03-24 and was last updated 2026-09-06, with 32 comments. The owner calls IBC 'a critical dependency' and says 'I have not made my mind'. The thread discusses replacement controllers ibctl and ibg-controller, and none has been adopted. I",
+       "from": "round-one judge"
+      }
+     ],
+     "evidence_items_in_full_file": 20,
+     "overturn_check": "No head-to-head is possible because only one maintained candidate exists. The judge's acceptance run confirms or reopens the pick, with one setup fix: pin image ghcr.io/gnzsnz/ib-gateway:stable explicitly, because the repository's docker-compose.yml defaults to :latest. On the WSL2 host, run the paper account for one trading week that crosses a Sunday, with TWOFA_TIMEOUT_ACTION=restart, RELOGIN_AFTER_TWOFA_TIMEOUT=yes and AUTO_RESTART_TIME set. Measure unattended start, each daily auto-restart without 2FA, the re-login after the Sunday credential expiry with one IBKR Mobile approval, and the NautilusTrader adapter reconnecting to 127.0.0.1:4002 after each restart. The layer reopens if C01 fails that run, if C01 replaces IBC with another controller (ibctl is on the maintainer's local branch, per #366), or if an IB Gateway release breaks IBC 3.24.2 and no fix exists upstream. Re-run this slot when the image adopts a maintained controller or an IBC fork, when an IB Gateway release breaks IBC's login, 2FA or daily auto-restart handling with no fix in the image, or when NautilusTrader's DockerizedIBGateway changes its default container.",
+     "families": {
+      "claude": {
+       "round": 1,
+       "run": "wf_4d2dd504-4a2",
+       "method": "merit judge plus adversarial critic (#589 method)",
+       "single_finalist": true,
+       "critic_verdict": "upheld",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     },
+     "maintenance_risk": "The selected image bundles IBC (github.com/IbcAlpha/IBC) for login, 2FA and dialog automation. IBC was archived on 2026-09-01 (archivedAt 2026-09-01T00:49:34Z, observed by the round-one critic), so no upstream remains to ship fixes such as its August 2026 auto-restart and Gateway v1048 changes. The image owner is evaluating a replacement controller (ibctl, issue #366) but has not adopted one.",
+     "install_pin_note": "The repository's docker-compose.yml builds ./latest (image :latest); the :stable tag comes from the README's sample compose and must be pinned explicitly (round-one critic finding)."
+    }
+   ]
+  },
+  {
+   "layer_id": "portfolio-risk",
+   "owns": [
+    "slot portfolio-construction (judged): portfolio optimization and walk-forward allocation (skfolio today)",
+    "slot performance-analytics (judged): risk and performance statistics and tear sheets of backtest and paper results"
+   ],
+   "uses": [
+    "NautilusTrader's RiskEngine (backtesting-engine) for deterministic pre-trade risk"
+   ],
+   "slots": [
+    {
+     "slot_id": "portfolio-construction",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "first_round",
+     "lane_record": {
+      "coincides": true,
+      "record_component": "skfolio",
+      "note": "freedom from current-use influence is not shown"
+     },
+     "default": {
+      "name": "skfolio",
+      "repository": "https://github.com/skfolio/skfolio",
+      "install_command": "pip install -U skfolio",
+      "installs_nothing_extra": false
+     },
+     "alternatives": [
+      {
+       "name": "PyPortfolioOpt",
+       "reason": "Covers mean-variance, semivariance, CVaR, CDaR, HRP and Black-Litterman, but documents no risk-budgeting (ERC) optimizer, walk-forward or CPCV. It has one default-branch commit since 2026-07-03 (on 2026-07-07) and its last release was v1.6.0 on 2026-02-26. At HEAD a6638d2e06, 10 of 21 check runs fail: 9 nosoftdeps jobs on ubuntu, macos and windows for Python 3.12 to 3.14, plus coverage. The full-d"
+      },
+      {
+       "name": "Riskfolio-Lib",
+       "reason": "Has the broadest model catalogue: mean-risk with 26 convex risk measures, risk parity with 22, HRP and HERC with 37, plus NCO and turnover, tracking-error and cardinality constraints. But it has no walk-forward or CPCV, and no transaction-cost model; it offers only a turnover constraint and sends backtests to external Backtrader or vectorbt. Its build.yml CI passes with the Test step commented out"
+      },
+      {
+       "name": "pyhrp",
+       "reason": "Only does hierarchical allocation (HRP, Schur complementary allocation and 1/N, per its README package layout). It has no mean-risk optimizer, risk budgeting, cross-validation or cost model. It is very active (v2.3.5 on 2026-09-29, 68 commits since 2026-07-03), but the CI rollup at HEAD 0867d85a56 is FAILURE."
+      },
+      {
+       "name": "fortitudo.tech",
+       "reason": "Offers Sequential Entropy Pooling, mean-CVaR and CML optimization, and Fully Flexible Resampling. It has no hierarchical or risk-parity model, no walk-forward or CPCV, and no documented cost model. Latest release v1.2.5 on 2026-08-20; GPL-3.0 (information only)."
+      },
+      {
+       "name": "riskparity.py",
+       "reason": "Only provides risk-parity solvers (Spinu's convex formulation, cyclical methods, and SCA for nonconvex variants). It has no mean-risk or hierarchical models, cross-validation or costs. Last release v0.5.1 on 2024-03-02, two default-branch commits since 2026-07-03, and the CI rollup at HEAD is FAILURE."
+      },
+      {
+       "name": "OptimalPortfolios",
+       "reason": "Documents drift-aware rolling (walk-forward) backtests with transaction costs, turnover, tracking-error and group constraints, risk budgeting, and HRP from a supplied linkage. It is very active (v7.10.2 on 2026-10-01). But it has no CPCV (code search for 'purged' finds only docs/package_comparison.md), and README line 175 sends non-quadratic risk measures (CVaR, MAD, drawdown) to other packages. N"
+      },
+      {
+       "name": "cvxportfolio",
+       "reason": "excluded (stale_or_archived): The last default-branch (master) commit is 351c782b9b on 2026-04-27 (gh api repos/cvxgrp/cvxportfolio/commits?per_page=1), and there is no default-branch commit since 2026-07-03. Latest release 1.5.1 on 2025-07-06."
+      },
+      {
+       "name": "deepdow",
+       "reason": "excluded (stale_or_archived): The last default-branch (master) commit is 384e18acc1 on 2024-01-24 (gh api repos/jankrepl/deepdow/commits?per_page=1). It has no GitHub releases."
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://github.com/skfolio/skfolio",
+       "shows": "README at HEAD 5b657bda01, read with gh api repos/skfolio/skfolio/readme on 2026-10-01. It lists MeanRisk, HRP, HERC, Schur Complementary Allocation, NCO and RiskBudgeting. Under 'Cross-Validation and Model Selection' it lists Walk Forward, Combinatorial Purged Cross-Validation and Multiple Randomiz",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://skfolio.org/user_guide/model_selection.html.md",
+       "shows": "Model Selection guide, fetched 2026-10-01. It shows cross_val_predict(MeanRisk(transaction_costs=0.001 / 5), X, cv=WalkForward(test_size=5, train_size=252), portfolio_params={'weight_drift': True, 'compounded': True}) and calendar-based walk-forward with freq='WOM-3FRI'. It describes CombinatorialPu",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/skfolio/skfolio/blob/main/.github/workflows/ci.yml",
+       "shows": "CI workflow, read through the GitHub contents API on 2026-10-01. It runs a Linux pytest matrix on Python 3.10 to 3.14 with the latest dependencies, plus a minimum-dependency path (uv pip compile --resolution lowest-direct). The main-Python job runs pytest with --cov=skfolio, and a separate job runs ",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://pypi.org/pypi/skfolio/json",
+       "shows": "Latest version 1.4.10, uploaded 2026-09-30. Files are an sdist and skfolio-1.4.10-py3-none-any.whl, with requires_python >=3.10. There have been 34 PyPI releases since 2026-07-03, including 1.0.0 on 2026-08-23.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/skfolio/skfolio/blob/main/pyproject.toml",
+       "shows": "Version 1.4.10 with requires-python >=3.10. Classifiers cover Unix, Windows and MacOS and Python 3.10 to 3.14. Dependencies are numpy>=1.24.0, scipy>=1.15.2, pandas>=2.1.0, cvxpy-base>=1.5.0, clarabel>=0.10.0 (the default solver) and scikit-learn>=1.6.0. The build uses setuptools, consistent with th",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://github.com/skfolio/skfolio/releases",
+       "shows": "gh api graphql on 2026-10-01: the repository is not archived and is BSD-3-Clause. The main branch's last commit was on 2026-10-01, with 138 default-branch commits since 2026-07-03. The latest GitHub release is v1.4.10 (2026-09-30), out of 93 releases. Issues: 16 open and 120 closed; 19 open PRs.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://arxiv.org/abs/2507.04176",
+       "shows": "Software paper 'skfolio: Portfolio Optimization in Python' by Nicolini, Manzi and Delatte (submitted 5 Jul 2025, revised 8 Jul 2025). It describes one framework covering mean-variance through clustering methods, with cross-validation built for financial time series. It describes the design and does ",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/graphql (repository skfolio/skfolio, queried 2026-10-01)",
+       "shows": "skfolio's head 5b657bda01 was committed 2026-10-01, with 138 default-branch commits since 2026-07-03 and a SUCCESS rollup",
+       "from": "round-one critic, checked"
+      }
+     ],
+     "evidence_items_in_full_file": 19,
+     "overturn_check": "skfolio is the only candidate whose source covers mean-risk, hierarchical and risk-parity models together with WalkForward, CombinatorialPurgedCV (purge and embargo), transaction costs and constraints. Keep the judge's overturn test on WSL2 x86_64 with a frozen US-equities return panel and cost model. Run skfolio's WalkForward and CombinatorialPurgedCV over MeanRisk, HierarchicalRiskParity and RiskBudgeting with transaction_costs and constraints. Run OptimalPortfolios' rolling backtester, and run Riskfolio-Lib inside an external walk-forward loop. Compare out-of-sample paths, constraint violations, solver failures and reproducibility across two runs, with skfolio pinned to one version given its 35 releases in the window. The pick is overturned only if skfolio shows repeated solver failures or non-reproducible paths where the others pass.",
+     "families": {
+      "claude": {
+       "round": 1,
+       "run": "wf_4d2dd504-4a2",
+       "method": "merit judge plus adversarial critic (#589 method)",
+       "single_finalist": true,
+       "critic_verdict": "upheld",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     }
+    },
+    {
+     "slot_id": "performance-analytics",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "decision_round",
+     "lane_record": {
+      "coincides": false,
+      "record_component": null,
+      "note": "no performance-analytics library is on the record"
+     },
+     "default": {
+      "name": "fincore",
+      "repository": "https://github.com/cloudQuant/fincore",
+      "install_command": "pip install \"fincore==0.5.1\"",
+      "installs_nothing_extra": false
+     },
+     "alternatives": [
+      {
+       "name": "jquantstats",
+       "reason": "Criterion 1 gap. It has no built-in gross, net, long/short or sector exposure statistic, only signed per-asset NAV weights and time in market. Its positions route recomputes NAV from prices × positions instead of taking the engine's returns with positions. Its HTML report bytes vary per render (date.today() footer in the data report; uuid4 Plotly div ids). It leads on criterion 4 hygiene (all 31 h"
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://github.com/cloudQuant/fincore/blob/576459c495a8f7ff839f55e0d3057daa636174cc/fincore/portfolio/positions.py#L231",
+       "shows": "fincore computes exposures from a positions panel. get_long_short_pos (L231) returns 'pyfolio-compatible long, short, and net portfolio exposure' normalised by net liquidation value, and gross_lev (L490) is sum|non-cash positions| / total value. Sector, style, cap and volume exposure functions are a",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/cloudQuant/fincore/blob/576459c495a8f7ff839f55e0d3057daa636174cc/README.md#L31-L104",
+       "shows": "The fincore README documents a report built from returns plus positions: build_portfolio_report(returns, positions=positions) followed by write_html (L91-99), with HTML, PDF and XLSX renderers (L36). The install command is `pip install fincore` (L48), with chart and PDF extras at L52-55. The README ",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/cloudQuant/fincore/blob/576459c495a8f7ff839f55e0d3057daa636174cc/fincore/report/portfolio/compute.py#L108-L174",
+       "shows": "fincore's portfolio report computes annual_return, annual_volatility, sharpe_ratio, calmar_ratio, max_drawdown and sortino_ratio (compute.py L108-118). It also reports gross leverage from positions, as average_gross_leverage and maximum_gross_leverage (L168-174).",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/cloudQuant/fincore/blob/576459c495a8f7ff839f55e0d3057daa636174cc/fincore/report/renderers/html.py#L85-L100",
+       "shows": "fincore's HTML tear sheet is a pure function of the report document. It is tables only (metrics, drawdown and series rendered as tables) and writes a data-report-digest attribute (html.py L85-100). The digest is SHA-256 (models.py L206-212). A grep of fincore/report/*.py found no uuid, random, date.",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/Jebel-Quant/jquantstats/blob/1a37127021c8f2b497723c50f1d8cd7b095cc04d/src/jquantstats/_portfolio_units.py#L152",
+       "shows": "jquantstats' only 'exposure' is time in market (returns != 0, _stats/_basic.py L334). It also has signed per-asset NAV weights (Portfolio.weights, _portfolio_units.py L152), from which gross and net exposure take one line to derive. src/ has no gross, net, long/short or sector exposure statistic, an",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/Jebel-Quant/jquantstats/blob/1a37127021c8f2b497723c50f1d8cd7b095cc04d/src/jquantstats/_portfolio_constructors.py#L89-L195",
+       "shows": "jquantstats constructors take either prices plus positions or returns alone. Portfolio.from_cash_position, from_risk_position and from_position are at _portfolio_constructors.py L89, L103 and L195, and Data.from_returns and from_prices at data.py L108 and L245. The README (L42-44) says the library '",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/plotly/plotly.py/blob/main/plotly/io/_html.py#L143",
+       "shows": "jquantstats' HTML reports are not byte-reproducible. The data report passes footer_date=str(date.today()) (_reports/_data.py L142), which templates/data_report.html renders at L52. Charts are emitted through pio.to_html(fig, full_html=False, ...) with no div_id (_reports/_formatting.py L34-36). plot",
+       "from": "round-two decider, order 1"
+      },
+      {
+       "url": "https://github.com/cloudQuant/fincore/blob/576459c495a8f7ff839f55e0d3057daa636174cc/tests/test_metrics/test_ratios_complete.py#L59-L77",
+       "shows": "Criterion 2 cannot decide. jquantstats tests parity with quantstats 0.0.81, an implementation rather than an oracle: test_basic.py L4 imports quantstats and checks sharpe L12, sortino L49 and max_drawdown L52 at 1e-12, with the pin at pyproject L71. fincore's 'P0 critical metric' Sharpe and Sortino ",
+       "from": "round-two decider, order 1"
+      }
+     ],
+     "evidence_items_in_full_file": 51,
+     "overturn_check": "Freeze one backtest and one paper-trading run, each with daily returns, a price panel and a position panel. Install fincore==0.5.1 and jquantstats==0.12.0 in separate fresh Python 3.13 venvs on the WSL2 x86_64 host, then repeat on a macOS arm64 laptop. With each library, compute total and annualised return, max drawdown, annualised Sharpe and annualised Sortino. Also compute long, short, net and gross exposure: in fincore with get_long_short_pos and gross_lev; in jquantstats as the sums of the signed and the absolute Portfolio.weights, which are NAV-normalised and so like for like with fincore's net-liquidation basis. Compare at rel 1e-9 against R PerformanceAnalytics at a pinned version, with matched ddof, downside-deviation and annualisation conventions. Pin 2.1.0, the version vetted's README L144-148 states it reproduces. Use a numpy reference for the exposures, and run every computation twice in fresh processes. Replace fincore with jquantstats if fincore misses the reference on any named metric under its documented convention, or gives different statistics across the two runs, while jquantstats matches on every named metric and on its weight-derived exposures. Record HTML byte identity, but do not gate on it.",
+     "families": {
+      "claude": {
+       "round": 2,
+       "run": "wf_01bd02cf-b21",
+       "method": "two deciders in seeded orders plus one critic (definitive-defaults method)",
+       "defaults_named": [
+        "fincore"
+       ],
+       "deciders_agree": true,
+       "critic_verdict": "converged",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "layer_id": "evaluation-experiments",
+   "owns": [
+    "slot experiment-tracking (judged): research experiment runs, parameters, artifacts and metrics (MLflow today)",
+    "slot strategy-qualification-statistics (judged): multiple-testing-aware strategy statistics (reality checks, deflated performance, overfitting probability)"
+   ],
+   "uses": [
+    "Inspect AI, Harbor, promptfoo (foundation quality-evaluation) for model-route and agent evaluations",
+    "agent-retrieval-bench (foundation quality-evaluation candidate task set)"
+   ],
+   "slots": [
+    {
+     "slot_id": "experiment-tracking",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "first_round",
+     "lane_record": {
+      "coincides": true,
+      "record_component": "MLflow",
+      "note": "freedom from current-use influence is not shown"
+     },
+     "default": {
+      "name": "MLflow",
+      "repository": "https://github.com/mlflow/mlflow",
+      "install_command": "pip install 'mlflow[mcp]>=3.5.1'",
+      "installs_nothing_extra": false
+     },
+     "alternatives": [
+      {
+       "name": "falsification-ledger",
+       "reason": "Misses two requirement elements. It is a hash-chained JSONL ledger of research claims, driven by the 'fl' CLI (preregister, submit, adjudicate, report, verify). The repo tree holds only cli.py, contracts.py and ledger.py plus schemas and tests, with no UI. It does not log run parameters, metrics or artifacts. It is alpha: the README says v0.1.4, PyPI has 0.1.4 (2026-09-06), the latest GitHub relea"
+      },
+      {
+       "name": "Opik",
+       "reason": "excluded (outside_requirement): The README says 'Opik covers the full LLM application lifecycle ... for teams building LLM apps and AI agents': agent tracing, LLM evaluation datasets and experiments, and LLM-as-a-judge metrics. The layer asks for strategy-research run tracking 'rather than model or agent evaluation'."
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://mlflow.org/docs/latest/ml/tracking/",
+       "shows": "Documented: 'MLflow Tracking is an API and UI for logging parameters, code versions, metrics, and output files ... and for later visualizing the results'. The default setup records metadata and artifacts per run to a local directory 'mlruns'. Setup 2 uses a SQLAlchemy-compatible database such as SQL",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://mlflow.org/docs/latest/ml/tracking/tracking-api/",
+       "shows": "Documented: the system tag mlflow.source.git.commit is set automatically 'When run from git repo'. mlflow.search_runs(filter_string=\"tags.environment = 'production' AND metrics.accuracy > 0.95\") queries runs by tags and metrics.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://mlflow.org/docs/latest/ml/dataset/",
+       "shows": "Documented: mlflow.data.from_pandas(...) plus mlflow.log_input(dataset, context='training') records a dataset's source and lineage with the run. This covers the data-snapshot element.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://mlflow.org/docs/latest/genai/mcp/",
+       "shows": "Documented: the MCP server is experimental and needs MLflow >= 3.5.1. MLFLOW_MCP_TOOLS=ml exposes the experiments, runs, models and deployments tools. The page gives a .mcp.json example running 'uv run --with mlflow[mcp]>=3.5.1 mlflow mcp run' for coding assistants.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/mlflow/mlflow/releases",
+       "shows": "Observed now: v3.16.1 (2026-09-17), v3.16.0 (2026-09-04), v3.15.2 (2026-08-26), v3.15.1 (2026-08-03), v3.15.0 (2026-07-31). The repo is not archived and has 2,155 open issues.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/mlflow/mlflow/commits?since=2026-07-03T00:00:00Z&per_page=100",
+       "shows": "Observed now: at least 100 default-branch commits in the last 90 days. The latest is 59dac6f73e on 2026-10-01.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/mlflow/mlflow/commits/59dac6f73e/check-runs",
+       "shows": "Observed now: 44 GitHub Actions check runs on the latest master commit: 39 success, 4 skipped (including unit-tests and e2e-tests) and 1 failure (check named 'main'). Push runs on master dated 2026-09-08 include 'MLflow tests' success (actions/runs?branch=master&event=push).",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://pypi.org/pypi/mlflow/json",
+       "shows": "Observed now: 3.16.1 uploaded 2026-09-16, requires_python >=3.10. The wheel is pure Python ('any'), so it installs on Linux x86_64 and macOS arm64. 7 releases since 2026-07-03.",
+       "from": "round-one judge"
+      }
+     ],
+     "evidence_items_in_full_file": 18,
+     "overturn_check": "No head-to-head is needed among the three packet candidates. Only MLflow documents every element: parameters, metrics, artifacts, the git-commit tag, dataset inputs, a local queryable store, a UI and agent access by MCP or script. Opik targets LLM and agent evaluation, and falsification-ledger has no UI and no run metric or artifact logging. MLflow would be overturned only by the packet's comparison against an equally complete tracker: log the same frozen research runs to each, then compare query completeness, artifact integrity, restore from backup of the SQLite store (mlflow.db) plus the artifact root, and scripted and MCP agent access. Run that comparison on the current SQLite default, not the legacy mlruns file store.",
+     "families": {
+      "claude": {
+       "round": 1,
+       "run": "wf_4d2dd504-4a2",
+       "method": "merit judge plus adversarial critic (#589 method)",
+       "single_finalist": true,
+       "critic_verdict": "upheld",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     }
+    },
+    {
+     "slot_id": "strategy-qualification-statistics",
+     "row_kind": "judged",
+     "definitive": false,
+     "decision_stage": "first_round",
+     "lane_record": {
+      "coincides": false,
+      "record_component": null,
+      "note": "neither arch nor purgedcv is on the record"
+     },
+     "default": [
+      {
+       "name": "arch",
+       "repository": "https://github.com/bashtage/arch",
+       "role": "Reality-check multiple-comparison tests on strategy return or loss series: Hansen's Test of Superior Predictive Ability (SPA, also called the Reality Check or Bootstrap Data Snooper), Romano-Wolf StepM and the Model Confidence Set. Also provides IID, stationary, circular-block and moving-block bootstraps, including bootstrapped Sharpe-ratio confidence intervals.",
+       "install_command": "python -m pip install arch",
+       "installs_nothing_extra": false
+      },
+      {
+       "name": "purgedcv / purged-cross-validation",
+       "repository": "https://github.com/eslazarev/purged-cross-validation",
+       "role": "Selection-bias and leakage-aware validation. Provides purged and embargoed k-fold, group-purged k-fold, walk-forward, and combinatorial purged CV with backtest-path reconstruction. Computes probability of backtest overfitting via CSCV, probabilistic and deflated Sharpe ratios (with effective_n_trials for correlated searches), MinTRL and MinBTL. Includes split-level leakage and embargo audits (audit_splitter, diagnostics.*).",
+       "install_command": "pip install purgedcv",
+       "installs_nothing_extra": false
+      }
+     ],
+     "alternatives": [
+      {
+       "name": "leakprobe",
+       "reason": "Detects temporal leakage in feature pipelines by metamorphic testing over feature-building functions, sources and timestamps. It is not a return-series statistic, so it cannot take part in the packet's deciding comparison. Its '9/9 planted leaks caught, 0/5 correct pipelines flagged' figure is an upstream self-report, not reproduced here. The repo was created 2026-09-10, has no GitHub releases and"
+      },
+      {
+       "name": "backtest-bias",
+       "reason": "Checks price panels and screening rules (survivorship, recycled tickers, universe and screen-selection look-ahead) rather than testing a strategy's return series for multiple testing, so it cannot run the packet's return-series comparison. Its bias figures are upstream self-reported 'measured constants'. The repo was created 2026-07-09 and its latest release is v0.3.0 (2026-09-05)."
+      },
+      {
+       "name": "RiskLabAI",
+       "reason": "The README lists PSR/DSR, PBO and purged/combinatorial CV, which overlaps purgedcv. It has no SPA/StepM, and its 'search-adjusted false discovery' sits inside the causal-factor protocol. Its public evidence is weaker: 9 CI runs (failures 2026-06-28 to 2026-07-12, success 2026-08-25/26) and no documented test count or coverage found. It needs Python >=3.12,<3.15. The GitHub repo was created 2026-06"
+      },
+      {
+       "name": "NoEdge-Bench",
+       "reason": "excluded (outside_requirement): The README calls it 'A reproducible negative-result benchmark: no model beats the coin on a memoryless synthetic binary-options feed'. It is a benchmark artifact, not a library for testing a strategy's return series. All 5 of its commits are dated 2026-08-07."
+      },
+      {
+       "name": "mlfinlab",
+       "reason": "excluded (stale_or_archived): The last default-branch commit is 79dcc7120e on 2021-12-01. There are no commits since 2026-07-03 and zero GitHub releases (api.github.com/repos/hudson-and-thames/mlfinlab/commits)."
+      }
+     ],
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/bashtage/arch/main/README.md",
+       "shows": "Documented under 'Multiple Comparison Procedures': 'Test of Superior Predictive Ability (SPA), also known as the Reality Check or Bootstrap Data Snooper', 'Stepwise (StepM)' and 'Model Confidence Set (MCS)'. Bootstraps: IID, Stationary, Circular Block, Moving Block. CI badges point to Azure Pipeline",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/bashtage/arch/commits/88ffcf8704/check-runs",
+       "shows": "Observed now: 26 of 26 check runs succeeded on the latest main commit. 19 are azure-pipelines, including 'LinuxTest python_311_cython_coverage' and 'LinuxTest python_310_no_numba'. 7 are github-actions, including ubuntu-latest and windows-latest cp314 wheel builds, dated 2026-09-27 to 2026-09-29.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/bashtage/arch/commits?since=2026-07-03T00:00:00Z&per_page=100",
+       "shows": "Observed now: 16 default-branch commits in the last 90 days, latest 88ffcf8704 on 2026-09-27 (merge of PR #869, a BCa acceleration fix). Currency caveat: the latest release is v8.0.0 from 2025-10-21, outside the 90-day window (releases API). The repo is not archived and has 59 open issues.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://pypi.org/pypi/arch/json",
+       "shows": "Observed now: 8.0.0, requires_python >=3.10. Wheels include manylinux x86_64 and macOS arm64. 48 releases since 2014-09-03.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/eslazarev/purged-cross-validation/main/README.md",
+       "shows": "Documented API table: PurgedKFold, PurgedGroupKFold, CombinatorialPurgedCV, CombinatoriallySymmetricCV ('CSCV ... the PBO substrate'), reconstruct_paths, probability_of_backtest_overfitting, probabilistic_sharpe_ratio, deflated_sharpe_ratio ('PSR corrected for multiple testing'), min_track_record_le",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/eslazarev/purged-cross-validation/main/paper/paper.md",
+       "shows": "Documented, self-reported in a JOSS submission dated 20 May 2026: 'pinned by 354 tests (unit, property-based, doctest, and end-to-end) at 98% line coverage', passes mypy --strict, and is 'checked against the original papers' (Bailey & López de Prado PSR/DSR, Bailey et al. PBO). None of this was meas",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/eslazarev/purged-cross-validation/actions/runs?branch=main&per_page=12",
+       "shows": "Observed now: 144 workflow runs in total. CI and Docs succeeded on the 2026-10-01 push to main.",
+       "from": "round-one judge"
+      },
+      {
+       "url": "https://api.github.com/repos/eslazarev/purged-cross-validation/releases?per_page=30",
+       "shows": "Observed now: v0.1.10 released 2026-10-01, with 8 releases since 2026-07-03. The commits API shows 40 default-branch commits since 2026-07-03. The repo was created 2026-05-15, is not archived and has 2 open issues.",
+       "from": "round-one judge"
+      }
+     ],
+     "evidence_items_in_full_file": 25,
+     "overturn_check": "arch holds the SPA/StepM role with no competitor in the packet. For the DSR/PBO/purged-CV slot, purgedcv beats RiskLabAI on documented but self-reported tests and coverage, its explicit leakage-audit API and its commit and release cadence, not on measured accuracy. The slot is closer than close_call=false implies, because the judge's 5-failure count was wrong (6 observed), the run-count comparison measures activity, and the Python floor does not separate the candidates. The judge's named head-to-head decides it. On the WSL2 x86_64 host, run purgedcv and RiskLabAI, with arch SPA/StepM alongside, on frozen return series with a known number of trials and a planted overfit strategy. Compare DSR with the Bailey & López de Prado (2014) worked example, PBO with Bailey et al. (2017), SPA/StepM with Hansen (2005) and Romano-Wolf (2005), and each tool's detection of the plant.",
+     "families": {
+      "claude": {
+       "round": 1,
+       "run": "wf_4d2dd504-4a2",
+       "method": "merit judge plus adversarial critic (#589 method)",
+       "single_finalist": true,
+       "critic_verdict": "upheld",
+       "status": "converged"
+      },
+      "gpt": {
+       "status": "pending",
+       "requested": "2026-10-01T21:39Z, new-wsl-catalog-20261001/claude-owner-response.md (round-one and round-two packets)",
+       "capacity_at_request": "OmniRoute pool: all six accounts at 100 of 100 weekly, read 2026-10-01 ~21:57Z, earliest reset 2026-10-03T17:14Z; the native-login Codex lane is scheduled by the Codex owner"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "layer_id": "agents-models-workers",
+   "owns": [],
+   "uses": [
+    "Claude Code and Codex (foundation native-clients)",
+    "Claude Agent SDK and Codex SDK (foundation agent-sdks)",
+    "the durable-memory owner (foundation durable-memory)",
+    "QMD and MinerU (foundation document-retrieval) for dated financial sources",
+    "the semantic-rag owner (foundation semantic-rag)",
+    "native subagents (foundation workers)"
+   ],
+   "slots": []
+  },
+  {
+   "layer_id": "observability-hosting",
+   "owns": [
+    "configuration only: the paper-trading dashboards and alert rules (observability/paper-trading-live/), on the foundation stack"
+   ],
+   "uses": [
+    "OTel Collector Contrib, Prometheus, Loki, Grafana (foundation observation-inference)",
+    "Dagu (foundation scheduling-supervision)",
+    "Restic (foundation recovery-portability)",
+    "the container engine (foundation hosting-services)"
+   ],
+   "slots": []
+  },
+  {
+   "layer_id": "security-supply-chain",
+   "owns": [
+    "engine-enforced controls only: paper-only endpoint guard, per-account credential pointers through the engine's guarded loader, no broker authority for research workers (these are engine behaviour, not tools)"
+   ],
+   "uses": [
+    "betterleaks and trufflehog (foundation secrets-credentials)",
+    "zizmor, attest, Syft, Dependabot, CodeQL upload-sarif, actionlint (foundation ci-supply-chain)"
+   ],
+   "slots": []
+  }
+ ],
+ "pinned_requirements": [
+  {
+   "name": "NautilusTrader 2.0.0rc5",
+   "owner": "backtesting-engine",
+   "source": "catalogs/us-equities/runtime-target.json engine (decision selected_destination)",
+   "evidence": [
+    "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json (one_zero PASS, rc5)",
+    "evidence/receipts/native-nautilus-v2-20260920.json (unchanged rc5 EURUSD quickstart)"
+   ],
+   "release_pin_rule": "the release pin changes only through a dated version-selection record after qualification"
+  },
+  {
+   "name": "IBKR path (NautilusTrader in-tree IBKR adapter)",
+   "owner": "execution-broker",
+   "source": "catalogs/us-equities/runtime-target.json broker_boundaries",
+   "evidence": [
+    "evidence/receipts/ibkr-readonly-acceptance-20260923.json (step 1 passed; steps 2-4 need the user's IB Gateway paper sign-in)"
+   ]
+  },
+  {
+   "name": "Alpaca adapter path (alpaca-py 0.44.0 + adaptive-paper at dca821cc)",
+   "owner": "execution-broker",
+   "source": "catalogs/us-equities/runtime-target.json broker_boundaries",
+   "evidence": [
+    "blueprints/us-equities/adaptive-paper/trials/{pre,rth,ext}-20260929/receipt.json (11 of 13 trials passed, engine b528bb55)",
+    "blueprints/us-equities/adaptive-paper/native-faults/receipt.json (native_faults_passed on dca821cc, PR #584)"
+   ]
+  }
+ ],
+ "no_blind_default_today": [
+  {
+   "slot": "security-identity",
+   "owner": "identity-provenance",
+   "reason": "the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate"
+  },
+  {
+   "slot": "predictive-ml",
+   "owner": "research-factors-ml",
+   "reason": "no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist"
+  }
+ ],
+ "overlaps_resolved": [
+  {
+   "overlap": "alpaca-py appeared in six trading rows.",
+   "resolution": "execution-broker owns it as part of the pinned Alpaca adapter path; market-data-reference uses it where the Alpaca data API serves research, and its provider slot judges the data source, not the SDK."
+  },
+  {
+   "overlap": "NautilusTrader appeared in four rows.",
+   "resolution": "backtesting-engine owns the pinned engine; execution-broker uses its IBKR adapter, portfolio-risk its RiskEngine and research-factors-ml its replays."
+  },
+  {
+   "overlap": "EdgarTools appeared in four rows.",
+   "resolution": "market-data-reference owns SEC filing acquisition and parsing; the others use it."
+  },
+  {
+   "overlap": "DuckDB appeared in three rows.",
+   "resolution": "storage-compute owns analytical storage; the data layers use it."
+  },
+  {
+   "overlap": "skfolio appeared in research-factors-ml and portfolio-risk.",
+   "resolution": "portfolio-risk owns portfolio construction; research uses it for chronological evaluation."
+  },
+  {
+   "overlap": "DVC versioning and Restic backup both restore data.",
+   "resolution": "different roles: DVC versions research datasets and reproduces their pipelines (identity-provenance); Restic backs up host and application state (foundation)."
+  }
+ ]
+}

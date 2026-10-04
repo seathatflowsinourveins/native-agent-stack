@@ -1,0 +1,1081 @@
+# Decision: the Codex worker lane: Codex's own config writer, RTK's text inline with this catalog's exceptions, and a max-effort worker profile (2026-09-26)
+
+**Status: decided; the repository side is in this change. Not yet applied to any host.** The workstation applies it
+in a coordinated quiet window with `tools/adoption/apply_codex_lane.py`, then runs `tools/adoption/prove_codex_lane.py`.
+Its dry run on the workstation's real Codex home passed, and wrote nothing there
+([evidence](../../evidence/artifacts/codex-worker-lane-20260926/README.md)).
+
+**Scope:**
+- new: `tools/adoption/apply_codex_lane.py`, `tools/adoption/prove_codex_lane.py`,
+  `adoption/templates/codex.AGENTS.template.md`, `adoption/templates/codex.stack-worker.config.toml`,
+  `tests/test_codex_worker_lane.py` with its fixtures, this record and its evidence;
+- changed: one comment in `adoption/templates/codex.config.template.toml`, `scripts/codex_quota.py` (its
+  app-server client takes a caller's argv and environment and keeps the server's error object, which it never
+  prints), `recipes/README.md` and `docs/token-session-handbook.md`.
+- untouched: `scripts/adoption_status.py`, whose RTK check (#368) is reused as it is; jCodeMunch's scope (below);
+  every Claude-side file.
+
+## Context
+
+Three gaps kept GPT-6 Codex workers from running inside the harness with the token stack, all confirmed on the
+workstation (codex-cli 0.157.1) before this change:
+
+1. **context-mode bound to the wrong directory.** A Codex session outside the main checkout used the plugin's
+   own server, which starts in the plugin cache and then follows the newest session log. From the main checkout,
+   an untracked project config pinned every session to the checkout. `codex mcp get context-mode --json` showed
+   `cwd` as the plugin cache and as the checkout. The template already has the fix: #333's session-bound entry,
+   which is the cm-deep plan's step 3 (H4). No host had it.
+2. **RTK's instructions never reached the model.** The global `AGENTS.md` held one `@<CODEX_HOME>/RTK.md` line,
+   the form `rtk init -g --codex` writes. Codex expands no `@` reference (`codex-rs/core/src/agents_md.rs` at
+   `rust-v0.157.1`), so `codex debug prompt-input` showed the path and 0 lines of RTK text or of the top rule.
+3. **Workers could not call three token-stack servers.** Under `approval_policy = "never"`, a `codex exec` worker's
+   `ai-memory` `memory_query` was refused with "MCP tool call requires approval, but approval policy is never".
+   There was also no worker profile.
+
+## Decision
+
+1. **Codex's own writer for `config.toml`.** The script sends `config/batchWrite` to `codex app-server` over
+   stdio, with the `expectedVersion` that a `config/read` in the same session returned
+   (`app-server-protocol/src/protocol/v2/config.rs` `ConfigBatchWriteParams`, `ConfigEdit`, `ConfigReadParams`;
+   `app-server/src/config_manager_service.rs` `apply_edits`). It uses the quota probe's app-server client
+   (`scripts/codex_quota.py`), not a new one. Probed on 0.157.1 against scratch homes:
+   - A stale version is refused with `configVersionConflict`.
+   - Comments and integer types survive, and only the edited tables change.
+   - A wrong type is refused. An unknown key under `mcp_servers.<id>` is accepted, so the script sends only its
+     own key paths and reads every one back.
+   - A `null` value deletes a key, but leaves the empty table header behind. Rollback therefore deletes the
+     shallowest table the run created, and the integration test restores the file byte for byte.
+   - `--profile` is refused for `app-server` (`cli/src/main.rs` `profile_v2_for_subcommand`), and `apply_edits`
+     refuses any file but the user config. So the profile is a plain atomic create, and a project config is a host
+     step.
+2. **The context-mode entry is the template's, exactly as the cm-deep plan's step 3 requires.** That means upstream
+   `start.mjs` from the npm pin through `${ECO_ROOT}/bin/node`, no `cwd`, `startup_timeout_sec = 60`,
+   `default_tools_approval_mode = "approve"`, the `RTK_TELEMETRY_DISABLED`, `PATH` and `CONTEXT_MODE_PLATFORM`
+   env keys, and `[plugins."context-mode@context-mode".mcp_servers.context-mode] enabled = false`. The same write
+   adds headroom's two Hugging Face offline variables, the host residual of the 2026-09-25 decision's addendum
+   (item 3). The entry is interim: it goes when upstream binds a Codex session to its own directory.
+3. **`AGENTS.md` carries the text itself.** Codex reads one global file: `AGENTS.override.md` when it has text,
+   else `AGENTS.md` (the Codex AGENTS.md guide, read 2026-09-26). The block has three parts:
+   - the top rule (120 words, marker `native-agent-stack:top-rule`);
+   - rtk-ai/rtk v0.50.0's `hooks/rtk-awareness-full.md`, verbatim (tag commit `1d87b8e7`, sha256 `278274ef…`,
+     byte-identical to this host's `RTK.md`);
+   - a marked exceptions block.
+
+   The exceptions block is needed because an explicit `rtk` prefix skips `exclude_commands`
+   (`src/discover/registry.rs:1690-1693` at v0.50.0). Its sources:
+   - the recipe's four hook exclusions (`git show REV:path` in any form, `diff`, `git branch`);
+   - the full-save study's fifth: standalone `jq`, where 60 of 152 rewrites were truncated to 40 lines of 120
+     characters;
+   - a complete `git log`, and `find` on a path that may be missing (both in the recipe);
+   - no `rtk` before a shell builtin. Upstream issue #3969 is open and its fix #4175 is not merged (checked with
+     `gh api` on 2026-09-26). On this host `rtk cd /tmp && echo REACHED`, `rtk export` and `rtk source` all exit 127.
+
+   The upstream text stays verbatim, so `scripts/adoption_status.py`'s check (RTK.md's text inline in what Codex
+   reads) passes unchanged. rtk's own `@RTK.md` line is kept, so `rtk init --codex --uninstall` still finds it.
+4. **The worker profile, `stack-worker.config.toml`.** Codex 0.134.0 and later layer a profile over `config.toml`
+   (`$CODEX_HOME/<name>.config.toml`: `config/src/loader/mod.rs:286-330`, precedence 21; the Codex advanced-config
+   page, read 2026-09-26). The layer is deep-merged, so a profile table that names only `enabled_tools` amends the
+   user-scope server (`codex -p stack-worker mcp get ai-memory --json` shows the merged entry).
+   - **`model = "gpt-6-astra"`, `model_reasoning_effort = "max"`.** `max` is what every GPT-6 step here runs at:
+     the control arm A0 of the GPT-6 tiering preregistration (#359, `blueprints/convergence-practice/
+     gpt6-family-tiering-20260926`), which has not run. It is also the child effort of the
+     [max-effort decision](2026-09-23-max-effort-default.md). The user default stays `ultra`, the Codex
+     counterpart of an orchestrating main loop. For `gpt-6-astra`, `ultra` does not send `max`: the request
+     carries the catalog's `multi_agent_reasoning_effort`, which is `xhigh` (`codex debug models --bundled`;
+     `ModelInfo::resolve_reasoning_effort` in `protocol/src/openai_models/reasoning_effort.rs`, applied in
+     `core/src/client.rs` `build_reasoning`). The model-visible input also differs (`core/src/session/
+     multi_agents.rs`):
+     - at `ultra`, "Proactive multi-agent delegation is active";
+     - at `max`, "Do not spawn sub-agents unless the user or applicable AGENTS.md/skill instructions explicitly
+       ask".
+
+     That second line is this harness's no-second-layer rule for children.
+   - **The launch pins model, effort and web search too.** A project `.codex/config.toml` outranks a profile file
+     (`config/src/config_layer_source.rs`: profile 21, project 25), and `-c` outranks both (session flags, 30).
+     So every worker starts with `codex exec -p stack-worker -m gpt-6-astra -c model_reasoning_effort="max" -c
+     web_search="live" ...`, and the profile is a convenience that carries the tool settings below.
+     `prove_codex_lane.py` starts its workers exactly so (`apply_codex_lane.worker_pins`, read from the profile
+     template), and the apply prints the command.
+   - **`web_search = "live"`.** Exec's default is `cached`, an index only (the recipe's codex row), and a
+     read-only or workspace-write sandbox keeps it (the Codex config reference defaults to `live` only for a
+     full-access sandbox). A lane that must not browse passes `-c web_search="disabled"`.
+   - **Read tools approved for three servers.** ai-memory 2.4.1 (23 tools), Headroom 0.37.0 (3 tools) and
+     SocratiCode 1.14.0 (`server.tool` registrations) declare no MCP tool annotations. Under the default `auto`
+     mode Codex then requires approval for every call (`core/src/mcp_tool_call.rs` `requires_mcp_tool_approval`),
+     which `approval_policy = "never"` refuses. Serena's and qmd's read tools carry `readOnlyHint` and pass. This
+     was read through `codex app-server` `mcpServerStatus/list`.
+
+     So these three servers get `default_tools_approval_mode = "approve"` with `enabled_tools` limited to read
+     tools. Both keys are confirmed in `config/src/mcp_types.rs` at the tag and in the Codex config reference.
+     The tool lists come from each server's own tool descriptions:
+     - ai-memory's writes and its LLM-backed `memory_explore` are left out;
+     - SocratiCode's graph and symbol tools are left out, because with `SOCRATICODE_WATCHER=auto` they build a
+       missing graph as a side effect (`dist/tools/graph-tools.js:29-44`).
+   - **`ctx_upgrade` and `ctx_purge` are disabled for workers.** `ctx_upgrade` returns the `context-mode upgrade`
+     command (`src/server.ts:4269-4290` at `6f0cc684`), and upgrade's `configureAllHooks` removes
+     `[mcp_servers.context-mode]` from `config.toml` (`src/cli.ts:1892`; `src/adapters/codex/index.ts:879-887`).
+     `ctx_purge` deletes indexed content.
+5. **Profile scope, not user scope, for these tool settings.** The full-save plan's step A8 wrote them to user scope.
+   The profile keeps interactive sessions' tool surfaces as they are, and it keeps a lane that approves writes
+   interactively working. The cost: a Codex session run without `-p stack-worker` still gets the refusals.
+6. **jCodeMunch stays project-scoped.** The adoption plan's D14 (a disabled user entry, enabled in the profile) is
+   not adopted. [Decision 2 of the Codex MCP scope record](2026-09-25-codex-mcp-scope.md) keeps it project-scoped
+   until a retrieval comparison on Codex calls shows it materially ahead of Serena and SocratiCode. That condition
+   is unmet: the 2026-09-25 counts were 15 jCodeMunch calls against 33 Serena and 7 SocratiCode, and hit@5 was
+   0.25 against SocratiCode's 0.85 (`adoption/bootstrap.md`). The profile would put jCodeMunch's "prefer me"
+   instructions into exactly the max-quality lanes.
+
+## Evidence
+
+The workstation, 2026-09-26, codex-cli 0.157.1: [`evidence/artifacts/codex-worker-lane-20260926/`](../../evidence/artifacts/codex-worker-lane-20260926/README.md).
+
+- **Source.** Every Codex file cited here hashes the same as `openai/codex` at `rust-v0.157.1` (`gh api`). The
+  rtk, context-mode and SocratiCode files are at the pins named above.
+- **Dry run on the real Codex home.** It exited 0 and the rehearsal passed. `config.toml`, `AGENTS.md`, `RTK.md`
+  and `hooks.json` had the same hashes and mtimes afterwards, and no profile was created.
+- **Prove before apply, on the real home.** It failed as expected, 2 pass and 5 fail:
+  - top-rule lines 0;
+  - `rtk_instructions_inline` false;
+  - context-mode's `cwd` was the plugin cache from `/` and the checkout from the checkout.
+
+  Blind isolation and RTK exactness passed. `rtk git show` returned 8,248 of 21,300 bytes.
+- **Rehearsal on a scratch home (copies of this host's three files; no `auth.json`).**
+  - apply, a second apply ("already in place"), rollback (both files byte-identical, profile removed) and a second
+    rollback ("already") all behaved as intended;
+  - prove passed 7 of 7 after apply, with a scratch project standing in for the main checkout after the host step.
+- **Live rehearsal (real model calls, on the real home, through `-c` overrides; no Codex file changed).**
+  - two concurrent workers each got their own directory from `ctx_execute pwd`;
+  - `memory_query` completed with the profile's keys and was refused without them;
+  - a worker given the block as project `AGENTS.md` ran `rtk git status --short` and then
+    `rtk proxy git show HEAD:big.txt`, byte-exact (21,300 bytes).
+
+  An earlier prompt that did not name the shell tool had that worker read the blob through `ctx_execute`. The
+  prove prompt now names the shell tool.
+- **Effort and precedence read-backs.** The bundled catalog gives `gpt-6-astra` a `multi_agent_reasoning_effort`
+  of `xhigh`. In a trusted scratch project whose config sets `ultra`, `-p stack-worker` still rendered proactive
+  delegation, so the project won over the profile, and adding `-c model_reasoning_effort="max"` rendered the
+  no-spawn sentence.
+- **Tests.** `tests/test_codex_worker_lane.py`: templates, block handling, and apply, rollback and conflict flows
+  against a fake codex (synthetic), and the pinned worker command line. The prove verdicts run on events from real
+  `codex exec --json` runs. Two opt-in tests with the real codex (`NAS_CODEX_INTEGRATION=1`) passed on the
+  workstation: the app-server apply and byte-exact rollback, and the project-over-profile precedence with the pins
+  winning.
+
+**Evidence classes:**
+- source review: the protocol, loader, approval and rtk/context-mode/SocratiCode reads;
+- local integration check: the dry run, the rehearsals, the opt-in test and `prove_codex_lane.py`, including
+  `--live` after the real apply;
+- synthetic: the fake-codex tests.
+
+Nothing here is host acceptance. The runner's JSON declares `evidence_class: "local integration check"` and
+`host_acceptance: false`. Under [the acceptance evidence policy](../acceptance-evidence-policy.md), acceptance
+requires the official pinned installation and upstream commands, with retained invocation arguments, actual
+returned output and exit statuses, and declared sanitization. A passing local runner summary cannot replace that
+evidence.
+
+## Alternatives considered
+
+- **u4's tomlkit editor.** Rejected: it is not Codex's writer, it has no version guard, and it fails review-u4
+  #4/#5.
+- **`codex mcp add`.** Rejected: it replaces the whole `[mcp_servers]` table (`ReplaceMcpServers`) and resets fields
+  it does not take (review-u4 #5).
+- **RTK.md verbatim alone.** Rejected: its "the prefix is always safe" is wrong for the exceptions above.
+- **A rewritten RTK text.** Rejected: it drops upstream alignment and fails the `adoption_status` check.
+- **Removing rtk's `@RTK.md` line.** Rejected: rtk owns it.
+- **Per-tool `approval_mode` instead of `enabled_tools`.** Rejected: it keeps write tools listed, and they are
+  refused anyway.
+- **Tool settings at user scope.** Rejected; see decision 5.
+- **The Codex-cache launcher.** Rejected: it has the Layer 1 cross-write hazard (cm-deep plan, H4).
+- **rtk's Codex hook.** Still not qualified (the recipe).
+- **jCodeMunch in the profile.** Rejected; see decision 6.
+
+## Overturn conditions
+
+- An rtk release that contains #4175: re-copy the upstream text and drop the builtin line. A release that applies
+  `exclude_commands` to explicit `rtk` commands: drop the matching exceptions.
+- Upstream context-mode binding a Codex session to its own directory, or Codex letting user config set a plugin
+  server's `cwd`: drop the interim entry.
+- A Codex release whose writer can edit a project config: script the host step.
+- ai-memory, Headroom or SocratiCode declaring read-only annotations: drop that server's approval setting and
+  `enabled_tools`. A pinned upgrade that renames tools, such as SocratiCode 1.15.0: re-check the lists.
+- A measured comparison showing that a lower effort, or `ultra`, matches `max` for these lanes at lower cost: the
+  tiering decision covers mechanical extraction only, and changes that stage's own command, not this profile.
+- jCodeMunch meeting Decision 2's condition.
+
+## Limitations and residuals
+
+- **Runner retention.** `live_checks` examines native events in memory but retains only verdicts, worker exits,
+  elapsed time, timeout/cleanup failures and usage. Native events, full invocation arguments and returned output
+  are discarded. Sanitized event retention is deferred: retaining model/tool payloads needs an explicit field and
+  redaction policy, and this bounded repair does not establish one. The JSON declares these omissions; its
+  summaries can still contain unredacted local paths and must remain private. This remains a local integration
+  limitation even when every verdict passes.
+- **Not applied.** The host changes wait for the coordinated window, and the host step (removing three tables from
+  the main checkout's untracked `.codex/config.toml`) is manual.
+- **Sessions without the profile.** They keep the approval refusals for the three servers, and they keep
+  `ctx_upgrade` approved.
+- **Claude-side writes.** After the apply, `start.mjs` writes its Layer 3/4 files under the Claude configuration
+  directory, as the plugin's own server already does (cm-deep plan, row 19b).
+- **The live rehearsal was not the applied state.** It expressed the post-apply state as `-c` overrides, and gave
+  the block as a project `AGENTS.md`, not the global file.
+- **The rtk-worker result is one run.** It measures behaviour, not a guarantee.
+- **The profile depends on the user-scope servers.** It amends servers the user template registers; on a home
+  without them, `-p stack-worker` fails. The dry run's read-back catches that.
+
+## Addendum 2026-09-27: start-up allowances, the gateway profile and four base keys
+
+**Status: decided; the repository side only. Not applied to any host.** Inputs: the 2026-09-27 settings synthesis
+(codex rows 1-10 and 16-22, conflicts K1-K5 and K11), the workstation's verified gateway wiring of the same day, and
+the token-stack verdict gaps serena#3, socraticode#2 and #3, jcodemunch-mcp#1 and #2, headroom#2, ai-memory#1 and
+context-mode#1. Codex paths below were read at `rust-v0.157.1` (tag object `ac0e23e5`), OmniRoute paths at `5458026c`
+(v3.8.50) or `a58000c7` (release/v3.8.51), all fetched with `gh api` on 2026-09-27.
+
+1. **The lane also owns two start-up allowances.** When serena or socraticode is registered, the batchWrite sets the
+   template's `startup_timeout_sec` (60 and 120 s). `codex mcp add` has no timeout option (its `--help`), so a server
+   it registered waits the 30 s default (`codex-mcp/src/rmcp_client.rs` L103 and L342); the verdict evidence found
+   both user entries without a value while the template and the main checkout's project file had one. Rollback
+   treats these keys like headroom's.
+2. **The gateway profile is opt-in and installed like the worker profile.** `--omniroute-profile` creates
+   `$CODEX_HOME/omniroute.config.toml` from `adoption/templates/codex.omniroute.config.toml`: only when absent,
+   journaled, removed by rollback only while it still holds the template. The profile file is a second user layer
+   (`config/src/loader/mod.rs` L286-334), so it carries the whole route and the base template stays gateway-free (K2):
+   - `cx/gpt-6-astra` with no gateway alias (K1; OmniRoute `docs/guides/CODEX-CLI-CONFIGURATION.md` L150-161);
+   - upstream's provider block with the literal port 20128 (the same guide, L22-41), `env_key` plus
+     `env_key_instructions` naming inventory id `omniroute` (K3), and `supports_websockets` unset (K5;
+     `model-provider-info/src/lib.rs` L190-192);
+   - the keyed `[shell_environment_policy.filters]` exclude for the key (`config/src/shell_environment_policy.rs`
+     L28-35 and L106-110), `supports_standalone_web_search` with the under-development `standalone_web_search`
+     feature (`features/src/lib.rs` L1115-1120), and `shell_snapshot = false`
+     (`shell-command/src/shell_snapshot_exports.rs`; the landscape sweep's GPT-6 probe found the key in a 0644
+     snapshot).
+
+   A base `config.toml` that still carries the gateway route is reported as a host step, not written: the lane sends
+   only keys it owns. The step lists the `[model_providers.omniroute]` table, a top-level `model_provider =
+   "omniroute"` and a `cx/` model, the form upstream's guide puts in `config.toml` (L26-41), to be deleted together.
+   A `model_provider` left without its table stops every launch without the profile with "Model provider `omniroute`
+   not found" (measured). Its read-back renders the prompt input with and without `-p omniroute`.
+
+   The profile does not choose the gateway build, but it names what a build needs. The bundled catalog runs
+   `gpt-6-astra` on Responses Lite (`models-manager/models.json` L4-23), which sends no hosted tools
+   (`core/src/tools/spec_plan.rs` L598-601; the unchanged upstream test `core/tests/suite/responses_lite.rs`
+   L328-370 asserts `web.run` present and hosted `web_search` absent, read, not run). A search therefore goes to the
+   provider-relative `alpha/search` (`codex-api/src/endpoint/search.rs` L14-15), which OmniRoute serves only with
+   upstream PR #13788, open and labelled `deferred-v3.8.52` on 2026-09-27. Upstream PR #14904, also open, reports
+   HTTP 500 for every `/v1/responses` request on `release/v3.8.51`. Commit `a58000c7` itself caps `gpt-6-astra` at
+   `ultra`, one level above `max` (`open-sse/executors/codex/reasoningSuffix.ts` L1-31).
+3. **Base keys (the synthesis's PR-F, H4 and H7).** `web_search = "live"` (`core/src/config/mod.rs` L2659-2670 and
+   L3050-3094), `check_for_update_on_startup = false` (`config/src/config_toml.rs` L520-523, with the pin in
+   `manifests/stack.json`), `[features] shell_snapshot = false` (`features/src/lib.rs` L1007-1012: stable, on by
+   default; without a snapshot each command runs as `shell -lc`, the login shell a snapshot would have captured,
+   `core/src/tools/runtimes/mod.rs` L268-276), and `[agents] default_subagent_reasoning_effort = "max"`
+   (`config_toml.rs` L723-724; `core/src/agent/child_config.rs` L196-250), with a comment that `max_depth` is
+   ignored for V2 models such as `gpt-6-astra`. The four dated `[projects]` trust entries are gone: none of the
+   directories exists on the recording host, and nothing else in this catalog names them. The workstation's own
+   `~/.codex/config.toml` already carried each of these keys on 2026-09-27 (a read of key names and these values
+   only), so the template now matches it there.
+4. **Template and recipe text for the token gaps.** `INCLUDE_DOT_FILES` (SocratiCode v1.14.0 `README.md` L1579) and
+   the approval-never refusal (`core/src/mcp_tool_call.rs` L1610-1614 and L2436-2466) are stated where the servers
+   are registered. The jCodeMunch recipe now works from the project template, not `codex mcp add`, which writes the
+   user config:
+   - it installs the server into the ecosystem prefix, where the template runs `${ECO_ROOT}/bin/jcodemunch-mcp`
+     (bootstrap step 4's uv-tool layout);
+   - it copies only the rendered `[mcp_servers.jcodemunch]` tables into the opted-in checkout or worktree. The whole
+     project template also sets `approval_policy`, `sandbox_mode`, `[agents]` and a shell `PATH`, and a project
+     file outranks the user config and its profiles (`config/src/config_layer_source.rs` L33-51);
+   - it keeps that file, which holds host paths, out of commits through the repository's private `info/exclude`
+     (git `gitrepository-layout`); the repository's `.gitignore` does not list `.codex/`.
+
+   The headroom recipe gains its Codex registration line.
+
+**Evidence, 2026-09-27, codex-cli 0.157.1 on the workstation:**
+- **Local integration check, scratch Codex homes** under `bwrap --unshare-net` with a private `/tmp`, no sign-in and
+  no gateway:
+  - With the rendered base template and both profiles, `codex --strict-config -p omniroute exec` stopped at "Missing
+    environment variable" for the gateway key, followed by the profile's instructions. So the configuration was
+    accepted and the provider came from the profile layer. Without a profile the same command reached the network
+    step, and `-p omniroute debug prompt-input` rendered the no-spawn sentence of `max`. The strict read goes
+    through `exec` because `codex debug` refuses the flag at 0.157.1 ("`--strict-config` is not supported for `codex
+    debug`"), so the synthesis's check "`codex --strict-config -p omniroute debug prompt-input`" cannot run as
+    written.
+  - `codex --strict-config -p stack-worker exec` fails with "invalid transport" on that profile's first
+    `[mcp_servers.*]` table, with main's templates too. Strict mode validates each configuration file on its own as a
+    whole `ConfigToml` (`config/src/loader/mod.rs` L594-600 and L625-645), and the profile's server tables name no
+    command or URL. The synthesis's advice to always pass `--strict-config` (codex row 6) therefore cannot apply to
+    stack-worker lanes as designed.
+  - `omniroute run codex --model` defines the provider inline and adds the model as
+    `-c model_providers.omniroute.model=...` (`bin/cli/commands/launch-codex.mjs` L173-194). With that exact flag
+    set, Codex ignores the model key with a warning and runs another model, and under `--strict-config` it refuses
+    to start with "unknown configuration field `model_providers.omniroute.model` in -c/--config override". Strict
+    mode checks the override layer on its own (`config/src/loader/mod.rs` L257-258 and L647-669), so the verifier's
+    "`--strict-config` rejects it" holds for the launcher. The same key passed alone is only warned about: that
+    layer has an empty provider name and fails to deserialize (`config/src/config_toml.rs` L979-983 and L992-1001),
+    and a layer that fails reports no ignored field (`config/src/strict_config.rs` L97-110). A first draft of this
+    addendum probed only the lone key and reached the opposite conclusion; the cross-family review below caught it.
+  - `codex mcp add headroom --env ...` printed "Added global MCP server" and kept the other servers'
+    `startup_timeout_sec` (rewritten as floats).
+  - The opt-in tests (`NAS_CODEX_INTEGRATION=1`) passed: the real app-server writes serena's allowance and rollback
+    restores the file byte for byte; `--strict-config -p omniroute exec` names the missing key; and through `codex -p
+    omniroute sandbox`, a fixture key reaches the command without the profile's filter and not with it, while the
+    base config's `set` reaches it in both arms (a failing-first control). Three more cover the recipe's claims:
+    - strict mode refuses the launcher's flag set, while the lone key is only warned about;
+    - `-p stack-worker` fails under `--strict-config`, while the same home renders its prompt input without it;
+    - the recipe's jCodeMunch step, copied into a trusted checkout, registers the server there, and an unrelated
+      directory lists none.
+- **Synthetic:**
+  - the fake-codex apply, dry-run and rollback tests of the new keys and the profile, including the host step for
+    base selectors;
+  - a render test that runs the recipe's own `sed` range on the rendered project template.
+- **Source review:** the paths above.
+- **Cross-family review:** one round of GPT-6 (`cx/gpt-6-astra` at max through the local gateway, read-only)
+  reported four defects in the first draft, and each was reproduced before it was fixed:
+  - the jCodeMunch step copied the project template's permissions;
+  - the host step missed base selectors;
+  - the launcher claim rested on the lone key;
+  - the install path did not match the template.
+
+Nothing here is host acceptance or a model run.
+
+**Alternatives considered:**
+- **A `${OMNIROUTE_PORT}` placeholder that `render_config.py` renders.** Rejected (K2): it fails every host without the
+  value, and 20128 is upstream's default.
+- **The provider block in the base template, or in `-c` flags for interactive use.** Rejected: every session would
+  route through the gateway, and the base config would stop matching the template.
+- **`auth = { command = ... }` instead of `env_key`.** Kept as an arm of the preregistered comparison (K3).
+- **Deleting a base `[model_providers.omniroute]` through batchWrite.** Rejected: the lane writes only keys it owns,
+  and a deleted table needs a new rollback form.
+- **The landscape sweep's lane-home builder reading this template.** Not done: that builder takes the model and URL as
+  arguments and has its own tests. `tests/test_codex_worker_lane.py` compares every provider and feature key it
+  writes with the profile's instead.
+- **Installing the whole rendered project template for jCodeMunch.** Rejected: the project layer would replace the
+  user's approval policy, sandbox, agents and shell `PATH` in that directory, against the codex row's "preserve the
+  existing ... approval policy and sandbox settings" in `recipes/README.md`.
+
+**Overturn conditions:**
+- An OmniRoute release or a Codex pin change that alters the provider fields, the effort clamp or standalone search:
+  re-read the sources and rerun the opt-in tests.
+- A preregistered same-task comparison in which the gateway matches native Codex at `max`: max lanes may move to the
+  route; the profile itself does not change.
+- A Codex release whose `--strict-config` accepts partial profile server tables: add a strict read-back of the
+  stack-worker lane.
+- `codex mcp add` gaining a timeout option: the registration recipe sets the allowances and the writer can drop them.
+
+**Not decided here:** the interactive effort (`ultra` or `max`), approving read tools one by one in interactive
+sessions, and a host's own trust entries are user decisions. The latency of a login shell per command, now that
+the snapshot is off, is unmeasured. The stack-worker knobs `mcp_optional_startup_grace_ms = 0`, `required = true` and
+a pinned `model_reasoning_summary` wait for their measured trial.
+
+## Addendum 2026-09-27: workstation apply, proof and the completed A0 control
+
+The coordinator's watcher applied the lane to the workstation's real `~/.codex`
+at **2026-09-27T07:51:52Z**, the first moment with no Codex process. The retained
+[`apply.txt`](../../evidence/artifacts/codex-worker-lane-host-20260927/apply.txt)
+confirms the quiet precondition and the installed/read-back files; the exact
+watcher timestamp is coordinator-supplied. Afterwards the coordinator privately
+backed up the main checkout's untracked `.codex/config.toml` and removed the
+three context-mode tables named by the documented host step. No private backup
+or active configuration is published.
+
+**2026-09-27 revision erratum:** the local `apply_codex_lane.py` / `prove_codex_lane.py` revision was **main before #395; exact commit not retained**; the [#395 start-up allowances](#addendum-2026-09-27-start-up-allowances-the-gateway-profile-and-four-base-keys) are not part of this apply and remain pending until a dry run and apply at the current revision.
+
+The [six sanitized records and evidence table](../../evidence/artifacts/codex-worker-lane-host-20260927/README.md)
+retain the initial 6/7 proof with its project-binding failure, the corrected
+**7/7 static proof**, and **12/12 with `--live` (five real model calls)**. The
+apply/read-backs are local integration on the real Codex home; the five worker
+calls additionally constitute live provider execution. They do not accept other
+hosts or become unchanged upstream tests. The records retain runner summaries,
+not full native events, complete invocation records or outer command exit
+statuses, so the earlier formal host-acceptance limitation still applies.
+
+The proof runner now adds an installed-skill check. A sixth worker reads one
+SKILL.md from `~/.agents/skills` (or `--skill-file`); completed native tool output
+must match its actual first line, and the result records the successful route.
+Context-mode's [v1.0.169 `evaluateProjectContainment`](https://github.com/mksglu/context-mode/blob/v1.0.169/src/security.ts#L766)
+(compiled to `security.js`, following [#852](https://github.com/mksglu/context-mode/issues/852))
+can refuse a file outside the worker directory, so an ordinary `rtk cat` shell
+read is accepted. No permission policy is relaxed. The event contract comes from
+[openai/codex `rust-v0.157.1` exec events](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/exec/src/exec_events.rs);
+the user skill location follows the [official skill documentation](https://developers.openai.com/codex/skills/).
+The historical 12/12 run predates this addition. Its new control cases are
+synthetic unittest events, not evidence of a sixth live call.
+
+**Dated update to Decision 4's “which has not run”:** the tiering preregistration's
+A0 control has now run. [The receipt published with #397](../../evidence/artifacts/gpt6-family-tiering-20260927/README.md)
+and its [run record](../../evidence/artifacts/gpt6-family-tiering-20260927/run-record.json)
+record `gpt-6-astra` at `max`, **25 successful calls**, exit 0, from
+2026-09-27T07:09:02.343Z to 07:13:45.011Z. This is live provider execution of the
+frozen mechanical-extraction experiment. It does not change the worker profile
+or establish tiering for general worker tasks; its findings and limits stay in
+that experiment's receipt. The earlier sentence remains the dated historical
+state, with this addendum supplying its update.
+
+## 2026-09-27 addendum: Custom agents and Context Hub
+
+**Scope:** custom-agent developer instructions and the worker profile's Context
+Hub opt-outs, with the dated repair below for MCP startup and approval settings. The worker
+installer, base Codex template, AGENTS template and gateway profile already exist.
+This addendum records new repository changes and local checks; the historical
+host receipts above retain their original scope.
+
+**[F4 RTK guidance carrier](2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26).** The three files under `examples/codex-native/agents/` already define
+`evidence-reviewer`, `isolated-builder` and `semantic-evidence-reviewer`. Append
+[rtk-ai/rtk `v0.50.0`, `hooks/rtk-awareness-full.md`](https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/rtk-awareness-full.md)
+verbatim and the existing marked exceptions from `codex.AGENTS.template.md` to
+each role's `developer_instructions`. Preserve its original task instructions,
+model/effort inheritance and parent sandbox authority. **2026-09-27 erratum:**
+the semantic reviewer's `sandbox_mode = "read-only"` has no effect at this pin.
+A role file cannot set or narrow the sandbox:
+[`role.rs:36–48`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L36-L48)
+lists the allowed overrides,
+[`119–126`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L119-L126)
+builds the projected layer, and
+[`182–189`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L182-L189)
+clones the parent configuration. All three roles inherit the parent's sandbox.
+Launch the parent with `-s read-only` to enforce read-only access for a semantic
+reviewer; its no-edit rule is a prompt instruction. The trusted-project
+template's `danger-full-access` parent passes that authority to its children.
+At openai/codex `rust-v0.157.1`,
+[`agent_role_config.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/agent_role_config.rs)
+parses these files and validates developer instructions,
+[`discovery.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/discovery.rs)
+finds agent TOML files,
+[`loader.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs)
+resolves their roles, and
+[`core/src/agent/role.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs)
+applies developer instructions as bounded role overrides. No additional custom
+agent, orchestration layer or installation mechanism is required.
+
+**Context Hub scope.** Put `CHUB_TELEMETRY = "0"` and `CHUB_FEEDBACK = "0"` in
+`codex.stack-worker.config.toml` under `[shell_environment_policy.set]`. Workers
+whose `HOME` or `CHUB_DIR` differs from the user's can miss that user's
+`~/.chub/config.yaml`: Context Hub `v0.1.4`
+[`cli/src/lib/config.js`](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/config.js)
+resolves that directory, and
+[`cli/src/lib/telemetry.js`](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js)
+honours each environment opt-out before loading configuration. Selecting this
+worker profile opts out for shell commands even with a shared home. It does not
+detect home identity. The dated amendments in the
+[recipe](../../recipes/README.md#context-hub-opt-out) and
+[macOS guide](../../adoption/platforms/macos-arm64.md) make this profile the one
+unconditional carrier; ordinary invocations retain the home-only environment rule.
+
+**Profile environment merge gate: passed for a profile-v2 file.** At `rust-v0.157.1`,
+[`config/src/loader/mod.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs)
+loads `$CODEX_HOME/stack-worker.config.toml` as a second user configuration layer
+over `config.toml`. The field is part of
+[`config_toml.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/config_toml.rs),
+and [`shell_environment_policy.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/shell_environment_policy.rs)
+accepts `set` as a string map.
+[`protocol/src/shell_environment.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/shell_environment.rs)
+applies those overrides when building a command's environment.
+[`cli/src/debug_sandbox.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/cli/src/debug_sandbox.rs)
+uses that environment builder for `codex sandbox`, which supplies the local
+execution check. This answer concerns the separate profile file selected by
+`-p stack-worker`, not a legacy `[profiles.stack-worker]` table.
+[`config_layer_source.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/config_layer_source.rs)
+assigns base user/profile/project/session-flag precedence 20/21/25/30: project
+settings and explicit flags can override these values. They are defaults for the
+worker lane, not an enforced egress boundary.
+
+**Evidence classes.** `tests.test_codex_agents` checks every role's parsed F4
+payload against the existing template and the pinned upstream hash.
+`tests.test_codex_worker_lane.TemplateTests.test_profile_template` checks the
+profile's two string values. Both failed before the corresponding changes.
+These are structural validation; no upstream tests were modified.
+
+`CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home`
+is local integration with installed `codex-cli 0.157.1`, using scratch `HOME` and
+`CODEX_HOME`, an allowlisted environment and no provider or MCP execution. It
+now asserts `chubdir=unset` and the separate override path, demonstrating that
+the profile leaves `CHUB_DIR` unchanged. The override directory exists. **2026-09-27
+erratum:** the original two subcases did not print or assert `CHUB_DIR`, so the
+earlier passing runs established only the other environment values. For both cases, actual
+shell output is asserted as follows (the base opts in to make the control visible):
+
+| Configuration | Telemetry | Feedback | Other base `set` | Base filter |
+| --- | --- | --- | --- | --- |
+| Base only | `1` | `1` | kept | excluded |
+| `-p stack-worker` | `0` | `0` | kept | excluded |
+| Profile plus explicit telemetry `-c` override | `1` | `0` | kept | excluded |
+
+Before the profile change, four worker/override subcases failed with feedback
+still `1`; both base controls passed. With the change all six cases passed for
+the original four-field probe. Returned commands and summaries appear below;
+the later repair run also checks `CHUB_DIR` and sandbox availability.
+
+The fixtures and unittest checks are locally authored; this is neither an
+unchanged upstream test run nor live provider execution. No agent adherence,
+Context Hub network behaviour, token saving or new host adoption is claimed.
+
+**Adoption limits.** `apply_codex_lane.py` already reads the profile template and
+installs its bytes; it still refuses a differing installed profile. Updating a
+host's existing profile is a separate reviewed adoption step. The gateway sweep
+selects `stack-worker` in its lane home, so it receives these defaults from that
+profile. The interactive `omniroute` profile and base user template receive no
+new unconditional CHUB setting. Changing only `CODEX_HOME` does not itself
+change Context Hub's `HOME`/`CHUB_DIR` lookup. F4 changes are portable examples;
+the existing copy/registration recipe remains the deployment path.
+
+Two HOME-overriding launchers **do not receive these opt-outs**:
+[`tools/sota-convergence/codex_lane.py`](../../tools/sota-convergence/codex_lane.py)
+(`ISOLATION_ARGS`, `child_env`) and
+[`gpt6-family-tiering-20260926/run_arm.py`](../../blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py)
+(`CODEX_ARGV`, the per-call environment). They pass `--ignore-user-config` and
+omit `-p stack-worker`. Follow-up for those lane owners: pass
+`-c 'shell_environment_policy.set.CHUB_TELEMETRY="0"'` and
+`-c 'shell_environment_policy.set.CHUB_FEEDBACK="0"'`, citing the pinned
+[Codex environment builder](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/shell_environment.rs)
+and [Context Hub switches](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js),
+then qualify their `codex exec` login-shell path. This template repair does not
+change those launchers or claim they are covered by the gateway sweep.
+
+Recheck the sources and native test when Codex profile loading or Context Hub's
+environment switches change. Fresh named-role execution and any token-savings
+comparison remain separate qualification work.
+
+### 2026-09-27 repair: Worktree MCP settings
+
+The worker profile adds partial `[mcp_servers.serena]` and
+`[mcp_servers.codebase-memory]` tables with `startup_timeout_sec = 60`.
+[`RawMcpServerConfig.startup_timeout_sec`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/config.schema.json)
+defines the setting; [`rmcp_client.rs:103`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/rmcp_client.rs#L103)
+sets the 30-second default consumed by
+[`connection_manager.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/connection_manager.rs).
+The partial tables retain user-scope commands. The header's existing layering
+rule still applies: profile 21 < project 25 < `-c` 30. This is configuration
+coverage for worktrees; successful server startup awaits the coordinator's host
+matrix rerun after adoption.
+
+The project template sets jcodemunch's `default_tools_approval_mode = "approve"`
+and `enabled_tools = ["route", "menu", "order"]`, retaining its project scope
+from [the scope decision, item 2](2026-09-25-codex-mcp-scope.md).
+[`mcp/mod.rs:89–98`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/mcp/mod.rs#L89-L98)
+auto-approves `Approve`; the same tag's config schema defines
+`RawMcpServerConfig` and `McpServerToolConfig`. jgravelle/jcodemunch-mcp
+`1.108.319`, commit `8f7b34abe16fb459e0bf1c04747d584216dfe32e`, defines this
+front door in [`counter.py`](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/counter.py).
+[`server.py:5500–5511`](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/server.py#L5500-L5511)
+makes `order` read-only by default (`allow_state_change=false`), but explicit
+`true` permits state-changing catalog actions. `route` defaults `execute=false`
+and [rejects state-changing automatic dispatch](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/server.py#L5535-L5577).
+The allowlist limits the exposed tools; it is not an enforced read-only boundary.
+No user-scope jcodemunch entry or host configuration is changed here.
+
+### Returned local evidence, 2026-09-27
+
+These are returned unittest summaries, not generated acceptance claims. Run
+commands from the checkout root. Historical build runs below preceded the
+repair and retain their original scope and output. The original template/hash
+checks are **structural validation**:
+
+```text
+rtk python3 -m unittest tests.test_codex_agents
+before role payload edits: exit=1
+Ran 1 test in 0.001s
+FAILED (failures=3)
+after role edits and correcting the hash separator: exit=0
+Ran 1 test in 0.001s
+OK
+
+rtk python3 -m unittest tests.test_codex_worker_lane.TemplateTests.test_profile_template
+before profile edit: exit=1
+Ran 1 test in 0.001s
+FAILED (failures=1)
+None != {'set': {'CHUB_TELEMETRY': '0', 'CHUB_FEEDBACK': '0'}}
+```
+
+The original environment merge control is **local native integration with
+synthetic inputs**, using installed Codex 0.157.1 and no provider or MCP call:
+
+```text
+NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest tests.test_codex_worker_lane.CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home
+before profile edit: exit=1
+Ran 1 test in 0.765s
+FAILED (failures=4)
+Actual failing output: ['telemetry=1', 'feedback=1', 'base=kept', 'filter=absent']
+
+NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest tests.test_codex_worker_lane.TemplateTests.test_profile_template tests.test_codex_worker_lane.CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home
+after profile edit: exit=0
+Ran 2 tests in 0.724s
+OK
+```
+
+The second command combines one structural check with one native integration
+check. Its six native cases checked the four fields shown above; preservation
+of `CHUB_DIR` was not yet observed. One later combined run
+(`NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest tests.test_codex_agents tests.test_codex_worker_lane`)
+exceeded its 55-second outer limit. It returned no completed unittest result
+and is not passing evidence. These **two separate commands** completed instead:
+
+```text
+NAS_CODEX_INTEGRATION=0 rtk python3 -m unittest -v tests.test_codex_agents tests.test_codex_worker_lane
+exit=0
+Ran 55 tests in 23.014s
+OK (skipped=8)
+
+NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests
+exit=0
+Ran 8 tests in 32.551s
+OK
+```
+
+The first command covers structural validation and locally authored synthetic
+fixtures; the second covers the same eight native tests skipped in the first.
+There were 55 distinct tests, not 63. An independent coordinator rerun of the
+pre-repair build state, with `TMPDIR=/var/tmp/claude-w3-codex-agents`, confirmed collection
+and native execution (local integration evidence, supplied 2026-09-27 ~14:00Z):
+
+```text
+python3 -m unittest -v tests.test_codex_agents tests.test_codex_worker_lane
+exit=0
+Ran 55 tests in 22.392s
+OK (skipped=8)
+
+NAS_CODEX_INTEGRATION=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests
+exit=0
+Ran 8 tests in 32.455s
+OK
+```
+
+Both the custom-agent payload test and the CHUB native method were collected.
+All eight native methods passed, including the CHUB and per-project jcodemunch
+registration methods. These reruns precede the repair's new controls.
+
+**Repair controls.** All repair unittest runs set
+`TMPDIR=/var/tmp/claude-w3-codex-agents`. New template controls are structural
+validation; `SandboxProbeControlTests` uses synthetic subprocess results;
+the CHUB observation test executes the native sandbox. Each added control failed
+before its correction:
+
+| Command (after `rtk python3 -m unittest -v`) | Before correction | After correction |
+| --- | --- | --- |
+| `tests.test_codex_worker_lane.TemplateTests.test_worker_startup_timeouts_layer_over_user_servers` | exit 1; `Ran 1 test in 0.002s`; `FAILED (failures=2)`; both tables absent | exit 0; `Ran 1 test in 0.001s`; `OK` |
+| `tests.test_codex_worker_lane.TemplateTests.test_project_jcodemunch_approves_only_read_front_door` | exit 1; `Ran 1 test in 0.001s`; `FAILED (failures=1)`; approval mode absent | exit 0; `Ran 1 test in 0.001s`; `OK` |
+| `tests.test_codex_worker_lane.SandboxProbeControlTests` | exit 1; `Ran 2 tests in 0.009s`; `FAILED (failures=1)`; unavailable sandbox asserted failure | covered by the three-test run below |
+| `tests.test_codex_worker_lane.CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home` with `NAS_CODEX_INTEGRATION=1` | exit 1; `Ran 1 test in 0.919s`; `FAILED (failures=6)`; `chubdir` absent from output | covered by the three-test run below |
+
+```text
+NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest -v tests.test_codex_worker_lane.SandboxProbeControlTests tests.test_codex_worker_lane.CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home
+exit=0
+Ran 3 tests in 0.873s
+OK
+```
+
+The probe now collects all six runs, uses the sibling's 120-second timeout,
+and skips when every sandbox invocation fails. Partial failures remain failures.
+The CHUB_DIR path is asserted internally but no scratch path is published here.
+The first repair native-class run
+(`NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests`)
+returned exit 1, `Ran 8 tests in 22.040s`, `FAILED (failures=2)`. Two older
+fixtures reported `invalid transport`: they lacked base registrations for the
+profile's new partial tables.
+The corrected fixtures register both user-scope servers before loading the
+profile, following the pinned config schema. The completed checks are:
+
+```sh
+export TMPDIR=/var/tmp/claude-w3-codex-agents
+NAS_CODEX_INTEGRATION=0 rtk python3 -m unittest -v tests.test_codex_agents tests.test_codex_worker_lane
+NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests
+NAS_CODEX_INTEGRATION=0 rtk python3 -m unittest -v tests.test_render_config
+```
+
+Returned results, in that order:
+
+```text
+exit=0
+Ran 59 tests in 26.667s
+OK (skipped=8)
+
+exit=0
+Ran 8 tests in 34.110s
+OK
+
+exit=0
+Ran 21 tests in 0.608s
+OK
+```
+
+The 59-test run covers structural checks and synthetic fixtures; the native
+eight cover its skips and passed after the fixture correction. Rendering is
+local integration with synthetic host settings. **Unchanged upstream tests,
+live provider execution, Context Hub network runs and token measurements: none.**
+The `codex exec` login-shell environment path was not separately qualified.
+F4 duplication in a spawned role when user AGENTS already contains F4 remains
+unverified; one block per role file does not establish one block per child rollout.
+
+## 2026-09-29 addendum: Codex stack role carriers
+
+**Scope.** Two Codex custom agents, `stack-researcher` and `stack-verifier`, for the
+[token-adoption E2E](../../evidence/artifacts/token-adoption-e2e-20260926/README.md).
+The worker profile and the three earlier custom agents keep their dated states above.
+This addendum supersedes one sentence of the 2026-09-27 addendum above, for these two
+agents only: "No additional custom agent, orchestration layer or installation mechanism
+is required." Two agents are added, and putting them under `$CODEX_HOME/agents/` is an
+installation step of its own. No orchestration layer is added.
+
+**Why.** The frozen preregistration launches four Codex sub-agent tasks, `seed-binding-1`,
+`-2`, `-3` and `-5`, with `agent_type` `stack-researcher`, and an unknown `agent_type` fails
+the spawn ([`role.rs:51-60`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L51-L60)).
+No role of that name existed in the repository. The arm-B table of the E2E README counts 5
+binding and 6 rtk-codex opportunities
+([`README.md:206,214`](../../evidence/artifacts/token-adoption-e2e-20260926/README.md)); counted
+from `preregistration.json`, 4 of each need that role, so without it only 1 and 2 could launch
+and the E2E could not be complete. `stack-verifier` has no frozen spawn. The E2E text names both
+as the only Codex custom carriers
+([`README.md:281-285`](../../evidence/artifacts/token-adoption-e2e-20260926/README.md),
+[`RUNBOOK.md:421-425`](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md)), and the
+verifier is qualified as capability evidence only.
+
+**Decision.**
+- **Carriers.** `adoption/agents/codex/stack-{researcher,verifier}.toml`, with byte-identical
+  mirrors under `examples/codex-native/agents/`. Each file carries exactly `name`, `description`,
+  `model = "gpt-6-astra"`, `model_reasoning_effort = "max"` and `developer_instructions`: an adapted
+  role text, then the F4 block verbatim. The two digests are also
+  `adoption/agents/codex/SHA256SUMS`, and the rules the tests and the installer share are
+  `tools/adoption/codex_roles.py`. The pins equal the route of every Codex task in the
+  preregistration (26 tasks, all `gpt-6-astra` at `max`). The descriptions name no tool, because the
+  `spawn_agent` tool text shows every role's description to every parent
+  ([`role.rs:294-334`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L294-L334)).
+- **Placement.** User-wide, by discovery, under `$CODEX_HOME/agents/`, with no `[agents.<name>]`
+  table, so `config.toml` and the `stack-worker` profile do not change. The E2E's arm A repeats
+  `seed-binding-1` "with its existing researcher role"
+  ([`README.md:155-158`](../../evidence/artifacts/token-adoption-e2e-20260926/README.md)), which is
+  the user-wide reading. Detail and the digest rows: the
+  [examples README](../../examples/codex-native/README.md#2026-09-29-stack-role-carriers).
+  `tools/adoption/apply_codex_lane.py` is that installation step: it checks each source against its
+  pinned digest, creates the files create-only (mode 0600, in a 0700 folder it makes), reads them back,
+  journals the run so that rollback removes only what it created, and its dry run reads a scratch copy
+  back through `codex doctor --json`. `tools/adoption/prove_codex_lane.py` has a static `roles` row.
+  Both report other role files, role tables and doctor warnings as counts, never as a name, path or text.
+  A link to a folder below `agents/` makes those counts unknown, never smaller: Codex follows links
+  (`LocalFileSystem::read_directory` classifies a link by its target,
+  [`codex-rs/exec-server/src/local_file_system.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/exec-server/src/local_file_system.rs#L710-L735)
+  at `rust-v0.157.1`) and loads what it finds behind one as roles, which a walk that skipped the link
+  would miss. Checked against `codex-cli 0.157.1` through `codex doctor --json` in a scratch home with
+  the network off, by `CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it`
+  in `tests/test_codex_worker_lane.py` (local integration, `NAS_CODEX_INTEGRATION=1`): a malformed role
+  behind a linked folder, or behind a link named `x.toml` to a file, is one role warning; behind a
+  dangling link, or a link whose own name is not `*.toml`, none; and the count is never below what
+  Codex collected. If a later pin stops following links, that test fails and the rule can be revisited.
+- **Role text.** Adapted sentence by sentence from the Claude carriers (17 sentences of the researcher
+  and 16 of the verifier are kept byte for byte and pinned by a test), with a one-agent rule, a
+  working-directory rule and `jq` output among the exact command shapes added. The working-directory
+  rule says a task's own instruction wins and `cwd` goes to context-mode only for a directory other
+  than the launch directory, which the server is already bound to; the frozen M13 leg reads sentinel
+  files with no explicit `cwd`
+  ([`README.md:370`](../../evidence/artifacts/token-adoption-e2e-20260926/README.md)).
+- **Status and freeze rows.** `scripts/adoption_status.py --client-wiring` gains `stack_roles_matching`, how
+  many of the two carriers the Codex home holds byte for byte (a count; `null` when it cannot be
+  compared, which makes `complete` false as every `null` does). `tools/token-e2e/freeze_snapshot.py`
+  gains twelve frozen `codex.*` rows that the E2E's role item takes its values from: the two carriers'
+  digests, the set of `*.toml` files below the Codex home's `agents/` and the number of
+  `[agents.<name>]` tables in `config.toml` and the profile (0 expected), the same two counts for the
+  system layer (`/etc/codex`, always loaded, N included) and the checkout's project layer, the digests
+  of the `codex` on `PATH` and of the file its launcher executes, and the server names and enabled flags of
+  `codex mcp list --json` with and without `-p stack-worker`, read in an empty directory so that a
+  project layer adds none: the parent's effective tool set, which a role child is compared with because
+  a role cannot bind tools at this pin. The binary row follows the identity launcher one hop
+  (its last line, `exec '<absolute path>' "$@"`): the design's "file the entry resolves to" would be
+  the launcher itself, since the entry on the reference host is a script and not a link. The file
+  that line names is a link to the npm package's Node entry (`@openai/codex` `bin/codex.js`), which
+  resolves and starts the native executable, so the row pins the install's entry point and
+  `codex.version` names the release; the native executable is not hashed, and following the entry
+  on to it would need a rule of its own for the platform package. No row
+  publishes a path, a file name a host chose, or a transport, environment value, argument or URL.
+  The rows are captured through `CODEX_HOME` as `adoption_status.py` reads it; the older `codex.*`
+  rows of the snapshot still read `~/.codex` whatever the variable says.
+- **Order of use** (binding decision U13-D5). After this change merges and before the E2E's seal
+  announcement, in an announced quiet window with no `codex` process running, from a checkout at
+  origin/main that holds it: (1) run R4a if a live `scripts/codex_quota.py --json` reading shows no reached
+  limit, because it needs a Codex home without any role file; (2) make a private 0600 backup of
+  `$CODEX_HOME/stack-worker.config.toml`; (3) assert that the live file still has the hash recorded for
+  the drifted profile and only then remove that literal path; (4) run the installer's dry run and expect
+  the profile and both roles to be `create` and "rehearsal passed"; (5) run the printed `--apply` command
+  with its two `--expect-*` hashes; (6) read back the profile hash against the template, `sha256sum
+  --check --strict SHA256SUMS`, `stack_roles_matching` 2, and the `roles` row of `prove_codex_lane.py`;
+  then run the probes R6, R1, R2, R3, R4b and R5 of the
+  [examples README](../../examples/codex-native/README.md#carrier-probes-r1-to-r6-procedures-none-has-been-run)
+  as unscored rehearsals, and only then write Amendment 4 citing them. When no live capacity exists the
+  roles and the profile are still installed and verified, and the probes move to the capability phase with
+  both outcomes for N described in advance. Undo is `--rollback <run>` and then restoring the private
+  backup by hand.
+
+**Alternatives considered.** Source read at openai/codex `rust-v0.157.1`; none was run in a session.
+
+| Alternative | Evidence | Not chosen because |
+| --- | --- | --- |
+| Per-launch `-c agents.<role>.config_file=<absolute path>` on the sub-agent launches | [`loader.rs:35-73,192-206`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs#L35-L206): tables from every enabled layer, session flags included, and the path must be absolute; that layer has no config folder ([`state.rs:227`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/state.rs#L218-L231)) | Those launches would differ from the RUNBOOK's launch command, and the roles would exist only for the proof, not as installed practice |
+| A project `.codex/agents/` copy | A project layer's folder is its `.codex` (`state.rs:226`) | A copy would load in every trusted session of that checkout, not only in the E2E's |
+| Role tables only in the `stack-worker` profile | – | Arm A runs without that profile and repeats `seed-binding-1` with the researcher role |
+| `multi_agent_v2.subagent_developer_instructions` | [`child_config.rs:145-153`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/child_config.rs#L145-L153) applies it to every V2 child | It would also reach `seed-binding-4`'s child, which the preregistration launches with no role |
+| A SubagentStart-style hook | – | Hooks in Codex children are unverified (E2E README, "Merge-before-run dependencies and unverified boundaries") |
+
+**Evidence and limits.** Structural validation only: `tests/test_codex_agents.py` checks the stem set,
+byte-identical mirrors and their SHA-256 rows, the closed key set, the pins against the frozen Codex
+tasks, description lane-neutrality against the preregistration's no-tool-names denylist, the F4 block,
+the kept sentences and the Claude-only names, with a mutation control per rule. No Codex session has
+spawned either role, and nothing here measures a token saving.
+- A role file cannot set the sandbox, an MCP allowlist, tools or web search
+  ([`role.rs:36-48`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L36-L48),
+  as in the 2026-09-27 erratum above): read-only access and the verifier's no-web rule are prompt rules,
+  and the parent's `-s` is the enforcement.
+- A child sees the F4 block twice, once through the inherited user AGENTS.md and once in its role text,
+  which is 2,180 bytes more context per child. The count in a real child rollout is unverified, as the
+  previous addendum says of F4 duplication.
+- Discovery under `--ignore-user-config` is a source-read prediction (`loader/mod.rs:503-519` keeps the
+  ignored user layer's file, so its folder stays `$CODEX_HOME`); it has not been run.
+- The Codex `cwd` sentence of `docs/token-session-handbook.md` ("Context Mode executor and session
+  store") said to pass `cwd` every time, which contradicted the role texts' working-directory rule. The same
+  change now says to pass `cwd` for any directory other than the session's launch directory, which the
+  server is already bound to; no other sentence of that document changed.
+- **Not in this change** (a follow-up unit, U13b, by a coordinator decision of 2026-09-29, recorded in
+  the history of this branch). The capability-gate blocks for role children (the sealed M13 structure
+  with disabled-server and wrong-root negatives per role and tool pair, and a spawned-children leg), the
+  offline grader of a child rollout (`role_child_state`, whose rules are stated in the
+  [examples README](../../examples/codex-native/README.md#carrier-probes-r1-to-r6-procedures-none-has-been-run)
+  and which the E2E's organic M11 grader must agree with), the tool that runs the probes, the gate's
+  refusal when the captured freeze rows differ from the pinned carriers, and the review's residuals for
+  the gate (a Serena wrong-root negative, and a web-search fixture that a wrong search cannot pass). The
+  probes R1 to R6 exist as procedures only. `prove_codex_lane.py` has a static `roles` row and no live
+  role check: `exec` forces `--ephemeral`, so no rollout persists, and the exec JSONL item for a spawned
+  agent carries no role or developer text (`codex-rs/exec/src/exec_events.rs:250-259` at
+  `rust-v0.157.1`), so a check through it could not show that a role applied.
+
+**Overturn conditions.** A Codex release whose role files can set a sandbox or an MCP allowlist would let
+these restrictions be enforced instead of instructed. A run in which a spawned role does not receive its
+developer text exactly once, or does not run at the pinned model and effort, would reopen the carriers.
+A later change to either file's bytes needs a new dated section and new digest rows in `SHA256SUMS`, the
+test and the examples README.
+
+## Addendum 2026-10-03: serena at the first turn (port of #436)
+
+**Status: Arm A selected by the preregistered trial; repository port, no host apply.** North-star action: make the native
+Codex worker's exact-symbol lane available on its first turn while building the foundation for research and
+historical simulation. This addendum answers the unmeasured startup knobs at L364-365 without rewriting that
+dated passage; the third knob deferred there, a pinned `model_reasoning_summary`, was not trialled and remains
+unmeasured. The port source is #436's pinned head `b18d9f031fdf854e74f59586529df1022e805975`; its historical
+observations remain historical.
+
+**Preregistered criteria (written before the trials).** Control is the current main stack-worker profile,
+unchanged. Arm A adds `required = true` only to `[mcp_servers.serena]`. Arm B sets
+`mcp_optional_startup_grace_ms = 0` at the profile root. Arm C would use `startup_readiness = "catalog"`, but
+is excluded: the process-scoped in-memory catalog starts empty in a fresh `codex exec`
+(`openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/tool_catalog_cache.rs:36-49`). `connection` and `catalog`
+are the supported values (`codex-rs/config/src/mcp_types.rs:219-225`), and execution still needs a live connection.
+
+Each included arm receives three fresh-process runs with a stdio Serena fixture delaying `initialize` by
+2.5 seconds, and three separate runs with Serena unable to start. Keep every run's first-turn tool names,
+time from Codex launch to first Responses request, process exit code, failure text and elapsed time. The oracle
+is `mcp__serena__fixture_serena` in the first turn's `ALL_TOOLS`, returned in the second request's
+`custom_tool_call_output`; first-request guidance alone is insufficient. The instrument follows #436's native
+race test and upstream code-mode tests, using `bwrap --unshare-net`, scratch homes and a loopback fake Responses
+endpoint. Its evidence class is local native integration on synthetic inputs, with no provider execution.
+
+An arm passes only if Serena's tool is on the first turn whenever startup succeeds within its configured
+timeout. Among passing arms, prefer no new configuration-owner map entry, then lower added latency, then explicit
+failure over silent degradation. Keep the existing startup allowances. Do not require codebase-memory. If B
+wins, run the configuration-map check and stop if its new root key is unmapped. Port rehearsal relaxation only
+if a failing-first native test proves that scratch HOME prevents Serena from starting.
+
+**Disclosures added 2026-10-03 after the independent review (the preregistered text above is unchanged).**
+The control's bytes differ between the two trial passes. In the initial trial the control is main's template
+byte for byte (profile sha256 `f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e`). In the
+capture refinement it is this port's template without `required = true` (profile sha256
+`d5e673fd82fcdbaf200c2704a18229a7232f41c7c4d899f71bf224bcc8d1c3a1`), which is TOML-equal to main's profile
+but carries the new comments. The driver also deviates from #436's race test: besides adding timestamps, it drops
+#436's cleanup after `proc.wait`, `os.killpg(proc.pid, signal.SIGKILL)` followed by a second `proc.wait()`. The
+`bwrap` wrapper unshares only the network, with no `--unshare-pid` or `--die-with-parent`, so a codex that
+reaches the driver's 120 s timeout, or a background child it leaves, can keep running orphaned after the test.
+The removal followed the builder run's no-process-killing constraint, not a product reason. None of the 36
+retained runs reached the timeout (the longest took 8.433619 s). Restoring the process-group kill of the driver's
+own child is due with the 0.160.0 rerun, which records its driver hash with its new rows.
+
+**Source verification before code.** The installed client and current base pin are `codex-cli 0.159.3`;
+#626 remains open and the coordinator owns the subsequent 0.160.0 rebase and rerun. GitHub release reads on
+2026-10-03 identify `rust-v0.160.0` as both that target and the latest stable tag. Read both the installed
+`rust-v0.159.3` source and the target tag. The required-server implementation, connection manager, catalog builder,
+cache, MCP types, per-step timeout implementation and selected MCP tests are byte-identical between those tags.
+The schema/config and session files differ elsewhere; the facts below were re-read at the target tag:
+
+- Shared grace: `openai/codex@rust-v0.160.0:codex-rs/core/config.schema.json:7394-7398` defines 1000 ms and zero
+  as waiting for each server's configured startup timeout. `codex-rs/core/src/config/mod.rs:4343-4346` consumes
+  the setting and `:1836` passes it into MCP configuration. `codex-rs/codex-mcp/src/connection_manager/tool_catalog.rs:270-334`
+  consumes it; `:309-311` starts the shared deadline at the first catalog build, after the required-server wait.
+- Required semantics: `openai/codex@rust-v0.160.0:codex-rs/config/src/mcp_types.rs:248-256` and
+  `codex-rs/codex-mcp/src/connection_manager/required.rs:17-63`; the required wait awaits the initialized client
+  at `:35`, and the aggregate failure text is at `:61`. `codex-rs/core/src/session/mcp_runtime.rs:147` validates
+  required servers, and `codex-rs/core/src/session/session.rs:1890-1897` awaits initial installation with `?`.
+- Per-step timeouts: `openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/rmcp_client.rs:356`, `:954-956` and
+  `:1019-1025` apply the startup timeout to client start, initialize and initial tools/list separately; 60 s
+  is not one overall deadline. The source default is 30 s at `:105`. The unversioned official MCP page's
+  10 s default differs from this pin; this port follows the tagged implementation
+  ([official MCP documentation](https://developers.openai.com/codex/mcp)).
+- Instrument references: `openai/codex@rust-v0.160.0:codex-rs/core/tests/suite/code_mode.rs:271-300` and
+  `:7874` (`code_mode_exports_all_tools_metadata_for_namespaced_mcp_tools`), plus
+  `codex-rs/core/tests/common/responses.rs:753`, `:773`, `:784`, `:821` and `:1011` for SSE events.
+
+**Unchanged upstream tests: not run.** Rust 1.95, cargo, rustc, rustup and just were not found on PATH; no
+toolchain is installed for this port. The target pins Rust 1.95.0 (`codex-rs/rust-toolchain.toml:2`). Retain
+the native upstream invocation `just test -p <crate> <filter>` (`justfile:87-88`) for these re-located tests:
+
+- `codex-core`: `core/tests/suite/mcp_optional_startup_grace.rs:40`
+  `optional_mcp_startup_grace_controls_initial_turn_tool_catalog` (network-dependent, skip at `:43`), and
+  `core/tests/suite/managed_threads_tests.rs:30` `dropping_startup_cleans_up_while_required_mcp_is_stalled`
+  (network-dependent, skip at `:31`).
+- `codex-mcp`: `codex-mcp/src/connection_manager_tests.rs:2872`
+  `capture_binding_skips_pending_optional_servers_after_configured_shared_startup_grace`, `:3029`
+  `capture_binding_waits_for_optional_startup_when_shared_grace_is_disabled`, and `:3122`
+  `capture_binding_shares_optional_startup_grace_across_connection_sets`.
+- `codex-exec`: `exec/tests/suite/mcp_required_exit.rs:9`
+  `exits_non_zero_when_required_mcp_server_fails_to_initialize`.
+
+**Trial, 2026-10-03, codex-cli 0.159.3.** The complete sanitized receipt is
+[`codex-serena-startup-port-20261003.json`](../../evidence/receipts/codex-serena-startup-port-20261003.json).
+The first table retains the initial trial; the second retains its capture refinement, adding per-run UTC
+start/end timestamps and instrument hashes. The fixture, criteria and selection are unchanged, and all 36
+runs remain in the receipt. Each cell retains all three runs in order. Times are seconds from Codex process launch; the failure
+elapsed time is the whole Codex process lifetime, including shutdown, rather than an MCP-only timer.
+
+| Arm | Serena on first turn, successful startup | First request times | Unable-to-start exit codes | Unable-to-start elapsed times | First request on failed start |
+| --- | --- | --- | --- | --- | --- |
+| Control, unchanged main | no, no, no | 1.560680, 1.497042, 1.568459 | 0, 0, 0 | 5.628248, 5.828195, 5.877896 | 0.509943, 0.699199, 0.726416 |
+| A, Serena required | yes, yes, yes | 3.038018, 3.051511, 3.164788 | 1, 1, 1 | 5.578561, 5.477765, 5.577368 | none, none, none |
+| B, zero shared grace | yes, yes, yes | 2.926075, 2.992365, 2.987239 | 0, 0, 0 | 5.677990, 5.678289, 5.627510 | 0.538059, 0.546088, 0.467973 |
+| C, cached readiness | excluded by source review | not run | not run | not run | not run |
+
+The complete-capture rerun returned `Ran 1 test in 129.972s`, `OK`, exit 0, from
+2026-10-03T19:53:09Z through 19:55:18Z:
+
+| Arm | Serena on first turn, successful startup | First request times | Unable-to-start exit codes | Unable-to-start elapsed times | First request on failed start |
+| --- | --- | --- | --- | --- | --- |
+| Control | no, no, no | 1.568545, 1.477847, 1.762726 | 0, 0, 0 | 5.778881, 5.678131, 5.777845 | 0.637889, 0.519297, 0.632459 |
+| A | yes, yes, yes | 3.174493, 3.308461, 3.160008 | 1, 1, 1 | 5.477237, 5.526917, 5.526881 | none, none, none |
+| B | yes, yes, yes | 2.986330, 3.001203, 2.975756 | 0, 0, 0 | 5.978234, 6.080438, 5.778326 | 0.847022, 0.946971, 0.638382 |
+
+**Decision and alternatives.** A and B pass the successful-start criterion, 3/3 each. Choose **A**, because
+`codex/*/mcp_servers.serena.*` already maps to `slot:serena`
+(`adoption/new-wsl/client-config-map.json:409-412`). B's root piece has no matching map entry. A's median
+first-request latency is 3.051511 s, adding 1.490831 s to the control's 1.560680 s; B's median is 2.987239 s.
+The preference for an existing map entry precedes the initial measured 0.064272 s latency difference.
+The complete-capture medians were 1.568545 s for control, 3.174493 s for A and 2.986330 s for B; the same
+owner-map preference selects A, and the first-request added latency in that repeat is 1.605948 s.
+A also fails explicitly before a request when Serena cannot start, while B silently continues; B would wait
+for every enabled optional server, including the existing longer allowances. Do not increase the shared grace.
+Cached readiness does not solve fresh-process startup. A per-prompt `mcp://` mention remains an unmeasured
+alternative that would require every brief to name Serena.
+
+**Destination propagation and ownership.** The destination's rendered `stack-worker.config.toml` gains
+`required = true` for Serena at its next client-config apply through the existing `slot:serena` route. No
+configuration-owner map entry is added. The map check passes, but its unchanged tests still expect the old
+piece counts and old rendered Serena table: two failures are handed to the configuration owner, and their
+files are not edited here. This requires that owner's ACK on #608 before merge. The coordinator rebases after
+#626 and repeats native acceptance with the resulting `lane.CODEX_VERSION` (0.160.0); the 0.159.3 trial is
+retained, not relabelled as a 0.160.0 execution.
+
+**Codebase-memory retirement from the required proposal.** Keep main's codebase-memory startup allowance
+but add no `required` key. `catalogs/foundation/new-wsl-architecture-20261001.json:363` names codebase-memory
+as an optional task-appended lane and `:376` reserves its installation for tasks that need it. The client map
+at `:330-335` marks `codex/*/mcp_servers.codebase-memory.*` as `not_wired` because the code-navigation slot
+belongs to Serena. #436's account-daemon residual below also makes requiring it outside the account HOME
+inappropriate. The three older native tests now use a working Serena fixture. The native app-server
+dry-run/apply/rollback test passes without rehearsal relaxation, so neither `relaxed_required_flags()` nor
+the dry-run override is ported.
+
+**Failing-first evidence and current checks.** These are our returned outputs, with the main profile and
+installer unchanged for the first two rows. The parser's absent helpers are synthetic evidence, not a native
+startup failure. Preserve the first attempted runs too: the sandbox's read-only var/tmp caused Python tempfile
+to fall back to /tmp despite the requested TMPDIR. Re-run under an upstream bubblewrap bind mount exposing
+authorized scratch storage at the required var/tmp path; its preflight printed the requested TMPDIR. All
+subsequent checks run under `nice -n 19` in that namespace.
+
+| Check | Class | Before | After |
+| --- | --- | --- | --- |
+| Profile startup assertions and `RequiredStartTests` | structural and synthetic | exit 1; `Ran 4 tests in 1.111s`; `FAILED (failures=2, errors=2)` | included in the unit suite, exit 0 |
+| `test_required_serena_starts_before_the_first_turn_on_a_custom_provider` | local native integration, synthetic inputs | exit 1; `Ran 1 test in 20.753s`; `FAILED (failures=3)`; no Serena tool, no tool-set difference, failed startup exits 0 | included in native suite, exit 0; Serena-only tool-set difference, failed startup before any request |
+| `test_serena_startup_trial` | local native integration, synthetic inputs | control arm retains all six runs | exit 0; `Ran 1 test in 128.612s`; `OK`; all 18 trial runs retained |
+| Existing native tests after required key | local native integration, synthetic inputs | exit 1; `Ran 12 tests in 106.490s`; `FAILED (failures=3, skipped=1)`; existing missing or /bin/false Serena stubs | exit 0; `Ran 12 tests in 122.185s`; `OK (skipped=1)`; trial-only test skipped because its separate trial already ran |
+| `new_wsl_client_config.py --check` | structural | current base map | exit 0; `check passed` |
+| `tests.test_new_wsl_client_config` | structural and synthetic | owner's unchanged expectations | exit 1; `Ran 146 tests in 34.207s`; `FAILED (failures=2)`; stale count tuple and rendered Serena table handed off |
+
+Final content checks after the capture refinement and R1 canonical-root repair: the required three-module
+unit suite returned `Ran 381 tests in 92.623s`, `OK (skipped=15)`, exit 0; the native class returned
+`Ran 12 tests in 121.994s`, `OK (skipped=1)`, exit 0. The trial's separate repeat retained above returned exit 0.
+The final publication scan found generated session metadata and the synthetic prompt transcript in the
+fixture stderr. The public receipt now retains diagnostics only, with separate Codex-home masking; original
+captures remain private. The scanner returned `{"scanned_files": 1, "status": "passed"}`, exit 0. The affected
+native first-turn regression then returned `Ran 1 test in 21.584s`, `OK`, exit 0, and the three-module unit suite
+returned `Ran 381 tests in 90.516s`, `OK (skipped=15)`, exit 0.
+
+R1 canonicalizes the synthetic harness's temporary root once; its rollback assertion compares `run.resolve()`
+with the printed canonical path and still calls rollback;
+all ported printed-path assertions were audited. The installer preserves a required failure's multiline text,
+bounded at 2,000 characters, alongside `names_best_effort`. Existing worker keys and allowances remain intact.
+The omniroute comment now cites the current `build_args.py:356-357` key exclusion, while the keyed filters
+table remains byte-identical to main.
+
+**Historical facts preserved from #436 (2026-09-27, codex-cli 0.157.1).** A peer relayed that Serena and
+codebase-memory were absent from GPT-6's first-turn tools through OmniRoute and appeared after a 75 s sleep;
+the peer artifact was not retained. Workstation stdio probes measured Serena initialize at 1.53-2.24 s and
+codebase-memory at 1.20-1.25 s, each timed from its own launch. The historical unchanged-profile first requests
+left at 1.63-1.69 s. Those probe times are not measurements of added latency, and the codebase-memory timing
+alone does not corroborate its relayed omission. The shared grace starts after the required wait, and each
+startup step receives the configured timeout independently. A partial profile MCP table without a base
+registration causes the `invalid transport` hazard under whole-file strict validation.
+
+At codebase-memory-mcp 0.11.0, the historical scratch-HOME probe returned no answer in 30 s because the active
+account daemon used a different cache directory; the account-HOME probe answered in 1.2 s. Workers under a
+different HOME could therefore fail or hang if codebase-memory were required. The source #436 also retained
+Serena probes from cwd `/` at 1.47-1.53 s and codebase-memory at 1.20-1.25 s; no host apply had run. These are
+historical claims from the pinned PR, not measurements repeated by this port. Preserve #436's commits
+`2da1144d` through `2ba0e799` as port credit and its `claude/w5-codex-mcp-required-20260927` branch.
+
+**Overturn conditions and residuals.** Re-measure if a maintained Codex release provides a persistent catalog
+that covers fresh processes, a per-server optional wait with an equivalent first-turn guarantee, or a changed
+grace policy. Compare A and any such supported alternative on the same first-turn oracle and startup-failure
+fixture, retaining all runs and owner-map effects. Reopen the decision if real Serena starts fail within the
+60 s per-step allowance or a retained gateway probe still lacks its tool after the profile is applied.
+
+The optional live route was skipped outside the runtime lane's 06:30-09:00Z window; no provider, model, gateway,
+real Serena, token or other-host acceptance is claimed. No Rust upstream tests were run. The initial trial
+lacked absolute per-run timestamps; its preserved capture refinement includes them and instrument hashes.
+Gate A owns the final-head review: the repository templates are not themselves items in `list-frozen`, but the
+installed stack-worker profile's presence and SHA256 are frozen (`codex.stack_worker_profile.present` and
+`.sha256`), alongside role tables and the effective MCP server set. No omniroute profile item is listed. No host
+apply occurred.
+
+**Completeness critic.** Covered the installed pin and target/latest source, required and optional starts,
+fresh-process cache limits, per-step timeouts, first-turn tool names, failed-start controls, owner-map propagation,
+codebase-memory retirement, historical evidence classes, canonical rollback paths and the frozen installed profile.
+The next lifecycle sweep must retain the target-pin rerun, configuration-owner fixes/ACK, Gate A review and quiet-window
+capability/host follow-up as open gates. Independent Opus and cross-family Sol review, all required CI, rebase,
+publication, merge and #436 closure are coordinator actions under the sandbox addendum.
+
+Concurrent main advancement was observed before final registration: this builder's HEAD remained the contract
+base `cac8700ba914950266272347468bff7ad630a4bf`, while origin/main moved to
+`463a57b983eec540ae90eb45c2b1a7c6fc469aed`. Its newer evidence manifest names unrelated files absent from this
+older worktree. No assigned content path changed in that interval. The prescribed registry commands are run,
+but rebase and final registration/validation remain with the coordinator; the builder cannot edit git state or
+fill other owners' artifacts.
+Both required report generators returned exit 0 (`status: written`). Publication validation after copying
+the latest main manifest returned exit 1 for those unrelated missing/stale files; its initial own-receipt
+privacy findings were repaired as recorded above. This is not a passed final publication gate. The coordinator
+must rebase, register the actual final content, regenerate reports and obtain `status: passed` before committing.
+
+**Resolution 2026-10-03 (coordinator custody, after the builder run).** The builder's state above stays as recorded.
+The coordinator rebased the port's content onto `6112d14d40f741855f0b961124d98939daaad00e`; that rebase moved one
+cited range, `build_args.py` L355-356 to L356-357, which the omniroute comment and this addendum now cite. The
+registry was then redone as the last commit, `fd252afcac09fbe49fcc31dfed789e314f47d9d6`, and the independent
+review of that head reproduced `python3 scripts/validate.py` and `python3 scripts/evidence_manifest.py --check`
+with exit 0 and `status: passed`. That base still precedes #626, so the 0.160.0 rebase, native rerun and final
+registration remain open, and each later registry commit's exact-head results are recorded on the PR.
+
+**Resolution 2026-10-04 (the 0.160.0 rerun after #626).** The records above stay as written. The branch merged main
+`6af8e55bd9e8f51aaafbf0304e510c11aaa71a6a`, which carries #626's 0.160.0 pin (`f77a35eb2`), in merge
+`e3ce7466a62aa9f2c6de50084b2900d41a210431`, so `lane.CODEX_VERSION` is 0.160.0. The pinned codex-cli 0.160.0 was
+installed into a scratch prefix and matched both pinned tarball hashes and the vendored binary hash. With it,
+`CodexIntegrationTests` exited 0 (12 run, 1 skipped) and the preregistered trial exited 0: arm A again exposed Serena
+on 3/3 delayed starts and failed explicitly before any request on 3/3 failed starts, so selection A holds. A scratch
+check also started the real Serena transport that the config template renders, and its tools reached the first turn
+under 0.160.0 and 0.159.3 alike. The rerun kept the driver unchanged (hash `83a33467…`, as in the 0.159.3 rows), so
+restoring the process-group kill described above remains open; no run reached the 120 s timeout (the longest took
+8.28 s). The real `--dry-run` of the capability-gate rerun also remains open. Results, hashes and the evidence class
+are in the receipt's `rerun_0160_20261004`.

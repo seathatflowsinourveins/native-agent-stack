@@ -36,24 +36,16 @@ from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, ext
                      must_end_flat, next_trading_day, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
 from transport import (AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, order_contract_status,
-                       preflight, halt_statuses_supported, nasdaq_halt_seed)
+                       preflight, halt_statuses_supported, nasdaq_halt_seed, fee_activities, fee_checkpoint)
 
 SOURCE = Path(__file__).resolve().parent
 LAST_OUTPUT = None
 # E4: how long entries wait at startup for the halt seed read (one halts feed request run
 # while the node connects) before the stream alone decides.
 HALT_SEED_WAIT_SECONDS = 3.0
-# A halt only the startup seed asserts (no status message has confirmed or cleared it)
-# expires, because the stream sends changes only and the feed lags (about 65 s p50), so a
-# pause that ended just before the read would otherwise hold its symbol all session: at
-# its resumption trade time when the feed gives one, or, for a LULD trading pause, 12
-# minutes after it began. LULD Plan Amendment 12 (Cboe fact sheet): a pause's first 5-
-# minute halt segment, and a second one when it is extended, run in full, so a pause still
-# closed after 10 minutes is exceptional; 2 minutes are a margin. A longer pause then counts
-# as trading until the stream reports it. Other seeded halts without a resumption time stay
-# until a status message arrives.
-SEEDED_LULD_PAUSE_SECONDS = 12 * 60
-LULD_PAUSE_REASON_CODES = frozenset({"LUDP", "LUDS", "M"})
+# Nasdaq Rule 4120(b)(4)(A)(i)c permits repeated LULD pause extensions.
+# As in transport.active_halts, only an authoritative resumption clears a seed;
+# elapsed time without one leaves the symbol halted.
 
 
 def _seed_failure(exc):
@@ -766,6 +758,12 @@ def reconcile(ledger, snapshot, baseline_cash):
     expected = {p.symbol: p.qty for p in ledger.positions().values() if p.qty}
     if actual != expected:
         raise SafetyError("position_mismatch")
+    if "fees" in snapshot:
+        # Broker FEE activities (REG, TAF, CAT, ...) created since the ledger's cash baseline,
+        # from the transport's allow-listed read, are recorded durably before the comparison.
+        # The comparison and its 0.01 USD tolerance are unchanged: deposits, withdrawals,
+        # journals, dividends, interest and every other activity stay unexplained and fail it.
+        ledger.record_fees(snapshot["fees"], time.time())
     cash_delta = Decimal(snapshot["account"]["cash"]) - Decimal(baseline_cash)
     if abs(cash_delta - ledger.accounting().cash_delta_usd) > Decimal("0.01"):
         raise SafetyError("cash_mismatch_or_unmodeled_fees")
@@ -1005,18 +1003,14 @@ class Controller:
 
     @staticmethod
     def _seed_expiry(halt):
-        """When a halt only the startup seed asserts stops counting (epoch ns), and why:
-        its resumption trade time when the feed gives one; else, for a LULD trading pause,
-        SEEDED_LULD_PAUSE_SECONDS after its halt time; else never (None)."""
+        """The authoritative resumption trade time (epoch ns), or no expiry."""
         if halt.get("resumption_trade_ns") is not None:
             return int(halt["resumption_trade_ns"]), "resumption_trade_time"
-        if halt.get("reason_code") in LULD_PAUSE_REASON_CODES:
-            return int(halt["halted_at_ns"]) + SEEDED_LULD_PAUSE_SECONDS * 1_000_000_000, "luld_pause_bound"
         return None, None
 
     def _expire_seeded_halts(self):
-        """Clear each seeded halt whose expiry has passed and that no streamed status has
-        replaced (a stale seed cannot block a symbol for the rest of the session)."""
+        """Clear a seed only at its published resumption time, unless a stream status
+        has replaced it. A pause of unknown duration stays halted."""
         if not self.seeded_halts:
             return
         now_ns = int(self.clock() * 1_000_000_000)
@@ -1068,9 +1062,9 @@ class Controller:
         """Mark each seeded symbol halted from its halt time (state ``seeded_halt``). A
         stream status newer than that time wins, so a resume streamed before the seed
         returned is not undone, and a later streamed resume clears the seeded halt. A
-        seeded halt no status has replaced expires (_seed_expiry); a seed already past its
-        expiry (for example a prior day's pause whose row kept no resumption time) is not
-        applied. Each applied symbol's expiry is recorded in the seed summary."""
+        seeded halt no status has replaced clears at its published resumption time;
+        without one it remains halted, even if old. Each applied symbol's resumption
+        time, or lack of one, is recorded in the seed summary."""
         halts = seed.get("halts") or {}
         now_ns = int(self.clock() * 1_000_000_000)
         applied, expiry, expired = [], {}, []
@@ -2386,12 +2380,47 @@ def main():
                 if metadata["config_sha256"] != summary["config_sha256"]:
                     raise SafetyError("recovery_config_differs_from_frozen_trial")
             else:
+                fee_start = (previous_metadata.get("fee_window_start", previous_metadata["started_at"])
+                             if previous_metadata else None)
+                if previous_metadata is None:
+                    def admit_checkpoint_read(kind, **_):
+                        if ledger.request_budget(time.time(), "read"):
+                            raise SafetyError("fee_checkpoint_budget_exhausted")
+                    fee_start = time.time()
+                    try:
+                        checkpoint = fee_checkpoint(key, secret, after=datetime.fromtimestamp(fee_start, timezone.utc),
+                                                    before_request=admit_checkpoint_read,
+                                                    request_observer=responses.append)
+                    except (TransportError, SafetyError) as exc:
+                        if str(exc) not in ("fee_activity_posted_during_checkpoint", "fee_checkpoint_budget_exhausted"):
+                            raise
+                        summary.update(status="not_started", stage="trial_start", reason=str(exc))
+                        save(args.output, summary)
+                        print(json.dumps({"status": "not_started", "stage": "trial_start", "reason": str(exc),
+                                          "orders_submitted": 0}))
+                        return 2
+                    ledger.record_fees(checkpoint["fees"], time.time())
+                    baseline_cash = format(Decimal(checkpoint["account"]["cash"])
+                                           - ledger.accounting().cash_delta_usd, "f")
+                    now = time.time()
                 if previous_metadata:
                     if previous_metadata["config_sha256"] != summary["config_sha256"]:
                         raise SafetyError("next_trial_config_differs_from_frozen_limits")
                     if (ledger.positions() or ledger.unresolved()) and not resumable_hold:
                         raise SafetyError("next_trial_requires_recovery")
                     if not resumable_hold:
+                        # Keep the first checkpoint's cash baseline and fee window (legacy:
+                        # started_at). Reserve every read durably before sending, including
+                        # failed pages, and book the fees before comparing unchanged cash tolerance.
+                        def admit_next_fee_read(kind, **_):
+                            if ledger.request_budget(time.time(), "read"):
+                                raise SafetyError("preflight_budget_inconsistent")
+                        fees = fee_activities(key, secret,
+                                              after=datetime.fromtimestamp(fee_start, timezone.utc),
+                                              before_request=admit_next_fee_read,
+                                              request_observer=responses.append)
+                        now = time.time()
+                        ledger.record_fees(fees, now)
                         expected_cash = Decimal(previous_metadata["baseline_cash"]) + ledger.accounting().cash_delta_usd
                         if abs(Decimal(observation["account"]["cash"]) - expected_cash) > Decimal("0.01"):
                             raise SafetyError("next_trial_cash_mismatch")
@@ -2410,7 +2439,8 @@ def main():
                 metadata = {"trial_id": args.trial,
                             "started_at": previous_metadata["started_at"] if previous_metadata else now,
                             "current_trial_started_at": now, "config_sha256": summary["config_sha256"],
-                            "baseline_cash": previous_metadata["baseline_cash"] if previous_metadata else observation["account"]["cash"],
+                            "fee_window_start": fee_start,
+                            "baseline_cash": previous_metadata["baseline_cash"] if previous_metadata else baseline_cash,
                             "phase": "starting"}
                 save(metadata_path, metadata)
             def fresh_port(recovering=False):
@@ -2422,6 +2452,10 @@ def main():
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
                     required_quote_symbols=needed if recovering and needed else config["benchmarks"],
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
+                    # This lane keeps its first checkpoint baseline and fee window; legacy
+                    # metadata keeps started_at, which follows the original account read.
+                    fee_history_start=datetime.fromtimestamp(metadata.get("fee_window_start", metadata["started_at"]),
+                                                           timezone.utc),
                     extended_hours_allowed=session_policy["extended_hours"],
                     include_margin=leverage_policy is not None))
             for sig in (signal.SIGINT, signal.SIGTERM):

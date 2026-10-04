@@ -1,0 +1,175 @@
+{
+ "real": {
+  "gpt6-probe-r3": {
+   "hit_parts": [],
+   "hits": 0
+  },
+  "lane-a-gpt6": {
+   "hit_parts": [],
+   "hits": 0
+  },
+  "adj2-gpt6-AB": {
+   "hit_parts": [],
+   "hits": 0
+  },
+  "adj2-gpt6-BA": {
+   "hit_parts": [],
+   "hits": 0
+  },
+  "adj2-claude-AB": {
+   "hit_parts": [
+    "ACCESS:hold_and_work_dirs"
+   ],
+   "hits": 35
+  },
+  "adj2-claude-BA": {
+   "hit_parts": [
+    "ACCESS:hold_and_work_dirs"
+   ],
+   "hits": 39
+  }
+ },
+ "synthetic": {
+  "/bin/bash -lc 'cat ~/.codex/sessions/2026/09/28/rollout-x.jsonl'": {
+   "want": [
+    "ACCESS:codex_home"
+   ],
+   "got": [
+    "ACCESS:codex_home"
+   ]
+  },
+  "/bin/bash -lc 'rtk rg -n Top ~/.codex'": {
+   "want": [
+    "ACCESS:codex_home"
+   ],
+   "got": [
+    "ACCESS:codex_home"
+   ]
+  },
+  "/bin/bash -lc 'sqlite3 $HOME/.codex/state_5.sqlite .tables'": {
+   "want": [
+    "ACCESS:codex_home"
+   ],
+   "got": [
+    "ACCESS:codex_home"
+   ]
+  },
+  "/bin/bash -lc 'rtk cat ~/.codex/RTK.md'": {
+   "want": [],
+   "got": []
+  },
+  "/bin/bash -lc 'cat ~/.codex/AGENTS.md'": {
+   "want": [],
+   "got": []
+  },
+  "/bin/bash -lc \"sed -n '1,80p' ~/.agents/skills/<skill>/SKILL.md\"": {
+   "want": [],
+   "got": []
+  },
+  "/bin/bash -lc 'ls ~/.claude/context-mode'": {
+   "want": [
+    "ACCESS:claude_home"
+   ],
+   "got": [
+    "ACCESS:claude_home"
+   ]
+  },
+  "/bin/bash -lc 'cat <projects>/p/memory/MEMORY.md'": {
+   "want": [
+    "ACCESS:claude_home"
+   ],
+   "got": [
+    "ACCESS:claude_home"
+   ]
+  },
+  "/bin/bash -lc 'cat ~/.claude/CLAUDE.md'": {
+   "want": [],
+   "got": []
+  },
+  "/bin/bash -lc 'ls ~/.local/share/ai-memory'": {
+   "want": [
+    "ACCESS:memory_store"
+   ],
+   "got": [
+    "ACCESS:memory_store"
+   ]
+  },
+  "/bin/bash -lc 'cat <tmp-root>/p/<session-id>/tasks/abc.output'": {
+   "want": [
+    "ACCESS:session_transcripts"
+   ],
+   "got": [
+    "ACCESS:session_transcripts"
+   ]
+  },
+  "/bin/bash -lc 'cat ~/code/native-agent-stack/AGENTS.md'": {
+   "want": [
+    "ACCESS:live_checkout"
+   ],
+   "got": [
+    "ACCESS:live_checkout"
+   ]
+  },
+  "/bin/bash -lc 'ls ../../../.hold3'": {
+   "want": [
+    "ACCESS:hold_and_work_dirs"
+   ],
+   "got": [
+    "ACCESS:hold_and_work_dirs"
+   ]
+  },
+  "/bin/bash -lc 'git diff --no-index <root>/base/AGENTS.md <root>/proposed/AGENTS.md'": {
+   "want": [],
+   "got": []
+  },
+  "/bin/bash -lc 'cat <k2>/work/gpt6/a2-gpt6/prompt.txt'": {
+   "want": [],
+   "got": []
+  },
+  "[{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"t1\", \"name\": \"Read\", \"input\": {\"file_path\": \"<tmp-root>/<project-dir>": {
+   "want": [],
+   "got": []
+  },
+  "[{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"t1\", \"name\": \"Read\", \"input\": {\"file_path\": \"/tmp/c/<session-id>": {
+   "want": [
+    "ACCESS:session_transcripts"
+   ],
+   "got": [
+    "ACCESS:session_transcripts"
+   ]
+  },
+  "[{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"t1\", \"name\": \"Grep\", \"input\": {\"path\": \"<projects>\", \"pattern\": \"x\"": {
+   "want": [
+    "ACCESS:claude_home"
+   ],
+   "got": [
+    "ACCESS:claude_home"
+   ]
+  },
+  "[{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"t1\", \"name\": \"mcp__ai-memory__memory_query\", \"input\": {\"query\": \"x\"}}]}}]": {
+   "want": [
+    "mcp__ call"
+   ],
+   "got": [
+    "mcp__ call"
+   ]
+  },
+  "[{\"type\": \"attachment\", \"attachment\": {\"type\": \"hook_additional_context\", \"content\": \"So never self-write without a SOTA source.\"}}]": {
+   "want": [
+    "PHRASES"
+   ],
+   "got": [
+    "PHRASES"
+   ]
+  },
+  "[{\"type\": \"user\", \"message\": {\"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"t1\", \"content\": \"see lane-a/claude.json\"}]}}]": {
+   "want": [
+    "MAPPING"
+   ],
+   "got": [
+    "MAPPING"
+   ]
+  }
+ },
+ "disagreements": []
+}

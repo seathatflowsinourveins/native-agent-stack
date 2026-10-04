@@ -24,7 +24,9 @@ usage() {
     'ECO_INSTALL_ROOT (default ~/.local/share/codex-ecosystem), each in an' \
     'isolated tools/<name>-<version> prefix with bin/ symlinks. Every archive' \
     'is SHA-256 verified with shasum -a 256 before extraction; a pin with a' \
-    'null sha256 refuses to install (fail closed). A selected component with' \
+    'null sha256 refuses to install (fail closed), except a uv-tool-from-git' \
+    'pin (serena), which has no archive to hash and instead pins and verifies' \
+    'an exact git commit. A selected component with' \
     'no pin at all also fails closed (exit 3) before installing anything, and' \
     'in --plan mode too, unless it is named in --allow-unpinned, in which case' \
     'it is skipped and echoed to the run log.' \
@@ -38,8 +40,9 @@ usage() {
     'Never edits a shell profile.' \
     '' \
     '  --plan  resolve and print each pinned component (version, asset,' \
-    '          sha256) without any network access or installation; still' \
-    '          exits 1 on a pin with no verified sha256 and 3 on a selected' \
+    '          sha256, or the commit of a uv-tool-from-git pin) without any' \
+    '          network access or installation; still exits 1 on a pin with' \
+    '          no verified sha256 (or 40-hex commit) and 3 on a selected' \
     '          component with no pin at all.'
 }
 
@@ -283,32 +286,43 @@ stage_dir=""
 # stage_dir, which this same cleanup() already removes wholesale below).
 pending_migration_prefix=""
 pending_migration_dest=""
+unpublished_prefix=""
+unpublished_dest=""
 cleanup() {
-  # Round 3e (Codex Medium #6, applied defensively here too): never itself
-  # fatal under the script's own `set -e` -- an ordinary failure in one
-  # cleanup step (the stage_dir removal below, say) must never abort this
-  # function before the lock release after it also runs. Every command from
-  # here on is checked explicitly rather than relied on to abort the whole
-  # function via errexit.
   set +e
   # An interrupted version report leaves its probe and watchdog running in
   # their own process groups (run_version_probe, below); stop both.
   # Reaped under a silenced stderr, so bash prints no job notice for them.
   local group
   for group in "${version_probe_pid:-}" "${version_watchdog_pid:-}"; do
-    if [[ -n "$group" ]]; then { kill -KILL -- "-$group" && wait "$group"; } 2>/dev/null; fi
+    if [[ -n "$group" ]]; then { kill -KILL -- "-$group" && wait "$group"; } 2>/dev/null || true; fi
   done
-  if [[ -n "$pending_migration_prefix" && -e "$pending_migration_prefix" && -n "$pending_migration_dest" ]]; then
-    if [[ ! -e "$pending_migration_dest" ]]; then
+  if [[ -n "${pending_migration_prefix:-}" && -e "$pending_migration_prefix" && -n "${pending_migration_dest:-}" ]]; then
+    if [[ ! -e "$pending_migration_dest" && ! -L "$pending_migration_dest" ]]; then
       mv -- "$pending_migration_prefix" "$pending_migration_dest" 2>/dev/null && pending_migration_prefix=""
     fi
     if [[ -n "$pending_migration_prefix" ]]; then
-      printf 'WARNING: an unexpected exit left a previous install moved aside at %s; its usual location %s was not restored automatically. Restore it manually with: mv -- %q %q\n' \
-        "$pending_migration_prefix" "$pending_migration_dest" "$pending_migration_prefix" "$pending_migration_dest" >&2
+      if [[ -e "$pending_migration_dest" || -L "$pending_migration_dest" ]]; then
+        printf 'WARNING: a previous install remains at %s; remove it with: rm -rf -- %q\n' \
+          "$pending_migration_prefix" "$pending_migration_prefix" >&2
+      else
+        printf 'WARNING: a previous install remains at %s; Restore it manually with: mv -- %q %q\n' \
+          "$pending_migration_prefix" "$pending_migration_prefix" "$pending_migration_dest" >&2
+      fi
     fi
   fi
+  # A signal immediately after os.replace can precede the state clear below.
+  # Never delete a prefix already reached through its publication symlink.
+  if [[ -n "${unpublished_prefix:-}" && "$unpublished_prefix" == "$ecosystem_root/tools/"* \
+        && -d "$unpublished_prefix" && ! -L "$unpublished_prefix" \
+        && "$(dirname -- "$(canonical_path "$unpublished_prefix")")" == "$(canonical_path "$ecosystem_root/tools")" \
+        && "$(canonical_path "${unpublished_dest:-/}")" != "$(canonical_path "$unpublished_prefix")" ]]; then
+    rm -rf -- "$unpublished_prefix" 2>/dev/null \
+      || printf 'WARNING: an unpublished install remains at %s; remove it with: rm -rf -- %q\n' \
+        "$unpublished_prefix" "$unpublished_prefix" >&2
+  fi
   if [[ -n "${stage_dir:-}" && "$stage_dir" == "$ecosystem_root"/staging.* && -d "$stage_dir" ]]; then
-    rm -rf -- "$stage_dir" 2>/dev/null || true
+    rm -rf -- "$stage_dir"
   fi
   if [[ "${lock_held:-0}" == 1 && -d "$lock_dir" ]]; then
     rmdir "$lock_dir" 2>/dev/null || true
@@ -336,14 +350,24 @@ else
 fi
 stage_dir="$(mktemp -d "$ecosystem_root/staging.XXXXXXXX")"
 
+verify_sha256() {
+  # Prefer macOS's native checker when available; Linux also supports the
+  # GNU coreutils fallback. Both consume checksum lines on standard input.
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 --check --status
+  else
+    sha256sum --check --status
+  fi
+}
+
 fetch() {
   local url="$1" checksum="$2" destination="$3"
-  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | shasum -a 256 --check --status; then
+  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | verify_sha256; then
     return
   fi
   curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \
     "$url" --output "$destination.partial"
-  printf '%s  %s\n' "$checksum" "$destination.partial" | shasum -a 256 --check --status || {
+  printf '%s  %s\n' "$checksum" "$destination.partial" | verify_sha256 || {
     printf 'Checksum mismatch: %s\n' "$url" >&2; exit 1
   }
   mv -- "$destination.partial" "$destination"
@@ -432,11 +456,15 @@ print(os.path.realpath(sys.argv[1]))' "$target" 2>/dev/null)" && [[ -n "$via_pyt
 # escalated -- pruning is disk hygiene, never a correctness requirement,
 # since bin_dir's symlinks only ever depend on final_prefix, not on this.
 prune_old_version() {
-  local id="$1" version="$2" target="$3"
+  local id="$1" version="$2" target="$3" published_prefix="${4:-}"
   [[ -n "$target" ]] || return 0
   local canonical_tools canonical_target
   canonical_tools="$(canonical_path "$ecosystem_root/tools")"
   canonical_target="$(canonical_path "$target")"
+  if [[ -n "$published_prefix" && "$canonical_target" == "$(canonical_path "$published_prefix")" ]]; then
+    printf 'Note: leaving newly published %s in place (not pruned for safety).\n' "$target" >&2
+    return 0
+  fi
   if [[ ! -d "$canonical_target" ]]; then
     printf 'Note: leaving %s in place (not a directory after resolving symlinks; not pruned for safety).\n' \
       "$target" >&2
@@ -781,15 +809,7 @@ install_npm() {
   command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
-  # final_prefix is deliberately NEVER canonicalized (round 3d fix): once a
-  # platform_dependency install has run once, it is a SYMLINK (see below),
-  # and canonical_path would resolve straight through it to whatever
-  # versioned directory it currently targets -- silently defeating the
-  # entire point of it being a stable, never-resolved name. ecosystem_root
-  # is already canonical by the time the top-level script reaches here (see
-  # its own canonicalization above); the one path that still genuinely
-  # needs canonical_path for install_platform_dependency's sake is the
-  # versioned prefix itself, canonicalized separately below.
+  # Keep the stable publication name unresolved; only the fresh tree is canonicalized.
   local final_prefix="$ecosystem_root/tools/$id-$version"
   local package
   package="$(npm_package_name "$url")"
@@ -797,90 +817,49 @@ install_npm() {
   if [[ "$(jq -r --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")" != "" ]]; then
     has_platform_dependency=1
   fi
+  # Linux provides the independent SHA-256/SHA-512 pre-install gate. The macOS
+  # reference retains its platform installer; this optional hook keeps the
+  # publication implementation shared without changing the macOS pin contract.
+  if [[ "$has_platform_dependency" == 1 ]] && declare -F fetch_platform_dependency >/dev/null; then
+    fetch_platform_dependency "$id"
+  fi
 
   local prefix="$final_prefix"
   if [[ "$has_platform_dependency" == 1 ]]; then
-    # Round 3d (Codex): rounds 3b/3c's rename-aside-then-move-in swap was
-    # only ever RECOVERABLE, not atomic, and the recovery itself had two
-    # more bugs -- an unchecked rollback `mv` that could itself fail
-    # silently, and no coverage at all for a signal landing between the
-    # rename and reporting success. This replaces it with the Homebrew
-    # Cellar/opt pattern: final_prefix becomes a SYMLINK to a versioned,
-    # never-reused directory (tools/<id>-<version>-<stamp>), installed here
-    # BEFORE it is ever live. bin_dir's own symlinks point into
-    # final_prefix/bin/* (unchanged below) and so transparently follow
-    # final_prefix through this extra indirection -- they never need to be
-    # re-created when a later install flips final_prefix to a new target.
-    # Flipping final_prefix is then a SINGLE rename(2) of one symlink over
-    # another (via python3's os.replace, guaranteed available -- see
-    # canonical_path's own comment -- and, unlike `ln -sfn`, a genuine
-    # single-syscall rename rather than an unlink-then-symlink pair), so at
-    # every instant final_prefix resolves to the complete old tree or the
-    # complete new one, never neither.
+    # The existing Homebrew Cellar/opt pattern publishes one complete tree
+    # through os.replace. Never merge into a stale directory at the new name.
     local stamp
     stamp="$(date -u +%Y%m%d%H%M%S)-$$"
     prefix="$final_prefix-$stamp"
+    mkdir "$prefix"
+    unpublished_prefix="$prefix"
+    unpublished_dest="$final_prefix"
+  else
+    mkdir -p "$prefix"
   fi
-  mkdir -p "$prefix"
   prefix="$(canonical_path "$prefix")"
 
   local npm_install_args=(--global --no-audit --no-fund --prefix "$prefix")
   if [[ "$ignore_scripts" == "true" || "$has_platform_dependency" == 1 ]]; then
-    # A platform_dependency needs the wrapper's own lifecycle scripts
-    # deferred until install_platform_dependency has replaced whatever npm
-    # auto-fetched with the verified copy; see that function's comment.
     npm_install_args+=(--ignore-scripts)
   fi
   npm install "${npm_install_args[@]}" "$archive" >/dev/null
   if [[ "$has_platform_dependency" == 1 ]]; then
     install_platform_dependency "$id" "$prefix" "$ignore_scripts"
 
-    # --- Atomic-flip recovery step table (round 3e) -------------------------
-    # INT, TERM and HUP are explicitly trapped (script-wide, "exit N" only;
-    # see the top-level trap block) so bash always defers a caught signal
-    # until whatever foreign command (mv, ln, python3, rm) is currently
-    # running actually finishes -- every "On a signal here" cell below is
-    # therefore identical to "On failure here": a signal can only ever be
-    # acted on at a step boundary, never mid-step.
-    # Step                                    | On failure or a signal here
-    # 1. mkdir versioned dir, npm install,    | final_prefix untouched; the new versioned directory is an orphan
-    #    install_platform_dependency (above)  | (never referenced), safe to ignore or prune
-    # 2. one-time migration: mv a REAL        | pending_migration_prefix set; final_prefix now absent, previous
-    #    final_prefix aside (only when it     | install moved aside but not yet restored -- top-level cleanup()
-    #    predates this design and is not      | (trap, script-wide) moves it back onto pending_migration_dest if
-    #    already a symlink)                   | that destination is still free; reports the exact manual `mv`
-    #                                         | otherwise
-    # 3. readlink final_prefix (only when     | read-only; nothing mutated. The value read here is UNVERIFIED
-    #    already a symlink) -> previous_ver-  | (an external or "../" target, or one this run does not own) and
-    #    ioned                                | is never trusted directly -- see step 6
-    # 4. ln -s new versioned dir -> tmp_link  | tmp_link absent or partial; final_prefix untouched. Harmless:
-    #    (a NEW symlink under stage_dir)      | tmp_link lives under stage_dir, removed wholesale by cleanup()
-    # 5. os.replace(tmp_link, final_prefix)   | rename(2) either completes or does not begin; a failed call never
-    #    -- THE atomic step                   | touches final_prefix at all. On failure, tmp_link is removed and
-    #                                         | any pending migration is left for cleanup() to restore
-    # 6. prune_old_version(previous_versioned | best-effort ONLY, never fails the install: deletes previous_
-    #    or migration_prefix) -- only after   | versioned ONLY when its canonical form is a direct child of the
-    #    step 5 already succeeded             | canonical tools/ directory with a name matching <id>-<version>-*
-    #                                         | (rejects an external target, a relative "../" target, a wrong-
-    #                                         | name target, and a symlink loop, which canonical_path resolves
-    #                                         | without hanging and which then simply fails these checks); a
-    #                                         | rejected or failed deletion is logged and left in place, never
-    #                                         | escalated. migration_prefix (this run's own, already known-safe)
-    #                                         | skips the ownership check but is equally best-effort
-    # -------------------------------------------------------------------------
     local migration_prefix=""
     if [[ -e "$final_prefix" && ! -L "$final_prefix" ]]; then
       migration_prefix="${final_prefix}.migrating.$$"
-      # Set BEFORE the mv, not after: a signal landing exactly between the
-      # mv completing and the next script line would otherwise reach
-      # cleanup() with pending_migration_prefix still empty, unable to find
-      # what it should restore even though the mv itself already succeeded.
-      # Harmless the other way around (signalled before the mv even starts):
-      # cleanup() only acts once pending_migration_prefix actually exists on
-      # disk.
       pending_migration_prefix="$migration_prefix"
       pending_migration_dest="$final_prefix"
-      mv -- "$final_prefix" "$migration_prefix"
+      # GNU mv -T prevents an existing destination from turning a rename
+      # into a directory merge. BSD mv does not provide this option.
+      if [[ "$(uname -s)" == Linux ]]; then
+        mv -T -- "$final_prefix" "$migration_prefix"
+      else
+        [[ ! -e "$migration_prefix" && ! -L "$migration_prefix" ]] || { printf 'Migration destination already exists: %s\n' "$migration_prefix" >&2; exit 1; }
+        mv -- "$final_prefix" "$migration_prefix"
+      fi
     fi
 
     local previous_versioned=""
@@ -895,21 +874,19 @@ install_npm() {
     local tmp_link="$stage_dir/${id}-${version}-link.$$"
     rm -f -- "$tmp_link"
     ln -s -- "$prefix" "$tmp_link"
-    if python3 -c '
+    if python3 -I -c '
 import os, sys
 os.replace(sys.argv[1], sys.argv[2])
 ' "$tmp_link" "$final_prefix"; then
+      # Clear recovery state before best-effort pruning. A leftover after a
+      # successful publication is for deletion, never for restoration.
+      pending_migration_prefix="" pending_migration_dest="" unpublished_prefix="" unpublished_dest=""
       if [[ -n "$migration_prefix" ]]; then
-        # This run's own, already known-safe (we created it above); still
-        # best-effort, never fatal, matching prune_old_version's own
-        # contract.
         rm -rf -- "$migration_prefix" 2>/dev/null \
-          || printf 'Note: failed to prune the migrated-aside %s; left in place (not fatal).\n' "$migration_prefix" >&2
-        pending_migration_prefix=""
-        pending_migration_dest=""
+          || printf 'Note: a migrated-aside install remains at %s; remove it with: rm -rf -- %q\n' "$migration_prefix" "$migration_prefix" >&2
       fi
       if [[ -n "$previous_versioned" ]]; then
-        prune_old_version "$id" "$version" "$previous_versioned"
+        prune_old_version "$id" "$version" "$previous_versioned" "$prefix"
       fi
     else
       rm -f -- "$tmp_link"
@@ -1041,10 +1018,10 @@ EOF
 # The pin is a floor, not a ceiling (2026-09-24): `"$bin" install <pin>`
 # moves the installer's own launcher back to the pin, dropping a newer
 # auto-updated release's fixes. A launcher at $HOME/.local/bin/<bin> whose
-# `--version` first word ("2.1.281" of "2.1.281 (Claude Code)") is a dotted
+# `--version` first word ("2.1.284" of "2.1.284 (Claude Code)") is a dotted
 # numeric version at or above the pin is kept: nothing is downloaded or
 # installed, and install_pin logs "Kept" instead of "Installed". Fields are
-# compared as base-10 numbers (2.1.99 is older than 2.1.281). No launcher, a
+# compared as base-10 numbers (2.1.99 is older than 2.1.284). No launcher, a
 # failing --version, a non-numeric version or an older one takes the
 # unchanged checksum-verified install. Self-contained on purpose:
 # tests/test_adoption_bootstrap.py runs install_native extracted alone.
@@ -1088,10 +1065,171 @@ install_native() {
   {
     printf '#!/usr/bin/env bash\n'
     printf '# Native auto-updating launcher (installed by %s install); the ecosystem no longer pins a snapshot.\n' "$id"
+    if [[ "$bin_name" == claude ]]; then
+      # Interactive default effort max (docs/decisions/2026-09-29-max-default-effort.md): the client cannot save max, so the
+      # documented --effort flag is added, and only when nothing has chosen an effort. The quoted heredoc keeps $HOME and $@ literal.
+      cat <<'LAUNCHER_EFFORT'
+# Interactive default effort: max. Claude Code cannot save max in settings (effortLevel and modelSettings take low to
+# xhigh) and CLAUDE_CODE_EFFORT_LEVEL would override every --effort, /effort and child effort, so the documented --effort
+# flag is added here, and only when nothing has chosen an effort: stdin and stdout are a terminal, no -p/--print (also as
+# a short-flag cluster such as -pc), no --effort, no CLAUDE_CODE_EFFORT_LEVEL, nothing after a "--", and a client at
+# 2.1.284 or newer (on 2.1.281 a max session turned Ultracode's orchestration off). An operand that merely equals one of
+# these flags, such as the value of --system-prompt, also suppresses the default. To bypass, pass --effort <level> or run
+# ~/.local/bin/claude directly.
+if [ -t 0 ] && [ -t 1 ] && [ -z "${CLAUDE_CODE_EFFORT_LEVEL+x}" ]; then
+  for arg in "$@"; do
+    case "$arg" in
+      --) break ;;
+      -p* | -[!-]*p* | --print | --print=* | --effort | --effort=*) exec "$HOME/.local/bin/claude" "$@" ;;
+    esac
+  done
+  version="$("$HOME/.local/bin/claude" --version 2>/dev/null < /dev/null)"
+  version="${version%%[[:space:]]*}"
+  case "$version" in
+    [0-9]*.[0-9]*.[0-9]*)
+      major="${version%%.*}"; rest="${version#*.}"; minor="${rest%%.*}"; patch="${rest#*.}"; patch="${patch%%.*}"
+      case "$major$minor$patch" in
+        *[!0-9]*) ;;
+        *)
+          if [ "$((10#$major))" -gt 2 ] || { [ "$((10#$major))" -eq 2 ] && { [ "$((10#$minor))" -gt 1 ] ||
+            { [ "$((10#$minor))" -eq 1 ] && [ "$((10#$patch))" -ge 284 ]; }; }; }; then
+            exec "$HOME/.local/bin/claude" --effort max "$@"
+          fi ;;
+      esac ;;
+  esac
+fi
+LAUNCHER_EFFORT
+    fi
     # shellcheck disable=SC2016
     printf 'exec "$HOME/.local/bin/%s" "$@"\n' "$bin_name"
   } > "$bin_dir/$bin_name"
   chmod 0755 "$bin_dir/$bin_name"
+}
+
+# install_uv_tool and install_uv_tool_from_git below (with the comments
+# between them) are copied verbatim from adoption/bootstrap-linux.sh, and
+# rtk_config_reminder's config-file check is the Linux reminder's own
+# five-entry text check, applied to the file rtk reads on macOS (not the
+# Linux path); all three were added here 2026-09-26 for the macOS
+# headroom/markitdown (uv-tool), serena (uv-tool-from-git) and rtk pins.
+# tests/test_adoption_bootstrap_macos.py asserts the two install functions
+# and their checksum/download helpers stay byte-identical to the Linux ones
+# and the reminder's text check matches
+# the Linux reminder's line for line, and runs all three under a real bash
+# 3.2: they use no mapfile, associative array or ${var,,}.
+# install_uv_tool was re-ported on 2026-09-26 after bootstrap-linux.sh's
+# (#334) started downloading and sha256-verifying a wheel url (headroom's
+# darwin arm64 wheel here) before uv runs. The shared fetch() and
+# verify_sha256() helpers prefer `shasum -a 256`, with a GNU sha256sum
+# fallback on Linux; both exit 1 on a mismatch before uv runs. jq is a
+# checked prerequisite and cache_dir is this script's download directory.
+install_uv_tool() {
+  # $3 (always given: install_pin below passes the pin's "package" field,
+  # falling back to its own "id" in the jq expression itself) is the actual
+  # installable spec when it differs from the component id -- e.g.
+  # headroom's PyPI distribution is "headroom-ai[mcp]", not "headroom".
+  # $4 and $5 are the pin's url and sha256. A wheel url (headroom) is
+  # consumed: fetch downloads that wheel and verifies its sha256 (exit 1 on
+  # a mismatch, before uv runs), and uv installs the local file as the
+  # direct reference "<package> @ file://<wheel>", which keeps the extras and
+  # which uv refuses when the wheel's filename names another distribution. A
+  # direct reference carries no ==version, so the filename's version must
+  # equal the pin's first. The wheel's own dependencies still resolve from
+  # uv's index, and uv's receipt records the wheel's path under downloads/.
+  # An sdist url (markitdown, tavily-cli) is not consumed: uv resolves
+  # "$package==$version" from its index, and that sha256 remains the
+  # cross-check its install_note describes.
+  local id="$1" version="$2" package="$3" url="$4" sha256="$5"
+  command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  local spec="${package}==${version}"
+  if [[ "$url" == *.whl ]]; then
+    # {distribution}-{version}(-{build tag})?-{python}-{abi}-{platform}.whl;
+    # neither the escaped distribution name nor the version contains "-".
+    local wheel_file="${url##*/}" wheel_version wheel_uri
+    wheel_version="${wheel_file#*-}"
+    wheel_version="${wheel_version%%-*}"
+    [[ "$wheel_version" == "$version" ]] || {
+      printf 'Refusing to install %s %s: its pinned wheel %s is version %s.\n' \
+        "$id" "$version" "$wheel_file" "$wheel_version" >&2
+      exit 1
+    }
+    fetch "$url" "$sha256" "$cache_dir/$wheel_file"
+    # PEP 508 reads a URI after "@", so the wheel is named by a file:// URL
+    # with each path segment percent-encoded (jq's @uri). As a bare path, a
+    # "#" in ECO_INSTALL_ROOT would start a fragment and a " ;" a marker, and
+    # uv would refuse the install.
+    wheel_uri="file://$(jq -rn --arg path "$cache_dir/$wheel_file" '$path | split("/") | map(@uri) | join("/")')"
+    spec="${package} @ ${wheel_uri}"
+  fi
+  UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
+    uv tool install --python 3.13 "$spec"
+}
+
+# Installs a uv tool pinned to an exact upstream git commit instead of a
+# released version (serena: upstream ships no PyPI release of its current
+# 2.0.0.dev0). The 40-hex commit is itself the integrity anchor -- git
+# refuses to resolve a rev that is not that exact object -- so there is no
+# downloaded archive to sha256; install_pin's own fail-closed gate checks
+# the commit's shape for this kind instead of a sha256. After install this
+# also reads back UV_TOOL_DIR's own uv-receipt.toml and refuses (exit 1)
+# unless uv actually resolved that same commit, so a stale prior install of
+# a different revision under the same tool name can never pass silently.
+install_uv_tool_from_git() {
+  # $5 is always given: install_pin below passes the pin's "package" field,
+  # falling back to its own "id" in the jq expression itself.
+  local id="$1" version="$2" repo_url="$3" commit="$4" package="$5"
+  command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
+    uv tool install --python 3.13 "git+${repo_url}@${commit}"
+  local receipt="$ecosystem_root/python-tools/$package/uv-receipt.toml"
+  [[ -f "$receipt" ]] || {
+    printf 'Refusing %s %s: no uv-receipt.toml at %s after install; cannot verify the resolved commit.\n' \
+      "$id" "$version" "$receipt" >&2
+    exit 1
+  }
+  grep -Fq "rev=${commit}" "$receipt" || {
+    printf 'Refusing %s %s: %s does not record the pinned commit %s.\n' "$id" "$version" "$receipt" "$commit" >&2
+    exit 1
+  }
+}
+
+# rtk 0.50.0's Claude hook windows `git show <rev>:<path>` blobs (a piped
+# `| tail` then reads the window, not the file's end), and a rewritten `diff`
+# exits 1 instead of 2 on a missing file. The bare "^git show [^ ]*:" pattern
+# misses a `git -C <dir> show HEAD:path` form (still windowed), and separately
+# `git branch -a`'s filter_branch_output always keeps git's `+ ` prefix on a
+# local branch checked out in a linked worktree, but only misreports it as
+# remote-only when a remote-tracking branch of the same name also exists.
+# The two added patterns anchor to the git subcommand position (only
+# -C/-c/--git-dir/--work-tree with a value, or another --flag, may precede
+# show/branch -- the same global options rtk's own discovery strips before
+# dispatch), so an ordinary command that merely mentions "show" or "branch"
+# as an argument is not misclassified.
+# recipes/README.md#native-context-mode-and-hooks excludes all four, and plain
+# jq (F2 in docs/decisions/2026-09-26-token-practice-f1-f9.md), through
+# rtk's own config (evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt).
+# A duplicate key or table is invalid TOML and rtk silently falls back to
+# defaults, so the reminder says to replace the whole value inside the existing
+# [hooks] table, adding the key or table only when missing.
+# The file is the one rtk reads on a Mac, not the Linux reminder's
+# ${XDG_CONFIG_HOME:-$HOME/.config}/rtk/config.toml: rtk 0.50.0's
+# get_config_path() is dirs::config_dir()/rtk/config.toml
+# (src/core/config.rs:495-498 at the v0.50.0 tag commit 1d87b8e7), and the
+# dirs crate its Cargo.lock pins (5.0.1) answers $HOME/Library/Application
+# Support on macOS whatever XDG_CONFIG_HOME says (src/mac.rs:7,10); rtk reads
+# no config-path variable of its own, and its README gives the same macOS
+# path (evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt).
+# Print-only: never writes that file.
+rtk_config_reminder() {
+  local config="$HOME/Library/Application Support/rtk/config.toml"
+  if [[ -f "$config" ]] \
+    && [[ $(grep -Ec '^[[:space:]]*exclude_commands[[:space:]]*=' "$config") -eq 1 ]] \
+    && grep -Fq '"^git show [^ ]*:"' "$config" && grep -Fq '"diff"' "$config" && grep -Fq '"jq"' "$config" \
+    && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:'" "$config" \
+    && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|\$)'" "$config"; then
+    return 0
+  fi
+  printf 'Reminder: for the Claude hook, in %s, inside the existing [hooks] table replace the whole exclude_commands value (from "exclude_commands =" through its closing "]"), or add the key if the table lacks it. Add the [hooks] header line only when the file has no [hooks] table. Use: exclude_commands = ["^git show [^ ]*:", "diff", '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\\n]*\s)?[^\s]*:'"'"', '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"'"', "jq"] (a duplicate key or table is invalid TOML and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); this script does not write it.\n' "$config"
 }
 
 install_pin() {
@@ -1102,19 +1240,31 @@ install_pin() {
     printf 'No pin for component %s in %s; skipping.\n' "$id" "$pins_path" >&2
     return 0
   fi
-  local version kind url sha256 note ignore_scripts
+  local version kind url sha256 note ignore_scripts commit
   version="$(jq -r '.version' <<<"$entry")"
   kind="$(jq -r '.kind' <<<"$entry")"
   url="$(jq -r '.url' <<<"$entry")"
   sha256="$(jq -r '.sha256' <<<"$entry")"
   note="$(jq -r '.install_note' <<<"$entry")"
   ignore_scripts="$(jq -r '.ignore_scripts // false' <<<"$entry")"
-  if [[ "$sha256" == "null" || -z "$sha256" ]]; then
+  if [[ "$kind" == "uv-tool-from-git" ]]; then
+    commit="$(jq -r '.commit' <<<"$entry")"
+    [[ "$commit" =~ ^[0-9a-f]{40}$ ]] || {
+      printf 'Refusing to install %s %s: pin has no verified 40-hex commit (%s)\n' "$id" "$version" "$note" >&2
+      exit 1
+    }
+  elif [[ "$sha256" == "null" || -z "$sha256" ]]; then
     printf 'Refusing to install %s %s: pin has no verified sha256 (%s)\n' "$id" "$version" "$note" >&2
     exit 1
   fi
   if [[ "$plan_mode" == 1 ]]; then
-    printf 'plan %-13s %-10s %-9s %s sha256=%s\n' "$id" "$version" "$kind" "${url##*/}" "$sha256"
+    # A uv-tool-from-git pin (serena) has no archive and a null sha256; its
+    # plan line names the commit it pins instead of printing "sha256=null".
+    if [[ "$kind" == "uv-tool-from-git" ]]; then
+      printf 'plan %-13s %-10s %-9s %s commit=%s\n' "$id" "$version" "$kind" "${url##*/}" "$commit"
+    else
+      printf 'plan %-13s %-10s %-9s %s sha256=%s\n' "$id" "$version" "$kind" "${url##*/}" "$sha256"
+    fi
     return 0
   fi
   # install_native sets this when it keeps an installed launcher at or above
@@ -1128,6 +1278,8 @@ install_pin() {
     *-tarball) install_single_binary_tarball "$id" "$version" "$url" "$sha256" ;;
     *-npm) install_npm "$id" "$version" "$url" "$sha256" "$ignore_scripts" ;;
     *-native) install_native "$id" "$version" "$url" "$sha256" "$(jq -r '.bin // .id' <<<"$entry")" ;;
+    *-uv-tool) install_uv_tool "$id" "$version" "$(jq -r '.package // .id' <<<"$entry")" "$url" "$sha256" ;;
+    *-uv-tool-from-git) install_uv_tool_from_git "$id" "$version" "$url" "$commit" "$(jq -r '.package // .id' <<<"$entry")" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac
   # A kept native launcher (at or above its floor) is still an installed
@@ -1135,6 +1287,7 @@ install_pin() {
   installed_pin_ids+=("$id")
   [[ -z "$native_floor_kept" ]] || return 0
   printf 'Installed %s %s (%s)\n' "$id" "$version" "$kind"
+  [[ "$id" != rtk ]] || rtk_config_reminder
 }
 
 # The pins this run installed, in install order; the version report below

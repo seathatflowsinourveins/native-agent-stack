@@ -1,0 +1,560 @@
+{
+ "layer_id": "strategy-research",
+ "proposal": {
+  "layer_id": "strategy-research",
+  "proposal": "add_candidates",
+  "summary": "Layer has no adopted winner (layers.json: winners=[], decision=\"research\", current_choice=\"Mover early-entry studies v1 and v2 found no development pass; Mover v3 core is preregistered and not frozen.\"). In-repo evidence, verified by reading the actual files: v1 ran 768 rule-exits and v2 ran 244 more (families E/F/P) on a frozen, cost-aware preregistered split -- 0/1012 pass net of costs (blueprints/us-equities/mover-early-entry/README.md; evidence/summary-dev-val-run-v1.json sha256 9d8c3d5b...; evidence/summary-v2-dev-val-run-v1.json sha256 75a5004b...). This falsifies naive long-only \"detect an extreme mover, ride it\" rules on this stack, and v3's own core draft (protocol-core-draft.json, status draft_pending_independent_pre_outcome_review, frozen_before_outcomes:false) is built on a literature-verified reversal/lottery-demand prior (Bali-Cakici-Whitelaw MAX effect), not a continuation prior. A separate, already-adversarially-verified sweep two days before this pass (catalogs/us-equities/mover-v3-sweep-20260924.json, 23 items) covers execution (Alpaca trailing_stop/OCO), halt/LULD data (databento/dbn normalized status schema) and several literature priors (days-to-cover, overnight/intraday tug-of-war) -- I cross-checked it and found no name overlap with this task's 15 candidates, so this pass is genuinely additive, not duplicative, with two exceptions folded into \"rejected\" below. No candidate anywhere meets the full compound requirement (detect+auto-size+auto-exit, preregistration-ready, US equities) as one system; the only full-shape system found is crypto/Bybit-scoped and off-requirement. The task's own adversarial-verification block was truncated after \"kronos-repo-license-date\"; I independently supplemented the gap via gh api / pypi.org / WebSearch / WebFetch (Kelly-Criterion, itch-book, Crypto Pump Scanner, Kronos re-check, the VPIN flash-crash controversy, and a direct re-fetch of the TLM abstract) rather than treating unverified claims as verified -- these are marked below. Per repo policy (docs/paper-lane-policy.md; AGENTS.md: \"Paper orders go only through the deterministic adaptive-paper engine; models stay in research\"), none of these candidates can move a paper-lane number directly regardless of merit -- their entire effect is on whether a future v3-successor ever earns a freeze/promotion.",
+  "winner_status": [],
+  "challengers": [
+   {
+    "name": "NoEdge-Bench (permutation-null / leak audit)",
+    "url": "https://github.com/nexusfinancial-dev/noedge-bench",
+    "why_better": "No component anywhere in this repo audits the mover-early-entry pipeline itself for look-ahead leakage or noise-fit. v1/v2's own 0/1012 result has never been checked against a permutation-null control, and v3's H1/H3 literature priors will need the same gate before any future 'survives' claim is trusted. NoEdge-Bench's own README demonstrates exactly this failure mode: a centered moving-average feature that peeked one step ahead scored AUC 0.74, and collapsed to 0.50 (null) once made strictly causal.",
+    "evidence_level": "source_review",
+    "trial_plan": "Install nexusfinancial-dev/noedge-bench at tag v1.0.0 (MIT, released 2026-08-07) into a disposable venv. Apply its permutation-null methodology to the already-frozen v1 split (protocol.json, frozen 4e57667a) using the existing 704-qualifying-rule-exit development set (evidence/summary-dev-val-run-v1.json). Pass criterion: the real (non-shuffled) v1 result must be statistically indistinguishable from its own permutation-null distribution (matching NoEdge-Bench's own p=0.83 example) -- this would confirm the 0/768 finding is leak-free, not a bug. Overturn condition: if the real result IS distinguishable from the null in a way summarize.py did not surface, that reopens whether 'no pass' hides a leak-driven false negative, and any future v3 pass claim must clear the same gate before being reported as a result.",
+    "paper_lane_impact": "none: a research-integrity audit of the offline preregistered pipeline, not a signal or order path; gates whether a future v3 pass is ever trusted enough to be proposed for promotion.",
+    "sources": [
+     "https://github.com/nexusfinancial-dev/noedge-bench",
+     "https://github.com/nexusfinancial-dev/noedge-bench/releases/tag/v1.0.0",
+     "blueprints/us-equities/mover-early-entry/evidence/summary-dev-val-run-v1.json",
+     "blueprints/us-equities/mover-early-entry/protocol.json"
+    ]
+   },
+   {
+    "name": "LPPLS (reframed as reversal/exit-timing overlay)",
+    "url": "https://github.com/Boulder-Investment-Technologies/lppls",
+    "why_better": "The candidate list framed LPPLS as an early-entry/'ride the blow-off' tool, but Sornette's estimator targets the critical time t_c of a bubble's regime change -- a reversal signal, which is exactly this repo's own already-verified prior (Bali-Cakici-Whitelaw MAX/lottery-reversal effect, 'survives' in mover-v3-sweep-20260924.json) rather than a continuation signal the repo's v1/v2 already falsified twice (0/768, 0/244). Merit lies in testing it as an exit/reversal overlay on movers the repo already selects, not as a new entry trigger.",
+    "evidence_level": "source_review",
+    "trial_plan": "pip install lppls==0.6.24 (PyPI, MIT, pinned to commit 69bcd7d / 2026-05-30) into a disposable venv. Reuse already-collected v1 candidate/intraday bars (mover-early-entry/collect.py output, D2) for the movers already labelled >=100%/>=200% in evidence/summary-dev-val-run-v1.json -- no new acquisition. Fit LPPLS.fit on each pre-peak window and compare estimated t_c against the mover's already-recorded actual local-top timestamp. Pass criterion: t_c error must beat a naive 'reversal N minutes after threshold' baseline at v1's own bootstrap standard. Overturn condition: no improvement over naive, or unstable/non-convergent fits on this repo's short intraday windows (LPPLS is normally fit on longer daily histories) -- drop rather than deploy.",
+    "paper_lane_impact": "none: stays in the research/preregistration track; earliest possible effect is a future v3-successor freeze proposal.",
+    "sources": [
+     "https://github.com/Boulder-Investment-Technologies/lppls",
+     "https://pypi.org/project/lppls/",
+     "catalogs/us-equities/mover-v3-sweep-20260924.json#non_repository_decisions/mover-v3-max-lottery"
+    ]
+   },
+   {
+    "name": "Wiseek Filing Impact dataset",
+    "url": "https://github.com/WiseekAI/wiseek-datasets",
+    "why_better": "This repo has native EdgarTools SEC access (data-edgartools winner) but no filing-importance-to-price-reaction dataset, and no other candidate touches the 'catalyst/news' category with an open, reproducible per-event dataset rather than a paid live-feed API. CC-BY-4.0, per-event file (events_score7plus.csv, 13,760 filings) with a stated reproduction recipe and checksums.",
+    "evidence_level": "source_review",
+    "trial_plan": "Clone WiseekAI/wiseek-datasets read-only (pushed 2026-09-12). For tickers/accessions this repo's own EdgarTools path can also retrieve, independently re-derive Wiseek's 'excess next-session move' using this repo's own session/price semantics (exchange_calendars-based) instead of trusting Wiseek's number as-is. Pass criterion: independently-computed excess-move series agree with Wiseek's within a small tolerance on the overlapping sample. Overturn condition: material disagreement, or the proprietary score cannot be reproduced without the undisclosed model -- caps this at a hypothesis-generation source, not a tradeable feature.",
+    "paper_lane_impact": "none: gated by the same preregistration and cost/PIT discipline as the rest of mover-v3.",
+    "sources": [
+     "https://github.com/WiseekAI/wiseek-datasets"
+    ]
+   },
+   {
+    "name": "exitkit (additional exit-policy arm)",
+    "url": "https://github.com/charlieyanhx/exitkit",
+    "why_better": "v1/v2 already ran 1,012 rule-exit combinations through in-house rules.py with zero passes; exitkit's 27 independently-authored exit policies (stop-loss/take-profit/time/volatility/signal-reversal/convergence) are the cheapest way to widen that search rather than hand-writing more rules. Already flagged as a 'lead' in this repo's own architecture/trading.json (2026-09-19, not_adopted, 'source/tests and hypothesis selection bias not examined') for the adjacent execution/risk layer -- this pass converges with, not duplicates, that signal.",
+    "evidence_level": "source_review",
+    "trial_plan": "pip install exitkit==0.1.0 (PyPI, MIT, only release, 2026-09-03) into a disposable venv. Wire its backtesting.py adapter as one more arm on the SAME frozen v1 development split (protocol.json). Pass criterion: identical to v1's own bar -- >=200 development trades, positive mean net return, holds on the untouched validation split. Overturn condition: given the 0/1012 prior, any apparent pass must additionally clear the NoEdge-Bench permutation-null gate above before being reported as real, not noise (v1 already saw 16/704 positive pre-cost by chance).",
+    "paper_lane_impact": "none: exits that reach the paper engine already go through Alpaca's own trailing_stop/OCO broker-held order classes per the 2026-09-24 mover-v3 sweep's execution decision, not a hand-rolled library -- exitkit stays strictly in offline research.",
+    "sources": [
+     "https://github.com/charlieyanhx/exitkit",
+     "https://pypi.org/project/exitkit/",
+     "catalogs/us-equities/architecture/trading.json#discovery_only_leads"
+    ]
+   },
+   {
+    "name": "riskkit (sizing / drawdown / pre-trade-validator arm)",
+    "url": "https://github.com/HasibVortex369/riskkit",
+    "why_better": "v1/v2 held a single fixed preregistered auto-leverage schedule and never searched sizing at all. riskkit's PositionSizer/DrawdownManager/CorrelationGuard/PreTradeValidator (zero runtime deps, MIT, pushed 2026-07-02) adds sizing as a second, orthogonal search dimension cheaply; also already an existing 'lead' in architecture/trading.json.",
+    "evidence_level": "source_review",
+    "trial_plan": "pip install riskkit-quant==0.4.2 (PyPI name differs from repo name; exact GitHub-tag match) into a disposable venv. Fix the best-so-far (still-failing) exit rule from the exitkit trial and vary only riskkit's sizing/drawdown parameters on the same split, same permutation-null gate. Pass/overturn criteria identical in structure to exitkit's.",
+    "paper_lane_impact": "none: leverage/sizing that reaches the paper engine is the deterministic adaptive-paper engine's own code path, not a research-side library.",
+    "sources": [
+     "https://github.com/HasibVortex369/riskkit",
+     "https://github.com/HasibVortex369/riskkit/releases/tag/v0.4.2",
+     "https://pypi.org/project/riskkit-quant/",
+     "catalogs/us-equities/architecture/trading.json#discovery_only_leads"
+    ]
+   },
+   {
+    "name": "orderflow-metrics (OFI / Kyle's lambda / trade-sign)",
+    "url": "https://github.com/twowaymind/orderflow-metrics",
+    "why_better": "Neither v1/v2 (daily/session rules) nor v3's H1/H3 (daily-close literature priors) test the layer's named 'order-flow' or 'momentum-ignition' categories at all -- the two genuinely open sub-requirements. This is the only candidate with working, README-confirmed OFI, Kyle's lambda, Lee-Ready trade-sign classification, information-driven bars and LOB reconstruction in one place, actively released days before this check. Its true latest is npm/tag v0.52.0 (29 tags since 2026-07-28); the PyPI mirror is stale at v0.40.0 -- adopt from npm/GitHub, not PyPI.",
+    "evidence_level": "source_review",
+    "trial_plan": "Do not add a Node runtime dependency for a handful of closed-form formulas: port bucketByVolume/vpin, kyleLambda, tickRule/leeReady and depth-imbalance to pure Python, checked line-for-line against the TypeScript source (pin the exact tag) and its own README worked examples as fixtures. Feed it BBO/trade data from the itch-book substrate (or a short Alpaca SIP sample, already covered by the data-alpaca-py winner) for movers v1/v2 already flagged; test whether a pre-threshold OFI/Kyle's-lambda spike predicts the eventual move's sign/magnitude better than a no-signal null, on held-out movers, at the pipeline's existing bootstrap standard. Overturn condition: no separation from null, or the signal disappears once realistic costs/latency are added.",
+    "paper_lane_impact": "none: a new, untested signal family that would need its own preregistration before touching engines-run/paper-acts-passed/paper-fills.",
+    "sources": [
+     "https://github.com/twowaymind/orderflow-metrics",
+     "https://www.npmjs.com/package/orderflow-metrics",
+     "https://github.com/twowaymind/orderflow-metrics/tags"
+    ]
+   },
+   {
+    "name": "itch-book (order-by-order data substrate)",
+    "url": "https://github.com/groovg/itch-book",
+    "why_better": "The order-flow trial above needs real microstructure, not synthetic bars. itch-book parses actual NASDAQ TotalView-ITCH 5.0 into BBO/trades/order-by-order/depth Parquet, MIT, and I independently reconfirmed it today (2026-09-26) even fresher than claimed: gh api shows pushed_at 2026-09-21 (vs. the candidate's stated 2026-09-06), tag v0.2.1 matching PyPI (4 releases). It is infrastructure, not a signal, so it earns a place only alongside the orderflow-metrics trial.",
+    "evidence_level": "metadata",
+    "trial_plan": "pip install itch-book==0.2.1 against a small, legitimately-licensed ITCH sample (this repo's Alpaca/SIP entitlement does not include raw ITCH -- a licensing gap to close first, consistent with the market-data-reference layer's open licensing gaps). Cross-check derived BBO/trade prints against the same symbol/window's Alpaca bars for basic provenance (price levels, timing) before using it for any feature. Note: the 2026-09-24 mover-v3 sweep already chose Databento's normalized status schema over raw ITCH H/h/J messages specifically for halt/LULD reconstruction -- itch-book's fit is the lit order-book side, not the halt-resumption side, which already has its own newer decision.",
+    "paper_lane_impact": "none: pure data infrastructure.",
+    "sources": [
+     "https://github.com/groovg/itch-book",
+     "https://pypi.org/project/itch-book/",
+     "catalogs/us-equities/mover-v3-sweep-20260924.json#repository_decisions/mover-v3-dbn-status-schema"
+    ]
+   },
+   {
+    "name": "ClusterLOB (order-flow clustering, stretch item)",
+    "url": "https://arxiv.org/abs/2504.20349",
+    "why_better": "The only dated, primary-sourced academic method found anywhere in this search that is methodologically adjacent to 'momentum-ignition' via participant-cluster order-flow-imbalance signals reported to beat non-clustered benchmarks (K-means++ on one year of NASDAQ MBO data). No author code exists and it does not overlap anything in mover-v3-sweep-20260924.json or the architecture catalogs, so it is a genuinely new, but high-effort, addition.",
+    "evidence_level": "source_review",
+    "trial_plan": "Deferred/stretch: requires an original from-scratch implementation (K-means++ clustering of MBO data into 3 clusters, 30-minute-bucket per-cluster OFI) on the same itch-book/Databento MBO substrate, evaluated with the same permutation-null and cost discipline as the rest of this set. Take on only after the cheaper orderflow-metrics/itch-book trial either succeeds or motivates a clustering refinement.",
+    "paper_lane_impact": "none.",
+    "sources": [
+     "https://arxiv.org/abs/2504.20349"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "Kronos (financial foundation model)",
+    "reason": "Off-requirement (general OHLCV price/volatility forecaster, not an extreme-mover/catalyst/order-flow method) and already independently tested at a different, more appropriate layer (research-factors-ml) on this exact stack: naive beat Kronos-small (dev mean per-fold MAE 0.043 vs naive 0.019, ratio 2.75x; reserved MAE 0.122 vs 0.021; Kronos better in only 2/20 folds -- evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/7-kronos-small-vs-naive.json). The 2026-09-23 sota-convergence manifest already verdicts it keep_but_compare with 'no distinct gap' vs incumbents chronos/timesfm (catalogs/sota-convergence/manifest-20260923.json). I re-checked via gh api today (2026-09-26): still unchanged since 2026-04-13 (pushed_at), ~5.4 months stale next to actively-pushed incumbents (chronos pushed 2026-09-17)."
+   },
+   {
+    "name": "Kelly-Criterion (deltaray-io)",
+    "reason": "Unmaintained: independently reconfirmed via gh api (pushed_at 2022-12-08, license BSD-3-Clause, 116 stars) and pypi.org/pypi/kelly-criterion/json (last release 1.2.0 uploaded 2019-02-16) -- about 3.8 years past any commit and 7.6 years past any release, far outside the 12-month window. Superseded on evidence by riskkit (fresher, composable, listed as a challenger above) and by the peer-reviewed multi-outcome Kelly paper already in this repo's catalog."
+   },
+   {
+    "name": "Crypto Pump Scanner",
+    "reason": "Off-requirement: independently reconfirmed via gh api that the repository's own description is 'Real-time crypto pump detector for Bybit. Monitors 500+ pairs every 3s, auto-trades volume spikes with TP cascade.' Crypto/Bybit market structure (no LULD bands, no regulatory halts, continuous session) does not transfer to US equities without a rebuild. Kept only as an architectural-pattern reference (detect+auto-entry+staged-exit in one system), not an adoptable component."
+   },
+   {
+    "name": "VPIN / Flow Toxicity (Easley, Lopez de Prado, O'Hara, SSRN 1695041)",
+    "reason": "Metadata only, and independently reconfirmed via WebSearch to be a genuinely contested, 15-year-old finding: Andersen & Bondarenko, 'VPIN and the Flash Crash' (SSRN 1881731) and related work report VPIN peaked after, not before, the 2010 crash and is a poor short-run volatility predictor once trading intensity is controlled for, against a published rejoinder from the original authors. Not a standalone challenger; retained only as the theoretical grounding already implemented inside the orderflow-metrics challenger above."
+   },
+   {
+    "name": "TLM: Trajectory-Aware Retrieval Agents (arXiv:2607.21625)",
+    "reason": "Metadata only even after a direct read: I independently re-fetched the abstract today. It confirms 'earnings call surprise prediction, and overnight stock gap prediction' as two of three evaluated tasks and states TLM 'yields consistent, economically meaningful gains on the two financial tasks,' but names no dataset, split, or performance number for either -- nothing concrete to build a falsifiable trial against. A general temporal-decision-making architecture paper (title/authors confirmed: Wang, Shen, Niu), not an equities-specific demonstrated result."
+   },
+   {
+    "name": "\"Pausing the Panic?\" KOSPI circuit-breaker study (SSRN 7208358)",
+    "reason": "Off-requirement as a direct result (Korean KOSPI, not US LULD) and not a new gap: catalogs/us-equities/mover-v3-sweep-20260924.json already registered and deferred the halt/LULD-reconstruction item (repository_decisions/mover-v3-dbn-status-schema, Databento normalized status schema, contested) two days before this pass. Better attached to that existing deferred item as a 2026-dated replication template (post-reopen realized-vol multiple, cross-stock correlation change) than opened as an independent addition. Not independently re-verified beyond the task's own search-indexed-abstract read (SSRN 403'd to direct fetch in both passes)."
+   },
+   {
+    "name": "Systematic Signals of Short Squeezes (Svoboda, Kapounek, Albrecht, 2026)",
+    "reason": "Not a new independent gap: mover-v3-sweep-20260924.json already registered Hong-Li-Ni-Scheinkman-Yan's days-to-cover finding on the same short-interest/crowding theme (non_repository_decisions/mover-v3-days-to-cover, 'survives', deferred to v3.1+), with an opposite-signed headline ('high days-to-cover predicts lower returns, no squeeze claim'). The two are not actually contradictory -- one is an unconditional mean-return factor, the other a conditional tail-event-probability claim -- but should be attached to the same registered item with an explicit target-variable split (mean return vs. squeeze-event probability) rather than opened as a separate hypothesis outside the existing preregistration. Not independently re-verified beyond the task's own search-indexed-abstract read (both ScienceDirect and SSRN 5334668 403'd to direct fetch)."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "lppls-repo-license-exists",
+   "claim": "Repository exists at github.com/Boulder-Investment-Technologies/lppls, MIT licensed, not archived.",
+   "verdict": "supported",
+   "note": "Confirmed via GitHub API full_name matches, license.spdx_id=MIT, archived=false, default_branch=master, 478 stars, created 2020-04-17.",
+   "sources": [
+    "https://github.com/Boulder-Investment-Technologies/lppls"
+   ]
+  },
+  {
+   "name": "lppls-release-freshness",
+   "claim": "PyPI 0.6.24 and a GitHub push both landed 2026-05-30, ahead of the last tagged GitHub Release (0.6.23, 2026-02-15).",
+   "verdict": "supported",
+   "note": "PyPI JSON: info.version=0.6.24, upload_time_iso_8601=2026-05-30T20:48:29Z/30Z. GitHub commit 69bcd7d ('bump version to 0.6.24') dated 2026-05-30T20:48:06Z; repo pushed_at=2026-05-30T21:05:45Z. GitHub Releases API confirms the newest formal Release tag is 0.6.23, published_at=2026-02-15T06:18:12Z (tag 0.6.24 exists only on PyPI/as a repo tag, not as a GitHub Release). Exact date match on every count.",
+   "sources": [
+    "https://pypi.org/project/lppls/",
+    "https://github.com/Boulder-Investment-Technologies/lppls/releases",
+    "https://github.com/Boulder-Investment-Technologies/lppls/commits/master"
+   ]
+  },
+  {
+   "name": "lppls-capability-sornette-lppls",
+   "claim": "Fits Sornette's Log-Periodic Power Law Singularity model to a price series to time bubble/blow-off-top singularities.",
+   "verdict": "supported",
+   "note": "README directly describes the LPPLS bubble/finite-time-singularity model with the exact formula (t_c, m, omega, phi terms), a working fit example (LPPLS.fit / mp_compute_nested_fits), and a bibliography explicitly naming Sornette repeatedly: 'Zhang, Zhang & Sornette 2016' (PLOS ONE, quantile regression), 'Demos & Sornette 2017' (Lagrange regularization for bubble inception), 'Filimonov, V. and Sornette, D. 2013' (Physica A calibration scheme), 'Sornette, D. Why Stock Markets Crash... 2002', and 'Sornette, D. and Demos, G... 2015' (Shanghai bubble paper). A GitHub code search for 'sornette' in this repo returns only README.md, confirming the attribution lives in the documented references, not in a fabricated claim.",
+   "sources": [
+    "https://github.com/Boulder-Investment-Technologies/lppls/blob/master/README.md"
+   ]
+  },
+  {
+   "name": "exitkit-repo-license-version",
+   "claim": "Repository exists at github.com/charlieyanhx/exitkit, MIT licensed, PyPI package exitkit v0.1.0.",
+   "verdict": "supported",
+   "note": "GitHub API confirms MIT, not archived, tag v0.1.0 present (single tag, no formal GitHub Release object -- releases API returns []). PyPI JSON confirms info.version=0.1.0, the only published version.",
+   "sources": [
+    "https://github.com/charlieyanhx/exitkit",
+    "https://pypi.org/project/exitkit/"
+   ]
+  },
+  {
+   "name": "exitkit-release-date-precision",
+   "claim": "Latest release dated 2026-09-03, with the repository's own fit-note separately citing a 2026-09-11 last push.",
+   "verdict": "supported",
+   "note": "PyPI upload_time_iso_8601 for v0.1.0 = 2026-09-03T22:14:55Z/57Z, matching repo created_at=2026-09-03T16:33:47Z -- this is the actual release date, correctly stated. The repo's pushed_at=2026-09-11T21:25:13Z is a later, separate event (post-release commits with no version bump); both dates are independently confirmed and are not in conflict once 'release date' and 'last push' are read as the two different things the candidate's own text already distinguishes them as.",
+   "sources": [
+    "https://pypi.org/project/exitkit/",
+    "https://github.com/charlieyanhx/exitkit"
+   ]
+  },
+  {
+   "name": "exitkit-capability-27-policies",
+   "claim": "27 position-exit policies across 6 families (stop-loss, take-profit, time, volatility, signal-reversal, convergence) behind one interface, with a drop-in backtesting.py adapter.",
+   "verdict": "supported",
+   "note": "Read exitkit/__init__.py directly: the FAMILIES dict (described in the README as 'how the test suite exercises every model uniformly') enumerates exactly 4+5+5+4+4+5=27 concrete model classes across the 6 named families, matching the claim precisely. exitkit/adapters/backtesting_py.py exists and the README shows a working ExitMixin/backtesting.py example with real output. CAVEAT (found by opening this same source file): the module's own docstring in __init__.py contradicts this, stating 'This packages thirty-two exit models in six families' -- an internal inconsistency in the package's own documentation (32 vs the 27 that both the README prose and the authoritative FAMILIES dict agree on). Treat the 27-count as the better-supported figure but note the shipped code disagrees with itself, consistent with this being an unaudited v0.1.0 release.",
+   "sources": [
+    "https://github.com/charlieyanhx/exitkit/blob/main/exitkit/__init__.py",
+    "https://github.com/charlieyanhx/exitkit/blob/main/README.md"
+   ]
+  },
+  {
+   "name": "exitkit-maintenance-claim",
+   "claim": "exitkit is 'actively maintained' (maintained:true).",
+   "verdict": "unverifiable",
+   "note": "Repo was created 2026-09-03 and all inspected commit activity falls within its first 8 days (through 2026-09-11); as of this check (2026-09-26) it is only 23 days old with a single PyPI release. 'Not stale' (within any maintenance window) is supported, but there is no track record of sustained maintenance to confirm or refute an ongoing-maintenance claim either way.",
+   "sources": [
+    "https://github.com/charlieyanhx/exitkit"
+   ]
+  },
+  {
+   "name": "riskkit-repo-license-version",
+   "claim": "Repository exists at github.com/HasibVortex369/riskkit, MIT licensed, framework-agnostic risk toolkit.",
+   "verdict": "supported",
+   "note": "GitHub API confirms MIT, not archived, latest tag v0.4.2 (commit 99d1d16). Cross-confirmed independently on PyPI: the package is published as 'riskkit-quant' (not 'riskkit' -- riskkit itself 404s on PyPI, consistent with the candidate never claiming a pypi modality for this entry), version 0.4.2, license MIT -- exact version match between GitHub tag and PyPI package.",
+   "sources": [
+    "https://github.com/HasibVortex369/riskkit",
+    "https://github.com/HasibVortex369/riskkit/releases/tag/v0.4.2",
+    "https://pypi.org/project/riskkit-quant/"
+   ]
+  },
+  {
+   "name": "riskkit-release-freshness",
+   "claim": "Latest release/push dated 2026-07-02.",
+   "verdict": "supported",
+   "note": "GitHub Release v0.4.2 published_at=2026-07-02T09:09:34Z; repo pushed_at=2026-07-02T09:08:14Z. Exact match. About 12 weeks before this 2026-09-26 check -- within the 12-month maintenance window.",
+   "sources": [
+    "https://github.com/HasibVortex369/riskkit/releases/tag/v0.4.2"
+   ]
+  },
+  {
+   "name": "riskkit-capability-components",
+   "claim": "Framework-agnostic risk toolkit: position sizing, drawdown control, stops, correlation limits and a pre-trade validator.",
+   "verdict": "supported",
+   "note": "README explicitly documents all five named components verbatim: PositionSizer (volatility-adjusted fixed-fractional sizing), DrawdownManager (tiered drawdown control), StopEngine (composable stop stack), CorrelationGuard (correlation-group limits), and PreTradeValidator (composable pass/fail gate). A sixth component (SessionManager) is also present but unclaimed -- strengthens rather than contradicts the claim. Zero-runtime-dependency claim also confirmed by a repo badge and README text.",
+   "sources": [
+    "https://github.com/HasibVortex369/riskkit/blob/main/README.md"
+   ]
+  },
+  {
+   "name": "orderflow-metrics-repo-license",
+   "claim": "Repository exists at github.com/twowaymind/orderflow-metrics, MIT licensed, dependency-free TypeScript with a PyPI listing.",
+   "verdict": "supported",
+   "note": "GitHub API confirms MIT, language=TypeScript, not archived. Despite modalities listing 'pypi' for a TypeScript repo (unusual), a real PyPI project does exist at this name (HTTP 200, dual npm+PyPI distribution confirmed by both registries and by Python usage examples in the README).",
+   "sources": [
+    "https://github.com/twowaymind/orderflow-metrics",
+    "https://pypi.org/project/orderflow-metrics/"
+   ]
+  },
+  {
+   "name": "orderflow-metrics-version-claim",
+   "claim": "Latest version is 0.40.0, released 2026-09-23.",
+   "verdict": "refuted",
+   "note": "The 2026-09-23 push date is confirmed (repo pushed_at=2026-09-23T04:50:40Z; PyPI upload_time for 0.40.0=2026-09-23T04:51:03Z), but '0.40.0' is NOT the latest version of the library as a whole: npm registry dist-tags.latest=0.52.0, and GitHub tags run through v0.52.0 (29 releases, v0.24.0 through v0.52.0, all pushed since repo creation 2026-07-28). PyPI itself is stuck 12 versions behind the canonical npm/tag release stream. Calling 0.40.0 'the latest version' materially understates how actively released this project is.",
+   "sources": [
+    "https://pypi.org/project/orderflow-metrics/",
+    "https://www.npmjs.com/package/orderflow-metrics",
+    "https://github.com/twowaymind/orderflow-metrics/tags"
+   ]
+  },
+  {
+   "name": "orderflow-metrics-capability-breadth",
+   "claim": "Scope includes VPIN, information-driven bars, Kyle's lambda, trade-sign classification and limit-order-book reconstruction (broader than the GitHub one-line description of 'OFI, depth and trade imbalance', which the candidate flagged as an unresolved discrepancy).",
+   "verdict": "supported",
+   "note": "Read the full README (not just the GitHub API's one-line 'description' field, which is indeed narrower/stale). It directly confirms every broader item: a dedicated '## VPIN' section implementing Easley/Lopez de Prado/O'Hara VPIN with bucketByVolume/vpin functions; an 'Information-driven bars' entry in the metrics index; an explicit kyleLambda() function with a worked example; a '## Trade-sign classification' section (tickRule, leeReady/Lee-Ready 1991); and a '## Order book' section with a full OrderBook class (bestBid/bestAsk/mid/spread/depth/imbalance, plus simulateMarketOrder and book-depth liquidity tools) implementing LOB reconstruction. This resolves the candidate's own self-flagged uncertainty: the broader capability claim is correct, not overstated -- the candidate's caution was based on an incomplete source (API metadata rather than the README).",
+   "sources": [
+    "https://github.com/twowaymind/orderflow-metrics/blob/main/README.md"
+   ]
+  },
+  {
+   "name": "clusterlob-paper-exists",
+   "claim": "Paper exists at arXiv:2504.20349, authored by Zhang, Cucuringu, Shestopaloff, Zohren.",
+   "verdict": "supported",
+   "note": "Direct fetch confirms title 'ClusterLOB: Enhancing Trading Strategies by Clustering Orders in Limit Order Books', authors Yichi Zhang, Mihai Cucuringu, Alexander Y. Shestopaloff, Stefan Zohren (exact match). v1 submitted 2025-04-29, current v3 dated 2025-05-10, matching the candidate's stated latest_release_date exactly.",
+   "sources": [
+    "https://arxiv.org/abs/2504.20349"
+   ]
+  },
+  {
+   "name": "clusterlob-capability-claim",
+   "claim": "K-means++ clustering of one year of NASDAQ market-by-order data into directional/opportunistic/market-making groups, with per-cluster order-flow-imbalance signals that outperform non-clustered benchmarks.",
+   "verdict": "supported",
+   "note": "Abstract verbatim confirms all elements: 'By applying the K-means++ clustering algorithm ... we are then able to assign each new order to one of three distinct clusters, which we identify as directional, opportunistic, and market-making participants'; 'one year of MBO data ... from NASDAQ'; 'we compute order flow imbalances across each cluster within 30-minute buckets'; 'its performance in the test dataset is superior to benchmark trading strategies that do not incorporate clustering'.",
+   "sources": [
+    "https://arxiv.org/abs/2504.20349"
+   ]
+  },
+  {
+   "name": "clusterlob-date-caveat",
+   "claim": "(Dating flag, not a candidate claim) whether this source meets the task's stated 2026-dated preference.",
+   "verdict": "refuted",
+   "note": "This paper is dated 2025 (v1 2025-04-29, v3 2025-05-10), roughly 16-17 months old as of 2026-09-26 -- it does not meet the task's stated preference for 2026-dated facts, though it is not old enough to be flagged unmaintained under the 12-month rule (a paper has no 'maintenance' concept regardless). Flagging per instructions rather than treating the underlying capability claim as weaker.",
+   "sources": [
+    "https://arxiv.org/abs/2504.20349"
+   ]
+  },
+  {
+   "name": "noedge-bench-repo-license-version",
+   "claim": "Repository exists at github.com/nexusfinancial-dev/noedge-bench, MIT licensed, v1.0.0 released 2026-08-07.",
+   "verdict": "supported",
+   "note": "GitHub API confirms MIT, not archived. Tag v1.0.0 and a formal GitHub Release both exist; release published_at=2026-08-07T15:05:48Z, repo pushed_at=2026-08-07T19:34:48Z -- both match the claimed date exactly.",
+   "sources": [
+    "https://github.com/nexusfinancial-dev/noedge-bench",
+    "https://github.com/nexusfinancial-dev/noedge-bench/releases/tag/v1.0.0"
+   ]
+  },
+  {
+   "name": "noedge-bench-capability-claim",
+   "claim": "Permutation-null benchmark methodology plus a look-ahead-leak case study.",
+   "verdict": "supported",
+   "note": "README directly demonstrates both: a permutation-null result table ('null AUC = 0.499 +/- 0.004 * real AUC = 0.501 * p = 0.83 ... statistically indistinguishable from one trained on shuffled labels') and an explicit leak case study ('Our first run scored AUC 0.74 ... a look-ahead leak: a centered moving-average feature (np.convolve(..., \"same\")) peeked one step into the future. Switching to strictly causal, past-only features collapsed it to 0.50'). Directly quoted, not inferred.",
+   "sources": [
+    "https://github.com/nexusfinancial-dev/noedge-bench/blob/main/README.md"
+   ]
+  },
+  {
+   "name": "noedge-bench-maintenance-claim",
+   "claim": "NoEdge-Bench is 'maintained' (maintained:true).",
+   "verdict": "unverifiable",
+   "note": "All observed activity -- repo creation, every commit, the v1.0.0 tag and release -- occurred within a single roughly 10-hour window on 2026-08-07, with no further commits in the ~7 weeks since. This is within the 12-month non-stale window (so not flaggable as unmaintained by that rule), but there is no evidence of an ongoing-maintenance process, only a one-time artifact drop by a self-described single-maintainer project.",
+   "sources": [
+    "https://github.com/nexusfinancial-dev/noedge-bench"
+   ]
+  },
+  {
+   "name": "wiseek-repo-license-date",
+   "claim": "Repository exists at github.com/WiseekAI/wiseek-datasets, CC-BY-4.0 licensed, last updated 2026-09-12.",
+   "verdict": "supported",
+   "note": "GitHub API confirms license.spdx_id=CC-BY-4.0 exactly, not archived, pushed_at=2026-09-12T11:43:12Z matching the claimed date exactly. No formal GitHub Releases/tags (data-release cadence is tracked via the data/ directory and a DOI, not GitHub Releases).",
+   "sources": [
+    "https://github.com/WiseekAI/wiseek-datasets"
+   ]
+  },
+  {
+   "name": "wiseek-capability-claim",
+   "claim": "Monthly statistics linking a proprietary SEC-filing-importance score to next-session excess stock moves, with per-event data and reproduction metadata.",
+   "verdict": "supported",
+   "note": "README confirms all elements directly: aggregate tables (impact_by_score.csv, score_x_mcap.csv, score_x_sentiment.csv, form_family.csv) covering scores 1-10; a genuine per-event file (events_score7plus.csv, 13,760 filings measured at T+1 for the August 2026 release); an explicit 'excess next-session move' methodology (filing-ticker move minus the same-session filer-panel median, to avoid crediting broad market days); and reproduction metadata (meta.json 'reproduction recipe', findings.json preregistered claims, manifest.sha256 checksums). Repo contents listing confirms a data/ directory exists.",
+   "sources": [
+    "https://github.com/WiseekAI/wiseek-datasets/blob/main/README.md"
+   ]
+  },
+  {
+   "name": "wiseek-proprietary-score-caveat",
+   "claim": "The filing-importance score itself is proprietary/unaudited.",
+   "verdict": "supported",
+   "note": "README confirms the score comes from 'Wiseek's scoring models' calibrated on filing type/transaction size/insider participation/historical price reaction, with only a high-level methodology page linked (wiseek.ai/methodology/) and no published model internals, training data, or third-party audit in this repository.",
+   "sources": [
+    "https://github.com/WiseekAI/wiseek-datasets/blob/main/README.md"
+   ]
+  },
+  {
+   "name": "kronos-repo-license-date",
+   "claim": "Repository exists at github.com/shiyu-coder/Kronos, MIT licensed, last released 2026-04-13.",
+   "verdict": "supported",
+   "note": "Fresh GitHub API check (independent of this repo's prior 2026-09-19/09-24 catalog audits) confirms license MIT, not archived, pushed_at unchanged at 2026-04-13T12:38:49Z (same commit 67b630e as previously catalogued) -- no new activity since the last internal review. CAVEAT: there is no formal GitHub Release object (releases API returns [], tags API returns []) -- 'latest_release_date' is really the last commit/push date, not a tagged release; the same imprecision this repo's own star-audit.json already flagged.",
+   "sources": [
+    "https://github.com/shiyu-coder/Kronos"
+   ]
+  },
+  {
+   "name": "kronos-capability-benchmarks",
+   "claim": "93% RankIC improvement over the leading time-series foundation model, 9% lower MAE in volatility forecasting, 22% better generative fidelity for synthetic K-line sequences; pre-trained on 12B+ K-line records from 45 global exchanges via a specialized OHLCV tokenizer.",
+   "verdict": "supported",
+   "note": "Directly fetched arXiv:2508.02739 abstract, which states verbatim: 'Kronos boosts price series forecasting RankIC by 93% over the leading TSFM and 87% over the best non-pre-trained baseline', 'achieves a 9% lower MAE in volatility forecasting', and a '22% improvement in generative fidelity for synthetic K-line sequences'. The 12B+/45-exchanges pretraining-corpus description and specialized tokenizer are also confirmed in the abstract/paper description. Note (as the candidate itself says) these are general forecasting/volatility/synthetic-data benchmarks, not an extreme-mover or catalyst-detection result.",
+   "sources": [
+    "https://arxiv.org/abs/2508.02739"
+   ]
+  },
+  {
+   "name": "kronos-aaai-2026-acceptance",
+   "claim": "Accepted at AAAI 2026 (AAAI-26).",
+   "verdict": "supported",
+   "note": "The arXiv abstract page itself has no 'Comments:' field mentioning conference acceptance, so that source alone is insufficient. Followed up by fetching the paper's actual venue-of-record directly: AAAI's own OJS proceedings page (ojs.aaai.org) confirms 'Proceedings of the AAAI Conference on Artificial Intelligence', Volume 40, Issue 30 ('AAAI-26 Technical Tracks 30'), pages 25366-25373, year 2026, same title and identical 7-author list (Shi, Fu, Chen, Zhao, Xu, Zhang, Li). This is a first-party confirmation from the conference's own publication platform, not a secondary citation.",
+   "sources": [
+    "https://ojs.aaai.org/index.php/AAAI/article/view/39730",
+    "https://arxiv.org/abs/2508.02739"
+   ]
+  },
+  {
+   "name": "kronos-maintenance-trend",
+   "claim": "Kronos is 'maintained' (maintained:true).",
+   "verdict": "supported",
+   "note": "Last push 2026-04-13 is about 5.5 months before this 2026-09-26 check -- inside the task's 12-month unmaintained threshold, so the literal claim holds, but it is trending toward stale: this repository's own prior internal catalog record (manifest-20260922.json) already flagged Kronos as having 'upstream evidence that has weakened since the label was assigned ... about five months without a [push]'. A fresh independent check here confirms no push has occurred since, i.e. the staleness trend the catalog already noted continues unresolved.",
+   "sources": [
+    "https://github.com/shiyu-coder/Kronos"
+   ]
+  },
+  {
+   "name": "scope-of-this-verification-pass",
+   "claim": "Coverage: which of the 15 supplied candidates were adversarially re-verified in this pass.",
+   "verdict": "supported",
+   "note": "winners_upstream was an empty array, so no current-winner upstream note applied. Per the task's 'top 8 candidates by fit' instruction, the 8 verified above (lppls, exitkit, riskkit, orderflow-metrics, ClusterLOB, NoEdge-Bench, Wiseek Filing Impact, Kronos) were selected as the strongest/most-directly-on-point fit claims in the supplied set. The remaining 7 -- itch-book, VPIN/Flow Toxicity, Kelly-Criterion (deltaray-io), Crypto Pump Scanner, Wiseek's TLM-adjacent citation, the KOSPI circuit-breaker SSRN study, and the Short Squeezes journal article -- were NOT independently re-opened in this pass and their verdicts remain whatever the original researcher supplied (several of those, per the candidate set's own notes, already carry SSRN-403/paywall or no-repo-found caveats).",
+   "sources": []
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "lppls (Log-Periodic Power Law Singularity)",
+   "url": "https://github.com/Boulder-Investment-Technologies/lppls",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Directly targets blow-off-top/extreme-run timing for the +10-200% gainer requirement via a well-published bubble model (Sornette et al.), and is actively maintained. It supplies detection only, not sizing or exits, and has not been run against this repository's preregistered protocol."
+  },
+  {
+   "name": "exitkit",
+   "url": "https://github.com/charlieyanhx/exitkit",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Directly matches the requirement's automatic-exits clause. It is early-stage (v0.1.0, last GitHub push 2026-09-11) so the correctness/completeness of the 27 policies is unverified by any independent run in this pass."
+  },
+  {
+   "name": "riskkit",
+   "url": "https://github.com/HasibVortex369/riskkit",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The freshest candidate found for the requirement's automatic-leverage-sizing and exit/pre-trade-validation needs (last push 2026-07-02), and a stronger maintenance signal than the awesome-list's Kelly-Criterion pick below. Not independently verified by code read or execution."
+  },
+  {
+   "name": "Kelly-Criterion (deltaray-io)",
+   "url": "https://github.com/deltaray-io/kelly-criterion",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Named in the awesome-list as the leverage-sizing pick, but the upstream check finds it unmaintained (last push 2022-12-08, last PyPI release 2019-02-16). Merit-based re-ranking demotes it below riskkit above and below the already-catalogued peer-reviewed 'Analytical Solution for Kelly's Criterion for Multiple Outcomes' paper (paperswithbacktest.com) for any new adoption; flagged per the task's maintenance rule rather than dropped, since it is a named current-choice-adjacent input."
+  },
+  {
+   "name": "orderflow-metrics",
+   "url": "https://github.com/twowaymind/orderflow-metrics",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Directly matches the order-flow method category and is the most actively released candidate found here (0.40.0, pushed 3 days before this review). Notable upstream-now finding: the current repo description is narrower ('OFI, depth and trade imbalance') than the input note's claim of 'VPIN, information-driven bars, Kyle's lambda, trade-sign classification and limit-order-book reconstruction' -- either the library was trimmed since that note was written or the note overstated scope; the broader claim should be treated as unverified until the code at this pin is read."
+  },
+  {
+   "name": "itch-book",
+   "url": "https://github.com/groovg/itch-book",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Supplies a genuine real-exchange, order-by-order US-equity data substrate needed to test any order-flow, momentum-ignition or halt-resumption method against real microstructure rather than synthetic bars. It is a data/parsing tool, not a mover-detection strategy itself."
+  },
+  {
+   "name": "ClusterLOB (order-flow clustering)",
+   "url": "https://arxiv.org/abs/2504.20349",
+   "modalities": [
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Beyond stars/awesome-lists: the closest dated, primary-sourced academic method found for the requirement's named 'order-flow' and 'momentum-ignition' categories -- directional-cluster imbalance is methodologically adjacent to detecting the aggressive order flow that precedes a rapid move. No author code repository was found, so reproduction requires independent implementation. General finding: no dedicated open-source or academic 'momentum ignition' detection method was located anywhere in this search beyond vendor market-abuse-surveillance glossaries (e.g. Trading Technologies' TT Score, Bookmap), which describe the pattern for compliance surveillance rather than as a tradeable open method."
+  },
+  {
+   "name": "VPIN / Flow Toxicity (Easley, Lopez de Prado, O'Hara)",
+   "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1695041",
+   "modalities": [
+    "paper"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The founding theory behind the orderflow-metrics implementation above, so it grounds that candidate's order-flow-toxicity claim in a named, citable primary source. Flag its age (2011, 15 years old, outside the task's preferred 2026 window) and a found counter-finding: later replications cited in this search report VPIN as 'a poor predictor of short-run volatility' that peaked after, not before, the Flash Crash -- treat as a debated, not settled, signal. SSRN abstract page returned HTTP 403 to direct fetch this session; sourced from search-engine-indexed abstract/citation text, not a direct read."
+  },
+  {
+   "name": "NoEdge-Bench",
+   "url": "https://github.com/nexusfinancial-dev/noedge-bench",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Serves the requirement's 'suitable for preregistered historical simulation' clause directly -- a permutation-null control is exactly what is needed to keep an extreme-mover claim (lppls, ClusterLOB-style signals, etc.) from being reported as an edge that is really noise. Small/single-maintainer project, so its own correctness is unverified here."
+  },
+  {
+   "name": "Crypto Pump Scanner",
+   "url": "https://github.com/stefanoviana/crypto-pump-scanner",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The only candidate found (input or new) that packages detection plus automatic sizing/entry plus staged exits into one working end-to-end architecture matching the requirement's full shape. It is crypto/Bybit-scoped, so detection thresholds and market-structure assumptions (no LULD bands, no regulatory halts) do not transfer directly to US equities and need re-validation on equity data."
+  },
+  {
+   "name": "Wiseek Filing Impact",
+   "url": "https://github.com/WiseekAI/wiseek-datasets",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The strongest catalyst/news candidate with an actual reproducible per-event dataset under an open license, rather than a paid live-feed API with docs-only evidence (e.g. EDGAR Events, FilingPulse, RTPR from the input set). The filing-importance score itself is proprietary/unaudited, so the causal claim needs independent replication before use in a preregistered study."
+  },
+  {
+   "name": "TLM: Trajectory-Aware Retrieval Agents (gap + earnings-surprise prediction)",
+   "url": "https://arxiv.org/abs/2607.21625",
+   "modalities": [
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Beyond stars/awesome-lists and dated 2026-07: touches two of the requirement's named categories at once (gap and catalyst/earnings) via a novel retrieval-agent method. It is a general temporal-decision-making methods paper, not an equities-specific system, so the reported gap/earnings numbers need to be read from the full paper body (not just the abstract) before any adoption claim -- an earlier search summary attributed specific Russell-3000 dataset statistics to this paper that this direct read could not confirm, so those numbers are explicitly not carried over here."
+  },
+  {
+   "name": "\"Pausing the Panic?\" -- KOSPI circuit-breaker resumption study",
+   "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7208358",
+   "modalities": [
+    "paper"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The only dated-2026 halt/circuit-breaker study found for the requirement's named 'halt-resumption' category. It is a Korean-market (KOSPI) study, not US LULD, so its volatility/correlation findings are a methodological template to replicate on US halt data, not a directly transferable US-equity result. SSRN page returned HTTP 403 to direct fetch this session; sourced from the search engine's indexed abstract text."
+  },
+  {
+   "name": "Systematic Signals of Short Squeezes: Insights from Rare Events",
+   "url": "https://www.sciencedirect.com/science/article/pii/S1062940826000598",
+   "modalities": [
+    "paper"
+   ],
+   "evidence_level": "metadata",
+   "fit": "A peer-reviewed, dated-2026 primary source directly on the requirement's extreme-gainer/short-squeeze sub-case, naming concrete precursor signals (short-interest level, attention spikes) a catalyst/momentum detector could operationalize. It is an empirical-finance study, not shipped code, so it supplies a hypothesis to test, not a runnable detector. Both the ScienceDirect and SSRN (id 5334668) pages returned HTTP 403 to direct fetch this session; sourced from search-indexed bibliographic/abstract text only."
+  },
+  {
+   "name": "Kronos (financial foundation model)",
+   "url": "https://github.com/shiyu-coder/Kronos",
+   "modalities": [
+    "github_search",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The strongest genuinely-new, beyond-awesome-list SOTA candidate found: an AAAI-2026-accepted, actively maintained (2026-04 push, MIT) financial foundation model that could underlie a forecasting/volatility-regime layer feeding an extreme-mover detector. Its own demonstrated capabilities are general forecasting/volatility/synthetic-data quality, not a validated extreme-gainer or catalyst-detection result -- applying it to this requirement is a transfer hypothesis to test, not a demonstrated fit. Not distributed on PyPI (GitHub/paper only)."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-cached",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/strategy-research--gpt-6-cached.md"
+  },
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/strategy-research--gpt-6-live.md"
+  }
+ ]
+}

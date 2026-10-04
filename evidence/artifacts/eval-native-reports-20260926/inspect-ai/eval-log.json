@@ -1,0 +1,2060 @@
+{
+  "version": 2,
+  "status": "success",
+  "eval": {
+    "eval_id": "PJAu9ezoDH6xQnNp3Y8VB7",
+    "run_id": "BD4wc9q2yVwDnpHYYAEKJM",
+    "created": "2026-09-26T02:52:11+00:00",
+    "task": "tiny_local_eval",
+    "task_id": "egTXbbFr2uvGgPNBRB5qhg",
+    "task_version": 0,
+    "task_file": "task.py",
+    "task_display_name": "tiny_local_eval",
+    "task_registry_name": "tiny_local_eval",
+    "task_attribs": {},
+    "task_args": {},
+    "task_args_passed": {},
+    "dataset": {
+      "samples": 4,
+      "sample_ids": [
+        "add",
+        "capital",
+        "reverse",
+        "wrong_target_control"
+      ],
+      "shuffled": false
+    },
+    "model": "openai-api/llamacpp/qwen3.8-27b-local",
+    "model_generate_config": {
+      "max_tokens": 192,
+      "temperature": 0.0
+    },
+    "model_base_url": "http://127.0.0.1:18232/v1",
+    "model_args": {},
+    "config": {
+      "epochs": 1,
+      "fail_on_error": true,
+      "continue_on_fail": false,
+      "score_on_error": false,
+      "sandbox_cleanup": true,
+      "sandbox_prebuilt": false,
+      "log_samples": true,
+      "log_realtime": false,
+      "log_images": true,
+      "log_shared": 0,
+      "score_display": true
+    },
+    "packages": {
+      "inspect_ai": "0.3.266"
+    },
+    "scorers": [
+      {
+        "name": "includes",
+        "options": {},
+        "metrics": [
+          {
+            "name": "inspect_ai/accuracy",
+            "options": {}
+          },
+          {
+            "name": "inspect_ai/stderr",
+            "options": {}
+          }
+        ],
+        "metadata": {}
+      }
+    ]
+  },
+  "plan": {
+    "name": "plan",
+    "steps": [
+      {
+        "solver": "generate",
+        "params": {
+          "tool_calls": "loop"
+        },
+        "params_passed": {}
+      }
+    ],
+    "config": {
+      "max_tokens": 192,
+      "temperature": 0.0
+    }
+  },
+  "results": {
+    "total_samples": 4,
+    "completed_samples": 4,
+    "scores": [
+      {
+        "name": "includes",
+        "scorer": "includes",
+        "scored_samples": 4,
+        "unscored_samples": 0,
+        "params": {},
+        "metrics": {
+          "accuracy": {
+            "name": "accuracy",
+            "value": 0.75,
+            "params": {}
+          },
+          "stderr": {
+            "name": "stderr",
+            "value": 0.25,
+            "params": {}
+          }
+        }
+      }
+    ],
+    "headline": {
+      "scorer": "includes",
+      "score": "includes",
+      "metric": "accuracy"
+    }
+  },
+  "stats": {
+    "started_at": "2026-09-26T02:52:11+00:00",
+    "completed_at": "2026-09-26T02:52:56+00:00",
+    "model_usage": {
+      "openai-api/llamacpp/qwen3.8-27b-local": {
+        "input_tokens": 16,
+        "output_tokens": 143,
+        "total_tokens": 417,
+        "input_tokens_cache_read": 258
+      }
+    },
+    "role_usage": {},
+    "connection_limit_history": []
+  },
+  "invalidated": false,
+  "tags": [],
+  "metadata": {},
+  "samples": [
+    {
+      "id": "add",
+      "epoch": 1,
+      "input": "What is 7 plus 5? Reply with only the number, nothing else.",
+      "target": "12",
+      "messages": [
+        {
+          "id": "gwJA2TH9TgnyHLVtBpgwDo",
+          "content": "What is 7 plus 5? Reply with only the number, nothing else.",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "EXczfbXhwFcdoXKoJopLrx",
+          "content": [
+            {
+              "internal": "reasoning_content",
+              "type": "reasoning",
+              "reasoning": "We need answer user's request: \"What is 7 plus 5? Reply with only the number, nothing else.\" Final only 12.\n",
+              "redacted": false
+            },
+            {
+              "type": "text",
+              "text": "12"
+            }
+          ],
+          "source": "generate",
+          "role": "assistant",
+          "model": "qwen3.8-27b-local"
+        }
+      ],
+      "output": {
+        "model": "qwen3.8-27b-local",
+        "choices": [
+          {
+            "message": {
+              "id": "EXczfbXhwFcdoXKoJopLrx",
+              "content": [
+                {
+                  "internal": "reasoning_content",
+                  "type": "reasoning",
+                  "reasoning": "We need answer user's request: \"What is 7 plus 5? Reply with only the number, nothing else.\" Final only 12.\n",
+                  "redacted": false
+                },
+                {
+                  "type": "text",
+                  "text": "12"
+                }
+              ],
+              "source": "generate",
+              "role": "assistant",
+              "model": "qwen3.8-27b-local"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "12",
+        "usage": {
+          "input_tokens": 4,
+          "output_tokens": 37,
+          "total_tokens": 106,
+          "input_tokens_cache_read": 65
+        },
+        "time": 10.472124491992872
+      },
+      "scores": {
+        "includes": {
+          "value": "C",
+          "answer": "12",
+          "explanation": "12",
+          "history": []
+        }
+      },
+      "metadata": {},
+      "store": {},
+      "events": [
+        {
+          "uuid": "95fe8FqZj428LAiLRNExt5",
+          "span_id": "bWVhodCRXgriEgjrQPHwxH",
+          "timestamp": "2026-09-26T02:52:11.513178+00:00",
+          "working_start": 224014.534007282,
+          "event": "span_begin",
+          "id": "bWVhodCRXgriEgjrQPHwxH",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "5XEGhaT3wqVRH2eatnh7mx",
+          "span_id": "bWVhodCRXgriEgjrQPHwxH",
+          "timestamp": "2026-09-26T02:52:11.513648+00:00",
+          "working_start": 224014.534476838,
+          "event": "sample_init",
+          "sample": {
+            "input": "What is 7 plus 5? Reply with only the number, nothing else.",
+            "target": "12",
+            "id": "add"
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "gwJA2TH9TgnyHLVtBpgwDo",
+                "content": "What is 7 plus 5? Reply with only the number, nothing else.",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "openai-api/llamacpp/qwen3.8-27b-local",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {}
+          }
+        },
+        {
+          "uuid": "k55PfKSQtLamn2giGYYDJb",
+          "span_id": "bWVhodCRXgriEgjrQPHwxH",
+          "timestamp": "2026-09-26T02:52:11.513789+00:00",
+          "working_start": 224014.534615562,
+          "event": "span_end",
+          "id": "bWVhodCRXgriEgjrQPHwxH"
+        },
+        {
+          "uuid": "X2VYXiTCaqMFNSdwNyZ787",
+          "span_id": "gSaxGwY5zYzuNcTqNWFA5Z",
+          "timestamp": "2026-09-26T02:52:11.516740+00:00",
+          "working_start": 0.002910366019932553,
+          "event": "span_begin",
+          "id": "gSaxGwY5zYzuNcTqNWFA5Z",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "DzCEMHRukZwWrSHnoZHKXp",
+          "span_id": "j6bk7CRuxrzJQwT24xWfpx",
+          "timestamp": "2026-09-26T02:52:11.517463+00:00",
+          "working_start": 0.003633400017861277,
+          "event": "span_begin",
+          "id": "j6bk7CRuxrzJQwT24xWfpx",
+          "parent_id": "gSaxGwY5zYzuNcTqNWFA5Z",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "jJHmSFyxuEDptJQFSQL5Rv",
+          "span_id": "j6bk7CRuxrzJQwT24xWfpx",
+          "timestamp": "2026-09-26T02:52:11.517682+00:00",
+          "working_start": 0.0038522570102941245,
+          "event": "model",
+          "model": "openai-api/llamacpp/qwen3.8-27b-local",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_tokens": 192,
+            "temperature": 0.0
+          },
+          "output": {
+            "model": "qwen3.8-27b-local",
+            "choices": [
+              {
+                "message": {
+                  "id": "EXczfbXhwFcdoXKoJopLrx",
+                  "content": [
+                    {
+                      "internal": "reasoning_content",
+                      "type": "reasoning",
+                      "reasoning": "attachment://753b6d4c54a013e43b7988f90311dabb",
+                      "redacted": false
+                    },
+                    {
+                      "type": "text",
+                      "text": "12"
+                    }
+                  ],
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "qwen3.8-27b-local"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "12",
+            "usage": {
+              "input_tokens": 4,
+              "output_tokens": 37,
+              "total_tokens": 106,
+              "input_tokens_cache_read": 65
+            },
+            "time": 10.472124491992872
+          },
+          "call": {
+            "request": {
+              "tools": null,
+              "tool_choice": null,
+              "extra_headers": {
+                "x-irid": "BMpE2SenNaLaL4hCPXtWB6"
+              },
+              "model": "qwen3.8-27b-local",
+              "max_tokens": 192,
+              "temperature": 0.0
+            },
+            "response": {
+              "id": "chatcmpl-5WDoC91FQeHyYHc0CWTWVaGZ88Ww73K6",
+              "choices": [
+                {
+                  "finish_reason": "stop",
+                  "index": 0,
+                  "logprobs": null,
+                  "message": {
+                    "content": "12",
+                    "refusal": null,
+                    "role": "assistant",
+                    "annotations": null,
+                    "audio": null,
+                    "function_call": null,
+                    "tool_calls": null,
+                    "reasoning_content": "attachment://753b6d4c54a013e43b7988f90311dabb"
+                  }
+                }
+              ],
+              "created": 1790391142,
+              "model": "qwen3.8-27b-local",
+              "object": "chat.completion",
+              "metadata": null,
+              "moderation": null,
+              "service_tier": null,
+              "system_fingerprint": "b11146-7fe450e19",
+              "usage": {
+                "completion_tokens": 37,
+                "prompt_tokens": 69,
+                "total_tokens": 106,
+                "completion_tokens_details": null,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cache_write_tokens": null,
+                  "cached_tokens": 65,
+                  "image_tokens": null,
+                  "text_tokens": null
+                }
+              },
+              "timings": {
+                "cache_n": 65,
+                "prompt_n": 4,
+                "prompt_ms": 786.204,
+                "prompt_per_token_ms": 196.551,
+                "prompt_per_second": 5.087738042543666,
+                "predicted_n": 37,
+                "predicted_ms": 8886.114,
+                "predicted_per_token_ms": 246.8365,
+                "predicted_per_second": 4.051264703558834
+              }
+            },
+            "time": 10.472124491992872,
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-26T02:52:22.211388+00:00",
+          "working_time": 10.472124491992872
+        },
+        {
+          "uuid": "KVDMEmVcTTmPES5FLHZV62",
+          "span_id": "j6bk7CRuxrzJQwT24xWfpx",
+          "timestamp": "2026-09-26T02:52:22.212340+00:00",
+          "working_start": 10.477309611975215,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "EXczfbXhwFcdoXKoJopLrx",
+                "content": [
+                  {
+                    "internal": "reasoning_content",
+                    "type": "reasoning",
+                    "reasoning": "attachment://753b6d4c54a013e43b7988f90311dabb",
+                    "redacted": false
+                  },
+                  {
+                    "type": "text",
+                    "text": "12"
+                  }
+                ],
+                "source": "generate",
+                "role": "assistant",
+                "model": "qwen3.8-27b-local"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 10.472124491992872
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 4,
+                "output_tokens": 37,
+                "total_tokens": 106,
+                "input_tokens_cache_read": 65
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "EXczfbXhwFcdoXKoJopLrx",
+                  "content": [
+                    {
+                      "internal": "reasoning_content",
+                      "type": "reasoning",
+                      "reasoning": "attachment://753b6d4c54a013e43b7988f90311dabb",
+                      "redacted": false
+                    },
+                    {
+                      "type": "text",
+                      "text": "12"
+                    }
+                  ],
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "qwen3.8-27b-local"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "12",
+              "replaced": ""
+            },
+            {
+              "op": "replace",
+              "path": "/output/model",
+              "value": "qwen3.8-27b-local",
+              "replaced": "openai-api/llamacpp/qwen3.8-27b-local"
+            }
+          ]
+        },
+        {
+          "uuid": "jpBv96XEtLm3Wn28awBFZz",
+          "span_id": "j6bk7CRuxrzJQwT24xWfpx",
+          "timestamp": "2026-09-26T02:52:22.212506+00:00",
+          "working_start": 10.477472906961339,
+          "event": "span_end",
+          "id": "j6bk7CRuxrzJQwT24xWfpx"
+        },
+        {
+          "uuid": "iswFZPJMNXT6YbADo2vgAr",
+          "span_id": "gSaxGwY5zYzuNcTqNWFA5Z",
+          "timestamp": "2026-09-26T02:52:22.212599+00:00",
+          "working_start": 10.47756538997055,
+          "event": "span_end",
+          "id": "gSaxGwY5zYzuNcTqNWFA5Z"
+        },
+        {
+          "uuid": "kqTuq6tEiHwqVetz9xQWMo",
+          "span_id": "EWzZSJg6aZAR7w9QCDXGGJ",
+          "timestamp": "2026-09-26T02:52:22.213080+00:00",
+          "working_start": 10.478047415963374,
+          "event": "span_begin",
+          "id": "EWzZSJg6aZAR7w9QCDXGGJ",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "hBXCE7WeTLzpkECmHMChtT",
+          "span_id": "At4eu7nJGCwT9GKhAewLZk",
+          "timestamp": "2026-09-26T02:52:22.213152+00:00",
+          "working_start": 10.478118827973958,
+          "event": "span_begin",
+          "id": "At4eu7nJGCwT9GKhAewLZk",
+          "parent_id": "EWzZSJg6aZAR7w9QCDXGGJ",
+          "type": "scorer",
+          "name": "includes"
+        },
+        {
+          "uuid": "MxRmJJCPBAi6Q5Tds2rNNT",
+          "span_id": "At4eu7nJGCwT9GKhAewLZk",
+          "timestamp": "2026-09-26T02:52:22.213260+00:00",
+          "working_start": 10.47822727196035,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "12",
+            "explanation": "12",
+            "history": []
+          },
+          "target": "12",
+          "intermediate": false,
+          "scorer": "includes",
+          "scorer_args": {},
+          "model_usage": {
+            "openai-api/llamacpp/qwen3.8-27b-local": {
+              "input_tokens": 4,
+              "output_tokens": 37,
+              "total_tokens": 106,
+              "input_tokens_cache_read": 65
+            }
+          }
+        },
+        {
+          "uuid": "3Z8DrfSgAcQWmEgjaxCGAW",
+          "span_id": "At4eu7nJGCwT9GKhAewLZk",
+          "timestamp": "2026-09-26T02:52:22.213354+00:00",
+          "working_start": 10.478321214963216,
+          "event": "span_end",
+          "id": "At4eu7nJGCwT9GKhAewLZk"
+        },
+        {
+          "uuid": "FniPLnxwWToWHNyPhzNV5n",
+          "span_id": "EWzZSJg6aZAR7w9QCDXGGJ",
+          "timestamp": "2026-09-26T02:52:22.213397+00:00",
+          "working_start": 10.478363815986086,
+          "event": "span_end",
+          "id": "EWzZSJg6aZAR7w9QCDXGGJ"
+        }
+      ],
+      "model_usage": {
+        "openai-api/llamacpp/qwen3.8-27b-local": {
+          "input_tokens": 4,
+          "output_tokens": 37,
+          "total_tokens": 106,
+          "input_tokens_cache_read": 65
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-26T02:52:11.513833+00:00",
+      "completed_at": "2026-09-26T02:52:22.213743+00:00",
+      "total_time": 10.7,
+      "working_time": 10.479,
+      "uuid": "oMb3Qyj5FAGSMekVfWRi27",
+      "error_retries": [],
+      "attachments": {
+        "753b6d4c54a013e43b7988f90311dabb": "We need answer user's request: \"What is 7 plus 5? Reply with only the number, nothing else.\" Final only 12.\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "gwJA2TH9TgnyHLVtBpgwDo",
+            "content": "What is 7 plus 5? Reply with only the number, nothing else.",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "role": "user",
+            "content": "What is 7 plus 5? Reply with only the number, nothing else."
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "capital",
+      "epoch": 1,
+      "input": "What is the capital of France? Reply with only the city name, nothing else.",
+      "target": "Paris",
+      "messages": [
+        {
+          "id": "MPmYhqp7ZzRGyycwpdJtkK",
+          "content": "What is the capital of France? Reply with only the city name, nothing else.",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "ai4e4JEfPsr9H7dEscsLvE",
+          "content": [
+            {
+              "internal": "reasoning_content",
+              "type": "reasoning",
+              "reasoning": "The user asks for the capital of France and wants only the city name. The capital of France is Paris. I must reply with only \"Paris\" and nothing else.\n",
+              "redacted": false
+            },
+            {
+              "type": "text",
+              "text": "Paris"
+            }
+          ],
+          "source": "generate",
+          "role": "assistant",
+          "model": "qwen3.8-27b-local"
+        }
+      ],
+      "output": {
+        "model": "qwen3.8-27b-local",
+        "choices": [
+          {
+            "message": {
+              "id": "ai4e4JEfPsr9H7dEscsLvE",
+              "content": [
+                {
+                  "internal": "reasoning_content",
+                  "type": "reasoning",
+                  "reasoning": "The user asks for the capital of France and wants only the city name. The capital of France is Paris. I must reply with only \"Paris\" and nothing else.\n",
+                  "redacted": false
+                },
+                {
+                  "type": "text",
+                  "text": "Paris"
+                }
+              ],
+              "source": "generate",
+              "role": "assistant",
+              "model": "qwen3.8-27b-local"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "Paris",
+        "usage": {
+          "input_tokens": 4,
+          "output_tokens": 39,
+          "total_tokens": 108,
+          "input_tokens_cache_read": 65
+        },
+        "time": 20.922989090002375
+      },
+      "scores": {
+        "includes": {
+          "value": "C",
+          "answer": "paris",
+          "explanation": "Paris",
+          "history": []
+        }
+      },
+      "metadata": {},
+      "store": {},
+      "events": [
+        {
+          "uuid": "hTBv6SSAGiqmuXHxq2ie9D",
+          "span_id": "hbJfNuSAbuamy5dosLHodd",
+          "timestamp": "2026-09-26T02:52:11.514418+00:00",
+          "working_start": 224014.535244573,
+          "event": "span_begin",
+          "id": "hbJfNuSAbuamy5dosLHodd",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "nmDiccv8ZkGBoQbm88SYGF",
+          "span_id": "hbJfNuSAbuamy5dosLHodd",
+          "timestamp": "2026-09-26T02:52:11.514699+00:00",
+          "working_start": 224014.535526073,
+          "event": "sample_init",
+          "sample": {
+            "input": "What is the capital of France? Reply with only the city name, nothing else.",
+            "target": "Paris",
+            "id": "capital"
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "MPmYhqp7ZzRGyycwpdJtkK",
+                "content": "What is the capital of France? Reply with only the city name, nothing else.",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "openai-api/llamacpp/qwen3.8-27b-local",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {}
+          }
+        },
+        {
+          "uuid": "gtdB4oLfDkJiND93Mc5DeH",
+          "span_id": "hbJfNuSAbuamy5dosLHodd",
+          "timestamp": "2026-09-26T02:52:11.514790+00:00",
+          "working_start": 224014.535616236,
+          "event": "span_end",
+          "id": "hbJfNuSAbuamy5dosLHodd"
+        },
+        {
+          "uuid": "n8NwKbTxwC3QTAZ7rvqHUH",
+          "span_id": "42P37YYbMdEghhBUf2eiMV",
+          "timestamp": "2026-09-26T02:52:11.517857+00:00",
+          "working_start": 0.0030389809980988503,
+          "event": "span_begin",
+          "id": "42P37YYbMdEghhBUf2eiMV",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "dDY93jg2JX9CyTrp7WUQxf",
+          "span_id": "b6iVEaafsRXGLNzo3X3ajG",
+          "timestamp": "2026-09-26T02:52:11.517915+00:00",
+          "working_start": 0.003096872998867184,
+          "event": "span_begin",
+          "id": "b6iVEaafsRXGLNzo3X3ajG",
+          "parent_id": "42P37YYbMdEghhBUf2eiMV",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "EHonNkQW2E8dWdsRTL53y5",
+          "span_id": "b6iVEaafsRXGLNzo3X3ajG",
+          "timestamp": "2026-09-26T02:52:11.518063+00:00",
+          "working_start": 0.0032454580068588257,
+          "event": "model",
+          "model": "openai-api/llamacpp/qwen3.8-27b-local",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_tokens": 192,
+            "temperature": 0.0
+          },
+          "output": {
+            "model": "qwen3.8-27b-local",
+            "choices": [
+              {
+                "message": {
+                  "id": "ai4e4JEfPsr9H7dEscsLvE",
+                  "content": [
+                    {
+                      "internal": "reasoning_content",
+                      "type": "reasoning",
+                      "reasoning": "attachment://30c531531763e0881c84eb22812a0c99",
+                      "redacted": false
+                    },
+                    {
+                      "type": "text",
+                      "text": "Paris"
+                    }
+                  ],
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "qwen3.8-27b-local"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "Paris",
+            "usage": {
+              "input_tokens": 4,
+              "output_tokens": 39,
+              "total_tokens": 108,
+              "input_tokens_cache_read": 65
+            },
+            "time": 20.922989090002375
+          },
+          "call": {
+            "request": {
+              "tools": null,
+              "tool_choice": null,
+              "extra_headers": {
+                "x-irid": "RqzdWv5UCVsverj2Xw6FtT"
+              },
+              "model": "qwen3.8-27b-local",
+              "max_tokens": 192,
+              "temperature": 0.0
+            },
+            "response": {
+              "id": "chatcmpl-xwsJm1Zi61YkIjHRZ8CjxRZGzD0mAC4K",
+              "choices": [
+                {
+                  "finish_reason": "stop",
+                  "index": 0,
+                  "logprobs": null,
+                  "message": {
+                    "content": "Paris",
+                    "refusal": null,
+                    "role": "assistant",
+                    "annotations": null,
+                    "audio": null,
+                    "function_call": null,
+                    "tool_calls": null,
+                    "reasoning_content": "attachment://30c531531763e0881c84eb22812a0c99"
+                  }
+                }
+              ],
+              "created": 1790391152,
+              "model": "qwen3.8-27b-local",
+              "object": "chat.completion",
+              "metadata": null,
+              "moderation": null,
+              "service_tier": null,
+              "system_fingerprint": "b11146-7fe450e19",
+              "usage": {
+                "completion_tokens": 39,
+                "prompt_tokens": 69,
+                "total_tokens": 108,
+                "completion_tokens_details": null,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cache_write_tokens": null,
+                  "cached_tokens": 65,
+                  "image_tokens": null,
+                  "text_tokens": null
+                }
+              },
+              "timings": {
+                "cache_n": 65,
+                "prompt_n": 4,
+                "prompt_ms": 628.694,
+                "prompt_per_token_ms": 157.1735,
+                "prompt_per_second": 6.362395696475551,
+                "predicted_n": 39,
+                "predicted_ms": 9185.74,
+                "predicted_per_token_ms": 241.73,
+                "predicted_per_second": 4.136846895296405
+              }
+            },
+            "time": 20.922989090002375,
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-26T02:52:32.718168+00:00",
+          "working_time": 20.922989090002375
+        },
+        {
+          "uuid": "QpnKCjkGKZq6y4VjHpBN7p",
+          "span_id": "b6iVEaafsRXGLNzo3X3ajG",
+          "timestamp": "2026-09-26T02:52:32.718624+00:00",
+          "working_start": 20.92698111300706,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "ai4e4JEfPsr9H7dEscsLvE",
+                "content": [
+                  {
+                    "internal": "reasoning_content",
+                    "type": "reasoning",
+                    "reasoning": "attachment://30c531531763e0881c84eb22812a0c99",
+                    "redacted": false
+                  },
+                  {
+                    "type": "text",
+                    "text": "Paris"
+                  }
+                ],
+                "source": "generate",
+                "role": "assistant",
+                "model": "qwen3.8-27b-local"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 20.922989090002375
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 4,
+                "output_tokens": 39,
+                "total_tokens": 108,
+                "input_tokens_cache_read": 65
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "ai4e4JEfPsr9H7dEscsLvE",
+                  "content": [
+                    {
+                      "internal": "reasoning_content",
+                      "type": "reasoning",
+                      "reasoning": "attachment://30c531531763e0881c84eb22812a0c99",
+                      "redacted": false
+                    },
+                    {
+                      "type": "text",
+                      "text": "Paris"
+                    }
+                  ],
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "qwen3.8-27b-local"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "Paris",
+              "replaced": ""
+            },
+            {
+              "op": "replace",
+              "path": "/output/model",
+              "value": "qwen3.8-27b-local",
+              "replaced": "openai-api/llamacpp/qwen3.8-27b-local"
+            }
+          ]
+        },
+        {
+          "uuid": "YgnSWLDC3oqTJ2bJaAUbmQ",
+          "span_id": "b6iVEaafsRXGLNzo3X3ajG",
+          "timestamp": "2026-09-26T02:52:32.718711+00:00",
+          "working_start": 20.927066125004785,
+          "event": "span_end",
+          "id": "b6iVEaafsRXGLNzo3X3ajG"
+        },
+        {
+          "uuid": "NNej3dcm5f5dC9TBobau9N",
+          "span_id": "42P37YYbMdEghhBUf2eiMV",
+          "timestamp": "2026-09-26T02:52:32.718783+00:00",
+          "working_start": 20.927137657999992,
+          "event": "span_end",
+          "id": "42P37YYbMdEghhBUf2eiMV"
+        },
+        {
+          "uuid": "YYi4qtp4SnHTmTXnJv4j8f",
+          "span_id": "8GWvNB2C9d8je95f8FE2yy",
+          "timestamp": "2026-09-26T02:52:32.719210+00:00",
+          "working_start": 20.92756575200474,
+          "event": "span_begin",
+          "id": "8GWvNB2C9d8je95f8FE2yy",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "52NdoDxJdumGep4Bi7cP7h",
+          "span_id": "YUALDLzgeNK3ecUwEXRnqN",
+          "timestamp": "2026-09-26T02:52:32.719287+00:00",
+          "working_start": 20.9276409939921,
+          "event": "span_begin",
+          "id": "YUALDLzgeNK3ecUwEXRnqN",
+          "parent_id": "8GWvNB2C9d8je95f8FE2yy",
+          "type": "scorer",
+          "name": "includes"
+        },
+        {
+          "uuid": "5PpfpQ5rSxD6PCaWpmhXAL",
+          "span_id": "YUALDLzgeNK3ecUwEXRnqN",
+          "timestamp": "2026-09-26T02:52:32.719374+00:00",
+          "working_start": 20.927728156995727,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "paris",
+            "explanation": "Paris",
+            "history": []
+          },
+          "target": "Paris",
+          "intermediate": false,
+          "scorer": "includes",
+          "scorer_args": {},
+          "model_usage": {
+            "openai-api/llamacpp/qwen3.8-27b-local": {
+              "input_tokens": 4,
+              "output_tokens": 39,
+              "total_tokens": 108,
+              "input_tokens_cache_read": 65
+            }
+          }
+        },
+        {
+          "uuid": "GCHydZahj3BcnqsmzJNrLy",
+          "span_id": "YUALDLzgeNK3ecUwEXRnqN",
+          "timestamp": "2026-09-26T02:52:32.719446+00:00",
+          "working_start": 20.927801020006882,
+          "event": "span_end",
+          "id": "YUALDLzgeNK3ecUwEXRnqN"
+        },
+        {
+          "uuid": "5JdnBwhNrggZtMbrN85fWa",
+          "span_id": "8GWvNB2C9d8je95f8FE2yy",
+          "timestamp": "2026-09-26T02:52:32.719494+00:00",
+          "working_start": 20.927848101011477,
+          "event": "span_end",
+          "id": "8GWvNB2C9d8je95f8FE2yy"
+        }
+      ],
+      "model_usage": {
+        "openai-api/llamacpp/qwen3.8-27b-local": {
+          "input_tokens": 4,
+          "output_tokens": 39,
+          "total_tokens": 108,
+          "input_tokens_cache_read": 65
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-26T02:52:11.514820+00:00",
+      "completed_at": "2026-09-26T02:52:32.719714+00:00",
+      "total_time": 21.205,
+      "working_time": 20.928,
+      "uuid": "enV2RUg5WdBVaccVmjZwps",
+      "error_retries": [],
+      "attachments": {
+        "30c531531763e0881c84eb22812a0c99": "The user asks for the capital of France and wants only the city name. The capital of France is Paris. I must reply with only \"Paris\" and nothing else.\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "MPmYhqp7ZzRGyycwpdJtkK",
+            "content": "What is the capital of France? Reply with only the city name, nothing else.",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "role": "user",
+            "content": "What is the capital of France? Reply with only the city name, nothing else."
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "reverse",
+      "epoch": 1,
+      "input": "Spell the word cat backwards. Reply with only the result, nothing else.",
+      "target": "tac",
+      "messages": [
+        {
+          "id": "SGrqU83R5e7FpZZcdMRAja",
+          "content": "Spell the word cat backwards. Reply with only the result, nothing else.",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "KkL2kR9rvbsYfAAemdDCiR",
+          "content": [
+            {
+              "internal": "reasoning_content",
+              "type": "reasoning",
+              "reasoning": "We need to answer user: \"Spell the word cat backwards. Reply with only the result, nothing else.\" Final only \"tac\".\n",
+              "redacted": false
+            },
+            {
+              "type": "text",
+              "text": "tac"
+            }
+          ],
+          "source": "generate",
+          "role": "assistant",
+          "model": "qwen3.8-27b-local"
+        }
+      ],
+      "output": {
+        "model": "qwen3.8-27b-local",
+        "choices": [
+          {
+            "message": {
+              "id": "KkL2kR9rvbsYfAAemdDCiR",
+              "content": [
+                {
+                  "internal": "reasoning_content",
+                  "type": "reasoning",
+                  "reasoning": "We need to answer user: \"Spell the word cat backwards. Reply with only the result, nothing else.\" Final only \"tac\".\n",
+                  "redacted": false
+                },
+                {
+                  "type": "text",
+                  "text": "tac"
+                }
+              ],
+              "source": "generate",
+              "role": "assistant",
+              "model": "qwen3.8-27b-local"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "tac",
+        "usage": {
+          "input_tokens": 4,
+          "output_tokens": 32,
+          "total_tokens": 99,
+          "input_tokens_cache_read": 63
+        },
+        "time": 44.83720495100715
+      },
+      "scores": {
+        "includes": {
+          "value": "C",
+          "answer": "tac",
+          "explanation": "tac",
+          "history": []
+        }
+      },
+      "metadata": {},
+      "store": {},
+      "events": [
+        {
+          "uuid": "4DZgGbQs3xPH3uhZZQvPby",
+          "span_id": "ZmsQf3oLwtoBSJJje9CGN6",
+          "timestamp": "2026-09-26T02:52:11.515281+00:00",
+          "working_start": 224014.536108312,
+          "event": "span_begin",
+          "id": "ZmsQf3oLwtoBSJJje9CGN6",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "FTQceqxWXDszoExQz7s53H",
+          "span_id": "ZmsQf3oLwtoBSJJje9CGN6",
+          "timestamp": "2026-09-26T02:52:11.515664+00:00",
+          "working_start": 224014.536491264,
+          "event": "sample_init",
+          "sample": {
+            "input": "Spell the word cat backwards. Reply with only the result, nothing else.",
+            "target": "tac",
+            "id": "reverse"
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "SGrqU83R5e7FpZZcdMRAja",
+                "content": "Spell the word cat backwards. Reply with only the result, nothing else.",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "openai-api/llamacpp/qwen3.8-27b-local",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {}
+          }
+        },
+        {
+          "uuid": "ZL4tvz6vPxL47psRhDDBDd",
+          "span_id": "ZmsQf3oLwtoBSJJje9CGN6",
+          "timestamp": "2026-09-26T02:52:11.515733+00:00",
+          "working_start": 224014.536559927,
+          "event": "span_end",
+          "id": "ZmsQf3oLwtoBSJJje9CGN6"
+        },
+        {
+          "uuid": "fEc4vCJFLVbAFdiajyYcsp",
+          "span_id": "guJNebJQdnrmiUX6CwqL5H",
+          "timestamp": "2026-09-26T02:52:11.518183+00:00",
+          "working_start": 0.0024267699918709695,
+          "event": "span_begin",
+          "id": "guJNebJQdnrmiUX6CwqL5H",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "68htiCuatwueZBpjRUXKYm",
+          "span_id": "ME8Nky7dtpMSbunSVzEWX3",
+          "timestamp": "2026-09-26T02:52:11.518332+00:00",
+          "working_start": 0.0025755949900485575,
+          "event": "span_begin",
+          "id": "ME8Nky7dtpMSbunSVzEWX3",
+          "parent_id": "guJNebJQdnrmiUX6CwqL5H",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "YWLxhCyNoxbi7wPGFacS2v",
+          "span_id": "ME8Nky7dtpMSbunSVzEWX3",
+          "timestamp": "2026-09-26T02:52:11.518476+00:00",
+          "working_start": 0.0027200299955438823,
+          "event": "model",
+          "model": "openai-api/llamacpp/qwen3.8-27b-local",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_tokens": 192,
+            "temperature": 0.0
+          },
+          "output": {
+            "model": "qwen3.8-27b-local",
+            "choices": [
+              {
+                "message": {
+                  "id": "KkL2kR9rvbsYfAAemdDCiR",
+                  "content": [
+                    {
+                      "internal": "reasoning_content",
+                      "type": "reasoning",
+                      "reasoning": "attachment://6833f6c8d448d707a5c96b6bf7ccd204",
+                      "redacted": false
+                    },
+                    {
+                      "type": "text",
+                      "text": "tac"
+                    }
+                  ],
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "qwen3.8-27b-local"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "tac",
+            "usage": {
+              "input_tokens": 4,
+              "output_tokens": 32,
+              "total_tokens": 99,
+              "input_tokens_cache_read": 63
+            },
+            "time": 44.83720495100715
+          },
+          "call": {
+            "request": {
+              "tools": null,
+              "tool_choice": null,
+              "extra_headers": {
+                "x-irid": "nhVigX986MMVxxAckjL4kL"
+              },
+              "model": "qwen3.8-27b-local",
+              "max_tokens": 192,
+              "temperature": 0.0
+            },
+            "response": {
+              "id": "chatcmpl-HJa0aDFqLSGUVcKDdQ4WpJCkpbkGOa2y",
+              "choices": [
+                {
+                  "finish_reason": "stop",
+                  "index": 0,
+                  "logprobs": null,
+                  "message": {
+                    "content": "tac",
+                    "refusal": null,
+                    "role": "assistant",
+                    "annotations": null,
+                    "audio": null,
+                    "function_call": null,
+                    "tool_calls": null,
+                    "reasoning_content": "attachment://6833f6c8d448d707a5c96b6bf7ccd204"
+                  }
+                }
+              ],
+              "created": 1790391176,
+              "model": "qwen3.8-27b-local",
+              "object": "chat.completion",
+              "metadata": null,
+              "moderation": null,
+              "service_tier": null,
+              "system_fingerprint": "b11146-7fe450e19",
+              "usage": {
+                "completion_tokens": 32,
+                "prompt_tokens": 67,
+                "total_tokens": 99,
+                "completion_tokens_details": null,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cache_write_tokens": null,
+                  "cached_tokens": 63,
+                  "image_tokens": null,
+                  "text_tokens": null
+                }
+              },
+              "timings": {
+                "cache_n": 63,
+                "prompt_n": 4,
+                "prompt_ms": 509.395,
+                "prompt_per_token_ms": 127.34875,
+                "prompt_per_second": 7.852452419046124,
+                "predicted_n": 32,
+                "predicted_ms": 7588.679,
+                "predicted_per_token_ms": 244.79609677419356,
+                "predicted_per_second": 4.085032454265097
+              }
+            },
+            "time": 44.83720495100715,
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-26T02:52:56.631803+00:00",
+          "working_time": 44.83720495100715
+        },
+        {
+          "uuid": "b6dqJPHwU37z29V6LE8oek",
+          "span_id": "ME8Nky7dtpMSbunSVzEWX3",
+          "timestamp": "2026-09-26T02:52:56.632159+00:00",
+          "working_start": 44.840495997981634,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "KkL2kR9rvbsYfAAemdDCiR",
+                "content": [
+                  {
+                    "internal": "reasoning_content",
+                    "type": "reasoning",
+                    "reasoning": "attachment://6833f6c8d448d707a5c96b6bf7ccd204",
+                    "redacted": false
+                  },
+                  {
+                    "type": "text",
+                    "text": "tac"
+                  }
+                ],
+                "source": "generate",
+                "role": "assistant",
+                "model": "qwen3.8-27b-local"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 44.83720495100715
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 4,
+                "output_tokens": 32,
+                "total_tokens": 99,
+                "input_tokens_cache_read": 63
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "KkL2kR9rvbsYfAAemdDCiR",
+                  "content": [
+                    {
+                      "internal": "reasoning_content",
+                      "type": "reasoning",
+                      "reasoning": "attachment://6833f6c8d448d707a5c96b6bf7ccd204",
+                      "redacted": false
+                    },
+                    {
+                      "type": "text",
+                      "text": "tac"
+                    }
+                  ],
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "qwen3.8-27b-local"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "tac",
+              "replaced": ""
+            },
+            {
+              "op": "replace",
+              "path": "/output/model",
+              "value": "qwen3.8-27b-local",
+              "replaced": "openai-api/llamacpp/qwen3.8-27b-local"
+            }
+          ]
+        },
+        {
+          "uuid": "V389xXqyBVHUPtPZ46CKgK",
+          "span_id": "ME8Nky7dtpMSbunSVzEWX3",
+          "timestamp": "2026-09-26T02:52:56.632231+00:00",
+          "working_start": 44.84056757099461,
+          "event": "span_end",
+          "id": "ME8Nky7dtpMSbunSVzEWX3"
+        },
+        {
+          "uuid": "iCfYTpxRSibYmVP32NZvQi",
+          "span_id": "guJNebJQdnrmiUX6CwqL5H",
+          "timestamp": "2026-09-26T02:52:56.632288+00:00",
+          "working_start": 44.84062351298053,
+          "event": "span_end",
+          "id": "guJNebJQdnrmiUX6CwqL5H"
+        },
+        {
+          "uuid": "AoXMbH83Q65Kzn3qKb3YkY",
+          "span_id": "4jNrMzTAEvbwRbbyRmBRyh",
+          "timestamp": "2026-09-26T02:52:56.632618+00:00",
+          "working_start": 44.840954972984036,
+          "event": "span_begin",
+          "id": "4jNrMzTAEvbwRbbyRmBRyh",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "kWpbT6zgdLYGpC4mZQk2LY",
+          "span_id": "k8cDkvrwmdxrohMKBYCQ3v",
+          "timestamp": "2026-09-26T02:52:56.632677+00:00",
+          "working_start": 44.84101352500147,
+          "event": "span_begin",
+          "id": "k8cDkvrwmdxrohMKBYCQ3v",
+          "parent_id": "4jNrMzTAEvbwRbbyRmBRyh",
+          "type": "scorer",
+          "name": "includes"
+        },
+        {
+          "uuid": "YUpSAkPbTiEz69AqWCxf9p",
+          "span_id": "k8cDkvrwmdxrohMKBYCQ3v",
+          "timestamp": "2026-09-26T02:52:56.632740+00:00",
+          "working_start": 44.84107612699154,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "tac",
+            "explanation": "tac",
+            "history": []
+          },
+          "target": "tac",
+          "intermediate": false,
+          "scorer": "includes",
+          "scorer_args": {},
+          "model_usage": {
+            "openai-api/llamacpp/qwen3.8-27b-local": {
+              "input_tokens": 4,
+              "output_tokens": 32,
+              "total_tokens": 99,
+              "input_tokens_cache_read": 63
+            }
+          }
+        },
+        {
+          "uuid": "Aj7SL2ivBNC3JRj5X9NnyV",
+          "span_id": "k8cDkvrwmdxrohMKBYCQ3v",
+          "timestamp": "2026-09-26T02:52:56.632797+00:00",
+          "working_start": 44.841132778994506,
+          "event": "span_end",
+          "id": "k8cDkvrwmdxrohMKBYCQ3v"
+        },
+        {
+          "uuid": "7BDAd92cBadUZesetcbjf8",
+          "span_id": "4jNrMzTAEvbwRbbyRmBRyh",
+          "timestamp": "2026-09-26T02:52:56.632834+00:00",
+          "working_start": 44.84116973998607,
+          "event": "span_end",
+          "id": "4jNrMzTAEvbwRbbyRmBRyh"
+        }
+      ],
+      "model_usage": {
+        "openai-api/llamacpp/qwen3.8-27b-local": {
+          "input_tokens": 4,
+          "output_tokens": 32,
+          "total_tokens": 99,
+          "input_tokens_cache_read": 63
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-26T02:52:11.515758+00:00",
+      "completed_at": "2026-09-26T02:52:56.633009+00:00",
+      "total_time": 45.117,
+      "working_time": 44.841,
+      "uuid": "huYfHBHnRHZGzTziBGiU37",
+      "error_retries": [],
+      "attachments": {
+        "6833f6c8d448d707a5c96b6bf7ccd204": "We need to answer user: \"Spell the word cat backwards. Reply with only the result, nothing else.\" Final only \"tac\".\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "SGrqU83R5e7FpZZcdMRAja",
+            "content": "Spell the word cat backwards. Reply with only the result, nothing else.",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "role": "user",
+            "content": "Spell the word cat backwards. Reply with only the result, nothing else."
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "wrong_target_control",
+      "epoch": 1,
+      "input": "What is 2 plus 2? Reply with only the number, nothing else.",
+      "target": "5",
+      "messages": [
+        {
+          "id": "BR9P5GVB29263SHJACqQaK",
+          "content": "What is 2 plus 2? Reply with only the number, nothing else.",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "2wWjNJ6dHDiNgRcAVQxwDB",
+          "content": [
+            {
+              "internal": "reasoning_content",
+              "type": "reasoning",
+              "reasoning": "We need to respond to user: \"What is 2 plus 2? Reply with only the number, nothing else.\" Final only \"4\".\n",
+              "redacted": false
+            },
+            {
+              "type": "text",
+              "text": "4"
+            }
+          ],
+          "source": "generate",
+          "role": "assistant",
+          "model": "qwen3.8-27b-local"
+        }
+      ],
+      "output": {
+        "model": "qwen3.8-27b-local",
+        "choices": [
+          {
+            "message": {
+              "id": "2wWjNJ6dHDiNgRcAVQxwDB",
+              "content": [
+                {
+                  "internal": "reasoning_content",
+                  "type": "reasoning",
+                  "reasoning": "We need to respond to user: \"What is 2 plus 2? Reply with only the number, nothing else.\" Final only \"4\".\n",
+                  "redacted": false
+                },
+                {
+                  "type": "text",
+                  "text": "4"
+                }
+              ],
+              "source": "generate",
+              "role": "assistant",
+              "model": "qwen3.8-27b-local"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "4",
+        "usage": {
+          "input_tokens": 4,
+          "output_tokens": 35,
+          "total_tokens": 104,
+          "input_tokens_cache_read": 65
+        },
+        "time": 36.22130576899508
+      },
+      "scores": {
+        "includes": {
+          "value": "I",
+          "answer": "4",
+          "explanation": "4",
+          "history": []
+        }
+      },
+      "metadata": {},
+      "store": {},
+      "events": [
+        {
+          "uuid": "ioNVeidn27BVwocsQduNFa",
+          "span_id": "LWNsnNcvUVXnayQN8GSHxV",
+          "timestamp": "2026-09-26T02:52:11.516148+00:00",
+          "working_start": 224014.536975051,
+          "event": "span_begin",
+          "id": "LWNsnNcvUVXnayQN8GSHxV",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "Mpc9DQFUYjfuweCtnDfZKP",
+          "span_id": "LWNsnNcvUVXnayQN8GSHxV",
+          "timestamp": "2026-09-26T02:52:11.516378+00:00",
+          "working_start": 224014.537204818,
+          "event": "sample_init",
+          "sample": {
+            "input": "What is 2 plus 2? Reply with only the number, nothing else.",
+            "target": "5",
+            "id": "wrong_target_control"
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "BR9P5GVB29263SHJACqQaK",
+                "content": "What is 2 plus 2? Reply with only the number, nothing else.",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "openai-api/llamacpp/qwen3.8-27b-local",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {}
+          }
+        },
+        {
+          "uuid": "VkLdZPrXdnKwHAHkiRkEXy",
+          "span_id": "LWNsnNcvUVXnayQN8GSHxV",
+          "timestamp": "2026-09-26T02:52:11.516439+00:00",
+          "working_start": 224014.53726594,
+          "event": "span_end",
+          "id": "LWNsnNcvUVXnayQN8GSHxV"
+        },
+        {
+          "uuid": "ZkPSQiL4GruoXsYD8DgkRM",
+          "span_id": "2to9DJKHDzZTfQEQHPYSqG",
+          "timestamp": "2026-09-26T02:52:11.518592+00:00",
+          "working_start": 0.002129380009137094,
+          "event": "span_begin",
+          "id": "2to9DJKHDzZTfQEQHPYSqG",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "ikq7wLWNrmtXivQjUcgPSF",
+          "span_id": "jgbW2tQxztWabDK4KG8JA4",
+          "timestamp": "2026-09-26T02:52:11.518645+00:00",
+          "working_start": 0.002199503011070192,
+          "event": "span_begin",
+          "id": "jgbW2tQxztWabDK4KG8JA4",
+          "parent_id": "2to9DJKHDzZTfQEQHPYSqG",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "XtCPYPiTiRvB4ZRwUwgJkX",
+          "span_id": "jgbW2tQxztWabDK4KG8JA4",
+          "timestamp": "2026-09-26T02:52:11.518813+00:00",
+          "working_start": 0.0023508979938924313,
+          "event": "model",
+          "model": "openai-api/llamacpp/qwen3.8-27b-local",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_tokens": 192,
+            "temperature": 0.0
+          },
+          "output": {
+            "model": "qwen3.8-27b-local",
+            "choices": [
+              {
+                "message": {
+                  "id": "2wWjNJ6dHDiNgRcAVQxwDB",
+                  "content": [
+                    {
+                      "internal": "reasoning_content",
+                      "type": "reasoning",
+                      "reasoning": "attachment://2ed7e778b3c186f1df169bd3ccb1c0e8",
+                      "redacted": false
+                    },
+                    {
+                      "type": "text",
+                      "text": "4"
+                    }
+                  ],
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "qwen3.8-27b-local"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "4",
+            "usage": {
+              "input_tokens": 4,
+              "output_tokens": 35,
+              "total_tokens": 104,
+              "input_tokens_cache_read": 65
+            },
+            "time": 36.22130576899508
+          },
+          "call": {
+            "request": {
+              "tools": null,
+              "tool_choice": null,
+              "extra_headers": {
+                "x-irid": "ZCaTmyTQ9gjHdTC2kMSMBS"
+              },
+              "model": "qwen3.8-27b-local",
+              "max_tokens": 192,
+              "temperature": 0.0
+            },
+            "response": {
+              "id": "chatcmpl-dkd9MiL8I78QvWYqxGF8Hcn3sEDjfGM3",
+              "choices": [
+                {
+                  "finish_reason": "stop",
+                  "index": 0,
+                  "logprobs": null,
+                  "message": {
+                    "content": "4",
+                    "refusal": null,
+                    "role": "assistant",
+                    "annotations": null,
+                    "audio": null,
+                    "function_call": null,
+                    "tool_calls": null,
+                    "reasoning_content": "attachment://2ed7e778b3c186f1df169bd3ccb1c0e8"
+                  }
+                }
+              ],
+              "created": 1790391168,
+              "model": "qwen3.8-27b-local",
+              "object": "chat.completion",
+              "metadata": null,
+              "moderation": null,
+              "service_tier": null,
+              "system_fingerprint": "b11146-7fe450e19",
+              "usage": {
+                "completion_tokens": 35,
+                "prompt_tokens": 69,
+                "total_tokens": 104,
+                "completion_tokens_details": null,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cache_write_tokens": null,
+                  "cached_tokens": 65,
+                  "image_tokens": null,
+                  "text_tokens": null
+                }
+              },
+              "timings": {
+                "cache_n": 65,
+                "prompt_n": 4,
+                "prompt_ms": 2311.628,
+                "prompt_per_token_ms": 577.907,
+                "prompt_per_second": 1.730382224129488,
+                "predicted_n": 35,
+                "predicted_ms": 12405.988,
+                "predicted_per_token_ms": 364.882,
+                "predicted_per_second": 2.7406120334793167
+              }
+            },
+            "time": 36.22130576899508,
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-26T02:52:48.015465+00:00",
+          "working_time": 36.22130576899508
+        },
+        {
+          "uuid": "TQmuVcXMkz2mLtRHaGBDxs",
+          "span_id": "jgbW2tQxztWabDK4KG8JA4",
+          "timestamp": "2026-09-26T02:52:48.015856+00:00",
+          "working_start": 36.224244034994626,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "2wWjNJ6dHDiNgRcAVQxwDB",
+                "content": [
+                  {
+                    "internal": "reasoning_content",
+                    "type": "reasoning",
+                    "reasoning": "attachment://2ed7e778b3c186f1df169bd3ccb1c0e8",
+                    "redacted": false
+                  },
+                  {
+                    "type": "text",
+                    "text": "4"
+                  }
+                ],
+                "source": "generate",
+                "role": "assistant",
+                "model": "qwen3.8-27b-local"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 36.22130576899508
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 4,
+                "output_tokens": 35,
+                "total_tokens": 104,
+                "input_tokens_cache_read": 65
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "2wWjNJ6dHDiNgRcAVQxwDB",
+                  "content": [
+                    {
+                      "internal": "reasoning_content",
+                      "type": "reasoning",
+                      "reasoning": "attachment://2ed7e778b3c186f1df169bd3ccb1c0e8",
+                      "redacted": false
+                    },
+                    {
+                      "type": "text",
+                      "text": "4"
+                    }
+                  ],
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "qwen3.8-27b-local"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "4",
+              "replaced": ""
+            },
+            {
+              "op": "replace",
+              "path": "/output/model",
+              "value": "qwen3.8-27b-local",
+              "replaced": "openai-api/llamacpp/qwen3.8-27b-local"
+            }
+          ]
+        },
+        {
+          "uuid": "U5DA3p6zLpJPQDZUmA8Ffq",
+          "span_id": "jgbW2tQxztWabDK4KG8JA4",
+          "timestamp": "2026-09-26T02:52:48.015937+00:00",
+          "working_start": 36.22432372698677,
+          "event": "span_end",
+          "id": "jgbW2tQxztWabDK4KG8JA4"
+        },
+        {
+          "uuid": "YXgaFjrCibaATcZNieBbK2",
+          "span_id": "2to9DJKHDzZTfQEQHPYSqG",
+          "timestamp": "2026-09-26T02:52:48.015995+00:00",
+          "working_start": 36.224381078995066,
+          "event": "span_end",
+          "id": "2to9DJKHDzZTfQEQHPYSqG"
+        },
+        {
+          "uuid": "9x8X3HRX7jXZNfgzTV9u8H",
+          "span_id": "7KobsPZUT9NFm6iSmjDdde",
+          "timestamp": "2026-09-26T02:52:48.016352+00:00",
+          "working_start": 36.22473871096736,
+          "event": "span_begin",
+          "id": "7KobsPZUT9NFm6iSmjDdde",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "QktRdX6NvFsKGLbqwoiUeo",
+          "span_id": "2dV9WzigPtkp2NgFwy2XYo",
+          "timestamp": "2026-09-26T02:52:48.016413+00:00",
+          "working_start": 36.22479975299211,
+          "event": "span_begin",
+          "id": "2dV9WzigPtkp2NgFwy2XYo",
+          "parent_id": "7KobsPZUT9NFm6iSmjDdde",
+          "type": "scorer",
+          "name": "includes"
+        },
+        {
+          "uuid": "eEEVB3Vmki4CUimJvXQGu5",
+          "span_id": "2dV9WzigPtkp2NgFwy2XYo",
+          "timestamp": "2026-09-26T02:52:48.016479+00:00",
+          "working_start": 36.224865364987636,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "4",
+            "explanation": "4",
+            "history": []
+          },
+          "target": "5",
+          "intermediate": false,
+          "scorer": "includes",
+          "scorer_args": {},
+          "model_usage": {
+            "openai-api/llamacpp/qwen3.8-27b-local": {
+              "input_tokens": 4,
+              "output_tokens": 35,
+              "total_tokens": 104,
+              "input_tokens_cache_read": 65
+            }
+          }
+        },
+        {
+          "uuid": "DkJaq2bBPDroGGfHB3rAjW",
+          "span_id": "2dV9WzigPtkp2NgFwy2XYo",
+          "timestamp": "2026-09-26T02:52:48.016538+00:00",
+          "working_start": 36.22492429698468,
+          "event": "span_end",
+          "id": "2dV9WzigPtkp2NgFwy2XYo"
+        },
+        {
+          "uuid": "kyfVUcW6YzEsKaTmhPpfc3",
+          "span_id": "7KobsPZUT9NFm6iSmjDdde",
+          "timestamp": "2026-09-26T02:52:48.016577+00:00",
+          "working_start": 36.22496313796728,
+          "event": "span_end",
+          "id": "7KobsPZUT9NFm6iSmjDdde"
+        }
+      ],
+      "model_usage": {
+        "openai-api/llamacpp/qwen3.8-27b-local": {
+          "input_tokens": 4,
+          "output_tokens": 35,
+          "total_tokens": 104,
+          "input_tokens_cache_read": 65
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-26T02:52:11.516464+00:00",
+      "completed_at": "2026-09-26T02:52:48.016769+00:00",
+      "total_time": 36.5,
+      "working_time": 36.225,
+      "uuid": "2tYDEzo7sbUDbwrdxmAaHr",
+      "error_retries": [],
+      "attachments": {
+        "2ed7e778b3c186f1df169bd3ccb1c0e8": "We need to respond to user: \"What is 2 plus 2? Reply with only the number, nothing else.\" Final only \"4\".\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "BR9P5GVB29263SHJACqQaK",
+            "content": "What is 2 plus 2? Reply with only the number, nothing else.",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "role": "user",
+            "content": "What is 2 plus 2? Reply with only the number, nothing else."
+          }
+        ]
+      },
+      "turn_count": 1
+    }
+  ],
+  "reductions": [
+    {
+      "scorer": "includes",
+      "samples": [
+        {
+          "value": 1.0,
+          "answer": "12",
+          "explanation": "12",
+          "history": [],
+          "sample_id": "add"
+        },
+        {
+          "value": 1.0,
+          "answer": "paris",
+          "explanation": "Paris",
+          "history": [],
+          "sample_id": "capital"
+        },
+        {
+          "value": 1.0,
+          "answer": "tac",
+          "explanation": "tac",
+          "history": [],
+          "sample_id": "reverse"
+        },
+        {
+          "value": 0.0,
+          "answer": "4",
+          "explanation": "4",
+          "history": [],
+          "sample_id": "wrong_target_control"
+        }
+      ]
+    }
+  ]
+}

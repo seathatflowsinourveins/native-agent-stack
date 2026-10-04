@@ -1,0 +1,218 @@
+{
+  "steps": [
+    {
+      "step": "S0-pre",
+      "utc": "2026-09-26T04:56:49Z",
+      "unit": {
+        "MainPID": "461",
+        "NRestarts": "0",
+        "ExecStart": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+        "ActiveState": "active",
+        "SubState": "running",
+        "ActiveEnterTimestamp": "Thu 2026-09-24 00:23:13 EDT"
+      },
+      "buildinfo": {
+        "version": "3.14.0",
+        "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "branch": "HEAD",
+        "buildUser": "root@f423027f4410",
+        "buildDate": "20260817-16:49:19",
+        "goVersion": "go1.26.6"
+      },
+      "up": [
+        [
+          "alertmanager",
+          "127.0.0.1:19093",
+          "1"
+        ],
+        [
+          "collector-health",
+          "127.0.0.1:28888",
+          "1"
+        ],
+        [
+          "collector-native",
+          "127.0.0.1:28889",
+          "1"
+        ],
+        [
+          "loki",
+          "127.0.0.1:13100",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:19090",
+          "1"
+        ],
+        [
+          "qdrant",
+          "127.0.0.1:26333",
+          "1"
+        ],
+        [
+          "vllm",
+          "127.0.0.1:18231",
+          "1"
+        ]
+      ],
+      "rules": {
+        "groups": 2,
+        "rules": 14,
+        "health": [
+          "ok"
+        ],
+        "firing": [
+          "EcosystemFreeLLMAPIHealthUnexpected",
+          "EcosystemOmniRouteHealthUnexpected"
+        ]
+      },
+      "tsdb_head_series": 9058,
+      "historical_up_6h": {
+        "series": 7,
+        "samples": 511,
+        "sha256": "6a44a254d87d1fad1c91344489c45587877bbda0888bd75313649503d9e939f0"
+      },
+      "runtimeinfo": {
+        "reloadConfigSuccess": true,
+        "storageRetention": "1w or 512MiB",
+        "lastConfigTime": "2026-09-25T21:01:32Z",
+        "startTime": "2026-09-24T04:23:13.541394999Z"
+      }
+    },
+    {
+      "step": "S1-unit-installed",
+      "utc": "2026-09-26T04:56:49Z",
+      "backup": "<scratch>/refresh-20260926/prometheus/cutover/backup/ecosystem-prometheus.service",
+      "mode": "0o644",
+      "sha256_before": "6fcf675deb70797d4bffee63dcce81f034a5d77db553f2ed3011b9e60a09c186",
+      "sha256_after": "626530f6d432bbde74463c7d2358c8a53553d240995ea895f6660f244454eba9"
+    },
+    {
+      "step": "S2-verify",
+      "utc": "2026-09-26T04:56:49Z",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "step": "S2-restart",
+      "utc": "2026-09-26T04:56:50Z",
+      "daemon_reload_exit": 0,
+      "restart_exit": 0,
+      "restart_output": "",
+      "ready_seconds_after_restart_call": 0.86
+    },
+    {
+      "step": "S3-post",
+      "utc": "2026-09-26T04:57:35Z",
+      "unit": {
+        "MainPID": "2097141",
+        "NRestarts": "0",
+        "ExecStart": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus",
+        "ActiveState": "active",
+        "SubState": "running",
+        "ActiveEnterTimestamp": "Sat 2026-09-26 00:56:49 EDT"
+      },
+      "buildinfo": {
+        "version": "3.15.0",
+        "revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+        "branch": "HEAD",
+        "buildUser": "root@4635dd007a60",
+        "buildDate": "20260925-07:33:45",
+        "goVersion": "go1.27.1"
+      },
+      "up": [
+        [
+          "alertmanager",
+          "127.0.0.1:19093",
+          "1"
+        ],
+        [
+          "collector-health",
+          "127.0.0.1:28888",
+          "1"
+        ],
+        [
+          "collector-native",
+          "127.0.0.1:28889",
+          "1"
+        ],
+        [
+          "loki",
+          "127.0.0.1:13100",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:19090",
+          "1"
+        ],
+        [
+          "qdrant",
+          "127.0.0.1:26333",
+          "1"
+        ],
+        [
+          "vllm",
+          "127.0.0.1:18231",
+          "1"
+        ]
+      ],
+      "rules": {
+        "groups": 2,
+        "rules": 14,
+        "health": [
+          "ok"
+        ],
+        "firing": []
+      },
+      "tsdb_head_series": 9112,
+      "historical_up_6h": {
+        "series": 7,
+        "samples": 511,
+        "sha256": "6a44a254d87d1fad1c91344489c45587877bbda0888bd75313649503d9e939f0"
+      },
+      "runtimeinfo": {
+        "reloadConfigSuccess": true,
+        "storageRetention": "1w or 512MiB",
+        "lastConfigTime": "2026-09-26T04:56:50Z",
+        "startTime": "2026-09-26T04:56:49.909987988Z"
+      }
+    },
+    {
+      "step": "S3-journal",
+      "utc": "2026-09-26T04:57:35Z",
+      "lines": 63,
+      "errors": [],
+      "warnings": [
+        "time=2026-09-26T00:56:49.763-04:00 level=WARN source=main.go:1249 msg=\"Received an OS signal, exiting gracefully...\" signal=terminated"
+      ]
+    },
+    {
+      "step": "S3-compare",
+      "utc": "2026-09-26T04:57:35Z",
+      "version_after": "3.15.0",
+      "revision_after": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "up_jobs_instances_equal": true,
+      "up_all_one_after": true,
+      "rules_count_equal": true,
+      "rules_health_after": [
+        "ok"
+      ],
+      "historical_equal": true,
+      "main_pid_changed": true
+    },
+    {
+      "step": "S4-bin-links",
+      "utc": "2026-09-26T04:57:35Z",
+      "prometheus": {
+        "before": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+        "after": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+      },
+      "promtool": {
+        "before": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool",
+        "after": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool"
+      }
+    }
+  ]
+}

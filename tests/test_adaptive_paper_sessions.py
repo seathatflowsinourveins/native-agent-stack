@@ -1045,32 +1045,26 @@ class HaltStateFromStatusMessages(unittest.TestCase):
         self.quote()
         self.assertTrue(self.controller.quotes["SPY"].halted)
 
-    def test_a_stale_luld_seed_expires_so_it_cannot_block_the_symbol_for_the_session(self):
-        # A3: the pause resumed before the engine subscribed, but the lagging feed still shows
-        # it and the stream sends changes only, so no status follows. The seed stops counting
-        # 12 minutes after the pause began; until then the symbol gets no order at all.
-        self.clock_at(70)
+    def test_luld_seed_without_resumption_stays_halted_beyond_twelve_minutes(self):
+        self.clock_at(10 + 11 * 60)
         self.quote()
         self.run_seed(self.luld_seed())
         self.assertTrue(self.halted())
         self.assertTrue(self.controller.quotes["SPY"].halted)
-        expires = self.ts(10) + 12 * 60 * 10 ** 9
-        summary = self.controller.halt_summary()
-        self.assertEqual(summary["seed"]["expiry"], {"SPY": {"expires_ns": expires, "basis": "luld_pause_bound"}})
-        self.assertEqual(summary["seeded_only"], {"SPY": {"expires_ns": expires, "basis": "luld_pause_bound"}})
-        self.assertEqual(self.controller.halt_states["SPY"]["expires_ns"], expires)
         self.clock_at(10 + 12 * 60 - 1)
         self.assertTrue(self.halted())
-        self.clock_at(10 + 12 * 60)
+        for elapsed in (12 * 60, 30 * 60, 6 * 3600):
+            self.clock_at(10 + elapsed)
+            self.assertTrue(self.halted())
+            self.assertTrue(self.controller.quotes["SPY"].halted)
+        summary = self.controller.halt_summary()
+        self.assertEqual(summary["seeded_only"], {"SPY": {"expires_ns": None, "basis": None}})
+        self.assertFalse(any(event.get("effect") == "seed_expired" for event in self.controller.events))
+        self.controller.trading_status({"symbol": "SPY", "halted": False, "state": "trading",
+                                       "ts_ns": self.ts(11) + 6 * 3600 * 10 ** 9})
         self.assertFalse(self.halted())
-        self.assertFalse(self.controller.quotes["SPY"].halted)      # entries resume as well
-        self.assertEqual(self.controller.halt_states["SPY"]["state"], "seed_expired")
-        expired = self.controller.events[-1]
-        self.assertEqual((expired["effect"], expired["basis"], expired["ts_ns"]),
-                         ("seed_expired", "luld_pause_bound", expires))
+        self.assertFalse(self.controller.quotes["SPY"].halted)
         self.assertEqual(self.controller.halt_summary()["seeded_only"], {})
-        self.send("SPY", "H", 30, rc="T1")      # a streamed halt newer than the seed still applies
-        self.assertTrue(self.halted())
 
     def test_a_seeded_halt_expires_at_its_resumption_trade_time(self):
         self.clock_at(20)
@@ -1092,14 +1086,14 @@ class HaltStateFromStatusMessages(unittest.TestCase):
         self.send("SPY", "T", 50)
         self.assertFalse(self.halted())
 
-    def test_a_seed_row_already_past_its_expiry_is_not_applied(self):
-        # A prior day's pause whose row kept no resumption time.
+    def test_old_luld_seed_without_resumption_is_still_applied(self):
+        # An old halt with no authoritative resumption remains unresolved.
         self.clock_at(20)
         self.run_seed(self.luld_seed(halted_at=self.ts(10) - 24 * 3600 * 10 ** 9))
-        self.assertFalse(self.halted())
+        self.assertTrue(self.halted())
         self.assertEqual((self.controller.halt_seed["applied"], self.controller.halt_seed["expired_on_arrival"]),
-                         ([], ["SPY"]))
-        self.assertNotIn("SPY", self.controller.halt_states)
+                         (["SPY"], []))
+        self.assertTrue(self.controller.halt_states["SPY"]["halted"])
 
     def test_a_non_luld_seed_without_a_resumption_time_lasts_until_a_status_arrives(self):
         self.clock_at(20)

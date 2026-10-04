@@ -1,0 +1,61 @@
+{
+  "profiles": [
+    {
+      "name": "WSL - Shell",
+      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <PROJECT> --exec /bin/bash -lc \"exec /bin/bash -l\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "suppressApplicationTitle": true,
+      "tabTitle": "WSL - Shell",
+      "tabColor": "#3B8065",
+      "bellStyle": ["taskbar"],
+      "closeOnExit": "graceful"
+    },
+    {
+      "name": "WSL - Codex",
+      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <PROJECT> --exec /bin/bash -lc \"exec codex\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "tabTitle": "WSL - Codex",
+      "tabColor": "#4C78A8",
+      "bellStyle": ["audible", "taskbar"],
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "closeOnExit": "graceful"
+    },
+    {
+      "name": "WSL - Codex - resume",
+      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <PROJECT> --exec /bin/bash -lc \"exec codex resume\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "tabTitle": "WSL - Codex (resume)",
+      "tabColor": "#4C78A8",
+      "bellStyle": ["audible", "taskbar"],
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "closeOnExit": "graceful"
+    },
+    {
+      "name": "WSL - Claude",
+      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <PROJECT> --exec /bin/bash -lc \"exec claude\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "environment": { "COLORTERM": "truecolor" },
+      "tabTitle": "WSL - Claude",
+      "tabColor": "#B87645",
+      "bellStyle": ["audible", "taskbar"],
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "closeOnExit": "graceful"
+    },
+    {
+      "name": "WSL - Claude - resume",
+      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <PROJECT> --exec /bin/bash -lc \"exec claude --resume\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "environment": { "COLORTERM": "truecolor" },
+      "tabTitle": "WSL - Claude (resume)",
+      "tabColor": "#B87645",
+      "bellStyle": ["audible", "taskbar"],
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "closeOnExit": "graceful"
+    }
+  ]
+}

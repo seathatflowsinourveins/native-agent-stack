@@ -1,0 +1,2930 @@
+{
+ "schema": "token-e2e-oracle-controls/1",
+ "controls": [
+  {
+   "id": "T1-right",
+   "class": "A",
+   "template": "T1",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "docs/h.md",
+    "heading_count": 4,
+    "first_ten": [
+     "Alpha topic",
+     "Beta topic",
+     "Gamma topic",
+     "Delta topic"
+    ],
+    "token_lines": {
+     "whole_word": 6,
+     "substring": 9,
+     "alnum_boundary": 7
+    }
+   },
+   "answer": "Second-level headings: 4\n1. Alpha topic\n2. Beta topic\n3. Gamma topic\n4. Delta topic\nLines containing the word token: 6",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T1-order",
+   "class": "A",
+   "template": "T1",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "docs/h.md",
+    "heading_count": 4,
+    "first_ten": [
+     "Alpha topic",
+     "Beta topic",
+     "Gamma topic",
+     "Delta topic"
+    ],
+    "token_lines": {
+     "whole_word": 6,
+     "substring": 9,
+     "alnum_boundary": 7
+    }
+   },
+   "answer": "Second-level headings: 4\n1. Beta topic\n2. Alpha topic\n3. Gamma topic\n4. Delta topic\nLines containing the word token: 6",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "headings_order"
+    ]
+   }
+  },
+  {
+   "id": "T1-count",
+   "class": "A",
+   "template": "T1",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "docs/h.md",
+    "heading_count": 4,
+    "first_ten": [
+     "Alpha topic",
+     "Beta topic",
+     "Gamma topic",
+     "Delta topic"
+    ],
+    "token_lines": {
+     "whole_word": 6,
+     "substring": 9,
+     "alnum_boundary": 7
+    }
+   },
+   "answer": "Second-level headings: 5\n1. Alpha topic\n2. Beta topic\n3. Gamma topic\n4. Delta topic\nLines containing the word token: 6",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "heading_count"
+    ]
+   }
+  },
+  {
+   "id": "T1-token",
+   "class": "A",
+   "template": "T1",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "docs/h.md",
+    "heading_count": 4,
+    "first_ten": [
+     "Alpha topic",
+     "Beta topic",
+     "Gamma topic",
+     "Delta topic"
+    ],
+    "token_lines": {
+     "whole_word": 6,
+     "substring": 9,
+     "alnum_boundary": 7
+    }
+   },
+   "answer": "Second-level headings: 4\n1. Alpha topic\n2. Beta topic\n3. Gamma topic\n4. Delta topic\nLines containing the word token: 9",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "token_lines"
+    ]
+   }
+  },
+  {
+   "id": "T1-missing",
+   "class": "A",
+   "template": "T1",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "docs/h.md",
+    "heading_count": 4,
+    "first_ten": [
+     "Alpha topic",
+     "Beta topic",
+     "Gamma topic",
+     "Delta topic"
+    ],
+    "token_lines": {
+     "whole_word": 6,
+     "substring": 9,
+     "alnum_boundary": 7
+    }
+   },
+   "answer": "Second-level headings: 4\n1. Alpha topic\n2. Beta topic\n4. Delta topic\nLines containing the word token: 6",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "headings_missing"
+    ]
+   }
+  },
+  {
+   "id": "T2-right",
+   "class": "A",
+   "template": "T2",
+   "component": "A",
+   "params": {},
+   "key": {
+    "sha256": "abababababababababababababababababababababababababababababababab",
+    "bytes": 891615
+   },
+   "answer": "Recovered original sha256 abababababababababababababababababababababababababababababababab, 891,615 bytes: match.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T2-bytes",
+   "class": "A",
+   "template": "T2",
+   "component": "A",
+   "params": {},
+   "key": {
+    "sha256": "abababababababababababababababababababababababababababababababab",
+    "bytes": 891615
+   },
+   "answer": "Recovered original sha256 abababababababababababababababababababababababababababababababab, 891,614 bytes: match.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "bytes"
+    ]
+   }
+  },
+  {
+   "id": "T2-digest",
+   "class": "A",
+   "template": "T2",
+   "component": "A",
+   "params": {},
+   "key": {
+    "sha256": "abababababababababababababababababababababababababababababababab",
+    "bytes": 891615
+   },
+   "answer": "Recovered original sha256 cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd, 891,615 bytes: match.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "sha256"
+    ]
+   }
+  },
+  {
+   "id": "T3-right",
+   "class": "A",
+   "template": "T3",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "scripts/host_receipts.py",
+    "lineno": 10,
+    "end_lineno": 12,
+    "segment": "def register_file(path):\n    return path\n",
+    "def_line": "def register_file(path):"
+   },
+   "answer": "scripts/host_receipts.py:10-12\n```python\ndef register_file(path):\n    return path\n```",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T3-def-line-only",
+   "class": "A",
+   "template": "T3",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "scripts/host_receipts.py",
+    "lineno": 10,
+    "end_lineno": 12,
+    "segment": "def register_file(path):\n    return path\n",
+    "def_line": "def register_file(path):"
+   },
+   "answer": "`def register_file(path):` at scripts/host_receipts.py:10-12",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "definition_text"
+    ]
+   }
+  },
+  {
+   "id": "T3-wrong-lines",
+   "class": "A",
+   "template": "T3",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "scripts/host_receipts.py",
+    "lineno": 10,
+    "end_lineno": 12,
+    "segment": "def register_file(path):\n    return path\n",
+    "def_line": "def register_file(path):"
+   },
+   "answer": "scripts/host_receipts.py:1-3\n```python\ndef register_file(path):\n    return path\n```",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "definition_location"
+    ]
+   }
+  },
+  {
+   "id": "T4-right",
+   "class": "A",
+   "template": "T4",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "adoption/update.md says a new machine pins a release with source.release_tag and source.release_commit (bootstrap step 0 in adoption/bootstrap.md).",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T4-other-document",
+   "class": "A",
+   "template": "T4",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "docs/other.md says a new machine pins a release with source.release_tag.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T5-right",
+   "class": "A",
+   "template": "T5",
+   "component": "A",
+   "params": {},
+   "key": {
+    "symbol": "register_file",
+    "def": [
+     "scripts/host_receipts.py",
+     1,
+     3
+    ],
+    "name_calls": [
+     [
+      "scripts/a.py",
+      12
+     ],
+     [
+      "scripts/b.py",
+      30
+     ]
+    ],
+    "attr_calls": [
+     [
+      "scripts/c.py",
+      7
+     ]
+    ],
+    "imports": [
+     [
+      "scripts/d.py",
+      2
+     ]
+    ],
+    "mentions": [
+     [
+      "scripts/e.py",
+      5
+     ]
+    ]
+   },
+   "answer": "register_file is defined at scripts/host_receipts.py:1-3.\nInvocations: scripts/a.py:12 and scripts/b.py:30.\nNot invocations: the attribute call scripts/c.py:7, the import scripts/d.py:2 and the comment scripts/e.py:5.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T5-missing-site",
+   "class": "A",
+   "template": "T5",
+   "component": "A",
+   "params": {},
+   "key": {
+    "symbol": "register_file",
+    "def": [
+     "scripts/host_receipts.py",
+     1,
+     3
+    ],
+    "name_calls": [
+     [
+      "scripts/a.py",
+      12
+     ],
+     [
+      "scripts/b.py",
+      30
+     ]
+    ],
+    "attr_calls": [
+     [
+      "scripts/c.py",
+      7
+     ]
+    ],
+    "imports": [
+     [
+      "scripts/d.py",
+      2
+     ]
+    ],
+    "mentions": [
+     [
+      "scripts/e.py",
+      5
+     ]
+    ]
+   },
+   "answer": "register_file is defined at scripts/host_receipts.py:1-3.\nInvocations: scripts/a.py:12.\nNot invocations: the attribute call scripts/c.py:7, the import scripts/d.py:2 and the comment scripts/e.py:5.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "sites_missing"
+    ]
+   }
+  },
+  {
+   "id": "T5-attribute-call-counted",
+   "class": "A",
+   "template": "T5",
+   "component": "A",
+   "params": {},
+   "key": {
+    "symbol": "register_file",
+    "def": [
+     "scripts/host_receipts.py",
+     1,
+     3
+    ],
+    "name_calls": [
+     [
+      "scripts/a.py",
+      12
+     ],
+     [
+      "scripts/b.py",
+      30
+     ]
+    ],
+    "attr_calls": [
+     [
+      "scripts/c.py",
+      7
+     ]
+    ],
+    "imports": [
+     [
+      "scripts/d.py",
+      2
+     ]
+    ],
+    "mentions": [
+     [
+      "scripts/e.py",
+      5
+     ]
+    ]
+   },
+   "answer": "register_file is defined at scripts/host_receipts.py:1-3.\nInvocations: scripts/a.py:12, scripts/b.py:30 and scripts/c.py:7.\nNot invocations: the attribute call scripts/c.py:7, the import scripts/d.py:2 and the comment scripts/e.py:5.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "site_excluded"
+    ]
+   }
+  },
+  {
+   "id": "T6-right",
+   "class": "A",
+   "template": "T6",
+   "component": "A",
+   "params": {},
+   "key": {
+    "function": "trust",
+    "path": "scripts/hr.py",
+    "lineno": 1,
+    "end_lineno": 6,
+    "segment": "def trust(item):\n    if item.get(\"author_association\") != \"OWNER\":\n        return False\n    if item[\"user\"][\"type\"] != \"User\":\n        return False\n    return True",
+    "conditions": [
+     "author_association",
+     "user.type",
+     "performed_via_github_app",
+     "repository_owner"
+    ],
+    "files": {
+     "scripts/hr.py": [
+      "def trust(item):",
+      "    if item.get(\"author_association\") != \"OWNER\":",
+      "        return False",
+      "    if item[\"user\"][\"type\"] != \"User\":",
+      "        return False",
+      "    return True"
+     ],
+     "recipes/x.md": [
+      "The tracker trusts an issue only when the owner wrote it."
+     ]
+    }
+   },
+   "answer": "trust() (scripts/hr.py:2 `if item.get(\"author_association\") != \"OWNER\":`) requires author_association OWNER, user.type User, no GitHub App (performed_via_github_app null) and the repository_owner as author.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T6-quote-not-in-source",
+   "class": "A",
+   "template": "T6",
+   "component": "A",
+   "params": {},
+   "key": {
+    "function": "trust",
+    "path": "scripts/hr.py",
+    "lineno": 1,
+    "end_lineno": 6,
+    "segment": "def trust(item):\n    if item.get(\"author_association\") != \"OWNER\":\n        return False\n    if item[\"user\"][\"type\"] != \"User\":\n        return False\n    return True",
+    "conditions": [
+     "author_association",
+     "user.type",
+     "performed_via_github_app",
+     "repository_owner"
+    ],
+    "files": {
+     "scripts/hr.py": [
+      "def trust(item):",
+      "    if item.get(\"author_association\") != \"OWNER\":",
+      "        return False",
+      "    if item[\"user\"][\"type\"] != \"User\":",
+      "        return False",
+      "    return True"
+     ],
+     "recipes/x.md": [
+      "The tracker trusts an issue only when the owner wrote it."
+     ]
+    }
+   },
+   "answer": "trust() (scripts/hr.py:2 `if item.get(\"author_association\") != \"MEMBER\":`) requires author_association OWNER, user.type User, no GitHub App (performed_via_github_app null) and the repository_owner as author.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_unresolved"
+    ]
+   }
+  },
+  {
+   "id": "T6-no-citation",
+   "class": "A",
+   "template": "T6",
+   "component": "A",
+   "params": {},
+   "key": {
+    "function": "trust",
+    "path": "scripts/hr.py",
+    "lineno": 1,
+    "end_lineno": 6,
+    "segment": "def trust(item):\n    if item.get(\"author_association\") != \"OWNER\":\n        return False\n    if item[\"user\"][\"type\"] != \"User\":\n        return False\n    return True",
+    "conditions": [
+     "author_association",
+     "user.type",
+     "performed_via_github_app",
+     "repository_owner"
+    ],
+    "files": {
+     "scripts/hr.py": [
+      "def trust(item):",
+      "    if item.get(\"author_association\") != \"OWNER\":",
+      "        return False",
+      "    if item[\"user\"][\"type\"] != \"User\":",
+      "        return False",
+      "    return True"
+     ],
+     "recipes/x.md": [
+      "The tracker trusts an issue only when the owner wrote it."
+     ]
+    }
+   },
+   "answer": "The lane checks author_association, user.type, performed_via_github_app and repository_owner.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T7-right",
+   "class": "A",
+   "template": "T7",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "The earlier decision matches recipes/host-request-lane.md.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T7-no-recipe",
+   "class": "A",
+   "template": "T7",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "The earlier decision says the lane trusts the owner.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T8-right",
+   "class": "A",
+   "template": "T8",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "scripts/hr.py",
+    "names": [
+     "alpha",
+     "beta",
+     "gamma"
+    ],
+    "distractors": [
+     "__init__"
+    ]
+   },
+   "answer": "3 total: alpha, beta, gamma",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T8-count",
+   "class": "A",
+   "template": "T8",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "scripts/hr.py",
+    "names": [
+     "alpha",
+     "beta",
+     "gamma"
+    ],
+    "distractors": [
+     "__init__"
+    ]
+   },
+   "answer": "4 total: alpha, beta, gamma",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "count"
+    ]
+   }
+  },
+  {
+   "id": "T8-distractor",
+   "class": "A",
+   "template": "T8",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "scripts/hr.py",
+    "names": [
+     "alpha",
+     "beta",
+     "gamma"
+    ],
+    "distractors": [
+     "__init__"
+    ]
+   },
+   "answer": "alpha, beta, gamma, __init__",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "name_excluded"
+    ]
+   }
+  },
+  {
+   "id": "T8-missing-name",
+   "class": "A",
+   "template": "T8",
+   "component": "A",
+   "params": {},
+   "key": {
+    "path": "scripts/hr.py",
+    "names": [
+     "alpha",
+     "beta",
+     "gamma"
+    ],
+    "distractors": [
+     "__init__"
+    ]
+   },
+   "answer": "alpha, beta",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "names_missing"
+    ]
+   }
+  },
+  {
+   "id": "T9-right",
+   "class": "A",
+   "template": "T9",
+   "component": "A",
+   "params": {},
+   "key": {
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "bytes": 1,
+    "record_count": 3,
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T9-wrong-record",
+   "class": "A",
+   "template": "T9",
+   "component": "A",
+   "params": {},
+   "key": {
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "bytes": 1,
+    "record_count": 3,
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"x\"}, {\"id\": 3, \"v\": \"c\"}]\n```",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "records"
+    ]
+   }
+  },
+  {
+   "id": "T10-right",
+   "class": "A",
+   "template": "T10",
+   "component": "A",
+   "params": {},
+   "key": {
+    "count": 3,
+    "files": 2,
+    "sites": [
+     [
+      "scripts/a.py",
+      5
+     ],
+     [
+      "scripts/a.py",
+      9
+     ],
+     [
+      "scripts/b.py",
+      2
+     ]
+    ]
+   },
+   "answer": "Total subprocess.run calls: 3 in 2 files.\nscripts/a.py:5\nscripts/a.py:9\nscripts/b.py:2",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T10-count",
+   "class": "A",
+   "template": "T10",
+   "component": "A",
+   "params": {},
+   "key": {
+    "count": 3,
+    "files": 2,
+    "sites": [
+     [
+      "scripts/a.py",
+      5
+     ],
+     [
+      "scripts/a.py",
+      9
+     ],
+     [
+      "scripts/b.py",
+      2
+     ]
+    ]
+   },
+   "answer": "Total subprocess.run calls: 4 in 2 files.\nscripts/a.py:5\nscripts/a.py:9\nscripts/b.py:2",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "count"
+    ]
+   }
+  },
+  {
+   "id": "T16-right",
+   "class": "A",
+   "template": "T16",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 60\nSource: pathlib.Path.read_text(encoding=...) at https://docs.python.org/3/library/pathlib.html and json at https://docs.python.org/3/library/json.html",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T16-sum",
+   "class": "A",
+   "template": "T16",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 61\nSource: pathlib.Path.read_text(encoding=...) at https://docs.python.org/3/library/pathlib.html and json at https://docs.python.org/3/library/json.html",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "latency_sum"
+    ]
+   }
+  },
+  {
+   "id": "T16-no-citation",
+   "class": "A",
+   "template": "T16",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 60\n",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T17-right",
+   "class": "A",
+   "template": "T17",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 60\nSource: pathlib.Path.read_text(encoding=...) at https://docs.python.org/3/library/pathlib.html and json at https://docs.python.org/3/library/json.html",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T17-sum",
+   "class": "A",
+   "template": "T17",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 61\nSource: pathlib.Path.read_text(encoding=...) at https://docs.python.org/3/library/pathlib.html and json at https://docs.python.org/3/library/json.html",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "latency_sum"
+    ]
+   }
+  },
+  {
+   "id": "T17-no-citation",
+   "class": "A",
+   "template": "T17",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 60\n",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T18-right",
+   "class": "A",
+   "template": "T18",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 60\nSource: pathlib.Path.read_text(encoding=...) at https://docs.python.org/3/library/pathlib.html and json at https://docs.python.org/3/library/json.html",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T18-sum",
+   "class": "A",
+   "template": "T18",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 61\nSource: pathlib.Path.read_text(encoding=...) at https://docs.python.org/3/library/pathlib.html and json at https://docs.python.org/3/library/json.html",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "latency_sum"
+    ]
+   }
+  },
+  {
+   "id": "T18-no-citation",
+   "class": "A",
+   "template": "T18",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 60\n",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T19-right",
+   "class": "A",
+   "template": "T19",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 60\nSource: pathlib.Path.read_text(encoding=...) at https://docs.python.org/3/library/pathlib.html and json at https://docs.python.org/3/library/json.html",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T19-sum",
+   "class": "A",
+   "template": "T19",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 61\nSource: pathlib.Path.read_text(encoding=...) at https://docs.python.org/3/library/pathlib.html and json at https://docs.python.org/3/library/json.html",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "latency_sum"
+    ]
+   }
+  },
+  {
+   "id": "T19-no-citation",
+   "class": "A",
+   "template": "T19",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 60\n",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T20-right",
+   "class": "A",
+   "template": "T20",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 60\nSource: pathlib.Path.read_text(encoding=...) at https://docs.python.org/3/library/pathlib.html and json at https://docs.python.org/3/library/json.html",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T20-sum",
+   "class": "A",
+   "template": "T20",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 61\nSource: pathlib.Path.read_text(encoding=...) at https://docs.python.org/3/library/pathlib.html and json at https://docs.python.org/3/library/json.html",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "latency_sum"
+    ]
+   }
+  },
+  {
+   "id": "T20-no-citation",
+   "class": "A",
+   "template": "T20",
+   "component": "A",
+   "params": {
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "key": {
+    "records": [
+     {
+      "id": 1,
+      "v": "a"
+     },
+     {
+      "id": 2,
+      "v": "b"
+     },
+     {
+      "id": 3,
+      "v": "c"
+     }
+    ],
+    "latency_sum": 60,
+    "range": [
+     1,
+     3
+    ],
+    "urls": [
+     "https://docs.python.org/3/library/json.html",
+     "https://docs.python.org/3/library/pathlib.html"
+    ]
+   },
+   "answer": "```json\n[{\"id\": 1, \"v\": \"a\"}, {\"id\": 2, \"v\": \"b\"}, {\"id\": 3, \"v\": \"c\"}]\n```\nLatency sum: 60\n",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T21-right",
+   "class": "A",
+   "template": "T21",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "Per catalogs/us-equities/README.md and docs/harness-defaults.md: NautilusTrader, 2.0.0rc5, IBKR, Alpaca.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T21-no-catalog",
+   "class": "A",
+   "template": "T21",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "According to docs/harness-defaults.md, NautilusTrader, 2.0.0rc5, IBKR, Alpaca.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T22-right",
+   "class": "A",
+   "template": "T22",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "Per catalogs/us-equities/agents-operations.md and docs/harness-defaults.md: native_proven.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T22-no-catalog",
+   "class": "A",
+   "template": "T22",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "According to docs/harness-defaults.md, native_proven.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T23-right",
+   "class": "A",
+   "template": "T23",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "Per catalogs/us-equities/lifecycle-source-review.md and docs/harness-defaults.md: META, METV.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T23-no-catalog",
+   "class": "A",
+   "template": "T23",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "According to docs/harness-defaults.md, META, METV.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T24-right",
+   "class": "A",
+   "template": "T24",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "Per catalogs/us-equities/native-workflows.md and docs/harness-defaults.md: us-equities-catalog, us-equities-foundation.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T24-no-catalog",
+   "class": "A",
+   "template": "T24",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "According to docs/harness-defaults.md, us-equities-catalog, us-equities-foundation.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T25-right",
+   "class": "A",
+   "template": "T25",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "Per catalogs/us-equities/foundation-memory.md and docs/harness-defaults.md: primary memory store, retrieval lane.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T25-no-catalog",
+   "class": "A",
+   "template": "T25",
+   "component": "A",
+   "params": {},
+   "key": {},
+   "answer": "According to docs/harness-defaults.md, primary memory store, retrieval lane.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "citation_missing"
+    ]
+   }
+  },
+  {
+   "id": "T26-right",
+   "class": "A",
+   "template": "T26",
+   "component": "A",
+   "params": {},
+   "key": {
+    "symbol": "register_file",
+    "def": [
+     "scripts/host_receipts.py",
+     1,
+     3
+    ],
+    "range": [
+     1,
+     10
+    ],
+    "error_events": [
+     3,
+     7
+    ],
+    "value_sum": 22,
+    "name_calls": [
+     [
+      "scripts/a.py",
+      12
+     ],
+     [
+      "scripts/b.py",
+      30
+     ]
+    ],
+    "attr_calls": [],
+    "imports": [],
+    "mentions": []
+   },
+   "answer": "ERROR events: 3, 7. Sum: 22.\nDefinition: scripts/host_receipts.py:1-3.\nInvocations: scripts/a.py:12 and scripts/b.py:30.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T26-sum",
+   "class": "A",
+   "template": "T26",
+   "component": "A",
+   "params": {},
+   "key": {
+    "symbol": "register_file",
+    "def": [
+     "scripts/host_receipts.py",
+     1,
+     3
+    ],
+    "range": [
+     1,
+     10
+    ],
+    "error_events": [
+     3,
+     7
+    ],
+    "value_sum": 22,
+    "name_calls": [
+     [
+      "scripts/a.py",
+      12
+     ],
+     [
+      "scripts/b.py",
+      30
+     ]
+    ],
+    "attr_calls": [],
+    "imports": [],
+    "mentions": []
+   },
+   "answer": "ERROR events: 3, 7. Sum: 23.\nDefinition: scripts/host_receipts.py:1-3.\nInvocations: scripts/a.py:12 and scripts/b.py:30.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "value_sum"
+    ]
+   }
+  },
+  {
+   "id": "T26-missing-site",
+   "class": "A",
+   "template": "T26",
+   "component": "A",
+   "params": {},
+   "key": {
+    "symbol": "register_file",
+    "def": [
+     "scripts/host_receipts.py",
+     1,
+     3
+    ],
+    "range": [
+     1,
+     10
+    ],
+    "error_events": [
+     3,
+     7
+    ],
+    "value_sum": 22,
+    "name_calls": [
+     [
+      "scripts/a.py",
+      12
+     ],
+     [
+      "scripts/b.py",
+      30
+     ]
+    ],
+    "attr_calls": [],
+    "imports": [],
+    "mentions": []
+   },
+   "answer": "ERROR events: 3, 7. Sum: 22.\nDefinition: scripts/host_receipts.py:1-3.\nInvocations: scripts/a.py:12.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "sites_missing"
+    ]
+   }
+  },
+  {
+   "id": "T27-right",
+   "class": "A",
+   "template": "T27",
+   "component": "A",
+   "params": {
+    "partition": 2
+   },
+   "key": {
+    "partition": 2,
+    "fixture_bytes": 84003,
+    "rows": 640,
+    "error_rows": 10,
+    "wc_l": 640,
+    "ls": [
+     "events.jsonl",
+     "table.json"
+    ],
+    "summary": "PASS partition 2"
+   },
+   "answer": "ls: events.jsonl, table.json; wc -l: 640. Acceptance exit code 0, final summary: PASS partition 2",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T27-summary",
+   "class": "A",
+   "template": "T27",
+   "component": "A",
+   "params": {
+    "partition": 2
+   },
+   "key": {
+    "partition": 2,
+    "fixture_bytes": 84003,
+    "rows": 640,
+    "error_rows": 10,
+    "wc_l": 640,
+    "ls": [
+     "events.jsonl",
+     "table.json"
+    ],
+    "summary": "PASS partition 2"
+   },
+   "answer": "ls: events.jsonl, table.json; wc -l: 640. Acceptance exit code 0, final summary: PASS partition 3",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "summary_literal"
+    ]
+   }
+  },
+  {
+   "id": "T28-right",
+   "class": "A",
+   "template": "T28",
+   "component": "A",
+   "params": {},
+   "key": {
+    "bytes": 52631,
+    "files": [
+     "run.py"
+    ],
+    "hunks": 31,
+    "added": 166,
+    "deleted": 581
+   },
+   "answer": "Changed file: run.py. 31 hunks, 166 added lines and 581 deleted lines.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T28-hunks",
+   "class": "A",
+   "template": "T28",
+   "component": "A",
+   "params": {},
+   "key": {
+    "bytes": 52631,
+    "files": [
+     "run.py"
+    ],
+    "hunks": 31,
+    "added": 166,
+    "deleted": 581
+   },
+   "answer": "Changed file: run.py. 30 hunks, 166 added lines and 581 deleted lines.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "hunks"
+    ]
+   }
+  },
+  {
+   "id": "T29-right",
+   "class": "A",
+   "template": "T29",
+   "component": "A",
+   "params": {},
+   "key": {
+    "function": "greeting",
+    "before_lines": 2,
+    "after_lines": 2
+   },
+   "answer": "Both files define greeting; each has two lines.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T29-lines",
+   "class": "A",
+   "template": "T29",
+   "component": "A",
+   "params": {},
+   "key": {
+    "function": "greeting",
+    "before_lines": 2,
+    "after_lines": 2
+   },
+   "answer": "Both files define greeting; before.py has 2 lines and after.py has 3 lines.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "line_count"
+    ]
+   }
+  },
+  {
+   "id": "T32-right",
+   "class": "A",
+   "template": "T32",
+   "component": "A",
+   "params": {},
+   "key": {
+    "record_id": 3,
+    "verdict": "yes",
+    "latency_ms": 18
+   },
+   "answer": "Verdict: yes. id 3, latency 18 ms.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T32-latency",
+   "class": "A",
+   "template": "T32",
+   "component": "A",
+   "params": {},
+   "key": {
+    "record_id": 3,
+    "verdict": "yes",
+    "latency_ms": 18
+   },
+   "answer": "Verdict: yes. id 3, latency 17 ms.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "latency"
+    ]
+   }
+  },
+  {
+   "id": "T32-verdict",
+   "class": "A",
+   "template": "T32",
+   "component": "A",
+   "params": {},
+   "key": {
+    "record_id": 3,
+    "verdict": "yes",
+    "latency_ms": 18
+   },
+   "answer": "Verdict: no. id 3, latency 18 ms.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "verdict"
+    ]
+   }
+  },
+  {
+   "id": "T33-right",
+   "class": "A",
+   "template": "T33",
+   "component": "A",
+   "params": {},
+   "key": {
+    "events": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "levels": [
+     "INFO",
+     "INFO",
+     "INFO",
+     "INFO",
+     "INFO"
+    ],
+    "file_bytes": 84003
+   },
+   "answer": "Events [1, 2, 3, 4, 5], all INFO.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T33-events",
+   "class": "A",
+   "template": "T33",
+   "component": "A",
+   "params": {},
+   "key": {
+    "events": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "levels": [
+     "INFO",
+     "INFO",
+     "INFO",
+     "INFO",
+     "INFO"
+    ],
+    "file_bytes": 84003
+   },
+   "answer": "Events [1, 2, 3, 4, 6], all INFO.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "events"
+    ]
+   }
+  },
+  {
+   "id": "T34-right",
+   "class": "A",
+   "template": "T34",
+   "component": "A",
+   "params": {},
+   "key": {
+    "count": 10
+   },
+   "answer": "10",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T34-wrong",
+   "class": "A",
+   "template": "T34",
+   "component": "A",
+   "params": {},
+   "key": {
+    "count": 10
+   },
+   "answer": "9",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "count"
+    ]
+   }
+  },
+  {
+   "id": "T35-right",
+   "class": "A",
+   "template": "T35",
+   "component": "A",
+   "params": {},
+   "key": {
+    "first": 64,
+    "last": 640
+   },
+   "answer": "First 64 and last 640.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T35-last",
+   "class": "A",
+   "template": "T35",
+   "component": "A",
+   "params": {},
+   "key": {
+    "first": 64,
+    "last": 640
+   },
+   "answer": "First 64 and last 128.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "last"
+    ]
+   }
+  },
+  {
+   "id": "T36-right",
+   "class": "A",
+   "template": "T36",
+   "component": "A",
+   "params": {},
+   "key": {
+    "value": "sentinel-a-1",
+    "sha256": "7cd5480eee83e5c840bed4c98905b8d0e3dea4d9df4c258ab088e8237f98027c",
+    "sibling_value": "sentinel-b-2",
+    "inventory": [
+     "after.py",
+     "before.py",
+     "sentinel.txt"
+    ],
+    "before_lines": 2
+   },
+   "answer": "sentinel.txt holds sentinel-a-1; fixtures: after.py, before.py, sentinel.txt; before.py has 2 lines.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T36-sibling",
+   "class": "A",
+   "template": "T36",
+   "component": "A",
+   "params": {},
+   "key": {
+    "value": "sentinel-a-1",
+    "sha256": "7cd5480eee83e5c840bed4c98905b8d0e3dea4d9df4c258ab088e8237f98027c",
+    "sibling_value": "sentinel-b-2",
+    "inventory": [
+     "after.py",
+     "before.py",
+     "sentinel.txt"
+    ],
+    "before_lines": 2
+   },
+   "answer": "sentinel.txt holds sentinel-a-1; fixtures: after.py, before.py, sentinel.txt; before.py has 2 lines. The sibling tree holds sentinel-b-2.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "sibling_value"
+    ]
+   }
+  },
+  {
+   "id": "T36-path-only",
+   "class": "A",
+   "template": "T36",
+   "component": "A",
+   "params": {},
+   "key": {
+    "value": "sentinel-a-1",
+    "sha256": "7cd5480eee83e5c840bed4c98905b8d0e3dea4d9df4c258ab088e8237f98027c",
+    "sibling_value": "sentinel-b-2",
+    "inventory": [
+     "after.py",
+     "before.py",
+     "sentinel.txt"
+    ],
+    "before_lines": 2
+   },
+   "answer": "The tree is /work/tree-a and its sentinel file sits there.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "path_only"
+    ]
+   }
+  },
+  {
+   "id": "T37-right",
+   "class": "A",
+   "template": "T37",
+   "component": "A",
+   "params": {},
+   "key": {
+    "function": "greeting",
+    "before_lines": 2,
+    "after_lines": 2
+   },
+   "answer": "Both files define greeting; the change adds an exclamation mark.",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T37-wrong",
+   "class": "A",
+   "template": "T37",
+   "component": "A",
+   "params": {},
+   "key": {
+    "function": "greeting",
+    "before_lines": 2,
+    "after_lines": 2
+   },
+   "answer": "The pair renames the method to hello and adds a comma.",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "names_missing"
+    ]
+   }
+  },
+  {
+   "id": "T38-right",
+   "class": "A",
+   "template": "T38",
+   "component": "A",
+   "params": {},
+   "key": {
+    "fixture_sha256": "0c18c5ed5a130ce5f346f4ece8a5afb11685e698d6496051e6164696fabb625a",
+    "input_sha256": "0c18c5ed5a130ce5f346f4ece8a5afb11685e698d6496051e6164696fabb625a"
+   },
+   "answer": "# Release checklist\n## Pinned tools\n### Steps\n| Tool | Version | Check |\n| --- | --- | --- |\n| rtk | 0.50.0 | inline filter tests |\n| markitdown | 0.1.8 | structure oracle |\n| ast-grep | 0.45.3 | call-site oracle |\n1. Install into a fresh prefix\n2. Run each fixture\n3. Keep only sanitized output\n- Record every command\n  - including failures\n- Never read account state\n[upgrade guide](https://example.invalid/guide)\n**pinned** and *scoped*\n> Evidence is not authority.\n```\nrtk git log -20\nmarkitdown page.html\n```\nTom & Jerry use `--offline` mode.\n![Pipeline diagram](diagram.png)",
+   "evidence": [],
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T38-missing-image",
+   "class": "A",
+   "template": "T38",
+   "component": "A",
+   "params": {},
+   "key": {
+    "fixture_sha256": "0c18c5ed5a130ce5f346f4ece8a5afb11685e698d6496051e6164696fabb625a",
+    "input_sha256": "0c18c5ed5a130ce5f346f4ece8a5afb11685e698d6496051e6164696fabb625a"
+   },
+   "answer": "# Release checklist\n## Pinned tools\n### Steps\n| Tool | Version | Check |\n| --- | --- | --- |\n| rtk | 0.50.0 | inline filter tests |\n| markitdown | 0.1.8 | structure oracle |\n| ast-grep | 0.45.3 | call-site oracle |\n1. Install into a fresh prefix\n2. Run each fixture\n3. Keep only sanitized output\n- Record every command\n  - including failures\n- Never read account state\n[upgrade guide](https://example.invalid/guide)\n**pinned** and *scoped*\n> Evidence is not authority.\n```\nrtk git log -20\nmarkitdown page.html\n```\nTom & Jerry use `--offline` mode.\n",
+   "evidence": [],
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "elements_missing"
+    ]
+   }
+  },
+  {
+   "id": "T31-right",
+   "class": "B",
+   "kind": "builder",
+   "args": {
+    "after": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n",
+    "before": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n",
+    "entries": [
+     {
+      "status": "M",
+      "path": "fixtures/before.py"
+     }
+    ]
+   },
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T31-extra-file",
+   "class": "B",
+   "kind": "builder",
+   "args": {
+    "after": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n",
+    "before": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n",
+    "entries": [
+     {
+      "status": "M",
+      "path": "fixtures/before.py"
+     },
+     {
+      "status": "??",
+      "path": "notes.txt"
+     }
+    ]
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "extra_changes"
+    ]
+   }
+  },
+  {
+   "id": "T31-empty-diff",
+   "class": "B",
+   "kind": "builder",
+   "args": {
+    "after": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n",
+    "before": "def greeting(name):\n    return \"Hello, \" + name\n",
+    "entries": []
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "empty_diff"
+    ]
+   }
+  },
+  {
+   "id": "T31-other-bytes",
+   "class": "B",
+   "kind": "builder",
+   "args": {
+    "after": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n",
+    "before": "def greeting(name):\n    return \"Hello, \" + name\n",
+    "entries": [
+     {
+      "status": "M",
+      "path": "fixtures/before.py"
+     }
+    ]
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "bytes_differ"
+    ]
+   }
+  },
+  {
+   "id": "T31-head-conflict",
+   "class": "B",
+   "kind": "builder",
+   "args": {
+    "after": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n",
+    "before": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n",
+    "entries": [
+     {
+      "status": "M",
+      "path": "fixtures/before.py"
+     }
+    ],
+    "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+   },
+   "expect": {
+    "status": "unknown",
+    "reasons": [
+     "block_grading"
+    ]
+   }
+  },
+  {
+   "id": "T31-key-hash",
+   "class": "B",
+   "kind": "builder",
+   "args": {
+    "after": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n",
+    "before": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n",
+    "entries": [
+     {
+      "status": "M",
+      "path": "fixtures/before.py"
+     }
+    ],
+    "wrong_key": true
+   },
+   "expect": {
+    "status": "unknown",
+    "reasons": [
+     "input_hash"
+    ]
+   }
+  },
+  {
+   "id": "T14-right",
+   "class": "B",
+   "kind": "t14",
+   "args": {
+    "run_token": "tok7fixture",
+    "starts": {
+     "tok7fixture.B.seed-web-table-1.1": "2026-10-01T01:00:00Z",
+     "tok7fixture.A.seed-web-table-1.1": "2026-10-01T01:10:00Z",
+     "tok7fixture.B.seed-web-table-2.1": "2026-10-01T01:40:00Z"
+    },
+    "q": "2026-10-01T01:30:00Z",
+    "text": "2 sessions matched: tok7fixture.B.seed-web-table-1.1 and tok7fixture.A.seed-web-table-1.1"
+   },
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T14-after-query",
+   "class": "B",
+   "kind": "t14",
+   "args": {
+    "run_token": "tok7fixture",
+    "starts": {
+     "tok7fixture.B.seed-web-table-1.1": "2026-10-01T01:00:00Z",
+     "tok7fixture.A.seed-web-table-1.1": "2026-10-01T01:10:00Z",
+     "tok7fixture.B.seed-web-table-2.1": "2026-10-01T01:40:00Z"
+    },
+    "q": "2026-10-01T01:30:00Z",
+    "text": "2 sessions matched: tok7fixture.B.seed-web-table-1.1, tok7fixture.B.seed-web-table-2.1"
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "session_not_before_query"
+    ]
+   }
+  },
+  {
+   "id": "T14-outside-table",
+   "class": "B",
+   "kind": "t14",
+   "args": {
+    "run_token": "tok7fixture",
+    "starts": {
+     "tok7fixture.B.seed-web-table-1.1": "2026-10-01T01:00:00Z",
+     "tok7fixture.A.seed-web-table-1.1": "2026-10-01T01:10:00Z",
+     "tok7fixture.B.seed-web-table-2.1": "2026-10-01T01:40:00Z"
+    },
+    "q": "2026-10-01T01:30:00Z",
+    "text": "2 sessions matched: tok7fixture.B.seed-web-table-1.1, tok7fixture.B.seed-web-table-9.1"
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "session_outside_table"
+    ]
+   }
+  },
+  {
+   "id": "T14-no-query",
+   "class": "B",
+   "kind": "t14",
+   "args": {
+    "run_token": "tok7fixture",
+    "starts": {
+     "tok7fixture.B.seed-web-table-1.1": "2026-10-01T01:00:00Z",
+     "tok7fixture.A.seed-web-table-1.1": "2026-10-01T01:10:00Z",
+     "tok7fixture.B.seed-web-table-2.1": "2026-10-01T01:40:00Z"
+    },
+    "q": null,
+    "text": "1 session matched: tok7fixture.B.seed-web-table-1.1"
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "no_archive_query"
+    ]
+   }
+  },
+  {
+   "id": "T14-process-survives",
+   "class": "B",
+   "kind": "t14",
+   "args": {
+    "run_token": "tok7fixture",
+    "starts": {
+     "tok7fixture.B.seed-web-table-1.1": "2026-10-01T01:00:00Z",
+     "tok7fixture.A.seed-web-table-1.1": "2026-10-01T01:10:00Z",
+     "tok7fixture.B.seed-web-table-2.1": "2026-10-01T01:40:00Z"
+    },
+    "q": "2026-10-01T01:30:00Z",
+    "text": "1 session matched: tok7fixture.B.seed-web-table-1.1",
+    "pending": 1
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "owned_process_survives"
+    ]
+   }
+  },
+  {
+   "id": "T14-count-mismatch",
+   "class": "B",
+   "kind": "t14",
+   "args": {
+    "run_token": "tok7fixture",
+    "starts": {
+     "tok7fixture.B.seed-web-table-1.1": "2026-10-01T01:00:00Z",
+     "tok7fixture.A.seed-web-table-1.1": "2026-10-01T01:10:00Z",
+     "tok7fixture.B.seed-web-table-2.1": "2026-10-01T01:40:00Z"
+    },
+    "q": "2026-10-01T01:30:00Z",
+    "text": "3 sessions matched: tok7fixture.B.seed-web-table-1.1 and tok7fixture.A.seed-web-table-1.1"
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "count_mismatch"
+    ]
+   }
+  },
+  {
+   "id": "T0-right",
+   "class": "B",
+   "kind": "t0",
+   "args": {
+    "answer": "Newest commit: feat: newest. Branch state: clean on main. Diff stat over the last five revisions: 3 files. Directory inventory: 12 entries. Matches: 2. tests.test_host_requests: Ran 49 tests, OK.",
+    "arm": {}
+   },
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   },
+   "component": "A"
+  },
+  {
+   "id": "T0-older-subject",
+   "class": "B",
+   "kind": "t0",
+   "args": {
+    "answer": "Newest commit: fix: older. Branch state: clean on main. Diff stat over the last five revisions: 3 files. Directory inventory: 12 entries. Matches: 2. tests.test_host_requests: Ran 49 tests, OK.",
+    "arm": {
+     "subjects": [
+      "feat: newest",
+      "fix: older"
+     ]
+    }
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "subject_not_newest"
+    ]
+   },
+   "component": "A"
+  },
+  {
+   "id": "T0-test-count",
+   "class": "B",
+   "kind": "t0",
+   "args": {
+    "answer": "Newest commit: feat: newest. Branch state: clean on main. Diff stat over the last five revisions: 3 files. Directory inventory: 12 entries. Matches: 2. tests.test_host_requests: Ran 48 tests, OK.",
+    "arm": {}
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "test_count"
+    ]
+   },
+   "component": "A"
+  },
+  {
+   "id": "T0-environment-skip",
+   "class": "B",
+   "kind": "t0",
+   "args": {
+    "answer": "Newest commit: feat: newest. Branch state: clean on main. Diff stat over the last five revisions: 3 files. Directory inventory: 12 entries. Matches: 2. tests.test_host_requests: Ran 49 tests, OK, 0 skipped.",
+    "arm": {
+     "skipped": 1
+    },
+    "plain": {
+     "skipped": 0
+    }
+   },
+   "expect": {
+    "status": "unknown",
+    "reasons": [
+     "env_mismatch"
+    ]
+   },
+   "component": "A"
+  },
+  {
+   "id": "T0-capture-missing",
+   "class": "B",
+   "kind": "t0",
+   "args": {
+    "answer": "Newest commit: feat: newest. Branch state: clean on main. Diff stat over the last five revisions: 3 files. Directory inventory: 12 entries. Matches: 2. tests.test_host_requests: Ran 49 tests, OK.",
+    "arm": {
+     "missing": [
+      "ls"
+     ]
+    }
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "capture_missing"
+    ]
+   },
+   "component": "B"
+  },
+  {
+   "id": "T0-pre-post-conflict",
+   "class": "B",
+   "kind": "t0",
+   "args": {
+    "answer": "Newest commit: feat: newest. Branch state: clean on main. Diff stat over the last five revisions: 3 files. Directory inventory: 12 entries. Matches: 2. tests.test_host_requests: Ran 49 tests, OK.",
+    "arm": {},
+    "post_arm": {
+     "subjects": [
+      "feat: other"
+     ]
+    }
+   },
+   "expect": {
+    "status": "unknown",
+    "reasons": [
+     "capture_conflict"
+    ]
+   },
+   "component": "B"
+  },
+  {
+   "id": "T27-run-right",
+   "class": "B",
+   "kind": "t27_run",
+   "args": {
+    "key": {
+     "partition": 2,
+     "fixture_bytes": 84003,
+     "rows": 640,
+     "error_rows": 10,
+     "wc_l": 640,
+     "ls": [
+      "events.jsonl",
+      "table.json"
+     ],
+     "summary": "PASS partition 2"
+    },
+    "answer": "x",
+    "acceptance": {
+     "exit": 0,
+     "last_line": "PASS partition 2"
+    }
+   },
+   "expect": {
+    "status": "pass",
+    "reasons": []
+   }
+  },
+  {
+   "id": "T27-run-fails",
+   "class": "B",
+   "kind": "t27_run",
+   "args": {
+    "key": {
+     "partition": 2,
+     "fixture_bytes": 84003,
+     "rows": 640,
+     "error_rows": 10,
+     "wc_l": 640,
+     "ls": [
+      "events.jsonl",
+      "table.json"
+     ],
+     "summary": "PASS partition 2"
+    },
+    "answer": "x",
+    "acceptance": {
+     "exit": 1,
+     "last_line": "PASS partition 2"
+    }
+   },
+   "expect": {
+    "status": "fail",
+    "reasons": [
+     "acceptance_run"
+    ]
+   }
+  },
+  {
+   "id": "response-right",
+   "class": "C",
+   "function": "validate_response",
+   "input": {
+    "answer": "x",
+    "evidence": [
+     "e"
+    ]
+   },
+   "expect": {
+    "result": {
+     "text": "x",
+     "evidence": [
+      "e"
+     ]
+    }
+   }
+  },
+  {
+   "id": "response-extra-property",
+   "class": "C",
+   "function": "validate_response",
+   "input": {
+    "answer": "x",
+    "evidence": [],
+    "extra": 1
+   },
+   "expect": {
+    "result": null
+   }
+  },
+  {
+   "id": "response-string-result",
+   "class": "C",
+   "function": "validate_response",
+   "input": "just a string",
+   "expect": {
+    "result": null
+   }
+  },
+  {
+   "id": "response-non-string-answer",
+   "class": "C",
+   "function": "validate_response",
+   "input": {
+    "answer": 5,
+    "evidence": []
+   },
+   "expect": {
+    "result": null
+   }
+  },
+  {
+   "id": "response-evidence-not-a-list",
+   "class": "C",
+   "function": "validate_response",
+   "input": {
+    "answer": "x",
+    "evidence": "e"
+   },
+   "expect": {
+    "result": null
+   }
+  },
+  {
+   "id": "agent-trailer-removed",
+   "class": "C",
+   "function": "strip_agent_result",
+   "input": "the child's answer\nagentId: fx9 (use SendMessage with to: 'fx9' to continue this agent)\n<usage>tool_uses: 2\nduration_ms: 900</usage>",
+   "expect": {
+    "result": {
+     "status": "inline",
+     "text": "the child's answer"
+    }
+   }
+  },
+  {
+   "id": "agent-bare-text",
+   "class": "C",
+   "function": "strip_agent_result",
+   "input": "the child's answer",
+   "expect": {
+    "result": {
+     "status": "inline",
+     "text": "the child's answer"
+    }
+   }
+  },
+  {
+   "id": "agent-trailer-not-recognised",
+   "class": "C",
+   "function": "strip_agent_result",
+   "input": "the child's answer\nagentId: fx9\nsome other footer",
+   "expect": {
+    "result": {
+     "status": "inline",
+     "text": "the child's answer\nagentId: fx9\nsome other footer"
+    }
+   }
+  },
+  {
+   "id": "agent-async-launch",
+   "class": "C",
+   "function": "strip_agent_result",
+   "input": "Async agent launched successfully.\nagentId: fx9",
+   "expect": {
+    "result": {
+     "status": "async",
+     "text": null
+    }
+   }
+  },
+  {
+   "id": "wait-notice",
+   "class": "C",
+   "function": "wait_notice",
+   "input": "Still waiting for the background task to finish.",
+   "expect": {
+    "result": true
+   }
+  },
+  {
+   "id": "not-a-wait-notice",
+   "class": "C",
+   "function": "wait_notice",
+   "input": "The two files define greeting and differ by one character.",
+   "expect": {
+    "result": false
+   }
+  },
+  {
+   "id": "limit-message-either-apostrophe",
+   "class": "C",
+   "function": "limit_message",
+   "input": "You’ve hit your weekly limit · resets Oct 4",
+   "expect": {
+    "result": true
+   }
+  },
+  {
+   "id": "not-a-limit-message",
+   "class": "C",
+   "function": "limit_message",
+   "input": "The limit of the range is 64.",
+   "expect": {
+    "result": false
+   }
+  },
+  {
+   "id": "codex-usage-limit",
+   "class": "C",
+   "function": "usage_limit_message",
+   "input": "You've hit your usage limit. Try again later.",
+   "expect": {
+    "result": true
+   }
+  },
+  {
+   "id": "codex-other-message",
+   "class": "C",
+   "function": "usage_limit_message",
+   "input": "You've hit your weekly limit",
+   "expect": {
+    "result": false
+   }
+  },
+  {
+   "id": "persisted-pointer",
+   "class": "C",
+   "function": "persisted_pointer",
+   "input": "<persisted-output>\nOutput too large.\nFull output saved to: tool-results/x.txt\n</persisted-output>",
+   "expect": {
+    "result": "tool-results/x.txt"
+   }
+  },
+  {
+   "id": "no-persisted-pointer",
+   "class": "C",
+   "function": "persisted_pointer",
+   "input": "an ordinary result",
+   "expect": {
+    "result": null
+   }
+  }
+ ]
+}

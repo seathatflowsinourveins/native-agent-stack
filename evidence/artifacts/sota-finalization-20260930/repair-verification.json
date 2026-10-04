@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "kind": "independent_post_review_repair_verification",
+  "evidence_class": "independent_native_and_original_source_observation",
+  "scope": "Bounded source repairs after original Claude changes_required; no second model review.",
+  "claims": [
+    {
+      "id": "F1-source-integration",
+      "verdict": "verified",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/cc1f6ce1f983721ecb42c7da27e58f0649c132f5/tools/adoption/apply_codex_lane.py",
+      "isolated_base": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+      "source_identity_exit": 0,
+      "updater_sha256": "324f01b27f6f1e3cae47e18f92cfd1cca92cb99b787c2c7e6fc3de4893b77cd7",
+      "proof_sha256": "9dcff7ea43326166f0bc085ba638165894bbdd87d94075bcf953a9ce9a2dcfeb",
+      "native_regression_exit": 0,
+      "native_regression_command": "rtk proxy python3 -B -m unittest tests.test_codex_worker_lane.ApplyFlowTests.test_owned_profile_migration_journals_and_restores_bytes_and_mode tests.test_codex_worker_lane.RoleStepTests.test_b_apply_creates_the_roles_read_back_and_rollback_removes_them tests.test_codex_worker_lane.RoleStepTests.test_control_the_short_circuit_needs_its_role_term -q",
+      "native_regression_capture_scope": "Actual exec_command/write_stdin returned combined output; no separate verifier stdout/stderr files persisted.",
+      "unchanged_upstream_oracle_sha256": [
+        "be42d1e66f300e77aad9a8a1e5bf76b9babcb6add01dc3364afa0b52971078c3",
+        "e2d51c2d97a407273278a69e4c667de9825b83c23ca8f8c852190010f8688d53"
+      ],
+      "returned_output": "Ran 3 tests in 2.182s\nOK",
+      "test_scope": "Actual generated-command regression and two unchanged current-upstream role lifecycle/short-circuit invariants."
+    },
+    {
+      "id": "F1-receipt-collision",
+      "verdict": "verified",
+      "native_exit": 0,
+      "host_receipt_id": "codex-01592-host-finalization-20260930",
+      "original_native_artifacts_unchanged": 3,
+      "other_owner_receipt_untouched": true
+    },
+    {
+      "id": "F2-complete-selected-closure",
+      "verdict": "verified",
+      "native_exit": 0,
+      "local_modules": 5,
+      "resources": 11,
+      "returned_output": "Sixteen checksum OK results; independent import walk found no omitted repository-local imports."
+    },
+    {
+      "id": "F2-rollout-disarmed",
+      "verdict": "verified",
+      "native_exit": 0,
+      "retry_timer": {
+        "load_state": "not-found",
+        "active_state": "inactive",
+        "sub_state": "dead",
+        "next_activation": false
+      },
+      "expiry_timer": {
+        "load_state": "not-found",
+        "active_state": "inactive",
+        "sub_state": "dead",
+        "next_activation": false
+      },
+      "host_hash_exit": 0,
+      "host_hashes_match_original_reviewed_receipt": true
+    }
+  ],
+  "original_runner_observation": {
+    "native_exit": 0,
+    "integration_artifact": "evidence/artifacts/sota-finalization-20260930/upstream-codex-integration.json",
+    "artifact_sha256": "4a9596c5f4877c81b803b1e150cd244aeb2c6c73a872d26b020b5bef76ad5bdf",
+    "returned_scope": "173 tests/11 skips; separate native config, doctor/link and repaired lifecycle/migration two-test groups return OK. Retained prior-source negative control and original fixture failure have exit1."
+  },
+  "limits": [
+    "These are repository integration checks, not unchanged OpenAI upstream tests.",
+    "Underlying passing native command streams were consumed by source-defined oracles and not separately retained; full runner captures and source hashes were independently inspected.",
+    "Live Window-W activity remains unknown. No production activation, remote publication or new Claude approval is established.",
+    "Original model review remains changes_required; its findings are addressed by the separately verified source repairs and disarmed scope."
+  ]
+}

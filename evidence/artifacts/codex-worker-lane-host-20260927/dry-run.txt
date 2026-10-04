@@ -1,0 +1,56 @@
+DRY RUN: nothing under the Codex home is written.
+Codex worker lane for CODEX_HOME=~/.codex
+preconditions:
+  [ok] codex version: codex-cli 0.157.1 (pin 0.157.1)
+  [ok] context-mode start.mjs: ~/.local/share/codex-ecosystem/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs: sha256 0324441841b2 (expected 0324441841b2)
+  [ok] node: ~/.local/share/codex-ecosystem/bin/node
+  [ok] HOST_PATH: ~/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
+  [ok] config.toml: ~/.codex/config.toml present
+  [ok] features.daemon_auto_start: false
+  [ok] AGENTS.override.md: none with text
+  [ok] AGENTS.md block: markers intact or absent
+  [ok] stack-worker profile: absent; will be created
+  [warn] codex processes: 1 running (pids <redacted>)
+config.toml, through codex app-server config/batchWrite (expectedVersion from config/read):
+  set  mcp_servers.context-mode: absent -> {args, command, default_tools_approval_mode, env, startup_timeout_sec}
+  set  plugins."context-mode@context-mode".mcp_servers.context-mode.enabled: absent -> false
+  keep mcp_servers.headroom.env.HEADROOM_OFFLINE: "1"
+  set  mcp_servers.headroom.env.HF_HUB_OFFLINE: absent -> "1"
+  set  mcp_servers.headroom.env.TRANSFORMERS_OFFLINE: absent -> "1"
+  keep mcp_servers.headroom.env.DO_NOT_TRACK: "1"
+AGENTS.md: writes the managed block (sha256 <private-file-sha256> -> <private-file-sha256>)
+stack-worker.config.toml: create
+rehearsal on private copies:
+  scratch Codex home, network namespace off (bwrap)
+  config/batchWrite: ok, version sha256:<private-config-version> -> sha256:<private-config-version>
+  keys outside the lane's own: unchanged (config/read, before and after)
+  config.toml diff:
+    @@ -23,2 +23,5 @@
+     enabled = true
+    +
+    +[plugins."context-mode@context-mode".mcp_servers.context-mode]
+    +enabled = false
+     
+    @@ -149,2 +152,15 @@
+     HEADROOM_OFFLINE = "1"
+    +HF_HUB_OFFLINE = "1"
+    +TRANSFORMERS_OFFLINE = "1"
+    +
+    +[mcp_servers.context-mode]
+    +command = "~/.local/share/codex-ecosystem/bin/node"
+    +args = ["~/.local/share/codex-ecosystem/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"]
+    +startup_timeout_sec = 60
+    +default_tools_approval_mode = "approve"
+    +
+    +[mcp_servers.context-mode.env]
+    +RTK_TELEMETRY_DISABLED = "1"
+    +PATH = "~/.local/share/codex-ecosystem/bin:~/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib"
+    +CONTEXT_MODE_PLATFORM = "codex"
+     
+  codex mcp get context-mode: command ~/.local/share/codex-ecosystem/bin/node, cwd None, env keys ['CONTEXT_MODE_PLATFORM', 'PATH', 'RTK_TELEMETRY_DISABLED']
+  prompt input: {'top_rule': 1, 'rtk_exceptions': 1, 'prefix_rule': 1, 'no_spawn_unless_asked': False, 'proactive_delegation': True}
+  prompt input -p stack-worker: {'top_rule': 1, 'rtk_exceptions': 1, 'prefix_rule': 1, 'no_spawn_unless_asked': True, 'proactive_delegation': False}
+  -p stack-worker servers: {"ai-memory": {"enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status", "memory_briefing"], "disabled_tools": null, "env": {}}, "context-mode": {"enabled_tools": null, "disabled_tools": ["ctx_upgrade", "ctx_purge"], "env": {}}, "headroom": {"enabled_tools": ["headroom_compress", "headroom_retrieve", "headroom_stats"], "disabled_tools": null, "env": {}}, "socraticode": {"enabled_tools": ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"], "disabled_tools": null, "env": {"SOCRATICODE_WATCHER": "manual"}}}
+result: rehearsal passed. Apply in a quiet window (no codex process) with:
+  python3 tools/adoption/apply_codex_lane.py --apply --expect-config-sha256 <private-file-sha256> --expect-agents-sha256 <private-file-sha256>
+workers then start with: codex exec -p stack-worker -m gpt-6-astra -c 'model_reasoning_effort="max"' -c 'web_search="live"' -s <sandbox> ... < /dev/null

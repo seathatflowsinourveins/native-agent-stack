@@ -1,0 +1,1093 @@
+--- run.py
++++ run.py
+@@ -16,10 +16,8 @@
+ 0. Refuses to start if any output of this run already exists
+    (``results-<run-id>.json``, ``native-<run-id>.json``,
+    ``report-<run-id>.md``), then reserves ``results-<run-id>.json``
+-   exclusively. No historical result or failed attempt is ever overwritten.
+-   SIGINT, SIGTERM and SIGHUP stop a run cleanly (see "Interrupts" below);
+-   only a signal the runner cannot handle, such as SIGKILL, leaves the
+-   reserved receipt at status ``started``.
++   exclusively. No historical result or failed attempt is ever overwritten,
++   and an interrupted run still leaves its reserved receipt behind.
+ 1. Re-hashes ``queries.json`` and compares it against the sha256 pinned in
+    ``PREREGISTRATION.md``'s "Sealing" section. Stops immediately on a
+    mismatch (per PREREGISTRATION.md: "A future runner must re-hash
+@@ -46,8 +44,6 @@
+    revision and requires the Hugging Face LFS sha256 of the pulled file at
+    that revision to equal the downloaded file's own sha256, then generates
+    embeddings for the frozen index (``qmd embed``) -- all forced onto CPU.
+-   The ETag QMD itself cached for each file (``<model cache>/<URI file
+-   name>.etag``) is recorded as a cross-reference, not as a pin.
+    An unresolved or mismatched pin, a failed or timed-out pull/embed, or an
+    incomplete embedding records Arm B as ``not_run`` with the exact reason,
+    and the 30-query loop for Arm B is skipped entirely (fails closed, per
+@@ -64,39 +60,18 @@
+ 8. Computes nDCG@10, recall@5 (of grade-2 files) and MRR per query per arm,
+    the paired bootstrap 95% CI of the per-query nDCG@10 difference, and the
+    preregistered decision rule. A query whose output is not a JSON array of
+-   hits with string ``file`` and ``docid`` fields, or whose top ``-n`` hits
+-   include even one that cannot be verified against the pinned corpus (an
+-   unknown collection or path, a hit naming another index, or a docid other
+-   than the first six hex characters of that file's pinned sha256), is
+-   rejected whole: it scores 0 on every metric, keeps no ranked paths and is
+-   recorded as an error with its rejected hits; the arm continues with the
+-   next query, per the protocol's "What counts as failure". (The 2026-09-25
+-   runner instead kept the other hits, scored a hit outside the pinned corpus
+-   as grade 0 at its rank and credited a hit whose docid did not match.)
++   hits with string ``file`` and ``docid`` fields, or which returns a hit
++   that cannot be verified against the pinned corpus (an unknown path, or a
++   docid other than the first six hex characters of that file's pinned
++   sha256), scores 0 on every metric and is recorded as an error; the arm
++   continues with the next query, per the protocol's "What counts as
++   failure".
+ 9. Writes ``results-<run-id>.json`` (the receipt), ``native-<run-id>.json``
+    (every qmd call's sanitized argv, working directory, start/end time,
+    exit code, stdout and stderr, each with its sha256) and
+    ``report-<run-id>.md`` (rendered from the same in-memory receipt). Each
+    per-query result names the native record and stdout sha256 it was scored
+-   from. A qmd call a stop request or an error cut short keeps its native
+-   record too.
+-
+-Interrupts: SIGINT, SIGTERM and SIGHUP ask the run to stop. Each is handled
+-only when the caller left it at its default action, so ``nohup``'s ignored
+-SIGHUP stays ignored. The handler only records the signal (see
+-``StopRequests``); the runner acts on it at safe points. qmd runs in its own
+-session and never receives these signals, so the runner kills the qmd
+-process group in flight within ``STOP_POLL_SECONDS``, keeps that call's
+-partial output as a native record (``interrupted_by`` names the signal) and
+-starts no further qmd call. The arm in progress becomes ``interrupted``
+-(queries it already scored stay in ``per_query``; no arm mean or decision is
+-computed from a partial arm), the status becomes ``aborted_interrupted``
+-with the signal, the phase and the call in flight in ``interruption``, and
+-all three outputs are written. ``signals_received`` lists every handled
+-signal that arrived before the receipt was written; later ones only reach
+-stderr. Run as a script, the runner then ends by the signal that stopped it,
+-so a shell or supervisor sees the stop; ``main()`` itself returns 128 + the
+-signal number.
++   from.
+ 
+ Every path written into these outputs is sanitized: the repository checkout
+ and scratch-home roots are replaced with symbolic placeholders, and any
+@@ -129,7 +104,6 @@
+ import time
+ from datetime import datetime, timezone
+ from pathlib import Path
+-from typing import NamedTuple
+ from urllib import parse as urlparse
+ from urllib import request as urlrequest
+ 
+@@ -239,98 +213,6 @@
+         self.slug = slug
+ 
+ 
+-def signal_name(signum) -> str:
+-    try:
+-        return signal.Signals(signum).name
+-    except ValueError:
+-        return f"signal {signum}"
+-
+-
+-class RunInterrupted(BaseException):
+-    """Raised at a safe point once SIGINT, SIGTERM or SIGHUP asked the run to stop.
+-
+-    A BaseException, like KeyboardInterrupt, so that no ``except Exception``
+-    in the runner can swallow it."""
+-
+-    def __init__(self, signum: int):
+-        self.signum = int(signum)
+-        super().__init__(f"stopped by {signal_name(signum)}")
+-
+-
+-def interrupt_signal(exc: BaseException):
+-    """The signal number behind an interrupt exception; None for any other exception."""
+-    if isinstance(exc, RunInterrupted):
+-        return exc.signum
+-    if isinstance(exc, KeyboardInterrupt):
+-        return int(signal.SIGINT)
+-    return None
+-
+-
+-class StopRequests:
+-    """Turns SIGINT, SIGTERM and SIGHUP into a stop request for one ``main()`` call.
+-
+-    The handler only records the signal; it never raises. An exception raised
+-    by a signal handler can land anywhere -- between ``fork`` and Popen
+-    recording the child's pid (leaving an untracked qmd running), half-way
+-    through writing a native record, or inside an ``except`` clause before the
+-    status is set. So the runner acts on a request at safe points instead:
+-    ``run_command`` polls ``requested()`` while qmd runs and kills its process
+-    group, ``QmdRunner.run`` records that call and then raises
+-    :class:`RunInterrupted`, and ``checkpoint()`` raises it before any qmd
+-    call starts.
+-
+-    Only a disposition left at its default is replaced (Python's
+-    ``default_int_handler`` for SIGINT, ``SIG_DFL`` otherwise). One the caller
+-    chose -- ``nohup``'s ignored SIGHUP, the ignored SIGINT of a background
+-    job, or a handler of its own -- is left alone. The first signal is the
+-    stop request; later ones (GNU ``timeout`` signals the runner and then its
+-    whole process group) are only recorded. ``restore()`` puts every original
+-    disposition back.
+-    """
+-
+-    HANDLED = ("SIGINT", "SIGTERM", "SIGHUP")
+-
+-    def __init__(self):
+-        self._original = {}
+-        self.received = []  # (signal number, UTC time, phase) in arrival order
+-        self.phase = None  # the phase main() is in; its phase timer keeps this current
+-
+-    @classmethod
+-    def signals(cls) -> list:
+-        # SIGHUP does not exist on Windows.
+-        return [getattr(signal, name) for name in cls.HANDLED if hasattr(signal, name)]
+-
+-    def _handle(self, signum, frame) -> None:
+-        self.received.append((int(signum), utc_now_iso_ms(), self.phase))
+-
+-    def arm(self) -> None:
+-        for signum in self.signals():
+-            default = signal.default_int_handler if signum == signal.SIGINT else signal.SIG_DFL
+-            if signal.getsignal(signum) is not default:
+-                continue
+-            try:
+-                self._original[signum] = signal.signal(signum, self._handle)
+-            except (ValueError, OSError):  # not the main thread, or not settable here
+-                continue
+-
+-    def restore(self) -> None:
+-        for signum, handler in self._original.items():
+-            with contextlib.suppress(ValueError, OSError, TypeError):
+-                signal.signal(signum, handler)
+-        self._original = {}
+-
+-    def requested(self) -> bool:
+-        return bool(self.received)
+-
+-    def first(self):
+-        """``(signal number, UTC time, phase)`` of the stop request, or None."""
+-        return self.received[0] if self.received else None
+-
+-    def checkpoint(self) -> None:
+-        if self.received:
+-            raise RunInterrupted(self.received[0][0])
+-
+-
+ # --------------------------------------------------------------------------
+ # Small utilities
+ # --------------------------------------------------------------------------
+@@ -537,58 +419,19 @@
+     return Path(env["QMD_CONFIG_DIR"]) / f"{index_name}.yml"
+ 
+ 
+-class CommandResult(NamedTuple):
+-    """How one qmd call ended, with the bytes it wrote."""
+-
+-    stdout: bytes
+-    stderr: bytes
+-    exit_code: object  # the process's exit code; None when the runner killed it
+-    timed_out: bool
+-    process_group_killed: bool
+-    output_complete: bool  # False when reading a killed call's pipes had to give up
+-    stopped: bool = False  # killed because a stop was requested
+-
+-
+-# A killed process group closes its pipes at once; this only bounds the wait
+-# when a descendant that left the group still holds one open.
+-COLLECT_AFTER_KILL_SECONDS = 10.0
+-# How often run_command checks for a stop request while qmd runs.
+-STOP_POLL_SECONDS = 0.2
+-
+-
+ def _kill_process_group(proc: subprocess.Popen) -> None:
+     with contextlib.suppress(ProcessLookupError, PermissionError):
+         os.killpg(proc.pid, signal.SIGKILL)
+ 
+ 
+-def _collect_after_kill(proc: subprocess.Popen) -> tuple:
+-    """Returns (stdout, stderr, complete) for a call whose process group was just killed."""
+-    try:
+-        stdout, stderr = proc.communicate(timeout=COLLECT_AFTER_KILL_SECONDS)
+-        return stdout or b"", stderr or b"", True
+-    except subprocess.TimeoutExpired as late:
+-        for stream in (proc.stdout, proc.stderr):
+-            with contextlib.suppress(OSError, ValueError):
+-                stream.close()
+-        with contextlib.suppress(subprocess.TimeoutExpired):
+-            proc.wait(timeout=1)
+-        return late.output or b"", late.stderr or b"", False
+-
+-
+-def run_command(argv: list, env: dict, cwd: Path, timeout: float, stop=None) -> CommandResult:
+-    """Runs ``argv`` in its own session and returns a :class:`CommandResult`.
++def run_command(argv: list, env: dict, cwd: Path, timeout: float) -> tuple:
++    """Runs ``argv`` in its own session; returns (stdout, stderr, exit_code, timed_out).
+ 
+     QMD's launcher (``bin/qmd``) spawns a child node process for
+-    ``dist/cli/qmd.js``. Killing only the launcher would orphan that child,
+-    which would keep running -- and keep writing to the scratch index -- after
+-    its phase was recorded as failed, so a timeout kills the whole process
+-    group. Because qmd runs in its own session, no signal sent to the runner
+-    or its terminal reaches it: while it runs, ``stop()`` (a
+-    ``StopRequests.requested``) is checked every STOP_POLL_SECONDS, and a stop
+-    request kills the group the same way. Any exception while waiting -- a
+-    caller's own SIGINT handler raising KeyboardInterrupt included -- also
+-    kills the group, attaches what the call had written as ``partial_result``
+-    and propagates.
++    ``dist/cli/qmd.js``. Killing only the launcher on a timeout would orphan
++    that child, which would keep running -- and keep writing to the scratch
++    index -- after its phase was recorded as failed, so the whole process
++    group is killed instead.
+     """
+     proc = subprocess.Popen(
+         argv,
+@@ -599,31 +442,17 @@
+         stderr=subprocess.PIPE,
+         start_new_session=True,
+     )
+-    deadline = time.monotonic() + timeout
+     try:
+-        while True:
+-            stopping = stop is not None and stop()
+-            remaining = deadline - time.monotonic()
+-            if stopping or remaining <= 0:
+-                _kill_process_group(proc)
+-                stdout, stderr, complete = _collect_after_kill(proc)
+-                return CommandResult(stdout, stderr, None, not stopping, True, complete, stopping)
+-            try:
+-                stdout, stderr = proc.communicate(
+-                    timeout=remaining if stop is None else min(remaining, STOP_POLL_SECONDS)
+-                )
+-            except subprocess.TimeoutExpired:
+-                continue  # communicate() keeps what it has read, and the next call resumes it
+-            return CommandResult(stdout or b"", stderr or b"", proc.returncode, False, False, True)
+-    except BaseException as exc:
++        stdout, stderr = proc.communicate(timeout=timeout)
++    except subprocess.TimeoutExpired:
+         _kill_process_group(proc)
+-        try:
+-            stdout, stderr, complete = _collect_after_kill(proc)
+-        except BaseException:  # anything further while collecting: keep stopping
+-            stdout, stderr, complete = b"", b"", False
+-        with contextlib.suppress(AttributeError):
+-            exc.partial_result = CommandResult(stdout, stderr, None, False, True, complete)
++        stdout, stderr = proc.communicate()
++        return stdout or b"", stderr or b"", None, True
++    except BaseException:
++        _kill_process_group(proc)
++        proc.wait()
+         raise
++    return stdout or b"", stderr or b"", proc.returncode, False
+ 
+ 
+ def retained_stream(name: str, raw: bytes, san: Sanitizer) -> tuple:
+@@ -654,43 +483,18 @@
+ class QmdRunner:
+     """Runs every qmd call with the owned environment and retains its native output."""
+ 
+-    def __init__(self, qmd_bin: str, env: dict, cwd: Path, san: Sanitizer, stops=None):
++    def __init__(self, qmd_bin: str, env: dict, cwd: Path, san: Sanitizer):
+         self.qmd_bin = qmd_bin
+         self.env = env
+         self.cwd = Path(cwd)
+         self.san = san
+-        self.stops = stops if stops is not None else StopRequests()
+         self.records = []
+ 
+-    def checkpoint(self) -> None:
+-        """Raises RunInterrupted once a stop was requested."""
+-        self.stops.checkpoint()
+-
+     def run(self, record_id: str, phase: str, args: list, timeout: float) -> NativeCall:
+-        """Runs one qmd call and appends its record before anything propagates.
+-
+-        No call starts once a stop was requested. A call that a stop request
+-        cut short is recorded (``interrupted_by``, with its partial output) and
+-        RunInterrupted is then raised, so it is never scored; a call that
+-        finished first is returned as usual. A call that an exception cut short
+-        is recorded the same way before the exception propagates.
+-        """
+-        self.checkpoint()
+         argv = [self.qmd_bin, *(str(a) for a in args)]
+         started_at = utc_now_iso_ms()
+         start = time.monotonic()
+-        try:
+-            result = run_command(argv, self.env, self.cwd, timeout, stop=self.stops.requested)
+-        except BaseException as exc:
+-            partial = getattr(exc, "partial_result", None) or CommandResult(b"", b"", None, False, False, False)
+-            self._append(record_id, phase, argv, started_at, start, timeout, partial, exc)
+-            raise
+-        record, stdout, stderr = self._append(record_id, phase, argv, started_at, start, timeout, result, None)
+-        if result.stopped:
+-            self.checkpoint()
+-        return NativeCall(record, stdout, stderr)
+-
+-    def _append(self, record_id, phase, argv, started_at, start, timeout, result, exc) -> tuple:
++        raw_out, raw_err, exit_code, timed_out = run_command(argv, self.env, self.cwd, timeout)
+         record = {
+             "id": record_id,
+             "phase": phase,
+@@ -700,26 +504,15 @@
+             "ended_at_utc": utc_now_iso_ms(),
+             "elapsed_ms": round((time.monotonic() - start) * 1000.0, 1),
+             "timeout_seconds": timeout,
+-            "exit_code": result.exit_code,
+-            "timed_out": result.timed_out,
+-            "interrupted_by": None,
+-            "process_group_killed": result.process_group_killed,
+-            "output_complete": result.output_complete,
++            "exit_code": exit_code,
++            "timed_out": timed_out,
+         }
+-        if result.stopped:
+-            record["interrupted_by"] = signal_name(self.stops.first()[0])
+-        elif exc is not None:
+-            signum = interrupt_signal(exc)
+-            if signum is not None:
+-                record["interrupted_by"] = signal_name(signum)
+-            else:
+-                record["runner_error"] = self.san(f"{type(exc).__name__}: {exc}")
+-        stdout, stdout_fields = retained_stream("stdout", result.stdout, self.san)
+-        stderr, stderr_fields = retained_stream("stderr", result.stderr, self.san)
++        stdout, stdout_fields = retained_stream("stdout", raw_out, self.san)
++        stderr, stderr_fields = retained_stream("stderr", raw_err, self.san)
+         record.update(stdout_fields)
+         record.update(stderr_fields)
+         self.records.append(record)
+-        return record, stdout, stderr
++        return NativeCall(record, stdout, stderr)
+ 
+     def setup(self, record_id: str, phase: str, args: list, timeout: float, slug: str) -> NativeCall:
+         """A setup step: a timeout or a non-zero exit is a recorded RunFailure."""
+@@ -892,12 +685,10 @@
+ def resolve_repository_path(file_field, docid_field, corpus_sha: dict, index_name: str) -> tuple:
+     """Maps a returned `qmd://<collection>/<relpath>?index=...` hit back to
+     this repository's path and verifies it against the pinned corpus. A hit
+-    is credited only when it names no other index (a hit without an
+-    ``?index=`` parameter is accepted), its path is one of the pinned files
+-    AND its docid is exactly the first 6 hex chars of that file's pinned
+-    sha256 (QMD's own docid derivation). Returns (repository_path, "ok") or
+-    (None, reason); a hit that fails any check is never scored, and run_arm
+-    then rejects the query's whole response."""
++    is credited only when its path is one of the pinned files AND its docid
++    is exactly the first 6 hex chars of that file's pinned sha256 (QMD's own
++    docid derivation). Returns (repository_path, "ok") or (None, reason); a
++    hit that fails either check is never scored."""
+     if not isinstance(file_field, str) or not file_field.startswith("qmd://"):
+         return None, f"unexpected file field (no qmd:// prefix): {file_field!r}"
+     location, _, query = file_field[len("qmd://"):].partition("?")
+@@ -990,13 +781,9 @@
+     corpus: list,
+     per_query_timeout: float,
+     top_k: int,
+-    results=None,
+ ) -> list:
+-    """Runs one arm; each scored query is appended to ``results`` (default: a
+-    new list) as soon as it is scored, so an interrupted arm keeps the queries
+-    it finished."""
+     corpus_sha = {d["path"]: d["sha256"] for d in corpus}
+-    results = [] if results is None else results
++    results = []
+     for q in queries:
+         call = runner.run(
+             f"{arm_label}:{q['id']}",
+@@ -1120,21 +907,6 @@
+     return {"revision": revision, "lfs_sha256": lfs_sha256, "lfs_size": lfs_size}
+ 
+ 
+-def qmd_model_cache_dir(env: dict) -> Path:
+-    """QMD's DEFAULT_MODEL_CACHE_DIR (dist/llm.js) under the environment qmd_env() builds."""
+-    return Path(env["XDG_CACHE_HOME"]) / "qmd" / "models"
+-
+-
+-def qmd_etag_path(model_cache_dir: Path, hf_uri: str) -> Path:
+-    """Where QMD 2.8.3 caches the ETag of a pulled model.
+-
+-    ``pullModels`` in dist/llm.js writes ``join(cacheDir, `${filename}.etag`)``
+-    with ``filename = model.split("/").pop()``: the URI's last path segment,
+-    not the name node-llama-cpp gives the downloaded file (``hf_<org>_<file>``).
+-    """
+-    return Path(model_cache_dir) / f"{hf_uri.rsplit('/', 1)[-1]}.etag"
+-
+-
+ def pull_and_pin_models(runner: QmdRunner, index_name: str, scratch_home: Path, pull_timeout: float, san: Sanitizer) -> dict:
+     call = runner.setup("arm_b:pull", "arm_b_setup", ["--index", index_name, "pull"], pull_timeout, "arm_b_pull")
+     stdout = strip_ansi(call.stdout)
+@@ -1154,10 +926,8 @@
+         )
+ 
+     owned_root = scratch_home.resolve()
+-    model_cache_dir = qmd_model_cache_dir(runner.env)
+     models = []
+-    for role, entry in zip(roles, parsed, strict=True):
+-        runner.checkpoint()  # hashing a model and two HF lookups take seconds; stop between models
++    for role, entry in zip(roles, parsed):
+         uri = entry["uri"]
+         local_path = Path(entry["path"])
+         parts = uri[len("hf:"):].split("/")
+@@ -1179,8 +949,8 @@
+         file_sha256 = sha256_file(local_path)
+         size_bytes = local_path.stat().st_size
+         pin = resolve_hf_pin(hf_repo_id, filename, file_sha256, size_bytes)
+-        etag_path = qmd_etag_path(model_cache_dir, uri)
+-        hf_content_etag = etag_path.read_text(encoding="utf-8").strip() if etag_path.is_file() else None
++        etag_path = local_path.with_name(local_path.name + ".etag")
++        hf_content_etag = etag_path.read_text().strip() if etag_path.is_file() else None
+         models.append(
+             {
+                 "role": role,
+@@ -1199,14 +969,9 @@
+                     "revision contains exactly these bytes."
+                 ),
+                 "hf_content_store_etag": hf_content_etag,
+-                "hf_content_store_etag_path": san(str(etag_path)),
+                 "hf_content_store_etag_note": (
+-                    "The ETag Hugging Face served for this file's resolve/main URL, as QMD cached it "
+-                    "to decide whether `qmd pull` must download again (pullModels in dist/llm.js "
+-                    "writes <model cache>/<URI file name>.etag). For a Xet-backed file it is the "
+-                    "file's Xet hash, not its sha256, so it is only a cross-reference to QMD's own "
+-                    "cache bookkeeping; the sha256 and LFS fields above are the pin. null when QMD "
+-                    "cached no ETag."
++                    "HF's Xet content-store token for this file, not a sha256 checksum; recorded "
++                    "only as a cross-reference to qmd's own cache bookkeeping."
+                 ),
+                 "pull_note": entry["note"],
+                 "pull_size_reported": entry["size"],
+@@ -1347,25 +1112,15 @@
+ 
+ 
+ def run_native_bench(
+-    runner: QmdRunner,
+-    index_name: str,
+-    queries: list,
+-    scratch_home: Path,
+-    timeout: float,
+-    db_path: Path,
+-    arm_results: dict,
+-    section=None,
++    runner: QmdRunner, index_name: str, queries: list, scratch_home: Path, timeout: float, db_path: Path, arm_results: dict
+ ) -> dict:
+-    """Runs ``qmd bench``; ``section`` (default: a new dict) is filled in place,
+-    so an interrupted benchmark still shows its fixture and state."""
+-    section = {} if section is None else section
+     fixture = build_bench_fixture(queries)
+     fixture_bytes = (json.dumps(fixture, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+     bench_dir = scratch_home / "bench"
+     bench_dir.mkdir(parents=True, exist_ok=True)
+     fixture_path = bench_dir / "fixture.json"
+     fixture_path.write_bytes(fixture_bytes)
+-    section.update({
++    section = {
+         "evidence_class": "upstream_native_operation",
+         "evidence_note": (
+             "QMD's own `qmd bench` command and scorer (README 'Benchmarking'; src/bench/bench.ts and "
+@@ -1385,7 +1140,7 @@
+             "content": fixture,
+         },
+         "llm_cache_rows_before": count_llm_cache(db_path),
+-    })
++    }
+     call = runner.run(
+         "native_bench", "native_bench", ["--index", index_name, "bench", str(fixture_path), "--json"], timeout
+     )
+@@ -1492,16 +1247,6 @@
+     return "n/a" if not isinstance(x, (int, float)) else f"{x:.{digits}f}"
+ 
+ 
+-# How the report names an arm that has no summary. "not_run" is the
+-# protocol's "not evaluated" (Arm B failed closed, or --skip-arm-b).
+-ARM_STATUS_LABELS = {
+-    "not_run": "not evaluated",
+-    "not_reached": "not reached",
+-    "interrupted": "interrupted",
+-    "aborted": "aborted",
+-}
+-
+-
+ def render_report(receipt: dict) -> str:
+     arm_a = receipt.get("arm_a") or {}
+     arm_b = receipt.get("arm_b") or {}
+@@ -1515,7 +1260,7 @@
+     outputs = receipt.get("outputs") or {}
+     qmd_version = receipt.get("qmd_version") or "unknown"
+     index_name = (receipt.get("index") or {}).get("index_name") or INDEX_NAME_DEFAULT
+-    n_queries = receipt.get("query_count") or (a or b or {}).get("query_count", 30)
++    n_queries = (a or b or {}).get("query_count", 30)
+ 
+     lines = [f"# Retrieval quality v2 run {run_id}: BM25 vs. hybrid", ""]
+     lines.append(
+@@ -1526,17 +1271,8 @@
+     )
+     lines.append("")
+     if receipt.get("abort_reason"):
+-        label = "Stopped after the decision" if decision else "Aborted before a decision"
+-        lines.append(f"**{label}:** {receipt['abort_reason']}")
++        lines.append(f"**Aborted before a decision:** {receipt['abort_reason']}")
+         lines.append("")
+-    for label, arm in (("Arm A", arm_a), ("Arm B", arm_b)):
+-        if arm.get("status") in ("interrupted", "aborted"):
+-            lines.append(
+-                f"{label} was {arm['status']} after {len(arm.get('per_query') or [])} of {n_queries} queries. "
+-                "The receipt keeps those queries' scores, but no arm mean or decision is computed "
+-                "from a partial arm."
+-            )
+-            lines.append("")
+     if a is not None and b_status == "evaluated" and b is not None and decision:
+         lines.append(
+             f"QMD **{qmd_version}** evaluated all {n_queries} preregistered held-out queries against both "
+@@ -1558,11 +1294,8 @@
+     lines.append("| Metric (mean over all queries) | Arm A -- BM25 (`search`) | Arm B -- hybrid (`query`, CPU) |")
+     lines.append("| --- | ---: | ---: |")
+ 
+-    def state(arm):
+-        return ARM_STATUS_LABELS.get(arm.get("status"), arm.get("status") or "not run")
+-
+-    def cell(arm, summary, key):
+-        return fmt(summary.get(key)) if summary else state(arm)
++    def cell(summary, key):
++        return fmt(summary.get(key)) if summary else "not run"
+ 
+     b_eval = b if b_status == "evaluated" else None
+     for label, key in (
+@@ -1570,19 +1303,13 @@
+         ("recall@5 (grade-2 files)", "mean_recall_at_5"),
+         ("MRR", "mean_mrr"),
+     ):
+-        lines.append(f"| {label} | {cell(arm_a, a, key)} | {cell(arm_b, b_eval, key)} |")
++        lines.append(f"| {label} | {cell(a, key)} | {cell(b_eval, key)} |")
+ 
+-    def count(arm, summary, key):
+-        return f"{len(summary.get(key) or [])}/{summary.get('query_count', n_queries)}" if summary else state(arm)
++    def count(summary, key):
++        return f"{len(summary.get(key) or [])}/{summary.get('query_count', n_queries)}" if summary else "not run"
+ 
+-    lines.append(
+-        f"| Queries erroring/timing out/rejected | {count(arm_a, a, 'errored_queries')} | "
+-        f"{count(arm_b, b_eval, 'errored_queries')} |"
+-    )
+-    lines.append(
+-        f"| Queries with no results | {count(arm_a, a, 'empty_result_queries')} | "
+-        f"{count(arm_b, b_eval, 'empty_result_queries')} |"
+-    )
++    lines.append(f"| Queries erroring/timing out/rejected | {count(a, 'errored_queries')} | {count(b_eval, 'errored_queries')} |")
++    lines.append(f"| Queries with no results | {count(a, 'empty_result_queries')} | {count(b_eval, 'empty_result_queries')} |")
+     lines.append("")
+     lines.append(
+         "recall@5 and MRR are secondary, non-gating evidence per PREREGISTRATION.md's Decision rule; "
+@@ -1779,30 +1506,6 @@
+     return json.dumps(document, indent=2, ensure_ascii=False) + "\n"
+ 
+ 
+-def settle_statuses(receipt: dict) -> None:
+-    """Gives both arms and the benchmark a final status once a run has ended.
+-
+-    Whatever was still running when the run stopped becomes ``interrupted``
+-    (a signal) or ``aborted`` (a failure), with the run's abort reason; what it
+-    never started becomes ``not_reached``. A completed run changes nothing.
+-    """
+-    outcome = "interrupted" if receipt.get("status") == "aborted_interrupted" else "aborted"
+-    reason = receipt.get("abort_reason")
+-    for key in ("arm_a", "arm_b"):
+-        arm = receipt[key]
+-        if arm.get("status") == "running":
+-            arm["status"] = outcome
+-            arm["stop_reason"] = reason
+-        elif arm.get("status") == "pending":
+-            arm["status"] = "not_reached"
+-    bench = receipt["native_bench"]
+-    if bench.get("status") in (None, "started"):
+-        bench["status"] = outcome
+-        bench["reason"] = reason
+-    elif bench.get("status") == "pending":
+-        bench["status"] = "not_reached"
+-
+-
+ # --------------------------------------------------------------------------
+ # CLI / main
+ # --------------------------------------------------------------------------
+@@ -1871,7 +1574,6 @@
+     san = Sanitizer(repo, scratch_home)
+     started_monotonic = time.monotonic()
+     durations = {
+-        "setup": None,
+         "seal_verify": None,
+         "corpus_staging": None,
+         "index_build": None,
+@@ -1879,29 +1581,18 @@
+         "arm_b_pull": None,
+         "arm_b_embed": None,
+         "arm_b": None,
+-        "decision": None,
+         "native_bench": None,
+         "total_wall_clock": None,
+     }
+     outputs_rel = {key: path.name for key, path in outputs.items()}
+ 
+     receipt = {
+-        # Schema 3 adds the arm and benchmark statuses pending, running,
+-        # interrupted, aborted and not_reached, plus query_count, interruption
+-        # and signals_received. Schema 2 receipts come from run.py efba31d5,
+-        # which had no signal handling.
+-        "schema_version": 3,
++        "schema_version": 2,
+         "run_id": run_id,
+         "run_date": run_id[:8],
+         "generated_at_utc": utc_now_iso(),
+         "generated_at_human": datetime.now(timezone.utc).strftime("%B %d, %Y"),
+         "status": "started",
+-        "status_note": (
+-            "Reserved when the run started. The runner rewrites this receipt when the run ends, "
+-            "a stop by SIGINT, SIGTERM or SIGHUP included; a receipt still at status 'started' means "
+-            "the runner was killed by a signal it cannot handle, such as SIGKILL, before it could "
+-            "record an outcome."
+-        ),
+         "evidence_class": "local_integration",
+         "evidence_class_note": (
+             "run.py is this repository's harness around upstream QMD CLI commands; its metrics and "
+@@ -1917,15 +1608,12 @@
+         "qmd": None,
+         "index": {"index_name": args.index_name},
+         "seal": {},
+-        "query_count": None,
+         "corpus_commit": None,
+         "corpus_staging": [],
+-        "arm_a": {"status": "pending", "per_query": [], "summary": None},
+-        "arm_b": {"status": "pending", "per_query": [], "summary": None, "model_provenance": None, "not_run_reason": None},
++        "arm_a": {"status": "not_run", "per_query": [], "summary": None},
++        "arm_b": {"status": "not_run", "per_query": [], "summary": None, "model_provenance": None, "not_run_reason": None},
+         "decision": None,
+-        "native_bench": {"status": "pending"},
+-        "interruption": None,
+-        "signals_received": [],
++        "native_bench": {"status": "not_run"},
+         "durations_seconds": durations,
+         "environment": {
+             "python_version": sys.version.split()[0],
+@@ -1943,89 +1631,54 @@
+         print(f"error: {outputs['results'].name} appeared concurrently; refusing to overwrite it", file=sys.stderr)
+         return 2
+ 
+-    exit_code = 0
+-    runner = None
+-    stops = StopRequests()
+-
+     def t(key):
+         class _Timer:
+             def __enter__(self_inner):
+                 self_inner.start = time.monotonic()
+-                stops.phase = key
+                 return self_inner
+ 
+             def __exit__(self_inner, exc_type, exc, tb):
+                 durations[key] = time.monotonic() - self_inner.start
+-                stops.phase = None
+-                if exc is not None and not hasattr(exc, "run_phase"):
+-                    with contextlib.suppress(AttributeError):
+-                        exc.run_phase = key  # the phase the exception left
+ 
+         return _Timer()
+ 
+-    def record_interruption(signum: int, received_at, phase, cause=None) -> int:
+-        """Sets status aborted_interrupted with its details; returns the exit code."""
+-        last = runner.records[-1] if runner is not None and runner.records else None
+-        in_flight = last["id"] if last is not None and last.get("interrupted_by") else None
+-        name = signal_name(signum)
+-        receipt["status"] = "aborted_interrupted"
+-        receipt["interruption"] = {
+-            "signal": name,
+-            "received_at_utc": received_at,
+-            "phase_when_received": phase,
+-            "acted_on_at_utc": utc_now_iso_ms(),
+-            "in_flight_native_record_id": in_flight,
+-        }
+-        reason = f"stopped by {name} during {phase or 'the runner work between phases'}"
+-        if in_flight:
+-            reason += (
+-                f"; the qmd call in flight ({in_flight}) was killed with its process group and is kept in "
+-                f"{outputs_rel['native']} with its partial output"
+-            )
+-        else:
+-            reason += "; no qmd call was in flight"
+-        if cause is not None:
+-            reason += f"; the run was already stopping when this failure followed: {cause}"
+-        receipt["abort_reason"] = san(reason)
+-        return 128 + signum
+-
++    exit_code = 0
++    runner = None
+     try:
+-        stops.arm()
+-        with t("setup"):
+-            qmd_bin = args.qmd_bin or shutil.which("qmd")
+-            if not qmd_bin:
+-                raise RunFailure("qmd_not_found", "qmd not found on PATH (command -v qmd)")
+-            env, not_inherited = qmd_env(scratch_home, args.index_name)
+-            receipt["environment"]["qmd_env"] = {
+-                "keys": sorted(env),
+-                "bound": {
+-                    key: san(env[key])
+-                    for key in (
+-                        "HOME",
+-                        "XDG_CACHE_HOME",
+-                        "XDG_CONFIG_HOME",
+-                        "XDG_DATA_HOME",
+-                        "TMPDIR",
+-                        "INDEX_PATH",
+-                        "QMD_CONFIG_DIR",
+-                        "QMD_FORCE_CPU",
+-                        "NODE_LLAMA_CPP_GPU",
+-                        "NO_COLOR",
+-                        "MCP_AUTO_OPEN_ENABLED",
+-                    )
+-                },
+-                "passed_through_from_caller": sorted(k for k in QMD_ENV_PASSTHROUGH if k in env),
+-                "caller_qmd_variables_not_inherited": not_inherited,
+-                "cwd": "<SCRATCH_HOME>",
+-            }
+-            runner = QmdRunner(qmd_bin, env, scratch_home, san, stops)
+-            receipt["qmd"] = describe_qmd_install(qmd_bin, san)
+-            ver = runner.setup("qmd:version", "setup", ["--index", args.index_name, "--version"], 30, "qmd_version")
+-            receipt["qmd_version_raw"] = ver.stdout.strip() or ver.stderr.strip()
+-            # "qmd --version" prints "qmd 2.8.3 (facd35e)"; keep just the semver for
+-            # qmd_version and the full banner in qmd_version_raw.
+-            version_match = re.search(r"(\d+\.\d+\.\d+)", receipt["qmd_version_raw"] or "")
+-            receipt["qmd_version"] = version_match.group(1) if version_match else receipt["qmd_version_raw"]
++        qmd_bin = args.qmd_bin or shutil.which("qmd")
++        if not qmd_bin:
++            raise RunFailure("qmd_not_found", "qmd not found on PATH (command -v qmd)")
++        env, not_inherited = qmd_env(scratch_home, args.index_name)
++        receipt["environment"]["qmd_env"] = {
++            "keys": sorted(env),
++            "bound": {
++                key: san(env[key])
++                for key in (
++                    "HOME",
++                    "XDG_CACHE_HOME",
++                    "XDG_CONFIG_HOME",
++                    "XDG_DATA_HOME",
++                    "TMPDIR",
++                    "INDEX_PATH",
++                    "QMD_CONFIG_DIR",
++                    "QMD_FORCE_CPU",
++                    "NODE_LLAMA_CPP_GPU",
++                    "NO_COLOR",
++                    "MCP_AUTO_OPEN_ENABLED",
++                )
++            },
++            "passed_through_from_caller": sorted(k for k in QMD_ENV_PASSTHROUGH if k in env),
++            "caller_qmd_variables_not_inherited": not_inherited,
++            "cwd": "<SCRATCH_HOME>",
++        }
++        runner = QmdRunner(qmd_bin, env, scratch_home, san)
++        receipt["qmd"] = describe_qmd_install(qmd_bin, san)
++        ver = runner.setup("qmd:version", "setup", ["--index", args.index_name, "--version"], 30, "qmd_version")
++        receipt["qmd_version_raw"] = ver.stdout.strip() or ver.stderr.strip()
++        # "qmd --version" prints "qmd 2.8.3 (facd35e)"; keep just the semver for
++        # qmd_version and the full banner in qmd_version_raw.
++        version_match = re.search(r"(\d+\.\d+\.\d+)", receipt["qmd_version_raw"] or "")
++        receipt["qmd_version"] = version_match.group(1) if version_match else receipt["qmd_version_raw"]
+ 
+         with t("seal_verify"):
+             seal = verify_seal(repo)
+@@ -2041,99 +1694,84 @@
+         queries = doc["queries"]
+         corpus = doc["corpus"]
+         commit = doc["corpus_commit"]
+-        receipt["query_count"] = len(queries)
+         receipt["corpus_commit"] = commit
+ 
+         stage_dir = scratch_home / "corpus-stage"
+         with t("corpus_staging"):
+             staged = stage_corpus(repo, commit, corpus, stage_dir)
+         receipt["corpus_staging"] = staged
+-        stops.checkpoint()
+ 
+         with t("index_build"):
+             index_summary = build_index(runner, env, stage_dir, args.index_name, args.index_timeout, corpus, san)
+         receipt["index"].update(index_summary)
+ 
+-        arm_a = receipt["arm_a"]
+-        arm_a["status"] = "running"
+         with t("arm_a"):
+-            run_arm(
+-                runner, args.index_name, "search", "arm_a", queries, corpus, args.arm_a_query_timeout, args.top_k,
+-                results=arm_a["per_query"],
++            arm_a_results = run_arm(
++                runner, args.index_name, "search", "arm_a", queries, corpus, args.arm_a_query_timeout, args.top_k
+             )
+-        arm_a["status"] = "evaluated"
+-        arm_a["summary"] = summarize_arm(arm_a["per_query"])
++        receipt["arm_a"] = {"status": "evaluated", "per_query": arm_a_results, "summary": summarize_arm(arm_a_results)}
+ 
+-        arm_b = receipt["arm_b"]
+         if args.skip_arm_b:
+-            arm_b["status"] = "not_run"
+-            arm_b["not_run_reason"] = "--skip-arm-b was passed"
++            receipt["arm_b"]["not_run_reason"] = "--skip-arm-b was passed"
+         else:
+-            arm_b["status"] = "running"
+             try:
+                 with t("arm_b_pull"):
+                     provenance = pull_and_pin_models(runner, args.index_name, scratch_home, args.pull_timeout, san)
+                 # Recorded as soon as it exists, so a subsequent embed failure
+                 # still leaves the resolved model provenance in the receipt.
+-                arm_b["model_provenance"] = provenance
++                receipt["arm_b"]["model_provenance"] = provenance
+ 
+                 with t("arm_b_embed"):
+                     embed_summary = embed_index(runner, args.index_name, args.embed_timeout, len(corpus), san)
+-                arm_b["embed_summary"] = embed_summary
+-            except RunFailure as exc:
+-                # A failure that follows a stop request is part of stopping, not a
+-                # finding about Arm B.
+-                stops.checkpoint()
+-                # PREREGISTRATION.md: Arm B fails closed and is reported as not evaluated.
+-                arm_b["status"] = "not_run"
+-                arm_b["not_run_reason"] = san(f"[{exc.slug}] {exc}")
+-            else:
++                receipt["arm_b"]["embed_summary"] = embed_summary
++
+                 with t("arm_b"):
+-                    run_arm(
+-                        runner, args.index_name, "query", "arm_b", queries, corpus, args.arm_b_query_timeout,
+-                        args.top_k, results=arm_b["per_query"],
++                    arm_b_results = run_arm(
++                        runner, args.index_name, "query", "arm_b", queries, corpus, args.arm_b_query_timeout, args.top_k
+                     )
+-                arm_b["status"] = "evaluated"
+-                arm_b["summary"] = summarize_arm(arm_b["per_query"])
++                receipt["arm_b"]["status"] = "evaluated"
++                receipt["arm_b"]["per_query"] = arm_b_results
++                receipt["arm_b"]["summary"] = summarize_arm(arm_b_results)
+                 stderr_by_record = {r["id"]: r["stderr"] for r in runner.records}
+-                arm_b["expansion_skipped_queries"] = [
++                receipt["arm_b"]["expansion_skipped_queries"] = [
+                     r["id"]
+-                    for r in arm_b["per_query"]
++                    for r in arm_b_results
+                     if "Strong BM25 signal" in stderr_by_record.get(r["native_record_id"], "")
+                 ]
++            except RunFailure as exc:
++                receipt["arm_b"]["status"] = "not_run"
++                receipt["arm_b"]["not_run_reason"] = san(f"[{exc.slug}] {exc}")
+ 
+-        stops.checkpoint()
+-        with t("decision"):
+-            if arm_b["status"] == "evaluated":
+-                pairs = zip(arm_a["per_query"], arm_b["per_query"], strict=True)
+-                diffs = [b["ndcg_at_10"] - a["ndcg_at_10"] for a, b in pairs]
+-                bootstrap = paired_bootstrap_ci(diffs, args.bootstrap_iterations, args.bootstrap_seed)
+-                receipt["decision"] = decide(arm_a["summary"], "evaluated", arm_b["summary"], bootstrap)
+-            else:
+-                receipt["decision"] = decide(arm_a["summary"], "not_run", None, None)
++        if receipt["arm_b"]["status"] == "evaluated":
++            diffs = [
++                b["ndcg_at_10"] - a["ndcg_at_10"]
++                for a, b in zip(receipt["arm_a"]["per_query"], receipt["arm_b"]["per_query"])
++            ]
++            bootstrap = paired_bootstrap_ci(diffs, args.bootstrap_iterations, args.bootstrap_seed)
++            receipt["decision"] = decide(receipt["arm_a"]["summary"], "evaluated", receipt["arm_b"]["summary"], bootstrap)
++        else:
++            receipt["decision"] = decide(receipt["arm_a"]["summary"], "not_run", None, None)
+ 
+         if args.skip_native_bench:
+             receipt["native_bench"] = {"status": "not_run", "reason": "--skip-native-bench was passed"}
+-        elif arm_b["status"] != "evaluated":
++        elif receipt["arm_b"]["status"] != "evaluated":
+             receipt["native_bench"] = {
+                 "status": "not_run",
+                 "reason": "qmd bench's vector/hybrid/full backends need Arm B's models and embeddings, which were not prepared",
+             }
+         else:
+-            bench = receipt["native_bench"] = {}
+             with t("native_bench"):
+-                run_native_bench(
++                receipt["native_bench"] = run_native_bench(
+                     runner,
+                     args.index_name,
+                     queries,
+                     scratch_home,
+                     args.bench_timeout,
+                     index_db_path(env),
+-                    {"arm_a": arm_a["per_query"], "arm_b": arm_b["per_query"]},
+-                    section=bench,
++                    {"arm_a": receipt["arm_a"]["per_query"], "arm_b": receipt["arm_b"]["per_query"]},
+                 )
+ 
+-        a_summary = arm_a["summary"]
++        a_summary = receipt["arm_a"]["summary"]
+         receipt["limitations"] = [
+             "Arm A is QMD's lexical `search` command as research workers call it, not BM25 in general: it "
+             f"returned no candidates for {len(a_summary['empty_result_queries'])} of {a_summary['query_count']} "
+@@ -2148,7 +1786,7 @@
+             "run.py is this repository's harness around upstream QMD commands, so its metrics and "
+             "decision are local_integration evidence, not an upstream test.",
+         ]
+-        if arm_b["status"] == "evaluated":
++        if receipt["arm_b"]["status"] == "evaluated":
+             receipt["limitations"] += [
+                 "Arm B's models ran forced onto CPU on a shared host; a GPU run or a different host's CPU "
+                 "could show different absolute latency.",
+@@ -2156,7 +1794,7 @@
+                 "strong; not every Arm B query exercised all three pulled models.",
+             ]
+         else:
+-            receipt["limitations"].append(f"Arm B was not evaluated: {arm_b['not_run_reason']}")
++            receipt["limitations"].append(f"Arm B was not evaluated: {receipt['arm_b']['not_run_reason']}")
+         if receipt["native_bench"].get("status") != "not_run":
+             receipt["limitations"].append(
+                 "`qmd bench` is QMD's own command and scorer, but its fixture is derived here from "
+@@ -2168,111 +1806,58 @@
+             )
+ 
+         receipt["status"] = (
+-            "completed_both_arms_evaluated" if arm_b["status"] == "evaluated" else "completed_arm_b_not_run"
++            "completed_both_arms_evaluated" if receipt["arm_b"]["status"] == "evaluated" else "completed_arm_b_not_run"
+         )
+ 
+-    except RunInterrupted as exc:
+-        first = stops.first()
+-        if first is not None:
+-            exit_code = record_interruption(*first)
+-        else:  # raised without a recorded signal, so not by this runner's StopRequests
+-            exit_code = record_interruption(exc.signum, None, getattr(exc, "run_phase", None))
+-    except KeyboardInterrupt as exc:
+-        # Raised by a SIGINT handler the caller installed; the runner leaves those in place.
+-        exit_code = record_interruption(int(signal.SIGINT), None, getattr(exc, "run_phase", None))
+     except RunFailure as exc:
+-        first = stops.first()
+-        if first is not None:
+-            # For example, a terminal's SIGINT also reaches a `git show` that the
+-            # runner started in its own process group.
+-            exit_code = record_interruption(*first, cause=san(f"[{exc.slug}] {exc}"))
+-        else:
+-            receipt["status"] = f"aborted_{exc.slug}"
+-            receipt["abort_reason"] = san(str(exc))
+-            exit_code = 1
++        receipt["status"] = f"aborted_{exc.slug}"
++        receipt["abort_reason"] = san(str(exc))
++        exit_code = 1
+     except Exception as exc:  # top-level safety net: still write an honest partial receipt
+         receipt["status"] = "aborted_unexpected_exception"
+         receipt["abort_reason"] = san(f"{type(exc).__name__}: {exc}")
+         exit_code = 1
+     finally:
++        durations["total_wall_clock"] = time.monotonic() - started_monotonic
++        native_doc = {
++            "schema_version": 1,
++            "run_id": run_id,
++            "results_file": outputs_rel["results"],
++            "evidence_class": "native_cli_output",
++            "sanitization": (
++                "stdout/stderr are decoded as UTF-8 (invalid bytes replaced); the repository checkout "
++                "becomes <STACK_REPO>, the scratch HOME <SCRATCH_HOME>, and any /home/<user> prefix ~. "
++                "*_raw_sha256/*_raw_bytes describe the bytes qmd returned; *_sha256 hashes the retained "
++                "text; *_identical_to_raw says whether they are the same bytes."
++            ),
++            "records": runner.records if runner is not None else [],
++        }
++        write_errors = []
+         try:
+-            settle_statuses(receipt)
+-            receipt.pop("status_note", None)
+-            receipt["signals_received"] = [
+-                {"signal": signal_name(signum), "received_at_utc": at, "phase": phase}
+-                for signum, at, phase in stops.received
+-            ]
+-            durations["total_wall_clock"] = time.monotonic() - started_monotonic
+-            native_doc = {
+-                "schema_version": 1,
+-                "run_id": run_id,
+-                "results_file": outputs_rel["results"],
+-                "evidence_class": "native_cli_output",
+-                "sanitization": (
+-                    "stdout/stderr are decoded as UTF-8 (invalid bytes replaced); the repository checkout "
+-                    "becomes <STACK_REPO>, the scratch HOME <SCRATCH_HOME>, and any /home/<user> prefix ~. "
+-                    "*_raw_sha256/*_raw_bytes describe the bytes qmd returned; *_sha256 hashes the retained "
+-                    "text; *_identical_to_raw says whether they are the same bytes."
+-                ),
+-                "records": runner.records if runner is not None else [],
+-            }
+-            write_errors = []
+-            try:
+-                write_new(outputs["native"], to_json(native_doc))
+-            except OSError as exc:
+-                write_errors.append(f"native: {exc}")
+-            try:
+-                replace_reserved(outputs["results"], to_json(receipt))
+-            except OSError as exc:
+-                write_errors.append(f"results: {exc}")
+-            try:
+-                write_new(outputs["report"], render_report(receipt))
+-            except Exception as exc:  # the receipt is already on disk; say so rather than crash
+-                write_errors.append(f"report: {type(exc).__name__}: {exc}")
+-
+-            print(f"status: {receipt['status']}")
+-            for key in ("results", "native", "report"):
+-                print(f"{key}: {outputs[key]}")
+-            if receipt.get("decision"):
+-                print(f"decision: {receipt['decision']['decision']}")
+-            for problem in write_errors:
+-                print(f"error writing output {problem}", file=sys.stderr)
+-            if write_errors:
+-                exit_code = 1
+-        finally:
+-            stops.restore()
+-
+-    unrecorded = stops.received[len(receipt["signals_received"]):]
+-    if unrecorded:
+-        names = ", ".join(signal_name(signum) for signum, _at, _phase in unrecorded)
+-        print(f"note: {names} arrived while the outputs were being written and is not in the receipt", file=sys.stderr)
+-    if exit_code == 0 and stops.received:
+-        # The run finished its work before it reached a point where it could stop;
+-        # it still reports that it was asked to stop.
+-        print(
+-            f"note: {signal_name(stops.received[0][0])} arrived after the last qmd call; the run completed first",
+-            file=sys.stderr,
+-        )
+-        exit_code = 128 + stops.received[0][0]
+-    return exit_code
+-
+-
+-def exit_process(code: int) -> None:
+-    """Ends the script with ``code``, or by the signal that stopped the run.
++            write_new(outputs["native"], to_json(native_doc))
++        except OSError as exc:
++            write_errors.append(f"native: {exc}")
++        try:
++            replace_reserved(outputs["results"], to_json(receipt))
++        except OSError as exc:
++            write_errors.append(f"results: {exc}")
++        try:
++            write_new(outputs["report"], render_report(receipt))
++        except Exception as exc:  # the receipt is already on disk; say so rather than crash
++            write_errors.append(f"report: {type(exc).__name__}: {exc}")
++
++        print(f"status: {receipt['status']}")
++        for key in ("results", "native", "report"):
++            print(f"{key}: {outputs[key]}")
++        if receipt.get("decision"):
++            print(f"decision: {receipt['decision']['decision']}")
++        for problem in write_errors:
++            print(f"error writing output {problem}", file=sys.stderr)
++        if write_errors:
++            exit_code = 1
+ 
+-    A process that handled SIGINT, SIGTERM or SIGHUP and then exits normally
+-    looks to its caller like one that failed, and a shell running it in a loop
+-    carries on. Ending by the same signal, once the outputs are written, lets
+-    a shell, GNU timeout or a supervisor see the stop for what it was.
+-    """
+-    signum = code - 128 if code > 128 else None
+-    if signum is not None and signum in {int(s) for s in StopRequests.signals()}:
+-        sys.stdout.flush()
+-        sys.stderr.flush()
+-        signal.signal(signum, signal.SIG_DFL)
+-        os.kill(os.getpid(), signum)
+-    sys.exit(code)
++    return exit_code
+ 
+ 
+ if __name__ == "__main__":
+-    exit_process(main())
++    sys.exit(main())

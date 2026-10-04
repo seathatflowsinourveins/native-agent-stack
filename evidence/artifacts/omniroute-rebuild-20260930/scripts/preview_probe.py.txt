@@ -1,0 +1,92 @@
+"""No-model probe of the live gateways' compression preview (dry run): does the headerless lane's whitespace folding (lite) or
+the dedup/ccr engines alter diffs, tab-indented code, aligned columns or exact-match edit text? Synthetic fixtures only."""
+import difflib
+import json
+import sys
+import urllib.request
+
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 20129
+URL = f"http://127.0.0.1:{PORT}/api/compression/preview"
+
+DIFF = (
+    "Please apply this patch exactly:\n\n"
+    "--- a/app.py\n+++ b/app.py\n@@ -10,7 +10,7 @@ def main():\n"
+    "     x = 1\n"
+    "     y  = 2   \n"          # double space inside, trailing spaces
+    "-\tz = 3\n"                # tab-indented removal
+    "+\tz = 4\n"
+    "     total    = x + y\n"   # aligned columns
+    "     return total\n"
+    "\\ No newline at end of file\n"
+)
+CODE = (
+    "Here is the function:\n\n```python\n"
+    "def scale(values, factor):\n"
+    "    result   = []\n"
+    "    for v in values:\n"
+    "        result.append(v   *  factor)\n"
+    "    return result\n"
+    "\n\n\n"
+    "TABLE = {\n"
+    "    'alpha':   1,\n"
+    "    'beta':    22,\n"
+    "    'gamma':   333,\n"
+    "}\n```\n"
+)
+EDIT = json.dumps({
+    "file_path": "/repo/src/util.py",
+    "old_string": "    def total(self):\n        return  self.a   +  self.b\n",
+    "new_string": "    def total(self):\n        return self.a + self.b\n",
+}, indent=2)
+TOOL_DIFF = (
+    "diff --git a/f.txt b/f.txt\nindex 1111111..2222222 100644\n--- a/f.txt\n+++ b/f.txt\n"
+    "@@ -1,4 +1,4 @@\n line one    \n-line  two\n+line  2\n\tline three\n line four\n"
+)
+
+FIXTURES = {
+    "F1 unified diff in a user message": [{"role": "user", "content": DIFF}],
+    "F2 fenced code with indentation and aligned columns": [{"role": "user", "content": CODE}],
+    "F3 exact-match edit arguments (assistant message)": [
+        {"role": "user", "content": "Edit the file."},
+        {"role": "assistant", "content": EDIT},
+    ],
+    "F4 git diff as a tool result": [
+        {"role": "user", "content": "Show the diff."},
+        {"role": "assistant", "content": "Running git diff."},
+        {"role": "tool", "content": TOOL_DIFF},
+    ],
+}
+
+RUNS = [
+    ("headerless lane [session-dedup, ccr, lite], preview defaults", {"pipeline": ["session-dedup", "ccr", "lite"]}),
+    ("lite alone, compressToolResults false (the live setting)", {"mode": "lite", "config": {"lite": {"compressToolResults": False}}}),
+]
+
+
+def post(payload):
+    request = urllib.request.Request(URL, data=json.dumps(payload).encode(), headers={"content-type": "application/json"})
+    with urllib.request.urlopen(request, timeout=60) as response:
+        return json.load(response)
+
+
+results = []
+for run_name, extra in RUNS:
+    for fixture_name, messages in FIXTURES.items():
+        reply = post({"messages": messages, **extra})
+        keys = sorted(reply.keys())
+        original = reply.get("original")
+        compressed = reply.get("compressed")
+        same = original == compressed
+        entry = {
+            "run": run_name,
+            "fixture": fixture_name,
+            "byte_identical": same,
+            "tokens": [reply.get("originalTokens"), reply.get("compressedTokens")],
+            "techniques": reply.get("techniquesUsed"),
+            "fallbackApplied": (reply.get("diff") or {}).get("fallbackApplied") if isinstance(reply.get("diff"), dict) else None,
+        }
+        if not same and isinstance(original, str) and isinstance(compressed, str):
+            entry["diff"] = [line for line in difflib.unified_diff(original.splitlines(True), compressed.splitlines(True), "in", "out", n=0)][:14]
+        results.append(entry)
+print("response keys:", keys, file=sys.stderr)
+print(json.dumps(results, indent=1, ensure_ascii=False))

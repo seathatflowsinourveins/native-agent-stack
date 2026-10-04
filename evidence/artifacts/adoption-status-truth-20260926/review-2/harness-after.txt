@@ -1,0 +1,27 @@
+under test: host-scripts/prove.py sha256 95afa1af79d8eb3f
+under test: adoption-status-truth-20260926/codex_known_answers.py sha256 c26df826420c7bde
+pins read from $CHECKOUT: codex 0.157.1, claude-code floor 2.1.281
+--- V1 no --version observation
+UNTESTED  G9 a pin mismatch surfaces at the top: --version: codex None (pin 0.157.1), claude None (floor 2.1.281); checker mismatched [], pinned_versions_match True; no --version observation for claude-code, codex
+EXPECT V1 the pin check reads UNTESTED: ok
+--- V2 both at their pins
+UNTESTED  G9 a pin mismatch surfaces at the top: --version: codex 0.157.1 (pin 0.157.1), claude 2.1.281 (floor 2.1.281); checker mismatched [], pinned_versions_match True; no observed mismatch to surface
+EXPECT V2 the pin check reads UNTESTED: ok
+--- V3 codex off its pin, surfaced
+PASS  G9 a pin mismatch surfaces at the top: --version: codex 0.0.1 (pin 0.157.1), claude 2.1.281 (floor 2.1.281); checker mismatched ['codex'], pinned_versions_match False
+EXPECT V3 the pin check reads PASS: ok
+--- V4 codex off its pin, not surfaced
+FAIL  G9 a pin mismatch surfaces at the top: --version: codex 0.0.1 (pin 0.157.1), claude 2.1.281 (floor 2.1.281); checker mismatched [], pinned_versions_match True
+EXPECT V4 the pin check reads FAIL: ok
+--- V5 codex at its pin, reported mismatched
+FAIL  G9 a pin mismatch surfaces at the top: --version: codex 0.157.1 (pin 0.157.1), claude 2.1.281 (floor 2.1.281); checker mismatched ['codex'], pinned_versions_match False
+EXPECT V5 the pin check reads FAIL: ok
+--- R1 prove.py codex_hooks_list, app-server never answers: finished in under 30 s; exit 0; last line: {"outcome": "raised RuntimeError: codex app-server gave no answer within 2 s", "answer_timeout": 2.0}
+EXPECT R1 returns inside 120 s (raised RuntimeError): ok
+--- R2 prove.py codex_hooks_list, app-server lingers after answering: finished in under 30 s; exit 0; last line: {"outcome": "returned 1 hook(s)", "answer_timeout": 2.0}
+EXPECT R2 returns inside 120 s (returned 1): ok
+--- R3 codex_known_answers.py, app-server never answers: finished in under 10 s; exit 1; last line: RuntimeError: no answer within 2 s
+EXPECT R3 returns inside 120 s (RuntimeError): ok
+--- O1 adoption-status-truth-20260926/codex_oracle.py sha256 59f7801755cb2951 trust --base <a directory holding trust/keep.txt>: finished; exit 2; last line: codex_oracle.py: error: --base must be a new or empty directory: the oracle deletes and recreates the case directories it makes there, and nothing else
+EXPECT O1 the existing trust/keep.txt survives: ok
+=== summary: 0 expectation(s) not met

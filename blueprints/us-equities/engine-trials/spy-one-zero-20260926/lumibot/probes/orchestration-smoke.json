@@ -1,0 +1,769 @@
+{
+  "all_checks_passed": true,
+  "checks": {
+    "after_market_closes:compare_bind_accepts_receipt": true,
+    "after_market_closes:compare_shape_fail_unattributed": true,
+    "after_market_closes:guards_failed_as_mechanism_probe": true,
+    "after_market_closes:no_port_scope_guard_failed": true,
+    "after_market_closes:parent_main_exit_zero": true,
+    "after_market_closes:twenty_nine_checks": true,
+    "after_market_closes:two_run_records_equal": true,
+    "before_starting_trading:compare_bind_accepts_receipt": true,
+    "before_starting_trading:compare_shape_blocked_by_distributions": true,
+    "before_starting_trading:guards_failed_as_mechanism_probe": true,
+    "before_starting_trading:no_port_scope_guard_failed": true,
+    "before_starting_trading:parent_main_exit_zero": true,
+    "before_starting_trading:twenty_nine_checks": true,
+    "before_starting_trading:two_run_records_equal": true,
+    "real_child_launch_refuses_synthetic_rows": true
+  },
+  "evidence_class": "synthetic fixture under the run sandbox; not parity evidence",
+  "float_projection": {
+    "after_market_closes": {
+      "max_abs_adjustment": "0.00000000001",
+      "noise_limit": "0.000001",
+      "per_run": {
+        "run-1": {
+          "max_abs_adjustment": "0.00000000001",
+          "noise_limit": "0.000001",
+          "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+          "values_projected": 9
+        },
+        "run-2": {
+          "max_abs_adjustment": "0.00000000001",
+          "noise_limit": "0.000001",
+          "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+          "values_projected": 9
+        }
+      },
+      "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+      "values_projected": 9
+    },
+    "before_starting_trading": {
+      "max_abs_adjustment": "0",
+      "noise_limit": "0.000001",
+      "per_run": {
+        "run-1": {
+          "max_abs_adjustment": "0",
+          "noise_limit": "0.000001",
+          "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+          "values_projected": 9
+        },
+        "run-2": {
+          "max_abs_adjustment": "0",
+          "noise_limit": "0.000001",
+          "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+          "values_projected": 9
+        }
+      },
+      "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+      "values_projected": 9
+    }
+  },
+  "guards": {
+    "after_market_closes": [
+      {
+        "name": "network_isolation",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "pinned_spy_parity_sources",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "frozen_plan",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "manifest_binding",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "frozen_inputs_and_rows",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "decision_rows_present",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "no_blocked_network_lookups",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "no_relative_home_directory",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "engine_version",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "backtest_configuration",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "engine_rows_equal_converted_rows",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "sessions_from_rows",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "lifecycle_clock",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "decision_bar_is_session_final",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "decision_bar_visible_and_matches",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "decision_bar_is_session_final",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "decision_bar_visible_and_matches",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "decisions_reached",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "engine_cash_events",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "causality",
+        "outcome": "fail",
+        "scope": "run-1"
+      },
+      {
+        "name": "final_state",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "orders_filled_none_canceled",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "submission_clock",
+        "outcome": "fail",
+        "scope": "run-1"
+      },
+      {
+        "name": "fill_at_next_session_first_bar",
+        "outcome": "fail",
+        "scope": "run-1"
+      },
+      {
+        "name": "fill_price_is_open_of_bar_indexed_at_fill_instant",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "costs_zero",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "fill_callbacks_match_trade_events",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "engine_cash_changes_only_at_fills",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "native_end_cash_equals_engine_event_path",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "identifiers_recognized",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "float_projection_noise_only",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "engine_version",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "backtest_configuration",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "engine_rows_equal_converted_rows",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "sessions_from_rows",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "lifecycle_clock",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "decision_bar_is_session_final",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "decision_bar_visible_and_matches",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "decision_bar_is_session_final",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "decision_bar_visible_and_matches",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "decisions_reached",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "engine_cash_events",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "causality",
+        "outcome": "fail",
+        "scope": "run-2"
+      },
+      {
+        "name": "final_state",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "orders_filled_none_canceled",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "submission_clock",
+        "outcome": "fail",
+        "scope": "run-2"
+      },
+      {
+        "name": "fill_at_next_session_first_bar",
+        "outcome": "fail",
+        "scope": "run-2"
+      },
+      {
+        "name": "fill_price_is_open_of_bar_indexed_at_fill_instant",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "costs_zero",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "fill_callbacks_match_trade_events",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "engine_cash_changes_only_at_fills",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "native_end_cash_equals_engine_event_path",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "identifiers_recognized",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "float_projection_noise_only",
+        "outcome": "pass",
+        "scope": "run-2"
+      }
+    ],
+    "before_starting_trading": [
+      {
+        "name": "network_isolation",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "pinned_spy_parity_sources",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "frozen_plan",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "manifest_binding",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "frozen_inputs_and_rows",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "decision_rows_present",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "no_blocked_network_lookups",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "no_relative_home_directory",
+        "outcome": "pass",
+        "scope": "port"
+      },
+      {
+        "name": "engine_version",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "backtest_configuration",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "engine_rows_equal_converted_rows",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "sessions_from_rows",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "lifecycle_clock",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "decision_bar_is_session_final",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "decision_bar_visible_and_matches",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "decision_bar_is_session_final",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "decision_bar_visible_and_matches",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "decisions_reached",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "engine_cash_events",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "causality",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "final_state",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "orders_filled_none_canceled",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "submission_clock",
+        "outcome": "fail",
+        "scope": "run-1"
+      },
+      {
+        "name": "fill_at_next_session_first_bar",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "fill_price_is_open_of_bar_indexed_at_fill_instant",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "costs_zero",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "fill_callbacks_match_trade_events",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "engine_cash_changes_only_at_fills",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "native_end_cash_equals_engine_event_path",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "identifiers_recognized",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "float_projection_noise_only",
+        "outcome": "pass",
+        "scope": "run-1"
+      },
+      {
+        "name": "engine_version",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "backtest_configuration",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "engine_rows_equal_converted_rows",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "sessions_from_rows",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "lifecycle_clock",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "decision_bar_is_session_final",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "decision_bar_visible_and_matches",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "decision_bar_is_session_final",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "decision_bar_visible_and_matches",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "decisions_reached",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "engine_cash_events",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "causality",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "final_state",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "orders_filled_none_canceled",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "submission_clock",
+        "outcome": "fail",
+        "scope": "run-2"
+      },
+      {
+        "name": "fill_at_next_session_first_bar",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "fill_price_is_open_of_bar_indexed_at_fill_instant",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "costs_zero",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "fill_callbacks_match_trade_events",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "engine_cash_changes_only_at_fills",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "native_end_cash_equals_engine_event_path",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "identifiers_recognized",
+        "outcome": "pass",
+        "scope": "run-2"
+      },
+      {
+        "name": "float_projection_noise_only",
+        "outcome": "pass",
+        "scope": "run-2"
+      }
+    ]
+  },
+  "mechanism_probe_sha256": "ffe5df9291d273f5a1e823dd1fd64ce44e5770be06b1b8eafffff0ace876b846",
+  "port_sha256": "d92cf90ce59f79dde1a7d5471a8a476d6105a2fee039992887010ee5a0b0c98e",
+  "receipt_keys": {
+    "after_market_closes": [
+      "arm",
+      "attribution_evidence",
+      "case",
+      "case_configuration",
+      "cash_ledger",
+      "classification",
+      "conversion",
+      "decision_hook",
+      "declared_deviations",
+      "derived_distributions",
+      "distribution_ledger",
+      "dividend_cash_usd",
+      "engine",
+      "engine_configuration",
+      "engine_totals",
+      "evidence_class",
+      "fees_usd",
+      "fills",
+      "final_quantity",
+      "float_projection",
+      "frozen_plan",
+      "gate_context",
+      "guards",
+      "guards_failed",
+      "id",
+      "inputs",
+      "intents",
+      "isolation",
+      "limitations",
+      "local_source_sha256",
+      "mapping_manifest",
+      "native_end_cash_usd",
+      "native_end_cash_usd_engine_repr",
+      "observed_utc",
+      "port_source_sha256",
+      "pre_run_findings",
+      "preregistration",
+      "reconciled_end_cash_usd",
+      "runs",
+      "schema_version",
+      "started_utc",
+      "tolerances",
+      "trial",
+      "two_run_determinism",
+      "two_run_records_equal",
+      "unsupported_mappings"
+    ],
+    "before_starting_trading": [
+      "arm",
+      "attribution_evidence",
+      "case",
+      "case_configuration",
+      "cash_ledger",
+      "classification",
+      "conversion",
+      "decision_hook",
+      "declared_deviations",
+      "derived_distributions",
+      "distribution_ledger",
+      "dividend_cash_usd",
+      "engine",
+      "engine_configuration",
+      "engine_totals",
+      "evidence_class",
+      "fees_usd",
+      "fills",
+      "final_quantity",
+      "float_projection",
+      "frozen_plan",
+      "gate_context",
+      "guards",
+      "guards_failed",
+      "id",
+      "inputs",
+      "intents",
+      "isolation",
+      "limitations",
+      "local_source_sha256",
+      "mapping_manifest",
+      "native_end_cash_usd",
+      "native_end_cash_usd_engine_repr",
+      "observed_utc",
+      "port_source_sha256",
+      "pre_run_findings",
+      "preregistration",
+      "reconciled_end_cash_usd",
+      "runs",
+      "schema_version",
+      "started_utc",
+      "tolerances",
+      "trial",
+      "two_run_determinism",
+      "two_run_records_equal",
+      "unsupported_mappings"
+    ]
+  },
+  "script_sha256": "7a9e29ab69a62a63827e96efd61bf10d2899a72224d66546bef5ac4ff19fcb48",
+  "smoke": "Lumibot port orchestration smoke test (synthetic bars, stand-in conversion)",
+  "synthetic_verdicts": {
+    "after_market_closes": {
+      "attribution_evidence": "converted bars",
+      "blocking_mappings": [],
+      "checks": 29,
+      "complete": true,
+      "failed": 6,
+      "failing": [
+        "end_cash.reconciled_end_cash_usd#21",
+        "entry_fill.fill_price_usd#12",
+        "entry_fill.utc_seconds#9",
+        "exit_fill.fill_price_usd#16",
+        "exit_fill.utc_seconds#13",
+        "native_end_cash.native_end_cash_usd#22"
+      ],
+      "rejected_attributions": [],
+      "unattributed_failures": [
+        "entry_fill.utc_seconds#9",
+        "entry_fill.fill_price_usd#12",
+        "exit_fill.utc_seconds#13",
+        "exit_fill.fill_price_usd#16",
+        "end_cash.reconciled_end_cash_usd#21",
+        "native_end_cash.native_end_cash_usd#22"
+      ],
+      "verdict": "FAIL"
+    },
+    "before_starting_trading": {
+      "attribution_evidence": "converted bars",
+      "blocking_mappings": [
+        "distributions_and_cash"
+      ],
+      "checks": 29,
+      "complete": true,
+      "failed": 1,
+      "failing": [
+        "native_end_cash.native_end_cash_usd#22"
+      ],
+      "rejected_attributions": [],
+      "unattributed_failures": [],
+      "verdict": "BLOCKED"
+    }
+  },
+  "two_run_determinism": {
+    "after_market_closes": {
+      "normalization_rule": "Only random uuid4 hex identifiers (fields identifier, parent_identifier, event_id, _identifier) are replaced by ordinals in order of first appearance, after format validation; the sequential bt_<n> identifiers Lumibot assigns in backtests stay raw. Timing, prices, quantities, fees, distributions, position transitions and decision order are never normalized, and the raw reports carry no run label or wall-clock value.",
+      "normalized_economic_sha256_equal": true,
+      "raw_field_paths_differing": [],
+      "raw_report_sha256_equal": true,
+      "runs": "two child processes of the port, each constructing a fresh engine with its own LUMIBOT_CACHE_FOLDER and working directory"
+    },
+    "before_starting_trading": {
+      "normalization_rule": "Only random uuid4 hex identifiers (fields identifier, parent_identifier, event_id, _identifier) are replaced by ordinals in order of first appearance, after format validation; the sequential bt_<n> identifiers Lumibot assigns in backtests stay raw. Timing, prices, quantities, fees, distributions, position transitions and decision order are never normalized, and the raw reports carry no run label or wall-clock value.",
+      "normalized_economic_sha256_equal": true,
+      "raw_field_paths_differing": [],
+      "raw_report_sha256_equal": true,
+      "runs": "two child processes of the port, each constructing a fresh engine with its own LUMIBOT_CACHE_FOLDER and working directory"
+    }
+  }
+}

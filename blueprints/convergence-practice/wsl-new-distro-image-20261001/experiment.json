@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "planned",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Accepted W-IMG dual-image recipe parameterization at base 798ac445 for a recoverable second WSL 2 distribution beside the running default workstation. Ubuntu 26.04.1 trial and 24.04.5 fallback are symmetric provisional arms with no merit precedence. Source/signature/image facts were inspected, but neither new-host import, first boot, systemd-user, GPU or toolkit comparison has run. The preceding native Claude preparation worker hit its actual weekly limit, exit 1, and made no changes.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+      "revision": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104"
+    },
+    {
+      "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
+      "revision": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e"
+    },
+    {
+      "url": "https://github.com/microsoft/WSL/blob/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json",
+      "revision": "8bc98bc33b246fe66710eec9eaa1b24c323da987"
+    },
+    {
+      "url": "https://github.com/microsoft/WSL",
+      "revision": "80697fd42cca3de0c0d5dd1931c36112372a577e"
+    },
+    {
+      "url": "https://github.com/canonical/cloud-init",
+      "revision": "8bf3567532b07e2cc15aa4c76c36ebed65ccfaec"
+    },
+    {
+      "url": "https://github.com/ubuntu/wsl-setup",
+      "revision": "86a561d5149a9d76ec3c9b3ce2745e7ebca5f2ad"
+    },
+    {
+      "url": "https://git.launchpad.net/ubuntu/+source/wsl-setup",
+      "revision": "74bfc89113bc7d46a4d9feb1e69cd6951fbc6908"
+    },
+    {
+      "url": "https://releases.ubuntu.com/24.04.5/SHA256SUMS",
+      "revision": "728064ecf411f4ab702d9c3ca0a938ce672771424c028a1b52b2449f7eb5a068"
+    },
+    {
+      "url": "https://releases.ubuntu.com/24.04.5/SHA256SUMS.gpg",
+      "revision": "f9be4b4a527b63f14dde0387edcb7a02ba3ac43d537b1674a5aeae19c6f23827"
+    },
+    {
+      "url": "https://github.com/microsoft/WSL/pull/40977",
+      "revision": "70f6890c83bb5e56b8ea17abdbb834b55e92dc80"
+    },
+    {
+      "url": "https://releases.ubuntu.com/26.04.1/SHA256SUMS",
+      "revision": "4adde9f7e7760a624db5821ad75679a76b9cde1e0d3e9cb2117cfe7d8043fa43"
+    },
+    {
+      "url": "https://releases.ubuntu.com/26.04.1/SHA256SUMS.gpg",
+      "revision": "055292b53dffbc5387c1691e8c2357df0b4db88e7d7fd4c1b36fadf068479c5d"
+    },
+    {
+      "url": "https://github.com/ubuntu/wsl-setup/blob/73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8/ubuntu-insights.sh",
+      "revision": "73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8"
+    }
+  ],
+  "discovery_provenance": [
+    "Research unit W2 of the 2026-10-01 definitive-WSL wave, decided by coordinator session native-agent-stack-c5. The unit wrote the recipe, the templates and the test, and re-read its sources the same day. A follow-up unit added F11 and the F5 range rule. docs/decisions/2026-10-01-new-wsl-distro-recipe.md lists every source with what was read; its Sources section says they are cited as the research unit reported them.",
+    "Pinned reads reported by the research unit: the 24.04.5 image streamed and hashed against Canonical's SHA256SUMS and DistributionInfo.json at 8bc98bc3; resolute SHA256SUMS of 2026-08-27 for the 26.04.1 image (sha256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104), which DistributionInfo.json maps to WSL's default Ubuntu; cloud-init at tag 26.1, microsoft/WSL at tag 2.7.13 and ubuntu/wsl-setup at 86a561d5 for the first-run and provisioning behaviour.",
+    "Review-repair unit of 2026-10-01, after the cross-family review of PR #569 asked for this record. It read Microsoft Learn's Basic commands for WSL (ms.date 2025-12-01) and Canonical's cloud-init on WSL page (last updated 2026-09-28) through Context Mode for W6's export before --unregister. It added the export, made the receipt example carry every recipe command, and wrote this record.",
+    "Second follow-up of 2026-10-01, on the coordinator's brief: a completeness critic (11 findings) and a researcher's packet (eight answers with sources and file:line) preceded it. The unit added R1 (a rehearsal on a throwaway name), P1 to P3 (signed checksums with gpgv, cloud-init schema -c on the render, the kernel journal's hv_storvsc count), W5's cloud-init schema --system, W7 (one terminate and a file-ownership probe for microsoft/WSL#40941) and F2's idle observation; corrected three facts (WSL 3.0.1 does change the first launch; the online wsl --install checks the catalog's hash while --from-file checks none; W5's console lines come from the image's wsl-setup at Launchpad 74bfc891); and ran P1 to P3's commands in the workstation distribution as artifact checks.",
+    "The coordinator then replaced P3's stop on any count, which an old burst would have made permanent on this host: P3's count is a baseline, the newest error line's kernel time against /proc/uptime stops the run only when it is less than one hour old (a threshold of this recipe's choosing, not an upstream figure), and W5 counts again after the first launch on both paths. The unit ran the new P3 in the workstation distribution on 2026-10-01 at 12:19Z: baseline 21, newest error line about 7.4 days old.",
+    "Accepted W-IMG follow-up at 798ac445 reuses the existing recipe/tests/source experiment and maintained search-first quick-mode and TDD guidance. The coordinator already verified both signed sums with gpgv, exit 0, key 843938DF228D22F7B3742BC0D94AA3F0EFE21092, and streamed the entire 26.04.1 image through curl/tee, sha256sum and tar inspection, exit 0. Preserved per-release native-signed-sums.stdout/stderr and sums/signature bytes, and 26.04.1 image-stream.sha256/native-image-inspection.stdout were inspected again without redownloading or rerunning them. The exact 26.04.1 hash matches the signed line and Microsoft catalog at 8bc98bc33b246fe66710eec9eaa1b24c323da987; 26.04.1 file size is unknown. The prior weekly-limit worker failure stays recorded; it is not an image acceptance run."
+  ],
+  "license_and_compatibility": "Existing Microsoft/Canonical creation commands remain the source; no custom installer or license assessment. The earlier installed WSL 2.7.13 capability read is historical, not a new version check. Canonical 26.04 release notes and Microsoft creation docs support creation, not full-stack compatibility. Canonical cloud-init WSL guidance assumes 24.04/22.04 and does not qualify 26.04. Actual 26.04.1 packages: cloud-init 26.1-0ubuntu3~26.04.1, systemd 259.5-0ubuntu3.4, Python interpreter 3.14.4-1ubuntu0.1 (python3 metapackage 3.14.3-0ubuntu2), sudo-rs 0.2.13-0ubuntu1 and wsl-setup 0.6.3ubuntu~26.04.1. System Python 3.14 is not toolkit CPython 3.13 migration acceptance; uv installs/selects managed 3.13 separately. Neither arm has new-host compatibility acceptance.",
+  "baseline_and_candidate": {
+    "baseline": "Provisional 24.04.5 rollback arm, ubuntu-24.04.5-wsl-amd64.wsl, exact SHA-256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e. Historical artifact/native receipts keep their original class and scope; they do not qualify this new distribution. Same P1-P3/W1-W7/F1-F9/R1 criteria and paths A/B as the default; it replaces the default only on a release-caused 26.04 failure with no in-release remedy.",
+    "candidate": "Provisional 26.04.1 default arm, ubuntu-26.04.1-wsl-amd64.wsl, exact SHA-256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104. Signature, whole-image hash and packaged source facts observed only; size unknown. Same P1-P3/W1-W7/F1-F9/R1 criteria and paths A/B as the rollback. Both acceptance comparisons unrun."
+  },
+  "frozen_inputs": {
+    "base_revision": "798ac445307e2cd8eba6e74d7722ac0e16da02c7",
+    "tasks": [
+      "wsl-new-distro-stage1-first-boot"
+    ],
+    "roles": [
+      "llm-native-host-session"
+    ],
+    "sources": [
+      {
+        "path": "adoption/platforms/linux-wsl2-new-distro.md",
+        "sha256": "7fdb79e02c0a2a670bc59e6ad86d4fe43132b93fb003763c1ce4e983505e23f4"
+      },
+      {
+        "path": "adoption/templates/wsl/cloud-init.user-data.template",
+        "sha256": "08e6a3f6b078dfa54d78297596d54729d10528d57147b9b9eae063c37160eeb9"
+      },
+      {
+        "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
+        "sha256": "ec03a494aa4d80ac004f74710250bf1ac7cf18e0506758d97a1cf98a0cee42a3"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "adoption/templates/wsl/host.new-distro.json.template",
+        "sha256": "4395aec846f1d418a55a862cb4db03906d2513d00fa596c190b56641f760f6b0"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "adoption/templates/wsl/first-boot-checklist.md",
+        "sha256": "d3f1a57e53d85cfb6ee02c147564be714c24f85a2d9b6917fa773784be3033b4"
+      },
+      {
+        "path": "adoption/templates/wsl/stage1-receipt.example.json",
+        "sha256": "7c0811c460fe8732f413b954cd7ddadb5cc41a5300f8686b5b83aefcd80a971a"
+      },
+      {
+        "path": "tests/test_wsl_new_distro_recipe.py",
+        "sha256": "20cbc7e07820a85700749d350a25779047fdb5de97ea9b0243c41d3f965d82ee"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Both 26.04.1 trial and 24.04.5 fallback are symmetric provisional arms with no merit precedence. Preregister the same separate-throwaway R1 comparisons on one unchanged host/kernel/driver, checkout, user-data and bootstrap profile. Both signed sums pass P1; P2 workstation schema is not image qualification. W2 hashes the whole selected image against its exact signed/catalog release mapping; W4/W6 use that filename. Each arm must record first_boot (W5 default uid 1000, retained results, selected-image cloud-init version/schema and F1 running; amended on 2026-10-02 before any comparison ran: on WSL 3.0.1 the criterion is F1's pass condition, running, or degraded with systemd-binfmt.service as the only failed unit, which fails by design there; amended on 2026-10-02 before any comparison ran, after rehearsal run 2 and the scoped cross-family read: the first amendment's short form means F1's complete pass condition, running with no failed unit, or degraded with exactly systemd-binfmt.service failed and its log holding Failed to flush binfmt_misc rules, ignoring: Read-only file system; W1 stops before W4 or any W6 import unless uid 1000, an acceptable system state and failed set, an active user manager and a noninitial namespace all hold; W5 requires the new getty masked and inactive with no restarts and all five workstation values equal to their baseline; its separate command exits and filtered storage readings are retained); systemd_user_from_second_instance (F2 linger/idle and F3 directory/socket ownership plus manager running from the workstation second instance); wsl_gpu (/dev/dxg and native nvidia-smi visibility on the same Windows driver); uv_cpython_3_13 (separate managed Python 3.13.x through uv); node_24 (bootstrap v24.21.0 startup). Preserve P3 age/baseline, W5 second count, W7 owner 1000:1000 and failed-rehearsal/W6 export-before-unregister guards. Missing, failed or skipped criteria do not qualify an arm or rank its peer. Record sanitized native per-arm output before selecting within the measured host scope. Full-stack, GPU-workload and model acceptance remain separate and unrun.",
+    "usage_rule": "No usage claim. The research unit's model usage (tokens, attempts and retries) was not recorded and stays unknown; this record neither estimates it nor counts it as zero. The second follow-up's two research passes, as the coordinator's brief reports them: the completeness critic made about 44 HTTP requests to 37 distinct URLs against a budget of about 25, its token usage not recorded here; the researcher used 284,098 tokens and 70 tool uses and made about 85 HTTP requests against a budget of about 35. The scope of that token counter is not stated here, and nothing is summed or compared. A host run executes deterministic commands; the session that runs them records its own provider usage separately. No whole-task savings claim. Prior native Claude W-IMG preparation attempt: actual weekly-limit failure, process exit 1, no changes. Its returned result has num_turns 87; input_tokens 162, cache_creation_input_tokens 390235, cache_read_input_tokens 19973920, output_tokens 110059 and output_tokens_details.thinking_tokens 86281. These are native result fields, not summed totals; thinking is included in output. Native retries, whole-task total and per-image usage remain unknown. No new provider run or usage comparison is claimed by this recipe parameterization."
+  },
+  "runtime_and_platform": {
+    "platform": "Planned target, not run: the existing Windows host, updated from WSL 2.7.13 to 3.0.1.0 on 2026-10-02 (the adopted release for a second systemd distribution), and a second WSL 2 distribution, <Name>, beside the workstation's.",
+    "tools": [
+      {
+        "name": "WSL",
+        "version": "3.0.1.0 as read on the host on 2026-10-02 (kernel 6.18.40.1-1); 2.7.13 as read by the research unit before the update; source read at microsoft/WSL tag 2.7.13 (80697fd42cca3de0c0d5dd1931c36112372a577e); not run for this record"
+      },
+      {
+        "name": "Ubuntu WSL image",
+        "version": "26.04.1: ubuntu-26.04.1-wsl-amd64.wsl, exact sha256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, preserved whole-image stream hash/inspection, size unknown. Historical 24.04.5: ubuntu-24.04.5-wsl-amd64.wsl, 388,975,696 bytes, sha256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e. Neither is imported or first-boot qualified."
+      },
+      {
+        "name": "cloud-init",
+        "version": "source read at tag 26.1 (8bf3567532b07e2cc15aa4c76c36ebed65ccfaec); the image's packaged version is not recorded here; the workstation distribution's 26.1-0ubuntu1~24.04.1 ran P2's schema check as an artifact check on 2026-10-01; actual 26.04.1 packaged version 26.1-0ubuntu3~26.04.1 inspected from the image, not executed"
+      },
+      {
+        "name": "gpgv",
+        "version": "2.4.4-2ubuntu17.6 with ubuntu-keyring 2023.11.28.1 in the workstation distribution, for P1's artifact check on 2026-10-01"
+      }
+    ],
+    "isolation": "No stage-1 command ran. For a host run, the recipe's host-wide rules apply: commands act on <Name> only, and the rehearsal's R1 terminates and unregisters only its own throwaway name; no .wslconfig change (W1 only reads two keys with Select-String), no wsl --update and never wsl --shutdown; the only stop is wsl --terminate <Name>; the default distribution stays the workstation's; and W6 exports the failed attempt before any --unregister. WSL 2 distributions share the global .wslconfig, one kernel and one network namespace, so the new distribution is not isolated from the workstation's; P1 to P3 run in the workstation distribution and write only into new temporary directories."
+  },
+  "commands": [
+    "R1 preregistration: rehearse both selected releases on separate throwaway names through F3, extend successful rehearsals through F9 via the existing bootstrap, then use the recipe's second-instance systemd-user, native WSL GPU visibility, separate uv CPython 3.13 and Node 24 comparison probes. Preserve failures before removing only the owned name; failed rehearsals export before unregister. No such host run has executed.",
+    "Pre-checks, P1 to P3: the sh blocks of adoption/platforms/linux-wsl2-new-distro.md in the workstation distribution, before W1.",
+    "Stage 1, W1 to W7: the PowerShell blocks of the same page on the Windows host, each run as a .ps1 file inside Start-Transcript; W6 only after the W5 markers; W7 on both paths.",
+    "First boot, F1 to F11: the sh blocks of the same page inside <Name> as <WSL_USER>; F2's idle observation and F10 from the Windows side; F11 in a login shell after stage 2 (F9) and F10.",
+    "python3 -m unittest tests.test_wsl_new_distro_recipe (a local consistency check of the recipe, the decision record, the templates and the receipt example; not a host run)",
+    "python3 scripts/validate_convergence.py blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"
+  ],
+  "observations": [],
+  "failures_and_skips": [],
+  "limitations": [
+    "Recipe parameterization only. Ubuntu 26.04.1 is the single default named by the merged definitive manifest and 24.04.5 the named rollback for a release-caused 26.04 failure; neither new-host acceptance comparison has run.",
+    "Status planned describes the host comparison, not the preserved artifact inspections or the rehearsals. No qualifying image comparison has run. A 26.04.1 rehearsal on WSL 2.7.13 on 2026-10-02 held stage 1 and stopped at F1 on the shared cgroup tree (evidence/artifacts/new-wsl-rehearsal-20261002/). Run 2 on WSL 3.0.1.0, 2026-10-02T08:32Z to 08:40Z, passed stage 1 and W5's path-A proofs and observed distinct cgroup namespaces, then stopped at W5's paired rule on a shared-console getty collision. Path A has run; path B's first boot and import provisioning remain open. These rehearsals qualify neither comparison arm.",
+    "The research unit read the sources, and the decision record cites them as it reported them. The review-repair unit re-read only Microsoft's Basic commands page and Canonical's cloud-init page on 2026-10-01; neither documents an in-place repair of a failed provisioning.",
+    "Usage unknown: the research unit's model and token usage was not recorded.",
+    "A new distribution on the existing WSL kernel and Windows installation is not a new physical machine, and it inherits the host-wide WSL settings.",
+    "The checker verifies declared consistency, not truth. The pinned test checks repository text and an in-memory template render; a pass is not a host run.",
+    "As of the 2026-10-01 artifact-check session, P1 to P3's commands ran only as artifact checks in the workstation distribution, not as a run of the recipe: P1's signature and P2's schema passed with their negative controls failing as expected, and P3 counted 21 hv_storvsc lines (one burst of 14 distinct WRITE_10 errors about seven days earlier) in the current boot's kernel journal. Under the coordinator's rule that count was P3's baseline and its newest line, about 7.4 days old, did not stop the run; no second reading existed, because no first launch had run. At that session nothing in stage 1 had run, the rehearsal included; the 2026-10-02 rehearsals below supersede that status.",
+    "Both signed sums and the entire 26.04.1 image hash/inspection are reused matching coordinator evidence, not new downloads or runs by this repair. The preserved 2026-10-01 stream did not measure image size; W2 in rehearsal run 2 on 2026-10-02 observed 418495746 bytes. Source/signature/image facts and reported rehearsal observations retain their separate evidence classes.",
+    "The failed prior native Claude worker hit its actual weekly limit, exit 1, with no changes. Its returned usage fields are retained separately; missing totals/retries and earlier unknown usage stay unknown.",
+    "Canonical cloud-init WSL guide covers 24.04/22.04, not 26.04 qualification. The workstation's version/schema check is not selected-image qualification. Python 3.14.4 system packages do not establish toolkit CPython 3.13 migration.",
+    "Completeness critic: no modality among the accepted two image arms was omitted from preregistration, but native execution of both arms and independent acceptance observation remain the decision-changing gap. GPU visibility and runtime startup are bounded checks; no full-stack, GPU workload, provider or model acceptance is claimed.",
+    "Amendments of 2026-10-02, made before any comparison ran: the comparison still applies the same criteria to both images with no merit precedence between them; the merged definitive manifest names 26.04.1 as the clean-install default and 24.04.5 as the rollback; the original first_boot criterion's 'F1 running' and the first amendment's short form mean F1's complete pass condition, including the read-only flush message when degraded (microsoft/WSL issue 41226). The second amendment adds the getty mask and separate baseline/paired observations after run 2 and the accepted scoped read.",
+    "Probe E1 at 2026-10-02T08:42Z, outside the recipe, observed the amended template's masked, inactive getty with no restarts and no cloud-init errors; it was removed afterwards. The workstation's getty had already failed in run 2, so a live workstation getty surviving a first boot is inferred from the masked unit never starting, not observed. The 24.04.5 image's own unit files and path B's first boot were not read or observed. Run 3 on 2026-10-02T10:54Z to 11:01Z then completed P1 to F5 with the amended template on a third throwaway name, including the paired proof and a rootless container; it is a rehearsal and qualifies neither comparison arm. The uv and Node probes, stage 2 and the rollback arm remain owed. Earlier planned/unrun and size-unknown fields retain the original record's scope and are superseded by these dated limitations only where stated."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "Accepted W-IMG recipe parameterization only, Ubuntu 26.04.1 as the single default and 24.04.5 as the named rollback, both provisional; source/signature/image facts retained. No host-scope adoption before both preregistered throwaway comparisons and independently observed native outputs.",
+    "qualification_run_ids": []
+  },
+  "rollback": "Nothing on a host changed for this record. A host run that stops before W4 installs nothing. After W4, W6 keeps the failed attempt as an export, and wsl --unregister on the literal <Name> removes the new distribution; R1 removes the rehearsal's throwaway name the same way, after an export when the rehearsal failed. The workstation's distribution, the default and .wslconfig are never touched. Reverting the recipe's commits removes the documentation.",
+  "next_decision_changing_test": "On WSL 3.0.1 or later, run both R1 throwaway rehearsals with identical host/kernel/driver, checkout, user-data and profile. For each selected release verify P1-P3, W1-W7, F1-F3 and its own cloud-init version/schema, storage readings and Windows-file owner; extend through F9 via the accepted bootstrap, then compare the preregistered first_boot, systemd_user_from_second_instance, wsl_gpu, uv_cpython_3_13 and node_24 criteria. Record per-arm native results and all failed/skipped criteria, with 26.04.1 as the default and 24.04.5 as the rollback; export each failed rehearsal before unregistering its literal name. Both new-host acceptance runs remain unrun; only complete independently observed comparisons permit a scoped image decision, followed by the real selected distribution and separate full-stack acceptance.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

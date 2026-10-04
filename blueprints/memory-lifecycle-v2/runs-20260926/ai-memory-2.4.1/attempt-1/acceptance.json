@@ -1,0 +1,244 @@
+{
+  "passed": true,
+  "pre": {
+    "passed": true,
+    "tool_calls": 71,
+    "checks": {
+      "expired_past_after_sweep_direct_read_rejected_as_expected": true,
+      "invalid_combined_scope_rejected_as_expected": true,
+      "invalid_expiry_rejected_as_expected": true,
+      "missing_scope_rejected_as_expected": true,
+      "ttl_after_sweep_direct_read_rejected_as_expected": true,
+      "routing_page_ids_distinct": true,
+      "write_alpha_ok": true,
+      "alpha_read_matches": true,
+      "alpha_search_self_own_page": true,
+      "write_beta_ok": true,
+      "beta_read_matches": true,
+      "beta_search_self_own_page": true,
+      "write_gamma_ok": true,
+      "gamma_read_matches": true,
+      "gamma_search_self_own_page": true,
+      "write_delta_ok": true,
+      "delta_read_matches": true,
+      "delta_search_self_own_page": true,
+      "alpha_search_beta_zero": true,
+      "alpha_search_gamma_zero": true,
+      "alpha_search_delta_zero": true,
+      "beta_search_alpha_zero": true,
+      "beta_search_gamma_zero": true,
+      "beta_search_delta_zero": true,
+      "gamma_search_alpha_zero": true,
+      "gamma_search_beta_zero": true,
+      "gamma_search_delta_zero": true,
+      "delta_search_alpha_zero": true,
+      "delta_search_beta_zero": true,
+      "delta_search_gamma_zero": true,
+      "scopes_ws1_three_one_page_per_project": true,
+      "scopes_ws1_three_all_routing": true,
+      "scopes_ws1_three_hits_carry_own_terms": true,
+      "scopes_excludes_delta_zero": true,
+      "global_finds_alpha_one_hit": true,
+      "global_finds_alpha_origin_annotated": true,
+      "global_finds_alpha_own_term": true,
+      "global_finds_beta_one_hit": true,
+      "global_finds_beta_origin_annotated": true,
+      "global_finds_beta_own_term": true,
+      "global_finds_gamma_one_hit": true,
+      "global_finds_gamma_origin_annotated": true,
+      "global_finds_gamma_own_term": true,
+      "global_finds_delta_one_hit": true,
+      "global_finds_delta_origin_annotated": true,
+      "global_finds_delta_own_term": true,
+      "ttl_before_expiry_one_hit": true,
+      "ttl_after_expiry_default_zero": true,
+      "ttl_after_expiry_explicit_one_hit": true,
+      "ttl_after_expiry_direct_read_ok": true,
+      "durable_after_expiry_wait_one_hit": true,
+      "sweep_preview_dry_run_true": true,
+      "sweep_preview_expired_set_correct": true,
+      "expired_past_after_preview_one_hit": true,
+      "ttl_after_preview_one_hit": true,
+      "sweep_apply_dry_run_false": true,
+      "sweep_apply_expired_set_correct": true,
+      "expired_past_after_sweep_zero": true,
+      "ttl_after_sweep_zero": true,
+      "future_after_sweep_one_hit": true,
+      "durable_after_sweep_one_hit": true,
+      "ttl_before_expiry_answered_before_native_expiry": true,
+      "ttl_after_expiry_calls_sent_after_native_expiry": true,
+      "write_expired_past_ok": true,
+      "expired_past_default_zero": true,
+      "expired_past_explicit_one_hit": true,
+      "expired_past_direct_read_body_and_pinned": true,
+      "write_future_ok": true,
+      "future_default_one_hit": true,
+      "write_old_new_distinct_ids": true,
+      "old_now_zero": true,
+      "new_now_one_hit": true,
+      "old_as_of_matches_old_id_and_fts_active": true,
+      "new_as_of_zero": true,
+      "delete_revision_true": true,
+      "deleted_now_zero": true,
+      "deleted_as_of_zero": true,
+      "beta_unaffected_by_alpha": true,
+      "write_old2_new2_distinct_ids": true,
+      "old2_as_of_one_hit_matches_id": true,
+      "new2_now_one_hit_matches_id": true,
+      "status_pre_no_imported_history": true
+    },
+    "failed_checks": [],
+    "expected_protocol_rejections": {
+      "expired_past_after_sweep_direct_read": {
+        "meets_bar": true,
+        "expected_code": -32603,
+        "expected_message_pattern": "page notes/expired\\.md not found in resolved scope lifecycle-v2/alpha",
+        "code": -32603,
+        "message": "page notes/expired.md not found in resolved scope lifecycle-v2/alpha"
+      },
+      "invalid_combined_scope": {
+        "meets_bar": true,
+        "expected_code": -32603,
+        "expected_message_pattern": "global cannot be combined with workspace/project/scopes",
+        "code": -32603,
+        "message": "global cannot be combined with workspace/project/scopes"
+      },
+      "invalid_expiry": {
+        "meets_bar": true,
+        "expected_code": -32603,
+        "expected_message_pattern": "invalid expires_at in frontmatter for notes/invalid-expiry\\.md \\(want RFC3339 or YYYY-MM-DD\\): not-a-date",
+        "code": -32603,
+        "message": "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date"
+      },
+      "missing_scope": {
+        "meets_bar": true,
+        "expected_code": -32602,
+        "expected_message_pattern": "project 'absent' not found in workspace 'lifecycle-v2'",
+        "code": -32602,
+        "message": "project 'absent' not found in workspace 'lifecycle-v2'"
+      },
+      "ttl_after_sweep_direct_read": {
+        "meets_bar": true,
+        "expected_code": -32603,
+        "expected_message_pattern": "page notes/ttl\\-short\\.md not found in resolved scope lifecycle-v2/alpha",
+        "code": -32603,
+        "message": "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha"
+      }
+    },
+    "sweep": {
+      "preview_expired": [
+        {
+          "id": "fixture-id-5",
+          "path": "notes/ttl-short.md",
+          "expired_at": "2026-09-26T02:19:05Z",
+          "deleted": false
+        },
+        {
+          "id": "fixture-id-7",
+          "path": "notes/expired.md",
+          "expired_at": "2000-01-01T00:00:00Z",
+          "deleted": false
+        }
+      ],
+      "apply_expired": [
+        {
+          "id": "fixture-id-5",
+          "path": "notes/ttl-short.md",
+          "expired_at": "2026-09-26T02:19:05Z",
+          "deleted": true
+        },
+        {
+          "id": "fixture-id-7",
+          "path": "notes/expired.md",
+          "expired_at": "2000-01-01T00:00:00Z",
+          "deleted": true
+        }
+      ],
+      "native_hard_deleted_counter": 0
+    },
+    "ttl_native_expired_at": "2026-09-26T02:19:05Z",
+    "status_counts": {
+      "pages_latest": 4,
+      "pages_all": 5,
+      "sessions": 0,
+      "observations": 0,
+      "evidence_rows": 0
+    },
+    "page_ids": {
+      "routing": {
+        "alpha": "fixture-id-1",
+        "beta": "fixture-id-2",
+        "gamma": "fixture-id-3",
+        "delta": "fixture-id-4"
+      },
+      "old_id": "fixture-id-9",
+      "new_id": "fixture-id-10",
+      "old2_id": "fixture-id-11",
+      "new2_id": "fixture-id-12"
+    }
+  },
+  "post": {
+    "passed": true,
+    "tool_calls": 18,
+    "checks": {
+      "expired_past_direct_read_gone_rejected_as_expected": true,
+      "revision_deleted_direct_read_rejected_as_expected": true,
+      "ttl_short_direct_read_gone_rejected_as_expected": true,
+      "alpha_read_persisted": true,
+      "beta_read_persisted": true,
+      "gamma_read_persisted": true,
+      "delta_read_persisted": true,
+      "durable_persisted": true,
+      "old2_as_of_persisted_same_id": true,
+      "new2_now_persisted_same_id": true,
+      "revision_deletion_persisted_current": true,
+      "revision_deletion_persisted_as_of": true,
+      "ttl_sweep_persisted": true,
+      "expired_past_sweep_persisted": true,
+      "future_persisted": true,
+      "status_post_no_imported_history": true,
+      "status_stable_across_restart": true,
+      "post_restart_write_ok": true,
+      "post_restart_readback_one_hit": true
+    },
+    "failed_checks": [],
+    "expected_protocol_rejections": {
+      "expired_past_direct_read_gone": {
+        "meets_bar": true,
+        "expected_code": -32603,
+        "expected_message_pattern": "page notes/expired\\.md not found in resolved scope lifecycle-v2/alpha",
+        "code": -32603,
+        "message": "page notes/expired.md not found in resolved scope lifecycle-v2/alpha"
+      },
+      "revision_deleted_direct_read": {
+        "meets_bar": true,
+        "expected_code": -32603,
+        "expected_message_pattern": "page notes/revision\\.md not found in resolved scope lifecycle-v2/alpha",
+        "code": -32603,
+        "message": "page notes/revision.md not found in resolved scope lifecycle-v2/alpha"
+      },
+      "ttl_short_direct_read_gone": {
+        "meets_bar": true,
+        "expected_code": -32603,
+        "expected_message_pattern": "page notes/ttl\\-short\\.md not found in resolved scope lifecycle-v2/alpha",
+        "code": -32603,
+        "message": "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha"
+      }
+    },
+    "status_counts_post": {
+      "pages_latest": 4,
+      "pages_all": 5,
+      "sessions": 0,
+      "observations": 0,
+      "evidence_rows": 0
+    },
+    "status_counts_pre": {
+      "evidence_rows": 0,
+      "observations": 0,
+      "pages_all": 5,
+      "pages_latest": 4,
+      "sessions": 0
+    }
+  },
+  "binary_sha256": "dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd"
+}

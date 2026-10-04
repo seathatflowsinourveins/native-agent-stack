@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "record": "wsl-lock-frozen-rename-20261004 audit_retirement mutants",
+  "run_utc": {
+    "start": "2026-10-04T08:24:10Z",
+    "end": "2026-10-04T08:24:12Z"
+  },
+  "method": "Local fault injection on one host, not CI and not an upstream harness. Each code mutant edits one requirement out of audit.py, loads the edited source as a module and runs the one LockDiscoveryGuardTests scenario designated for it, on a scratch Git repository holding a copy of the partition. M0 runs every scenario on the unmutated guard; N1 is a negative control (a message-only edit) that must survive, which shows the harness can report a surviving mutant. tests/test_wsl_retrieval.py::LockDiscoveryGuardTests.test_each_requirement_is_enforced_by_a_scenario re-runs M1-M8 in every unittest run.",
+  "command": "TMPDIR=<scratch> nice -n 19 python3 run-mutants.py.txt <checkout>",
+  "harness": {
+    "path": "evidence/artifacts/wsl-lock-frozen-rename-20261004/run-mutants.py.txt",
+    "sha256": "eaa37ac567326a6e7b91fa44d28d43c0ddc61f73e9a03f7ca4c729bb8cace57f"
+  },
+  "subject": {
+    "blueprints/convergence-practice/wsl-retrieval/audit.py": "05fae80832470371bde09b145d7aeeb125cd4c44accee82052aa499ad5f79207",
+    "tests/test_wsl_retrieval.py": "72a79a26ffccc2582c536af34f25f7c18c0bdedc99040f671d86476df0d9fe91"
+  },
+  "exit_code": 0,
+  "results": [
+    {
+      "id": "M0",
+      "mutant": "unmutated guard",
+      "scenario": "all scenarios",
+      "expected": "pass",
+      "observed": "pass",
+      "tests_run": 11,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "M1",
+      "mutant": "archive digest unchecked",
+      "scenario": "test_missing_or_changed_archive_rejected",
+      "expected": "fail",
+      "observed": "fail",
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "id": "M2",
+      "mutant": "assessment digest unchecked",
+      "scenario": "test_changed_assessment_lock_identity_rejected",
+      "expected": "fail",
+      "observed": "fail",
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "id": "M3",
+      "mutant": "disk names unchecked",
+      "scenario": "test_restored_npm_name_rejected_on_disk",
+      "expected": "fail",
+      "observed": "fail",
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "id": "M4",
+      "mutant": "npm-shrinkwrap.json not a lock name",
+      "scenario": "test_every_discovered_lock_name_rejected_on_disk",
+      "expected": "fail",
+      "observed": "fail",
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "id": "M5",
+      "mutant": "top-level walk only",
+      "scenario": "test_nested_lock_name_rejected_on_disk",
+      "expected": "fail",
+      "observed": "fail",
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "id": "M6",
+      "mutant": "case-sensitive names",
+      "scenario": "test_case_varied_lock_name_rejected_on_disk",
+      "expected": "fail",
+      "observed": "fail",
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "id": "M7",
+      "mutant": "archive tracking unchecked",
+      "scenario": "test_untracked_archive_rejected",
+      "expected": "fail",
+      "observed": "fail",
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "id": "M8",
+      "mutant": "index names unchecked",
+      "scenario": "test_lock_name_tracked_in_git_rejected",
+      "expected": "fail",
+      "observed": "fail",
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "id": "N1",
+      "mutant": "negative control: message-only edit",
+      "scenario": "test_restored_npm_name_rejected_on_disk",
+      "expected": "pass",
+      "observed": "pass",
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "verdict": "ALL_AS_EXPECTED"
+}

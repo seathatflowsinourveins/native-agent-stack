@@ -1,0 +1,1234 @@
+{
+  "unit": "sota-refresh-gate-rehearsal-prometheus.service",
+  "port": 29390,
+  "cases": [
+    {
+      "case": "G0",
+      "what": "--from-version 3.13.0 while 3.14.0 runs",
+      "shim": null,
+      "exit": 1,
+      "seconds": 0.3,
+      "failed_gates": [
+        "running-from-version"
+      ],
+      "gates": [
+        [
+          "unit-active",
+          true
+        ],
+        [
+          "unit-has-no-pending-change",
+          true
+        ],
+        [
+          "unit-runs-from-prefix",
+          true
+        ],
+        [
+          "running-from-version",
+          false
+        ],
+        [
+          "to-prefix-reports-to-version",
+          true
+        ],
+        [
+          "to-promtool-check-config",
+          true
+        ],
+        [
+          "expected-unit-changes-only-the-exec-prefix",
+          true
+        ]
+      ],
+      "restore": null,
+      "failure": null,
+      "reset_failed_before_case": 0,
+      "before": {
+        "unit": {
+          "MainPID": "1564846",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:03:12 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790416992665283277
+      },
+      "after": {
+        "unit": {
+          "MainPID": "1564846",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:03:12 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790416992665283277
+      },
+      "expectations": {
+        "exit": true,
+        "failed_gates": true,
+        "running_version": true,
+        "unit_file_is_render_of_serving_prefix": true,
+        "serving_exec_start": true,
+        "links_follow_serving_prefix": true,
+        "restart_as_expected": true,
+        "active_running": true,
+        "unit_file_mtime_kept": true
+      },
+      "passed": true
+    },
+    {
+      "case": "G1",
+      "what": "switch 3.14.0 -> 3.15.0",
+      "shim": null,
+      "exit": 0,
+      "seconds": 21.3,
+      "failed_gates": [],
+      "gates": [
+        [
+          "unit-active",
+          true
+        ],
+        [
+          "unit-has-no-pending-change",
+          true
+        ],
+        [
+          "unit-runs-from-prefix",
+          true
+        ],
+        [
+          "running-from-version",
+          true
+        ],
+        [
+          "to-prefix-reports-to-version",
+          true
+        ],
+        [
+          "to-promtool-check-config",
+          true
+        ],
+        [
+          "expected-unit-changes-only-the-exec-prefix",
+          true
+        ],
+        [
+          "unit-installed",
+          true
+        ],
+        [
+          "verify",
+          true
+        ],
+        [
+          "daemon-reload",
+          true
+        ],
+        [
+          "unit-loaded",
+          true
+        ],
+        [
+          "restart",
+          true
+        ],
+        [
+          "ready",
+          true
+        ],
+        [
+          "new-main-pid",
+          true
+        ],
+        [
+          "version",
+          true
+        ],
+        [
+          "revision",
+          true
+        ],
+        [
+          "exec-start",
+          true
+        ],
+        [
+          "no-automatic-restart",
+          true
+        ],
+        [
+          "same-targets",
+          true
+        ],
+        [
+          "no-target-went-down",
+          true
+        ],
+        [
+          "same-rule-counts",
+          true
+        ],
+        [
+          "rule-health",
+          true
+        ],
+        [
+          "history-unchanged",
+          true
+        ],
+        [
+          "journal-has-no-error",
+          true
+        ],
+        [
+          "links",
+          true
+        ]
+      ],
+      "restore": null,
+      "failure": null,
+      "reset_failed_before_case": 0,
+      "before": {
+        "unit": {
+          "MainPID": "1564846",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:03:12 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790416992665283277
+      },
+      "after": {
+        "unit": {
+          "MainPID": "1670339",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:35 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+        },
+        "build": [
+          "3.15.0",
+          "5241a27fe3c6983549fccc32f6e65917408c63cd"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool"
+        },
+        "unit_sha256": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006",
+        "unit_mtime_ns": 1790417194619114260
+      },
+      "expectations": {
+        "exit": true,
+        "failed_gates": true,
+        "running_version": true,
+        "unit_file_is_render_of_serving_prefix": true,
+        "serving_exec_start": true,
+        "links_follow_serving_prefix": true,
+        "restart_as_expected": true,
+        "active_running": true
+      },
+      "passed": true
+    },
+    {
+      "case": "G2",
+      "what": "rollback 3.15.0 -> 3.14.0 with the same script",
+      "shim": null,
+      "exit": 0,
+      "seconds": 21.1,
+      "failed_gates": [],
+      "gates": [
+        [
+          "unit-active",
+          true
+        ],
+        [
+          "unit-has-no-pending-change",
+          true
+        ],
+        [
+          "unit-runs-from-prefix",
+          true
+        ],
+        [
+          "running-from-version",
+          true
+        ],
+        [
+          "to-prefix-reports-to-version",
+          true
+        ],
+        [
+          "to-promtool-check-config",
+          true
+        ],
+        [
+          "expected-unit-changes-only-the-exec-prefix",
+          true
+        ],
+        [
+          "unit-installed",
+          true
+        ],
+        [
+          "verify",
+          true
+        ],
+        [
+          "daemon-reload",
+          true
+        ],
+        [
+          "unit-loaded",
+          true
+        ],
+        [
+          "restart",
+          true
+        ],
+        [
+          "ready",
+          true
+        ],
+        [
+          "new-main-pid",
+          true
+        ],
+        [
+          "version",
+          true
+        ],
+        [
+          "revision",
+          true
+        ],
+        [
+          "exec-start",
+          true
+        ],
+        [
+          "no-automatic-restart",
+          true
+        ],
+        [
+          "same-targets",
+          true
+        ],
+        [
+          "no-target-went-down",
+          true
+        ],
+        [
+          "same-rule-counts",
+          true
+        ],
+        [
+          "rule-health",
+          true
+        ],
+        [
+          "history-unchanged",
+          true
+        ],
+        [
+          "journal-has-no-error",
+          true
+        ],
+        [
+          "links",
+          true
+        ]
+      ],
+      "restore": null,
+      "failure": null,
+      "reset_failed_before_case": 0,
+      "before": {
+        "unit": {
+          "MainPID": "1670339",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:35 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+        },
+        "build": [
+          "3.15.0",
+          "5241a27fe3c6983549fccc32f6e65917408c63cd"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool"
+        },
+        "unit_sha256": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006",
+        "unit_mtime_ns": 1790417194619114260
+      },
+      "after": {
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790417215949034191
+      },
+      "expectations": {
+        "exit": true,
+        "failed_gates": true,
+        "running_version": true,
+        "unit_file_is_render_of_serving_prefix": true,
+        "serving_exec_start": true,
+        "links_follow_serving_prefix": true,
+        "restart_as_expected": true,
+        "active_running": true
+      },
+      "passed": true
+    },
+    {
+      "case": "G3",
+      "what": "daemon-reload exits 1",
+      "shim": "fail",
+      "exit": 2,
+      "seconds": 0.3,
+      "failed_gates": [
+        "daemon-reload"
+      ],
+      "gates": [
+        [
+          "unit-active",
+          true
+        ],
+        [
+          "unit-has-no-pending-change",
+          true
+        ],
+        [
+          "unit-runs-from-prefix",
+          true
+        ],
+        [
+          "running-from-version",
+          true
+        ],
+        [
+          "to-prefix-reports-to-version",
+          true
+        ],
+        [
+          "to-promtool-check-config",
+          true
+        ],
+        [
+          "expected-unit-changes-only-the-exec-prefix",
+          true
+        ],
+        [
+          "unit-installed",
+          true
+        ],
+        [
+          "verify",
+          true
+        ],
+        [
+          "daemon-reload",
+          false
+        ]
+      ],
+      "restore": {
+        "step": "R-restore",
+        "utc": "2026-09-26T10:07:17Z",
+        "unit_equals_backup": true,
+        "daemon_reload": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 1,
+          "output": "gate rehearsal shim: simulated daemon-reload failure"
+        },
+        "restart_needed": false,
+        "version_after": "3.14.0",
+        "revision_after": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "unit_after": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "restored": true
+      },
+      "failure": {
+        "step": "P-failed",
+        "utc": "2026-09-26T10:07:17Z",
+        "error": "GateFailed('daemon-reload')",
+        "restarted": false,
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "yes",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        }
+      },
+      "reset_failed_before_case": 0,
+      "before": {
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790417215949034191
+      },
+      "after": {
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790417215949034191
+      },
+      "expectations": {
+        "exit": true,
+        "failed_gates": true,
+        "running_version": true,
+        "unit_file_is_render_of_serving_prefix": true,
+        "serving_exec_start": true,
+        "links_follow_serving_prefix": true,
+        "restart_as_expected": true,
+        "active_running": true,
+        "unit_file_mtime_kept": true
+      },
+      "passed": true
+    },
+    {
+      "case": "G4",
+      "what": "daemon-reload exits 0 without reloading",
+      "shim": "skip",
+      "exit": 2,
+      "seconds": 0.3,
+      "failed_gates": [
+        "unit-loaded"
+      ],
+      "gates": [
+        [
+          "unit-active",
+          true
+        ],
+        [
+          "unit-has-no-pending-change",
+          true
+        ],
+        [
+          "unit-runs-from-prefix",
+          true
+        ],
+        [
+          "running-from-version",
+          true
+        ],
+        [
+          "to-prefix-reports-to-version",
+          true
+        ],
+        [
+          "to-promtool-check-config",
+          true
+        ],
+        [
+          "expected-unit-changes-only-the-exec-prefix",
+          true
+        ],
+        [
+          "unit-installed",
+          true
+        ],
+        [
+          "verify",
+          true
+        ],
+        [
+          "daemon-reload",
+          true
+        ],
+        [
+          "unit-loaded",
+          false
+        ]
+      ],
+      "restore": {
+        "step": "R-restore",
+        "utc": "2026-09-26T10:07:17Z",
+        "unit_equals_backup": true,
+        "daemon_reload": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "restart_needed": false,
+        "version_after": "3.14.0",
+        "revision_after": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "unit_after": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "restored": true
+      },
+      "failure": {
+        "step": "P-failed",
+        "utc": "2026-09-26T10:07:17Z",
+        "error": "GateFailed('unit-loaded')",
+        "restarted": false,
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "yes",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        }
+      },
+      "reset_failed_before_case": 0,
+      "before": {
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790417215949034191
+      },
+      "after": {
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790417215949034191
+      },
+      "expectations": {
+        "exit": true,
+        "failed_gates": true,
+        "running_version": true,
+        "unit_file_is_render_of_serving_prefix": true,
+        "serving_exec_start": true,
+        "links_follow_serving_prefix": true,
+        "restart_as_expected": true,
+        "active_running": true,
+        "unit_file_mtime_kept": true
+      },
+      "passed": true
+    },
+    {
+      "case": "G5",
+      "what": "the new server exits at start",
+      "shim": null,
+      "exit": 2,
+      "seconds": 31.3,
+      "failed_gates": [
+        "ready"
+      ],
+      "gates": [
+        [
+          "unit-active",
+          true
+        ],
+        [
+          "unit-has-no-pending-change",
+          true
+        ],
+        [
+          "unit-runs-from-prefix",
+          true
+        ],
+        [
+          "running-from-version",
+          true
+        ],
+        [
+          "to-prefix-reports-to-version",
+          true
+        ],
+        [
+          "to-promtool-check-config",
+          true
+        ],
+        [
+          "expected-unit-changes-only-the-exec-prefix",
+          true
+        ],
+        [
+          "unit-installed",
+          true
+        ],
+        [
+          "verify",
+          true
+        ],
+        [
+          "daemon-reload",
+          true
+        ],
+        [
+          "unit-loaded",
+          true
+        ],
+        [
+          "restart",
+          true
+        ],
+        [
+          "ready",
+          false
+        ]
+      ],
+      "restore": {
+        "step": "R-restore",
+        "utc": "2026-09-26T10:07:48Z",
+        "unit_equals_backup": true,
+        "daemon_reload": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "restart_needed": true,
+        "reset_failed": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "reset-failed",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "restart": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "restart",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "ready_seconds": 0.57,
+        "version_after": "3.14.0",
+        "revision_after": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "unit_after": {
+          "MainPID": "1687659",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:48 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "restored": true
+      },
+      "failure": {
+        "step": "P-failed",
+        "utc": "2026-09-26T10:07:48Z",
+        "error": "GateFailed('ready')",
+        "restarted": true,
+        "unit": {
+          "MainPID": "0",
+          "Result": "exit-code",
+          "NRestarts": "3",
+          "ActiveState": "failed",
+          "SubState": "failed",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:28 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "<scratch>/r3-verify/prom-work/fake-start-fails/prometheus"
+        }
+      },
+      "reset_failed_before_case": 0,
+      "before": {
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790417215949034191
+      },
+      "after": {
+        "unit": {
+          "MainPID": "1687659",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:48 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790417215949034191
+      },
+      "expectations": {
+        "exit": true,
+        "failed_gates": true,
+        "running_version": true,
+        "unit_file_is_render_of_serving_prefix": true,
+        "serving_exec_start": true,
+        "links_follow_serving_prefix": true,
+        "restart_as_expected": true,
+        "active_running": true
+      },
+      "passed": true
+    },
+    {
+      "case": "G6",
+      "what": "the restarted server reports 3.14.0",
+      "shim": null,
+      "exit": 2,
+      "seconds": 22.1,
+      "failed_gates": [
+        "version",
+        "revision"
+      ],
+      "gates": [
+        [
+          "unit-active",
+          true
+        ],
+        [
+          "unit-has-no-pending-change",
+          true
+        ],
+        [
+          "unit-runs-from-prefix",
+          true
+        ],
+        [
+          "running-from-version",
+          true
+        ],
+        [
+          "to-prefix-reports-to-version",
+          true
+        ],
+        [
+          "to-promtool-check-config",
+          true
+        ],
+        [
+          "expected-unit-changes-only-the-exec-prefix",
+          true
+        ],
+        [
+          "unit-installed",
+          true
+        ],
+        [
+          "verify",
+          true
+        ],
+        [
+          "daemon-reload",
+          true
+        ],
+        [
+          "unit-loaded",
+          true
+        ],
+        [
+          "restart",
+          true
+        ],
+        [
+          "ready",
+          true
+        ],
+        [
+          "new-main-pid",
+          true
+        ],
+        [
+          "version",
+          false
+        ],
+        [
+          "revision",
+          false
+        ],
+        [
+          "exec-start",
+          true
+        ],
+        [
+          "no-automatic-restart",
+          true
+        ],
+        [
+          "same-targets",
+          true
+        ],
+        [
+          "no-target-went-down",
+          true
+        ],
+        [
+          "same-rule-counts",
+          true
+        ],
+        [
+          "rule-health",
+          true
+        ],
+        [
+          "history-unchanged",
+          true
+        ],
+        [
+          "journal-has-no-error",
+          true
+        ]
+      ],
+      "restore": {
+        "step": "R-restore",
+        "utc": "2026-09-26T10:08:11Z",
+        "unit_equals_backup": true,
+        "daemon_reload": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "restart_needed": true,
+        "reset_failed": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "reset-failed",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "restart": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "restart",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "ready_seconds": 0.59,
+        "version_after": "3.14.0",
+        "revision_after": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "unit_after": {
+          "MainPID": "1693224",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:08:10 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "restored": true
+      },
+      "failure": {
+        "step": "P-failed",
+        "utc": "2026-09-26T10:08:10Z",
+        "error": "GateFailed('acceptance')",
+        "restarted": true,
+        "unit": {
+          "MainPID": "1688000",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:49 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "<scratch>/r3-verify/prom-work/fake-serves-3.14.0/prometheus"
+        }
+      },
+      "reset_failed_before_case": 0,
+      "before": {
+        "unit": {
+          "MainPID": "1687659",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:48 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790417215949034191
+      },
+      "after": {
+        "unit": {
+          "MainPID": "1693224",
+          "Result": "success",
+          "NRestarts": "0",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:08:10 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "build": [
+          "3.14.0",
+          "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        ],
+        "links": {
+          "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        },
+        "unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "unit_mtime_ns": 1790417215949034191
+      },
+      "expectations": {
+        "exit": true,
+        "failed_gates": true,
+        "running_version": true,
+        "unit_file_is_render_of_serving_prefix": true,
+        "serving_exec_start": true,
+        "links_follow_serving_prefix": true,
+        "restart_as_expected": true,
+        "active_running": true
+      },
+      "passed": true
+    }
+  ],
+  "systemd": "systemd 255 (255.4-1ubuntu8.17)",
+  "production_before": {
+    "unit": {
+      "ActiveState": "active",
+      "SubState": "running",
+      "MainPID": "2097141",
+      "NRestarts": "0",
+      "ActiveEnterTimestamp": "Sat 2026-09-26 00:56:49 EDT",
+      "NeedDaemonReload": "no",
+      "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+    },
+    "links": {
+      "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus",
+      "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool"
+    }
+  },
+  "setup": {
+    "daemon_reload": 0,
+    "start": 0,
+    "ready_seconds": 1.01,
+    "build": [
+      "3.14.0",
+      "d7598b7141418fa35be2b5ec5d0fefb634199610"
+    ]
+  },
+  "teardown": {
+    "stop": 0,
+    "removed": [
+      "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service"
+    ],
+    "daemon_reload": 0,
+    "reset_failed": 1,
+    "runtime_dir_left": [],
+    "runtime_dir_removed": true,
+    "daemon_reload_after_rmdir": 0,
+    "scratch_unit_load_state": "not-found"
+  },
+  "production_after": {
+    "unit": {
+      "ActiveState": "active",
+      "SubState": "running",
+      "MainPID": "2097141",
+      "NRestarts": "0",
+      "ActiveEnterTimestamp": "Sat 2026-09-26 00:56:49 EDT",
+      "NeedDaemonReload": "no",
+      "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+    },
+    "links": {
+      "prometheus": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus",
+      "promtool": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool"
+    }
+  },
+  "production_unchanged": true,
+  "all_cases_passed": true
+}

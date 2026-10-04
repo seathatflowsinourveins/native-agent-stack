@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--vidore-benchmark--install--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "c09dd6dfc68d2e17ed79aca436f6beaa6927a78d",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "vidore-benchmark",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "/tmp/nas-colpali-trial/.venv-combined/bin/python -c \"\nimport importlib.metadata as m\nfrom vidore_benchmark.retrievers.registry_utils import VISION_RETRIEVER_REGISTRY, load_vision_retriever_class_from_registry\nprint('vidore_benchmark_version=' + m.version('vidore-benchmark'))\nkeys = sorted(VISION_RETRIEVER_REGISTRY.keys())\nprint('registered_classes=' + ','.join(keys))\nassert 'colpali' in keys and 'colqwen2' in keys and 'dummy_vision_retriever' in keys and 'colqwen2_5' not in keys\nprint('POSITIVE_ASSERTION_PASS: colpali, colqwen2 and dummy_vision_retriever are registered')\ntry:\n    load_vision_retriever_class_from_registry('this_model_class_does_not_exist_xyz')\n    print('UNEXPECTED_SUCCESS')\nexcept ValueError as e:\n    print('NEGATIVE_CONTROL_PASS: ' + str(e)[:90])\n\"",
+      "exit": 0,
+      "duration_s": 8.096,
+      "output_sha256": "442767b6552706ee0829e71df78e61280ad9194ebff91f3d389b97f465ae0f85",
+      "output_excerpt": "vidore_benchmark_version=5.0.0\nregistered_classes=bge-m3,bge-m3-colbert,biqwen2,bm25,cohere,colidefics3,colpali,colqwen2,dse-qwen2,dummy_vision_retriever,jina-clip-v1,nomic-embed-vision,siglip\nPOSITIVE_ASSERTION_PASS: colpali, colqwen2 and dummy_vision_retriever are registered\nNEGATIVE_CONTROL_PASS: Unknown model name `this_model_class_does_not_exist_xyz`. Available models: ['bge-m3-colbe\n"
+    }
+  ],
+  "tool_versions": {
+    "vidore-benchmark": "5.0.0"
+  },
+  "observed_at_utc": "2026-09-26T03:04:02Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925, vidore-benchmark 5.0.0's real retriever registry contains colpali, colqwen2 and dummy_vision_retriever (plus 10 others: bge-m3, bge-m3-colbert, biqwen2, bm25, cohere, colidefics3, dse-qwen2, jina-clip-v1, nomic-embed-vision, siglip) but confirmed NO colqwen2_5/colqwen2.5 entry; the CLI's own registry lookup correctly raises ValueError naming the available models for an unknown model-class. Dry-run under /bin/sh from the worktree root, exit 0.",
+  "limitations": [
+    "Registry introspection only, not a benchmark run -- see the paired 'use' receipt.",
+    "This is also the primary evidence for why vidore/colqwen2.5-v0.2 (the trial-suggested model) is BLOCKED on this release: no colqwen2_5 class exists in the installed 5.0.0 to load it."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T03:04:02Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

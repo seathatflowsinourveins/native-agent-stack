@@ -1,0 +1,35 @@
+start=2026-09-30T04:46:36Z cwd=<throwaway directory>/cwd
+=== phase 1 start=2026-09-30T04:46:36Z uid=1000
+lsof on PATH: /usr/bin/lsof | listeners before: 0
+health=200 after 3s
+last health code=200 | health body (first 300 bytes): {"status":"ok","timestamp":"2026-09-30T04:46:39.800Z"}
+listeners while running: 127.0.0.1:20197 127.0.0.1:20198 127.0.0.1:20199 
+store (rows, integrity, tables) while running: 193 ok 138
+SIGTERM: serve exit code=143 after 0s
+listeners after exit: 0
+tree/listener pids still alive after exit: none
+store after stop (rows, integrity, tables): 193 ok 138
+=== phase 2 start=2026-09-30T04:46:46Z uid=1000
+lsof on PATH: /usr/bin/lsof | listeners before: 0
+health=200 after 4s
+last health code=200 | health body (first 300 bytes): {"status":"ok","timestamp":"2026-09-30T04:46:50.802Z"}
+listeners while running: 127.0.0.1:20197 127.0.0.1:20198 127.0.0.1:20199 
+store (rows, integrity, tables) while running: 193 ok 138
+SIGTERM: serve exit code=143 after 0s
+listeners after exit: 0
+tree/listener pids still alive after exit: none
+store after stop (rows, integrity, tables): 193 ok 138
+data dir entries (names and modes only):
+total 5732
+drwxr-x--- .
+drwxr-xr-x ..
+-rw------- .env
+drwxr-xr-x logs
+drwxr-xr-x server
+-rw-r--r-- storage.sqlite
+-rw-r--r-- storage.sqlite-shm
+-rw-r--r-- storage.sqlite-wal
+drwxr-xr-x supervisor
+data dir mode 750
+end=2026-09-30T04:46:57Z
+serve-1.log lines: 28; serve-2.log lines: 29

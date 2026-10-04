@@ -29,7 +29,7 @@
       "type": "stdio",
       "command": "/ABSOLUTE/NODE_EXECUTABLE",
       "args": [
-        "/ABSOLUTE/STACK_HOME/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"
+        "/ABSOLUTE/STACK_HOME/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
       ],
       "env": {
         "QDRANT_MODE": "external",

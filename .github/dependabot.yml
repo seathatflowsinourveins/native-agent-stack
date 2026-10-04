@@ -8,11 +8,13 @@ version: 2
 # (post-merge SBOM check in section 8). No pip version-update entry is added: a zizmor
 # security-update PR fails the pin test and the evidence hash check by design, and the
 # maintainer does the reviewed relock and closes it, as with #97/#98 -> #99.
-# npm/pnpm and uv: the only manifests (blueprints/convergence-practice/application-delivery,
-# blueprints/convergence-practice/wsl-retrieval, evidence/artifacts/macos-application-20260924/variant)
+# npm/pnpm and uv: the only manifests that declare dependencies
+# (blueprints/convergence-practice/application-delivery, evidence/artifacts/macos-application-20260924/variant)
 # are frozen experiment or evidence artifacts whose lock hashes are registered in
 # manifests/evidence.json and cited by receipts, so a version bump would break validate;
 # application-delivery also pins pnpm 12, outside the pnpm versions Dependabot lists.
+# blueprints/convergence-practice/wsl-retrieval keeps only a dependency-free package.json; its
+# retired lock is package-lock.json.frozen (2026-10-04), a name the dependency graph does not read.
 # NuGet: the 23 packages.lock.json files are overlays for an upstream LEAN checkout with
 # no project file; neither Dependabot nor the dependency graph discovers them, and
 # security-scan.yml's osv-scanner job is their only vulnerability-alert path.

@@ -283,9 +283,11 @@ and the other `credentials(path)` callers depend on it.
 `exec`s the command, so only that command and its children receive the pair. The loader then removes both
 names from its own `os.environ` as it reads them, so a child the runner starts afterwards does not inherit
 them. Accepted residual exposure: the process's initial environment block stays readable, for the life of the
-process, by processes of the same uid (`ps eww` on macOS, `/proc/<pid>/environ` on Linux) and by root. That
+process, by processes of the same uid (`ps -E` on macOS, whose ps(1) shows the environment with `-E` while `-e` means
+`-A` outside legacy mode; `/proc/<pid>/environ` or `ps eww` on Linux) and by root. That
 uid can already read the Keychain item through `security` while the login Keychain is unlocked, so this does
-not widen access beyond it.
+not widen access beyond it. (Corrected on 2026-09-29: this note said `ps eww` on macOS; see
+apple-oss-distributions/adv_cmds@6bed8737 `ps/ps.1` L123-128 and L602-609.)
 
 **Refusals (`keychain-env`)**, each a fixed code with no value or path, raised outside any `except` block and
 checked in this order: a non-paper `APCA_API_BASE_URL` (below); neither name set (`keychain_env:missing`); only

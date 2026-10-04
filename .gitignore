@@ -17,6 +17,34 @@ node_modules/
 # committed and pushed (blueprints/us-equities/mover-v3/protocol-core-draft.json, run_discipline).
 !blueprints/us-equities/mover-v3/*.jsonl
 !blueprints/us-equities/mover-v3/data/*.jsonl
+# Sanitized Codex --json event streams retained as receipt evidence (client configuration output withheld).
+!evidence/artifacts/codex-use-20260926-5/*.jsonl
+!evidence/artifacts/codex-use-20260926-6/*.jsonl
+# The model-server gates' per-run Codex event streams: the frozen pass rule is scored on them and both receipts
+# inventory them by hash.
+!evidence/artifacts/local-model-server-gate-20261001/runs/*/events.jsonl
+!evidence/artifacts/local-model-server-gate-confirmatory-20261001/runs/*/events.jsonl
+# The local-model measurement's per-case validity files and per-query nDCG@10 files: both decision statistics reproduce
+# from them, and both receipts inventory them by hash (evidence/artifacts/new-wsl-local-models-20261002/README.md).
+!evidence/artifacts/new-wsl-local-models-20261002/part-a/logs/*/validity.jsonl
+!evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/*/per-query.jsonl
+# Codex app-server hooks/list oracle answers behind scripts/adoption_status.py's Codex model (throwaway homes shown
+# as $BASE, no hash value): evidence/artifacts/adoption-status-truth-20260926/README.md.
+!evidence/artifacts/adoption-status-truth-20260926/*.jsonl
+# native_token_ci.py's committed synthetic Claude usage-log fixture for the ccusage
+# CLAUDE_CONFIG_DIR fixture (docs/token-efficiency-stack.md#hosted-ci-coverage-2026-09-26):
+# clearly labelled synthetic content, not host history.
+!fixtures/ccusage-synthetic-claude/**/*.jsonl
+# The OmniRoute gateway's sanitized SEARCH log lines (queries and provider only, no ids), retained as receipt evidence:
+# evidence/artifacts/omniroute-gateway-20260927/README.md.
+!evidence/artifacts/omniroute-gateway-20260927/*.jsonl
+# PR-H's frozen public synthetic log fixture (blind-lane positive control and
+# seed-log-symbol tasks, evidence/artifacts/token-adoption-e2e-20260926/preregistration.json):
+# clearly labelled synthetic content, not host history.
+!evidence/artifacts/token-adoption-e2e-20260926/fixtures/*.jsonl
+# The GraphQL pull-request pages (P) that docs/decisions/2026-10-03-macos-ci-scope.md's replay reads, inventoried by
+# hash in evidence/artifacts/macos-ci-scope-20261003/README.md.
+!evidence/artifacts/macos-ci-scope-20261003/prs_graphql.jsonl
 adoption/hosts/*.json
 !adoption/hosts/example.json
 !adoption/hosts/macos-example.json
@@ -37,6 +65,10 @@ evidence/hosts/**/*.json.tmp-*
 # `claude --worktree` creates inside the repository.
 .claude/settings.local.json
 .claude/worktrees/
+
+# ai-memory's capture opt-in is each host's own decision, never committed; .worktreeinclude
+# copies it into new worktrees (recipes/README.md, "Worktrees and the capture marker").
+/.ai-memory.toml
 
 # Credential-shaped files never belong in a checkout; secrets live under
 # ${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack (docs/secret-storage.md).

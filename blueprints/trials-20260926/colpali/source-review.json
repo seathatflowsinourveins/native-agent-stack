@@ -1,0 +1,440 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "items": [
+    {
+      "id": "device-auto",
+      "claim": "vidore-benchmark 5.0.0 resolves device 'auto' to cuda:0 whenever torch.cuda.is_available(), else mps, else cpu, and logs the choice at info level.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "src/vidore_benchmark/utils/torch_utils.py",
+      "lines": [
+        9,
+        28
+      ],
+      "blob": "00c0448247ac84cea76f54c25e96d90bbbe3375e",
+      "file_sha256": "477596d462df076740522839a095ef5d953f5af5a263f9f4564495b8c3061416",
+      "excerpt": "def get_torch_device(device: str = \"auto\") -> str:\n    \"\"\"\n    Returns the device (string) to be used by PyTorch.\n\n    `device` arg defaults to \"auto\" which will use:\n    - \"cuda:0\" if available\n    - else \"mps\" if available\n    - else \"cpu\".\n    \"\"\"\n\n    if device == \"auto\":\n        if torch.cuda.is_available():\n            device = \"cuda:0\"\n        elif torch.backends.mps.is_available():  # for Apple Silicon\n            device = \"mps\"\n        else:\n            device = \"cpu\"\n        logger.info(f\"Using device: {device}\")\n\n    return device"
+    },
+    {
+      "id": "colpali-retriever-device",
+      "claim": "ColPaliRetriever defaults device to 'auto' and loads ColPali in bfloat16 with device_map set to that device, so a run without CUDA_VISIBLE_DEVICES='' uses the GPU when one is visible.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "src/vidore_benchmark/retrievers/colpali_retriever.py",
+      "lines": [
+        23,
+        60
+      ],
+      "blob": "7be5ba8e973079a5b4036eebe68f948f0ea63441",
+      "file_sha256": "4980e1d400f18be3a522432a0d74156915307e8deb9390489986390f9d55b94a",
+      "excerpt": "class ColPaliRetriever(BaseVisionRetriever):\n    \"\"\"\n    ColPali retriever that implements the model from \"ColPali: Efficient Document Retrieval\n    with Vision Language Models\".\n    \"\"\"\n\n    def __init__(\n        self,\n        pretrained_model_name_or_path: str = \"vidore/colpali-v1.3\",\n        device: str = \"auto\",\n        num_workers: int = 0,\n        **kwargs,\n    ):\n        super().__init__(use_visual_embedding=True)\n\n        try:\n            from colpali_engine.models import ColPali, ColPaliProcessor\n        except ImportError:\n            raise ImportError(\n                'Install the missing dependencies with `pip install \"vidore-benchmark[colpali-engine]\"` '\n                \"to use ColPaliRetriever.\"\n            )\n\n        self.device = get_torch_device(device)\n        self.num_workers = num_workers\n\n        # Load the model\n        self.model = cast(\n            ColPali,\n            ColPali.from_pretrained(\n                pretrained_model_name_or_path,\n                torch_dtype=torch.bfloat16,\n                device_map=self.device,\n            ).eval(),\n        )\n\n        # Load the processor\n        self.processor = cast("
+    },
+    {
+      "id": "colqwen2-retriever-classes",
+      "claim": "The registered colqwen2 retriever loads colpali_engine's ColQwen2 and ColQwen2Processor classes.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "src/vidore_benchmark/retrievers/colqwen2_retriever.py",
+      "lines": [
+        23,
+        65
+      ],
+      "blob": "998869375f0fb14494cc25c689eea98c8720e345",
+      "file_sha256": "ff538374c4d3635e34d901d8a66a6594ecf7c090524fb8f33fde41c8b9c57a63",
+      "excerpt": "@register_vision_retriever(\"colqwen2\")\nclass ColQwen2Retriever(BaseVisionRetriever):\n    \"\"\"\n    ColQwen2 retriever that implements the model from \"ColPali: Efficient Document Retrieval\n    with Vision Language Models\".\n    \"\"\"\n\n    def __init__(\n        self,\n        pretrained_model_name_or_path: str = \"vidore/colqwen2-v1.0\",\n        device: str = \"auto\",\n        num_workers: int = 0,\n        **kwargs,\n    ):\n        super().__init__(use_visual_embedding=True)\n\n        try:\n            from colpali_engine.models import ColQwen2, ColQwen2Processor\n        except ImportError:\n            raise ImportError(\n                'Install the missing dependencies with `pip install \"vidore-benchmark[colpali-engine]\"` '\n                \"to use ColQwen2Retriever.\"\n            )\n\n        self.device = get_torch_device(device)\n        self.num_workers = num_workers\n\n        # Load the model and LORA adapter\n        self.model = cast(\n            ColQwen2,\n            ColQwen2.from_pretrained(\n                pretrained_model_name_or_path,\n                torch_dtype=torch.bfloat16,\n                device_map=self.device,\n                attn_implementation=\"flash_attention_2\" if is_flash_attn_2_available() else None,\n            ).eval(),\n        )\n\n        # Load the processor\n        self.processor = cast(\n            ColQwen2Processor,\n            ColQwen2Processor.from_pretrained(pretrained_model_name_or_path),\n        )"
+    },
+    {
+      "id": "retriever-modules",
+      "claim": "The retriever package imports 13 retriever modules; none is a ColQwen2.5 retriever.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "src/vidore_benchmark/retrievers/__init__.py",
+      "lines": [
+        1,
+        16
+      ],
+      "blob": "eadeebe3a0633bb21a44d4c76c5491f1b7041544",
+      "file_sha256": "720a4a9ef66d2d0a93d60c8493cd34f73eee3f1f98d182a5dbc56f492b33e7f8",
+      "excerpt": "from .base_vision_retriever import BaseVisionRetriever\nfrom .bge_m3_colbert_retriever import BGEM3ColbertRetriever\nfrom .bge_m3_retriever import BGEM3Retriever\nfrom .biqwen2_retriever import BiQwen2Retriever\nfrom .bm25_retriever import BM25Retriever\nfrom .cohere_api_retriever import CohereAPIRetriever\nfrom .colidefics3_retriever import ColIdefics3Retriever\nfrom .colpali_retriever import ColPaliRetriever\nfrom .colqwen2_retriever import ColQwen2Retriever\nfrom .dse_qwen2_retriever import DSEQwen2Retriever\nfrom .dummy_vision_retriever import DummyVisionRetriever\nfrom .jina_clip_retriever import JinaClipRetriever\nfrom .nomic_retriever import NomicVisionRetriever\nfrom .registry_utils import VISION_RETRIEVER_REGISTRY, load_vision_retriever_from_registry, register_vision_retriever\nfrom .siglip_retriever import SigLIPRetriever\nfrom .vision_retriever import VisionRetriever"
+    },
+    {
+      "id": "cli-single-command",
+      "claim": "The 5.0.0 CLI defines evaluate-retriever as its command.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "src/vidore_benchmark/cli/main.py",
+      "lines": [
+        96,
+        98
+      ],
+      "blob": "e129de61f22645d346126c591d037eb488aef852",
+      "file_sha256": "72107a6abe0fa55952bbd2ec920c9b16a4bba6a5483b580569c5c619425791d7",
+      "excerpt": "@app.command()\ndef evaluate_retriever(\n    model_class: Annotated[str, typer.Option(help=\"Model class\")],"
+    },
+    {
+      "id": "vidore-deps",
+      "claim": "vidore-benchmark 5.0.0 requires sentence-transformers>=3.0.1,<4.0.0 and offers colpali-engine>=0.3.8,<0.4.0 as an extra.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "pyproject.toml",
+      "lines": [
+        35,
+        54
+      ],
+      "blob": "bce79feced49f8800c78393a4f932b8e1c21bf8a",
+      "file_sha256": "ba95cec259e08c5d3422aeee0e65123fbb9f417df15123d0e4f71e30720857b6",
+      "excerpt": "dependencies = [\n    \"datasets>=2.15.0\",\n    \"GPUtil>=1.4.0,<2.0.0\",\n    \"mteb>=1.16.3,<1.17.0\",\n    \"pydantic>=2.0.0,<3.0.0\",\n    \"python-dotenv>=1.0.1,<2.0.0\",\n    \"sentence-transformers>=3.0.1,<4.0.0\",\n    \"sentencepiece>=0.2.0,<1.0.0\",\n    \"tenacity>=8.0.0\",\n    \"transformers>=4.46.1\",\n    \"typer>=0.12.3,<1.0.0\",\n]\n\n[project.optional-dependencies]\ndev = [\"pytest>=8.2.1\", \"ruff>=0.4.5\"]\n\nbge-m3 = [\"FlagEmbedding>=1.2.10,<2.0.0\"]\nbm25 = [\"nltk>=3.8.1,<4.0.0\", \"rank-bm25>=0.2.2,<1.0.0\"]\ncohere = [\"cohere>=5.11.2,<6.0.0\"]\ncolpali-engine = [\"colpali-engine>=0.3.8,<0.4.0\"]"
+    },
+    {
+      "id": "colpali-engine-deps",
+      "claim": "colpali-engine 0.3.13 requires transformers>=4.53.1,<4.58.0 and torch<2.9.0.",
+      "repository": "https://github.com/illuin-tech/colpali.git",
+      "commit": "174055b00d4a36f672c6f915f2bdd0002e4fc9ee",
+      "path": "pyproject.toml",
+      "lines": [
+        35,
+        44
+      ],
+      "blob": "7fb2ee391d2b5b6fd504fe9259b6c6b6153dad09",
+      "file_sha256": "5eefbf00cd0be60e2bd77dfeab93a11374ac9bdf72b8e3b7c3c900aff91d84c3",
+      "excerpt": "dependencies = [\n    \"numpy\",\n    \"peft>=0.14.0,<0.18.0\",\n    \"pillow>=10.0.0\",\n    \"requests\",\n    \"scipy\",\n    \"torch>=2.2.0,<2.9.0\",\n    \"torchvision\",\n    \"transformers>=4.53.1,<4.58.0\",\n]"
+    },
+    {
+      "id": "colpali-engine-classes",
+      "claim": "colpali-engine 0.3.13 exports ColQwen2_5/ColQwen2_5_Processor separately from ColQwen2/ColQwen2Processor.",
+      "repository": "https://github.com/illuin-tech/colpali.git",
+      "commit": "174055b00d4a36f672c6f915f2bdd0002e4fc9ee",
+      "path": "colpali_engine/models/__init__.py",
+      "lines": [
+        3,
+        5
+      ],
+      "blob": "cb9a71acec04c7118b2e5e4842aed838a2eb1e56",
+      "file_sha256": "ad4d988f38f9e9431e4db1592ffc430a9f657dd8a60cf68047aa13905af58f6c",
+      "excerpt": "from .paligemma import BiPali, BiPaliProcessor, BiPaliProj, ColPali, ColPaliProcessor\nfrom .qwen2 import BiQwen2, BiQwen2Processor, ColQwen2, ColQwen2Processor\nfrom .qwen2_5 import BiQwen2_5, BiQwen2_5_Processor, ColQwen2_5, ColQwen2_5_Processor"
+    },
+    {
+      "id": "colpali-deprecation",
+      "claim": "The colpali README on main marks colpali-engine deprecated for new projects and recommends Sentence Transformers v6 MultiVectorEncoder.",
+      "repository": "https://github.com/illuin-tech/colpali.git",
+      "commit": "97487f8871ff4d5d2284411fe61bdcd2cfe99894",
+      "path": "README.md",
+      "lines": [
+        31,
+        36
+      ],
+      "blob": "b7372cdaedad84ee180d5ac0494b97b1fdd3bfa7",
+      "file_sha256": "7fee6d4bdf5771caef5a7cd5699af89ec38f116f877df154e11d60ba20fe3a31",
+      "excerpt": "## \u26a0\ufe0f ColPali Engine is deprecated\n\n> [!IMPORTANT]\n> `colpali-engine` is now deprecated. The repository and package remain available for research, reproducibility, and existing projects, but we recommend [Sentence Transformers](https://www.sbert.net/) for new projects and production use.\n\n[Sentence Transformers v6](https://github.com/huggingface/sentence-transformers/releases/tag/v6.0.0) introduces first-class support for ColPali-style models through `MultiVectorEncoder`. It provides one ecosystem for embedding and retrieval models\u2014including dense bi-encoders and multi-vector late-interaction models\u2014across text, images, audio, and video, depending on the model."
+    },
+    {
+      "id": "vidore-main-mteb",
+      "claim": "The vidore-benchmark README on main moved single-model ViDoRe v1-v3 evaluation to MTEB.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "a70f23af8bb3b33efe8a4a6c6c15a6e2d978035e",
+      "path": "README.md",
+      "lines": [
+        22,
+        25
+      ],
+      "blob": "0617d4a4b52b8cb0fb1bc46c0d7888a179022e9d",
+      "file_sha256": "a97c1298faf02ce82a2d01ce0b9276b6134f4dc6e80721ddff58a18925979245",
+      "excerpt": "## Evaluating single-model retrievers on ViDoRe v1\u2013v3 with MTEB\nWe shifted from in-house evaluations to the general MTEB evaluation framework for retrieval models by moving to [MTEB](https://github.com/embeddings-benchmark/mteb/tree/main).\n\nHere are the main steps to evaluate and submit your retriever to the ViDoRe V1-V3 leaderboards ; see the [MTEB official documentation](https://embeddings-benchmark.github.io/mteb/contributing/adding_a_model/) for full details. This section covers mteb leaderboards only; for our in-house pipeline leaderboard, see the section below."
+    },
+    {
+      "id": "license-colpali",
+      "claim": "colpali-engine is MIT licensed at v0.3.13.",
+      "repository": "https://github.com/illuin-tech/colpali.git",
+      "commit": "174055b00d4a36f672c6f915f2bdd0002e4fc9ee",
+      "path": "LICENSE",
+      "lines": [
+        1,
+        3
+      ],
+      "blob": "c67416730fed7bab154d250168c820fcc27eff97",
+      "file_sha256": "00971d5f2329e778f05085eebf3f0a72dd626b7b448f8c8549997420cc633932",
+      "excerpt": "MIT License\n\nCopyright (c) 2024 Manuel Faysse, Hugues Sibille, Tony Wu"
+    },
+    {
+      "id": "license-vidore",
+      "claim": "vidore-benchmark is MIT licensed at v5.0.0.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "LICENSE",
+      "lines": [
+        1,
+        3
+      ],
+      "blob": "c67416730fed7bab154d250168c820fcc27eff97",
+      "file_sha256": "00971d5f2329e778f05085eebf3f0a72dd626b7b448f8c8549997420cc633932",
+      "excerpt": "MIT License\n\nCopyright (c) 2024 Manuel Faysse, Hugues Sibille, Tony Wu"
+    },
+    {
+      "id": "readme-model-table",
+      "claim": "The colpali README model table (main) lists vidore/colpali-v1.3 with ViDoRe score 84.8 under the Gemma license and vidore/colqwen2.5-v0.2 with 89.4 under Apache 2.0; the Hub cards of the adapters say mit and the base-model chain is Gemma (colpali) and Qwen research (Qwen2.5-VL-3B-Instruct), see native-outputs/hf-license-chain.txt.",
+      "repository": "https://github.com/illuin-tech/colpali.git",
+      "commit": "97487f8871ff4d5d2284411fe61bdcd2cfe99894",
+      "path": "README.md",
+      "lines": [
+        100,
+        109
+      ],
+      "blob": "b7372cdaedad84ee180d5ac0494b97b1fdd3bfa7",
+      "file_sha256": "7fee6d4bdf5771caef5a7cd5699af89ec38f116f877df154e11d60ba20fe3a31",
+      "excerpt": "| Model                                                               | Score on [ViDoRe](https://huggingface.co/spaces/vidore/vidore-leaderboard) \ud83c\udfc6 | License    | Comments                                                                                                                                                       | Currently supported |\n|---------------------------------------------------------------------|-------------------------------------------------------------------------------|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|\n| [vidore/colpali](https://huggingface.co/vidore/colpali)             | 81.3                                                                          | Gemma      | \u2022 Based on `google/paligemma-3b-mix-448`.<br />\u2022 Checkpoint used in the ColPali paper.                                                                         | \u274c                   |\n| [vidore/colpali-v1.1](https://huggingface.co/vidore/colpali-v1.1)   | 81.5                                                                          | Gemma      | \u2022 Based on `google/paligemma-3b-mix-448`.<br />\u2022 Fix right padding for queries.                                                                                | \u2705                   |\n| [vidore/colpali-v1.2](https://huggingface.co/vidore/colpali-v1.2)   | 83.9                                                                          | Gemma      | \u2022 Similar to `vidore/colpali-v1.1`.                                                                                                                            | \u2705                   |\n| [vidore/colpali-v1.3](https://huggingface.co/vidore/colpali-v1.3)   | 84.8                                                                          | Gemma      | \u2022 Similar to `vidore/colpali-v1.2`.<br />\u2022 Trained with a larger effective batch size of 256 batch size for 3 epochs.                                          | \u2705                   |\n| [vidore/colqwen2-v0.1](https://huggingface.co/vidore/colqwen2-v0.1) | 87.3                                                                          | Apache 2.0 | \u2022 Based on `Qwen/Qwen2-VL-2B-Instruct`.<br />\u2022 Supports dynamic resolution.<br />\u2022 Trained using 768 image patches per page and an effective batch size of 32. | \u2705                   |\n| [vidore/colqwen2-v1.0](https://huggingface.co/vidore/colqwen2-v1.0) | 89.3                                                                          | Apache 2.0 | \u2022 Similar to `vidore/colqwen2-v0.1`, but trained with more powerful GPUs and with a larger effective batch size (256).                                         | \u2705                   |\n| [vidore/colqwen2.5-v0.1](https://huggingface.co/vidore/colqwen2.5-v0.1) | 88.8                                                                          | Apache 2.0 | \u2022 Based on `Qwen/Qwen2.5-VL-3B-Instruct`<br />\u2022 Supports dynamic resolution.<br />\u2022 Trained using 768 image patches per page and an effective batch size of 32.                                         | \u2705                   |\n| [vidore/colqwen2.5-v0.2](https://huggingface.co/vidore/colqwen2.5-v0.2) | 89.4                                                                          | Apache 2.0 | \u2022 Similar to `vidore/colqwen2.5-v0.1`, but trained with slightly different hyper parameters                                        | \u2705                   |"
+    },
+    {
+      "id": "dummy-retriever",
+      "claim": "dummy_vision_retriever returns torch.randn embeddings (16-dim) for queries and passages and scores them by dot product: an uninformative control.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "src/vidore_benchmark/retrievers/dummy_vision_retriever.py",
+      "lines": [
+        12,
+        62
+      ],
+      "blob": "55c9b1f6e96f3f7cee213552db1f432d6f56617d",
+      "file_sha256": "14c59acb15349040a1b9bb92ca4e21b219740feb88a68aa608dcb97537f799e1",
+      "excerpt": "@register_vision_retriever(\"dummy_vision_retriever\")\nclass DummyVisionRetriever(BaseVisionRetriever):\n    \"\"\"\n    Dummy retriever that generates random dense embeddings.\n    \"\"\"\n\n    def __init__(\n        self,\n        emb_dim_query: int = 16,\n        emb_dim_doc: int = 16,\n        device: str = \"cpu\",\n        **kwargs,\n    ):\n        super().__init__(use_visual_embedding=True)\n        self.emb_dim_query = emb_dim_query\n        self.emb_dim_doc = emb_dim_doc\n        self.device = device\n\n    def forward_queries(\n        self,\n        queries: List[str],\n        batch_size: int,\n        **kwargs,\n    ) -> torch.Tensor:\n        return torch.randn(len(queries), self.emb_dim_query)\n\n    def forward_passages(\n        self,\n        passages: List[Image.Image],\n        batch_size: int,\n        **kwargs,\n    ) -> torch.Tensor:\n        return torch.randn(len(passages), self.emb_dim_doc)\n\n    def get_scores(\n        self,\n        query_embeddings: Union[torch.Tensor, List[torch.Tensor]],\n        passage_embeddings: Union[torch.Tensor, List[torch.Tensor]],\n        batch_size: Optional[int] = None,\n    ) -> torch.Tensor:\n        \"\"\"\n        Dot-product similarity between queries and passages.\n        \"\"\"\n        if isinstance(query_embeddings, list):\n            query_embeddings = torch.stack(query_embeddings)\n        if isinstance(passage_embeddings, list):\n            passage_embeddings = torch.stack(passage_embeddings)\n\n        scores = torch.einsum(\"bd,cd->bc\", query_embeddings, passage_embeddings)\n\n        return scores"
+    },
+    {
+      "id": "cli-fixed-seed",
+      "claim": "The CLI module calls transformers.set_seed(42) at import, so the dummy control's random embeddings, and its metrics, are identical across runs.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "src/vidore_benchmark/cli/main.py",
+      "lines": [
+        24,
+        24
+      ],
+      "blob": "e129de61f22645d346126c591d037eb488aef852",
+      "file_sha256": "72107a6abe0fa55952bbd2ec920c9b16a4bba6a5483b580569c5c619425791d7",
+      "excerpt": "set_seed(42)"
+    },
+    {
+      "id": "vidore-python-api",
+      "claim": "The vidore-benchmark 5.0.0 README's Python usage section: the CLI evaluates a fixed list of models, and the Python API (VisionRetriever(model=..., processor=...) wrapped in ViDoReEvaluatorQA) evaluates other retrievers whose processor implements process_images and process_queries; its example evaluates vidore/tabfquad_test_subsampled with batch sizes 4/4/4.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "README.md",
+      "lines": [
+        129,
+        171
+      ],
+      "blob": "35ddab1c31de2ca0ab88379b83b78ccf588f8b2e",
+      "file_sha256": "3ab9553c968c884472f908d646207ea830f855645ac4c1046b44e8524ed7a865",
+      "excerpt": "## Python usage\n\n### Quickstart example\n\nWhile the CLI can be used to evaluate a fixed list of models, you can also use the Python API to evaluate your own retriever. Here is an example of how to evaluate the ColPali model on the ViDoRe benchmark. Note that your processor must implement a `process_images` and a `process_queries` methods, similarly to the ColVision processors.\n\n```python\nfrom typing import Dict, Optional\n\nimport torch\nfrom colpali_engine.models import ColIdefics3, ColIdefics3Processor\nfrom datasets import load_dataset\nfrom tqdm import tqdm\n\nfrom vidore_benchmark.evaluation.vidore_evaluators import ViDoReEvaluatorQA\nfrom vidore_benchmark.retrievers import VisionRetriever\nfrom vidore_benchmark.utils.data_utils import get_datasets_from_collection\n\nmodel_name = \"vidore/colSmol-256M\"\nprocessor = ColIdefics3Processor.from_pretrained(model_name)\nmodel = ColIdefics3.from_pretrained(\n    model_name,\n    torch_dtype=torch.bfloat16,\n    device_map=\"cuda\",\n).eval()\n\n# Get retriever instance\nvision_retriever = VisionRetriever(\n    model=model,\n    processor=processor,\n)\nvidore_evaluator = ViDoReEvaluatorQA(vision_retriever)\n\n# Evaluate on a single dataset\ndataset_name = \"vidore/tabfquad_test_subsampled\"\n\nds = load_dataset(dataset_name, split=\"test\")\nmetrics_dataset = vidore_evaluator.evaluate_dataset(\n    ds=ds,\n    batch_query=4,\n    batch_passage=4,\n    batch_score=4,\n)"
+    },
+    {
+      "id": "vision-retriever-processor-methods",
+      "claim": "VisionRetriever in vidore-benchmark 5.0.0 takes any model and processor, and requires only that the processor has process_images, process_queries and score.",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark.git",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "path": "src/vidore_benchmark/retrievers/vision_retriever.py",
+      "lines": [
+        21,
+        38
+      ],
+      "blob": "75c4f0e7b060239709534232d4bd614e2d403182",
+      "file_sha256": "8dadc89c33f3fd036d63bec790e7c78f8b2971aa017905baa50eaa9d5c29d16a",
+      "excerpt": "class VisionRetriever(BaseVisionRetriever):\n    def __init__(\n        self,\n        model: torch.nn.Module,\n        processor: ProcessorMixin,\n    ):\n        super().__init__(use_visual_embedding=True)\n\n        self.model = model\n        self.model.eval()\n\n        self.processor = processor\n        if not hasattr(self.processor, \"process_images\"):\n            raise ValueError(\"Processor must have `process_images` method\")\n        if not hasattr(self.processor, \"process_queries\"):\n            raise ValueError(\"Processor must have `process_queries` method\")\n        if not hasattr(self.processor, \"score\"):\n            raise ValueError(\"Processor must have `score` method\")"
+    },
+    {
+      "id": "colqwen2_5-processor-class",
+      "claim": "colpali-engine 0.3.13's ColQwen2_5_Processor subclasses BaseVisualRetrieverProcessor, the ColVision processor base class, and Qwen2VLProcessor.",
+      "repository": "https://github.com/illuin-tech/colpali.git",
+      "commit": "174055b00d4a36f672c6f915f2bdd0002e4fc9ee",
+      "path": "colpali_engine/models/qwen2_5/colqwen2_5/processing_colqwen2_5.py",
+      "lines": [
+        9,
+        12
+      ],
+      "blob": "9c17cd050444a231d77affd04c5ee5280ecbece3",
+      "file_sha256": "3ae0a2f9b5d31b0bd0985209b3c80e537041bd8dcf8959f85affe6b6ad61ac24",
+      "excerpt": "from colpali_engine.utils.processing_utils import BaseVisualRetrieverProcessor\n\n\nclass ColQwen2_5_Processor(BaseVisualRetrieverProcessor, Qwen2VLProcessor):  # noqa: N801"
+    },
+    {
+      "id": "transformers-4.53.1-list-repo-templates",
+      "claim": "transformers 4.53.1 (tag v4.53.1): list_repo_templates returns a Hub repository's template names with the .jinja suffix kept (online branch: removeprefix only) but local-cache names without it (offline branch: entry.stem).",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "896e9cea1ade521b2648f4798218550f6c72190c",
+      "path": "src/transformers/utils/hub.py",
+      "lines": [
+        146,
+        183
+      ],
+      "blob": "6ab677f84aa46682097959dd3f8e8902d0420b6e",
+      "file_sha256": "84f391a6ceacae8f46cc1b32ccd8c0179e49a519f7a81e9b12655c8b1c9b8481",
+      "excerpt": "def list_repo_templates(\n    repo_id: str,\n    *,\n    local_files_only: bool,\n    revision: Optional[str] = None,\n    cache_dir: Optional[str] = None,\n) -> list[str]:\n    \"\"\"List template files from a repo.\n\n    A template is a jinja file located under the `additional_chat_templates/` folder.\n    If working in offline mode or if internet is down, the method will list jinja template from the local cache - if any.\n    \"\"\"\n\n    if not local_files_only:\n        try:\n            return [\n                entry.path.removeprefix(f\"{CHAT_TEMPLATE_DIR}/\")\n                for entry in list_repo_tree(\n                    repo_id=repo_id, revision=revision, path_in_repo=CHAT_TEMPLATE_DIR, recursive=False\n                )\n                if entry.path.endswith(\".jinja\")\n            ]\n        except (GatedRepoError, RepositoryNotFoundError, RevisionNotFoundError):\n            raise  # valid errors => do not catch\n        except (ConnectionError, HTTPError):\n            pass  # offline mode, internet down, etc. => try local files\n\n    # check local files\n    try:\n        snapshot_dir = snapshot_download(\n            repo_id=repo_id, revision=revision, cache_dir=cache_dir, local_files_only=True\n        )\n    except LocalEntryNotFoundError:  # No local repo means no local files\n        return []\n    templates_dir = Path(snapshot_dir, CHAT_TEMPLATE_DIR)\n    if not templates_dir.is_dir():\n        return []\n    return [entry.stem for entry in templates_dir.iterdir() if entry.is_file() and entry.name.endswith(\".jinja\")]"
+    },
+    {
+      "id": "transformers-4.53.1-processor-template-path",
+      "claim": "transformers 4.53.1 ProcessorMixin.get_processor_dict appends .jinja to every listed Hub template name, so additional_chat_templates/sentence_transformers.jinja is requested as additional_chat_templates/sentence_transformers.jinja.jinja.",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "896e9cea1ade521b2648f4798218550f6c72190c",
+      "path": "src/transformers/processing_utils.py",
+      "lines": [
+        871,
+        881
+      ],
+      "blob": "9dd9d9ce008604a45f50b89eb7c7e5b36ad44049",
+      "file_sha256": "1797bd6a4d78851e2de2969d3543be62f51dc89c399b9be2b3b077c643b8a48b",
+      "excerpt": "            else:\n                try:\n                    for template in list_repo_templates(\n                        pretrained_model_name_or_path,\n                        local_files_only=local_files_only,\n                        revision=revision,\n                        cache_dir=cache_dir,\n                    ):\n                        additional_chat_template_files[template] = f\"{CHAT_TEMPLATE_DIR}/{template}.jinja\"\n                except EntryNotFoundError:\n                    pass  # No template dir means no template files"
+    },
+    {
+      "id": "transformers-4.53.1-template-resolve",
+      "claim": "transformers 4.53.1 resolves each additional template path with cached_file(..., _raise_exceptions_for_missing_entries=False); with that flag a file missing from the repository resolves to None instead of raising (#transformers-4.53.1-cached-files-missing-entries, #transformers-4.53.1-cached-files-return-none, #transformers-4.53.1-cached-file-wrapper).",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "896e9cea1ade521b2648f4798218550f6c72190c",
+      "path": "src/transformers/processing_utils.py",
+      "lines": [
+        933,
+        949
+      ],
+      "blob": "9dd9d9ce008604a45f50b89eb7c7e5b36ad44049",
+      "file_sha256": "1797bd6a4d78851e2de2969d3543be62f51dc89c399b9be2b3b077c643b8a48b",
+      "excerpt": "                resolved_additional_chat_template_files = {\n                    template_name: cached_file(\n                        pretrained_model_name_or_path,\n                        template_file,\n                        cache_dir=cache_dir,\n                        force_download=force_download,\n                        proxies=proxies,\n                        resume_download=resume_download,\n                        local_files_only=local_files_only,\n                        token=token,\n                        user_agent=user_agent,\n                        revision=revision,\n                        subfolder=subfolder,\n                        _raise_exceptions_for_missing_entries=False,\n                    )\n                    for template_name, template_file in additional_chat_template_files.items()\n                }"
+    },
+    {
+      "id": "transformers-4.53.1-template-open",
+      "claim": "transformers 4.53.1 then opens every resolved template path; open(None) raises the TypeError at line 993 that attempt 6 shows.",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "896e9cea1ade521b2648f4798218550f6c72190c",
+      "path": "src/transformers/processing_utils.py",
+      "lines": [
+        991,
+        995
+      ],
+      "blob": "9dd9d9ce008604a45f50b89eb7c7e5b36ad44049",
+      "file_sha256": "1797bd6a4d78851e2de2969d3543be62f51dc89c399b9be2b3b077c643b8a48b",
+      "excerpt": "        else:\n            chat_templates = {\n                template_name: open(template_file, \"r\", encoding=\"utf-8\").read()\n                for template_name, template_file in resolved_additional_chat_template_files.items()\n            }"
+    },
+    {
+      "id": "transformers-4.57.6-list-repo-templates",
+      "claim": "transformers 4.57.6 (tag v4.57.6), the version the documented vidore-benchmark[colpali-engine]==5.0.0 install resolved within colpali-engine 0.3.13's range (>=4.53.1,<4.58.0): list_repo_templates still keeps the .jinja suffix in its online branch.",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "753d61104116eefc8ffc977327b441ee0c8d599f",
+      "path": "src/transformers/utils/hub.py",
+      "lines": [
+        151,
+        193
+      ],
+      "blob": "9eb68e0eee6b1fd3fa4e4fa7165b70e4c0289dc7",
+      "file_sha256": "bc8f49e9360b904c4382c830b58b5b70d7df5ed66fd90b298bfb0edc23e2e846",
+      "excerpt": "def list_repo_templates(\n    repo_id: str,\n    *,\n    local_files_only: bool,\n    revision: Optional[str] = None,\n    cache_dir: Optional[str] = None,\n    token: Union[bool, str, None] = None,\n) -> list[str]:\n    \"\"\"List template files from a repo.\n\n    A template is a jinja file located under the `additional_chat_templates/` folder.\n    If working in offline mode or if internet is down, the method will list jinja template from the local cache - if any.\n    \"\"\"\n\n    if not local_files_only:\n        try:\n            return [\n                entry.path.removeprefix(f\"{CHAT_TEMPLATE_DIR}/\")\n                for entry in list_repo_tree(\n                    repo_id=repo_id,\n                    revision=revision,\n                    path_in_repo=CHAT_TEMPLATE_DIR,\n                    recursive=False,\n                    token=token,\n                )\n                if entry.path.endswith(\".jinja\")\n            ]\n        except (GatedRepoError, RepositoryNotFoundError, RevisionNotFoundError):\n            raise  # valid errors => do not catch\n        except (HTTPError, OfflineModeIsEnabled, requests.exceptions.ConnectionError):\n            pass  # offline mode, internet down, etc. => try local files\n\n    # check local files\n    try:\n        snapshot_dir = snapshot_download(\n            repo_id=repo_id, revision=revision, cache_dir=cache_dir, local_files_only=True\n        )\n    except LocalEntryNotFoundError:  # No local repo means no local files\n        return []\n    templates_dir = Path(snapshot_dir, CHAT_TEMPLATE_DIR)\n    if not templates_dir.is_dir():\n        return []\n    return [entry.stem for entry in templates_dir.iterdir() if entry.is_file() and entry.name.endswith(\".jinja\")]"
+    },
+    {
+      "id": "transformers-4.57.6-processor-template-path",
+      "claim": "transformers 4.57.6 get_processor_dict still appends .jinja to each listed name.",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "753d61104116eefc8ffc977327b441ee0c8d599f",
+      "path": "src/transformers/processing_utils.py",
+      "lines": [
+        959,
+        970
+      ],
+      "blob": "8b40b6535f1b5448c8f97fa913aab224194f7121",
+      "file_sha256": "6c29de5c3fc674cf21ba6377a39cbafb2ba3e4bc2d1202d4b944f8cf840e6f33",
+      "excerpt": "            else:\n                try:\n                    for template in list_repo_templates(\n                        pretrained_model_name_or_path,\n                        local_files_only=local_files_only,\n                        revision=revision,\n                        cache_dir=cache_dir,\n                        token=token,\n                    ):\n                        additional_chat_template_files[template] = f\"{CHAT_TEMPLATE_DIR}/{template}.jinja\"\n                except EntryNotFoundError:\n                    pass  # No template dir means no template files"
+    },
+    {
+      "id": "transformers-4.57.6-template-open",
+      "claim": "transformers 4.57.6 opens every resolved template path; open(None) raises the TypeError at line 1082 that attempt 5 shows.",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "753d61104116eefc8ffc977327b441ee0c8d599f",
+      "path": "src/transformers/processing_utils.py",
+      "lines": [
+        1080,
+        1084
+      ],
+      "blob": "8b40b6535f1b5448c8f97fa913aab224194f7121",
+      "file_sha256": "6c29de5c3fc674cf21ba6377a39cbafb2ba3e4bc2d1202d4b944f8cf840e6f33",
+      "excerpt": "        else:\n            chat_templates = {\n                template_name: open(template_file, \"r\", encoding=\"utf-8\").read()\n                for template_name, template_file in resolved_additional_chat_template_files.items()\n            }"
+    },
+    {
+      "id": "transformers-5.0.0-processor-strips-suffix",
+      "claim": "transformers 5.0.0 (tag v5.0.0) strips the .jinja suffix before building the path (template.removesuffix('.jinja')), which removes the double suffix; colpali-engine 0.3.13 requires transformers<4.58.0 (#colpali-engine-deps).",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "08810b1e278938278c50153ee1edfd7a20a759da",
+      "path": "src/transformers/processing_utils.py",
+      "lines": [
+        959,
+        971
+      ],
+      "blob": "256789a9370fbe3c33504fdeb640fffc550e2641",
+      "file_sha256": "0a62cb918dd0ab76394da290c01f47824c5b64b874ad2a55062629d918c495ef",
+      "excerpt": "            else:\n                try:\n                    for template in list_repo_templates(\n                        pretrained_model_name_or_path,\n                        local_files_only=local_files_only,\n                        revision=revision,\n                        cache_dir=cache_dir,\n                        token=token,\n                    ):\n                        template = template.removesuffix(\".jinja\")\n                        additional_chat_template_files[template] = f\"{CHAT_TEMPLATE_DIR}/{template}.jinja\"\n                except EntryNotFoundError:\n                    pass  # No template dir means no template files"
+    },
+    {
+      "id": "transformers-4.53.1-cached-files-missing-entries",
+      "claim": "transformers 4.53.1 documents cached_files' private flag _raise_exceptions_for_missing_entries: when False, a missing entry returns None instead of raising.",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "896e9cea1ade521b2648f4798218550f6c72190c",
+      "path": "src/transformers/utils/hub.py",
+      "lines": [
+        376,
+        377
+      ],
+      "blob": "6ab677f84aa46682097959dd3f8e8902d0420b6e",
+      "file_sha256": "84f391a6ceacae8f46cc1b32ccd8c0179e49a519f7a81e9b12655c8b1c9b8481",
+      "excerpt": "        _raise_exceptions_for_missing_entries (`bool`):\n            if False, do not raise an exception for missing entries but return None."
+    },
+    {
+      "id": "transformers-4.53.1-cached-files-return-none",
+      "claim": "transformers 4.53.1 cached_files drops unresolved (missing) entries when that flag is False and returns None when none is left.",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "896e9cea1ade521b2648f4798218550f6c72190c",
+      "path": "src/transformers/utils/hub.py",
+      "lines": [
+        578,
+        583
+      ],
+      "blob": "6ab677f84aa46682097959dd3f8e8902d0420b6e",
+      "file_sha256": "84f391a6ceacae8f46cc1b32ccd8c0179e49a519f7a81e9b12655c8b1c9b8481",
+      "excerpt": "    # Remove potential missing entries (we can silently remove them at this point based on the flags)\n    resolved_files = [file for file in resolved_files if file is not None]\n    # Return `None` if the list is empty, coherent with other Exception when the flag is not active\n    resolved_files = None if len(resolved_files) == 0 else resolved_files\n\n    return resolved_files"
+    },
+    {
+      "id": "transformers-4.53.1-cached-file-wrapper",
+      "claim": "transformers 4.53.1 cached_file returns cached_files' None unchanged for a single missing file.",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "896e9cea1ade521b2648f4798218550f6c72190c",
+      "path": "src/transformers/utils/hub.py",
+      "lines": [
+        312,
+        314
+      ],
+      "blob": "6ab677f84aa46682097959dd3f8e8902d0420b6e",
+      "file_sha256": "84f391a6ceacae8f46cc1b32ccd8c0179e49a519f7a81e9b12655c8b1c9b8481",
+      "excerpt": "    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)\n    file = file[0] if file is not None else file\n    return file"
+    },
+    {
+      "id": "transformers-4.57.6-template-resolve",
+      "claim": "transformers 4.57.6 resolves each additional template path with cached_file(..., _raise_exceptions_for_missing_entries=False), as 4.53.1 does.",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "753d61104116eefc8ffc977327b441ee0c8d599f",
+      "path": "src/transformers/processing_utils.py",
+      "lines": [
+        1022,
+        1038
+      ],
+      "blob": "8b40b6535f1b5448c8f97fa913aab224194f7121",
+      "file_sha256": "6c29de5c3fc674cf21ba6377a39cbafb2ba3e4bc2d1202d4b944f8cf840e6f33",
+      "excerpt": "                resolved_additional_chat_template_files = {\n                    template_name: cached_file(\n                        pretrained_model_name_or_path,\n                        template_file,\n                        cache_dir=cache_dir,\n                        force_download=force_download,\n                        proxies=proxies,\n                        resume_download=resume_download,\n                        local_files_only=local_files_only,\n                        token=token,\n                        user_agent=user_agent,\n                        revision=revision,\n                        subfolder=subfolder,\n                        _raise_exceptions_for_missing_entries=False,\n                    )\n                    for template_name, template_file in additional_chat_template_files.items()\n                }"
+    },
+    {
+      "id": "transformers-4.57.6-cached-files-return-none",
+      "claim": "transformers 4.57.6 cached_files still drops missing entries under that flag and returns None when none is left.",
+      "repository": "https://github.com/huggingface/transformers.git",
+      "commit": "753d61104116eefc8ffc977327b441ee0c8d599f",
+      "path": "src/transformers/utils/hub.py",
+      "lines": [
+        588,
+        593
+      ],
+      "blob": "9eb68e0eee6b1fd3fa4e4fa7165b70e4c0289dc7",
+      "file_sha256": "bc8f49e9360b904c4382c830b58b5b70d7df5ed66fd90b298bfb0edc23e2e846",
+      "excerpt": "    # Remove potential missing entries (we can silently remove them at this point based on the flags)\n    resolved_files = [file for file in resolved_files if file is not None]\n    # Return `None` if the list is empty, coherent with other Exception when the flag is not active\n    resolved_files = None if len(resolved_files) == 0 else resolved_files\n\n    return resolved_files"
+    }
+  ]
+}

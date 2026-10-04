@@ -1,0 +1,80 @@
+{
+ "layer_id": "instructions-skills",
+ "title": "Instructions and skills",
+ "requirement": "Give each task concise canonical rules and useful upstream procedures without activating whole instruction or plugin catalogs.",
+ "a_deciding_comparison_would_measure": "Use a pinned skill on its matching task; retain discovery, loaded sections, concrete findings and baseline conflict/effort before adding another pack.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "Trail of Bits skills",
+   "repository": null
+  },
+  {
+   "key": "C02",
+   "name": "VoltAgent subagent collection",
+   "repository": "https://github.com/voltagent/awesome-claude-code-subagents"
+  },
+  {
+   "key": "C03",
+   "name": "skill:openai-curated (openai)",
+   "repository": "https://github.com/openai/skills"
+  },
+  {
+   "key": "C04",
+   "name": "Shan Claude best practice",
+   "repository": "https://github.com/shanraisshan/claude-code-best-practice"
+  },
+  {
+   "key": "C05",
+   "name": "Vercel agent-skills",
+   "repository": null
+  },
+  {
+   "key": "C06",
+   "name": "affaan-m/ecc",
+   "repository": "https://github.com/affaan-m/ECC"
+  },
+  {
+   "key": "C07",
+   "name": "Anthropic webapp-testing skill",
+   "repository": "https://github.com/anthropics/skills"
+  },
+  {
+   "key": "C08",
+   "name": "Anthropic skills (webapp-testing)",
+   "repository": null
+  },
+  {
+   "key": "C09",
+   "name": "skill:typesafe-ai (typesafe-ai)",
+   "repository": "https://github.com/typesafe-ai/skills"
+  },
+  {
+   "key": "C10",
+   "name": "skills-ref",
+   "repository": "https://github.com/agentskills/agentskills"
+  },
+  {
+   "key": "C11",
+   "name": "Trail of Bits security skills",
+   "repository": "https://github.com/trailofbits/skills"
+  },
+  {
+   "key": "C12",
+   "name": "Claude Code Templates",
+   "repository": "https://github.com/davila7/claude-code-templates"
+  },
+  {
+   "key": "C13",
+   "name": "skills (mattpocock)",
+   "repository": "https://github.com/mattpocock/skills"
+  },
+  {
+   "key": "C14",
+   "name": "Vercel frontend skills",
+   "repository": "https://github.com/vercel-labs/agent-skills"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

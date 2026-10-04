@@ -1,0 +1,205 @@
+{
+  "layers": [
+    {
+      "layer_id": "workers",
+      "selection": [
+        {
+          "name": "C05 — Codex native workers",
+          "repository": "https://github.com/openai/codex",
+          "role": "Native coordinator for bounded delegation, worker messaging, interruption, failure reporting and review. Ownership boundaries remain instructions rather than enforced filesystem isolation.",
+          "install_command": "npm install -g @openai/codex",
+          "install_source": "Upstream README; evaluated stable rust-v0.160.0, released 2026-10-01.",
+          "basis": [
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/tools/handlers/multi_agents_spec.rs#L716",
+              "shows": "Explicit guidance for concrete bounded tasks, disjoint write sets, changed-file reporting and review before integration."
+            },
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/tools/handlers/multi_agents/wait.rs#L243",
+              "shows": "Errored and missing workers are reported as failed, with their statuses retained."
+            },
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/tools/handlers/multi_agents_tests.rs#L3772",
+              "shows": "Public worker tests distinguish mailbox activity from successful task completion."
+            },
+            {
+              "url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+              "shows": "Recent stable release explicitly fixes propagation of subagent environment configuration and preparation failures; publishes Linux x86_64 and macOS arm64 assets."
+            },
+            {
+              "url": "https://github.com/openai/codex/blob/d25c114d494ddb693290b76bf5e5f64ecbdb38fc/README.md",
+              "shows": "Documented Linux installation and platform binaries. Default-branch commit is 2026-10-02; repository is unarchived."
+            },
+            {
+              "url": "https://github.com/openai/codex/actions/runs/36960595021/job/110693201972",
+              "shows": "Captured default-branch Linux x86_64 Bazel test succeeded."
+            },
+            {
+              "url": "https://github.com/openai/codex/actions/runs/36960595021/job/110693201834",
+              "shows": "Captured Linux clippy check failed; overall default-branch CI was FAILURE, despite target-platform test passes."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C10 — Worktrunk",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "role": "Complementary ownership layer: separate branches and worktrees, agent handoffs, review visibility and configurable checks before merging.",
+          "install_command": "cargo install worktrunk && wt config shell install",
+          "install_source": "Upstream README; evaluated release v0.80.0 and default-branch commit 85e685e313f7fbc0612c0e055e655c3917e39f29.",
+          "basis": [
+            {
+              "url": "https://github.com/max-sixty/worktrunk/blob/85e685e313f7fbc0612c0e055e655c3917e39f29/README.md",
+              "shows": "Documented installation, isolated worktrees, agent launching, pre-merge hooks and PR/local merge workflows. Commit is 2026-10-01."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/blob/v0.80.0/skills/worktrunk/SKILL.md",
+              "shows": "Supported parallel-worker pattern: parent creates worktrees and supplies each child its owned path. This is guidance, not enforced write confinement."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+              "shows": "2026-09-27 release preserves branches after failed squash commits and protects dirty submodules and remaining worktree files. Includes Linux x86_64 and macOS arm64 binaries."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/actions/runs/36918528104/job/110558445342",
+              "shows": "Captured Linux tests succeeded; default-branch check rollup was SUCCESS."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/actions/runs/36918528104/job/110558445086",
+              "shows": "Captured macOS tests succeeded."
+            }
+          ],
+          "confidence": "high"
+        },
+        {
+          "name": "C02 — Codex for Claude companion",
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "role": "Claude Code entry point for bounded Codex jobs, explicit read-only reviews, returned results and cancellation. Use separate worktrees and require completed review before integration.",
+          "install_command": "/plugin marketplace add openai/codex-plugin-cc\n/plugin install codex@openai-codex\n/codex:setup",
+          "install_source": "Upstream README at db52e28f4d9ded852ab3942cea316258ae4ef346; release v1.0.6.",
+          "basis": [
+            {
+              "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md",
+              "shows": "Direct Claude Code integration for rescue, review, status, results and cancellation; documented installation requires Node.js ≥18.18 and local Codex."
+            },
+            {
+              "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/plugins/codex/scripts/codex-companion.mjs#L485",
+              "shows": "Task handling preserves actual status and returns raw output, touched files and persistent Codex thread IDs."
+            },
+            {
+              "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/tests/runtime.test.mjs",
+              "shows": "Public fixture tests cover authentication failures, retained cancellation records/logs and interruption of running app-server turns."
+            },
+            {
+              "url": "https://github.com/openai/codex-plugin-cc/actions/runs/28907774977/job/85758420640",
+              "shows": "Latest merged change had successful Ubuntu test/build CI on its pre-merge commit; this is not an exact default-HEAD check."
+            },
+            {
+              "url": "https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6",
+              "shows": "Release and default-branch commit are 2026-07-08, approximately 86 days old on 2026-10-02: current under the frozen rule, though less recently maintained than other finalists."
+            },
+            {
+              "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/plugins/codex/scripts/stop-review-gate-hook.mjs#L159",
+              "shows": "Optional Stop gate fails open when Codex is unavailable. It is not a Git integration gate."
+            },
+            {
+              "url": "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/plugins/codex/scripts/session-lifecycle-hook.mjs",
+              "shows": "Session cleanup removes plugin job artifacts; underlying persistent Codex threads are separate. The plugin does not establish independent edit isolation."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "Deep Agents",
+          "reason": "Credible finalist with tested parallel delegation, filesystem permissions, interrupts and async error/cancellation handling; the complete Claude Code/Codex ownership-to-reviewed-integration workflow remains unmeasured. [Source](https://github.com/langchain-ai/deepagents/blob/372bc221ee8e66885f25e22f42bd8168a21c3ac7/libs/deepagents/tests/unit_tests/test_subagents.py)."
+        },
+        {
+          "key": "C03",
+          "name": "Beads",
+          "reason": "Atomic claims, blockers and audit trails address task coordination, but contribute less directly to execution isolation and reviewed code integration; captured HEAD lint checks failed. [README](https://github.com/gastownhall/beads/blob/555b01d7891d4b592d83c4545a6dcedd018cbb9c/README.md)."
+        },
+        {
+          "key": "C04",
+          "name": "DeerFlow",
+          "reason": "Strong delegation and failed-output preservation, but subagents share filesystem behavior; its published eight-pair handoff evaluation measures synthetic artifacts and cost, rather than owned edits and review before integration. [Evaluation](https://github.com/bytedance/deer-flow/blob/63e399f2bdf6ad1269724c10cfc98bb40c7550d3/backend/scripts/benchmark/context_snapshot/README.md)."
+        },
+        {
+          "key": "C06",
+          "name": "OpenHands SDK",
+          "reason": "Credible finalist with passing SDK/ACP CI, native Claude Code/Codex adapters, delegation and cancellation; worktree ownership and integration-review policy still require assembling a workflow. [Delegation example](https://github.com/OpenHands/software-agent-sdk/blob/53a4bc5014902ca84bb21fff30eac606ff4905aa/examples/01_standalone_sdk/25_agent_delegation.py), [ACP tests](https://github.com/OpenHands/software-agent-sdk/blob/53a4bc5014902ca84bb21fff30eac606ff4905aa/tests/sdk/agent/test_acp_conformance.py)."
+        },
+        {
+          "key": "C07",
+          "name": "LangGraph",
+          "reason": "Strong durable orchestration and human-intervention primitives, but a lower-level foundation requiring more assembly than the selected worker commands and worktree tooling. [README](https://github.com/langchain-ai/langgraph/blob/157a06dda988d85afeb8751ff27b35ab3f4f8bf4/README.md)."
+        },
+        {
+          "key": "C08",
+          "name": "Microsoft Agent Framework",
+          "reason": "Supports concurrent graphs, checkpoints and human intervention; its general framework has less direct clean-install fit for this coding-worker ownership and integration requirement. [README](https://github.com/microsoft/agent-framework/blob/a91fe6682f160cd9b2e57bbeba404d65ae51a9da/README.md)."
+        },
+        {
+          "key": "C09",
+          "name": "claude-code",
+          "reason": "Current release describes useful worker/worktree fixes, but inspected public tests cover repository workflows and plugins rather than establishing core worker failure-preservation correctness. License information was not a scoring penalty. [Release](https://github.com/anthropics/claude-code/releases/tag/v2.1.287), [test workflow](https://github.com/anthropics/claude-code/blob/52c76441cae91f6891e4712306bffb057ff6fec5/.github/workflows/mod-tests.yml)."
+        },
+        {
+          "key": "C11",
+          "name": "Temporal",
+          "reason": "A tested durable-execution server; its README directs users to separate SDKs to implement workers, leaving substantial assembly for agent-client integration, edit ownership and review. [README](https://github.com/temporalio/temporal/blob/37aa0e95e59523cd909dbdbdf20169ad7dbc33ae/README.md)."
+        },
+        {
+          "key": "C12",
+          "name": "OpenHands Agent Canvas",
+          "reason": "Direct Claude Code/Codex integration and concurrent containers are useful, but same-workspace conversations still share files; captured mock-LLM end-to-end CI failed and live E2E was cancelled. [README](https://github.com/OpenHands/OpenHands/blob/1ff45c267fe5737c9387ccaf54d44cab3da6d9dd/README.md), [failed E2E](https://github.com/OpenHands/OpenHands/actions/runs/36948750156/job/110656729810)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "The selected complementary set has the most direct documented fit for the specified agent sessions, but no matched evidence establishes workflow superiority. On WSL2, compare native single-agent Codex, Codex workers with Worktrunk and the Claude companion, and equivalently configured OpenHands SDK and Deep Agents graphs. Freeze tasks, models, acceptance checks and budgets; include pre-existing owned edits, an intentional nonzero failure, cancellation after partial edits, session restart and a reviewer-rejected integration. Measure accepted integrations, lost or misattributed edits/results, retained original errors, cancellation latency, complete parent-plus-worker usage, elapsed time and operator intervention. Require independent acceptance and completed relevant review before every integration.",
+      "evidence_gaps": [
+        "The packet contains no completed comparison. Upstream unit tests, CI and framework microbenchmarks do not establish comparative end-to-end worker quality.",
+        "Native ownership instructions and Worktrunk child-path guidance are not enforced write confinement. Codex root --worktree does not establish a separate worktree for every native child.",
+        "The companion's optional Stop gate is not a mandatory merge gate. Plugin job artifacts are cleaned up and retention is capped; preservation of underlying Codex threads must not be confused with preservation of every plugin artifact.",
+        "Linux x86_64 and macOS arm64 support is evidenced for Codex and Worktrunk; WSL2 end-to-end behavior and companion macOS arm64 execution were not measured. This coordination requirement does not need the RTX 4090.",
+        "All 12 repositories were unarchived, had default-branch commits within 90 days, recent published releases and issue updates around October 1–2. Issue updates do not establish maintainer responsiveness. Some monorepo latest releases concern CLI or language-specific packages.",
+        "CI observations are captured check contexts, not exhaustive pass reports. Codex, Beads, Microsoft Agent Framework and Agent Canvas had failed captured checks; those failures were retained in the judgment.",
+        "Source inspection confirmed that OpenHands SDK has native Claude Code/Codex ACP adapters. Its conformance tests demonstrate protocol compatibility rather than completed coding tasks; the linked SWE-bench evaluation was not independently fetched or used to claim superiority.",
+        "The mandated ctx_fetch_and_index call was rejected because it required approval while the session approval policy is never. Authorized GitHub API blobs were instead indexed with ctx_index and read with ctx_search. External documentation and paper pages were not fetched.",
+        "Research used 30 GitHub API calls, one web search and one rejected page-fetch attempt."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/openai/codex",
+        "https://api.github.com/repos/openai/codex/commits?per_page=1",
+        "https://api.github.com/repos/max-sixty/worktrunk",
+        "https://api.github.com/repos/max-sixty/worktrunk/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/agent-framework",
+        "https://api.github.com/repos/microsoft/agent-framework/commits?per_page=1",
+        "https://api.github.com/repos/temporalio/temporal",
+        "https://api.github.com/repos/temporalio/temporal/commits?per_page=1",
+        "https://api.github.com/repos/bytedance/deer-flow",
+        "https://api.github.com/repos/bytedance/deer-flow/commits?per_page=1",
+        "https://api.github.com/repos/langchain-ai/deepagents",
+        "https://api.github.com/repos/langchain-ai/deepagents/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/claude-code",
+        "https://api.github.com/repos/anthropics/claude-code/commits?per_page=1",
+        "https://api.github.com/repos/openai/codex-plugin-cc",
+        "https://api.github.com/repos/openai/codex-plugin-cc/commits?per_page=1",
+        "https://api.github.com/repos/gastownhall/beads",
+        "https://api.github.com/repos/gastownhall/beads/commits?per_page=1",
+        "https://api.github.com/repos/OpenHands/software-agent-sdk",
+        "https://api.github.com/repos/OpenHands/software-agent-sdk/commits?per_page=1",
+        "https://api.github.com/repos/langchain-ai/langgraph",
+        "https://api.github.com/repos/langchain-ai/langgraph/commits?per_page=1",
+        "https://api.github.com/repos/OpenHands/OpenHands",
+        "https://api.github.com/repos/OpenHands/OpenHands/commits?per_page=1",
+        "https://api.github.com/repos/openai/codex/releases/latest",
+        "https://api.github.com/repos/max-sixty/worktrunk/releases/latest",
+        "https://api.github.com/graphql — four batched queries retrieved all candidate READMEs, workflow sources, release and issue activity, check results, and the pinned implementation/test sources cited above."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+[project]
+name = "native-memory-qualification"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "inspect-ai==0.3.275",
+    "pydantic==2.13.5",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+]

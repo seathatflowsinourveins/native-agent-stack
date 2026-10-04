@@ -2,7 +2,7 @@
   "schema_version": 1,
   "reviewed_at": "2026-09-22",
   "platform": "linux-x86_64",
-  "source": "Ported from agent-lab .devcontainer/bootstrap-linux.sh (node, uv, gh, codex, claude) plus fresh 2026-09-22 fetches for qmd, mcporter, rtk, ai-memory, context-mode. Each archive was downloaded into a disposable worktree temp directory and hashed with sha256sum; npm entries were additionally cross-checked against `npm view <pkg> dist.integrity` (sha512, base64) computed with `openssl dgst -sha512 -binary | base64` over the same downloaded tarball -- all five matched exactly.",
+  "source": "Ported from agent-lab .devcontainer/bootstrap-linux.sh (node, uv, gh, codex, claude) plus fresh 2026-09-22 fetches for qmd, mcporter, rtk, ai-memory, context-mode. Each archive was downloaded into a disposable worktree temp directory and hashed with sha256sum; npm entries were additionally cross-checked against `npm view <pkg> dist.integrity` (sha512, base64) computed with `openssl dgst -sha512 -binary | base64` over the same downloaded tarball -- all five matched exactly. 2026-10-04 bounded token pin move: RTK 0.51.0 and mcporter 0.14.2 follow their bounded host receipts; earlier paragraphs describe dated checks. NativeStack WSL2 host execution is distinct from new-host acceptance. claude-hud 0.10.0 has no release asset and remains a native Claude plugin, installed from tag v0.10.0 through the settings template and recipe rather than an unsupported bootstrap pin kind.",
   "tools": [
     {
       "id": "node",
@@ -51,26 +51,63 @@
     },
     {
       "id": "codex",
-      "version": "0.155.1",
+      "version": "0.160.0",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.155.1.tgz",
-      "sha256": "fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66",
-      "install_note": "npm registry tarball for @openai/codex@0.155.1 (thin wrapper package, 4904 bytes); npm dist.integrity sha512-02fAAGyBtlA1zPjEo3kTj/bOSYbPz5DvjLwRZJdV7weFFEDzNFOMjQGmZ/+5CuirYV0hE+AZTrnjzwXYU4AdAQ== matches a fresh openssl sha512/base64 digest of the same download. `npm install --global --prefix tools/codex-0.155.1 @openai/codex@0.155.1`. The complete native package (codex-code-mode-host, bundled rg) used by the agent-lab devcontainer script is a separate, larger GitHub release asset; this pin follows the npm alternative the task specified.",
+      "ignore_scripts": true,
+      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0.tgz",
+      "sha256": "373517768e912eeb5054024ae9215e2c90a1420957b66fe134ef745a00948d4a",
+      "install_note": "npm registry tarball for @openai/codex@0.160.0 (thin wrapper package, 4,902 bytes); the downloaded bytes match npm dist.integrity sha512-kEtVGzjRAYAMOwJxN39bGcna7LT3IDQgq64NNJ/dDTfu4OzZaocJcyNb5/gGJ/IVF/Vj7oK7E2m3nmTan7lpjg== and this row's SHA256. Registry signature and attestation metadata are present, but verification was not recorded for this promotion. A private-prefix npm install selected @openai/codex@0.160.0-linux-x64; its native binary SHA256 is 12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad, matching the SDK's bundled binary. The coordinator recorded strict-hash SDK/CLI 0.160.0 installation facts and completed native-account SDK, gateway SDK and gateway CLI marker canaries (evidence/artifacts/runtime-sdk-20261003/receipt.json). The upstream scripts/install/install.sh and app-server-daemon/README.md at rust-v0.160.0, commit a956835d020762cb2b570053af06f643a11c0ecc, are unchanged from rust-v0.159.3. The portable Linux bootstrap supports `npm install --global --prefix tools/codex-0.160.0 <verified codex-0.160.0.tgz>` and relinks its bin entry; applying that bootstrap to an existing identity wrapper needs the host's serialized launcher ownership. The shared host launcher, daemon and production prefix still run 0.159.3 until a coordinated switch. The host's existing daemon_auto_start is enabled and its 0.159.3 daemon updater is disabled and pinned; adoption/templates/codex.config.template.toml remains an opt-in portable baseline with daemon_auto_start false. The earlier queue and Hindsight receipts qualify only 0.159.3; this 0.160.0 evidence is a same-host compatibility attempt with retained outputs and discriminating controls; original SDK invocation/source and process timing evidence is incomplete, so native_cli_e2e, new-host and model-quality acceptance remain unestablished. bootstrap-linux.sh verifies the platform_dependency archive by SHA-256/SHA-512 before npm install. ignore_scripts=true keeps lifecycle scripts disabled: the 0.160.0 wrapper and platform package have no scripts or dependencies. It requires the installed wrapper optionalDependencies alias to equal the pin, rejects unexpected nested/global packages, replaces only the contained Node-resolved package or a new contained alias, and checks package identity/version and the installed executable SHA-256. A fresh versioned tree is atomically published; failed unpublished trees are cleaned up and successful publication clears migration recovery before pruning. Pins that allow a rebuild must retain the complete verified platform tree byte for byte. A mismatch fails closed before publication.",
       "version_probe": {
         "method": "exec",
         "command": "codex",
         "args": [
           "--version"
         ]
-      }
+      },
+      "platform_dependency": {
+        "name": "@openai/codex-linux-x64",
+        "resolved_package": "@openai/codex",
+        "version": "0.160.0-linux-x64",
+        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0-linux-x64.tgz",
+        "sha256": "37a41d61c3399182b8c727b77090cc7a1566bd849d0f09070a0bbc6fec4c58dc",
+        "integrity": "sha512-KI/73OqGrHmR18s7ya7E1NqV6rT0y3lxr0s8S1qR2m6zU6QRF/HlR529jALLh5vjdUnsRT4Ahoxt0axb4kY99g==",
+        "checksum_ref": "npm view @openai/codex@0.160.0 optionalDependencies maps this alias to npm:@openai/codex@0.160.0-linux-x64; evidence/artifacts/runtime-sdk-20261003/npm-dist-linux-x64.json retains the registry URL and integrity (2026-10-03). The coordinator downloaded 163273896 bytes and independently matched SHA-256 and SHA-512; the archive executable SHA-256 matches the recorded installed and bundled CLI.",
+        "installed_binary_check": {
+          "path": "vendor/x86_64-unknown-linux-musl/bin/codex",
+          "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad"
+        }
+      },
+      "holds": [
+        {
+          "version": "0.159.3",
+          "until": "2026-11-04",
+          "reason": "X18: hosts not yet switched stay on 0.159.3 until retired (#626 landing exception)",
+          "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz",
+          "sha256": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79",
+          "checksum_ref": "URL and SHA-256 are this row's 0.159.3 values before f77a35eb2 (#626), introduced by 85543efe5 (#580). Re-verified 2026-10-04: npm view @openai/codex@0.159.3 dist.integrity = sha512-hg4nlqCwRb87GocxNnHvz4sadOrdJ71mO0a4CUYWXjAozJe2gtuAdRFldKGSQXw9m7SgR4ydis12KDVVPgzDkQ== and dist.shasum = b49833a850e61217e62b7992e251a385462a6dac, and the 4,904-byte tarball downloaded from the registry matched both and this SHA-256. A hold records what a host not yet switched runs; the bootstrap installs only the row's version, and scripts/adoption_status.py --pinned-versions reports a probe that names this version as held before the until date and as drift on or after it (docs/decisions/2026-10-04-codex-dated-holds.md).",
+          "platform_dependency": {
+            "name": "@openai/codex-linux-x64",
+            "resolved_package": "@openai/codex",
+            "version": "0.159.3-linux-x64",
+            "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3-linux-x64.tgz",
+            "sha256": "0719027cfe326e248971a2dff0a391c3532a3d838b4e3cc660bf93b2a606d2ce",
+            "integrity": "sha512-xlHydfOksnNt/qz4BEVFvjMWunweaVSNtha/DkVUwWZnVZxbqiJwsXSl2iZDk04b6k/g0OI7jU06XqzHB2s5og==",
+            "checksum_ref": "npm view @openai/codex@0.159.3 optionalDependencies maps this alias to npm:@openai/codex@0.159.3-linux-x64, and npm view @openai/codex@0.159.3-linux-x64 gives the integrity above and dist.shasum = 62a9c71b5086d6aea6cd0cde61178a6d39f0eeba (2026-10-04). The 162,464,331-byte archive downloaded from the registry matched SHA-512, SHA-1 and this SHA-256; its package.json names @openai/codex 0.159.3-linux-x64 with no scripts or dependencies, and the executable SHA-256 is read from the same archive. First recorded here: no earlier repository record carries this archive's hashes, and no held host's installed executable was compared with it.",
+            "installed_binary_check": {
+              "path": "vendor/x86_64-unknown-linux-musl/bin/codex",
+              "sha256": "8bf204b36a2f6dd0dab73aa2f639892e67ef9ac8befccb4a05b1496ebf25c479"
+            }
+          }
+        }
+      ]
     },
     {
       "id": "claude-code",
-      "version": "2.1.281",
+      "version": "2.1.284",
       "kind": "native",
-      "url": "https://downloads.claude.ai/claude-code-releases/2.1.281/linux-x64/claude",
-      "sha256": "56fe3da88458465fb27d7e9299dddb3fead55750fb9c2de795f233b5eea6dce1",
-      "install_note": "minimum version; native auto-update on the latest channel. Raised from 2.1.280 (1e08503dbdf3c2cb0d706d32f3408277388d1c76ef108673e8fe42c1b322925b, verified 2026-09-23 by downloading the linux-x64 binary and re-hashing it) in step with the macOS pin, since shared components keep one version on both platforms: 2.1.281 fixes a recursive rm of command-substitution output running unprompted in auto and --dangerously-skip-permissions mode. This sha256 is the 2.1.281 manifest.json's platforms.linux-x64.checksum (fetched 2026-09-24, size 237375560); the linux-x64 binary was not re-downloaded or re-hashed for it, and fetch() verifies the served bytes against it before anything runs. Superseded the prior npm-wrapper pin (2.1.278, DISABLE_AUTOUPDATER=1) once the native installer became the reference path: fetch the binary, verify its sha256, then run `\"$bin\" install 2.1.281`, matching ~/codex-ecosystem/bin/bootstrap-linux.sh's own claude-code step. The installed binary self-manages ~/.local/share/claude/versions and the ~/.local/bin/claude launcher and auto-updates on the latest channel from there; this pin is a floor, not a ceiling: adoption/bootstrap-linux.sh's install_native (identical to bootstrap-macos.sh's since 2026-09-24) keeps a ~/.local/bin/claude whose --version already reports 2.1.281 or newer, logging `Kept installed claude-code <version>` with nothing downloaded or installed, and runs the checksum-verified install only when that launcher is missing, older or unreadable, so re-running the bootstrap never moves a newer auto-updated install back to this pin. No DISABLE_AUTOUPDATER opt-out is set.",
+      "url": "https://downloads.claude.ai/claude-code-releases/2.1.284/linux-x64/claude",
+      "sha256": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f",
+      "install_note": "minimum version; native auto-update on the latest channel. Raised from 2.1.281 (56fe3da88458465fb27d7e9299dddb3fead55750fb9c2de795f233b5eea6dce1, that release's manifest.json platforms.linux-x64.checksum fetched 2026-09-24, size 237375560; its binary was not re-downloaded or re-hashed) in step with the macOS pin, since shared components keep one version on both platforms: 2.1.284 is the first release whose `sonnet` alias resolves to Sonnet 5.5 (`claude-sonnet-5-5`; CHANGELOG.md 2.1.284: \"Added Claude Sonnet 5.5 (`claude-sonnet-5-5`), now the default Sonnet model on the Anthropic API\"; https://code.claude.com/docs/en/model-config lists `sonnet` as Sonnet 5.5 from v2.1.284 and Sonnet 5 from v2.1.197, both read 2026-09-29), so an older client routes `sonnet` to Sonnet 5 on the Anthropic API; the 2.1.281 fix for a recursive rm of command-substitution output running unprompted in auto and --dangerously-skip-permissions mode stays included. This sha256 is the 2.1.284 manifest.json's platforms.linux-x64.checksum (https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json, fetched 2026-09-29: commit 2b8ce618c24de26410e4bdfc4e1d592accd61f61, buildDate 2026-09-28T02:36:51Z, size 243059896). First independent byte check, without a download: the 2.1.284 linux-x64 binary that Claude Code's own native updater had already installed on the NativeStack WSL2 host (~/.local/share/claude/versions/2.1.284, 243059896 bytes) re-hashes to the same digest (2026-09-29). Also re-hashed on 2026-09-29: the binary streamed from this pin's URL (HTTP 200, 243059896 bytes) hashes to the same digest. The manifest itself was verified with the documented procedure (https://code.claude.com/docs/en/setup#binary-integrity-and-code-signing) on 2026-09-29: the key at https://downloads.claude.ai/keys/claude-code.asc, imported into an empty keyring, has the documented fingerprint 31DD DE24 DDFA B679 F42D 7BD2 BAA9 29FF 1A7E CACE, and `gpg --verify manifest.json.sig manifest.json` reported `Good signature from \"Anthropic Claude Code Release Signing <security@anthropic.com>\"` (gpg's untrusted-key warning is expected; a copy of the manifest with one byte changed failed with BAD signature). The key's own certification, expiry and revocation were not checked, and the fingerprint comes from the same documentation. fetch() still verifies the served bytes against this sha256 before anything runs. Superseded the prior npm-wrapper pin (2.1.278, DISABLE_AUTOUPDATER=1) once the native installer became the reference path: fetch the binary, verify its sha256, then run `\"$bin\" install 2.1.284`, matching ~/codex-ecosystem/bin/bootstrap-linux.sh's own claude-code step. The installed binary self-manages ~/.local/share/claude/versions and the ~/.local/bin/claude launcher and auto-updates on the latest channel from there; this pin is a floor, not a ceiling: adoption/bootstrap-linux.sh's install_native (identical to bootstrap-macos.sh's since 2026-09-24) keeps a ~/.local/bin/claude whose --version already reports 2.1.284 or newer, logging `Kept installed claude-code <version>` with nothing downloaded or installed, and runs the checksum-verified install only when that launcher is missing, older or unreadable, so re-running the bootstrap never moves a newer auto-updated install back to this pin. No DISABLE_AUTOUPDATER opt-out is set.",
       "bin": "claude",
       "version_probe": {
         "method": "exec",
@@ -99,26 +136,28 @@
     },
     {
       "id": "rtk",
-      "version": "0.50.0",
+      "version": "0.51.0",
       "kind": "tarball",
-      "url": "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz",
-      "sha256": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
-      "install_note": "Verified against the v0.50.0 release's checksums.txt fetched 2026-09-25 (`sha256sum --check --strict`: OK; the checksums.txt sha256 4c7116898ae812960dfa0de3b3acc5406a0da49209f0ad7bed4d4ed8c4785048 equals the GitHub API asset digest), matching recipes/README.md's rtk 0.50.0 row; qualified against 0.49.0 and switched on nativestack-5975wx-20260925 (evidence/receipts/rtk-050-qualification-20260925.json). The bootstrap installs the binary only: a host that runs the Claude hook also needs the ~/.config/rtk/config.toml exclude_commands in recipes/README.md, or 0.50.0's `git show <rev>:<path> | tail` blob window is live.",
+      "url": "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz",
+      "sha256": "5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5",
+      "install_note": "Official rtk-ai/rtk v0.51.0 at e001f773f80b22b7dc4c7a79521b30e35aaef026; the existing single-binary tarball installer applies. NativeStack WSL2 installed and verified this Linux asset on 2026-10-04; this is historical host execution, not acceptance for another host. BREAKING: scripts relying on implicit shell expansion in executable positional arguments must use --shell, for example rtk test --shell sh 'cargo test && cargo clippy'. Direct argv, rtk proxy and hook-check inspection strings remain direct calls. For the Claude hook, keep the five-entry [hooks] exclude_commands value from recipes/README.md#native-context-mode-and-hooks in ~/.config/rtk/config.toml (or the absolute XDG_CONFIG_HOME equivalent). Replace the existing key rather than adding duplicate TOML tables. Bootstrap prints a reminder and does not write this configuration. rtk init was not re-run in the host upgrade. evidence/receipts/rtk-051-qualification-20261004.json",
       "version_probe": {
         "method": "exec",
         "command": "rtk",
         "args": [
           "--version"
         ]
-      }
+      },
+      "checksum_source": "publisher_checksum_file",
+      "checksum_ref": "rtk-ai/rtk v0.51.0 checksums.txt, rtk-x86_64-unknown-linux-musl.tar.gz; publisher SHA-256 matches. See evidence/receipts/rtk-051-qualification-20261004.json data.artifact_checks."
     },
     {
       "id": "ai-memory",
-      "version": "2.3.2",
+      "version": "2.4.1",
       "kind": "tarball",
-      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-linux-x86_64.tar.gz",
-      "sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
-      "install_note": "Verified against the release's ai-memory-linux-x86_64.tar.gz.sha256 sidecar fetched 2026-09-22, following the upstream source named in blueprints/convergence-practice/wsl-native-tools/pins.json's convention and recipes/README.md's ai-memory row (official akitaonrails/ai-memory v2.3.2 archive).",
+      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.1/ai-memory-linux-x86_64.tar.gz",
+      "sha256": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+      "install_note": "Verified 2026-09-25 against three upstream values that agree (by the qualification run at 22:43Z and its independent verifier at 23:10Z): the v2.4.1 release's ai-memory-linux-x86_64.tar.gz.sha256 sidecar, the GitHub API asset digest (16,026,020 bytes) and the checksum list in the release body; the API digest was re-checked on 2026-09-26 before the cutover; the archive's ai-memory binary has sha256 dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd, and the release has no artifact attestation (HTTP 404), an unsigned tag and is not immutable. Matches recipes/README.md's ai-memory row (official akitaonrails/ai-memory v2.4.1 archive, tag commit 433a19f3d54dea287571b1423591db2a89965fa9). On nativestack-5975wx-20260925, 2.4.0 replaced 2.3.2 on 2026-09-25 and 2.4.1 replaced 2.4.0 on 2026-09-26, each after a rehearsal on restored copies and a cold-copy cutover (evidence/receipts/ai-memory-240-qualification-20260925.json and ai-memory-241-qualification-20260925.json); that is one host's state, not evidence about any other Linux host. Migrations are forward-only: 2.4.1 migrates a 2.3.2 store V64 -> V67 and a 2.4.0 store V66 -> V67 when `serve` first opens it, an older binary then refuses that store, and no automatic pre-migration archive is written for a 2.x store. On a host with an existing store, stop the service and take an at-rest copy of the data directory before the service restarts on this binary, then re-run `ai-memory install-hooks --apply` for each client (the hook commands name the versioned prefix).",
       "version_probe": {
         "method": "exec",
         "command": "ai-memory",
@@ -129,16 +168,33 @@
     },
     {
       "id": "mcporter",
-      "version": "0.13.13",
+      "version": "0.14.2",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.13.13.tgz",
-      "sha256": "ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d",
-      "install_note": "npm dist.integrity sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA== matched. `npm install --global --prefix tools/mcporter-0.13.13 mcporter@0.13.13`, matching recipes/README.md. Requires Node >=24.",
+      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.2.tgz",
+      "sha256": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b",
+      "install_note": "npm install --global --prefix tools/mcporter-0.14.2 mcporter@0.14.2; Node >=24 and ps on the daemon launch PATH are required. NativeStack WSL2 returned version 0.14.2 and two successful ad-hoc stdio calls on 2026-10-04. The host configured-daemon calls failed on a stale rendezvous; ad-hoc --stdio calls succeeded. No daemon recovery was attempted. evidence/receipts/mcporter-0142-qualification-20261004.json",
       "version_probe": {
         "method": "exec",
         "command": "mcporter",
         "args": [
           "--version"
+        ]
+      },
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "Fresh mcporter@0.14.2 registry tarball (3,585,823 bytes) SHA-256 was computed on 2026-10-04; SHA-512 matches dist.integrity sha512-3ajjKzPLe/39hN582XqMuOw3S9vHQfLpSBq72zVakT03xso3GDXHcht/eVLu/l2MDqulIOtLevnTKreUxymHJQ== and SHA-1 matches dist.shasum ee7d91e7362e7dc5b44b5fcc5cfdea7cfaedb1fd. SLSA provenance attestation is present. See evidence/receipts/mcporter-0142-qualification-20261004.json data.artifact_checks."
+    },
+    {
+      "id": "context-hub",
+      "version": "0.1.4",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/@aisuite/chub/-/chub-0.1.4.tgz",
+      "sha256": "ca9fb94a21d3b5ae3025923ded305dd11f189626da5adab48a8b947bc523888f",
+      "install_note": "2026-09-26 fetch of the npm registry tarball for @aisuite/chub@0.1.4 (35884 compressed bytes), independently SHA-256 hashed. npm dist.integrity sha512-/Jwme37Jqc3MQLBbtbTmPzW1wSBrZadkwCmcLd3YReBW2t99bHpimy+8qS333oGC4cu9/3WpF2MYTK7fYG6q8Q== matches both Python hashlib and a fresh OpenSSL SHA-512/base64 digest; SHA-1 also matches npm dist.shasum 39fad45082d70f0067c352024b96eca20ba0e77c. `npm install --global --prefix tools/context-hub-0.1.4 @aisuite/chub@0.1.4`, matching recipes/README.md and manifests/stack.json. Registry metadata lists no optionalDependencies; this package digest does not pin transitive dependencies or establish native acceptance. Set telemetry: false and feedback: false in ~/.chub/config.yaml; use CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 only where HOME or CHUB_DIR is overridden (andrewyng/context-hub v0.1.4 docs/cli-reference.md:215-229 and SECURITY.md:28; recipes/README.md#context-hub-opt-out).",
+      "version_probe": {
+        "method": "exec",
+        "command": "chub",
+        "args": [
+          "--cli-version"
         ]
       }
     },
@@ -148,7 +204,7 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/context-mode/-/context-mode-1.0.169.tgz",
       "sha256": "09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
-      "install_note": "npm dist.integrity sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== matched. recipes/README.md flags that the npm context-mode@1.0.169 release is a DIFFERENT source revision from the native plugin pin (git 6f0cc6841c687e754059f36714a11233fda1a02b installed via `codex plugin marketplace add` / `claude plugin marketplace add`) and is not a substitute for full plugin evidence. This pin installs the npm CLI package only (`npm install --global --prefix tools/context-mode-1.0.169 context-mode@1.0.169`) so the script can place an executable on PATH; it does NOT install or replace the client-native plugin, and does not by itself establish the plugin-level acceptance recorded elsewhere in the catalog.",
+      "install_note": "npm dist.integrity sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== matched. The npm context-mode@1.0.169 package and native plugin pin 6f0cc6841c687e754059f36714a11233fda1a02b use the same context-mode source; separately built bundles that differ by one vendored expression (evidence/artifacts/context-mode-codex-binding-20260926/README.md#packages). Distinct installation surfaces still require full plugin evidence. This pin installs the npm CLI package only (`npm install --global --prefix tools/context-mode-1.0.169 context-mode@1.0.169`) so the script can place an executable on PATH; it does NOT install or replace the client-native plugin, and does not by itself establish the plugin-level acceptance recorded elsewhere in the catalog.",
       "version_probe": {
         "method": "npm-metadata",
         "note": "No version flag: every argv other than its named subcommands and --help falls through to starting its MCP stdio server, so the package version is read from npm metadata instead (observed 2026-09-25 with context-mode 1.0.169)."
@@ -246,11 +302,11 @@
     },
     {
       "id": "ccusage",
-      "version": "20.0.24",
+      "version": "20.0.26",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/ccusage/-/ccusage-20.0.24.tgz",
-      "sha256": "69787a0aa2269cd14f3d0f41d179b80744d5384e912ee11852897ecd0bf91183",
-      "install_note": "2026-09-25 fetch to complete the `token-efficiency` profile's Linux pin coverage. npm registry tarball for ccusage@20.0.24 downloaded fresh and independently sha256-hashed; npm dist.integrity sha512-sHq7axM0ucbFS4m5xFzS7NxYSmOP1+PSDup3nVb+pitI3eEuwEiGObhsXvu47DSvB2hHpEts/quA3/0EE5i1Zw== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/ccusage-20.0.24 ccusage@20.0.24`, the npm form recipes/native-upgrades-20260921.md's isolated-prefix installation documents, and the exact version manifests/stack.json already pins. `ccusage --version` prints `ccusage 20.0.24` and exits; confirmed 2026-09-25 in an isolated `npm --prefix` scratch install, not the shared host copy.",
+      "url": "https://registry.npmjs.org/ccusage/-/ccusage-20.0.26.tgz",
+      "sha256": "b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2",
+      "install_note": "2026-09-27 move from 20.0.24 (evidence/receipts/ccusage-20026-qualification-20260927.json). npm registry tarball for ccusage@20.0.26 downloaded fresh and independently hashed; npm dist.integrity sha512-46TTmFKcuNyWbtqj8HZqWTmVQIsApvGO4xP+E2VL5NC/oMjdtHOv9svVTsHX1WQgetbNOV4GdvQGHLG22vXZgg== and dist.shasum a0d190787b26183dd78797283c59db3ec9ee7817 match fresh sha512 and sha1 digests of the same download. The tarball carries only the JavaScript launcher; `npm view ccusage@20.0.26 optionalDependencies` lists six `@ccusage/ccusage-*@20.0.26` native builds and npm resolves `@ccusage/ccusage-linux-x64` at install time, outside this hash. `npm install --global --prefix tools/ccusage-20.0.26 ccusage@20.0.26`, the npm form recipes/native-upgrades-20260921.md's isolated-prefix installation documents, and the exact version manifests/stack.json pins. `ccusage --version` prints `ccusage 20.0.26` on the host install the coordinator switched to on 2026-09-27; the 20.0.24 prefix is retained for rollback.",
       "version_probe": {
         "method": "exec",
         "command": "ccusage",
@@ -266,7 +322,7 @@
       "package": "headroom-ai[mcp]",
       "url": "https://files.pythonhosted.org/packages/72/b8/16878cf4fe6fc390a0d22025b671468619db690ff14c1b103ace4b5e35f9/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl",
       "sha256": "2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46",
-      "install_note": "2026-09-25 fetch to complete the `token-efficiency` profile's Linux pin coverage. PyPI package `headroom-ai` (repository headroomlabs-ai/headroom) 0.37.0 with the `[mcp]` extra recipes/README.md's upstream-MCP recipe installs (`headroom mcp serve`). url/sha256 above are the `manylinux_2_28_x86_64` wheel this exact platform resolves (PyPI JSON https://pypi.org/pypi/headroom-ai/0.37.0/json urls[].digests.sha256, read 2026-09-25); the wheel was independently downloaded and re-hashed and matches exactly. `install_uv_tool` now takes an optional `package` (this entry's `headroom-ai[mcp]`; every other uv-tool pin keeps falling back to its own `.id`, unchanged) so the installed spec is `uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'`, exactly recipes/README.md's command and the version manifests/stack.json already pins. `headroom --version` prints `headroom, version 0.37.0` and exits; confirmed 2026-09-25 in an isolated `UV_TOOL_DIR`/`UV_TOOL_BIN_DIR` scratch install, not the shared host copy.",
+      "install_note": "2026-09-25 fetch to complete the `token-efficiency` profile's Linux pin coverage. PyPI package `headroom-ai` (repository headroomlabs-ai/headroom) 0.37.0 with the `[mcp]` extra recipes/README.md's upstream-MCP recipe installs (`headroom mcp serve`). url/sha256 above are the `manylinux_2_28_x86_64` wheel this exact platform resolves (PyPI JSON https://pypi.org/pypi/headroom-ai/0.37.0/json urls[].digests.sha256, read 2026-09-25); the wheel was independently downloaded and re-hashed and matches exactly. `install_uv_tool` takes an optional `package` (this entry's `headroom-ai[mcp]`; every other uv-tool pin falls back to its own `.id`) and, since 2026-09-26, consumes a wheel url: fetch() downloads the wheel above and verifies this sha256, exiting 1 before uv runs on a mismatch, so the installed spec is `uv tool install --python 3.13 'headroom-ai[mcp] @ file://<ECO_INSTALL_ROOT>/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl'` (the path percent-encoded per segment), the same distribution, version and extra as recipes/README.md's `'headroom-ai[mcp]==0.37.0'` and the version manifests/stack.json already pins; the wheel's own dependencies still resolve from uv's index. `headroom --version` prints `headroom, version 0.37.0` and exits; confirmed 2026-09-25 in an isolated `UV_TOOL_DIR`/`UV_TOOL_BIN_DIR` scratch install, not the shared host copy.",
       "version_probe": {
         "method": "exec",
         "command": "headroom",
@@ -294,17 +350,17 @@
     },
     {
       "id": "socraticode",
-      "version": "1.14.0",
+      "version": "1.15.0",
       "kind": "npm",
       "ignore_scripts": true,
-      "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.14.0.tgz",
-      "sha256": "3dbb106c876be4214048289cef31094eb0e48e97007fb90180270edc4eed7c46",
+      "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz",
+      "sha256": "f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1",
       "checksum_source": "npm_registry_integrity_crosscheck",
-      "checksum_ref": "npm view socraticode@1.14.0 dist.integrity read 2026-09-25; the tarball was downloaded to a scratch directory and independently sha256- and sha512-hashed, both matching, and the sha256 also matches adoption/pins-macos-arm64.json's existing socraticode pin exactly",
-      "install_note": "2026-09-25 addition to complete the `token-efficiency` profile's Linux pin coverage: mirrors adoption/pins-macos-arm64.json's existing `socraticode` entry (same version, url, sha256 and `--ignore-scripts`). AGPL-3.0-only; upstream commercial alternative. `npm install --global --prefix tools/socraticode-1.14.0 --ignore-scripts socraticode@1.14.0`, exactly recipes/README.md's documented recipe, which this pin now also drives through the bootstrap script instead of only a manual install. `--ignore-scripts` (this pin's own `ignore_scripts: true` field, read by `install_npm`) skips native postinstall/build steps. Only a reviewed archive hash, not a claim of a working native codebase-index handshake on this host.",
+      "checksum_ref": "npm view socraticode@1.15.0 dist.integrity (sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ==) and dist.shasum read 2026-09-27; the tarball was downloaded to a scratch directory and independently sha256-, sha512- and sha1-hashed, all matching (evidence/receipts/socraticode-1150-qualification-20260927.json). adoption/pins-macos-arm64.json keeps 1.14.0 until a Mac qualifies 1.15.0",
+      "install_note": "Moved from 1.14.0 on 2026-09-27 (docs/decisions/2026-09-25-workstation-sota-refresh.md, the cutover update; evidence/receipts/socraticode-1150-qualification-20260927.json). AGPL-3.0-only; upstream commercial alternative. recipes/README.md's recipe is `npm install --global --prefix tools/socraticode-1.15.0 --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0`: `--before` reproduces the qualified dependency tree, because the package ships no shrinkwrap and later releases inside its dependency ranges (undici 6.29.0, @lumis-sh/wasm-eex 0.26.2) resolve without it. The bootstrap's `install_npm` installs this pin's verified tarball with `--ignore-scripts` (this pin's own `ignore_scripts: true` field) but passes no `--before`, so its dependency tree can differ from the qualified one. Only a reviewed archive hash, not a claim of a working native codebase-index handshake on a new host.",
       "version_probe": {
         "method": "npm-metadata",
-        "note": "No argument parsing at all: every invocation, --help and --version included, starts its MCP stdio server (dist/index.js never reads process.argv; observed 2026-09-25 with socraticode 1.14.0, matching the macOS pin's own note), so the package version is read from npm metadata instead. Never run `socraticode --version` or with no arguments on a real install -- it starts the server."
+        "note": "No argument parsing at all: every invocation, --help and --version included, starts its MCP stdio server (dist/index.js never reads process.argv; observed 2026-09-25 with socraticode 1.14.0, matching the macOS pin's own note, and 1.15.0's dist/index.js still reads none), so the package version is read from npm metadata instead. Never run `socraticode --version` or with no arguments on a real install -- it starts the server."
       }
     }
   ]

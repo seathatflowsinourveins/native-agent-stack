@@ -1,0 +1,6 @@
+# binding rerun with retained provenance (2026-09-26)
+provenance_rerun.py sha256 1df810e5175b1d09781eb8f6fdce38d46e0a252d4c0eef175e9861c33f0cdc36
+command: python binding_check.py --plugin-src ~/.codex/plugins/cache/context-mode/context-mode/1.0.169 --npm-src ~/.local/share/codex-ecosystem/tools/context-mode-1.0.169/lib/node_modules/context-mode --node ~/.local/share/codex-ecosystem/bin/node --work <work>
+interpreter: Python 3.13.15; binding_check.py sha256 0c6ed66d8ec370b2f3a3bac30bb8bfdc945f62d062af5d7db42fb2779f810c32
+UTC: 2026-09-26T06:49:56Z to 2026-09-26T06:50:02Z; exit status: 0; stderr: 0 bytes
+stdout: results-rerun.json, sha256 29bf03c78a8edfbafdd175b666b0dcc643b77e566387c623e11a380ac357e63e, 11106 bytes

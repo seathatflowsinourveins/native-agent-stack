@@ -15,6 +15,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -45,8 +46,20 @@ lane_packets = load_module("lane_packets", "lane_packets.py")
 LeakDetected = lane_packets.assert_no_leak.__globals__["LeakDetected"]
 
 
+def fit_member(vote):
+    """One family's fit vote as landscape-sweep/convert.py retains it: {refuted} as returned, or {missing: true} when
+    the vote never returned."""
+    return {"missing": True} if vote is None else {"refuted": vote}
+
+
 # Seeded order of the manifest-mode fixture (seed 20260922, layer-b); newcomers have no component id.
 EXPECTED_SEEDED_COMPONENT_ORDER = [None, None, 'data-two', 'data-one', 'data-three']
+# Rule 2's merit sentence (2026-09-26 user directives, verdict-wave runbook D1): a winner earns it on what its
+# evidence shows was run, never on its status, license or popularity. Generic by design: the shared prompt names no
+# repository or product.
+MERIT_SENTENCE = ("Adoption, incumbency, installation, retained-control status, receipt count, packet position, "
+                  "license, stars and popularity are not evidence of fit; choose among adopted candidates on what "
+                  "their evidence shows was run.")
 
 
 class LanePacketsFixture(unittest.TestCase):
@@ -73,6 +86,46 @@ class LanePacketsFixture(unittest.TestCase):
     def packet(self, catalog, layer_id, packets=None):
         packets = packets if packets is not None else self.build()
         return json.loads(packets[lane_packets.packet_filename(catalog, layer_id)])
+
+    SWEEP_LANE = "landscape-sweep-20260926"
+    SWEEP_RETURNS = "evidence/artifacts/landscape-sweep-20260926/returns.json"
+    SATURATION_LEDGER = "catalogs/saturation/ledger.json"
+
+    def record_sweep(self, catalog, layer_id, votes):
+        """A completed landscape sweep of one manifest layer, as landscape-sweep/convert.py and saturation_ledger.py
+        --append record it. ``votes`` maps each proposed repository to its (facts, Claude fit, GPT-6 fit) votes: True
+        refutes, False does not, None never returned (a missing vote counts as refuted). Each repository's manifest
+        row gets the sweep's lane and the disposition its votes give; the returns and the ledger are written last,
+        because the sweep records the manifest's sha256."""
+        manifest = self.read(lane_packets.SOTA_MANIFEST_PATH)
+        row = next(item for item in manifest["foundation" if catalog == "foundation" else "trading"]
+                   if item["layer"] == layer_id)
+        rows = {item["repository"]: item for item in row.setdefault("candidates", [])}
+        returns = []
+        layer = {"catalog": catalog, "layer_id": layer_id, "votes": "retained", "survived": [], "refuted": []}
+        for index, (repository, (facts, claude, gpt6)) in enumerate(votes.items()):
+            facts_refuted, fit_refuted = facts is not False, claude is not False or gpt6 is not False
+            if repository not in rows:
+                rows[repository] = {"repository": repository}
+                row["candidates"].append(rows[repository])
+            rows[repository].update({"lane": self.SWEEP_LANE, "disposition": "refuted_targeted_candidate"
+                                     if facts_refuted or fit_refuted else "targeted_candidate"})
+            returns.append({"facts": {"role": "facts", "repository": repository, "refuted": facts_refuted,
+                                      **({"missing": True} if facts is None else {})},
+                            "fit": {"role": "fit", "repository": repository, "refuted": fit_refuted,
+                                    "claude": fit_member(claude), "gpt6": fit_member(gpt6)}})
+            ref = f"{self.SWEEP_RETURNS}#/votes/{layer_id}/{index}"
+            layer["refuted" if facts_refuted or fit_refuted else "survived"].append({
+                "repo": repository,
+                "facts": {"vote": "refuted" if facts_refuted else "not_refuted", "ref": f"{ref}/facts"},
+                "fit": {"vote": "refuted" if fit_refuted else "not_refuted", "ref": f"{ref}/fit"}})
+        self.write(lane_packets.SOTA_MANIFEST_PATH, manifest)
+        self.write(self.SWEEP_RETURNS, {"votes": {layer_id: returns}})
+        manifest_sha256 = hashlib.sha256((self.root / lane_packets.SOTA_MANIFEST_PATH).read_bytes()).hexdigest()
+        self.write(self.SATURATION_LEDGER, {"schema_version": 1, "sweeps": [{
+            "sweep_id": self.SWEEP_LANE, "status": "completed", "lane": self.SWEEP_LANE,
+            "manifest_ref": lane_packets.SOTA_MANIFEST_PATH, "manifest_sha256": manifest_sha256,
+            "returns_ref": self.SWEEP_RETURNS, "layers": [layer]}]})
 
 
 class BuildAllPacketsTests(LanePacketsFixture):
@@ -165,6 +218,8 @@ class BuildAllPacketsTests(LanePacketsFixture):
         self.assertEqual(len(packet["rules"]), 5)
         self.assertEqual(packet["rules"], lane_packets.load_rules())
         self.assertIn("Judge from retained evidence.", packet["rules"][0])
+        # Every packet carries the merit rule, so the refuters and judges who read the packet see it too.
+        self.assertIn(MERIT_SENTENCE, packet["rules"][1])
 
     def test_group_is_present_for_us_equities_and_null_for_foundation(self):
         self.assertIsNone(self.packet("foundation", "layer-a")["group"])
@@ -189,6 +244,23 @@ class LoadRulesFailureTests(unittest.TestCase):
             prompt.write_text("Intro text.\n\nRules\n1. One.\n2. Two.\n3. Three.\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "must have exactly five numbered rules, found 3"):
                 lane_packets.load_rules(prompt)
+
+
+class LanePromptMeritRuleTests(unittest.TestCase):
+    """The shared prompt's Rules section (2026-09-26, verdict-wave runbook D1): Rule 2 carries the merit sentence,
+    and the file numbers exactly five rules, 1 to 5, counted here apart from load_rules (which only counts them), so
+    dropping the sentence, moving it out of Rule 2, or adding, removing or renumbering a rule fails."""
+
+    def test_rule_2_states_the_merit_sentence(self):
+        rules = lane_packets.load_rules()
+        self.assertTrue(rules[1].startswith("The winner set is 1-3 adopted candidates (adopted == true)"), rules[1])
+        self.assertIn(MERIT_SENTENCE, rules[1])
+
+    def test_the_rules_section_numbers_exactly_five_rules(self):
+        text = (TOOL_DIR / "lane-prompt.md").read_text(encoding="utf-8")
+        _, separator, section = text.partition("\nRules\n")
+        self.assertTrue(separator, "lane-prompt.md must keep its Rules section")
+        self.assertEqual(re.findall(r"(?m)^(\d+)\.\s", section), ["1", "2", "3", "4", "5"])
 
 
 class ShuffleTests(LanePacketsFixture):
@@ -899,6 +971,33 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
         self.assertEqual([c["name"] for c in built["candidates"]], ["ECC skills", "Tool", "Plain", "Other"])
 
 
+class RealLedgerIncumbentBlindnessTests(unittest.TestCase):
+    """Codex post-merge review of #269 (P2): dated durable-memory limitations named the incumbent's build (19b6429),
+    its releases (2.3.2, 2.4.0, 2.4.1) and its 'production control' role without naming a candidate, so the prose
+    filter kept them and a blind reviewer could recover the incumbent. The real ledger keeps those facts; its withheld
+    durable-memory packet must carry none of them, in the default build and with the blind export's parameters."""
+
+    IDENTIFIERS = ("19b6429", "2.3.2", "2.4.0", "2.4.1", "production control")
+    BUILDS = {
+        "default": dict(catalogs=["foundation"], seed="20260926", checked_at="2026-09-26", withhold=True),
+        "blind export": dict(catalogs=["foundation", "us-equities"], seed="20260923", checked_at="2026-09-23",
+                             trading_candidates="manifest", withhold=True,
+                             manifest="catalogs/sota-convergence/manifest-20260923.json", registered_receipts=True),
+    }
+
+    def test_the_withheld_durable_memory_packet_names_no_incumbent_build_or_release(self):
+        for label, kwargs in self.BUILDS.items():
+            with self.subTest(label):
+                text = lane_packets.build_all_packets(ROOT, **kwargs)["foundation__durable-memory.json"].lower()
+                self.assertEqual([identifier for identifier in self.IDENTIFIERS if identifier in text], [])
+
+    def test_the_ledger_still_records_those_facts(self):
+        ledger = json.loads((ROOT / "catalogs/landscape/foundation.json").read_text(encoding="utf-8"))
+        row = next(row for row in ledger["layers"] if row["layer_id"] == "durable-memory")
+        facts = " ".join(row["limitations"]).lower()
+        self.assertEqual([identifier for identifier in self.IDENTIFIERS if identifier not in facts], [])
+
+
 class WithheldProseTests(unittest.TestCase):
     """Codex review of #145: the ledger's shared prose named the incumbent ("Use the selected NautilusTrader
     destination...") before a blind lane read any evidence."""
@@ -962,7 +1061,7 @@ class WithheldProseTests(unittest.TestCase):
 
 
 class ManifestNewcomersTests(LanePacketsFixture):
-    """--manifest-newcomers (2026-09-23 landscape sweep): the dated manifest's surviving newcomers reach
+    """--manifest-newcomers (2026-09-23 landscape sweep): the dated manifest's newcomers not refuted on merit reach
     foundation packets too, shuffled with the ledger candidates, with their registered evidence files."""
 
     SWEEP = "evidence/artifacts/landscape-sweep-20260923"
@@ -1084,9 +1183,81 @@ class ManifestNewcomersTests(LanePacketsFixture):
         packet = json.loads((self.out / "packets" / "foundation__layer-a.json").read_text(encoding="utf-8"))
         self.assertIn("https://github.com/new/alpha", [c["repository"] for c in packet["candidates"]])
 
+    # F-2W-3 (2026-09-28): a discovery refuted only because a vote did not return was not adjudicated
+    # (saturation_ledger.refuted_by_absence), so it is carried; a returned refuting vote still withholds it. The vote
+    # shapes are the 2026-09-26 sweep's: 27 proposals whose GPT-6 fit vote alone was missing, and 44 whose missing
+    # GPT-6 vote sat beside a returned refuting vote. Every case asserts the absence-only row as a control, so a sweep
+    # the build failed to bind cannot pass a "still withheld" assertion.
+    ABSENT = "https://github.com/new/absent-vote"
+    MERIT_FIT = "https://github.com/new/refuted-fit"
+    MERIT_FACTS = "https://github.com/new/refuted-facts"
+    MIXED = "https://github.com/new/refuted-beside-missing"
+    SURVIVOR = "https://github.com/new/survivor"
+
+    def test_a_discovery_refuted_only_by_a_missing_vote_is_carried(self):
+        self.record_sweep("foundation", "layer-a", {self.ABSENT: (False, False, None)})
+        _, by_repository = self.candidates(manifest_newcomers_on=True)
+        self.assertIn(self.ABSENT, by_repository, "no returned vote refuted it")
+        self.assertTrue(by_repository[self.ABSENT]["newcomer"])
+        self.assertFalse(by_repository[self.ABSENT]["adopted"])
+
+    def test_a_discovery_a_returned_vote_refuted_stays_withheld(self):
+        self.record_sweep("foundation", "layer-a", {self.ABSENT: (False, False, None),
+                                                    self.MERIT_FIT: (False, True, False),
+                                                    self.MERIT_FACTS: (True, False, False)})
+        _, by_repository = self.candidates(manifest_newcomers_on=True)
+        self.assertIn(self.ABSENT, by_repository, "control: the sweep is bound and read")
+        self.assertNotIn(self.MERIT_FIT, by_repository)
+        self.assertNotIn(self.MERIT_FACTS, by_repository)
+
+    def test_a_missing_vote_beside_a_returned_refuting_vote_stays_withheld(self):
+        self.record_sweep("foundation", "layer-a", {self.ABSENT: (False, False, None),
+                                                    self.MIXED: (False, True, None)})
+        _, by_repository = self.candidates(manifest_newcomers_on=True)
+        self.assertIn(self.ABSENT, by_repository, "control: the sweep is bound and read")
+        self.assertNotIn(self.MIXED, by_repository, "the Claude fit vote returned and refuted it")
+
+    def test_candidates_that_are_not_refuted_are_unchanged(self):
+        _, before = self.candidates(manifest_newcomers_on=True)
+        self.record_sweep("foundation", "layer-a", {self.ABSENT: (False, False, None),
+                                                    self.SURVIVOR: (False, False, False)})
+        _, after = self.candidates(manifest_newcomers_on=True)
+        self.assertIn(self.ABSENT, after, "control: the sweep is bound and read")
+        self.assertIn(self.SURVIVOR, after)
+        unkeyed = lambda candidates: {r: {k: v for k, v in c.items() if k != "key"} for r, c in candidates.items()}
+        self.assertEqual({r: c for r, c in unkeyed(after).items() if r in before}, unkeyed(before))
+        self.assertNotIn("https://github.com/new/beta", after, "a refuted row the sweep did not record stays withheld")
+
+    def test_only_a_completed_sweep_of_these_manifest_bytes_releases_its_own_lane_rows(self):
+        self.record_sweep("foundation", "layer-a", {self.ABSENT: (False, False, None)})
+        self.assertIn(self.ABSENT, self.candidates(manifest_newcomers_on=True)[1], "control: the bound sweep")
+        bound = self.read(self.SATURATION_LEDGER)
+        for field, value in (("status", "stopped"), ("lane", "landscape-sweep-other"), ("manifest_sha256", "0" * 64)):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(bound)
+                changed["sweeps"][0][field] = value
+                self.write(self.SATURATION_LEDGER, changed)
+                self.assertNotIn(self.ABSENT, self.candidates(manifest_newcomers_on=True)[1])
+        for role in ("facts", "fit"):
+            # facts is a not-refuting vote here, which refuted_by_absence never resolves (Codex review of #471).
+            with self.subTest("a vote ref does not resolve", role=role):
+                changed = copy.deepcopy(bound)
+                changed["sweeps"][0]["layers"][0]["refuted"][0][role]["ref"] = self.SWEEP_RETURNS + "#/missing"
+                self.write(self.SATURATION_LEDGER, changed)
+                self.assertNotIn(self.ABSENT, self.candidates(manifest_newcomers_on=True)[1])
+        with self.subTest("lens votes"):
+            changed = copy.deepcopy(bound)
+            changed["sweeps"][0]["layers"][0]["refuted"][0]["lens_votes"] = []
+            self.write(self.SATURATION_LEDGER, changed)
+            self.assertNotIn(self.ABSENT, self.candidates(manifest_newcomers_on=True)[1])
+        with self.subTest("the returns do not resolve"):
+            self.write(self.SATURATION_LEDGER, bound)
+            (self.root / self.SWEEP_RETURNS).unlink()
+            self.assertNotIn(self.ABSENT, self.candidates(manifest_newcomers_on=True)[1])
+
 
 class ManifestNewcomersTradingTests(ManifestTradingCandidatesTests):
-    """--manifest-newcomers in manifest-mode trading packets: a refuted discovery is left out."""
+    """--manifest-newcomers in manifest-mode trading packets: a discovery refuted on merit is left out."""
 
     def test_a_refuted_newcomer_is_left_out_in_manifest_mode(self):
         self.write("manifests/evidence.json", {"schema_version": 1, "convergence_records": [], "receipts": [],
@@ -1101,6 +1272,19 @@ class ManifestNewcomersTradingTests(ManifestTradingCandidatesTests):
         repositories = [c["repository"] for c in packet["candidates"]]
         self.assertNotIn("https://github.com/acme/newcomer", repositories)
         self.assertIn("https://github.com/acme/kbc-only", repositories)
+
+    def test_a_newcomer_refuted_only_by_a_missing_vote_is_carried_in_manifest_mode(self):
+        # F-2W-3: manifest_layer_candidates passes the layer's absence-only rows on to manifest_newcomers.
+        self.write("manifests/evidence.json", {"schema_version": 1, "convergence_records": [], "receipts": [],
+                                               "files": []})
+        self.record_sweep("us-equities", "layer-b", {"https://github.com/acme/newcomer": (False, False, None),
+                                                     "https://github.com/acme/refuted": (False, True, None)})
+        packet = self.packet("us-equities", "layer-b", self.build(trading_candidates="manifest",
+                                                                  manifest_newcomers_on=True))
+        repositories = [c["repository"] for c in packet["candidates"]]
+        self.assertIn("https://github.com/acme/newcomer", repositories)
+        self.assertEqual(repositories.count("https://github.com/acme/newcomer"), 1, "first seen wins")
+        self.assertNotIn("https://github.com/acme/refuted", repositories)
 
 
 class GapReceiptsTests(LanePacketsFixture):
@@ -1313,6 +1497,56 @@ class RealNewcomerPacketTests(unittest.TestCase):
                 with self.subTest(packet=name, field=field):
                     self.assertEqual(json.dumps(self.packets[name].get(field)).count(lane_packets.CANDIDATE_PLACEHOLDER),
                                      json.dumps(before.get(field)).count(lane_packets.CANDIDATE_PLACEHOLDER))
+
+
+class RealAbsenceRefutedNewcomerTests(unittest.TestCase):
+    """F-2W-3 (2026-09-28) on this repository's 2026-09-26 manifest and saturation ledger: the sweep refuted 27
+    proposals only because the GPT-6 fit vote did not return (its ledger layers' votes_note names them). With
+    --manifest-newcomers the 23 that are not already ledger candidates are carried as newcomers; the other 4 keep their
+    ledger place. A proposal a returned vote refuted stays withheld."""
+
+    MANIFEST = "catalogs/sota-convergence/manifest-20260926.json"
+
+    @classmethod
+    def setUpClass(cls):
+        packets = lane_packets.build_all_packets(
+            ROOT, catalogs=["foundation", "us-equities"], seed="20260928", checked_at="2026-09-28",
+            manifest=cls.MANIFEST, manifest_newcomers_on=True)
+        cls.candidates = {name: {c["repository"]: c for c in json.loads(text)["candidates"]}
+                          for name, text in packets.items()}
+
+    def test_every_proposal_refuted_only_by_absence_reaches_its_packet(self):
+        absent = lane_packets.absence_refuted(ROOT, self.MANIFEST)
+        self.assertEqual(sum(len(pairs) for pairs in absent.values()), 27)
+        newcomers = 0
+        for (catalog, layer_id), pairs in absent.items():
+            packet = {lane_packets.candidate_identity(repository, True): candidate for repository, candidate
+                      in self.candidates[lane_packets.packet_filename(catalog, layer_id)].items() if repository}
+            for _lane, identity in pairs:
+                with self.subTest(layer=layer_id, repository=identity):
+                    self.assertIn(identity, packet)
+                    newcomers += bool(packet[identity].get("newcomer"))
+        self.assertEqual(newcomers, 23)
+
+    def test_a_missing_gpt6_vote_alone_is_carried_and_beside_a_refuting_claude_vote_is_not(self):
+        native = {lane_packets.candidate_identity(repository, True): candidate for repository, candidate
+                  in self.candidates["foundation__native-clients.json"].items() if repository}
+        # facts and Claude fit not refuted, GPT-6 fit missing.
+        self.assertIn("earendil-works/pi", native)
+        self.assertTrue(native["earendil-works/pi"]["newcomer"])
+        # facts not refuted, Claude fit refuted, GPT-6 fit missing: refuted on merit, and not a ledger candidate.
+        self.assertNotIn("agentclientprotocol/claude-agent-acp", native)
+
+    def test_the_release_is_scoped_to_the_layer_the_absence_was_recorded_in(self):
+        # The same sweep lane proposed earendil-works/pi in two layers: native-clients refuted it only by a missing
+        # GPT-6 vote, agent-sdks on a returned vote. A release keyed by (lane, identity) alone would carry it in both.
+        absent = lane_packets.absence_refuted(ROOT, self.MANIFEST)
+        pair = ("landscape-sweep-20260926", "earendil-works/pi")
+        self.assertIn(pair, absent[("foundation", "native-clients")], "control: absence-only in native-clients")
+        self.assertNotIn(pair, absent.get(("foundation", "agent-sdks"), set()))
+        sdks = {lane_packets.candidate_identity(repository, True) for repository
+                in self.candidates["foundation__agent-sdks.json"] if repository}
+        self.assertNotIn("earendil-works/pi", sdks, "refuted on merit in agent-sdks")
 
 
 class RealPacketProseTests(unittest.TestCase):

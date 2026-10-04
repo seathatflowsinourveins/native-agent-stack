@@ -1,0 +1,11 @@
+--- a/crates/ai-memory-store/src/reader.rs
++++ b/crates/ai-memory-store/src/reader.rs
+@@ -49,7 +49,7 @@
+ /// annotate expiry instead of hiding it, and the sweep must see
+ /// expired rows to delete them.
+ fn not_expired(table: &str, now_param: &str) -> String {
+-    format!(" AND ({table}.expires_at IS NULL OR {table}.expires_at > {now_param})")
++    format!(" AND ({table}.expires_at IS NULL OR {table}.expires_at > {now_param} OR 1 = 1)")
+ }
+ 
+ /// Latest-version guard for retrieval candidate queries (FTS / vector /

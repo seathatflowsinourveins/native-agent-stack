@@ -1,0 +1,14 @@
+Adjudicate unit X5c (one item, X5c).
+Input file: <judges>/adjudication-inputs/x5c.BA.json
+Packet file: <judges>/packets/x5c.json
+Repository root: <root>
+
+The input holds the question, the rules, the choices and, for the item, the packet item, Return A and Return B, each
+with its effective resolution; the packet holds the frozen packet both returns judged. Under the repository root,
+base/ is main at 8315274f, proposed/ and amended/ are base/ with each resolution applied, proposal.diff and
+amendment.diff are their diffs, and packet.md is the packet text. Read only these two files and files under the root.
+You cannot run commands; the measured checks in the input were run by the coordinator, and you check them against
+the files.
+Return only this JSON: {"leak": false, "leak_text": "", "items": [{"id": "X5c", "choice": "A" | "B" | "neither",
+"reasons": "...", "sources": [{"locator": "...", "quote": "..."}], "confidence": 0..1}]}, with exactly one entry,
+for X5c. If you find a leak, return {"leak": true, "leak_text": "<the offending text>", "items": []} and stop.

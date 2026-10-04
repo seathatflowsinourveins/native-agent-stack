@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "kind": "new-wsl-handbook-profile-integration",
+  "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+  "evidence_class": "local_integration",
+  "generator_sha256": "a78239b6a2558c916b30f4cbc852fe948904a849e99ae37cfadc1c810a6df20e",
+  "profile_sha256": "381645d1470125614137eef39a3b802e0a91ec480f6453a45051fbe99c743f21",
+  "outputs": {
+    "docs/new-wsl-handbook.json": "3e699173f1dc25672eb0d95f05e169386a610646db4e3a82e9e67f39814dd41a",
+    "docs/new-wsl-handbook.md": "c540e0af3f9fccd04da00e7ddc73693b7184079455e1327ed961d096ae81f34b"
+  },
+  "inventory": {"layers": 37, "profile_entries": 69, "projected_tools": 73, "canonical_package_ids": 20},
+  "validation": [
+    {"scope": "prior package repair full handbook suite", "tests": 44, "native_exit_code": 0, "reused_for_unchanged_test_bodies": true},
+    {"command": "python3 -m unittest discover -s tests -p test_new_wsl_handbook.py -k package", "tests": 6, "native_exit_code": 0, "independent": true, "returned_output": "Ran 6 tests in 1.789s; OK"},
+    {"command": "python3 scripts/build_new_wsl_handbook.py --check", "native_exit_code": 0, "independent": true, "returned_status": "passed"},
+    {"scope": "independent exact sole-canonical-sibling unresolved-package public CLI probe", "public_cli_exit_code": 0, "assertion_exit_code": 0, "returned_output": "EXACT_PRIOR_SINGLE_SIBLING_COUNTEREXAMPLE_PASSED"},
+    {"command": "python3 -m unittest tests.test_new_wsl_profile.NewWslProfileCliTests.test_existing_public_generator_preserves_the_native_profile_pointer", "tests": 1, "native_exit_code": 0, "returned_output": "Ran 1 test in 3.341s; OK"},
+    {"command": "git diff --cached --check", "native_exit_code": 0}
+  ],
+  "failed_conditions_retained": [
+    {"condition": "repository-only identity merged distinct Python and TypeScript Codex checksums", "native_exit_code": 1, "correction": "derive separate canonical package identities from supported metadata URLs"},
+    {"condition": "explicit unsupported metadata URL coalesced with the sole canonical sibling", "native_exit_code": 1, "correction": "only a selection alias without its own profile entry may inherit a sole canonical package"}
+  ],
+  "derived_catalog_correction": {
+    "failed_ci_checks": [{"platform": "linux", "run_id": 36940301620, "native_check_exit_code": 1}, {"platform": "macos", "run_id": 36940301756, "native_check_exit_code": 1}],
+    "cause": "The new adoption profile changed the new-host grand-list source projection; its generated files were stale.",
+    "supported_generator_commands": [{"command": "python3 scripts/component_matrix.py --write", "native_exit_code": 0}, {"command": "python3 scripts/new_host_grand_list.py --write", "native_exit_code": 0}, {"command": "python3 scripts/new_host_grand_list.py --check", "native_exit_code": 0}],
+    "returned_check": {"status": "passed", "layers": 32, "winners": 66},
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/85543efe5abcddb7b7cddb14e8774e83b6758616/scripts/new_host_grand_list.py"
+  },
+  "independent_source_observation": {
+    "privacy_guards_unchanged": true,
+    "verdict_binding_unchanged": true,
+    "same_package_conflicts_preserved": true,
+    "blocker_union_preserved": true,
+    "prior_44_test_bodies_unchanged": true,
+    "unresolved_entry_separate_with_binding_gap": true
+  },
+  "requested_architecture_worker": {"model": "gpt-6-astra", "effort": "max", "trigger": "consequential architecture and failed bounded package-identity repair", "actual_backend": null},
+  "not_claimed": ["whole catalog convergence", "default acceptance from profile metadata", "unchanged upstream test acceptance", "provider execution", "GPU acceptance", "new WSL creation or boot acceptance"],
+  "sources": [
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/scripts/build_ecosystem.py",
+    "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+    "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+    "adoption/new-wsl-profile.json",
+    "docs/decisions/2026-10-01-new-wsl-handbook-generator.md"
+  ]
+}

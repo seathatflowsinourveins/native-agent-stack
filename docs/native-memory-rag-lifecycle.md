@@ -14,12 +14,114 @@ session's consolidation finished on attempt 1. No learning run was triggered
 manually for this observation. These outcomes establish lifecycle execution,
 not improved answer quality or token savings.
 
-## Installed selection
+## September 30 scheduled follow-up: consolidation quota failure
+
+**Host scope — added 2026-10-03 under 0c custody.** This section is a historical
+2026-09-30 observation of a systemd-managed `agent-lab` memory stack, and its
+receipt has no host field. The receipt's `ai-memory`, `qdrant-agent-lab` and
+`nemotron-embed-agent-lab` units match the records of the WSL2 authoring laptop
+(`wsl-authoring-20260923` in the [host registry](../adoption/host-roles.json);
+its [September 26 embedding switch](../evidence/receipts/vllm-030-switch-laptop-20260926.json)
+names the same embedding unit), not the workstation. This automation's
+[September 27 receipt](../observability/memory-scheduled-20260927.json) records
+the custom build `2.3.2-prefix-gpt6-f24f7181` from source `62e73148`, the
+previously recorded source this receipt cites, whereas the
+[component lock](../manifests/stack.json) records upstream 2.4.1 on the
+workstation's memory unit since 2026-09-26. The observation predates the
+[2026-10-02 two-host decision](decisions/2026-10-02-two-host-north-star-architecture.md),
+whose scope is macOS and the workstation only. It is therefore not evidence
+about the Mac's ai-memory 2.5.2 owner, that decision's singular memory owner,
+the workstation or current consolidation health. Queue semantics after
+the reviewed pin `353841d9` were not reviewed, including those of main's ai-memory
+2.4.1 component lock and the Mac owner's 2.5.2.
+
+The [September 30 receipt](../observability/memory-scheduled-20260930.json) records
+the actual scheduled wake and a new failed consolidation. A scoped read-only
+store query returned generation 17,318 in `failed` state after five attempts;
+the last attempt ended at 08:58:10 UTC with provider HTTP 429
+`usage_limit_reached`. Its error reports a reset at October 4, 06:59:07 UTC;
+that historical timestamp is not a fresh quota check or a recovery guarantee.
+Explicit native MCP readback confirmed the genuine session end at 08:49:54 UTC.
+The ended generation and the later MCP observation count have different scopes.
+
+Memory, Qdrant and embedding services still run, the native collector published
+successfully, and all nine Prometheus targets were up. Inventory `llm_status`
+changed from `ok` to `unavailable`; that metadata alone does not establish the
+cause. No consolidation-specific firing alert was returned. Existing dashboard
+service health and historical task checkpoints do not establish successful
+consolidation. One semantic retrieval matched its original source; the unchanged
+QMD setup note reuses the previous search/get evidence.
+
+The upstream learning report still returns 83 historical runs and 19 approved
+terminal proposals. Its unchanged aggregate is separate from the consolidation
+queue. The hourly learning scheduler remains paused. No provider retry, account
+switch, fake session-end event or database mutation was performed; preserve the
+failed generation and qualify supported recovery after quota returns. Installed
+selections, exact-savings unknowns and restart-evidence boundaries remain unchanged.
+
+The available clean [upstream consolidation queue](https://github.com/akitaonrails/ai-memory/blob/353841d91618d20b110b208de284a74d0b960379/crates/ai-memory-store/src/session_consolidation.rs)
+stops claiming a generation once it is `failed`. Its direct MCP
+`memory_consolidate` interface accepts an exact session ID, but does not reset
+that queue row; a later manual result must retain its separate provenance.
+The source also has nested provider retries, so five queue attempts do not
+establish the number of HTTP requests. Actual request count is unmeasured.
+This is source review only: the installed custom build's equivalence is unknown,
+and the previously recorded source ref could not be retrieved. No recovery
+command was executed during this wake.
+
+## September 28 scheduled follow-up
+
+The [September 28 receipt](../observability/memory-scheduled-20260928.json) records
+the next actual wake. Services and existing publications were healthy; the swap
+warning was no longer firing. Learning remains paused, and the upstream report
+still returns 83 runs and 19 approved terminal proposals. Its body matches the
+retained September 27 result apart from the reporting-window timestamps.
+
+Explicit native MCP retrieval confirmed the long Claude session ended at
+01:22:54 UTC, and the scoped store records generation 31,006 completed at
+01:26:43 on attempt 1. This proves recorded completion, not provider success or
+improved answers. The MCP default selects completed sessions by start time;
+it therefore returned the newer-starting September 26 short session. Source
+inspection resolved that difference without restarting a client.
+
+The previous evidence PR's secret scan detected seven upstream rejection
+digests. Source review confirmed their SHA-256 construction. A separate,
+exact-file/seven-value exception preserves unrelated credential detection;
+the original failure, regression checks and bounded native scan are retained.
+
+## September 27 scheduled follow-up
+
+The [September 27 observation](../observability/memory-scheduled-20260927.json)
+and [returned native results](../observability/memory-scheduled-results-20260927.json)
+record the actual daily wake. Current local service/configuration reads confirm
+the previously installed prefix-enabled ai-memory build, Nemotron memory
+embeddings, vLLM 0.30.0 and Codex gpt-6-sol at medium effort. The hourly learning
+scheduler has been intentionally paused since September 25. The table below and
+September 21 configuration are historical; do not restore their older model,
+embedding or scheduler settings over the current qualified setup.
+
+Memory, Qdrant and embedding services were healthy; the existing collector
+published successfully and all 9 Prometheus targets were up. The native report
+returned 83 historical runs and 19 approved terminal proposals. The latest
+captured completed session has no consolidation job. The latest completed job
+is an older observation generation, completed September 24; it does not validate
+the subsequent model change. One semantic excerpt and the QMD pause decision
+matched their source. Exact session/lifetime savings remain unknown.
+
+Stock ai-memory [v2.4.1](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1)
+still lacks the query/document prefixes required by this deployment. Independent
+tagged-source review confirmed that its query-dispatch fix is already present in
+the installed patch. Retain the current build pending a release containing
+upstream #859 and isolated migration/retrieval qualification; this wake made no
+runtime change. Existing gateway/swap warnings and missing journal output are
+retained in the receipt. No restart persistence or new cross-client E2E is claimed.
+
+## Historical September 21 installed selection
 
 | Layer | Accepted upstream | Current qualification |
 | --- | --- | --- |
 | Shared memory | ai-memory 2.3.2 | Scoped native MCP, allowlisted hooks, local MiniLM embeddings, native Codex consolidation, hourly learning configuration. |
-| Semantic code retrieval | SocratiCode 1.14.0 | Current stable release; both clients registered, direct project watcher active. |
+| Semantic code retrieval | SocratiCode 1.15.0 | Current stable release; both clients registered, direct project watcher active. 1.14.0 until the 2026-09-27 cutover ([receipt](../evidence/receipts/socraticode-1150-qualification-20260927.json)). |
 | Vector store | Qdrant 1.19.1 | Current stable release; existing native loopback service and persistent project collection. |
 | Local embedding inference | vLLM 0.25.0 with pinned NVIDIA Nemotron-3-Embed-1B-BF16 | Retained qualified version. Newer 0.29.0 has an actual host initialization failure; newer is not automatically usable. |
 | Exact source navigation | Serena 2.0.0.dev0 at c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | Current native symbol lookup returned the original scope-selection implementation. |
@@ -115,6 +217,56 @@ qmd --index agent-lab-docs get qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-
 systemctl --user show ai-memory.service qdrant-agent-lab.service nemotron-embed-agent-lab.service --property=ActiveState --property=UnitFileState --property=Result
 systemctl --user show ecosystem-native-data.timer --property=ActiveState --property=LastTriggerUSec
 ```
+
+### Maintained-decision routing
+
+After native compaction or resume, retrieve the latest maintained decision from
+the verified project scope before describing deployed architecture. Check its
+currency and original sources; a compacted summary can retain stale versions.
+This is task-triggered retrieval, not an added startup hook or audit. Preserve
+native compaction and caching.
+
+For a maintained current decision whose exact path is unknown, use the adopted
+project marker's workspace and project explicitly. Select the installed schema
+before using optional fields; the example needs ai-memory 2.4.0 or later:
+
+```text
+memory_query(query="memory selection",
+             workspace="agent-lab", project="agent-lab",
+             pin_first=true, limit=2, answer=false)
+memory_read_page(path="<exact path returned by memory_query>",
+                 workspace="agent-lab", project="agent-lab")
+```
+
+These are supported MCP arguments, not shell syntax. Substitute the adopted
+scope; never fall back to another project when the requested scope is missing.
+The portable Mac installer still pins 2.3.2, whose schema lacks `pin_first`:
+omit both `pin_first` and `answer`, which that schema also lacks, and use ordinary
+scoped query followed by exact-path read. `answer=false` keeps this lookup
+on the supported retrieval path without LLM answer synthesis. Read the exact page
+when a returned snippet omits a required fact; keep source provenance visible.
+Read a known exact path directly. `pin_first` prioritizes existing pins; it does
+not create or maintain a pin, certify currency or make memory operating authority.
+Check the full page's date, supersession and cited canonical sources before
+acting. Widen the scoped query if the two results do not satisfy the task; retry
+without `pin_first` when unrelated or stale pins crowd out relevant hits. A
+miss in the first two is not evidence of absence. Upstream applies `pin_first`
+only to a single-project query; it ignores it on `scopes`, `global` and `as_of`.
+See [ai-memory v2.5.0's schema and ordering implementation](https://github.com/akitaonrails/ai-memory/blob/v2.5.0/crates/ai-memory-mcp/src/server.rs#L565).
+
+The [Mac owner's report](decisions/2026-09-30-bounded-native-decision-routing.md)
+found the maintained decision at rank three with the default query and first
+with scoped `pin_first=true, limit=2`, followed by exact-path read. This establishes
+reported retrieval ordering only. The official Mac ai-memory 2.5.0 control does
+not inherit the historical local build's measured quality; Hindsight remains
+isolated pending the amended paired comparison and existing promotion gates.
+
+The [separate continuity follow-up](https://github.com/seathatflowsinourveins/native-agent-stack/issues/384#issuecomment-5924447784)
+reports failed tool-free recall after compaction, then correct deployed-version
+and zero-savings recall in a distinct turn using exactly two native memory calls
+(bounded scoped query and exact-page read). That is maintained-memory recovery;
+the original compaction semantic gate remains failed. Successful PreCompact
+dispatch does not establish durable attribution to the assigned session.
 
 For another PC, use the chosen [adoption profile](../adoption/manifest.json) and
 upstream recipes, native sign-in, explicit project scope and that host's own

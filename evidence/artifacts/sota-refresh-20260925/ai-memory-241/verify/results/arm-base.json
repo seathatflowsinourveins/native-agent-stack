@@ -1,0 +1,67 @@
+{
+ "at": "2026-09-25T23:10:50Z",
+ "copy_safety": {
+  "server_url_keys": [],
+  "backfill_on_start": false,
+  "safe": true,
+  "capture_mode": "allowlist"
+ },
+ "before": {
+  "schema_max": 66,
+  "schema_rows": 66,
+  "last_migration": "auto_improve_claim_attempts",
+  "quick_check": "ok",
+  "pages": 38,
+  "observations": 85011
+ },
+ "ready": {
+  "ready": true,
+  "seconds": 0.6
+ },
+ "info": {
+  "server": "ai-memory",
+  "version": "2.4.0",
+  "protocol": "2024-11-05",
+  "tools": "<23 names>",
+  "n_tools": 23,
+  "resolved_by": "explicit"
+ },
+ "known_page_mcp_sha256": "98eb1dfb4fc6b0f5aa496ad78443b0d75cca699c9fa25e2a2fbccea46adba356",
+ "known_page_db_sha256": "98eb1dfb4fc6b0f5aa496ad78443b0d75cca699c9fa25e2a2fbccea46adba356",
+ "status": {
+  "rc": 0,
+  "version": "2.4.0",
+  "capture_mode": "allowlist",
+  "pages_fts_eq": true,
+  "obs_fts_eq": true,
+  "pages_rows": 38,
+  "observations_rows": 85011,
+  "missing_embeddings": 0,
+  "embedding": [
+   "unknown",
+   "local",
+   "all-MiniLM-L6-v2",
+   384
+  ],
+  "top_keys": [
+   "bind",
+   "capture_mode",
+   "client",
+   "counts",
+   "data_dir",
+   "db_path",
+   "derived",
+   "ingest",
+   "providers",
+   "spool",
+   "storage",
+   "version"
+  ]
+ },
+ "stop": {
+  "rc": 0,
+  "pid_gone": true,
+  "port_closed": true
+ },
+ "leftovers": []
+}

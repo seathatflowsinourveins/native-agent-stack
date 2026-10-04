@@ -1,0 +1,72 @@
+name: Practice references freshness (report-only)
+
+# Weekly report on the Claude Code practice references pinned in
+# catalogs/foundation/practice-references.json: archived, stale (the OpenSSF Scorecard
+# Maintained check's 90-day window), renamed or missing repositories, and default-branch
+# commits since each pin. Report-only: drift, staleness and fetch errors never fail the job.
+# It fails when the checker's offline tests fail or the catalog is malformed
+# (tools/sota-convergence/practice_references.py then exits 2 and writes no report).
+# Nothing is written back to the repository. Conventions follow catalog-freshness.yml.
+
+on:
+  schedule:
+    # Thursday 06:41 UTC. Off the top of the hour, which GitHub names as a high-load time
+    # when scheduled runs can be delayed or dropped
+    # (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule),
+    # with the repository's GITHUB_TOKEN REST budget shared across these workflows
+    # (https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api).
+    # The daily catalog report is scheduled 24 minutes earlier; this timing does not prove
+    # that their execution or API use cannot overlap. No quota impact is measured here.
+    - cron: '41 6 * * 4'
+  workflow_dispatch:
+
+# No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  practice-references:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Run the checker's offline tests
+        run: python3 -m unittest tests.test_practice_references -v
+      - name: Report the practice references against upstream (read-only token)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/practice-references"
+          python3 tools/sota-convergence/practice_references.py \
+            --catalog catalogs/foundation/practice-references.json \
+            --out "$RUNNER_TEMP/practice-references/practice-references-freshness.json" \
+            --markdown "$RUNNER_TEMP/practice-references/practice-references-freshness.md"
+          cat "$RUNNER_TEMP/practice-references/practice-references-freshness.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain the freshness report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: practice-references-freshness-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/practice-references/practice-references-freshness.json
+            ${{ runner.temp }}/practice-references/practice-references-freshness.md
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 30

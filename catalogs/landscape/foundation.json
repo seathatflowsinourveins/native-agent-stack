@@ -46,12 +46,19 @@
         {
           "name": "OpenAI Agents SDK",
           "repository": "https://github.com/openai/openai-agents-python",
-          "disposition": "conditional",
-          "rationale": "Fits an application-owned API agent; it is not a substitute for the established subscription-backed native Codex account and behavior.",
+          "disposition": "unqualified",
+          "rationale": "Source review corrected on 2026-10-03. The managed Agents API requires OPENAI_API_KEY and bills at API rates. The open-source SDK supports OpenAI-compatible endpoints through OPENAI_BASE_URL. Its experimental codex_tool forwards an explicit codex_options.api_key, otherwise resolves CODEX_API_KEY or OPENAI_API_KEY from options.env, then the process environment, then the set_default_openai_key value, and exports the resolved key as CODEX_API_KEY to the local Codex CLI. The native Codex login applies only when no key resolves, or when the caller supplies a Codex instance without api_key and preserves its native authentication environment/configuration. SDK requests through OmniRoute have not been measured. The 2026-10-02 Codex-practice audit item AD-5, hold on Agents SDK codex_tool adoption, remains unresolved: no demonstrated orchestration requirement or accepted newly preregistered comparison of codex_tool, the Codex thread API and codex exec --json plus resume, and codex_tool is still experimental.",
           "evidence_kind": "source_review",
           "evidence_refs": [
-            "docs/foundation-closure-20260921.md",
-            "catalogs/us-equities/agents-operations.json"
+            "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+            "https://developers.openai.com/api/docs/guides/agents-api/overview",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/codex_tool.py#L584-L628",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/codex_tool.py#L631-L639",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/thread.py#L108-L111",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/exec.py#L226-L240",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/config.md#L84-L88",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/tools.md#L890-L894",
+            "catalogs/sota-convergence/manifest-20260926.json"
           ]
         },
         {
@@ -1917,11 +1924,13 @@
         "Scheduler admission does not establish learned-write quality; the retained model review rejected insufficient evidence.",
         "Bounded sanitized assistant excerpts are not complete transcripts, and exact lifetime memory token savings are unknown.",
         "Current primary-source review (2026-09-21) corrects manual-only, Claude-only and cloud-only exclusions. No matched memory benchmark or new installation was run in that review; automatic capture, local providers and published scores remain source claims until exercised on the selected profile.",
-        "The 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) keeps ai-memory as the production control and adopts no challenger. Its only measurements are Mac runs in the LongMemEval-S harness, descriptive under amendment A15.2 (full track, n = 470, recall_all@5): C3, ai-memory with its production embedder and the reranker off, scores 0.570, and am-minilm (+0.251, 95% CI [+0.203, +0.299]), dense Qwen3-Embedding-4B (+0.183), BM25 (+0.177) and the official BM25 (+0.170) exceed it with Holm p 0.0001, while ai-memory with MiniLM (0.496) and with FTS only (0.400) trail it. The layer decision still needs C4, production with the LLM reranker (A14), which did not run on the Mac, and confirmatory decisions come only from the VelaNext rerun under A15, A15.2 and A16.",
+        "The 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) keeps the incumbent ai-memory as the production control and adopts no challenger. Its only measurements are Mac runs in the LongMemEval-S harness, descriptive under amendment A15.2 (full track, n = 470, recall_all@5): C3, ai-memory with its production embedder and the reranker off, scores 0.570, and am-minilm (+0.251, 95% CI [+0.203, +0.299]), dense Qwen3-Embedding-4B (+0.183), BM25 (+0.177) and the official BM25 (+0.170) exceed it with Holm p 0.0001, while ai-memory with MiniLM (0.496) and with FTS only (0.400) trail it. The layer decision still needs C4, production with the LLM reranker (A14), which did not run on the Mac, and confirmatory decisions come only from the VelaNext rerun under A15, A15.2 and A16.",
         "Its trial rows (three memory systems, plus the named embedders, rerankers and memory LLMs) rest on discovery and vendor evidence and blind cross-family judgments by one judge model; a trial changes production only through the preregistered comparison against both C3 and C4 and the memory-lane acceptance.",
-        "Production now runs ai-memory 19b6429, a local cargo build of release/2.5 that reports 2.4.0 and is ahead of official v2.4.0; the retained native evidence covers the 2.3.2 pin only and does not transfer to that build.",
-        "2026-09-25: the 19b6429 build above is the Mac coordinator's production control; the WSL2 workstation nativestack-5975wx-20260925 runs the official 2.3.2 release. VelaNext, named above as the host of the confirmatory rerun, was retired on 2026-09-25 (docs/decisions/2026-09-25-retire-vela-velanext.md), and no rerun or C4 result was recorded in this repository before then. Amendment A15 fixed VelaNext as the one platform per comparison, so C4 and the confirmatory rerun need another host, such as the workstation's RTX 4090, a new preregistration amendment naming it, and the harness used for the Mac runs committed; until then the layer decision stays open.",
-        "2026-09-25: open_gaps[0] (no matched semantic-recall or usefulness benchmark) is superseded only in part. The Mac run measured session retrieval (recall_all@5) on the 19b6429 build, not usefulness and not the 2.3.2 pin, so the representative recall and usefulness gap in open_gaps still stands. open_gaps is a verdict field, so its text changes only at the next lane re-record."
+        "Production now runs the incumbent ai-memory 19b6429, a local cargo build of release/2.5 that reports 2.4.0 and is ahead of official v2.4.0, and the incumbent's retained native evidence covers the 2.3.2 pin only and does not transfer to that build.",
+        "2026-09-25: the incumbent's 19b6429 build above is the Mac coordinator's production control, and the WSL2 workstation nativestack-5975wx-20260925 runs the incumbent's official 2.3.2 release. VelaNext, named above as the host of the confirmatory rerun, was retired on 2026-09-25 (docs/decisions/2026-09-25-retire-vela-velanext.md), and no rerun or C4 result was recorded in this repository before then. Amendment A15 fixed VelaNext as the one platform per comparison, so C4 and the confirmatory rerun need another host, such as the workstation's RTX 4090, a new preregistration amendment naming it, and the harness used for the Mac runs committed; until then the layer decision stays open.",
+        "2026-09-25: open_gaps[0] (no matched semantic-recall or usefulness benchmark) is superseded only in part. The Mac run measured session retrieval (recall_all@5) on the incumbent's 19b6429 build, not usefulness and not the incumbent's 2.3.2 pin, so the representative recall and usefulness gap in open_gaps still stands. open_gaps is a verdict field, so its text changes only at the next lane re-record.",
+        "2026-09-25T20:44Z: the WSL2 workstation nativestack-5975wx-20260925 was cut over from the incumbent's 2.3.2 to its official 2.4.0 release (evidence/receipts/ai-memory-240-qualification-20260925.json: rehearsal on restored copies, a user-approved cold-copy cutover, schema V64 to V66), and at 2026-09-26T00:19Z from 2.4.0 to the official 2.4.1 release (evidence/receipts/ai-memory-241-qualification-20260925.json, schema V66 to V67). The statement above that the workstation runs the incumbent's official 2.3.2 release predates those cutovers. The winner pin stays 2.3.2 until a new verdict wave re-records this layer, and receipts at 2.4.x do not bind to it.",
+        "2026-10-01: under the merit rule of 2026-10-01 (docs/decisions/2026-10-01-definitive-sota-wsl-program.md, decision 5) the incumbent ai-memory is the source host's selection of record and the comparison's reference arm, not a merit winner, and this layer's merit winner is undetermined. The incumbent's upstream published v2.5.2 on 2026-10-01, which is not qualified here. The 2026-09-25 result above compares D2 with C3, the incumbent's arm with the reranker off, so it is configuration-level evidence and not a production head-to-head. No result is recorded for C4 (the incumbent's production arm with the LLM reranker, amendment A14), for D2h (agentmemory through its shipped hook path), for K1 (Hindsight) or for M1 and M2 (MemPalace), the remaining arms of the frozen harness (blueprints/memory-stack/longmemeval/v4/PREREGISTRATION.md). The comparison runs on the new WSL distribution with each system installed fresh by its upstream commands, and holds of this host's own integrations are not evidence about a repository. A verdict wave can name only an adopted candidate (a disposition of selected or conditional) as winner (tools/sota-convergence/lane_packets.py, scripts/landscape.py), so the comparison's result reaches this row through a disposition change and a new wave, not through a re-record alone."
       ],
       "overturn_when": "An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable complete provider use, latency, capture/deletion and restore behavior without ambiguous memory ownership.",
       "candidates": [
@@ -4556,7 +4565,7 @@
       "requirement": "Give a worker structured events, custom tools or session control through a supported SDK when the native CLI's bounded review is not enough.",
       "current_choice": "Codex SDK/CLI (component codex) for supported start/run/resume; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain source-reviewed, unselected alternatives.",
       "decision": "retain",
-      "rationale": "Codex SDK integration is accepted only within its recorded tests and needs no new runtime; the SDK table in docs/foundation-closure-20260921.md (lines 78-84) reviewed the alternatives on 2026-09-21 and none has since been revisited by any lane.",
+      "rationale": "Codex SDK integration is accepted only within its recorded tests and needs no new runtime. The 2026-09-21 SDK table in docs/foundation-closure-20260921.md has its header at line 80 and five candidate rows at lines 82-86, with no OpenAI Agents SDK row. The 2026-10-03 source revisit adds that SDK as unqualified without qualifying its experimental codex_tool or its requests through OmniRoute; see docs/decisions/2026-10-03-foundation-catalog-drift.md.",
       "evidence_refs": [
         "docs/foundation-closure-20260921.md",
         "catalogs/foundation/decisions.json"
@@ -4576,6 +4585,25 @@
           "evidence_refs": [
             "catalogs/foundation/decisions.json",
             "docs/foundation-closure-20260921.md"
+          ]
+        },
+        {
+          "name": "OpenAI Agents SDK",
+          "repository": "https://github.com/openai/openai-agents-python",
+          "disposition": "unqualified",
+          "rationale": "Source review at v0.23.1 supports an OpenAI-compatible SDK endpoint. Experimental codex_tool forwards an explicit codex_options.api_key, otherwise resolves CODEX_API_KEY or OPENAI_API_KEY from options.env, then the process environment, then the set_default_openai_key value, and exports the resolved key as CODEX_API_KEY. The native Codex login applies only when no key resolves, or when the caller supplies a Codex instance without api_key and preserves its native authentication environment/configuration. The managed Agents API separately requires an API key and bills at API rates. SDK requests through OmniRoute have not been measured. The 2026-10-02 Codex-practice audit item AD-5, hold on Agents SDK codex_tool adoption, stays on hold until a needed orchestration capability, graduation from experimental and an accepted newly preregistered comparison of codex_tool, the Codex thread API and codex exec --json plus resume justify adoption, with complete usage and effect/recovery checks. This candidate comparison is separate from the sealed three-arm workers comparison. The completed two-family fit refutation is retained at evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/agent-sdks/6/fit; correcting the Claude vote's managed-API premise does not qualify the candidate.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+            "evidence/artifacts/landscape-sweep-20260926/returns.json",
+            "catalogs/sota-convergence/manifest-20260926.json",
+            "https://developers.openai.com/api/docs/guides/agents-api/overview",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/codex_tool.py#L584-L628",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/codex_tool.py#L631-L639",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/thread.py#L108-L111",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/exec.py#L226-L240",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/config.md#L84-L88",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/tools.md#L890-L894"
           ]
         },
         {

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "mode": "mover_paper",
+  "protocol": "mover-early-entry-v1-20260924",
+  "endpoint": "https://paper-api.alpaca.markets",
+  "feed": "sip",
+  "regular_session_only": false,
+  "extended_hours_enabled": true,
+  "sessions": {
+    "extended_hours": true,
+    "overnight_holds": false,
+    "overnight_gross_multiple": "1.0"
+  },
+  "catalyst_orders_enabled": false,
+  "benchmarks": [
+    "SPY"
+  ],
+  "capital_usd": "10000",
+  "max_gross_exposure_usd": "2000",
+  "max_order_notional_usd": "2000",
+  "max_order_quantity": 100,
+  "max_order_qty_mode": "notional",
+  "max_held_symbols": 5,
+  "max_outstanding_orders": 20,
+  "max_gross_loss_usd": "1000",
+  "max_drawdown_usd": "1000",
+  "max_leverage": "1",
+  "max_spread_bps": "100",
+  "quote_max_age_seconds": 3,
+  "max_api_requests_per_minute": 200,
+  "max_submit_requests_per_minute": 180,
+  "duration_seconds": 3600,
+  "cleanup_seconds": 600,
+  "min_entry_close_seconds": 600,
+  "order_timeout_seconds": 10,
+  "mover": {
+    "rule": "10:00|G20|V250000|any",
+    "session_scope": "any_session",
+    "trial_end_et": "15:30",
+    "exit": "X2",
+    "entry": {
+      "limit_cap_bps": "50",
+      "timeout_seconds": 60,
+      "window_seconds": 30
+    },
+    "exit_orders": {
+      "limit_cap_bps": "50",
+      "timeout_seconds": 10,
+      "max_orders_per_symbol": 20
+    },
+    "flatten_reserve_seconds": 120,
+    "max_scan_age_seconds": 300,
+    "max_symbols": 5,
+    "max_entry_notional_usd": "200",
+    "appreciation_allowance": "2",
+    "gross_guard_fraction": "0.9",
+    "stream_quote_timeout_seconds": 3,
+    "rung_schedule": [
+      {
+        "from_session": 1,
+        "to_session": 20,
+        "rung": "1"
+      }
+    ]
+  },
+  "notes": "Mac mover trial A, 2026-09-24, mechanics-only (protocol mover-early-entry-v1-20260924 paper_e2e: nothing validated, so the candidate is the most-traded development rule, 10:00|G0.20|V250000|any). Deviations: the scan runs after 10:00 (at trial start, about 12:50 ET), so the snapshot prefilter uses the latest trade then; entries are at trial start instead of 10:00; exit X2 (60 minutes after the first fill) replaces the candidate's X1 because the engine bounds a hold at about 70 minutes. All caps are config-mover.json's."
+}

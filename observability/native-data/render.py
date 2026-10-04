@@ -14,11 +14,46 @@ def latest(kind, entity=None):
             ' == on() group_left() max(last_over_time(' + marker + '))')
 
 
+WRITER_IDENTITY = ('Writers without a per-process identity (instance="unscoped": a Claude session without '
+                   'session.id, or a Codex process started without the identity launcher) are excluded, because '
+                   'concurrent writers of one series make its increase meaningless; see the native-telemetry-integrity '
+                   'alert rules.')
+CLAUDE_PER_MINUTE = ('60 * sum by (type) (rate(ecosystem_claude_code_token_usage_tokens_total{instance!="unscoped"}'
+                     '[$__rate_interval]))')
+CODEX_PER_MINUTE = ('60 * sum by (token_type) (rate(ecosystem_codex_turn_token_usage_sum{instance!="unscoped"}'
+                    '[$__rate_interval]))')
+
+
+def by_query_source(field):
+    """Sum a claude-code api_request token field by query_source, a free-form string the
+    client sets per request (recent examples observed live: repl_main_thread:outputStyle:Concise,
+    agent:custom, agent:builtin:workflow-subagent, agent:builtin:general-purpose, agent_summary,
+    compact, away_summary -- not an exhaustive or fixed set). One event per API request; the
+    Prometheus ecosystem_claude_code_token_usage_tokens_total counters read the same provider
+    usage, so the two overlap and must never be added."""
+    return ('sum by (query_source) (sum_over_time({service_name="claude-code"} | event_name="api_request"'
+            ' | unwrap ' + field + ' [$__interval]))')
+
+
+def savings_series():
+    """One series per savings scope, grouped by entity_id alone, so no estimate is added to another.
+    A step shows a scope's estimate only when that scope's newest row in the step is ok: the newest
+    ok row's observed_unix must equal the newest row's, so an earlier success in the same step never
+    replaces a failed or stale newest row. Such a step has no value, which Grafana draws as a gap."""
+    def newest(fields, value):
+        return ('last_over_time({service_name="agent-stack-native-data",record_kind="savings"}'
+                ' | json ' + fields + ' | unwrap ' + value + ' | __error__="" [$__interval]) by (entity_id)')
+    return (newest('entity_id, state, estimated_saved | state="ok"', 'estimated_saved')
+            + ' and on(entity_id) (' + newest('entity_id, state, observed_unix | state="ok"', 'observed_unix')
+            + ' == on(entity_id) ' + newest('entity_id, observed_unix', 'observed_unix') + ')')
+
+
 def dashboard():
     panels = []
+    shift = [0]  # height of rows inserted above the panels added after them
 
     def add(pid, title, typ, x, y, w, h, expr=None, source='ecosystem-loki', **extra):
-        item = dict(id=pid, title=title, type=typ, gridPos=dict(x=x, y=y, w=w, h=h))
+        item = dict(id=pid, title=title, type=typ, gridPos=dict(x=x, y=y + shift[0], w=w, h=h))
         if expr:
             item.update(datasource={'uid': source}, targets=[{
                 'refId': 'A', 'expr': expr,
@@ -105,6 +140,24 @@ def dashboard():
     table(5, 'savings', 'Token-saving estimates · separate native scopes', 11, 12,
           ['title', 'state', 'estimated_saved', 'session_estimated_saved', 'source_updated_at',
            'kind', 'boundary', 'source_command'])
+    add(20, 'Token-saving estimates over time · one series per native scope, never summed', 'timeseries',
+        0, 23, 24, 8, savings_series(), interval='3m',
+        description='Each savings row is its own series, grouped only by entity_id. A step shows a scope\'s native '
+                    'estimate only when that scope\'s newest row in the step is ok; a step whose newest row failed '
+                    'or is stale is a gap, and an earlier success never fills it. Steps are at least 3 minutes, so '
+                    'each holds a 2-minute snapshot. Series are never stacked or added, and the legend names them '
+                    'without values: the table above is the latest generation with each scope\'s current value, '
+                    'state and source time. Scopes overlap: global RTK includes its project subset, and each '
+                    'Context Mode row is one runtime snapshot. These are native estimates, not provider usage. '
+                    'The symlog axis keeps small counters visible.',
+        fieldConfig={'defaults': {'unit': 'short', 'decimals': 0, 'noValue': 'No recent successful observation',
+                                  'custom': {'stacking': {'mode': 'none', 'group': 'A'}, 'spanNulls': False,
+                                             'scaleDistribution': {'type': 'symlog', 'log': 10, 'linearThreshold': 10}}},
+                     'overrides': []},
+        options={'legend': {'displayMode': 'list', 'placement': 'right', 'calcs': []},
+                 'tooltip': {'mode': 'multi', 'sort': 'desc'}})
+    panels[-1]['targets'][0]['legendFormat'] = '{{entity_id}}'
+    shift[0] = 8  # the sections below move down by the inserted series panel's height
     table(6, 'memory', 'Memory and retrieval · actual scoped inventory', 23, 7,
           ['title', 'state', 'value', 'unit', 'source_updated_at'],
           widths={'title': 290, 'state': 125, 'value': 90, 'unit': 85, 'source_updated_at': 260})
@@ -126,20 +179,55 @@ def dashboard():
     add(8, 'Native embedding-server completed requests', 'timeseries', 12, 44, 12, 8,
         'vllm:request_success_total{job="vllm"}', source='ecosystem-prometheus',
         description='Native process counters by completion reason; not token savings or lifetime across restarts.')
-    add(9, 'Codex provider telemetry · typed counters', 'timeseries', 0, 52, 12, 8,
-        'sum by (token_type) (ecosystem_codex_turn_token_usage_sum)', source='ecosystem-prometheus',
-        description='Native exported usage; overlapping cache/input/total fields must not be added. Not a counterfactual saving.')
-    add(10, 'Claude provider telemetry · typed counters', 'timeseries', 12, 52, 12, 8,
-        'sum by (type) (ecosystem_claude_code_token_usage_tokens_total)', source='ecosystem-prometheus',
-        description='Only native exported samples in the selected range. An inactive client may have no current series; use its archive/report for recorded usage.')
+    add(9, 'Codex provider telemetry · turn tokens per minute', 'timeseries', 0, 52, 12, 8,
+        CODEX_PER_MINUTE, source='ecosystem-prometheus',
+        description='Native per-turn histogram sums by token_type, one series per Codex process summed at query '
+                    'time; a turn is recorded when it ends. Overlapping cache/input/total fields must not be added. '
+                    'Not a counterfactual saving. ' + WRITER_IDENTITY)
+    add(10, 'Claude provider telemetry · tokens per minute (Prometheus)', 'timeseries', 12, 52, 12, 8,
+        CLAUDE_PER_MINUTE, source='ecosystem-prometheus',
+        description='Native cumulative counters by type, one series per Claude session summed at query time. '
+                    'Without session ids every Claude process wrote one shared series: a raw sum showed whichever '
+                    'process wrote last (the undercount this panel used to report), and increase() read the '
+                    'resulting resets as usage (73 to 193 times the Loki sums over one hour on the workstation on '
+                    '2026-09-26). '
+                    'Samples recorded before the writer-identity Collector profile '
+                    '(observability/collector/README.md) stay invalid; use the Loki api_request panels below for '
+                    'those hours. ' + WRITER_IDENTITY)
     table(11, 'coverage', 'All selected repositories · recorded acceptance, not live process status', 60, 18,
           ['title', 'coverage_status', 'canonical_receipt_count', 'state', 'source_updated_at', 'timestamp_basis', 'boundary'])
     add(12, 'Sanitized native client activity', 'logs', 0, 78, 24, 10,
-        '{service_name=~"Codex Desktop|codex-app-server|claude-code|codex-sdk-receipt"}',
+        '{service_name=~"Codex Desktop|codex-app-server|codex_exec|codex_cli_rs|claude-code|claude-code-desktop|codex-sdk-receipt"}',
         options={'showTime': True, 'sortOrder': 'Descending', 'wrapLogMessage': True},
         description='Existing native telemetry; prompt/tool bodies are removed upstream in the collector.')
+
+    for pid, field, title, x, y in (
+        (15, 'cache_read_tokens', 'Cache-read tokens by query_source', 0, 88),
+        (16, 'input_tokens', 'Input tokens by query_source', 12, 88),
+        (17, 'output_tokens', 'Output tokens by query_source', 0, 96),
+        (18, 'cache_creation_tokens', 'Cache-creation tokens by query_source', 12, 96),
+    ):
+        add(pid, title + ' (Loki api_request)', 'timeseries', x, y, 12, 8, by_query_source(field),
+            description='Live claude-code api_request events unwrapped and split by query_source, a free-form '
+                        'string the client sets per request (recent examples: repl_main_thread:outputStyle:Concise, '
+                        'agent:custom, agent:builtin:workflow-subagent, agent:builtin:general-purpose, '
+                        'agent_summary, compact, away_summary). One event per API request; it overlaps the '
+                        'Prometheus typed-counters panel above (both read the same underlying provider usage) '
+                        'and must not be summed with it or with the savings table. The legend sum equals '
+                        'the range total only when the query step equals $__interval; verify that in Grafana '
+                        'before reading it as a total.',
+            options={'legend': {'displayMode': 'table', 'placement': 'bottom', 'calcs': ['sum']}})
+    add(19, 'Claude provider telemetry · effort split (Prometheus)', 'timeseries', 0, 104, 12, 8,
+        'sum by (effort) (increase(ecosystem_claude_code_token_usage_tokens_total{instance!="unscoped"}[$__rate_interval]))',
+        source='ecosystem-prometheus',
+        description='Per-interval increase, split by effort level (the metrics pipeline keeps the "effort" '
+                    'datapoint attribute; see observability/collector/collector.yaml). increase() is used rather '
+                    'than a raw sum of the cumulative counters because each session is its own series: series '
+                    'appear with a session and leave five minutes after it ends (the Prometheus exporter\'s '
+                    'default metric_expiration), so a raw sum follows series lifetimes, not token use. '
+                    + WRITER_IDENTITY)
     return dict(uid='native-foundation-data', title='Native foundation · memory, retrieval and savings',
-                schemaVersion=39, version=4, editable=False, preload=True, timezone='browser', refresh='30s',
+                schemaVersion=39, version=5, editable=False, preload=True, timezone='browser', refresh='30s',
                 time={'from': 'now-6h', 'to': 'now'}, tags=['ecosystem', 'native', 'memory', 'tokens'],
                 panels=panels)
 

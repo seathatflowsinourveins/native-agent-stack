@@ -1,0 +1,17 @@
+config/config.go DefaultScrapeProtocols at v3.14.0 and v3.15.0 (gh api contents, identical list):
+	DefaultScrapeProtocols = []ScrapeProtocol{
+		OpenMetricsText1_0_0,
+		OpenMetricsText0_0_1,
+		PrometheusText1_0_0,
+		PrometheusText0_0_4,
+	}
+
+
+v3.15.0 storage.tsdb.chunk_encoding.floats: empty follows --enable-feature=xor2-encoding (not set on this host), so float chunks stay XOR:
+// ChunkEncodingConfig configures per-chunk-type encoding overrides.
+type ChunkEncodingConfig struct {
+	// Floats selects the encoding used for float chunks.
+	// Valid values are "xor", "xor2", and "" (empty/absent). When empty, the
+	// encoding follows the --enable-feature=xor2-encoding flag.
+	Floats string `yaml:"floats,omitempty"`
+}

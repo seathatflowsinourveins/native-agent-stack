@@ -1,0 +1,198 @@
+{
+ "codex_hooks_list": {
+  "taken_at_utc": "2026-09-26T16:03:34Z",
+  "codex": "codex-cli 0.157.1",
+  "hooks": [
+   {
+    "event": "preToolUse",
+    "source": "user",
+    "plugin": null,
+    "ai_memory": true,
+    "enabled": true,
+    "trust": "trusted",
+    "checker_hash_equals_codex": true
+   },
+   {
+    "event": "postToolUse",
+    "source": "user",
+    "plugin": null,
+    "ai_memory": true,
+    "enabled": true,
+    "trust": "trusted",
+    "checker_hash_equals_codex": true
+   },
+   {
+    "event": "preCompact",
+    "source": "user",
+    "plugin": null,
+    "ai_memory": true,
+    "enabled": true,
+    "trust": "trusted",
+    "checker_hash_equals_codex": true
+   },
+   {
+    "event": "sessionStart",
+    "source": "user",
+    "plugin": null,
+    "ai_memory": true,
+    "enabled": true,
+    "trust": "trusted",
+    "checker_hash_equals_codex": true
+   },
+   {
+    "event": "sessionEnd",
+    "source": "user",
+    "plugin": null,
+    "ai_memory": true,
+    "enabled": true,
+    "trust": "trusted",
+    "checker_hash_equals_codex": true
+   },
+   {
+    "event": "userPromptSubmit",
+    "source": "user",
+    "plugin": null,
+    "ai_memory": true,
+    "enabled": true,
+    "trust": "trusted",
+    "checker_hash_equals_codex": true
+   },
+   {
+    "event": "stop",
+    "source": "user",
+    "plugin": null,
+    "ai_memory": true,
+    "enabled": true,
+    "trust": "trusted",
+    "checker_hash_equals_codex": true
+   },
+   {
+    "event": "preToolUse",
+    "source": "plugin",
+    "plugin": "context-mode@context-mode",
+    "ai_memory": false,
+    "enabled": true,
+    "trust": "trusted"
+   },
+   {
+    "event": "postToolUse",
+    "source": "plugin",
+    "plugin": "context-mode@context-mode",
+    "ai_memory": false,
+    "enabled": true,
+    "trust": "trusted"
+   },
+   {
+    "event": "preCompact",
+    "source": "plugin",
+    "plugin": "context-mode@context-mode",
+    "ai_memory": false,
+    "enabled": true,
+    "trust": "trusted"
+   },
+   {
+    "event": "sessionStart",
+    "source": "plugin",
+    "plugin": "context-mode@context-mode",
+    "ai_memory": false,
+    "enabled": true,
+    "trust": "trusted"
+   },
+   {
+    "event": "userPromptSubmit",
+    "source": "plugin",
+    "plugin": "context-mode@context-mode",
+    "ai_memory": false,
+    "enabled": true,
+    "trust": "trusted"
+   },
+   {
+    "event": "stop",
+    "source": "plugin",
+    "plugin": "context-mode@context-mode",
+    "ai_memory": false,
+    "enabled": true,
+    "trust": "trusted"
+   }
+  ],
+  "ai_memory_user_hooks": 7,
+  "ai_memory_user_hooks_trusted": 7
+ },
+ "hook_files_last_written_utc": {
+  "hooks.json": "2026-09-26T00:19:44Z",
+  "config.toml": "2026-09-26T14:37:12Z"
+ },
+ "fixed_checker": {
+  "run_at_utc": "2026-09-26T18:07:11Z",
+  "hooks": [
+   {
+    "event": "PostToolUse",
+    "loads": true,
+    "ai_memory": true,
+    "trusted_hash_recorded": true,
+    "current_hash_equals_trusted_hash": true,
+    "enabled": true
+   },
+   {
+    "event": "PreCompact",
+    "loads": true,
+    "ai_memory": true,
+    "trusted_hash_recorded": true,
+    "current_hash_equals_trusted_hash": true,
+    "enabled": true
+   },
+   {
+    "event": "PreToolUse",
+    "loads": true,
+    "ai_memory": true,
+    "trusted_hash_recorded": true,
+    "current_hash_equals_trusted_hash": true,
+    "enabled": true
+   },
+   {
+    "event": "SessionEnd",
+    "loads": true,
+    "ai_memory": true,
+    "trusted_hash_recorded": true,
+    "current_hash_equals_trusted_hash": true,
+    "enabled": true
+   },
+   {
+    "event": "SessionStart",
+    "loads": true,
+    "ai_memory": true,
+    "trusted_hash_recorded": true,
+    "current_hash_equals_trusted_hash": true,
+    "enabled": true
+   },
+   {
+    "event": "Stop",
+    "loads": true,
+    "ai_memory": true,
+    "trusted_hash_recorded": true,
+    "current_hash_equals_trusted_hash": true,
+    "enabled": true
+   },
+   {
+    "event": "UserPromptSubmit",
+    "loads": true,
+    "ai_memory": true,
+    "trusted_hash_recorded": true,
+    "current_hash_equals_trusted_hash": true,
+    "enabled": true
+   }
+  ],
+  "codex_client_wiring": {
+   "rtk_instructions": false,
+   "context_mode_plugin_enabled": true,
+   "mcp_servers_present": {
+    "serena": true,
+    "socraticode": true,
+    "ai-memory": true
+   },
+   "hooks_feature_enabled": true,
+   "ai_memory_hook_events": 7,
+   "ai_memory_hook_events_trusted": 7
+  }
+ }
+}

@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-mibayy-token-savior",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/Mibayy/token-savior",
+ "reviewed_commit": "73e9c7f56fd7cd40ecc72cdc4b032264018f8b4f",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "code-navigation"
+ ],
+ "claim": "Source and documentation review of Mibayy/token-savior at commit 73e9c7f56fd7cd40ecc72cdc4b032264018f8b4f (license MIT), read from README.md at that commit. Repository description: \"MCP server that gets Claude to 97.9% (188/192) on a real coding benchmark at -80% active tokens and -83% wall time, vs 78.3% plain. Structural code navigation + persistent memory engine. Works with every MCP client.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1160,
+  "pushed_at": "2026-08-10T08:19:00Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@73e9c7f56fd7cd40ecc72cdc4b032264018f8b4f",
+   "text": "> One MCP server. One profile. **97.9% on tsbench at -80% tokens.** > Structural code navigation, persistent memory, and Bash command rewriting for AI coding agents."
+  },
+  {
+   "source": "README.md@73e9c7f56fd7cd40ecc72cdc4b032264018f8b4f",
+   "text": "**[mibayy.github.io/token-savior](https://mibayy.github.io/token-savior/)** -- project site + benchmark landing Benchmark source + fixtures: not currently published (see *Reproducing the score* below)"
+  },
+  {
+   "source": "README.md@73e9c7f56fd7cd40ecc72cdc4b032264018f8b4f",
+   "text": "### Benchmark -- 96 real coding tasks (Claude Opus 4.7, May 2026)"
+  }
+ ]
+}

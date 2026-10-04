@@ -1,0 +1,39 @@
+[y] S1-command-v: exit=0 pass=True wall=0.0s
+[y] R-mcporter-install-0: exit=0 pass=True wall=0.1s
+[y] R-mcporter-install-1: exit=0 pass=True wall=0.1s
+[y] R-socraticode-use-0: exit=0 pass=True wall=1.0s
+[y] R-socraticode-use-1: exit=0 pass=True wall=0.8s
+[y] R-socraticode-use-2: exit=0 pass=True wall=0.6s
+[y] R-socraticode-use-3: exit=0 pass=True wall=0.4s
+[y] S3-ctx_doctor: exit=0 pass=True wall=0.7s
+[y] S4-list-ai-memory: exit=0 pass=True wall=0.4s
+[y] S4-list-jcodemunch: exit=0 pass=True wall=1.0s
+[y] S5-token-report-oneoff: exit=0 pass=True wall=1.0s
+[y] R-jcodemunch-use-0: exit=0 pass=True wall=1.5s
+[y] R-jcodemunch-use-1: exit=0 pass=True wall=2.2s
+[y] R-context-mode-use-0: exit=0 pass=True wall=0.2s
+[y] R-context-mode-use-1: exit=1 pass=False wall=0.6s
+[y] S6a-daemon-status-check: exit=0 pass=True wall=0.2s
+[y] S6b-repeat-socraticode-health: exit=0 pass=True wall=0.3s
+[y] S6c-daemon-status-recheck: exit=0 pass=True wall=0.2s
+[y] S6d-daemon-ownership: pass=True {"status_pid": 3680898, "status_socket_is_arm_socket": true, "protocolVersion": 3, "metadata_pid": 3680898, "kernel_socket_owner_pids": [3680898], "cmdline_is_a
+[y] A1-ctx_execute_file-project-read: exit=0 pass=True wall=0.3s
+[y] A2-ctx_execute-42: exit=0 pass=True wall=0.3s
+[y] A3-probe-persistence-and-ppid-chain: exit=0 pass=True wall=0.7s
+[y] A4-ai-memory-status: exit=0 pass=True wall=0.4s
+[y] B1a-daemon-stop-retires-daemon-and-server: exit=0 pass=True wall=0.5s
+[y] B1b-next-probe-relaunches: exit=0 pass=True wall=0.9s
+[y] B1c-daemon-restart: exit=0 pass=True wall=0.6s
+[y] B1d-probe-after-restart: exit=0 pass=True wall=0.6s
+[y] B2a-probe-refuses-after-daemon-sigkill: exit=1 pass=True wall=0.2s
+[y] B2b-retire-orphans-and-archive-metadata: pass=True {"descendants_alive_after_kill": [], "terminated_with_TERM": true, "escalated_to_KILL": [], "all_gone": true, "metadata_archived": true}
+[y] B2c-deliberate-daemon-start: exit=0 pass=True wall=0.5s
+[y] B2d-list-context-mode-brief: exit=0 pass=True wall=0.6s
+[y] B2e-bridge-recovered: exit=0 pass=True wall=0.3s
+[y] B3a-stop-and-hold-lock: exit=0 pass=True wall=0.4s
+[y] B3b-probe-while-lock-held-fails: exit=1 pass=True wall=45.2s
+[y] B3c-probe-after-holder-exit-recovers: exit=0 pass=True wall=0.8s
+[y] F-daemon-stop-no-leftovers: exit=0 pass=True wall=0.4s
+[y] DONE passed=False steps=36 failed=['R-context-mode-use-1']
+[y] cleanup={'final_stop_exit': 0, 'terminated_in_cleanup': [], 'alive_after_cleanup': [], 'arm_daemons_after_cleanup': [], 'listeners_under_daemon_dir_after_cleanup': []}
+exit=0

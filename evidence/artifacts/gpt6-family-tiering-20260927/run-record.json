@@ -1,0 +1,369 @@
+{
+  "schema_version": 1,
+  "kind": "gpt6_family_tiering_run_record",
+  "recorded_on": "2026-09-27",
+  "preregistration": "blueprints/convergence-practice/gpt6-family-tiering-20260926",
+  "plan_sha256": "455e38df43e6bcc9e6e89c5e9399657f93a0a8cebcbf779c1d22c28afe370532",
+  "host_id": "nativestack-5975wx-20260925",
+  "provenance": {
+    "coordinator": "Launch, the pre-run verify-frozen and layout checks, the loop log, the quota reading and the first analyze.py run.",
+    "recorder": "This change, from 2026-09-27T07:40Z: the runner's own records read from the private state directory (metadata only), the layout check again and a rerun of analyze.py."
+  },
+  "evidence_class": "Live provider execution: the preregistration's 'later run' class, native execution of the hosted GPT-6 models on this host through the native Codex sign-in, one run per arm. Token counts are Codex's own turn.completed counters. Wall times are shared-host, shared-account observations. Convergence-protocol vocabulary: model_task_execution.",
+  "checkout": {
+    "revision": "50b9579f6722ddb0d751b81956c102046581c21b",
+    "what": "A separate git worktree at origin/main, used only for the run. verify-frozen passed there before the loop, and it passes on this change's checkout too (same frozen bytes)."
+  },
+  "pre_run_checks": [
+    {
+      "command": "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py verify-frozen",
+      "stdout": "frozen inputs verified",
+      "observed_by": "coordinator"
+    },
+    {
+      "command": "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py layout --acquisition \"$LI26_ACQ\"",
+      "stdout": {
+        "batches": 25,
+        "filings": 360,
+        "filings_per_batch": {
+          "max": 15,
+          "min": 1
+        },
+        "layout_sha256": "1db33e0f5f9c6328eab7c691e69c175b6084bedfe16a96e81fecacf33cf10d15",
+        "matches_plan": true,
+        "prompt_bytes": {
+          "max": 106870,
+          "min": 12088,
+          "total": 2016724
+        }
+      },
+      "observed_by": "coordinator; the same output again at recording"
+    }
+  ],
+  "launch": {
+    "utc": "2026-09-27T07:09:02Z",
+    "how": "A transient systemd --user unit running the README's frozen loop: for arm in A0 A1 S0 S1 L0 L1, run_arm.py run --arm \"$arm\" --acquisition \"$LI26_ACQ\" --lock-dir \"$CODEX_SLOT_LOCKS\" || break.",
+    "sign_in": "Native Codex sign-in. Each call linked the native sign-in file into its own CODEX_HOME; the runner never read or copied it and removed the link after the call.",
+    "loop_end_utc": "2026-09-27T07:28:28Z",
+    "loop_exits": {
+      "A0": 0,
+      "A1": 0,
+      "S0": 0,
+      "S1": 0,
+      "L0": 0,
+      "L1": 0
+    },
+    "stop_notes_after_loop": "none: the state directory holds no LIMIT or UNAVAILABLE note"
+  },
+  "arms": [
+    {
+      "arm": "A0",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "runs": 1,
+      "started_utc": "2026-09-27T07:09:02.343Z",
+      "finished_utc": "2026-09-27T07:13:45.011Z",
+      "elapsed_seconds": 282.668,
+      "exit": 0,
+      "status": "complete",
+      "calls": 25,
+      "batches": {
+        "completed": 25,
+        "failed": 0,
+        "pending": 0
+      },
+      "errors": 0,
+      "codex_version": "codex-cli 0.157.1",
+      "identity_matches_plan": true
+    },
+    {
+      "arm": "A1",
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "runs": 1,
+      "started_utc": "2026-09-27T07:13:45.162Z",
+      "finished_utc": "2026-09-27T07:15:58.107Z",
+      "elapsed_seconds": 132.945,
+      "exit": 0,
+      "status": "complete",
+      "calls": 25,
+      "batches": {
+        "completed": 25,
+        "failed": 0,
+        "pending": 0
+      },
+      "errors": 0,
+      "codex_version": "codex-cli 0.157.1",
+      "identity_matches_plan": true
+    },
+    {
+      "arm": "S0",
+      "model": "gpt-6-sol",
+      "effort": "max",
+      "runs": 1,
+      "started_utc": "2026-09-27T07:15:58.337Z",
+      "finished_utc": "2026-09-27T07:19:04.315Z",
+      "elapsed_seconds": 185.978,
+      "exit": 0,
+      "status": "complete",
+      "calls": 25,
+      "batches": {
+        "completed": 25,
+        "failed": 0,
+        "pending": 0
+      },
+      "errors": 0,
+      "codex_version": "codex-cli 0.157.1",
+      "identity_matches_plan": true
+    },
+    {
+      "arm": "S1",
+      "model": "gpt-6-sol",
+      "effort": "medium",
+      "runs": 1,
+      "started_utc": "2026-09-27T07:19:04.469Z",
+      "finished_utc": "2026-09-27T07:21:34.100Z",
+      "elapsed_seconds": 149.631,
+      "exit": 0,
+      "status": "complete",
+      "calls": 25,
+      "batches": {
+        "completed": 25,
+        "failed": 0,
+        "pending": 0
+      },
+      "errors": 0,
+      "codex_version": "codex-cli 0.157.1",
+      "identity_matches_plan": true
+    },
+    {
+      "arm": "L0",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "runs": 1,
+      "started_utc": "2026-09-27T07:21:34.249Z",
+      "finished_utc": "2026-09-27T07:26:52.507Z",
+      "elapsed_seconds": 318.257,
+      "exit": 0,
+      "status": "complete",
+      "calls": 25,
+      "batches": {
+        "completed": 25,
+        "failed": 0,
+        "pending": 0
+      },
+      "errors": 0,
+      "codex_version": "codex-cli 0.157.1",
+      "identity_matches_plan": true
+    },
+    {
+      "arm": "L1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "runs": 1,
+      "started_utc": "2026-09-27T07:26:52.650Z",
+      "finished_utc": "2026-09-27T07:28:28.460Z",
+      "elapsed_seconds": 95.81,
+      "exit": 0,
+      "status": "complete",
+      "calls": 26,
+      "batches": {
+        "completed": 25,
+        "failed": 0,
+        "pending": 0
+      },
+      "errors": 0,
+      "codex_version": "codex-cli 0.157.1",
+      "identity_matches_plan": true
+    }
+  ],
+  "calls": {
+    "total": 151,
+    "by_outcome": {
+      "failed:tool_use": 1,
+      "ok": 150
+    },
+    "credential_link": {
+      "removed": 151
+    },
+    "slots_used": {
+      "1": 51,
+      "2": 49,
+      "3": 51
+    },
+    "json_stream_items": {
+      "agent_message": 151
+    },
+    "session_record_items": {
+      "custom_tool_call": 1,
+      "custom_tool_call_output": 1,
+      "message": 604,
+      "reasoning": 189
+    },
+    "scratch_entries_left": 0,
+    "unexpected_items": 0,
+    "error_events": 0,
+    "turn_failed": 0,
+    "timed_out": 0,
+    "limit": 0,
+    "interrupted": 0,
+    "session_record_missing": 0,
+    "usage_not_reported": 0,
+    "no_document_text_false": 0,
+    "source": "Each attempt's call.json, metadata fields only (outcome, reason, usage, slot, credential-link state, scratch entries, item-type counts, flags). Per-arm usage summed from these records equals the decision's totals for every arm."
+  },
+  "retried_batches": [
+    {
+      "arm": "L1",
+      "batch": "b016",
+      "reading": "Attempt 1 completed its turn and exited 0, but its session record held one custom_tool_call and its output while the --json stream showed only an agent_message: the signature of the isolation probe's scripted code-mode exec cells (results.json cases isolated-code-mode and isolated-plain-luna). The tool's name and arguments were not read. The call failed with reason tool_use, its reply was not scored, and its usage counts in L1's totals. The batch's single retry (attempt 2) was ok.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "outcome": "failed",
+          "reason": "tool_use",
+          "exit_code": 0,
+          "turn_completed": 1,
+          "reply_status": "valid",
+          "json_stream_items": {
+            "agent_message": 1
+          },
+          "session_record_items": {
+            "custom_tool_call": 1,
+            "custom_tool_call_output": 1,
+            "message": 4
+          },
+          "tool_items": 2,
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 23296,
+            "input_tokens": 48639,
+            "output_tokens": 393,
+            "reasoning_output_tokens": 0
+          },
+          "wall_seconds": 11.728,
+          "started_utc": "2026-09-27T07:27:44.584Z",
+          "finished_utc": "2026-09-27T07:27:56.312Z"
+        },
+        {
+          "attempt": 2,
+          "outcome": "ok",
+          "reason": null,
+          "exit_code": 0,
+          "turn_completed": 1,
+          "reply_status": "valid",
+          "json_stream_items": {
+            "agent_message": 1
+          },
+          "session_record_items": {
+            "message": 4
+          },
+          "tool_items": 0,
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 5888,
+            "input_tokens": 24291,
+            "output_tokens": 368,
+            "reasoning_output_tokens": 0
+          },
+          "wall_seconds": 9.376,
+          "started_utc": "2026-09-27T07:28:19.079Z",
+          "finished_utc": "2026-09-27T07:28:28.455Z"
+        }
+      ]
+    }
+  ],
+  "usage_all_arms": {
+    "calls": 151,
+    "input": 4004329,
+    "cached_input": 338432,
+    "cache_write_input": 0,
+    "output_including_reasoning": 127155,
+    "reasoning": 70942,
+    "billed": 3793052,
+    "input_plus_output": 4131484,
+    "note": "Sums over the six arms' disjoint calls, each counted once. Input includes cached input and output includes reasoning (docs/token-practice.md); billed is input minus cached input plus output."
+  },
+  "versions": {
+    "codex": "codex-cli 0.157.1: every arm's runs.jsonl and identity.json, and the decision's codex_version",
+    "python": "Not stored by the run. The analysis rerun at recording used Python 3.13.15; the interpreter of the transient unit was not recorded.",
+    "models": "The run records model slugs only (gpt-6-astra, gpt-6-sol, gpt-6-luna), as the provider served them on 2026-09-27; no provider-side model revision was recorded."
+  },
+  "deviations": [
+    {
+      "what": "Slot lock directory",
+      "planned": "README step 2: CODEX_SLOT_LOCKS is the host's shared Codex slot directory holding slot-1..slot-3, which the landscape-sweep runner also takes.",
+      "actual": "None existed at launch (coordinator). At the run's checkout, the landscape-sweep runner's slot pool defaults to its own <work-dir>/locks (tools/sota-convergence/landscape-sweep/codex_job.py, docstring and settings()), and the coordinator reported that the sweep's GPT-6 lane runs through OmniRoute with its own work-dir locks. The coordinator created a dedicated owner-only (0700) directory holding slot-1..slot-3 and passed it as --lock-dir.",
+      "effect": "The three-slot cap bounded the tiering's own calls (slots 1, 2 and 3 took 51, 49 and 51 calls; each arm's summed slot wait was at most 0.002 s), but it was not shared with other Codex jobs on the host. Scoring reads each call's own reply, so it does not depend on the pool. Token counts are per-call Codex counters, but their cached input reflects the provider's cache state, which scheduling (concurrency and call order) can influence; the dedicated pool's effect on cached input was not measured. Without the cache credit S1 still ranks first, at 1,861.8 input plus output tokens per filing against A0's 1,924.8 (README 'Reading the cost numbers', outside the frozen rule). Wall times could also depend on the pool; wall time only breaks cost ties, which this decision did not need."
+    },
+    {
+      "what": "Modes inside each call's Codex home",
+      "planned": "plan.json state_dir: the whole state tree, including each attempt's codex-home/ with Codex's session record, logs and state, as 0700 directories and 0600 files.",
+      "actual": "The runner's own 314 directories are 0700 and its 629 files 0600, and it creates each codex-home at 0700 (run_arm.py, codex_home.mkdir(mode=0o700); its only chmod sets its own files to 0600). It sets no umask and does not change the modes of what Codex writes there. Under codex-home, each codex-home itself included, 302 directories are 0700 and 5,285 are 0775; of the files there, 151 are 0600, 9,513 are 0664 and 1,329 are 0644 (privacy_check.state_directory_modes).",
+      "effect": "Each of these lies below its call's 0700 attempt directory, so it is reachable only through owner-only directories. No file from them is copied into these records; they hold only the item-type counts that each call's call.json took from its session record. Scores and token counts do not depend on these modes."
+    }
+  ],
+  "quota_context": {
+    "reading": {
+      "source": "scripts/codex_quota.py --json, read by the coordinator at launch",
+      "bucket": "codex",
+      "window": "weekly",
+      "used_percent": 3,
+      "plan_type": "pro"
+    },
+    "per_arm_readings": null,
+    "decision_quota_context": null,
+    "caveat": "One reading at launch; no per-arm before/after readings were taken, so analyze.py ran without --quota-context. Other sessions share the account: the percentage is context only, is not attributable to any arm and never enters the rule."
+  },
+  "analysis": {
+    "command": "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/analyze.py --acquisition \"$LI26_ACQ\" --out <decision.json>",
+    "coordinator_run_utc": "2026-09-27T07:29:16Z",
+    "stdout": {
+      "final": true,
+      "selected": {
+        "arm": "S1",
+        "control_billed_per_filing": 1852.2666666666667,
+        "control_usage_complete": true,
+        "effort": "medium",
+        "model": "gpt-6-sol",
+        "outcome": "route_mechanical_extraction",
+        "ranked": [
+          "S1",
+          "S0",
+          "L1",
+          "L0",
+          "A1"
+        ],
+        "routable": [
+          "A0",
+          "A1",
+          "S0",
+          "S1",
+          "L0",
+          "L1"
+        ]
+      }
+    },
+    "decision_sha256": "555ed71c29a8a33070d9a185b65d69986e31a7955f1ed49b944224414b2a40ea",
+    "rerun": {
+      "utc": "2026-09-27T07:42:10Z",
+      "checkout": "50b9579f6722 (a second separate worktree)",
+      "python": "Python 3.13.15",
+      "byte_identical_to_coordinator_output": true,
+      "what_it_checks": "The frozen analysis over the retained private state and inputs. It re-checks the analysis step, not the provider calls."
+    }
+  },
+  "privacy_check": {
+    "state_directory_modes": {
+      "codex_home directories 0700": 302,
+      "codex_home directories 0775": 5285,
+      "codex_home files 0600": 151,
+      "codex_home files 0644": 1329,
+      "codex_home files 0664": 9513,
+      "runner directories 0700": 314,
+      "runner files 0600": 629
+    },
+    "reading": "The runner's own directories and files are 0700 and 0600, as the plan states. Inside each call's 0700 codex-home, Codex created directories at 0775 and files at 0664 and 0644 besides 0700 and 0600, where the plan's state_dir gives 0700 and 0600 for the whole tree (deviations[1]); they are reachable only through the owner-only directories above them. Every call's credential link was removed, and no call left an entry in its scratch directory."
+  },
+  "sanitization": "Aggregates and metadata only. No filing text, accession number, rendered batch prompt or its hash, reply, event, stderr or Codex session record was copied. The only prompt hash in these records is the public template's (prompt.txt), in decision.json's frozen map. Private paths are written as ~ or as the README's pointer variables LI26_ACQ and CODEX_SLOT_LOCKS."
+}

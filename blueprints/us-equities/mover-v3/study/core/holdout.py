@@ -516,7 +516,7 @@ def collect(ctx: dict, authorization_id: str, last: str, accrual: list, snapshot
     plus the rename-day re-fetch. No quote, no minute bar, no membership selection, no outcome."""
     from core.runner import check_clock
     check_clock(ctx, now)
-    gate.require_granted(ctx["access_log"], authorization_id, "collect")
+    auth = gate.require_granted(ctx["access_log"], authorization_id, "collect")
     cal, prev = ctx["cal"], batches(ctx)
     first = cal.offset(prev[-1]["sessions"][1], 1) if prev else cal.next_on_or_after(ctx["freeze_session"])
     if not cal.is_session(last) or last < first or cal.close(last) > now:
@@ -539,9 +539,27 @@ def collect(ctx: dict, authorization_id: str, last: str, accrual: list, snapshot
 
     start, status, sha = iso_utc(now), "failed", None
     store = Store()
+    directory = Path(snapshot_root) / f"collect-{authorization_id}"
+    # As in runner.begin_or_resume, bind the attempt's inputs; as in transport_check.seal_live_samples,
+    # reuse a seal left before the logs. The binding is inside the hashed ledger, not inferred from its path.
+    identity = {"authorization_sha256": sha256_bytes(dumps(auth).encode("utf-8")),
+                "study_tree": ctx["tree"], "protocol_sha256": ctx["protocol_sha256"],
+                "runtime_lock_sha256": ctx["runtime_lock_sha256"],
+                "base_snapshots": [list(r) for r in sealed_refs(ctx, ("collect",))],
+                "sessions": [first, last], "exposed_symbol_sessions": list(accrual)}
+    if (directory / "ledger.jsonl").exists():
+        sha = sha256_file(directory / "ledger.jsonl")
+        store = Store.read(directory, sha)
+        binding = store.binding or {}
+        if binding.get("identity") != identity or not binding.get("utc_start"):
+            raise HoldoutRefused("collection snapshot binding differs from the authorization or batch identity")
+        start = binding["utc_start"]
+    elif (directory / "pages").exists():
+        raise HoldoutRefused("collection snapshot is partially written: cannot overwrite or fetch it again")
     try:
-        driver.stage_fetch(planner, transports, store, fetch_date, clock=clock)
-        sha = store.write(Path(snapshot_root) / f"collect-{authorization_id}")
+        if sha is None:
+            driver.stage_fetch(planner, transports, store, fetch_date, clock=clock)
+            sha = store.write(directory, binding={"identity": identity, "utc_start": start})
         status = "complete"
     finally:
         _finish(ctx, authorization_id, start, now, status, sha, 0, None, list(accrual),
@@ -617,15 +635,20 @@ def _planner(spec_for, mode, enum_date, terminal_date):
     def planner(store):
         if any(not store.has(r["key"]) for r in enum_reqs):
             return enum_reqs
+        # Let the single re-fetch finish before planning trades from required terminal records.
+        if store.status(plan.terminal_actions_request(terminal_date)["key"]) != "complete":
+            return enum_reqs
         return enum_reqs + STG.planner(spec_for(store), mode)(store)
     return planner
 
 
 def terminal_records(store, terminal_date) -> list:
-    """The records of the action's own terminal-record request, or [] when it is not held complete (its failure is
-    counted in the action's fetch-incomplete rate, populations.fetch_failures)."""
+    """The mandatory action-specific records (universe_and_identity.corporate_action_dates, N02).
+    An incomplete acquisition is unknown, regardless of the pooled fetch-incomplete rate."""
     key = plan.terminal_actions_request(terminal_date)["key"]
-    return list(store.parsed(key)) if store.status(key) == "complete" else []
+    if store.status(key) != "complete":
+        raise HoldoutRefused("terminal_actions acquisition is incomplete: terminal records are unknown")
+    return list(store.parsed(key))
 
 
 def _fetch_step(ctx, purpose, auth, bases, snapshot_root, spec_for, mode, enum_date, transports, clock, now,

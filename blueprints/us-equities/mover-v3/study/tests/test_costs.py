@@ -163,8 +163,9 @@ class FeeSupersession(unittest.TestCase):
 class ChargeDates(unittest.TestCase):
     """Review round 15, fee-date item: the SEC Section 31 row is the one in force on the sale's charge date, its
     settlement date under the cycle in force on its trade date (T+3 before 2017-09-05, T+2 from then, T+1 from
-    2024-05-28), counted in settlement days (sessions that are not Columbus Day or Veterans Day); the FINRA TAF row is
-    the one in force on the trade date. At e7529b47 both rows were chosen by the trade date."""
+    2024-05-28), counted in settlement days (sessions plus sourced exchange-only closures, excluding Columbus Day
+    and Veterans Day); the FINRA TAF row is the one in force on the trade date. At e7529b47 both rows were chosen by
+    the trade date."""
 
     def setUp(self):
         from core.calendar import Calendar
@@ -185,6 +186,32 @@ class ChargeDates(unittest.TestCase):
         self.assertEqual(sd("2017-07-04"), None)              # not a session
         self.assertEqual(costs.bank_only_holidays(2018), frozenset({"2018-10-08", "2018-11-12"}))
         self.assertEqual(costs.bank_only_holidays(2017), frozenset({"2017-10-09"}))   # Nov 11 on a Saturday
+
+    def test_settlement_on_2025_mourning_day_despite_exchange_closure(self):
+        # Nasdaq ECA2024-632: January 8 trades settle January 9, which is not a trade date.
+        # https://classic.nasdaqtrader.com/TraderNews.aspx?id=ECA2024-632
+        self.assertFalse(self.cal.is_session("2025-01-09"))
+        self.assertEqual(costs.settlement_date(self.cal, "2025-01-08"), "2025-01-09")
+        self.assertIsNone(costs.settlement_date(self.cal, "2025-01-09"))
+        self.assertEqual(costs.settlement_date(self.cal, "2025-01-10"), "2025-01-13")
+
+    def test_settlement_on_2018_mourning_day_despite_exchange_closure(self):
+        # Nasdaq ETA2018-99: December 3 trades settle December 5 under T+2.
+        # https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2018-99
+        self.assertFalse(self.cal.is_session("2018-12-05"))
+        self.assertEqual(costs.settlement_date(self.cal, "2018-12-03"), "2018-12-05")
+        self.assertEqual(costs.settlement_date(self.cal, "2018-12-04"), "2018-12-06")
+        self.assertIsNone(costs.settlement_date(self.cal, "2018-12-05"))
+
+    def test_sec_fee_boundary_after_2025_mourning_day(self):
+        # Synthetic rates expose the wrong charge date; no historical rate changes on January 10.
+        doc = synth.fee_document(
+            [("2025-01-01", "2025-01-09", 10.0), ("2025-01-10", None, 20.0)],
+            [("2025-01-01", "2025-01-08", 0.01, 10.0), ("2025-01-09", None, 0.02, 10.0)])
+        fees = costs.Fees(doc, cal=self.cal)
+        self.assertEqual(fees.sale_fees("2025-01-08", 100, 1_000_000), 11.0)
+        self.assertEqual(fees.rates("2025-01-08"), (10.0, 0.01, 10.0))
+        self.assertEqual(fees.sale_fees("2025-01-10", 100, 1_000_000), 22.0)
 
     def test_sec_rows_cross_on_the_settlement_date_and_taf_rows_on_the_trade_date(self):
         sec = lambda d: self.f.rates(d)[0]                   # noqa: E731

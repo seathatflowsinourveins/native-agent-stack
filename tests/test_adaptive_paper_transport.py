@@ -138,6 +138,37 @@ class Normalization(unittest.TestCase):
         with self.assertRaises(t.TransportError):
             t.timestamp_ns("2026-09-21T15:00:00")
 
+    def test_timestamp_rfc3339_offsets_and_zero_to_nine_fraction_digits(self):
+        # RFC 3339 section 5.6 / reviewer probe_ts.py. All clocks below
+        # represent the same UTC second; expected nanoseconds use integers.
+        base = 1_790_002_800_000_000_000
+        fractions = (("", 0), (".1", 100_000_000), (".12", 120_000_000),
+                     (".123", 123_000_000), (".1234", 123_400_000),
+                     (".12345", 123_450_000), (".123456", 123_456_000),
+                     (".1234567", 123_456_700), (".12345678", 123_456_780),
+                     (".123456789", 123_456_789))
+        for clock, zone in (("15:00:00", "Z"), ("15:00:00", "+00:00"),
+                            ("11:00:00", "-04:00"), ("20:30:00", "+05:30")):
+            for fraction, nanos in fractions:
+                value = f"2026-09-21T{clock}{fraction}{zone}"
+                with self.subTest(value=value):
+                    self.assertEqual(t.timestamp_ns(value), base + nanos)
+
+    def test_timestamp_accepts_lowercase_z(self):
+        for fraction, nanos in (("", 0), (".1", 100_000_000), (".123456789", 123_456_789)):
+            with self.subTest(fraction=fraction):
+                self.assertEqual(t.timestamp_ns(f"2026-09-21T15:00:00{fraction}z"),
+                                 1_790_002_800_000_000_000 + nanos)
+
+    def test_timestamp_truncates_subnanosecond_fraction(self):
+        for value in ("2026-09-21T15:00:00.1234567891Z",
+                      "2026-09-21T15:00:00.1234567899+00:00",
+                      "2026-09-21T11:00:00.123456789123-04:00",
+                      "2026-09-21T20:30:00.123456789123+05:30",
+                      "2026-09-21T15:00:00.1234567891z"):
+            with self.subTest(value=value):
+                self.assertEqual(t.timestamp_ns(value), 1_790_002_800_123_456_789)
+
     def test_crossed_and_one_sided_quotes_are_untradable_not_corrupt(self):
         base = {"S": "SPY", "bp": "100.01", "ap": "100.02", "bs": 1, "as": 1, "t": "2026-09-23T15:00:00.000000001Z"}
         self.assertEqual(t.normalize_quote(base)["bid"], "100.01")
@@ -593,6 +624,40 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([(c.args, c.kwargs) for c in cancels],
                          [((self.port.before_request, "cancel"), {"client_id": "trial-1"})])
 
+    async def test_task_cancellation_preserves_worker_cancel_identity(self):
+        self.port.adopt_intents([intent()])
+        await self.port._observe(t.normalize_order(order()))
+        loop = asyncio.get_running_loop()
+        worker_started = asyncio.Event()
+        worker_finished = asyncio.Event()
+        native_cancel = self.port._client.cancel_order_by_id
+
+        def cancel_in_worker(order_id):
+            loop.call_soon_threadsafe(worker_started.set)
+            try:
+                return native_cancel(order_id)
+            finally:
+                loop.call_soon_threadsafe(worker_finished.set)
+
+        with patch.object(self.port._client, "cancel_order_by_id", side_effect=cancel_in_worker), \
+                patch.object(self.port._client._session._session, "request",
+                             return_value=response(None, 204)) as request:
+            self.port._http_lock.acquire()
+            try:
+                task = asyncio.create_task(self.port.cancel("trial-1"))
+                await asyncio.wait_for(worker_started.wait(), 2)
+                task.cancel()
+                with self.assertRaises(asyncio.CancelledError):
+                    await task
+                request.assert_not_called()
+            finally:
+                self.port._http_lock.release()
+                await asyncio.wait_for(worker_finished.wait(), 2)
+
+        self.assertEqual([call.args[0] for call in request.call_args_list], ["DELETE"])
+        self.assertEqual([entry[:2] for entry in self.budgets], [("cancel", "trial-1")])
+        self.assertIsNone(self.port._client._session._cancel_expectation)
+
     async def test_replayed_id_cannot_change_intent(self):
         self.port.adopt_intents([intent()])
         with patch.object(self.port._client._session._session, "request") as request:
@@ -773,13 +838,15 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
     async def test_proven_not_sent_intent_does_not_break_flat_snapshot(self):
         self.port.adopt_intents([intent()])
         self.port._not_sent.add("trial-1")
+        # account, positions, open orders, all orders, then the FEE activities (read last).
         values = [response({"cash": "1000", "equity": "1000", "buying_power": "1000"}),
-                  response([]), response([]), response([])]
+                  response([]), response([]), response([]), response([])]
         with patch.object(self.port._client._session._session, "request", side_effect=values) as request:
             snapshot = await self.port.snapshot()
         self.assertTrue(snapshot["complete"])
         self.assertEqual(snapshot["positions"], [])
-        self.assertEqual(request.call_count, 4)
+        self.assertEqual(snapshot["fees"], [])
+        self.assertEqual(request.call_count, 5)
 
     async def test_late_event_cannot_undo_cumulative_fill(self):
         final = t.normalize_order(order(filled_qty="1", filled_avg_price="100", status="filled"))
@@ -812,6 +879,115 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.port._observed["trial-1"]["status"], "canceled")   # stored state never moves back
         self.assertNotIn("execution_id", self.port._observed["trial-1"])
         self.assertEqual(self.port.health["reasons"], [])
+
+    async def test_stream_fill_time_reaches_ledger_losslessly(self):
+        import tempfile
+        from runner import Controller
+        from safety import Ledger, Quote, RiskLimits
+
+        self.port._on_order = lambda row: None
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "ledger.sqlite3"
+            limits = RiskLimits(max_order_qty=t.Decimal(2))
+            ledger = Ledger(path, limits)
+            self.addCleanup(ledger.close)
+            now = time.time()
+            ledger.start_trial(now)
+            ledger.reserve_intent("trial-1", "SPY", "buy", "2", "100.01",
+                quote=Quote("SPY", "100", "100.01", now), now=now, market_open=True,
+                session_close=now + 3600, stop_file=Path(root) / "STOP")
+            self.port.sink_observation = Controller(ledger, now + 3600, market_open=True).observe
+            # Alpaca https://docs.alpaca.markets/docs/websocket-streaming:
+            # trade_updates.data.timestamp is fill time, not order.updated_at.
+            for cum, event, fraction in ((1, "partial_fill", "123456789"), (2, "fill", "123456790")):
+                self.port._enqueue("order", {"data": {
+                    "event": event, "timestamp": "2026-09-21T15:00:00." + fraction + "Z",
+                    "execution_id": "exec-%d" % cum, "qty": "1", "price": "100",
+                    "order": order(qty="2", filled_qty=str(cum), filled_avg_price="100",
+                                   status="filled" if cum == 2 else "partially_filled",
+                                   updated_at="2026-09-21T15:00:05.999999999Z")}})
+            await self._drain()
+            self.assertEqual(self.port.health["reasons"], [])
+            ledger.close()
+            reopened = Ledger(path, limits)
+            self.addCleanup(reopened.close)
+            rows = reopened.db.execute("SELECT * FROM executions ORDER BY cum_qty").fetchall()
+            self.assertEqual(len(rows), 2)
+            self.assertIn("execution_time_ns", rows[0].keys())
+            expected = [1790002800123456789, 1790002800123456790]
+            self.assertEqual([r["execution_time_ns"] for r in rows], expected)
+            self.assertTrue(all(type(r["execution_time_ns"]) is int for r in rows))
+            self.assertNotIn("execution_time_ns", self.port._observed["trial-1"])
+
+    async def test_b2_fallback_never_rolls_back_or_freezes_either_arrival_order(self):
+        import tempfile
+        from runner import Controller
+        from safety import Ledger, Quote, RiskLimits
+
+        self.port._on_order = lambda row: None
+        for first in ("S", "U"):
+            with self.subTest(first=first), tempfile.TemporaryDirectory() as root:
+                limits = RiskLimits(max_order_qty=t.Decimal(2), max_gross_loss_usd=t.Decimal(100),
+                                    max_drawdown_usd=t.Decimal(100))
+                path = Path(root) / "ledger.sqlite3"
+                ledger = Ledger(path, limits)
+                self.addCleanup(ledger.close)
+                now = time.time()
+                ledger.start_trial(now)
+                ledger.adopt_broker_snapshot({"positions": [
+                    {"symbol": "SPY", "qty": "1", "avg_entry_price": "100"}]}, now)
+                controller = Controller(ledger, now + 3600, market_open=True)
+                self.port.sink_observation = controller.observe
+                rows = {}
+
+                def reserve(label, side, price):
+                    cid = first + "-" + label
+                    ledger.reserve_intent(cid, "SPY", side, "1", price,
+                        quote=Quote("SPY", "130", "130.01", now), now=now, market_open=True,
+                        session_close=now + 3600, stop_file=Path(root) / "STOP")
+                    rows[label] = order(client_order_id=cid, id="broker-" + cid, side=side,
+                                        limit_price=price, filled_qty="1", filled_avg_price=price, status="filled")
+
+                async def execution(label, second):
+                    self.port._enqueue("order", {"event": "fill", "execution_id": first + "-" + label,
+                        "qty": "1", "price": rows[label]["filled_avg_price"], "order": rows[label],
+                        "timestamp": "2026-09-21T15:00:0%d.000000001Z" % second})
+                    await self._drain()
+                    self.assertEqual(self.port.health["reasons"], [])
+
+                reserve("B", "buy", "130")
+                await execution("B", 2)
+                reserve("U", "sell", "95")
+                self.assertEqual(ledger.accounting().outstanding_orders, 1)
+                await self.port._observe(t.normalize_order(rows["U"]))
+                reserve("S", "sell", "110")
+                await self.port._observe(t.normalize_order(rows["S"]))
+                await execution(first, 1 if first == "S" else 3)
+                # With U still untimed, swapping S into B's slot would leave
+                # zero held before U. Fall back to B,U,S: each sale closes at
+                # $115, losing $20 and $5. This intermediate state is durable.
+                state = ledger.accounting()
+                self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                                  state.cumulative_realized_loss_usd),
+                                 (t.Decimal(75), t.Decimal(-25), t.Decimal(25)))
+                self.assertEqual(ledger.db.execute("SELECT COUNT(*) FROM executions").fetchone()[0], 2)
+                before = tuple(ledger.db.iterdump())
+                ledger.close()
+                ledger = Ledger(path, limits)
+                self.addCleanup(ledger.close)
+                controller.ledger = ledger
+                self.assertEqual(tuple(ledger.db.iterdump()), before)
+                self.assertEqual(ledger.accounting(), state)
+                other = "U" if first == "S" else "S"
+                await execution(other, 3 if other == "U" else 1)
+                # All three now timed: S(+10), B, U(-35), flat. Same cash/net
+                # as fallback, but gains cannot offset the $35 losing fill.
+                state = ledger.accounting()
+                self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                                  state.cumulative_realized_loss_usd),
+                                 (t.Decimal(75), t.Decimal(-25), t.Decimal(35)))
+                self.assertEqual(ledger.positions(), {})
+                self.assertEqual(ledger.db.execute("SELECT COUNT(*) FROM executions").fetchone()[0], 3)
 
     def fill_activity(self, cum, qty, price="5.61", *, index=0, order_id=ID, **changes):
         row = {"activity_type": "FILL", "id": "20260924150021%03d::%s" % (index, __import__("uuid").uuid4()),
@@ -1098,6 +1274,47 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
             with self.assertRaisesRegex(t.TransportError, "not ready"):
                 await self.port.submit(intent())
         request.assert_not_called()
+
+    async def test_owned_exit_with_a_fresh_quote_reaches_the_wire_under_an_admission_freeze(self):
+        # #215 guard: an admission freeze (stale benchmark, reconnect) blocks entries only; an
+        # owned sell whose own quote is fresh still reaches the wire (README-recovery.md: an
+        # admission freeze alone does not forbid a confirmed owned exit).
+        self.port.freeze_health("quote_stale")
+        self.assertFalse(self.port.ready)
+        with patch.object(self.port._client._session._session, "request",
+                          return_value=response(order(side="sell", limit_price="99.99"))) as request:
+            result = await self.port.submit(intent(side="sell", limit_price="99.99"))
+        self.assertEqual(request.call_args.args[0], "POST")
+        self.assertEqual((result["side"], result["client_order_id"]), ("sell", "trial-1"))
+
+    async def test_an_exit_without_its_own_fresh_quote_is_refused_before_the_wire_as_not_sent(self):
+        # #215 guard: exit freshness is per symbol at the wire, with the not_sent guarantee
+        # that lets the caller retire the reservation (README-safety.md, mark_not_sent).
+        self.port._quote_values["SPY"]["ts_ns"] = time.time_ns() - int((self.port.quote_timeout + 1) * 1e9)
+        with patch.object(self.port._client._session._session, "request") as request:
+            with self.assertRaises(t.SubmissionNotSent) as refused:
+                await self.port.submit(intent(side="sell", limit_price="99.99"))
+        request.assert_not_called()
+        self.assertTrue(refused.exception.not_sent)
+
+    async def test_start_waits_on_the_required_basket_only(self):
+        # #215 guard: a subscribed symbol that never quotes (FakeStream publishes SPY only)
+        # gates start() only when it is required, as a recovery port's held symbols were.
+        await self.port.stop()
+        for required, ready in ((["SPY"], True), (["SPY", "QQQ"], False)):
+            with self.subTest(required=required):
+                with patch.object(t, "_stream_classes", return_value=(FakeStream, FakeStream)):
+                    self.port = t.AlpacaPaperTransport("fixture-key", "fixture-secret", ["SPY", "QQQ"],
+                            before_request=lambda *a, **k: None, before_submit=lambda x: None,
+                            sink_observation=lambda x: None, start_timeout=0.5, required_quote_symbols=required)
+                if ready:
+                    await self.port.start(lambda quote: None, lambda order: None)
+                    self.assertTrue(self.port.ready)
+                    await self.port.stop()
+                else:
+                    with self.assertRaisesRegex(t.TransportError, "readiness failed"):
+                        await self.port.start(lambda quote: None, lambda order: None)
+                    self.assertIn("start_not_ready", self.port.health["reasons"])
 
     async def test_snapshot_paginates_and_rejects_nonadvancing_page(self):
         page = [order(id=f"00000000-0000-0000-0000-{i:012d}", client_order_id=f"fixture-{i}") for i in range(500)]

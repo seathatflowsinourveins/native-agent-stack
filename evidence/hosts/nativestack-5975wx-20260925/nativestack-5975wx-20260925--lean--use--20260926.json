@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--lean--use--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "a74dd1b60ad5f055cee3e1489a490b7e6e6b056f",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "lean",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "L=\"$HOME/.local/share/codex-ecosystem/lean\"\nPIN=$(python3 -c \"import json,glob;print(sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')=='lean'})[0])\") || { echo \"LEAN_SOURCE_FAIL: no winner pin\"; exit 1; }\nSP=$(python3 -c \"import json;print([c['source_pin'] for c in json.load(open('manifests/stack.json'))['components'] if c['id']=='lean'][0])\") || { echo \"LEAN_SOURCE_FAIL: no stack source_pin\"; exit 1; }\nHEAD=$(git -C \"$L/Lean\" --no-optional-locks rev-parse HEAD) || { echo \"LEAN_SOURCE_FAIL: no LEAN source tree\"; exit 1; }\nURL=$(git -C \"$L/Lean\" --no-optional-locks remote get-url origin) || { echo \"LEAN_SOURCE_FAIL: no origin remote\"; exit 1; }\ngit -C \"$L/Lean\" --no-optional-locks apply --reverse --check \"$PWD/blueprints/us-equities/engine/patches/lean-dependencies.patch\" || { echo \"LEAN_SOURCE_FAIL: tracked changes are not the documented dependency patch\"; exit 1; }\nDIFF=$(git -C \"$L/Lean\" --no-optional-locks diff --name-only | sort | tr '\\n' ' ')\nEXP=$(printf '%s\\n' Compression/QuantConnect.Compression.csproj Messaging/QuantConnect.Messaging.csproj Tests/QuantConnect.Tests.csproj | sort | tr '\\n' ' ')\nSDKS=$(DOTNET_ROOT=\"$L/dotnet-10.0.401\" timeout 20 \"$L/dotnet-10.0.401/dotnet\" --list-sdks) || { echo \"LEAN_SOURCE_FAIL: pinned dotnet SDK did not run\"; exit 1; }\nif [ -n \"$PIN\" ] && [ \"$PIN\" = \"$SP\" ] && [ \"$HEAD\" = \"$PIN\" ] && [ \"$DIFF\" = \"$EXP\" ] && printf '%s\\n' \"$SDKS\" | grep -q '^10\\.0\\.401 ' && [ \"$URL\" = \"https://github.com/QuantConnect/Lean.git\" ]; then\n  echo \"LEAN_SOURCE_OK | source tree HEAD $HEAD == landscape winner pin == manifests/stack.json source_pin | origin $URL | tracked diff == the documented dependency patch | .NET SDK 10.0.401 listed\"\nelse\n  echo \"LEAN_SOURCE_FAIL | HEAD $HEAD | winner pin $PIN | stack source_pin $SP | origin $URL | diff $DIFF\"\n  exit 1\nfi\necho \"patched files: $DIFF| dotnet --list-sdks: $(printf '%s' \"$SDKS\" | tr '\\n' ';')\"",
+      "exit": 0,
+      "duration_s": 0.292,
+      "output_sha256": "fb38adcae0c797985c6f75767e9a1936163633c1dc521cdde2ef076b10478728",
+      "output_excerpt": "LEAN_SOURCE_OK | source tree HEAD 985ef30ad3ac774218c5ac516b4cb0aa2655730f == landscape winner pin == manifests/stack.json source_pin | origin https://github.com/QuantConnect/Lean.git | tracked diff == the documented dependency patch | .NET SDK 10.0.401 listed\npatched files: Compression/QuantConnect.Compression.csproj Messaging/QuantConnect.Messaging.csproj Tests/QuantConnect.Tests.csproj | dotnet"
+    },
+    {
+      "cmd": "W=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$W\"' EXIT\nL=\"$HOME/.local/share/codex-ecosystem/lean\"\nHEAD=$(git -C \"$L/Lean\" --no-optional-locks rev-parse HEAD) || { echo \"LEAN_BACKTEST_FAIL: no LEAN source tree\"; exit 1; }\n[ \"$HEAD\" = \"985ef30ad3ac774218c5ac516b4cb0aa2655730f\" ] || { echo \"LEAN_BACKTEST_FAIL: source HEAD $HEAD is not the winner pin\"; exit 1; }\nmkdir -p \"$W/run/tmp\" || exit 1\ncp -a \"$L/Lean/Launcher/bin/Debug\" \"$W/run/launcher\" || { echo \"LEAN_BACKTEST_FAIL: launcher copy failed\"; exit 1; }\ncd \"$W/run/launcher\" || exit 1\nrm -f BasicTemplateFrameworkAlgorithm-*.json BasicTemplateFrameworkAlgorithm-log.txt BasicTemplateFrameworkAlgorithm.json data-monitor-report-*.json succeeded-data-requests-*.txt failed-data-requests-*.txt log.txt || exit 1\nrm -rf BasicTemplateFrameworkAlgorithm || exit 1\ntimeout 40 bwrap --unshare-net --die-with-parent --clearenv --setenv HOME \"$W/run\" --setenv TMPDIR \"$W/run/tmp\" --setenv PATH /usr/bin:/bin --setenv DOTNET_ROOT \"$L/dotnet-10.0.401\" --setenv DOTNET_CLI_TELEMETRY_OPTOUT 1 --setenv DOTNET_NOLOGO 1 --ro-bind / / --dev /dev --proc /proc --bind \"$W\" \"$W\" --chdir \"$W/run/launcher\" \"$L/dotnet-10.0.401/dotnet\" QuantConnect.Lean.Launcher.dll --data-folder \"$L/Lean/Data/\" --close-automatically true < /dev/null > \"$W/run/stdout.txt\" 2> \"$W/run/stderr.txt\"\nrc=$?\npython3 - \"$L/Lean/Algorithm.CSharp/BasicTemplateFrameworkAlgorithm.cs\" \"$W/run/stdout.txt\" \"$W/run/stderr.txt\" \"$W/run/launcher/BasicTemplateFrameworkAlgorithm-order-events.json\" \"$rc\" \"$HEAD\" <<'PY'\nimport collections, json, os, re, sys\nsrc_path, out_path, err_path, events_path, rc, head = sys.argv[1:7]\nrc = int(rc)\nsrc = open(src_path).read()\nblock = src[src.index('ExpectedStatistics'):]\nblock = block[:block.index('};')]\nwant = dict(re.findall(r'\\{\"([^\"]+)\",\\s*\"([^\"]*)\"\\}', block))\nout = open(out_path).read() if os.path.isfile(out_path) else ''\nstderr_bytes = os.path.getsize(err_path) if os.path.isfile(err_path) else -1\ngot = {}\nfor line in out.splitlines():\n    if line.startswith('STATISTICS:: '):\n        body = line[13:]\n        keys = [k for k in want if body.startswith(k + ' ')]\n        if keys:\n            key = max(keys, key=len)\n            got[key] = body[len(key) + 1:]\nbad = {k: (want[k], got.get(k)) for k in want if got.get(k) != want[k]}\npoints = re.findall(r'Processing total of [0-9,]+ data points', out)\nevents = json.load(open(events_path)) if os.path.isfile(events_path) else []\ncounts = dict(collections.Counter(e['status'] for e in events))\nok = rc == 0 and stderr_bytes == 0 and bool(points) and bool(want) and not bad and len(events) == 6 and counts == {'submitted': 3, 'filled': 3}\nprint('LEAN_BACKTEST_' + ('OK' if ok else 'FAIL'), '| launcher exit', rc, '| stderr bytes', stderr_bytes, '| upstream ExpectedStatistics matched', len(want) - len(bad), 'of', len(want), '| Total Orders', got.get('Total Orders'), '| End Equity', got.get('End Equity'), '| OrderListHash', got.get('OrderListHash'), '| order events', len(events), counts)\nprint('engine source commit', head, '| data:', points[0] if points else 'no data-point line', '| mismatches', bad)\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 9.198,
+      "output_sha256": "5c12f1f172d0f3385140e5cb0c5d43319f9c2a7404a86000c63efd501039fc77",
+      "output_excerpt": "LEAN_BACKTEST_OK | launcher exit 0 | stderr bytes 0 | upstream ExpectedStatistics matched 28 of 28 | Total Orders 3 | End Equity 101655.30 | OrderListHash f209ed42701b0419858e0100595b40c0 | order events 6 {'submitted': 3, 'filled': 3}\nengine source commit 985ef30ad3ac774218c5ac516b4cb0aa2655730f | data: Processing total of 3,943 data points | mismatches {}\n"
+    },
+    {
+      "cmd": "W=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$W\"' EXIT\nL=\"$HOME/.local/share/codex-ecosystem/lean\"\nmkdir -p \"$W/empty-data\" \"$W/control/tmp\" || exit 1\ncp -a \"$L/Lean/Launcher/bin/Debug\" \"$W/control/launcher\" || { echo \"LEAN_EMPTY_DATA_CONTROL_FAIL: launcher copy failed\"; exit 1; }\ncd \"$W/control/launcher\" || exit 1\nrm -f BasicTemplateFrameworkAlgorithm-*.json BasicTemplateFrameworkAlgorithm-log.txt BasicTemplateFrameworkAlgorithm.json data-monitor-report-*.json succeeded-data-requests-*.txt failed-data-requests-*.txt log.txt || exit 1\nrm -rf BasicTemplateFrameworkAlgorithm || exit 1\ntimeout 40 bwrap --unshare-net --die-with-parent --clearenv --setenv HOME \"$W/control\" --setenv TMPDIR \"$W/control/tmp\" --setenv PATH /usr/bin:/bin --setenv DOTNET_ROOT \"$L/dotnet-10.0.401\" --setenv DOTNET_CLI_TELEMETRY_OPTOUT 1 --setenv DOTNET_NOLOGO 1 --ro-bind / / --dev /dev --proc /proc --bind \"$W\" \"$W\" --chdir \"$W/control/launcher\" \"$L/dotnet-10.0.401/dotnet\" QuantConnect.Lean.Launcher.dll --data-folder \"$W/empty-data/\" --close-automatically true < /dev/null > \"$W/control/stdout.txt\" 2> \"$W/control/stderr.txt\"\ncrc=$?\npython3 - \"$W/control/stdout.txt\" \"$W/control/stderr.txt\" \"$crc\" <<'PY'\nimport os, re, sys\nout_path, err_path, crc = sys.argv[1], sys.argv[2], int(sys.argv[3])\nhas_log = os.path.isfile(out_path) and os.path.getsize(out_path) > 0\nout = open(out_path).read() if has_log else ''\nerr = open(err_path).read() if os.path.isfile(err_path) else ''\nhashes = re.findall(r'STATISTICS:: OrderListHash ([0-9a-f]{32})', out)\nempty_md5 = 'd41d8cd98f00b204e9800998ecf8427e'\nreason = 'Unable to locate symbol properties file' in err\nok = has_log and crc == 1 and hashes == [empty_md5] and 'STATISTICS:: Total Orders' not in out and reason\nprint('LEAN_EMPTY_DATA_CONTROL_' + ('OK' if ok else 'FAIL'), '| launcher exit', crc, '(expected 1) | control stdout log bytes', os.path.getsize(out_path) if has_log else 0, '| OrderListHash', hashes, '(md5 of an empty order list is', empty_md5 + ') | Total Orders line present:', 'STATISTICS:: Total Orders' in out, '| stderr names the missing symbol properties database:', reason)\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 3.884,
+      "output_sha256": "98c77ae9a756809fd8c5eacad6aca7d5a1740cb970a45e85021db8b7cc2673d2",
+      "output_excerpt": "LEAN_EMPTY_DATA_CONTROL_OK | launcher exit 1 (expected 1) | control stdout log bytes 3470 | OrderListHash ['d41d8cd98f00b204e9800998ecf8427e'] (md5 of an empty order list is d41d8cd98f00b204e9800998ecf8427e) | Total Orders line present: False | stderr names the missing symbol properties database: True\n"
+    }
+  ],
+  "tool_versions": {
+    "lean": "985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+  },
+  "observed_at_utc": "2026-09-26T02:46:45Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), QuantConnect LEAN at the backtesting-engine winner pin 985ef30ad3ac774218c5ac516b4cb0aa2655730f runs a backtest and reproduces upstream's expected result. The on-host LEAN source tree HEAD equals the winner pin and the manifests/stack.json source_pin, its origin is https://github.com/QuantConnect/Lean.git, its only tracked changes are the documented dependency patch, and .NET SDK 10.0.401 is listed. A copy of the checkout's built launcher runs upstream's BasicTemplateFrameworkAlgorithm on LEAN's bundled data, with networking unshared, in a temporary directory: it exits 0 with empty stderr, processes 3,943 data points, matches all 28 of the algorithm's ExpectedStatistics (Total Orders 3, End Equity 101655.30, OrderListHash f209ed42701b0419858e0100595b40c0) and writes 6 order events, 3 submitted and 3 filled. A separate control run of the same launcher against an empty data folder writes its own log, exits 1 because the symbol properties database is missing, and reports the empty-order-list hash d41d8cd98f00b204e9800998ecf8427e with no Total Orders line (positive control). Every command exits 0 on its own assertions and exits non-zero as soon as one of its steps or checks fails.",
+  "limitations": [
+    "Replaces nativestack-5975wx-20260925--lean--use--20260925 as this host's latest LEAN use receipt. It is a new dated receipt, not a further generation: record --supersedes links generations only within one date, and the 2026-09-25 receipts stay unchanged. They still count in scripts/platform_status.py, which counts every independently agreed native_proven pass, unless a reviewer records needs_changes on them. The cross-family review of #281 found that its backtest command failed open: a failed primary run or statistics check fell through to the control section, where '! grep' succeeded on the missing control log and the final message exited 0. Reproduced: with the primary run's data folder missing, that exact command exits 0. Here the primary run (command 2) exits non-zero on any failed step or check, and the control (command 3) is a separate command that requires its own log, exit code 1 and the empty-order-list hash.",
+    "This is LEAN's own regression fixture (bundled 2013 SPY minute data), not a strategy backtest on this project's research data or a comparison with NautilusTrader.",
+    "It exercises the existing on-host build under Launcher/bin/Debug and does not rebuild LEAN. No build stamp ties the binaries to HEAD; the tie is functional, through the pinned source's own ExpectedStatistics.",
+    "Install source: a git checkout of https://github.com/QuantConnect/Lean.git at the pin under ~/.local/share/codex-ecosystem/lean/Lean with blueprints/us-equities/engine/patches/lean-dependencies.patch applied, and the .NET SDK under ~/.local/share/codex-ecosystem/lean/dotnet-10.0.401 (command 1). Recorded by the workstation coordinator Claude Code session, through a repair worker that shares its session id, from a git worktree at published origin/main (the catalog_revision).",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T02:46:45Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session. Reproduce: Re-ran once in a throwaway cp -a copy of the worktree via host_receipts.run_command. cmd1-cmd3 exit 0 with output sha256 identical to the recorded ones (28 of 28 ExpectedStatistics, OrderListHash f209ed42, 6 order events 3 submitted/3 filled; empty-data control exit 1 with d41d8cd9). Extra check: the LEAN checkout tracked diff has the same git patch-id --stable as blueprints/us-equities/engine/patches/lean-dependencies.patch (3 tracked files), confirming \"only tracked changes are the documented dependency patch\" beyond cmd1 reverse-check. Adequacy: (1) backtesting-engine: the pinned engine runs upstream BasicTemplateFrameworkAlgorithm on LEAN bundled data and reproduces upstream ExpectedStatistics; (2) positive control: a separate empty-data run exits 1 with the empty-order-list hash and the missing symbol-properties reason; retained controls 03/04 show the old fail-open and the new cmd2 exiting 1; (3) backed: all claims are in the excerpts; (4) bound: tool_versions 985ef30a pin_matches the winner and equals the stack source_pin. Class native_proven correct: upstream regression algorithm and data (LIM1). Fail-closed; sanitized; gitleaks clean.",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T06:15:14Z",
+      "reviewer": {
+        "identity_sha256": "f07a9dfbc09d23994b3810ea11bc96fd931f69f88b9e1b02d24261f4b8dcad04",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

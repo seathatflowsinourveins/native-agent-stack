@@ -1,0 +1,24 @@
+Exploration, not a receipt: DuckDB's upstream tests/fast in full (2026-09-26, about 05:05Z)
+
+Why: the data-pandera generation-2 receipt widened its selection to every importable tests/pandas file. This run
+checked whether the data-duckdb receipt could do the same with duckdb-python v1.5.5's whole tests/fast directory.
+
+Command: command 2 of nativestack-5975wx-20260925--data-duckdb--use--20260926-2, run the way
+scripts/host_receipts.py record runs commands (/bin/sh -c, worktree root), with three edits:
+  FILES="tests/fast" instead of the nine selected files;
+  pytest -rE added, so the error summary lists the failing test;
+  grep -E '^(ERROR|E  +fixture)' over the pytest log, printed after the exit code is captured.
+
+Result: exit 1 after 82 s. Output (sanitized with scripts/host_receipts.py sanitize()):
+
+E       fixture 'reraise' not found
+ERROR tests/fast/api/test_query_progress.py::TestQueryProgress::test_query_progress
+DUCKDB_UPSTREAM_TESTS_FAIL | pytest exit 1 | 1819 passed, 158 skipped, 7 xfailed, 1 error in 79.49s (0:01:19) | configfile ['pyproject.toml'] | duckdb-python v1.5.5 checkout b236c8194ed1 with external/duckdb at d8cdaa33fda8df955cc76ef58a280f68f4cd43fa | duckdb from sdk-py313: True
+skip reasons: {} | upstream files run unchanged: tests/fast | platform linux -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0 -- ~/.cache/uv/builds-v0/.tmpju5HMl/bin/python | configfile: pyproject.toml | duckdb/pytest 1.5.5 9.1.1
+
+Reading: 1 error, no failure. TestQueryProgress.test_query_progress requests the fixture 'reraise'. The
+pytest-reraise plugin provides it, and upstream's pyproject.toml lists that plugin in its [dependency-groups] test
+group (with pytest-timeout, adbc-driver-manager, polars, psutil and others); the receipt's overlay installs pytest
+9.1.1 only. Widening the selection would mean installing upstream's test group into the overlay and accounting for
+158 skips that this run does not itemize (-rE summarizes errors only). The data-duckdb generation-2 receipt
+therefore keeps generation 1's nine-file selection and its disclosed omissions.

@@ -1,0 +1,54 @@
+{
+  "backend_from_startup_log": {
+    "device_lines": [
+      "0.13.206.256 I cmn  common_param:   - MTL0    : Apple M5 Pro (53084 MiB, 53083 MiB free)",
+      "0.13.276.651 I llama_prepare_model_devices: using device MTL0 (Apple M5 Pro) (unknown id) - 53083 MiB free",
+      "0.13.328.764 I load_tensors: offloaded 25/25 layers to GPU"
+    ],
+    "layer_lines_assigned_to_cpu": 0,
+    "model_loads_in_log": 3,
+    "offload_lines": [
+      "offloaded 25/25 layers to GPU"
+    ]
+  },
+  "command": "python3 tools/adoption/embed_acceptance.py http://127.0.0.1:8232 evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json",
+  "host_id": "mac-coordinator-64gb-20260925",
+  "kind": "mac_embed_acceptance",
+  "launchd_before_step_1": [
+    {
+      "label": "local.agent-ecosystem.ai-memory",
+      "last_exit": 0,
+      "running": true
+    },
+    {
+      "label": "local.agent-ecosystem.maintenance",
+      "last_exit": 1,
+      "running": false
+    },
+    {
+      "label": "local.agent-ecosystem.ollama",
+      "last_exit": 0,
+      "running": true
+    },
+    {
+      "label": "local.agent-ecosystem.qdrant",
+      "last_exit": 0,
+      "running": true
+    }
+  ],
+  "model": {
+    "filename": "embeddinggemma-300M-Q8_0.gguf",
+    "repository": "ggml-org/embeddinggemma-300M-GGUF",
+    "revision": "0f741b5a6585bd53aeb15cd1372c56f2a0f65e12",
+    "sha256": "b5ce9d77a3fc4b3b39ccb5643c36777911cc4eb46a66962eadfa3f5f60490d63"
+  },
+  "result": {
+    "cosine": 0.999661109106148,
+    "dimension_actual": 768,
+    "dimension_expected": 768,
+    "passed": true,
+    "threshold": 0.99,
+    "url": "http://127.0.0.1:8232/v1/embeddings"
+  },
+  "service": "com.native-stack.llama-embed LaunchAgent (llama.cpp b11057 llama-server --embedding, port 8232)"
+}

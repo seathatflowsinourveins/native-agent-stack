@@ -1,0 +1,1 @@
+d=$(mktemp -d) && git clone --branch v3.16.1 --depth 1 https://github.com/campfirein/byterover-cli.git "$d/src" >/dev/null 2>&1 && cd "$d/src" && test "$(git rev-parse HEAD)" = "1f4609c18ca735810860b3ba9178cae2dd8a67b0" && DO_NOT_TRACK=1 npm ci --no-audit --no-fund >/dev/null 2>&1 && DO_NOT_TRACK=1 npm test >"$d/test.log" 2>&1; ec=$?; tail -6 "$d/test.log"; rm -rf "$d"; exit $ec

@@ -1,0 +1,260 @@
+#!/usr/bin/env python3
+"""Switch the two OmniRoute user units to new install prefixes, with capture, read-back and automatic rollback.
+
+Our integration script for a host operation, not an upstream tool. Values-free: it edits only the prefix segment of
+Environment=PATH= and ExecStart= and the Description= line of each unit, never prints or reads an EnvironmentFile,
+and reads only unit metadata, dist/BUILD_SHA and GET /api/health.
+
+  switch_gateways.py --prefix-20128 NAME --prefix-20129 NAME --desc-20128 TEXT --desc-20129 TEXT --dry-run
+  switch_gateways.py ... --apply [--restart-hindsight]
+  switch_gateways.py --only 20128 --prefix-20128 NAME --desc-20128 TEXT --dry-run    (one unit: the other unit and hindsight-live are
+                                                                                     neither written nor restarted)
+  switch_gateways.py --rollback SWITCH_DIR
+
+Order (the previous switch's recorded order): 20129, then (optionally) hindsight-live, then 20128. The first failed
+health or identity read-back rolls that unit back to its saved unit file and restarts it, then stops."""
+import argparse
+import datetime
+import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import urllib.request
+from pathlib import Path
+
+HOME = Path.home()
+TOOLS = HOME / ".local/share/codex-ecosystem/tools"
+UNIT_DIR = HOME / ".config/systemd/user"
+STATE = Path(os.environ.get("TOKENSAVE_STATE_DIR", str(HOME / ".local/state/native-agent-stack/omniroute-tokensave-20260929")))
+UNITS = {"20129": "omniroute-fw.service", "20128": "omniroute.service"}
+DROPIN = UNIT_DIR / "omniroute.service.d" / "20-codex-client-version.conf"
+DROPIN_SAVED = "dropin-20-codex-client-version.conf"
+VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
+# v1: the 2026-09-27 shim (no-match status 1 becomes 0); v2: 2026-09-30, answers the preflight query with status 2 so upstream's bind probe is the guard (see the shim text)
+SHIM_SHAS = {"b12c64614c54bc86bad8b5cd2778e04c50ae624f47b2d2d525d1a9edc00c8f56": "v1", "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854": "v2"}
+PREFIX_RE = re.compile(r"(/\.local/share/codex-ecosystem/tools|%h/\.local/share/codex-ecosystem/tools)/omniroute-[A-Za-z0-9._-]+")
+
+
+def now():
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def sh(*args, check=False):
+    result = subprocess.run(args, capture_output=True, text=True)
+    if check and result.returncode != 0:
+        raise SystemExit(f"FAILED {' '.join(args)[:120]}: {result.stderr.strip()[:200]}")
+    return result
+
+
+def private(path):
+    path.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(path, 0o700)
+    return path
+
+
+def health(port, timeout=90):
+    end = time.time() + timeout
+    last = "no response"
+    while time.time() < end:
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/health", timeout=5) as response:
+                body = json.loads(response.read())
+                if response.status == 200 and body.get("status") in ("ok", "healthy", "up", "pass", "passed", "OK"):
+                    return True, body.get("status")
+                last = f"status {response.status} {body.get('status')}"
+        except Exception as error:
+            last = type(error).__name__
+        time.sleep(2)
+    return False, last
+
+
+def unit_state(unit):
+    fields = dict(line.split("=", 1) for line in sh("systemctl", "--user", "show", unit, "-p", "ActiveState", "-p", "SubState", "-p", "MainPID", "-p", "NRestarts", "-p", "ExecMainStartTimestamp").stdout.splitlines() if "=" in line)
+    return fields
+
+
+def running_prefix(pid):
+    args = sh("ps", "-o", "args=", "-p", str(pid)).stdout
+    match = re.search(r"/tools/(omniroute-[A-Za-z0-9._-]+)/", args)
+    return match.group(1) if match else ""
+
+
+def build_sha(prefix):
+    path = TOOLS / prefix / "lib/node_modules/omniroute/dist/BUILD_SHA"
+    return path.read_text().strip() if path.exists() else ""
+
+
+def check_prefix(name):
+    problems = []
+    base = TOOLS / name
+    if not (base / "bin/omniroute").exists():
+        problems.append("missing bin/omniroute")
+    if not build_sha(name):
+        problems.append("missing dist/BUILD_SHA")
+    shim = base / "shim/lsof"
+    if not shim.exists():
+        problems.append("missing shim/lsof")
+    elif hashlib.sha256(shim.read_bytes()).hexdigest() not in SHIM_SHAS:
+        problems.append("shim/lsof sha256 is neither recorded shim (v1, v2)")
+    return problems
+
+
+def new_text(text, prefix, description, client_version=None):
+    changed = []
+    out = []
+    for line in text.splitlines(keepends=True):
+        if line.startswith("Description="):
+            new = f"Description={description}\n"
+        elif line.startswith("Environment=PATH=") or line.startswith("ExecStart="):
+            new = PREFIX_RE.sub(lambda m: m.group(1) + "/" + prefix, line)
+        elif client_version and line.startswith("Environment=CODEX_CLIENT_VERSION="):
+            new = f"Environment=CODEX_CLIENT_VERSION={client_version}\n"
+        else:
+            new = line
+        if new != line:
+            changed.append(line.split("=", 1)[0])
+        out.append(new)
+    return "".join(out), changed
+
+
+def dropin_body_ok(text, version):
+    """The drop-in must carry only comments, one [Service] header and the single client-version assignment."""
+    lines = [line for line in text.splitlines() if line.strip() and not line.lstrip().startswith("#")]
+    return lines == ["[Service]", f"Environment=CODEX_CLIENT_VERSION={version}"]
+
+
+def restore_dropin(directory):
+    saved = directory / DROPIN_SAVED
+    if saved.exists():
+        DROPIN.parent.mkdir(parents=True, exist_ok=True)
+        DROPIN.write_bytes(saved.read_bytes())
+        print("drop-in restored from", directory.name)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--prefix-20128")
+    parser.add_argument("--prefix-20129")
+    parser.add_argument("--desc-20128")
+    parser.add_argument("--desc-20129")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--restart-hindsight", action="store_true")
+    parser.add_argument("--client-version", help="rewrite Environment=CODEX_CLIENT_VERSION= in both units to this x.y.z")
+    parser.add_argument("--absorb-dropin", action="store_true", help="fold the peer's 20-codex-client-version drop-in into the 20128 unit: it must set exactly --client-version; removed in the same restart")
+    parser.add_argument("--only", choices=("20128", "20129"), help="switch only this port's unit; the other unit and hindsight-live are neither written nor restarted")
+    parser.add_argument("--rollback")
+    opts = parser.parse_args()
+    if opts.client_version and not VERSION_RE.match(opts.client_version):
+        raise SystemExit("--client-version must look like 0.159.1")
+    if opts.absorb_dropin and not opts.client_version:
+        raise SystemExit("--absorb-dropin needs --client-version")
+    if opts.only and opts.restart_hindsight:
+        raise SystemExit("--only leaves hindsight-live alone; drop --restart-hindsight")
+    if opts.only and opts.absorb_dropin and opts.only != "20128":
+        raise SystemExit("--absorb-dropin belongs to the 20128 unit")
+
+    if opts.rollback:
+        directory = Path(opts.rollback)
+        restored = []
+        for port in ("20128", "20129"):
+            saved = directory / UNITS[port]
+            if saved.exists():
+                (UNIT_DIR / UNITS[port]).write_bytes(saved.read_bytes())
+                restored.append(port)
+        restore_dropin(directory)
+        sh("systemctl", "--user", "daemon-reload", check=True)
+        for port in ("20129", "20128"):
+            if port in restored:   # a switch directory holds only the units that switch saved (one unit after --only)
+                sh("systemctl", "--user", "restart", UNITS[port])
+                print(port, "rollback health:", health(port))
+        return
+
+    want = {"20128": (opts.prefix_20128, opts.desc_20128), "20129": (opts.prefix_20129, opts.desc_20129)}
+    if opts.only:
+        want = {opts.only: want[opts.only]}
+    for port, (prefix, description) in want.items():
+        if not prefix or not description:
+            raise SystemExit(f"--prefix-{port} and --desc-{port} are required for the {port} unit")
+    untouched = [port for port in UNITS if port not in want]
+    for port in untouched:
+        state = unit_state(UNITS[port])
+        print(f"{port} {UNITS[port]}: NOT in scope; running {running_prefix(state.get('MainPID', '0'))} ({build_sha(running_prefix(state.get('MainPID', '0')))}) MainPID={state.get('MainPID')} NRestarts={state.get('NRestarts')}")
+    plan = {}
+    for port, (prefix, description) in want.items():
+        unit_path = UNIT_DIR / UNITS[port]
+        current = unit_path.read_text()
+        problems = check_prefix(prefix)
+        text, changed = new_text(current, prefix, description, opts.client_version)
+        state = unit_state(UNITS[port])
+        plan[port] = {"prefix": prefix, "problems": problems, "changed": changed, "text": text, "was": running_prefix(state.get("MainPID", "0")), "state": state}
+        shim_version = SHIM_SHAS.get(hashlib.sha256((TOOLS / prefix / "shim/lsof").read_bytes()).hexdigest(), "?") if (TOOLS / prefix / "shim/lsof").exists() else "none"
+        print(f"{port} {UNITS[port]}: running {plan[port]['was']} ({build_sha(plan[port]['was'])}) -> {prefix} ({build_sha(prefix) or '?'}, shim {shim_version}); lines changed: {changed}; prefix problems: {problems}")
+        extra = set(changed) - {"Description", "Environment", "ExecStart"}
+        if extra:
+            raise SystemExit(f"{port}: unexpected lines would change: {extra}")
+    if any(p["problems"] for p in plan.values()):
+        raise SystemExit("prefix problems; nothing changed")
+    if opts.dry_run or not opts.apply:
+        print("dry run: no unit file written, nothing restarted")
+        return
+
+    absorb = opts.absorb_dropin and DROPIN.exists()
+    if opts.absorb_dropin and not absorb:
+        print("no drop-in present; nothing to absorb")
+    if absorb:
+        body = DROPIN.read_text()
+        if not dropin_body_ok(body, opts.client_version):
+            raise SystemExit("drop-in content is not exactly the client-version assignment for " + opts.client_version + "; nothing changed")
+    directory = private(STATE / f"switch-{now()}")
+    for port in plan:
+        target = directory / UNITS[port]
+        target.write_bytes((UNIT_DIR / UNITS[port]).read_bytes())
+        os.chmod(target, 0o600)
+    if absorb:
+        saved = directory / DROPIN_SAVED
+        saved.write_bytes(DROPIN.read_bytes())
+        os.chmod(saved, 0o600)
+        print("saved drop-in sha256", hashlib.sha256(saved.read_bytes()).hexdigest()[:16])
+    print("saved prior unit files to", directory.name)
+    order = [port for port in ("20129", "20128") if port in plan]
+    done = []
+    for port in order:
+        if port == "20128" and opts.restart_hindsight:
+            sh("systemctl", "--user", "restart", "hindsight-live.service")
+            time.sleep(6)
+            print("hindsight-live restarted:", unit_state("hindsight-live.service").get("ActiveState"))
+        unit_path = UNIT_DIR / UNITS[port]
+        unit_path.write_text(plan[port]["text"])
+        if port == "20128" and absorb:
+            DROPIN.unlink()
+            try:
+                DROPIN.parent.rmdir()
+            except OSError:
+                pass
+            print("drop-in removed: the unit file now carries CODEX_CLIENT_VERSION=" + opts.client_version)
+        sh("systemctl", "--user", "daemon-reload", check=True)
+        sh("systemctl", "--user", "restart", UNITS[port])
+        ok, detail = health(port)
+        state = unit_state(UNITS[port])
+        now_prefix = running_prefix(state.get("MainPID", "0"))
+        identity = now_prefix == plan[port]["prefix"] and build_sha(now_prefix) == build_sha(plan[port]["prefix"])
+        print(f"{port}: health={ok} ({detail}) running prefix={now_prefix} identity_ok={identity} MainPID={state.get('MainPID')} NRestarts={state.get('NRestarts')}")
+        if not (ok and identity):
+            unit_path.write_bytes((directory / UNITS[port]).read_bytes())
+            restore_dropin(directory)
+            sh("systemctl", "--user", "daemon-reload", check=True)
+            sh("systemctl", "--user", "restart", UNITS[port])
+            print(f"{port}: ROLLED BACK; health after rollback:", health(port))
+            raise SystemExit(f"switch failed at {port}; earlier switched units: {done}; rollback dir {directory}")
+        done.append(port)
+    for port in untouched:
+        state = unit_state(UNITS[port])
+        print(f"{port} {UNITS[port]}: untouched; running {running_prefix(state.get('MainPID', '0'))} ({build_sha(running_prefix(state.get('MainPID', '0')))}) MainPID={state.get('MainPID')} NRestarts={state.get('NRestarts')}")
+    print("switched:", done, "| rollback dir:", str(directory))
+
+
+main()

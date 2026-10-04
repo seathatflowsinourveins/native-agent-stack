@@ -1,0 +1,6 @@
+16081 root files; {'MAPPING': 0, 'PHRASES': 0} [] | root paths matching ACCESS: 0 []
+packets/packet.md: ['WEB']
+packets/packet.sha256: clean
+prompts/claude-brief.txt: ['WEB']
+prompts/gpt6-prompt.txt: ['WEB']
+schemas/lane.json: clean

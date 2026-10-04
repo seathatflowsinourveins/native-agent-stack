@@ -1,0 +1,3 @@
+after (X5a and X5c applied); tools/token-report/token_manifest.py count_files, gpt-tokenizer 3.4.0 o200k_base
+examples/claude-native/CLAUDE.md bytes 8680 tokens 1757 words 1235 lines 48 sha256 a31b3551bb9be77f91a3ff841768bb30ef90d61a9870a657044df3b4e98f663a
+adoption/templates/codex.AGENTS.template.md bytes 3371 tokens 829 words 535 lines 49 sha256 dd2788672367552755285c8ef504985a6cfe66c228d675e395eeb02da48af6d3

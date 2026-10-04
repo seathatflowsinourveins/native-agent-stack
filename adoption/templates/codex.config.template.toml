@@ -1,12 +1,58 @@
-model = "gpt-6-astra"
+# User-selected native coordinator: Sol/Ultra (user decision 2026-09-30; routing record
+# docs/decisions/2026-09-30-sol-primary-quality-defaults.md). Ultra sends Sol's catalog multi-agent effort, xhigh,
+# and enables proactive delegation (openai/codex rust-v0.159.2 protocol/src/openai_models/reasoning_effort.rs
+# and models-manager/models.json). tools/adoption/render_config.py fills CODEX_MODEL from the platform's Codex pin:
+# gpt-6.1-sol from Codex 0.159.1, which added it to the bundled catalog (rust-v0.159.1 release notes), and gpt-6-astra
+# on an older pin (macOS 0.155.1), a model that client's catalog lists; --set CODEX_MODEL=<model> names another.
+model = "${CODEX_MODEL}"
 model_reasoning_effort = "ultra"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
 mcp_oauth_credentials_store = "file"
+# Live search in every sandbox. Without this key a read-only or workspace-write sandbox searches Codex's cached index
+# only, and only full access picks live (codex-rs/core/src/config/mod.rs L2659-2670 and L3050-3094 at rust-v0.157.1;
+# docs/harness-defaults.md, row 2026-09-26). A lane that must not browse passes -c web_search="disabled".
+web_search = "live"
+# The client is pinned (manifests/stack.json; evidence/receipts/codex-01592-qualification-20260930.json), so Codex
+# neither checks for updates nor prompts about them at startup: "Set to `false` only if your Codex updates are
+# centrally managed" (codex-rs/config/src/config_toml.rs L520-523).
+check_for_update_on_startup = false
 
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3
+# Generic children use Sol/Max: effort alone keeps the parent's model, while a model alone selects its catalog
+# default (low for Sol). Explicit spawn selections replace these defaults, then the selected role config applies,
+# preserving Astra judgment-role overrides (openai/codex rust-v0.159.2 core/src/agent/child_config.rs L62-73,
+# L204-249). Max sends API max and delegates only when asked; Ultra above sends xhigh and delegates proactively
+# (protocol/src/openai_models/reasoning_effort.rs and models-manager/models.json at the same pin). The child model is
+# the coordinator's CODEX_MODEL, so a pin before 0.159.1 runs gpt-6-astra children at max.
+default_subagent_model = "${CODEX_MODEL}"
+default_subagent_reasoning_effort = "max"
+
+# The skills catalog the model sees. Unset, Codex budgets it at 2% of the model's context window (5,440 tokens for the
+# 272,000-token window of gpt-6.1-sol and gpt-6-astra in models-manager/models.json) and at 8,000 characters only when
+# the window is unknown; a set value is capped at 10,000 tokens (codex-rs/ext/skills/src/render.rs L19-22 and L126-152
+# at rust-v0.159.2, L17-20 and L123-149 at rust-v0.157.1; the key is core/config.schema.json L4122-4127 at
+# rust-v0.159.2). The manifest's 24 catalog-visible skills render to about 11,100 bytes with a 28-character skills
+# root, which render.rs charges at about 2,790 tokens (each line and its newline at ceil(bytes / 4), L154-160 and L25),
+# so a fixed 6,000 leaves room for Codex's five .system skills and plugin skills on any model a child runs
+# (docs/decisions/2026-09-30-skills-llm-native-listing.md). Per-skill [[skills.config]] disables of manifest skills
+# stay out of this template: tools/adoption/install_skills.py --print-codex-config prints the manifest's, each keyed by
+# the installed SKILL.md path (adoption/skills/lifecycle.md). The one rule below turns off Codex's bundled
+# skill-installer by its path, so skills reach a host only through that installer (wave-2 skills ruling, 2026-10-03;
+# a path rule names one skill, a name rule every skill of the name: codex-rs/config/src/skills_config.rs at
+# rust-v0.160.0). Rules for an account's remote plugin skills are per account and are not in this template.
+# The path is relative on purpose: Codex installs its bundled skills in <Codex home>/skills/.system
+# (codex-rs/skills/src/lib.rs L62-69) and resolves a relative path in config.toml against the folder that file is in,
+# which for this file is the Codex home, CODEX_HOME or else ~/.codex (config/src/loader/mod.rs L557, L573-582 and
+# L1424-1445; utils/absolute-path/src/lib.rs L392-405; the same functions at rust-v0.159.3 and rust-v0.155.1).
+[skills]
+max_context_tokens = 6000
+
+[[skills.config]]
+path = "skills/.system/skill-installer/SKILL.md"
+enabled = false
 
 # User scope, so every worktree Codex is launched from inherits these servers without a project-local
 # .codex/config.toml (docs/decisions/2026-09-25-codex-mcp-scope.md). serena and socraticode take no
@@ -14,8 +60,9 @@ max_concurrent_threads_per_session = 3
 # ai-memory's registration carries no project: its workspace/project scoping is a per-call argument.
 # headroom, codebase-memory and qmd mirror the Claude user-scope set: headroom's dead proxy URL means
 # it reroutes no model traffic, codebase-memory indexes only on an explicit index_repository call,
-# and qmd serves the named catalog index. jcodemunch stays project-scoped (#240) and context-mode comes
-# from its plugin; see project.codex.config.template.toml.
+# and qmd serves the named catalog index. jcodemunch stays project-scoped (#240). context-mode's plugin
+# supplies its hooks and skills, while its MCP server is registered below, bound to each session's own
+# directory; see project.codex.config.template.toml.
 [mcp_servers.serena]
 command = "${ECO_ROOT}/bin/serena"
 args = ["start-mcp-server", "--transport", "stdio", "--project-from-cwd", "--context", "codex", "--enable-web-dashboard", "true", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
@@ -25,12 +72,20 @@ startup_timeout_sec = 60
 RTK_TELEMETRY_DISABLED = "1"
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 
+# Registered is not callable under approval_policy = "never". A tool without MCP annotations needs approval in Codex's
+# default mode, and a never policy turns that into "MCP tool call requires approval, but approval policy is never"
+# (codex-rs/core/src/mcp_tool_call.rs L2436-2466 and L1610-1614 at rust-v0.157.1). ai-memory, SocratiCode and
+# Headroom declare none, so every call to them is refused unless configuration approves it: the stack-worker profile
+# (codex.stack-worker.config.toml) approves their read tools for workers, and sessions without that profile keep the
+# refusals (docs/decisions/2026-09-26-codex-worker-lane.md, decision 5). The new WSL distribution's approval of
+# ai-memory's tools is not in this shared template: adoption/new-wsl/templates/codex.config.additions.toml carries it,
+# and only tools/adoption/new_wsl_client_config.py reads that file, with --with-authorization-settings.
 [mcp_servers.ai-memory]
 url = "http://${AI_MEMORY_URL}/mcp"
 
 [mcp_servers.socraticode]
 command = "${ECO_ROOT}/bin/node"
-args = ["${ECO_ROOT}/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"]
+args = ["${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/lib/node_modules/socraticode/dist/index.js"]
 startup_timeout_sec = 120
 
 [mcp_servers.socraticode.env]
@@ -47,6 +102,9 @@ EMBEDDING_QUERY_PREFIX = "query: "
 EMBEDDING_DOCUMENT_PREFIX = "passage: "
 EMBEDDING_DOCUMENT_INCLUDE_PATH = "true"
 RESPECT_GITIGNORE = "true"
+# SocratiCode's own default: files and directories whose names start with "." are not indexed (README.md L1579 at
+# v1.14.0, the same at v1.15.0), so .github/, .claude/, .codex/ and dotfiles never come back from codebase_search.
+# Read those files directly; indexing them is a separate, measured change of scope.
 INCLUDE_DOT_FILES = "false"
 SOCRATICODE_WATCHER = "auto"
 SEARCH_DEFAULT_LIMIT = "3"
@@ -56,10 +114,16 @@ command = "${ECO_ROOT}/bin/headroom"
 args = ["mcp", "serve", "--proxy-url", "http://127.0.0.1:1"]
 
 # headroom-ai 0.37.0 turns its usage beacon on by default (telemetry/beacon.py BEACON_DEFAULT_ON).
-# HEADROOM_OFFLINE is its master no-egress switch (offline.py): beacon, update check, usage reporter and
-# model downloads off. DO_NOT_TRACK also disables the beacon if a later release renames that switch.
+# HEADROOM_OFFLINE is its master no-egress switch (offline.py) for the beacon, update check and usage
+# reporter. Its model-download half, apply_offline_env(), runs only at proxy startup (proxy/server.py),
+# never in `headroom mcp serve` (cli/mcp.py), so the two variables it would set are set here:
+# huggingface_hub and transformers then make no Hub request, so a compress call on a cold cache (Kompress,
+# where it is installed) cannot download a model. DO_NOT_TRACK also disables the beacon if a later release
+# renames that switch.
 [mcp_servers.headroom.env]
 HEADROOM_OFFLINE = "1"
+HF_HUB_OFFLINE = "1"
+TRANSFORMERS_OFFLINE = "1"
 DO_NOT_TRACK = "1"
 
 [mcp_servers.codebase-memory]
@@ -69,26 +133,47 @@ command = "${ECO_ROOT}/bin/codebase-memory-mcp"
 command = "${ECO_ROOT}/bin/qmd"
 args = ["--index", "native-agent-stack-catalog", "mcp"]
 
-[projects."${HOME}/codex-ecosystem/validation/native-codex"]
-trust_level = "trusted"
+# context-mode's plugin server (.codex-plugin/mcp.json: `node ./start.mjs`, cwd ".") starts in the plugin
+# root, because Codex joins a plugin server's relative cwd to that root. Upstream start.mjs then sets no
+# CONTEXT_MODE_PROJECT_DIR, and the server takes its project from the newest Codex session log, so with two
+# concurrent sessions one runs ctx_execute shell commands in the other's worktree. This entry has no cwd:
+# Codex starts it in the session's own directory, and the same upstream start.mjs, from the pinned npm
+# install, binds CONTEXT_MODE_PROJECT_DIR to that directory. The plugin's own server is turned off under
+# [plugins."context-mode@context-mode"] below; its hooks and skills stay on. Approval mode and platform are
+# the plugin manifest's own. See docs/decisions/2026-09-25-codex-mcp-scope.md, addendum 2026-09-26. Interim:
+# drop this entry once upstream binds a Codex session to its own directory. tools/adoption/apply_codex_lane.py
+# writes exactly this entry to an existing host through Codex's config writer.
+[mcp_servers.context-mode]
+command = "${ECO_ROOT}/bin/node"
+args = ["${ECO_ROOT}/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"]
+startup_timeout_sec = 60
+default_tools_approval_mode = "approve"
 
-[projects."${HOME}/codex-ecosystem/validation/native-codex-20260918T222103Z"]
-trust_level = "trusted"
+[mcp_servers.context-mode.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+CONTEXT_MODE_PLATFORM = "codex"
 
+# Trust lets Codex load a project's own .codex/config.toml, which is otherwise loaded but disabled; for a linked
+# worktree Codex looks the trust up under its main checkout (codex-rs/config/src/loader/mod.rs L131-133 and
+# L1041-1084; git-utils/src/trust.rs L9-16). Four dated validation directories this list used to trust were removed:
+# none exists on the recording host, and nothing else in this catalog names them.
 [projects."${PROJECT_ROOT}"]
-trust_level = "trusted"
-
-[projects."${HOME}/codex-ecosystem/validation/native-paired-20260918-v2/source"]
-trust_level = "trusted"
-
-[projects."${HOME}/codex-ecosystem/state/gap-resolution-20260919/deerflow/run-1/runtime/acp-workspace"]
 trust_level = "trusted"
 
 [projects."${HOME}/code/native-agent-stack-publication"]
 trust_level = "trusted"
 
+# Codex's startup notice for a newly available model, seeded as already shown its maximum number of times so a host set
+# up from this template does not show it. At openai/codex rust-v0.160.0 (a956835d020762cb2b570053af06f643a11c0ecc) the
+# table is a map of model slug to a u32 show count (codex-rs/config/src/types.rs L789-795, the [tui] field at L940-942);
+# the TUI shows a model's notice only while its count is below MODEL_AVAILABILITY_NUX_MAX_SHOW_COUNT = 4
+# (tui/src/app/startup_prompts.rs L242 and L250-266) and writes the count back one higher per showing (L281-305). At
+# that tag the bundled catalog's one notice is gpt-6.1-sol's (models-manager/models.json L178 and L245-247). The slug
+# has a dot, so its key is quoted.
 [tui.model_availability_nux]
 gpt-6-astra = 4
+"gpt-6.1-sol" = 4
 
 [hooks.state]
 
@@ -125,6 +210,7 @@ trusted_hash = "sha256:00dc3791bfd4ae0b46c43cb8ee8a391b6da63e5b7690cebfe1bd59cf8
 [hooks.state."${HOME}/.codex/hooks.json:session_start:0:0"]
 trusted_hash = "sha256:6994cf4fb1fc4534ee5efb35367f0f85b3bcd5fb3e200b0b3fd73c9d337397cc"
 
+
 [hooks.state."${HOME}/.codex/hooks.json:session_end:0:0"]
 trusted_hash = "sha256:9a190d2120d2c9dd8dcb4adfb956379e2bfc9d74435eaea9262b22a31b5649fd"
 
@@ -141,8 +227,34 @@ source = "https://github.com/mksglu/context-mode.git"
 [plugins."context-mode@context-mode"]
 enabled = true
 
+# Replaced by the session-bound [mcp_servers.context-mode] above.
+[plugins."context-mode@context-mode".mcp_servers.context-mode]
+enabled = false
+
 [features]
 hooks = true
+# 0.157.x otherwise copies itself into CODEX_HOME/packages/app-server-daemon on its first interactive launch and
+# starts a self-updating background app-server outside the pinned prefix
+# (evidence/receipts/codex-01571-qualification-20260926.json); 0.155.1 accepts the key.
+# Changed after `v2026.09.26.2` (the key is absent at that tag).
+daemon_auto_start = false
+# The shell snapshot (stable, on by default: codex-rs/features/src/lib.rs L1007-1012 at rust-v0.157.1) writes every
+# exported variable, secrets included, into CODEX_HOME/shell_snapshots (shell-command/src/shell_snapshot_exports.rs);
+# the landscape sweep's GPT-6 probe found a provider key there in a 0644 file (tools/sota-convergence/landscape-sweep/
+# README.md). Without it each command runs as `shell -lc`, the same login shell the snapshot would have captured
+# (core/src/tools/runtimes/mod.rs L268-276), at the cost of starting that shell per command.
+shell_snapshot = false
+
+# Notify only when Codex needs a decision: an approval (approval-requested), a plan-mode prompt or a `request_user_input` question (both
+# reported as plan-mode-prompt, tui/src/chatwidget/tool_requests.rs L449-458 at rust-v0.155.1 and rust-v0.157.1) or an asynchronous question
+# (async-question, added after 0.155.1, so inert at the macOS pin). `agent-turn-complete` (a finished turn) is left out on purpose. The list
+# is plain strings, so a misspelled kind loads cleanly and never notifies; the kinds are type_name() in
+# codex-rs/tui/src/chatwidget/notifications.rs. The channel stays Codex's own per-terminal `auto` (docs/decisions/2026-09-28-terminal-experience.md).
+[tui]
+notifications = ["approval-requested", "plan-mode-prompt", "async-question"]
+# The footer's items, set explicitly because Codex's default footer shows no usage (wave-2 usage ruling, the statusline
+# row of the definitive manifest; item names from codex-rs/tui/src/bottom_pane/status_line_setup.rs at rust-v0.160.0).
+status_line = ["model-with-reasoning", "project-name", "git-branch", "context-used", "five-hour-limit", "weekly-limit"]
 
 # Local ecosystem observation; content is removed before collector persistence.
 [otel]
@@ -159,7 +271,9 @@ max_bytes = 0
 [analytics]
 enabled = true
 
-# Native WSL defaults; regenerate PATH when adopting another host/runtime.
+# Native WSL defaults; regenerate PATH when adopting another host/runtime. The new WSL distribution's
+# `inherit = "none"` and the rest of its set table are in adoption/new-wsl/templates/codex.config.additions.toml, which
+# only tools/adoption/new_wsl_client_config.py reads (docs/secret-storage.md, Codex, describes the practice for any host).
 [shell_environment_policy.set]
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 RTK_TELEMETRY_DISABLED = "1"

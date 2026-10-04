@@ -20,6 +20,7 @@ import hashlib
 from datetime import datetime, timezone
 from decimal import Decimal
 import importlib.metadata
+import inspect
 from pathlib import Path
 import re
 import sys
@@ -688,6 +689,40 @@ class AlpacaExecutionClient(ExecutionClient):
         limit = self._terminal_limit(prior)
         if limit is not None and any(execution["cum"] > limit for execution, _ in executions):
             raise ValueError("post_terminal_fill_requires_reconciliation")
+        sink_observation = getattr(self.session.port, "sink_observation", None)
+        if sink_observation is not None:
+            # Use the same hook as AlpacaPaperTransport._observe_locked. Validate
+            # the whole prefix before persisting any of it; FILL activities bypass
+            # the normal observation path and must precede native fill callbacks.
+            covered = Decimal(0)
+            for execution, _ in executions:
+                cum = execution["cum"]
+                if cum - execution["qty"] != covered:
+                    raise ValueError("fill_activity_ledger_incomplete")
+                covered = cum
+            if covered < target and self._covered(prior, target) < target:
+                raise ValueError("fill_gap_unresolved_after_activities")
+            notional = Decimal(0)
+            for execution, stamp in executions:
+                cum = execution["cum"]
+                notional += execution["qty"] * execution["price"]
+                status = "filled" if cum == dec(str(order.quantity)) else "partially_filled"
+                if limit is not None and cum == limit:
+                    status = prior["terminal"] or prior["pending_terminal"][0]
+                # Retain reported averages where available; Alpaca reports new ones
+                # to six decimals. Exact execution prices drive ledger accounting.
+                average = prior["averages"].get(cum, (notional / cum).quantize(Decimal("0.000001")))
+                result = sink_observation({"client_order_id": cid, "id": prior["id"], "status": status,
+                    "filled_qty": str(cum), "filled_avg_price": str(average), "updated_at_ns": stamp,
+                    # https://docs.alpaca.markets/docs/account-activities:
+                    # FILL transaction_time is the
+                    # execution time. Preserve its integer ns through the sink.
+                    "execution_time_ns": stamp,
+                    "event": "fill" if status == "filled" else "partial_fill",
+                    "execution_id": execution["trade_id"], "event_qty": str(execution["qty"]),
+                    "event_price": str(execution["price"])})
+                if inspect.isawaitable(result):
+                    await result
         for execution, stamp in executions:
             if self._book(order, prior, execution, broker_id, stamp):
                 self.session.execution_stats["activity_executions_booked"] += 1
@@ -845,7 +880,28 @@ class AlpacaExecutionClient(ExecutionClient):
             if prior is None:
                 ins, qty, filled, avg = self._normalized(row)
                 prior = self._new_state(row["id"])
+                sink_observation = getattr(self.session.port, "sink_observation", None)
+                notional = Decimal(0)
                 for execution in await self._adopted_executions(row):
+                    cum = execution["cum"]
+                    notional += execution["qty"] * execution["price"]
+                    if sink_observation is not None:
+                        # NautilusTrader 2.0.0rc5 installed contract:
+                        # live/clients.py:_generate_fill_reports and model/__init__.pyi:
+                        # FillReport(trade_id, last_qty, last_px), ExecutionMassStatus.add_fill_reports.
+                        # Reconciliation consumes these per-execution reports; persist them
+                        # through the same observation hook as activity recovery before
+                        # exposing them to native reconciliation (or caching booking state).
+                        average = avg if cum == filled else (notional / cum).quantize(Decimal("0.000001"))
+                        status = row["status"] if cum == filled else "partially_filled"
+                        result = sink_observation(dict(row, status=status, filled_qty=str(cum),
+                            filled_avg_price=str(average), updated_at_ns=execution["ts"],
+                            execution_time_ns=execution["ts"],  # FILL transaction_time, not startup order.updated_at
+                            event="fill" if status == "filled" else "partial_fill",
+                            execution_id=execution["trade_id"], event_qty=str(execution["qty"]),
+                            event_price=str(execution["price"])))
+                        if inspect.isawaitable(result):
+                            await result
                     prior["executions"][execution["cum"]] = {"qty": execution["qty"], "price": execution["price"],
                                                              "trade_id": execution["trade_id"], "source": "activity",
                                                              "ts": execution["ts"]}

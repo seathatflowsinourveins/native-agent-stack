@@ -1,0 +1,892 @@
+{
+ "rows": 27,
+ "included": 27,
+ "excluded": [],
+ "grader_mismatches": 0,
+ "per_arm": {
+  "0": {
+   "n": 9,
+   "excluded": 0,
+   "counts": {
+    "correct": 9,
+    "answered": 9,
+    "no_builtin_skill": 9,
+    "loaded_schema": 5,
+    "executed_target": 3,
+    "cli_diagnostic": 0,
+    "asks_user": 0,
+    "names_command": 9
+   },
+   "by_case": {
+    "correct": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "answered": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "no_builtin_skill": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "loaded_schema": {
+     "K1": 3,
+     "K2": 2,
+     "K3": 0
+    },
+    "executed_target": {
+     "K1": 3,
+     "K2": 0,
+     "K3": 0
+    },
+    "cli_diagnostic": {
+     "K1": 0,
+     "K2": 0,
+     "K3": 0
+    },
+    "asks_user": {
+     "K1": 0,
+     "K2": 0,
+     "K3": 0
+    },
+    "names_command": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    }
+   },
+   "median_turns": 4,
+   "median_duration_s_after_first": 22.8875,
+   "median_cost_usd_after_first": 0.1308,
+   "sum_cost_usd": 1.7699
+  },
+  "c": {
+   "n": 9,
+   "excluded": 0,
+   "counts": {
+    "correct": 9,
+    "answered": 9,
+    "no_builtin_skill": 9,
+    "loaded_schema": 9,
+    "executed_target": 6,
+    "cli_diagnostic": 0,
+    "asks_user": 0,
+    "names_command": 8
+   },
+   "by_case": {
+    "correct": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "answered": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "no_builtin_skill": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "loaded_schema": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "executed_target": {
+     "K1": 3,
+     "K2": 0,
+     "K3": 3
+    },
+    "cli_diagnostic": {
+     "K1": 0,
+     "K2": 0,
+     "K3": 0
+    },
+    "asks_user": {
+     "K1": 0,
+     "K2": 0,
+     "K3": 0
+    },
+    "names_command": {
+     "K1": 2,
+     "K2": 3,
+     "K3": 3
+    }
+   },
+   "median_turns": 4,
+   "median_duration_s_after_first": 25.1425,
+   "median_cost_usd_after_first": 0.1678,
+   "sum_cost_usd": 2.067
+  },
+  "g": {
+   "n": 9,
+   "excluded": 0,
+   "counts": {
+    "correct": 9,
+    "answered": 9,
+    "no_builtin_skill": 9,
+    "loaded_schema": 9,
+    "executed_target": 6,
+    "cli_diagnostic": 0,
+    "asks_user": 0,
+    "names_command": 6
+   },
+   "by_case": {
+    "correct": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "answered": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "no_builtin_skill": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "loaded_schema": {
+     "K1": 3,
+     "K2": 3,
+     "K3": 3
+    },
+    "executed_target": {
+     "K1": 3,
+     "K2": 0,
+     "K3": 3
+    },
+    "cli_diagnostic": {
+     "K1": 0,
+     "K2": 0,
+     "K3": 0
+    },
+    "asks_user": {
+     "K1": 0,
+     "K2": 0,
+     "K3": 0
+    },
+    "names_command": {
+     "K1": 0,
+     "K2": 3,
+     "K3": 3
+    }
+   },
+   "median_turns": 5,
+   "median_duration_s_after_first": 31.8625,
+   "median_cost_usd_after_first": 0.2628,
+   "sum_cost_usd": 2.4542
+  }
+ },
+ "fisher": {
+  "0-c:correct": {
+   "table": [
+    [
+     9,
+     0
+    ],
+    [
+     9,
+     0
+    ]
+   ],
+   "p_two_sided": 1.0
+  },
+  "0-c:no_builtin_skill": {
+   "table": [
+    [
+     9,
+     0
+    ],
+    [
+     9,
+     0
+    ]
+   ],
+   "p_two_sided": 1.0
+  },
+  "0-g:correct": {
+   "table": [
+    [
+     9,
+     0
+    ],
+    [
+     9,
+     0
+    ]
+   ],
+   "p_two_sided": 1.0
+  },
+  "0-g:no_builtin_skill": {
+   "table": [
+    [
+     9,
+     0
+    ],
+    [
+     9,
+     0
+    ]
+   ],
+   "p_two_sided": 1.0
+  },
+  "c-g:correct": {
+   "table": [
+    [
+     9,
+     0
+    ],
+    [
+     9,
+     0
+    ]
+   ],
+   "p_two_sided": 1.0
+  },
+  "c-g:no_builtin_skill": {
+   "table": [
+    [
+     9,
+     0
+    ],
+    [
+     9,
+     0
+    ]
+   ],
+   "p_two_sided": 1.0
+  }
+ },
+ "runs": [
+  {
+   "arm": "g",
+   "case": "K1",
+   "transcript": "20260928T022359Z-1137529.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": false,
+   "calls": [
+    "ToolSearch",
+    "mcp__socraticode__codebase_list_projects",
+    "mcp__socraticode__codebase_status"
+   ],
+   "turns": 4,
+   "duration_ms": 15187,
+   "cost_usd": 0.3193956,
+   "final_head": "Yes, the socraticode MCP server is active in this session. Its tools loaded and two read-only calls to it returned results.\n\n- **Tools are listed:** 26 `mcp__socraticode__*` tools appear in this session's deferred-tool list, from `codebase_"
+  },
+  {
+   "arm": "c",
+   "case": "K1",
+   "transcript": "20260928T022414Z-1142940.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "mcp__socraticode__codebase_list_projects",
+    "mcp__socraticode__codebase_status"
+   ],
+   "turns": 4,
+   "duration_ms": 14865,
+   "cost_usd": 0.316406,
+   "final_head": "Yes, the socraticode MCP server is active in this session. I loaded two of its tools and called them, and both returned live answers.\n\n1. **Tools are registered:** the session's tool list includes 24 socraticode tools, from `codebase_about`"
+  },
+  {
+   "arm": "0",
+   "case": "K1",
+   "transcript": "20260928T022429Z-1151282.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "mcp__socraticode__codebase_list_projects",
+    "mcp__socraticode__codebase_status"
+   ],
+   "turns": 4,
+   "duration_ms": 17043,
+   "cost_usd": 0.32274680000000006,
+   "final_head": "Yes. The socraticode MCP server is connected and answering tool calls in this session.\n\n1. **The session lists its tools.** The system reminder lists 29 `mcp__socraticode__*` tools, such as `codebase_search`, `codebase_status` and `codebase"
+  },
+  {
+   "arm": "g",
+   "case": "K1",
+   "transcript": "20260928T022446Z-1155075.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": false,
+   "calls": [
+    "ToolSearch",
+    "mcp__socraticode__codebase_health",
+    "mcp__socraticode__codebase_status",
+    "mcp__socraticode__codebase_list_projects"
+   ],
+   "turns": 5,
+   "duration_ms": 24190,
+   "cost_usd": 0.3324818,
+   "final_head": "Yes. The socraticode MCP server is running in this session, and I called its tools rather than just seeing them listed.\n\n- **Listed:** The session's list of available tools includes 27 `mcp__socraticode__*` tools, such as `codebase_search`,"
+  },
+  {
+   "arm": "c",
+   "case": "K1",
+   "transcript": "20260928T022511Z-1161048.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": false,
+   "calls": [
+    "ToolSearch",
+    "mcp__socraticode__codebase_status"
+   ],
+   "turns": 3,
+   "duration_ms": 11503,
+   "cost_usd": 0.0497236,
+   "final_head": "Yes. The socraticode MCP server is connected and responding in this session.\n\n- **Its tools are registered:** the session's list of available tools includes about 30 `mcp__socraticode__*` tools, such as `codebase_search`, `codebase_status` "
+  },
+  {
+   "arm": "0",
+   "case": "K1",
+   "transcript": "20260928T022523Z-1164248.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "mcp__socraticode__codebase_list_projects",
+    "mcp__socraticode__codebase_status"
+   ],
+   "turns": 4,
+   "duration_ms": 17727,
+   "cost_usd": 0.3179934,
+   "final_head": "Yes. The socraticode MCP server is connected and answering in this session.\n\n**Evidence:**\n\n1. **Its tools are registered.** The session's deferred-tool list includes 28 `mcp__socraticode__*` tools, such as `codebase_search`, `codebase_stat"
+  },
+  {
+   "arm": "g",
+   "case": "K1",
+   "transcript": "20260928T022541Z-1172140.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": false,
+   "calls": [
+    "ToolSearch",
+    "mcp__socraticode__codebase_list_projects",
+    "mcp__socraticode__codebase_status"
+   ],
+   "turns": 4,
+   "duration_ms": 14983,
+   "cost_usd": 0.061237400000000004,
+   "final_head": "Yes. The socraticode MCP server is active in this session: I loaded its tools and two read-only calls to it returned results.\n\n- **Its tools are registered here.** All 25 `mcp__socraticode__*` tools appear in this session's deferred-tool li"
+  },
+  {
+   "arm": "c",
+   "case": "K1",
+   "transcript": "20260928T022556Z-1180183.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "mcp__socraticode__codebase_list_projects"
+   ],
+   "turns": 3,
+   "duration_ms": 12714,
+   "cost_usd": 0.0520288,
+   "final_head": "Yes, socraticode is active in this session.\n\n- **Tools are registered:** the session lists 26 `mcp__socraticode__*` tools as deferred. Loading `codebase_status` and `codebase_list_projects` returned their full schemas from the server.\n- **T"
+  },
+  {
+   "arm": "0",
+   "case": "K1",
+   "transcript": "20260928T022609Z-1187549.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "mcp__socraticode__codebase_list_projects",
+    "mcp__socraticode__codebase_status"
+   ],
+   "turns": 4,
+   "duration_ms": 16396,
+   "cost_usd": 0.0657416,
+   "final_head": "**Yes.** The socraticode MCP server is connected in this session and answered live tool calls.\n\n1. **Its tools are registered.** The session's deferred-tool list has 26 `mcp__socraticode__*` tools, from `codebase_about` to `codebase_watch`."
+  },
+  {
+   "arm": "g",
+   "case": "K2",
+   "transcript": "20260928T022626Z-1201189.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "Bash"
+   ],
+   "turns": 3,
+   "duration_ms": 22641,
+   "cost_usd": 0.3683056,
+   "final_head": "**No.** The GitHub MCP server isn't active in this session, and I found no configuration for it.\n\n- **No GitHub tools loaded:** the session's deferred tool list has no `mcp__github__*` names. A tool search for \"github\" returned only built-i"
+  },
+  {
+   "arm": "c",
+   "case": "K2",
+   "transcript": "20260928T022649Z-1210454.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "Bash"
+   ],
+   "turns": 3,
+   "duration_ms": 25979,
+   "cost_usd": 0.3769922,
+   "final_head": "**No.** There is no GitHub MCP server running in this session.\n\n- **No GitHub tools are loaded.** None of this session's tools come from a server called `github`. The MCP tools that are present come from these servers: `ai-memory`, `codebas"
+  },
+  {
+   "arm": "0",
+   "case": "K2",
+   "transcript": "20260928T022715Z-1220695.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": false,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "Bash",
+    "Bash!",
+    "Bash"
+   ],
+   "turns": 4,
+   "duration_ms": 30697,
+   "cost_usd": 0.3817244,
+   "final_head": "No. The GitHub MCP server isn't active in this session.\n\n1. **No GitHub tools are loaded.** The session's tool list has MCP tools from nine servers: `ai-memory`, `codebase-memory`, `headroom`, `jcodemunch`, `qmd`, `serena`, `socraticode`, `"
+  },
+  {
+   "arm": "g",
+   "case": "K2",
+   "transcript": "20260928T022746Z-1230887.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "Bash",
+    "ToolSearch",
+    "Bash"
+   ],
+   "turns": 5,
+   "duration_ms": 31191,
+   "cost_usd": 0.19304259999999998,
+   "final_head": "**No.** No GitHub MCP server is active in this session.\n\n- **No tools in the session:** The deferred-tool list has no `mcp__github__*`, `mcp__plugin_*github*` or `mcp__claude_ai_*` tools. I searched ToolSearch for `github` and then for tool"
+  },
+  {
+   "arm": "c",
+   "case": "K2",
+   "transcript": "20260928T022817Z-1237326.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "ToolSearch",
+    "Bash"
+   ],
+   "turns": 4,
+   "duration_ms": 23145,
+   "cost_usd": 0.1986908,
+   "final_head": "**No.** Nothing in this session shows a GitHub MCP server as active.\n\n- **No GitHub tools are loaded.** The MCP tools available here come from eight servers: `ai-memory`, `codebase-memory`, `headroom`, `jcodemunch`, `context-mode` (a plugin"
+  },
+  {
+   "arm": "0",
+   "case": "K2",
+   "transcript": "20260928T022841Z-1241960.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "Bash",
+    "Bash"
+   ],
+   "turns": 4,
+   "duration_ms": 23736,
+   "cost_usd": 0.1321522,
+   "final_head": "**No.** No GitHub MCP server is loaded in this session.\n\n- **Loaded tools:** this session's deferred tool list has MCP tools from only eight servers: `ai-memory`, `codebase-memory`, `headroom`, `jcodemunch`, `qmd`, `serena`, `socraticode`, "
+  },
+  {
+   "arm": "g",
+   "case": "K2",
+   "transcript": "20260928T022905Z-1248866.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "ToolSearch",
+    "Bash",
+    "Bash"
+   ],
+   "turns": 5,
+   "duration_ms": 32534,
+   "cost_usd": 0.19062159999999997,
+   "final_head": "**No.** No GitHub MCP server is connected in this session.\n\n**What this session exposes:**\n- **Loaded tools:** the MCP tools here come from ai-memory, codebase-memory, headroom, jcodemunch, context-mode (a plugin), qmd, serena and socratico"
+  },
+  {
+   "arm": "c",
+   "case": "K2",
+   "transcript": "20260928T022938Z-1256818.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "ToolSearch",
+    "Bash"
+   ],
+   "turns": 4,
+   "duration_ms": 24306,
+   "cost_usd": 0.416219,
+   "final_head": "No, the GitHub MCP server is not active in this session.\n\n- **No GitHub tools are loaded.** Every MCP tool this session has comes from one of seven servers: `ai-memory`, `codebase-memory`, `headroom`, `jcodemunch`, `qmd`, `serena` and `socr"
+  },
+  {
+   "arm": "0",
+   "case": "K2",
+   "transcript": "20260928T023003Z-1263908.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "Bash",
+    "Bash"
+   ],
+   "turns": 4,
+   "duration_ms": 23415,
+   "cost_usd": 0.129453,
+   "final_head": "No, the GitHub MCP server is not active in this session.\n\n- **Loaded tools:** this session has tools from these MCP servers: `ai-memory`, `codebase-memory`, `headroom`, `jcodemunch`, `qmd`, `serena`, `socraticode` and the context-mode plugi"
+  },
+  {
+   "arm": "g",
+   "case": "K3",
+   "transcript": "20260928T023026Z-1273890.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "Bash",
+    "mcp__ai-memory__memory_status",
+    "mcp__codebase-memory__list_projects",
+    "mcp__headroom__headroom_stats",
+    "mcp__jcodemunch__menu",
+    "mcp__plugin_context-mode_context-mode__ctx_stats",
+    "mcp__qmd__status",
+    "mcp__serena__list_memories",
+    "mcp__socraticode__codebase_list_projects"
+   ],
+   "turns": 11,
+   "duration_ms": 58323,
+   "cost_usd": 0.4260104,
+   "final_head": "I couldn't run `/mcp` myself: it's a built-in client command and isn't available to me as a skill. Instead I made one read-only call to each MCP server that has tools in this session. All eight answered.\n\n| Server | Probe | Result |\n|---|--"
+  },
+  {
+   "arm": "c",
+   "case": "K3",
+   "transcript": "20260928T023125Z-1296103.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "mcp__qmd__status",
+    "mcp__ai-memory__memory_status",
+    "mcp__codebase-memory__list_projects",
+    "mcp__headroom__headroom_stats",
+    "mcp__jcodemunch__menu",
+    "mcp__plugin_context-mode_context-mode__ctx_stats",
+    "mcp__serena__list_memories",
+    "mcp__socraticode__codebase_list_projects",
+    "ListMcpResourcesTool"
+   ],
+   "turns": 11,
+   "duration_ms": 44761,
+   "cost_usd": 0.38588279999999997,
+   "final_head": "I can't run `/mcp` because it's a command only you can type. Instead I sent a read-only call to every MCP server that has tools in this session. **All 8 replied.**\n\n| Server | Probe | Result |\n|---|---|---|\n| `ai-memory` | `memory_status` |"
+  },
+  {
+   "arm": "0",
+   "case": "K3",
+   "transcript": "20260928T023210Z-1314557.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": false,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [],
+   "turns": 1,
+   "duration_ms": 22360,
+   "cost_usd": 0.3063348,
+   "final_head": "I can't run `/mcp` myself. It's a built-in Claude Code command that only you can type. What I can see is which MCP servers have tools registered in this session, and a server only shows up there if it connected and listed its tools.\n\n**8 se"
+  },
+  {
+   "arm": "g",
+   "case": "K3",
+   "transcript": "20260928T023233Z-1322232.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "ToolSearch",
+    "mcp__qmd__status",
+    "mcp__ai-memory__memory_status",
+    "mcp__headroom__headroom_stats",
+    "mcp__codebase-memory__list_projects",
+    "mcp__socraticode__codebase_status",
+    "mcp__plugin_context-mode_context-mode__ctx_stats",
+    "mcp__jcodemunch__menu",
+    "ToolSearch",
+    "mcp__serena__list_memories"
+   ],
+   "turns": 12,
+   "duration_ms": 51568,
+   "cost_usd": 0.4343088,
+   "final_head": "I can't run `/mcp` myself: it's a built-in client command, not a skill I can call. Instead I checked the session's own MCP tools. **Eight MCP servers are connected, and each one answered a read-only call.** Headroom's proxy backend isn't wo"
+  },
+  {
+   "arm": "c",
+   "case": "K3",
+   "transcript": "20260928T023324Z-1335970.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "mcp__qmd__status",
+    "mcp__headroom__headroom_stats",
+    "mcp__plugin_context-mode_context-mode__ctx_stats",
+    "mcp__codebase-memory__list_projects",
+    "mcp__jcodemunch__menu",
+    "mcp__serena__list_memories",
+    "mcp__socraticode__codebase_list_projects",
+    "mcp__ai-memory__memory_status",
+    "ListMcpResourcesTool"
+   ],
+   "turns": 11,
+   "duration_ms": 50723,
+   "cost_usd": 0.136813,
+   "final_head": "I can't run `/mcp` because only you can type it. Instead I made one read-only call to each MCP server that has tools in this session, and all 8 answered:\n\n| Server | Call | Result |\n|---|---|---|\n| `qmd` | `status` | 269 docs in 4 collectio"
+  },
+  {
+   "arm": "0",
+   "case": "K3",
+   "transcript": "20260928T023415Z-1351223.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": false,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [],
+   "turns": 1,
+   "duration_ms": 21699,
+   "cost_usd": 0.0518904,
+   "final_head": "I can't run `/mcp` because it's a built-in command that only you can type. What I can do is report which MCP servers have tools loaded in this session. Their tools show up in my deferred-tool list, and a server only appears there after it h"
+  },
+  {
+   "arm": "g",
+   "case": "K3",
+   "transcript": "20260928T023437Z-1356811.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "mcp__qmd__status",
+    "mcp__ai-memory__memory_status",
+    "mcp__codebase-memory__list_projects",
+    "mcp__headroom__headroom_stats",
+    "mcp__jcodemunch__menu",
+    "mcp__plugin_context-mode_context-mode__ctx_stats",
+    "mcp__serena__list_memories",
+    "mcp__socraticode__codebase_list_projects"
+   ],
+   "turns": 10,
+   "duration_ms": 50920,
+   "cost_usd": 0.1287758,
+   "final_head": "I can't run `/mcp` myself because it's a built-in client command. Instead I sent one read-only call to each MCP server that shows up in this session. **All 8 answered:**\n\n| Server | Probe | Result |\n|---|---|---|\n| `ai-memory` | `memory_sta"
+  },
+  {
+   "arm": "c",
+   "case": "K3",
+   "transcript": "20260928T023529Z-1372010.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": true,
+   "executed_target": true,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [
+    "ToolSearch",
+    "mcp__qmd__status",
+    "mcp__headroom__headroom_stats",
+    "mcp__codebase-memory__list_projects",
+    "mcp__socraticode__codebase_list_projects",
+    "mcp__jcodemunch__menu",
+    "mcp__serena__list_memories",
+    "mcp__plugin_context-mode_context-mode__ctx_stats",
+    "mcp__ai-memory__memory_status"
+   ],
+   "turns": 10,
+   "duration_ms": 47816,
+   "cost_usd": 0.1342134,
+   "final_head": "I can't run `/mcp` myself because it's a command only you can type. Instead I loaded one tool from every MCP server this session exposes and made a read-only call to each. All 8 answered:\n\n| Server | Probe | Result |\n|---|---|---|\n| `ai-mem"
+  },
+  {
+   "arm": "0",
+   "case": "K3",
+   "transcript": "20260928T023617Z-1383533.jsonl",
+   "correct": true,
+   "answered": true,
+   "no_builtin_skill": true,
+   "loaded_schema": false,
+   "executed_target": false,
+   "cli_diagnostic": false,
+   "asks_user": false,
+   "names_command": true,
+   "calls": [],
+   "turns": 1,
+   "duration_ms": 24861,
+   "cost_usd": 0.061890400000000005,
+   "final_head": "I can't run `/mcp` myself because it's an interactive command only you can type. What I can see is this session's tool registry, and tools only show up there for servers that connected. Based on that, **8 MCP servers are connected**:\n\n| Ser"
+  }
+ ]
+}

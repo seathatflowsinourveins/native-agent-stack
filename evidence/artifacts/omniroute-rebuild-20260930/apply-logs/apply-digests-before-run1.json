@@ -1,0 +1,17 @@
+{
+ "digests": {
+  "20128": {
+   "/api/context/combos": "16e4e6699a56bc53b1a076e92843b6568058a9dbe4abf31af412e2a38fcbae31",
+   "/api/model-capability-overrides": "54e7a95ab4b36b7ccb5a610ee3fbc7efca05e5df83c59b1305ae97322d73cf1f",
+   "/api/resilience": "92d2060b6ce52f2ee5ba39516e593e4aff675252645c85724d7874cc48d49a7a",
+   "/api/settings/compression": "13fa45d614767e7002135335bf406b7219ce1dd87c88c49e08ea34927328f215"
+  },
+  "20129": {
+   "/api/context/combos": "b249cec33f0f0f386f316cc3ea92407dfa57ae423d887f9f53ed97f495e3d4b9",
+   "/api/model-capability-overrides": "4be3a94ee28697c47cd9f1fc8196c3a1ac97f3a3eb8f1a84399f585b3303aef3",
+   "/api/resilience": "3ce8a52205a0b58260aa339727de71ba939e8f1007e6504d61045e081528816e",
+   "/api/settings/compression": "ed38086bee1e2e94bd10c1108a2420a182ed097f91656d7e5e3f05cfb8772f30"
+  }
+ },
+ "taken": "2026-09-30T00:06:04Z"
+}

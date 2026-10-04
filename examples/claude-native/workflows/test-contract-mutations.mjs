@@ -39,9 +39,44 @@ const MUTATIONS = [
   ['a stage loses its agentType', 'workflows/readiness-audit.js', "agentType: 'source-scout', ", '', 'routes each stage to its reviewed agent, model and effort'],
   ['a call is written as agent (', 'workflows/review-changes.js', "phase('Inventory')", "phase('Inventory')\nif (a.extraStage) await agent ('extra', { label: 'extra' })", 'binds model and effort inside every options literal'],
   ['a later duplicate key overrides the model', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max' }", "agentType: 'evidence-reviewer', model: 'opus', effort: 'max', model: undefined }", 'declares model and effort exactly once'],
-  ['the builder loses worktree isolation', 'agents/isolated-builder.md', 'isolation: worktree\n', '', 'runs in its own worktree'],
+  // Since 2026-09-27 the builder carries no frontmatter isolation and checks a coordinator-created worktree itself.
+  ['the builder regains frontmatter worktree isolation', 'agents/isolated-builder.md', 'effort: max\n', 'effort: max\nisolation: worktree\n', 'declares no frontmatter isolation'],
+  ['the builder drops its own-checkout comparison', 'agents/isolated-builder.md', 'compare `git -C <path> rev-parse --show-toplevel`', 'read `git -C <path> rev-parse --show-toplevel`', 'edits only in a coordinator-created worktree'],
+  ['the builder stops refusing to edit without a worktree', 'agents/isolated-builder.md', 'stop without editing', 'continue editing', 'edits only in a coordinator-created worktree'],
+  // Each refusal condition on its own (the 2026-09-27 cross-family review removed either one and the suite still passed).
+  ['the builder drops its no-path refusal', 'agents/isolated-builder.md', 'when the brief names no path, ', '', 'edits only in a coordinator-created worktree'],
+  ['the builder drops its own-checkout refusal', 'agents/isolated-builder.md', 'when both commands print the same top level (the coordinator\'s own checkout) or ', '', 'edits only in a coordinator-created worktree'],
+  ['the builder drops its wrong-base refusal', 'agents/isolated-builder.md', ' or when HEAD is not the brief\'s base', '', 'edits only in a coordinator-created worktree'],
+  ['the builder stops reading its HEAD', 'agents/isolated-builder.md', ', and read `git -C <path> rev-parse HEAD`', '', 'edits only in a coordinator-created worktree'],
+  ['the agent table restates the builder on Sonnet', ROUTING_DOC_FILE, '| `isolated-builder` | Opus, max,', '| `isolated-builder` | Sonnet, max,', 'the agent table restates each listed agent'],
+  ['the agent table restates the verifier on Sonnet', ROUTING_DOC_FILE, '| `stack-verifier` | Opus, max |', '| `stack-verifier` | Sonnet, max |', 'the agent table restates each listed agent'],
+  // Stack agents and dispatch by role (docs/decisions/2026-09-26-stack-agents-role-dispatch.md): a regained fetch,
+  // skill, edit or Serena symbol-edit tool, or a role table that reroutes or restates a role, must fail.
+  ['the researcher regains WebFetch', 'agents/stack-researcher.md', 'tools: Read, Glob, Grep, Bash, WebSearch, ToolSearch, ', 'tools: Read, Glob, Grep, Bash, WebSearch, WebFetch, ToolSearch, ', 'stack-researcher tool surface is exactly the reviewed list'],
+  ['the researcher gains the Skill tool', 'agents/stack-researcher.md', 'tools: Read, Glob, Grep, Bash, WebSearch, ToolSearch, ', 'tools: Read, Glob, Grep, Bash, WebSearch, Skill, ToolSearch, ', 'stack-researcher tool surface is exactly the reviewed list'],
+  ['the verifier gains Edit', 'agents/stack-verifier.md', 'tools: Read, Glob, Grep, Bash, ToolSearch, ', 'tools: Read, Edit, Glob, Grep, Bash, ToolSearch, ', 'stack-verifier tool surface is exactly the reviewed list'],
+  ['the builder regains a Serena symbol-edit tool', 'agents/isolated-builder.md', 'mcp__serena__get_diagnostics_for_file, ', 'mcp__serena__get_diagnostics_for_file, mcp__serena__replace_symbol_body, ', 'isolated-builder grants only Serena read tools'],
+  ['the role table sends the verifier role to the default child', ROUTING_DOC_FILE, '| verifier | `stack-verifier` |', '| verifier | `general-purpose` |', 'the role table maps each dispatch role'],
+  ['the role table restates the researcher on Sonnet', ROUTING_DOC_FILE, '| researcher | `stack-researcher` | Opus, max |', '| researcher | `stack-researcher` | Sonnet, max |', 'the role table maps each dispatch role'],
+  ['a harmless reordering of the researcher tools', 'agents/stack-researcher.md', 'tools: Read, Glob, Grep, ', 'tools: Glob, Read, Grep, ', null],
+  ['the researcher loses catalog search', 'agents/stack-researcher.md', 'mcp__jcodemunch__menu, ', '', 'stack-researcher tool surface is exactly the reviewed list'],
+  ['the security reviewer gains Bash', 'agents/security-reviewer.md', 'tools: Read, Glob, Grep, ToolSearch, ', 'tools: Read, Glob, Grep, Bash, ToolSearch, ', 'security-reviewer tool surface is exactly the reviewed list'],
+  ['the security reviewer gains Edit', 'agents/security-reviewer.md', 'tools: Read, Glob, Grep, ToolSearch, ', 'tools: Read, Glob, Grep, Edit, ToolSearch, ', 'security-reviewer tool surface is exactly the reviewed list'],
+  ['the security reviewer gains Write', 'agents/security-reviewer.md', 'tools: Read, Glob, Grep, ToolSearch, ', 'tools: Read, Glob, Grep, Write, ToolSearch, ', 'security-reviewer tool surface is exactly the reviewed list'],
+  ['the security reviewer gains WebFetch', 'agents/security-reviewer.md', 'tools: Read, Glob, Grep, ToolSearch, ', 'tools: Read, Glob, Grep, WebFetch, ToolSearch, ', 'security-reviewer tool surface is exactly the reviewed list'],
+  ['the security reviewer gains Skill invocation', 'agents/security-reviewer.md', 'tools: Read, Glob, Grep, ToolSearch, ', 'tools: Read, Glob, Grep, Skill, ToolSearch, ', 'security-reviewer tool surface is exactly the reviewed list'],
+  ['the security reviewer loses its preload', 'agents/security-reviewer.md', 'skills:\n  - security-best-practices\n', '', 'security-reviewer preloads exactly its reviewed skill'],
+  ['the role table sends security to the general reviewer', ROUTING_DOC_FILE, '| security | `security-reviewer` |', '| security | `evidence-reviewer` |', 'the role table maps each dispatch role'],
+  ['the builder loses its preload', 'agents/isolated-builder.md', 'skills:\n  - context-mode:context-mode\n', '', 'isolated-builder preloads exactly its reviewed skills'],
+  ['the builder substitutes a user-invocable-only skill', 'agents/isolated-builder.md', '  - context-mode:context-mode\n', '  - grill-me\n', 'isolated-builder preloads exactly its reviewed skills'],
+  // Removed from the skills trial on 2026-09-28 (docs/decisions/2026-09-25-skills-trial-and-usage.md); with one
+  // preload left, the former harmless reordering case has nothing to reorder.
+  ['the builder regains the removed skill', 'agents/isolated-builder.md', '  - context-mode:context-mode\n', '  - context-mode:context-mode\n  - verification-before-completion\n', 'isolated-builder preloads exactly its reviewed skills'],
+  ['a harmless reordering of the security reviewer tools', 'agents/security-reviewer.md', 'tools: Read, Glob, Grep, ', 'tools: Glob, Read, Grep, ', null],
   // Effort max (docs/decisions/2026-09-23-max-effort-default.md): a stage or agent that drops its effort, or binds
-  // any level other than max, must fail; a stage without effort would inherit the coordinator's xhigh.
+  // any level other than max, must fail; a stage without effort would run at its agent's frontmatter effort, else at
+  // the effort the session was given explicitly (--effort, /effort or the model picker), else at its model's saved level or
+  // default (on 2.1.281 the coordinator's xhigh).
   ['a later stage drops its effort', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max'", "agentType: 'evidence-reviewer', model: 'opus'", 'binds model and effort inside every options literal'],
   ['a default-child stage drops its effort', 'workflows/readiness-audit.js', "schema: VERIFY, model: 'opus', effort: 'max'", "schema: VERIFY, model: 'opus'", 'binds model and effort inside every options literal'],
   ['a review stage runs at effort high', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max'", "agentType: 'evidence-reviewer', model: 'opus', effort: 'high'", 'binds effort max in every options literal'],
@@ -58,10 +93,10 @@ const MUTATIONS = [
   ['an agent gains a second, lower effort line', 'agents/blind-lane-reviewer.md', 'effort: max\n', 'effort: max\neffort: high\n', 'runs at effort max on a single effort line'],
   ['the routing table restates source-scout at medium', ROUTING_DOC_FILE, 'running acceptance commands | `source-scout` | Sonnet, max |', 'running acceptance commands | `source-scout` | Sonnet, medium |', 'lists every project agent once with the model and effort its file declares'],
   ['the routing table restates a default child at high', ROUTING_DOC_FILE, '| default workflow subagent | Opus, max |', '| default workflow subagent | Opus, high |', 'every default workflow subagent row binds a model at effort max'],
-  ['the routing table moves the coordinator off xhigh under ultracode', ROUTING_DOC_FILE, '| coordinator | Opus 5.5, xhigh under `ultracode`', '| coordinator | Opus 5.5, max', 'the coordinator row stays at xhigh under ultracode'],
+  ['the routing table drops the saved xhigh fallback from the coordinator row', ROUTING_DOC_FILE, '| coordinator | Opus 5.5, max from the launcher, else saved xhigh, under `ultracode`', '| coordinator | Opus 5.5, max under `ultracode`', 'the coordinator row states the launcher max and the saved xhigh fallback under ultracode'],
   ['the instructions stop stating the stage effort literal', INSTRUCTIONS_FILE, "`effort: 'max'`", "`effort: 'high'`", 'state the effort literal every stage binds'],
   // CLAUDE_CODE_EFFORT_LEVEL overrides every stage's and agent's effort at any value (docs; probes P6 and P9 at max), and any
-  // value other than xhigh also turns ultracode's orchestration off (P1); an effort cap below max clamps the stages.
+  // value other than xhigh also turned ultracode's orchestration off on 2.1.281 (P1); an effort cap below max clamps the stages.
   ['the settings env sets CLAUDE_CODE_EFFORT_LEVEL=max', SETTINGS_FILE, 'env', { ...ENV, CLAUDE_CODE_EFFORT_LEVEL: 'max' }, 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],
   ['the settings env sets CLAUDE_CODE_EFFORT_LEVEL=xhigh', SETTINGS_FILE, 'env', { ...ENV, CLAUDE_CODE_EFFORT_LEVEL: 'xhigh' }, 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],
   ['the settings cap every model at xhigh', SETTINGS_FILE, 'maxEffortLevel', 'xhigh', 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],

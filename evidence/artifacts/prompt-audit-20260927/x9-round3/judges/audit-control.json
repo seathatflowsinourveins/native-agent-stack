@@ -1,0 +1,119 @@
+{
+ "note": "audit_control_r3.py: audit_r3.py on private copies of the four judges' inputs, unchanged (clean) and with one planted access per judgment (planted). Hits are pattern, scope and match only. The copies are not published, because the Claude transcripts carry the host's injected session context.",
+ "patterns_sha256": "437acde35d706950ecfd2060900f96567bcda547caadf85791fbbbe493d263da",
+ "plants": {
+  "gpt6-AB": {
+   "type": "item.completed",
+   "item": {
+    "type": "command_execution",
+    "command": "cat planted/x9-round2/arms/CLAUDE.g.md",
+    "aggregated_output": "planted"
+   }
+  },
+  "gpt6-BA": {
+   "type": "item.completed",
+   "item": {
+    "type": "web_search",
+    "query": "native-agent-stack pull/445",
+    "action": {
+     "type": "search"
+    }
+   }
+  },
+  "claude-AB": {
+   "type": "assistant",
+   "message": {
+    "content": [
+     {
+      "type": "tool_use",
+      "name": "mcp__planted__search",
+      "input": {
+       "query": "planted"
+      }
+     }
+    ]
+   }
+  },
+  "claude-BA": {
+   "type": "assistant",
+   "message": {
+    "content": [
+     {
+      "type": "tool_use",
+      "name": "Read",
+      "input": {
+       "file_path": "planted/x9-round3/analysis-r3.json"
+      }
+     }
+    ]
+   }
+  }
+ },
+ "clean": {
+  "gpt6-AB": {
+   "void": false,
+   "hits": []
+  },
+  "gpt6-BA": {
+   "void": false,
+   "hits": []
+  },
+  "claude-AB": {
+   "void": false,
+   "hits": []
+  },
+  "claude-BA": {
+   "void": false,
+   "hits": []
+  }
+ },
+ "clean_matches_published_audit": true,
+ "planted": {
+  "gpt6-AB": {
+   "void": true,
+   "hits": [
+    [
+     "MAPPING",
+     "command",
+     "CLAUDE.g.md"
+    ]
+   ]
+  },
+  "gpt6-BA": {
+   "void": true,
+   "hits": [
+    [
+     "WEB",
+     "web search",
+     "native-agent-stack"
+    ]
+   ]
+  },
+  "claude-AB": {
+   "void": true,
+   "hits": [
+    [
+     "mcp__ call",
+     "tool call",
+     "mcp__planted__search"
+    ]
+   ]
+  },
+  "claude-BA": {
+   "void": true,
+   "hits": [
+    [
+     "MAPPING",
+     "tool call Read",
+     "analysis-r3.json"
+    ],
+    [
+     "ACCESS",
+     "tool call Read",
+     "x9-round3"
+    ]
+   ]
+  }
+ },
+ "every_planted_judgment_void": true
+}

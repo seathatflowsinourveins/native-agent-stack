@@ -1,0 +1,232 @@
+{
+ "results": [
+  {
+   "source": {
+    "path": "<REVIEW-SCRATCH>/wt/blueprints/runtime-workers/openhands/requirements.lock",
+    "type": "lockfile"
+   },
+   "packages": [
+    {
+     "package": {
+      "name": "oauthlib",
+      "version": "3.3.1",
+      "ecosystem": "PyPI"
+     },
+     "groups": [
+      {
+       "ids": [
+        "GHSA-hj66-6f7g-4r5v"
+       ],
+       "aliases": [
+        "CVE-2026-49264",
+        "GHSA-hj66-6f7g-4r5v"
+       ],
+       "max_severity": "6.1"
+      },
+      {
+       "ids": [
+        "GHSA-xpv3-w29h-x7cv"
+       ],
+       "aliases": [
+        "CVE-2026-49265",
+        "GHSA-xpv3-w29h-x7cv"
+       ],
+       "max_severity": "6.8"
+      }
+     ],
+     "vulnerabilities": [
+      {
+       "affected": [
+        {
+         "database_specific": {
+          "last_known_affected_version_range": "<= 3.3.1",
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-hj66-6f7g-4r5v/GHSA-hj66-6f7g-4r5v.json"
+         },
+         "package": {
+          "ecosystem": "PyPI",
+          "name": "oauthlib",
+          "purl": "pkg:pypi/oauthlib"
+         },
+         "ranges": [
+          {
+           "events": [
+            {
+             "introduced": "0.6.1"
+            },
+            {
+             "fixed": "4.0.0"
+            }
+           ],
+           "type": "ECOSYSTEM"
+          }
+         ],
+         "versions": [
+          "0.6.1",
+          "0.6.2",
+          "0.6.3",
+          "0.7.0",
+          "0.7.1",
+          "0.7.2",
+          "1.0.0",
+          "1.0.1",
+          "1.0.2",
+          "1.0.3",
+          "1.1.0",
+          "1.1.1",
+          "1.1.2",
+          "2.0.0",
+          "2.0.1",
+          "2.0.2",
+          "2.0.3",
+          "2.0.4",
+          "2.0.5",
+          "2.0.6",
+          "2.0.7",
+          "2.1.0",
+          "3.0.0",
+          "3.0.1",
+          "3.0.2",
+          "3.1.0",
+          "3.1.1",
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.3.0",
+          "3.3.1"
+         ]
+        }
+       ],
+       "aliases": [
+        "CVE-2026-49264"
+       ],
+       "database_specific": {
+        "cwe_ids": [
+         "CWE-79"
+        ],
+        "github_reviewed": true,
+        "github_reviewed_at": "2026-09-29T17:53:41Z",
+        "nvd_published_at": null,
+        "severity": "MODERATE"
+       },
+       "id": "GHSA-hj66-6f7g-4r5v",
+       "modified": "2026-09-29T18:00:06.461704652Z",
+       "published": "2026-09-29T17:53:41Z",
+       "references": [
+        {
+         "type": "WEB",
+         "url": "https://github.com/oauthlib/oauthlib/security/advisories/GHSA-hj66-6f7g-4r5v"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/oauthlib/oauthlib/pull/951"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/oauthlib/oauthlib/commit/c888359f3c42bec235b2c5caab2069c9ed62457c"
+        },
+        {
+         "type": "PACKAGE",
+         "url": "https://github.com/oauthlib/oauthlib"
+        }
+       ],
+       "schema_version": "1.9.0",
+       "severity": [
+        {
+         "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+         "type": "CVSS_V3"
+        }
+       ],
+       "summary": "Oauthlib : Unsafe JSONP callback injection in RevocationEndpoint allows arbitrary JavaScript response generation"
+      },
+      {
+       "affected": [
+        {
+         "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-xpv3-w29h-x7cv/GHSA-xpv3-w29h-x7cv.json"
+         },
+         "package": {
+          "ecosystem": "PyPI",
+          "name": "oauthlib",
+          "purl": "pkg:pypi/oauthlib"
+         },
+         "ranges": [
+          {
+           "events": [
+            {
+             "introduced": "3.0.0"
+            },
+            {
+             "fixed": "4.0.0"
+            }
+           ],
+           "type": "ECOSYSTEM"
+          }
+         ],
+         "versions": [
+          "3.0.0",
+          "3.0.1",
+          "3.0.2",
+          "3.1.0",
+          "3.1.1",
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.3.0",
+          "3.3.1"
+         ]
+        }
+       ],
+       "aliases": [
+        "CVE-2026-49265"
+       ],
+       "database_specific": {
+        "cwe_ids": [
+         "CWE-208"
+        ],
+        "github_reviewed": true,
+        "github_reviewed_at": "2026-09-29T17:56:31Z",
+        "nvd_published_at": null,
+        "severity": "MODERATE"
+       },
+       "id": "GHSA-xpv3-w29h-x7cv",
+       "modified": "2026-09-29T18:15:04.747320327Z",
+       "published": "2026-09-29T17:56:31Z",
+       "references": [
+        {
+         "type": "WEB",
+         "url": "https://github.com/oauthlib/oauthlib/security/advisories/GHSA-xpv3-w29h-x7cv"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/oauthlib/oauthlib/pull/963"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/oauthlib/oauthlib/commit/40b0ab56da3682c2484a4b78bbff309f8025d950"
+        },
+        {
+         "type": "PACKAGE",
+         "url": "https://github.com/oauthlib/oauthlib"
+        }
+       ],
+       "schema_version": "1.9.0",
+       "severity": [
+        {
+         "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N",
+         "type": "CVSS_V3"
+        }
+       ],
+       "summary": "Oauthlib: Timing Attack Vulnerability in PKCE code_verifier Comparison (CWE-208)"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "experimental_config": {
+  "licenses": {
+   "summary": false,
+   "allowlist": null
+  }
+ }
+}

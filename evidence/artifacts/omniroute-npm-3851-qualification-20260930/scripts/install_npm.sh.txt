@@ -1,0 +1,31 @@
+#!/bin/bash
+# Published copy of the script as it ran on 2026-09-30. Host paths are replaced by the placeholders named in the assignments below
+# (<work directory>, <bin directory of Node 24.21.0>, <npm cache>, <throwaway directory>); nothing else differs.
+# install_npm.sh: the pinned recipe's install (docs/foundation-stack.md, "Optional OmniRoute installation") for omniroute@3.8.51 into a fresh scratch prefix,
+# in a clean environment on the host network (the install and the allowlisted rebuild fetch prebuilt native binaries). No shim, no drop-in.
+set -u
+OM=<work directory>
+ISO=$OM/iso
+NODEBIN=<bin directory of Node 24.21.0>
+P=$OM/prefix
+L=$OM/logs
+[ -e "$P" ] && { echo "PREFIX EXISTS, stopping: $P"; exit 90; }
+mkdir -p "$ISO/home" "$ISO/tmp" "$L"
+run() { /usr/bin/env -i "HOME=$ISO/home" "TMPDIR=$ISO/tmp" "PATH=$NODEBIN:/usr/local/bin:/usr/bin:/bin" "npm_config_cache=<npm cache>" "HUSKY=0" "NEXT_TELEMETRY_DISABLED=1" "LANG=C.UTF-8" "TERM=dumb" "$@"; }
+stamp() { date -u +%FT%TZ; }
+echo "[$(stamp)] node $(run node --version) npm $(run npm --version)"
+echo "[$(stamp)] npm view (registry facts)"
+run npm view omniroute@3.8.51 version dist.integrity dist.shasum dist.tarball engines gitHead --json 2>&1 | tee "$L/npm-view.json"
+echo "[$(stamp)] npm pack (download the published tarball)"
+(cd "$OM/tarball" && run npm pack omniroute@3.8.51 --pack-destination "$OM/tarball" --json 2>&1 | tee "$L/npm-pack.json")
+ls -la "$OM/tarball"
+echo "[$(stamp)] npm install"
+run npm install --global --prefix "$P" omniroute@3.8.51 --include=optional --no-audit --no-fund > "$L/npm-install.log" 2>&1; rc=$?
+echo "[$(stamp)] npm install rc=$rc"; [ $rc -eq 0 ] || exit 91
+echo "[$(stamp)] npm rebuild (allowlisted scripts)"
+run npm rebuild --global --prefix "$P" --allow-scripts=omniroute,keytar,onnxruntime-node,tls-client-node,@parcel/watcher,@swc/core,protobufjs,koffi,esbuild --foreground-scripts --no-audit --no-fund > "$L/npm-rebuild.log" 2>&1; rc=$?
+echo "[$(stamp)] npm rebuild rc=$rc"; [ $rc -eq 0 ] || exit 92
+echo "[$(stamp)] omniroute --version: $(run "$P/bin/omniroute" --version 2>&1 | tail -1)"
+echo "[$(stamp)] BUILD_SHA: $(cat "$P/lib/node_modules/omniroute/dist/BUILD_SHA" 2>&1 | head -c 80)"
+echo "[$(stamp)] package.json version: $(run node -p "require('$P/lib/node_modules/omniroute/package.json').version")"
+ls -la "$P/bin" | tail -4

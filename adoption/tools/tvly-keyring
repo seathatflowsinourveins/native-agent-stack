@@ -1,0 +1,61 @@
+#!/bin/sh
+# tvly-keyring: run the real `tvly` (tavily-cli) with TAVILY_API_KEY from the Linux kernel user
+# keyring, set in that one command's environment only. kernel_keyring.py reads the key and starts
+# tvly (`kernel_keyring.py exec`); this script never reads it. Every argument reaches tvly verbatim.
+# Written in this repository on 2026-09-26; adoption/tools/README.md documents it.
+#
+#   tvly-keyring search "<query>" --json
+#   tvly-keyring research run "<question>" --model pro --json
+#
+# kernel_keyring.py is the copy beside this script (or beside the file a symlink to it points at),
+# or TVLY_KEYRING_SCRIPT when that is set. TVLY_KEYRING_NAME overrides the key name tavily_api_key.
+# Exit status: 2 when kernel_keyring.py is missing, the key is absent or cannot be checked, or tvly
+# on PATH is this script; 127 when there is no tvly on PATH; otherwise tvly's own status, or
+# kernel_keyring.py's when it refuses to start tvly.
+set -u
+
+name=${TVLY_KEYRING_NAME:-tavily_api_key}
+
+if [ -n "${TVLY_KEYRING_SCRIPT:-}" ]; then
+    keyring=$TVLY_KEYRING_SCRIPT
+    where="at TVLY_KEYRING_SCRIPT"
+else
+    keyring=$(dirname -- "$0")/kernel_keyring.py
+    if [ ! -f "$keyring" ] && [ -L "$0" ]; then
+        target=$(readlink -f -- "$0" 2>/dev/null) && keyring=$(dirname -- "$target")/kernel_keyring.py
+    fi
+    where="beside this script"
+fi
+if [ ! -f "$keyring" ]; then
+    echo "tvly-keyring: no kernel_keyring.py $where; install it next to tvly-keyring or set" \
+        "TVLY_KEYRING_SCRIPT (adoption/tools/README.md)" >&2
+    exit 2
+fi
+
+if ! tvly=$(command -v tvly) || [ ! -x "$tvly" ]; then
+    echo "tvly-keyring: no tvly on PATH; install tavily-cli (recipes/tavily.md)" >&2
+    exit 127
+fi
+self=$(readlink -f -- "$0" 2>/dev/null) || self=$0
+real=$(readlink -f -- "$tvly" 2>/dev/null) || real=$tvly
+if [ "$real" = "$self" ]; then
+    echo "tvly-keyring: tvly on PATH is this wrapper; put the real tvly first on PATH" >&2
+    exit 2
+fi
+
+# status prints only "<name>: present" or "<name>: absent", never the value. Only a name that status
+# accepted is repeated here: a refused name could be a pasted value.
+state=$(python3 "$keyring" status "$name")
+rc=$?
+if [ "$rc" -ne 0 ]; then
+    if [ "$rc" -eq 1 ] && [ "$state" = "$name: absent" ]; then
+        echo "tvly-keyring: $name is not in the kernel user keyring; store it in your own terminal:" \
+            "python3 scripts/kernel_keyring.py store $name (docs/secret-storage.md)" >&2
+    else
+        echo "tvly-keyring: cannot check the key in the kernel user keyring (kernel_keyring.py status" \
+            "exited $rc)" >&2
+    fi
+    exit 2
+fi
+
+exec python3 "$keyring" exec "$name" TAVILY_API_KEY -- "$tvly" "$@"

@@ -88,6 +88,88 @@ def tearDownModule():
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
 class IntegratedRunner(unittest.TestCase):
+    def test_activity_recovery_persists_fills_before_native_callbacks(self):
+        """Alpaca FILL activities can advance beyond the REST snapshot that opened a gap."""
+        from native_adapter import build_node
+        from nautilus_trader.config import StrategyConfig
+        from nautilus_trader.model import InstrumentId, OrderSide, Quantity, TimeInForce
+        from nautilus_trader.trading import Strategy
+
+        class MissingStreamPort(SimulatedPort):
+            async def submit(self, payload):
+                self.controller.before_submit(payload)
+                await self.controller.before_request("submit", client_id=payload["client_order_id"])
+                stamp = time.time_ns()
+                row = dict(payload, id="paper-buy", status="partially_filled", filled_qty="1",
+                           filled_avg_price=payload["limit_price"], updated_at_ns=stamp)
+                self.controller.observe(row)
+                self.executions[row["id"]] = [
+                    {"trade_id": f"activity-{cum}", "qty": "1", "price": payload["limit_price"],
+                     "cum_qty": str(cum), "symbol": "SPY", "side": "buy",
+                     "transaction_time_ns": stamp + cum, "source": "activity"}
+                    for cum in (1, 2, 3)]
+                return row
+
+        class RecoveryWatcher(Strategy):
+            def __new__(cls, ledger):
+                return super().__new__(cls, StrategyConfig(log_events=False, log_commands=False))
+
+            def __init__(self, ledger):
+                self.ledger, self.order = ledger, None
+                self.filled, self.durable_at_callback = Decimal(0), []
+                self.refusals = []
+
+            def on_start(self):
+                self.subscribe_quotes(InstrumentId.from_str("SPY.ALPACA"))
+
+            def on_quote(self, tick):
+                if self.order is None:
+                    self.order = self.order_factory.limit(tick.instrument_id, OrderSide.BUY,
+                        Quantity.from_int(3), tick.ask_price, time_in_force=TimeInForce.DAY)
+                    self.submit_order(self.order)
+
+            def on_order_filled(self, event):
+                self.filled += Decimal(str(event.last_qty))
+                intent = self.ledger.intents()[0]
+                self.durable_at_callback.append((intent.filled_qty, intent.status,
+                                                  len(self.ledger.unresolved())))
+                if self.filled == 3:
+                    self.shutdown_system("activity recovery complete")
+
+            def on_order_rejected(self, event):
+                self.refusals.append(str(event.reason))
+                self.shutdown_system("unexpected recovery test refusal")
+
+            on_order_denied = on_order_rejected
+
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "journal.db"
+            limits = RiskLimits(max_order_qty=Decimal(3))
+            ledger = Ledger(path, limits)
+            self.addCleanup(ledger.close)
+            now = time.time()
+            ledger.start_trial(now)
+            controller = Controller(ledger, now + 3600, market_open=True)
+            port = MissingStreamPort(controller, ("SPY",))
+            controller.port = port
+            watcher = RecoveryWatcher(ledger)
+            session = build_node(port, [{"symbol": "SPY"}], [watcher])
+            session.fill_gap_grace_seconds = .01
+
+            async def exercise():
+                await asyncio.wait_for(session.run_async(), timeout=5)
+
+            asyncio.run(exercise())
+            self.assertEqual(session.errors, [])
+            self.assertEqual(watcher.refusals, [])
+            self.assertEqual(watcher.filled, Decimal(3))
+            self.assertEqual(ledger.intents()[0].filled_qty, watcher.filled)
+            self.assertEqual(watcher.durable_at_callback, [(Decimal(3), "filled", 0)] * 3)
+            self.assertEqual(ledger.unresolved(), [])
+            with contextlib.closing(Ledger(path, limits)) as reopened:
+                self.assertEqual(reopened.intents()[0].filled_qty, Decimal(3))
+                self.assertEqual(reopened.unresolved(), [])
+
     def test_default_config_is_bounded(self):
         config, risk, policy = runner_module.load_config(SOURCE / "config.json")
         self.assertEqual(risk.max_submits_per_minute, 180)
@@ -793,13 +875,8 @@ class IntegratedRunner(unittest.TestCase):
             self.assertIn("adp-fixture-0000098", [str(c) for c in cancelled])  # re-pricing resumes
             ledger.close()
 
-    def test_a_stale_seed_on_a_held_symbol_blocks_its_exit_only_until_the_seed_expires(self):
-        """A3 and B6 through the adaptive strategy and a real Controller: the startup seed says
-        AAPL and IBM are in a LULD pause that in fact resumed before the engine subscribed (no
-        status message follows), and their quotes carry the best-effort condition flag. While
-        the seed counts, AAPL's flatten waits and IBM's resting exit is not cancelled for
-        re-pricing; at the seed's 12-minute expiry both go ahead, and the quote flag, still
-        set, holds neither exit back."""
+    def test_luld_pause_beyond_twelve_minutes_protects_exits_until_resume(self):
+        """Nasdaq Rule 4120 allows continuing pauses: elapsed time cannot release an exit."""
         from native_strategy import AdaptiveStrategy
         from strategies import AdaptivePolicy, SelectorConfig
         from selector import ACTIVE, FLATTEN_BEFORE_SWITCH, SelectionDecision
@@ -843,7 +920,7 @@ class IntegratedRunner(unittest.TestCase):
                                   now=now, market_open=True, session_close=now + 3600)
             ledger.record_order("buy-1", "broker-buy-1", "filled", "1", "100", timestamp=now)
             controller = Controller(ledger, now + 3600, market_open=True, clock=lambda: clock[0])
-            halted_at = int((now - 12 * 60 + .02) * 1e9)          # the seed expires at now + 0.02 s
+            halted_at = int((now - 11 * 60) * 1e9)  # startup confirms the eleven-minute-old pause
             pause = {"halted_at_ns": halted_at, "resumption_trade_ns": None, "reason_code": "LUDP", "market": "NASDAQ"}
             controller.apply_halt_seed({"source": "nasdaq_trade_halts_rss", "fetched_at_ns": int(now * 1e9),
                                         "sha256": "0" * 64, "bytes": 1, "items": 2,
@@ -872,17 +949,30 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual((submitted, cancelled), ([], []))                  # the seed still counts
             self.assertEqual(controller.halt_summary()["halted_now"], ["AAPL", "IBM"])
 
-            clock[0] = now + .03                                                # past the seed's expiry
-            policy.observe("AAPL", 100.995, 101.005, now + .03)
+            for elapsed in (59, 60, 900):
+                clock[0] = now + elapsed
+                strategy.cancel_expired(clock[0], 10)
+                self.assertEqual(cancelled, [], f"exit canceled at pause age {660 + elapsed}s")
+                for symbol in ("AAPL", "IBM"):
+                    controller.quote({"symbol": symbol, "bid": "100.99", "ask": "101.01",
+                                      "ts_ns": int(clock[0] * 1e9)})
+                    self.assertTrue(controller.current_quote(symbol).halted)
+                    self.assertTrue(controller.is_halted(symbol))
+
+            clock[0] = now + 901
+            for symbol in ("AAPL", "IBM"):
+                controller.trading_status({"symbol": symbol, "halted": False, "state": "trading",
+                                           "ts_ns": int(clock[0] * 1e9)})
+            policy.observe("AAPL", 100.995, 101.005, clock[0])
             policy.last_decision = 0
-            strategy.rebalance(now + .03)
-            strategy.cancel_expired(now + .03, 10)
+            strategy.rebalance(clock[0])
+            strategy.cancel_expired(clock[0], 10)
             self.assertEqual(len(submitted), 1)
             self.assertIn("reason=rotation_flatten", strategy._fake_order_factory.calls[0]["tags"])
             self.assertEqual([str(c) for c in cancelled], ["adp-fixture-0000098"])   # re-pricing resumes
-            self.assertTrue(controller.quotes["AAPL"].halted)                   # the flag alone: entries only
+            self.assertFalse(controller.quotes["AAPL"].halted)
             self.assertEqual(controller.halt_summary()["halted_now"], [])
-            self.assertEqual(sorted(e["symbol"] for e in controller.events if e.get("effect") == "seed_expired"),
+            self.assertEqual(sorted(e["symbol"] for e in controller.events if e.get("effect") == "resumed"),
                              ["AAPL", "IBM"])
             ledger.close()
 

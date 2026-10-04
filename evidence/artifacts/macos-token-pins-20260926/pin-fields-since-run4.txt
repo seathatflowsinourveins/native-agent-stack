@@ -1,0 +1,31 @@
+# Fields changed in the two pins files since digest-check.txt (run 4) checked them, 2026-09-26T09:49:36Z
+# python3 evidence/artifacts/macos-token-pins-20260926/pin_fields.py <label>=<old> <label>=<new>; exit 0 means no field verify_pins.py reads differs.
+
+## macOS: the copy run 4 checked (a scratch copy taken before the polish passes) -> this change's file
+run-4 copy: sha256 2387dab60f5f6cca387a1cc154f240911d013229b2237bfd36120981069d6dc5
+adoption/pins-macos-arm64.json: sha256 8767c3672c19e8c1917df4b08201041f627e666e30e859f65db260b5bec5c3a8
+changed: source
+changed: tools[rtk].install_note
+2 changed field(s); read by verify_pins.py: none
+[exit 0]
+
+## Linux: the branch base 9c1669c7 (the copy run 4 checked) -> origin/main b5c6313b
+9c1669c7: sha256 59bdb4cf3f1c6431483300663f1ad2cbbbb439d5e124886d1ef4a739c7590612
+origin/main b5c6313b: sha256 a274e88827dac55cf827eb8ac6db9451ba110739b2069ee00b9b041cf95772ac
+changed: tools[rtk].install_note
+1 changed field(s); read by verify_pins.py: none
+[exit 0]
+
+## Control: the run-4 copy -> negative_control.py's wrong-answer copy of it (must report the altered fields and exit 1)
+run-4 copy: sha256 2387dab60f5f6cca387a1cc154f240911d013229b2237bfd36120981069d6dc5
+wrong-answer copy: sha256 aabcf6db113ba07adc16fedb61b92f3466e3c7a132057983b1f3347912a97ee5
+changed: tools[rtk].sha256
+changed: tools[qmd].sha256
+changed: tools[repomix].sha256
+changed: tools[toon].sha256
+changed: tools[ccusage].sha256
+changed: tools[headroom].sha256
+changed: tools[markitdown].sha256
+changed: tools[serena].commit
+8 changed field(s); read by verify_pins.py: tools[rtk].sha256, tools[qmd].sha256, tools[repomix].sha256, tools[toon].sha256, tools[ccusage].sha256, tools[headroom].sha256, tools[markitdown].sha256, tools[serena].commit
+[exit 1]

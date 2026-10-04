@@ -17,6 +17,53 @@ The [PR #26 qualification record](https://github.com/seathatflowsinourveins/nati
 links the final hosted revision, integration and publication outcomes; local
 implementation records below remain dated observations.
 
+## Current practice (2026-10-02)
+
+This section is the current practice. The dated sections below are history; where they differ, this section and the
+live settings win. Live state read with `gh api` GETs on 2026-10-02: ruleset 23739774 (updated
+2026-09-27T17:00:13-04:00) matches [`.github/main-ruleset.json`](../.github/main-ruleset.json).
+
+- **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
+  `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate`, `validate-macos` and
+  `sota-sources`. Renaming one of these jobs, or giving it a job-level `name:`, orphans its required check.
+- **Merging.** Squash merges only; merge commits and rebase merges are off. The ruleset adds linear history, deletion
+  and non-fast-forward rules, resolved review threads, no human approval count and a CodeQL code-scanning rule.
+  Auto-merge is allowed by the repository settings but is not used for bot PRs: Dependabot PRs and the
+  catalog-freshness `propose` PR stay reviewable. Branches are deleted on merge. Land a PR with the merge guard in
+  [`docs/lanes.md`, "Labels and PRs"](lanes.md#labels-and-prs): read the head SHA, confirm that every required check
+  is in bucket `pass`, then squash-merge with that SHA pinned.
+- **Labels and the PR template.** Every PR carries exactly one of `lane:foundation`, `lane:trading` or `lane:shared`,
+  and a `lane:shared` PR needs the other lane's acknowledgement as a comment or review.
+  [`.github/pull_request_template.md`](../.github/pull_request_template.md) carries the Lane line and a
+  `### SOTA sources` section, which the required `sota-sources` check enforces.
+- **Generated reports.** CI checks each generated report against its inputs (`build_verdicts.py`,
+  `component_matrix.py`, `new_host_grand_list.py`, `gap_crosswalk.py`, `gap_wave_ledger.py`, `build_ecosystem.py`,
+  and the final catalog's generator once it lands). `manifests/evidence.json` follows the hot-file protocol in
+  [`docs/lanes.md`](lanes.md#hot-file-protocol).
+- **Secrets.** The required `secret-scan` job runs gitleaks 8.30.1 over the history and the working tree, plus the
+  allowlist regression tests. `secret-scan-betterleaks` runs betterleaks v1.8.1 as a non-required, report-only trial;
+  its fixture tests d2, d4 and d5 fail on every run, and its findings appear only as counts. GitHub secret scanning and
+  push protection are on; non-provider patterns and validity checks are off.
+- **Code and dependency scanning.** CodeQL default setup with the `default` suite. `github/codeql-action/upload-sarif`
+  carries the osv-scanner, zizmor and Scorecard SARIF. Dependabot version updates cover GitHub Actions only (weekly,
+  7-day cooldown), and Dependabot security updates are on.
+- **Actions.** Every `uses:` is pinned to a full commit SHA, which the repository also requires. The allow-list is
+  GitHub-owned actions plus `step-security/harden-runner` and `ossf/scorecard-action`. No agent action runs in CI:
+  only the catalog-freshness `propose` job holds `pull-requests: write`, and no workflow reviews or approves a pull
+  request (`test_pull_requests_write_is_granted_only_to_the_propose_job`,
+  `test_no_workflow_reviews_or_approves_a_pull_request`).
+- **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
+  family made for these layers. The clean-room definitive round announced there decides one pick per slot.
+  - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
+    structural-diff comparison shows a gain); one picked difftastic and claude-code-action. difftastic remains the
+    selection of record, and claude-code-action stays unadopted (decision M45).
+  - ci-supply-chain: both families picked attest, Syft, Dependabot, actionlint (kjanat) and zizmor, all in use;
+    `github/codeql-action`, picked by one, is the `upload-sarif` step above.
+  - secrets-credentials: both families picked betterleaks, and one picked trufflehog. gitleaks stays the required
+    gate until the definitive pick passes the acceptance test preregistered in
+    [`docs/decisions/2026-10-02-github-automation-practice.md`](decisions/2026-10-02-github-automation-practice.md)
+    decides.
+
 ## Event and execution policy
 
 The four ordinary workflows run on pull requests, relevant pushes to `main`,
@@ -97,17 +144,17 @@ against the existing maintenance task. Assign each dependency one updater.
 
 Use installed upstream checks; avoid a home-grown workflow parser as the primary
 validator. The existing pinned zizmor lane checks workflow security. Upstream
-[actionlint](https://github.com/rhysd/actionlint) checks workflow syntax, expressions
+[actionlint](https://github.com/kjanat/actionlint) checks workflow syntax, expressions
 and action usage. Neither executes a job or establishes model-task quality.
 
-The upstream [binary installation procedure](https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md)
-supports a task-local download and provenance verification, with no global install:
+Since 2026-09-28 the pin is kjanat/actionlint 1.17.0, the maintained fork that replaced the stalled rhysd/actionlint 1.7.12 ([swap receipt](../evidence/artifacts/actionlint-successor-swap-20260928/README.md)). Its The 2026-09-20 and 2026-09-21 results and the shellcheck finding below used this procedure against rhysd/actionlint v1.7.12 ([its install doc at v1.7.12](https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md)).
+[binary installation procedure](https://github.com/kjanat/actionlint/blob/v1.17.0/docs/install.md?plain=1#L124-L134) supports a task-local download and provenance verification, with no global install:
 
 ```sh
-gh release download --repo rhysd/actionlint --pattern '*_linux_amd64.tar.gz' --pattern '*_checksums.txt' v1.7.12
-gh attestation verify -R rhysd/actionlint actionlint_1.7.12_linux_amd64.tar.gz
-sha256sum --check --ignore-missing actionlint_1.7.12_checksums.txt
-tar -xzf actionlint_1.7.12_linux_amd64.tar.gz actionlint
+gh release download --repo kjanat/actionlint --pattern '*_linux_amd64.tar.gz' --pattern '*_checksums.txt' v1.17.0
+gh attestation verify -R kjanat/actionlint actionlint_1.17.0_linux_amd64.tar.gz
+sha256sum --check --ignore-missing actionlint_1.17.0_checksums.txt
+tar -xzf actionlint_1.17.0_linux_amd64.tar.gz actionlint
 ./actionlint -version
 ```
 
@@ -170,6 +217,9 @@ Cloud engine authentication and billing are distinct from local Desktop sign-in;
 do not transfer a native client's credential store.
 
 ## Publication and practical acceptance
+
+**Superseded 2026-10-02** by "Current practice (2026-10-02)" above: the live ruleset now requires 8
+checks and allows squash merges only. This section is kept as history.
 
 As of a dated 2026-09-23 GET (see below), the active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
 (id 23739774, updated 2026-09-22T11:08:22-04:00) requires the `validate`,
@@ -268,7 +318,10 @@ changed" and "frozen local source differs". `native-token-e2e.yml` is bound by n
 test, but its current SHA-256 is recorded in four execution receipts and artifacts, so
 an edit would detach the file from its dated run evidence. A cosmetic comment does not
 justify re-freezing a plan or detaching a receipt, so those six comments wait for the
-next functional change. The
+next functional change. (Update 2026-09-26, changed after `v2026.09.26.2`: that change came
+with the `harden-runner` step for all three files, so the six comments now name exact releases
+(`# v7.0.1`, `# v8.0.1`), see
+[`docs/decisions/2026-09-26-token-workflow-hardening.md`](decisions/2026-09-26-token-workflow-hardening.md).) The
 publication job's two write permissions now carry explanatory comments. No SHA,
 permission, trigger or step changed. Convention since then (restored 2026-09-25 for
 `catalog-freshness.yml:propose` and the three `saturation-tracking.yml` jobs): every
@@ -295,19 +348,30 @@ change) and `adoption-bootstrap.yml`'s `bootstrap-linux`, `bootstrap-macos` and
 `adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`
 change, or on a pull request that touches the same paths -- described in full
 further below). None of these appear in `main-ruleset.json`'s required status
-checks; a required check must run on every PR, and a scheduled or path-gated
-lane does not. Update 2026-09-22: `sbom-vuln` is no longer report-only; it
+checks; a required check must report on every PR, and a scheduled lane or a
+workflow skipped by a `paths:` filter does not (GitHub leaves its check
+pending). Update 2026-09-22: `sbom-vuln` is no longer report-only; it
 fails its own job on a High or Critical grype match (see "Secret and
 supply-chain scanning"), but it is still not a required check.
 `adoption-bootstrap.yml`'s fifth job, `validate-macos`, is the exception
-(2026-09-25): its workflow's `pull_request` trigger carries no `paths:` filter
-at all, so `validate-macos` itself reports a status on every pull request and
-is a required check (see "validate-macos required (2026-09-25)" in
+(2026-09-25, scoped 2026-10-03): its workflow's `pull_request` trigger carries
+no `paths:` filter, so `validate-macos` reports on every pull request and is a
+required check (see "validate-macos required (2026-09-25)" in
 [docs/decisions/2026-09-22-github-automation-closure.md](decisions/2026-09-22-github-automation-closure.md)).
-A `changes` job, added in the same workflow, diffs the pull request's base and
-head with plain `git` (no new third-party action) to keep the other three jobs
-path-gated on `pull_request` the same way GitHub's own `paths:` filter already
-path-gates them on `push`.
+Since 2026-10-03 it reports one of three results, as a `changes` job in the
+same workflow decides from the pull request's diff
+([docs/decisions/2026-10-03-macos-ci-scope.md](decisions/2026-10-03-macos-ci-scope.md)):
+a full run when the pull request changes a listed macOS-relevant path; a
+changed-tests run of only the top-level test modules it changed, which is a
+scoped result and not a macOS full-suite pass; or `skipped` when it changes
+neither. A job skipped by its own job-level `if:` reports `skipped`, which
+GitHub accepts for a required check; this repository records it as untested,
+not passed. Push, schedule and dispatch runs always run in full. The same
+`changes` job diffs the base and head with plain `git` (no third-party action)
+to keep the other three jobs path-gated on `pull_request` the same way GitHub's
+own `paths:` filter path-gates them on `push`, and `bootstrap-macos` and
+`bootstrap-macos-brew` run on a pull request only when `validate-macos` runs in
+full.
 
 `catalog-freshness.yml` reuses `tools/sota-convergence/extract_layers.py` and
 `github_freshness.py` unchanged, then rebuilds a manifest with
@@ -337,6 +401,19 @@ rust-ibapi). Each row shows pin vs upstream latest, the last release and
 default-branch commit dates, a dormancy flag (no release or commit in 180+
 days) and the archived flag. Dormant or archived rows never set
 `drift-status.txt` and are never read into the `propose` job's component ids.
+A third report-only table, built from `build_manifest.py --runtime-freshness-out`
+(`runtime-freshness.json`, also retained in the artifact), tracks the GPT runtime
+workers, SDKs and agents with the same columns: the pins in `extract_layers.py`'s
+`RUNTIME_PIN_SOURCES` (the new-WSL install plan rows, the runtime-worker recipe
+pin record and the native SDK constraints) and the watch-only upstreams in
+`RUNTIME_WATCH_SOURCES`, such as pi. It lists the pinned rows behind upstream and
+any source that did not resolve, and like the trading table it never sets
+`drift-status.txt`. A fetch failure on a repository that only `runtime-pins.json`
+names (no foundation, trading, trading-pin or star-candidate working file does)
+counts in `github-freshness.json`'s `runtime_only_errors` or
+`runtime_only_partial_errors`, not in the `upstream_errors` and `partial_errors`
+that hold the `propose` job below, and the table names that row in one line; a
+repository another working file also names counts in the gate as it did before.
 
 `catalog-freshness.yml`'s `python3 -m unittest` step runs on this job's
 `setup-python 3.13` interpreter, which has no `requests` package installed
@@ -362,7 +439,18 @@ findings by severity). Since 2026-09-22 it runs grype with `--config .grype.yaml
 path-filtered, so it is not a required check (see "Automation closure,
 2026-09-22").
 
+Update 2026-09-28: `practice-references-freshness.yml` (Thursdays 06:41 UTC, plus
+manual dispatch) runs `tools/sota-convergence/practice_references.py` over
+`catalogs/foundation/practice-references.json`. It reports archived, stale (no
+default-branch commit in 90 days), renamed or missing repositories and
+default-branch commits since each pin, and never changes a pin. It is not a
+required check; it fails only when the checker's offline tests fail or the
+catalog is malformed, including a decision record that does not exist.
+
 ## Secret and supply-chain scanning, 2026-09-22
+
+For the current state, which adds the report-only betterleaks trial and GitHub push protection, see
+"Current practice (2026-10-02)" above.
 
 `validate.yml`'s `secret-scan` job runs gitleaks 8.30.1 (SHA-256 verified
 against `blueprints/convergence-practice/wsl-native-tools/pins.json`,
@@ -428,9 +516,10 @@ service), the private vulnerability reporting link (enabled;
 returned `{"enabled":true}` on 2026-09-23), supported refs (`main` and the
 latest `v*` tag) and the `gh attestation verify` and `gh release verify-asset`
 commands for the immutable tag releases. [`.github/pull_request_template.md`](../.github/pull_request_template.md)
-requires scope, base commit, a per-claim evidence-class table, exact local
+requires scope with a Lane line (exactly one `lane:*` label), base commit, a `### SOTA sources` section
+(enforced by the required `sota-sources` check), a per-claim evidence-class table, exact local
 commands run, a decision-record path and a checklist covering SHA pins,
-`contents: read`, no secrets, no paid hosting and preserved peer-owned
+top-level `permissions: {}`, no secrets, no paid hosting and preserved peer-owned
 untracked files.
 
 ## Ruleset upgrade, 2026-09-22
@@ -446,7 +535,8 @@ live on 2026-09-25; `allowed_merge_methods:
 [`docs/decisions/2026-09-22-github-automation-closure.md`](decisions/2026-09-22-github-automation-closure.md),
 section 10 ("Rulesets"). This section is kept as history and is not
 corrected in place; the `gh api` commands below still apply (a `PUT` is
-idempotent), just against the current target file.
+idempotent), just against the current target file. **Update 2026-10-02:** `sota-sources` is live, and the live
+ruleset matches the target file (see "Current practice (2026-10-02)").
 
 [`.github/main-ruleset.json`](../.github/main-ruleset.json) gained
 `deletion`, `non_fast_forward`, `required_linear_history`, a `pull_request`
@@ -489,6 +579,77 @@ Edit them in place:
 ```sh
 gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23829417 --input .github/tag-ruleset.json
 gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23859358 --input .github/tag-creation-ruleset.json
+```
+
+### Agent branch ruleset (2026-09-28)
+
+`.github/agent-branch-ruleset.json` ("Agent branches: no history rewrite") applies
+`non_fast_forward` with no bypass to `refs/heads/openhands/*` and
+`refs/heads/openhands/**/*`. These are the branches the host-local OpenHands
+resolver pushes, one per issue. The driver pushes with the owner's `gh` login, so
+a bypass for the admin role or for the owner's account would free it too. (A bypass
+granted only to a separate GitHub App would not.) The rule therefore has no bypass
+at all. It enforces server-side what the upstream OpenHands resolver does
+client-side, opening numbered branches instead of force-pushing
+([OpenHands/extensions@bea7a20c](https://github.com/OpenHands/extensions/tree/bea7a20c)
+`github-issue-to-pr` `scripts/main.py` L449-463).
+
+Rule patterns use `fnmatch` with `FNM_PATHNAME`, where `*` does not cross `/`
+([creating rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository),
+fetched 2026-09-28). There, `**/` may match zero directories, so
+`refs/heads/openhands/**/*` alone should also cover single-level names; GitHub's
+docs describe `releases/**/*` the same way. The single-level pattern is kept as an
+explicit, harmless duplicate.
+
+The ruleset leaves three things alone:
+- **Branch deletion.** `delete_branch_on_merge` is on, and a deletion rule would
+  also block post-merge auto-delete and the owner's cleanup
+  ([automatic deletion](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-the-automatic-deletion-of-branches)).
+  An admin-bypass deletion rule would protect nothing, because the driver acts as
+  the admin. The driver therefore closes delete-and-recreate on its own side: no ref
+  DELETE, no `--delete` and no `:ref` refspec.
+- **Main.** Ruleset 23739774 already requires checks, squash-only merges, linear
+  history and thread resolution, with no bypass. An approval rule would bind the
+  owner and the driver identically, because they are the same identity.
+- **Never-merge, no-ready, no-tag and no-workflow-edit.** These stay client-side
+  while the driver uses the owner's login.
+
+Overturn it in either of these cases:
+- a receipt shows the driver deleting or recreating an `openhands/*` ref: add
+  `{"type": "deletion"}` without bypass. That rule also blocks the owner's manual
+  deletion
+  ([restrict deletions](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#restrict-deletions)),
+  so merged `openhands/*` branches then stay until a cleanup window. In that window,
+  PUT the ruleset with `enforcement: "disabled"`, delete the branches, then restore
+  `active`;
+- any client-side limit above must hold server-side: move the driver to a dedicated
+  GitHub App identity without the `workflows` permission.
+
+**Applied 2026-09-28 as ruleset 24132241.**
+- The POST returned `enforcement: active`, no bypass actors, `non_fast_forward`
+  only, and both patterns. `GET .../rulesets/24132241` matches the committed file
+  field by field (name, target, enforcement, bypass actors, conditions, rules).
+- `GET .../rules/branches/openhands/issue-1` and
+  `GET .../rules/branches/openhands/nested/issue-1` each list `non_fast_forward`
+  (ruleset 24132241). Both were `[]` before.
+- Behaviour check with the owner login:
+  1. Pushed probe branch `openhands/ruleset-probe-20260928` at `9b874acc`.
+  2. A `--force-with-lease` rewrite to a sibling commit was refused with
+     `GH013: Repository rule violations ... Cannot force-push to this branch`, and
+     the branch stayed at `9b874acc`.
+  3. Deleting the probe branch succeeded, leaving no `openhands/*` refs.
+- No `push`-event workflow runs on these branches, because every `push:` trigger
+  names `main` or `v*` tags, so the probe, which had no pull request, started
+  none. Once a pull request is open from an `openhands/*` branch, each push
+  triggers `pull_request` `synchronize` runs (`validate.yml`, `token-report.yml`)
+  as it would for any branch
+  ([pull_request events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request)).
+
+Edit it in place:
+
+```sh
+gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/24132241 --input .github/agent-branch-ruleset.json
+gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/openhands/issue-1
 ```
 
 ## Recorded decisions, 2026-09-22
@@ -701,8 +862,8 @@ to the full commit SHA of `v2.4.4`
 annotated tag with `gh api repos/ossf/scorecard-action/git/tags/<sha>`) on a
 weekly schedule, `workflow_dispatch`, and push to `main`. `publish_results`
 is `false` -- results are never published to the public `api.scorecard.dev`
-dataset or badge. The workflow's top-level permission is `contents: read`;
-since 2026-09-22 the `analysis` job alone also holds `security-events: write`,
+dataset or badge. The workflow's top-level permissions are `{}` (since 2026-10-04)
+and the `analysis` job holds `contents: read`; since 2026-09-22 it alone also holds `security-events: write`,
 which it uses only to upload the SARIF report to code scanning with
 `github/codeql-action/upload-sarif` v4.38.1 (free for this public repository,
 no GitHub Advanced Security purchase). The SARIF report is also retained as a
@@ -712,30 +873,40 @@ workflow artifact (`scorecard-results-<run_id>`, 5-day retention).
 the full commit SHA of its latest release `v2.21.1`
 (`e14015d583714f6e62063499dc959a02595150a1`, from
 `gh api repos/step-security/harden-runner/releases/latest`), runs as the
-*first* step, before checkout, with `egress-policy: audit` (never `block`),
-on 21 of 25 `ubuntu-24.04` jobs (measured 2026-09-23 at HEAD: every job across
-`.github/workflows/*.yml` whose `runs-on` is a literal `ubuntu-` label, using
-`tests/test_workflow_hardening.py`'s own job/first-step parser -- 25 such jobs
-total, 4 in the hash-frozen exemptions below, and all 21 remaining jobs start
-with `harden-runner` in audit mode, per
-`test_every_ubuntu_job_starts_with_harden_runner_in_audit_mode`). The four exempt jobs are those whose
-workflows are byte-pinned by retained evidence: `source` and `destination`
-(`native-offhost-app-state.yml`, pinned in
-`blueprints/convergence-practice/offhost-app-state/plan.json`'s
-`frozen_sources`), `synthetic-restore` (`native-offhost-restore.yml`, pinned
-in `blueprints/convergence-practice/offhost-restore/hosted-plan.json`) and
+*first* step, before checkout, with `egress-policy: audit` (never `block`).
+Measured 2026-09-26 with `tests/test_workflow_hardening.py`'s own job/first-step
+parser (changed after `v2026.09.26.2`): all 32 jobs across `.github/workflows/*.yml`
+whose `runs-on` is a literal `ubuntu-` label start with it, and so do 3 of the 4
+`macos-` jobs, because the pinned release also supports GitHub-hosted macOS runners
+in audit mode. The one job without it is `hardware-profile-smoke.yml`'s
+`macos-profile`, a named ownership exemption (another task owns that file), not a
+platform one. `test_every_ubuntu_and_macos_job_starts_with_harden_runner_in_audit_mode`
+fails on any other `ubuntu` or `macos` job without the step, and on a job whose
+runner label is neither.
+
+Until 2026-09-26 four `ubuntu` jobs were exempt because retained evidence pinned
+their workflows' exact bytes: `source` and `destination`
+(`native-offhost-app-state.yml`, `frozen_sources` of
+`blueprints/convergence-practice/offhost-app-state/plan.json`),
+`synthetic-restore` (`native-offhost-restore.yml`,
+`blueprints/convergence-practice/offhost-restore/hosted-plan.json`) and
 `native-token-tools` (`native-token-e2e.yml`, recorded in four dated execution
-receipts). Adding a step to one of those needs the evidence re-run and
-re-pinned. `bootstrap-macos` runs on `macos-15`, which `harden-runner` does not
-support. `tests/test_workflow_hardening.py` classifies every job: an unhardened
-`ubuntu` job outside the named exemptions fails, an unrecognized runner label
-fails, and each exemption fails as soon as its workflow drifts from the pinned
-hash. The exemptions and their overturn condition are recorded in the
-"Integration follow-up" of
+receipts). The exemptions and their overturn condition are in the "Integration
+follow-up" of
 [`docs/decisions/2026-09-22-actions-hardening-fix-round.md`](decisions/2026-09-22-actions-hardening-fix-round.md).
-Audit mode only logs
-observed egress; it cannot fail a job or block a network call, so it changes
-no existing pass/fail behavior.
+All four now start with the step
+([`docs/decisions/2026-09-26-token-workflow-hardening.md`](decisions/2026-09-26-token-workflow-hardening.md)):
+`HASH_FROZEN` in the test is empty, and
+`test_formerly_exempt_workflows_stay_hardened` keeps the four jobs hardened. No run
+has executed the step in them yet. Local `--install` runs, which call
+`scripts/native_token_ci.py` directly, re-recorded the `native-token-tools` harness
+receipts against the new workflow bytes (`fb06cf92…`,
+[evidence](../evidence/artifacts/token-workflow-hardening-20260926/README.md)); the
+pull request's hosted run of that job is the step's first execution there. The three
+off-host jobs got the step with a refresh of only their plans' prospective bindings,
+as on 2026-09-20, so each workflow's next dispatch is its first run with the step.
+Audit mode only logs observed egress; it cannot fail a job or block a network call,
+so it changes no existing pass/fail behavior.
 
 **`dependency-review.yml` (actions/dependency-review-action).** Pinned to
 the full commit SHA of its latest release `v5.0.0`
@@ -894,9 +1065,11 @@ one instead of overlapping at all -- keyed on whether the run is a manual
 silently replace a pending manual request in the same queue slot (GitHub's
 default concurrency queue holds one pending run per group, and a newly
 queued run cancels/replaces it; the `queue: max` property that allows up to
-100 queued runs instead is rejected by this repository's pinned actionlint
-1.7.12, which does not yet recognize that key -- see
-[the decision record](decisions/2026-09-23-bot-pr-dispatch.md)). Two runs
+100 queued runs instead was not used because the actionlint pinned on 2026-09-23,
+rhysd/actionlint 1.7.12, rejected that key -- see
+[the decision record](decisions/2026-09-23-bot-pr-dispatch.md); kjanat/actionlint
+1.17.0, pinned since 2026-09-28, accepts it, and re-adopting it is a separate
+change). Two runs
 *within* the same category can still replace each other's pending slot
 (an accepted, lower-stakes loss: the later same-category request already
 supersedes the earlier one), and a manual and a scheduled run can therefore
@@ -905,12 +1078,25 @@ close together -- `--force-with-lease` above is what keeps that safe, not
 this concurrency group.
 `gh pr create` opens `automation/catalog-freshness` against `main` (or
 `gh pr edit` updates the existing one, keyed on `gh pr list --head
-automation/catalog-freshness`), with a body that includes the run's
-`drift.md` table (each cell rendered as escaped inline code by
-`scripts/freshness_propose.py`'s `md_cell()`, so an upstream release tag
-fetched from an external API can never break the Markdown table or smuggle
-formatting) and states plainly: "no selection or pin changed; pin bumps
-require a qualified receipt under evidence/artifacts/*/".
+automation/catalog-freshness`), with a description pointing to the branch's
+current report and receipt. The description contains no run-specific table,
+so overlapping proposals cannot leave an older run's report in the body. It
+includes the required `### SOTA sources` section and states plainly:
+"no selection or pin changed; pin bumps require a qualified receipt under
+evidence/artifacts/*/". Reports cover foundation and trading source observations,
+so a new or unlabeled PR defaults to `lane:shared`. An existing single supported
+lane label is preserved and reflected in the body; multiple or unknown lane
+labels stop the metadata step for owner resolution. Shared reports retain the
+other lane's acknowledgement requirement in [the lane policy](lanes.md).
+See the [metadata decision](decisions/2026-10-02-catalog-freshness-pr-metadata.md).
+
+For an existing PR whose old body lacks source metadata, the preceding push can
+capture that old body in its `synchronize` payload. The later bot body edit does
+not trigger another run. After approval, if the source gate fails for that reason,
+make a genuine human-authenticated body edit that retains the source section;
+rerunning the old event retains the old payload. Future synchronizations carry
+the corrected body. This one-time migration preserves the workflow's push order
+and token permissions. [GitHub documents the event behavior](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
 
 **No workflow is dispatched from this job, and that is deliberate.** An
 earlier version of this design called `gh workflow run validate.yml
@@ -962,7 +1148,7 @@ reviewer's act. See "Live test, 2026-09-23" in the decision record.
 
 `propose` is the one job in this workflow with write permissions
 (`contents: write`, `pull-requests: write`, scoped to the job, not the
-workflow -- the top-level `permissions:` block stays `contents: read`),
+workflow -- the top-level `permissions:` block is `{}` and `freshness` holds `contents: read`),
 because it is the one job that opens a PR; it needs no `actions: write`
 since it no longer dispatches other workflows. It is still never a required
 check and it never merges anything by itself.
@@ -1230,10 +1416,14 @@ holds the evidence, alternatives and overturn comparison for each item.
 - **`security-scan.yml`.** The `osv-scanner` job (OSV-Scanner 2.6.0,
   checksum-verified) scans every lockfile and manifest listed in
   `.github/osv-scanner-lockfiles.json` with `--no-resolve` and fails on any
-  vulnerability not ignored in `.github/osv-scanner.toml`; it runs on every PR
-  (a required check in branch ruleset 23739774). Off PRs it keeps its SARIF as
-  an artifact that the tool-free `osv-sarif-upload` job uploads (category
-  `osv-scanner`). `tests/test_osv_lockfile_coverage.py` fails when a
+  vulnerability not ignored in `.github/osv-scanner.toml`; the inventory entries
+  that name `.github/osv-scanner-frozen-macos.toml` (today the one frozen macOS
+  lock) are scanned in an invocation of their own under that config alone,
+  because an explicit `--config` applies to every input of one invocation. It
+  runs on every PR (a required check in branch ruleset 23739774). Off PRs it
+  keeps both SARIF reports as one artifact that the tool-free
+  `osv-sarif-upload` job uploads (categories `osv-scanner` and
+  `osv-scanner-frozen-macos`). `tests/test_osv_lockfile_coverage.py` fails when a
   tracked lockfile is missing from the list. Its `excluded` list may name only
   a deliberately vulnerable test fixture, with a reason and an evidence path;
   today it lists three gap-wave-2 DVC-lock evidence fixtures under

@@ -1,0 +1,1 @@
+{"type":"object","properties":{"first_layer":{"type":"string"}},"required":["first_layer"],"additionalProperties":false}

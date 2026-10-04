@@ -1,0 +1,158 @@
+{
+  "layers": [
+    {
+      "layer_id": "structural-code-search",
+      "selection": [
+        {
+          "name": "ast-grep (C02)",
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "role": "Unranked clean-install finalist for direct syntax-tree search and rewrite through a CLI that Claude Code and Codex can invoke.",
+          "install_command": "npm install --global @ast-grep/cli",
+          "install_source": "Upstream README inspected at release 0.45.3; this is its documented install command.",
+          "basis": [
+            {
+              "url": "https://raw.githubusercontent.com/ast-grep/ast-grep/0.45.3/README.md",
+              "shows": "Direct requirement fit: tree-sitter structural matching, code-shaped patterns, metavariables, replacement templates, YAML rules, and command-line search/rewrite examples. The README documents npm, pip, Cargo and binary-install options."
+            },
+            {
+              "url": "https://api.github.com/repos/ast-grep/ast-grep",
+              "shows": "Not archived; default branch main; 70 open issue/PR entries at inspection. MIT license, recorded as information only."
+            },
+            {
+              "url": "https://api.github.com/repos/ast-grep/ast-grep/commits?per_page=1",
+              "shows": "Latest default-branch commit 25334496c105c9c728f0a6024f3d164aed40cacc is dated 2026-09-28 and merges a custom-language loading feature, inside the 90-day window."
+            },
+            {
+              "url": "https://api.github.com/repos/ast-grep/ast-grep/releases/latest",
+              "shows": "Release 0.45.3 was published 2026-08-31. Its assets include Linux x86_64 GNU and macOS aarch64 binaries. These support the intended platform choices; installation on WSL2 was not exercised."
+            },
+            {
+              "url": "https://api.github.com/repos/ast-grep/ast-grep/actions/runs/36435558702/jobs?per_page=100",
+              "shows": "The 2026-09-28 default-branch coverage workflow completed successfully on ubuntu-latest. Its coverage-generation, formatting, lint and NAPI-lint jobs succeeded. This verifies public CI results, without establishing a coverage percentage or comparative search accuracy."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Semgrep Community Edition (C09)",
+          "repository": "https://github.com/semgrep/semgrep",
+          "role": "Unranked clean-install finalist for structural queries and rule-based automatic fixes, with an upstream MCP integration for agent sessions.",
+          "install_command": "python3 -m pip install semgrep",
+          "install_source": "Upstream README inspected at v1.179.0 explicitly documents this command for Ubuntu/WSL/Linux/macOS. Use an isolated Python environment on distributions that restrict system-wide pip installs.",
+          "basis": [
+            {
+              "url": "https://raw.githubusercontent.com/semgrep/semgrep/v1.179.0/README.md",
+              "shows": "Documents code-pattern queries, custom rules and automatic-fix examples. Login is optional for local use. The repository also documents semgrep mcp and a Claude Code plugin, providing a direct agent integration path."
+            },
+            {
+              "url": "https://api.github.com/repos/semgrep/semgrep",
+              "shows": "Not archived; default branch develop; 943 open issue/PR entries at inspection. LGPL-2.1 license, recorded as information only."
+            },
+            {
+              "url": "https://api.github.com/repos/semgrep/semgrep/commits?per_page=1",
+              "shows": "Latest default-branch commit 31729a1719c6e76ac8d41ec8fb9ab191621ee10f has a committer date of 2026-09-30, inside the 90-day window."
+            },
+            {
+              "url": "https://api.github.com/repos/semgrep/semgrep/releases/latest",
+              "shows": "Release v1.179.0 was published 2026-10-02, demonstrating current release activity."
+            },
+            {
+              "url": "https://api.github.com/repos/semgrep/semgrep/actions/runs?branch=develop&per_page=10",
+              "shows": "At the inspected default-branch head, the tests workflow, grammar tests, tree-sitter-core tests and end-to-end CI workflow succeeded. The 2026-10-01 nightly workflow failed, so the observed CI record is mixed; that failure was not diagnosed within this budget."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C07",
+          "name": "Greph",
+          "reason": "Strong PHP-specific contender with structural rewrites, oracle regressions and published WordPress comparisons, but its PHP AST scope is narrower than the finalists; its two reported cold AST comparisons split the runtime wins. [Pinned README](https://raw.githubusercontent.com/inline0/greph/a2fe0e83c343877507a9c8fcd16fee365e57e9b9/README.md)."
+        },
+        {
+          "key": "C06",
+          "name": "rwr",
+          "reason": "Direct structural search/rewrite fit for Ruby, with a documented Cargo install and Claude skill, but its Ruby-specific scope makes it a specialist choice rather than a general clean-host selection. [Pinned README](https://raw.githubusercontent.com/dpep/rwr/e6e270d27cb755daebb4ccbfff03764b30c21e17/README.md)."
+        },
+        {
+          "key": "C08",
+          "name": "Threadmoth",
+          "reason": "Provides tree-sitter targeting, structural inspection, MCP integration and binaries for both target architectures, but its documented emphasis is bounded file mutation; that is a less direct fit for repository-wide code-pattern search, and its self-checks do not resolve the packet's retrieval comparison. [Pinned README](https://raw.githubusercontent.com/matthewjameswatkins1978-cyber/Threadmoth/e36e2b46ac21023b4a6092ba28d82afc12127a7b/README.md)."
+        },
+        {
+          "key": "C04",
+          "name": "astx",
+          "reason": "Capable JavaScript/TypeScript structural transforms, but upstream describes limited active maintenance and its latest release is from 2023-09-24; the 2026-08-05 documentation commit keeps it outside the frozen stale exclusion. [README](https://raw.githubusercontent.com/codemodsquad/astx/9f0ee21ce3b1e34a0122a50a5e604a109fa9a09a/README.md), [release API](https://api.github.com/repos/codemodsquad/astx/releases/latest)."
+        },
+        {
+          "key": "C05",
+          "name": "NodeSeek",
+          "reason": "Credible eight-language contender with 126 reported example/metamorphic tests, successful public CI and a reproducible Apple M4 benchmark; its latest commit/release dates are 2026-07-14, and the benchmark does not establish target-host precision, recall or token advantages over the finalists. [README](https://raw.githubusercontent.com/connorg45/nodeseek/56ad43154113b6cf5db7c4e8763c8ffb7386e334/README.md), [CI](https://github.com/connorg45/nodeseek/actions/runs/29305854275)."
+        },
+        {
+          "key": "C01",
+          "name": "No additional component",
+          "reason": "The packet contains no completed comparison establishing that text search and symbol navigation cover the structural queries and rewrites; omitting a component remains an option to test, rather than an evidenced selection."
+        },
+        {
+          "key": "C03",
+          "name": "GritQL",
+          "reason": "Expressive structural search/rewrite capability, but its latest release is dated 2026-03-30 and its latest default-branch commit is a 2026-08-30 dependency update, giving weaker recent release/development evidence than the finalists. [README](https://raw.githubusercontent.com/biomejs/gritql/4ca283484ab9bd11ca3cbc9e14b5ad2db5d61a37/README.md), [release API](https://api.github.com/repos/biomejs/gritql/releases/latest), [commit API](https://api.github.com/repos/biomejs/gritql/commits?per_page=1)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "The selections are two alternative finalists; a single winner remains undecided. On the specified clean WSL2 Linux x86_64 host, compare ast-grep 0.45.3 and Semgrep CE 1.179.0, with NodeSeek and GritQL as challengers, against a fixed ripgrep-plus-symbol-navigation baseline. Use a labeled corpus of structural queries covering multiline code, comments/strings, repeated captures, nested calls and safe rewrites. Measure precision, recall, incorrect rewrites and total agent tokens per correctly answered query, using identical agent/client settings and counting retries and tool output. Record clean-install success and cold/warm latency separately. If the text/symbol baseline covers the required tasks with equivalent correctness and lower token cost, the no-additional-component option should win. Repeat the leading arms on macOS arm64 for secondary-platform validation.",
+      "evidence_gaps": [
+        "The packet supplies no comparison where every named arm ran. The inspected upstream evidence does not establish comparative precision, recall or agent-token superiority on the target host.",
+        "Greph's published WordPress CI benchmark reports 2859.27 ms versus ast-grep's 4090.82 ms for new $CLASS(), but 5537.70 ms versus 4133.41 ms for array($$$ITEMS). These are workload-specific runtime results, not a general quality ranking. [Benchmark tables](https://raw.githubusercontent.com/inline0/greph/a2fe0e83c343877507a9c8fcd16fee365e57e9b9/README.md).",
+        "NodeSeek reports 0.031 seconds and 983 structural matches on an Apple M4 corpus, versus grep's 0.011 seconds and 1070 text hits. The README explains that the tools answer different questions; those counts are not labeled precision/recall evidence. [Benchmark methodology](https://raw.githubusercontent.com/connorg45/nodeseek/56ad43154113b6cf5db7c4e8763c8ffb7386e334/README.md).",
+        "No clean-host installation or runtime test was performed. Ast-grep's Linux x86_64 and macOS arm64 release artifacts were verified in the release API. Semgrep documents Linux/WSL/macOS installation, but its macOS arm64 package support was not independently verified within this budget. The documented parser-based workloads imply CPU use; the RTX 4090 is not needed for the described functionality.",
+        "All eight repositories are unarchived and have a default-branch commit within 2026-07-04 through 2026-10-02, so none meets the frozen stale exclusion. Recent commits include documentation-only and bot changes, which provide less maintenance evidence than substantive development. Issue response times and closure activity were not sampled; open issue/PR counts are backlog snapshots.",
+        "The required ctx_fetch_and_index tool was denied by the environment with 'requires approval, but approval policy is never'. Eight pinned upstream READMEs were instead fetched through read-only HTTP, indexed with ctx_index and read with ctx_search. This deviates from the requested fetch route.",
+        "Research used 30 GitHub API calls and eight successful page fetches. One denied ctx fetch request retrieved no page. A web-search request containing three queries failed with an upstream timeout and supplied no evidence."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/semgrep/semgrep",
+        "https://api.github.com/repos/semgrep/semgrep/releases/latest",
+        "https://api.github.com/repos/semgrep/semgrep/commits?per_page=1",
+        "https://api.github.com/repos/inline0/greph",
+        "https://api.github.com/repos/inline0/greph/releases/latest",
+        "https://api.github.com/repos/inline0/greph/commits?per_page=1",
+        "https://api.github.com/repos/dpep/rwr",
+        "https://api.github.com/repos/dpep/rwr/releases/latest",
+        "https://api.github.com/repos/dpep/rwr/commits?per_page=1",
+        "https://api.github.com/repos/matthewjameswatkins1978-cyber/Threadmoth",
+        "https://api.github.com/repos/matthewjameswatkins1978-cyber/Threadmoth/releases/latest",
+        "https://api.github.com/repos/matthewjameswatkins1978-cyber/Threadmoth/commits?per_page=1",
+        "https://api.github.com/repos/codemodsquad/astx",
+        "https://api.github.com/repos/codemodsquad/astx/releases/latest",
+        "https://api.github.com/repos/codemodsquad/astx/commits?per_page=1",
+        "https://api.github.com/repos/ast-grep/ast-grep",
+        "https://api.github.com/repos/ast-grep/ast-grep/releases/latest",
+        "https://api.github.com/repos/ast-grep/ast-grep/commits?per_page=1",
+        "https://api.github.com/repos/connorg45/nodeseek",
+        "https://api.github.com/repos/connorg45/nodeseek/releases/latest",
+        "https://api.github.com/repos/connorg45/nodeseek/commits?per_page=1",
+        "https://api.github.com/repos/biomejs/gritql",
+        "https://api.github.com/repos/biomejs/gritql/releases/latest",
+        "https://api.github.com/repos/biomejs/gritql/commits?per_page=1",
+        "https://raw.githubusercontent.com/semgrep/semgrep/v1.179.0/README.md",
+        "https://raw.githubusercontent.com/inline0/greph/a2fe0e83c343877507a9c8fcd16fee365e57e9b9/README.md",
+        "https://raw.githubusercontent.com/dpep/rwr/e6e270d27cb755daebb4ccbfff03764b30c21e17/README.md",
+        "https://raw.githubusercontent.com/matthewjameswatkins1978-cyber/Threadmoth/e36e2b46ac21023b4a6092ba28d82afc12127a7b/README.md",
+        "https://raw.githubusercontent.com/codemodsquad/astx/9f0ee21ce3b1e34a0122a50a5e604a109fa9a09a/README.md",
+        "https://raw.githubusercontent.com/ast-grep/ast-grep/0.45.3/README.md",
+        "https://raw.githubusercontent.com/connorg45/nodeseek/56ad43154113b6cf5db7c4e8763c8ffb7386e334/README.md",
+        "https://raw.githubusercontent.com/biomejs/gritql/4ca283484ab9bd11ca3cbc9e14b5ad2db5d61a37/README.md",
+        "https://api.github.com/repos/ast-grep/ast-grep/actions/runs?branch=main&per_page=10",
+        "https://api.github.com/repos/semgrep/semgrep/actions/runs?branch=develop&per_page=10",
+        "https://api.github.com/repos/connorg45/nodeseek/actions/runs?branch=main&per_page=10",
+        "https://api.github.com/repos/ast-grep/ast-grep/actions/runs?branch=main&event=push&per_page=10",
+        "https://api.github.com/repos/connorg45/nodeseek/actions/runs?branch=main&event=push&per_page=10",
+        "https://api.github.com/repos/ast-grep/ast-grep/actions/runs/36435558702/jobs?per_page=100"
+      ]
+    }
+  ]
+}

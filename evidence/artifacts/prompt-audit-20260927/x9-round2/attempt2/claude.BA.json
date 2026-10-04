@@ -1,0 +1,124 @@
+{
+ "lane": "Claude Agent tool, blind-adjudicator (frontmatter model opus, effort max; Read, Glob and Grep only)",
+ "usage": {
+  "agent_type": "blind-adjudicator",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 11,
+  "advisor_calls": 1,
+  "provider_usage": {
+   "input_tokens": 24,
+   "cache_creation_input_tokens": 107000,
+   "cache_read_input_tokens": 777846,
+   "output_tokens": 53580
+  },
+  "harness_counters": {
+   "subagent_tokens": 132998,
+   "tool_uses": 17,
+   "duration_ms": 579136
+  }
+ },
+ "return": {
+  "leak": false,
+  "leak_text": "",
+  "items": [
+   {
+    "id": "X9",
+    "choice": "B",
+    "reasons": "No source, repository file or installed-client record contradicts either return. The current line is contradicted: CLAUDE.md:3 tells the model to inspect with /mcp and /context, but installed client 2.1.283 refuses both as Skill calls and says to ask the user to run them (C1, C2). So 'neither' loses. A's /plugin is not a contradiction. C4 is only a headless session's command list, and it has no 'plugin' entry. R10 documents /plugin as a command the user types in a running terminal session. docs/harness-defaults.md:67 requires at least the installed client and the changelog for an absence claim. A's Skill clause is also accurate (C3, R5). The executed comparison does not separate A from B. correct is 9 of 9 for A, B and the current line, and no_builtin_skill is 9 for each. executed_target is 6 for A and 6 for B, against 3 for the current line. asks_user is 0 in every arm across K1-K4. K4 was added to test the fallback, but it records 'The case's premise did not hold.' The method lists interactive sessions and other session models as not tested. The choice therefore rests on the sources and the repository. The fallback decides it for B. CLAUDE.md loads at launch (S8), so this line also reaches headless claude -p runs. The comparison ran that way, and the repository documents headless runs of saved workflows (examples/claude-native/workflows/README.md:53-54). R59 separates unattended runs from sessions 'where someone is there to answer', and this line loads in both. B's 'report it as unconfirmed and name the command that would' returns a status whether or not anyone answers. In an interactive session, the named command is the one the user needs to run, which fits the client's own ask-the-user pattern (C1, C2, R15). A's 'ask for the relevant /plugin, /mcp or /context output' only helps if someone answers. In a headless run the request goes unanswered, and /plugin is not in the headless command list (C4). B also matches AGENTS.md:15, which allows stopping only for necessary native sign-in, operating system consent or an unresolved material decision and says to continue independent work. It also matches the repository's rule that 'an unknown stays unknown' (examples/claude-native/agents/stack-verifier.md:18). B names only /mcp and /context. Both are in the headless list (C4), and R42 documents both as showing the current session's state. By contrast, /plugin's Installed view confirms only that a plugin is 'listed and enabled' (R43), and a plugin can be installed without being activated (R45), so /plugin may not settle 'active'. B is 3 lines to A's 6, and the repository names the word budget of the instruction surface 'per session and per child' as something to revisit (docs/decisions/2026-09-27-claude-harness-settings.md:200). A's real advantage is coverage. Plugins can ship agents (T1), and B does not list them. A's listed-versus-executed clause guards against tool names loaded from the discovery cache before any connection (R27), which B's 'present' does not. The repository's own check also makes one useful call (docs/token-session-handbook.md:67). This could matter for a more literal session model (S2), which the comparison did not test. The advantage is limited. R27 says the discovery cache is off by default. With the tested model, B's text led to target execution as often as A's (6 and 6). When presence cannot settle a claim, B reports it as unconfirmed rather than asserting it. On balance, B's fallback works in attended and unattended runs alike, and that outweighs A's coverage additions, whose value the retained runs did not show.",
+    "sources": [
+     {
+      "locator": "CLAUDE.md:3",
+      "quote": "Inspect native loaded tools with `/mcp` and loaded context with `/context` before"
+     },
+     {
+      "locator": "C1",
+      "quote": "context is a built-in CLI command, not a skill. Ask the user to run /context themselves — it cannot be invoked via the Skill tool."
+     },
+     {
+      "locator": "C2",
+      "quote": "mcp is a UI command, not a skill. Ask the user to run /mcp themselves — it cannot be invoked via the Skill tool."
+     },
+     {
+      "locator": "C3",
+      "quote": "Only names from the listing (or that the user typed explicitly) are valid. Built-in CLI commands (`/help`, `/clear`, …) aren't skills."
+     },
+     {
+      "locator": "R5",
+      "quote": "A few built-in commands are also available through the Skill tool, including `/init` and `/security-review`. Other built-in commands such as `/compact` are not."
+     },
+     {
+      "locator": "C4",
+      "quote": "slash_commands (107 entries) includes \"mcp\", \"context\" and \"reload-plugins\" and no \"plugin\""
+     },
+     {
+      "locator": "R10",
+      "quote": "`/plugin` is a command you type inside a running Claude Code terminal session, and it opens an interactive panel."
+     },
+     {
+      "locator": "docs/harness-defaults.md:67",
+      "quote": "An absence claim (\"X has no Y\") needs at least steps 1 and 2 at the installed version"
+     },
+     {
+      "locator": "S8",
+      "quote": "CLAUDE.md and CLAUDE.local.md files in the directory hierarchy above the working directory are loaded at launch."
+     },
+     {
+      "locator": "examples/claude-native/workflows/README.md:53-54",
+      "quote": "A headless\n   `claude -p` run of a saved workflow is refused"
+     },
+     {
+      "locator": "R59",
+      "quote": "leave the addition out of human-in-the-loop applications, where someone is there to answer."
+     },
+     {
+      "locator": "R15",
+      "quote": "Claude is now told to ask you to run the skill instead of replicating its workflow"
+     },
+     {
+      "locator": "AGENTS.md:15",
+      "quote": "Stop only for necessary native sign-in, operating system consent or an unresolved material decision, and continue independent work."
+     },
+     {
+      "locator": "examples/claude-native/agents/stack-verifier.md:18",
+      "quote": "A command you did not run is not run, a failure stays a failure and an unknown stays unknown."
+     },
+     {
+      "locator": "R42",
+      "quote": "The `/context` command shows everything occupying the context window for the current session, broken down by category: system prompt, system tools, MCP tools, custom subagents with the source each loaded from, memory files, skills, and conversation messages.\nRun `/mcp` to see every configured server, its connection status, and whether you have approved it for the current project."
+     },
+     {
+      "locator": "R43",
+      "quote": "Run `/plugin` and open **Installed**. Confirm the plugin is listed and enabled."
+     },
+     {
+      "locator": "R45",
+      "quote": "Claude Code didn't activate the plugin during the install"
+     },
+     {
+      "locator": "docs/decisions/2026-09-27-claude-harness-settings.md:200",
+      "quote": "**Word budget.** Revisit with a `/context` measurement of the instruction surface per session and per child."
+     },
+     {
+      "locator": "T1",
+      "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components that Claude Code installs and loads as one unit."
+     },
+     {
+      "locator": "R27",
+      "quote": "Claude Code loaded the server's tool list from its discovery cache, saved in a previous session, instead of connecting at startup, and Claude Code connects the server the first time Claude calls one of the server's tools.\nThe discovery cache is off by default unless a gradual rollout has enabled it for your account."
+     },
+     {
+      "locator": "docs/token-session-handbook.md:67",
+      "quote": "After a relevant setup change, inspect connected servers with `/mcp`, then make one useful call and check its returned content."
+     },
+     {
+      "locator": "S2",
+      "quote": "interprets prompts literally and explicitly, particularly at lower effort levels"
+     }
+    ],
+    "confidence": 0.6
+   }
+  ]
+ }
+}

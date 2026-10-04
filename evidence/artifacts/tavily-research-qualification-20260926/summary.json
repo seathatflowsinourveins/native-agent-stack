@@ -1,0 +1,359 @@
+{
+ "all_reports": {
+  "reports": 33,
+  "response_time_s": {
+   "max": 367.68,
+   "median": 248.85,
+   "min": 168.49
+  },
+  "sources_per_report": {
+   "max": 32,
+   "median": 17,
+   "min": 11
+  },
+  "status_counts": {
+   "completed": 33
+  }
+ },
+ "kind": "tavily_research_run_summary",
+ "landscape": {
+  "content_chars": 16934,
+  "created_at": "2026-09-26T03:00:49.112271+00:00",
+  "model": "pro",
+  "report": "tavily-research-pro.json",
+  "request_id": "uuid-sha256:810355bc30e79707",
+  "response_time_s": 291.57,
+  "sources": 32,
+  "status": "completed"
+ },
+ "privacy": {
+  "host_paths": false,
+  "raw_request_ids": false,
+  "report_text": false,
+  "source_urls": false
+ },
+ "request_id_hash": "uuid-sha256:<first 16 hex digits of the SHA-256 of the request id's UTF-8 bytes>",
+ "schema_version": 1,
+ "sweep": {
+  "content_chars": {
+   "max": 16257,
+   "median": 11618.0,
+   "min": 8141
+  },
+  "created_at_first": "2026-09-26T04:17:21.304485+00:00",
+  "created_at_last": "2026-09-26T04:49:21.046007+00:00",
+  "launcher_exit_status_counts": {
+   "0": 32
+  },
+  "launcher_layers_match_reports": true,
+  "reports": 32,
+  "reports_with_expected_fields": 32,
+  "request_ids_distinct": 32,
+  "request_ids_uuid_shaped": 32,
+  "response_time_s": {
+   "max": 367.68,
+   "median": 248.18,
+   "min": 168.49
+  },
+  "runs": [
+   {
+    "content_chars": 13028,
+    "created_at": "2026-09-26T04:17:21.423511+00:00",
+    "layer": "agent-sdks",
+    "request_id": "uuid-sha256:d75368c8c8fb69de",
+    "response_time_s": 241.93,
+    "sources": 20,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11493,
+    "created_at": "2026-09-26T04:17:21.313777+00:00",
+    "layer": "agents-models-workers",
+    "request_id": "uuid-sha256:328496932080c117",
+    "response_time_s": 367.68,
+    "sources": 12,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11377,
+    "created_at": "2026-09-26T04:17:21.323807+00:00",
+    "layer": "backtesting-engine",
+    "request_id": "uuid-sha256:15743fa5db629cee",
+    "response_time_s": 230.79,
+    "sources": 13,
+    "status": "completed"
+   },
+   {
+    "content_chars": 10284,
+    "created_at": "2026-09-26T04:17:21.304485+00:00",
+    "layer": "ci-supply-chain",
+    "request_id": "uuid-sha256:f24d31992e2f71c6",
+    "response_time_s": 211.19,
+    "sources": 17,
+    "status": "completed"
+   },
+   {
+    "content_chars": 10692,
+    "created_at": "2026-09-26T04:21:02.885671+00:00",
+    "layer": "code-navigation",
+    "request_id": "uuid-sha256:da41bcb42a233de6",
+    "response_time_s": 211.49,
+    "sources": 14,
+    "status": "completed"
+   },
+   {
+    "content_chars": 13011,
+    "created_at": "2026-09-26T04:21:12.711404+00:00",
+    "layer": "data-quality-orchestration",
+    "request_id": "uuid-sha256:2eb608f9d413f2e9",
+    "response_time_s": 261.96,
+    "sources": 25,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11664,
+    "created_at": "2026-09-26T04:21:32.687909+00:00",
+    "layer": "document-retrieval",
+    "request_id": "uuid-sha256:3cdc010aafdae8a5",
+    "response_time_s": 290.59,
+    "sources": 11,
+    "status": "completed"
+   },
+   {
+    "content_chars": 16257,
+    "created_at": "2026-09-26T04:23:33.004765+00:00",
+    "layer": "durable-memory",
+    "request_id": "uuid-sha256:94ae022b9860a8a1",
+    "response_time_s": 276.68,
+    "sources": 22,
+    "status": "completed"
+   },
+   {
+    "content_chars": 12136,
+    "created_at": "2026-09-26T04:24:44.196400+00:00",
+    "layer": "evaluation-experiments",
+    "request_id": "uuid-sha256:220d4605054f7ffc",
+    "response_time_s": 248.85,
+    "sources": 19,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11896,
+    "created_at": "2026-09-26T04:25:43.932007+00:00",
+    "layer": "execution-broker",
+    "request_id": "uuid-sha256:9c15f4eea4c52e9e",
+    "response_time_s": 251.77,
+    "sources": 13,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11469,
+    "created_at": "2026-09-26T04:26:24.020478+00:00",
+    "layer": "git-github-automation",
+    "request_id": "uuid-sha256:5b80959ea2c0469f",
+    "response_time_s": 210.12,
+    "sources": 17,
+    "status": "completed"
+   },
+   {
+    "content_chars": 12962,
+    "created_at": "2026-09-26T04:28:14.349676+00:00",
+    "layer": "hosting-services",
+    "request_id": "uuid-sha256:47f1287d48a64c98",
+    "response_time_s": 303.07,
+    "sources": 25,
+    "status": "completed"
+   },
+   {
+    "content_chars": 14214,
+    "created_at": "2026-09-26T04:28:55.457642+00:00",
+    "layer": "identity-provenance",
+    "request_id": "uuid-sha256:d8348daeb8fb0c18",
+    "response_time_s": 203.16,
+    "sources": 16,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11083,
+    "created_at": "2026-09-26T04:29:55.164679+00:00",
+    "layer": "instructions-skills",
+    "request_id": "uuid-sha256:630f0bc5534417b6",
+    "response_time_s": 308.44,
+    "sources": 14,
+    "status": "completed"
+   },
+   {
+    "content_chars": 12128,
+    "created_at": "2026-09-26T04:30:05.139519+00:00",
+    "layer": "isolation",
+    "request_id": "uuid-sha256:7e5d48795df8f9cd",
+    "response_time_s": 347.73,
+    "sources": 17,
+    "status": "completed"
+   },
+   {
+    "content_chars": 12680,
+    "created_at": "2026-09-26T04:32:26.508219+00:00",
+    "layer": "market-data-reference",
+    "request_id": "uuid-sha256:daa57616b6ac57fb",
+    "response_time_s": 271.1,
+    "sources": 17,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11016,
+    "created_at": "2026-09-26T04:33:25.701598+00:00",
+    "layer": "mcp-surfaces",
+    "request_id": "uuid-sha256:71dc5acc60dd0751",
+    "response_time_s": 282.5,
+    "sources": 20,
+    "status": "completed"
+   },
+   {
+    "content_chars": 10368,
+    "created_at": "2026-09-26T04:35:06.595677+00:00",
+    "layer": "native-clients",
+    "request_id": "uuid-sha256:33e285870aa85f2a",
+    "response_time_s": 202.71,
+    "sources": 11,
+    "status": "completed"
+   },
+   {
+    "content_chars": 15892,
+    "created_at": "2026-09-26T04:35:56.571787+00:00",
+    "layer": "observability-hosting",
+    "request_id": "uuid-sha256:f0799688b01689e9",
+    "response_time_s": 247.51,
+    "sources": 18,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11893,
+    "created_at": "2026-09-26T04:37:07.832639+00:00",
+    "layer": "observation-inference",
+    "request_id": "uuid-sha256:50484fb095eaf79a",
+    "response_time_s": 323.46,
+    "sources": 12,
+    "status": "completed"
+   },
+   {
+    "content_chars": 10949,
+    "created_at": "2026-09-26T04:38:17.516008+00:00",
+    "layer": "portfolio-risk",
+    "request_id": "uuid-sha256:a1ffb477a0f6eb40",
+    "response_time_s": 208.94,
+    "sources": 19,
+    "status": "completed"
+   },
+   {
+    "content_chars": 9227,
+    "created_at": "2026-09-26T04:38:37.678163+00:00",
+    "layer": "quality-evaluation",
+    "request_id": "uuid-sha256:5f26aeebabb962e3",
+    "response_time_s": 189.74,
+    "sources": 14,
+    "status": "completed"
+   },
+   {
+    "content_chars": 9511,
+    "created_at": "2026-09-26T04:40:07.921886+00:00",
+    "layer": "recovery-portability",
+    "request_id": "uuid-sha256:f5e0d047e43d9c0f",
+    "response_time_s": 168.49,
+    "sources": 14,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11409,
+    "created_at": "2026-09-26T04:41:48.658591+00:00",
+    "layer": "research-factors-ml",
+    "request_id": "uuid-sha256:efe41686d25bd580",
+    "response_time_s": 186.49,
+    "sources": 18,
+    "status": "completed"
+   },
+   {
+    "content_chars": 13245,
+    "created_at": "2026-09-26T04:41:48.670593+00:00",
+    "layer": "scheduling-supervision",
+    "request_id": "uuid-sha256:621c549b53f5c009",
+    "response_time_s": 199.38,
+    "sources": 21,
+    "status": "completed"
+   },
+   {
+    "content_chars": 8141,
+    "created_at": "2026-09-26T04:42:39.242880+00:00",
+    "layer": "secrets-credentials",
+    "request_id": "uuid-sha256:118e2828ae9bd3d7",
+    "response_time_s": 229.94,
+    "sources": 16,
+    "status": "completed"
+   },
+   {
+    "content_chars": 14877,
+    "created_at": "2026-09-26T04:42:58.950400+00:00",
+    "layer": "security-supply-chain",
+    "request_id": "uuid-sha256:7db174f08f1160d3",
+    "response_time_s": 297.81,
+    "sources": 19,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11661,
+    "created_at": "2026-09-26T04:44:59.764044+00:00",
+    "layer": "semantic-rag",
+    "request_id": "uuid-sha256:1dc8d3bde65efd8e",
+    "response_time_s": 257.34,
+    "sources": 18,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11575,
+    "created_at": "2026-09-26T04:45:09.729527+00:00",
+    "layer": "storage-compute",
+    "request_id": "uuid-sha256:05326354ad5a3a91",
+    "response_time_s": 244.18,
+    "sources": 17,
+    "status": "completed"
+   },
+   {
+    "content_chars": 12703,
+    "created_at": "2026-09-26T04:46:30.506854+00:00",
+    "layer": "token-efficiency",
+    "request_id": "uuid-sha256:c0072f1f1e47b29f",
+    "response_time_s": 303.21,
+    "sources": 20,
+    "status": "completed"
+   },
+   {
+    "content_chars": 9705,
+    "created_at": "2026-09-26T04:48:00.328600+00:00",
+    "layer": "web-research",
+    "request_id": "uuid-sha256:bf5ca776a7579473",
+    "response_time_s": 286.72,
+    "sources": 19,
+    "status": "completed"
+   },
+   {
+    "content_chars": 11385,
+    "created_at": "2026-09-26T04:49:21.046007+00:00",
+    "layer": "workers",
+    "request_id": "uuid-sha256:a365bfa4eac04345",
+    "response_time_s": 228.21,
+    "sources": 22,
+    "status": "completed"
+   }
+  ],
+  "sources_per_report": {
+   "max": 25,
+   "median": 17.0,
+   "min": 11
+  },
+  "status_counts": {
+   "completed": 32
+  },
+  "stderr_output_saved_only": 32,
+  "stdout_bytes_total": 0
+ }
+}

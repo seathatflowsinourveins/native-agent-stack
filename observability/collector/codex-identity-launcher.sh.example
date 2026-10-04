@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Codex telemetry identity launcher. Local integration, not an upstream component.
+#
+# Codex exports no per-process attribute on its metrics (rust-v0.157.1: resource service.name, service.version,
+# env, os, os_version; data point tags auth_mode, session_source, originator, service_name, model, app.version).
+# Its opentelemetry_sdk 0.31 Resource::builder() reads OTEL_RESOURCE_ATTRIBUTES, so this launcher gives each
+# process a fresh service.instance.id and runs the real codex unchanged. Without one, concurrent Codex processes
+# share one delta stream in the Collector, whose delta_to_cumulative drops their points as out of order.
+#
+# An inherited id (from a shell, worker or parent codex that set one) is kept as a prefix: the process gets
+# <inherited>/<fresh>, so concurrent children of one parent stay separate writers. The entry is parsed the way the
+# SDK does (sdk/src/resource/env.rs at v0.31.0: split on commas, then on the first '=', key and value trimmed; the
+# last duplicate wins). The script is POSIX sh apart from its shebang, so macOS bash 3.2 runs it.
+#
+# Every other entry is kept, unchanged, after the new id. A Codex lane names itself with ECOSYSTEM_LANE: its launch
+# runs ECOSYSTEM_LANE=<root|runtime|token|trading> codex ..., and this launcher appends ecosystem.lane=<lane>, so the
+# process exports service.instance.id=<fresh>,ecosystem.lane=<lane>. The value must match the Collector's pattern,
+# ^[a-z][a-z0-9_-]{0,31}$; any other value is dropped with a warning on stderr that does not repeat it, and codex
+# still starts. An empty value names no lane. An ecosystem.lane entry already in OTEL_RESOURCE_ATTRIBUTES (a key that
+# trims to ecosystem.lane, with an '=', which the SDK reads as the attribute: env.rs L45-58 at v0.31.0) wins, so a
+# child started through the launcher from a lane process keeps the lane next to its <inherited>/<fresh> id. The
+# Collector makes the lane the ecosystem_lane metric label (collector.yaml, transform/privacy and exporters.prometheus).
+# @CODEX_BIN@ is the absolute path of the real codex executable; see observability/collector/README.md for
+# installing a rendered copy in place of the codex link on PATH.
+set -eu
+# POSIX assignments keep inherited export flags. Scratch assignments run in the function below, which executes in
+# the subshell of $(...), so even an inherited private name reaches codex unchanged; only OTEL_RESOURCE_ATTRIBUTES
+# changes in this shell. The parsing lives in a function, not inline in $(...): bash 3.2 (macOS bash and /bin/sh)
+# takes a case pattern's closing parenthesis inside a command substitution as the end of the substitution. bash -n
+# does not report it; at run time the shell prints a syntax error and continues with a wrong value. A function body
+# parses normally. Nested quoted expansions inside $(...) parse correctly in bash 3.2.
+__codex_identity_attributes() {
+  __codex_identity_id=""
+  if [ -r /proc/sys/kernel/random/uuid ]; then
+    __codex_identity_id="$(cat /proc/sys/kernel/random/uuid)"
+  elif command -v uuidgen >/dev/null 2>&1; then
+    __codex_identity_id="$(uuidgen | tr '[:upper:]' '[:lower:]')"
+  fi
+  # exec keeps this PID for codex, so the pair is unique on the host.
+  [ -n "$__codex_identity_id" ] || __codex_identity_id="pid$$-$(date +%s)"
+  __codex_identity_inherited=""
+  __codex_identity_kept=""
+  __codex_identity_listed_lane=""
+  __codex_identity_rest="${OTEL_RESOURCE_ATTRIBUTES:-}"
+  while [ -n "$__codex_identity_rest" ]; do
+    case "$__codex_identity_rest" in
+      *,*) __codex_identity_entry="${__codex_identity_rest%%,*}"; __codex_identity_rest="${__codex_identity_rest#*,}" ;;
+      *) __codex_identity_entry="$__codex_identity_rest"; __codex_identity_rest="" ;;
+    esac
+    __codex_identity_key="${__codex_identity_entry%%=*}"
+    __codex_identity_key="${__codex_identity_key#"${__codex_identity_key%%[![:space:]]*}"}"
+    __codex_identity_key="${__codex_identity_key%"${__codex_identity_key##*[![:space:]]}"}"
+    if [ "$__codex_identity_key" = service.instance.id ] && [ "$__codex_identity_entry" != "${__codex_identity_entry#*=}" ]; then
+      __codex_identity_value="${__codex_identity_entry#*=}"
+      __codex_identity_value="${__codex_identity_value#"${__codex_identity_value%%[![:space:]]*}"}"
+      __codex_identity_inherited="${__codex_identity_value%"${__codex_identity_value##*[![:space:]]}"}"
+    elif [ -n "$__codex_identity_entry" ]; then
+      if [ "$__codex_identity_key" = ecosystem.lane ] && [ "$__codex_identity_entry" != "${__codex_identity_entry#*=}" ]; then
+        __codex_identity_listed_lane=1
+      fi
+      __codex_identity_kept="${__codex_identity_kept:+$__codex_identity_kept,}$__codex_identity_entry"
+    fi
+  done
+  # ECOSYSTEM_LANE (see the header). The characters are listed, not ranged: in bash 3.2 a [a-z] range follows the
+  # locale's collation. The warning is written before the result and cannot fail the substitution under set -e.
+  __codex_identity_lane="${ECOSYSTEM_LANE:-}"
+  if [ -n "$__codex_identity_lane" ] && [ -z "$__codex_identity_listed_lane" ]; then
+    case "$__codex_identity_lane" in
+      [abcdefghijklmnopqrstuvwxyz]*[!abcdefghijklmnopqrstuvwxyz0123456789_-]*) __codex_identity_lane="" ;;
+      [abcdefghijklmnopqrstuvwxyz]*) [ "${#__codex_identity_lane}" -le 32 ] || __codex_identity_lane="" ;;
+      *) __codex_identity_lane="" ;;
+    esac
+    if [ -n "$__codex_identity_lane" ]; then
+      __codex_identity_kept="${__codex_identity_kept:+$__codex_identity_kept,}ecosystem.lane=$__codex_identity_lane"
+    else
+      printf '%s\n' 'codex identity launcher: ECOSYSTEM_LANE ignored; a lane name matches ^[a-z][a-z0-9_-]{0,31}$' >&2 || :
+    fi
+  fi
+  # A final sentinel prevents command substitution from stripping an inherited attribute's trailing newlines.
+  printf '%s.' "service.instance.id=${__codex_identity_inherited:+$__codex_identity_inherited/}${__codex_identity_id}${__codex_identity_kept:+,$__codex_identity_kept}"
+}
+OTEL_RESOURCE_ATTRIBUTES="$(__codex_identity_attributes)"
+unset -f __codex_identity_attributes
+OTEL_RESOURCE_ATTRIBUTES="${OTEL_RESOURCE_ATTRIBUTES%.}"
+export OTEL_RESOURCE_ATTRIBUTES
+exec '@CODEX_BIN@' "$@"

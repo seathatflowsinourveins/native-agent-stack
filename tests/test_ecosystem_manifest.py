@@ -692,6 +692,193 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("must be selected and unique", result.stdout)
 
+    TOPIC_EDITION = "2026-09-27"
+    TOPIC_CARD_SOURCE = "evidence/artifacts/token-cards/cards/search.json"
+
+    def topic_card(self, recorded_pin="1.0"):
+        """A present per-tool card: every block keeps its own evidence class, the row cites exact card bytes."""
+        raw = json.dumps({"tool": "search", "pin": recorded_pin + " (fixture card)"}).encode()
+        target = self.root / self.TOPIC_CARD_SOURCE
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(raw)
+        return {"status": "present", "edition": self.TOPIC_EDITION, "recorded_pin": recorded_pin,
+                "source": {"path": self.TOPIC_CARD_SOURCE, "bytes": len(raw),
+                           "sha256": hashlib.sha256(raw).hexdigest()},
+                "upstream": {"evidence_class": "upstream provenance (live release metadata)",
+                             "latest_release": "v1.1", "latest_date": "2026-09-24",
+                             "behind_by": "One minor release behind",
+                             "recommended_install": {"command": "search install",
+                                                     "url": "https://github.com/example/search#install"}},
+                "native_adaptation": {"evidence_class": "repository configuration review",
+                                      "assessment": "Claude hook and Codex instructions follow upstream"},
+                "e2e_returned_results": {"evidence_class": "local integration (upstream commands, returned data retained)",
+                                         "status": "pass", "records_total": 3,
+                                         "cited_records": ["search-01-query"]},
+                "adapted_performance": {"evidence_class": "one class per entry; never summed across classes",
+                                        "per_payload_and_lane": [
+                                            {"lane": "claude_subagent", "payload": "Same query raw versus search output",
+                                             "before_tokens": 400, "after_tokens": 100, "change_pct": -75.0,
+                                             "encoding": "o200k_base", "evidence_class": "exact artifact comparison"}]},
+                "invoke_rates": {"evidence_class": "local integration (transcript counts)",
+                                 "window": "2026-09-25T11:37:28Z to 2026-09-26T23:37:28Z",
+                                 "populations": [{"population": "agent_subagents", "agents_using": 14, "agents": 71,
+                                                  "pct_agents_using": 0.1972, "mcp_calls": 0, "cli_calls": 85}]},
+                "gpt6_review": {"evidence_class": "model review (judgment over retained sources, not execution)",
+                                "review_verdict": "defects", "final_verdict": "adapted-with-gaps",
+                                "summary": "Aligned with one documented gap", "open_findings": []}}
+
+    def write_topic(self, card, **row_fields):
+        row = {"component_id": "search", "group": "core", "purpose": "Find exact source",
+               "upstream_commands": {"use": "search --native"},
+               "returned_result_summary": "Exact source returned",
+               "session_statistics": {"value": None, "summary": "Not provided by upstream"},
+               "lifetime_statistics": {"value": None, "summary": "No cumulative savings counter"},
+               "baseline_summary": "Keep the focused read", "lifecycle_summary": "Dated acceptance only",
+               "source_paths": ["evidence/history.json"], "card": card, **row_fields}
+        evidence = [card["source"]["path"]] if isinstance(card, dict) and "source" in card else []
+        self.write("docs/token-efficiency-stack.json", {
+            "schema_version": 1, "scope": "Dated topic evidence",
+            "edition": {"date_utc": self.TOPIC_EDITION, "source_paths": evidence},
+            "rows": [row]})
+
+    def test_topic_card_joins_the_current_stack_pin_and_keeps_each_evidence_class(self):
+        self.write_topic(self.topic_card())
+        page, _ = self.build()
+        data = json.loads(page.data)
+        topic = data["efficiency"]["topic"]
+        actual = topic["rows"][0]
+        self.assertEqual(actual["pin"], {"version": "1.0", "repository": "https://github.com/example/search",
+                                         "source": "manifests/stack.json"})
+        self.assertEqual(actual["version"], "1.0")
+        self.assertIsNone(actual["pin_drift"])
+        self.assertIsNone(actual["card_marker"])
+        card = actual["card"]
+        for block in ("upstream", "native_adaptation", "e2e_returned_results", "adapted_performance",
+                      "invoke_rates", "gpt6_review"):
+            with self.subTest(block=block):
+                self.assertTrue(card[block]["evidence_class"].strip())
+        self.assertEqual(card["adapted_performance"]["per_payload_and_lane"][0]["evidence_class"],
+                         "exact artifact comparison")
+        # The edition's new artifacts do not exist at the immutable base: they resolve at the publication ref.
+        self.assertTrue(card["source"]["url"].endswith("/blob/main/" + self.TOPIC_CARD_SOURCE))
+        self.assertTrue(topic["edition"]["sources"][0]["url"].endswith("/blob/main/" + self.TOPIC_CARD_SOURCE))
+        self.assertIn(self.TOPIC_CARD_SOURCE, {row["path"] for row in data["inputs"]})
+
+    def test_topic_card_pin_drift_note_appears_only_when_the_stack_pin_differs(self):
+        self.write_topic(self.topic_card(recorded_pin="0.9"))
+        page, _ = self.build()
+        actual = json.loads(page.data)["efficiency"]["topic"]["rows"][0]
+        self.assertEqual(actual["version"], "1.0")
+        self.assertEqual(actual["pin_drift"],
+                         "Pin drift: this card recorded 0.9; manifests/stack.json now pins 1.0. The card's "
+                         "upstream, E2E, performance and review facts describe 0.9 until a newer card edition "
+                         "is recorded.")
+        self.write_topic(self.topic_card(recorded_pin="1.0"))
+        page, _ = self.build()
+        self.assertIsNone(json.loads(page.data)["efficiency"]["topic"]["rows"][0]["pin_drift"])
+
+    def test_topic_row_without_a_card_carries_only_the_edition_marker(self):
+        self.write_topic({"status": "no card in this edition", "edition": self.TOPIC_EDITION})
+        page, _ = self.build()
+        actual = json.loads(page.data)["efficiency"]["topic"]["rows"][0]
+        self.assertEqual(actual["card"], {"status": "no card in this edition", "edition": self.TOPIC_EDITION})
+        self.assertEqual(actual["card_marker"], "No card in this edition (2026-09-27)")
+        self.assertIsNone(actual["pin_drift"])
+        self.assertEqual(actual["pin"]["version"], "1.0")
+        # A missing card is a marker, never invented card data.
+        self.write_topic({"status": "no card in this edition", "edition": self.TOPIC_EDITION,
+                          "gpt6_review": {"evidence_class": "model review"}})
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("carries only the edition marker", result.stdout)
+
+    def test_topic_card_rejects_missing_blocks_unlabelled_figures_and_tampered_sources(self):
+        cases = []
+        card = self.topic_card()
+        del card["gpt6_review"]
+        cases.append(("missing block", card, {}, "gpt6_review with its evidence class"))
+        card = self.topic_card()
+        del card["adapted_performance"]["per_payload_and_lane"][0]["evidence_class"]
+        cases.append(("unlabelled figure", card, {}, "comparison needs its lane, payload and evidence class"))
+        card = self.topic_card()
+        card["adapted_performance"]["per_payload_and_lane"][0]["change_pct"] = -80.0
+        cases.append(("inconsistent change", card, {}, "comparison counts are inconsistent"))
+        card = self.topic_card()
+        card["source"]["sha256"] = "0" * 64
+        cases.append(("tampered source", card, {}, "card source hash or size mismatch"))
+        card = self.topic_card()
+        card["source"]["path"] = "evidence/history.json"
+        cases.append(("non-artifact source", card, {}, "card source must be a public evidence artifact"))
+        cases.append(("row-level pin", self.topic_card(), {"version": "9.9"},
+                      "pins come from manifests/stack.json"))
+        cases.append(("missing card", None, {}, "needs a card of this edition"))
+        for label, card, fields, message in cases:
+            with self.subTest(case=label):
+                self.write_topic(card, **fields)
+                if card is None:
+                    topic = json.loads((self.root / "docs/token-efficiency-stack.json").read_text())
+                    del topic["rows"][0]["card"]
+                    self.write("docs/token-efficiency-stack.json", topic)
+                result = self.run_generator("--write")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stdout)
+
+    # docs/ecosystem/template.html topicCard renders these four upstream fields as links (sourcedLine), so they
+    # pass the build's public_url gate, the one every other external source link uses (card.source.url is built
+    # by file_url instead).
+    TOPIC_CARD_LINK_FIELDS = {
+        "upstream.recommended_install.url": lambda upstream, url: upstream["recommended_install"].update(url=url),
+        "upstream.recommended_wiring[0].url": lambda upstream, url: upstream.update(
+            recommended_wiring=[{"client": "claude", "how": "Plugin marketplace", "url": url}]),
+        "upstream.new_since_pin[0].url": lambda upstream, url: upstream.update(
+            new_since_pin=[{"text": "Adds a JSON report", "url": url}]),
+        "upstream.limitations[0].url": lambda upstream, url: upstream.update(
+            limitations=[{"text": "Large files are skipped", "url": url}]),
+    }
+
+    def test_topic_card_links_outside_the_public_url_gate_fail_the_check(self):
+        planted = {"plain http": "http://github.com/example/search#install",
+                   "loopback address": "https://127.0.0.1/example/search",
+                   "script scheme": "javascript:alert(document.domain)"}
+        for field, plant in self.TOPIC_CARD_LINK_FIELDS.items():
+            for label, url in planted.items():
+                with self.subTest(field=field, url=label):
+                    card = self.topic_card()
+                    plant(card["upstream"], url)
+                    self.write_topic(card)
+                    result = self.run_generator("--check")
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn(f"token topic card {self.TOPIC_CARD_SOURCE}: {field} must be a public HTTPS URL",
+                                  result.stdout)
+
+    def test_topic_card_list_fields_reject_any_non_list_value(self):
+        # The template maps over these fields, so a falsy non-list ({} or "") must not slip past the list guard.
+        for field in ("recommended_wiring", "new_since_pin", "limitations"):
+            for label, value in (("empty object", {}), ("empty string", ""), ("null", None)):
+                with self.subTest(field=field, value=label):
+                    card = self.topic_card()
+                    card["upstream"][field] = value
+                    self.write_topic(card)
+                    result = self.run_generator("--check")
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn(f"token topic card {self.TOPIC_CARD_SOURCE}: upstream.{field} must be a list", result.stdout)
+
+    def test_topic_card_public_https_links_pass_the_check_unchanged(self):
+        card = self.topic_card()
+        clean = {"upstream.recommended_install.url": "https://github.com/example/search#install",
+                 "upstream.recommended_wiring[0].url": "https://github.com/example/search#claude-code",
+                 "upstream.new_since_pin[0].url": "https://github.com/example/search/releases/tag/v1.1",
+                 "upstream.limitations[0].url": "https://github.com/example/search/issues/7"}
+        for field, url in clean.items():
+            self.TOPIC_CARD_LINK_FIELDS[field](card["upstream"], url)
+        self.write_topic(card)
+        self.check_report()
+        page, _ = self.build()
+        upstream = json.loads(page.data)["efficiency"]["topic"]["rows"][0]["card"]["upstream"]
+        self.assertEqual([upstream["recommended_install"]["url"], upstream["recommended_wiring"][0]["url"],
+                          upstream["new_since_pin"][0]["url"], upstream["limitations"][0]["url"]],
+                         list(clean.values()))
+
     def grand_catalog_fixture(self):
         self.config["grand_catalogs"] = {
             "foundation_manifest": "catalogs/foundation/manifest.json",
@@ -1003,6 +1190,952 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
         result = self.run_generator("--write")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("supersedes an unknown decision", result.stdout)
+
+    # ------------------------------------------------------------------------- convergence by layer
+
+    MATRIX = "catalogs/landscape/component-evidence-matrix.json"
+
+    @staticmethod
+    def convergence_matrix():
+        """A generated-matrix fixture with one layer per layer_state (scripts/component_matrix.py writes the
+        repository's own; only rows[].convergence and summary.convergence are read)."""
+        def layer(catalog, layer_id, state, counts, factors, unresolved=(), reopened=()):
+            in_use, converged, all_rows, winner_rows = counts
+            return {"catalog": catalog, "layer_id": layer_id, "title": "Title " + layer_id, "winners": [],
+                    "convergence": {
+                        "layer_state": state, "verdict_checked_at": "2026-09-22",
+                        "reopened_by": [{"sweep_id": sweep, "date": day} for sweep, day in reopened],
+                        "in_use": in_use, "converged": converged, "all_rows": all_rows,
+                        "recorded_winner_rows": winner_rows,
+                        "factors": {name: dict(zip(("true", "false", "unknown"), values)) for name, values in
+                                    zip(("verdict_winner", "pin_current", "host_e2e"), factors)},
+                        "unresolved": [{"id": name, "repository": "https://github.com/example/" + name,
+                                        "reason": "no manifests/stack.json id, alias or repository match"}
+                                       for name in unresolved],
+                        "manifest_layer_found": True, "winners_without_manifest_row": [],
+                        "winner_rows": [], "components": [], "invoke": None,
+                        "invoke_reason": "no post-fix invoke receipt yet"}}
+        rows = [
+            layer("foundation", "f-current", "confirmed_current", (3, 1, 4, 2),
+                  ((2, 1, 0), (2, 0, 1), (1, 1, 1)), unresolved=("stranger",)),
+            layer("foundation", "f-reopened", "recorded_reopened", (1, 0, 1, 1),
+                  ((1, 0, 0), (1, 0, 0), (1, 0, 0)), reopened=(("sweep-0926", "2026-09-26"),)),
+            layer("us-equities", "u-none", "no_selection", (1, 0, 2, 0), ((0, 1, 0), (0, 0, 1), (0, 0, 1))),
+            layer("us-equities", "u-pending", "pending_lanes", (2, 0, 2, 0), ((0, 0, 2), (1, 1, 0), (0, 0, 2))),
+        ]
+        block = {
+            "frozen_at": "2026-09-27",
+            "definitions": [{"term": "layer_state", "definition": "Exactly one of four states."},
+                            {"term": "converged", "definition": "Every factor true in a confirmed_current layer."}],
+            "sources": {"verdict_ledgers": {"foundation": "catalogs/landscape/foundation.json",
+                                            "us-equities": "catalogs/landscape/us-equities.json"},
+                        "saturation_ledger": "catalogs/saturation/ledger.json",
+                        "completed_sweeps": [{"sweep_id": "sweep-0926", "date": "2026-09-26", "layers": 4,
+                                              "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json"}],
+                        "stack": "manifests/stack.json",
+                        "aliases": "tools/sota-convergence/receipt-component-aliases.json",
+                        "host_e2e_platform": "linux-wsl2-x86_64"},
+            "layer_states": {"confirmed_current": 1, "no_selection": 1, "pending_lanes": 1, "recorded_reopened": 1},
+            "catalogs": {"foundation": {"layers": 2, "in_use": 4, "converged": 1, "share": 0.25, "unresolved": 1},
+                         "us-equities": {"layers": 2, "in_use": 3, "converged": 0, "share": 0.0, "unresolved": 0}},
+            "overall": {"layers": 4, "in_use": 7, "converged": 1, "share": 0.1429, "unresolved": 1},
+            "newest_manifest": {"path": "catalogs/sota-convergence/manifest-20260926.json",
+                                "id": "sota-convergence-20260926", "checked_at": "2026-09-26"},
+            "newest_verdict_checked_at": {"foundation": "2026-09-22", "us-equities": "2026-09-22"},
+            "manifest_layers_without_matrix_row": [],
+        }
+        return {"schema_version": 1, "checked_at": "2026-09-22", "rows": rows, "summary": {"convergence": block}}
+
+    def join_gap_matrix(self):
+        """convergence_matrix() plus a recorded layer missing from the newest manifest, whose winner therefore has
+        no manifest row, and a manifest layer without a matrix row."""
+        matrix = self.convergence_matrix()
+        missing = json.loads(json.dumps(matrix["rows"][1]))
+        missing.update(layer_id="f-missing", title="Title f-missing")
+        missing["convergence"].update(
+            in_use=0, converged=0, all_rows=0, recorded_winner_rows=0, manifest_layer_found=False,
+            winners_without_manifest_row=["lonely-winner"],
+            factors={name: {"true": 0, "false": 0, "unknown": 0} for name in ("verdict_winner", "pin_current", "host_e2e")})
+        matrix["rows"].insert(2, missing)
+        summary = matrix["summary"]["convergence"]
+        summary["layer_states"]["recorded_reopened"] += 1
+        summary["catalogs"]["foundation"]["layers"] += 1
+        summary["overall"]["layers"] += 1
+        summary["manifest_layers_without_matrix_row"] = [{"catalog": "us-equities", "layer_id": "u-unlisted"}]
+        return matrix
+
+    def write_matrix(self, matrix):
+        self.matrix = matrix
+        self.write(self.MATRIX, matrix)
+
+    def use_real_template(self):
+        self.write("docs/ecosystem/template.html", (ROOT / "docs/ecosystem/template.html").read_text())
+
+    def test_convergence_is_absent_without_the_generated_matrix(self):
+        self.use_real_template()
+        page, _ = self.build()
+        self.assertIsNone(json.loads(page.data)["convergence"])
+        self.assertIn("hidden", page.elements["tab-convergence"])
+
+    def test_convergence_block_is_embedded_from_the_matrix_with_its_hash_and_dates(self):
+        self.use_real_template()
+        self.write_matrix(self.convergence_matrix())
+        page, text = self.build()
+        data = json.loads(page.data)
+        convergence = data["convergence"]
+        self.assertEqual([(row["catalog"], row["layer_id"], row["title"], row["layer_state"])
+                          for row in convergence["layers"]], [
+            ("foundation", "f-current", "Title f-current", "confirmed_current"),
+            ("foundation", "f-reopened", "Title f-reopened", "recorded_reopened"),
+            ("us-equities", "u-none", "Title u-none", "no_selection"),
+            ("us-equities", "u-pending", "Title u-pending", "pending_lanes")])
+        block = self.matrix["summary"]["convergence"]
+        for key in ("frozen_at", "definitions", "sources", "layer_states", "catalogs", "overall",
+                    "newest_manifest", "newest_verdict_checked_at", "manifest_layers_without_matrix_row"):
+            with self.subTest(key=key):
+                self.assertEqual(convergence[key], block[key])
+        first = self.matrix["rows"][0]["convergence"]
+        embedded = convergence["layers"][0]
+        for key in ("verdict_checked_at", "reopened_by", "in_use", "converged", "all_rows", "recorded_winner_rows",
+                    "factors", "unresolved", "invoke", "invoke_reason", "manifest_layer_found",
+                    "winners_without_manifest_row"):
+            with self.subTest(key=key):
+                self.assertEqual(embedded[key], first[key])
+        # Per-component detail stays in the matrix; the page links it.
+        self.assertNotIn("components", embedded)
+        self.assertIn("/blob/main/" + self.MATRIX, convergence["url"])
+        hashes = {row["path"]: row["sha256"] for row in data["inputs"]}
+        self.assertEqual(hashes[self.MATRIX], hashlib.sha256((self.root / self.MATRIX).read_bytes()).hexdigest())
+        self.assertEqual(page.elements["convergence"]["role"], "tabpanel")
+        self.assertEqual(page.elements["tab-convergence"]["aria-controls"], "convergence")
+        self.assertIn("Convergence by layer", text)
+        self.assertEqual(len(page.scripts), 2)
+
+        def reopen_another_layer():
+            self.matrix["rows"][0]["convergence"]["reopened_by"] = [{"sweep_id": "sweep-0927", "date": "2026-09-27"}]
+            self.matrix["rows"][0]["convergence"]["layer_state"] = "recorded_reopened"
+            self.matrix["rows"][0]["convergence"]["converged"] = 0
+            summary = self.matrix["summary"]["convergence"]
+            summary["layer_states"].update(confirmed_current=0, recorded_reopened=2)
+            summary["catalogs"]["foundation"].update(converged=0, share=0.0)
+            summary["overall"].update(converged=0, share=0.0)
+            self.write_matrix(self.matrix)
+        self.assert_check_digest_changes(reopen_another_layer)
+
+    def test_convergence_block_must_agree_with_its_rows(self):
+        cases = (
+            (lambda m: m["summary"].pop("convergence"), "component_matrix.py --write"),
+            (lambda m: m["rows"][2].pop("convergence"), "every component matrix row needs a convergence object"),
+            (lambda m: m["rows"][0]["convergence"].update(layer_state="converging"), "unknown convergence layer_state"),
+            (lambda m: m["rows"][0]["convergence"]["factors"]["host_e2e"].update(unknown=2), "must add up to in_use"),
+            (lambda m: m["rows"][1]["convergence"].update(converged=1), "only a confirmed_current layer"),
+            (lambda m: m["rows"][0]["convergence"].update(in_use=-1), "nonnegative integers"),
+            (lambda m: m["rows"][0]["convergence"].update(invoke_reason=""), "null invoke needs its reason"),
+            (lambda m: m["summary"]["convergence"]["overall"].update(converged=2), "differs from its layer rows"),
+            (lambda m: m["summary"]["convergence"]["layer_states"].update(pending_lanes=2), "differs from its layer rows"),
+            (lambda m: m["summary"]["convergence"]["catalogs"]["foundation"].update(share=0.5), "differs from its layer rows"),
+            (lambda m: m["summary"]["convergence"].update(definitions=[]), "convergence definitions"),
+            (lambda m: m["rows"][0]["convergence"].update(manifest_layer_found="yes"), "manifest_layer_found"),
+            # A layer missing from the newest manifest has no manifest rows to count.
+            (lambda m: m["rows"][0]["convergence"].update(manifest_layer_found=False), "manifest_layer_found"),
+            (lambda m: m["rows"][0]["convergence"].update(winners_without_manifest_row=[None]),
+             "winners_without_manifest_row"),
+            (lambda m: m["summary"]["convergence"].update(manifest_layers_without_matrix_row="none"),
+             "manifest_layers_without_matrix_row"),
+            # A manifest layer listed as having no matrix row while the matrix has that row.
+            (lambda m: m["summary"]["convergence"].update(
+                manifest_layers_without_matrix_row=[{"catalog": "foundation", "layer_id": "f-current"}]),
+             "manifest_layers_without_matrix_row"),
+        )
+        for mutate, message in cases:
+            with self.subTest(message=message):
+                matrix = self.convergence_matrix()
+                mutate(matrix)
+                self.write_matrix(matrix)
+                result = self.run_generator("--write")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stdout)
+
+    def test_convergence_text_is_inert_public_data(self):
+        self.use_real_template()
+        hostile = '</script><script src="https://invalid.example/steal.js"></script>'
+        matrix = self.convergence_matrix()
+        matrix["rows"][0]["title"] = hostile
+        matrix["rows"][0]["convergence"]["unresolved"][0]["reason"] = hostile
+        matrix["summary"]["convergence"]["definitions"][0]["definition"] = hostile
+        self.write_matrix(matrix)
+        page, _ = self.build()
+        self.assertEqual(len(page.scripts), 2)
+        self.assertEqual(page.external_assets, [])
+        convergence = json.loads(page.data)["convergence"]
+        self.assertEqual(convergence["definitions"][0]["definition"], hostile)
+        self.assertEqual(convergence["layers"][0]["unresolved"][0]["reason"], hostile)
+
+    CONVERGENCE_FUNCTIONS = ("convergenceSummaryLines", "convergenceTableRows", "convergenceListings",
+                             "renderConvergence")
+
+    def render_convergence_functions(self, convergence):
+        """Run the page's pure convergence functions (all but renderConvergence) on ``convergence`` in Node."""
+        template = (ROOT / "docs/ecosystem/template.html").read_text()
+        functions = [re.search(r"function " + name + r"\(.*?^}", template, re.S | re.M).group(0)
+                     for name in self.CONVERGENCE_FUNCTIONS]
+        for source in functions:
+            # No typed number: every count, share and date on the page comes from the matrix. A digit inside
+            # an identifier (host_e2e) is a name, not a number.
+            self.assertNotRegex(source, r"(?<![A-Za-z_$])\d")
+        script = "\n".join(functions[:-1]) + (
+            "\nconst input = JSON.parse(require('node:fs').readFileSync(0, 'utf8'));"
+            "\nprocess.stdout.write(JSON.stringify({summary: convergenceSummaryLines(input),"
+            " rows: convergenceTableRows(input), listings: convergenceListings(input)}));")
+        result = subprocess.run(["node", "-e", script], input=json.dumps(convergence), capture_output=True,
+                                text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return json.loads(result.stdout)
+
+    @unittest.skipUnless(shutil.which("node"), "Convergence rendering check needs Node")
+    def test_convergence_rendering_reads_every_number_date_and_definition_from_the_data(self):
+        self.write_matrix(self.convergence_matrix())
+        page, _ = self.build()
+        rendered = self.render_convergence_functions(json.loads(page.data)["convergence"])
+        self.assertEqual(rendered["rows"], [
+            ["foundation/f-current", "confirmed_current", "2026-09-22", "-", "3", "1", "2/1/0", "2/0/1", "1/1/1",
+             "4", "2", "stranger", "null"],
+            ["foundation/f-reopened", "recorded_reopened", "2026-09-22", "sweep-0926", "1", "0", "1/0/0", "1/0/0",
+             "1/0/0", "1", "1", "-", "null"],
+            ["us-equities/u-none", "no_selection", "2026-09-22", "-", "1", "0", "0/1/0", "0/0/1", "0/0/1", "2", "0",
+             "-", "null"],
+            ["us-equities/u-pending", "pending_lanes", "2026-09-22", "-", "2", "0", "0/0/2", "1/1/0", "0/0/2", "2",
+             "0", "-", "null"]])
+        summary = "\n".join(rendered["summary"])
+        self.assertNotIn("in-use components", summary)
+        for expected in ("Layer states: confirmed_current 1 · no_selection 1 · pending_lanes 1 · recorded_reopened 1",
+                         "foundation: 1 of 4 in-use layer-component rows converged across 2 layers (share 0.25); "
+                         "1 unresolved manifest rows",
+                         "overall: 1 of 7 in-use layer-component rows converged across 4 layers (share 0.1429); "
+                         "1 unresolved manifest rows",
+                         "a component in several layers counts once per layer",
+                         "Newest sweep manifest: sota-convergence-20260926, checked_at 2026-09-26 "
+                         "(catalogs/sota-convergence/manifest-20260926.json)",
+                         "Newest verdict checked_at: foundation 2026-09-22 · us-equities 2026-09-22",
+                         "Completed sweeps: sweep-0926 (2026-09-26)",
+                         "host_e2e platform: linux-wsl2-x86_64",
+                         "Definitions frozen 2026-09-27"):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, summary)
+        self.assertEqual(rendered["listings"], [
+            ["Unresolved manifest rows",
+             ["foundation/f-current · stranger: no manifests/stack.json id, alias or repository match"]],
+            ["Recorded winners without a row in the newest sweep manifest", []],
+            ["Layers missing from the newest sweep manifest", []],
+            ["Newest sweep manifest layers without a matrix row", []]])
+
+    @unittest.skipUnless(shutil.which("node"), "Convergence rendering check needs Node")
+    def test_the_page_lists_join_gaps_from_the_data(self):
+        """Next to the unresolved rows, the page lists recorded winners without a manifest row, layers missing
+        from the newest manifest and manifest layers without a matrix row, each read from the matrix."""
+        self.write_matrix(self.join_gap_matrix())
+        page, _ = self.build()
+        convergence = json.loads(page.data)["convergence"]
+        self.assertEqual(convergence["manifest_layers_without_matrix_row"],
+                         [{"catalog": "us-equities", "layer_id": "u-unlisted"}])
+        rendered = self.render_convergence_functions(convergence)
+        self.assertEqual(rendered["listings"][1:], [
+            ["Recorded winners without a row in the newest sweep manifest", ["foundation/f-missing: lonely-winner"]],
+            ["Layers missing from the newest sweep manifest", ["foundation/f-missing"]],
+            ["Newest sweep manifest layers without a matrix row", ["us-equities/u-unlisted"]]])
+        self.assertEqual(rendered["rows"][2][:6], ["foundation/f-missing", "recorded_reopened", "2026-09-22",
+                                                   "sweep-0926", "0", "0"])
+
+    # Runs a generated page's whole inline script against the page's own elements (every id and data-tab /
+    # data-open / data-catalog-tab element, with its attributes), so a renderer that throws, or looks up an id
+    # the page lacks, shows up here instead of as the page's recovery screen.
+    PAGE_HARNESS = r'''
+const vm = require("node:vm");
+const input = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
+class Element {
+  constructor(tag, attrs) {
+    this.tagName = tag.toUpperCase(); this.attrs = {...attrs}; this.children = []; this.text = "";
+    this.hidden = Object.prototype.hasOwnProperty.call(attrs, "hidden"); this.className = attrs.class || "";
+    this.dataset = {}; this.listeners = {}; this.value = ""; this.checked = false; this.open = false;
+    this.type = attrs.type || "";
+    for (const [key, value] of Object.entries(attrs)) if (key.startsWith("data-"))
+      this.dataset[key.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = value === null ? "" : value;
+  }
+  set textContent(value) { this.text = String(value); this.children = []; }
+  get textContent() { return this.text + this.children.map(child => child.textContent).join(""); }
+  appendChild(child) { this.children.push(child); return child; }
+  replaceChildren(...children) { this.children = children; this.text = ""; }
+  get childElementCount() { return this.children.length; }
+  setAttribute(key, value) { this.attrs[key] = String(value); }
+  getAttribute(key) { return key in this.attrs ? this.attrs[key] : null; }
+  addEventListener(type, listener) { (this.listeners[type] ||= []).push(listener); }
+  focus() {} click() {} showModal() { this.open = true; } close() { this.open = false; }
+  getBoundingClientRect() { return {left: 0, right: 0, top: 0, bottom: 0}; }
+}
+const byId = {}, ordered = [], missing = [], errors = [];
+for (const [tag, attrs] of input.elements) {
+  const element = new Element(tag, attrs); ordered.push(element); if (attrs.id) byId[attrs.id] = element;
+}
+byId["ecosystem-data"].text = input.data;
+const document = {
+  getElementById(id) { if (!(id in byId)) { missing.push(id); return null; } return byId[id]; },
+  createElement(tag) { return new Element(tag, {}); },
+  querySelectorAll(selector) {
+    const match = selector.match(/^\[([a-z-]+)\]$/);
+    if (!match) throw new Error("Unexpected selector: " + selector);
+    return ordered.filter(element => match[1] in element.attrs);
+  },
+  addEventListener() {}, activeElement: {tagName: "BODY"},
+};
+const location = {hash: "#" + input.tab, href: "https://catalog.example/index.html"};
+vm.runInNewContext(input.script, {document, location, window: {scrollTo() {}, addEventListener() {}, location},
+  history: {replaceState() {}}, requestAnimationFrame(callback) { callback(); }, URL, Blob: class {}, setTimeout, atob,
+  console: {error(message, error) { errors.push(String((error && error.stack) || error || message)); }}});
+const text = id => byId[id] ? byId[id].children.map(child => child.textContent) : null;
+process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-app"].hidden,
+  recovery_hidden: byId["catalog-recovery"].hidden, tab_hidden: (byId["tab-convergence"] || {}).hidden,
+  panel_hidden: (byId["convergence"] || {}).hidden,
+  rows: (byId["convergence-rows"] || {children: []}).children.map(row => row.children.map(cell => cell.textContent)),
+  summary: text("convergence-summary"), definitions: byId["convergence-definitions"] ? byId["convergence-definitions"].textContent : null,
+  token_topic: byId["token-topic"] ? byId["token-topic"].textContent : null,
+  architecture_tab_hidden: (byId["tab-architecture"] || {}).hidden, architecture_panel_hidden: (byId["architecture"] || {}).hidden,
+  architecture_edition: byId["architecture-edition"] ? byId["architecture-edition"].textContent : null,
+  architecture: byId["architecture-topic"] ? byId["architecture-topic"].textContent : null}));
+'''
+
+    @staticmethod
+    def page_elements(html_text):
+        class Elements(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.found = []
+
+            def handle_starttag(self, tag, attrs):
+                attrs = dict(attrs)
+                if "id" in attrs or {"data-tab", "data-open", "data-catalog-tab"} & set(attrs):
+                    self.found.append([tag, attrs])
+
+        parser = Elements()
+        parser.feed(html_text)
+        return parser.found
+
+    def run_page(self, html_text, tab="convergence"):
+        page = Page(html_text)
+        script, = page.inline_scripts
+        result = subprocess.run(["node", "-e", self.PAGE_HARNESS], input=json.dumps({
+            "script": script, "data": page.data, "elements": self.page_elements(html_text), "tab": tab}),
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return json.loads(result.stdout)
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_script_renders_the_convergence_tab(self):
+        self.use_real_template()
+        _, without = self.build()
+        observed = self.run_page(without)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed["app_hidden"], observed["recovery_hidden"]), (False, True))
+        # No matrix: the tab stays hidden and #convergence falls back to the overview.
+        self.assertEqual((observed["tab_hidden"], observed["panel_hidden"], observed["rows"]), (True, True, []))
+
+        self.write_matrix(self.convergence_matrix())
+        _, with_matrix = self.build()
+        observed = self.run_page(with_matrix)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed["app_hidden"], observed["recovery_hidden"]), (False, True))
+        self.assertEqual((observed["tab_hidden"], observed["panel_hidden"]), (False, False))
+        self.assertEqual([row[:6] for row in observed["rows"]], [
+            ["foundation/f-current", "confirmed_current", "2026-09-22", "-", "3", "1"],
+            ["foundation/f-reopened", "recorded_reopened", "2026-09-22", "sweep-0926", "1", "0"],
+            ["us-equities/u-none", "no_selection", "2026-09-22", "-", "1", "0"],
+            ["us-equities/u-pending", "pending_lanes", "2026-09-22", "-", "2", "0"]])
+        self.assertEqual(observed["summary"][0],
+                         "Layer states: confirmed_current 1 · no_selection 1 · pending_lanes 1 · recorded_reopened 1")
+        for item in self.matrix["summary"]["convergence"]["definitions"]:
+            self.assertIn(item["term"] + item["definition"], observed["definitions"])
+        self.assertIn("foundation/f-current · stranger: no manifests/stack.json id, alias or repository match",
+                      observed["definitions"])
+        self.assertIn("Recorded winners without a row in the newest sweep manifestNone.", observed["definitions"])
+
+        self.write_matrix(self.join_gap_matrix())
+        _, with_gaps = self.build()
+        observed = self.run_page(with_gaps)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        for expected in ("Recorded winners without a row in the newest sweep manifestfoundation/f-missing: lonely-winner",
+                         "Layers missing from the newest sweep manifestfoundation/f-missing",
+                         "Newest sweep manifest layers without a matrix rowus-equities/u-unlisted"):
+            self.assertIn(expected, observed["definitions"])
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_script_renders_the_token_topic_cards(self):
+        """The topic section shows each card block with its evidence class, the drift note and the marker."""
+        self.use_real_template()
+        self.write_topic(self.topic_card(recorded_pin="0.9"))
+        _, with_card = self.build()
+        observed = self.run_page(with_card)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        topic = observed["token_topic"]
+        for expected in (
+                "Edition 2026-09-27",
+                "Pin drift: this card recorded 0.9; manifests/stack.json now pins 1.0. The card's upstream, E2E, "
+                "performance and review facts describe 0.9 until a newer card edition is recorded.",
+                "Per-tool card · edition 2026-09-27",
+                "Card source: " + self.TOPIC_CARD_SOURCE + " ↗",
+                "UpstreamEvidence class: upstream provenance (live release metadata)",
+                "Latest release v1.1 (2026-09-24)", "Behind: One minor release behind",
+                "Recommended install: search install",
+                "Native adaptationEvidence class: repository configuration review",
+                "Assessment: Claude hook and Codex instructions follow upstream",
+                "E2E returned resultsEvidence class: local integration (upstream commands, returned data retained)",
+                "Status pass", "Records: 3; cited: search-01-query",
+                "Adapted performance per payload and laneEvidence class: one class per entry; never summed across classes",
+                "claude_subagent · Same query raw versus search output: 400 → 100 tokens (-75%) · o200k_base · "
+                "exact artifact comparison",
+                "Invoke ratesEvidence class: local integration (transcript counts)",
+                "Window: 2026-09-25T11:37:28Z to 2026-09-26T23:37:28Z",
+                "agent_subagents: 14 of 71 agents (19.72%) · MCP calls 0 · CLI calls 85",
+                "GPT-6 reviewEvidence class: model review (judgment over retained sources, not execution)",
+                "Verdict adapted-with-gaps (review: defects)", "Aligned with one documented gap"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, topic)
+        self.assertNotIn("No card in this edition", topic)
+
+        self.write_topic({"status": "no card in this edition", "edition": self.TOPIC_EDITION})
+        _, without_card = self.build()
+        observed = self.run_page(without_card)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertIn("No card in this edition (2026-09-27)", observed["token_topic"])
+        self.assertNotIn("Pin drift", observed["token_topic"])
+        self.assertNotIn("Per-tool card", observed["token_topic"])
+
+    def test_the_repository_matrix_convergence_block_is_accepted(self):
+        """The real generated matrix, not the fixture: the page accepts what scripts/component_matrix.py writes."""
+        source = ROOT / self.MATRIX
+        self.write(self.MATRIX, source.read_text(encoding="utf-8"))
+        page, _ = self.build()
+        convergence = json.loads(page.data)["convergence"]
+        real = json.loads(source.read_text(encoding="utf-8"))
+        self.assertEqual(convergence["overall"], real["summary"]["convergence"]["overall"])
+        self.assertEqual([(row["catalog"], row["layer_id"]) for row in convergence["layers"]],
+                         [(row["catalog"], row["layer_id"]) for row in real["rows"]])
+
+    # The dated new-WSL architecture edition (the "Final architecture" tab).
+    ARCHITECTURE = "catalogs/foundation/new-wsl-architecture-20261001.json"
+    ARCHITECTURE_SOURCE = "docs/decisions/edition-fixture.md"
+    ARCHITECTURE_VERDICTS = ("closed", "selection_of_record_open", "provisional", "comparison_required",
+                             "new_host_required", "no_selection")
+    ARCHITECTURE_CLASSES = ("upstream_test", "upstream_example_or_native_operation", "local_integration_check",
+                            "synthetic_fixture", "independent_observation", "structural_validation", "source_review",
+                            "none_recorded")
+    CLOSE_ONLY_WHEN = ["Selected choice, alternatives and evidence", "Frozen candidate set",
+                       "Comparisons and target-host checks", "Second independent review", "Dated closure record"]
+
+    def architecture_winner(self, **fields):
+        source = {"source_path": self.ARCHITECTURE_SOURCE}
+        return {"component_id": "search", "repository": "https://github.com/example/search", "pin": "1.0",
+                "pin_source": "manifests/stack.json:1",
+                "install": {"command": "search install", "kind": "repo_recipe", **source},
+                "acceptance": {"command": "search --self-test", "evidence_class": "upstream_test", **source},
+                "upstream_currency": {"latest_release": "v1.1 (2026-09-30)", "checked_at": "2026-10-01T05:00Z",
+                                      "pin_is_latest": "no", "url": "https://github.com/example/search/releases"},
+                **fields}
+
+    def architecture_row(self, layer_id="native-clients", catalog="foundation", **fields):
+        source = {"source_path": self.ARCHITECTURE_SOURCE}
+        return {"layer_id": layer_id, "catalog": catalog, "title": "Title " + layer_id,
+                "winners": [self.architecture_winner()], "verdict": "selection_of_record_open",
+                "closure": {"c1": "met", "c2": "partial", "c3": "unmet", "c4": "unmet", "c5": "partial",
+                            "missing": "c2: candidate set not frozen; c3: no new-distro run; c4: no second review; "
+                                       "c5: no closure record"},
+                "reasons": [{"text": "Recorded verdict winner", **source}],
+                "evidence_class": "upstream_test",
+                "alternatives": [{"name": "Other client", "verdict": "refuted on fit", **source}],
+                "new_host_steps": ["Install the pinned client", "Sign in natively"],
+                "gates": [{"text": "Native sign-in on the new distro", "kind": "user_side", **source}],
+                "owner_lane": "foundation", "notes": "", **fields}
+
+    def architecture_edition(self):
+        pending = {"path": "docs/pending-recipe.md", "pull_request": 569, "commit": "eabe7654"}
+        # The five closure texts joined in order with newlines, no trailing newline.
+        texts_sha256 = hashlib.sha256("\n".join(self.CLOSE_ONLY_WHEN).encode()).hexdigest()
+        return {"schema_version": 1, "kind": "new_wsl_architecture_edition",
+                "edition": {"date_utc": "2026-10-01", "base_commit": "c" * 40, "scope": "Fixture edition",
+                            "close_only_when_sha256": texts_sha256,
+                            "verdict_rules": ["A layer is closed only when all five close_only_when items hold."],
+                            "verdict_values": {value: "Meaning of " + value for value in self.ARCHITECTURE_VERDICTS},
+                            "evidence_classes": {value: "Label of " + value for value in self.ARCHITECTURE_CLASSES},
+                            "sources": [{"source_path": self.ARCHITECTURE_SOURCE}]},
+                "rows": [self.architecture_row(),
+                         self.architecture_row("backtesting-engine", "us-equities", verdict="no_selection",
+                                               winners=[], evidence_class="none_recorded",
+                                               closure={**{item: "unknown" for item in ("c1", "c2", "c3", "c4", "c5")},
+                                                        "missing": "; ".join(item + ": assessment pending" for item
+                                                                             in ("c1", "c2", "c3", "c4", "c5"))}),
+                         self.architecture_row("cross:credential-practice", "cross",
+                                               reasons=[{"text": "Recipe lands with its pull request",
+                                                         "pending_source": pending}],
+                                               gates=[{"text": "Upstream fix pending", "kind": "upstream",
+                                                       "url": "https://github.com/example/search/issues/7"}])]}
+
+    def write_architecture(self, edition, close_only_when=None, foundation_layers=("native-clients",)):
+        self.write("catalogs/foundation/manifest.json", {"layers": [
+            {"id": layer, "title": layer.replace("-", " ").capitalize()} for layer in foundation_layers]})
+        self.write("catalogs/landscape/research-state.json", {
+            "saturation": {"close_only_when": self.CLOSE_ONLY_WHEN if close_only_when is None else close_only_when},
+            "layers": [{"catalog": "foundation", "layer_id": "native-clients", "status": "on_requirement_change"},
+                       {"catalog": "us-equities", "layer_id": "backtesting-engine", "status": "comparison_required"},
+                       {"catalog": "us-equities", "layer_id": "execution-broker", "status": "comparison_required"}]})
+        self.write(self.ARCHITECTURE_SOURCE, "# Fixture edition record\n")
+        self.write(self.ARCHITECTURE, edition)
+
+    def test_architecture_edition_validates_and_joins_pins_sources_and_closure_items(self):
+        self.write_architecture(self.architecture_edition())
+        page, _ = self.build()
+        data = json.loads(page.data)
+        architecture = data["architecture"]
+        self.assertEqual([(row["catalog"], row["layer_id"], row["verdict"]) for row in architecture["rows"]], [
+            ("foundation", "native-clients", "selection_of_record_open"),
+            ("us-equities", "backtesting-engine", "no_selection"),
+            ("cross", "cross:credential-practice", "selection_of_record_open")])
+        self.assertEqual([row["research_status"] for row in architecture["rows"]],
+                         ["on_requirement_change", "comparison_required", None])
+        # A catalog layer without a row is listed as a gap, never silently dropped.
+        self.assertEqual(architecture["missing_layers"], ["us-equities/execution-broker"])
+        self.assertEqual([(item["id"], item["text"]) for item in architecture["edition"]["closure_items"]],
+                         list(zip(("c1", "c2", "c3", "c4", "c5"), self.CLOSE_ONLY_WHEN)))
+        winner = architecture["rows"][0]["winners"][0]
+        self.assertEqual((winner["label"], winner["pin"]), ("search", "1.0"))
+        self.assertTrue(winner["pin_source"]["url"].endswith("/blob/main/manifests/stack.json#L1"))
+        # The edition's sources are newer than the immutable base: they resolve at the publication ref.
+        self.assertTrue(winner["install"]["source"]["url"].endswith("/blob/main/" + self.ARCHITECTURE_SOURCE))
+        self.assertTrue(architecture["url"].endswith("/blob/main/" + self.ARCHITECTURE))
+        self.assertEqual(architecture["rows"][2]["reasons"][0]["source"], {
+            "kind": "pending", "path": "docs/pending-recipe.md", "pull_request": 569, "commit": "eabe7654",
+            "url": "https://github.com/example/public-stack/pull/569"})
+        self.assertEqual(architecture["rows"][2]["gates"][0]["source"],
+                         {"kind": "url", "url": "https://github.com/example/search/issues/7"})
+        hashed = {row["path"] for row in data["inputs"]}
+        self.assertLessEqual({self.ARCHITECTURE, self.ARCHITECTURE_SOURCE, "catalogs/foundation/manifest.json",
+                              "catalogs/landscape/research-state.json"}, hashed)
+        # A pending source whose file is absent is linked through its pull request and hashes nothing.
+        self.assertFalse((self.root / "docs/pending-recipe.md").exists())
+        self.assertNotIn("docs/pending-recipe.md", hashed)
+        # Once the file exists it landed after this edition's base: hashed and linked like a source_path, and the
+        # build passes, so a later merge of that pull request never breaks main.
+        self.write("docs/pending-recipe.md", "# Landed recipe\n")
+        page, _ = self.build()
+        data = json.loads(page.data)
+        landed = data["architecture"]["rows"][2]["reasons"][0]["source"]
+        self.assertEqual({key: value for key, value in landed.items() if key != "url"}, {
+            "kind": "landed", "path": "docs/pending-recipe.md", "pull_request": 569, "commit": "eabe7654"})
+        self.assertTrue(landed["url"].endswith("/blob/main/docs/pending-recipe.md"))
+        self.assertIn("docs/pending-recipe.md", {row["path"] for row in data["inputs"]})
+
+    def test_architecture_tab_is_hidden_without_the_edition(self):
+        self.use_real_template()
+        page, _ = self.build()
+        self.assertIsNone(json.loads(page.data)["architecture"])
+        self.assertIn("hidden", page.elements["tab-architecture"])
+        self.assertEqual(page.elements["tab-architecture"]["aria-controls"], "architecture")
+        self.assertEqual(page.elements["architecture"]["role"], "tabpanel")
+        self.write_architecture(self.architecture_edition())
+        page, _ = self.build()
+        self.assertIsNotNone(json.loads(page.data)["architecture"])
+        self.assertEqual(len(page.scripts), 2)
+
+    def test_architecture_edition_change_changes_the_check_digest(self):
+        edition = self.architecture_edition()
+        self.write_architecture(edition)
+
+        def reword_a_reason():
+            edition["rows"][0]["reasons"][0]["text"] = "Recorded verdict winner, reworded"
+            self.write(self.ARCHITECTURE, edition)
+        self.assert_check_digest_changes(reword_a_reason)
+
+    ARCHITECTURE_HOSTILE = '</script><script src="https://invalid.example/steal.js"></script>'
+
+    def write_hostile_architecture(self):
+        hostile = self.ARCHITECTURE_HOSTILE
+        edition = self.architecture_edition()
+        row = edition["rows"][0]
+        row["title"] = row["notes"] = row["reasons"][0]["text"] = hostile
+        row["new_host_steps"] = [hostile]
+        self.write_architecture(edition)
+        return hostile
+
+    def test_architecture_text_is_inert_public_data(self):
+        self.use_real_template()
+        hostile = self.write_hostile_architecture()
+        page, _ = self.build()
+        self.assertEqual(len(page.scripts), 2)
+        self.assertEqual(page.external_assets, [])
+        embedded = json.loads(page.data)["architecture"]["rows"][0]
+        self.assertEqual((embedded["title"], embedded["notes"], embedded["reasons"][0]["text"],
+                          embedded["new_host_steps"]), (hostile, hostile, hostile, [hostile]))
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_renders_hostile_architecture_text_as_text(self):
+        """The renderer writes text nodes only: the harness elements have no markup parser, so a renderer that
+        wrote the string as markup would lose it from textContent and this test would fail."""
+        self.use_real_template()
+        hostile = self.write_hostile_architecture()
+        _, text = self.build()
+        observed = self.run_page(text, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        table = observed["architecture"]
+        for expected in (hostile + "foundation/native-clients", hostile + " (" + self.ARCHITECTURE_SOURCE + ") ↗",
+                         "Notes: " + hostile, "New-host steps, in order" + hostile + "Gates"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, table)
+        self.assertEqual(table.count(hostile), 4)
+
+    def test_architecture_edition_rejects_each_invalid_contract(self):
+        def winner(edition):
+            return edition["rows"][0]["winners"][0]
+
+        def reason(edition):
+            return edition["rows"][0]["reasons"][0]
+        cases = (
+            (lambda e: e.update(schema_version=2), "unsupported architecture edition schema"),
+            (lambda e: e.update(kind="other"), "architecture edition kind must be new_wsl_architecture_edition"),
+            (lambda e: e["edition"].pop("base_commit"), "architecture edition needs exactly its date, base commit"),
+            (lambda e: e["edition"].update(close_only_when_sha256="0" * 63),
+             "architecture edition needs exactly its date, base commit"),
+            (lambda e: e["edition"]["verdict_values"].pop("closed"),
+             "architecture edition must define every value of verdict_values"),
+            (lambda e: e.update(rows=[]), "architecture rows must be a non-empty list"),
+            (lambda e: e["rows"][0].update(winner={}), "architecture row has an unknown field"),
+            (lambda e: e["rows"][0].update(layer_id="unknown-layer"),
+             "architecture layer_id must be a known catalog layer or a cross: id"),
+            (lambda e: e["rows"][0].update(catalog="us-equities"), "architecture row catalog must match its layer"),
+            (lambda e: e["rows"][0].update(title=" "), "architecture row needs its title"),
+            (lambda e: e["rows"][0].pop("owner_lane"), "architecture row needs its owner_lane"),
+            (lambda e: e["rows"][0].update(notes=None), "architecture row notes must be text"),
+            (lambda e: e["rows"][0].update(verdict="done"), "unknown architecture verdict"),
+            (lambda e: e["rows"][0].update(evidence_class="anecdote"), "unknown architecture evidence class"),
+            (lambda e: e["rows"][0]["closure"].pop("c5"), "architecture closure needs c1..c5"),
+            (lambda e: e["rows"][0].update(verdict="closed"),
+             "a closed architecture verdict requires all five closure items met"),
+            (lambda e: e["rows"][0]["closure"].update(missing=" "), "an open architecture row must name what is missing"),
+            (lambda e: e["rows"][0].update(verdict="no_selection"),
+             "a no_selection architecture row carries no winners, and every other row has one"),
+            (lambda e: winner(e).update(name="search"), "architecture winner needs exactly one of component_id or name"),
+            (lambda e: winner(e).update(component_id="unlisted"),
+             "architecture winner component_id must be a manifests/stack.json component"),
+            (lambda e: winner(e).update(role=" "),
+             "architecture winner role must be non-empty text of at most 120 characters"),
+            (lambda e: winner(e).update(role="r" * 121),
+             "architecture winner role must be non-empty text of at most 120 characters"),
+            (lambda e: (winner(e).pop("component_id"), winner(e).update(name="ripgrep", pin=" ")),
+             "architecture winner needs its name and pin"),
+            (lambda e: winner(e).update(repository="http://github.com/example/search"),
+             "architecture winner repository must be a public HTTPS URL"),
+            (lambda e: winner(e).update(pin_source="manifests/absent.json:1"),
+             "architecture winner pin_source must be a repository file with an optional line range"),
+            (lambda e: winner(e).update(pin_source="manifests/stack.json:2"),
+             "architecture winner pin_source line range must fall inside the file"),
+            (lambda e: winner(e)["install"].update(kind="curl"),
+             "architecture install needs a known kind and a command unless none is recorded"),
+            (lambda e: winner(e)["acceptance"].update(command=""),
+             "architecture acceptance needs its evidence class and a command unless none is recorded"),
+            (lambda e: winner(e)["upstream_currency"].pop("checked_at"),
+             "architecture upstream currency needs latest_release, checked_at and pin_is_latest"),
+            (lambda e: winner(e)["upstream_currency"].update(url="javascript:alert(document.domain)"),
+             "architecture upstream currency url must be a public HTTPS URL"),
+            (lambda e: winner(e)["install"].pop("source_path"),
+             "architecture search install needs exactly one of source_path, pending_source or url"),
+            (lambda e: reason(e).update(url="https://github.com/example/search"),
+             "architecture reason needs exactly one of source_path, pending_source or url"),
+            (lambda e: reason(e).update(source_path="docs/absent.md"),
+             "architecture reason source_path must be a repository file"),
+            (lambda e: (reason(e).pop("source_path"), reason(e).update(
+                pending_source={"path": "docs/pending-recipe.md", "pull_request": "569"})),
+             "architecture reason pending_source needs a path, a pull request number and an optional commit"),
+            (lambda e: (reason(e).pop("source_path"), reason(e).update(url="https://127.0.0.1/record")),
+             "architecture reason url must be a public HTTPS URL"),
+            (lambda e: reason(e).update(source_path="manifests/evidence.json"),
+             "architecture citations cannot use the generated page or the evidence manifest"),
+            (lambda e: e["rows"][0].update(reasons=[]), "architecture row needs reasons with their text"),
+            (lambda e: e["rows"][0].update(alternatives=[{"name": "Other client"}]),
+             "architecture alternatives need their name and verdict"),
+            (lambda e: e["rows"][0].update(new_host_steps=[]), "architecture row needs ordered new-host steps"),
+            (lambda e: e["rows"][0]["gates"][0].update(kind="defect"),
+             "architecture gates need their text and a known kind (user_side, upstream or lane)"),
+            (lambda e: e["rows"].append(e["rows"][0]), "architecture layer_id must be unique"),
+            # The reverse direction of each "if and only if" rule.
+            (lambda e: e["rows"][0]["closure"].update(c2="met", c3="met", c4="met", c5="met", missing=""),
+             "a closed architecture verdict requires all five closure items met"),
+            (lambda e: e["rows"][0].update(winners=[]),
+             "a no_selection architecture row carries no winners, and every other row has one"),
+            (lambda e: e["rows"][0].update(verdict="closed", closure={
+                **{item: "met" for item in ("c1", "c2", "c3", "c4", "c5")}, "missing": "c1: nothing"}),
+             "an open architecture row must name what is missing, and a closed row nothing"),
+            # recipes/search.md has five lines, so :5-3 fails on its order, not on the file's bounds.
+            (lambda e: winner(e).update(pin_source="recipes/search.md:5-3"),
+             "architecture winner pin_source line range must fall inside the file"),
+            (lambda e: e["rows"][2].update(catalog="foundation"), "architecture row catalog must match its layer"),
+            (lambda e: winner(e)["install"].update(kind="none_recorded"),
+             "architecture install needs a known kind and a command unless none is recorded"),
+            # A path escape at each architecture call site.
+            (lambda e: reason(e).update(source_path="../outside.md"),
+             "source path must be canonical and confined to the repository"),
+            (lambda e: winner(e).update(pin_source="../manifests/stack.json:1"),
+             "source path must be canonical and confined to the repository"),
+            (lambda e: (reason(e).pop("source_path"), reason(e).update(
+                pending_source={"path": "../pending-recipe.md", "pull_request": 569})),
+             "source path must be canonical and confined to the repository"),
+        )
+        for mutate, message in cases:
+            with self.subTest(message=message):
+                edition = self.architecture_edition()
+                mutate(edition)
+                self.write_architecture(edition)
+                result = self.run_generator("--check")
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertIn(message, result.stdout)
+        with self.subTest(message="close_only_when"):
+            self.write_architecture(self.architecture_edition(), close_only_when=self.CLOSE_ONLY_WHEN[:4])
+            result = self.run_generator("--check")
+            self.assertNotEqual(result.returncode, 0, result.stdout)
+            self.assertIn("architecture closure items must be the five close_only_when items of the research state",
+                          result.stdout)
+
+    def test_architecture_closure_texts_are_bound_by_their_hash(self):
+        """The edition records the sha256 of the five close_only_when texts it was written against, so a reworded or
+        reordered research state fails the build instead of showing each row's states beside other texts."""
+        message = ("architecture edition close_only_when_sha256 must be the sha256 of the research state's five "
+                   "close_only_when texts")
+        self.write_architecture(self.architecture_edition())
+        result = self.run_generator("--check")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        texts = self.CLOSE_ONLY_WHEN
+        for name, changed in (("reworded", [texts[0] + ", reworded", *texts[1:]]),
+                              ("reordered", [texts[1], texts[0], *texts[2:]])):
+            with self.subTest(case=name):
+                self.write_architecture(self.architecture_edition(), close_only_when=changed)
+                result = self.run_generator("--check")
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertIn(message, result.stdout)
+
+    def assert_architecture_cases(self, cases):
+        """Each case mutates a fresh fixture edition; None expects a passing --check, a string that failure."""
+        for name, mutate, message in cases:
+            with self.subTest(case=name):
+                edition = self.architecture_edition()
+                mutate(edition)
+                self.write_architecture(edition)
+                result = self.run_generator("--check")
+                if message is None:
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                else:
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn(message, result.stdout)
+
+    def test_a_none_recorded_acceptance_may_name_the_check_to_run(self):
+        """A check that is prescribed but has no recorded run keeps its command; every other class needs one."""
+        def prescribed(edition):
+            edition["rows"][0]["winners"][0]["acceptance"].update(command="rg --version", evidence_class="none_recorded")
+            edition["rows"][0]["evidence_class"] = "none_recorded"
+        self.assert_architecture_cases((
+            ("a prescribed check without a recorded run", prescribed, None),
+            ("a recorded class without a command",
+             lambda e: e["rows"][0]["winners"][0]["acceptance"].update(command=" "),
+             "architecture acceptance needs its evidence class and a command unless none is recorded")))
+
+    def recorded_winner(self, evidence_class):
+        """A second, name-keyed winner whose acceptance carries the given class."""
+        winner = self.architecture_winner(name="ripgrep", pin="14.1.1", acceptance={
+            "command": "" if evidence_class == "none_recorded" else "rg --version",
+            "evidence_class": evidence_class, "source_path": self.ARCHITECTURE_SOURCE})
+        winner.pop("component_id")
+        return winner
+
+    def test_architecture_pin_drift_passes_and_is_listed(self):
+        """A dated edition keeps the pin it recorded: a later stack move passes the build, the winner carries the
+        stack's version and --check lists it; a component_id outside the stack still fails (rejects test)."""
+        self.write_architecture(self.architecture_edition())
+        self.assertEqual(self.check_report()["architecture_pin_drift"], [])
+        self.stack["components"][0]["version"] = "1.1"
+        self.save()
+        self.assertEqual(self.check_report()["architecture_pin_drift"], [
+            {"row": "foundation/native-clients", "component_id": "search", "edition_pin": "1.0", "stack_pin": "1.1"},
+            {"row": "cross/cross:credential-practice", "component_id": "search", "edition_pin": "1.0",
+             "stack_pin": "1.1"}])
+        page, _ = self.build()
+        winner = json.loads(page.data)["architecture"]["rows"][0]["winners"][0]
+        self.assertEqual((winner["pin"], winner["pin_drift"]), ("1.0", "1.1"))
+
+    def test_architecture_layer_identity_is_the_catalog_and_layer_id_pair(self):
+        """The two catalogs may share a layer id; each (catalog, layer id) pair is its own layer."""
+        shared = ("native-clients", "backtesting-engine")
+        edition = self.architecture_edition()
+        edition["rows"].append(self.architecture_row("backtesting-engine", "foundation"))
+        self.write_architecture(edition, foundation_layers=shared)
+        page, _ = self.build()
+        architecture = json.loads(page.data)["architecture"]
+        identities = [(row["catalog"], row["layer_id"], row["research_status"]) for row in architecture["rows"]]
+        self.assertEqual(identities[1::2], [("us-equities", "backtesting-engine", "comparison_required"),
+                                            ("foundation", "backtesting-engine", None)])
+        self.assertEqual(architecture["missing_layers"], ["us-equities/execution-broker"])
+        # The us-equities row does not cover the foundation layer of the same id.
+        self.write_architecture(self.architecture_edition(), foundation_layers=shared)
+        page, _ = self.build()
+        self.assertEqual(json.loads(page.data)["architecture"]["missing_layers"],
+                         ["foundation/backtesting-engine", "us-equities/execution-broker"])
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_renders_architecture_roles_pin_drift_and_landed_sources(self):
+        self.use_real_template()
+        edition = self.architecture_edition()
+        edition["rows"][0]["winners"][0]["role"] = "selected destination engine"
+        self.write_architecture(edition)
+        self.write("docs/pending-recipe.md", "# Landed recipe\n")
+        self.stack["components"][0]["version"] = "1.1"
+        self.save()
+        _, text = self.build()
+        observed = self.run_page(text, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        drift = "Pin drift: the stack now records 1.1; this edition recorded 1.0."
+        for expected in ("search ↗ · selected destination engine1.0" + drift,
+                         "search · selected destination engine · 1.0Pin of record: manifests/stack.json:1 ↗" + drift,
+                         "Recipe lands with its pull request (docs/pending-recipe.md · landed after this edition's base "
+                         "(pull request #569)) ↗"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, observed["architecture"])
+
+    def test_architecture_row_class_is_the_floor_its_winners_reach(self):
+        """No order is defined among the six policy classes, so the build enforces what it can: a row with a
+        none_recorded winner is none_recorded, and otherwise its class is one that a winner's acceptance carries."""
+        floor = "architecture row evidence class must be none_recorded when any winner's acceptance is none_recorded"
+        carried = "architecture row evidence class must be one that at least one winner's acceptance carries"
+
+        def with_second(evidence_class, row_class):
+            def mutate(edition):
+                edition["rows"][0]["winners"].append(self.recorded_winner(evidence_class))
+                edition["rows"][0]["evidence_class"] = row_class
+            return mutate
+        self.assert_architecture_cases((
+            ("a none_recorded winner under a recorded row class", with_second("none_recorded", "upstream_test"), floor),
+            ("a row class no winner carries", lambda e: e["rows"][0].update(evidence_class="local_integration_check"),
+             carried),
+            ("a none_recorded winner under a none_recorded row", with_second("none_recorded", "none_recorded"), None),
+            ("a row class one of two winners carries",
+             with_second("local_integration_check", "local_integration_check"), None),
+            ("a row without winners keeps its owner's class",
+             lambda e: e["rows"][1].update(evidence_class="local_integration_check"), None)))
+
+    def test_architecture_missing_names_exactly_the_open_items(self):
+        """`missing` is one "cN: ..." segment per item that is not met (segments separated by "; cN:"), none for a
+        met item; a trailing sentence without a cN: prefix belongs to the last segment."""
+        message = "architecture closure missing must name each item that is not met in its own cN: segment"
+
+        def missing(text):
+            return lambda edition: edition["rows"][0]["closure"].update(missing=text)
+        named = "c2: candidate set not frozen; c3: no new-distro run; c4: no second review; c5: no closure record"
+        self.assert_architecture_cases((
+            ("open items without a segment", missing("c2: candidate set not frozen"), message),
+            ("free text only", missing("TBD"), message),
+            ("free text before the segments", missing("TBD; " + named), message),
+            ("a met item with a segment", missing("c1: already met; " + named), message),
+            ("an open item named twice", missing(named + "; c5: and again"), message),
+            ("a trailing sentence without a prefix", missing(named + "; the owner re-reads this row next edition."),
+             None)))
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_script_renders_the_architecture_tab(self):
+        self.use_real_template()
+        _, without = self.build()
+        observed = self.run_page(without, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        # No edition: the tab stays hidden and #architecture falls back to the overview.
+        self.assertEqual((observed["architecture_tab_hidden"], observed["architecture_panel_hidden"]), (True, True))
+        self.assertEqual(observed["architecture"], "")
+
+        edition = self.architecture_edition()
+        self.write_architecture(edition)
+        _, with_edition = self.build()
+        observed = self.run_page(with_edition, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed["app_hidden"], observed["recovery_hidden"]), (False, True))
+        self.assertEqual((observed["architecture_tab_hidden"], observed["architecture_panel_hidden"]), (False, False))
+        head, table = observed["architecture_edition"], observed["architecture"]
+        for expected in ("Edition 2026-10-01 · base commit " + "c" * 40, "Fixture edition",
+                         "Closed: 0 of 3 rows. No layer is closed in this edition: none meets all five closure items",
+                         "Verdicts: no selection 1 · selection of record open 2",
+                         "Catalog layers without a row in this edition: us-equities/execution-broker",
+                         "Verdict rulesA layer is closed only when all five close_only_when items hold.",
+                         "c5Dated closure record", "selection of record openMeaning of selection_of_record_open"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, head)
+        for expected in ("Foundation layers", "US-equities layers", "Cross-cutting rows",
+                         "LayerSource host's selection (pin)VerdictEvidence classReasonsInstall on the new distro",
+                         "Title native-clientsfoundation/native-clientsResearch state: on requirement change",
+                         "search ↗1.0", "Meaning of selection_of_record_openLabel of upstream_test",
+                         "Recorded verdict winner (" + self.ARCHITECTURE_SOURCE + ") ↗",
+                         "Recipe lands with its pull request (docs/pending-recipe.md · pull request #569 at eabe7654, "
+                         "not on main at this edition's base) ↗",
+                         "search · repo recipesearch install", "No selection of record",
+                         "c2 · partialFrozen candidate set", "Missing: c2: candidate set not frozen; c3: no new-distro run",
+                         "Pin of record: manifests/stack.json:1 ↗", "Acceptance (Label of upstream_test)search --self-test",
+                         "Upstream: v1.1 (2026-09-30) · pin is latest: no · checked 2026-10-01T05:00Z ↗",
+                         "Other client · refuted on fit · " + self.ARCHITECTURE_SOURCE + " ↗",
+                         "Install the pinned clientSign in natively",
+                         "user side gate: Native sign-in on the new distro", "upstream gate: Upstream fix pending",
+                         "Gate source: https://github.com/example/search/issues/7 ↗",
+                         "Missing: c1: assessment pending; c2: assessment pending", "Owner lane: foundation"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, table)
+
+        # One row meeting all five items, closed: the count comes from the data and the "none" sentence goes away.
+        edition["rows"][0].update(verdict="closed", closure={**{item: "met" for item in ("c1", "c2", "c3", "c4", "c5")},
+                                                              "missing": ""})
+        self.write_architecture(edition)
+        _, with_closed = self.build()
+        observed = self.run_page(with_closed, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertIn("Closed: 1 of 3 rows.", observed["architecture_edition"])
+        self.assertNotIn("No layer is closed", observed["architecture_edition"])
+        self.assertIn("Nothing missing: all five closure items hold.", observed["architecture"])
+
+    @unittest.skipUnless(shutil.which("git"), "Tracked-file check needs git")
+    def test_the_repository_architecture_edition_validates_and_cites_tracked_files(self):
+        """The real edition, not the fixture: the generator's own validation passes and every file the edition
+        cites (and the generator hashes) is tracked by git in this checkout. A catalog layer without a row is
+        listed on the page, not a failure, so this test does not require every layer to have a row."""
+        sys.path.insert(0, str(ROOT / "scripts"))
+        try:
+            import build_ecosystem
+            from catalog_decisions import load
+        finally:
+            sys.path.remove(str(ROOT / "scripts"))
+        hashed = set()
+
+        def read(path):
+            hashed.add(path)
+            return load(ROOT, path)
+        architecture = build_ecosystem.build_architecture(
+            ROOT, "https://github.com/example/public-stack", read(build_ecosystem.STACK), read, hashed.add,
+            lambda path: "https://github.com/example/public-stack/blob/main/" + path, set())
+        self.assertIsNotNone(architecture)
+        tracked = set(subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True,
+                                     check=True).stdout.decode().split("\0"))
+        self.assertGreater(len(hashed), 3)
+        self.assertEqual(sorted(hashed - tracked), [])
+
+    def test_the_repository_architecture_record_keeps_the_acceptance_invariant(self):
+        """The record states the rule every winner's acceptance class follows and the dated review that corrected
+        the edition. The build cannot read prose, so this test keeps a later edit from dropping either silently."""
+        record = (ROOT / "docs/decisions/2026-10-01-new-wsl-architecture-edition.md").read_text(encoding="utf-8")
+        record = " ".join(record.split())
+        for sentence in (
+                "A winner's acceptance class describes a run that the cited source, or one file that source links, "
+                "shows was run on a host and what it returned.",
+                "A check that is only prescribed, planned, not run or failed is `none_recorded`.",
+                "A version print is metadata, not an acceptance.",
+                "An independent review on 2026-10-01 found 32 of the 119 winner acceptance classes overstated, 13 "
+                "commands that were only version or status prints and 6 entries it could not settle"):
+            with self.subTest(sentence=sentence[:50]):
+                self.assertIn(sentence, record)
 
 
 if __name__ == "__main__":

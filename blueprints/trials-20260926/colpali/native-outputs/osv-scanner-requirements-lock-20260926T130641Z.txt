@@ -1,0 +1,50 @@
+# Retained output of the pinned OSV-Scanner on a temporary copy of the removed reproduction/requirements-lock.txt.
+# Binary: osv-scanner_linux_amd64 2.6.0, sha256 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108 (OSV_SCANNER_SHA256 in .github/workflows/security-scan.yml).
+# Working directory <scratch>/final-fix/osv-scan held requirements-lock.txt (1834 bytes, sha256 0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9) and osv-scanner.toml (a copy of .github/osv-scanner.toml).
+# Run at 2026-09-26T13:06:41Z-13:06:42Z; the scanner queried the OSV API. Lines starting with # or $ are ours; the rest is the scanner output with the session scratch path replaced by <scratch>.
+$ osv-scanner --version
+osv-scanner version: 2.6.0
+osv-scalibr version: 0.5.2
+commit: e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6
+built at: 2026-09-14T01:44:58Z
+$ osv-scanner scan source --config osv-scanner.toml --no-resolve --lockfile=requirements.txt:requirements-lock.txt
+Starting filesystem walk for root: /
+Scanned <scratch>/final-fix/osv-scan/requirements-lock.txt file and found 94 packages
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 479.215µs elapsed, 479.285µs wall time
+osv-scanner.toml has unused ignores:
+ - GHSA-8mgp-746c-j5xp
+ - GHSA-h35f-9h28-mq5c
+
+Total 2 packages affected by 20 known vulnerabilities (1 Critical, 15 High, 4 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+10 vulnerabilities can be fixed.
+
++-------------------------------------+------+-----------+--------------+---------+---------------+-----------------------+
+| OSV URL                             | CVSS | ECOSYSTEM | PACKAGE      | VERSION | FIXED VERSION | SOURCE                |
++-------------------------------------+------+-----------+--------------+---------+---------------+-----------------------+
+| https://osv.dev/PYSEC-2025-203      | 7.5  | PyPI      | torch        | 2.8.0   | 2.9.0         | requirements-lock.txt |
+| https://osv.dev/PYSEC-2025-204      | 7.5  | PyPI      | torch        | 2.8.0   | 2.9.0         | requirements-lock.txt |
+| https://osv.dev/PYSEC-2025-206      | 5.3  | PyPI      | torch        | 2.8.0   | 2.9.0         | requirements-lock.txt |
+| https://osv.dev/PYSEC-2026-139      | 7.8  | PyPI      | torch        | 2.8.0   | --            | requirements-lock.txt |
+| https://osv.dev/PYSEC-2026-2286     | 8.8  | PyPI      | torch        | 2.8.0   | 2.10.0        | requirements-lock.txt |
+| https://osv.dev/GHSA-qfhq-4f3w-5fph | 5.3  | PyPI      | torch        | 2.8.0   | 2.10.0        | requirements-lock.txt |
+| https://osv.dev/GHSA-rrmf-rvhw-rf47 | 5.3  | PyPI      | torch        | 2.8.0   | 2.13.0        | requirements-lock.txt |
+| https://osv.dev/GHSA-vgrw-7cvw-pwgx | 5.3  | PyPI      | torch        | 2.8.0   | 2.9.1         | requirements-lock.txt |
+| https://osv.dev/PYSEC-2025-211      | 7.8  | PyPI      | transformers | 4.53.1  | --            | requirements-lock.txt |
+| https://osv.dev/PYSEC-2025-212      | 7.8  | PyPI      | transformers | 4.53.1  | --            | requirements-lock.txt |
+| https://osv.dev/PYSEC-2025-213      | 7.8  | PyPI      | transformers | 4.53.1  | --            | requirements-lock.txt |
+| https://osv.dev/PYSEC-2025-214      | 7.8  | PyPI      | transformers | 4.53.1  | --            | requirements-lock.txt |
+| https://osv.dev/PYSEC-2025-215      | 7.8  | PyPI      | transformers | 4.53.1  | --            | requirements-lock.txt |
+| https://osv.dev/PYSEC-2025-216      | 7.8  | PyPI      | transformers | 4.53.1  | --            | requirements-lock.txt |
+| https://osv.dev/PYSEC-2025-217      | 7.8  | PyPI      | transformers | 4.53.1  | --            | requirements-lock.txt |
+| https://osv.dev/PYSEC-2025-218      | 7.8  | PyPI      | transformers | 4.53.1  | --            | requirements-lock.txt |
+| https://osv.dev/PYSEC-2026-2288     | 7.8  | PyPI      | transformers | 4.53.1  | 5.0.0         | requirements-lock.txt |
+| https://osv.dev/GHSA-69w3-r845-3855 |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-2289     | 7.8  | PyPI      | transformers | 4.53.1  | 5.3.0         | requirements-lock.txt |
+| https://osv.dev/GHSA-29pf-2h5f-8g72 |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-2290     | 9.6  | PyPI      | transformers | 4.53.1  | --            | requirements-lock.txt |
+| https://osv.dev/GHSA-fgcw-684q-jj6r |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3929     | 7.1  | PyPI      | transformers | 4.53.1  | 5.10.0        | requirements-lock.txt |
+| https://osv.dev/GHSA-xrqw-3rrv-vx5w |      |           |              |         |               |                       |
++-------------------------------------+------+-----------+--------------+---------+---------------+-----------------------+
+# exit status: 1 (vulnerabilities found)
+# The same command with --format json (exit status 1, 185555 bytes, sha256 cdbb291fe83d991a566e045b6de47159163f020e81dea33338d9017ce8d04b8e, not published) is the source of environment-record.json#/known_advisories.

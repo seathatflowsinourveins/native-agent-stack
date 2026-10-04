@@ -1,0 +1,1198 @@
+{
+  "schema_version": 1,
+  "id": "spy-one-zero-engine-trial-lumibot-run-20260926",
+  "kind": "run_record",
+  "trial": "spy-one-zero-engine-trials-20260926",
+  "arm": "lumibot",
+  "case": "one_zero",
+  "evidence_class": "HIST",
+  "classification": "local historical replay of bundled LEAN sample data through Lumibot 4.6.1 (GPL-3.0, evaluation only), scored by the unchanged spy-parity compare.py; not an unchanged upstream test, a point-in-time dataset, a strategy result or any broker execution",
+  "recorded_utc": "2026-09-26T06:32:25+00:00",
+  "result": {
+    "primary_attempt": "attempt-01",
+    "verdict": "FAIL",
+    "checks": 29,
+    "pass": 23,
+    "fail": 6,
+    "skipped": 0,
+    "complete": true,
+    "attribution_evidence": "converted bars",
+    "blocking_mappings": [],
+    "unattributed_failures": [
+      "entry_fill.utc_seconds#9",
+      "entry_fill.fill_price_usd#12",
+      "exit_fill.utc_seconds#13",
+      "exit_fill.fill_price_usd#16",
+      "end_cash.reconciled_end_cash_usd#21",
+      "native_end_cash.native_end_cash_usd#22"
+    ],
+    "rejected_attributions": [],
+    "native_end_cash_usd": "91807.2000",
+    "failing_rows": [
+      {
+        "check": "entry_fill.utc_seconds#9",
+        "expected": "1577977200",
+        "observed": "1577826000",
+        "delta": "-151200",
+        "blocked_by": null
+      },
+      {
+        "check": "entry_fill.fill_price_usd#12",
+        "expected": "323.58",
+        "observed": "320.9400",
+        "delta": "-2.6400",
+        "blocked_by": null
+      },
+      {
+        "check": "exit_fill.utc_seconds#13",
+        "expected": "1588255200",
+        "observed": "1588190400",
+        "delta": "-64800",
+        "blocked_by": null
+      },
+      {
+        "check": "exit_fill.fill_price_usd#16",
+        "expected": "291.69",
+        "observed": "293.9900",
+        "delta": "2.3000",
+        "blocked_by": null
+      },
+      {
+        "check": "end_cash.reconciled_end_cash_usd#21",
+        "expected": "90734.080",
+        "observed": "92235.8400",
+        "delta": "1501.7600",
+        "blocked_by": null
+      },
+      {
+        "check": "native_end_cash.native_end_cash_usd#22",
+        "expected": "90734.080",
+        "observed": "91807.2000",
+        "delta": "1073.1200",
+        "blocked_by": null
+      }
+    ],
+    "scorer_exit_code": 1,
+    "prediction": "BLOCKED, 28 of 29, only native_end_cash failing and attributed to distributions_and_cash (preregistration.json predictions.lumibot)",
+    "prediction_falsifiers_observed": [
+      "Both fills stamped at their decision bar's end instant (1577826000 and 1588190400), not at the next session's first bar end (1577977200 and 1588255200).",
+      "Both fills priced at their decision bar's open (320.9400 and 293.9900), not at the next session's first bar open (323.58 and 291.69).",
+      "Five failures besides native_end_cash (the four fill checks and the reconciled end cash), none attributable.",
+      "Failed guards in both runs: causality, fill_at_next_session_first_bar and submission_clock."
+    ],
+    "prediction_falsifiers_not_observed": [
+      "a native dividend posting",
+      "unequal run records"
+    ],
+    "mechanism": "The pre-run finding recorded before the attempt: the backtesting broker processes pending orders at the current clock whenever the strategy next awaits the market open, before the clock advances, and prices a market order at the open of the bar indexed at that clock. With END-indexed bars, a GTC market order submitted in after_market_closes at 16:00 fills at 16:00 at the open of the bar that has just completed. The fills use prices printed one hour before each decision, which is why the reconciled end cash is 1501.76 above the oracle (304 x 2.64 on entry plus 304 x 2.30 on exit); native cash also lacks the 428.64 of unposted distributions.",
+    "scope": "One historical-simulation case (one_zero) on bundled sample data. It ranks, promotes or adopts no engine and says nothing about one_stress, two_zero, later cases, paper or live operation."
+  },
+  "post_hoc_results": [
+    {
+      "id": "post-hoc-01",
+      "attempt": "attempt-02",
+      "decision_hook": "before_starting_trading",
+      "receipt": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.post-hoc-01.json",
+      "verdict_file": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.post-hoc-01.json",
+      "verdict": "BLOCKED",
+      "checks": 29,
+      "pass": 28,
+      "fail": 1,
+      "skipped": 0,
+      "complete": true,
+      "blocking_mappings": [
+        "distributions_and_cash"
+      ],
+      "unattributed_failures": [],
+      "rejected_attributions": [],
+      "native_end_cash_usd": "90305.4400",
+      "failing_rows": [
+        {
+          "check": "native_end_cash.native_end_cash_usd#22",
+          "expected": "90734.080",
+          "observed": "90305.4400",
+          "delta": "-428.6400",
+          "blocked_by": "distributions_and_cash"
+        }
+      ],
+      "guards_failed": [
+        "run-1:submission_clock",
+        "run-2:submission_clock"
+      ],
+      "reading": "Deciding at the next session's open instant (10:00) and submitting there reproduces the oracle's fill instants, prices and reconciled end cash exactly, leaving only the unposted distributions: the preregistered BLOCKED shape. It is not a pass of the preregistered strategy: the order is submitted at the instant it fills and is priced at the 09:30 open of the bar that just completed, which the port contract excludes (engine clock at submission before the fill; guard submission_clock failed in both runs)."
+    },
+    {
+      "id": "post-hoc-02",
+      "attempt": "attempt-03",
+      "decision_hook": "before_market_opens",
+      "receipt": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.post-hoc-02.json",
+      "verdict_file": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.post-hoc-02.json",
+      "verdict": "FAIL",
+      "checks": 29,
+      "pass": 25,
+      "fail": 4,
+      "skipped": 0,
+      "complete": true,
+      "blocking_mappings": [],
+      "unattributed_failures": [
+        "exit_fill.utc_seconds#13",
+        "exit_fill.fill_price_usd#16",
+        "end_cash.reconciled_end_cash_usd#21",
+        "native_end_cash.native_end_cash_usd#22"
+      ],
+      "rejected_attributions": [],
+      "native_end_cash_usd": "91004.6400",
+      "failing_rows": [
+        {
+          "check": "exit_fill.utc_seconds#13",
+          "expected": "1588255200",
+          "observed": "1588251600",
+          "delta": "-3600",
+          "blocked_by": null
+        },
+        {
+          "check": "exit_fill.fill_price_usd#16",
+          "expected": "291.69",
+          "observed": "293.9900",
+          "delta": "2.3000",
+          "blocked_by": null
+        },
+        {
+          "check": "end_cash.reconciled_end_cash_usd#21",
+          "expected": "90734.080",
+          "observed": "91433.2800",
+          "delta": "699.2000",
+          "blocked_by": null
+        },
+        {
+          "check": "native_end_cash.native_end_cash_usd#22",
+          "expected": "90734.080",
+          "observed": "91004.6400",
+          "delta": "270.5600",
+          "blocked_by": null
+        }
+      ],
+      "guards_failed": [
+        "run-1:fill_at_next_session_first_bar",
+        "run-1:fill_price_is_open_of_bar_indexed_at_fill_instant",
+        "run-1:submission_clock",
+        "run-2:fill_at_next_session_first_bar",
+        "run-2:fill_price_is_open_of_bar_indexed_at_fill_instant",
+        "run-2:submission_clock"
+      ],
+      "reading": "Deciding before the next open (09:00) fills the entry at the next session's first bar open only because the 2019-12-31 to 2020-01-02 gap exceeds the broker's one-day fill-distance guard, which defers the order to 10:00; the exit (2020-04-29 to 04-30, an 18-hour gap) fills at 09:00 at the decision bar's open."
+    }
+  ],
+  "post_hoc_policy": "preregistration.json failure_policy F5: scored with the same command, sheet and arm manifest, reported beside the primary verdict and never instead of it. Neither changes a row status, the binding, the sheet or the scorer.",
+  "host": {
+    "id": "nativestack-5975wx-20260925",
+    "compute": "CPU only",
+    "gpu": "none: --dev /dev exposes no GPU device node inside the sandbox and no GPU library is configured",
+    "tools": {
+      "bwrap": "0.9.0",
+      "uv": "0.12.17",
+      "base_interpreter": "/usr/bin/python3.12 (CPython 3.12.3)"
+    }
+  },
+  "scorer_pin": {
+    "main_commit": "5c1961e49b89dd56ef5626950a5448735caabe4c",
+    "compare_py": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec"
+    },
+    "tolerances": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
+      "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
+    },
+    "convert_py": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
+      "sha256": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65"
+    },
+    "fixture_strategy_py": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
+      "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1"
+    },
+    "oracle": {
+      "path": "blueprints/us-equities/historical-simulation/receipt.json",
+      "sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9"
+    },
+    "plan": {
+      "path": "blueprints/us-equities/historical-simulation/plan.json",
+      "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+    },
+    "equal_to_preregistered_pins": true,
+    "note": "The checkout that ran and scored is main 5c1961e4 plus the preregistration commit, the ml4t-backtest arm's commits and this arm's freeze commit; none touches spy-parity or historical-simulation, and the hashes above were taken there."
+  },
+  "sheet": {
+    "registered": "v1",
+    "tolerances_sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+    "registered_before_first_run": true,
+    "registered_in_commit": "a74ed16d7084a4d84cd31ce3116a95457baa913c",
+    "same_sheet_for_both_engines": true,
+    "tolerance_changes_after_results": "none"
+  },
+  "preregistration": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/preregistration.json",
+    "sha256": "73ea82e9007d92e1b00feb86ba190d5fb8842b7d14962c651b0caf74b8522b38",
+    "commit": "a74ed16d7084a4d84cd31ce3116a95457baa913c"
+  },
+  "engine": {
+    "package": "lumibot",
+    "version": "4.6.1",
+    "license": "GPL-3.0 (license file and package metadata at the tag); evaluation only",
+    "upstream_repository": "https://github.com/Lumiwealth/lumibot",
+    "upstream_tag": "v4.6.1",
+    "upstream_commit": "2dfdda100cdc34e5acb46a7f13e8208a35aede72",
+    "annotated_tag_object": "0f3110d594c7131cda163391c964058ea72257e9",
+    "wheel": "lumibot-4.6.1-py3-none-any.whl",
+    "wheel_sha256": "d06b8feb32c8a23026628e9030b9f166a25f4ab3af510d241aaa915516554159",
+    "wheel_bytes": 37945888,
+    "uploaded_utc": "2026-09-26T01:07:45Z",
+    "checks_2026_09_26": [
+      "PyPI JSON for lumibot 4.6.1 re-fetched: the only distribution is the wheel, with the preregistered digest, size and upload time; license GPL-3.0 (class: primary-source metadata).",
+      "git ls-remote: Lumiwealth/lumibot refs/tags/v4.6.1 -> 0f3110d5 (peeled 2dfdda10) (class: primary-source metadata).",
+      "docsrc/backtesting.pandas.rst, tests/test_hour_timestep_support.py and LICENSE fetched at 2dfdda10 hash to the preregistered values; the page documents the minute and day timesteps and passes pandas_data to run_backtest with PandasDataBacktesting (class: primary-source documentation).",
+      "The installed lumibot package files equal the unpacked hash-verified wheel (diff -r, __pycache__ excluded)."
+    ]
+  },
+  "environment": {
+    "location": "$ENV = ~/.local/share/codex-ecosystem/engine-trials-20260926/lumibot-4.6.1",
+    "base_interpreter": "/usr/bin/python3.12 (CPython 3.12.3); $ENV/pyvenv.cfg home = /usr/bin",
+    "uv_version": "0.12.17",
+    "create": "uv venv --python /usr/bin/python3.12 \"$ENV\"",
+    "built_from_source": {
+      "ibapi": {
+        "version": "9.81.1.post1",
+        "sdist": "ibapi-9.81.1.post1.tar.gz from files.pythonhosted.org, uploaded 2020-12-06T03:18:39Z",
+        "sdist_sha256": "49f6678bf4cced996920f32ad4b48e6897749ac30ba14a661082285f4ec09cd6",
+        "sdist_checked": "sha256 equal to the PyPI digest before the build",
+        "build_environment": {
+          "location": "$BUILD/build-venv = ~/.local/share/codex-ecosystem/engine-trials-20260926/lumibot-4.6.1-build/build-venv",
+          "create": "uv venv --python /usr/bin/python3.12 build-venv",
+          "resolve": "uv pip compile build.in --python-version 3.12 --only-binary :all: --generate-hashes --exclude-newer 2026-09-26T04:45:00Z --no-header -o build.lock",
+          "install": "uv pip sync --python build-venv/bin/python --require-hashes --only-binary :all: build.lock",
+          "input": {
+            "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.in",
+            "sha256": "31f8feeaa574268e12516e27875da873a940143e692091ded15503c8aa4c5d52"
+          },
+          "lock": {
+            "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
+            "sha256": "9c7fe3619134c402d5f35ba788be621ffd186139d590a435d468e4e5565c7031",
+            "packages": [
+              "packaging==26.3",
+              "pip==26.2.1",
+              "setuptools==84.0.0",
+              "wheel==0.48.0"
+            ]
+          }
+        },
+        "build_command": "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind \"$BUILD/build-venv\" \"$BUILD/build-venv\" --ro-bind \"$BUILD/sdist\" /sdist --bind \"$BUILD/wheelhouse\" /wheelhouse --chdir /tmp --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv HOME /tmp/home --setenv SOURCE_DATE_EPOCH 1607224719 \"$BUILD/build-venv/bin/python\" -I -m pip wheel --no-deps --no-build-isolation --no-index --no-cache-dir --disable-pip-version-check --wheel-dir /wheelhouse /sdist/ibapi-9.81.1.post1.tar.gz",
+        "network": "unshared (--unshare-all); nothing fetched during the build",
+        "source_date_epoch": "1607224719, the sdist's PyPI upload time, so the wheel's archive timestamps are fixed",
+        "built_wheel_sha256": "664a4d01e9b47da023fde90630aa312d42b88f2f5f31c1adfd5d32f17debdcaf",
+        "built_wheel_bytes": 67998,
+        "reproduced": "A second build from the same inputs into another directory produced the identical sha256.",
+        "built_utc": "2026-09-26T05:52:59Z",
+        "license": "IB API Non-Commercial License or the IB API Commercial License; evaluation only, never redistributed"
+      }
+    },
+    "resolve": "uv pip compile lockcheck/lumibot.in --python-version 3.12 --only-binary :all: --find-links \"$BUILD/wheelhouse\" --generate-hashes --exclude-newer 2026-09-26T04:45:00Z --no-header -o lockcheck/lumibot.lock",
+    "install": "uv pip sync --python \"$ENV/bin/python\" --require-hashes --no-build --find-links \"$BUILD/wheelhouse\" lockcheck/lumibot.lock",
+    "cutoff": "2026-09-26T04:45:00Z",
+    "cutoff_and_local_wheel": "The cutoff did not exclude the local ibapi wheel, which has no upload time: the binary-only resolution kept it, and the lock pins ibapi 9.81.1.post1 to that wheel's sha256 alone.",
+    "requirements_input": {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.in",
+      "sha256": "7041c4745c8cbe98987ef3611eba953b4f69b6dcd11a7a588410f2eca2081a05",
+      "content": "lumibot==4.6.1"
+    },
+    "lock": {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+      "sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+      "packages": 264,
+      "equals_preregistered_indicative_pins": true,
+      "note": "The 264 name==version pins equal the preregistration's indicative resolution (which allowed the ibapi sdist and recorded no hashes). Resolving again from the arm directory reproduced the lock byte for byte."
+    },
+    "installed_packages": 264,
+    "key_versions": {
+      "lumibot": "4.6.1",
+      "ibapi": "9.81.1.post1",
+      "pandas": "2.3.3",
+      "numpy": "2.4.6",
+      "polars": "1.44.2",
+      "pytz": "2026.4",
+      "yfinance": "1.7.0",
+      "setuptools": "80.10.2",
+      "pandas-market-calendars": "5.4.0",
+      "exchange-calendars": "4.13.2"
+    },
+    "size_on_disk": "1.4 GB",
+    "built_utc": {
+      "started": "2026-09-26T05:52:27Z",
+      "finished": "2026-09-26T05:53:43Z"
+    },
+    "network": "The sdist download, the build environment, resolution and installation ran before any run and outside the run sandbox; the ibapi build itself ran with the network unshared. Nothing was installed or fetched inside the run sandbox."
+  },
+  "arm_manifest": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/mapping-manifest.json",
+    "sha256": "6b36b4f8babcfa5d3cb0c58fef22dc3be04699e80c75eba13342c76bdcc06af6",
+    "projection_equals_binding": true,
+    "frozen_in_commit": "681b458b1fd66461d6453ae1c6120edbd2528545",
+    "mapping_status": {
+      "instrument_identity": "resolved",
+      "raw_data_decoding": "resolved",
+      "sessions_and_time": "resolved",
+      "decision_visibility": "resolved",
+      "market_on_open_proxy": "resolved",
+      "distributions_and_cash": "unsupported",
+      "costs_and_rounding": "resolved",
+      "margin_and_adaptive_state": "blocked"
+    },
+    "unsupported_mappings": [
+      "distributions_and_cash"
+    ],
+    "documentation_notes": "Written before the freeze with the pre-run findings in its non-binding text (market_on_open_proxy.pre_run_finding, generated_id_normalization.pre_run_finding); no binding value differs from the preregistration."
+  },
+  "port": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/fixture_port.py",
+    "sha256": "d92cf90ce59f79dde1a7d5471a8a476d6105a2fee039992887010ee5a0b0c98e",
+    "frozen_in_commit": "681b458b1fd66461d6453ae1c6120edbd2528545",
+    "equals_receipt_port_source_sha256": true,
+    "gpl": "Imports GPL-3.0 Lumibot from the isolated environment for evaluation only; contains no Lumibot code, docstring, example strategy or test; cites pinned locations instead of quoting.",
+    "decision_hook": "after_market_closes (the preregistration's example hook), chosen before the first attempt: at the session-final bar's end (16:00 New York; 13:00 on 2019-12-24) it reads that bar with get_historical_prices(asset, 1, 'hour', timeshift=-1), checks its end instant and close against the converted row, sizes with fixture_strategy.target_quantity over the engine-reported portfolio value and submits one market order with time_in_force gtc. --decision-hook before_market_opens or before_starting_trading exists for post-hoc variants only.",
+    "why_this_hook": "The probes showed no hook inside the port contract's window (submission at or after the decision bar's end and before the fill) that lands the fill on the next session's first bar: only before_starting_trading does, and it submits at the fill instant. after_market_closes is the preregistration's example and submits at LEAN's own decision instant; before_market_opens would have been chosen for a calendar artifact (the one-day fill-distance guard that happens to rescue the 2019-12-31 entry), not for a mechanism.",
+    "pandas_data_argument": "a one-element list [Data(...)], which PandasData accepts like the documented dict (lumibot/data_sources/pandas_data.py lines 77-87 in the wheel)"
+  },
+  "backtest_configuration": {
+    "entry_point": "OneZeroPort.run_backtest(PandasDataBacktesting, 2019-12-02 00:00, 2020-04-30 23:59, pandas_data=[Data(SPY, 725 END-indexed rows, timestep='hour', quote=USD)], ...)",
+    "arguments": {
+      "analyze_backtest": false,
+      "benchmark_asset": null,
+      "budget": "float:100000.0",
+      "buy_trading_fees": [],
+      "minutes_before_closing": 5,
+      "minutes_before_opening": 60,
+      "name": "one_zero_port",
+      "quiet_logs": true,
+      "risk_free_rate": "float:0.0",
+      "save_logfile": false,
+      "save_stats_file": false,
+      "save_tearsheet": false,
+      "sell_trading_fees": [],
+      "show_indicators": false,
+      "show_plot": false,
+      "show_progress_bar": false,
+      "show_tearsheet": false,
+      "sleeptime": "60M"
+    },
+    "window_local": [
+      "2019-12-02T00:00:00",
+      "2020-04-30T23:59:00"
+    ],
+    "facts_reported_by_the_engine": {
+      "buy_trading_fees": 0,
+      "cash_financing_enabled": false,
+      "data_source_class": "PandasDataBacktesting",
+      "data_source_kind": "PANDAS",
+      "data_source_timestep": "hour",
+      "data_store_entries": 1,
+      "data_timestep": "hour",
+      "datetime_end": "2020-04-30T23:59:00-04:00",
+      "datetime_start": "2019-12-02T00:00:00-05:00",
+      "initialize_calls": 1,
+      "is_backtesting": true,
+      "market": "NASDAQ",
+      "minutes_before_closing": 5,
+      "minutes_before_opening": 60,
+      "quote_asset": {
+        "asset": "USD",
+        "asset_type": "forex"
+      },
+      "risk_free_rate": "float:0.0",
+      "sell_trading_fees": 0,
+      "sleeptime": "60M"
+    },
+    "reporting_side_effects": {
+      "preregistered": "benchmark_asset None; analysis, plots, tearsheets, indicators, progress bar, stats and log files off.",
+      "added_before_the_first_attempt": "risk_free_rate 0.0. Left unset, the strategy's risk_free_rate property asks Yahoo for ^IRX when the statistics are dumped (probe-01: three refused lookups per run and a relative ~/.cache/py-yfinance directory). It feeds statistics only; cash financing is off (engine default, recorded in the facts). Not listed in the preregistration's reporting_side_effects; recorded here as the port author's argument choice.",
+      "engine_files": "logs/data_provenance.json in each run's private working directory"
+    }
+  },
+  "sandbox": {
+    "template": "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind \"$ENV\" \"$ENV\" --ro-bind \"$REPO\" /repo --ro-bind \"$LEAN\" /data --bind \"$OUT\" /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 --setenv LUMIBOT_DISABLE_DOTENV 1 --setenv LUMIBOT_CACHE_FOLDER /tmp/lumibot-cache \"$ENV/bin/python\" -I /repo/blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/fixture_port.py --lean-data /data --out /out/port",
+    "placeholders": {
+      "ENV": "~/.local/share/codex-ecosystem/engine-trials-20260926/lumibot-4.6.1",
+      "REPO": "<worktree> at 681b458b1fd66461d6453ae1c6120edbd2528545",
+      "LEAN": "~/.local/share/codex-ecosystem/lean/Lean/Data",
+      "OUT": "~/.local/state/native-agent-stack/engine-trials-20260926/lumibot/attempt-NN"
+    },
+    "mirrors": "blueprints/us-equities/engine-nautilus/spy-parity/README.md (Reproduce receipt.json): same flags, mounts and environment, with the port in place of run.py and the arm's declared additions",
+    "added_environment_variables": [
+      "LUMIBOT_DISABLE_DOTENV=1",
+      "LUMIBOT_CACHE_FOLDER=/tmp/lumibot-cache"
+    ],
+    "per_run": "Each child run gets LUMIBOT_CACHE_FOLDER=/tmp/lumibot-cache/run-N and a working directory /out/port/run-N/engine-cwd, set by the port (declared deviation D3); --chdir stays /repo.",
+    "observed_inside": {
+      "network_interfaces": [
+        [
+          1,
+          "lo"
+        ]
+      ],
+      "environment_names": [
+        "LANG",
+        "LUMIBOT_CACHE_FOLDER",
+        "LUMIBOT_DISABLE_DOTENV",
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "PATH",
+        "PWD",
+        "PYTHONDONTWRITEBYTECODE"
+      ],
+      "environment_additions": [],
+      "declared_additions": [
+        "LUMIBOT_CACHE_FOLDER",
+        "LUMIBOT_DISABLE_DOTENV"
+      ],
+      "python_flags_isolated": 1,
+      "read_only": {
+        "data_root": true,
+        "port_source": true,
+        "python_prefix": true,
+        "spy_parity_sources": true
+      }
+    },
+    "private_outputs": "outside every checkout, directories 0700 under umask 077"
+  },
+  "mechanism_probes": [
+    {
+      "id": "probe-01",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/hook_probe.py",
+      "script_sha256": "3f62d7ac0aea6e15a576a8a7efcfce52b8e1c55432da9573424d5b74f40e91d9",
+      "utc_start": "2026-09-26T06:00:36Z",
+      "exit_code": 0,
+      "wall_seconds": 68.23,
+      "repository_commit": "2b65bcc05afd6be33b2de65ff014f1e971653ed8",
+      "worktree_clean": false,
+      "sandbox": "template with the arm additions, without the /data mount",
+      "outcome": "four variants on synthetic bars, all exit 0: a GTC market order submitted in after_market_closes fills at the decision bar's end instant at that bar's open; before_market_opens fills the entry (42-hour gap) at the next session's first bar open and the exit (18-hour gap) at 09:00 at the decision bar's open; before_starting_trading fills both at the next session's first bar open, at the instant of submission; hour data with a dividend column credits nothing. Every variant also asked Yahoo for ^IRX three times (refused by the sandbox) and left a relative '~/.cache/py-yfinance' directory in its working directory.",
+      "classification": "development probe on the pre-freeze working copy; the finding that led to risk_free_rate=0.0; superseded by probe-02 and probe-05",
+      "private_report_sha256": "857440b950327c3d0b0f772f196853ba7b2ffe9e7e4a95af642e858e923be074"
+    },
+    {
+      "id": "probe-02",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/hook_probe.py",
+      "script_sha256": "91d03a38a7438d77edd6791508e745dea0e13825ad9ffeb0f7144e0a8304209e",
+      "utc_start": "2026-09-26T06:09:00Z",
+      "exit_code": 0,
+      "wall_seconds": 13.385,
+      "repository_commit": "2b65bcc05afd6be33b2de65ff014f1e971653ed8",
+      "worktree_clean": false,
+      "sandbox": "template with the arm additions, without the /data mount",
+      "outcome": "the same four variants with risk_free_rate=0.0 and fill instants from the broker's trade-event log: identical fill instants and prices to probe-01, no blocked host lookup, no relative home directory, empty stderr",
+      "classification": "development probe on the pre-freeze working copy; repeated at the freeze commit as probe-05",
+      "private_report_sha256": "607d3b986f681f896272b1414702baf835ccaad257984480f10e81356c30191b"
+    },
+    {
+      "id": "probe-03",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/mechanism_probe.py",
+      "script_sha256": "ffe5df9291d273f5a1e823dd1fd64ce44e5770be06b1b8eafffff0ace876b846",
+      "utc_start": "2026-09-26T06:20:27Z",
+      "exit_code": 1,
+      "wall_seconds": 10.039,
+      "repository_commit": "2b65bcc05afd6be33b2de65ff014f1e971653ed8",
+      "worktree_clean": false,
+      "sandbox": "template with the arm additions, without the /data mount",
+      "port_sha256": "e6123daff2c1d1a729d8f27c22b8d2dacd659105c102e283f15ce708b2da7d61",
+      "outcome": "fills as expected for all three hooks; the only unmet expectation was the failed-guard set, because every backtest order identifier had the shape bt_<n>, not the uuid4 hex the preregistration expected (guard identifiers_are_uuid4_hex failed); the port was corrected to keep sequential identifiers raw",
+      "classification": "development probe on the pre-freeze working copy (exit 1); the identifier finding",
+      "private_report_sha256": "a82a85b5a080ef04b96cff79f9a436e469db62f005f39934dc52873c385dbc20"
+    },
+    {
+      "id": "probe-04",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/mechanism_probe.py",
+      "script_sha256": "ffe5df9291d273f5a1e823dd1fd64ce44e5770be06b1b8eafffff0ace876b846",
+      "utc_start": "2026-09-26T06:22:18Z",
+      "exit_code": 0,
+      "wall_seconds": 9.101,
+      "repository_commit": "2b65bcc05afd6be33b2de65ff014f1e971653ed8",
+      "worktree_clean": false,
+      "sandbox": "template with the arm additions, without the /data mount",
+      "port_sha256": "cf4e336244e9d8638f67865b28031017c93f8055848341943f97a2ca88577d5e",
+      "outcome": "all expectations met for all three hooks",
+      "classification": "development probe on the pre-freeze working copy; repeated as probe-06",
+      "private_report_sha256": "df56edef3939776c13a28a235873628603eb89e436f8d703ec5828f0b6fcb960"
+    },
+    {
+      "id": "smoke-01",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/orchestration_smoke.py",
+      "script_sha256": "7a9e29ab69a62a63827e96efd61bf10d2899a72224d66546bef5ac4ff19fcb48",
+      "utc_start": "2026-09-26T06:22:32Z",
+      "exit_code": 0,
+      "wall_seconds": 12.727,
+      "repository_commit": "2b65bcc05afd6be33b2de65ff014f1e971653ed8",
+      "worktree_clean": false,
+      "sandbox": "template with the arm additions, without the /data mount",
+      "port_sha256": "cf4e336244e9d8638f67865b28031017c93f8055848341943f97a2ca88577d5e",
+      "outcome": "all checks passed (synthetic verdicts: after_market_closes FAIL, before_starting_trading BLOCKED)",
+      "classification": "development smoke test on the pre-freeze working copy; repeated as smoke-02",
+      "private_report_sha256": "2de7c624ce95e7a7c015e2b0080e3243f98abcf27df2b0e95f44d77e176f7af5"
+    },
+    {
+      "id": "probe-05",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/hook_probe.py",
+      "script_sha256": "91d03a38a7438d77edd6791508e745dea0e13825ad9ffeb0f7144e0a8304209e",
+      "utc_start": "2026-09-26T06:26:01Z",
+      "exit_code": 0,
+      "wall_seconds": 12.264,
+      "repository_commit": "681b458b1fd66461d6453ae1c6120edbd2528545",
+      "worktree_clean": true,
+      "sandbox": "template with the arm additions, without the /data mount",
+      "report": {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/hook-probe.json",
+        "sha256": "7cdd4f0c8cb243b7178b6a856bafa5e11e974abcf20fad9a64ae289057202d2d"
+      },
+      "outcome": "at the freeze commit: summary identical to probe-02 for all four variants; no blocked host lookup, no relative home directory, no cash event"
+    },
+    {
+      "id": "probe-06",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/mechanism_probe.py",
+      "script_sha256": "ffe5df9291d273f5a1e823dd1fd64ce44e5770be06b1b8eafffff0ace876b846",
+      "utc_start": "2026-09-26T06:26:13Z",
+      "exit_code": 0,
+      "wall_seconds": 9.02,
+      "repository_commit": "681b458b1fd66461d6453ae1c6120edbd2528545",
+      "worktree_clean": true,
+      "sandbox": "template with the arm additions, without the /data mount",
+      "port_sha256": "d92cf90ce59f79dde1a7d5471a8a476d6105a2fee039992887010ee5a0b0c98e",
+      "report": {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/mechanism-probe.json",
+        "sha256": "319cc4abbe5a5c6a755ab2d2cd01b039b6f6afd1ef0aa3b852698b70b44a48f7"
+      },
+      "outcome": "at the freeze commit: all expectations met for all three hooks, the port's fills, ledgers and failed-guard sets matching the engine behaviour probe-05 shows"
+    },
+    {
+      "id": "smoke-02",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/orchestration_smoke.py",
+      "script_sha256": "7a9e29ab69a62a63827e96efd61bf10d2899a72224d66546bef5ac4ff19fcb48",
+      "utc_start": "2026-09-26T06:26:22Z",
+      "exit_code": 0,
+      "wall_seconds": 12.928,
+      "repository_commit": "681b458b1fd66461d6453ae1c6120edbd2528545",
+      "worktree_clean": true,
+      "sandbox": "template with the arm additions, without the /data mount",
+      "port_sha256": "d92cf90ce59f79dde1a7d5471a8a476d6105a2fee039992887010ee5a0b0c98e",
+      "report": {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/orchestration-smoke.json",
+        "sha256": "8df7f698ee7d4a40b9a2abd9d05a91bbc9e9109706dbe8d054bb8314a39eb51b"
+      },
+      "outcome": "at the freeze commit: all checks passed: a real child launch refused synthetic rows against the frozen row hash; parent_main's synthetic receipts for after_market_closes and before_starting_trading passed compare.bind with equal two-run records and scored FAIL (the four fill checks and both end-cash checks unattributed) and BLOCKED (native_end_cash by distributions_and_cash) against the LEAN shape on the synthetic bars"
+    }
+  ],
+  "mechanism_probe_class": "synthetic fixture executed by the pinned engine under the run sandbox; never SPY rows, the frozen inputs or the LEAN data mount; not parity evidence",
+  "pre_run_findings": [
+    {
+      "id": "F-market-on-open",
+      "found_by": "probe-01, confirmed by probe-02 and probe-05",
+      "preregistered": "engines.lumibot.market_on_open_mechanism: fill predicted at the next session's first bar open, stamped 10:00 New York",
+      "observed": "A GTC market order submitted after the decision bar completes fills at the instant the strategy next awaits the market open (the backtesting broker processes pending orders at the current clock before advancing), at the open of the bar indexed at that clock, which for END-indexed bars is the bar that has just completed (backtesting_broker.py lines 665-707, 2660-2691, 2956-3080 and 3091-3092 in the wheel).",
+      "effect": "Reported as a pre-run finding. The row stays resolved (binding); the primary attempt runs the preregistered example hook, and its verdict stands as scored."
+    },
+    {
+      "id": "F-risk-free-rate",
+      "found_by": "probe-01",
+      "observed": "Without an explicit risk_free_rate the strategy asks Yahoo for ^IRX when it dumps its statistics; the sandbox refused each lookup, and yfinance left a relative ~/.cache directory (no HOME).",
+      "effect": "The port passes risk_free_rate=0.0 (statistics only). probe-02 onward: no lookup, no such directory."
+    },
+    {
+      "id": "F-identifiers",
+      "found_by": "probe-03",
+      "preregistered": "engines.lumibot.identifiers: uuid4 hex order identifiers, replaced by ordinals",
+      "observed": "Strategy.create_order assigns sequential bt_<n> identifiers in backtests (lumibot/strategies/strategy.py lines 884-890 in the wheel).",
+      "effect": "Under the preregistered determinism rule (only random identifiers are normalized; sequential ids stay raw) nothing is normalized in practice. The binding's use_random_ids stays true as preregistered; published files carry order ordinals only."
+    },
+    {
+      "id": "F-dividends",
+      "found_by": "probe-01 (variant dividend_column)",
+      "observed": "Hour data with a dividend column credits nothing either; without the column (the binding) no cash event appears. Consistent with the preregistered unsupported status.",
+      "effect": "None; external ledger as preregistered."
+    }
+  ],
+  "attempts": [
+    {
+      "id": "attempt-01",
+      "classification": "primary",
+      "decision_hook": "after_market_closes",
+      "utc_start": "2026-09-26T06:26:48Z",
+      "wall_seconds": 6.54,
+      "repository_commit": "681b458b1fd66461d6453ae1c6120edbd2528545",
+      "worktree_clean_at_start": true,
+      "bwrap_argv": "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind \"$ENV\" \"$ENV\" --ro-bind \"$REPO\" /repo --ro-bind \"$LEAN\" /data --bind \"$OUT\" /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 --setenv LUMIBOT_DISABLE_DOTENV 1 --setenv LUMIBOT_CACHE_FOLDER /tmp/lumibot-cache \"$ENV/bin/python\" -I /repo/blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/fixture_port.py --lean-data /data --out /out/port",
+      "added_environment_variables": [
+        "LUMIBOT_DISABLE_DOTENV=1",
+        "LUMIBOT_CACHE_FOLDER=/tmp/lumibot-cache"
+      ],
+      "port_sha256": "d92cf90ce59f79dde1a7d5471a8a476d6105a2fee039992887010ee5a0b0c98e",
+      "manifest_sha256": "6b36b4f8babcfa5d3cb0c58fef22dc3be04699e80c75eba13342c76bdcc06af6",
+      "lock_sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+      "port_exit_code": 0,
+      "sandbox_stderr_bytes": 0,
+      "outcome_class": "receipt",
+      "receipt": {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.json",
+        "sha256": "969314969dfcb42e1d214f040c7d19330336164417e3dd98f30041e96508030e",
+        "published_unchanged": true
+      },
+      "runs": [
+        {
+          "label": "run-1",
+          "exit_code": 0,
+          "wall_seconds": 3.169,
+          "normalized_economic_sha256": "f57ba3366961017cc11f7561f2d471b0d15e625089740d230997721f6953f913",
+          "raw_report_sha256": "7721a67833963b24eb57902d616cb27eac2c3604058fd0f8cd6d954411c4e303",
+          "guards_failed": [
+            "causality",
+            "fill_at_next_session_first_bar",
+            "submission_clock"
+          ],
+          "blocked_host_lookups": 0,
+          "engine_cwd_entries": [
+            "logs",
+            "logs/data_provenance.json"
+          ],
+          "cache_folder": "/tmp/lumibot-cache/run-1",
+          "lifecycle_calls": {
+            "after_market_closes": 104,
+            "before_market_closes": 0,
+            "before_market_opens": 104,
+            "before_starting_trading": 104,
+            "on_trading_iteration": 621
+          },
+          "trade_events": 4,
+          "cash_events": 0,
+          "stats_snapshots": 934,
+          "identifier_normalization": {
+            "fields": [
+              "identifier",
+              "parent_identifier",
+              "event_id",
+              "_identifier"
+            ],
+            "rejected": 0,
+            "sequential_kept": 2,
+            "uuid4_hex_normalized": 0
+          }
+        },
+        {
+          "label": "run-2",
+          "exit_code": 0,
+          "wall_seconds": 3.032,
+          "normalized_economic_sha256": "f57ba3366961017cc11f7561f2d471b0d15e625089740d230997721f6953f913",
+          "raw_report_sha256": "7721a67833963b24eb57902d616cb27eac2c3604058fd0f8cd6d954411c4e303",
+          "guards_failed": [
+            "causality",
+            "fill_at_next_session_first_bar",
+            "submission_clock"
+          ],
+          "blocked_host_lookups": 0,
+          "engine_cwd_entries": [
+            "logs",
+            "logs/data_provenance.json"
+          ],
+          "cache_folder": "/tmp/lumibot-cache/run-2",
+          "lifecycle_calls": {
+            "after_market_closes": 104,
+            "before_market_closes": 0,
+            "before_market_opens": 104,
+            "before_starting_trading": 104,
+            "on_trading_iteration": 621
+          },
+          "trade_events": 4,
+          "cash_events": 0,
+          "stats_snapshots": 934,
+          "identifier_normalization": {
+            "fields": [
+              "identifier",
+              "parent_identifier",
+              "event_id",
+              "_identifier"
+            ],
+            "rejected": 0,
+            "sequential_kept": 2,
+            "uuid4_hex_normalized": 0
+          }
+        }
+      ],
+      "two_run_records_equal": true,
+      "guards": {
+        "total": 54,
+        "failed": [
+          "run-1:causality",
+          "run-1:fill_at_next_session_first_bar",
+          "run-1:submission_clock",
+          "run-2:causality",
+          "run-2:fill_at_next_session_first_bar",
+          "run-2:submission_clock"
+        ]
+      },
+      "float_projection": {
+        "values_projected": 9,
+        "max_abs_adjustment": "0.00000000001"
+      },
+      "fills": [
+        {
+          "utc_seconds": 1577826000,
+          "quantity": 304,
+          "price": "320.9400",
+          "fee": "0.0000"
+        },
+        {
+          "utc_seconds": 1588190400,
+          "quantity": -304,
+          "price": "293.9900",
+          "fee": "0.0000"
+        }
+      ],
+      "native_end_cash_usd": "91807.2000",
+      "reconciled_end_cash_usd": "92235.8400",
+      "scorer": {
+        "command": "python3 -B blueprints/us-equities/engine-nautilus/spy-parity/compare.py --receipt blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.json --manifest blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/mapping-manifest.json --tolerances blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json --lean-data \"$LEAN\" --verdict blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.json",
+        "run_from": "<worktree> repository root at 681b458b1fd66461d6453ae1c6120edbd2528545 plus the published receipt",
+        "interpreter": "/usr/bin/python3 (standard library only)",
+        "utc_start": "2026-09-26T06:27:04Z",
+        "exit_code": 1,
+        "verdict_line": "VERDICT {\"attribution_evidence\": \"converted bars\", \"blocking_mappings\": [], \"case\": \"one_zero\", \"complete\": true, \"failed\": 6, \"manifest_schema_version\": 1, \"manifest_unsupported_mappings\": [\"distributions_and_cash\"], \"native_end_cash_usd\": \"91807.2000\", \"note\": \"A failure is BLOCKED only when a measured deviation matches a mapping the bound manifest declares unsupported. Any residue stays an unattributed FAIL, and a skipped check or rejected attribution leaves the comparison incomplete.\", \"rejected_attributions\": [], \"skipped\": [], \"unattributed_failures\": [\"entry_fill.utc_seconds#9\", \"entry_fill.fill_price_usd#12\", \"exit_fill.utc_seconds#13\", \"exit_fill.fill_price_usd#16\", \"end_cash.reconciled_end_cash_usd#21\", \"native_end_cash.native_end_cash_usd#22\"], \"verdict\": \"FAIL\"}",
+        "verdict": {
+          "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.json",
+          "sha256": "4e06649bd789e1b0cc0b0427b2f3219e9cb7ccb8d112174ad4c6184d5f0dbb75",
+          "written_by": "compare.py --verdict, committed as written"
+        },
+        "stderr_bytes": 0,
+        "bytecode_written": false
+      },
+      "private_outputs": {
+        "directory": "~/.local/state/native-agent-stack/engine-trials-20260926/lumibot/attempt-01",
+        "sha256": {
+          "port/child-input.private.json": "50b1909639e69ad5de5f619a01cff291429fc706bad8f55a1f751f43cf7cee8d",
+          "port/converted-rows.private.json": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc",
+          "port/receipt.json": "969314969dfcb42e1d214f040c7d19330336164417e3dd98f30041e96508030e",
+          "port/run-1/engine-cwd/logs/data_provenance.json": "71db65a7a8fcd559beb4894b177a773ef6086d130bcc513674fbba941b217dce",
+          "port/run-1/raw-report.private.json": "7721a67833963b24eb57902d616cb27eac2c3604058fd0f8cd6d954411c4e303",
+          "port/run-1/run-1.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "port/run-1/run-1.stdout.log": "89961d544ce3792ba9971b2c78520e57e203c18554036165e64dfa8a44633ba4",
+          "port/run-1/summary.private.json": "47720bf49ac5d6abac0b2400516320023b3f5dbf1ca4a36c0e3fb4d9fa1063e2",
+          "port/run-2/engine-cwd/logs/data_provenance.json": "71db65a7a8fcd559beb4894b177a773ef6086d130bcc513674fbba941b217dce",
+          "port/run-2/raw-report.private.json": "7721a67833963b24eb57902d616cb27eac2c3604058fd0f8cd6d954411c4e303",
+          "port/run-2/run-2.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "port/run-2/run-2.stdout.log": "b21e123b7cba8693e6a2ab42b995ec4f990d5ee0285e40d0757ce25606ad81cc",
+          "port/run-2/summary.private.json": "2e1f5128e3d67f064f1225fcc37ceca977abfd808296e94034bb3ed7222f066d",
+          "sandbox.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sandbox.stdout": "dc909e2e53ead5f27db3d68ae757421cc7f71f0c0e2bb4ce8365771b3948f6ba",
+          "scorer.rc": "119310c8014bf26fab3e2ed530bd523920db49dcf08d7cc56c995fe2278bb689",
+          "scorer.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "scorer.stdout": "43cedba16192ffd4030ea998c936f8243b49c52038ce914e78e089c5ffb05f17",
+          "scorer.utc": "9450c17feef7ae6db642408b69d692466d2988d8d15476f1c972b0a16fde37c7"
+        },
+        "note": "Converted rows, raw per-run reports, per-run summaries, child input, engine working-directory files, logs and captured stdout and stderr stay private; only these hashes are published."
+      }
+    },
+    {
+      "id": "attempt-02",
+      "classification": "post_hoc",
+      "decision_hook": "before_starting_trading",
+      "utc_start": "2026-09-26T06:27:34Z",
+      "wall_seconds": 6.229,
+      "repository_commit": "681b458b1fd66461d6453ae1c6120edbd2528545",
+      "worktree_clean_at_start": false,
+      "bwrap_argv": "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind \"$ENV\" \"$ENV\" --ro-bind \"$REPO\" /repo --ro-bind \"$LEAN\" /data --bind \"$OUT\" /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 --setenv LUMIBOT_DISABLE_DOTENV 1 --setenv LUMIBOT_CACHE_FOLDER /tmp/lumibot-cache \"$ENV/bin/python\" -I /repo/blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/fixture_port.py --lean-data /data --out /out/port --decision-hook before_starting_trading",
+      "added_environment_variables": [
+        "LUMIBOT_DISABLE_DOTENV=1",
+        "LUMIBOT_CACHE_FOLDER=/tmp/lumibot-cache"
+      ],
+      "port_sha256": "d92cf90ce59f79dde1a7d5471a8a476d6105a2fee039992887010ee5a0b0c98e",
+      "manifest_sha256": "6b36b4f8babcfa5d3cb0c58fef22dc3be04699e80c75eba13342c76bdcc06af6",
+      "lock_sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+      "port_exit_code": 0,
+      "sandbox_stderr_bytes": 0,
+      "outcome_class": "receipt",
+      "receipt": {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.post-hoc-01.json",
+        "sha256": "cb62d14f84efd4632e7e9ea4ca78d5fa243e44164486300d7f6c12b16c0bda1e",
+        "published_unchanged": true
+      },
+      "runs": [
+        {
+          "label": "run-1",
+          "exit_code": 0,
+          "wall_seconds": 2.925,
+          "normalized_economic_sha256": "12803112d0939382068872e1bb05c53a7c55e758412102b47a93bb4c1838e299",
+          "raw_report_sha256": "2675dd12a996d7246c6356433a05d81d94da634b0ff82564089dec0256207757",
+          "guards_failed": [
+            "submission_clock"
+          ],
+          "blocked_host_lookups": 0,
+          "engine_cwd_entries": [
+            "logs",
+            "logs/data_provenance.json"
+          ],
+          "cache_folder": "/tmp/lumibot-cache/run-1",
+          "lifecycle_calls": {
+            "after_market_closes": 104,
+            "before_market_closes": 0,
+            "before_market_opens": 104,
+            "before_starting_trading": 104,
+            "on_trading_iteration": 621
+          },
+          "trade_events": 4,
+          "cash_events": 0,
+          "stats_snapshots": 934,
+          "identifier_normalization": {
+            "fields": [
+              "identifier",
+              "parent_identifier",
+              "event_id",
+              "_identifier"
+            ],
+            "rejected": 0,
+            "sequential_kept": 2,
+            "uuid4_hex_normalized": 0
+          }
+        },
+        {
+          "label": "run-2",
+          "exit_code": 0,
+          "wall_seconds": 2.974,
+          "normalized_economic_sha256": "12803112d0939382068872e1bb05c53a7c55e758412102b47a93bb4c1838e299",
+          "raw_report_sha256": "2675dd12a996d7246c6356433a05d81d94da634b0ff82564089dec0256207757",
+          "guards_failed": [
+            "submission_clock"
+          ],
+          "blocked_host_lookups": 0,
+          "engine_cwd_entries": [
+            "logs",
+            "logs/data_provenance.json"
+          ],
+          "cache_folder": "/tmp/lumibot-cache/run-2",
+          "lifecycle_calls": {
+            "after_market_closes": 104,
+            "before_market_closes": 0,
+            "before_market_opens": 104,
+            "before_starting_trading": 104,
+            "on_trading_iteration": 621
+          },
+          "trade_events": 4,
+          "cash_events": 0,
+          "stats_snapshots": 934,
+          "identifier_normalization": {
+            "fields": [
+              "identifier",
+              "parent_identifier",
+              "event_id",
+              "_identifier"
+            ],
+            "rejected": 0,
+            "sequential_kept": 2,
+            "uuid4_hex_normalized": 0
+          }
+        }
+      ],
+      "two_run_records_equal": true,
+      "guards": {
+        "total": 54,
+        "failed": [
+          "run-1:submission_clock",
+          "run-2:submission_clock"
+        ]
+      },
+      "float_projection": {
+        "values_projected": 9,
+        "max_abs_adjustment": "0.00000000001"
+      },
+      "fills": [
+        {
+          "utc_seconds": 1577977200,
+          "quantity": 304,
+          "price": "323.5800",
+          "fee": "0.0000"
+        },
+        {
+          "utc_seconds": 1588255200,
+          "quantity": -304,
+          "price": "291.6900",
+          "fee": "0.0000"
+        }
+      ],
+      "native_end_cash_usd": "90305.4400",
+      "reconciled_end_cash_usd": "90734.0800",
+      "scorer": {
+        "command": "python3 -B blueprints/us-equities/engine-nautilus/spy-parity/compare.py --receipt blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.post-hoc-01.json --manifest blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/mapping-manifest.json --tolerances blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json --lean-data \"$LEAN\" --verdict blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.post-hoc-01.json",
+        "run_from": "<worktree> repository root at 681b458b1fd66461d6453ae1c6120edbd2528545 plus the published receipts",
+        "interpreter": "/usr/bin/python3 (standard library only)",
+        "utc_start": "2026-09-26T06:28:02Z",
+        "exit_code": 1,
+        "verdict_line": "VERDICT {\"attribution_evidence\": \"converted bars\", \"blocking_mappings\": [\"distributions_and_cash\"], \"case\": \"one_zero\", \"complete\": true, \"failed\": 1, \"manifest_schema_version\": 1, \"manifest_unsupported_mappings\": [\"distributions_and_cash\"], \"native_end_cash_usd\": \"90305.4400\", \"note\": \"A failure is BLOCKED only when a measured deviation matches a mapping the bound manifest declares unsupported. Any residue stays an unattributed FAIL, and a skipped check or rejected attribution leaves the comparison incomplete.\", \"rejected_attributions\": [], \"skipped\": [], \"unattributed_failures\": [], \"verdict\": \"BLOCKED\"}",
+        "verdict": {
+          "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.post-hoc-01.json",
+          "sha256": "83904e29e85791709deb70cbe2ba0a381a06d541f23ea00119854365fe455754",
+          "written_by": "compare.py --verdict, committed as written"
+        },
+        "stderr_bytes": 0,
+        "bytecode_written": false
+      },
+      "private_outputs": {
+        "directory": "~/.local/state/native-agent-stack/engine-trials-20260926/lumibot/attempt-02",
+        "sha256": {
+          "port/child-input.private.json": "bbae0c28cfef09d8b0225a6dffcd7a46da33daf73648c37dcce5cd3b237106ce",
+          "port/converted-rows.private.json": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc",
+          "port/receipt.json": "cb62d14f84efd4632e7e9ea4ca78d5fa243e44164486300d7f6c12b16c0bda1e",
+          "port/run-1/engine-cwd/logs/data_provenance.json": "71db65a7a8fcd559beb4894b177a773ef6086d130bcc513674fbba941b217dce",
+          "port/run-1/raw-report.private.json": "2675dd12a996d7246c6356433a05d81d94da634b0ff82564089dec0256207757",
+          "port/run-1/run-1.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "port/run-1/run-1.stdout.log": "3f288f4ffa4dcba4ed33ab14b7a20708e608b528ac70460651a7347ed7aec371",
+          "port/run-1/summary.private.json": "ed79ebd41ef43d4be9ac5673014c5645254384018305f6d2aa8e04c576f56da5",
+          "port/run-2/engine-cwd/logs/data_provenance.json": "71db65a7a8fcd559beb4894b177a773ef6086d130bcc513674fbba941b217dce",
+          "port/run-2/raw-report.private.json": "2675dd12a996d7246c6356433a05d81d94da634b0ff82564089dec0256207757",
+          "port/run-2/run-2.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "port/run-2/run-2.stdout.log": "6f51483023f1181fc1a38049a1484febfc62a9568836ab8aac5966155efe4c01",
+          "port/run-2/summary.private.json": "5151aa67f822c620424748683ac9964fb959bef9b1760e2da1bfc004762a8ffd",
+          "sandbox.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sandbox.stdout": "ecdacc8e40700cb61f2d81c8bdc0fc53ed35f38bfc856f60b6cc7628817ff914",
+          "scorer.rc": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "scorer.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "scorer.stdout": "d6e956120380fca198a08abe61685c3d8813f0df9564eb3c59134dde096bf4c5",
+          "scorer.utc": "4016c0f61fca352d3d5dcd7bdce2795b14d5405b035b3258086f6f0e9fd2855f"
+        },
+        "note": "Converted rows, raw per-run reports, per-run summaries, child input, engine working-directory files, logs and captured stdout and stderr stay private; only these hashes are published."
+      },
+      "note": "Run after the primary verdict; the worktree held only the uncommitted primary receipt and verdict, which the port does not read."
+    },
+    {
+      "id": "attempt-03",
+      "classification": "post_hoc",
+      "decision_hook": "before_market_opens",
+      "utc_start": "2026-09-26T06:27:41Z",
+      "wall_seconds": 7.139,
+      "repository_commit": "681b458b1fd66461d6453ae1c6120edbd2528545",
+      "worktree_clean_at_start": false,
+      "bwrap_argv": "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind \"$ENV\" \"$ENV\" --ro-bind \"$REPO\" /repo --ro-bind \"$LEAN\" /data --bind \"$OUT\" /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 --setenv LUMIBOT_DISABLE_DOTENV 1 --setenv LUMIBOT_CACHE_FOLDER /tmp/lumibot-cache \"$ENV/bin/python\" -I /repo/blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/fixture_port.py --lean-data /data --out /out/port --decision-hook before_market_opens",
+      "added_environment_variables": [
+        "LUMIBOT_DISABLE_DOTENV=1",
+        "LUMIBOT_CACHE_FOLDER=/tmp/lumibot-cache"
+      ],
+      "port_sha256": "d92cf90ce59f79dde1a7d5471a8a476d6105a2fee039992887010ee5a0b0c98e",
+      "manifest_sha256": "6b36b4f8babcfa5d3cb0c58fef22dc3be04699e80c75eba13342c76bdcc06af6",
+      "lock_sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+      "port_exit_code": 0,
+      "sandbox_stderr_bytes": 0,
+      "outcome_class": "receipt",
+      "receipt": {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.post-hoc-02.json",
+        "sha256": "6effb429ffe191274baaec3dcce4eb4a588a4e459f5dde5a1a8680d46001f8a8",
+        "published_unchanged": true
+      },
+      "runs": [
+        {
+          "label": "run-1",
+          "exit_code": 0,
+          "wall_seconds": 2.924,
+          "normalized_economic_sha256": "64b6bf3efe281ba8d574b814699e295caeb3260fb602f28bb3fc88e7b31ee699",
+          "raw_report_sha256": "dbd4f1b1c0ec5eb01b845f12db382d13a52df0b04c28774feda1baf028ca4803",
+          "guards_failed": [
+            "fill_at_next_session_first_bar",
+            "fill_price_is_open_of_bar_indexed_at_fill_instant",
+            "submission_clock"
+          ],
+          "blocked_host_lookups": 0,
+          "engine_cwd_entries": [
+            "logs",
+            "logs/data_provenance.json"
+          ],
+          "cache_folder": "/tmp/lumibot-cache/run-1",
+          "lifecycle_calls": {
+            "after_market_closes": 104,
+            "before_market_closes": 0,
+            "before_market_opens": 104,
+            "before_starting_trading": 104,
+            "on_trading_iteration": 621
+          },
+          "trade_events": 4,
+          "cash_events": 0,
+          "stats_snapshots": 934,
+          "identifier_normalization": {
+            "fields": [
+              "identifier",
+              "parent_identifier",
+              "event_id",
+              "_identifier"
+            ],
+            "rejected": 0,
+            "sequential_kept": 2,
+            "uuid4_hex_normalized": 0
+          }
+        },
+        {
+          "label": "run-2",
+          "exit_code": 0,
+          "wall_seconds": 3.885,
+          "normalized_economic_sha256": "64b6bf3efe281ba8d574b814699e295caeb3260fb602f28bb3fc88e7b31ee699",
+          "raw_report_sha256": "dbd4f1b1c0ec5eb01b845f12db382d13a52df0b04c28774feda1baf028ca4803",
+          "guards_failed": [
+            "fill_at_next_session_first_bar",
+            "fill_price_is_open_of_bar_indexed_at_fill_instant",
+            "submission_clock"
+          ],
+          "blocked_host_lookups": 0,
+          "engine_cwd_entries": [
+            "logs",
+            "logs/data_provenance.json"
+          ],
+          "cache_folder": "/tmp/lumibot-cache/run-2",
+          "lifecycle_calls": {
+            "after_market_closes": 104,
+            "before_market_closes": 0,
+            "before_market_opens": 104,
+            "before_starting_trading": 104,
+            "on_trading_iteration": 621
+          },
+          "trade_events": 4,
+          "cash_events": 0,
+          "stats_snapshots": 934,
+          "identifier_normalization": {
+            "fields": [
+              "identifier",
+              "parent_identifier",
+              "event_id",
+              "_identifier"
+            ],
+            "rejected": 0,
+            "sequential_kept": 2,
+            "uuid4_hex_normalized": 0
+          }
+        }
+      ],
+      "two_run_records_equal": true,
+      "guards": {
+        "total": 54,
+        "failed": [
+          "run-1:fill_at_next_session_first_bar",
+          "run-1:fill_price_is_open_of_bar_indexed_at_fill_instant",
+          "run-1:submission_clock",
+          "run-2:fill_at_next_session_first_bar",
+          "run-2:fill_price_is_open_of_bar_indexed_at_fill_instant",
+          "run-2:submission_clock"
+        ]
+      },
+      "float_projection": {
+        "values_projected": 9,
+        "max_abs_adjustment": "0.00000000001"
+      },
+      "fills": [
+        {
+          "utc_seconds": 1577977200,
+          "quantity": 304,
+          "price": "323.5800",
+          "fee": "0.0000"
+        },
+        {
+          "utc_seconds": 1588251600,
+          "quantity": -304,
+          "price": "293.9900",
+          "fee": "0.0000"
+        }
+      ],
+      "native_end_cash_usd": "91004.6400",
+      "reconciled_end_cash_usd": "91433.2800",
+      "scorer": {
+        "command": "python3 -B blueprints/us-equities/engine-nautilus/spy-parity/compare.py --receipt blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.post-hoc-02.json --manifest blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/mapping-manifest.json --tolerances blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json --lean-data \"$LEAN\" --verdict blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.post-hoc-02.json",
+        "run_from": "<worktree> repository root at 681b458b1fd66461d6453ae1c6120edbd2528545 plus the published receipts",
+        "interpreter": "/usr/bin/python3 (standard library only)",
+        "utc_start": "2026-09-26T06:28:02Z",
+        "exit_code": 1,
+        "verdict_line": "VERDICT {\"attribution_evidence\": \"converted bars\", \"blocking_mappings\": [], \"case\": \"one_zero\", \"complete\": true, \"failed\": 4, \"manifest_schema_version\": 1, \"manifest_unsupported_mappings\": [\"distributions_and_cash\"], \"native_end_cash_usd\": \"91004.6400\", \"note\": \"A failure is BLOCKED only when a measured deviation matches a mapping the bound manifest declares unsupported. Any residue stays an unattributed FAIL, and a skipped check or rejected attribution leaves the comparison incomplete.\", \"rejected_attributions\": [], \"skipped\": [], \"unattributed_failures\": [\"exit_fill.utc_seconds#13\", \"exit_fill.fill_price_usd#16\", \"end_cash.reconciled_end_cash_usd#21\", \"native_end_cash.native_end_cash_usd#22\"], \"verdict\": \"FAIL\"}",
+        "verdict": {
+          "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.post-hoc-02.json",
+          "sha256": "cd05f6278098afee2435784fb2acb5473e2aa51464ca20928695386c97a6da38",
+          "written_by": "compare.py --verdict, committed as written"
+        },
+        "stderr_bytes": 0,
+        "bytecode_written": false
+      },
+      "private_outputs": {
+        "directory": "~/.local/state/native-agent-stack/engine-trials-20260926/lumibot/attempt-03",
+        "sha256": {
+          "port/child-input.private.json": "5686beef04483661d429a4c41ee2c6562bbb23367fdced8f3bfed33b33f20456",
+          "port/converted-rows.private.json": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc",
+          "port/receipt.json": "6effb429ffe191274baaec3dcce4eb4a588a4e459f5dde5a1a8680d46001f8a8",
+          "port/run-1/engine-cwd/logs/data_provenance.json": "71db65a7a8fcd559beb4894b177a773ef6086d130bcc513674fbba941b217dce",
+          "port/run-1/raw-report.private.json": "dbd4f1b1c0ec5eb01b845f12db382d13a52df0b04c28774feda1baf028ca4803",
+          "port/run-1/run-1.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "port/run-1/run-1.stdout.log": "49a7772f537db11b9000e5e330b1ec80c9385d6bb3d08199773b573082f105d1",
+          "port/run-1/summary.private.json": "04da2fa61607ee41947b4867d436c8fd2d61d490f8832e318fd7f86c41ef426c",
+          "port/run-2/engine-cwd/logs/data_provenance.json": "71db65a7a8fcd559beb4894b177a773ef6086d130bcc513674fbba941b217dce",
+          "port/run-2/raw-report.private.json": "dbd4f1b1c0ec5eb01b845f12db382d13a52df0b04c28774feda1baf028ca4803",
+          "port/run-2/run-2.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "port/run-2/run-2.stdout.log": "cc3e2bc0dd98c1558d89ee80ca2ba19e7d3beb3de53fedadcdf8ea0d3f55a01f",
+          "port/run-2/summary.private.json": "61e78f844cc50c62bd33af1c71eae85d829a0d13b42ea381bc3dc94ab73a1e3f",
+          "sandbox.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sandbox.stdout": "2cff88d261b94f582a6c1b29b6c8b459617bfbaf21fe1921b55a5fec3fdfcfe1",
+          "scorer.rc": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "scorer.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "scorer.stdout": "e66abb7dfe5a7e0f347510e70c371ebc6279bf5be71455f0b26d97a3b7fa95bf",
+          "scorer.utc": "4016c0f61fca352d3d5dcd7bdce2795b14d5405b035b3258086f6f0e9fd2855f"
+        },
+        "note": "Converted rows, raw per-run reports, per-run summaries, child input, engine working-directory files, logs and captured stdout and stderr stay private; only these hashes are published."
+      },
+      "note": "Run after the primary verdict; the worktree held only the uncommitted primary receipt and verdict, which the port does not read."
+    }
+  ],
+  "declared_deviations": [
+    {
+      "id": "D1_per_arm_mapping_manifest",
+      "source": "preregistration.json declared_deviations",
+      "applied": "scored against this arm's schema_version 1 mapping-manifest.json via compare.py --manifest"
+    },
+    {
+      "id": "D2_v1_contract_only",
+      "source": "preregistration.json declared_deviations",
+      "applied": "v1 29-check contract; no v2 manifest or sheet"
+    },
+    {
+      "id": "D3_lumibot_environment_and_working_directory",
+      "source": "preregistration.json declared_deviations",
+      "applied": "--setenv LUMIBOT_DISABLE_DOTENV 1 and --setenv LUMIBOT_CACHE_FOLDER /tmp/lumibot-cache (one subdirectory per run, set by the port), engine working directory under /out set by the port"
+    }
+  ],
+  "run_time_deviations": [],
+  "declared_scope_notes": [
+    "PandasData's pinned documentation names the minute and day raw timesteps; this arm uses the hour timestep the Data entity accepts (preregistered).",
+    "Distributions are an external Decimal ledger (engine_posted false) at LEAN's ex-date instants (1576818000 and 1584676800); row distributions_and_cash is unsupported.",
+    "The account is Lumibot's cash-tracking backtest (CASH); no margin model is configured or claimed.",
+    "The two cash_ledger check labels differ from the Nautilus v1 and ml4t verdicts because they embed this arm's fill instants."
+  ],
+  "context_other_arms": {
+    "nautilus_v1": {
+      "verdict": "BLOCKED",
+      "checks": 29,
+      "pass": 25,
+      "fail": 4,
+      "blocking_mappings": [
+        "distributions_and_cash",
+        "market_on_open_proxy"
+      ],
+      "scored": "2026-09-22 by an earlier compare.py (fc0ed683); refused at bind by the pinned compare.py on 2026-09-26, so it is a dated verdict"
+    },
+    "nautilus_v2": {
+      "verdict": "PASS",
+      "checks": 136,
+      "note": "a different contract (106 execution checks plus 30 preconditions); context only"
+    },
+    "ml4t_backtest": {
+      "verdict": "PASS",
+      "checks": 29,
+      "pass": 29,
+      "fail": 0,
+      "run_record": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/run.json"
+    }
+  },
+  "no_paper": "No paper step of any kind: no broker client, adapter, endpoint or credential was constructed, configured, contacted or read; the run sandbox had no network.",
+  "hygiene": "Host paths appear only as placeholders. No UUID-shaped string, engine identifier, credential or log excerpt is recorded here."
+}

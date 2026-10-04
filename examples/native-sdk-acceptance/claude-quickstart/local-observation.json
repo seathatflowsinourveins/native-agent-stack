@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "scope": "Local regression-oracle discrimination; no SDK/provider execution",
+  "observed_date_utc": "2026-10-02",
+  "evidence_class": "local_integration_with_synthetic_controls",
+  "source": "https://code.claude.com/docs/en/agent-sdk/quickstart",
+  "source_section": "Create a buggy file",
+  "fixture_sha256": "c29fde59b52cc1ee333382b6b216462a0271f37a455550052f0c1414b4d72fa5",
+  "oracle_sha256": "7f555898a5cef064bc72121a9d123f61d7161ad573c2117b342ece316eecb1d5",
+  "command": "rtk proxy python3 -m unittest discover -s examples/native-sdk-acceptance/claude-quickstart -p test_utils.py -v",
+  "candidate_selection": "NATIVE_SDK_CANDIDATE names the exact local candidate file; paths remain private.",
+  "runs": [
+    {
+      "id": "upstream-baseline",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "tests": 4,
+      "passed": 2,
+      "errors": 2,
+      "failures": 0,
+      "candidate_sha256": "c29fde59b52cc1ee333382b6b216462a0271f37a455550052f0c1414b4d72fa5",
+      "stdout": "",
+      "sanitized_stderr_file": "results/baseline.stderr.txt",
+      "stderr_original_sha256": "467c0bdd2855289525ae7750eaaec8c95befea713968be78b8dc68b75a439c90",
+      "returned_error_types": ["ZeroDivisionError: division by zero", "TypeError: 'NoneType' object is not subscriptable"],
+      "returned_summary": "Ran 4 tests in 0.001s\n\nFAILED (errors=2)"
+    },
+    {
+      "id": "manual-positive-control",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "errors": 0,
+      "failures": 0,
+      "candidate_sha256": "1437e6ee8ca79042b05b497f4907ad51b3375cab68928866902c92c46bd1cc4a",
+      "manual_delta": "Return None for an empty number list and for a null user; retain the original normal computation.",
+      "retained_candidate_file": "controls/positive.py",
+      "sanitized_stderr_file": "results/positive.stderr.txt",
+      "stdout": "",
+      "stderr_original_sha256": "d4f0b690c988bba7842b69922a6a2464aa4ce8d33f164b6fa1ac151752dc9c22",
+      "returned_summary": "Ran 4 tests in 0.000s\n\nOK"
+    },
+    {
+      "id": "manual-regression-control",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "tests": 4,
+      "passed": 2,
+      "errors": 0,
+      "failures": 2,
+      "candidate_sha256": "52a77b4291afb3e44be8283aba7df0f7f7d2d5f74a4ec08b81896720cd7e87f1",
+      "manual_delta": "Both functions return None for every input, preventing crashes while breaking their normal results.",
+      "retained_candidate_file": "controls/regression.py",
+      "sanitized_stderr_file": "results/regression.stderr.txt",
+      "stdout": "",
+      "stderr_original_sha256": "d52805419226f8d160f5213a47ec5be87eebb1c146f7d5e272719d87427a4dbe",
+      "returned_assertions": ["AssertionError: None != 4", "AssertionError: None != 'ALICE'"],
+      "returned_summary": "Ran 4 tests in 0.001s\n\nFAILED (failures=2)"
+    }
+  ],
+  "limitations": [
+    "All three runs used native unittest locally, with no model or SDK call.",
+    "Manual controls establish only the narrow oracle's discrimination; they are not model solutions or upstream test results.",
+    "The three stderr files retain returned output with only the private checkout prefix replaced by <checkout>. Original-output hashes are kept separately; they are not hashes of sanitized bytes.",
+    "The source fixture is transcribed from dated official documentation, not claimed to be an immutable upstream repository file.",
+    "No independent reviewer has accepted the oracle or cross-runtime capture contract."
+  ]
+}

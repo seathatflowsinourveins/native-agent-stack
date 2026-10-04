@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-temporalio-temporal",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/temporalio/temporal",
+ "reviewed_commit": "d8f9c6d86b2cd0ea5c27d0694a598da84c6d337d",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "scheduling-supervision"
+ ],
+ "claim": "Source and documentation review of temporalio/temporal at commit d8f9c6d86b2cd0ea5c27d0694a598da84c6d337d (license MIT), read from README.md at that commit. Repository description: \"Temporal service\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 23303,
+  "pushed_at": "2026-09-26T12:22:25Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@d8f9c6d86b2cd0ea5c27d0694a598da84c6d337d",
+   "text": "**[Introduction](#introduction) &nbsp;&nbsp;&bull;&nbsp;&nbsp;** **[Getting Started](#getting-started) &nbsp;&nbsp;&bull;&nbsp;&nbsp;** **[Contributing](#contributing) &nbsp;&nbsp;&bull;&nbsp;&nbsp;** **[Temporal Docs](https://docs.temporal.io/) &nbsp;&nbsp;&bull;&nbsp;&nbsp;** **[Temporal 101](https://learn.temporal.io/courses/temporal_101/)**"
+  },
+  {
+   "source": "README.md@d8f9c6d86b2cd0ea5c27d0694a598da84c6d337d",
+   "text": "Temporal is a durable execution platform that enables developers to build scalable applications without sacrificing productivity or reliability. The Temporal server executes units of application logic called Workflows in a resilient manner that automatically handles intermittent failures, and retries failed operations."
+  },
+  {
+   "source": "README.md@d8f9c6d86b2cd0ea5c27d0694a598da84c6d337d",
+   "text": "Temporal is a mature technology that originated as a fork of Uber's Cadence. It is developed by [Temporal Technologies](https://temporal.io/), a startup by the creators of Cadence."
+  }
+ ]
+}

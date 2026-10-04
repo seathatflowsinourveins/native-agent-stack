@@ -10,16 +10,21 @@ reaches it on its next re-record. The inputs are the host receipts under ``evide
 ``evidence_refs``; nothing here reads a lane's prose.
 
 A receipt is *bound* when it is schema-valid, its ``host.os``/``host.architecture`` match the
-platform profile, and its ``tool_versions[component_id]`` equals the winner's current ``pin``
-after ``normalize_pin`` (the whole string, so a multi-part pin must match in full). A
-*qualifying* receipt is a bound ``native_proven`` pass at stage ``use``, on a declared second
-physical machine, independently reviewed (``host_receipts.review_state`` is ``agree``: a reviewer
-identity other than the recorder's agrees and nothing dissents); the same receipt at stage
-``install`` supports ``conditional`` at most, through the receipt route only
-(docs/decisions/2026-09-24-accepted-needs-use-stage.md). A
-*blocking* fail is a bound ``native_proven`` fail at ``install`` or ``use`` that is the latest
-receipt for its host and stage, whatever its review; it withholds ``accepted`` until that host
-records a later pass for that stage.
+platform profile, its ``tool_versions[component_id]`` equals the winner's current ``pin``
+after ``normalize_pin`` (the whole string, so a multi-part pin must match in full), and it is
+in the winner's layer (``in_layer_scope``: its ``layer_refs``, when it has them, name that
+layer; an unscoped receipt is in every layer the component wins, as the id and pin it was
+recorded against are the same in each). A bound receipt is *current* unless a present receipt
+supersedes it at the same component version or it lies on a forked supersede chain from the fork
+on (``non_current_paths``). A *qualifying* receipt is a current ``native_proven`` pass
+at stage ``use``, on a declared second physical machine, independently reviewed
+(``host_receipts.review_state`` is ``agree``: a reviewer identity other than the recorder's
+agrees and nothing dissents); the same receipt at stage ``install`` supports ``conditional`` at
+most, through the receipt route only (docs/decisions/2026-09-24-accepted-needs-use-stage.md). A
+*blocking* fail is a bound ``native_proven`` fail at ``install`` or ``use``, superseded or not,
+whatever its review, with no later current bound ``native_proven`` pass for its host and stage:
+supersession retires acceptance evidence, never a failure, so a superseding partial, synthetic
+or other-platform receipt does not clear it.
 
 ``macos-arm64``: ``accepted`` needs a qualifying pass and no blocking fail; ``conditional`` a
 bound pass that is not ``synthetic``, comes from a declared second physical machine and has
@@ -30,7 +35,9 @@ otherwise ``untested``.
 ``measured_comparison`` winner citing at least one ``evidence/`` file registered in
 ``manifests/evidence.json`` (not one the layer-verdict pipeline sealed under
 ``evidence/artifacts/layer-verdicts-<run-id>/``: packets, lane returns and adjudications are lane
-inputs or opinions, not execution receipts), and in both cases no blocking fail; ``conditional`` covers the
+inputs or opinions, not execution receipts; and not a host receipt under ``evidence/hosts/``,
+which counts only through the receipt route with its binding, review, layer and supersession
+checks), and in both cases no blocking fail; ``conditional`` covers the
 same classes otherwise, ``local_integration``, ``synthetic`` and any bound non-``synthetic``
 pass without a standing dissent; otherwise ``not_established``.
 
@@ -93,15 +100,18 @@ pin_matches = host_receipts.pin_matches
 
 # What the layer-verdict pipeline itself seals (tools/sota-convergence/record_verdicts.py).
 LAYER_VERDICT_ARTIFACTS = "evidence/artifacts/layer-verdicts-"
+# Host receipts: judged only through the receipt route, never as a generic registered artifact, or citing one in
+# evidence_refs would bypass its pin binding, review, layer scope and supersession.
+HOST_RECEIPTS = "evidence/hosts/"
 
 
 def registered_evidence_refs(winner: dict, registered_paths) -> tuple[str, ...]:
     """The winner's refs (a ``#fragment`` ignored) naming a registered ``evidence/`` file that is
-    not a layer-verdict artifact."""
+    neither a layer-verdict artifact nor a host receipt."""
     refs = winner.get("evidence_refs") or []
     paths = [(ref, ref.split("#", 1)[0]) for ref in refs if isinstance(ref, str)]
     return tuple(ref for ref, path in paths if path.startswith("evidence/")
-                 and not path.startswith(LAYER_VERDICT_ARTIFACTS) and path in registered_paths)
+                 and not path.startswith((LAYER_VERDICT_ARTIFACTS, HOST_RECEIPTS)) and path in registered_paths)
 
 
 def _platform_receipts(summary: dict, component_id, platform_id: str) -> list[dict]:
@@ -110,23 +120,68 @@ def _platform_receipts(summary: dict, component_id, platform_id: str) -> list[di
     return [entry for entry in bucket.get("receipts", []) or [] if isinstance(entry, dict)]
 
 
-def platform_status(platform_id: str, winner: dict, context: StatusContext) -> PlatformStatus:
+def in_layer_scope(entry: dict, layer, *, unscoped: bool = True) -> bool:
+    """Whether a ``host_receipts.build_summary`` receipt entry speaks for a row in ``layer``
+    (``"<catalog>/<layer_id>"``, or ``None`` when the caller has no layer): a receipt with
+    ``layer_refs`` only in the layers they name (so never for ``layer`` ``None``); an unscoped
+    receipt when ``unscoped``. A winner passes ``unscoped`` True: the receipt was recorded against
+    that winner's id and pin. An alternative, which joins receipts by repository alone, passes True
+    only when that repository is catalogued in one layer (scripts/component_matrix.py
+    build_alternative), since otherwise nothing says which layer's role an unscoped receipt
+    exercised. Supersession is separate (``superseded_paths``)."""
+    scope = entry.get("layer_scope")
+    if scope is None:
+        return unscoped
+    return layer is not None and layer in scope
+
+
+def _component_entries(summary: dict, component_id) -> list[dict]:
+    component = (summary.get("components") or {}).get(component_id) or {}
+    return [entry for bucket in (component.get("platforms") or {}).values() if isinstance(bucket, dict)
+            for entry in bucket.get("receipts", []) or [] if isinstance(entry, dict)]
+
+
+def superseded_paths(summary: dict, component_id) -> set[str]:
+    """Receipts of ``component_id`` that a receipt present in ``summary`` supersedes, on any platform
+    (``host_receipts.superseded_paths``). Computed from the summary given, so a caller that filters
+    receipts (scripts/verdict_review_gate.py's base-trusted view) never inherits a supersession from a
+    successor it dropped."""
+    return host_receipts.superseded_paths(_component_entries(summary, component_id))
+
+
+def non_current_paths(summary: dict, component_id) -> set[str]:
+    """``superseded_paths`` plus every receipt of a forked supersede chain from the fork on
+    (``host_receipts.non_current_paths``): no acceptance evidence, though a failure among them still
+    blocks. Computed from the summary given, like ``superseded_paths``."""
+    return host_receipts.non_current_paths(_component_entries(summary, component_id))
+
+
+def platform_status(platform_id: str, winner: dict, context: StatusContext, *, layer=None) -> PlatformStatus:
     """The strongest status the recorded evidence supports for ``winner`` on ``platform_id``.
-    ``winner`` needs ``component_id``, ``pin``, ``evidence_class`` and ``evidence_refs``."""
+    ``winner`` needs ``component_id``, ``pin``, ``evidence_class`` and ``evidence_refs``; ``layer``
+    (``"<catalog>/<layer_id>"``) is the row it is a winner of, which scoped receipts must name."""
     if platform_id not in PLATFORMS:
         raise ValueError(f"unknown platform {platform_id!r}")
     component_id = winner.get("component_id")
     pin = winner.get("pin")
-    entries = _platform_receipts(context.summary, component_id, platform_id)
-    bound = [entry for entry in entries
-             if entry.get("shape_ok") and entry.get("platform_identity_ok")
-             and pin_matches(entry.get("component_version"), pin)]
+    entries = [entry for entry in _platform_receipts(context.summary, component_id, platform_id)
+               if in_layer_scope(entry, layer)]
+    superseded = non_current_paths(context.summary, component_id)
+    bound_any = [entry for entry in entries
+                 if entry.get("shape_ok") and entry.get("platform_identity_ok")
+                 and pin_matches(entry.get("component_version"), pin)]
+    # Acceptance evidence is current receipts only; failure accounting also keeps superseded fails.
+    bound = [entry for entry in bound_any if entry.get("path") not in superseded]
     native_stage = [entry for entry in bound
                     if entry.get("evidence_class") == "native_proven" and entry.get("stage") in BLOCKING_STAGES]
+    native_fails = [entry for entry in bound_any if entry.get("path") in superseded
+                    and entry.get("evidence_class") == "native_proven" and entry.get("stage") in BLOCKING_STAGES
+                    and entry.get("result") == "fail"]
     latest_per_host_stage: dict[tuple, tuple] = {}
     # Only pass and fail decide; a later partial or not_runnable receipt neither clears a fail nor
-    # withdraws a pass.
-    for entry in (item for item in native_stage if item.get("result") in ("pass", "fail")):
+    # withdraws a pass. A superseded fail stays in (supersession never clears a failure); a superseded
+    # pass does not, so only a current native pass at this pin, platform, host, stage and layer clears it.
+    for entry in (item for item in native_stage + native_fails if item.get("result") in ("pass", "fail")):
         key = (entry.get("host_id"), entry.get("stage"))
         # On an equal timestamp a fail sorts after a pass, so the tie blocks.
         rank = (entry.get("observed_at_utc") or "", entry.get("result") == "fail", entry.get("path") or "")
@@ -163,9 +218,11 @@ def platform_status(platform_id: str, winner: dict, context: StatusContext) -> P
         if passes:
             return PlatformStatus("conditional", "pin-bound passing host receipt(s) without the full "
                                   "acceptance conditions" + fail_note, pass_refs)
-        if bound:
+        if bound_any:
+            # Current receipts and blocking fails, else (every bound receipt superseded or on a forked chain) all of them.
+            refs = {entry["path"] for entry in bound} | set(blocking) or {entry["path"] for entry in bound_any}
             return PlatformStatus("not_established", f"host receipts at pin {pin!r} but none passes without "
-                                  "a standing dissent" + fail_note, tuple(sorted(entry["path"] for entry in bound)))
+                                  "a standing dissent" + fail_note, tuple(sorted(refs)))
         return PlatformStatus("untested", f"no schema-valid host receipt bound to pin {pin!r}", ())
 
     evidence_class = winner.get("evidence_class")
@@ -186,11 +243,12 @@ def platform_status(platform_id: str, winner: dict, context: StatusContext) -> P
                           registered)
 
 
-def declared_status_error(platform_id: str, declared, winner: dict, context: StatusContext) -> str | None:
+def declared_status_error(platform_id: str, declared, winner: dict, context: StatusContext, *,
+                          layer=None) -> str | None:
     """A message when ``declared`` claims more than ``platform_status`` derives, else ``None``.
     A weaker declaration is stale but conservative and allowed, so a new receipt never breaks
     CI before the row is re-recorded."""
-    derived = platform_status(platform_id, winner, context)
+    derived = platform_status(platform_id, winner, context, layer=layer)
     if STATUS_RANK.get(declared, len(STATUS_RANK)) <= STATUS_RANK[derived.status]:
         return None
     return (f"platform_status.{platform_id} declares {declared!r} but the recorded evidence supports at most "

@@ -1,0 +1,5 @@
+before_utc=2026-09-26T04:51:23Z
+before=~/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/bin/mcp-inspector
+after_utc=2026-09-26T04:51:23Z
+after=~/.local/share/codex-ecosystem/tools/mcp-inspector-2.8.0/bin/mcp-inspector
+resolved=~/.local/share/codex-ecosystem/tools/mcp-inspector-2.8.0/lib/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js

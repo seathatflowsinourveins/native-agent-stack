@@ -1,0 +1,17 @@
+{
+  "clientCwd": "<scratch>/trial-byterover/brv-project",
+  "content": "{\"limit\":10,\"query\":\"zzznonexistentxyz123\"}",
+  "createdAt": 1790386746342,
+  "id": "tsk-<uuid>",
+  "model": "qwen3.8-27b-local",
+  "projectPath": "<scratch>/trial-byterover/brv-project",
+  "provider": "openai-compatible",
+  "schemaVersion": 1,
+  "taskId": "<uuid>",
+  "type": "search",
+  "worktreeRoot": "<scratch>/trial-byterover/brv-project",
+  "completedAt": 1790386746353,
+  "result": "{\"message\":\"No matching knowledge found. Try different search terms or check available topics with /query.\",\"results\":[],\"totalFound\":0}",
+  "startedAt": 1790386746351,
+  "status": "completed"
+}

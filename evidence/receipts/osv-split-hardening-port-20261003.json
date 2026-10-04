@@ -1,0 +1,1829 @@
+{
+  "schema_version": 1,
+  "record": "osv-split-hardening-port-20261003",
+  "purpose": "Port #555 review-7 policy, upload and provenance fixes onto main's existing three-scan gate, retaining #622 and retired WSL evidence.",
+  "checked_commit": "cac8700ba914950266272347468bff7ad630a4bf",
+  "observed_utc": "2026-10-03T19:11:41Z",
+  "observed_until_utc": "2026-10-03T19:55:27Z",
+  "authorization": "User-issued custody run contract for PR555; Git/GitHub writes, exact-head CI and the independent review are coordinator-owned steps, recorded on PR #673.",
+  "evidence_class": "source_review; local_integration; synthetic; native_proven (claims separated below)",
+  "limitations": [
+    "Checks were run against modified, uncommitted worktree bytes at the unchanged base HEAD; file hashes bind those bytes. No port commit or hosted PR exists from this builder run.",
+    "The eight required contexts and independent exact-head Opus review are coordinator-only and not run here.",
+    "The 164-test integrated suite has two existing skips: no hash-frozen workflow and optional PyYAML unavailable. Neither is counted as a pass.",
+    "The preserved four-control helper still extracts obsolete two-group mapfile lines: its list subsection prints 'sum check: 0 == 53' while exiting 0. This subsection is invalid current partition evidence; its current native scan subsections and the separate exact Bash run remain distinct.",
+    "The unchanged helper only retains two SARIF artifacts itself and does not record six statuses. The separate exact-step run retains all three reports and the six status lines.",
+    "The historical verifier file SHA256 2541edab1f363e6b63c4bbf30a54fc690cf1da5231dbfb16014a4257b1c55a6a is cited as reported provenance in #555's receipt; the distinct file is not reproduced or verified here.",
+    "One native ID/id collision is reproduced; source map iteration does not guarantee which alias value wins.",
+    "NPM in any case is rejected by defensive repository policy; native OSV ecosystem comparison is case-sensitive.",
+    "Hosted SARIF upload actions were not executed locally; their failure-path guards are source-backed local checks.",
+    "No model-run, provider-usage, broader security-audit or convergence-improvement claim is made; unrecorded usage remains unknown.",
+    "origin/main advanced after the pre-edit gate. The mandated registry read brought a newer dashboard hash into the older tested HEAD; unchanged base dashboard bytes were re-registered for local consistency. The coordinator must regenerate/re-register after rebase."
+  ],
+  "ci_failure": {
+    "hosted_run": "not run: GitHub writes and exact-head commit are coordinator-only",
+    "pre_edit_red_controls": [
+      {
+        "id": "R1",
+        "expectation": "survives",
+        "started_utc": "2026-10-03T19:11:41Z",
+        "finished_utc": "2026-10-03T19:11:44Z",
+        "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+        "exit_code": 0,
+        "tests_run": 54,
+        "skipped": [],
+        "failing_tests": [],
+        "wall_seconds": 2.413,
+        "evidence_class": "synthetic",
+        "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R1.txt",
+        "selection": "R1 within the single red-controls invocation",
+        "output_sanitization": "Project-root paths in public failing-test tracebacks replaced with <scan-root>; original outputs retained privately."
+      },
+      {
+        "id": "R2",
+        "expectation": "caught",
+        "started_utc": "2026-10-03T19:11:44Z",
+        "finished_utc": "2026-10-03T19:11:46Z",
+        "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+        "exit_code": 1,
+        "tests_run": 5,
+        "skipped": [],
+        "failing_tests": [
+          "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate",
+          "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan (mutation='unknown-config')"
+        ],
+        "wall_seconds": 2.303,
+        "evidence_class": "synthetic",
+        "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R2.txt",
+        "selection": "R2 within the single red-controls invocation",
+        "output_sanitization": "Project-root paths in public failing-test tracebacks replaced with <scan-root>; original outputs retained privately."
+      },
+      {
+        "id": "R3",
+        "expectation": "caught",
+        "started_utc": "2026-10-03T19:11:46Z",
+        "finished_utc": "2026-10-03T19:11:48Z",
+        "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+        "exit_code": 1,
+        "tests_run": 5,
+        "skipped": [],
+        "failing_tests": [
+          "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained (primary=(0, 0, 0), sarif=(0, 0, 1))",
+          "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained (primary=(0, 0, 0), sarif=(0, 0, 7))"
+        ],
+        "wall_seconds": 2.048,
+        "evidence_class": "synthetic",
+        "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R3.txt",
+        "selection": "R3 within the single red-controls invocation",
+        "output_sanitization": "Project-root paths in public failing-test tracebacks replaced with <scan-root>; original outputs retained privately."
+      },
+      {
+        "id": "R4-override",
+        "expectation": "survives",
+        "started_utc": "2026-10-03T19:11:48Z",
+        "finished_utc": "2026-10-03T19:11:48Z",
+        "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+        "exit_code": 0,
+        "tests_run": 2,
+        "skipped": [],
+        "failing_tests": [],
+        "wall_seconds": 0.003,
+        "evidence_class": "synthetic",
+        "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-override.txt",
+        "selection": "R4-override within the single red-controls invocation",
+        "output_sanitization": "Project-root paths in public failing-test tracebacks replaced with <scan-root>; original outputs retained privately."
+      },
+      {
+        "id": "R4-key",
+        "expectation": "survives",
+        "started_utc": "2026-10-03T19:11:48Z",
+        "finished_utc": "2026-10-03T19:11:48Z",
+        "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+        "exit_code": 0,
+        "tests_run": 2,
+        "skipped": [],
+        "failing_tests": [],
+        "wall_seconds": 0.004,
+        "evidence_class": "synthetic",
+        "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-key.txt",
+        "selection": "R4-key within the single red-controls invocation",
+        "output_sanitization": "Project-root paths in public failing-test tracebacks replaced with <scan-root>; original outputs retained privately."
+      }
+    ],
+    "required_contexts": [
+      "validate",
+      "token-report",
+      "secret-scan",
+      "dependency-review",
+      "osv-scanner",
+      "verdict-review-gate",
+      "validate-macos",
+      "sota-sources"
+    ]
+  },
+  "advisory": {
+    "frozen_exceptions": "Existing macOS next and retired WSL braces exceptions; no config/lock changes",
+    "case_alias_reproduction": {
+      "observed_utc": "2026-10-03T19:22:01Z",
+      "target_advisory": "GHSA-vcvr-r3jv-pc5j",
+      "runs": {
+        "baseline": {
+          "exit_code": 1,
+          "advisory_ids": [
+            "GHSA-vcvr-r3jv-pc5j"
+          ]
+        },
+        "case-alias": {
+          "exit_code": 0,
+          "advisory_ids": []
+        }
+      },
+      "reproduced": true,
+      "limitation": "Single native observation. Source map iteration does not establish which alias wins. If absent, the exact-key guard remains defense-in-depth."
+    }
+  },
+  "release_facts": {
+    "osv_scanner": "v2.6.0, commit e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+    "toml": "BurntSushi/toml v1.6.0, commit 52534926c55b4cd85b05aee90569dd0668b8cf30",
+    "actionlint": "kjanat/actionlint v1.17.0",
+    "zizmor": "1.30.1 pinned by .github/requirements-ci.txt",
+    "sources": {
+      "observed_utc": "2026-10-03T19:24:50Z",
+      "evidence_class": "source_review",
+      "sources": [
+        {
+          "repository": "https://github.com/google/osv-scanner",
+          "pin": "v2.6.0",
+          "file": "docs/configuration.md",
+          "url": "https://github.com/google/osv-scanner/blob/v2.6.0/docs/configuration.md",
+          "original_file_sha256": "6bb6562e3d05bc9c1cfddc3836f77ff1a3db85f3727714ad01e682650398997e",
+          "excerpts": [
+            {
+              "start_line": 18,
+              "end_line": 25,
+              "text": "/child-dir/nested-dir/package-lock.json\n```\n\n`osv-scanner.toml (1)` will only apply to `Cargo.lock`, `osv-scanner.toml (2)` will only apply to `go.mod`, and no config will apply to `package-lock.json`.\n\nTo override `osv-scanner.toml` files, pass the `--config=/path/to/config.toml` flag with the path to the configuration you want to apply instead, this will apply `config.toml` to all files parsed, and ignore `osv-scanner.toml` in all directories.\n\n## Ignore vulnerabilities by ID"
+            },
+            {
+              "start_line": 48,
+              "end_line": 63,
+              "text": "\n```toml\n[[PackageOverrides]]\n# One or more fields to match each package against:\nname = \"lib\"\n# nameIsRegex = true # Optional: treat name as a regular expression pattern\nversion = \"1.0.0\"\necosystem = \"Go\"\ngroup = \"dev\"\n\n# Actions to take for matching packages:\nignore = true # Ignore this package completely, including both reporting vulnerabilities and license violations\nvulnerability.ignore = true # Ignore vulnerabilities for this package, while still checking the license (if not also ignored)\nlicense.ignore = true # Ignore the license of the package, while still checking for vulnerabilities (if not also ignored)\nlicense.override = [\"MIT\", \"0BSD\"] # Override the license of the package, if it is not ignored from license scanning completely\n"
+            },
+            {
+              "start_line": 92,
+              "end_line": 107,
+              "text": "name = \"axios\"\necosystem = \"npm\"\ngroup = \"dev\"\nignore = true\n\n# ignore packages matching a regex pattern (e.g. all internal packages)\n[[PackageOverrides]]\nname = \"internal-.*\"\nnameIsRegex = true\nignore = true\nreason = \"internal packages should not be checked\"\n\n# ... and so on\n```\n\nWhen `nameIsRegex` is set to `true`, the `name` field is treated as a regular expression pattern. The pattern is automatically anchored to match the full package name (i.e. `^pattern$`). Standard [Go regular expression syntax](https://pkg.go.dev/regexp/syntax) is supported. An invalid regex pattern will cause a config loading error."
+            }
+          ]
+        },
+        {
+          "repository": "https://github.com/google/osv-scanner",
+          "pin": "v2.6.0",
+          "file": "go.mod",
+          "url": "https://github.com/google/osv-scanner/blob/v2.6.0/go.mod",
+          "original_file_sha256": "47db8d4f9e4b49922097899d76692a37a84e29143f439cc47fdf925b4feab615",
+          "excerpts": [
+            {
+              "start_line": 1,
+              "end_line": 12,
+              "text": "module github.com/google/osv-scanner/v2\n\ngo 1.27.0\n\nrequire (\n\tcharm.land/glamour/v2 v2.0.1\n\tcharm.land/lipgloss/v2 v2.0.6\n\tgithub.com/BurntSushi/toml v1.6.0\n\tgithub.com/CycloneDX/cyclonedx-go v0.12.0\n\tgithub.com/gkampitakis/go-snaps v0.5.23\n\tgithub.com/go-git/go-git/v5 v5.19.2\n\tgithub.com/gobwas/glob v0.2.3"
+            }
+          ]
+        },
+        {
+          "repository": "https://github.com/google/osv-scanner",
+          "pin": "v2.6.0",
+          "file": "internal/config/manager.go",
+          "url": "https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/manager.go",
+          "original_file_sha256": "f58fa2447b0f9a2236acc05be379bda716590c1a15ca682c14fc8aad9a17262d",
+          "excerpts": [
+            {
+              "start_line": 24,
+              "end_line": 46,
+              "text": "// UseOverride updates the Manager to use the config at the given path in place\n// of any other config files that would be loaded when calling Get\nfunc (m *Manager) UseOverride(configPath string) error {\n\tconfig, configErr := tryLoadConfig(configPath)\n\tif configErr != nil {\n\t\treturn configErr\n\t}\n\tm.OverrideConfig = &config\n\n\treturn nil\n}\n\n// Get returns the appropriate config to use based on the targetPath\nfunc (m *Manager) Get(targetPath string) Config {\n\tif m.OverrideConfig != nil {\n\t\treturn *m.OverrideConfig\n\t}\n\n\tconfigPath, err := normalizeConfigLoadPath(targetPath)\n\tif err != nil {\n\t\t// TODO: This can happen when target is not a file (e.g. Docker container, git hash...etc.)\n\t\t// Figure out a more robust way to load config from non files\n\t\t// r.PrintErrorf(\"Can't find config path: %s\\n\", err)"
+            },
+            {
+              "start_line": 110,
+              "end_line": 129,
+              "text": "\n// tryLoadConfig attempts to parse the config file at the given path as TOML,\n// returning the Config object if successful or otherwise the error\nfunc tryLoadConfig(configPath string) (Config, error) {\n\tconfig := Config{}\n\tc, err := toml.DecodeFile(configPath, &config)\n\tif err == nil {\n\t\tunknownKeys := c.Undecoded()\n\n\t\tif len(unknownKeys) > 0 {\n\t\t\tkeys := make([]string, 0, len(unknownKeys))\n\n\t\t\tfor _, key := range unknownKeys {\n\t\t\t\tkeys = append(keys, key.String())\n\t\t\t}\n\n\t\t\treturn Config{}, fmt.Errorf(\"unknown keys in config file: %s\", strings.Join(keys, \", \"))\n\t\t}\n\n\t\tconfig.LoadPath = configPath"
+            }
+          ]
+        },
+        {
+          "repository": "https://github.com/google/osv-scanner",
+          "pin": "v2.6.0",
+          "file": "internal/config/config.go",
+          "url": "https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go",
+          "original_file_sha256": "a49970f7f8fb7383b6ce2255f024698a90331404b917a65fdde3151642efdcd4",
+          "excerpts": [
+            {
+              "start_line": 22,
+              "end_line": 34,
+              "text": "\t// set by the scanner after having successfully parsed the file\n\tLoadPath string `toml:\"-\"`\n}\n\ntype IgnoreEntry struct {\n\tID          string    `toml:\"id\"`\n\tIgnoreUntil time.Time `toml:\"ignoreUntil\"`\n\tReason      string    `toml:\"reason\"`\n\n\tUsed bool `toml:\"-\"`\n}\n\nfunc (ie *IgnoreEntry) MarkAsUsed() {"
+            },
+            {
+              "start_line": 52,
+              "end_line": 82,
+              "text": "func (e PackageOverrideEntry) matches(pkg *extractor.Package) bool {\n\tif e.Name != \"\" {\n\t\tif e.NameIsRegex {\n\t\t\tre, err := cachedregexp.Compile(\"^\" + e.Name + \"$\")\n\t\t\tif err != nil {\n\t\t\t\t// This should not happen as regex is validated at config load time\n\t\t\t\treturn false\n\t\t\t}\n\t\t\tif !re.MatchString(imodels.Name(pkg)) {\n\t\t\t\treturn false\n\t\t\t}\n\t\t} else if e.Name != imodels.Name(pkg) {\n\t\t\treturn false\n\t\t}\n\t}\n\tif e.Version != \"\" && e.Version != imodels.Version(pkg) {\n\t\treturn false\n\t}\n\t// If there is an ecosystem filter, the filter must not match both the:\n\t//  - Full ecosystem + suffix\n\t//  - The base ecosystem\n\tif e.Ecosystem != \"\" && (e.Ecosystem != imodels.Ecosystem(pkg).String() && e.Ecosystem != string(imodels.Ecosystem(pkg).Ecosystem)) {\n\t\treturn false\n\t}\n\tif e.Group != \"\" && !slices.Contains(imodels.DepGroups(pkg), e.Group) {\n\t\treturn false\n\t}\n\n\treturn true\n}\n"
+            },
+            {
+              "start_line": 104,
+              "end_line": 115,
+              "text": "func (c *Config) ShouldIgnore(vulnID string) (bool, *IgnoreEntry) {\n\tindex := slices.IndexFunc(c.IgnoredVulns, func(e *IgnoreEntry) bool { return e.ID == vulnID })\n\tif index == -1 {\n\t\treturn false, &IgnoreEntry{}\n\t}\n\tignoredLine := c.IgnoredVulns[index]\n\n\treturn shouldIgnoreTimestamp(ignoredLine.IgnoreUntil), ignoredLine\n}\n\nfunc (c *Config) filterPackageVersionEntries(pkg *extractor.Package, condition func(PackageOverrideEntry) bool) (bool, PackageOverrideEntry) {\n\tindex := slices.IndexFunc(c.PackageOverrides, func(e PackageOverrideEntry) bool {"
+            }
+          ]
+        },
+        {
+          "repository": "https://github.com/BurntSushi/toml",
+          "pin": "v1.6.0",
+          "file": "decode.go",
+          "url": "https://github.com/BurntSushi/toml/blob/v1.6.0/decode.go",
+          "original_file_sha256": "4f9aa86faf2339423f39b6000f7499b0d5530be77ab71fac6f9142c101a74956",
+          "excerpts": [
+            {
+              "start_line": 105,
+              "end_line": 115,
+              "text": "// # Key mapping\n//\n// TOML keys can map to either keys in a Go map or field names in a Go struct.\n// The special `toml` struct tag can be used to map TOML keys to struct fields\n// that don't match the key name exactly (see the example). A case insensitive\n// match to struct names will be tried if an exact match can't be found.\n//\n// The mapping between TOML values and Go values is loose. That is, there may\n// exist TOML values that cannot be placed into your representation, and there\n// may be parts of your representation that do not correspond to TOML values.\n// This loose mapping can be made stricter by using the IsDefined and/or"
+            },
+            {
+              "start_line": 305,
+              "end_line": 330,
+              "text": "\t}\n\n\tfor key, datum := range tmap {\n\t\tvar f *field\n\t\tfields := cachedTypeFields(rv.Type())\n\t\tfor i := range fields {\n\t\t\tff := &fields[i]\n\t\t\tif ff.name == key {\n\t\t\t\tf = ff\n\t\t\t\tbreak\n\t\t\t}\n\t\t\tif f == nil && strings.EqualFold(ff.name, key) {\n\t\t\t\tf = ff\n\t\t\t}\n\t\t}\n\t\tif f != nil {\n\t\t\tsubv := rv\n\t\t\tfor _, i := range f.index {\n\t\t\t\tsubv = indirect(subv.Field(i))\n\t\t\t}\n\n\t\t\tif isUnifiable(subv) {\n\t\t\t\tmd.decoded[md.context.add(key).String()] = struct{}{}\n\t\t\t\tmd.context = append(md.context, key)\n\n\t\t\t\terr := md.unify(datum, subv)"
+            }
+          ]
+        },
+        {
+          "repository": "https://github.com/github/docs",
+          "pin": "b32e08ff7345b996e5bb059bfd5bfc11d08bcc36",
+          "file": "content/actions/reference/workflows-and-actions/expressions.md",
+          "url": "https://github.com/github/docs/blob/b32e08ff7345b996e5bb059bfd5bfc11d08bcc36/content/actions/reference/workflows-and-actions/expressions.md",
+          "original_file_sha256": "61fcae832a7bc5134b94eacef043123f409208b93890db1cb305bd20d9f95c77",
+          "excerpts": [
+            {
+              "start_line": 320,
+              "end_line": 356,
+              "text": "## Status check functions\n\nYou can use the following status check functions as expressions in `if` conditionals. A default status check of `success()` is applied unless you include one of these functions. For more information about `if` conditionals, see [AUTOTITLE](/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idif) and [AUTOTITLE](/actions/reference/workflows-and-actions/metadata-syntax#runsstepsif).\n\nOutside `if` conditionals, you can use `job.status` to access the job status. For more information, see [AUTOTITLE](/actions/reference/workflows-and-actions/contexts#job-context).\n\n### success\n\nReturns `true` when all previous steps have succeeded.\n\n#### Example of `success`\n\n```yaml\nsteps:\n  ...\n  - name: The job has succeeded\n    if: {% raw %}${{ success() }}{% endraw %}\n```\n\n### always\n\nCauses the step to always execute, and returns `true`, even when canceled. The `always` expression is best used at the step level or on tasks that you expect to run even when a job is canceled. For example, you can use `always` to send logs even when a job is canceled.\n\n> [!WARNING]\n> Avoid using `always` for any task that could suffer from a critical failure, for example: getting sources, otherwise the workflow may hang until it times out. If you want to run a job or step regardless of its success or failure, use the recommended alternative: `if: {% raw %}${{ !cancelled() }}{% endraw %}`\n\n#### Example of `always`\n\n```yaml\nif: {% raw %}${{ always() }}{% endraw %}\n```\n\n### cancelled\n\nReturns `true` if the workflow was canceled.\n\n#### Example of `cancelled`"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "locks": [
+    {
+      "config": ".github/osv-scanner-frozen-macos.toml",
+      "count": 1,
+      "paths": [
+        "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"
+      ],
+      "changed": false
+    },
+    {
+      "config": ".github/osv-scanner-frozen-wsl-retrieval.toml",
+      "count": 1,
+      "paths": [
+        "blueprints/convergence-practice/wsl-retrieval/package-lock.json"
+      ],
+      "changed": false
+    },
+    {
+      "config": ".github/osv-scanner.toml",
+      "count": 51,
+      "paths": [
+        "examples/claude-runtime-sdk/worker.py.lock",
+        "examples/omniroute-codex-sdk/worker.py.lock",
+        "examples/omniroute-codex-sdk/test_worker.py.lock",
+        ".github/requirements-ci.txt",
+        "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
+        "adoption/sdk/accepted-constraints.txt",
+        "adoption/sdk/requirements-linux-x86_64-py313.lock",
+        "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+        "blueprints/convergence-practice/application-delivery/uv.lock",
+        "blueprints/memory-stack/native-qualification/uv.lock",
+        "blueprints/us-equities/adaptive-paper/requirements.txt",
+        "blueprints/us-equities/catalyst-provenance/requirements.lock",
+        "blueprints/us-equities/data/requirements.in",
+        "blueprints/us-equities/data/requirements.lock",
+        "blueprints/runtime-workers/openhands/requirements.lock",
+        "blueprints/runtime-workers/openhands/build-requirements.lock",
+        "blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Algorithm.Framework/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Algorithm/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/AlgorithmFactory/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Api/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Brokerages/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Common/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Compression/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/DownloaderDataProvider/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Engine/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Indicators/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Optimizer/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Queues/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json",
+        "blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json",
+        "blueprints/us-equities/research-evaluation/requirements.in",
+        "blueprints/us-equities/research-evaluation/requirements.lock",
+        "blueprints/us-equities/workers/requirements.txt",
+        "tools/mlx-smoke/requirements.in",
+        "tools/mlx-smoke/requirements.lock.txt",
+        "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+        "blueprints/us-equities/mover-v3/data-tools/requirements.lock",
+        "blueprints/us-equities/mover-v3/study/runtime-requirements.txt",
+        "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
+        "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock",
+        "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+        "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock"
+      ],
+      "changed": false
+    }
+  ],
+  "upstream_changes": {
+    "source_pr": 555,
+    "source_head": "8c263acebe7396c09d66d9d4f70bf144e1c4cdd3",
+    "findings": [
+      {
+        "id": "P2-4",
+        "finding": "SARIF-only findings could leave the step green",
+        "main": "Already fixed by #622",
+        "action": "Preserved; R3 catches removal of SARIF statuses"
+      },
+      {
+        "id": "P2-5",
+        "finding": "An ordinary upload failure skips later archive uploads",
+        "main": "Open for macOS and WSL uploads",
+        "action": "Each later upload has its own !cancelled() condition and assertion"
+      },
+      {
+        "id": "P2-2",
+        "finding": "Native TOML decoder reads case-varied keys the policy misses",
+        "main": "Open",
+        "action": "Ported exact entry-key and top-level table checks; native ID/id collision reproduced"
+      },
+      {
+        "id": "P2-1",
+        "finding": "Regex or ecosystem-less package override bypasses literal-name checks",
+        "main": "Open for next and braces",
+        "action": "Ordinary policy rejects an absent ecosystem or npm in any case; real preflight mutation checks extended"
+      },
+      {
+        "id": "P2-3",
+        "finding": "First-config-only recording doubles and no discriminating step mutations",
+        "main": "Mostly fixed by #622",
+        "action": "Extend existing SyntheticWorkflowInvocationTests: exactly one config in either documented spelling, eleven contract mutations and one inline duplicate-config variant"
+      },
+      {
+        "id": "nit-6",
+        "finding": "Archive-removal procedure leaves empty required groups",
+        "main": "Open",
+        "action": "Document scan, SARIF, upload, exact jq assignment and both non-empty guards alongside config/inventory/policy-row removal"
+      },
+      {
+        "id": "nit-7",
+        "finding": "Review-history provenance was not retained",
+        "main": "Open",
+        "action": "Five pinned excerpts retained byte-identically; historical reported exchanges stay distinct from native execution"
+      },
+      {
+        "id": "nit-8",
+        "finding": "09-30 helper incorrectly claimed no network traffic",
+        "main": "Open in historical bytes",
+        "action": "New receipt erratum; historical helper unchanged"
+      }
+    ],
+    "excluded_ports": [
+      "SCANNER_STUB",
+      "run_scan_step",
+      "scan_step_problems",
+      "workflow_scan_script",
+      "#555 workflow hunk",
+      "historical measured fields",
+      "relock txt/err reruns"
+    ]
+  },
+  "osv_scanner": {
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "native_runs": [
+      {
+        "id": "native-four-controls",
+        "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-osv-split-hardening.osv-split-controls.py.txt $NATIVE_TOOLS/osv-scanner $PROJECT_ROOT/evidence/artifacts/osv-split-hardening-port-20261003/native-controls",
+        "started_utc": "2026-10-03T19:21:29Z",
+        "finished_utc": "2026-10-03T19:21:43Z",
+        "exit_code": 0,
+        "wall_seconds": 13.217,
+        "evidence_class": "native_proven",
+        "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/native-four-controls.stdout.txt",
+        "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/native-four-controls.stderr.txt"
+      },
+      {
+        "id": "p2-2-baseline",
+        "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 $NATIVE_TOOLS/osv-scanner scan source --config <case-alias-root>/baseline.toml --no-resolve --lockfile=pnpm-lock.yaml:<case-alias-root>/pnpm-lock.yaml --format json",
+        "started_utc": "2026-10-03T19:22:00Z",
+        "finished_utc": "2026-10-03T19:22:00Z",
+        "exit_code": 1,
+        "wall_seconds": 0.358,
+        "evidence_class": "native_proven",
+        "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.stdout.txt",
+        "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.stderr.txt"
+      },
+      {
+        "id": "p2-2-case-alias",
+        "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 $NATIVE_TOOLS/osv-scanner scan source --config <case-alias-root>/case-alias.toml --no-resolve --lockfile=pnpm-lock.yaml:<case-alias-root>/pnpm-lock.yaml --format json",
+        "started_utc": "2026-10-03T19:22:00Z",
+        "finished_utc": "2026-10-03T19:22:01Z",
+        "exit_code": 0,
+        "wall_seconds": 0.385,
+        "evidence_class": "native_proven",
+        "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.stdout.txt",
+        "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.stderr.txt"
+      },
+      {
+        "id": "native-step",
+        "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 bash --noprofile --norc -e -o pipefail $PROJECT_ROOT/evidence/artifacts/osv-split-hardening-port-20261003/native-step.sh.txt",
+        "started_utc": "2026-10-03T19:22:00Z",
+        "finished_utc": "2026-10-03T19:22:05Z",
+        "exit_code": 0,
+        "wall_seconds": 5.385,
+        "evidence_class": "native_proven",
+        "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/native-step.stdout.txt",
+        "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/native-step.stderr.txt"
+      }
+    ],
+    "exact_three_scan_step": {
+      "observed_utc": "2026-10-03T19:22:05Z",
+      "exit_code": 0,
+      "six_statuses": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "script_sha256": "4863ee1116f0fe26c1a15aea284121e063ae7704b6f7b0be97fb5db5ddc4eace",
+      "preflight": "real repository unittest classes",
+      "command_environment": {
+        "TMPDIR": "/var/tmp",
+        "WRITE_SARIF": "true",
+        "RUNNER_TEMP": "<runner-temp>"
+      },
+      "reports": [
+        {
+          "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-macos.sarif",
+          "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+          "bytes": 1168,
+          "runs": 1,
+          "results": 0
+        },
+        {
+          "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-wsl-retrieval.sarif",
+          "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+          "bytes": 1168,
+          "runs": 1,
+          "results": 0
+        },
+        {
+          "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner.sarif",
+          "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+          "bytes": 1168,
+          "runs": 1,
+          "results": 0
+        }
+      ]
+    },
+    "preserved_helper": {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-osv-split-hardening.osv-split-controls.py.txt",
+      "sha256": "3933fa846e89e755a2ccbc6722654cdcd2d64f58cf4ab702c6ac69e2ca8e0f18",
+      "byte_identical_source": "8c263acebe7396c09d66d9d4f70bf144e1c4cdd3",
+      "four_controls": "Each ordinary fixture exits 1 with the next advisory; each frozen-config fixture exits 0 with no findings"
+    }
+  },
+  "carried_forward_review": {
+    "source_head": "8c263acebe7396c09d66d9d4f70bf144e1c4cdd3",
+    "review_excerpts": [
+      {
+        "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-7.md",
+        "sha256": "327c0de8c449151d630b4aa696637efc3c03977bae22dbca28bbd17a2317fef4",
+        "bytes": 4851,
+        "byte_identical": true
+      },
+      {
+        "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-7.txt",
+        "sha256": "ed5c4eb4747c12447951fe1d6673bf52613c179daf1f40c93db75ecb148702ac",
+        "bytes": 4515,
+        "byte_identical": true
+      },
+      {
+        "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-1.events.txt",
+        "sha256": "ed2a572adacb52eab031348e11a147f93b492a277c224a68202dcaf2738c2ede",
+        "bytes": 1539,
+        "byte_identical": true
+      },
+      {
+        "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-2.events.txt",
+        "sha256": "d0355e50e9e96baa2bbada4f23a5805dc29b5bb17b0f9601f4f4d5bbb9e3db24",
+        "bytes": 1788,
+        "byte_identical": true
+      },
+      {
+        "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.event-excerpt.py.txt",
+        "sha256": "6a387138ee642e256e9914ee5b2d0bcc08bef35a6f8211e41d5f8db66fed3784",
+        "bytes": 1319,
+        "byte_identical": true
+      }
+    ],
+    "historical_receipts_unchanged": true,
+    "errata": [
+      {
+        "id": "review-6-attempt-2",
+        "correction": "The retained excerpt contains 51 events and no turn.completed or turn.failed. The old receipt's cancellation reason is a historical coordinator report, not proved by these events.",
+        "verification_path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-2.events.txt"
+      },
+      {
+        "id": "nit-8",
+        "correction": "The 09-30 helper invokes native OSV without --offline and can query OSV over the network. Its no-network docstring is inaccurate; its bytes and historical outputs remain unchanged.",
+        "verification_path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-split-controls.py.txt; native OSV scan source --help"
+      }
+    ]
+  },
+  "release_choice": {
+    "decision": "Extend main's maintained three-scan harness and port only the selected policy checks",
+    "decision_record": "docs/decisions/2026-10-03-osv-split-hardening-port.md",
+    "alternatives": [
+      "Keep name-only policy checks",
+      "Replace the current harness with #555's two-scan runner",
+      "Trust native undecoded-key validation alone"
+    ],
+    "overturn": "A maintained native scanner and smaller harness demonstrate the same path/key/override boundaries and reject all eleven mutations without preflight re-entry"
+  },
+  "independent_review": {
+    "status": "run on 48bbe5c5f, verdict repair; repair re-check at 4d7f4dd0e, verdict clear (recorded on PR #673)",
+    "reason": "Exact-head independent review and one repair round are coordinator-owned steps, recorded on PR #673; see repair_round and recheck_round"
+  },
+  "follow_up": "Coordinator commits content first and registry last, rebases for #626/current main, coordinates with #615 (#628 already merged), creates port PR, completes eight exact-head contexts and independent Opus review, posts #555 custody notice, waits two hours without objection, and only then closes #555 citing port URL/head/findings.",
+  "registrations": [
+    ".github/workflows/security-scan.yml",
+    "tests/test_osv_lockfile_coverage.py",
+    "tests/test_workflow_hardening.py",
+    "docs/decisions/2026-09-22-github-automation-closure.md",
+    "docs/decisions/2026-10-03-osv-split-hardening-port.md",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-7.md",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-7.txt",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-1.events.txt",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-2.events.txt",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.event-excerpt.py.txt",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-osv-split-hardening.osv-split-controls.py.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/acceptance-runs.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/actionlint.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/actionlint.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/builder-attempts.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/convergence-repair-1.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/convergence-repair-1.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/eleven-mutants.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/eleven-mutants.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/mutants-final.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/mutants-final.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-controls/relock-2026-09-30-urllib3.split-osv-scanner-frozen-macos.sarif",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-controls/relock-2026-09-30-urllib3.split-osv-scanner.sarif",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-four-controls.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-four-controls.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-step-summary.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-step.sh.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-step.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-step.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-macos.sarif",
+    "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-wsl-retrieval.sarif",
+    "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner.sarif",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.toml",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.toml",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-pnpm-input.yaml.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-summary.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/primary-sources.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-R1.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-R2.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-R3.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-key.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-override.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-controls.py.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-runs.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/registry-base-reconciliation.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/unittest.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/unittest.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate-convergence.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate-convergence.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate-repair-1.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate-repair-1.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline-repository.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline-repository.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stdout.txt",
+    "evidence/receipts/osv-split-hardening-port-20261003.json",
+    "manifests/evidence.json"
+  ],
+  "source": {
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "pr": 555,
+    "head": "8c263acebe7396c09d66d9d4f70bf144e1c4cdd3",
+    "base": "cac8700ba914950266272347468bff7ad630a4bf"
+  },
+  "red_runs": [
+    {
+      "id": "R1",
+      "expectation": "survives",
+      "started_utc": "2026-10-03T19:11:41Z",
+      "finished_utc": "2026-10-03T19:11:44Z",
+      "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+      "exit_code": 0,
+      "tests_run": 54,
+      "skipped": [],
+      "failing_tests": [],
+      "wall_seconds": 2.413,
+      "evidence_class": "synthetic",
+      "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R1.txt",
+      "selection": "R1 within the single red-controls invocation",
+      "output_sanitization": "Project-root paths in public failing-test tracebacks replaced with <scan-root>; original outputs retained privately."
+    },
+    {
+      "id": "R2",
+      "expectation": "caught",
+      "started_utc": "2026-10-03T19:11:44Z",
+      "finished_utc": "2026-10-03T19:11:46Z",
+      "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+      "exit_code": 1,
+      "tests_run": 5,
+      "skipped": [],
+      "failing_tests": [
+        "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate",
+        "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan (mutation='unknown-config')"
+      ],
+      "wall_seconds": 2.303,
+      "evidence_class": "synthetic",
+      "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R2.txt",
+      "selection": "R2 within the single red-controls invocation",
+      "output_sanitization": "Project-root paths in public failing-test tracebacks replaced with <scan-root>; original outputs retained privately."
+    },
+    {
+      "id": "R3",
+      "expectation": "caught",
+      "started_utc": "2026-10-03T19:11:46Z",
+      "finished_utc": "2026-10-03T19:11:48Z",
+      "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+      "exit_code": 1,
+      "tests_run": 5,
+      "skipped": [],
+      "failing_tests": [
+        "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained (primary=(0, 0, 0), sarif=(0, 0, 1))",
+        "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained (primary=(0, 0, 0), sarif=(0, 0, 7))"
+      ],
+      "wall_seconds": 2.048,
+      "evidence_class": "synthetic",
+      "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R3.txt",
+      "selection": "R3 within the single red-controls invocation",
+      "output_sanitization": "Project-root paths in public failing-test tracebacks replaced with <scan-root>; original outputs retained privately."
+    },
+    {
+      "id": "R4-override",
+      "expectation": "survives",
+      "started_utc": "2026-10-03T19:11:48Z",
+      "finished_utc": "2026-10-03T19:11:48Z",
+      "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+      "exit_code": 0,
+      "tests_run": 2,
+      "skipped": [],
+      "failing_tests": [],
+      "wall_seconds": 0.003,
+      "evidence_class": "synthetic",
+      "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-override.txt",
+      "selection": "R4-override within the single red-controls invocation",
+      "output_sanitization": "Project-root paths in public failing-test tracebacks replaced with <scan-root>; original outputs retained privately."
+    },
+    {
+      "id": "R4-key",
+      "expectation": "survives",
+      "started_utc": "2026-10-03T19:11:48Z",
+      "finished_utc": "2026-10-03T19:11:48Z",
+      "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+      "exit_code": 0,
+      "tests_run": 2,
+      "skipped": [],
+      "failing_tests": [],
+      "wall_seconds": 0.004,
+      "evidence_class": "synthetic",
+      "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-key.txt",
+      "selection": "R4-key within the single red-controls invocation",
+      "output_sanitization": "Project-root paths in public failing-test tracebacks replaced with <scan-root>; original outputs retained privately."
+    }
+  ],
+  "green_runs": [
+    {
+      "id": "actionlint",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 $NATIVE_TOOLS/actionlint .github/workflows/security-scan.yml",
+      "started_utc": "2026-10-03T19:21:29Z",
+      "finished_utc": "2026-10-03T19:21:30Z",
+      "exit_code": 0,
+      "wall_seconds": 0.016,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/actionlint.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/actionlint.stderr.txt"
+    },
+    {
+      "id": "zizmor-offline",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir $NATIVE_TOOLS/zizmor-cache .github/workflows/security-scan.yml",
+      "started_utc": "2026-10-03T19:21:30Z",
+      "finished_utc": "2026-10-03T19:21:30Z",
+      "exit_code": 0,
+      "wall_seconds": 0.085,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stderr.txt"
+    },
+    {
+      "id": "unittest",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_wsl_retrieval -v",
+      "started_utc": "2026-10-03T19:21:29Z",
+      "finished_utc": "2026-10-03T19:21:43Z",
+      "exit_code": 0,
+      "wall_seconds": 13.807,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/unittest.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/unittest.stderr.txt",
+      "tests_run": 164,
+      "unittest_reported_seconds": 13.676,
+      "skipped_tests": [
+        "test_hash_frozen_exemptions_are_still_pinned (tests.test_workflow_hardening.HardenRunnerTests.test_hash_frozen_exemptions_are_still_pinned) ... skipped 'no workflow is hash-frozen (empty since 2026-09-26)'",
+        "test_job_parser_matches_yaml_when_available (tests.test_workflow_hardening.HardenRunnerTests.test_job_parser_matches_yaml_when_available) ... skipped 'PyYAML not installed; the text parser is the only job source'"
+      ]
+    },
+    {
+      "id": "eleven-mutants",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 -m unittest tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_the_step_catches_a_mutant_of_itself -v",
+      "started_utc": "2026-10-03T19:24:09Z",
+      "finished_utc": "2026-10-03T19:24:15Z",
+      "exit_code": 0,
+      "wall_seconds": 6.702,
+      "evidence_class": "synthetic",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/eleven-mutants.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/eleven-mutants.stderr.txt",
+      "tests_run": 1,
+      "unittest_reported_seconds": 6.607,
+      "skipped_tests": []
+    },
+    {
+      "id": "component-matrix",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/component_matrix.py --write",
+      "started_utc": "2026-10-03T19:31:09Z",
+      "finished_utc": "2026-10-03T19:31:10Z",
+      "exit_code": 0,
+      "wall_seconds": 0.373,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stderr.txt"
+    },
+    {
+      "id": "component-matrix",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/component_matrix.py --write",
+      "started_utc": "2026-10-03T19:31:42Z",
+      "finished_utc": "2026-10-03T19:31:43Z",
+      "exit_code": 0,
+      "wall_seconds": 0.307,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stderr.txt"
+    },
+    {
+      "id": "new-host-grand-list",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/new_host_grand_list.py --write",
+      "started_utc": "2026-10-03T19:31:43Z",
+      "finished_utc": "2026-10-03T19:31:43Z",
+      "exit_code": 0,
+      "wall_seconds": 0.16,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stderr.txt"
+    },
+    {
+      "id": "validate-repair-1",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/validate.py",
+      "started_utc": "2026-10-03T19:38:55Z",
+      "finished_utc": "2026-10-03T19:39:17Z",
+      "exit_code": 0,
+      "wall_seconds": 21.399,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/validate-repair-1.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/validate-repair-1.stderr.txt"
+    },
+    {
+      "id": "convergence-repair-1",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/validate_convergence.py --all-recorded",
+      "started_utc": "2026-10-03T19:41:23Z",
+      "finished_utc": "2026-10-03T19:41:24Z",
+      "exit_code": 0,
+      "wall_seconds": 1.581,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/convergence-repair-1.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/convergence-repair-1.stderr.txt"
+    },
+    {
+      "id": "tests-final",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_wsl_retrieval -v",
+      "started_utc": "2026-10-03T19:48:47Z",
+      "finished_utc": "2026-10-03T19:48:59Z",
+      "exit_code": 0,
+      "wall_seconds": 12.784,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stderr.txt",
+      "tests_run": 164,
+      "unittest_reported_seconds": 12.676,
+      "skipped_tests": [
+        "test_hash_frozen_exemptions_are_still_pinned (tests.test_workflow_hardening.HardenRunnerTests.test_hash_frozen_exemptions_are_still_pinned) ... skipped 'no workflow is hash-frozen (empty since 2026-09-26)'",
+        "test_job_parser_matches_yaml_when_available (tests.test_workflow_hardening.HardenRunnerTests.test_job_parser_matches_yaml_when_available) ... skipped 'PyYAML not installed; the text parser is the only job source'"
+      ]
+    },
+    {
+      "id": "mutants-final",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 -m unittest tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_the_step_catches_a_mutant_of_itself -v",
+      "started_utc": "2026-10-03T19:51:13Z",
+      "finished_utc": "2026-10-03T19:51:20Z",
+      "exit_code": 0,
+      "wall_seconds": 6.814,
+      "evidence_class": "synthetic",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/mutants-final.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/mutants-final.stderr.txt",
+      "tests_run": 1,
+      "unittest_reported_seconds": 6.716,
+      "skipped_tests": [],
+      "contract_mutants": 11,
+      "additional_inline_config_mutant": 1
+    },
+    {
+      "id": "zizmor-offline-repository",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir $NATIVE_TOOLS/zizmor-cache .",
+      "started_utc": "2026-10-03T19:52:25Z",
+      "finished_utc": "2026-10-03T19:52:25Z",
+      "exit_code": 0,
+      "wall_seconds": 0.171,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline-repository.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline-repository.stderr.txt"
+    }
+  ],
+  "failed_integration_runs": [
+    {
+      "id": "validate-convergence",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/validate_convergence.py --all-recorded",
+      "started_utc": "2026-10-03T19:32:51Z",
+      "finished_utc": "2026-10-03T19:32:52Z",
+      "exit_code": 1,
+      "wall_seconds": 1.433,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/validate-convergence.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/validate-convergence.stderr.txt"
+    },
+    {
+      "id": "validate",
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/validate.py",
+      "started_utc": "2026-10-03T19:32:49Z",
+      "finished_utc": "2026-10-03T19:33:11Z",
+      "exit_code": 1,
+      "wall_seconds": 22.046,
+      "evidence_class": "local_integration",
+      "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+      "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/validate.stdout.txt",
+      "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/validate.stderr.txt"
+    }
+  ],
+  "mutant_checks": [
+    {
+      "mutation": "R1 duplicated config",
+      "check": "SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "R1 duplicated inline config",
+      "check": "SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "R2 omitted ordinary input and weakened count",
+      "check": "SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "macOS scan uses ordinary config",
+      "check": "SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "WSL list selected with macOS config",
+      "check": "SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "primary status dropped",
+      "check": "SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "R3 SARIF statuses dropped",
+      "check": "SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "scanner error no longer wins",
+      "check": "SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "preflight failure ignored",
+      "check": "SyntheticWorkflowInvocationTests.test_preflight_failure_is_returned_before_scan",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "SARIF written on pull_request",
+      "check": "SyntheticWorkflowInvocationTests.test_pr_collects_three_primary_statuses_without_sarif",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "jq assignment and uniqueness guard removed",
+      "check": "SyntheticWorkflowInvocationTests.test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    },
+    {
+      "mutation": "ordinary scan resolves unpinned inputs",
+      "check": "SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate",
+      "result": "Rejected: aggregate test exits 0 only after each mapped check produces failures with no errors"
+    }
+  ],
+  "evidence_classes": [
+    {
+      "claim": "Pinned native scanner controls, ID collision and real three-scan step",
+      "evidence_class": "native_proven"
+    },
+    {
+      "claim": "Recording doubles and injected workflow/policy mutations",
+      "evidence_class": "synthetic"
+    },
+    {
+      "claim": "Repository unittest suite, linters, generators and validators",
+      "evidence_class": "local_integration"
+    },
+    {
+      "claim": "Pinned upstream semantics and historical excerpt byte identity",
+      "evidence_class": "source_review"
+    }
+  ],
+  "artifact_bindings": [
+    {
+      "path": ".github/workflows/security-scan.yml",
+      "sha256": "a71ad8f600b6ceb327ae4245de038ced38c4c1762e92a675e0cd0053df497f35",
+      "bytes": 14773
+    },
+    {
+      "path": "tests/test_osv_lockfile_coverage.py",
+      "sha256": "c8c9b92cc0604fb308e8c5ca9b62fda93cf4f6acde7636ab196f727e70a86a25",
+      "bytes": 73738
+    },
+    {
+      "path": "tests/test_workflow_hardening.py",
+      "sha256": "79051e14665c2b9398f8d61ef8c1c3e04a4b86d747caa035c1860776e9089106",
+      "bytes": 87979
+    },
+    {
+      "path": "docs/decisions/2026-09-22-github-automation-closure.md",
+      "sha256": "e2f1a186cdd2be91138bef340cea766c67c0b040d4ae0595ceec4c8733025e8d",
+      "bytes": 148153
+    },
+    {
+      "path": "docs/decisions/2026-10-03-osv-split-hardening-port.md",
+      "sha256": "32f57955e30f015c550769b57f6d97417bd70e3c5b0e7eba5b57c4ca3774725f",
+      "bytes": 4454
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-7.md",
+      "sha256": "327c0de8c449151d630b4aa696637efc3c03977bae22dbca28bbd17a2317fef4",
+      "bytes": 4851
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-7.txt",
+      "sha256": "ed5c4eb4747c12447951fe1d6673bf52613c179daf1f40c93db75ecb148702ac",
+      "bytes": 4515
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-1.events.txt",
+      "sha256": "ed2a572adacb52eab031348e11a147f93b492a277c224a68202dcaf2738c2ede",
+      "bytes": 1539
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-2.events.txt",
+      "sha256": "d0355e50e9e96baa2bbada4f23a5805dc29b5bb17b0f9601f4f4d5bbb9e3db24",
+      "bytes": 1788
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.event-excerpt.py.txt",
+      "sha256": "6a387138ee642e256e9914ee5b2d0bcc08bef35a6f8211e41d5f8db66fed3784",
+      "bytes": 1319
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-osv-split-hardening.osv-split-controls.py.txt",
+      "sha256": "3933fa846e89e755a2ccbc6722654cdcd2d64f58cf4ab702c6ac69e2ca8e0f18",
+      "bytes": 8296
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/acceptance-runs.json",
+      "sha256": "932b155b20a059f3c5b7d350470e0e09ac97584a5398bb74360c38e27f8fff95",
+      "bytes": 13809
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/actionlint.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/actionlint.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/builder-attempts.json",
+      "sha256": "9cf900f28efd7c1e8185f9e335a62643492fd711f8dcf9debdb941334db5e83e",
+      "bytes": 1940
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stdout.txt",
+      "sha256": "4cd2e50526b588cf998c7136436856094ee43628f56bf7db7f397105a40df225",
+      "bytes": 61
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/convergence-repair-1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/convergence-repair-1.stdout.txt",
+      "sha256": "2e2cb59d7e86bd664480e5a763a93b1b8ec6faa809e75511fff22873cb951b42",
+      "bytes": 512
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/eleven-mutants.stderr.txt",
+      "sha256": "d1eb84fac17926d15eb4a352fa7296a61931e26749909b129050431e79f7ad6f",
+      "bytes": 254
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/eleven-mutants.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/mutants-final.stderr.txt",
+      "sha256": "cb04dc61e25864f517eb5fd97734db638da2e2d3c00c1122e762e56d31fa7311",
+      "bytes": 254
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/mutants-final.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-controls/relock-2026-09-30-urllib3.split-osv-scanner-frozen-macos.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-controls/relock-2026-09-30-urllib3.split-osv-scanner.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-four-controls.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-four-controls.stdout.txt",
+      "sha256": "a80bd4344323e4c43e1be1286f273fea6e55c0aa087864a0aff88da050f98b9d",
+      "bytes": 2745
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-step-summary.json",
+      "sha256": "0800c2c0fc6618f4c362840d8a92d24892ec621503a29430680e2d4fd4444180",
+      "bytes": 1166
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-step.sh.txt",
+      "sha256": "4863ee1116f0fe26c1a15aea284121e063ae7704b6f7b0be97fb5db5ddc4eace",
+      "bytes": 4756
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-step.stderr.txt",
+      "sha256": "2bc0b5232f057e28cde26f0940933ed4c9f7141c37df31f3e84a589f6fbc681b",
+      "bytes": 18392
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-step.stdout.txt",
+      "sha256": "6d1cb39ab08eebfb1ab1d2fade781e499c2e2e02f674a4aed9e120c008c8f335",
+      "bytes": 18444
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stdout.txt",
+      "sha256": "f161f06c41a6dffe6e66c88c61f6e8de9ac981c52fc179231fb0df66ccb30b5a",
+      "bytes": 51
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-macos.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-wsl-retrieval.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.stderr.txt",
+      "sha256": "0bf26b36afe0d989095718667c1043c17d53ac06182ee87baf6588b700aa6ca0",
+      "bytes": 282
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.stdout.txt",
+      "sha256": "854566d9eb4b9bcce521ab2734128971bdcb931bb1cec854725e6ab3b8e7d7c7",
+      "bytes": 4389
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.toml",
+      "sha256": "05f72772704ae8ccecf1088651f819636cb35362d19931019f64d023249a8a65",
+      "bytes": 121
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.stderr.txt",
+      "sha256": "c64e191ca356523553f6e212cb67b3e6250f148ee7c8b94b1f491f8d3f1b0f11",
+      "bytes": 336
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.stdout.txt",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.toml",
+      "sha256": "0f0d9a8150ddf977783f5dd6f2738812fac8271fdbcd6103a777c7455ac7f252",
+      "bytes": 148
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-pnpm-input.yaml.txt",
+      "sha256": "2953a34b57cae2670d4dfca47019df189dd5beec47ed8ba74d9ef4d2ba4025e0",
+      "bytes": 67
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-summary.json",
+      "sha256": "30694bf41f9e73391e39a6cf9cd96e03ec82beec6371f58f729572cf5482d045",
+      "bytes": 471
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/primary-sources.json",
+      "sha256": "8c80ac4c005d5e48a06a0b0a9f54889d8e2e7d2d81bc3ecdff0a3244d6fb139f",
+      "bytes": 11941
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R1.txt",
+      "sha256": "f7ec26a21667f324a924557e8060a61e3ed0f566c40a2aa6d6a6e73c3bc46f53",
+      "bytes": 9327
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R2.txt",
+      "sha256": "b48e506ef200045fecbb9c8c9e6976b936fa9aba9eb0c8592b7b3d53a725b211",
+      "bytes": 3355
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R3.txt",
+      "sha256": "df553c63c13c39e037d17acaca41c10fb7aac24c931c2085dd04b6fb30dbff0d",
+      "bytes": 2807
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-key.txt",
+      "sha256": "df335c5f75ca13b5530ff03cf53f8ab869ef9d309244e99c88dc03b9a88df4ae",
+      "bytes": 457
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-override.txt",
+      "sha256": "081521e8e93134af19effbb2a3151978cd152d7235edf845f5188bb7dd8f8c1e",
+      "bytes": 469
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-controls.py.txt",
+      "sha256": "6a240fe60d67040037d0178098ea9b3a2b17c78200b0ec9190a9066e3e83fd09",
+      "bytes": 4955
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-runs.json",
+      "sha256": "722afe4026b7b576ddf28bf2b3430a6edce251aeff1ca4e56ee64e5862699b86",
+      "bytes": 3386
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/registry-base-reconciliation.json",
+      "sha256": "4b95da057479835e433da0ccefae0cb6a85d5709eb849259a0cd7732df7fc32c",
+      "bytes": 611
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stderr.txt",
+      "sha256": "0b782c5d0b46f72714633a087253c1d5d997982751e08246e5797901fafdc34c",
+      "bytes": 28944
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/unittest.stderr.txt",
+      "sha256": "cffc00eb7ff370c8c0663d873d2b13543dbda6b9b02903836d6323a948026550",
+      "bytes": 28944
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/unittest.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate-convergence.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate-convergence.stdout.txt",
+      "sha256": "fe82d4684fbf64b6b9f3871505f3ca5fc7f9128d5fe6e8bec80c78aa4d37ed44",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate-repair-1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate-repair-1.stdout.txt",
+      "sha256": "52eb04115e661d26eb766811d400c4a17f1cd4ec8d3a2c161fdabc43a090b9cc",
+      "bytes": 161
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate.stdout.txt",
+      "sha256": "9e5a654f1e9184a0fd9d60809e1cd8999dcccb22771e50a7dd92a4c7b35586f4",
+      "bytes": 356
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline-repository.stderr.txt",
+      "sha256": "cfe14c3e69b41f395c8fba4c5ccdc8ceb717637612d1a72b718d46d3104db154",
+      "bytes": 1756
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline-repository.stdout.txt",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stderr.txt",
+      "sha256": "a8d483dad2ee7a40cbe333bc3c62eb7a02f0b9fec7debbee5062891a5273012a",
+      "bytes": 106
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stdout.txt",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    }
+  ],
+  "evidence_paths": [
+    ".github/workflows/security-scan.yml",
+    "tests/test_osv_lockfile_coverage.py",
+    "tests/test_workflow_hardening.py",
+    "docs/decisions/2026-09-22-github-automation-closure.md",
+    "docs/decisions/2026-10-03-osv-split-hardening-port.md",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-7.md",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-7.txt",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-1.events.txt",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-2.events.txt",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.event-excerpt.py.txt",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-osv-split-hardening.osv-split-controls.py.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/acceptance-runs.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/actionlint.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/actionlint.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/builder-attempts.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/convergence-repair-1.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/convergence-repair-1.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/eleven-mutants.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/eleven-mutants.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/mutants-final.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/mutants-final.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-controls/relock-2026-09-30-urllib3.split-osv-scanner-frozen-macos.sarif",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-controls/relock-2026-09-30-urllib3.split-osv-scanner.sarif",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-four-controls.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-four-controls.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-step-summary.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-step.sh.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-step.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/native-step.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-macos.sarif",
+    "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-wsl-retrieval.sarif",
+    "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner.sarif",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.toml",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.toml",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-pnpm-input.yaml.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-summary.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/primary-sources.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-R1.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-R2.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-R3.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-key.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-override.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-controls.py.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/red-runs.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/registry-base-reconciliation.json",
+    "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/unittest.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/unittest.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate-convergence.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate-convergence.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate-repair-1.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate-repair-1.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/validate.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline-repository.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline-repository.stdout.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stderr.txt",
+    "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stdout.txt"
+  ],
+  "builder_attempts": [
+    {
+      "command": "rtk python3 - (copy selected pinned evidence through git show, then assert helper SHA256 equals historical verifier SHA256)",
+      "exit_code": 1,
+      "outcome": "Five excerpt copies succeeded. The helper hash assertion failed before writing the new helper; source bytes had not changed.",
+      "observed_utc": null,
+      "usage": null,
+      "timing": "Original command had no date stamp; unknown remains unknown.",
+      "correction": "The cited verifier file SHA256 is distinct from the split-controls helper. Native git show and rtk proxy git show independently return 8296 bytes and SHA256 3933fa846e89e755a2ccbc6722654cdcd2d64f58cf4ab702c6ac69e2ca8e0f18."
+    },
+    {
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 /tmp/pr555-acceptance.py case-alias",
+      "exit_code": 1,
+      "outcome": "ModuleNotFoundError: No module named 'tests'; OSV not invoked.",
+      "observed_utc": null,
+      "usage": null,
+      "timing": "Original command had no date stamp; unknown remains unknown.",
+      "correction": "Add the repository root to the observation wrapper import path; the subsequent native baseline/alias outputs are retained separately."
+    },
+    {
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 - (importlib.util.spec_from_file_location of scripts/host_receipts.py, then register_file)",
+      "exit_code": 1,
+      "outcome": "Relative import had no package context, then ModuleNotFoundError: No module named 'validate'; register_file was not invoked.",
+      "observed_utc": null,
+      "usage": null,
+      "timing": "Original command had no date stamp; unknown remains unknown.",
+      "correction": "Use the supported package import from scripts.host_receipts import register_file; 51 changed/new paths were then registered successfully before rerunning the required generators."
+    },
+    {
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/component_matrix.py --write (first of two runs; registry_and_generators.generators[0])",
+      "exit_code": 0,
+      "outcome": "The first run wrote its stdout and stderr to the same two artifact paths as the second run at 2026-10-03T19:31:42Z, which overwrote them. The first run's returned output is not retained; its exit code and timing are the builder's record only.",
+      "observed_utc": "2026-10-03T19:31:09Z",
+      "usage": null,
+      "timing": "Started 2026-10-03T19:31:09Z, finished 2026-10-03T19:31:10Z, wall 0.373 s, as recorded under registry_and_generators.",
+      "correction": "Recorded in the review repair round: component-matrix.stdout.txt and component-matrix.stderr.txt hold only the second run's output."
+    }
+  ],
+  "preserved": {
+    "scan_step_sha256": "4863ee1116f0fe26c1a15aea284121e063ae7704b6f7b0be97fb5db5ddc4eace",
+    "matches_unmodified_base": true,
+    "protected_paths_byte_identical": [
+      "evidence/receipts/osv-urllib3-next-20260930.json",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-split-controls.py.txt",
+      ".github/osv-scanner.toml",
+      ".github/osv-scanner-frozen-macos.toml",
+      ".github/osv-scanner-frozen-wsl-retrieval.toml",
+      ".github/osv-scanner-lockfiles.json",
+      "evidence/receipts/wsl-retrieval-retirement-20261003.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix-ignore.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/integrated-osv-tests.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix-ignore.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-registry-validation.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-active-control.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix-ignore.native-command.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-integration.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install.native-command.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-convergence-corrected.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/prospective-archive.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-osv-scanner.sarif",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-audit-corrected.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-expiry-control.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/candidate-archive-expired.toml",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/controls.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-ignore.native-command.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/macos-portability-correction.md",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-final-expired.stdout.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/candidate-archive.toml",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/candidate-archive-expired-invalid-attempt1.toml",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-scan.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-validate-before-scan.exit.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-osv-scanner-frozen-wsl-retrieval.sarif",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/ordinary-active.stdout.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-ignore.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-integration.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-runner-controls.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-active-control.stdout.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-workflow-scan.sh",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-validate-before-scan.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/prospective-archive.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/macos-portability-integration.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-scan.exit.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-expired-final-config.toml",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/receipt-binding-correction.md",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/prospective-archive-attempt2.stdout.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix-ignore.native-command.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/prospective-archive-attempt2.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-native-record.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix-ignore.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-ignore.native-command.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/candidate-archive-invalid-attempt1.toml",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-ignore.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix.native-command.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-workflow-scan.sh",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-tests-corrected.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-expiry-control.exit.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-osv-scanner-frozen-macos.sarif",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/osv-scanner-frozen-macos.sarif",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-validate-before-scan.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-integration.exit.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/osv-scanner.sarif",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-ignore.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive-attempt2.stdout.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-final-convergence.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-expiry-control.stdout.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-scan.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci.native-command.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-prefix.native-command.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/ordinary-active.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/final-native-scan-record.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/independent-source-review.md",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-ignore.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/integrated-osv-tests.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install.stdout.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-final-config-expired.toml",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-scan.time.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-controls-red.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/completion-active-control.exit.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/final-scan-final-expired.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/expired-archive-attempt2.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-install-prefix-ignore.stderr.txt",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/osv-scanner-frozen-wsl-retrieval.sarif",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/ci-correction.md",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/frozen-retrieval-source-controls-red-2.json",
+      "evidence/artifacts/wsl-retrieval-retirement-20261003/publication-correction.md",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-scan.sh.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-advisories.py.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-6-attempt-2.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-6-attempt-1.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-2.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-main.err",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.install-check.sh.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-after-noconfig.err",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-4.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-1.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.relock.sh.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.pyjwt-surface.sh.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review.sh.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-summary.py.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-5.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-3.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.txt",
+      "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-split-controls.py.txt"
+    ]
+  },
+  "completeness_critic": "Policy input keys/tables, regex and absent ecosystems, all three input groups, parser preservation, duplicate config, counts, assignments, native preflight, primary/SARIF status aggregation, pull-request behavior, no-resolve and upload failure guards covered. Current native acceptance corrects the historical verifier's obsolete list subsection. Hosted upload/CI/review and the reported historical verifier file remain expressly outside this builder evidence.",
+  "registry_and_generators": {
+    "registry_source_command": "rtk proxy git show origin/main:manifests/evidence.json > manifests/evidence.json",
+    "registry_source_exit_code": 0,
+    "base_reconciliation": "evidence/artifacts/osv-split-hardening-port-20261003/registry-base-reconciliation.json",
+    "register_api": "scripts.host_receipts.register_file(Path.cwd(), path)",
+    "generators": [
+      {
+        "id": "component-matrix",
+        "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/component_matrix.py --write",
+        "started_utc": "2026-10-03T19:31:09Z",
+        "finished_utc": "2026-10-03T19:31:10Z",
+        "exit_code": 0,
+        "wall_seconds": 0.373,
+        "evidence_class": "local_integration",
+        "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stdout.txt",
+        "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stderr.txt"
+      },
+      {
+        "id": "component-matrix",
+        "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/component_matrix.py --write",
+        "started_utc": "2026-10-03T19:31:42Z",
+        "finished_utc": "2026-10-03T19:31:43Z",
+        "exit_code": 0,
+        "wall_seconds": 0.307,
+        "evidence_class": "local_integration",
+        "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stdout.txt",
+        "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stderr.txt"
+      },
+      {
+        "id": "new-host-grand-list",
+        "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/new_host_grand_list.py --write",
+        "started_utc": "2026-10-03T19:31:43Z",
+        "finished_utc": "2026-10-03T19:31:43Z",
+        "exit_code": 0,
+        "wall_seconds": 0.16,
+        "evidence_class": "local_integration",
+        "output_sanitization": "Project root, private native-tools and scratch paths replaced with declared placeholders.",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stdout.txt",
+        "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stderr.txt"
+      }
+    ],
+    "generated_reports_changed": false,
+    "rebase_required": true,
+    "final_registration_utc": "2026-10-03T19:55:27Z"
+  },
+  "repair_round": {
+    "observed_utc": "2026-10-03T20:55:57Z",
+    "observed_until_utc": "2026-10-03T20:58:32Z",
+    "reviewed_head": "48bbe5c5f8090c52eab4b99fb1514fa8b20c3238",
+    "review": "Independent read-only Claude Opus 5.5 review at max effort, run as a separate headless session on the reviewed head: verdict repair, 0 blocking, 2 should-fix, 5 minor. Each finding's disposition is recorded on PR #673.",
+    "source": {
+      "repository": "https://github.com/google/osv-scanner",
+      "pin": "v2.6.0",
+      "file": "internal/config/config.go",
+      "lines": "38-49 (PackageOverrideEntry toml tags) and 83-89 (Vulnerability and License toml tags)",
+      "original_file_sha256": "a49970f7f8fb7383b6ce2255f024698a90331404b917a65fdde3151642efdcd4",
+      "check": "Re-fetched at 2026-10-03T20:52:17Z from raw.githubusercontent.com at the tag; its sha256 equals primary-sources.json sources[3]."
+    },
+    "changes": [
+      "tests/test_osv_lockfile_coverage.py: override_problems rejects [[PackageOverrides]] keys outside the pinned toml tags (PACKAGE_OVERRIDE_KEYS) and nested vulnerability/license keys outside theirs; main's next/braces name assertion is restored beside override_problems(self.ordinary_config); FrozenPolicyMutationTests gains case-aliased-ecosystem and case-aliased-name-and-ecosystem; the override unit test gains three aliased cases.",
+      "docs/decisions/2026-09-22-github-automation-closure.md: the first overturn trigger again ends with '; or OSV lists an advisory for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes.', and the removal procedure follows it before **Not covered:**.",
+      "docs/decisions/2026-10-03-osv-split-hardening-port.md and this receipt: coordinator-owned steps are worded neutrally; limitations quote the recorded line 'sum check: 0 == 53'; builder_attempts records the overwritten first component-matrix output."
+    ],
+    "controls": [
+      {
+        "id": "override-key-function",
+        "evidence_class": "synthetic",
+        "input": "{'name': 'lib', 'Name': 'next', 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True} and {'name': 'nex[t]', 'nameIsRegex': True, 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True}",
+        "before_utc": "2026-10-03T20:55:57Z",
+        "before": [
+          "head 48bbe5c5f double-alias override_problems: [] ignore_entry_problems: []",
+          "head 48bbe5c5f regex+Ecosystem override_problems: [] ignore_entry_problems: []"
+        ],
+        "after_utc": "2026-10-03T20:56:20Z",
+        "after": [
+          "repair double-alias override_problems: [\"'lib': unknown key 'Ecosystem'\", \"'lib': unknown key 'Name'\"]",
+          "repair regex+Ecosystem override_problems: [\"'nex[t]': unknown key 'Ecosystem'\"]"
+        ],
+        "exit_codes": [0, 0],
+        "retained_rerun": {
+          "evidence_class": "synthetic",
+          "observed_utc": "2026-10-04T00:47:27Z",
+          "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 <scratch>/override-key-function.py",
+          "script": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.py.txt",
+          "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.stdout.txt",
+          "stderr": "empty",
+          "exit_code": 0,
+          "result": "The original probe kept no command or script. This re-run loads both functions from the committed blobs at 48bbe5c5f and 4d7f4dd0e, feeds the same two inputs and prints four lines equal to before and after above; its own comparison with this record as committed at 4d7f4dd0e prints True."
+        }
+      },
+      {
+        "id": "repair-round-controls",
+        "evidence_class": "synthetic",
+        "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. nice -n 19 python3 <scratch>/repair-controls.py",
+        "script": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.py.txt",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.stdout.txt",
+        "observed_utc": "2026-10-03T20:58:15Z",
+        "exit_code": 0,
+        "result": "The base 463a57b98 workflow fails test_failure_path_semantics_keep_findings_uploadable and the head workflow passes it; R4-key is caught on this head by IgnorePolicyTests and FrozenScanTests; both case-aliased overrides are caught by FrozenScanTests and IgnorePolicyTests."
+      },
+      {
+        "id": "three-module-unittest",
+        "evidence_class": "local_integration",
+        "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_wsl_retrieval -v",
+        "started_utc": "2026-10-03T20:58:21Z",
+        "finished_utc": "2026-10-03T20:58:32Z",
+        "exit_code": 0,
+        "result": "Ran 164 tests in 11.339s; OK (skipped=2)",
+        "retained_rerun": {
+          "evidence_class": "local_integration",
+          "checked_commit": "4d7f4dd0e41aafb2e0f9ce1dabda93e3c1b2ea36",
+          "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_wsl_retrieval -v",
+          "started_utc": "2026-10-04T00:46:56Z",
+          "finished_utc": "2026-10-04T00:47:08Z",
+          "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stdout.txt",
+          "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stderr.txt",
+          "exit_code": 0,
+          "result": "Ran 164 tests in 11.475s; OK (skipped=2)",
+          "note": "The same command on the committed repair head with a clean worktree. The 20:58:21Z run's own output was not retained."
+        }
+      }
+    ],
+    "bindings_after_repair": [
+      {
+        "path": "tests/test_osv_lockfile_coverage.py",
+        "sha256": "33fcb5e4580443d97e3dd0ac282651d10eec26d9b8e72cf10651c4426eb8f2d3",
+        "bytes": 75469
+      },
+      {
+        "path": "docs/decisions/2026-09-22-github-automation-closure.md",
+        "sha256": "0267c93b58e204089a3db684c552fcfb62c21020d152d32525742439eec080e2",
+        "bytes": 148156
+      },
+      {
+        "path": "docs/decisions/2026-10-03-osv-split-hardening-port.md",
+        "sha256": "3a5a7491e8a1034b3fb6ecbe6d482d03eb261920c957a99992751604246a8e0f",
+        "bytes": 4475
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.py.txt",
+        "sha256": "06eab390d148c50eb7a8833474d5ef1e9da0da89477b7823fbdcbd16c3547f4f",
+        "bytes": 4087
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.stdout.txt",
+        "sha256": "7e42d7dd71f3a3351a3b56db793aa7696cadae9c6d8a8b9b57c6772dfc630055",
+        "bytes": 4226
+      }
+    ],
+    "artifact_bindings_note": "artifact_bindings above remain the build-time bytes; bindings_after_repair holds the bytes this round changed or added. This receipt cannot bind its own bytes; manifests/evidence.json does.",
+    "residuals": [
+      "Main moved to 6112d14d40f7, one commit past the reviewed base 463a57b98, touching manifests/evidence.json and tests/test_landscape_sweep_harness.py. Rebase right before merge and rebuild manifests/evidence.json from the new main, as contract step 7 requires.",
+      "The build-time PR body's exact-head re-run lines have no retained output; the PR body labels them as unretained confirmations.",
+      "Final acceptance exit codes on the repaired head are recorded on PR #673."
+    ]
+  },
+  "recheck_round": {
+    "observed_utc": "2026-10-04T00:46:56Z",
+    "observed_until_utc": "2026-10-04T00:49:49Z",
+    "rechecked_head": "4d7f4dd0e41aafb2e0f9ce1dabda93e3c1b2ea36",
+    "recheck": "Bounded read-only re-check of the repair round by a separate Claude Opus 5.5 session (2026-10-04T00:21:29Z to 00:36:39Z): verdict clear, with three new minor findings. Its result is recorded on PR #673.",
+    "per_finding": [
+      "should-fix 1, case-aliased override keys: resolved",
+      "should-fix 2, lost overturn trigger: resolved",
+      "minor 1, unretained exact-head output: partly; receipt half resolved, PR-body half not read by the re-check",
+      "minor 2, missing discriminating controls: resolved",
+      "minor 3, paraphrased helper line: partly; receipt half resolved, PR-body half not read by the re-check",
+      "minor 4, unpublished authority reference: resolved",
+      "minor 5, main moved: not resolved; the pre-merge rebase of contract step 7"
+    ],
+    "pr_body_halves": "Read at 2026-10-04T00:49:41Z from the PR body at head 4d7f4dd0e: line 33 heads the build-time exact-head block '(unretained confirmations)', and line 94 quotes 'sum check: 0 == 53'; no line says '0 + 0 == 53'. Both PR-body halves are resolved.",
+    "new_minors": [
+      {
+        "id": "weak-advisory-mutation",
+        "where": "tests/test_osv_lockfile_coverage.py:1014, with :609 and :612",
+        "problem": "Pre-existing since 476f60099. The 'advisory' mutation had no reason and no ignoreUntil, so ignore_entry_problems (:609) rejected it before the frozen-id check (:612) could; deleting :612 left every test green.",
+        "disposition": "fixed; see changes and controls"
+      },
+      {
+        "id": "stale-review-status",
+        "where": "independent_review.status",
+        "problem": "The status still said 'not run' after the review and its repair round.",
+        "disposition": "fixed; the status states both verdicts"
+      },
+      {
+        "id": "unretained-repair-controls",
+        "where": "repair_round.controls override-key-function and three-module-unittest",
+        "problem": "Neither control retained its inputs or outputs.",
+        "disposition": "fixed; both were re-run and their script or command and output retained, see each entry's retained_rerun"
+      }
+    ],
+    "changes": [
+      "tests/test_osv_lockfile_coverage.py: the 'advisory' mutation in FrozenPolicyMutationTests.test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs adds a well-formed exception (reason 'synthetic leaked exception', ignoreUntil 30 days out) and asserts that ignore_entry_problems accepts the mutated config, so the frozen-id check at :612 is the only check that can reject it.",
+      "This receipt: independent_review.status states the review and re-check verdicts; the override-key-function and three-module-unittest entries in repair_round.controls gain retained re-runs; this section."
+    ],
+    "controls": [
+      {
+        "id": "advisory-mutation-control",
+        "evidence_class": "synthetic",
+        "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 <scratch>/advisory-mutation-control.py",
+        "script": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.py.txt",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.stdout.txt",
+        "stderr": "empty",
+        "observed_utc": "2026-10-04T00:48:40Z",
+        "exit_code": 0,
+        "module_sha256": "86f372452299daf1be59452c3e0c13691a1c00058154d17a8a594a914c19dbe6",
+        "result": "With the frozen-id check (line 612) present, the mutation test passes; its advisory input has no ignore_entry_problems or override_problems, and the guarded preflight test rejects it only with line 612's message. With line 612 removed from an in-memory scratch copy of the module source, the mutation test fails on the advisory subtest only: 'the actual preflight guard accepted the changed input'. The prior head 4d7f4dd0e's mutation, with the same line removed, still passes, which reproduces the reported defect. The repository file's sha256 is the same before and after the run.",
+        "earlier_attempt": "A first run at 2026-10-04T00:48:28Z, before the script printed the guarded test's last message line, returned the same observations and exit 0; this run's output replaced it."
+      }
+    ],
+    "bindings_after_recheck": [
+      {
+        "path": "tests/test_osv_lockfile_coverage.py",
+        "sha256": "86f372452299daf1be59452c3e0c13691a1c00058154d17a8a594a914c19dbe6",
+        "bytes": 75774
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.py.txt",
+        "sha256": "023b555522e1291b8e978326eaac31b31834b26fce74e7606ba1f31478888933",
+        "bytes": 6335
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.stdout.txt",
+        "sha256": "6c14c74d306c2a672fad9a94767ba9c10d7f453163c58802611a1b5d485daad6",
+        "bytes": 2895
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.py.txt",
+        "sha256": "b1449383dcfc2f5799d9bc1a5f144a1bd063f08dc6b776dac5f22d0af0135c7f",
+        "bytes": 2558
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.stdout.txt",
+        "sha256": "e71767e753c536e0e7cc4eab58723cef0e59844be9a2fc9dee992f44397df19a",
+        "bytes": 530
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stderr.txt",
+        "sha256": "824676798b6e82d6695738d40180680c6b160b905334435aaf55ffed745af77d",
+        "bytes": 28944
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    ],
+    "bindings_note": "evidence_paths, registrations and artifact_bindings remain the build-time lists, and bindings_after_repair the repair round's bytes; bindings_after_recheck holds the bytes this round changed or added and supersedes the earlier test-module rows. This receipt cannot bind its own bytes; manifests/evidence.json does.",
+    "residuals": [
+      "Main is e0c329ae98ef at 2026-10-04T00:49:49Z, eight commits past the base 463a57b98. git merge-tree conflicts only in manifests/evidence.json, but #677 (e0c329ae9) also changes two PR-owned paths: tests/test_workflow_hardening.py (imports, and from line 1235) and docs/decisions/2026-09-22-github-automation-closure.md (line 1421). Both changes are region-disjoint from this PR's hunks and merge cleanly as text. The landing check stops at its first condition on the registry conflict; its drift condition (3) would flag both paths, and artifact_bindings hold their pre-merge bytes. This round did not merge main, because its merge allowance covered only a registry-only failure. Rebase or merge main right before merge, as contract step 7 requires.",
+      "Exact-head acceptance exit codes for this round are recorded on PR #673."
+    ]
+  }
+}

@@ -1,0 +1,366 @@
+"""Offline tests of gateway_apply.py against a fake local gateway (no real gateway is contacted)."""
+import copy
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import threading
+import unittest
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+SCRIPT = HERE / "gateway_apply.py"
+SECRET = "SUPER-SECRET-VALUE-123"
+
+
+class Gateway:
+    def __init__(self):
+        self.compression = {"defaultMode": "off", "enginesExplicit": True,
+                            "engines": {"lite": {"enabled": False}, "ccr": {"enabled": False}}, "lite": {"compressToolResults": False}}
+        self.settings = {"settingsRevision": 5, "oidcClientSecret": SECRET, "blockedProviders": None}
+        self.refuse_patch = False
+        self.calls = []
+
+
+def make_server(state):
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            pass
+
+        def _send(self, status, body):
+            data = json.dumps(body).encode()
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+        def do_GET(self):
+            state.calls.append(("GET", self.path))
+            if self.path == "/api/settings/compression":
+                self._send(200, state.compression)
+            elif self.path == "/api/settings":
+                self._send(200, state.settings)
+            elif self.path == "/api/context/combos":
+                self._send(200, {"combos": []})
+            else:
+                self._send(404, {"error": "nf"})
+
+        def do_PATCH(self):
+            length = int(self.headers.get("Content-Length", 0))
+            body = json.loads(self.rfile.read(length) or b"{}")
+            state.calls.append(("PATCH", self.path, body))
+            if self.path == "/api/settings/compression":
+                if state.refuse_patch:
+                    self._send(400, {"error": "no"})
+                    return
+                for key, value in body.items():
+                    state.compression[key] = value
+                self._send(200, state.compression)
+            elif self.path == "/api/settings":
+                if body.get("expectedRevision") != state.settings["settingsRevision"]:
+                    self._send(409, {"error": "conflict"})
+                    return
+                for key, value in body.items():
+                    if key != "expectedRevision":
+                        state.settings[key] = value
+                state.settings["settingsRevision"] += 1
+                self._send(200, {"ok": True})
+            else:
+                self._send(404, {"error": "nf"})
+
+    server = HTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server
+
+
+def plan_for(port, readback_value="stacked"):
+    base = f"http://127.0.0.1:{port}"
+    return {
+        "version": 1,
+        "gateways": {"20128": base, "20129": base},
+        "digest_routes": ["/api/settings/compression", "/api/context/combos"],
+        "steps": [
+            {"id": "T01", "title": "compression default", "gateway": "20129", "features": ["x"], "risk": "low", "source": "h:1",
+             "captures": [{"name": "before", "type": "get", "route": "/api/settings/compression", "keep": ["defaultMode", "engines", "lite"]}],
+             "write": {"method": "PATCH", "route": "/api/settings/compression",
+                       "body": {"defaultMode": "stacked", "engines": {"lite": {"enabled": True}, "ccr": {"enabled": False}}}},
+             "readback": [{"type": "get", "route": "/api/settings/compression", "asserts": [
+                 {"path": "defaultMode", "op": "equals", "value": readback_value}, {"path": "engines.lite.enabled", "op": "equals", "value": True}]}],
+             "rollback": {"method": "PATCH", "route": "/api/settings/compression", "body_from_capture": {"capture": "before", "paths": ["defaultMode", "engines", "lite"]}},
+             "rollback_verify": [{"type": "get", "route": "/api/settings/compression", "asserts": [
+                 {"path": "defaultMode", "op": "equals", "value": {"$capture": "before", "path": "defaultMode"}},
+                 {"path": "engines.lite.enabled", "op": "equals", "value": {"$capture": "before", "path": "engines.lite.enabled"}}]}]},
+            {"id": "T02", "title": "settings with revision", "gateway": "20129", "features": ["y"], "risk": "low", "source": "h:2",
+             "captures": [{"name": "rev", "type": "get", "route": "/api/settings", "keep": ["settingsRevision", "blockedProviders"]}],
+             "precondition": [{"type": "get", "route": "/api/settings/compression", "asserts": [{"path": "defaultMode", "op": "equals", "value": "stacked"}]}],
+             "write": {"method": "PATCH", "route": "/api/settings", "body": {"expectedRevision": {"$capture": "rev", "path": "settingsRevision"}, "blockedProviders": ["a"]}},
+             "readback": [{"type": "get", "route": "/api/settings/compression", "asserts": [{"path": "defaultMode", "op": "equals", "value": "stacked"}]}],
+             "rollback": {"method": "PATCH", "route": "/api/settings", "body": {"expectedRevision": 6, "blockedProviders": None}},
+             "rollback_verify": [{"type": "get", "route": "/api/settings/compression", "asserts": [{"path": "defaultMode", "op": "equals", "value": "stacked"}]}]},
+        ],
+    }
+
+
+def run(plan, *flags, state_dir):
+    plan_path = Path(state_dir) / "plan.json"
+    plan_path.write_text(json.dumps(plan))
+    env = dict(os.environ, TOKENSAVE_STATE_DIR=str(Path(state_dir) / "state"))
+    return subprocess.run([sys.executable, str(SCRIPT), str(plan_path), *flags], capture_output=True, text=True, env=env)
+
+
+class ApplyTests(unittest.TestCase):
+    def setUp(self):
+        self.state = Gateway()
+        self.server = make_server(self.state)
+        self.port = self.server.server_address[1]
+        self.tmp = tempfile.mkdtemp(prefix="gwapply-")
+
+    def tearDown(self):
+        self.server.shutdown()
+
+    def test_check_accepts_a_valid_plan(self):
+        result = run(plan_for(self.port), "--check", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_dry_run_writes_nothing(self):
+        before = copy.deepcopy(self.state.compression)
+        result = run(plan_for(self.port), "--dry-run", "--steps", "T01", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.state.compression, before)
+        self.assertFalse([c for c in self.state.calls if c[0] == "PATCH"])
+
+    def test_apply_writes_reads_back_and_never_prints_a_secret(self):
+        result = run(plan_for(self.port), "--apply", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.state.compression["defaultMode"], "stacked")
+        self.assertEqual(self.state.settings["blockedProviders"], ["a"])
+        self.assertNotIn(SECRET, result.stdout + result.stderr)
+        state_files = "".join(p.read_text() for p in (Path(self.tmp) / "state").rglob("*.json"))
+        self.assertNotIn(SECRET, state_files)
+        for p in (Path(self.tmp) / "state").rglob("*.json"):
+            self.assertEqual(p.stat().st_mode & 0o777, 0o600, p)
+
+    def test_failed_readback_rolls_back_exactly_and_stops(self):
+        original = copy.deepcopy(self.state.compression)
+        result = run(plan_for(self.port, readback_value="WRONG"), "--apply", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("rollback: restored", result.stdout)
+        self.assertEqual(self.state.compression["defaultMode"], original["defaultMode"])
+        self.assertEqual(self.state.compression["engines"], original["engines"])
+        self.assertFalse([c for c in self.state.calls if c[:2] == ("PATCH", "/api/settings")])  # T02 never ran
+
+    def test_refused_write_rolls_back_and_stops(self):
+        self.state.refuse_patch = True
+        result = run(plan_for(self.port), "--apply", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("write-refused", result.stdout)
+
+    def test_precondition_failure_stops_before_the_write(self):
+        plan = plan_for(self.port)
+        plan["steps"][1]["precondition"][0]["asserts"][0]["value"] = "never"
+        result = run(plan, "--apply", "--steps", "T02", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("precondition-failed", result.stdout)
+        self.assertFalse([c for c in self.state.calls if c[:2] == ("PATCH", "/api/settings")])
+
+    def test_manual_rollback_restores_from_the_saved_capture(self):
+        run(plan_for(self.port), "--apply", "--steps", "T01", state_dir=self.tmp)
+        self.assertEqual(self.state.compression["defaultMode"], "stacked")
+        result = run(plan_for(self.port), "--rollback", "T01", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.state.compression["defaultMode"], "off")
+
+    def test_verify_detects_drift(self):
+        run(plan_for(self.port), "--apply", "--steps", "T01", state_dir=self.tmp)
+        ok = run(plan_for(self.port), "--verify", "--steps", "T01", state_dir=self.tmp)
+        self.assertEqual(ok.returncode, 0, ok.stdout)
+        self.state.compression["defaultMode"] = "off"
+        drift = run(plan_for(self.port), "--verify", state_dir=self.tmp)
+        self.assertEqual(drift.returncode, 1)
+        self.assertIn("DRIFT", drift.stdout)
+
+    def test_plan_checks_refuse_unsafe_plans(self):
+        plan = plan_for(self.port)
+        plan["steps"][0]["captures"][0].pop("keep")
+        plan["steps"][1]["captures"][0].pop("keep")
+        self.assertIn("needs 'keep' paths", run(plan, "--check", state_dir=self.tmp).stdout)
+        plan = plan_for(self.port)
+        plan["steps"][0]["write"]["route"] = "/api/keys"
+        self.assertIn("write route refused", run(plan, "--check", state_dir=self.tmp).stdout)
+        plan = plan_for(self.port)
+        plan["steps"][0]["rollback"]["method"] = "DELETE"
+        plan["steps"][0]["write"]["route"] = "/api/settings/feature-flags"
+        self.assertIn("DELETE on feature-flags", run(plan, "--check", state_dir=self.tmp).stdout)
+        plan = plan_for(self.port)
+        plan["steps"][0]["captures"].append({"name": "c", "type": "sqlite_ro", "gateway_store": "20129", "sql": "SELECT api_key FROM provider_connections"})
+        self.assertIn("credential column", run(plan, "--check", state_dir=self.tmp).stdout)
+        plan = plan_for(self.port)
+        plan["steps"][0]["captures"].append({"name": "c", "type": "sqlite_ro", "gateway_store": "20129", "sql": "SELECT provider_specific_data FROM provider_connections"})
+        self.assertIn("provider_specific_data only via json_extract", run(plan, "--check", state_dir=self.tmp).stdout)
+        plan = plan_for(self.port)
+        plan["steps"][0]["captures"].append({"name": "c", "type": "sqlite_ro", "gateway_store": "20129",
+                                             "sql": "SELECT json_extract(provider_specific_data,'$.timeoutMs') FROM provider_connections"})
+        self.assertNotIn("PLAN PROBLEM", run(plan, "--check", state_dir=self.tmp).stdout)
+
+    def test_cache_path_and_json_type_are_accepted_but_credential_paths_are_not(self):
+        accepted = ["SELECT json_extract(provider_specific_data,'$.cache') FROM provider_connections",
+                    "SELECT json_extract(provider_specific_data,'$.cache.supportsPromptCaching') FROM provider_connections",
+                    "SELECT json_type(provider_specific_data,'$.timeoutMs') FROM provider_connections"]
+        for sql in accepted:
+            plan = plan_for(self.port)
+            plan["steps"][0]["captures"].append({"name": "c", "type": "sqlite_ro", "gateway_store": "20129", "sql": sql})
+            self.assertNotIn("PLAN PROBLEM", run(plan, "--check", state_dir=self.tmp).stdout, sql)
+        refused = ["SELECT json_extract(provider_specific_data,'$.apiKey') FROM provider_connections",
+                   "SELECT json_type(provider_specific_data,'$.cacheToken') FROM provider_connections",
+                   "SELECT json_extract(provider_specific_data,'$.cachefoo') FROM provider_connections"]
+        for sql in refused:
+            plan = plan_for(self.port)
+            plan["steps"][0]["captures"].append({"name": "c", "type": "sqlite_ro", "gateway_store": "20129", "sql": sql})
+            self.assertIn("PLAN PROBLEM", run(plan, "--check", state_dir=self.tmp).stdout, sql)
+
+    # ---------------------------------------------------------------- round F: recorded step state (P-HOLD-T09-CHECKS)
+    def state_path(self, *parts):
+        return Path(self.tmp, "state", *parts)
+
+    def test_dry_run_and_failed_precondition_never_write_an_apply_capture(self):
+        result = run(plan_for(self.port), "--dry-run", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 1, result.stdout)  # T02's precondition needs T01 applied
+        self.assertTrue(self.state_path("captures-unapplied", "T01.json").exists())
+        self.assertFalse(self.state_path("captures").exists())
+        self.assertFalse(self.state_path("status").exists())
+        plan = plan_for(self.port)
+        plan["steps"][1]["precondition"][0]["asserts"][0]["value"] = "never"
+        run(plan, "--apply", "--steps", "T02", state_dir=self.tmp)
+        self.assertFalse(self.state_path("captures", "T02.json").exists())
+        self.assertFalse(self.state_path("status", "T02.json").exists())
+
+    def test_held_step_is_not_applied_and_does_not_fail_verify(self):
+        run(plan_for(self.port), "--dry-run", "--steps", "T01", state_dir=self.tmp)
+        run(plan_for(self.port), "--apply", "--steps", "T01", state_dir=self.tmp)
+        result = run(plan_for(self.port), "--verify", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("T01 OK", result.stdout)
+        self.assertIn("T02 NOT-APPLIED (precondition holds now)", result.stdout)
+        self.assertNotIn("DRIFT", result.stdout)
+        expect = run(plan_for(self.port), "--verify", "--expect-applied", "T01,T02", state_dir=self.tmp)
+        self.assertEqual(expect.returncode, 1, expect.stdout)
+        self.assertIn("but expected applied", expect.stdout)
+
+    def test_rollback_of_a_step_never_applied_is_refused(self):
+        run(plan_for(self.port), "--dry-run", state_dir=self.tmp)
+        calls_before = len(self.state.calls)
+        result = run(plan_for(self.port), "--rollback", "T01", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("REFUSED", result.stdout)
+        self.assertFalse([c for c in self.state.calls[calls_before:] if c[0] != "GET"])
+
+    def test_rollback_then_verify_reports_not_applied_not_drift(self):
+        run(plan_for(self.port), "--apply", "--steps", "T01", state_dir=self.tmp)
+        run(plan_for(self.port), "--rollback", "T01", state_dir=self.tmp)
+        result = run(plan_for(self.port), "--verify", "--steps", "T01", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("T01 NOT-APPLIED", result.stdout)
+        self.assertNotIn("DRIFT", result.stdout)
+        again = run(plan_for(self.port), "--rollback", "T01", state_dir=self.tmp)
+        self.assertIn("REFUSED", again.stdout)
+
+    def test_apply_skips_an_applied_step_and_keeps_its_rollback_capture(self):
+        run(plan_for(self.port), "--apply", "--steps", "T01", state_dir=self.tmp)
+        capture = self.state_path("captures", "T01.json").read_text()
+        patches = len([c for c in self.state.calls if c[0] == "PATCH"])
+        result = run(plan_for(self.port), "--apply", "--steps", "T01", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("already-applied", result.stdout)
+        self.assertEqual(self.state_path("captures", "T01.json").read_text(), capture)
+        self.assertEqual(len([c for c in self.state.calls if c[0] == "PATCH"]), patches)
+        run(plan_for(self.port), "--rollback", "T01", state_dir=self.tmp)
+        self.assertEqual(self.state.compression["defaultMode"], "off")  # restored from the first capture
+
+    def test_legacy_state_dir_is_read_from_its_logs(self):
+        # A pre-round-F dir: the old dry run wrote captures for both steps, the apply log has T01 only.
+        state = self.state_path()
+        (state / "captures").mkdir(parents=True)
+        pre = {"defaultMode": "off", "engines": copy.deepcopy(self.state.compression["engines"]),
+               "lite": {"compressToolResults": False}}
+        (state / "captures" / "T01.json").write_text(json.dumps({"before": pre}))
+        (state / "captures" / "T02.json").write_text(json.dumps({"rev": {"settingsRevision": 5}}))
+        (state / "log-dry-run-2026-09-29T23:40:00Z.json").write_text(json.dumps(
+            {"started": "2026-09-29T23:40:00Z", "mode": "dry-run", "steps": {"T01": {"result": "dry-run-ok"},
+                                                                          "T02": {"result": "dry-run-ok"}}}))
+        (state / "log-apply-2026-09-29T23:45:00Z.json").write_text(json.dumps(
+            {"started": "2026-09-29T23:45:00Z", "mode": "apply", "steps": {"T01": {"result": "applied"}}}))
+        self.state.compression["defaultMode"] = "stacked"
+        self.state.compression["engines"]["lite"]["enabled"] = True
+        result = run(plan_for(self.port), "--verify", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("T01 OK", result.stdout)
+        self.assertIn("T02 NOT-APPLIED", result.stdout)
+        refused = run(plan_for(self.port), "--rollback", "T02", state_dir=self.tmp)
+        self.assertIn("REFUSED", refused.stdout)
+        self.assertFalse([c for c in self.state.calls if c[:2] == ("PATCH", "/api/settings")])
+        rolled = run(plan_for(self.port), "--rollback", "T01", state_dir=self.tmp)
+        self.assertEqual(rolled.returncode, 0, rolled.stdout)
+        self.assertEqual(self.state.compression["defaultMode"], "off")
+
+    def test_state_dir_without_logs_keeps_the_old_capture_rule(self):
+        state = self.state_path()
+        (state / "captures").mkdir(parents=True)
+        (state / "captures" / "T01.json").write_text(json.dumps({"before": {"defaultMode": "off"}}))
+        result = run(plan_for(self.port), "--verify", "--steps", "T01", state_dir=self.tmp)
+        self.assertIn("T01 DRIFT", result.stdout)  # treated as applied, as the pre-round-F script did
+        self.assertIn("no log", result.stdout)
+
+    def test_rollback_body_overrides_are_written_with_the_captured_keys(self):
+        plan = plan_for(self.port)
+        plan["steps"][0]["rollback"]["body_from_capture"]["paths"] = ["defaultMode", "lite"]
+        plan["steps"][0]["rollback"]["body_overrides"] = {"engines": {}}
+        plan["steps"][0]["rollback_verify"][0]["asserts"] = [
+            {"path": "defaultMode", "op": "equals", "value": {"$capture": "before", "path": "defaultMode"}},
+            {"path": "engines", "op": "equals", "value": {}}]
+        self.assertEqual(run(plan, "--check", state_dir=self.tmp).returncode, 0)
+        run(plan, "--apply", "--steps", "T01", state_dir=self.tmp)
+        result = run(plan, "--rollback", "T01", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        last_patch = [c for c in self.state.calls if c[0] == "PATCH"][-1]
+        self.assertEqual(last_patch[2], {"defaultMode": "off", "lite": {"compressToolResults": False}, "engines": {}})
+
+    def test_contract_refuses_bad_overrides_duplicate_ids_and_unknown_ids(self):
+        plan = plan_for(self.port)
+        plan["steps"][1]["rollback"]["body_overrides"] = {"x": 1}
+        self.assertIn("body_overrides needs body_from_capture", run(plan, "--check", state_dir=self.tmp).stdout)
+        plan = plan_for(self.port)
+        plan["steps"][0]["rollback"]["body_overrides"] = {"lite": {}}
+        self.assertIn("repeats a body_from_capture path", run(plan, "--check", state_dir=self.tmp).stdout)
+        plan = plan_for(self.port)
+        plan["steps"][1]["id"] = "T01"
+        self.assertIn("duplicate step id", run(plan, "--check", state_dir=self.tmp).stdout)
+        result = run(plan_for(self.port), "--verify", "--steps", "T09", state_dir=self.tmp)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("UNKNOWN STEP IDS", result.stdout)
+        plan = plan_for(self.port)
+        plan["steps"][0]["requires"] = ["T02"]  # a later step
+        self.assertIn("requires must list ids of earlier steps", run(plan, "--check", state_dir=self.tmp).stdout)
+
+    def test_requires_gates_apply_and_orders_rollback(self):
+        plan = plan_for(self.port)
+        plan["steps"][1]["requires"] = ["T01"]
+        blocked = run(plan, "--apply", "--steps", "T02", state_dir=self.tmp)
+        self.assertEqual(blocked.returncode, 1, blocked.stdout)
+        self.assertIn("requires-unapplied", blocked.stdout)
+        self.assertFalse([c for c in self.state.calls if c[0] == "PATCH"])
+        self.assertEqual(run(plan, "--apply", state_dir=self.tmp).returncode, 0)
+        refused = run(plan, "--rollback", "T01", state_dir=self.tmp)
+        self.assertEqual(refused.returncode, 1, refused.stdout)
+        self.assertIn("T02 still applied and require T01", refused.stdout)
+        self.assertEqual(self.state.compression["defaultMode"], "stacked")
+        both = run(plan, "--rollback", "T01,T02", state_dir=self.tmp)  # reverse plan order: T02 first
+        self.assertEqual(both.returncode, 0, both.stdout)
+        self.assertLess(both.stdout.index("T02"), both.stdout.index("T01"))
+        self.assertEqual(self.state.compression["defaultMode"], "off")
+
+
+if __name__ == "__main__":
+    unittest.main()

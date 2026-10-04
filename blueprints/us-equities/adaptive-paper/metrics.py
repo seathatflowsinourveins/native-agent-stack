@@ -388,7 +388,10 @@ def make_server(ledger_path: Path, trial_path: Path, *, host: str = HOST, port: 
 
 def _file_sd_groups(path: Path) -> list:
     """The target groups in the file_sd list at ``path`` ([] when it does not exist yet). Anything that is not a
-    JSON list of ``{"targets": [str, ...], "labels": {...}}`` groups raises ValueError instead of being replaced."""
+    JSON list of ``{"targets": [str, ...], "labels": {...}}`` groups raises ValueError instead of being replaced.
+
+    Prometheus v3.15.0 discovery/file/file.go decodes labels as model.LabelSet: names must be nonempty and
+    values must be strings (JSON null also decodes to an empty string upstream)."""
     try:
         groups = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
@@ -398,7 +401,9 @@ def _file_sd_groups(path: Path) -> list:
     if not isinstance(groups, list) or not all(
             isinstance(group, dict) and set(group) <= {"targets", "labels"} and isinstance(group.get("targets"), list)
             and all(isinstance(target, str) for target in group["targets"])
-            and isinstance(group.get("labels", {}), dict) for group in groups):
+            and isinstance(group.get("labels", {}), dict)
+            and all(name and (isinstance(value, str) or value is None)
+                    for name, value in group.get("labels", {}).items()) for group in groups):
         raise ValueError(f"{path.name} is not a file_sd target list")
     return groups
 
@@ -513,15 +518,18 @@ def main(argv=None) -> int:
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         clean_stop = True
     finally:
-        server.server_close()
-    # Only a clean stop of a finished trial deregisters; a crash propagates above and skips this entirely.
-    if clean_stop and args.file_sd is not None:
-        if trial_finished(trial_path):
-            update_file_sd(args.file_sd, target, registered=False)
-            print(f"adaptive-paper metrics exporter {target} deregistered", file=sys.stderr)
-        else:
-            print(f"adaptive-paper metrics exporter {target} stays registered: the trial has not finished",
-                  file=sys.stderr)
+        try:
+            # Deregister while still owning the listener, before a replacement can bind and register.
+            # Only a clean stop of a finished trial deregisters; a crash leaves its target registered.
+            if clean_stop and args.file_sd is not None:
+                if trial_finished(trial_path):
+                    update_file_sd(args.file_sd, target, registered=False)
+                    print(f"adaptive-paper metrics exporter {target} deregistered", file=sys.stderr)
+                else:
+                    print(f"adaptive-paper metrics exporter {target} stays registered: the trial has not finished",
+                          file=sys.stderr)
+        finally:
+            server.server_close()
     return 0
 
 

@@ -1,0 +1,73 @@
+{
+ "base": {
+  "branch": "release/v3.8.51",
+  "commit": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+  "note": "head of the default branch release/v3.8.51 on 2026-09-27; npm latest is 3.8.50"
+ },
+ "builds": [
+  {
+   "build_sha": "bf0255649",
+   "head": "bf02556494beb99cd6dbd14391266ebbb0d48079",
+   "status": "superseded 07:19:45Z",
+   "tarball_sha256": "8663882260d5b4309354187fa0bb80c3b96fc361807f9584ce11bb94eb8b7e8b"
+  },
+  {
+   "build_sha": "dd6e9607e",
+   "head": "dd6e9607e4884ec75c9bc0d96e60b01e9483d84e",
+   "status": "running",
+   "tarball_sha256": "039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d"
+  }
+ ],
+ "cherry_picks": [
+  {
+   "applied_as": [
+    "22fb9f15fcc1d4579547d7969b238849c5f448bc",
+    "bf02556494beb99cd6dbd14391266ebbb0d48079"
+   ],
+   "chosen_over": [
+    14872,
+    14886
+   ],
+   "pr": 14904,
+   "pr_head": "b94e2dba4da4c19792a80c11d63cacb931dfdafb",
+   "state_2026_09_27": "open, unreviewed",
+   "title": "fix(sse): rebuild deadline-wrapped request from public accessors",
+   "upstream_commits": [
+    "07a6317b2",
+    "b94e2dba4"
+   ]
+  },
+  {
+   "applied_as": [
+    "b9f0d76eb3fc93aa9265af4c769ade80348d024e",
+    "dd6e9607e4884ec75c9bc0d96e60b01e9483d84e"
+   ],
+   "pr": 13788,
+   "pr_head": "6c7990058c4ce9677de79452c8cefb10b4bf1b3d",
+   "state_2026_09_27": "open, label deferred-v3.8.52",
+   "title": "feat(search): implement /v1/alpha/search endpoint for Codex native web search",
+   "upstream_commits": [
+    "24bbadbad",
+    "6c7990058 (maintainer's commit)"
+   ]
+  }
+ ],
+ "commands": [
+  "npm ci --no-audit --no-fund",
+  "npm run build:release",
+  "npm run build:cli-api",
+  "npm pack --pack-destination <dir>",
+  "OMNIROUTE_ALLOW_CANARY_BUILD=1 npm run check:pack-artifact",
+  "npm install --global --prefix <new prefix> <tarball> --include=optional --no-audit --no-fund",
+  "npm rebuild --global --prefix <new prefix> --allow-scripts=omniroute,keytar,onnxruntime-node,tls-client-node,@parcel/watcher,@swc/core,protobufjs,koffi,esbuild --foreground-scripts"
+ ],
+ "pack_gate": [
+  "[provenance] BUILD_SHA dd6e9607e is NOT on the release line \u2014 allowed as a canary build because OMNIROUTE_ALLOW_CANARY_BUILD=1 was set.",
+  "\u2705 Pack artifact policy check passed."
+ ],
+ "toolchain": {
+  "node": "v24.21.0",
+  "npm": "11.19.0"
+ },
+ "upstream": "https://github.com/diegosouzapw/OmniRoute"
+}

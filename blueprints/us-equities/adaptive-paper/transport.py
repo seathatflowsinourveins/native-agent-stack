@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 from concurrent.futures import TimeoutError as FutureTimeout
+from contextvars import ContextVar
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 import hashlib
@@ -40,9 +41,22 @@ UUID = re.compile(r"[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\Z")
 ACTIVITY_FILL_PATH = "/v2/account/activities/FILL"
 ACTIVITY_ID = re.compile(r"[0-9]{1,32}::([0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})\Z")
 ACTIVITY_PAGE_SIZE = 100
+# The same endpoint with activity_type FEE ("Fee denominated in USD"), read after one UTC
+# instant: the ledger's cash baseline. Reference (updatedAt 2026-05-27, fetched 2026-09-30):
+# https://docs.alpaca.markets/us/reference/getaccountactivitiesbyactivitytype-1.md. after: "Get
+# activities created after this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are
+# supported."; direction: "The chronological order of response based on the activity datetime."
+# (default desc, so asc is always sent); page_size: minimum 1, maximum 100; page_token: "Provide
+# the ID of the last activity from the last page to retrieve the next set of results." Its
+# ActivitySubType lists for FEE: REG (Regulatory Fee), TAF (Trading Activity Fee), LCT, ORF, OCC,
+# NRC, NRV, COM (Commission) and CAT (Consolidated Audit Trail Fee).
+ACTIVITY_FEE_PATH = "/v2/account/activities/FEE"
+FEE_SUB_TYPES = frozenset({"REG", "TAF", "LCT", "ORF", "OCC", "NRC", "NRV", "COM", "CAT"})
+FEE_AFTER = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\Z")
+FEE_DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}\Z")
 # trade_updates events that carry one execution's own qty, price and execution_id.
 EXECUTION_EVENTS = frozenset({"fill", "partial_fill"})
-EXECUTION_FIELDS = ("event", "execution_id", "event_qty", "event_price")
+EXECUTION_FIELDS = ("event", "execution_id", "event_qty", "event_price", "execution_time_ns")
 # The pre-submission boundary (blueprints/us-equities/order-contract). Loaded by
 # path at import, so a missing or broken contract fails transport import closed.
 ORDER_CONTRACT_PATH = Path(__file__).resolve().parent.parent / "order-contract" / "order_contract.py"
@@ -327,11 +341,13 @@ def timestamp_ns(value):
             raise TransportError("timestamp lacks timezone")
         return int(value.timestamp()) * 1_000_000_000 + value.microsecond * 1000
     if isinstance(value, str):
-        match = re.fullmatch(r"(.+?)(?:\.(\d{1,9}))?(Z|[+-]\d\d:\d\d)", value)
+        # RFC 3339 section 5.6 permits lowercase z and arbitrary fractional
+        # precision. Keep the first nine digits for integer nanoseconds.
+        match = re.fullmatch(r"(.+?)(?:\.(\d+))?([Zz]|[+-]\d\d:\d\d)", value)
         if not match:
             raise TransportError("invalid timestamp")
-        base = datetime.fromisoformat(match[1] + match[3].replace("Z", "+00:00"))
-        return int(base.timestamp()) * 1_000_000_000 + int((match[2] or "").ljust(9, "0"))
+        base = datetime.fromisoformat(match[1] + match[3].upper().replace("Z", "+00:00"))
+        return int(base.timestamp()) * 1_000_000_000 + int((match[2] or "")[:9].ljust(9, "0"))
     raise TransportError("unsupported timestamp")
 
 
@@ -412,6 +428,93 @@ def _activity_params(params):
     return (isinstance(params.get("order_id"), str) and bool(UUID.fullmatch(params["order_id"]))
             and params.get("direction", "asc") == "asc" and type(size) is int and 1 <= size <= ACTIVITY_PAGE_SIZE
             and (token is None or (isinstance(token, str) and bool(ACTIVITY_ID.fullmatch(token)))))
+
+
+def fee_after_text(moment):
+    """The documented UTC ``after`` value (YYYY-MM-DDTHH:MM:SSZ) for a timezone-aware instant,
+    truncated to the second. The checkpoint and every subsequent fee read use this same
+    formatted cutoff. Fees from earlier within that second are booked by the checkpoint
+    before computing the cash baseline, and subsequent reads deduplicate them by id."""
+    if not isinstance(moment, datetime) or moment.tzinfo is None:
+        raise TransportError("timezone-aware fee window required")
+    return moment.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _fee_after(value):
+    if not isinstance(value, str) or not FEE_AFTER.fullmatch(value):
+        return False
+    try:
+        datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        return False
+    return True
+
+
+def _fee_activity_params(params):
+    """Only the documented FEE read after one UTC instant: ``after`` (YYYY-MM-DDTHH:MM:SSZ) and
+    direction asc are required, page_size 1-100 and an activity-id page_token are optional. No
+    other filter (order_id, date, until, ...) is ever sent."""
+    if not isinstance(params, dict) or not set(params) <= {"after", "direction", "page_size", "page_token"}:
+        return False
+    size, token = params.get("page_size", ACTIVITY_PAGE_SIZE), params.get("page_token")
+    return (_fee_after(params.get("after")) and params.get("direction") == "asc"
+            and type(size) is int and 1 <= size <= ACTIVITY_PAGE_SIZE
+            and (token is None or (isinstance(token, str) and bool(ACTIVITY_ID.fullmatch(token)))))
+
+
+def normalize_fee_activity(raw):
+    """One documented NonTradeActivity of activity_type FEE: ``{id, date, net_amount, sub_type}``
+    and nothing else. Account Activities (https://docs.alpaca.markets/us/docs/account-activities.md,
+    updatedAt 2026-05-25): id "Can be sent as `page_token`"; date "The date on which the activity
+    occurred or on which the transaction associated with the activity settled."; net_amount "The
+    net amount of money (positive or negative) associated with the activity." (a documented
+    string). An absent or null activity_sub_type is UNSPECIFIED; currency must be absent or USD
+    and status absent or executed (the by-type reference also lists correct and canceled, which
+    this engine does not model). The description field, which carries the account number, is
+    never read. Raises TransportError for any other shape; provider text is never retained."""
+    if not isinstance(raw, dict) or raw.get("activity_type") != "FEE":
+        raise TransportError("invalid fee activity")
+    activity_id, day, amount = raw.get("id"), raw.get("date"), raw.get("net_amount")
+    sub_type = raw.get("activity_sub_type")
+    if (not isinstance(activity_id, str) or not ACTIVITY_ID.fullmatch(activity_id)
+            or not isinstance(day, str) or not FEE_DATE.fullmatch(day) or not isinstance(amount, str)
+            or (sub_type is not None and (not isinstance(sub_type, str) or sub_type not in FEE_SUB_TYPES))
+            or ("currency" in raw and raw["currency"] != "USD")
+            or ("status" in raw and raw["status"] != "executed")):
+        raise TransportError("invalid fee activity")
+    try:
+        datetime.strptime(day, "%Y-%m-%d")
+    except ValueError:
+        raise TransportError("invalid fee activity") from None
+    return {"id": activity_id, "date": day, "net_amount": decimal_string(amount),
+            "sub_type": sub_type or "UNSPECIFIED"}
+
+
+def _collect_fee_pages(client, fee_after, max_pages):
+    """Every FEE activity created after the timezone-aware instant ``fee_after``, oldest first,
+    normalized. Each page repeats the filters and continues from the last activity id, as
+    alpaca-py 0.44.0 BrokerClient._get_account_activities_iterator keeps its request fields and
+    sets page_token to the last result's id. A page bound reached is "completeness unproven",
+    never a partial list; a repeated id means pagination did not advance."""
+    after = fee_after_text(fee_after)
+    fees, seen, token = [], set(), None
+    for _ in range(max_pages):
+        params = {"after": after, "direction": "asc", "page_size": ACTIVITY_PAGE_SIZE}
+        if token is not None:
+            params["page_token"] = token
+        page = client.get("/account/activities/FEE", params)
+        if not isinstance(page, list) or len(page) > ACTIVITY_PAGE_SIZE:
+            raise TransportError("invalid fee activity page")
+        rows = [normalize_fee_activity(row) for row in page]
+        ids = [row["id"] for row in rows]
+        if len(set(ids)) != len(ids) or seen.intersection(ids):
+            raise TransportError("fee activity pagination did not advance")
+        fees.extend(rows)
+        seen.update(ids)
+        if len(page) < ACTIVITY_PAGE_SIZE:
+            return fees
+        token = ids[-1]
+    raise TransportError("fee activity page bound reached; completeness unproven")
 
 
 # Best-effort CTA/UTP quote-condition code that can mark an individual NBBO
@@ -739,7 +842,17 @@ class GuardedSession:
         self._envelopes = {}
         # (lowercase broker order id, client order id) of the DELETE the owner is about to
         # send, so the budget hook can record which order a cancel request was for.
-        self._cancel_expectation = None
+        # asyncio.to_thread copies this context: canceling the awaiting task cannot
+        # clear or overwrite the identity retained by an unfinished HTTP worker.
+        self._cancel_context = ContextVar("cancel_expectation", default=None)
+
+    @property
+    def _cancel_expectation(self):
+        return self._cancel_context.get()
+
+    @_cancel_expectation.setter
+    def _cancel_expectation(self, value):
+        self._cancel_context.set(value)
 
     def expect_submission(self, envelope):
         self._envelopes[envelope["intent"]["client_order_id"]] = envelope
@@ -780,8 +893,10 @@ class GuardedSession:
                      "/v2/orders:by_client_order_id"}
             asset = path.startswith("/v2/assets/") and SYMBOL.fullmatch(path[len("/v2/assets/"):])
             order_id = path.startswith("/v2/orders/") and UUID.fullmatch(path[len("/v2/orders/"):])
-            # FILL activities only, and only filtered by one broker order (fill gap-fill).
-            activities = path == ACTIVITY_FILL_PATH and _activity_params(kwargs.get("params"))
+            # FILL activities only filtered by one broker order (fill gap-fill), and FEE
+            # activities only after one UTC instant (the ledger's cash baseline). Both are reads.
+            activities = ((path == ACTIVITY_FILL_PATH and _activity_params(kwargs.get("params")))
+                          or (path == ACTIVITY_FEE_PATH and _fee_activity_params(kwargs.get("params"))))
             allowed = ((method == "GET" and (path in reads or asset or order_id or activities))
                        or (not self.read_only and method == "POST" and path == "/v2/orders")
                        or (not self.read_only and method == "DELETE" and order_id))
@@ -895,6 +1010,50 @@ def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, reque
         data._session.close()
 
 
+def fee_activities(api_key, secret_key, *, after, before_request, request_observer=None, max_pages=20):
+    """Read-only FEE activities created after the timezone-aware instant ``after``, oldest first,
+    for a caller that records them durably before a cash comparison it makes outside a transport
+    snapshot (runner.main's next-trial check). The snapshot's own allow-listed read, normalization
+    and page bound, on a fresh read-only client; ``before_request`` sees each GET as "read"."""
+    fee_after_text(after)  # a naive instant is refused before any client or request
+    if type(max_pages) is not int or not 1 <= max_pages <= 100:
+        raise TransportError("bounded fee activity pages required")
+    trading = _sdk_client(api_key, secret_key, before_request, request_observer, read_only=True)
+    try:
+        return _collect_fee_pages(trading, after, max_pages)
+    finally:
+        trading._session.close()
+
+
+def fee_checkpoint(api_key, secret_key, *, after, before_request, request_observer=None, max_pages=20):
+    """Read F1, account cash, then F2 on one fresh read-only client; refuse a changed
+    id -> normalized row map. Reuse the Alpaca account-activities endpoint and pagination
+    documented above; before_request synchronously admits each GET as a read.
+
+    Assuming a FEE activity is visible exactly when its amount is in account cash,
+    every fee in F2 is in checkpoint cash and must be booked into ledger cash_delta
+    before computing baseline = cash - cash_delta. Later fees after the fixed formatted
+    L cutoff are booked once by id; fees before that cutoff are in cash and never listed.
+    Thus the per-trial baseline neither double counts nor misses a fee. Truncation can
+    include an earlier fee in L's fractional second; it too is booked before baseline.
+    Fees earlier engines absorbed into baseline are booked at the next checkpoint and
+    baseline is recomputed afterwards, preserving cash reconciliation.
+    """
+    fee_after_text(after)
+    if type(max_pages) is not int or not 1 <= max_pages <= 100:
+        raise TransportError("bounded fee activity pages required")
+    trading = _sdk_client(api_key, secret_key, before_request, request_observer, read_only=True)
+    try:
+        first = _collect_fee_pages(trading, after, max_pages)
+        account = normalize_account(trading.get_account())
+        second = _collect_fee_pages(trading, after, max_pages)
+        if {row["id"]: row for row in first} != {row["id"]: row for row in second}:
+            raise TransportError("fee_activity_posted_during_checkpoint")
+        return {"account": account, "fees": second}
+    finally:
+        trading._session.close()
+
+
 def _symbols(symbols):
     result = tuple(sorted(set(symbols)))
     if not result or len(result) > 30 or any(not isinstance(s, str) or not SYMBOL.fullmatch(s) for s in result):
@@ -986,7 +1145,8 @@ class AlpacaPaperTransport:
                  sink_observation, queue_size=1024, quote_timeout=5.0, start_timeout=15.0,
                  order_update_timeout=10.0, request_observer=None, history_start=None,
                  max_snapshot_pages=20, required_quote_symbols=None, feed="iex",
-                 extended_hours_allowed=False, include_margin=False, sink_status=None):
+                 extended_hours_allowed=False, include_margin=False, sink_status=None,
+                 fee_history_start=None):
         # sink_status receives every normalized trading status message of a subscribed
         # symbol (normalize_trading_status) on the owning loop, like sink_observation.
         self.sink_status = sink_status
@@ -1014,6 +1174,10 @@ class AlpacaPaperTransport:
         self.history_start = history_start or datetime.now(timezone.utc)
         if self.history_start.tzinfo is None or not 1 <= max_snapshot_pages <= 100:
             raise TransportError("bounded snapshot with timezone-aware history start required")
+        # The caller reuses its checkpoint's fixed lineage window for every snapshot.
+        # Legacy callers keep their recorded baseline window. Defaults to history_start.
+        self.fee_history_start = fee_history_start or self.history_start
+        fee_after_text(self.fee_history_start)
         self.max_snapshot_pages = max_snapshot_pages
         self._events = queue.Queue(maxsize=queue_size)
         self._state_lock = threading.RLock()
@@ -1279,6 +1443,11 @@ class AlpacaPaperTransport:
                                         ("event_qty", "qty"), ("event_price", "price")):
                         if payload.get(source) is not None:
                             order[key] = str(payload[source])
+                    # https://docs.alpaca.markets/docs/websocket-streaming:
+                    # fill/partial_fill timestamp is when the execution occurred;
+                    # nested order.updated_at is a separate order-state timestamp.
+                    if order.get("event") in EXECUTION_EVENTS and payload.get("timestamp") is not None:
+                        order["execution_time_ns"] = timestamp_ns(payload["timestamp"])
                     self._stream_seen.add(order["client_order_id"])
                     self._pending_stream.pop(order["client_order_id"], None)
                     order = await self._observe(order)
@@ -1461,8 +1630,8 @@ class AlpacaPaperTransport:
             self._assert_matches(order, self._intents[client_order_id])
             answer = 204
             try:
-                # The request log records which owned order this DELETE was for (exact
-                # sim-to-paper cancel pairing); the operation lock keeps it to one DELETE.
+                # The worker's copied context retains this DELETE's owned identity
+                # even if task cancellation releases the operation lock early.
                 self._client._session.announce_cancel(order["id"], client_order_id)
                 await asyncio.to_thread(self._client.cancel_order_by_id, order["id"])
             except Exception as exc:
@@ -1544,9 +1713,12 @@ class AlpacaPaperTransport:
                               "avg_entry_price": decimal_string(p["avg_entry_price"])}
                              for p in self._client.get_all_positions()]
                 orders = self._pages("open") + self._pages("all", after=self.history_start)
-                return account, positions, orders
+                # Last, after account cash, through the caller's fixed fee window. A fee
+                # posted between these reads can cause a cash mismatch; fail closed.
+                fees = _collect_fee_pages(self._client, self.fee_history_start, self.max_snapshot_pages)
+                return account, positions, orders, fees
             try:
-                account, positions, raw_orders = await asyncio.to_thread(collect)
+                account, positions, raw_orders, fees = await asyncio.to_thread(collect)
                 orders = {}
                 for raw in raw_orders:
                     order = await self._observe(normalize_order(raw))
@@ -1559,7 +1731,8 @@ class AlpacaPaperTransport:
                             raise TransportError("owned intent absent from complete snapshot")
                         orders[key] = found
                 return {"account": account, "orders": list(orders.values()), "positions": positions,
-                        "complete": True, "history_start": self.history_start.isoformat(),
+                        "fees": fees, "complete": True, "history_start": self.history_start.isoformat(),
+                        "fee_history_start": self.fee_history_start.isoformat(),
                         "scope": "all_open_and_recent_plus_owned", "health": self.health}
             except Exception:
                 self.freeze_health("snapshot_incomplete")

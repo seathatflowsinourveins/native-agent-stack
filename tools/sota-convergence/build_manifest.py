@@ -467,6 +467,188 @@ def build_trading_freshness(trading_by_layer: dict, trading_pins: dict | None, r
 
 
 # ---------------------------------------------------------------------------
+# Runtime freshness: GPT runtime workers, SDKs and agents vs upstream, plus dormancy
+# ---------------------------------------------------------------------------
+
+# pin_comparison_reason on a runtime row whose pin is not compared for a reason
+# other than classify_pin's: its source record did not resolve, or it is watch-only.
+RUNTIME_SOURCE_UNRESOLVED = "source_unresolved"
+RUNTIME_WATCH_ONLY = "watch_only"
+# The fixed top-level "gate_error" of a runtime-freshness.json whose rows main()
+# withheld because they tripped assert_no_leak. Never the matched text.
+RUNTIME_LEAK_GATE_ERROR = "leak_gate_tripped"
+# upstream.latest_source on a runtime row whose entry declares tags (extract_layers.py's
+# RUNTIME_TAG_KEYS): the latest is the highest matching tag, the declared pattern matched
+# no fetched tag, the record has no tag list for the declared prefix (github_freshness.py
+# never fetched one, or its matching-refs call failed), or the record's tag list was cut at
+# github_freshness.py's MATCHING_TAGS_CAP ("matching_tags_truncated"), so a higher version
+# may be missing from it. A row without the declaration has no latest_source.
+RUNTIME_LATEST_MATCHING_TAG = "matching_tag"
+RUNTIME_TAG_PATTERN_UNMATCHED = "tag_pattern_unmatched"
+RUNTIME_TAG_PATTERN_UNFETCHED = "tag_pattern_unfetched"
+RUNTIME_TAG_PATTERN_TRUNCATED = "tag_pattern_truncated"
+# pin_comparison_reason on a pinned runtime row whose latest_source is
+# RUNTIME_TAG_PATTERN_TRUNCATED: a latest read from a cut list is not compared.
+RUNTIME_TAG_LIST_TRUNCATED = "tag_list_truncated"
+# A tag pattern's capture group is ranked only when it is a dotted numeric version in ASCII
+# digits. re.ASCII here and on the declared pattern: \d otherwise matches any Unicode decimal
+# digit and int() reads one, so a tag in fullwidth digits could outrank the real version.
+DOTTED_VERSION_RE = re.compile(r"\d+(?:\.\d+)+", re.ASCII)
+# What re.compile raises for a pattern string that does not compile: a syntax error, inline
+# flags that conflict with re.ASCII ("(?u)"), a repeat count too large or nesting too deep.
+PATTERN_COMPILE_ERRORS = (re.error, ValueError, OverflowError, RecursionError)
+
+
+def select_matching_tag(names, pattern):
+    """``(name, count)``: the name in ``names`` with the highest version among the
+    names that ``re.fullmatch`` ``pattern`` with a dotted numeric version
+    (DOTTED_VERSION_RE) in its one capture group, and how many names qualified;
+    ``(None, 0)`` when none did. Both match ASCII digits only (re.ASCII).
+
+    A ``pattern`` that is missing or does not compile also gives ``(None, 0)``
+    instead of raising: extract_layers.py raises on such a declaration, and this is
+    the defence for a hand-edited runtime-pins.json, as github_freshness.py ignores
+    a bad prefix.
+
+    Versions compare as integer tuples, never as names: GitHub lists matching refs
+    in name order, in which 0.3.99 sorts after 0.3.276 (nvchecker's ``use_max_tag``
+    and Renovate's github-tags datasource also rank by parsed version). A tie goes
+    to the greater name, so the result does not depend on the list's order."""
+    if not isinstance(pattern, str):
+        return None, 0
+    try:
+        compiled = re.compile(pattern, re.ASCII)
+    except PATTERN_COMPILE_ERRORS:
+        return None, 0
+    best, count = None, 0
+    for name in names or ():
+        match = compiled.fullmatch(name) if isinstance(name, str) else None
+        captured = match.group(1) if match and compiled.groups == 1 else None
+        if not isinstance(captured, str) or not DOTTED_VERSION_RE.fullmatch(captured):
+            continue
+        count += 1
+        key = (tuple(int(part) for part in captured.split(".")), name)
+        if best is None or key > best:
+            best = key
+    return (best[1] if best else None), count
+
+
+def apply_tag_declaration(upstream: dict, tags: dict, record) -> dict:
+    """``upstream`` (compute_upstream's result) for a runtime row that declares
+    ``tags`` ({"prefix", "pattern"}), given the row's github-freshness.json record.
+
+    With a ``matching_tags`` list for the prefix and a name the pattern selects
+    (``select_matching_tag``), ``latest`` becomes that full tag name (replacing None
+    or a release tag), with ``latest_source`` RUNTIME_LATEST_MATCHING_TAG and
+    ``matching_tag_count``. ``released_at`` and ``prerelease`` become None, because
+    they describe the repository's latest GitHub release, which in a monorepo can be
+    another package's, and ``latest_flag`` is dropped, because no tag-listing fallback
+    is withheld in place of this latest; every other field stays as compute_upstream
+    returned it, and dormancy still reads the repository's activity from the record.
+    Otherwise ``upstream`` is unchanged apart from ``latest_source``:
+    RUNTIME_TAG_PATTERN_UNMATCHED when the pattern selects no name (a pattern that is
+    missing or does not compile included), or RUNTIME_TAG_PATTERN_UNFETCHED without a
+    list (never fetched, or github_freshness.py's ``matching_tags_errors`` holds the
+    failed call).
+
+    When the record carries ``matching_tags_truncated``, the list may lack a higher
+    version, so ``latest_source`` is RUNTIME_TAG_PATTERN_TRUNCATED in place of
+    RUNTIME_LATEST_MATCHING_TAG or RUNTIME_TAG_PATTERN_UNMATCHED; ``latest`` is still
+    the tag selected from the names kept (with ``matching_tag_count``), or
+    compute_upstream's when none matched, and build_runtime_freshness does not compare
+    the pin. github_freshness.py marks the record, not the prefix, so a cut list of any
+    prefix of the repository marks every row that declares one of them."""
+    held = record.get("matching_tags") if isinstance(record, dict) else None
+    names = held.get(tags.get("prefix")) if isinstance(held, dict) else None
+    if not isinstance(names, list):
+        return {**upstream, "latest_source": RUNTIME_TAG_PATTERN_UNFETCHED}
+    truncated = bool(record.get("matching_tags_truncated"))
+    tag, count = select_matching_tag(names, tags.get("pattern"))
+    if tag is None:
+        return {**upstream,
+                "latest_source": RUNTIME_TAG_PATTERN_TRUNCATED if truncated else RUNTIME_TAG_PATTERN_UNMATCHED}
+    kept = {key: value for key, value in upstream.items() if key != "latest_flag"}
+    return {**kept, "latest": tag, "released_at": None, "prerelease": None,
+            "latest_source": RUNTIME_TAG_PATTERN_TRUNCATED if truncated else RUNTIME_LATEST_MATCHING_TAG,
+            "matching_tag_count": count}
+
+
+def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, checked_at: str,
+                            os_package_ids=DEFAULT_OS_PACKAGE_IDS,
+                            threshold_days=DORMANCY_THRESHOLD_DAYS) -> dict:
+    """One row per ``runtime-pins.json`` entry: the GPT runtime workers, SDKs and
+    agents extract_layers.py resolves from runtime records (``RUNTIME_PIN_SOURCES``)
+    plus the watch-only upstreams named on main that no install or runtime record
+    there pins (``RUNTIME_WATCH_SOURCES``).
+
+    A resolved pin uses the same ``compute_upstream``/``classify_pin``/
+    ``pin_comparison_fields`` as the manifest rows. A row whose source did not
+    resolve (``error``) or that is watch-only keeps its upstream and dormancy but
+    publishes ``pin_behind_upstream: null``, ``pin_comparison: "not_compared"`` and
+    the reason ``source_unresolved`` or ``watch_only``. Every row carries
+    ``compute_dormancy``; a row without a repository gets the ``not_fetched``
+    dormancy. This is report-only data: it selects nothing and is not part of
+    the manifest.
+
+    An entry with a repository and a ``tags`` declaration (extract_layers.py's
+    RUNTIME_TAG_KEYS) takes its upstream latest from the tags github_freshness.py
+    listed for the declared prefix (``apply_tag_declaration``), before the pin is
+    compared, so a tag-only or monorepo upstream is compared by its own version
+    tags. A missing or failed tag list only sets ``latest_source``
+    RUNTIME_TAG_PATTERN_UNFETCHED. A cut tag list sets RUNTIME_TAG_PATTERN_TRUNCATED,
+    and a pinned row with it is ``not_compared`` with the reason
+    RUNTIME_TAG_LIST_TRUNCATED (an unresolved or watch-only row keeps its own reason).
+    Every other row's upstream is compute_upstream's, unchanged."""
+    entries = []
+    for pin in sorted((runtime_pins or {}).get("entries", []), key=lambda item: str(item.get("id"))):
+        repository = pin.get("repository")
+        upstream = compute_upstream(repository, repositories) if repository else {}
+        tags = pin.get("tags")
+        if repository and isinstance(tags, dict):
+            upstream = apply_tag_declaration(upstream, tags, freshness_record(repository, repositories))
+        if pin.get("error"):
+            pin_fields = {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
+                          "pin_comparison_reason": RUNTIME_SOURCE_UNRESOLVED}
+        elif pin.get("kind") == RUNTIME_WATCH_ONLY:
+            pin_fields = {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
+                          "pin_comparison_reason": RUNTIME_WATCH_ONLY}
+        elif upstream.get("latest_source") == RUNTIME_TAG_PATTERN_TRUNCATED:
+            # A latest read from a cut tag list is not definitive: a higher version can be
+            # among the names github_freshness.py did not keep.
+            pin_fields = {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
+                          "pin_comparison_reason": RUNTIME_TAG_LIST_TRUNCATED}
+        else:
+            pin_fields = pin_comparison_fields(classify_pin(
+                pin.get("pin"), repository, upstream.get("latest"),
+                component_id=pin.get("id"), os_package_ids=os_package_ids))
+        entries.append({
+            "id": pin.get("id"), "group": pin.get("group"), "kind": pin.get("kind"),
+            "repository": repository, "pin": pin.get("pin"), "pin_source": pin.get("pin_source"),
+            "named_in": pin.get("named_in"), "error": pin.get("error"), "upstream": upstream, **pin_fields,
+            "dormancy": compute_dormancy(freshness_record(repository, repositories) if repository else None,
+                                         checked_at, threshold_days=threshold_days),
+        })
+    return {
+        "schema": "runtime-freshness/1",
+        "checked_at": checked_at,
+        "dormancy_threshold_days": threshold_days,
+        "dormancy_rule": DORMANCY_RULE,
+        "counts": {
+            "entries": len(entries),
+            "pin_source": sum(1 for row in entries if row["kind"] == "pin_source"),
+            "watch_only": sum(1 for row in entries if row["kind"] == RUNTIME_WATCH_ONLY),
+            "unresolved": sum(1 for row in entries if row["error"]),
+            "pin_behind_upstream": sum(1 for row in entries if row["pin_behind_upstream"] is True),
+            "not_compared": sum(1 for row in entries if row["pin_comparison"] == PIN_NOT_COMPARED),
+            "dormant": sum(1 for row in entries if row["dormancy"]["dormant"] is True),
+            "dormancy_unknown": sum(1 for row in entries if row["dormancy"]["dormant"] is None),
+            "archived": sum(1 for row in entries if row["upstream"].get("archived") is True),
+        },
+        "entries": entries,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Disposition and sanitization
 # ---------------------------------------------------------------------------
 
@@ -1840,6 +2022,13 @@ def parse_args(argv=None):
                          help="Also write the report-only trading-freshness.json (every pinned trading "
                               "component vs upstream, with a dormancy signal relative to --checked-at). "
                               "The manifest itself is unchanged.")
+    parser.add_argument("--runtime-pins", type=Path, default=None,
+                         help="extract_layers.py's runtime-pins.json (default: <work-dir>/runtime-pins.json "
+                              "when it exists). Read only with --runtime-freshness-out.")
+    parser.add_argument("--runtime-freshness-out", type=Path, default=None,
+                         help="Also write the report-only runtime-freshness.json (every GPT runtime worker, "
+                              "SDK and agent in runtime-pins.json vs upstream, with a dormancy signal "
+                              "relative to --checked-at). The manifest and the trading sidecar are unchanged.")
     return parser.parse_args(argv)
 
 
@@ -1916,6 +2105,45 @@ def main(argv=None) -> int:
         args.trading_freshness_out.parent.mkdir(parents=True, exist_ok=True)
         args.trading_freshness_out.write_text(trading_text + "\n", encoding="utf-8")
         print(json.dumps({"trading_freshness": trading_freshness["counts"]}))
+
+    if args.runtime_freshness_out:
+        # Written after the manifest and the trading sidecar, which are byte-identical
+        # with or without this flag. A work dir without runtime-pins.json (written
+        # before it existed) still gets a sidecar, with zero entries.
+        runtime_pins_path = args.runtime_pins or (work_dir / "runtime-pins.json" if work_dir else None)
+        runtime_pins = (load_json(runtime_pins_path)
+                        if runtime_pins_path and runtime_pins_path.exists() else None)
+        runtime_freshness = build_runtime_freshness(
+            runtime_pins, freshness_doc.get("repositories") or {}, args.checked_at,
+            os_package_ids=tuple(args.os_package_ids),
+        )
+        runtime_text = json.dumps(sanitize_value(runtime_freshness, work_dir=work_dir_for_sanitize,
+                                                 checkout_roots=checkout_roots), indent=1)
+        json.loads(runtime_text)
+        runtime_summary = runtime_freshness["counts"]
+        try:
+            assert_no_leak(runtime_text)
+            leak_gate_tripped = False
+        except LeakDetected:
+            # A runtime upstream's own data (a third-party release tag, say) tripped
+            # the gate. Only this report-only sidecar is withheld, so a runtime-only
+            # upstream cannot take down the foundation and trading report: the
+            # manifest and the trading sidecar are already written, and their own
+            # leak checks above stay fatal.
+            leak_gate_tripped = True
+        if leak_gate_tripped:
+            # Same schema and keys, no entries, every count 0, and a fixed-string
+            # gate_error: never the matched text or the exception message.
+            withheld = build_runtime_freshness(None, {}, args.checked_at, os_package_ids=tuple(args.os_package_ids))
+            withheld["gate_error"] = RUNTIME_LEAK_GATE_ERROR
+            runtime_text = json.dumps(sanitize_value(withheld, work_dir=work_dir_for_sanitize,
+                                                     checkout_roots=checkout_roots), indent=1)
+            json.loads(runtime_text)
+            assert_no_leak(runtime_text)
+            runtime_summary = {"gate_error": RUNTIME_LEAK_GATE_ERROR}
+        args.runtime_freshness_out.parent.mkdir(parents=True, exist_ok=True)
+        args.runtime_freshness_out.write_text(runtime_text + "\n", encoding="utf-8")
+        print(json.dumps({"runtime_freshness": runtime_summary}))
     return 0
 
 

@@ -67,7 +67,8 @@ def find_candidates(root: Path, context: platform_evidence.StatusContext | None 
                 declared_map = winner.get("platform_status") if isinstance(winner.get("platform_status"), dict) else {}
                 for platform_key in sorted(PLATFORM_KEYS):
                     declared = declared_map.get(platform_key, "untested")
-                    derived = platform_evidence.platform_status(platform_key, winner, context)
+                    derived = platform_evidence.platform_status(platform_key, winner, context,
+                                                                layer=f"{catalog}/{layer_id}")
                     declared_rank = platform_evidence.STATUS_RANK.get(declared, -1)
                     derived_rank = platform_evidence.STATUS_RANK.get(derived.status, 0)
                     if derived_rank > declared_rank:

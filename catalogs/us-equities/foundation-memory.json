@@ -14,10 +14,10 @@
       "role": "Cross-harness project memory and handoffs",
       "decision": "default",
       "rationale": "Retain one scoped memory of record shared by Codex and Claude; lexical retrieval avoids an extraction-model dependency.",
-      "version_or_commit": "v2.3.1",
-      "source_commit": "bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025",
-      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
-      "release_date": "2026-09-17T18:26:44Z",
+      "version_or_commit": "v2.4.1",
+      "source_commit": "433a19f3d54dea287571b1423591db2a89965fa9",
+      "source_pin_scope": "Release tag v2.4.1 (annotated tag 1e11aa43..., peeled to commit 433a19f3...), the manifests/stack.json pin since #307; not a source review of that commit. The v2.3.1-era reviewed default-branch snapshot bbc96c4a (checked 2026-09-19) is superseded.",
+      "release_date": "2026-09-25T21:46:32Z",
       "license": "MIT",
       "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
       "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
@@ -26,7 +26,9 @@
       "evidence_refs": [
         "evidence/receipts/native-memory.json",
         "evidence/receipts/desktop-direct-rag.json",
-        "evidence/receipts/component-history.json"
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/ai-memory-241-qualification-20260925.json",
+        "evidence/receipts/ai-memory-240-qualification-20260925.json"
       ],
       "native_workflow": [
         "ai-memory --version",
@@ -38,13 +40,14 @@
         "Native client hooks/instructions and explicit project identity; existing local installation."
       ],
       "limitations": [
-        "Lifecycle capture is bounded sanitized observations, not complete transcripts. Durable writes require explicit intent; recalled prose cannot authorize actions."
+        "Lifecycle capture is bounded sanitized observations, not complete transcripts. Durable writes require explicit intent; recalled prose cannot authorize actions.",
+        "Aligned 2026-09-26 with the 2.4.1 stack pin (#307): the WSL2 workstation's native_cli_e2e qualification receipt covers 2.4.1, with the 2.4.0 receipt kept as history. The durable-memory winner pin in catalogs/landscape/foundation.json stays 2.3.2 (the sealed 2026-09-22 packet), and macOS stays on 2.3.2."
       ],
       "sources": [
-        "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/README.md",
-        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.1"
+        "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/README.md",
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1"
       ],
-      "installed_version": "2.3.1"
+      "installed_version": "2.4.1"
     },
     {
       "id": "foundation-context-mode",

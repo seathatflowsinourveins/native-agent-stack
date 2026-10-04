@@ -1,6 +1,23 @@
 # Native Astra research workers
 
-The official Python Codex SDK was installed and used with the existing native
+The current example uses official Codex Python SDK **0.160.0**, pinned to
+[`rust-v0.160.0`, a956835d](https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python),
+and can select the clean loopback OmniRoute lane per invocation. The
+[October 3 compatibility record](../../../evidence/artifacts/runtime-sdk-20261003/receipt.json)
+retains completed native-account and gateway marker canaries for this pair;
+missing original invocation and timing evidence limits it to a compatibility
+attempt. These marker checks do not qualify tool registration or thread resume
+with the upgraded SDK.
+
+The historical September 30 run used SDK **0.159.2**. It registered and
+called its lookup tool, then resumed the same persistent thread in a new process
+and called it again. Both returned the frozen fixture value through
+`cx/gpt-6-astra-max`, Responses and reasoning effort `max`.
+[September 30 qualification](../../../evidence/artifacts/runtime-sdk-20260930/receipt.json).
+This bounded tool/lifecycle qualification does not establish the research or
+review task-quality gates for the whole worker roster.
+
+The earlier official Python Codex SDK run used the existing native
 Codex 0.155.1 binary. Native sign-in completed; the first allowance check was
 blocked, and the post-login check allowed the research task. The actual task
 completed in **58,410 ms** with configured model `gpt-6-astra`, provider `openai`,
@@ -44,8 +61,10 @@ non-interactive) and repeatable `--config-override KEY=TOML` for per-process nat
 overrides such as disabling hooks. `--lookup-tool JSON` (deny_all only) registers
 one read-only custom lookup tool (`{name, description, values}`) through the SDK's
 `CodexClient` (`thread_start` with the experimental `dynamicTools` field, answered by
-its `approval_handler`), because `AsyncCodex.thread_start` has no tool field in
-0.155.1. The executed tool turn and resume, SDK 0.155.1 rerun and
+its `approval_handler`), because the installed **0.160.0**
+[`AsyncCodex.thread_start` signature](https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/src/openai_codex/api.py#L393)
+has no tool argument (checked against the installed SDK, release changelog and
+source at a956835d). The earlier executed tool turn and resume, SDK 0.155.1 rerun and
 Context Mode root finding are in
 [the gap-wave-2 receipts](../../../evidence/artifacts/gap-wave2-20260923/foundation__agent-sdks/README.md).
 
@@ -56,6 +75,23 @@ It preserves native authentication, explicitly selects Astra, requires reported
 ordinary allowance, checks the configured model/provider before submission,
 uses a read-only sandbox, denies escalation and adds [the shared policy](policy.md)
 as developer instructions. It does not build another agent framework.
+
+For GPT workers dispatched by Claude, add `--provider omniroute` to the same
+native `inspect` and `run` commands. The default endpoint is
+`http://127.0.0.1:20128/v1`; `--gateway-base-url` accepts only a port-qualified
+HTTP loopback `/v1` endpoint. The example passes the official
+[`CodexConfig.config_overrides`](https://github.com/openai/codex/tree/rust-v0.160.0/sdk/python)
+provider settings: `wire_api="responses"`, `requires_openai_auth=false` and
+`model_reasoning_effort="max"`. It selects the gateway alias explicitly and
+rejects extra settings that would replace this route contract. No sampling
+parameter is added. Gateway discovery checks the advertised alias and makes no
+native account-allowance claim; only a completed model run provides execution
+evidence. The default `openai` invocation keeps native account readiness and
+sign-in. This revision also explicitly sets `model_reasoning_effort="max"` on
+the default `openai` path; earlier revisions passed only caller overrides on
+that path. That effort change applies to this bounded worker example, rather
+than a global client setting. Claude itself retains its native Claude model
+route.
 
 The turn deadline starts after the upstream turn is accepted. Startup and
 readiness RPCs can block independently; the outer native process timeout limits
@@ -171,6 +207,9 @@ The optional file is published atomically, mode `0600`, with a unique
 `observation_id`, task status, configured model, duration, usage availability and
 aggregate usage. It contains no prompt, response/items, raw errors, account
 identity or native thread identifier. Unavailable usage remains JSON `null`.
+Reported usage carries `usage_scope: native_thread_cumulative`: persisted-thread
+resume counters include earlier turns. Count the final snapshot for that thread
+once; observation files and prior snapshots are not additional token charges.
 Its identifier is a local ingestion/deduplication key, not a public session ID.
 The detailed `--receipt` remains private and is a different artifact.
 
@@ -201,5 +240,5 @@ can increase startup and context cost.
 
 Upstream: [Codex SDK](https://learn.chatgpt.com/docs/codex-sdk),
 [App Server](https://learn.chatgpt.com/docs/app-server),
-[native source](https://github.com/openai/codex),
+[native source](https://github.com/openai/codex/tree/rust-v0.160.0),
 [prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching).

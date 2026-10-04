@@ -1,0 +1,30 @@
+[
+  {
+    "run": "runs-20260925/ai-memory-2.3.2/attempt-5",
+    "evaluated_checks": 95,
+    "passed_checks": 95,
+    "failed_checks": [],
+    "excluded_checks": [
+      "expired_past_after_sweep_direct_read_rejected_as_expected",
+      "expired_past_direct_read_gone_rejected_as_expected",
+      "ttl_after_expiry_calls_sent_after_native_expiry",
+      "ttl_after_sweep_direct_read_rejected_as_expected",
+      "ttl_before_expiry_answered_before_native_expiry",
+      "ttl_short_direct_read_gone_rejected_as_expected"
+    ]
+  },
+  {
+    "run": "runs-20260925/ai-memory-2.4.0/attempt-2",
+    "evaluated_checks": 95,
+    "passed_checks": 95,
+    "failed_checks": [],
+    "excluded_checks": [
+      "expired_past_after_sweep_direct_read_rejected_as_expected",
+      "expired_past_direct_read_gone_rejected_as_expected",
+      "ttl_after_expiry_calls_sent_after_native_expiry",
+      "ttl_after_sweep_direct_read_rejected_as_expected",
+      "ttl_before_expiry_answered_before_native_expiry",
+      "ttl_short_direct_read_gone_rejected_as_expected"
+    ]
+  }
+]

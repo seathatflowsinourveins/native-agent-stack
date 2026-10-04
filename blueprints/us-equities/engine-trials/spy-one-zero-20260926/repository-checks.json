@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "record": "repository_checks",
+  "trial": "blueprints/us-equities/engine-trials/spy-one-zero-20260926",
+  "host_id": "nativestack-5975wx-20260925",
+  "checked_commit": "fee2d6d818c796c379270c42c278b9d9fca33d7e",
+  "observed_utc": {
+    "osv_scans": "2026-09-26T10:13:16Z to 2026-09-26T11:07:10Z",
+    "unittest_runs": "2026-09-26T10:12:52Z to 2026-09-26T11:06:44Z"
+  },
+  "scope": "Review round 1 (independent reviewer, 2026-09-26) found two repository unit tests that the trial's new files fail. Both need a registration in a repository file outside this directory, and simulating them showed a third: manifests/evidence.json hashes the lockfile inventory. This record reproduces the failures, gives the exact entries and records the OSV-Scanner result that the lock registration exposes. No engine ran. No port, manifest, lock, receipt, verdict, run record, scorer or tolerance sheet changed, and nothing was re-scored.",
+  "evidence_class": "Local integration checks on this host: the repository's own unit tests and the security-scan.yml OSV-Scanner command. The registered state was applied only in a scratch git worktree. It is a simulation of the coordinator's change, not the state of this branch, and not a CI run.",
+  "findings": [
+    {
+      "id": "R1",
+      "check": "tests/test_blind_checkout.py RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified",
+      "reproduced": "fails: 16 unclassified values",
+      "values": "the eight mappings[*].decision strings of each arm manifest",
+      "class": "data. Each string states how one arm maps one LEAN concept onto its engine, like the eight spy-parity manifest strings already listed in DATA_VALUE_SHA256. None states a selection, and blind_checkout.is_label_value returns False for all 16 under the current rules, so registering them changes no blind-checkout output.",
+      "why_not_fixed_in_this_directory": "The strings are in the frozen arm manifests. Each manifest's sha256 is bound by its receipts and re-verified by compare.py (mapping_manifest_sha256_mismatch). Rewording or re-keying them would unbind every verdict.",
+      "registration": {
+        "file": "tools/sota-convergence/blind_checkout.py",
+        "table": "DATA_VALUE_SHA256",
+        "digest": "sha256 of the exact UTF-8 string, as the test computes it",
+        "entries": [
+          {
+            "manifest": "ml4t-backtest/mapping-manifest.json",
+            "mapping_index": 0,
+            "mapping_id": "instrument_identity",
+            "sha256": "31a259c4e9b07acc86cf9e227c973dd3c9938772ffac4c5f63cccaf81f003f12"
+          },
+          {
+            "manifest": "ml4t-backtest/mapping-manifest.json",
+            "mapping_index": 1,
+            "mapping_id": "raw_data_decoding",
+            "sha256": "030a370a1ba75ca7f9c8a49c076d9b9aed94f5b5225a54826d4d2ecf926729bc"
+          },
+          {
+            "manifest": "ml4t-backtest/mapping-manifest.json",
+            "mapping_index": 2,
+            "mapping_id": "sessions_and_time",
+            "sha256": "6f0bdca37a45f5746a514009e6711a9af2ed9899b7f2ab0bc75eb27ae3d4d314"
+          },
+          {
+            "manifest": "ml4t-backtest/mapping-manifest.json",
+            "mapping_index": 3,
+            "mapping_id": "decision_visibility",
+            "sha256": "2478c0541a4d7b2b64074c9a4a80cda49172a43747e18b9d7b769ea67c698a2a"
+          },
+          {
+            "manifest": "ml4t-backtest/mapping-manifest.json",
+            "mapping_index": 4,
+            "mapping_id": "market_on_open_proxy",
+            "sha256": "f7e39b00037c3a83b7ea454812c5ebcc6a09430cb3f6b5370a021e56167d021c"
+          },
+          {
+            "manifest": "ml4t-backtest/mapping-manifest.json",
+            "mapping_index": 5,
+            "mapping_id": "distributions_and_cash",
+            "sha256": "5eec7f9120abecb8338bba826c08763afc591b6df674bd1bfde320fceb2cd89b"
+          },
+          {
+            "manifest": "ml4t-backtest/mapping-manifest.json",
+            "mapping_index": 6,
+            "mapping_id": "costs_and_rounding",
+            "sha256": "911569fe3526b0c4b208c244e0231da9001b6be4484323ca879f3ef2229e6564"
+          },
+          {
+            "manifest": "ml4t-backtest/mapping-manifest.json",
+            "mapping_index": 7,
+            "mapping_id": "margin_and_adaptive_state",
+            "sha256": "089c43f0e2f95a4c46d617e4fdaca5102f148b02e36581eb6eb2deda20bd7eee"
+          },
+          {
+            "manifest": "lumibot/mapping-manifest.json",
+            "mapping_index": 0,
+            "mapping_id": "instrument_identity",
+            "sha256": "4ce4bc9ea27b38cdcc533a307f4b9160146e3c6a3faeb87ff801c7933ccfb97f"
+          },
+          {
+            "manifest": "lumibot/mapping-manifest.json",
+            "mapping_index": 1,
+            "mapping_id": "raw_data_decoding",
+            "sha256": "c1a17616ba4e1c616a186e918af0110a0819888362d5c44b4aa0424b3f2d186a"
+          },
+          {
+            "manifest": "lumibot/mapping-manifest.json",
+            "mapping_index": 2,
+            "mapping_id": "sessions_and_time",
+            "sha256": "8d4281229ff0cdc20bdae943b39bcddf65fd0d976bb412ff571d5a06abaff710"
+          },
+          {
+            "manifest": "lumibot/mapping-manifest.json",
+            "mapping_index": 3,
+            "mapping_id": "decision_visibility",
+            "sha256": "9b4160bf849b1cb871c2b0461d2266e542e9e0a9ca53f04a05cbc98f819a527b"
+          },
+          {
+            "manifest": "lumibot/mapping-manifest.json",
+            "mapping_index": 4,
+            "mapping_id": "market_on_open_proxy",
+            "sha256": "7bfe9da350c9938704089f39b888f18d57da5a513b6da1b1becfc41512acc3a8"
+          },
+          {
+            "manifest": "lumibot/mapping-manifest.json",
+            "mapping_index": 5,
+            "mapping_id": "distributions_and_cash",
+            "sha256": "9ebd0ff391fc888fd9ec0024acef41cc5e0f0fe323d7cb84d63537ec43f77745"
+          },
+          {
+            "manifest": "lumibot/mapping-manifest.json",
+            "mapping_index": 6,
+            "mapping_id": "costs_and_rounding",
+            "sha256": "0dc1c8c8d26ceaf9cd684a2c083c9670b8da26a152a33d6e161a76b202092ab1"
+          },
+          {
+            "manifest": "lumibot/mapping-manifest.json",
+            "mapping_index": 7,
+            "mapping_id": "margin_and_adaptive_state",
+            "sha256": "fafa04bedfb57e630da10b4cc58f0fcd60314f293bf3a058cd89f861f403830b"
+          }
+        ]
+      }
+    },
+    {
+      "id": "R2",
+      "check": "tests/test_osv_lockfile_coverage.py LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed",
+      "reproduced": "fails: 3 tracked lockfiles missing from .github/osv-scanner-lockfiles.json",
+      "why_not_fixed_in_this_directory": "Each arm manifest binds its lock's path and sha256 (engine.lock), and run.json cites all three. Renaming, untracking or relocking a lock would unbind the manifest from its receipts or change the recorded environment.",
+      "registration": {
+        "file": ".github/osv-scanner-lockfiles.json",
+        "list": "lockfiles",
+        "entries": [
+          {
+            "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock",
+            "parser": "requirements.txt"
+          },
+          {
+            "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+            "parser": "requirements.txt"
+          },
+          {
+            "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
+            "parser": "requirements.txt"
+          }
+        ],
+        "precedent": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock, a hashed uv pip compile lock listed with the requirements.txt parser"
+      },
+      "follow_on_registration": {
+        "file": "manifests/evidence.json",
+        "entry": ".github/osv-scanner-lockfiles.json",
+        "why": "scripts/validate.py checks the inventory's sha256 and byte count. With the inventory changed and this entry not, tests.test_catalog_freshness_propose.RebuildExplorerSubprocessTests.test_general_publication_validator_passes_after_the_run failed with '.github/osv-scanner-lockfiles.json: SHA-256 mismatch' and 'byte count mismatch'.",
+        "checked_commit_value": {
+          "sha256": "cfdc1cf9bad1fa20e37547656a5e509ffd62cb08dec993f6722f1328f1fad828",
+          "bytes": 9336
+        },
+        "simulated_value": {
+          "sha256": "d1cab283114c18e009752d9489851ef733f7ac0fedaa4981426724005aeacfef",
+          "bytes": 9814,
+          "valid_for": "the three entries appended to the end of lockfiles and the file rewritten with two-space JSON indentation and a final newline; any other layout has its own value"
+        }
+      },
+      "consequence": "Once listed, the required osv-scanner job scans the three locks. ml4t.lock and build.lock are clean. lumibot.lock fails the job on the two advisories under osv_scanner.advisories unless they are ignored. The inventory's excluded list admits only a deliberately vulnerable test fixture. Its decision record (docs/decisions/2026-09-22-github-automation-closure.md) names a second exclusion for a file that is not a test fixture as an overturn condition, so excluding these locks needs an explicit policy decision."
+    }
+  ],
+  "osv_scanner": {
+    "tool": "OSV-Scanner 2.6.0 (osv-scalibr 0.5.2, commit e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6)",
+    "binary": "osv-scanner_linux_amd64 of release v2.6.0, sha256 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108, checked against the value pinned in .github/workflows/security-scan.yml; kept outside every checkout",
+    "command": "osv-scanner scan source --config <config> --no-resolve --lockfile=<parser>:<path> ..., the security-scan.yml command; the inventory runs expand the inventory with its jq line",
+    "database": "the OSV API at scan time",
+    "lock_sha256": {
+      "ml4t-backtest/lockcheck/ml4t.lock": "e168a18f30b48e50d024b19fd1f734b90dc4cef70627d70e637431fe7505c791",
+      "lumibot/lockcheck/lumibot.lock": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+      "lumibot/lockcheck/ibapi-build/build.lock": "9c7fe3619134c402d5f35ba788be621ffd186139d590a435d468e4e5565c7031"
+    },
+    "runs": [
+      {
+        "inputs": "the three trial locks only",
+        "config": ".github/osv-scanner.toml unchanged (no ignores)",
+        "exit_code": 1,
+        "packages_scanned": {
+          "ml4t-backtest/lockcheck/ml4t.lock": 15,
+          "lumibot/lockcheck/lumibot.lock": 264,
+          "lumibot/lockcheck/ibapi-build/build.lock": 4
+        },
+        "result": "two advisory groups, both in lumibot/lockcheck/lumibot.lock"
+      },
+      {
+        "inputs": "the checked commit's inventory (44 lockfiles)",
+        "config": "unchanged",
+        "exit_code": 0,
+        "result": "no vulnerabilities; 175 local packages filtered"
+      },
+      {
+        "inputs": "that inventory plus the three trial locks (47 lockfiles), scratch worktree",
+        "config": "unchanged",
+        "exit_code": 1,
+        "result": "Total 2 packages affected by 2 known vulnerabilities (0 Critical, 1 High, 1 Medium, 0 Low, 0 Unknown) from 1 ecosystem."
+      },
+      {
+        "inputs": "the same 47 lockfiles, scratch worktree",
+        "config": "unchanged plus [[IgnoredVulns]] for GHSA-8mgp-746c-j5xp and GHSA-h35f-9h28-mq5c",
+        "exit_code": 0,
+        "result": "No issues found; the two ids and their aliases (3 vulnerabilities) filtered"
+      },
+      {
+        "inputs": "a scratch merge of origin/main e372369d with 4e1b5c38, the commit that added this file, with every registration applied (47 lockfiles)",
+        "config": "with the two ignores",
+        "exit_code": 0,
+        "result": "No issues found; the two ids and their aliases filtered"
+      },
+      {
+        "inputs": "4e1b5c38 with every registration applied (47 lockfiles), scratch worktree",
+        "config": "with the two ignores, each reason citing this file",
+        "exit_code": 0,
+        "result": "No issues found; tests.test_osv_lockfile_coverage (8 tests) passed with that config"
+      }
+    ],
+    "advisories": [
+      {
+        "id": "GHSA-8mgp-746c-j5xp",
+        "aliases": [
+          "CVE-2026-81726",
+          "PYSEC-2026-3740"
+        ],
+        "package": "nltk",
+        "version": "3.10.3",
+        "lock": "lumibot/lockcheck/lumibot.lock",
+        "required_by": [
+          "google-adk",
+          "llama-index-core"
+        ],
+        "github_severity": "HIGH",
+        "cvss": [
+          "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:L",
+          "CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:L/VA:L/SC:N/SI:N/SA:N"
+        ],
+        "affected": "introduced 0, last_affected 3.10.3",
+        "fixed_version": null,
+        "summary": "NLTK: Model-artifact APIs bypass pathsec and touch files outside allowed roots",
+        "precondition": "The application enables nltk pathsec enforcement and lets untrusted input choose the model import or export path of TransitionParser.train or parse, AveragedPerceptron.save or load, PerceptronTagger.save_to_json or save_maxent_params.",
+        "reach_in_this_trial": "No trial code calls nltk: the ports and probe scripts contain no nltk reference, and neither does any file of the installed lumibot 4.6.1 package (text search). The runs were offline under bwrap with the network unshared and the environment, checkout and LEAN data read-only. Evidence level: source search. Whether a dependency imports nltk at runtime was not traced.",
+        "remedy": "none available: the advisory lists no patched release, and the lock is the frozen record of the evaluated environment"
+      },
+      {
+        "id": "GHSA-h35f-9h28-mq5c",
+        "aliases": [
+          "BIT-setuptools-2026-59890",
+          "CVE-2026-59890",
+          "PYSEC-2026-3447"
+        ],
+        "package": "setuptools",
+        "version": "80.10.2",
+        "lock": "lumibot/lockcheck/lumibot.lock",
+        "required_by": [
+          "ccxt",
+          "llama-index-core",
+          "lumibot"
+        ],
+        "github_severity": "MODERATE",
+        "cvss": [
+          "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:L/A:N"
+        ],
+        "affected": "introduced 0, fixed 83.0.0",
+        "fixed_version": "83.0.0",
+        "summary": "setuptools: MANIFEST.in exclusion bypass in sdist via Unicode normalization collision (NFC/NFD) on macOS APFS/HFS+",
+        "precondition": "Building a source distribution whose MANIFEST.in excludes files, on a normalization-preserving file system (macOS APFS or HFS+).",
+        "reach_in_this_trial": "Not reached. The environment was installed binary-only on Linux (uv pip sync --require-hashes --no-build), and nothing builds a source distribution with it. The one source build, the ibapi wheel, ran in a separate build environment locked by ibapi-build/build.lock with setuptools 84.0.0, a fixed version, and it built a wheel, not a source distribution.",
+        "remedy": "relocking to setuptools 83.0.0 or later would change the frozen record of the evaluated environment, so the lock is not relocked after the run"
+      }
+    ],
+    "ignore_policy": "An [[IgnoredVulns]] entry in .github/osv-scanner.toml needs id, a concrete reason and an ignoreUntil at most 90 days after it is added (2026-12-25 for an entry added on 2026-09-26), and is listed with its evidence in docs/decisions/2026-09-22-github-automation-closure.md. The two ids above are enough: OSV-Scanner 2.6.0 filtered each id together with its aliases."
+  },
+  "unittest": {
+    "command": "uv run --no-project --with jsonschema --with pyyaml python -B -m unittest (repository root)",
+    "interpreter": "uv 0.12.17 with its managed CPython 3.14.7, jsonschema 4.26.0 and PyYAML 6.0.3",
+    "runs": [
+      {
+        "tree": "the checked commit as committed",
+        "finished_utc": "2026-09-26T10:22:15Z",
+        "ran": 5805,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 667,
+        "exit_code": 1,
+        "summary_line": "Ran 5805 tests in 560.816s; FAILED (failures=4, skipped=667)",
+        "failing": [
+          {
+            "test": "tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified",
+            "cause": "finding R1: 16 unclassified values"
+          },
+          {
+            "test": "tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed",
+            "cause": "finding R2: the three trial locks are not listed"
+          },
+          {
+            "test": "tests.test_pre_commit_gate.PreCommitGateTests.test_blocks_synthetic_key_and_passes_clean_commit",
+            "cause": "host contention, not this branch: 'gitleaks: another scan holds the per-user lock; retry after it finishes'",
+            "rerun": "failed the same way four times from 10:23:07Z while another scan held the lock, passed at 10:24:29Z, and passed again when run alone"
+          },
+          {
+            "test": "tests.test_adaptive_paper_metrics.FileSdRegistrationTests.test_a_clean_stop_of_an_unfinished_trial_stays_registered",
+            "cause": "timing under host load from concurrent sessions (load average about 27 to 42), not this branch: 'exporter never registered its target'",
+            "rerun": "passed in a separate run of tests.test_adaptive_paper_metrics with tests.test_pre_commit_gate (40 tests; the one failure was the gitleaks lock)"
+          }
+        ],
+        "wall_seconds": 563
+      },
+      {
+        "tree": "scratch worktree at the checked commit with the R1 entries, the R2 inventory entries and the two ignores",
+        "started_utc": "2026-09-26T10:24:59Z",
+        "finished_utc": "2026-09-26T10:33:21Z",
+        "wall_seconds": 502,
+        "ran": 5805,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 667,
+        "exit_code": 1,
+        "summary_line": "Ran 5805 tests in 499.538s; FAILED (failures=1, skipped=667)",
+        "failing": [
+          {
+            "test": "tests.test_catalog_freshness_propose.RebuildExplorerSubprocessTests.test_general_publication_validator_passes_after_the_run",
+            "cause": "Publication validation failed: '.github/osv-scanner-lockfiles.json: SHA-256 mismatch' and '.github/osv-scanner-lockfiles.json: byte count mismatch'; the R2 follow-on registration"
+          }
+        ]
+      },
+      {
+        "tree": "the same scratch worktree plus the manifests/evidence.json update for the inventory, with this README section and a draft of this file copied in",
+        "started_utc": "2026-09-26T10:35:07Z",
+        "finished_utc": "2026-09-26T10:42:58Z",
+        "wall_seconds": 470,
+        "ran": 5805,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 667,
+        "exit_code": 0,
+        "summary_line": "Ran 5805 tests in 467.574s; OK (skipped=667)",
+        "validate_py": "scripts/validate.py passed in the same tree: status passed, 6049 hashed files, 154 receipts"
+      },
+      {
+        "tree": "4e1b5c38, the commit that added this file, with every registration applied in a scratch worktree",
+        "started_utc": "2026-09-26T10:46:57Z",
+        "finished_utc": "2026-09-26T10:56:28Z",
+        "wall_seconds": 571,
+        "ran": 5805,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 648,
+        "exit_code": 1,
+        "summary_line": "Ran 5805 tests in 567.996s; FAILED (failures=1, skipped=648)",
+        "failing": [
+          {
+            "test": "tests.test_pre_commit_gate.PreCommitGateTests.test_blocks_synthetic_key_and_passes_clean_commit",
+            "cause": "host contention, not this branch: 'gitleaks: another scan holds the per-user lock; retry after it finishes'",
+            "rerun": "tests.test_pre_commit_gate passed at 10:56:43Z (3 tests)"
+          }
+        ],
+        "validate_py": "scripts/validate.py passed in the same tree: status passed, 6049 hashed files"
+      },
+      {
+        "tree": "a scratch merge of origin/main e372369d with 4e1b5c38, every registration applied, like the merge a pull request check tests",
+        "started_utc": "2026-09-26T10:56:48Z",
+        "finished_utc": "2026-09-26T11:06:44Z",
+        "wall_seconds": 596,
+        "ran": 6041,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 651,
+        "exit_code": 0,
+        "summary_line": "Ran 6041 tests in 591.758s; OK (skipped=651)",
+        "validate_py": "scripts/validate.py passed in the same tree: status passed, 6323 hashed files"
+      }
+    ]
+  },
+  "registrations_outside_this_directory": [
+    "tools/sota-convergence/blind_checkout.py DATA_VALUE_SHA256: the 16 sha256 values under findings R1.",
+    ".github/osv-scanner-lockfiles.json lockfiles: the three entries under findings R2.",
+    "manifests/evidence.json: the new sha256 and byte count of .github/osv-scanner-lockfiles.json (findings R2 follow_on_registration).",
+    ".github/osv-scanner.toml: ignores for GHSA-8mgp-746c-j5xp and GHSA-h35f-9h28-mq5c, listed with their evidence in docs/decisions/2026-09-22-github-automation-closure.md, whose sha256 and byte count manifests/evidence.json also records; or an explicit policy decision that replaces the ignores. Without either, the required osv-scanner job fails on lumibot.lock.",
+    "manifests/evidence.json: this file with the trial's other files (see README)."
+  ]
+}

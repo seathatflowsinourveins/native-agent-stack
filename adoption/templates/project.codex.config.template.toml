@@ -15,11 +15,12 @@ max_concurrent_threads_per_session = 3
 
 # serena, ai-memory and socraticode moved to user scope (codex.config.template.toml), so every Codex
 # worktree worker has them without this project-local file (docs/decisions/2026-09-25-codex-mcp-scope.md).
-# context-mode also moved: its own plugin manifest (~/.codex/plugins/cache/context-mode/*/.codex-plugin/
-# plugin.json) already declares its mcp_servers.context-mode with no "cwd", so the "enabled = false"
-# override this project template used to carry, and its own cwd-pinned mcp_servers.context-mode block,
-# are both removed -- the plugin's own user-scope registration (already enabled in
-# codex.config.template.toml's [plugins."context-mode@context-mode"]) is used unchanged.
+# context-mode's MCP server moved there too. Its plugin's own server declares cwd "." in
+# .codex-plugin/mcp.json, which Codex resolves to the plugin root, not the project, so the user-scope
+# template turns that server off and registers context-mode with no cwd: Codex starts it in each
+# session's own directory, which upstream start.mjs binds as CONTEXT_MODE_PROJECT_DIR. That replaces the
+# main-checkout-only binding this file used to carry. recipes/README.md ("Retained Context Mode") keeps
+# the project-scoped form for a project that needs a fixed directory.
 
 # jcodemunch stays project-scoped: its own MCP instructions ("Prefer it over Read/Grep/Glob/Bash for code
 # navigation") would load into every session at user scope, contradicting this catalog's own retrieval
@@ -29,6 +30,16 @@ max_concurrent_threads_per_session = 3
 [mcp_servers.jcodemunch]
 command = "${ECO_ROOT}/bin/jcodemunch-mcp"
 startup_timeout_sec = 60
+# Approve auto-approves even under approval_policy = "never":
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/mcp/mod.rs#L89-L98
+# RawMcpServerConfig / McpServerToolConfig: codex-rs/core/config.schema.json at the same tag.
+# Read front door: jcodemunch-mcp 1.108.319, counter.py FRONT_DOOR and server.py:5500-5577:
+# https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/counter.py
+# `order` defaults allow_state_change=false but accepts true; this list is not a read-only sandbox.
+# route(execute=true) sends the whole task as the query (counter.py L616-630, blob 0605443d at 8f7b34ab and v1.108.327).
+# Look up a known name with order search_symbols {repo, query: NAME}, and call route without execute for an open task.
+default_tools_approval_mode = "approve"
+enabled_tools = ["route", "menu", "order"]
 
 [mcp_servers.jcodemunch.env]
 RTK_TELEMETRY_DISABLED = "1"

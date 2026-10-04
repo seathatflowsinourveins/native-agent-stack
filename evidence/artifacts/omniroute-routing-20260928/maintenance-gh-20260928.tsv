@@ -1,0 +1,19 @@
+# gh api repos/<r> (.archived, .default_branch) and commits?sha=<default>&per_page=1, run 2026-09-28T02:01:49Z; cutoff 2026-06-30
+BerriAI/litellm	false	main	9b08112ed278 2026-09-28T01:48:45Z
+smg-project/smg	false	main	33dd6c4e717b 2026-09-27T03:07:25Z
+llm-d/llm-d-router	false	main	038495c27ee1 2026-09-27T16:08:55Z
+vllm-project/production-stack	false	main	691dffa71119 2026-09-22T23:39:07Z
+vllm-project/semantic-router	false	main	6333468475b3 2026-09-27T16:08:36Z
+theagentrouter/agent-router	false	main	780fcf46b2a3 2026-09-26T19:22:29Z
+maximhq/bifrost	false	dev	ed40d135e4dc 2026-09-27T10:10:47Z
+router-for-me/CLIProxyAPI	false	main	acdace936fa7 2026-09-28T00:19:03Z
+QuantumNous/new-api	false	main	c2b7a9a9e0b5 2026-09-25T04:43:11Z
+katanemo/plano	false	main	003c36aea896 2026-08-19T19:28:26Z
+ai-dynamo/dynamo	false	main	b75173c448d7 2026-09-27T12:19:27Z
+openai/codex	false	main	1cc7e2361237 2026-09-28T01:10:27Z
+openai/openai-python	false	main	d0207b48c043 2026-09-28T00:32:31Z
+anthropics/anthropic-sdk-python	false	main	4421d56a4dd2 2026-09-22T16:24:54Z
+open-telemetry/semantic-conventions-genai	false	main	e57c543b4889 2026-09-24T23:07:35Z
+Portkey-AI/gateway	false	main	669825cbe89e 2026-05-25T13:54:51Z
+Wei-Shaw/sub2api	false	main	790723e0402b 2026-09-28T02:01:15Z
+diegosouzapw/OmniRoute	false	release/v3.8.51	a58000c7685f 2026-09-27T05:01:55Z

@@ -1,0 +1,460 @@
+Round-2 local synthetic integration controls; not upstream E2E acceptance.
+Returned output from incremental test-first snapshots, ordered by execution.
+Only private filesystem prefixes are replaced. The first output includes the tool's own 17-token truncation marker; it is not a full log.
+Earlier snapshots used the same unittest discovery command without RTK; the final skills-state snapshot used RTK after the updated AGENTS.md arrived.
+
+=== red-routing ===
+Command: PYTHONDONTWRITEBYTECODE=1 TMPDIR=<research-scratch> python3 -m unittest discover -s tests -p test_runtime_worker_openhands.py -v
+Exit code: 1
+Warning: truncated output (original token count: 3017)
+Total output lines: 105
+
+test_broken_answer_and_symlink_cannot_pass (test_runtime_worker_openhands.OpenHandsFrozenOracleTests.test_broken_answer_and_symlink_cannot_pass) ... ok
+test_deleted_or_skipped_test_and_extra_files_are_rejected (test_runtime_worker_openhands.OpenHandsFrozenOracleTests.test_deleted_or_skipped_test_and_extra_files_are_rejected) ... ok
+test_fixed_copy_passes_and_frozen_source_stays_broken (test_runtime_worker_openhands.OpenHandsFrozenOracleTests.test_fixed_copy_passes_and_frozen_source_stays_broken) ... ok
+test_no_native_red_observation_cannot_pass (test_runtime_worker_openhands.OpenHandsFrozenOracleTests.test_no_native_red_observation_cannot_pass) ... ok
+test_red_after_edit_cannot_pass (test_runtime_worker_openhands.OpenHandsFrozenOracleTests.test_red_after_edit_cannot_pass) ... ok
+test_cleanup_timeout_does_not_erase_primary_exit (test_runtime_worker_openhands.OpenHandsReceiptTests.test_cleanup_timeout_does_not_erase_primary_exit) ... ok
+test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage (test_runtime_worker_openhands.OpenHandsReceiptTests.test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage) ... ok
+test_skills_and_mcp_require_observations (test_runtime_worker_openhands.OpenHandsReceiptTests.test_skills_and_mcp_require_observations) ... ok
+test_truncated_native_summary_retains_failed_attempt_receipt (test_runtime_worker_openhands.OpenHandsReceiptTests.test_truncated_native_summary_retains_failed_attempt_receipt) ... ok
+test_checker_rejects_an_empty_result (test_runtime_worker_openhands.OpenHandsRecipeTests.test_checker_rejects_an_empty_result) ... ok
+test_every_container_is_owned_and_has_no_published_port (test_runtime_worker_openhands.OpenHandsRecipeTests.test_every_container_is_owned_and_has_no_published_port) ... FAIL
+test_fresh_call_headers_keep_session_affinity (test_runtime_worker_openhands.OpenHandsRecipeTests.test_fresh_call_headers_keep_session_affinity) ... ok
+test_gateway_model_and_container_topology (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_model_and_container_topology) ... ok
+test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) ... 
+  test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (model='claude-opus-5-5') ... FAIL
+  test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (model='cx/claude-opus-5-5') ... FAIL
+  test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (model='cx/gpt-5') ... FAIL
+  test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (model='openai/cx/gpt-6-astra-max') ... FAIL
+  test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (change={'temperature': 0.1}) ... FAIL
+  test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (change={'response_format': {'type': 'json_object'}}) ... FAIL
+  test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (change={'native_tool_calling': False}) ... FAIL
+test_immutable_artifacts (test_runtime_worker_openhands.OpenHandsRecipeTests.test_immutable_artifacts) ... ok
+test_installer_and_runtime_are_scoped (test_runtime_worker_openhands.OpenHandsRecipeTests.test_installer_and_runtime_are_scoped) ... ok
+test_mcp_limits (test_runtime_worker_openhands.OpenHandsRecipeTests.test_mcp_limits) ... ok
+test_no_public_binds_or_secret_material (test_runtime_worker_openhands.OpenHandsRecipeTests.test_no_public_binds_or_secret_material) ... ok
+test_qmd_guard_requires_explicit_scope_and_lexical_query (test_runtime_worker_openhands.OpenHandsRecipeTests.test_qmd_guard_requires_explicit_scope_and_lexical_query) ... ok
+test_runtime_model_override_and_native_tool_filter (test_runtime_worker_openhands.OpenHandsRecipeTests.test_runtime_model_override_and_native_tool_filter) ... ok
+test_serena_activates_plain_fixture_and_keeps_metadata_outside_it (test_runtime_worker_openhands.OpenHandsRecipeTests.test_serena_activates_plain_fixture_and_keeps_metadata_outside_it) ... ok
+
+======================================================================
+FAIL: test_every_container_is_owned_and_has_no_published_port (test_runtime_worker_openhands.OpenHandsRecipeTests.test_every_container_is_owned_and_has_no_published_port)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 160, in test_every_container_is_owned_and_has_no_published_port
+    self.assertIn("com.native-agent-stack.owner=gpt6-omniroute-framework-integration", args)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'com.native-agent-stack.owner=gpt6-omniroute-framework-integration' not found in ['docker', '--context', 'rootless', 'run', '--rm', '--pull=never', '--name', 'rw-openhands-control', '--platform', 'linux/amd64', '--label', 'native-agent-stack.runtime-worker=openhands', '--user', '0:0', '--cap-drop=ALL', '--security-opt=no-new-privileges', '--rea…17 tokens truncated…oot:rw,nosuid,nodev,mode=0700', '--env', 'PYTHONDONTWRITEBYTECODE=1', '--env', 'UV_PYTHON_DOWNLOADS=never', '--cpus', '4', '--memory', '8g', '--pids-limit', '384']
+
+======================================================================
+FAIL: test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (model='claude-opus-5-5')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 149, in test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes
+    with self.subTest(model=model), self.assertRaises(ValueError):
+                                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (model='cx/claude-opus-5-5')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 149, in test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes
+    with self.subTest(model=model), self.assertRaises(ValueError):
+                                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (model='cx/gpt-5')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 149, in test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes
+    with self.subTest(model=model), self.assertRaises(ValueError):
+                                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (model='openai/cx/gpt-6-astra-max')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 149, in test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes
+    with self.subTest(model=model), self.assertRaises(ValueError):
+                                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (change={'temperature': 0.1})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 154, in test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes
+    with self.subTest(change=change), self.assertRaises(ValueError):
+                                      ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (change={'response_format': {'type': 'json_object'}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 154, in test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes
+    with self.subTest(change=change), self.assertRaises(ValueError):
+                                      ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) (change={'native_tool_calling': False})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 154, in test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes
+    with self.subTest(change=change), self.assertRaises(ValueError):
+                                      ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.707s
+
+FAILED (failures=8)
+
+=== red-grader ===
+Command: PYTHONDONTWRITEBYTECODE=1 TMPDIR=<research-scratch> python3 -m unittest discover -s tests -p test_runtime_worker_openhands.py -v
+Exit code: 1
+test_cleanup_timeout_does_not_erase_primary_exit (test_runtime_worker_openhands.OpenHandsReceiptTests.test_cleanup_timeout_does_not_erase_primary_exit) ... ok
+test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage (test_runtime_worker_openhands.OpenHandsReceiptTests.test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage) ... ok
+test_skills_and_mcp_require_observations (test_runtime_worker_openhands.OpenHandsReceiptTests.test_skills_and_mcp_require_observations) ... ok
+test_truncated_native_summary_retains_failed_attempt_receipt (test_runtime_worker_openhands.OpenHandsReceiptTests.test_truncated_native_summary_retains_failed_attempt_receipt) ... ok
+test_every_container_is_owned_and_has_no_published_port (test_runtime_worker_openhands.OpenHandsRecipeTests.test_every_container_is_owned_and_has_no_published_port) ... ok
+test_fresh_call_headers_keep_session_affinity (test_runtime_worker_openhands.OpenHandsRecipeTests.test_fresh_call_headers_keep_session_affinity) ... ok
+test_gateway_model_and_container_topology (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_model_and_container_topology) ... ok
+test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) ... ok
+test_immutable_artifacts (test_runtime_worker_openhands.OpenHandsRecipeTests.test_immutable_artifacts) ... ok
+test_installer_and_runtime_are_scoped (test_runtime_worker_openhands.OpenHandsRecipeTests.test_installer_and_runtime_are_scoped) ... ok
+test_mcp_limits (test_runtime_worker_openhands.OpenHandsRecipeTests.test_mcp_limits) ... ok
+test_no_public_binds_or_secret_material (test_runtime_worker_openhands.OpenHandsRecipeTests.test_no_public_binds_or_secret_material) ... ok
+test_qmd_guard_requires_explicit_scope_and_lexical_query (test_runtime_worker_openhands.OpenHandsRecipeTests.test_qmd_guard_requires_explicit_scope_and_lexical_query) ... ok
+test_runtime_model_override_and_native_tool_filter (test_runtime_worker_openhands.OpenHandsRecipeTests.test_runtime_model_override_and_native_tool_filter) ... ok
+test_serena_activates_plain_fixture_and_keeps_metadata_outside_it (test_runtime_worker_openhands.OpenHandsRecipeTests.test_serena_activates_plain_fixture_and_keeps_metadata_outside_it) ... ok
+test_input_sanity_does_not_grade_the_patch (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_input_sanity_does_not_grade_the_patch) ... ERROR
+test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) ... 
+  test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) (bucket='unresolved_ids') ... FAIL
+  test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) (bucket='empty_patch_ids') ... FAIL
+  test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) (bucket='error_ids') ... FAIL
+  test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) (bucket='incomplete_ids') ... FAIL
+test_known_pass_relays_upstream_resolution (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_pass_relays_upstream_resolution) ... FAIL
+test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed) ... ERROR
+
+======================================================================
+ERROR: test_input_sanity_does_not_grade_the_patch (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_input_sanity_does_not_grade_the_patch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 232, in test_input_sanity_does_not_grade_the_patch
+    checked = self.checker.check_input(path, self.INSTANCE)
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_recipe_test_e2e_check' has no attribute 'check_input'
+
+======================================================================
+ERROR: test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 226, in test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed
+    self.checker.read_report(path, self.INSTANCE)
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_recipe_test_e2e_check' has no attribute 'read_report'
+
+======================================================================
+FAIL: test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) (bucket='unresolved_ids')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 212, in test_known_fail_is_not_a_successful_process_verdict
+    self.assertEqual(completed.returncode, 1, completed.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 1 : usage: check.py [-h] [--result RESULT] [--baseline BASELINE]
+                [--test-child TEST_CHILD]
+check.py: error: unrecognized arguments: --report <research-scratch>/tmppysfzva8/report.json --instance-id django__django-11333
+
+
+======================================================================
+FAIL: test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) (bucket='empty_patch_ids')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 212, in test_known_fail_is_not_a_successful_process_verdict
+    self.assertEqual(completed.returncode, 1, completed.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 1 : usage: check.py [-h] [--result RESULT] [--baseline BASELINE]
+                [--test-child TEST_CHILD]
+check.py: error: unrecognized arguments: --report <research-scratch>/tmppysfzva8/report.json --instance-id django__django-11333
+
+
+======================================================================
+FAIL: test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) (bucket='error_ids')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 212, in test_known_fail_is_not_a_successful_process_verdict
+    self.assertEqual(completed.returncode, 1, completed.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 1 : usage: check.py [-h] [--result RESULT] [--baseline BASELINE]
+                [--test-child TEST_CHILD]
+check.py: error: unrecognized arguments: --report <research-scratch>/tmppysfzva8/report.json --instance-id django__django-11333
+
+
+======================================================================
+FAIL: test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) (bucket='incomplete_ids')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 212, in test_known_fail_is_not_a_successful_process_verdict
+    self.assertEqual(completed.returncode, 1, completed.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 1 : usage: check.py [-h] [--result RESULT] [--baseline BASELINE]
+                [--test-child TEST_CHILD]
+check.py: error: unrecognized arguments: --report <research-scratch>/tmppysfzva8/report.json --instance-id django__django-11333
+
+
+======================================================================
+FAIL: test_known_pass_relays_upstream_resolution (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_pass_relays_upstream_resolution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 203, in test_known_pass_relays_upstream_resolution
+    self.assertEqual(completed.returncode, 0, completed.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : usage: check.py [-h] [--result RESULT] [--baseline BASELINE]
+                [--test-child TEST_CHILD]
+check.py: error: unrecognized arguments: --report <research-scratch>/tmpchnquw_9/report.json --instance-id django__django-11333
+
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.589s
+
+FAILED (failures=5, errors=2)
+
+=== red-lifecycle ===
+Command: PYTHONDONTWRITEBYTECODE=1 TMPDIR=<research-scratch> python3 -m unittest discover -s tests -p test_runtime_worker_openhands.py -v
+Exit code: 1
+test_cleanup_timeout_does_not_erase_primary_exit (test_runtime_worker_openhands.OpenHandsReceiptTests.test_cleanup_timeout_does_not_erase_primary_exit) ... ok
+test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage (test_runtime_worker_openhands.OpenHandsReceiptTests.test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage) ... ok
+test_skills_and_mcp_require_observations (test_runtime_worker_openhands.OpenHandsReceiptTests.test_skills_and_mcp_require_observations) ... ok
+test_truncated_native_summary_retains_failed_attempt_receipt (test_runtime_worker_openhands.OpenHandsReceiptTests.test_truncated_native_summary_retains_failed_attempt_receipt) ... ok
+test_every_container_is_owned_and_has_no_published_port (test_runtime_worker_openhands.OpenHandsRecipeTests.test_every_container_is_owned_and_has_no_published_port) ... ok
+test_fresh_call_headers_keep_session_affinity (test_runtime_worker_openhands.OpenHandsRecipeTests.test_fresh_call_headers_keep_session_affinity) ... ok
+test_gateway_model_and_container_topology (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_model_and_container_topology) ... ok
+test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) ... ok
+test_immutable_artifacts (test_runtime_worker_openhands.OpenHandsRecipeTests.test_immutable_artifacts) ... ok
+test_installer_and_runtime_are_scoped (test_runtime_worker_openhands.OpenHandsRecipeTests.test_installer_and_runtime_are_scoped) ... ok
+test_mcp_limits (test_runtime_worker_openhands.OpenHandsRecipeTests.test_mcp_limits) ... ok
+test_no_public_binds_or_secret_material (test_runtime_worker_openhands.OpenHandsRecipeTests.test_no_public_binds_or_secret_material) ... ok
+test_qmd_guard_requires_explicit_scope_and_lexical_query (test_runtime_worker_openhands.OpenHandsRecipeTests.test_qmd_guard_requires_explicit_scope_and_lexical_query) ... ok
+test_runtime_model_override_and_native_tool_filter (test_runtime_worker_openhands.OpenHandsRecipeTests.test_runtime_model_override_and_native_tool_filter) ... ok
+test_serena_activates_plain_fixture_and_keeps_metadata_outside_it (test_runtime_worker_openhands.OpenHandsRecipeTests.test_serena_activates_plain_fixture_and_keeps_metadata_outside_it) ... ok
+test_input_sanity_does_not_grade_the_patch (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_input_sanity_does_not_grade_the_patch) ... ok
+test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) ... ok
+test_known_pass_relays_upstream_resolution (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_pass_relays_upstream_resolution) ... ok
+test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed) ... ok
+test_official_grader_container_transport_preserves_upstream_settings (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_official_grader_container_transport_preserves_upstream_settings) ... ERROR
+test_shared_skills_installer_is_the_only_install_path (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_shared_skills_installer_is_the_only_install_path) ... ERROR
+test_task_adapter_hides_oracle_and_requires_frozen_original_bytes (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_task_adapter_hides_oracle_and_requires_frozen_original_bytes) ... ERROR
+
+======================================================================
+ERROR: test_official_grader_container_transport_preserves_upstream_settings (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_official_grader_container_transport_preserves_upstream_settings)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 262, in test_official_grader_container_transport_preserves_upstream_settings
+    module = load_recipe_module("e2e/docker_grader.py")
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 32, in load_recipe_module
+    spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1019, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1156, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1214, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '<checkout>/blueprints/runtime-workers/openhands/e2e/docker_grader.py'
+
+======================================================================
+ERROR: test_shared_skills_installer_is_the_only_install_path (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_shared_skills_installer_is_the_only_install_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 250, in test_shared_skills_installer_is_the_only_install_path
+    host.install_workspace_skills(ROOT, workspace)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_recipe_test_host' has no attribute 'install_workspace_skills'
+
+======================================================================
+ERROR: test_task_adapter_hides_oracle_and_requires_frozen_original_bytes (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_task_adapter_hides_oracle_and_requires_frozen_original_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 276, in test_task_adapter_hides_oracle_and_requires_frozen_original_bytes
+    module = load_recipe_module("e2e/task.py")
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 32, in load_recipe_module
+    spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1019, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1156, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1214, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '<checkout>/blueprints/runtime-workers/openhands/e2e/task.py'
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.369s
+
+FAILED (errors=3)
+
+=== red-receipt ===
+Command: PYTHONDONTWRITEBYTECODE=1 TMPDIR=<research-scratch> python3 -m unittest discover -s tests -p test_runtime_worker_openhands.py -v
+Exit code: 1
+test_cleanup_timeout_does_not_erase_primary_exit (test_runtime_worker_openhands.OpenHandsReceiptTests.test_cleanup_timeout_does_not_erase_primary_exit) ... ok
+test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage (test_runtime_worker_openhands.OpenHandsReceiptTests.test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage) ... ok
+test_local_pass_field_is_never_a_worker_verdict (test_runtime_worker_openhands.OpenHandsReceiptTests.test_local_pass_field_is_never_a_worker_verdict) ... FAIL
+test_skills_and_mcp_require_observations (test_runtime_worker_openhands.OpenHandsReceiptTests.test_skills_and_mcp_require_observations) ... ok
+test_truncated_native_summary_retains_failed_attempt_receipt (test_runtime_worker_openhands.OpenHandsReceiptTests.test_truncated_native_summary_retains_failed_attempt_receipt) ... ok
+test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass (test_runtime_worker_openhands.OpenHandsReceiptTests.test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass) ... FAIL
+test_every_container_is_owned_and_has_no_published_port (test_runtime_worker_openhands.OpenHandsRecipeTests.test_every_container_is_owned_and_has_no_published_port) ... ok
+test_fresh_call_headers_keep_session_affinity (test_runtime_worker_openhands.OpenHandsRecipeTests.test_fresh_call_headers_keep_session_affinity) ... ok
+test_gateway_model_and_container_topology (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_model_and_container_topology) ... ok
+test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) ... ok
+test_immutable_artifacts (test_runtime_worker_openhands.OpenHandsRecipeTests.test_immutable_artifacts) ... ok
+test_installer_and_runtime_are_scoped (test_runtime_worker_openhands.OpenHandsRecipeTests.test_installer_and_runtime_are_scoped) ... ok
+test_mcp_limits (test_runtime_worker_openhands.OpenHandsRecipeTests.test_mcp_limits) ... ok
+test_no_public_binds_or_secret_material (test_runtime_worker_openhands.OpenHandsRecipeTests.test_no_public_binds_or_secret_material) ... ok
+test_qmd_guard_requires_explicit_scope_and_lexical_query (test_runtime_worker_openhands.OpenHandsRecipeTests.test_qmd_guard_requires_explicit_scope_and_lexical_query) ... ok
+test_runtime_model_override_and_native_tool_filter (test_runtime_worker_openhands.OpenHandsRecipeTests.test_runtime_model_override_and_native_tool_filter) ... ok
+test_serena_activates_plain_fixture_and_keeps_metadata_outside_it (test_runtime_worker_openhands.OpenHandsRecipeTests.test_serena_activates_plain_fixture_and_keeps_metadata_outside_it) ... ok
+test_input_sanity_does_not_grade_the_patch (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_input_sanity_does_not_grade_the_patch) ... ok
+test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) ... ok
+test_known_pass_relays_upstream_resolution (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_pass_relays_upstream_resolution) ... ok
+test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed) ... ok
+test_official_grader_container_transport_preserves_upstream_settings (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_official_grader_container_transport_preserves_upstream_settings) ... ok
+test_shared_skills_installer_is_the_only_install_path (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_shared_skills_installer_is_the_only_install_path) ... ok
+test_task_adapter_hides_oracle_and_requires_frozen_original_bytes (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_task_adapter_hides_oracle_and_requires_frozen_original_bytes) ... ok
+
+======================================================================
+FAIL: test_local_pass_field_is_never_a_worker_verdict (test_runtime_worker_openhands.OpenHandsReceiptTests.test_local_pass_field_is_never_a_worker_verdict)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 308, in test_local_pass_field_is_never_a_worker_verdict
+    self.assertFalse(receipt["task_passed"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass (test_runtime_worker_openhands.OpenHandsReceiptTests.test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 330, in test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass
+    self.assertTrue(module.create_receipt(result, database=result / "absent.sqlite")["task_passed"])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.381s
+
+FAILED (failures=2)
+
+=== red-native-llm ===
+Command: PYTHONDONTWRITEBYTECODE=1 TMPDIR=<research-scratch> python3 -m unittest discover -s tests -p test_runtime_worker_openhands.py -v
+Exit code: 1
+test_cleanup_timeout_does_not_erase_primary_exit (test_runtime_worker_openhands.OpenHandsReceiptTests.test_cleanup_timeout_does_not_erase_primary_exit) ... ok
+test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage (test_runtime_worker_openhands.OpenHandsReceiptTests.test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage) ... ok
+test_local_pass_field_is_never_a_worker_verdict (test_runtime_worker_openhands.OpenHandsReceiptTests.test_local_pass_field_is_never_a_worker_verdict) ... ok
+test_skills_and_mcp_require_observations (test_runtime_worker_openhands.OpenHandsReceiptTests.test_skills_and_mcp_require_observations) ... ok
+test_truncated_native_summary_retains_failed_attempt_receipt (test_runtime_worker_openhands.OpenHandsReceiptTests.test_truncated_native_summary_retains_failed_attempt_receipt) ... ok
+test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass (test_runtime_worker_openhands.OpenHandsReceiptTests.test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass) ... ok
+test_every_container_is_owned_and_has_no_published_port (test_runtime_worker_openhands.OpenHandsRecipeTests.test_every_container_is_owned_and_has_no_published_port) ... ok
+test_fresh_call_headers_keep_session_affinity (test_runtime_worker_openhands.OpenHandsRecipeTests.test_fresh_call_headers_keep_session_affinity) ... ok
+test_gateway_model_and_container_topology (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_model_and_container_topology) ... ok
+test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) ... ok
+test_header_transport_preserves_exact_native_llm_type_and_restores_methods (test_runtime_worker_openhands.OpenHandsRecipeTests.test_header_transport_preserves_exact_native_llm_type_and_restores_methods) ... ERROR
+test_immutable_artifacts (test_runtime_worker_openhands.OpenHandsRecipeTests.test_immutable_artifacts) ... ok
+test_installer_and_runtime_are_scoped (test_runtime_worker_openhands.OpenHandsRecipeTests.test_installer_and_runtime_are_scoped) ... ok
+test_mcp_limits (test_runtime_worker_openhands.OpenHandsRecipeTests.test_mcp_limits) ... ok
+test_no_public_binds_or_secret_material (test_runtime_worker_openhands.OpenHandsRecipeTests.test_no_public_binds_or_secret_material) ... ok
+test_qmd_guard_requires_explicit_scope_and_lexical_query (test_runtime_worker_openhands.OpenHandsRecipeTests.test_qmd_guard_requires_explicit_scope_and_lexical_query) ... ok
+test_runtime_model_override_and_native_tool_filter (test_runtime_worker_openhands.OpenHandsRecipeTests.test_runtime_model_override_and_native_tool_filter) ... ok
+test_serena_activates_plain_fixture_and_keeps_metadata_outside_it (test_runtime_worker_openhands.OpenHandsRecipeTests.test_serena_activates_plain_fixture_and_keeps_metadata_outside_it) ... ok
+test_input_sanity_does_not_grade_the_patch (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_input_sanity_does_not_grade_the_patch) ... ok
+test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) ... ok
+test_known_pass_relays_upstream_resolution (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_pass_relays_upstream_resolution) ... ok
+test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed) ... ok
+test_official_grader_container_transport_preserves_upstream_settings (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_official_grader_container_transport_preserves_upstream_settings) ... ok
+test_shared_skills_installer_is_the_only_install_path (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_shared_skills_installer_is_the_only_install_path) ... ok
+test_task_adapter_hides_oracle_and_requires_frozen_original_bytes (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_task_adapter_hides_oracle_and_requires_frozen_original_bytes) ... ok
+
+======================================================================
+ERROR: test_header_transport_preserves_exact_native_llm_type_and_restores_methods (test_runtime_worker_openhands.OpenHandsRecipeTests.test_header_transport_preserves_exact_native_llm_type_and_restores_methods)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 138, in test_header_transport_preserves_exact_native_llm_type_and_restores_methods
+    with worker.gateway_transport(NativeLLM):
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_recipe_test_worker' has no attribute 'gateway_transport'
+
+----------------------------------------------------------------------
+Ran 25 tests in 0.409s
+
+FAILED (errors=1)
+
+=== red-skills-state ===
+Command: PYTHONDONTWRITEBYTECODE=1 TMPDIR=<research-scratch> rtk python3 -m unittest discover -s tests -p test_runtime_worker_openhands.py -v
+Exit code: 1
+test_cleanup_timeout_does_not_erase_primary_exit (test_runtime_worker_openhands.OpenHandsReceiptTests.test_cleanup_timeout_does_not_erase_primary_exit) ... ok
+test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage (test_runtime_worker_openhands.OpenHandsReceiptTests.test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage) ... ok
+test_local_pass_field_is_never_a_worker_verdict (test_runtime_worker_openhands.OpenHandsReceiptTests.test_local_pass_field_is_never_a_worker_verdict) ... ok
+test_skills_and_mcp_require_observations (test_runtime_worker_openhands.OpenHandsReceiptTests.test_skills_and_mcp_require_observations) ... ok
+test_truncated_native_summary_retains_failed_attempt_receipt (test_runtime_worker_openhands.OpenHandsReceiptTests.test_truncated_native_summary_retains_failed_attempt_receipt) ... ok
+test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass (test_runtime_worker_openhands.OpenHandsReceiptTests.test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass) ... ok
+test_every_container_is_owned_and_has_no_published_port (test_runtime_worker_openhands.OpenHandsRecipeTests.test_every_container_is_owned_and_has_no_published_port) ... ok
+test_fresh_call_headers_keep_session_affinity (test_runtime_worker_openhands.OpenHandsRecipeTests.test_fresh_call_headers_keep_session_affinity) ... ok
+test_gateway_model_and_container_topology (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_model_and_container_topology) ... ok
+test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes) ... ok
+test_header_transport_preserves_exact_native_llm_type_and_restores_methods (test_runtime_worker_openhands.OpenHandsRecipeTests.test_header_transport_preserves_exact_native_llm_type_and_restores_methods) ... ok
+test_immutable_artifacts (test_runtime_worker_openhands.OpenHandsRecipeTests.test_immutable_artifacts) ... ok
+test_installer_and_runtime_are_scoped (test_runtime_worker_openhands.OpenHandsRecipeTests.test_installer_and_runtime_are_scoped) ... ok
+test_mcp_limits (test_runtime_worker_openhands.OpenHandsRecipeTests.test_mcp_limits) ... ok
+test_no_public_binds_or_secret_material (test_runtime_worker_openhands.OpenHandsRecipeTests.test_no_public_binds_or_secret_material) ... ok
+test_qmd_guard_requires_explicit_scope_and_lexical_query (test_runtime_worker_openhands.OpenHandsRecipeTests.test_qmd_guard_requires_explicit_scope_and_lexical_query) ... ok
+test_runtime_model_override_and_native_tool_filter (test_runtime_worker_openhands.OpenHandsRecipeTests.test_runtime_model_override_and_native_tool_filter) ... ok
+test_serena_activates_plain_fixture_and_keeps_metadata_outside_it (test_runtime_worker_openhands.OpenHandsRecipeTests.test_serena_activates_plain_fixture_and_keeps_metadata_outside_it) ... ok
+test_input_sanity_does_not_grade_the_patch (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_input_sanity_does_not_grade_the_patch) ... ok
+test_known_fail_is_not_a_successful_process_verdict (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_fail_is_not_a_successful_process_verdict) ... ok
+test_known_pass_relays_upstream_resolution (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_known_pass_relays_upstream_resolution) ... ok
+test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed) ... ok
+test_official_grader_container_transport_preserves_upstream_settings (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_official_grader_container_transport_preserves_upstream_settings) ... ok
+test_project_skills_bookkeeping_is_excluded_from_worker_patch (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_project_skills_bookkeeping_is_excluded_from_worker_patch) ... FAIL
+test_project_skills_install_refuses_task_path_conflicts (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_project_skills_install_refuses_task_path_conflicts) ... 
+  test_project_skills_install_refuses_task_path_conflicts (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_project_skills_install_refuses_task_path_conflicts) (reserved='.agents') ... FAIL
+  test_project_skills_install_refuses_task_path_conflicts (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_project_skills_install_refuses_task_path_conflicts) (reserved='skills-lock.json') ... FAIL
+test_shared_skills_installer_is_the_only_install_path (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_shared_skills_installer_is_the_only_install_path) ... ok
+test_task_adapter_hides_oracle_and_requires_frozen_original_bytes (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_task_adapter_hides_oracle_and_requires_frozen_original_bytes) ... ok
+
+======================================================================
+FAIL: test_project_skills_bookkeeping_is_excluded_from_worker_patch (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_project_skills_bookkeeping_is_excluded_from_worker_patch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 311, in test_project_skills_bookkeeping_is_excluded_from_worker_patch
+    self.assertEqual(checked.stdout.splitlines(), [".agents/skills/tdd/SKILL.md", "skills-lock.json"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [] != ['.agents/skills/tdd/SKILL.md', 'skills-lock.json']
+
+Second list contains 2 additional elements.
+First extra element 0:
+'.agents/skills/tdd/SKILL.md'
+
+- []
++ ['.agents/skills/tdd/SKILL.md', 'skills-lock.json']
+
+======================================================================
+FAIL: test_project_skills_install_refuses_task_path_conflicts (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_project_skills_install_refuses_task_path_conflicts) (reserved='.agents')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 320, in test_project_skills_install_refuses_task_path_conflicts
+    with patch.object(host.subprocess, "run") as run, self.assertRaises(ValueError):
+                                                      ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_project_skills_install_refuses_task_path_conflicts (test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_project_skills_install_refuses_task_path_conflicts) (reserved='skills-lock.json')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_openhands.py", line 320, in test_project_skills_install_refuses_task_path_conflicts
+    with patch.object(host.subprocess, "run") as run, self.assertRaises(ValueError):
+                                                      ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.414s
+
+FAILED (failures=3)

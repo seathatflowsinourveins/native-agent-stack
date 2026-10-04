@@ -1,0 +1,257 @@
++ SCRATCH=<scratch>/trial-colpali
++ export HF_HOME=<scratch>/trial-colpali/hf-cache
++ HF_HOME=<scratch>/trial-colpali/hf-cache
++ export HF_HUB_OFFLINE=1
++ HF_HUB_OFFLINE=1
++ export HF_HUB_DISABLE_TELEMETRY=1
++ HF_HUB_DISABLE_TELEMETRY=1
++ export DO_NOT_TRACK=1
++ DO_NOT_TRACK=1
++ export TOKENIZERS_PARALLELISM=false
++ TOKENIZERS_PARALLELISM=false
++ export CUDA_VISIBLE_DEVICES=
++ CUDA_VISIBLE_DEVICES=
++ export MCP_AUTO_OPEN_ENABLED=false
++ MCP_AUTO_OPEN_ENABLED=false
++ cd <scratch>/trial-colpali
++ <scratch>/trial-colpali/.venv-combined/bin/vidore-benchmark evaluate-retriever --model-class colqwen2 --model-name vidore/colqwen2-v1.0 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4 --output-dir <scratch>/trial-colpali/outputs
+`torch_dtype` is deprecated! Use `dtype` instead!
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/transformers/utils/hub.py:479 in cached_files                         │
+│                                                                              │
+│    476 │   try:                                                              │
+│    477 │   │   if len(full_filenames) == 1:                                  │
+│    478 │   │   │   # This is slightly better for only 1 file                 │
+│ ❱  479 │   │   │   hf_hub_download(                                          │
+│    480 │   │   │   │   path_or_repo_id,                                      │
+│    481 │   │   │   │   filenames[0],                                         │
+│    482 │   │   │   │   subfolder=None if len(subfolder) == 0 else subfolder, │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/huggingface_hub/utils/_validators.py:114 in _inner_fn                 │
+│                                                                              │
+│   111 │   │   if check_use_auth_token:                                       │
+│   112 │   │   │   kwargs =                                                   │
+│       smoothly_deprecate_use_auth_token(fn_name=fn.__name__,                 │
+│       has_token=has_token, kwargs=kwargs)                                    │
+│   113 │   │                                                                  │
+│ ❱ 114 │   │   return fn(*args, **kwargs)                                     │
+│   115 │                                                                      │
+│   116 │   return _inner_fn  # type: ignore                                   │
+│   117                                                                        │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/huggingface_hub/file_download.py:1014 in hf_hub_download              │
+│                                                                              │
+│   1011 │   │   │   local_files_only=local_files_only,                        │
+│   1012 │   │   )                                                             │
+│   1013 │   else:                                                             │
+│ ❱ 1014 │   │   return _hf_hub_download_to_cache_dir(                         │
+│   1015 │   │   │   # Destination                                             │
+│   1016 │   │   │   cache_dir=cache_dir,                                      │
+│   1017 │   │   │   # File info                                               │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/huggingface_hub/file_download.py:1121 in                              │
+│ _hf_hub_download_to_cache_dir                                                │
+│                                                                              │
+│   1118 │   │   │   │   │   return pointer_path                               │
+│   1119 │   │                                                                 │
+│   1120 │   │   # Otherwise, raise appropriate error                          │
+│ ❱ 1121 │   │   _raise_on_head_call_error(head_call_error, force_download,    │
+│        local_files_only)                                                     │
+│   1122 │                                                                     │
+│   1123 │   # From now on, etag, commit_hash, url and size are not None.      │
+│   1124 │   assert etag is not None, "etag must have been retrieved from      │
+│        server"                                                               │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/huggingface_hub/file_download.py:1653 in _raise_on_head_call_error    │
+│                                                                              │
+│   1650 │                                                                     │
+│   1651 │   # No head call + couldn't find an appropriate file on disk =>     │
+│        raise an error.                                                       │
+│   1652 │   if local_files_only:                                              │
+│ ❱ 1653 │   │   raise LocalEntryNotFoundError(                                │
+│   1654 │   │   │   "Cannot find the requested files in the disk cache and    │
+│        outgoing traffic has been disabled. To enable"                        │
+│   1655 │   │   │   " hf.co look-ups and downloads online, set                │
+│        'local_files_only' to False."                                         │
+│   1656 │   │   )                                                             │
+╰──────────────────────────────────────────────────────────────────────────────╯
+LocalEntryNotFoundError: Cannot find the requested files in the disk cache and 
+outgoing traffic has been disabled. To enable hf.co look-ups and downloads 
+online, set 'local_files_only' to False.
+
+The above exception was the direct cause of the following exception:
+
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/vidore_benchmark/cli/main.py:143 in evaluate_retriever                │
+│                                                                              │
+│   140 │   elif dataset_name is not None and collection_name is not None:     │
+│   141 │   │   raise ValueError("Please provide only one of dataset name or   │
+│       collection name")                                                      │
+│   142 │                                                                      │
+│ ❱ 143 │   retriever = load_vision_retriever_from_registry(                   │
+│   144 │   │   model_class,                                                   │
+│   145 │   │   pretrained_model_name_or_path=model_name,                      │
+│   146 │   │   num_workers=num_workers,                                       │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/vidore_benchmark/retrievers/registry_utils.py:51 in                   │
+│ load_vision_retriever_from_registry                                          │
+│                                                                              │
+│   48 │   retriever_class =                                                   │
+│      load_vision_retriever_class_from_registry(model_class)                  │
+│   49 │                                                                       │
+│   50 │   if pretrained_model_name_or_path:                                   │
+│ ❱ 51 │   │   retriever = retriever_class(                                    │
+│   52 │   │   │                                                               │
+│      pretrained_model_name_or_path=pretrained_model_name_or_path,            │
+│   53 │   │   │   **kwargs,                                                   │
+│   54 │   │   )                                                               │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/vidore_benchmark/retrievers/colqwen2_retriever.py:53 in __init__      │
+│                                                                              │
+│    50 │   │   # Load the model and LORA adapter                              │
+│    51 │   │   self.model = cast(                                             │
+│    52 │   │   │   ColQwen2,                                                  │
+│ ❱  53 │   │   │   ColQwen2.from_pretrained(                                  │
+│    54 │   │   │   │   pretrained_model_name_or_path,                         │
+│    55 │   │   │   │   torch_dtype=torch.bfloat16,                            │
+│    56 │   │   │   │   device_map=self.device,                                │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/colpali_engine/models/qwen2/colqwen2/modeling_colqwen2.py:34 in       │
+│ from_pretrained                                                              │
+│                                                                              │
+│   31 │   │   key_mapping = kwargs.pop("key_mapping", None)                   │
+│   32 │   │   if key_mapping is None:                                         │
+│   33 │   │   │   key_mapping = super()._checkpoint_conversion_mapping        │
+│ ❱ 34 │   │   return super().from_pretrained(*args, **kwargs,                 │
+│      key_mapping=key_mapping)                                                │
+│   35 │                                                                       │
+│   36 │   def forward(self, *args, **kwargs) -> torch.Tensor:                 │
+│   37 │   │   # Handle the custom "pixel_values" input obtained with          │
+│      `ColQwen2Processor` through unpadding                                   │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/transformers/modeling_utils.py:277 in _wrapper                        │
+│                                                                              │
+│    274 │   def _wrapper(*args, **kwargs):                                    │
+│    275 │   │   old_dtype = torch.get_default_dtype()                         │
+│    276 │   │   try:                                                          │
+│ ❱  277 │   │   │   return func(*args, **kwargs)                              │
+│    278 │   │   finally:                                                      │
+│    279 │   │   │   torch.set_default_dtype(old_dtype)                        │
+│    280                                                                       │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/transformers/modeling_utils.py:4843 in from_pretrained                │
+│                                                                              │
+│   4840 │   │   # Load config if we don't provide a configuration             │
+│   4841 │   │   if not isinstance(config, PretrainedConfig):                  │
+│   4842 │   │   │   config_path = config if config is not None else           │
+│        pretrained_model_name_or_path                                         │
+│ ❱ 4843 │   │   │   config, model_kwargs = cls.config_class.from_pretrained(  │
+│   4844 │   │   │   │   config_path,                                          │
+│   4845 │   │   │   │   cache_dir=cache_dir,                                  │
+│   4846 │   │   │   │   return_unused_kwargs=True,                            │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/transformers/configuration_utils.py:622 in from_pretrained            │
+│                                                                              │
+│    619 │   │                                                                 │
+│    620 │   │   cls._set_token_in_kwargs(kwargs, token)                       │
+│    621 │   │                                                                 │
+│ ❱  622 │   │   config_dict, kwargs =                                         │
+│        cls.get_config_dict(pretrained_model_name_or_path, **kwargs)          │
+│    623 │   │   if cls.base_config_key and cls.base_config_key in             │
+│        config_dict:                                                          │
+│    624 │   │   │   config_dict = config_dict[cls.base_config_key]            │
+│    625                                                                       │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/transformers/configuration_utils.py:662 in get_config_dict            │
+│                                                                              │
+│    659 │   │                                                                 │
+│    660 │   │   original_kwargs = copy.deepcopy(kwargs)                       │
+│    661 │   │   # Get config dict associated with the base config file        │
+│ ❱  662 │   │   config_dict, kwargs =                                         │
+│        cls._get_config_dict(pretrained_model_name_or_path, **kwargs)         │
+│    663 │   │   if config_dict is None:                                       │
+│    664 │   │   │   return {}, kwargs                                         │
+│    665 │   │   if "_commit_hash" in config_dict:                             │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/transformers/configuration_utils.py:721 in _get_config_dict           │
+│                                                                              │
+│    718 │   │   │                                                             │
+│    719 │   │   │   try:                                                      │
+│    720 │   │   │   │   # Load from local folder or from cache or download    │
+│        from model Hub and cache                                              │
+│ ❱  721 │   │   │   │   resolved_config_file = cached_file(                   │
+│    722 │   │   │   │   │   pretrained_model_name_or_path,                    │
+│    723 │   │   │   │   │   configuration_file,                               │
+│    724 │   │   │   │   │   cache_dir=cache_dir,                              │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/transformers/utils/hub.py:322 in cached_file                          │
+│                                                                              │
+│    319 │   model_weights_file = cached_file("google-bert/bert-base-uncased", │
+│        "pytorch_model.bin")                                                  │
+│    320 │   ```                                                               │
+│    321 │   """                                                               │
+│ ❱  322 │   file = cached_files(path_or_repo_id=path_or_repo_id,              │
+│        filenames=[filename], **kwargs)                                       │
+│    323 │   file = file[0] if file is not None else file                      │
+│    324 │   return file                                                       │
+│    325                                                                       │
+│                                                                              │
+│ /tmp/claude-1000/-home-<user>-code-native-agent-stack/<session> │
+│ <session-tail>/scratchpad/trial-colpali/.venv-combined/lib/python3.11/site-pa │
+│ ckages/transformers/utils/hub.py:553 in cached_files                         │
+│                                                                              │
+│    550 │   │   │   # Here we only raise if both flags for missing entry and  │
+│        connection errors are True (because it can be raised                  │
+│    551 │   │   │   # even when `local_files_only` is True, in which case     │
+│        raising for connections errors only would not make sense)             │
+│    552 │   │   │   elif _raise_exceptions_for_missing_entries:               │
+│ ❱  553 │   │   │   │   raise OSError(                                        │
+│    554 │   │   │   │   │   f"We couldn't connect to                          │
+│        '{HUGGINGFACE_CO_RESOLVE_ENDPOINT}' to load the files, and couldn't   │
+│        find them in the"                                                     │
+│    555 │   │   │   │   │   f" cached files.\nCheck your internet connection  │
+│        or see how to run the library in offline mode at"                     │
+│    556 │   │   │   │   │   "                                                 │
+│        'https://huggingface.co/docs/transformers/installation#offline-mode'. │
+│        "                                                                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+OSError: We couldn't connect to 'https://huggingface.co' to load the files, and 
+couldn't find them in the cached files.
+Check your internet connection or see how to run the library in offline mode at 
+'https://huggingface.co/docs/transformers/installation#offline-mode'.
+
+real	0m18.889s
+user	0m21.091s
+sys	0m2.488s
++ echo EVAL_EXIT=1
+EVAL_EXIT=1

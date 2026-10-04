@@ -1,0 +1,30 @@
+{
+ "at": "2026-09-25T18:57:40Z",
+ "healthz_code": 404,
+ "healthz_body": null,
+ "get_mcp_code": 405,
+ "get_mcp_allow": "POST",
+ "config_server_url_top_level_present": false,
+ "config_server_url_nested_keys": [],
+ "config_backfill_on_start": false,
+ "scratch_safety_selectors": {
+  "embedding_provider": "local",
+  "llm_provider_configured": false,
+  "admission_webhooks_configured": false,
+  "allowed_hosts": [
+   "localhost",
+   "127.0.0.1",
+   "::1"
+  ],
+  "auto_improve_scheduler_enabled": true,
+  "auto_improve_eval_enabled": false,
+  "consolidate_on_session_end": false
+ },
+ "assert": {
+  "healthz_404": true,
+  "get_mcp_405_allow_post": true,
+  "server_url_absent": true,
+  "backfill_on_start_false": true
+ },
+ "pass": true
+}

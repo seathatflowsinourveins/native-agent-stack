@@ -1,0 +1,71 @@
+{
+ "codex_version": "codex-cli 0.157.1",
+ "shapes": [
+  {
+   "event": "SessionStart",
+   "matcher": "",
+   "handler": {
+    "type": "command",
+    "command": "/opt/example/ai-memory --data-dir /opt/example hook --event session-start --agent codex --server-url http://127.0.0.1:1"
+   },
+   "key": "$CODEX_HOME/hooks.json:session_start:0:0",
+   "current_hash": "sha256:4d9205412446343ca20dacc40b406615e933c2f04732fbde2cb6b51d442817df"
+  },
+  {
+   "event": "UserPromptSubmit",
+   "matcher": "",
+   "handler": {
+    "type": "command",
+    "command": "/opt/example/ai-memory --data-dir /opt/example hook --event user-prompt-submit --agent codex --server-url http://127.0.0.1:1"
+   },
+   "key": "$CODEX_HOME/hooks.json:user_prompt_submit:0:0",
+   "current_hash": "sha256:bafdaee0246ea58754e42a0dde6985508cefd06c7510da4cee65a0fd29ff6297"
+  },
+  {
+   "event": "SessionEnd",
+   "matcher": "",
+   "handler": {
+    "type": "command",
+    "command": "/opt/example/ai-memory --data-dir /opt/example hook --event session-end --agent codex --server-url http://127.0.0.1:1",
+    "timeout": 10
+   },
+   "key": "$CODEX_HOME/hooks.json:session_end:0:0",
+   "current_hash": "sha256:15f2c9d33be78a0162254dd01e08e2e0c9d7d7d284fa18db9fc2203be0970642"
+  },
+  {
+   "event": "PreToolUse",
+   "matcher": "Bash",
+   "handler": {
+    "type": "command",
+    "command": "rtk hook codex",
+    "timeout": 30,
+    "statusMessage": "rewriting"
+   },
+   "key": "$CODEX_HOME/hooks.json:pre_tool_use:0:0",
+   "current_hash": "sha256:fd1656dbf26529a5398e69be444b6c6bf660a49f7a42ed33f5504b237ae5080a"
+  },
+  {
+   "event": "PostToolUse",
+   "matcher": "mcp__.*",
+   "handler": {
+    "type": "command",
+    "command": "/opt/example/ai-memory --data-dir /opt/example hook --event post-tool-use --agent codex --server-url http://127.0.0.1:1",
+    "async": true,
+    "additionalContextLimit": 4000
+   },
+   "key": "$CODEX_HOME/hooks.json:post_tool_use:0:0",
+   "current_hash": "sha256:717174d53c367657dfdeeb4663aa1a5b2eca26383a58d2c3d17c3b261007af34"
+  },
+  {
+   "event": "Stop",
+   "matcher": null,
+   "handler": {
+    "type": "command",
+    "command": "echo 'quoted \"text\" é'",
+    "commandWindows": "echo win"
+   },
+   "key": "$CODEX_HOME/hooks.json:stop:0:0",
+   "current_hash": "sha256:7e3fccfd4440e1614122d1f033d78f688ce70f27cbb06f81d233ed9bb02b47e1"
+  }
+ ]
+}

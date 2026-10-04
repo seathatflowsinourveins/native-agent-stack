@@ -1,0 +1,23 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "repository",
+  "latest_release",
+  "stars_known"
+ ],
+ "properties": {
+  "repository": {
+   "type": "string"
+  },
+  "latest_release": {
+   "type": "string"
+  },
+  "stars_known": {
+   "type": [
+    "integer",
+    "null"
+   ]
+  }
+ }
+}

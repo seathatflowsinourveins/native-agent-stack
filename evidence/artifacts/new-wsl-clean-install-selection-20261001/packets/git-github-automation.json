@@ -1,0 +1,55 @@
+{
+ "layer_id": "git-github-automation",
+ "title": "Git practice and GitHub automation",
+ "requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+ "a_deciding_comparison_would_measure": "Qualify gh CLI's own lifecycle evidence and a changed codex-for-claude review-bridge version before extending acceptance beyond worktrunk, gh and difftastic.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "ataraxy-labs/sem",
+   "repository": "https://github.com/ataraxy-labs/sem"
+  },
+  {
+   "key": "C02",
+   "name": "native git worktree and git diff --no-index",
+   "repository": null
+  },
+  {
+   "key": "C03",
+   "name": "cli/cli",
+   "repository": "https://github.com/cli/cli"
+  },
+  {
+   "key": "C04",
+   "name": "codex-for-claude",
+   "repository": "https://github.com/openai/codex-plugin-cc"
+  },
+  {
+   "key": "C05",
+   "name": "worktrunk",
+   "repository": "https://github.com/max-sixty/worktrunk"
+  },
+  {
+   "key": "C06",
+   "name": "Difftastic",
+   "repository": "https://github.com/Wilfred/difftastic"
+  },
+  {
+   "key": "C07",
+   "name": "git/git",
+   "repository": "https://github.com/git/git"
+  },
+  {
+   "key": "C08",
+   "name": "openai/codex-plugin-cc 1.0.6",
+   "repository": null
+  },
+  {
+   "key": "C09",
+   "name": "claude-code-action",
+   "repository": "https://github.com/anthropics/claude-code-action"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

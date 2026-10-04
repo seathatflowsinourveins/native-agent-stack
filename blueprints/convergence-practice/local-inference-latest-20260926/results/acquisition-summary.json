@@ -1,0 +1,62 @@
+{
+  "accessions_fetched": 360,
+  "automatic_retries": 0,
+  "cohort": {
+    "8-K": 362,
+    "8-K/A": 9,
+    "accessions": 360,
+    "rows": 371
+  },
+  "day": "2020-03-02",
+  "edgartools": "5.58.0",
+  "eligible": 360,
+  "error": null,
+  "exclusions": {
+    "acquisition_failure": 0,
+    "empty_primary_document": 0,
+    "zero_declared_items": 0
+  },
+  "finished_at": "2026-09-26T05:06:02.388184Z",
+  "historical_point_in_time": false,
+  "index_sha256": "5865f91e3d68590389b08760ea256fbaa1693fbc1b0e1350142fc3634a9c3383",
+  "input_chars_max": 29508,
+  "input_chars_median": 3941.0,
+  "input_chars_total": 1893730,
+  "inputs_sha256": "2a5c8c9bd1650bc20a3e7364defef2d725904f6eb1ef509a511a49526a32bfe0",
+  "kind": "local_inference_latest_acquisition_summary",
+  "label_counts": {
+    "1.01": 49,
+    "1.02": 2,
+    "1.03": 1,
+    "2.01": 11,
+    "2.02": 87,
+    "2.03": 9,
+    "2.04": 1,
+    "2.05": 1,
+    "3.01": 3,
+    "3.02": 17,
+    "3.03": 9,
+    "4.01": 4,
+    "4.02": 1,
+    "5.01": 2,
+    "5.02": 84,
+    "5.03": 17,
+    "5.07": 15,
+    "5.08": 2,
+    "7.01": 95,
+    "8.01": 89,
+    "9.01": 275
+  },
+  "manifest_sha256": "a48e45dfbd7ebaf5ad354c5d0728bad6e931baff0132af4b3b7b551faa4adf99",
+  "max_requests_per_second": 5,
+  "native_primary_agreement": {
+    "agree": 360
+  },
+  "request_count": 721,
+  "run_id": "acq-20260926",
+  "schema_version": 1,
+  "started_at": "2026-09-26T05:02:27.915697Z",
+  "status": "complete",
+  "stopped": null,
+  "truncated_inputs": 11
+}

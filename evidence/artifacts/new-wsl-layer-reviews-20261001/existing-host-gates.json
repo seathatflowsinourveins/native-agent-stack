@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "kind": "historical_existing_host_gate_summary",
+  "checked_at": "2026-10-01",
+  "source_commit": "3e6617d1ee73da9aef619cc277c624ac74e07326",
+  "selection_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "purpose": "Carry capability-specific acceptance and failed conditions into the replacement-WSL architecture without replaying them as new-host evidence.",
+  "gates": [
+    {
+      "capability": "Native Codex shared daemon queue",
+      "version": "0.159.3",
+      "historical_result": "passed within the owned native queue trial",
+      "conditions": ["Idle thread delivery", "Delivery queued while a preceding turn was busy", "Disconnected TUI resume and queued delivery"],
+      "source": "evidence/receipts/codex-01593-native-queue-20261001.json",
+      "evidence_class": "Historical provider-backed native execution with synthetic inputs and independent observation",
+      "boundary": "These queue paths do not qualify arbitrary Relay PTY messages or every cross-session transport.",
+      "new_host_result": "unknown"
+    },
+    {
+      "capability": "Hindsight native coding-agent capture and recall",
+      "versions": {"api": "0.10.2", "coding_agents": "0.8.0"},
+      "historical_result": "passed within headless and daemon-backed Codex paths; one cross-family recall also passed",
+      "sources": [
+        "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
+        "evidence/receipts/hindsight-cross-family-native-recall-20261001.json"
+      ],
+      "evidence_class": "Historical native integration with invented canaries; native model runs are distinct from backend reflection/extraction usage",
+      "boundary": "Canary recall is not representative semantic quality, page freshness or Git seed acceptance. Backend usage remains unknown where unreported.",
+      "new_host_result": "unknown"
+    },
+    {
+      "capability": "Hindsight live knowledge-page freshness",
+      "historical_result": "failed; automatic refresh held under the upstream failure-pause contract",
+      "conditions": "Five pages were stale. One fresh supported manual refresh failed at the unchanged backend 300-second wall limit; independent post-failure metadata retained the failed latest attempt.",
+      "source": "evidence/artifacts/hindsight-live-page-recovery-20261001/receipt.json",
+      "upstream_source": "https://github.com/vectorize-io/hindsight/tree/v0.10.2",
+      "evidence_class": "Historical live integration observation and failed provider-backed operation",
+      "new_host_result": "unknown",
+      "next_acceptance": "A native refresh completes and independent page metadata establishes freshness; service health or a larger caller timeout cannot substitute."
+    },
+    {
+      "capability": "Hindsight cold Git seed",
+      "historical_result": "held; automatic seed disabled",
+      "conditions": "Default 300-commit seed failed. The corrected bounded 20-commit attempt retained 300-second backend deadlines, server extraction concurrency 2/1 and the existing model route; it remained unfinished within 25 minutes, was canceled through the supported operation lifecycle, and native API recovery preserved PostgreSQL and captured memories.",
+      "sources": [
+        "evidence/artifacts/hindsight-native-cap-repair-20261001/receipt.json",
+        "recipes/seamless-local-production.md:151"
+      ],
+      "evidence_class": "Historical failed and unfinished native provider-backed integration with scoped cancellation and recovery",
+      "new_host_result": "unknown"
+    },
+    {
+      "capability": "Relay/Relaycast transport and owned restart",
+      "versions": {"agent_relay": "13.0.0", "relaycast_engine": "8.14.0"},
+      "historical_result": "passed for the local native smoke, owned transport and restart checks",
+      "source": "evidence/receipts/seamless-local-runtime-20261001.json",
+      "evidence_class": "Historical native transport/lifecycle checks; separate from model or PTY acceptance",
+      "new_host_result": "unknown"
+    },
+    {
+      "capability": "Relay default unchanged upstream suite",
+      "historical_result": "failed",
+      "native_command": "npm test",
+      "exit_code": 1,
+      "returned_counts": {"passed": 3531, "failed": 1, "skipped": 35},
+      "failed_condition": "Broker-lifecycle fenced-child test exceeded its default 5000 ms timeout.",
+      "focused_retry": {
+        "exit_code": 0,
+        "passed": 1,
+        "skipped": 78,
+        "changed_execution_parameter": "--testTimeout 30000",
+        "boundary": "A focused retry with a different timeout does not make the default full suite green."
+      },
+      "source": "evidence/receipts/seamless-local-runtime-20261001.json#/unchanged_upstream_tests",
+      "new_host_result": "unknown"
+    },
+    {
+      "capability": "Managed automatic Codex PTY push",
+      "historical_result": "held",
+      "conditions": "An ordinary directed message remained unsubmitted in the Codex composer. The native managed adapter's version and web-search behavior did not preserve the selected Codex parity.",
+      "sources": [
+        "evidence/receipts/seamless-local-runtime-20261001.json",
+        "recipes/seamless-local-production.md:82",
+        "https://github.com/AgentWorkforce/relay/pull/1864"
+      ],
+      "boundary": "Transport delivery, native Claude messaging and Codex shared app-server queues cannot be promoted to this capability's acceptance.",
+      "new_host_result": "unknown"
+    },
+    {
+      "capability": "Scoped QMD and SocratiCode retrieval",
+      "historical_result": "passed for the retained scoped index and lookup checks",
+      "source": "evidence/receipts/seamless-local-runtime-20261001.json#/rag",
+      "boundary": "Index population and lookup do not establish a matched retrieval-quality advantage or whole-stack restore.",
+      "new_host_result": "unknown"
+    }
+  ],
+  "unexecuted_target_host_boundaries": [
+    "Replacement distro provisioning and first boot",
+    "Native client sign-in and restored-state capture/isolation checks",
+    "Separate process restart, distro shutdown/start and Windows reboot",
+    "GPU/provider native acceptance at the selected target pins",
+    "Representative comparisons required by the frozen per-layer requirement"
+  ],
+  "closure": "Historical references only; no gate in this artifact certifies the replacement host or full saturation."
+}

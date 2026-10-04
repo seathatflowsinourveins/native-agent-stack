@@ -256,11 +256,23 @@ class Validator:
                 )
                 if listing.stdout and not listing.stdout.endswith(b"\0"):
                     raise ValueError("Git listing is not NUL terminated")
-                paths.update(os.fsdecode(item) for item in listing.stdout.split(b"\0") if item)
+                listed = {os.fsdecode(item) for item in listing.stdout.split(b"\0") if item}
             except (OSError, subprocess.CalledProcessError, ValueError):
                 # Do not fall back to a success on an incomplete or redirected
                 # Git listing, and do not echo Git's possibly private stderr.
                 self.error("Git publication enumeration failed at the exact root")
+            else:
+                # The listing holds every tracked file plus every untracked file Git
+                # would add. A hash-listed file outside it is ignored and untracked:
+                # it passes here only because it exists on this disk, and a commit of
+                # this tree leaves it out, so a clean clone (CI) reports it missing.
+                for name in sorted(paths - listed):
+                    candidate = self.root / name
+                    if candidate.is_file() or candidate.is_symlink():
+                        self.error(f"{name}: hash-listed but ignored by Git and not tracked, so a commit "
+                                   "would leave it out; rename it, add a narrow .gitignore exception, "
+                                   "or force-add it")
+                paths.update(listed)
         else:
             # A source archive can be inside some unrelated parent repository.
             # Never borrow that ancestor's ignores. Prune only Git metadata and

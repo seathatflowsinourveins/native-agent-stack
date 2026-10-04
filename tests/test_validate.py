@@ -319,6 +319,30 @@ class PublicationValidationTests(unittest.TestCase):
         self.write_binary("evidence/artifacts/.runtime/local.dat", b"\xff\x00", hashed=False)
         validate(self.root)
 
+    def test_git_ignored_untracked_hash_listed_file_fails_as_uncommittable(self):
+        # A hash-listed file that Git ignores and does not track exists only in this
+        # checkout: `git add -A` skips it silently, so a clean clone (CI) would miss it
+        # while a local validation that only checks the disk still passes.
+        self.init_git()
+        self.write(".gitignore", "*.jsonl\n")
+        name = "evidence/artifacts/events.jsonl"
+        self.write_binary(name, b'{"event": "done"}\n')
+        self.assert_invalid(f"{name}: hash-listed but ignored by Git and not tracked")
+        with self.subTest(route="force-added"):
+            self.git("add", "--force", "--", name)
+            validate(self.root)
+            self.git("rm", "--cached", "--quiet", "--", name)
+        with self.subTest(route="narrow .gitignore exception"):
+            self.write(".gitignore", "*.jsonl\n!evidence/artifacts/events.jsonl\n")
+            validate(self.root)
+        with self.subTest(route="missing file reports only the missing file"):
+            self.write(".gitignore", "*.jsonl\n")
+            (self.root / name).unlink()
+            with self.assertRaises(InvalidPublication) as caught:
+                validate(self.root)
+            self.assertIn("file missing", str(caught.exception))
+            self.assertNotIn("ignored by Git", str(caught.exception))
+
     def test_git_errors_never_fall_back_to_filesystem_success(self):
         self.init_git()
         for error in (OSError("unavailable"), subprocess.CalledProcessError(128, ["git"])):

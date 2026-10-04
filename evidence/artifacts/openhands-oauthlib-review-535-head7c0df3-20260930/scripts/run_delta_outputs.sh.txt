@@ -1,0 +1,135 @@
+#!/bin/bash
+# run_delta_outputs.sh -- regenerate, from the immutable git objects of draft PR 535 at head 7c0df369 and a fresh scratch install of its lock, every read-only output of the
+# owner delta review: identity, prediction, closure differences, hashed install, the independent OAuthlib sweep, the PyJWT surface, the OSV scans and the workflow's own scan
+# step, the two new runtime-worker locks, the four excluded compile-input captures, the receipt bindings, the external hashes and the repository's own checks at the head.
+# Each output carries its observed time. Nothing here touches a gateway, a store or a credential; the network is used for PyPI, the OSV API and codeload only.
+set -u
+W=<REVIEW-SCRATCH>
+C=<REPO>
+P=refs/remotes/origin/pr535
+HEAD=7c0df369f6aaeb263fc25576dbedfbfada74b6ab
+BASE=8fc86119eacfd5be9b8a139e1ed167d85748091b
+PREMERGE=11227bfdf25b55b0481a9e78985c3fed26052472
+REVIEWED=00aa6c25fe6f27e9f5974e9f6a5592aa31683479
+O=blueprints/runtime-workers/openhands
+OSV=<OSV-BIN>/osv-scanner
+OUT=$W/out2
+WT=$W/wt
+SP=$W/venv/lib/python3.13/site-packages
+stamp() { date -u +%FT%TZ; }
+[ "$(git -C $C rev-parse $P)" = "$HEAD" ] || { echo "the fetched PR head is not $HEAD" >&2; exit 3; }
+rm -rf "$OUT"; mkdir -p "$OUT/split"
+git -C $C show $P:$O/requirements.lock > $W/cand.lock
+git -C $C show $P:$O/build-requirements.lock > $W/build.lock
+git -C $C show $BASE:$O/requirements.lock > $W/main.lock
+git -C $C show $REVIEWED:$O/requirements.lock > $W/old383.lock
+rm -rf "$WT"; git -C $C worktree prune; git -C $C worktree add --detach "$WT" $HEAD > /dev/null 2>&1 || { echo "worktree add failed" >&2; exit 3; }
+: > $W/empty.toml
+
+{ echo "observed_utc=$(stamp)"; python3 $W/scripts/predict_candidate.py $W/old383.lock $W/predicted.lock; } > "$OUT/prediction.txt" 2>&1
+
+{
+  echo "observed_utc=$(stamp)"
+  echo "pr head:                              $(git -C $C rev-parse $P)"
+  echo "main at the merge of #546:            $(git -C $C rev-parse $BASE)"
+  echo "merge base of head and main:          $(git -C $C merge-base $P $BASE)"
+  echo "commits on the PR beyond main:        $(git -C $C rev-list --count $BASE..$P)"
+  echo "candidate lock sha256 at the head:    $(sha256sum $W/cand.lock | cut -d' ' -f1)"
+  echo "previously reviewed lock (#537):      $(sha256sum $W/old383.lock | cut -d' ' -f1) (from the earlier candidate head ${REVIEWED:0:8})"
+  echo "lock on main:                         $(sha256sum $W/main.lock | cut -d' ' -f1)"
+  echo "pins.json requirements_sha256:        $(git -C $C show $P:$O/pins.json | python3 -c 'import json,sys; print(json.load(sys.stdin)["requirements_sha256"])')"
+  echo "pins.json version:                    $(git -C $C show $P:$O/pins.json | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')"
+  echo "candidate == independent prediction (prediction.txt): $(cmp -s $W/cand.lock $W/predicted.lock && echo BYTE-IDENTICAL || echo DIFFERENT)"
+  echo "build-requirements.lock unchanged versus main: $(git -C $C diff --quiet $BASE $P -- $O/build-requirements.lock && echo yes || echo NO)"
+  echo "--- the OpenHands entry of IGNORE_ALLOWED_LOCKS at the head:"
+  git -C $C show $P:tests/test_osv_lockfile_coverage.py | grep -n -A4 '"blueprints/runtime-workers/openhands/requirements.lock": {' | sed 's/^/  /'
+  echo "--- the evidence file named by the entry exists at the head: $(git -C $C cat-file -t $P:$O/evidence/pyjwt-relock-20260930.json 2>&1)"
+  echo "--- tests/test_osv_lockfile_coverage.py versus main, changed lines only:"
+  git -C $C diff -U0 $BASE $P -- tests/test_osv_lockfile_coverage.py | grep '^[-+]' | grep -v '^+++\|^---' | cut -c1-170 | sed 's/^/  /'
+  echo "--- .github files that differ from main: $(git -C $C diff --name-only $BASE $P -- .github | tr '\n' ' ')"
+  echo "--- workflow, frozen config and workflow hardening tests versus main: $(git -C $C diff --quiet $BASE $P -- .github/workflows/security-scan.yml .github/osv-scanner-frozen-macos.toml tests/test_workflow_hardening.py && echo BYTE-IDENTICAL || echo CHANGED)"
+  echo "--- .github/osv-scanner.toml versus main, changed lines only:"
+  git -C $C diff -U0 $BASE $P -- .github/osv-scanner.toml | grep '^[-+]' | grep -v '^+++\|^---' | cut -c1-140 | sed 's/^/  /'
+  echo "--- parsed [[IgnoredVulns]] (id, ignoreUntil) and PackageOverrides count, main then head:"
+  for pair in "main:$BASE" "head:$P"; do printf '  %s: ' "${pair%%:*}"; git -C $C show "${pair#*:}":.github/osv-scanner.toml | python3 -c 'import sys,tomllib; d=tomllib.loads(sys.stdin.read()); print([(e["id"], str(e["ignoreUntil"])) for e in d.get("IgnoredVulns", [])], "| PackageOverrides:", len(d.get("PackageOverrides", [])))'; done
+  echo "--- inventory lockfile entries: main $(git -C $C show $BASE:.github/osv-scanner-lockfiles.json | python3 -c 'import json,sys; print(len(json.load(sys.stdin)["lockfiles"]))'), head $(git -C $C show $P:.github/osv-scanner-lockfiles.json | python3 -c 'import json,sys; print(len(json.load(sys.stdin)["lockfiles"]))')"
+} > "$OUT/pr535-identity.txt" 2>&1
+
+{
+  echo "observed_utc=$(stamp)"
+  echo "== candidate versus the previously reviewed lock (383ccc5b, #537's subject): package closure"
+  python3 $W/scripts/lock_closure_diff.py $W/old383.lock $W/cand.lock
+  echo
+  echo "== the same two locks, line level (hashes abbreviated to 8 hex): every changed line"
+  diff <(sed -E 's/--hash=sha256:([0-9a-f]{8})[0-9a-f]+/--hash=sha256:\1.../' $W/old383.lock) <(sed -E 's/--hash=sha256:([0-9a-f]{8})[0-9a-f]+/--hash=sha256:\1.../' $W/cand.lock) | grep '^[<>]'
+  echo "(line counts: reviewed $(wc -l < $W/old383.lock), candidate $(wc -l < $W/cand.lock))"
+} > "$OUT/closure-diff-vs-reviewed-383ccc.txt" 2>&1
+{ echo "observed_utc=$(stamp)"; echo "== candidate versus the lock on main after #546 (1d11bae3): package closure"; python3 $W/scripts/lock_closure_diff.py $W/main.lock $W/cand.lock; } > "$OUT/closure-diff-vs-main.txt" 2>&1
+
+bash $W/scripts/install_candidate.sh > "$OUT/install-log.txt" 2>&1
+{ echo "observed_utc=$(stamp)"; $W/venv/bin/python $W/scripts/oauthlib_independent_scan.py "$SP"; } > "$OUT/independent-scan.txt" 2>&1
+{ echo "observed_utc=$(stamp)"; bash $W/scripts/pyjwt_surface.sh "$SP" <RELOCK-SCRATCH>/pyjwt-src; } > "$OUT/pyjwt-surface.txt" 2>&1
+{ echo "observed_utc=$(stamp)"; $W/venv/bin/python $W/scripts/constraint_sources.py "$SP"; } > "$OUT/pin-sources.txt" 2>&1
+
+mkdir -p $W/oldscan && cp $W/old383.lock $W/oldscan/requirements.lock
+{
+  echo "observed_utc=$(stamp)"
+  echo "osv-scanner binary sha256: $(sha256sum $OSV | cut -d' ' -f1)"
+  echo "CI pin (.github/workflows/security-scan.yml at the head): $(grep -o 'OSV_SCANNER_SHA256: [0-9a-f]*' $WT/.github/workflows/security-scan.yml | cut -d' ' -f2)"
+  cd $WT
+  "$OSV" scan source --config .github/osv-scanner.toml --no-resolve --lockfile="requirements.txt:$O/requirements.lock" --format json > "$OUT/osv-cand-lock-with-ci-config.raw" 2> "$OUT/osv-cand-lock-with-ci-config.err"; echo "candidate lock, the head's ordinary config: scan exit $?"
+  "$OSV" scan source --config $W/empty.toml --no-resolve --lockfile="requirements.txt:$O/requirements.lock" --format json > "$OUT/osv-cand-lock-empty-config.raw" 2> "$OUT/osv-cand-lock-empty-config.err"; echo "candidate lock, EMPTY config (control): scan exit $?"
+  cd $W/oldscan && "$OSV" scan source --config $W/empty.toml --no-resolve --lockfile="requirements.txt:requirements.lock" --format json > "$OUT/osv-reviewed383-lock-empty-config.raw" 2> "$OUT/osv-reviewed383-lock-empty-config.err"; echo "previously reviewed lock 383ccc, EMPTY config (control): scan exit $?"
+  cd /tmp && python3 $W/scripts/osv_summary.py "$OUT/osv-cand-lock-with-ci-config.raw" "$OUT/osv-cand-lock-empty-config.raw" "$OUT/osv-reviewed383-lock-empty-config.raw"
+  grep -h "found [0-9]* package" "$OUT/osv-cand-lock-with-ci-config.err" | sed "s#$WT/#<pr-tree>/#; s/^/stderr: /"
+  grep -h "filtered out" "$OUT/osv-cand-lock-with-ci-config.err" | cut -c1-60 | sed 's/^/ordinary config filtered: /'
+} > "$OUT/osv-exit-codes-and-findings.txt" 2>&1
+
+cd $WT && python3 -B $W/scripts/osv_split_controls.py "$OSV" "$OUT/split" > "$OUT/osv-split-controls.txt" 2>&1
+
+G=blueprints/runtime-workers/gpt-researcher/requirements.lock; K=blueprints/runtime-workers/crawl4ai/requirements.lock
+{
+  echo "observed_utc=$(stamp)"
+  echo "what makes the ordinary scan filter 9 vulnerabilities at the head where it filtered 7 on main: the two new runtime-worker locks under the ordinary config and under an empty config"
+  cd $WT
+  "$OSV" scan source --config .github/osv-scanner.toml --no-resolve --lockfile="requirements.txt:$G" --lockfile="requirements.txt:$K" --format json > "$OUT/osv-two-new-locks-ci-config.raw" 2> "$OUT/osv-two-new-locks-ci-config.err"; echo "two new locks, the head's ordinary config: scan exit $?"
+  "$OSV" scan source --config $W/empty.toml --no-resolve --lockfile="requirements.txt:$G" --lockfile="requirements.txt:$K" --format json > "$OUT/osv-two-new-locks-empty-config.raw" 2> "$OUT/osv-two-new-locks-empty-config.err"; echo "two new locks, EMPTY config (control): scan exit $?"
+  python3 $W/scripts/osv_summary.py "$OUT/osv-two-new-locks-ci-config.raw" "$OUT/osv-two-new-locks-empty-config.raw"
+  grep -h -E "^Filtered" "$OUT/osv-two-new-locks-ci-config.err" | cut -c1-70 | sed 's/^/ordinary config: /'
+  echo "allowed rows for these two locks in the head's tests: $(git -C $C show $P:tests/test_osv_lockfile_coverage.py | grep -c -E 'runtime-workers/(gpt-researcher|crawl4ai)/requirements.lock')"
+} > "$OUT/osv-two-new-locks.txt" 2>&1
+
+E=$O/evidence
+{
+  echo "observed_utc=$(stamp)"
+  echo "== the four compile-input captures the PR lists under 'excluded', and what the pinned scanner reports about each as a requirements file (empty config)"
+  cd $WT
+  for f in pyjwt-relock-20260930-constraints.txt urllib3-relock-20260930-constraints.txt main-reconcile-20260930-constraints.txt wheel-relock-20260930-constraints.txt; do
+    printf '%s: %s pinned lines, sha256 %s\n' "$f" "$(grep -c -E '^[A-Za-z0-9_.-]+==' $E/$f)" "$(sha256sum $E/$f | cut -c1-16)"
+    "$OSV" scan source --config $W/empty.toml --no-resolve --lockfile="requirements.txt:$E/$f" --format json > "$OUT/osv-capture-$f.raw" 2> /dev/null; code=$?
+    printf '   scan exit %s | %s\n' "$code" "$(python3 $W/scripts/osv_summary.py "$OUT/osv-capture-$f.raw" | sed 's/^osv-capture-//' | cut -c1-330)"
+  done
+  echo "== references to these files outside evidence directories, receipts, manifests and the inventory (git grep at the head):"
+  git grep -n -E 'pyjwt-relock-20260930-constraints|urllib3-relock-20260930-constraints|main-reconcile-20260930-constraints|wheel-relock-20260930-constraints' -- . ':(exclude)blueprints/runtime-workers/openhands/evidence' ':(exclude)evidence' ':(exclude)manifests/evidence.json' ':(exclude).github/osv-scanner-lockfiles.json' | cut -c1-200
+  echo "(end of matches)"
+  echo "== the inventory description's rule for the excluded list:"
+  python3 -c "import json; d=json.load(open('.github/osv-scanner-lockfiles.json')); s=d['description']; i=s.index('An excluded entry'); print(s[i:i+190])"
+  echo "== the four entries' reasons (first 330 characters each):"
+  python3 -c "
+import json
+d=json.load(open('.github/osv-scanner-lockfiles.json'))
+for e in d['excluded']:
+    if 'constraints' in e['path'] and 'openhands' in e['path']: print(e['path'].split('/')[-1], '|', e['reason'][:330])"
+} > "$OUT/excluded-compile-input-captures.txt" 2>&1
+
+{ echo "observed_utc=$(stamp)"; cd $WT && python3 -B $W/scripts/receipt_bindings.py $O/evidence/pyjwt-relock-20260930.json; } > "$OUT/receipt-bindings.txt" 2>&1
+{ echo "observed_utc=$(stamp)"; cd $WT && python3 -B $W/scripts/external_hashes.py $O/evidence/pyjwt-relock-20260930.json $C $BASE $PREMERGE; } > "$OUT/external-hashes.txt" 2>&1
+{
+  echo "observed_utc=$(stamp)"; echo "head: $(git -C $WT rev-parse HEAD)"; cd $WT
+  python3 -B -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_runtime_worker_openhands tests.test_openhands_150 2>&1 | tail -5; echo "unittest exit: ${PIPESTATUS[0]}"
+  timeout 1500 python3 scripts/validate.py 2>&1 | tail -3; echo "validate.py exit: ${PIPESTATUS[0]}"
+  python3 scripts/evidence_manifest.py --check 2>&1 | tail -2; echo "evidence_manifest --check exit: ${PIPESTATUS[0]}"
+  echo "head unchanged after the checks: $(git rev-parse HEAD) | worktree clean: $([ -z "$(git status --porcelain)" ] && echo yes || echo NO)"
+} > "$OUT/repo-checks-at-head.txt" 2>&1
+git -C $C worktree remove --force "$WT" > /dev/null 2>&1; git -C $C worktree prune
+echo "[$(stamp)] outputs regenerated in $OUT"

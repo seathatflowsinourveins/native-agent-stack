@@ -1,0 +1,695 @@
+{
+  "schema_version": 1,
+  "description": "Sanitized copies of the MIRIX trial's native outputs and of the self-written glue that produced some of them. Log timestamps inside the files are host local time (UTC-4); 'observed' values are UTC file-modification times of the private originals.",
+  "sanitization_policy": "Private originals are not published; their name, byte count and sha256 are recorded here. They were in this session's scratch directory: the first pass's trees, which the first polish pass deleted on 2026-09-26 at 06:39Z (../host-cleanup-20260926/first-pass-scratch-trees/), or the port's and polish passes' own trees (trials-2, trials-pol), which remain (../README.md#host-state). Published copies replace the session scratch path with <scratch>, the home directory with ~, the user name with <user> (also inside underscore-encoded paths), UUID-shaped identifiers with <uuid>, and credential values with <redacted>; excerpts mark every omitted line range in place. Files marked verbatim are byte-for-byte copies. Each published copy passed scripts/validate.py PRIVATE_CONTENT and a credential-shape check.",
+  "outputs": [
+    {
+      "path": "native-outputs/pytest-v0.1.6-full.log",
+      "evidence_class": "upstream_test",
+      "what": "Upstream's unchanged test suite at tag v0.1.6 (tests/README.md: pytest -v) against a fresh private Postgres+pgvector database; MIRIX_API_KEY was not set for this run.",
+      "command": "cd mirix-src (v0.1.6) && MIRIX_PG_URI=postgresql+psycopg2://postgres:@/mirix_tests?host=<pgserver socket dir> python -m pytest -v",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:46:37Z",
+      "private_original": {
+        "name": "pytest_v016_full.log",
+        "bytes": 67656,
+        "sha256": "073057ffe47140cf326ae39eb94df62f454a90a392b61df987825783158bca41"
+      },
+      "published": {
+        "bytes": 67201,
+        "sha256": "d1786b5f530d0a3a9d276dcb44bd78fbbf593548b6ce50ab5ec22fba7458aca5"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 5
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/pytest-v0.1.6-test_search_all_users-rerun.log",
+      "evidence_class": "upstream_test",
+      "what": "Re-run of the one erroring upstream test file with MIRIX_API_KEY and MIRIX_API_URL set against a fresh server and database.",
+      "command": "cd mirix-src (v0.1.6) && python -m pytest -v tests/test_search_all_users.py, with MIRIX_API_KEY and MIRIX_API_URL (the port-18000 server) set",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:47:53Z",
+      "private_original": {
+        "name": "pytest_search_all_users.log",
+        "bytes": 11589,
+        "sha256": "d842b1eae96f188b2847043b7925b81ac6624cfa654a1de6d6278a311a50bc57"
+      },
+      "published": {
+        "bytes": 11225,
+        "sha256": "bc581ce273c878fe81c503edd76a942ec14bb6b532b2e4e09f6a67234a3cbbe0"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 4
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/server-v0.1.6-port18000-tests.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Upstream REST server (scripts/start_server.py, v0.1.6) started for the test-file re-run.",
+      "command": "python scripts/start_server.py --port 18000",
+      "exit_code": null,
+      "observed": "2026-09-26T01:47:36Z",
+      "private_original": {
+        "name": "server-tests.log",
+        "bytes": 2752,
+        "sha256": "16b492da2ec542d1aa83920a87103d106d35d834b014c8404473ece1f2f82991"
+      },
+      "published": {
+        "bytes": 2752,
+        "sha256": "16b492da2ec542d1aa83920a87103d106d35d834b014c8404473ece1f2f82991"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/quickstart-v0.1.6-attempt1-embeddings-on.log",
+      "evidence_class": "local_integration",
+      "what": "Self-written wrapper (local-integration/quickstart_add_retrieve.py) calling upstream MirixClient.initialize_meta_agent/add/retrieve_with_conversation as the README Option B quickstart does, with local endpoints and build_embeddings_for_memory: true.",
+      "command": "MIRIX_API_URL=http://127.0.0.1:18531 python quickstart_add_retrieve.py config/mirix_local.yaml",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:35:17Z",
+      "private_original": {
+        "name": "quickstart_run1.log",
+        "bytes": 1883,
+        "sha256": "563a62f550ecd52205fb3db48ec531f19aba3a08e4dc557a82a332722c13f238"
+      },
+      "published": {
+        "bytes": 1428,
+        "sha256": "a82b45261742aeb14d52f2827fe70309b108634b19e7d2e24fc876d59d90db8e"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 5
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/quickstart-v0.1.6-attempt2-bm25.log",
+      "evidence_class": "local_integration",
+      "what": "Same wrapper with build_embeddings_for_memory: false. HTTP calls return 200; the queued memory write then fails server-side (server-v0.1.6.log 21:37-21:47 local).",
+      "command": "MIRIX_API_URL=http://127.0.0.1:18531 python quickstart_add_retrieve.py config/mirix_local_bm25.yaml",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:37:53Z",
+      "private_original": {
+        "name": "quickstart_run2.log",
+        "bytes": 2680,
+        "sha256": "774eaad00659bc7ce16b492fe8c73fdfe97ca6aa4ba3af06a06a0a5f8720677d"
+      },
+      "published": {
+        "bytes": 2590,
+        "sha256": "a269affedbeb01a55c9ec0c6558ce1b603e8bb999351da8a6850f5fd60af37fb"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 3
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/check-v0.1.6-bounded-poll.log",
+      "evidence_class": "local_integration",
+      "what": "Self-written bounded check (local-integration/check_v016_bounded_poll.sh): add one message, poll retrieve_with_conversation for up to 280 s, exit 0 only if any memory type reports total_count > 0. The first poll hit the client's 60 s read timeout; the server log shows the same F1 validation error for this add at 22:08 local.",
+      "command": "timeout 300 sh check_v016_bounded_poll.sh",
+      "exit_code": 1,
+      "observed": "2026-09-26T02:05:34Z",
+      "private_original": {
+        "name": "receipt_check_v016_use.log",
+        "bytes": 6435,
+        "sha256": "f6f369189970c36258df86858adadcb058a86b227d488c402e2113ca73106d86"
+      },
+      "published": {
+        "bytes": 4909,
+        "sha256": "43112e373aea06147e73735ef9f39f122174892aa46e740f23ea4f70afd72693"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 16
+        },
+        {
+          "rule": "home directory",
+          "replacements": 4
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/server-v0.1.6-port18531.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Upstream REST server log (v0.1.6) for every v0.1.6 quickstart and check run: F2 at 21:35; F1 for the 21:37 add at every attempt until 'Retries exhausted' at 21:47; F1 for the 22:01 add at 22:08, whose final error was a 503 'Loading model' after the host llama.cpp service restarted at 22:15; and F1 again at every attempt for the skipped v0.1.6 use dry run (add at 23:18, retries exhausted 23:35). Times are host local (UTC-4).",
+      "command": "MIRIX_PG_URI=postgresql+psycopg2://postgres:@/mirix?host=<pgserver socket dir> python scripts/start_server.py --port 18531",
+      "exit_code": null,
+      "observed": "2026-09-26T03:35:29Z",
+      "private_original": {
+        "name": "server.log",
+        "bytes": 55308,
+        "sha256": "b73f998d45aa9461d5ea524598ae2014aacd4593f387e3e317b9329eb61eabfe"
+      },
+      "published": {
+        "bytes": 46015,
+        "sha256": "6a083796f58807b268a769d546edc8cd8a31fd571705c8e2c7b43a269548527c"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 93
+        },
+        {
+          "rule": "home directory",
+          "replacements": 2
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 27
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/install-main-8cb06a62.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "uv install of upstream main@8cb06a62 requirements.txt into the secondary venv.",
+      "command": "uv pip install -r mirix-main-src/requirements.txt",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:44:04Z",
+      "private_original": {
+        "name": "install-main.log",
+        "bytes": 4904,
+        "sha256": "704274091f2a3c0afc43ef0c98ddf610850a1f47d5b683defe2d9012b2470500"
+      },
+      "published": {
+        "bytes": 4813,
+        "sha256": "aacb740704106a4636c0d8e313922c59022271c3414ea0f4a041a50960bef981"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/quickstart-main-run1-sync-calls.log",
+      "evidence_class": "local_integration",
+      "what": "main@8cb06a62 with the synchronous wrapper, the call shape of main's README quick start: every client call returns an un-awaited coroutine and no request is made (F3). Exit code not retained. (samples/run_client.py at main awaits these calls; the first trial pass wrongly listed it as affected.)",
+      "command": "MIRIX_API_URL=http://127.0.0.1:18533 python quickstart_add_retrieve.py config/mirix_main_local_bm25.yaml",
+      "exit_code": null,
+      "observed": "2026-09-26T01:50:58Z",
+      "private_original": {
+        "name": "quickstart_main_run1.log",
+        "bytes": 567,
+        "sha256": "3a8e7e7ec1cd97d9bba03fefdf36f02184f2c652b95df5a546bbc82a2519dd39"
+      },
+      "published": {
+        "bytes": 567,
+        "sha256": "3a8e7e7ec1cd97d9bba03fefdf36f02184f2c652b95df5a546bbc82a2519dd39"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/quickstart-main-run2-list-content.log",
+      "evidence_class": "local_integration",
+      "what": "main@8cb06a62: README content shape (list of {type: text} parts); server returns 500 (F5).",
+      "command": "python quickstart_add_retrieve_async.py config/mirix_main_local_bm25.yaml",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:51:40Z",
+      "private_original": {
+        "name": "quickstart_main_run2.log",
+        "bytes": 4622,
+        "sha256": "aade959a51db51a6831a482c113ef3db55d1fa6a20b560edc178aac829a17e73"
+      },
+      "published": {
+        "bytes": 3986,
+        "sha256": "b409caaf76629ccaa95bde80b86be71295ae426c9b9cbd80629aca3c8d275a04"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 6
+        },
+        {
+          "rule": "home directory",
+          "replacements": 3
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 2
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/quickstart-main-run3-string-content.log",
+      "evidence_class": "local_integration",
+      "what": "main@8cb06a62: plain-string content; HTTP 200, write then fails server-side (server-main-8cb06a62.log).",
+      "command": "python quickstart_add_retrieve_async.py config/mirix_main_local_bm25.yaml (plain-string content)",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:52:40Z",
+      "private_original": {
+        "name": "quickstart_main_run3.log",
+        "bytes": 2663,
+        "sha256": "471ebb27c74896eb29049ad8e40ab9a32cb4f5b3393adbfa3190cd2263882ed3"
+      },
+      "published": {
+        "bytes": 2573,
+        "sha256": "bed1f8f955ec058f90fe851d73febf2033731a2c484bcc449a25ed7170f9b8dc"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 3
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/server-main-8cb06a62-port18533.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Upstream REST server log (main@8cb06a62): four F5 500 responses (21:51), topic extraction and trigger_memory_update succeed (21:53-21:56), semantic_memory_insert fails on F2 (22:03), llama.cpp restart 22:15; the recorder's 23:07 run repeats the pattern and also shows episodic_memory_insert failing on F2 (23:15, 23:18); from 23:37 the private Postgres was already stopped (connection FileNotFoundError), an environment artifact.",
+      "command": "MIRIX_PG_URI=postgresql+asyncpg://postgres:@/mirix_main?host=<pgserver socket dir> python scripts/start_server.py --port 18533",
+      "exit_code": null,
+      "observed": "2026-09-26T03:37:55Z",
+      "private_original": {
+        "name": "server-main.log",
+        "bytes": 327003,
+        "sha256": "183624726ddff9463283dde7469f6add79798ad719608a6f745f4450464a7f34"
+      },
+      "published": {
+        "bytes": 243037,
+        "sha256": "3b6c1e02e4fa8f55b724538099c8395c35e6f49a95dc69ed99c6c000603869d9"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 916
+        },
+        {
+          "rule": "home directory",
+          "replacements": 16
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 15
+        }
+      ]
+    },
+    {
+      "path": "local-integration/quickstart_add_retrieve.py",
+      "evidence_class": "local_integration_source",
+      "what": "Self-written wrapper: loads a MIRIX config YAML and calls upstream MirixClient.initialize_meta_agent, add and retrieve_with_conversation (README Option B shape), printing JSON.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "quickstart_add_retrieve.py",
+        "bytes": 1693,
+        "sha256": "e35ab0d3743eda13b6d7cb4d70a3337678b354a6987c5776e55fc5c083026671"
+      },
+      "published": {
+        "bytes": 1693,
+        "sha256": "e35ab0d3743eda13b6d7cb4d70a3337678b354a6987c5776e55fc5c083026671"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/quickstart_add_retrieve_async.py",
+      "evidence_class": "local_integration_source",
+      "what": "Self-written wrapper for main@8cb06a62, where the client methods are async (F3). Its docstring's statement that samples/run_client.py calls them synchronously is wrong: that sample awaits them at main.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "quickstart_add_retrieve_async.py",
+        "bytes": 2539,
+        "sha256": "416d253f87f0f7eac5d00c4743b84ae61bb433635b48ed76c1e73b941cda6f42"
+      },
+      "published": {
+        "bytes": 2539,
+        "sha256": "416d253f87f0f7eac5d00c4743b84ae61bb433635b48ed76c1e73b941cda6f42"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/gen_key_main.py",
+      "evidence_class": "local_integration_source",
+      "what": "Fixed awaited adaptation of upstream samples/generate_demo_api_key.py at 8cb06a62. Writes only to a caller-chosen new 0600 file, refuses existing files/symlinks, and prints no key or upstream exception details. The as-run version printed the key to the terminal and is not retained. private_original describes that historical source only; published describes this repaired successor, checked with dummy modules rather than a MIRIX server.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "gen_key_main.py",
+        "bytes": 2321,
+        "sha256": "a46418ef09a7f4c70737a648289d1f965ceb4e592be690a7ba690d3080f706be"
+      },
+      "published": {
+        "bytes": 4459,
+        "sha256": "447f4260309984b6f6f54adb00cb9721c9b1d0f6868c6d921fefea824ca399d2"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [],
+      "as_run_status": "Unsafe source not retained; historical size/hash only."
+    },
+    {
+      "path": "local-integration/check_v016_bounded_poll.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Self-written bounded check around upstream MirixClient (v0.1.6). Its oracle: exit 0 only if any memory type reports total_count > 0 within 280 s. The ephemeral server's demo key is redacted.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "receipt_check_v016_use.sh",
+        "bytes": 1974,
+        "sha256": "c890d2bab880227f77e7b08a1a3c92804b6d60581f7d3f07644d53772ee9b75e"
+      },
+      "published": {
+        "bytes": 1668,
+        "sha256": "cd601adf26f6a0ed59da60ed0350e455ea88e399a531795739c6787086bf955f"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 3
+        },
+        {
+          "rule": "credential value after api_key",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "local-integration/check_main_bounded_poll.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Same bounded check for main@8cb06a62 (drafted, not the source of any retained output). The ephemeral server's demo key is redacted.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "receipt_check_main_use.sh",
+        "bytes": 1682,
+        "sha256": "abf7a9e50659b7fab6cc215b758a79e8f97151f852dcc63753e17ff6d6fa28fa"
+      },
+      "published": {
+        "bytes": 1467,
+        "sha256": "a62204b566a3e9f889bd779a8496792cf3fbf5b2ebf0e92ed48d275df035e4d5"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 2
+        },
+        {
+          "rule": "credential value after api_key",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "local-integration/config-mirix_local.yaml",
+      "evidence_class": "local_integration_source",
+      "what": "MIRIX config for local llama.cpp chat and vLLM embeddings (build_embeddings_for_memory: true). Endpoint keys redacted.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "mirix_local.yaml",
+        "bytes": 1482,
+        "sha256": "a0aa8e34c9201240c3d56445a62b4828bc9c947cb9cde6a0c6afbced29e3c979"
+      },
+      "published": {
+        "bytes": 1368,
+        "sha256": "f7444103baf061746a58f99f83a8a801dbc39ecba26bdaec19e53f69b8da48c3"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "credential value after api_key",
+          "replacements": 3
+        }
+      ]
+    },
+    {
+      "path": "local-integration/config-mirix_local_bm25.yaml",
+      "evidence_class": "local_integration_source",
+      "what": "Same config with build_embeddings_for_memory: false. Endpoint keys redacted.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "mirix_local_bm25.yaml",
+        "bytes": 1483,
+        "sha256": "2cb871b820940d2643f22d1394c766f67c6a8393194a030e8a298f0c63a0d286"
+      },
+      "published": {
+        "bytes": 1369,
+        "sha256": "c517f90ee343404cd3848ebe156dbf943f7f09cfaa158584277b8e23c44eb036"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "credential value after api_key",
+          "replacements": 3
+        }
+      ]
+    },
+    {
+      "path": "local-integration/config-mirix_main_local_bm25.yaml",
+      "evidence_class": "local_integration_source",
+      "what": "Config used against main@8cb06a62 (build_embeddings_for_memory: false). Endpoint keys redacted.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "mirix_main_local_bm25.yaml",
+        "bytes": 1759,
+        "sha256": "f7069bae39be6684a4ba60c1bdcfe0e4eb2f18c1ed6e1d9c2a1ea5ba60b9d610"
+      },
+      "published": {
+        "bytes": 1645,
+        "sha256": "f44f775a26e73677ec4c9b94e1afca2c5a3542d081d74af1e8b6553d688efb52"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "credential value after api_key",
+          "replacements": 3
+        }
+      ]
+    },
+    {
+      "path": "withdrawn-host-receipts/nativestack-5975wx-20260925--mirix--install--20260926.json",
+      "evidence_class": "withdrawn_host_receipt",
+      "what": "Draft host receipt recorded by the first trial pass and withdrawn before merge; copied byte for byte. Why withdrawn: component_id 'mirix' is neither a manifests/stack.json component nor a landscape winner, so scripts/host_receipts.py validate rejects the receipt (docs/contributing-evidence.md section 3, step 3). Its commands also read /tmp/nas-mirix-trial, a symlink into this session's scratch directory.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "nativestack-5975wx-20260925--mirix--install--20260926.json",
+        "bytes": 3058,
+        "sha256": "ee6d3d2ffd55915b2542e17f6372b38f8e4e14800a250062e13b672022090f7e"
+      },
+      "published": {
+        "bytes": 3058,
+        "sha256": "ee6d3d2ffd55915b2542e17f6372b38f8e4e14800a250062e13b672022090f7e"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "withdrawn-host-receipts/nativestack-5975wx-20260925--mirix--use--20260926.json",
+      "evidence_class": "withdrawn_host_receipt",
+      "what": "Draft host receipt recorded by the first trial pass and withdrawn before merge; copied byte for byte. Why withdrawn: Same component-id rejection. In addition its result 'pass' rests on the HTTP-level exit code of a self-written wrapper while its own claim states that the memory write failed; the server log of that run (native-outputs/server-main-8cb06a62-port18533.log, 23:07-23:21 local) shows both semantic_memory_insert and episodic_memory_insert failing on F2.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "nativestack-5975wx-20260925--mirix--use--20260926.json",
+        "bytes": 3864,
+        "sha256": "53532c496efd4983a9724243dfc15100610d4d189e9e9cc7f7365df51709a9fa"
+      },
+      "published": {
+        "bytes": 3864,
+        "sha256": "53532c496efd4983a9724243dfc15100610d4d189e9e9cc7f7365df51709a9fa"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "skipped-receipt-specs.json",
+      "evidence_class": "skipped_receipt_spec",
+      "what": "The two v0.1.6 use-stage receipt specs the first pass never recorded because a dry-run command failed, with the retained outputs of the same commands.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "mirix-skipped-receipt-specs.json",
+        "bytes": 6733,
+        "sha256": "7e0fe7e63452893dcf1e19d885afc7c32fbbe5ccb89fa8ae134a8d67790b68be"
+      },
+      "published": {
+        "bytes": 6733,
+        "sha256": "7e0fe7e63452893dcf1e19d885afc7c32fbbe5ccb89fa8ae134a8d67790b68be"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/pypi-mirix-client-check.txt",
+      "evidence_class": "registry_observation",
+      "what": "F7 re-check: mirix 0.1.7's PyPI description says `pip install mirix-client`; the mirix-client project is registered on PyPI with no files and no versions (simple index), and its JSON API returns 404.",
+      "command": "see the commands inside the file",
+      "exit_code": 0,
+      "observed": "2026-09-26T05:03:36Z",
+      "private_original": {
+        "name": "f7-check.txt",
+        "bytes": 716,
+        "sha256": "d64fa3a15147164946d3faab792a7f8c223c181ec5fa4df162a6e4690e6af2eb"
+      },
+      "published": {
+        "bytes": 716,
+        "sha256": "d64fa3a15147164946d3faab792a7f8c223c181ec5fa4df162a6e4690e6af2eb"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "source-review.json",
+      "evidence_class": "source_review",
+      "what": "Pinned upstream source lines behind this trial's findings, produced by ../provenance/source_excerpts.py (sha256 8f71c03c3757731ccd60fdd8c8c19d9fd6ae6f95b2ee839b1b290c6050fc61f8) from fresh fetches of each named commit; each item carries the file's blob id and sha256.",
+      "command": "python3 ../provenance/source_excerpts.py <items.json>",
+      "exit_code": 0,
+      "observed": "2026-09-26T05:02:00Z",
+      "private_original": {
+        "name": "source-review-mirix.json",
+        "bytes": 24309,
+        "sha256": "4cfeabe894e8fda993634c7c321dbaec29a05e146d90ea870eb090fd54701aa9"
+      },
+      "published": {
+        "bytes": 24309,
+        "sha256": "4cfeabe894e8fda993634c7c321dbaec29a05e146d90ea870eb090fd54701aa9"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/pgserver-bundled-versions.txt",
+      "evidence_class": "independent_observation",
+      "what": "What the trial's database ran on, read from the v0.1.6 venv before the first pass's scratch tree was deleted (polish pass): the pgserver 0.1.4 package bundles PostgreSQL 16.2 (its postgres and pg_config --version; the cluster's PG_VERSION is 16) and the pgvector extension 0.6.2 (vector.control default_version). The pgvector 0.5.0 distribution in the venv is the Python client binding, which is all the install log shows.",
+      "command": "sh ../host-cleanup-20260926/first-pass-scratch-trees/capture-facts.sh <out-dir>",
+      "exit_code": 0,
+      "observed": "2026-09-26T06:37:31Z",
+      "private_original": {
+        "name": "pgserver-bundled-versions.txt",
+        "bytes": 818,
+        "sha256": "5916c4e18aab9b71f3c0c63a02f4ff68020984483878377577df10e63e2a01dd"
+      },
+      "published": {
+        "bytes": 818,
+        "sha256": "5916c4e18aab9b71f3c0c63a02f4ff68020984483878377577df10e63e2a01dd"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/pypi-mirix-0.1.7-wheel-contents.txt",
+      "evidence_class": "registry_observation",
+      "what": "Contents of the PyPI mirix 0.1.7 wheel the first pass downloaded (sha256 ead9e0ec...af45, the pinned digest), read before its scratch tree was deleted: 62 files; summary 'Mirix Client - Lightweight Python client for Mirix server'; subpackages client, helpers and schemas only (mirix/client/remote_client.py is the client); no server, agent, services or ORM module.",
+      "command": "sh ../host-cleanup-20260926/first-pass-scratch-trees/capture-facts.sh <out-dir>",
+      "exit_code": 0,
+      "observed": "2026-09-26T06:37:31Z",
+      "private_original": {
+        "name": "mirix-0.1.7-wheel-contents.txt",
+        "bytes": 3281,
+        "sha256": "38bb9fceca9d39c5be47b25c437e5b71d945983c3184f1116c2679d1e50831ac"
+      },
+      "published": {
+        "bytes": 3281,
+        "sha256": "38bb9fceca9d39c5be47b25c437e5b71d945983c3184f1116c2679d1e50831ac"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/gen_key_main_check.py",
+      "evidence_class": "local_integration_source",
+      "what": "Synthetic integration checker using stub MIRIX modules and dummy key values only; success, 0600 permissions under permissive/restrictive umasks, existing file/symlink refusal, missing flag, and key-bearing exception suppression.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": null,
+      "published": {
+        "bytes": 8078,
+        "sha256": "485e57714d162efc6d6c40933228f89eeb0a537f29b219a79bf5b585a6c162c5"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/gen-key-main-check-20260926.txt",
+      "evidence_class": "local_integration",
+      "what": "Actual returned output: all 19 expectations passed against the fixed helper. No real key or MIRIX service used.",
+      "command": "python local-integration/gen_key_main_check.py",
+      "exit_code": 0,
+      "observed": "2026-09-26T14:02:05.336701+00:00",
+      "private_original": null,
+      "published": {
+        "bytes": 896,
+        "sha256": "430a230399ad2fd8c1c0963d8968359616be6a00827e3496148a03820f0c1cbb"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    }
+  ]
+}

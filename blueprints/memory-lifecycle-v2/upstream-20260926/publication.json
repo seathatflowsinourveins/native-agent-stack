@@ -1,0 +1,334 @@
+{
+  "schema_version": 1,
+  "substitutions": [
+    "private upstream scratch root -> <scratch>",
+    "scripts/host_receipts.py sanitize(): home directory -> ~, user name -> <user>, private-content matches of scripts/validate.py -> [redacted]"
+  ],
+  "not_retained": [
+    "the tag checkouts, Rust toolchain, cargo registry, sandbox HOME and /tmp directories, and cargo target directories under the scratch root",
+    "the rustup-init binary (its sha256 is in rustup-init-verification.json)"
+  ],
+  "extra_files": {
+    "release-verification.json": "output of verify_release.py (the 02:58Z rerun)",
+    "rustup-init-verification.json": "output of verify_rustup_init.py",
+    "setup.log": "output of setup.sh: rustup-init, the pinned-tag clones and their commit checks, the toolchains and cargo fetch --locked"
+  },
+  "published_files": [
+    {
+      "path": "control/control-0-unmodified.log",
+      "sha256": "dfe8e4de77f8fee8f5fe6c384becb3c14195bad4af1f6bdfee9c751c4c403ea3",
+      "bytes": 2332,
+      "source": "<scratch>/out2/control/control-0-unmodified.log",
+      "source_sha256": "dfe8e4de77f8fee8f5fe6c384becb3c14195bad4af1f6bdfee9c751c4c403ea3",
+      "source_bytes": 2332,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "control/control-0-unmodified.receipt.json",
+      "sha256": "285c85d216ff15c42a39ce4848ddd43b837d5878d9d8237eb262054b8e111740",
+      "bytes": 3538,
+      "source": "<scratch>/out2/control/control-0-unmodified.receipt.json",
+      "source_sha256": "7be8cd780cff38a57feb32ca084981fed6d00d1283caefdba25cb143f96884c4",
+      "source_bytes": 3392,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": true
+    },
+    {
+      "path": "control/control-1-empty-fragment.diff",
+      "sha256": "fe3b31e51dd43125c662f06352868935c2243bc6e397870432081c0851297fd4",
+      "bytes": 479,
+      "source": "<scratch>/out2/control/control-1-empty-fragment.diff",
+      "source_sha256": "fe3b31e51dd43125c662f06352868935c2243bc6e397870432081c0851297fd4",
+      "source_bytes": 479,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "control/control-1-empty-fragment.log",
+      "sha256": "f95d6392f167ef64bb926e5d056fe60e6477ae2fb4bab284fc4411855c807aca",
+      "bytes": 1097,
+      "source": "<scratch>/out2/control/control-1-empty-fragment.log",
+      "source_sha256": "f95d6392f167ef64bb926e5d056fe60e6477ae2fb4bab284fc4411855c807aca",
+      "source_bytes": 1097,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "control/control-1-empty-fragment.receipt.json",
+      "sha256": "79ad258e96d1f850b602ba5b46086db2c45271983ad12dab75cf3bf394d28c99",
+      "bytes": 3703,
+      "source": "<scratch>/out2/control/control-1-empty-fragment.receipt.json",
+      "source_sha256": "0bd60980a8aa2d1a31ada75623c629048845d4b09ec15557bb6c65d2c1768cd1",
+      "source_bytes": 3561,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": true
+    },
+    {
+      "path": "control/control-2-filter-always-true.diff",
+      "sha256": "b6d7855ea6605a89d7afb99c74fd70b8acd451d12a3e8dfd0b5d9ac4715fc19e",
+      "bytes": 522,
+      "source": "<scratch>/out2/control/control-2-filter-always-true.diff",
+      "source_sha256": "b6d7855ea6605a89d7afb99c74fd70b8acd451d12a3e8dfd0b5d9ac4715fc19e",
+      "source_bytes": 522,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "control/control-2-filter-always-true.log",
+      "sha256": "b5a6855a1b3a61c67872267cb3996abee1a51e096bbb80fa4e4641c15de35c83",
+      "bytes": 1177,
+      "source": "<scratch>/out2/control/control-2-filter-always-true.log",
+      "source_sha256": "b5a6855a1b3a61c67872267cb3996abee1a51e096bbb80fa4e4641c15de35c83",
+      "source_bytes": 1177,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "control/control-2-filter-always-true.receipt.json",
+      "sha256": "4b3d2c27410ac7142f40d06b24eba90ffa6ba36809087dfe1dfff52172a19b2e",
+      "bytes": 3715,
+      "source": "<scratch>/out2/control/control-2-filter-always-true.receipt.json",
+      "source_sha256": "fdeb1d764d4ab1bbc3b669405b2d2b50bf3ce0ec34a2bfb52f9492a7440c531f",
+      "source_bytes": 3573,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": true
+    },
+    {
+      "path": "control/control-3-restored.log",
+      "sha256": "bb427baed49545fa0ffef5a0629d2584d7e520c72b2239b3eb28d6b20efadd12",
+      "bytes": 590,
+      "source": "<scratch>/out2/control/control-3-restored.log",
+      "source_sha256": "bb427baed49545fa0ffef5a0629d2584d7e520c72b2239b3eb28d6b20efadd12",
+      "source_bytes": 590,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "control/control-3-restored.receipt.json",
+      "sha256": "ba6322c7619de92cf3b320ff5b13cc39484db32024d9281adae8acefc0d0d15c",
+      "bytes": 3530,
+      "source": "<scratch>/out2/control/control-3-restored.receipt.json",
+      "source_sha256": "0f20c3dcfbc1f1c53c9c09cf1dce7d5e835a6c481a5a07cbc72a99ae0ea8f518",
+      "source_bytes": 3385,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": true
+    },
+    {
+      "path": "control/control-summary.json",
+      "sha256": "512120451eb7c6cd433437df9fe41d0da4138b3eb93f430361558f3638e5ecf7",
+      "bytes": 329,
+      "source": "<scratch>/out2/control/control-summary.json",
+      "source_sha256": "512120451eb7c6cd433437df9fe41d0da4138b3eb93f430361558f3638e5ecf7",
+      "source_bytes": 329,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "property-map.json",
+      "sha256": "8e209c4cddb1bd1d244c96c128f1a0b52087fba8a75302c72d332e8db108a8ce",
+      "bytes": 284176,
+      "source": null,
+      "transform": "built by this script from the per-test results of the final-round v*/ receipts (bound by their tests_sha256)"
+    },
+    {
+      "path": "release-verification.json",
+      "sha256": "53900aef48af7a9d44440ade96311e603ed1937ba23a68f92cb97bf508e782a0",
+      "bytes": 3397,
+      "source": "<scratch>/../releases2/release-verification.json",
+      "source_sha256": "53900aef48af7a9d44440ade96311e603ed1937ba23a68f92cb97bf508e782a0",
+      "source_bytes": 3397,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "rustup-init-verification.json",
+      "sha256": "c7598bc1c0e5e35969ea3dc73270ec7e5684badfeb18134676ade694070a34e6",
+      "bytes": 1364,
+      "source": "<scratch>/../../g4-fin/rustup-init-verification.json",
+      "source_sha256": "c7598bc1c0e5e35969ea3dc73270ec7e5684badfeb18134676ade694070a34e6",
+      "source_bytes": 1364,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "setup.log",
+      "sha256": "13baa112ed790de734726ad14e852b13b3591aa35262a9741262153c689acc36",
+      "bytes": 22949,
+      "source": "<scratch>/out/setup.log",
+      "source_sha256": "7546261ee8a758cac684ebe2957b2e728aaf06e78b1eaec6e6746bb6e2dcace7",
+      "source_bytes": 23567,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": true
+    },
+    {
+      "path": "superseded-round-1/v2.3.2/workspace-all-targets.log",
+      "sha256": "6439a7f7b4e7b5b71875de0a8dc1dad1d314f32161d1c8e3224bf45d9c74f065",
+      "bytes": 304089,
+      "source": "<scratch>/out/v2.3.2/workspace-all-targets.log",
+      "source_sha256": "6439a7f7b4e7b5b71875de0a8dc1dad1d314f32161d1c8e3224bf45d9c74f065",
+      "source_bytes": 304089,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "superseded-round-1/v2.3.2/workspace-all-targets.receipt.json",
+      "sha256": "c25f242a3737c77c8f797c30c7ef38d5637bde21b5b4bc719ef8a79ce8f0d185",
+      "bytes": 6281,
+      "source": "<scratch>/out/v2.3.2/workspace-all-targets.receipt.json",
+      "source_sha256": "1289624ffdba7bdd07af5287f8d5d51e013694b15f5d6fd342b71fae01242b8b",
+      "source_bytes": 537783,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize(); superseded note added",
+      "changed_by_transform": true
+    },
+    {
+      "path": "superseded-round-1/v2.4.0/workspace-all-targets.log",
+      "sha256": "b72e0c4a6f7d19b4474cf4b62a2924f8e5b31e965c68777703cae70e55778839",
+      "bytes": 316857,
+      "source": "<scratch>/out/v2.4.0/workspace-all-targets.log",
+      "source_sha256": "b72e0c4a6f7d19b4474cf4b62a2924f8e5b31e965c68777703cae70e55778839",
+      "source_bytes": 316857,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "superseded-round-1/v2.4.0/workspace-all-targets.receipt.json",
+      "sha256": "7369fb894af41e4bf6f416db1a2607c95bb9a28cabc8c349d344cf0662ed15f3",
+      "bytes": 6281,
+      "source": "<scratch>/out/v2.4.0/workspace-all-targets.receipt.json",
+      "source_sha256": "0f7aea8cd8cc9ff6451f47cb4867f07237feb00cd38d70690151477a74b34455",
+      "source_bytes": 563335,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize(); superseded note added",
+      "changed_by_transform": true
+    },
+    {
+      "path": "superseded-round-1/v2.4.1/workspace-all-targets.log",
+      "sha256": "33dc1490363d16fa7e9c6d5295ae156986ba1db94534821ad16b749df3032243",
+      "bytes": 325131,
+      "source": "<scratch>/out/v2.4.1/workspace-all-targets.log",
+      "source_sha256": "33dc1490363d16fa7e9c6d5295ae156986ba1db94534821ad16b749df3032243",
+      "source_bytes": 325131,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "superseded-round-1/v2.4.1/workspace-all-targets.receipt.json",
+      "sha256": "f459191f8df03569638400271d4ffb43e8587863e68e0794e1cc7e748b431bc8",
+      "bytes": 6281,
+      "source": "<scratch>/out/v2.4.1/workspace-all-targets.receipt.json",
+      "source_sha256": "22f77cbdd3f01da57d86fe371acd09a4cdcf2eb4a0652e0fc5b9bd6dcd47bfee",
+      "source_bytes": 579328,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize(); superseded note added",
+      "changed_by_transform": true
+    },
+    {
+      "path": "superseded-round-1/v2.4.1/workspace-doc.log",
+      "sha256": "02e813d2b1bae6701d02b0f185341b2574f20e01fd67fe7b7e3272862b7243bc",
+      "bytes": 1643,
+      "source": "<scratch>/out/v2.4.1/workspace-doc.log",
+      "source_sha256": "02e813d2b1bae6701d02b0f185341b2574f20e01fd67fe7b7e3272862b7243bc",
+      "source_bytes": 1643,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "superseded-round-1/v2.4.1/workspace-doc.receipt.json",
+      "sha256": "4410f9f063994f0f635133cf9184d4010befc436f747a1875c3d362f3616f079",
+      "bytes": 4776,
+      "source": "<scratch>/out/v2.4.1/workspace-doc.receipt.json",
+      "source_sha256": "7b97bab4e1bccffc9315f47a53890f68bf9c0d2c577ef4458cc2724035627640",
+      "source_bytes": 4272,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize(); superseded note added",
+      "changed_by_transform": true
+    },
+    {
+      "path": "v2.3.2/workspace-all-targets.log",
+      "sha256": "e4e005b87b6f0d048a6365c1a70c081b913d719930a64f75ea6d0de09545fe04",
+      "bytes": 291372,
+      "source": "<scratch>/out2/v2.3.2/workspace-all-targets.log",
+      "source_sha256": "e4e005b87b6f0d048a6365c1a70c081b913d719930a64f75ea6d0de09545fe04",
+      "source_bytes": 291372,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "v2.3.2/workspace-all-targets.receipt.json",
+      "sha256": "092f2aaf5adf0b98b9aec3c343d953eb89bc0a0238bd2f1aa98638dcb586d64c",
+      "bytes": 6366,
+      "source": "<scratch>/out2/v2.3.2/workspace-all-targets.receipt.json",
+      "source_sha256": "03c368fb6bcf2a57b25fc5077d83dab71db78ff4a6d71b312a08fc6d209faed7",
+      "source_bytes": 538072,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": true
+    },
+    {
+      "path": "v2.4.0/workspace-all-targets.log",
+      "sha256": "8b8d0d814a5a383144eb5a737aab27908d0e05662e6c7b8da488905c41735979",
+      "bytes": 303962,
+      "source": "<scratch>/out2/v2.4.0/workspace-all-targets.log",
+      "source_sha256": "8b8d0d814a5a383144eb5a737aab27908d0e05662e6c7b8da488905c41735979",
+      "source_bytes": 303962,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "v2.4.0/workspace-all-targets.receipt.json",
+      "sha256": "e4e4f3885d860a00412df131ac220b3658fdb7b4e5292bed8aa6c35d3957f9a7",
+      "bytes": 6366,
+      "source": "<scratch>/out2/v2.4.0/workspace-all-targets.receipt.json",
+      "source_sha256": "4a17fad1a99fb54519927988eeb9df92f843d0dba6e5be8a1773cd23c368dda5",
+      "source_bytes": 563624,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": true
+    },
+    {
+      "path": "v2.4.1/workspace-all-targets.log",
+      "sha256": "8aae8f08634c6f2f1a78d94dea87fbbf88079f222f8ac69f09f467b17efbb1eb",
+      "bytes": 312476,
+      "source": "<scratch>/out2/v2.4.1/workspace-all-targets.log",
+      "source_sha256": "8aae8f08634c6f2f1a78d94dea87fbbf88079f222f8ac69f09f467b17efbb1eb",
+      "source_bytes": 312476,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "v2.4.1/workspace-all-targets.receipt.json",
+      "sha256": "a1b2fd975dfeb571b781f095d883c29fbb3001d3b29def393070240b9e4800ed",
+      "bytes": 6366,
+      "source": "<scratch>/out2/v2.4.1/workspace-all-targets.receipt.json",
+      "source_sha256": "e9998b9e87226565ae5acd7556a6e3490ac4d68f17d35b4701d782c002c4d8fa",
+      "source_bytes": 579617,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": true
+    },
+    {
+      "path": "v2.4.1/workspace-doc.log",
+      "sha256": "7fadc1b7903049a49abac67f1c4c743af0808148e7013d379fac41b044ab71c3",
+      "bytes": 1643,
+      "source": "<scratch>/out2/v2.4.1/workspace-doc.log",
+      "source_sha256": "7fadc1b7903049a49abac67f1c4c743af0808148e7013d379fac41b044ab71c3",
+      "source_bytes": 1643,
+      "transform": "scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": false
+    },
+    {
+      "path": "v2.4.1/workspace-doc.receipt.json",
+      "sha256": "26878fdda25d9c0a9cdd9e6824d1f86ae32d945977fa8b0ca6de25fdd37eccb7",
+      "bytes": 4845,
+      "source": "<scratch>/out2/v2.4.1/workspace-doc.receipt.json",
+      "source_sha256": "9c4683cd18d79f03ff64856d44751f2883b9bcbc865a91a77f2fbe645b88f219",
+      "source_bytes": 4545,
+      "transform": "per-test dictionary dropped (tests_count and tests_sha256 bind it); log_sha256 and log_bytes kept as log_sha256_private and log_bytes_private and set to the retained log; scratch root -> <scratch>; scripts/host_receipts.py sanitize()",
+      "changed_by_transform": true
+    }
+  ],
+  "private_only_files": [
+    {
+      "name": "release-verification-first-run.json",
+      "source": "<scratch>/../releases/release-verification.json",
+      "sha256": "70c0d57c4f525ce0b1258d85999ad2324bbe1617271b97d001e411383eb76d5d",
+      "bytes": 3364,
+      "reason": "the first verify_release.py run (02:05Z). One field was then renamed because gitleaks flagged the public digest, and the rerun retained as release-verification.json gave the same digests and verdicts."
+    }
+  ]
+}

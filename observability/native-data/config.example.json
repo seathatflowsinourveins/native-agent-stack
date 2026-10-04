@@ -6,7 +6,8 @@
     "binary": "/absolute/bin/ai-memory",
     "data_dir": "/absolute/private/ai-memory",
     "workspace": "selected-workspace",
-    "project": "selected-project"
+    "project": "selected-project",
+    "server_url": "http://127.0.0.1:49374"
   },
   "qmd": {
     "binary": "/absolute/bin/qmd",
@@ -14,6 +15,13 @@
     "collection": "selected-collection"
   },
   "qdrant": null,
+  "report_scopes": {
+    "context-mode-native-codex": "Codex (Context Mode plugin)",
+    "context-mode-native-claude": "Claude Code (Context Mode plugin)",
+    "context-mode-desktop-wsl": "Desktop WSL",
+    "headroom": "Native / last 30 days",
+    "jcodemunch": "Linux / upstream default index"
+  },
   "state_dir": "/absolute/private/native-dashboard-data",
   "loki_url": "http://127.0.0.1:13100/loki/api/v1/push",
   "stale_after_seconds": 1800,

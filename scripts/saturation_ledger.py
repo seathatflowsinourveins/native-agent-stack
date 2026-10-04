@@ -17,6 +17,9 @@ Derived per layer, never stored:
   platform-profile hash;
 - a stopped sweep neither counts nor resets; a survivor, a reopen entry, a changed requirement or
   platform-profile hash, or a sweep without retained returns resets the count to 0, durably;
+- a refuted proposal that no returned vote refutes (a vote that did not return counts as refuted, and
+  the retained vote object marks it ``{missing: true}``) is **refuted by absence**: it is not an
+  earlier adjudication, so a later sweep that proposes it again counts it as new;
 - a current ``pin_moved``/``stale`` receipt flag or an archived/renamed/relicensed selection is a
   *current* trigger: it holds the count at 0 only while it stands, because the report reads it
   from today's files and the weekly workflow never writes the ledger. It becomes a durable reset
@@ -26,6 +29,14 @@ A saturation candidate is only an input to closure. Closing a layer still goes t
 ``catalogs/landscape/research-state.json`` ``closure_refs``, owned by the landscape owners; this
 script never writes that file or anything under ``catalogs/landscape/`` or
 ``catalogs/sota-convergence/``.
+
+Skills layers: the landscape sweep's skills modality sweeps the tasks of
+``catalogs/landscape/skills-lifecycle.json`` as catalog ``skills`` layers (``skills-<task>``). ``--report``
+lists them beside the research-state layers and ``--append`` records them. Their requirement hash
+covers the task's lifecycle_task, requirement and overturn_when (``skills_requirement_sha256``; the
+sweep freezes it with ``build_inputs.py --skills-scope``, since ``--scope`` covers research-state
+rows only). A SOTA-convergence manifest has no skills section, so a skills survivor binds to its
+retained votes and its source review, not to a manifest row.
 
   python3 scripts/saturation_ledger.py --check                  # schema, chain and bindings
   python3 scripts/saturation_ledger.py --check --base origin/main  # also: base ledger is a prefix
@@ -55,6 +66,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = "catalogs/saturation/ledger.json"
 RESEARCH_STATE = "catalogs/landscape/research-state.json"
+# The skills modality's layers: one per task of the skills lifecycle catalog, as catalog "skills".
+SKILLS_CATALOG = "catalogs/landscape/skills-lifecycle.json"
+SKILLS = "skills"
+SKILLS_REQUIREMENT_FIELDS = ("lifecycle_task", "requirement", "overturn_when")
 ADOPTION = "adoption/manifest.json"
 EVIDENCE = "manifests/evidence.json"
 # Paths this script must never write (the landscape owners' files and the verdict data).
@@ -65,6 +80,8 @@ SELECTION_KEY = {"foundation": "components", "trading": "entries"}
 STATUSES = ("completed", "stopped")
 VOTES = ("retained", "not_retained", "not_returned")
 VOTE_VALUES = ("refuted", "not_refuted")
+V2_STATUSES = ("credible", "not_credible", "pending")
+V2_CRITERIA = ("target_host_incompatible", "outside_requirement", "paid_service_required")
 ROLES = ("facts", "fit")
 REOPEN_TRIGGERS = ("requirement_changed", "platform_profile_changed", "retained_failure",
                    "missing_capability", "comparison_changed", "pin_moved", "stale_receipt",
@@ -79,6 +96,7 @@ SWEEP_FIELDS = ("sweep_id", "date", "workflow_run", "status", "manifest_ref", "m
                 "prev_sha256", "layers")
 LAYER_FIELDS = ("catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256", "votes", "votes_note",
                 "discovery_ref", "calls", "proposed", "known", "new", "survived", "refuted", "reopen")
+V2_LAYER_FIELDS = (*LAYER_FIELDS, "contract_version", "field_sha256", "source_field_sha256", "eligible_field", "pending")
 # A manifest lens-vote pointer: /<section>/<layer index>/candidates/<row>/adversarial_verification/votes/<k>
 LENS_POINTER = re.compile(r"/(foundation|trading)/(\d+)/candidates/(\d+)/adversarial_verification/votes/(\d+)")
 COMPUTED_LAYER_FIELDS = ("requirement_sha256", "platform_profiles_sha256", "known", "new")
@@ -99,6 +117,19 @@ class LedgerError(Exception):
 
 def canonical(value) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
+
+def v2_field_sha256(layer: dict) -> str:
+    """U11V4 identity/scope binding, shared with the neutral input producer's field_sha256.
+
+    Source: decision 89424e36, sections A/B; screen state and adoption never alter identity.
+    """
+    binding = {key: layer[key] for key in (
+        "contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")}
+    binding["members"] = sorted(
+        ({"candidate_key": row["candidate_key"], "repository": row["repository"]}
+         for row in layer["eligible_field"]), key=lambda row: row["candidate_key"])
+    return hashlib.sha256(canonical(binding)).hexdigest()
 
 
 def sha256_bytes(raw: bytes) -> str:
@@ -142,6 +173,346 @@ def norm_repo(repository: str) -> str:
     return repository.strip().rstrip("/").lower()
 
 
+def v2_identity(catalog: str, layer_id: str, repository: str) -> tuple[str, str]:
+    """Reuse producer identity helpers (sweep_common and source_reviews at 798ac445)."""
+    if not isinstance(repository, str) or not repository.strip():
+        raise ValueError("V2 repository identity must be a nonempty string")
+    helper_path = str(ROOT / "tools/sota-convergence/landscape-sweep")
+    if helper_path not in sys.path:
+        sys.path.insert(0, helper_path)
+    from sweep_common import canon, slug
+    from source_reviews import HUB, hub_model
+    model = hub_model(repository)
+    repo = f"{HUB}/{model}" if model else canon(repository)
+    if not isinstance(repo, str) or (not model and not re.fullmatch(r"https://github\.com/[^/\s]+/[^/\s]+", repo)):
+        raise ValueError("V2 field needs a canonical GitHub repository or Hugging Face model identity")
+    return repo, f"{catalog}/{layer_id}/{slug(repo)}"
+
+
+def v2_proposals(value, pointer):
+    """Traverse return envelopes; proposal items themselves stay raw, including malformed items."""
+    if isinstance(value, list):
+        for index, item in enumerate(value):
+            yield item, f"{pointer}/{index}"
+    elif isinstance(value, dict):
+        if "repository" in value:
+            yield value, pointer
+        elif "output" in value:
+            yield from v2_proposals(value["output"], f"{pointer}/output")
+        elif "proposed" in value:
+            if isinstance(value["proposed"], list):
+                yield from v2_proposals(value["proposed"], f"{pointer}/proposed")
+            else:
+                yield value["proposed"], f"{pointer}/proposed"
+        else:
+            yield value, pointer
+    elif value is not None:
+        yield value, pointer
+
+
+def v2_discovery_identity(catalog: str, layer_id: str, repository) -> tuple[str, str, bool]:
+    """U11 B and PR #590 review: unsupported discovery must remain pending, never abort conversion.
+
+    This opaque key identifies a raw proposal; it does not claim a supported upstream identity.
+    Frozen supported identities keep their strict contract; opaque keys may recur in later fields.
+    """
+    try:
+        repo, key = v2_identity(catalog, layer_id, repository)
+        return repo, key, True
+    except ValueError:
+        raw = json.dumps(repository, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        repo = repository.strip() if isinstance(repository, str) and repository.strip() else raw
+        repo, key = v2_opaque_identity(catalog, layer_id, repo)
+        return repo, key, False
+
+
+def v2_opaque_identity(catalog, layer_id, repository):
+    """Keep raw identity text opaque: the supported adapter searches for URLs inside larger strings."""
+    return repository, f"{catalog}/{layer_id}/unsupported-identity-{sha256_bytes(norm_repo(repository).encode())}"
+
+
+def v2_frozen_identity(catalog, layer_id, row):
+    """Verify an earlier opaque key without reparsing its raw JSON as a supported repository."""
+    repository, key = row.get("repository"), row.get("candidate_key")
+    if isinstance(key, str) and key.startswith(f"{catalog}/{layer_id}/unsupported-identity-"):
+        if not isinstance(repository, str) or not repository.strip():
+            raise ValueError("V2 frozen opaque identity must retain nonempty raw text")
+        canonical_repo, _, supported = v2_discovery_identity(catalog, layer_id, repository)
+        if supported and canonical_repo == repository:
+            raise ValueError("V2 opaque key cannot replace a supported canonical identity")
+        return v2_opaque_identity(catalog, layer_id, repository)
+    return v2_identity(catalog, layer_id, repository)
+
+
+def v2_proposal_details(catalog, layer_id, proposal, ref):
+    """U11 revision 5 item 6: malformed shape/evidence is pending, never a valid evidence list.
+
+    Source: decision at 49a4260029244e3e20d8b2dd3ada00af7983a3c9 and PR #590 comment 5942837180.
+    Raw returns stay untouched; an opaque malformed-proposal identity binds the complete raw item.
+    """
+    if not isinstance(proposal, dict) or "repository" not in proposal or ref.endswith("/proposed"):
+        raw = json.dumps(proposal, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        repo, key = v2_opaque_identity(catalog, layer_id, raw)
+        return repo, key, ["malformed_discovery_proposal"], []
+    repo, key, supported = v2_discovery_identity(catalog, layer_id, proposal["repository"])
+    issues = [] if supported else ["unsupported_discovery_identity"]
+    evidence = proposal.get("evidence", [])
+    if not isinstance(evidence, list) or not all(isinstance(value, str) for value in evidence):
+        issues.append("malformed_discovery_evidence")
+        evidence = []
+    return repo, key, issues, evidence
+
+
+def v2_expand_field(source: dict, rounds: list) -> list[dict]:
+    """U11V4 A: every discoverer's returned identity joins the frozen field before any cap.
+
+    Discovery labels and supplied keys are untrusted for eligibility; retain them in raw evidence.
+    Dedupe uses the exact producer policy, including Hugging Face case/trailing-slash aliases.
+    """
+    members = {}
+    catalog, layer_id = source["catalog"], source["layer_id"]
+    for row in source["eligible_field"]:
+        repo, key = v2_frozen_identity(catalog, layer_id, row)
+        if row.get("candidate_key") != key or row.get("evidence_key") != key or row["repository"] != repo \
+                or key in members:
+            raise ValueError("V2 original frozen field has a duplicate or mismatched identity")
+        members[key] = copy.deepcopy(row)
+
+    token = layer_id.replace("~", "~0").replace("/", "~1")
+    for i, entry in enumerate(rounds):
+        if entry.get("catalog") != catalog or entry.get("layer_id") != layer_id:
+            raise ValueError("V2 raw round does not belong to the frozen catalog/layer")
+        for slot in ("claude_discover", "gpt6_discover", "merged", "dropped"):
+            for row, ref in v2_proposals(entry.get(slot), f"#/raw/{token}/{i}/{slot}"):
+                repo, key, issues, evidence = v2_proposal_details(catalog, layer_id, row, ref)
+                if key not in members:
+                    reason = row.get("pending_reason") if isinstance(row, dict) else None
+                    members[key] = {"candidate_key": key, "repository": repo,
+                                    "disposition": "admit_pending", "exclusion_reason": None,
+                                    "pending_reason": reason if isinstance(reason, str) and reason
+                                    else "discovery_awaiting_v2_screen",
+                                    "evidence_key": key, "evidence_refs": [], "material": True}
+                if issues:
+                    members[key]["pending_reason"] = issues[0]
+                refs = [ref, *evidence]
+                members[key]["evidence_refs"] = sorted(set(members[key]["evidence_refs"] + refs))
+    return list(members.values())
+
+
+def material_pending(layer: dict) -> list[dict]:
+    """V2 material identities stay pending even if a cutoff drops the separate pending list."""
+    if layer.get("contract_version") != 2:
+        return []
+    rows = {}
+    for field in ("eligible_field", "pending"):
+        for row in layer.get(field) or []:
+            if isinstance(row, dict) and row.get("material") is not False and (
+                    field == "pending" or row.get("status") == "pending" or row.get("disposition") == "admit_pending"):
+                rows[row.get("candidate_key", row.get("repository", row.get("repo")))] = row
+    return list(rows.values())
+
+
+def v2_screen_documents(rounds: list) -> dict:
+    """Keep one normalized list per screen, bound to the final raw round, including lost returns."""
+    def documents(value):
+        if isinstance(value, list):
+            return [doc for item in value for doc in documents(item)]
+        if isinstance(value, dict) and "status" in value and "output" in value:
+            return documents(value["output"]) if value["status"] == "ok" else [value]
+        return [] if value is None else [value]
+
+    latest = rounds[-1] if rounds and not rounds[-1].get("lost") else {}
+    return {"facts": [*documents(latest.get("facts")), *documents(latest.get("facts_gpt6"))],
+            "fit": [*documents(latest.get("fit_claude")), *documents(latest.get("fit_gpt6"))]}
+
+
+def v2_round_failures(rounds: list) -> list[dict]:
+    """A lost round/discovery cannot be a clean search, even if no candidate remains pending."""
+    failures = []
+    for index, row in enumerate(rounds):
+        token = row.get("layer_id", "").replace("~", "~0").replace("/", "~1")
+        for slot in ("claude_discover", "gpt6_discover", "merged", "dropped"):
+            for proposal, ref in v2_proposals(row.get(slot), f"#/raw/{token}/{index}/{slot}"):
+                _, _, issues, _ = v2_proposal_details(row.get("catalog"), row.get("layer_id"), proposal, ref)
+                failures.extend({"round": index, "cause": issue, "ref": ref} for issue in issues)
+        if row.get("lost"):
+            failures.append({"round": index, "cause": "round_lost"})
+        for family, slot in (("claude", "claude_discover"), ("gpt6", "gpt6_discover")):
+            doc = row.get(slot)
+            if isinstance(doc, dict) and "status" in doc and "output" in doc:
+                doc = doc["output"] if doc["status"] == "ok" else None
+            if not isinstance(doc, dict) or doc.get("contract_version") != 2 \
+                    or doc.get("layer_id") != row.get("layer_id") or not isinstance(doc.get("proposed"), list):
+                failures.append({"round": index, "cause": "discovery_missing_or_malformed", "family": family})
+    return failures
+
+
+def v2_provenance_conflict(documents: dict) -> bool:
+    """One judgment ID cannot represent two independent role/family judgments."""
+    ids = [doc.get("judgment", {}).get("judgment_id") for docs in documents.values() for doc in docs
+           if isinstance(doc, dict) and isinstance(doc.get("judgment"), dict)]
+    ids = [value for value in ids if isinstance(value, str) and value]
+    return len(ids) != len(set(ids))
+
+
+def v2_supported_exclusion(row: dict, source_field: dict) -> bool:
+    """Check the retained evidence contract, not the truth of a primary source.
+
+    U11V4 B requires a fact and requirement-relative support. Health is deliberately not a
+    model-vote criterion. Missing credentials never establish a mandatory paid dependency.
+    """
+    if row.get("criterion") not in V2_CRITERIA or not all(
+            isinstance(row.get(key), str) and row[key].strip() for key in ("fact", "requirement_fit")):
+        return False
+    if not row.get("refs") or not all(re.match(r"https?://[^/\s]+", ref) for ref in row["refs"]):
+        return False
+    fact = row["fact"].lower()
+    # A model cannot turn the script-only maintenance criterion into a fit exclusion by relabeling it.
+    # The current typed vote contract has no deterministic maintenance proof, so keep such claims pending.
+    if re.search(r"\b(?:archived|stale|unmaintained|inactive)\b", fact):
+        return False
+    credential = r"(?:credentials?|sign[ -]?in|api key|authentication)"
+    absent = r"(?:missing|absent|unavailable|\bno\b|not (?:available|configured)|lack\w*)"
+    if re.search(rf"(?:{credential}.{{0,30}}{absent}|{absent}.{{0,30}}{credential})", fact):
+        return False
+    requirement = source_field.get("requirement")
+    if not requirement:
+        return False
+    if row["criterion"] == "paid_service_required":
+        # Design-owner clarification in PR #590: part 2 owns the explicit, hash-bound policy.
+        # Requirement-text patterns are not a substitute for that field.
+        return False
+    return True
+
+
+def v2_member_outcome(member: dict, screens: dict) -> dict:
+    """Retain the original identity/reason unless both required screens resolve it."""
+    result = dict(member, status="pending", disposition="admit_pending", exclusion_reason=None, material=True)
+    result["pending_reason"] = member.get("pending_reason") or "awaiting_v2_screen"
+    if any("the paid-service policy field arrives in part 2" in screen.get("pending_reasons", [])
+           for screen in screens.values()):
+        result["pending_reason"] = "the paid-service policy field arrives in part 2"
+    if all(screen["status"] == "credible" for screen in screens.values()):
+        result.update(status="credible", disposition="admit", pending_reason=None)
+    elif screens["facts"]["status"] == "not_credible" and screens["facts"]["criterion"] in (
+            "target_host_incompatible", "paid_service_required"):
+        # Confirmed platform/cost facts stand regardless of the fit judgment on claimed facts.
+        result.update(status="not_credible", disposition="refuted", pending_reason=None,
+                      exclusion_reason=screens["facts"]["criterion"], material=False)
+    elif screens["fit"]["status"] == "not_credible" and screens["fit"]["criterion"] == "outside_requirement":
+        # The fit role owns requirement fit; facts alone cannot establish this exclusion.
+        result.update(status="not_credible", disposition="refuted", pending_reason=None,
+                      exclusion_reason="outside_requirement", material=False)
+    elif all(screen["status"] != "pending" for screen in screens.values()):
+        criteria = {screen["criterion"] for screen in screens.values() if screen["status"] == "not_credible"}
+        if len(criteria) == 1:
+            result.update(status="not_credible", disposition="refuted", pending_reason=None,
+                          exclusion_reason=criteria.pop(), material=False)
+    return result
+
+
+def v2_screen(role: str, documents: list, member: dict, source_field: dict, conflict=False) -> dict:
+    """Recompute a declared U11V4 screen; replication and provenance are not provider execution proof.
+
+    Two distinct judgments/order seeds per family and agreeing majorities are required. Unknown native
+    sampling seeds stay unknown; order_seed only binds declared packet order, not provider sampling.
+    """
+    out = {"status": "pending", "criterion": None, "complete": False, "pending_reasons": []}
+    # Carrying an opaque/malformed proposal into a later frozen field cannot let model labels resolve it.
+    # Revision 5 item 6 leaves adapter/shape failures pending with their retained raw provenance.
+    if member.get("candidate_key", "").startswith(
+            f"{source_field.get('catalog')}/{source_field.get('layer_id')}/unsupported-identity-") \
+            or member.get("pending_reason") in (
+            "malformed_discovery_proposal", "malformed_discovery_evidence"):
+        out["pending_reasons"].append(member.get("pending_reason") or "unsupported_discovery_identity")
+        return out
+    if conflict:
+        out["pending_reasons"].append("overlapping_judgment_ids")
+        return out
+    key = member.get("candidate_key")
+    if key not in {row.get("candidate_key") for row in source_field.get("eligible_field") or []}:
+        out["pending_reasons"].append("outside_source_field")
+        return out
+    required_doc = {"contract_version", "layer_id", "role", "votes", "skills_used", "judgment"}
+    required_judgment = {"judgment_id", "order_seed", "family", "model_route_requested", "model_route_actual",
+                         "source_field_sha256", "provider_sampling_seed_requested", "provider_sampling_seed_actual",
+                         "provider_sampling_seed_status"}
+    required_vote = {"candidate_key", "repository", "evidence_key", "status", "criterion", "fact", "confidence",
+                     "reasoning", "refs", "requirement_fit"}
+    families = {"claude": [], "gpt6": []}
+    malformed = False
+    for doc in documents:
+        good = (isinstance(doc, dict) and set(doc) == required_doc and type(doc.get("contract_version")) is int
+                and doc["contract_version"] == 2 and doc.get("role") == role
+                and doc.get("layer_id") == source_field.get("layer_id")
+                and isinstance(doc.get("votes"), list) and isinstance(doc.get("skills_used"), list)
+                and all(isinstance(skill, str) for skill in doc["skills_used"]))
+        provenance = doc.get("judgment") if isinstance(doc, dict) else None
+        good = good and isinstance(provenance, dict) and set(provenance) == required_judgment
+        if good:
+            good = (provenance.get("family") in families and type(provenance.get("order_seed")) is int
+                    and isinstance(provenance.get("judgment_id"), str) and bool(provenance["judgment_id"].strip())
+                    and isinstance(provenance.get("model_route_requested"), str)
+                    and bool(provenance["model_route_requested"].strip())
+                    and (provenance["model_route_actual"] is None or (
+                        isinstance(provenance["model_route_actual"], str) and bool(provenance["model_route_actual"].strip())))
+                    and provenance["source_field_sha256"] == source_field.get("field_sha256")
+                    and provenance["provider_sampling_seed_status"] in ("unknown", "not_exposed", "recorded")
+                    and all(provenance[field] is None or type(provenance[field]) is int for field in (
+                        "provider_sampling_seed_requested", "provider_sampling_seed_actual")))
+            if good:
+                requested = provenance["provider_sampling_seed_requested"]
+                actual = provenance["provider_sampling_seed_actual"]
+                good = ((provenance["provider_sampling_seed_status"] == "recorded" and actual is not None
+                         and requested in (None, actual)) or
+                        (provenance["provider_sampling_seed_status"] in ("unknown", "not_exposed") and actual is None))
+        matching = [row for row in doc.get("votes", []) if isinstance(row, dict) and row.get("candidate_key") == key] \
+            if isinstance(doc, dict) and isinstance(doc.get("votes"), list) else []
+        row = matching[0] if len(matching) == 1 else None
+        good = good and isinstance(row, dict) and set(row) == required_vote
+        if good:
+            good = (row.get("repository") == member.get("repository") and row.get("evidence_key") == key
+                    and row.get("status") in V2_STATUSES and row.get("criterion") in (None, *V2_CRITERIA)
+                    and (row["fact"] is None or isinstance(row["fact"], str))
+                    and type(row["confidence"]) in (int, float) and 0 <= row["confidence"] <= 1
+                    and isinstance(row["reasoning"], str) and bool(row["reasoning"])
+                    and isinstance(row["refs"], list)
+                    and all(isinstance(ref, str) and bool(ref) for ref in row["refs"])
+                    and (row["requirement_fit"] is None or isinstance(row["requirement_fit"], str)))
+        if not good:
+            malformed = True
+            out["pending_reasons"].append("malformed_or_unbound_judgment")
+            continue
+        families[provenance["family"]].append((provenance, row))
+    majority = {}
+    if any(row["status"] == "not_credible" and row["criterion"] == "paid_service_required"
+           for judgments in families.values() for _, row in judgments):
+        out["pending_reasons"].append("the paid-service policy field arrives in part 2")
+    for family, judgments in families.items():
+        if len(judgments) < 2 or len({p["order_seed"] for p, _ in judgments}) != len(judgments) \
+                or len({p["judgment_id"] for p, _ in judgments}) != len(judgments):
+            out["pending_reasons"].append(f"{family}:incomplete_replication")
+            continue
+        votes = [(row["status"], row["criterion"]) if (
+            row["status"] == "credible" and row["criterion"] is None or
+            row["status"] == "not_credible" and v2_supported_exclusion(row, source_field)
+            and (role != "facts" or row["criterion"] in ("target_host_incompatible", "paid_service_required")))
+            else ("pending", None) for _, row in judgments]
+        for vote in set(votes):
+            if vote[0] != "pending" and votes.count(vote) * 2 > len(votes):
+                majority[family] = vote
+        if family not in majority:
+            out["pending_reasons"].append(f"{family}:no_supported_majority")
+    out["complete"] = not malformed and all(len(items) >= 2 for items in families.values()) \
+        and all(len({p["order_seed"] for p, _ in items}) == len(items) for items in families.values())
+    if out["complete"] and len(majority) == 2 and majority["claude"] == majority["gpt6"]:
+        status, criterion = majority["claude"]
+        out.update(status=status, criterion=criterion, pending_reasons=[])
+    elif len(majority) == 2:
+        out["pending_reasons"].append("family_majorities_disagree")
+    return out
+
+
 def genesis_sha256(ledger: dict) -> str:
     return sha256_bytes(canonical({"schema_version": ledger.get("schema_version"), "policy": ledger.get("policy")}))
 
@@ -153,6 +524,11 @@ def record_sha256(record: dict) -> str:
 def requirement_sha256(row: dict) -> str:
     """The layer's frozen requirement: its research-state next_action and decision_ref."""
     return sha256_bytes(canonical({"next_action": row.get("next_action"), "decision_ref": row.get("decision_ref")}))
+
+
+def skills_requirement_sha256(task: dict) -> str:
+    """A skills layer's frozen requirement: its skills lifecycle task's lifecycle_task, requirement and overturn_when."""
+    return sha256_bytes(canonical({field: task.get(field) for field in SKILLS_REQUIREMENT_FIELDS}))
 
 
 def platform_profiles_sha256(adoption: dict) -> str:
@@ -186,6 +562,22 @@ def research_rows(root: Path) -> dict:
         if isinstance(row, dict):
             rows[(row.get("catalog"), row.get("layer_id"))] = row
     return rows
+
+
+def skills_rows(root: Path) -> dict:
+    """{("skills", layer_id): task} for the tasks of the skills lifecycle catalog; {} when the checkout has none."""
+    if not safe_path(root, SKILLS_CATALOG).is_file():
+        return {}
+    return {(SKILLS, task["layer_id"]): task for task in load_json(root, SKILLS_CATALOG).get("tasks") or []
+            if isinstance(task, dict) and isinstance(task.get("layer_id"), str)}
+
+
+def layer_requirements(root: Path) -> dict:
+    """{(catalog, layer_id): requirement hash} of every layer a sweep can record: the research-state rows, then the
+    skills lifecycle tasks."""
+    requirements = {key: requirement_sha256(row) for key, row in research_rows(root).items()}
+    requirements.update({key: skills_requirement_sha256(task) for key, task in skills_rows(root).items()})
+    return requirements
 
 
 def registered_files(root: Path) -> dict:
@@ -230,10 +622,55 @@ def baseline_repositories(section: str, layer_row: dict, lane: str) -> set:
     return repos
 
 
-def adjudicated_repos(layer: dict) -> set:
-    """Repositories an earlier sweep already put through both refuters for this layer."""
+def refutes_on_merit(target) -> bool | None:
+    """Whether a retained vote object refutes on a returned vote. None when it does not refute (or is not a vote
+    object). True when a returned vote refutes: a two-family fit object's member ({claude, gpt6}) that is not
+    {missing: true} and does not say refuted: false (a returned vote refutes unless it says false), or a single
+    vote object without the missing marker. False when it refutes only because a vote did not return: the
+    landscape-sweep harness writes {missing: true} for a vote that never came back and counts it as refuted."""
+    if not isinstance(target, dict) or target.get("refuted") is not True:
+        return None
+    members = [target[key] for key in ("claude", "gpt6") if isinstance(target.get(key), dict)]
+    if members:
+        return any(not member.get("missing") and member.get("refuted") is not False for member in members)
+    return not target.get("missing")
+
+
+def refuted_by_absence(entry: dict, target_of) -> bool:
+    """A refuted outcome that no returned vote refutes: each of its refuting votes refutes only because a vote did
+    not return (refutes_on_merit False). ``target_of(ref)`` resolves a ``path#/pointer`` ref. Lens votes, and a vote
+    whose ref does not resolve, count as adjudicated (False)."""
+    if not isinstance(entry, dict) or "lens_votes" in entry:
+        return False
+    verdicts = []
+    for role in ROLES:
+        vote = entry.get(role)
+        if not isinstance(vote, dict) or vote.get("vote") != "refuted":
+            continue
+        try:
+            verdicts.append(refutes_on_merit(target_of(vote.get("ref"))))
+        except (LedgerError, TypeError, ValueError):
+            return False
+    return bool(verdicts) and all(verdict is False for verdict in verdicts)
+
+
+def ref_resolver(document_of):
+    """A ``target_of(ref)`` for refuted_by_absence over ``document_of(path)`` (a loader that may cache)."""
+    def target_of(ref):
+        if not isinstance(ref, str):
+            raise LedgerError(f"vote ref must be a string: {ref!r}")
+        path, _, pointer = ref.partition("#")
+        return resolve_pointer(document_of(path), pointer)
+    return target_of
+
+
+def adjudicated_repos(layer: dict, target_of=None) -> set:
+    """Repositories an earlier sweep already put through both refuters for this layer. With ``target_of`` (a ref
+    resolver), a refuted entry that is refuted_by_absence is left out: no returned vote judged it, so it stays new
+    in later sweeps."""
     return {norm_repo(entry["repo"]) for field in ("survived", "refuted") for entry in layer.get(field) or []
-            if isinstance(entry, dict) and isinstance(entry.get("repo"), str)}
+            if isinstance(entry, dict) and isinstance(entry.get("repo"), str)
+            and not (field == "refuted" and target_of is not None and refuted_by_absence(entry, target_of))}
 
 
 def split_known(proposed: list, baseline: set, earlier: set) -> tuple[list, list]:
@@ -282,6 +719,7 @@ class Checker:
         self.errors: list[str] = []
         self._files = None
         self._json_cache: dict = {}
+        self._v2_fields: dict = {}
 
     def error(self, message: str) -> None:
         self.errors.append(message)
@@ -440,9 +878,11 @@ class Checker:
                     self.error(f"{label}: a completed sweep needs a completed {prefix} child in {sweep.get('usage_ref')}")
 
     def check_sweep(self, sweep: dict, label: str, proposals_so_far: dict) -> None:
-        extra = set(sweep) - set(SWEEP_FIELDS)
+        extra = set(sweep) - set(SWEEP_FIELDS) - {"contract_version"}
         if extra:
             self.error(f"{label}: unknown keys {sorted(extra)}")
+        if "contract_version" in sweep and type(sweep["contract_version"]) is not int or sweep.get("contract_version", 1) not in (1, 2):
+            self.error(f"{label}: contract_version must be 1 or 2")
         status = sweep.get("status")
         if status not in STATUSES:
             self.error(f"{label}: status must be one of {STATUSES}")
@@ -519,6 +959,13 @@ class Checker:
         if not isinstance(layers, list):
             self.error(f"{label}: layers must be a list")
             return
+        if sweep.get("contract_version") == 2:
+            returns = self.document(returns_ref) if isinstance(returns_ref, str) else {}
+            ids = {row.get("layer_id") for row in layers if isinstance(row, dict)}
+            if returns.get("contract_version") != 2 or not isinstance(returns.get("discovery"), dict) \
+                    or not isinstance(returns.get("raw"), dict) or ids != set(returns.get("discovery", {})) \
+                    or ids != set(returns.get("raw", {})):
+                self.error(f"{label}: V2 layers must cover every retained discovery and raw field")
         seen = set()
         for position, layer in enumerate(layers):
             layer_label = f"{label}.layers[{position}]"
@@ -530,7 +977,7 @@ class Checker:
                 self.error(f"{layer_label}: duplicate layer {key}")
             seen.add(key)
             self.check_layer(sweep, layer, layer_label, manifest, lane, proposals_so_far.get(key, set()))
-            proposals_so_far.setdefault(key, set()).update(adjudicated_repos(layer))
+            proposals_so_far.setdefault(key, set()).update(adjudicated_repos(layer, ref_resolver(self.document)))
 
     def check_lost_workers(self, sweep: dict, usage, label: str) -> None:
         """lost_workers is exactly the usage output's incomplete children: each listed label never
@@ -553,12 +1000,24 @@ class Checker:
             self.error(f"{label}: lost_workers omits incomplete children of {sweep.get('usage_ref')}: {omitted}")
 
     def check_layer(self, sweep, layer, label, manifest, lane, earlier) -> None:
+        key = (layer.get("catalog"), layer.get("layer_id"))
+        if sweep.get("contract_version") == 2 and layer.get("contract_version") != 2:
+            self.error(f"{label}: V2 sweep cannot project a layer into V1")
+        if layer.get("contract_version") == 2:
+            identities = {row.get("candidate_key") for row in layer.get("eligible_field", []) if isinstance(row, dict)}
+            if not self._v2_fields.get(key, set()).issubset(identities):
+                self.error(f"{label}: V2 field omits prior frozen/discovery identities")
+            self._v2_fields.setdefault(key, set()).update(identities)
+            self.check_v2_layer(sweep, layer, label, manifest, lane, earlier)
+            return
+        if key in self._v2_fields:
+            self.error(f"{label}: prior V2 field requires tri-state evidence, not a V1 projection")
         extra = set(layer) - set(LAYER_FIELDS)
         if extra:
             self.error(f"{label}: unknown keys {sorted(extra)}")
         catalog, layer_id = layer.get("catalog"), layer.get("layer_id")
-        if catalog not in MANIFEST_SECTION or not isinstance(layer_id, str):
-            self.error(f"{label}: catalog must be one of {sorted(MANIFEST_SECTION)} with a layer_id")
+        if (catalog not in MANIFEST_SECTION and catalog != SKILLS) or not isinstance(layer_id, str):
+            self.error(f"{label}: catalog must be one of {sorted([*MANIFEST_SECTION, SKILLS])} with a layer_id")
             return
         for field in ("requirement_sha256", "platform_profiles_sha256"):
             if not (isinstance(layer.get(field), str) and HEX64.fullmatch(layer[field])):
@@ -589,7 +1048,8 @@ class Checker:
             self.check_discovery(sweep, layer, f"{label}.discovery_ref", proposed)
         # known/new partition proposed, recomputed from the manifest baseline and earlier sweeps.
         located = manifest_layer(manifest, catalog, layer_id) if manifest is not None else None
-        if manifest is not None and located is None:
+        # A manifest has no skills section: a skills layer's outcomes bind to its retained votes and source reviews.
+        if manifest is not None and located is None and catalog != SKILLS:
             self.error(f"{label}: layer {catalog}/{layer_id} is not in {sweep.get('manifest_ref')}")
         baseline = baseline_repositories(located[0], located[2], lane) if located else set()
         known, new = split_known(proposed, baseline, earlier)
@@ -615,7 +1075,7 @@ class Checker:
                     self.error(f"{entry_label}: listed as {field} but its votes give "
                                f"{'survived' if entry_survives(entry) else 'refuted'}")
                 if survives:
-                    self.check_survivor(entry, entry_label, layer_id, located, lane)
+                    self.check_survivor(entry, entry_label, layer_id, located, lane, catalog)
         if sweep.get("status") == "completed":
             missing = [repo for repo in proposed if norm_repo(repo) not in adjudicated]
             if missing:
@@ -655,6 +1115,137 @@ class Checker:
             if target.get(field) != layer.get(field):
                 self.error(f"{label}: {field} differs from the frozen scope in {ref} "
                            f"({target.get(field)!r}); the scope changed after the sweep froze it")
+
+    def check_v2_layer(self, sweep, layer, label, manifest, lane, earlier) -> None:
+        """Recompute each tri-state screen and partition from retained V2 evidence."""
+        extra = set(layer) - set(V2_LAYER_FIELDS)
+        if extra:
+            self.error(f"{label}: unknown V2 keys {sorted(extra)}")
+        catalog, layer_id = layer.get("catalog"), layer.get("layer_id")
+        if catalog not in MANIFEST_SECTION or not isinstance(layer_id, str):
+            self.error(f"{label}: V2 requires a repository catalog/layer")
+            return
+        if sweep.get("contract_version") != 2:
+            self.error(f"{label}: a V2 layer requires an explicit V2 sweep")
+        if layer.get("votes") != "retained":
+            self.error(f"{label}: V2 pending evidence needs retained returns")
+        self.check_discovery(sweep, layer, label + ".discovery_ref", layer.get("proposed") or [])
+        target = self.pointed(layer.get("discovery_ref"), label, sweep.get("returns_ref"))
+        if not isinstance(target, dict) or target.get("contract_version") != 2:
+            self.error(f"{label}: discovery must retain contract_version 2")
+            return
+        source = target.get("source_field")
+        if not isinstance(source, dict) or any(source.get(key) != layer.get(key) for key in (
+                "contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")):
+            self.error(f"{label}: original frozen field differs from layer scope")
+            return
+        documents = target.get("screen_judgments")
+        if not isinstance(documents, dict) or set(documents) != set(ROLES) \
+                or not all(isinstance(documents[role], list) for role in ROLES):
+            self.error(f"{label}: both retained V2 screen judgment lists are required")
+            return
+        conflict = v2_provenance_conflict(documents)
+        for field in ("field_sha256", "source_field_sha256"):
+            if not isinstance(layer.get(field), str) or not HEX64.fullmatch(layer[field]):
+                self.error(f"{label}: {field} must be 64 lowercase hex")
+            if layer.get(field) != target.get(field):
+                self.error(f"{label}: {field} differs from retained field")
+        members = layer.get("eligible_field")
+        if not isinstance(members, list) or members != target.get("eligible_field"):
+            self.error(f"{label}: eligible_field differs from retained discovery")
+            return
+        try:
+            if v2_field_sha256(layer) != layer.get("field_sha256"):
+                self.error(f"{label}: expanded field_sha256 does not bind identities/scope")
+            if v2_field_sha256(source) != layer.get("source_field_sha256") \
+                    or source.get("field_sha256") != layer.get("source_field_sha256"):
+                self.error(f"{label}: source_field_sha256 does not bind original frozen field")
+        except (KeyError, TypeError):
+            self.error(f"{label}: invalid V2 field identity/scope binding")
+        by_repo = {}
+        retained_returns = self.document(sweep["returns_ref"])
+        raw = retained_returns.get("raw", {}).get(layer_id)
+        if not isinstance(raw, list) or not all(isinstance(row, dict) for row in raw):
+            self.error(f"{label}: V2 requires every retained raw round")
+            return
+        if documents != v2_screen_documents(raw):
+            self.error(f"{label}: V2 screen judgments differ from the final raw return")
+        failures = v2_round_failures(raw)
+        if failures != retained_returns.get("failures", {}).get(layer_id):
+            self.error(f"{label}: V2 failures differ from raw discovery returns")
+        failure_ref = f"{sweep['returns_ref']}#/failures/{layer_id.replace('~', '~0').replace('/', '~1')}"
+        if failures and {"trigger": "retained_failure", "ref": failure_ref} not in (layer.get("reopen") or []):
+            self.error(f"{label}: missing V2 discovery must retain its reopen trigger")
+        try:
+            original = {row["candidate_key"]: row for row in v2_expand_field(source, raw)}
+        except (KeyError, TypeError, ValueError) as error:
+            self.error(f"{label}: invalid frozen/discovery field ({error})")
+            return
+        if {row.get("candidate_key") for row in members if isinstance(row, dict)} != set(original):
+            self.error(f"{label}: V2 field must retain every frozen identity")
+        screens_by_key = {}
+        for member in members:
+            if not isinstance(member, dict) or not isinstance(member.get("repository"), str):
+                self.error(f"{label}: V2 member requires repository")
+                continue
+            repo = member["repository"]
+            original_member = original.get(member.get("candidate_key"))
+            canonical_repo = original_member.get("repository") if original_member else None
+            expected = original_member.get("candidate_key") if original_member else None
+            if repo != canonical_repo or member.get("candidate_key") != expected or member.get("evidence_key") != expected:
+                self.error(f"{label}: V2 candidate/evidence identity mismatch")
+            if norm_repo(repo) in by_repo:
+                self.error(f"{label}: duplicate V2 repository")
+            by_repo[norm_repo(repo)] = member
+            if not isinstance(member.get("material"), bool) or not isinstance(member.get("evidence_refs"), list):
+                self.error(f"{label}: V2 material/refs required")
+            if original_member is not None:
+                screens = {role: v2_screen(role, docs, original_member, source, conflict)
+                           for role, docs in documents.items()}
+                screens_by_key[member["candidate_key"]] = screens
+                if member != v2_member_outcome(original_member, screens):
+                    self.error(f"{label}: V2 member differs from recomputed tri-state evidence")
+        proposed = layer.get("proposed")
+        if not isinstance(proposed, list) or len(proposed) != len(by_repo) \
+                or {norm_repo(repo) for repo in proposed if isinstance(repo, str)} != set(by_repo):
+            self.error(f"{label}: proposed must contain the whole V2 field")
+        located = manifest_layer(manifest, catalog, layer_id) if manifest is not None else None
+        baseline = baseline_repositories(located[0], located[2], lane) if located else set()
+        if isinstance(proposed, list):
+            known, new = split_known(proposed, baseline, earlier)
+            if layer.get("known") != known or layer.get("new") != new:
+                self.error(f"{label}: V2 known/new partition differs from baseline/adjudications")
+        seen = set()
+        for field, status in (("pending", "pending"), ("survived", "credible"), ("refuted", "not_credible")):
+            entries = layer.get(field)
+            if not isinstance(entries, list):
+                self.error(f"{label}: V2 {field} must be a list")
+                continue
+            for row in entries:
+                member = by_repo.get(norm_repo(str(row.get("repo", "")))) if isinstance(row, dict) else None
+                if member is None or any(row.get(key) != value for key, value in member.items()):
+                    self.error(f"{label}: V2 {field} outcome differs from retained member")
+                    continue
+                key = member["candidate_key"]
+                if key in seen or member.get("status") != status:
+                    self.error(f"{label}: V2 outcomes must partition the field by tri-state status")
+                seen.add(key)
+                for role in ROLES:
+                    vote = row.get(role)
+                    expected = screens_by_key.get(key, {}).get(role)
+                    if not isinstance(vote, dict) or expected is None or vote.get("vote") != expected["status"]:
+                        self.error(f"{label}: {role} must retain the recomputed tri-state vote")
+                        continue
+                    retained = self.pointed(vote.get("ref"), f"{label}.{role}", sweep.get("returns_ref"))
+                    if retained != {"contract_version": 2, "role": role, "candidate_key": key,
+                                    "repository": member["repository"], "evidence_key": member["evidence_key"],
+                                    "judgments": documents[role], **expected}:
+                        self.error(f"{label}: {role} vote differs from retained V2 judgments/identity")
+        if seen != {row.get("candidate_key") for row in members if isinstance(row, dict)}:
+            self.error(f"{label}: V2 outcomes must retain every member, including material pending")
+        for item in layer.get("reopen") or []:
+            if not isinstance(item, dict) or item.get("trigger") not in REOPEN_TRIGGERS or not item.get("ref"):
+                self.error(f"{label}: invalid V2 reopen entry")
 
     def check_votes(self, layer, entry, label, located, lane, sweep) -> None:
         votes = layer.get("votes")
@@ -698,8 +1289,10 @@ class Checker:
             if candidate.get("lane") != lane or norm_repo(str(candidate.get("repository", ""))) != norm_repo(entry["repo"]):
                 self.error(f"{vote_label}: {vote['ref']} is a vote on a different candidate row")
 
-    def check_survivor(self, entry, label, layer_id, located, lane) -> None:
-        if located is None:
+    def check_survivor(self, entry, label, layer_id, located, lane, catalog=None) -> None:
+        if catalog == SKILLS:
+            pass  # no manifest row to bind to: the retained votes (check_votes) and the source review below bind it
+        elif located is None:
             self.error(f"{label}: a survivor needs a manifest layer to bind to")
         else:
             rows = lane_rows(located[2], lane)
@@ -770,10 +1363,11 @@ def derive(ledger: dict, current: dict | None = None) -> dict:
     K, gap = policy.get("K", 3), policy.get("min_gap_days", 7)
     state: dict = {}
     for sweep in ledger.get("sweeps") or []:
-        if sweep.get("status") != "completed":
-            continue  # a stopped sweep neither counts nor resets
+        completed = sweep.get("status") == "completed"
         sweep_date = date.fromisoformat(sweep["date"])
         for layer in sweep.get("layers") or []:
+            if not completed and not material_pending(layer):
+                continue  # V1 stopped runs remain inert; a V2 cutoff cannot erase material pending.
             key = (layer.get("catalog"), layer.get("layer_id"))
             entry = state.setdefault(key, {"count": 0, "last_counted": None, "requirement_sha256": None,
                                            "platform_profiles_sha256": None, "counted_sweeps": [],
@@ -791,6 +1385,9 @@ def derive(ledger: dict, current: dict | None = None) -> dict:
             not_clean = [dict(item) for item in layer.get("reopen") or []]
             not_clean += [{"trigger": "survivor", "ref": f"{sweep['sweep_id']}:{item.get('repo')}"}
                           for item in layer.get("survived") or []]
+            if material_pending(layer):
+                not_clean += [{"trigger": "material_pending", "ref": f"{sweep['sweep_id']}:{item.get('candidate_key')}"}
+                              for item in material_pending(layer)]
             if layer.get("votes") != "retained":
                 not_clean.append({"trigger": f"votes_{layer.get('votes')}", "ref": sweep["sweep_id"]})
             elif not layer.get("discovery_ref"):
@@ -814,7 +1411,8 @@ def derive(ledger: dict, current: dict | None = None) -> dict:
         reasons = []
         wanted = (current.get("requirements") or {}).get(key)
         if wanted is not None and entry["requirement_sha256"] not in (None, wanted):
-            reasons.append({"trigger": "requirement_changed", "ref": RESEARCH_STATE})
+            reasons.append({"trigger": "requirement_changed",
+                            "ref": SKILLS_CATALOG if key[0] == SKILLS else RESEARCH_STATE})
         profiles = current.get("platform_profiles_sha256")
         if profiles is not None and entry["platform_profiles_sha256"] not in (None, profiles):
             reasons.append({"trigger": "platform_profile_changed", "ref": f"{ADOPTION}#/platform_profiles"})
@@ -923,15 +1521,16 @@ def build_report(root: Path, ledger: dict, staleness=None, freshness=None, fresh
     triggers, notes = external_triggers(baseline, staleness, freshness)
     freshness_state, freshness_notes = freshness_input(freshness, freshness_status)
     notes = freshness_notes + notes
-    current = {"requirements": {key: requirement_sha256(row) for key, row in rows.items()},
+    requirements = layer_requirements(root)  # the research-state layers, then the skills layers (no research status)
+    current = {"requirements": requirements,
                "platform_profiles_sha256": platform_profiles_sha256(adoption), "triggers": triggers}
     state = derive(ledger, current)
     layers = []
-    for key in rows:
+    for key in requirements:
         entry = state.get(key) or {"count": 0, "saturation_candidate": False, "reset": [], "last_sweep": None,
                                    "last_counted": None}
         layers.append({
-            "catalog": key[0], "layer_id": key[1], "research_status": rows[key].get("status"),
+            "catalog": key[0], "layer_id": key[1], "research_status": (rows.get(key) or {}).get("status"),
             "clean_count": entry["count"], "saturation_candidate": entry["saturation_candidate"],
             "due": not entry["saturation_candidate"], "last_sweep": entry.get("last_sweep"),
             "last_counted": entry.get("last_counted"), "reset": entry.get("reset") or [],
@@ -983,7 +1582,8 @@ def render_markdown(report: dict) -> str:
         reasons = "; ".join(f"{r.get('trigger')} ({r.get('ref')})" for r in (layer["reset"] or [])[:4]) or "-"
         if len(layer["reset"] or []) > 4:
             reasons += f"; +{len(layer['reset']) - 4} more"
-        lines.append(f"| {layer['catalog']}/{layer['layer_id']} | {layer['research_status']} | {layer['clean_count']} | "
+        status = "-" if layer["research_status"] is None else layer["research_status"]  # a skills layer has none
+        lines.append(f"| {layer['catalog']}/{layer['layer_id']} | {status} | {layer['clean_count']} | "
                      f"{'yes' if layer['saturation_candidate'] else 'no'} | {layer['last_sweep'] or '-'} | {reasons} |")
     for note in report["notes"]:
         lines.append(f"\nNote: {note}")
@@ -1028,7 +1628,7 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
         if field in result:
             raise LedgerError(f"result must not set computed field {field}")
     record = copy.deepcopy(result)
-    rows = research_rows(root)
+    requirements = layer_requirements(root)
     profiles = platform_profiles_sha256(load_json(root, ADOPTION))
     if record.get("manifest_ref") is not None:
         record["manifest_sha256"] = file_sha256(root, record["manifest_ref"])
@@ -1044,22 +1644,26 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
             raise LedgerError(f"returns_ref {record['returns_ref']} does not exist")
     manifest = load_json(root, record["manifest_ref"]) if record.get("manifest_ref") else None
     earlier: dict = {}
+    documents: dict = {}
+    target_of = ref_resolver(lambda path: documents[path] if path in documents
+                             else documents.setdefault(path, load_json(root, path)))
     for sweep in ledger.get("sweeps") or []:
         for layer in sweep.get("layers") or []:
-            earlier.setdefault((layer.get("catalog"), layer.get("layer_id")), set()).update(adjudicated_repos(layer))
+            earlier.setdefault((layer.get("catalog"), layer.get("layer_id")), set()).update(
+                adjudicated_repos(layer, target_of))
     layers = []
     for layer in record.get("layers") or []:
         for field in COMPUTED_LAYER_FIELDS:
             if field in layer:
                 raise LedgerError(f"result layer must not set computed field {field}")
         key = (layer.get("catalog"), layer.get("layer_id"))
-        if key not in rows:
-            raise LedgerError(f"{key[0]}/{key[1]} is not a layer in {RESEARCH_STATE}")
+        if key not in requirements:
+            raise LedgerError(f"{key[0]}/{key[1]} is not a layer in {RESEARCH_STATE} or a task in {SKILLS_CATALOG}")
         located = manifest_layer(manifest, *key) if manifest is not None else None
         baseline = baseline_repositories(located[0], located[2], record.get("lane")) if located else set()
         known, new = split_known(layer.get("proposed") or [], baseline, earlier.get(key, set()))
         ordered = {"catalog": key[0], "layer_id": key[1],
-                   "requirement_sha256": requirement_sha256(rows[key]),
+                   "requirement_sha256": requirements[key],
                    "platform_profiles_sha256": profiles}
         frozen = frozen_scope(root, record.get("returns_ref"), layer.get("discovery_ref"))
         if frozen is not None:
@@ -1070,6 +1674,10 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
             if field in layer:
                 ordered[field] = layer[field]
         ordered["known"], ordered["new"] = known, new
+        if layer.get("contract_version") == 2:
+            for field in ("contract_version", "field_sha256", "source_field_sha256", "eligible_field", "pending"):
+                if field in layer:
+                    ordered[field] = layer[field]
         for field in ("survived", "refuted", "reopen"):
             ordered[field] = layer.get(field, [])
         extra = set(layer) - set(ordered)

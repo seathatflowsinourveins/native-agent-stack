@@ -1,0 +1,402 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "kind": "derived_navigation_crosswalk",
+  "selection_not_install_lock": true,
+  "sources": [
+    "catalogs/foundation/manifest.json",
+    "catalogs/landscape/foundation.json",
+    "catalogs/landscape/us-equities.json",
+    "catalogs/landscape/research-state.json",
+    "catalogs/us-equities/runtime-target.json",
+    "docs/ecosystem/manifest.json",
+    "manifests/stack.json",
+    "adoption/pins-linux-x86_64.json"
+  ],
+  "meaning": "The 20 foundation and 12 US-equities capability layers are authoritative. The 10 ecosystem themes are presentation families. This explicit many-to-many navigation mapping is derived for the new catalog; it does not assert an upstream or existing one-to-one join, install every alternative, change a selection, or close a gate.",
+  "catalog_layers": [
+    {
+      "catalog": "foundation",
+      "layer_id": "native-clients",
+      "presentation_themes": [
+        "agents"
+      ],
+      "composition_component_ids": [
+        "codex",
+        "claude-code"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "instructions-skills",
+      "presentation_themes": [
+        "skills"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "workers",
+      "presentation_themes": [
+        "workers",
+        "agents"
+      ],
+      "composition_component_ids": [
+        "codex",
+        "claude-code",
+        "agent-relay",
+        "relaycast"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "isolation",
+      "presentation_themes": [
+        "workers",
+        "operations"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "code-navigation",
+      "presentation_themes": [
+        "retrieval"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "document-retrieval",
+      "presentation_themes": [
+        "retrieval"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "semantic-rag",
+      "presentation_themes": [
+        "retrieval",
+        "operations"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "durable-memory",
+      "presentation_themes": [
+        "memory"
+      ],
+      "composition_component_ids": [
+        "hindsight-api",
+        "hindsight-coding-agents"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "web-research",
+      "presentation_themes": [
+        "research"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency",
+      "presentation_themes": [
+        "agents",
+        "operations"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "quality-evaluation",
+      "presentation_themes": [
+        "evaluation"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "ci-supply-chain",
+      "presentation_themes": [
+        "evaluation",
+        "operations"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "scheduling-supervision",
+      "presentation_themes": [
+        "operations"
+      ],
+      "composition_component_ids": [
+        "codex",
+        "hindsight-api",
+        "agent-relay"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "hosting-services",
+      "presentation_themes": [
+        "applications",
+        "operations"
+      ],
+      "composition_component_ids": [
+        "relaycast",
+        "hindsight-api"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "recovery-portability",
+      "presentation_themes": [
+        "operations"
+      ],
+      "composition_component_ids": [
+        "codex",
+        "hindsight-api",
+        "relaycast"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "observation-inference",
+      "presentation_themes": [
+        "operations"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "agent-sdks",
+      "presentation_themes": [
+        "agents",
+        "workers"
+      ],
+      "composition_component_ids": [
+        "codex",
+        "claude-code"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces",
+      "presentation_themes": [
+        "skills",
+        "agents"
+      ],
+      "composition_component_ids": [
+        "hindsight-coding-agents",
+        "relaycast"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "secrets-credentials",
+      "presentation_themes": [
+        "operations"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "git-github-automation",
+      "presentation_themes": [
+        "workers",
+        "operations"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "market-data-reference",
+      "presentation_themes": [
+        "research"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "identity-provenance",
+      "presentation_themes": [
+        "research",
+        "evaluation"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "storage-compute",
+      "presentation_themes": [
+        "research",
+        "operations"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "data-quality-orchestration",
+      "presentation_themes": [
+        "research",
+        "evaluation"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "research-factors-ml",
+      "presentation_themes": [
+        "research",
+        "evaluation"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "presentation_themes": [
+        "research",
+        "applications"
+      ],
+      "composition_component_ids": [
+        "nautilus-trader"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "execution-broker",
+      "presentation_themes": [
+        "applications"
+      ],
+      "composition_component_ids": [
+        "nautilus-trader"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "portfolio-risk",
+      "presentation_themes": [
+        "research",
+        "evaluation"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "evaluation-experiments",
+      "presentation_themes": [
+        "evaluation"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "agents-models-workers",
+      "presentation_themes": [
+        "agents",
+        "workers"
+      ],
+      "composition_component_ids": [
+        "codex",
+        "claude-code"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "observability-hosting",
+      "presentation_themes": [
+        "operations"
+      ],
+      "composition_component_ids": []
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "security-supply-chain",
+      "presentation_themes": [
+        "operations",
+        "evaluation"
+      ],
+      "composition_component_ids": []
+    }
+  ],
+  "composition_components": [
+    {
+      "id": "codex",
+      "repository": "https://github.com/openai/codex",
+      "composition_pin": "0.159.3",
+      "source_revision": "01fc69f4026735edfdf6789820549727a4867b11",
+      "capability": "Native shared daemon and persistent session queues",
+      "selection_authority": "Main stack/bootstrap pin of record is separate from the production qualification extension.",
+      "existing_host_evidence": "Native idle/busy/reconnect queue delivery qualified on the production branch; historical for the new distro.",
+      "new_host_acceptance": "unknown"
+    },
+    {
+      "id": "claude-code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "composition_pin": "2.1.286",
+      "source_revision": "f5f60250a032caa72d1eb47f9ca5f29becc7066f",
+      "capability": "Native workflows, roles and explicit live-peer coordination",
+      "existing_host_evidence": "One native lead-coordinator handoff submitted through SendMessage and a designated owner response received. The research role has no messaging tools.",
+      "new_host_acceptance": "unknown"
+    },
+    {
+      "id": "agent-relay",
+      "repository": "https://github.com/AgentWorkforce/relay",
+      "composition_pin": "13.0.0",
+      "source_revision": "d8e1a188ac8988be59b6fa447856516de292a195",
+      "capability": "Conditional managed agent messaging",
+      "existing_host_evidence": "Transport/restart passed; automated Codex PTY message submission held. Read acknowledgements do not prove model submission.",
+      "new_host_acceptance": "unknown"
+    },
+    {
+      "id": "relaycast",
+      "repository": "https://github.com/AgentWorkforce/relaycast",
+      "composition_pin": "8.14.0",
+      "source_revision": "4d0c22afb8edb80841a5ad00d60b8de065f57570",
+      "capability": "Conditional persistent messaging engine",
+      "existing_host_evidence": "Local engine transport and scoped restart passed; not a substitute for receiving-model acceptance.",
+      "new_host_acceptance": "unknown"
+    },
+    {
+      "id": "hindsight-api",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "composition_pin": "0.10.2",
+      "source_revision": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "capability": "Scoped memory evaluation target",
+      "existing_host_evidence": "Native capture/recall passed; five pages stale, one manual refresh failed at 300 seconds, automatic refresh paused and cold git seed held. Not the canonical default memory component.",
+      "new_host_acceptance": "unknown"
+    },
+    {
+      "id": "hindsight-coding-agents",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "composition_pin": "0.8.0",
+      "source_revision": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+      "capability": "Native Codex/Claude hooks and scoped memory MCP",
+      "existing_host_evidence": "Fresh mapped-session capture/retrieval qualified; original checkout remains outside opt-in scope. One authoritative capture writer per project.",
+      "new_host_acceptance": "unknown"
+    },
+    {
+      "id": "nautilus-trader",
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "composition_pin": "2.0.0rc5",
+      "source_revision": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "capability": "Trading research and independently qualified broker-paper destination",
+      "selection_authority": "catalogs/us-equities/runtime-target.json",
+      "existing_host_evidence": "Selection metadata is cited here; no new trading or broker execution was performed for this crosswalk.",
+      "new_host_acceptance": "unknown"
+    }
+  ],
+  "normalization": "Composition ids identify these explicit runtime rows; they do not assert that every row already exists in manifests/stack.json. Preserve original landscape component aliases and resolve them against canonical source records before other joins.",
+  "reopen_on": [
+    "A capability-layer or presentation taxonomy changes.",
+    "A selection/pin of record changes after reviewed acceptance.",
+    "A composition capability is overturned by retained native evidence.",
+    "The replacement host changes requirements or exposes a new lifecycle failure."
+  ]
+}

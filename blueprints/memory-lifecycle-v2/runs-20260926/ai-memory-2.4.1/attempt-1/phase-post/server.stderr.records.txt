@@ -1,0 +1,16 @@
+2026-09-26T02:19:08.558443Z  INFO ai_memory_cli: ai-memory starting version="2.4.1" server_url=http://127.0.0.1:49374 data_dir=/run/data bind=127.0.0.1:49374
+2026-09-26T02:19:08.558943Z  INFO ai_memory_cli::commands::serve: single-instance serve lock held lock=/run/data/.serve.lock
+2026-09-26T02:19:08.567578Z  INFO refinery_core::traits: current version: 67
+2026-09-26T02:19:08.567705Z  INFO refinery_core::traits::sync: no migrations to apply
+2026-09-26T02:19:08.567711Z  INFO refinery_core::traits::sync: preparing to apply 0 migrations: Map {
+2026-09-26T02:19:08.593170Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_EMBEDDING_PROVIDER unset; vector search disabled (FTS5 + entity + graph active)
+2026-09-26T02:19:08.595848Z  INFO ai_memory_cli::commands::serve: watcher disabled by --no-watcher
+2026-09-26T02:19:08.595896Z  INFO ai_memory_cli::commands::serve: active-project isolation mode mode=PerActor session_ttl_secs=3600 max_entries=4096
+2026-09-26T02:19:08.601873Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_LLM_PROVIDER unset; memory_consolidate disabled, PreCompact falls back to rule-based checkpoint, lint runs rule-based only
+2026-09-26T02:19:08.601955Z  INFO ai_memory_cli::commands::serve: scheduled retention/lint/embed maintenance disabled
+2026-09-26T02:19:08.601963Z  INFO ai_memory_cli::commands::serve: auto-improve scheduler disabled; manual auto-improve remains available
+2026-09-26T02:19:08.601967Z  INFO ai_memory_cli::commands::serve: scheduled maintenance enabled but all intervals are disabled
+2026-09-26T02:19:08.601974Z  INFO ai_memory_cli::commands::serve: MCP server ready on stdio (Ctrl-C to stop)
+2026-09-26T02:19:08.676382Z  WARN rmcp::service: response error id=12 error=ErrorData { code: ErrorCode(-32603), message: "page notes/revision.md not found in resolved scope lifecycle-v2/alpha", data: None }
+2026-09-26T02:19:08.688456Z  WARN rmcp::service: response error id=15 error=ErrorData { code: ErrorCode(-32603), message: "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha", data: None }
+2026-09-26T02:19:08.689550Z  WARN rmcp::service: response error id=16 error=ErrorData { code: ErrorCode(-32603), message: "page notes/expired.md not found in resolved scope lifecycle-v2/alpha", data: None }

@@ -1,0 +1,348 @@
+{
+  "schema_version": 2,
+  "trial": "colpali",
+  "trial_date": "2026-09-26",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "note": "First pass 2026-09-26 01:23Z-03:16Z; self-contained CPU reproduction 04:12Z-04:21Z (48 logical CPUs, load average 22-28 during the run); processor-load probe 06:34Z. The trial ran on CPU by intent: every CPU run pinned CUDA_VISIBLE_DEVICES=''. The first pass's recorder ran three slice runs without a device pin, and they were GPU-indicated (check slice-unpinned-device-runs, finding C5)."
+  },
+  "components": [
+    {
+      "trial_component_id": "colpali-engine",
+      "repository": "https://github.com/illuin-tech/colpali",
+      "description": "ColVision late-interaction visual document retrievers (ColPali on PaliGemma, ColQwen2 / ColQwen2.5 on Qwen2-VL / Qwen2.5-VL): one embedding per image patch and per query token, scored by ColBERT MaxSim, so page images are indexed without OCR.",
+      "license": {
+        "fact": "MIT (code)",
+        "evidence": [
+          "source-review.json#license-colpali"
+        ]
+      },
+      "upstream_status": "The README on main marks colpali-engine deprecated for new projects and recommends Sentence Transformers v6 MultiVectorEncoder (source-review.json#colpali-deprecation)."
+    },
+    {
+      "trial_component_id": "vidore-benchmark",
+      "repository": "https://github.com/illuin-tech/vidore-benchmark",
+      "description": "ViDoRe evaluation package (CLI evaluate-retriever) for visual document retrievers.",
+      "license": {
+        "fact": "MIT (code)",
+        "evidence": [
+          "source-review.json#license-vidore"
+        ]
+      },
+      "upstream_status": "The README on main moved single-model ViDoRe v1-v3 evaluation to MTEB (source-review.json#vidore-main-mteb); the 5.0.0 release's CLI command is evaluate-retriever."
+    }
+  ],
+  "pins": {
+    "colpali_engine": {
+      "installed": "0.3.13",
+      "tag": "v0.3.13",
+      "commit": "174055b00d4a36f672c6f915f2bdd0002e4fc9ee",
+      "wheel_sha256": "4f6225a4368cd17716fa8c2e0f20024490c745a1d5f84afab7e4d71790f48002",
+      "pypi_latest_at_trial": "0.3.18",
+      "wheel_sha256_0_3_18": "9f04fa89d123b174a9c9e5fa31824776644e9331c37c1d79768e16e3fe5be9d4"
+    },
+    "vidore_benchmark": {
+      "installed": "5.0.0",
+      "tag": "v5.0.0",
+      "commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "wheel_sha256": "ad2b214127c807a9cd557ccce9c10f853e7ddbade563c95bb5b7f8735012a7b6",
+      "sdist_sha256": "cb3d1a68cfc5542d3aca50b7e06ab630203c6fef0e19c18da78a10e7eeeeb80c"
+    },
+    "hub": {
+      "vidore/colpali-v1.3": "b5c6dd62125326e6f0b540c1f7b36e901cdc0a11",
+      "vidore/colpaligemma-3b-pt-448-base": "30ab955d073de4a91dc5a288e8c97226647e3e5a",
+      "vidore/tabfquad_test_subsampled (dataset)": "16c8e633612fbda7400bfcbbc31d61a7534f580f"
+    },
+    "environment": "reproduction/environment-record.json preserves all 94 original pins, hash lists (the original had no --hash options), original SHA-256/size and 20 known advisories (1 Critical, 15 High, 4 Medium), sourced from the retained OSV-Scanner output. The current CPU reproduction requires --accept-known-advisories, regenerates the identical lock in a temporary directory and compares the installed set with that recorded environment.",
+    "verification": "../provenance/run-20260926T045856Z/verify-pins.log (tag clone rev-parse, PyPI-reported and downloaded sha256, Hub revision lookups)"
+  },
+  "dataset": {
+    "id": "vidore/tabfquad_test_subsampled",
+    "split": "test",
+    "full_split": "280 query rows over 70 distinct page images (French questions over tables)",
+    "slice": "first 12 rows, 12 distinct images; rebuilt byte-identically by reproduction/build_slice.py and checked against reproduction/slice-expected.json"
+  },
+  "checks": [
+    {
+      "id": "install-conflict-latest",
+      "evidence_class": "upstream_native_operation",
+      "command": "uv pip install colpali-engine==0.3.18 vidore-benchmark==5.0.0",
+      "exit_code": 1,
+      "result": "Unsatisfiable: colpali-engine 0.3.18 requires transformers>=5.3.0,<6.0.0; vidore-benchmark 5.0.0 requires sentence-transformers>=3.0.1,<4.0.0, whose 3.4.1 release requires transformers<5.0.0.",
+      "retained": [
+        "native-outputs/install-colpali-engine-0.3.18-with-vidore-benchmark-5.0.0-conflict.log",
+        "source-review.json#vidore-deps"
+      ]
+    },
+    {
+      "id": "install-extras",
+      "evidence_class": "upstream_native_operation",
+      "command": "uv venv --python 3.11 .venv-combined; uv pip install --python .venv-combined/bin/python \"vidore-benchmark[colpali-engine]==5.0.0\" (vidore-benchmark's documented extras); then transformers==4.53.1",
+      "exit_code": 0,
+      "result": "Resolved colpali-engine 0.3.13 and transformers 4.57.6 (94 packages); transformers later pinned to 4.53.1, the floor of colpali-engine 0.3.13's range.",
+      "retained": [
+        "native-outputs/venv-combined-create.log",
+        "native-outputs/install-vidore-benchmark-5.0.0-colpali-engine-extra.log",
+        "native-outputs/install-transformers-4.53.1.log"
+      ]
+    },
+    {
+      "id": "install-mteb-path-unreported",
+      "evidence_class": "upstream_native_operation",
+      "command": "not retained (an install into a separate .venv)",
+      "exit_code": "not retained",
+      "result": "colpali-engine 0.3.18 with mteb 2.21.8, sentence-transformers 6.1.0, transformers 5.17.0 and torch 2.13.0 installed together (93 packages). No evaluation ran in that environment. The first pass did not report this install.",
+      "retained": [
+        "native-outputs/install-mteb-2.21.8-colpali-engine-0.3.18.log"
+      ]
+    },
+    {
+      "id": "colqwen2-attempts",
+      "evidence_class": "upstream_native_operation",
+      "command": "vidore-benchmark evaluate-retriever --model-class colqwen2 --model-name vidore/colqwen2-v1.0 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4 (six attempts, CPU)",
+      "exit_code": 1,
+      "result": "Attempt 1: wrong venv (ImportError asking for the colpali-engine extra). Attempts 2-4: offline-mode setup errors (OSError loading the model files; ConnectionError for the dataset under OfflineModeIsEnabled). Attempts 5 and 6, network allowed: ColQwen2Processor.from_pretrained raises 'TypeError: expected str, bytes or os.PathLike object, not NoneType' in transformers processing_utils, at transformers 4.57.6 and again at 4.53.1. Cause: a Hub chat-template file that transformers <5 resolves to None (finding C2, check colqwen-processor-probe).",
+      "retained": [
+        "native-outputs/eval-colqwen2-v1.0-attempt1-missing-extra.log",
+        "native-outputs/eval-colqwen2-v1.0-attempt2.log",
+        "native-outputs/eval-colqwen2-v1.0-attempt3.log",
+        "native-outputs/eval-colqwen2-v1.0-attempt4.log",
+        "native-outputs/eval-colqwen2-v1.0-attempt5.log",
+        "native-outputs/eval-colqwen2-v1.0-attempt6.log",
+        "local-integration/run_eval.sh",
+        "local-integration/run_eval_combined.sh"
+      ]
+    },
+    {
+      "id": "colqwen-processor-probe",
+      "evidence_class": "local_integration",
+      "command": "CUDA_VISIBLE_DEVICES= HF_HOME=<fresh dir> HOME=<fresh dir> <first pass's .venv-combined>/bin/python local-integration/colqwen_processor_probe.py (transformers 4.53.1, huggingface_hub 0.36.2, colpali-engine 0.3.13, vidore-benchmark 5.0.0, torch 2.8.0; the venv's installed set equalled the pins now preserved in reproduction/environment-record.json)",
+      "exit_code": 0,
+      "result": "All five expectations written into the probe before the run held (0 mismatches). A: transformers' list_repo_templates returns ['sentence_transformers.jinja'] for vidore/colqwen2-v1.0 main, suffix kept. B: ColQwen2Processor.from_pretrained('vidore/colqwen2-v1.0') at main raises 'TypeError: expected str, bytes or os.PathLike object, not NoneType' at transformers/processing_utils.py:993, as in attempt 6. C: it loads at 83a0134c, the last revision without additional_chat_templates/. D: ColQwen2_5_Processor at the pinned vidore/colqwen2.5-v0.2 revision dcbe8d9c raises the same TypeError. E: it loads at 6f6fcdfd, the last colqwen2.5-v0.2 revision without the template, and has process_images, process_queries and score. Only processor and tokenizer files were downloaded, into the fresh private HF_HOME.",
+      "retained": [
+        "local-integration/colqwen_processor_probe.py",
+        "native-outputs/colqwen-processor-probe-20260926T0634Z.ndjson",
+        "native-outputs/colqwen-processor-probe-20260926T0634Z.stderr",
+        "native-outputs/hf-chat-template-files.txt",
+        "local-integration/hf-chat-template-files.sh"
+      ]
+    },
+    {
+      "id": "colpali-full-split-cpu",
+      "evidence_class": "upstream_native_operation",
+      "command": "local-integration/run_eval_colpali.sh: vidore-benchmark evaluate-retriever --model-class colpali --model-name vidore/colpali-v1.3 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4 --output-dir outputs (CUDA_VISIBLE_DEVICES=''); the invocation around the script was not retained",
+      "exit_code": "not retained: the log stops without the script's EVAL_EXIT line, and no metrics were written",
+      "result": "Queries embedded (7 pre-batches, 5 min 20 s); the first 6 of the 70 image batches finished at 162, 197, 228, 217, 227 and 243 s per batch of 4 images (from the elapsed stamps; tqdm's 162.54-224.56 s/it column is its smoothed rate). The log then stops. The first pass reported a 1700 s timeout, which neither the retained script nor the log shows; how the run ended is not retained.",
+      "retained": [
+        "native-outputs/eval-colpali-v1.3-full280-cpu-interrupted.log",
+        "local-integration/run_eval_colpali.sh"
+      ]
+    },
+    {
+      "id": "dummy-full-split",
+      "evidence_class": "upstream_native_operation",
+      "command": "vidore-benchmark evaluate-retriever --model-class dummy_vision_retriever --dataset-name vidore/tabfquad_test_subsampled ... --output-dir outputs-control",
+      "exit_code": 0,
+      "result": "nDCG@5 0.0334 on the full 280-row split (30.9 s).",
+      "retained": [
+        "native-outputs/eval-dummy-full280-cpu.log",
+        "native-outputs/metrics-dummy-full280.json",
+        "local-integration/run_eval_dummy.sh"
+      ]
+    },
+    {
+      "id": "colpali-slice-cpu-reproduction",
+      "evidence_class": "upstream_native_operation + local_integration",
+      "command": "Historical as-run: sh reproduce-cpu.sh <out>, fresh mktemp venv from the exact pins now preserved in reproduction/environment-record.json (installed set checked equal), CUDA_VISIBLE_DEVICES='' checked (torch.cuda.is_available() False), pinned Hub revisions into a private HF_HOME, slice rebuilt byte-identically, then evaluate-retriever offline for colpali and for dummy_vision_retriever under /usr/bin/time -v. The current reproduction/reproduce-cpu.sh supersedes that source and requires --accept-known-advisories; it has not rerun these model operations.",
+      "exit_code": 0,
+      "result": {
+        "colpali-v1.3": {
+          "ndcg_at_5": 0.89682,
+          "ndcg_at_1": 0.75,
+          "recall_at_1": 0.75,
+          "recall_at_3": 1.0,
+          "mrr_at_3": 0.8611,
+          "device_logged": "cpu",
+          "wall_s": 529.1,
+          "user_cpu_s": 8905.32,
+          "system_cpu_s": 409.79,
+          "total_cpu_s": 9315.11,
+          "max_rss_kib": 41712648,
+          "max_rss_gb": 42.7
+        },
+        "dummy_vision_retriever (control)": {
+          "ndcg_at_5": 0.19678,
+          "ndcg_at_1": 0.0,
+          "recall_at_3": 0.25,
+          "wall_s": 7.1
+        }
+      },
+      "retained": [
+        "reproduction/run-20260926T0412Z/",
+        "reproduction/reproduce-cpu.sh",
+        "reproduction/build_slice.py",
+        "reproduction/slice-expected.json",
+        "reproduction/environment-record.json"
+      ]
+    },
+    {
+      "id": "colpali-slice-cpu-first-pass",
+      "evidence_class": "upstream_native_operation",
+      "command": "the same two evaluate-retriever commands on the same slice (first pass, CPU, private HF_HOME)",
+      "exit_code": 0,
+      "result": "colpali-v1.3 nDCG@5 0.89682 (real 14 min 3.3 s, user 209 min 31 s, under concurrent sibling-trial load; 206, 226 and 266 s per image batch); dummy 0.19678 (11.0 s). Its metrics file was later overwritten by the unpinned-device runs below.",
+      "retained": [
+        "native-outputs/eval-colpali-v1.3-slice12-cpu-original.log",
+        "native-outputs/eval-dummy-slice12-cpu-original.log",
+        "local-integration/run_eval_colpali_small.sh",
+        "local-integration/run_eval_dummy_small.sh"
+      ]
+    },
+    {
+      "id": "slice-unpinned-device-runs",
+      "evidence_class": "upstream_native_operation",
+      "command": "the first pass's recorder dry run and its two recorded receipt runs of the same commands, with neither CUDA_VISIBLE_DEVICES nor HF_HOME set",
+      "exit_code": 0,
+      "result": "Same rank metrics (nDCG@5 0.89682 / 0.19678) in 216 s (dry run, including a 20 s model download into the host's default Hugging Face cache), 119.1 s and 105.0 s. The device was not logged. vidore-benchmark 5.0.0 resolves device 'auto' to cuda:0 when CUDA is visible, and the dry run's document forward passes took about 0.5 s per batch of 4 images against 149 s per batch on CPU, so these runs indicate GPU execution. naucs_at_1_std differs from the CPU run (0.878 against 0.800), consistent with different score arithmetic.",
+      "retained": [
+        "native-outputs/recorder-dryrun-slice12-unpinned-device.log",
+        "local-integration/recorder-colpali_use_dryrun.sh",
+        "native-outputs/metrics-colpali-v1.3-slice12-unpinned-device-0314Z.json",
+        "native-outputs/metrics-dummy-slice12-0314Z.json",
+        "withdrawn-host-receipts/",
+        "source-review.json#device-auto",
+        "source-review.json#colpali-retriever-device"
+      ]
+    },
+    {
+      "id": "weights-license-chain",
+      "evidence_class": "registry_observation",
+      "command": "Hub API model info for the evaluated weights and the colqwen2.5 chain",
+      "exit_code": 0,
+      "result": "vidore/colpali-v1.3 card: mit, on vidore/colpaligemma-3b-pt-448-base (gemma) on google/paligemma-3b-pt-448 (gemma, gated). vidore/colqwen2.5-v0.2: mit, on vidore/colqwen2.5-base (apache-2.0) on Qwen/Qwen2.5-VL-3B-Instruct (qwen-research). The colpali README table lists colpali-v1.3 as Gemma and colqwen2.5-v0.2 as Apache 2.0.",
+      "retained": [
+        "native-outputs/hf-license-chain.txt",
+        "source-review.json#readme-model-table"
+      ]
+    },
+    {
+      "id": "lock-regeneration-repair",
+      "evidence_class": "local_integration",
+      "command": "sh reproduction/lock_regeneration_check.sh",
+      "exit_code": 0,
+      "result": "Exact original 1834-byte lock and SHA-256 reproduced only after opt-in; all advisory IDs surfaced; tamper and Git-tree refusal verified; synthetic uv verifies installed-set equality/mismatch and cleanup. No model execution or package install.",
+      "retained": [
+        "reproduction/environment-record.json",
+        "reproduction/regenerate_lock.py",
+        "reproduction/lock_regeneration_check.sh",
+        "native-outputs/lock-regeneration-check-20260926-final.txt"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "C1",
+      "summary": "colpali-v1.3 retrieves correctly on a real ViDoRe slice through the unchanged upstream CLI: nDCG@5 0.89682 and recall@3 1.0 on 12 TabFQuAD rows, against 0.19678 and 0.25 for the built-in random-embedding control on the same rows. The control's embeddings come from torch.randn under the CLI's fixed seed 42, so its metrics are identical in every run.",
+      "evidence": [
+        "reproduction/run-20260926T0412Z/colpali_vidore_colpali-v1.3_metrics.json",
+        "reproduction/run-20260926T0412Z/dummy_vision_retriever_metrics.json",
+        "source-review.json#dummy-retriever",
+        "source-review.json#cli-fixed-seed"
+      ]
+    },
+    {
+      "id": "C2",
+      "summary": "vidore/colqwen2.5-v0.2 was not evaluated. It is not selectable through the vidore-benchmark 5.0.0 CLI: no retriever is registered for ColQwen2.5 (the colqwen2 retriever loads ColQwen2/ColQwen2Processor, while colqwen2.5-v0.2's base declares architectures ColQwen2_5, model_type qwen2_5_vl). The documented 5.0.0 Python API (VisionRetriever(model, processor) in ViDoReEvaluatorQA, for retrievers outside the CLI list; the processor needs process_images, process_queries and score) accepts colpali-engine 0.3.13's ColQwen2_5 and ColQwen2_5_Processor, but it was not tried. The colqwen2-v1.0 attempts failed while loading the processor, not on the architecture: since 2026-08-17 both Hub repositories carry additional_chat_templates/sentence_transformers.jinja, and transformers 4.53.1 and 4.57.6 (the ends of colpali-engine 0.3.13's range) request it as .jinja.jinja, get None and raise the TypeError in open(). transformers 5.0.0 strips the suffix, but colpali-engine 0.3.13 requires transformers <4.58.0. The probe showed the same TypeError for ColQwen2_5_Processor at the pinned colqwen2.5-v0.2 revision dcbe8d9c, and that both processors load at the last revision without the template (83a0134c, 6f6fcdfd).",
+      "evidence": [
+        "source-review.json#colqwen2-retriever-classes",
+        "source-review.json#retriever-modules",
+        "source-review.json#colpali-engine-classes",
+        "source-review.json#vidore-python-api",
+        "source-review.json#vision-retriever-processor-methods",
+        "source-review.json#colqwen2_5-processor-class",
+        "source-review.json#transformers-4.53.1-list-repo-templates",
+        "source-review.json#transformers-4.53.1-processor-template-path",
+        "source-review.json#transformers-4.53.1-template-resolve",
+        "source-review.json#transformers-4.53.1-template-open",
+        "source-review.json#transformers-4.57.6-processor-template-path",
+        "source-review.json#transformers-4.57.6-template-open",
+        "source-review.json#transformers-5.0.0-processor-strips-suffix",
+        "source-review.json#colpali-engine-deps",
+        "../provenance/run-20260926T045856Z/verify-pins.log",
+        "native-outputs/eval-colqwen2-v1.0-attempt5.log",
+        "native-outputs/eval-colqwen2-v1.0-attempt6.log",
+        "native-outputs/colqwen-processor-probe-20260926T0634Z.ndjson",
+        "native-outputs/hf-chat-template-files.txt"
+      ]
+    },
+    {
+      "id": "C3",
+      "summary": "The PyPI-latest colpali-engine (0.3.18) cannot be installed with vidore-benchmark 5.0.0 (transformers>=5.3.0 against sentence-transformers<4, which needs transformers<5); it does install with mteb 2.21.8 and sentence-transformers 6.1.0, the path vidore-benchmark's main README now points to, which this trial did not evaluate.",
+      "evidence": [
+        "native-outputs/install-colpali-engine-0.3.18-with-vidore-benchmark-5.0.0-conflict.log",
+        "native-outputs/install-mteb-2.21.8-colpali-engine-0.3.18.log",
+        "source-review.json#vidore-main-mteb"
+      ]
+    },
+    {
+      "id": "C4",
+      "summary": "On CPU a 3B ColPali model is slow: 149 s per batch of 4 page images in the reproduction (load average 22-28); 206-266 s (slice) and 162-243 s (full split) per batch in the first pass under heavier contention, taken from the logs' elapsed stamps rather than tqdm's smoothed s/it column. The 12-row slice took 529 s wall and 9315.11 CPU-seconds (8905.32 user plus 409.79 system) with a peak RSS of 41,712,648 KiB = 42.7 GB (39.8 GiB) by /usr/bin/time -v. The first pass reported a peak RSS of about 8 GB, which the reproduction does not support.",
+      "evidence": [
+        "reproduction/run-20260926T0412Z/colpali.log",
+        "reproduction/run-20260926T0412Z/colpali.time.txt",
+        "native-outputs/eval-colpali-v1.3-slice12-cpu-original.log",
+        "native-outputs/eval-colpali-v1.3-full280-cpu-interrupted.log"
+      ]
+    },
+    {
+      "id": "C5",
+      "summary": "Without CUDA_VISIBLE_DEVICES='' the CLI uses the GPU whenever one is visible (device 'auto'). The first pass's receipt runs relied on that default while claiming a CPU run; their 105-119 s durations are GPU-indicated, not CPU.",
+      "evidence": [
+        "source-review.json#device-auto",
+        "native-outputs/recorder-dryrun-slice12-unpinned-device.log"
+      ]
+    }
+  ],
+  "blocked": [
+    {
+      "item": "vidore/colqwen2.5-v0.2 (the model the trial brief suggested) through vidore-benchmark 5.0.0",
+      "reason": "Finding C2: not selectable through the 5.0.0 CLI registry; the documented 5.0.0 Python API path was not tried; the processor at the pinned Hub revision does not load within colpali-engine 0.3.13's transformers range. The weights were never downloaded."
+    },
+    {
+      "item": "The full 280-row split on CPU",
+      "reason": "The first pass's run stopped after 6 of 70 image batches; how it ended is not retained. The CLI embeds the image of every query row (280 images in 70 batches of 4), so at the observed 149-243 s per batch the full split needs about 2.9 to 4.7 hours of image embedding plus about 5 minutes of queries on this CPU. The trial ran on CPU by intent."
+    }
+  ],
+  "not_evaluated": [
+    "Any GPU run on purpose. The trial ran on CPU by intent; the three unpinned-device runs above were GPU-indicated but not intended to use the GPU.",
+    "colqwen2.5-v0.2 through the vidore-benchmark 5.0.0 Python API (VisionRetriever with ViDoReEvaluatorQA).",
+    "The MTEB evaluation path and the Sentence Transformers v6 MultiVectorEncoder path that upstream now recommends.",
+    "The other nine ViDoRe v1 datasets; the upstream README's 84.8 for colpali-v1.3 is a ViDoRe aggregate and is not comparable to a 12-row TabFQuAD slice."
+  ],
+  "withdrawn_host_receipts": {
+    "files": [
+      "withdrawn-host-receipts/nativestack-5975wx-20260925--colpali-engine--install--20260926.json",
+      "withdrawn-host-receipts/nativestack-5975wx-20260925--colpali-engine--use--20260926.json",
+      "withdrawn-host-receipts/nativestack-5975wx-20260925--vidore-benchmark--install--20260926.json",
+      "withdrawn-host-receipts/nativestack-5975wx-20260925--vidore-benchmark--use--20260926.json"
+    ],
+    "why": "scripts/host_receipts.py validate rejects component_ids 'colpali-engine' and 'vidore-benchmark' (neither a manifests/stack.json component nor a landscape winner). The two use receipts also claim an 843.3 s CPU run while their recorded commands ran for 119.1 s and 105.0 s with no device pin (finding C5), and the install receipts are self-written python -c introspection checks."
+  },
+  "host_state": "Still on the host, outside the session scratch directory: ~/.cache/huggingface/hub, created by the unpinned-device runs with vidore/colpali-v1.3 (113 MB) and vidore/colpaligemma-3b-pt-448-base (5.85 GB); their hf_xet log in ~/.cache/huggingface/xet/logs; ~/.cache/huggingface/datasets (the local slice's cache entry and lock file); and the empty ~/.cache/mteb created by importing mteb 2.21.8. The first pass's trial-colpali scratch tree (31 GB) was deleted by the polish pass. See ../README.md#host-state for sizes, evidence and removal commands.",
+  "verdict": {
+    "measured": "colpali-v1.3 through the unchanged vidore-benchmark 5.0.0 CLI on CPU: nDCG@5 0.89682 and recall@3 1.0 on a 12-image TabFQuAD slice, against 0.19678 and 0.25 for the random control on the same slice; reproduced self-contained. The slice is too small to compare with published ViDoRe aggregates.",
+    "blockers": [
+      "colqwen2.5-v0.2 is not selectable through the vidore-benchmark 5.0.0 CLI, and its processor at the pinned Hub revision does not load within colpali-engine 0.3.13's transformers range; the documented 5.0.0 Python API path is untried (finding C2)",
+      "PyPI-latest colpali-engine does not co-install with vidore-benchmark 5.0.0 (finding C3)",
+      "CPU throughput (finding C4) made the full split impractical"
+    ],
+    "facts": [
+      "colpali-engine is marked deprecated upstream in favour of Sentence Transformers v6 MultiVectorEncoder",
+      "vidore-benchmark's main branch moved single-model evaluation to MTEB",
+      "code licences MIT; weight licences follow the base models (Gemma for colpali-v1.3, Qwen research licence at the root of the colqwen2.5 chain)"
+    ],
+    "layer_decision": "Not made here. The foundation document-retrieval layer is re-recorded by its own verdict wave (tools/sota-convergence/record_verdicts.py); this trial supplies measured results, facts and blockers only.",
+    "retrial_trigger": "Evaluate colqwen2.5-v0.2 against the same slice and control through the vidore-benchmark 5.0.0 Python API (VisionRetriever plus ViDoReEvaluatorQA with ColQwen2_5, at the pre-template revision 6f6fcdfd or with a colpali-engine and transformers pair that loads the current revision) and through the upstream-recommended path (Sentence Transformers v6 MultiVectorEncoder or MTEB's ViDoRe tasks), then a full split on a GPU window the host schedule allows."
+  }
+}

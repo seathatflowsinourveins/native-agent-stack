@@ -1,0 +1,165 @@
+# --pinned-versions interrupt window: discriminating control (2026-09-26)
+# Python 3.13.15 on Linux x86_64; driver sha256 cbffdad3e28f2718c19f453faa8593f8a6b1afee97ef6eddd529fea0c0b3ec15
+# pre-fix scripts/adoption_status.py sha256 cd1229719768632b045e53e5dc7ee0d4c24ea2c36084589d28f8886329c349a6
+# fixed scripts/adoption_status.py sha256 2b372896fb827871660789b99ab4553ec5d72bbc21c3b3a23a634950013a5d6b
+# tests/test_adoption_status.py sha256 1069ee96b71602c98fa508cb10c6f0fb72b3257ed8b1bb894f67271fc0f5e6cf (both trees)
+
+# exit statuses, runs A to D: [1, 0, 0, 0]
+
+===== Run A: the pre-fix script =====
+# tree: <pre-fix-tree>
+# runner: default; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# 2026-09-26T10:21:30Z to 2026-09-26T10:21:58Z, exit 1
+test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) ... ok
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_a_release_raises_what_was_held_then_the_hold_resumes (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_release_raises_what_was_held_then_the_hold_resumes) ... FAIL
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group) ... 
+  test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group) (probe='exits at once') ... FAIL
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py:1140: ResourceWarning: subprocess 2090003 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py:1140: ResourceWarning: subprocess 2090983 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py:1140: ResourceWarning: subprocess 2092806 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py:1140: ResourceWarning: subprocess 2095155 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+  test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group) (probe='outlives its bound') ... FAIL
+test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends) ... ok
+test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) ... ok
+
+======================================================================
+FAIL: test_a_release_raises_what_was_held_then_the_hold_resumes (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_release_raises_what_was_held_then_the_hold_resumes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 931, in test_a_release_raises_what_was_held_then_the_hold_resumes
+    self.assertTrue(reached, "the hold's block stopped early")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the hold's block stopped early
+
+======================================================================
+FAIL: test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group) (probe='exits at once')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 1003, in test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group
+    self.assertEqual(left_running, [], "the probe's background child outlived these interrupts")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['run_version_probe, line 523', 'run_versi[73 chars]564'] != []
+
+First list contains 4 additional elements.
+First extra element 0:
+'run_version_probe, line 523'
+
++ []
+- ['run_version_probe, line 523',
+-  'run_version_probe, line 524',
+-  'held_interrupts, line 561',
+-  'held_interrupts, line 564'] : the probe's background child outlived these interrupts
+
+======================================================================
+FAIL: test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group) (probe='outlives its bound')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/scripts/adoption_status.py", line 516, in run_version_probe
+    status = process.wait(timeout=seconds)
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py", line 1280, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/subprocess.py", line 2077, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['<tmpdir><tmpdir>e1iaxjq2<tmpdir>jl4peuri/probe']' timed out after 0.1 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 1003, in test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group
+    self.assertEqual(left_running, [], "the probe's background child outlived these interrupts")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['run_version_probe, line 523', 'run_versi[73 chars]564'] != []
+
+First list contains 4 additional elements.
+First extra element 0:
+'run_version_probe, line 523'
+
++ []
+- ['run_version_probe, line 523',
+-  'run_version_probe, line 524',
+-  'held_interrupts, line 561',
+-  'held_interrupts, line 564'] : the probe's background child outlived these interrupts
+
+----------------------------------------------------------------------
+Ran 11 tests in 28.212s
+
+FAILED (failures=3)
+
+===== Run B: the fixed script =====
+# tree: <fixed-tree>
+# runner: default; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# 2026-09-26T10:21:58Z to 2026-09-26T10:22:02Z, exit 0
+test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) ... ok
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_a_release_raises_what_was_held_then_the_hold_resumes (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_release_raises_what_was_held_then_the_hold_resumes) ... ok
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group) ... ok
+test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends) ... ok
+test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 3.527s
+
+OK
+
+===== Run C: the fixed script, under nohup =====
+# tree: <fixed-tree>
+# runner: nohup; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# 2026-09-26T10:22:02Z to 2026-09-26T10:22:05Z, exit 0
+test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) ... ok
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_a_release_raises_what_was_held_then_the_hold_resumes (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_release_raises_what_was_held_then_the_hold_resumes) ... ok
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group) ... ok
+test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends) ... ok
+test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 3.499s
+
+OK
+
+===== Run D: the fixed script, as a background job =====
+# tree: <fixed-tree>
+# runner: background; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# 2026-09-26T10:22:05Z to 2026-09-26T10:22:09Z, exit 0
+test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) ... ok
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_a_release_raises_what_was_held_then_the_hold_resumes (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_release_raises_what_was_held_then_the_hold_resumes) ... ok
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group) ... ok
+test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends) ... ok
+test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 3.560s
+
+OK
+

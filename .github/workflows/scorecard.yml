@@ -14,8 +14,8 @@ on:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope by default; the analysis job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}

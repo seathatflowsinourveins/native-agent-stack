@@ -16,16 +16,40 @@ on:
       - 'tests/test_native_token_ci.py'
       - 'fixtures/**'
       - 'manifests/stack.json'
+  # Weekly re-run of the pinned upstream installs and fixture commands, so hosted
+  # evidence keeps up with upstream registries and the runner image between pin changes.
+  # Monday 07:11 UTC: off the top of the hour, which GitHub's schedule docs say can
+  # delay or drop runs, and clear of the other Monday lanes (05:13-07:53).
+  schedule:
+    - cron: '11 7 * * 1'
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope and no cache access by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
+cache-mode: none
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   native-token-tools:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Allow unprivileged user namespaces for the context-hub offline probe
+        # Ubuntu 24.04 restricts them by default (kernel.apparmor_restrict_unprivileged_userns=1);
+        # the hosted ubuntu-24.04 image keeps that restriction (actions/runner-images#10443), so
+        # context_hub_fixture's `unshare -rn` would otherwise fail "Operation not permitted" here.
+        # Passwordless sudo on the runner already grants this; the sysctl only stops AppArmor
+        # denying it to the unprivileged runner user. No SHA pin applies to a `run:` step.
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Check out public fixture source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -43,7 +67,7 @@ jobs:
           --output "$RUNNER_TEMP/native-token-e2e-results"
       - name: Upload only sanitized fixture evidence
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: native-token-e2e-results
           path: ${{ runner.temp }}/native-token-e2e-results/

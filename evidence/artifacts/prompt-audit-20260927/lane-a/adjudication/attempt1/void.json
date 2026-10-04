@@ -1,0 +1,9 @@
+{
+ "recorded": "2026-09-28T08:54:09Z",
+ "attempt": 1,
+ "dispatched": "2026-09-28T08:50:24Z",
+ "void": true,
+ "reason": "Both Claude blind-adjudicator judgments returned leak: true with zero tool calls. Their own reasoning names the cause: the task did not give the three labelled lines (Input file:, Packet file:, Repository root:) and the input and packet were Markdown files (adjudicate.AB.md, packet.md under x5/), while the role's contract (.claude/agents/blind-adjudicator.md) accepts only an input named *.AB.json or *.BA.json under adjudication-inputs/ and a .json packet under packets/. This is the coordinator's wiring, not a leak: no file was read.",
+ "decision": "Attempt 1 decides nothing. Attempt 2 re-runs all four adjudications (two GPT-6 runner jobs, two blind-adjudicators) on one contract-conforming JSON input per order and one JSON packet, carrying the same items, returns and rules. The two GPT-6 attempt-1 jobs are left to finish and are kept as records, not counted; this decision is recorded before any attempt-1 GPT-6 result was read.",
+ "claude_attempt1": {"AB": {"leak": true, "tool_uses": 0, "subagent_tokens": 13837, "duration_ms": 63373}, "BA": {"leak": true, "tool_uses": 0, "subagent_tokens": 15388, "duration_ms": 78178}}
+}

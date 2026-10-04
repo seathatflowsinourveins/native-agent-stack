@@ -1,0 +1,70 @@
+{
+ "final/adjudication/frozen-final.sha256": {
+  "void_patterns_final.py": "differs",
+  "audit_final.py": "match",
+  "audit_selftest_final.py": "differs",
+  "audit-selftest-final.json": "differs",
+  "root_scan_final.py": "match",
+  "root-scan-final.out": "match",
+  "build_root_final.py": "match",
+  "build_adjudication_final.py": "differs",
+  "apply_x5c_variant.py": "match",
+  "tally_adjudication_final.py": "match",
+  "outcome-actions.md": "match",
+  "adjudication-mapping-final.json": "match",
+  "withheld-check.json": "match",
+  "adjudication-inputs/x5c.AB.json": "match",
+  "adjudication-inputs/x5c.BA.json": "match",
+  "packets/x5c.json": "match",
+  "prompts/claude-task-AB.txt": "differs",
+  "prompts/claude-task-BA.txt": "differs",
+  "prompts/judge-AB.txt": "differs",
+  "prompts/judge-BA.txt": "differs",
+  "schemas/adjudicate.json": "match",
+  "root/packet.md": "match",
+  "root/proposal.diff": "match",
+  "root/amendment.diff": "match"
+ },
+ "final/frozen-a2.sha256": {
+  "void_patterns_a2.py": "match",
+  "audit_a2.py": "match",
+  "audit_selftest_a2.py": "differs",
+  "root_scan_a2.py": "match",
+  "build_lane_a2.py": "differs",
+  "packets/packet.md": "match",
+  "prompts/gpt6-prompt.txt": "differs",
+  "prompts/claude-brief.txt": "differs",
+  "schemas/lane.json": "match",
+  "root/proposal.diff": "match"
+ },
+ "adjudication/attempt2/sent-sha256.json": {
+  "adjudication-inputs/x5.AB.json": "match",
+  "adjudication-inputs/x5.BA.json": "match",
+  "packets/x5.json": "match",
+  "prompts/claude-task-AB.txt": "differs",
+  "prompts/claude-task-BA.txt": "differs",
+  "prompts/judge-AB.txt": "differs",
+  "prompts/judge-BA.txt": "differs",
+  "schemas/adjudicate.json": "match"
+ },
+ "final/adjudication/sent-sha256.json": {
+  "adjudication-inputs/x5c.AB.json": "match",
+  "adjudication-inputs/x5c.BA.json": "match",
+  "packets/x5c.json": "match",
+  "prompts/claude-task-AB.txt": "differs",
+  "prompts/claude-task-BA.txt": "differs",
+  "prompts/judge-AB.txt": "differs",
+  "prompts/judge-BA.txt": "differs",
+  "schemas/adjudicate.json": "match",
+  "root/amendment.diff": "match",
+  "root/proposal.diff": "match",
+  "root/packet.md": "match"
+ },
+ "final/sent-sha256.json": {
+  "packets/packet.md": "match",
+  "prompts/gpt6-prompt.txt": "differs",
+  "prompts/claude-brief.txt": "differs",
+  "schemas/lane.json": "match",
+  "root/proposal.diff": "match"
+ }
+}

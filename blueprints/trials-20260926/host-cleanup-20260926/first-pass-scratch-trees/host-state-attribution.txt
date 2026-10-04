@@ -1,0 +1,32 @@
+# Attribution facts for trial-owned host state outside the scratch directory (2026-09-26T06:37:31Z)
+## ~/.cache/mteb
+$ stat -c '%w (birth) %y (mtime)' ~/.cache/mteb
+2026-09-25 21:29:06.502891439 -0400 (birth) 2026-09-25 21:29:06.502891439 -0400 (mtime)
+$ ls <scratch>/trial-colpali/.venv/lib/python3.11/site-packages | grep '^mteb-'
+mteb-2.21.8.dist-info
+$ stat -c '%w (birth) %n' of the mteb bytecode written when that venv first imported mteb
+2026-09-25 21:29:03.365033225 -0400 (birth) mteb/__pycache__/__init__.cpython-311.pyc
+2026-09-25 21:29:06.502857038 -0400 (birth) mteb/__pycache__/evaluate.cpython-311.pyc
+2026-09-25 21:29:04.668562263 -0400 (birth) mteb/cache/__pycache__/result_cache.cpython-311.pyc
+$ grep -n of the import-time cache creation in that installed mteb 2.21.8 (file sha256 first)
+151c37b96e9ded660ffd7f0e5a57416f85a94d21767b631344881ac89540a279  mteb/evaluate.py
+9acddf8d87f162c6cb068638361cd86a7b74bd45c28b9295f5e76dc26ba9686e  mteb/cache/result_cache.py
+46:_DEFAULT_CACHE = ResultCache()
+223:        self.cache_path.mkdir(parents=True, exist_ok=True)
+442:        default_cache_directory = Path.home() / ".cache" / "mteb"
+473:        self.cache_path.mkdir(parents=True, exist_ok=True)
+## /run/user/<uid>/python_PostgresServer
+$ stat -c '%w (birth) %y (mtime) %F %n' of the runtime directory, its lock file and its entries
+2026-09-25 21:29:36.694199978 -0400 (birth) 2026-09-25 21:29:37.394247364 -0400 (mtime) directory /run/user/<uid>/python_PostgresServer
+2026-09-25 21:29:36.694199978 -0400 (birth) 2026-09-25 21:29:36.694199978 -0400 (mtime) regular empty file /run/user/<uid>/python_PostgresServer/.lockfile
+2026-09-25 21:29:37.394247364 -0400 (birth) 2026-09-25 23:37:40.962377149 -0400 (mtime) directory /run/user/<uid>/python_PostgresServer/2dcf3c6d23
+$ grep -n of pgserver 0.1.4's runtime and socket paths (file sha256 first)
+976709aaa9a86a51cd29c5ef1a4dec6d55b09866d712b6705ca1a5dd303e137d  pgserver/postgres_server.py
+e3f78fe90ba8431ecb0b96f179c5340e937289bf03aaf7bed3649f1cddd7c788  pgserver/utils.py
+30:    runtime_path : Path = platformdirs.user_runtime_path('python_PostgresServer')
+31:    lock_path = platformdirs.user_runtime_path('python_PostgresServer') / '.lockfile'
+246:    string_identifier = f'{pgdata}-{pgdata.stat().st_ino}'
+247:    path_hash = hashlib.sha256(string_identifier.encode()).hexdigest()[:10]
+251:        runtime_path / path_hash,
+$ sha256('<scratch>/trial-mirix/pgdata-' + str(st_ino))[:10], pgserver's socket-directory name for the trial cluster
+2dcf3c6d23

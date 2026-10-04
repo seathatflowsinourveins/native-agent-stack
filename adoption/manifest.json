@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "kind": "portable_adoption_reference",
-  "updated_at": "2026-09-25",
+  "updated_at": "2026-09-26",
   "source": {
     "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
     "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
     "baseline_meaning": "Parent accepted publication before this adoption addition; local revision is always git rev-parse HEAD. This commit predates adoption/ and tools/adoption/ entirely and must never be the checkout target for a new machine (see release_tag/release_commit below, and adoption/bootstrap.md step 0; Codex cross-family review finding, codex-review-72).",
-    "release_tag": "v2026.09.25.2",
-    "release_commit": "f5812d3f2266399b0c3df3ea76aa6720c7f3e598",
+    "release_tag": "v2026.09.26.2",
+    "release_commit": "771f25f824a7851a6cb46ebcfa2922b54cb88d9e",
     "release_meaning": "The attested release tag adoption/bootstrap.md step 0 checks out on a new machine (or a later tag): published with SLSA build provenance by .github/workflows/publish-catalog.yml, and contains both adoption/ and tools/adoption/ (unlike baseline_commit above)."
   },
   "supported_platforms": [
@@ -59,6 +59,7 @@
     "boundaries": "docs/evidence.md",
     "current_activation": "observability/desktop-restart.md",
     "update_protocol": "adoption/update.md",
+    "scaffold": "tools/adoption/scaffold_repo.py",
     "adoption_receipt": "adoption/receipt.json",
     "portability_research": "adoption/research.json",
     "current_paired_acceptance": "adoption/paired/receipt.json",
@@ -190,6 +191,31 @@
   },
   "profiles": [
     {
+      "id": "new-wsl-clean-foundation",
+      "label": "Clean replacement WSL: minimal native foundation; source-review recommendations only",
+      "source_profile": "adoption/new-wsl-profile.json",
+      "required_commands": [
+        "git",
+        "python3",
+        "node",
+        "npm",
+        "uv",
+        "gh",
+        "codex",
+        "claude"
+      ],
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "recipe_paths": [
+        "adoption/new-wsl-profile.json",
+        "adoption/new-wsl-profile.md",
+        "adoption/bootstrap.md",
+        "recipes/README.md"
+      ]
+    },
+    {
       "id": "foundation-cpu",
       "label": "Native clients, context and lexical memory foundation",
       "required_commands": [
@@ -294,7 +320,8 @@
       "recipe_paths": [
         "observability/README.md",
         "observability/backends/README.md",
-        "observability/grand-dashboard/README.md"
+        "observability/grand-dashboard/README.md",
+        "observability/native-data/README.md"
       ]
     },
     {
@@ -379,7 +406,7 @@
     },
     {
       "id": "token-efficiency",
-      "label": "Drafted, not accepted: the selected token-efficiency practice and its native Claude Code and Codex wiring",
+      "label": "Accepted 2026-09-30 as the selection, per docs/decisions/2026-09-30-task-model-routing.md: the token-efficiency practice and its Claude Code and Codex wiring",
       "required_commands": [
         "codex",
         "claude",
@@ -415,7 +442,8 @@
         "docs/token-efficiency-stack.md",
         "docs/token-session-handbook.md",
         "recipes/README.md",
-        "recipes/native-upgrades-20260921.md"
+        "recipes/native-upgrades-20260921.md",
+        "docs/decisions/2026-09-30-task-model-routing.md"
       ]
     }
   ],
@@ -452,7 +480,9 @@
       "observability/grand-dashboard/README.md",
       "blueprints/us-equities/catalyst-convergence/README.md"
     ],
-    "next_action_refs": [],
+    "next_action_refs": [
+      "claude-code-sandbox-profile"
+    ],
     "next_action_scope": "Foundation required gate IDs only; an empty list does not establish comparative saturation. Optional comparison work lives in research_refs.",
     "research_refs": [
       "docs/landscape-continuation.md",

@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "local-inference",
+  "task_and_failure": "The production local generation endpoint (Qwen3.8-27B UD-Q4_K_M on llama.cpp b11146, 36 of 65 layers on the GPU) decodes at a median 4.79 tokens/s (its own journal, 70 replies) under partial offload. Newer Qwen3.8-family serving profiles and releases from the past weeks may be faster at equal quality on the north-star 8-K item-extraction workload, but no frozen, paired comparison exists on this workstation.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/ggml-org/llama.cpp",
+      "revision": "7fe450e19305b828c199d602c23a8337aaa1f03b"
+    },
+    {
+      "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF",
+      "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3.8-27B",
+      "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0"
+    },
+    {
+      "url": "https://huggingface.co/ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF",
+      "revision": "81baddc39bc48924a88e87b8d31aceb03058e559"
+    },
+    {
+      "url": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B",
+      "revision": "2367e865d009c13ac81713a2878291d33ab28177"
+    },
+    {
+      "url": "https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf",
+      "revision": "b072e1d3b35a0a630cece372c2127528e0994386"
+    },
+    {
+      "url": "https://huggingface.co/XingChen-AGI/Xing4.0-29B-A4B-GGUF",
+      "revision": "b8cd0a75f3d3dfa992bd8423ee22041b987eaf44"
+    },
+    {
+      "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF",
+      "revision": "38bb39ee97821de2c9009abb7e93950eec396e66"
+    },
+    {
+      "url": "https://github.com/dgunning/edgartools",
+      "revision": "abe44344c56cf4bfb5443e0debca7e39342f6e7a"
+    }
+  ],
+  "discovery_provenance": [
+    "Coordinator landscape sweep landscape-sweep-20260926, restricted to the Qwen3.8 family and releases from the past weeks; the sweep itself is not a repository artifact in this change.",
+    "Hugging Face model API reads (revision/main and tree with LFS oids) on 2026-09-26 UTC for every pinned repository; no adoption by stars, downloads or leaderboard position.",
+    "Read-only local evidence on 2026-09-26: llama-server --help and --version for b11146, argv parse checks, the installed runtime hashes, the production GGUF header and tensor table, a SHA-256 of the production model file, whole-device nvidia-smi memory, the embeddings and production unit definitions, and the production unit's journal timing lines.",
+    "llama.cpp sources at 7fe450e (server error paths, --n-cpu-ffn, MTP drafting on the target model) and the SDK's EdgarTools 5.58.0 source, whose co-filer header failure was reproduced offline on synthetic headers.",
+    "Independent review of the first freeze (Claude Opus and GPT-6-Astra), repaired in one round before any run."
+  ],
+  "license_and_compatibility": "Runtime llama.cpp b11146 is MIT. C0, C1 and C2 use unsloth/Qwen3.8-27B-GGUF UD-Q4_K_M (Apache-2.0; base Qwen/Qwen3.8-27B Apache-2.0); C2 drafts from the MTP layer inside that file, so no draft file is used. The tasked profiles (-ngl 99 without FFN offload, and the MTP draft file MTP/mtp-Qwen3.8-27B-Q4_0.gguf, same license) are resource_infeasible on this host and stay pinned. M uses ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF Q8_0 (MIT; base XiaomiMiMo MIT on Qwen3.5-9B Apache-2.0), architecture qwen35 as in production. B, PrismML Ternary Bonsai 2 27B PTQ1_0 (Apache-2.0), is runtime_unsupported: b11146's type table has no ptq1_0/pq2_0 and the card requires the PrismML fork. X, Xing4.0-29B-A4B IQ4_NL (Apache-2.0), is runtime_unsupported: b11146 has no xing4_0 architecture. Qwen3.8-Flash-Next (qwen-community-1.0) is resource_infeasible, not an arm. SEC EDGAR content is public but retained privately under the repository's data policy; EdgarTools 5.58.0 is MIT.",
+  "baseline_and_candidate": {
+    "baseline": "C0: production Qwen3.8-27B UD-Q4_K_M, llama.cpp b11146, 36 GPU layers, 8192 context, frozen non-thinking greedy request.",
+    "candidate": "C1 (same model, every layer and the output head on the GPU, dense FFN of blocks 0-19 on the CPU), C2 (C1 plus MTP drafting from the file's own MTP layer) and M (MiMo-V2.6-Distill-Qwen-9B Q8_0, all layers on the GPU), each scored on the same filings with the same request; B and X are predeclared runtime_unsupported."
+  },
+  "frozen_inputs": {
+    "base_revision": "ff20470b8fc00fee288916f309123586b15668ec",
+    "tasks": [
+      "sec-8k-item-extraction-20200302"
+    ],
+    "roles": [
+      "local-generation-endpoint",
+      "sec-acquisition"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/us-equities/catalyst-provenance/catalyst.py",
+        "sha256": "26a85df727df99a67c800be1c1ed792eec05ec488f65186ac179acb9b1acd13e"
+      },
+      {
+        "path": "scripts/path_safety.py",
+        "sha256": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/local-inference-latest-20260926/plan.json",
+        "sha256": "b90db46f20624895089cee5bbce27b0c8df2f3c783b1873cea5920a0f8e18b95"
+      },
+      {
+        "path": "blueprints/convergence-practice/local-inference-latest-20260926/prompt.txt",
+        "sha256": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58"
+      },
+      {
+        "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
+        "sha256": "9e949e2db789b55f8c6145aaa382ed3fee02c15a8c4ca60499e775a92adbfe51"
+      },
+      {
+        "path": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
+        "sha256": "7b60e7c82f3cc3cbbf867fc122fdb1ad72d2c6ee6d7b915d0b76942fd8e1f066"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py",
+        "sha256": "1af22fd1bd1c99091f8de214d8bd74625717d782905563ad652a77da237e6bdc"
+      },
+      {
+        "path": "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py",
+        "sha256": "cebc1561c0353d0b6c63008b14c05cbf655c7c69cb275d261a4172a24958c3be"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "An arm replaces C0 as the production generation model only if (1) the paired bootstrap (10,000 resamples, seed 20260926) 95% lower bound of micro-F1(arm) - micro-F1(C0) is at least -0.02, (2) its median decode tokens/s exceeds C0's, (3) its JSON-valid rate is at least 0.98, and (4) it had no memory or deadline failure. Inference speed alone does not pass. C1 or C2 passing means keep the model and change only the serving profile. Micro-F1 is over per-accession item-code sets against the filer-declared header ITEMS; macro-F1, exact match and per-filing precision and recall are reported alongside.",
+    "usage_rule": "Retain llama-server usage (prompt and completion tokens) and timings per filing as local-model counters. No provider usage, cache categories or token-savings claim; unknown values stay null."
+  },
+  "runtime_and_platform": {
+    "platform": "nativestack-5975wx-20260925: WSL2 Ubuntu 24.04.5 x86_64, Threadripper PRO 5975WX, 104,613 MiB WSL memory, RTX 4090 24,564 MiB (Ada, compute 8.9), Windows driver 616.64",
+    "tools": [
+      {
+        "name": "llama.cpp llama-server",
+        "version": "b11146 (0.5.0-dev, commit 7fe450e) Linux CUDA 12.8 release build"
+      },
+      {
+        "name": "EdgarTools",
+        "version": "5.58.0 in the catalyst-provenance SDK (Python 3.13.15)"
+      },
+      {
+        "name": "Python",
+        "version": "3.13.15 (the host's python3) for eval_arm.py, analyze.py and window.sh's helpers"
+      },
+      {
+        "name": "systemd",
+        "version": "255 user manager (transient scopes with MemoryMax)"
+      }
+    ],
+    "isolation": "One arm segment at a time on 127.0.0.1:18299 in its own systemd user scope (MemoryMax 20G, no swap, verified) with a 1 Hz whole-device GPU-memory guard whose queries are bounded; the production unit is stopped for the window, a transient restore timer is armed first, and the exit trap restores production with bounded steps. Filing text, raw replies, error bodies and server logs stay private; not an OS sandbox."
+  },
+  "commands": [
+    "\"$CATALYST_SDK_PY\" blueprints/convergence-practice/local-inference-latest-20260926/acquire.py --env-file \"$SEC_CONTACT_ENV\" --state-dir \"$LI26_STATE\" --run-id <fresh run id>",
+    "hf download ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF MiMo-V2.6-Distill-Qwen-9B-Q8_0.gguf --revision 81baddc39bc48924a88e87b8d31aceb03058e559 --local-dir \"$MODELS_DIR/mimo-v2.6-distill-qwen-9b-81baddc\"",
+    "bash blueprints/convergence-practice/local-inference-latest-20260926/window.sh --arms C0 --acquisition \"$LI26_STATE/sec/<run id>\" --inputs-sha256 <inputs_sha256> --runtime-dir \"$LLAMA_B11146\" --models-dir \"$MODELS_DIR\" --state-dir \"$LI26_STATE\"",
+    "bash blueprints/convergence-practice/local-inference-latest-20260926/window.sh --arms C1,C2,M --acquisition \"$LI26_STATE/sec/<run id>\" --inputs-sha256 <inputs_sha256> --runtime-dir \"$LLAMA_B11146\" --models-dir \"$MODELS_DIR\" --state-dir \"$LI26_STATE\"",
+    "python3 blueprints/convergence-practice/local-inference-latest-20260926/analyze.py --state-dir \"$LI26_STATE\" --out <decision.json>",
+    "uv run --no-project --with jsonschema --with pyyaml python -m unittest tests.test_local_inference_latest_20260926 -v",
+    "bash blueprints/convergence-practice/local-inference-latest-20260926/window.sh --arms C2 --acquisition \"$LI26_STATE/sec/<run id>\" --inputs-sha256 <inputs_sha256> --runtime-dir \"$LLAMA_B11146\" --models-dir \"$MODELS_DIR\" --state-dir \"$LI26_STATE\""
+  ],
+  "observations": [
+    {
+      "id": "li26-acq-attempt-1",
+      "task": "sec-8k-item-extraction-20200302",
+      "role": "sec-acquisition",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "SEC acquisition acq-20260926 of the frozen 2020-03-02 8-K cohort under EdgarTools 5.58.0, the shared input of every arm (recorded under the baseline condition; the contract has no shared-setup condition)",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/results.md",
+          "sha256": "0f42a99d031e72d4c7e31d240b734936d68b776a982b968a7ec483401274b294"
+        },
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
+          "sha256": "9e949e2db789b55f8c6145aaa382ed3fee02c15a8c4ca60499e775a92adbfe51"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "li26-acq-attempt-2",
+      "task": "sec-8k-item-extraction-20200302",
+      "role": "sec-acquisition",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "SEC acquisition acq-20260926 of the frozen 2020-03-02 8-K cohort under EdgarTools 5.58.0, the shared input of every arm (recorded under the baseline condition; the contract has no shared-setup condition)",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/acquisition-summary.json",
+          "sha256": "c775d341ea2b0750cd368386b373e3639197ae0819d69131d7a9d3f5a09c68fa"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "li26-c0-w1",
+      "task": "sec-8k-item-extraction-20200302",
+      "role": "local-generation-endpoint",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "model_task_execution",
+      "scope": "C0 control: unsloth/Qwen3.8-27B-GGUF UD-Q4_K_M (4ca7207) on llama.cpp b11146 with 36 GPU layers, 8192 context and one slot; frozen greedy non-thinking 8-K item extraction of the 360 eligible 2020-03-02 filings on nativestack-5975wx-20260925",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T050938Z/window-summary.json",
+          "sha256": "d4c735636386148534bceb7c3229aaeefbfa77f5ad896a124eeee17c241812dd"
+        },
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T050938Z/C0/window.json",
+          "sha256": "7a515078bdd51fabd0d68e61abbf760fd81be3bcf522e58652184197384c8ceb"
+        },
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/decision.json",
+          "sha256": "672be297908b9832b77949d2c8e15b3972f3acc4fbd12c92cef717f61d05d3e4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 726255,
+        "cache_creation": null,
+        "cache_read": 0,
+        "output": 6048,
+        "reasoning_in_output": null,
+        "total": 732303,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "li26-c1-w2",
+      "task": "sec-8k-item-extraction-20200302",
+      "role": "local-generation-endpoint",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "C1 serving profile (--gpu-layers 99 --n-cpu-ffn 20) of the same model and runtime; the same frozen task and filings on nativestack-5975wx-20260925",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/window-summary.json",
+          "sha256": "5a515ada7314832152740eba8512fc58abd06262a12dfa6adac38310770e5ce2"
+        },
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/C1/window.json",
+          "sha256": "64fa973e429a681d6a8a682aa202cafc308cd6770928da3a0fdf0a34acaa716d"
+        },
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/decision.json",
+          "sha256": "672be297908b9832b77949d2c8e15b3972f3acc4fbd12c92cef717f61d05d3e4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 726255,
+        "cache_creation": null,
+        "cache_read": 0,
+        "output": 6048,
+        "reasoning_in_output": null,
+        "total": 732303,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "li26-c2-w2-admission-refused",
+      "task": "sec-8k-item-extraction-20200302",
+      "role": "local-generation-endpoint",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "C2 serving profile (--gpu-layers 99 --n-cpu-ffn 20 --spec-type draft-mtp --spec-draft-n-max 3, 8192 context, one slot) for unsloth/Qwen3.8-27B-GGUF UD-Q4_K_M (4ca7207) on llama.cpp b11146 as the production generation endpoint of nativestack-5975wx-20260925, qualified on frozen greedy non-thinking 8-K item extraction of the 360 eligible 2020-03-02 filings",
+      "status": "skipped",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/window-summary.json",
+          "sha256": "5a515ada7314832152740eba8512fc58abd06262a12dfa6adac38310770e5ce2"
+        },
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/C2/window.json",
+          "sha256": "56a16e8969b4cd5c13b61ebc1cd293651950a4fb6e9055b0a89c3e21e5a2ceee"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "li26-m-w2",
+      "task": "sec-8k-item-extraction-20200302",
+      "role": "local-generation-endpoint",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "M: ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF Q8_0 (81baddc) with every layer on the GPU, llama.cpp b11146; the same frozen task and filings on nativestack-5975wx-20260925",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/window-summary.json",
+          "sha256": "5a515ada7314832152740eba8512fc58abd06262a12dfa6adac38310770e5ce2"
+        },
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/M/window.json",
+          "sha256": "897889130228e3d816e1802c0bc769a7d1f453700261d3b5c5ceea9925247a07"
+        },
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/decision.json",
+          "sha256": "672be297908b9832b77949d2c8e15b3972f3acc4fbd12c92cef717f61d05d3e4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 725535,
+        "cache_creation": null,
+        "cache_read": 0,
+        "output": 6240,
+        "reasoning_in_output": null,
+        "total": 731775,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "li26-c2-w3",
+      "task": "sec-8k-item-extraction-20200302",
+      "role": "local-generation-endpoint",
+      "condition": "candidate",
+      "attempt": 4,
+      "command_index": 6,
+      "evidence_class": "model_task_execution",
+      "scope": "C2 serving profile (--gpu-layers 99 --n-cpu-ffn 20 --spec-type draft-mtp --spec-draft-n-max 3, 8192 context, one slot) for unsloth/Qwen3.8-27B-GGUF UD-Q4_K_M (4ca7207) on llama.cpp b11146 as the production generation endpoint of nativestack-5975wx-20260925, qualified on frozen greedy non-thinking 8-K item extraction of the 360 eligible 2020-03-02 filings",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T102638Z/window-summary.json",
+          "sha256": "4f212c49f30e6c8a74e7b96864d5937c50aad4fd6f1e701123e8ffcc64122b6a"
+        },
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T102638Z/C2/window.json",
+          "sha256": "fa7f3ad77f2dd706f2969d5a942401c1e97d3fdfa816c24cfff731f48b2de436"
+        },
+        {
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/decision.json",
+          "sha256": "672be297908b9832b77949d2c8e15b3972f3acc4fbd12c92cef717f61d05d3e4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 726255,
+        "cache_creation": null,
+        "cache_read": 0,
+        "output": 6048,
+        "reasoning_in_output": null,
+        "total": 732303,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "li26-acq-attempt-1",
+      "reason": "acquire.py refused with state_dir_must_be_owner_only before any SEC request: the existing state directory was not owner-only. The refusal comes before the run directory is created. The coordinator set the directory to 0700 and reran the same run id (li26-acq-attempt-2). The exit status was not retained."
+    },
+    {
+      "run_id": "li26-c2-w2-admission-refused",
+      "reason": "window.sh's admission check refused C2 before any load: 17,366 MiB were free against the 17,535 required. Production had been idle-sleeping (--sleep-idle-seconds 600) with about 438 MiB loaded, so stopping it freed far less than the 9,478 MiB that the window's start prediction adds. Nothing started. C2 ran in window w-20260926T102638Z (li26-c2-w3) after further Windows-side applications were closed."
+    },
+    {
+      "run_id": "li26-m-w2",
+      "reason": "Failed frozen criterion (1): the paired bootstrap 95% lower bound of micro-F1(M) - micro-F1(C0) is -0.0560, below the -0.02 margin (point -0.0240, upper -0.0049); micro-F1 was 0.9670 against 0.9909. Criteria (2) to (4) held: median decode 80.16 against 5.25 tokens/s, JSON-valid 1.0, and failure-free. The outcome is retain_control."
+    }
+  ],
+  "limitations": [
+    "Native execution on nativestack-5975wx-20260925, one run per arm, under the frozen protocol. No arm was repeated, so run-to-run variance is unmeasured. Speed and memory are this host's, under its load at the time: a shared WSL2 desktop with the Windows-side GPU applications closed for each window. They are not isolated benchmarks.",
+    "Labels are filer-declared header ITEMS, not hand-checked or frontier-model labels; the task is a proxy for catalyst extraction and does not meet that catalog trial's gate.",
+    "One day of filings (360 accessions, all eligible, from 2020-03-02); not a representative sample of 8-K forms or years.",
+    "Inputs are capped at 16,000 characters (head and tail; 11 of 360 were cut); items in a dropped middle are unreachable for every arm alike.",
+    "The three windows ran at different times on 2026-09-26 on a shared WSL2 desktop, so timing and memory are shared-host, whole-device observations. C0 finished in one segment rather than the expected two.",
+    "Admission needed the Windows-side GPU applications closed first. Window 1's closes went by image name, with a forced second pass, not by the PIDs that README step 3 names. Window 3 followed further closes outside that list, under the user approval the coordinator recorded. C2 was refused once (window 2) before it was admitted in window 3.",
+    "C1 and C2 differ from the tasked profiles (-ngl 99 without FFN offload; the MTP draft file), which cannot be admitted beside the embeddings service on this host; those profiles have no result.",
+    "Device-memory estimates are planning figures from the GGUF tensor table and a fixed overhead, and the production estimate overstates what stopping an idle-sleeping production unit frees; the measured guard protected other GPU users.",
+    "B and X are excluded by pinned-runtime evidence, not by a load attempt; Qwen3.8-Flash-Next is excluded by size.",
+    "Greedy non-thinking decoding is a fixed protocol, not each publisher's recommended setting.",
+    "C1 and C2 predicted the same item sets as C0 on all 360 filings, so their bootstrap interval is exactly zero. MTP accepted 4,735 of 4,737 drafted tokens on replies averaging about 17 tokens. C2's decode gain is established for this protocol only, not for production's own sampled or thinking requests.",
+    "Production now runs C2 with no free-memory guard of its own. C2's minimum whole-device free memory was 3,829 MiB with the Windows-side applications closed, so Windows-side GPU applications reopened later can exhaust device memory.",
+    "The production switch and its immediate checks come from the coordinator's dated operations log. A later read-only recheck is recorded in two llama-cpp host receipts that carry self reviews only."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "C2 serving profile (--gpu-layers 99 --n-cpu-ffn 20 --spec-type draft-mtp --spec-draft-n-max 3, 8192 context, one slot) for unsloth/Qwen3.8-27B-GGUF UD-Q4_K_M (4ca7207) on llama.cpp b11146 as the production generation endpoint of nativestack-5975wx-20260925, qualified on frozen greedy non-thinking 8-K item extraction of the 360 eligible 2020-03-02 filings",
+    "qualification_run_ids": [
+      "li26-c2-w3"
+    ]
+  },
+  "rollback": "Production changed only because the frozen rule passed. It now runs C2 through the systemd --user drop-in nativestack-generation.service.d/li26-c2-serving-profile.conf, which resets ExecStart with four changed options (--gpu-layers 36 -> 99, plus --n-cpu-ffn 20, --spec-type draft-mtp and --spec-draft-n-max 3). Rollback removes that drop-in, runs systemctl --user daemon-reload, restarts nativestack-generation.service and checks /health 200. The base unit (C0's serving profile, 36 GPU layers) and the model file are unchanged, so rollback restores the pre-switch production unit. Each window's own stop was undone by its exit trap: restore timers were cancelled and /health was ok.",
+  "next_decision_changing_test": "Measure C2 on production's own requests (sampled and thinking, longer replies): decode speed, MTP acceptance, and free device memory with the Windows-side applications back in use. Reopen if free memory approaches the 3,072 MiB reserve, production shows allocation failures, or quality regresses. A repeated run of the frozen task would bound run-to-run variance. B or X re-enter only under a new plan with a pinned runtime that supports them.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

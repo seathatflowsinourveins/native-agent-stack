@@ -1,0 +1,29 @@
+Transcription, not a recording: the values below are copied by hand from the returned outputs of the commands run on 2026-09-30 between 05:50Z and 05:55Z
+(read-only sqlite opens in mode=ro of the 20129 store, status columns only and no credential column; the gateway's own test route; model requests through
+20129 and 20128). Internal identifiers are shortened to eight hex characters.
+
+1. Cause, row of 20129's call_logs (timestamp, model, requested model, status, error type, error summary, duration ms):
+   2026-09-30T05:50:13.561Z | gpt-6.1-sol-max | sharedgw/gpt-6.1-sol-max | 401 | unauthorized | [401]: No active credentials for provider: openai. | 6064
+   It is the last request of the baseline run of probe_gate.py (scripts/probe_gate.py.txt, an earlier version that sent this request unconditionally).
+   The bare id gpt-6.1-sol-max was forwarded by the sharedgw node to 20128, whose registry lacked it, so it resolved to provider openai and answered 401.
+
+2. The sharedgw node's only connection before the repair (provider_connections, columns id, provider, auth_type, is_active, test_status, last_error_type,
+   error_code, last_error_at, last_tested, rate_limited_until, backoff_level; last_error text):
+   id 3eea0518 | provider openai-compatible-responses-3393b3bd | auth_type apikey | is_active 1 | test_status expired | last_error_type unauthorized |
+   error_code 401.0 | last_error_at 2026-09-30T05:50:13.572Z | last_tested 2026-09-30T05:03:17.973Z | rate_limited_until null | backoff_level 0
+   last_error: [401]: No active credentials for provider: openai.
+
+3. Effect, requests through 20129 after 05:50:13.572Z:
+   05:51:50Z sharedgw/gpt-6-astra      -> HTTP 401 in 0.0 s, "All 1 connection(s) authentication expired - please reconnect in the dashboard"
+   05:52:43Z sharedgw/gpt-6-astra-max  -> HTTP 401 in 0.0 s, the same message
+   (20129 rows after 05:50:27.067Z: none; requests in flight before 05:50:13.572Z finished with 200. Direct requests to 20128 were never affected.)
+
+4. Repair, 05:54:44Z: POST /api/providers/3eea0518-.../test on 20129 (the dashboard's Test connection), body {}. Answer: HTTP 200, valid true, statusCode null,
+   latencyMs 604, testedAt 2026-09-30T05:54:45.300Z, error null, diagnosis type ok source upstream.
+
+5. The connection after the repair (same columns):
+   id 3eea0518 | is_active 1 | test_status active | last_error_type null | error_code null | last_error_at null | last_tested 2026-09-30T05:54:45.300Z |
+   rate_limited_until null | backoff_level 0 ; last_error: (empty)
+   05:54:52Z sharedgw/gpt-6-astra -> HTTP 200, nine response events, last response.completed, 1.9 s.
+   Outage of the route for requests started after 05:50:13.572Z: until 05:54:45Z, about 4.5 minutes. No restart, no unit, settings or pool change.
+   A fresh owner record at 05:55:27Z equals the published 00:48:58Z record on 31 of 32 paths (only taken_utc differs); the record carries no connection status.

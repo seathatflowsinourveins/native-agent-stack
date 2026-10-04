@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""Value-free snapshot of both OmniRoute gateways for the Gate A window baseline and receipts.
+
+Prints, per gateway: unit name, running install prefix, dist/BUILD_SHA, MainPID, NRestarts, ExecMainStartTimestamp,
+and the sha256 (json.dumps(body, sort_keys=True)) of the four route bodies plus the 20128 compression body.
+Writes the same data to STATE_DIR/snapshot-<tag>.json (0600). No credentials are read; only the four settings bodies
+and unit metadata are fetched."""
+import datetime
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import urllib.request
+from pathlib import Path
+
+TAG = sys.argv[1] if len(sys.argv) > 1 else "snapshot"
+STATE_DIR = Path(os.environ.get("TOKENSAVE_STATE_DIR", str(Path.home() / ".local/state/native-agent-stack/omniroute-tokensave-20260929")))
+ROUTES = ["/api/settings/compression", "/api/context/combos", "/api/model-capability-overrides", "/api/resilience"]
+UNITS = {"20128": "omniroute", "20129": "omniroute-fw"}
+
+
+def get(port, route):
+    with urllib.request.urlopen(urllib.request.Request(f"http://127.0.0.1:{port}{route}", method="GET"), timeout=30) as response:
+        return json.loads(response.read())
+
+
+out = {"taken_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "gateways": {}}
+for port, unit in UNITS.items():
+    show = subprocess.run(["systemctl", "--user", "show", unit + ".service", "-p", "MainPID", "-p", "NRestarts", "-p", "ExecMainStartTimestamp", "-p", "Description"],
+                          capture_output=True, text=True).stdout.strip().splitlines()
+    fields = dict(line.split("=", 1) for line in show if "=" in line)
+    pid = fields.get("MainPID", "0")
+    args = subprocess.run(["ps", "-o", "args=", "-p", pid], capture_output=True, text=True).stdout.strip()
+    prefix = ""
+    for part in args.split():
+        if "/tools/omniroute-" in part:
+            prefix = part.split("/tools/")[1].split("/")[0]
+    build = ""
+    if prefix:
+        base = Path.home() / ".local/share/codex-ecosystem/tools" / prefix / "lib/node_modules/omniroute/dist/BUILD_SHA"
+        build = base.read_text().strip() if base.exists() else ""
+    digests = {}
+    for route in ROUTES:
+        try:
+            digests[route] = hashlib.sha256(json.dumps(get(port, route), sort_keys=True).encode()).hexdigest()
+        except Exception as error:
+            digests[route] = "error-" + type(error).__name__
+    out["gateways"][port] = {"unit": unit, "prefix": prefix, "build_sha": build, "MainPID": pid, "NRestarts": fields.get("NRestarts"),
+                             "ExecMainStartTimestamp": fields.get("ExecMainStartTimestamp"), "Description": fields.get("Description", "")[:90], "digests": digests}
+STATE_DIR.mkdir(mode=0o700, parents=True, exist_ok=True)
+target = STATE_DIR / f"snapshot-{TAG}.json"
+fd = os.open(str(target), os.O_WRONLY | os.O_CREAT | os.O_TRUNC | os.O_NOFOLLOW, 0o600)
+with os.fdopen(fd, "w") as handle:
+    json.dump(out, handle, indent=1, sort_keys=True)
+print("taken", out["taken_utc"])
+for port, data in out["gateways"].items():
+    print(f"{port} {data['unit']} prefix={data['prefix']} BUILD_SHA={data['build_sha']} MainPID={data['MainPID']} NRestarts={data['NRestarts']} started={data['ExecMainStartTimestamp']}")
+    for route, digest in data["digests"].items():
+        print("   ", route.rsplit("/", 1)[-1], digest)

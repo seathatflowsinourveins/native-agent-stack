@@ -1,0 +1,91 @@
+{
+ "at": "2026-09-25T22:44:29Z",
+ "extract": {
+  "models_copied": true,
+  "capture_mode_file": "allowlist"
+ },
+ "copy_config_safety": {
+  "server_url_top_level_present": false,
+  "server_url_nested_keys": [],
+  "backfill_on_start": false,
+  "tcp_keepalive_secs_present": false,
+  "embedding_provider": "local",
+  "bind_is_loopback": true,
+  "safe": true
+ },
+ "fingerprint_before": "schema V66 (66 rows) quick_check=ok pages=38 observations=85011",
+ "ready_seconds": 0.6,
+ "status": {
+  "version": "2.4.0",
+  "counts": {
+   "pages_latest": 33,
+   "pages_all": 38,
+   "sessions": 35,
+   "observations": 85011
+  },
+  "derived": {
+   "pages_rows": 38,
+   "pages_fts_rows": 38,
+   "observations_rows": 85011,
+   "observations_fts_rows": 85011,
+   "latest_pages_missing_embeddings": 0,
+   "embedding_rows": 38
+  },
+  "embedding": {
+   "status": "unknown",
+   "provider": "local",
+   "model": "all-MiniLM-L6-v2",
+   "dim": 384
+  },
+  "status_top_level_keys": [
+   "bind",
+   "capture_mode",
+   "client",
+   "counts",
+   "data_dir",
+   "db_path",
+   "derived",
+   "ingest",
+   "providers",
+   "spool",
+   "storage",
+   "version"
+  ],
+  "capture_mode": "allowlist",
+  "checks": {
+   "version": true,
+   "pages_fts_match": true,
+   "observations_fts_match": true,
+   "embedding_ok": true,
+   "embedding_identity": true,
+   "latest_pages_missing_embeddings_zero": true
+  },
+  "pass": true
+ },
+ "stop": {
+  "rc": 0,
+  "pid_gone": true,
+  "port_closed": true
+ },
+ "killed_leftovers": [],
+ "fingerprint_compare": "V66 -> V66 (66 rows) quick_check=ok | pages before=38 missing_or_changed=0 after=38 | observations before=85011 missing=0 after=85011 | PASS",
+ "fingerprint_detail": {
+  "pages_content_changed_strong": 0,
+  "pages_frontmatter_changed": 0,
+  "observations_content_changed": 0
+ },
+ "archives": {
+  "pre_migration_receipt_present": false,
+  "backup_dir_entries": 0,
+  "scratch_home_archives": 0,
+  "real_home_archives": 0,
+  "data_dir_backups_dir_entries": 0
+ },
+ "checks": {
+  "opens_under_2.4.0": true,
+  "status_pass": true,
+  "still_v66": true,
+  "server_stopped": true
+ },
+ "pass": true
+}

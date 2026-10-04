@@ -1,0 +1,6 @@
+bash: GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
+FIFO .bash_profile: bash blocked: True | model: unusable bash_profile False
+symlink loop (ELOOP): model unusable/False | bash read nothing: True
+HOME is a regular file (ENOTDIR): model unusable/False | bash read nothing: True
+HOME not searchable (EACCES): model unusable/False | bash read nothing: True
+combinations checked: 512 | mismatches: 0 | negative control (empty file treated as absent) disagrees with real bash in 26 combinations

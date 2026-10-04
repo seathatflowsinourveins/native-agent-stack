@@ -1,0 +1,229 @@
+{
+  "layers": [
+    {
+      "layer_id": "scheduling-supervision",
+      "selection": [
+        {
+          "name": "Dagu (C03)",
+          "repository": "https://github.com/dagucloud/dagu",
+          "role": "Conditional scheduler choice for command-based local workflows: scheduling, visible run history, retries, stop/retry CLI and authenticated MCP. Pair with configured Linux supervision; detached-descendant cancellation remains unqualified.",
+          "install_command": "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh | bash -s -- --version v2.18.1",
+          "install_source": "README and installer help at v2.18.1, commit 3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7.",
+          "basis": [
+            {
+              "url": "https://github.com/dagucloud/dagu/blob/v2.18.1/README.md",
+              "shows": "Existing shell/container workflows, local file-backed history, scheduling, CLI controls and built-in MCP; one binary without an external database."
+            },
+            {
+              "url": "https://github.com/dagucloud/dagu/blob/v2.18.1/scripts/installer.sh",
+              "shows": "Documented version selection and supported systemd service installation. The generated service starts dagu start-all; it does not configure resource caps."
+            },
+            {
+              "url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.1",
+              "shows": "Release published 2026-09-29; Linux amd64 and macOS arm64 binaries."
+            },
+            {
+              "url": "https://github.com/dagucloud/dagu/commit/f5e755c9591b345fde6a1f1cb80733c099d0be3a",
+              "shows": "Default-branch commit dated 2026-10-02; fixes a flaky graceful-stop test. Repository metadata reports unarchived."
+            },
+            {
+              "url": "https://github.com/dagucloud/dagu/actions/runs/36950342641",
+              "shows": "Latest inspected main-branch CI run completed successfully."
+            },
+            {
+              "url": "https://github.com/dagucloud/dagu/actions/runs/36950342645",
+              "shows": "Latest inspected main-branch conformance run completed successfully; no cross-candidate superiority follows."
+            },
+            {
+              "url": "https://github.com/dagucloud/dagu/blob/v2.18.1/internal/runtime/builtin/command/command_unix_test.go",
+              "shows": "Existing test checks original-process-group cleanup after parent death; it does not test descendants escaping through setsid."
+            },
+            {
+              "url": "https://github.com/dagucloud/dagu/blob/v2.18.1/internal/runtime/resourcelimit/guard.go",
+              "shows": "Resource enforcement is explicitly best effort: failure warns and execution continues."
+            },
+            {
+              "url": "https://github.com/dagucloud/dagu/blob/v2.18.1/internal/runtime/resourcelimit/native_linux.go",
+              "shows": "Linux cgroup-v2 CPU/memory limits require accessible cgroups; cleanup does not terminate remaining cgroup processes."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "systemd (C05)",
+          "repository": "https://github.com/systemd/systemd",
+          "role": "Linux supervision component: configured PID/CPU/memory/runtime bounds, service-cgroup cancellation, restart policy and persistent journal. Native macOS is unsupported; effect recovery remains application-specific.",
+          "install_command": "sudo apt-get update -y && sudo apt-get install systemd systemd-sysv -y",
+          "install_source": "Official Microsoft WSL installation instructions. systemd's own v262 README also documents Linux source installation with meson setup, ninja and sudo meson install after prerequisites.",
+          "basis": [
+            {
+              "url": "https://github.com/MicrosoftDocs/WSL/blob/a1473a69d10c9eacdfe5e99f7496652795af28d9/WSL/systemd.md",
+              "shows": "Supported WSL2 setup and Ubuntu/Debian package command; systemd services do not themselves keep WSL alive."
+            },
+            {
+              "url": "https://github.com/systemd/systemd/blob/v262/README",
+              "shows": "Upstream Linux requirements, build/install/test commands and regularly tested amd64/arm64 architectures."
+            },
+            {
+              "url": "https://github.com/systemd/systemd/blob/v262/man/systemd.kill.xml",
+              "shows": "Default KillMode=control-group terminates the unit's remaining processes, escalating after the stop timeout."
+            },
+            {
+              "url": "https://github.com/systemd/systemd/blob/v262/man/systemd.resource-control.xml",
+              "shows": "OS-enforced TasksMax, CPUQuota and MemoryMax controls; explicit configuration is necessary."
+            },
+            {
+              "url": "https://github.com/systemd/systemd/blob/v262/man/journald.conf.xml",
+              "shows": "Persistent journal configuration preserves visible service logs across restarts."
+            },
+            {
+              "url": "https://github.com/systemd/systemd/blob/v262/test/units/TEST-07-PID1.subgroup-kill.sh",
+              "shows": "Existing integration assertions exercise termination of a service inside a nested cgroup."
+            },
+            {
+              "url": "https://github.com/systemd/systemd/blob/v262/test/units/TEST-19-CGROUP.tasks-max-scale.sh",
+              "shows": "Regression assertions verify PID-limit configuration survives daemon reload."
+            },
+            {
+              "url": "https://github.com/systemd/systemd/actions/runs/36944941468",
+              "shows": "Recent coverage workflow completed successfully; its source runs integration tests."
+            },
+            {
+              "url": "https://github.com/systemd/systemd/actions/runs/35141785517",
+              "shows": "Latest inspected build-test workflow failed on 2026-09-16; cause and release applicability were not investigated."
+            },
+            {
+              "url": "https://github.com/systemd/systemd/releases/tag/v262",
+              "shows": "Release published 2026-09-22."
+            },
+            {
+              "url": "https://github.com/systemd/systemd/commit/b43fed88efe34889a49a7710a92141849dc4906d",
+              "shows": "Default-branch commit dated 2026-10-01; repository metadata reports unarchived."
+            }
+          ],
+          "confidence": "high"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "conductor",
+          "reason": "Current and unarchived: v3.32.5 released September 25, default-branch commit October 1. Durable worker orchestration and recovery tests are credible, but local process-tree containment and a target-workload advantage remain unqualified; external effects require idempotent workers under its documented [at-least-once semantics](https://github.com/conductor-oss/conductor/blob/602bf6e97b9b9a4121fc2ef77156a33bf44b582c/docs/architecture/durable-execution.md)."
+        },
+        {
+          "key": "C02",
+          "name": "Prefect",
+          "reason": "Close alternative for Python workflows; current and unarchived, with 3.8.7 released September 26 and a default-branch commit October 1. [Cancellation depends on execution infrastructure](https://github.com/PrefectHQ/prefect/blob/686d93ee93b8f44abe935e4a00cf80349990b9a5/docs/v3/advanced/cancel-workflows.mdx), and result persistence needs configuration. The inspected [main-branch unit-test run failed](https://github.com/PrefectHQ/prefect/actions/runs/36903337533); its cause is unknown, so this alone does not establish inferiority."
+        },
+        {
+          "key": "C04",
+          "name": "Dagster",
+          "reason": "Current and unarchived: 1.13.25 and the latest default-branch commit are dated October 1. Strong asset-oriented orchestration with multiprocessing and monitoring tests, but persistent local storage requires setup and [DefaultRunLauncher lacks worker-crash detection](https://github.com/dagster-io/dagster/blob/a69038cd47003200a1c8fc3540b5855c6d93746e/docs/docs/deployment/execution/run-monitoring.md); no measured advantage for this requirement was established."
+        },
+        {
+          "key": "C06",
+          "name": "pg_durable",
+          "reason": "Current and unarchived: v0.2.8 released September 11, default-branch commit October 1. Its [README](https://github.com/microsoft/pg_durable/blob/0ba88f3cfbf9d4422fd2399c226ea7952bba41a1/README.md) identifies predominantly external workflows as a poor fit; preview-stage SQL orchestration is narrower than general local-command supervision despite a relevant published [upgrade/replay evaluation](https://github.com/microsoft/pg_durable/blob/0ba88f3cfbf9d4422fd2399c226ea7952bba41a1/docs/upgrade-testing.md)."
+        },
+        {
+          "key": "C07",
+          "name": "Temporal",
+          "reason": "Current and unarchived: v1.32.0 released September 11, default-branch commit October 2. Strong durable-workflow finalist with [passing inspected All Tests CI](https://github.com/temporalio/temporal/actions/runs/36952856845) and documented WSL2 development, but the packet does not establish a need for its server/SDK/worker model or qualify OS process-tree containment and operating cost."
+        },
+        {
+          "key": "C08",
+          "name": "Restate",
+          "reason": "Current and unarchived: v1.7.13 released October 1, default-branch commit October 1. Durable invocation history, retries and [cancellation tests](https://github.com/restatedev/restate/blob/08a6f25b8f6ae74557d0fa78d8cdc1b1c22e92cd/crates/worker/src/partition/state_machine/tests/kill_cancel.rs) support application workflows; local OS-process bounds and target-host operating cost remain unqualified. It remains a durable-workflow finalist."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "Compare Dagu+systemd against Prefect+systemd on the actual WSL2 workload with equal persistence, retry, resource and concurrency settings. Test scheduler/worker crashes, reboot during waits, cancellation with detached descendants, and a crash after an external effect commits but before acknowledgement. Measure surviving processes, duplicate/lost effects, retained history, recovery latency, resource use and operator steps. If host-loss recovery or durable long waits are required, qualify Temporal against Restate under those same cases before selecting a durable engine. The packet's unequal recovery comparison names no winner.",
+      "evidence_gaps": [
+        "The packet does not specify workload language, effect semantics or required wait/recovery duration. Dagu is a conditional choice for command workflows; the evidence does not settle Dagu versus Prefect for all local workloads.",
+        "No fair cross-candidate measured superiority was established. Existing suites and observed CI conclusions are evidence of tested coverage, not comparative performance.",
+        "Source verification corrected the initial uncertainty about Dagu: its CPU/memory guard is per DAG run and best effort; cancellation targets the original process group. Detached descendants are not covered by that mechanism. systemd whole-service cancellation does not establish independent per-run cancellation.",
+        "The selected composition has not been tested on the target host. Explicit cgroup caps, persistent history and application idempotency/checkpoints are required; a default installation does not establish recoverable external effects.",
+        "Dagu ships macOS arm64 binaries, but its native CPU/memory guard is unsupported on macOS. systemd requires Linux. Equivalent bounded-tree supervision on native macOS remains unresolved.",
+        "Linux install paths were verified for every candidate. Temporal and Restate provide Darwin arm64 release assets; Conductor provides Linux arm64 containers; Prefect and Dagster document Mac installation. pg_durable's macOS arm64 support remains unverified. This layer needs no GPU.",
+        "All eight repositories are unarchived and have releases and default-branch commits within the 90-day window beginning 2026-07-04. Issue-resolution responsiveness was not established. Dagu has an open queue-scheduling report, whose behavior was not reproduced: https://github.com/dagucloud/dagu/issues/2970.",
+        "Current CI conclusions were sampled for Dagu, systemd, Prefect and Temporal. Conductor, Dagster, pg_durable and Restate test sources were inspected, but current CI outcomes were not verified.",
+        "Restate's current BSL-1.1 license is source-available rather than an Open Source license; this is information only and did not determine its disposition: https://github.com/restatedev/restate/blob/08a6f25b8f6ae74557d0fa78d8cdc1b1c22e92cd/LICENSE.",
+        "Budget used: 30 GitHub API calls, zero web searches and zero successful page fetches. Required context fetching was blocked with 'MCP tool call requires approval, but approval policy is never'. Public pinned Git snapshots/archives supplied README, documentation and test evidence instead; the requested ctx-fetch/search method could not be completed."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/dagucloud/dagu",
+        "https://api.github.com/repos/dagucloud/dagu/releases/latest",
+        "https://api.github.com/repos/dagucloud/dagu/commits?per_page=1",
+        "https://api.github.com/repos/dagucloud/dagu/actions/runs?branch=main&per_page=6",
+        "https://api.github.com/repos/dagucloud/dagu/issues?state=all&sort=updated&direction=desc&per_page=2",
+        "https://api.github.com/repos/systemd/systemd",
+        "https://api.github.com/repos/systemd/systemd/releases/latest",
+        "https://api.github.com/repos/systemd/systemd/commits?per_page=1",
+        "https://api.github.com/repos/systemd/systemd/actions/runs?branch=main&per_page=6",
+        "https://api.github.com/repos/systemd/systemd/actions/workflows/build-test.yml/runs?branch=main&per_page=3",
+        "https://api.github.com/repos/conductor-oss/conductor",
+        "https://api.github.com/repos/conductor-oss/conductor/releases/latest",
+        "https://api.github.com/repos/conductor-oss/conductor/commits?per_page=1",
+        "https://api.github.com/repos/PrefectHQ/prefect",
+        "https://api.github.com/repos/PrefectHQ/prefect/releases/latest",
+        "https://api.github.com/repos/PrefectHQ/prefect/commits?per_page=1",
+        "https://github.com/PrefectHQ/prefect/actions/runs/36903337533",
+        "https://api.github.com/repos/dagster-io/dagster",
+        "https://api.github.com/repos/dagster-io/dagster/releases/latest",
+        "https://api.github.com/repos/dagster-io/dagster/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/pg_durable",
+        "https://api.github.com/repos/microsoft/pg_durable/releases/latest",
+        "https://api.github.com/repos/microsoft/pg_durable/commits?per_page=1",
+        "https://api.github.com/repos/temporalio/temporal",
+        "https://api.github.com/repos/temporalio/temporal/releases/latest",
+        "https://api.github.com/repos/temporalio/temporal/commits?per_page=1",
+        "https://github.com/temporalio/temporal/actions/runs/36952856845",
+        "https://api.github.com/repos/restatedev/restate",
+        "https://api.github.com/repos/restatedev/restate/releases/latest",
+        "https://api.github.com/repos/restatedev/restate/commits?per_page=1",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/README.md",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/scripts/installer.sh",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/internal/runtime/resourcelimit/guard.go",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/internal/runtime/resourcelimit/native_linux.go",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/internal/runtime/resourcelimit/native_unsupported.go",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/internal/runtime/resourcelimit/guard_test.go",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/internal/cmn/cmdutil/lifecycle_unix.go",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/internal/runtime/builtin/command/command_unix_test.go",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/internal/runtime/agent/agent.go",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/.github/workflows/ci.yaml",
+        "https://github.com/dagucloud/dagu/blob/v2.18.1/.github/workflows/conformance.yml",
+        "https://github.com/systemd/systemd/blob/v262/README",
+        "https://github.com/systemd/systemd/blob/v262/man/systemd.kill.xml",
+        "https://github.com/systemd/systemd/blob/v262/man/systemd.resource-control.xml",
+        "https://github.com/systemd/systemd/blob/v262/man/systemd.service.xml",
+        "https://github.com/systemd/systemd/blob/v262/man/systemd.timer.xml",
+        "https://github.com/systemd/systemd/blob/v262/man/journald.conf.xml",
+        "https://github.com/systemd/systemd/blob/v262/test/units/TEST-07-PID1.subgroup-kill.sh",
+        "https://github.com/systemd/systemd/blob/v262/test/units/TEST-19-CGROUP.tasks-max-scale.sh",
+        "https://github.com/systemd/systemd/blob/v262/.github/workflows/coverage.yml",
+        "https://github.com/MicrosoftDocs/WSL/blob/a1473a69d10c9eacdfe5e99f7496652795af28d9/WSL/systemd.md",
+        "https://github.com/conductor-oss/conductor/blob/602bf6e97b9b9a4121fc2ef77156a33bf44b582c/README.md",
+        "https://github.com/conductor-oss/conductor/blob/602bf6e97b9b9a4121fc2ef77156a33bf44b582c/docs/architecture/durable-execution.md",
+        "https://github.com/conductor-oss/conductor/blob/602bf6e97b9b9a4121fc2ef77156a33bf44b582c/core/src/test/java/com/netflix/conductor/core/execution/TestWorkflowExecutor.java",
+        "https://github.com/PrefectHQ/prefect/blob/686d93ee93b8f44abe935e4a00cf80349990b9a5/README.md",
+        "https://github.com/PrefectHQ/prefect/blob/686d93ee93b8f44abe935e4a00cf80349990b9a5/docs/v3/advanced/cancel-workflows.mdx",
+        "https://github.com/PrefectHQ/prefect/blob/686d93ee93b8f44abe935e4a00cf80349990b9a5/docs/v3/advanced/results.mdx",
+        "https://github.com/PrefectHQ/prefect/blob/686d93ee93b8f44abe935e4a00cf80349990b9a5/tests/runner/test__process_manager.py",
+        "https://github.com/dagster-io/dagster/blob/a69038cd47003200a1c8fc3540b5855c6d93746e/docs/docs/getting-started/installation.md",
+        "https://github.com/dagster-io/dagster/blob/a69038cd47003200a1c8fc3540b5855c6d93746e/docs/docs/deployment/execution/run-monitoring.md",
+        "https://github.com/dagster-io/dagster/blob/a69038cd47003200a1c8fc3540b5855c6d93746e/python_modules/dagster/dagster_tests/execution_tests/engine_tests/test_multiprocessing.py",
+        "https://github.com/microsoft/pg_durable/blob/0ba88f3cfbf9d4422fd2399c226ea7952bba41a1/README.md",
+        "https://github.com/microsoft/pg_durable/blob/0ba88f3cfbf9d4422fd2399c226ea7952bba41a1/docs/upgrade-testing.md",
+        "https://github.com/microsoft/pg_durable/blob/0ba88f3cfbf9d4422fd2399c226ea7952bba41a1/tests/e2e/sql/22_cancel_status_consistency.sql",
+        "https://github.com/temporalio/temporal/blob/37aa0e95e59523cd909dbdbdf20169ad7dbc33ae/README.md",
+        "https://github.com/temporalio/temporal/blob/37aa0e95e59523cd909dbdbdf20169ad7dbc33ae/CONTRIBUTING.md",
+        "https://github.com/temporalio/temporal/blob/37aa0e95e59523cd909dbdbdf20169ad7dbc33ae/tests/cancel_workflow_test.go",
+        "https://github.com/restatedev/restate/blob/08a6f25b8f6ae74557d0fa78d8cdc1b1c22e92cd/README.md",
+        "https://github.com/restatedev/restate/blob/08a6f25b8f6ae74557d0fa78d8cdc1b1c22e92cd/crates/worker/src/partition/state_machine/tests/kill_cancel.rs",
+        "https://github.com/restatedev/restate/blob/08a6f25b8f6ae74557d0fa78d8cdc1b1c22e92cd/docs/dev/release-testing.md",
+        "https://github.com/restatedev/restate/releases/tag/v1.7.13"
+      ]
+    }
+  ]
+}

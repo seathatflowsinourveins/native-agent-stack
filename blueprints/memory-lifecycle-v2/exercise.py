@@ -8,16 +8,22 @@ timeout-queue pattern this reuses by attribution: run only inside a namespace th
 no real home, account or memory directory.
 
 Two phases, selected by --phase:
-  pre  -- fresh server against an empty --data-dir; the full 69-call fixture (routing across
+  pre  -- fresh server against an empty --data-dir; the full 71-call fixture (routing across
           4 projects/2 workspaces, documented scopes/global search, a TTL crossing in real
-          wall-clock time, a forget sweep, v1-shape supersession/delete regressions, and a
-          SECOND supersession pair left undeleted). Ends by writing a small handoff file
-          (page ids + the captured as_of instants + expected bodies) to /run/handoff so a
-          later, separate server process can check its own answers against them.
+          wall-clock time, a forget sweep followed by direct reads of both swept pages,
+          v1-shape supersession/delete regressions, and a SECOND supersession pair left
+          undeleted). Ends by writing a small handoff file (page ids + the captured as_of
+          instants + expected bodies) to /run/handoff so a later, separate server process can
+          check its own answers against them.
   post -- a NEW server process against the SAME --data-dir (the caller stops the "pre"
           process fully before starting this one). Reads the handoff file and performs only
-          read-only verification calls, plus one write+read-back to confirm the restarted
-          process is fully live, not just serving frozen state.
+          read-only verification calls (18 in all, including direct reads of the swept and
+          deleted pages), plus one write+read-back to confirm the restarted process is fully
+          live, not just serving frozen state.
+
+Every request is retained with its label and wall-clock send/receive instants in
+records.json (the full protocol exchange) and timeline.json (label -> instants), so the
+real-time TTL ordering can be checked against the server's own reported expiry.
 """
 import argparse
 import datetime
@@ -97,10 +103,11 @@ class Server:
         finally:
             self.replies.put(EOFError('native stdio closed'))
 
-    def request(self, method, params):
+    def request(self, method, params, label=None):
         self._next_id += 1
         ident = self._next_id
         message = {'jsonrpc': '2.0', 'id': ident, 'method': method, 'params': params}
+        sent = now_utc().isoformat()
         self.proc.stdin.write(json.dumps(message) + '\n')
         self.proc.stdin.flush()
         deadline = time.monotonic() + 15
@@ -109,7 +116,9 @@ class Server:
             if isinstance(response, Exception):
                 raise response
             if response.get('id') == ident:
-                self.records.append({'request': message, 'response': response})
+                self.records.append({'label': label, 'sent_utc': sent,
+                                     'received_utc': now_utc().isoformat(),
+                                     'request': message, 'response': response})
                 return response
             if time.monotonic() > deadline:
                 raise TimeoutError('native MCP response deadline exceeded')
@@ -144,15 +153,20 @@ class Server:
         return self.proc.returncode
 
 
-def make_call_fn(server, outcomes):
+def make_call_fn(server, outcomes, timeline):
     def call(label, tool, scope, **arguments):
         """scope is a (workspace, project) pair, or None to omit both (for global=true,
         scopes=[...], and server-default calls)."""
+        if label in outcomes:
+            raise ValueError(f'duplicate fixture label {label}')
         if scope is not None:
             workspace, project = scope
             arguments = {**arguments, 'workspace': workspace, 'project': project}
-        outcomes[label] = server.request('tools/call', {'name': tool, 'arguments': arguments})
+        outcomes[label] = server.request('tools/call', {'name': tool, 'arguments': arguments}, label)
+        record = server.records[-1]
+        timeline[label] = {'sent_utc': record['sent_utc'], 'received_utc': record['received_utc']}
         save('outcomes.json', outcomes)
+        save('timeline.json', timeline)
         return outcomes[label]
     return call
 
@@ -174,7 +188,7 @@ def payload(response):
 
 def run_phase_pre(server):
     outcomes = {}
-    call = make_call_fn(server, outcomes)
+    call = make_call_fn(server, outcomes, {})
     alpha, beta, gamma, delta = (WS1, 'alpha'), (WS1, 'beta'), (WS1, 'gamma'), (WS2, 'delta')
 
     # Group R -- routing/isolation across 4 projects / 2 workspaces.
@@ -237,6 +251,8 @@ def run_phase_pre(server):
     call('expired_past_after_sweep', 'memory_query', alpha, query=TERM['expired_past'],
          include_expired=True)
     call('ttl_after_sweep', 'memory_query', alpha, query=TERM['ttl_short'], include_expired=True)
+    call('ttl_after_sweep_direct_read', 'memory_read_page', alpha, path='notes/ttl-short.md')
+    call('expired_past_after_sweep_direct_read', 'memory_read_page', alpha, path='notes/expired.md')
     call('future_after_sweep', 'memory_query', alpha, query=TERM['future'])
     call('durable_after_sweep', 'memory_query', alpha, query=TERM['durable'])
 
@@ -272,8 +288,8 @@ def run_phase_pre(server):
 
     call('status_pre', 'memory_status', None)
 
-    if len(outcomes) != 69:
-        raise ValueError(f'expected exactly 69 phase-pre native tool calls, got {len(outcomes)}')
+    if len(outcomes) != 71:
+        raise ValueError(f'expected exactly 71 phase-pre native tool calls, got {len(outcomes)}')
 
     old_id = payload(outcomes['write_old'])['page_id']
     new_id = payload(outcomes['write_new'])['page_id']
@@ -293,7 +309,7 @@ def run_phase_pre(server):
 def run_phase_post(server):
     handoff = json.loads(HANDOFF.read_text())
     outcomes = {}
-    call = make_call_fn(server, outcomes)
+    call = make_call_fn(server, outcomes, {})
     alpha, beta, gamma, delta = (WS1, 'alpha'), (WS1, 'beta'), (WS1, 'gamma'), (WS2, 'delta')
 
     for name, scope in [('alpha', alpha), ('beta', beta), ('gamma', gamma), ('delta', delta)]:
@@ -308,14 +324,16 @@ def run_phase_post(server):
     call('revision_deleted_direct_read', 'memory_read_page', alpha, path='notes/revision.md')
     call('ttl_short_gone', 'memory_query', alpha, query=TERM['ttl_short'], include_expired=True)
     call('expired_past_gone', 'memory_query', alpha, query=TERM['expired_past'], include_expired=True)
+    call('ttl_short_direct_read_gone', 'memory_read_page', alpha, path='notes/ttl-short.md')
+    call('expired_past_direct_read_gone', 'memory_read_page', alpha, path='notes/expired.md')
     call('future_present', 'memory_query', alpha, query=TERM['future'])
     call('status_post', 'memory_status', None)
     call('post_restart_write_readback', 'memory_write_page', alpha, path='notes/post-restart.md',
          body=f"# Post-restart fixture\n{TERM['post_restart']} was written after restart.\n")
     call('post_restart_readback_search', 'memory_query', alpha, query=TERM['post_restart'])
 
-    if len(outcomes) != 16:
-        raise ValueError(f'expected exactly 16 phase-post native tool calls, got {len(outcomes)}')
+    if len(outcomes) != 18:
+        raise ValueError(f'expected exactly 18 phase-post native tool calls, got {len(outcomes)}')
     return outcomes, handoff
 
 

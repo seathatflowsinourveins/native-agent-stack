@@ -25,6 +25,14 @@ bounded checks that passed (locked install, peers, typecheck, production build)
 are in [history/recipe-revisions.json](history/recipe-revisions.json). The full
 `make verify` acceptance above ran 16.3.5 and has not been repeated at 16.3.6.
 
+On October 1, 2026 the lock moved to Next.js **16.3.8**, whose release notes list
+seven security advisories; the most severe is the high
+[GHSA-cjq9-62q9-8jv4](https://github.com/vercel/next.js/security/advisories/GHSA-cjq9-62q9-8jv4)
+(server-side request forgery in Image Optimization). pnpm's release-age rule refused
+the first frozen install while the release was a day old; no exclusion was added,
+and the unchanged candidate passed the same bounded checks after the window
+([receipt](../../../evidence/receipts/nextjs-1638-qualification-20261001.json)). `make verify` has not been repeated at 16.3.8.
+
 Two compatibility decisions were made from actual evidence. The latest
 TypeScript 7.0.2 failed the current OpenAPI generator's declared `^5.x` peer and
 native type generation. The accepted project pins the latest supported

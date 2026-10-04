@@ -1,0 +1,55 @@
+{
+  "candidates": [
+    {
+      "name": "claude-codex-actions",
+      "repository": "https://github.com/andrii-artemenko-gen/claude-codex-actions",
+      "why_candidate": "Composite GitHub Actions for Claude Code and Codex, with isolated CLI state and configurable agent permissions; latest release [v1.0.0](https://github.com/andrii-artemenko-gen/claude-codex-actions/releases/tag/v1.0.0), 2026-09-10."
+    },
+    {
+      "name": "claude-code-action (Anthropic)",
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "why_candidate": "GitHub Action running Claude Code on pull requests and issues; latest release [v1](https://github.com/anthropics/claude-code-action/releases/tag/v1), 2025-08-26; default-branch commit [97c5347](https://github.com/anthropics/claude-code-action/commit/97c53473391b), 2026-10-01."
+    },
+    {
+      "name": "claude-code-base-action",
+      "repository": "https://github.com/anthropics/claude-code-base-action",
+      "why_candidate": "Claude Code workflow wrapper with tool-allowlist inputs, maintained as an automated mirror; latest release [beta](https://github.com/anthropics/claude-code-base-action/releases/tag/beta), 2025-05-19; default-branch commit [4bd489c](https://github.com/anthropics/claude-code-base-action/commit/4bd489c7d926), 2026-10-01."
+    },
+    {
+      "name": "CodeForge",
+      "repository": "https://github.com/freema/codeforge",
+      "why_candidate": "Orchestrator with a GitHub Action supporting Claude Code or Codex, custom prompts, and Claude tool allowlists; latest release [v1.1.3](https://github.com/freema/codeforge/releases/tag/v1.1.3), 2026-09-17."
+    },
+    {
+      "name": "GitHub Agentic Workflows",
+      "repository": "https://github.com/github/gh-aw",
+      "why_candidate": "Compiles repository automation into GitHub Actions with Claude Code and Codex engines, sandboxed agent jobs, and scoped output jobs; latest release [v0.89.21](https://github.com/github/gh-aw/releases/tag/v0.89.21), 2026-09-23."
+    },
+    {
+      "name": "codex-action (iCoreTech)",
+      "repository": "https://github.com/icoretech/codex-action",
+      "why_candidate": "Docker-backed GitHub Action running Codex CLI with configurable sandbox settings and documented pull-request and issue workflows; latest release [v0.9.48](https://github.com/icoretech/codex-action/releases/tag/v0.9.48), 2026-10-01."
+    },
+    {
+      "name": "codex-action (OpenAI)",
+      "repository": "https://github.com/openai/codex-action",
+      "why_candidate": "GitHub Action running Codex CLI with privilege-reduction strategies and permission profiles; [latest-release endpoint](https://api.github.com/repos/openai/codex-action/releases/latest) returned HTTP 404; default-branch commit [8636508](https://github.com/openai/codex-action/commit/86365089eb2b), 2026-08-20."
+    },
+    {
+      "name": "multi-llm-security-review",
+      "repository": "https://github.com/shaztechio/multi-llm-security-review",
+      "why_candidate": "Reusable GitHub Actions workflow running Claude Code and Codex security reviews with restricted agent permissions and fix pull requests; latest release [1.0.4](https://github.com/shaztechio/multi-llm-security-review/releases/tag/1.0.4), 2026-10-01."
+    },
+    {
+      "name": "claude-code-action (StepSecurity)",
+      "repository": "https://github.com/step-security/claude-code-action",
+      "why_candidate": "Claude Code GitHub Action for pull requests and issues with configurable triggers, tools, and workflow permissions; latest release [v1.0.183](https://github.com/step-security/claude-code-action/releases/tag/v1.0.183), 2026-08-12."
+    },
+    {
+      "name": "No additional component",
+      "repository": "",
+      "why_candidate": "Direct invocation of the existing Claude Code and Codex CLIs from GitHub Actions run steps using workflow and agent permission controls; component release and date are not applicable."
+    }
+  ],
+  "search_notes": "Verified on 2026-10-02 UTC, corresponding to 2026-10-01 America/New_York; the 90-day cutoff was 2026-07-04 UTC. All nine repository entries were public, unarchived, and MIT- or Apache-2.0-licensed. Each was checked through gh api repos/OWNER/REPO and repos/OWNER/REPO/releases/latest, plus its upstream README. Entries with older releases or a latest-release HTTP 404 qualified through the cited default-branch commit. Discovery covered Claude-action and Codex-action repository names and descriptions mentioning both agents and GitHub Actions. Budget used: 30 GitHub API calls, including README/document API requests; 8 non-API page fetches; 4 web-search queries, which returned no usable results. Repository entries are ordered alphabetically by canonical repository URL, without ranking. PR/issue event wiring and least-privilege configuration remain caller responsibilities for configurable wrappers; multi-llm-security-review documents manual/reusable invocation and needs caller event wiring. The execution assumption is Ubuntu-family Linux CI runners accessible from the stated workstations; native self-hosted WSL2 and macOS arm64 execution was not tested. The direct-CLI baseline is an inference from the documented [Claude Code invocation model](https://github.com/anthropics/claude-code-base-action#trust-model) and [Codex CLI invocation](https://github.com/openai/codex-action#readme). Exhaustive coverage of every public fork is not established within the search budget."
+}

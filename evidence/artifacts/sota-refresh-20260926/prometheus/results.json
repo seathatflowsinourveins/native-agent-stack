@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "id": "prometheus-3150-qualification-20260926",
+  "unit": "prometheus",
+  "host": "nativestack-5975wx-20260925",
+  "date_utc": "2026-09-26",
+  "baseline_version": "3.14.0",
+  "candidate_version": "3.15.0",
+  "upstream": {
+    "release": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0",
+    "release_name": "3.15.0 / 2026-09-24",
+    "published_at": "2026-09-25T08:56:22Z",
+    "immutable_release": true,
+    "tag_commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+    "tag_object": "e9d9395a3ff7b6f3bdb6833f0816e2716efa6dff (annotated, PGP-signed by the release shepherd; GitHub reports verified false, reason bad_email; stage/tag-v3.15.0.json)",
+    "release_notes_review": [
+      "[CHANGE] --log.level is deprecated in favour of runtime.log_level in the configuration; the host unit does not pass --log.level",
+      "[CHANGE] two PromQL changes (subquery step alignment inside unaligned range queries; start-timestamp reset registration); the host's 14 rules evaluated with health ok and the same firing set before and after",
+      "TSDB: XOR2 float chunk encoding stabilised but only selected by storage.tsdb.chunk_encoding.floats or the deprecated feature flag; neither is set here, so the on-disk float chunk format is unchanged (stage/source-checks.txt)",
+      "default scrape_protocols list identical at v3.14.0 and v3.15.0 (config/config.go DefaultScrapeProtocols; OM 2.0 scraping is new but not in the default list)",
+      "new self-metrics such as prometheus_tsdb_head_appenders_created_total, consistent with arm B's 3 extra head series",
+      "about 50 bug fixes, several in TSDB (head GC dropping samples, WAL corruption after a failed write in agent mode, chunk ID overflow, eviction panics after WAL replay) and PromQL"
+    ]
+  },
+  "integrity": {
+    "asset": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
+    "bytes": 111651578,
+    "sha256": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0",
+    "checks": [
+      "equal to the GitHub API asset digest and to the release sha256sums.txt line; sha256sum --check --strict OK (stage/checksum-check.txt)",
+      "installed through the repository's unchanged observability/backends/install.py (sha256 d87c47cf...) run from a scratch copy beside a one-entry pins.json (stage/installer-pins.json), so it verified the archive against the pin and the downloaded checksum file and refused an existing prefix",
+      "installed prefix tools/ecosystem-prometheus-3.15.0 byte-identical to the archive (diff -r)",
+      "prometheus and promtool report version 3.15.0, revision 5241a27f..., equal to the tag commit (stage/versions.txt)"
+    ],
+    "not_checked": "no signature or attestation verified; the release publishes checksums only"
+  },
+  "qualification": {
+    "script": {
+      "rehearse.py": "298f3da94cf02d10baa0d8ed09a74bb9ddccbbb8124f2bcc69a3d55308527c2a"
+    },
+    "R0_config_and_rules": {
+      "3.14.0": {
+        "check_config_exit": 0,
+        "check_rules_exit": 0
+      },
+      "3.15.0": {
+        "check_config_exit": 0,
+        "check_rules_exit": 0
+      }
+    },
+    "R1_copy": {
+      "copy_started_utc": "2026-09-26T04:53:46Z",
+      "copy_seconds": 0.22,
+      "bytes": 115828843
+    },
+    "R1_blocks": 11,
+    "method": "both arms ran side by side on copies of one copy of the live TSDB (taken with cp while the live server ran), with the live config minus `alerting` (no notification could leave) and the self-scrape target moved to the arm's own port; the other targets are the host's live loopback exporters, scraped read-only",
+    "arms": {
+      "A (3.14.0, 127.0.0.1:29190)": {
+        "ready_seconds": 1.04,
+        "up": [
+          [
+            "alertmanager",
+            "127.0.0.1:19093",
+            "1"
+          ],
+          [
+            "collector-health",
+            "127.0.0.1:28888",
+            "1"
+          ],
+          [
+            "collector-native",
+            "127.0.0.1:28889",
+            "1"
+          ],
+          [
+            "loki",
+            "127.0.0.1:13100",
+            "1"
+          ],
+          [
+            "prometheus",
+            "127.0.0.1:19090",
+            "1"
+          ],
+          [
+            "prometheus",
+            "<self>",
+            "1"
+          ],
+          [
+            "qdrant",
+            "127.0.0.1:26333",
+            "1"
+          ],
+          [
+            "vllm",
+            "127.0.0.1:18231",
+            "1"
+          ]
+        ],
+        "rules": [
+          "ok"
+        ],
+        "rule_count": 14,
+        "historical_up_6h": {
+          "series": 7,
+          "samples": 511,
+          "sha256": "22d1cb613b67d5e065f0ad3427a76c23c1ab2a9336b719e8c1d21bade2824298"
+        },
+        "head_series": 10023
+      },
+      "B (3.15.0, 127.0.0.1:29191)": {
+        "ready_seconds": 1.02,
+        "up": [
+          [
+            "alertmanager",
+            "127.0.0.1:19093",
+            "1"
+          ],
+          [
+            "collector-health",
+            "127.0.0.1:28888",
+            "1"
+          ],
+          [
+            "collector-native",
+            "127.0.0.1:28889",
+            "1"
+          ],
+          [
+            "loki",
+            "127.0.0.1:13100",
+            "1"
+          ],
+          [
+            "prometheus",
+            "127.0.0.1:19090",
+            "1"
+          ],
+          [
+            "prometheus",
+            "<self>",
+            "1"
+          ],
+          [
+            "qdrant",
+            "127.0.0.1:26333",
+            "1"
+          ],
+          [
+            "vllm",
+            "127.0.0.1:18231",
+            "1"
+          ]
+        ],
+        "rules": [
+          "ok"
+        ],
+        "rule_count": 14,
+        "historical_up_6h": {
+          "series": 7,
+          "samples": 511,
+          "sha256": "22d1cb613b67d5e065f0ad3427a76c23c1ab2a9336b719e8c1d21bade2824298"
+        },
+        "head_series": 10026
+      }
+    },
+    "comparison": {
+      "up_equal_after_normalizing_self_target": true,
+      "targets_equal": true,
+      "rules_equal": true,
+      "historical_query_equal": true,
+      "vllm_up_samples_1h_equal": true,
+      "raw_up_lists_differ_only_by_self_target": "rehearsal.json R3-compare reports up_values_equal false because arm A's self target is 127.0.0.1:29190 and arm B's is 127.0.0.1:29191; the copied series of the live 127.0.0.1:19090 target appear in both"
+    },
+    "reload": {
+      "A": {
+        "reload_success": true
+      },
+      "B": {
+        "reload_success": true
+      }
+    },
+    "rollback_rehearsal": {
+      "procedure": "arm B (3.15.0) stopped with SIGTERM (exit 0), then 3.14.0 started on the data 3.15.0 had written",
+      "ready_seconds": 1.02,
+      "historical_query_equal_to_B": true,
+      "self_samples_written_by_3_15_0_readable": [
+        "5"
+      ],
+      "rules_health": [
+        "ok"
+      ]
+    },
+    "logs": {
+      "A": {
+        "errors": 0,
+        "warnings": 1
+      },
+      "B": {
+        "errors": 0,
+        "warnings": 1
+      },
+      "B-rollback": {
+        "errors": 0,
+        "warnings": 1
+      }
+    },
+    "log_note": "the one WARN line in each arm is the graceful shutdown on SIGTERM",
+    "repository_test": "tests/test_observability_backends_alerts.py now derives the promtool and amtool paths from observability/backends/pins.json and ran 18 tests OK against promtool 3.15.0, including promtool check rules/config on configure.py renders and promtool test rules"
+  },
+  "switch": {
+    "script": {
+      "switch.py": "ded427ca8854e439377917f11e88a6de78cf269069b7187afea883ee05f9b0b6"
+    },
+    "unit_render": "observability/backends/configure.py with the 3.15.0 pin and the host's saved port overrides, rendered to a scratch root with the live roots substituted, differs from the live unit only in the ExecStart prefix; the loki, grafana, alertmanager and ntfy renders equal their live units (cutover/unit-diff.txt)",
+    "pre": {
+      "buildinfo": {
+        "version": "3.14.0",
+        "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "branch": "HEAD",
+        "buildUser": "root@f423027f4410",
+        "buildDate": "20260817-16:49:19",
+        "goVersion": "go1.26.6"
+      },
+      "rules": {
+        "groups": 2,
+        "rules": 14,
+        "health": [
+          "ok"
+        ],
+        "firing": [
+          "EcosystemFreeLLMAPIHealthUnexpected",
+          "EcosystemOmniRouteHealthUnexpected"
+        ]
+      },
+      "tsdb_head_series": 9058,
+      "historical_up_6h": {
+        "series": 7,
+        "samples": 511,
+        "sha256": "6a44a254d87d1fad1c91344489c45587877bbda0888bd75313649503d9e939f0"
+      }
+    },
+    "unit_installed": {
+      "mode": "0o644",
+      "sha256_before": "6fcf675deb70797d4bffee63dcce81f034a5d77db553f2ed3011b9e60a09c186",
+      "sha256_after": "626530f6d432bbde74463c7d2358c8a53553d240995ea895f6660f244454eba9"
+    },
+    "backup": "the previous unit file was copied to a private scratch directory; it is not published (its only difference is shown in cutover/unit-diff.txt)",
+    "systemd_analyze_verify_exit": 0,
+    "restart": {
+      "daemon_reload_exit": 0,
+      "restart_exit": 0,
+      "ready_seconds_after_restart_call": 0.86
+    },
+    "restart_utc": "2026-09-26T04:56:50Z",
+    "post": {
+      "buildinfo": {
+        "version": "3.15.0",
+        "revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+        "branch": "HEAD",
+        "buildUser": "root@4635dd007a60",
+        "buildDate": "20260925-07:33:45",
+        "goVersion": "go1.27.1"
+      },
+      "rules": {
+        "groups": 2,
+        "rules": 14,
+        "health": [
+          "ok"
+        ],
+        "firing": []
+      },
+      "tsdb_head_series": 9112,
+      "historical_up_6h": {
+        "series": 7,
+        "samples": 511,
+        "sha256": "6a44a254d87d1fad1c91344489c45587877bbda0888bd75313649503d9e939f0"
+      }
+    },
+    "journal_since_restart": {
+      "errors": 0,
+      "warnings": [
+        "time=2026-09-26T00:56:49.763-04:00 level=WARN source=main.go:1249 msg=\"Received an OS signal, exiting gracefully...\" signal=terminated"
+      ]
+    },
+    "compare": {
+      "step": "S3-compare",
+      "utc": "2026-09-26T04:57:35Z",
+      "version_after": "3.15.0",
+      "revision_after": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "up_jobs_instances_equal": true,
+      "up_all_one_after": true,
+      "rules_count_equal": true,
+      "rules_health_after": [
+        "ok"
+      ],
+      "historical_equal": true,
+      "main_pid_changed": true
+    },
+    "bin_links": {
+      "step": "S4-bin-links",
+      "utc": "2026-09-26T04:57:35Z",
+      "prometheus": {
+        "before": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+        "after": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+      },
+      "promtool": {
+        "before": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool",
+        "after": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool"
+      }
+    },
+    "firing_alerts": "before: EcosystemFreeLLMAPIHealthUnexpected and EcosystemOmniRouteHealthUnexpected (endpoints this host does not run); 45 s after the restart none (pending restore); at the 05:17Z read-back the same two were firing again, Alertmanager kept their 2026-09-24T04:25:26Z startsAt (state restored, not re-fired) and ntfy had no new message since 04:55Z (cutover/readback.txt)",
+    "stack_commands": "promtool check config \"$PROMETHEUS_CONFIG\" (SUCCESS, 14 rules) and promtool query instant http://127.0.0.1:19090 up (7 targets up) through bin/promtool 3.15.0 (cutover/stack-commands.out)",
+    "rollback": "restore the previous ExecStart prefix (tools/ecosystem-prometheus-3.14.0/prometheus) in ~/.config/systemd/user/ecosystem-prometheus.service, systemctl --user daemon-reload, systemctl --user restart ecosystem-prometheus.service, and relink bin/prometheus and bin/promtool to the 3.14.0 prefix; the rehearsal showed 3.14.0 opening a TSDB 3.15.0 wrote"
+  },
+  "not_published": [
+    "the release archive and sha256sums.txt (public at the release)",
+    "the TSDB copies and the arm data directories (live metric data)",
+    "the previous unit file backup (private; its only difference is in cutover/unit-diff.txt)"
+  ],
+  "files": [
+    "cutover/readback.txt",
+    "cutover/stack-commands.out",
+    "cutover/switch-run.log",
+    "cutover/switch.json",
+    "cutover/unit-diff.txt",
+    "rehearsal/raw-outputs.json",
+    "rehearsal/rehearsal.json",
+    "rehearse.py",
+    "stage/checksum-check.txt",
+    "stage/install.log",
+    "stage/installation.json",
+    "stage/installer-pins.json",
+    "stage/source-checks.txt",
+    "stage/tag-v3.15.0.json",
+    "stage/versions.txt",
+    "switch.py"
+  ]
+}

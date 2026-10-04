@@ -1,0 +1,204 @@
+2026-09-26 01:29:19.287 [Daemon] Starting daemon...
+2026-09-26 01:29:19.514 [Daemon] Selected port 55261
+2026-09-26 01:29:19.515 [Daemon] Instance acquired (PID: 2628763, port: 55261)
+2026-09-26 01:29:19.525 [Daemon] Web UI server started on port 7700
+2026-09-26 01:29:19.525 [Daemon] Heartbeat started
+2026-09-26 01:29:19.526 [Daemon] Daemon resilience installed
+2026-09-26 01:29:19.526 [Daemon] Agent idle timeout policy started
+2026-09-26 01:29:19.787 [Daemon] Feature handlers registered
+2026-09-26 01:29:19.788 [Daemon] Auth state polling started
+2026-09-26 01:29:19.788 [Daemon] Idle timeout policy started
+2026-09-26 01:29:19.791 [Daemon] Transport server started on port 55261
+2026-09-26 01:29:19.791 [Daemon] Daemon fully started (PID: 2628763, port: 55261)
+2026-09-26 01:29:20.010 [Transport] Client connected: OI8ndwpE96oxG1PcAAAA
+2026-09-26 01:29:20.012 [Transport] Client registered: OI8ndwpE96oxG1PcAAAA (type=cli)
+2026-09-26 01:29:20.028 [Transport] Client disconnected: OI8ndwpE96oxG1PcAAAA
+2026-09-26 01:29:21.148 [Transport] Client connected: ytFtEfQyMQwgo4XpAAAB
+2026-09-26 01:29:21.149 [Transport] Client registered: ytFtEfQyMQwgo4XpAAAB (type=cli)
+2026-09-26 01:29:21.152 [Transport] Client disconnected: ytFtEfQyMQwgo4XpAAAB
+2026-09-26 01:29:22.269 [Transport] Client connected: zkGDy53uN5HQ6JIIAAAC
+2026-09-26 01:29:22.271 [Transport] Client registered: zkGDy53uN5HQ6JIIAAAC (type=cli)
+2026-09-26 01:29:22.274 [Transport] Client disconnected: zkGDy53uN5HQ6JIIAAAC
+2026-09-26 01:29:23.427 [Transport] Client connected: MGXVrYjrfgcR5arUAAAD
+2026-09-26 01:29:23.429 [Transport] Client registered: MGXVrYjrfgcR5arUAAAD (type=cli)
+2026-09-26 01:29:23.432 [Transport] Client disconnected: MGXVrYjrfgcR5arUAAAD
+2026-09-26 01:29:45.464 [Transport] Client connected: WtaDxQxzuAOE7V3LAAAE
+2026-09-26 01:29:45.466 [Transport] Client registered: WtaDxQxzuAOE7V3LAAAE (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:29:45.473 [Transport] Client disconnected: WtaDxQxzuAOE7V3LAAAE
+2026-09-26 01:29:55.155 [Transport] Client connected: eUkhObjHTytGC5tGAAAF
+2026-09-26 01:29:55.157 [Transport] Client registered: eUkhObjHTytGC5tGAAAF (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:29:55.162 [Transport] Task accepted: <uuid> (type=curate, client=eUkhObjHTytGC5tGAAAF)
+2026-09-26 01:29:55.166 [task-history] audit <scratch>/trial-byterover/brv-project — 0 live entries, 0 data files. ok.
+2026-09-26 01:29:55.790 [Transport] Client connected: AsDHzYtAIHQO0Cp-AAAG
+2026-09-26T01:29:55.791Z [agent-process:<scratch>/trial-byterover/brv-project] Connected to daemon (clientId=AsDHzYtAIHQO0Cp-AAAG)
+2026-09-26 01:29:55.797 [Daemon] Loaded project state: <scratch>/trial-byterover/brv-project (config=yes, sessions=0)
+2026-09-26T01:29:55.798Z [agent-process:<scratch>/trial-byterover/brv-project] Initial config loaded from state server
+2026-09-26T01:29:55.798Z [agent-process:<scratch>/trial-byterover/brv-project] Provider: openai-compatible, Model: qwen3.8-27b-local
+2026-09-26T01:29:55.813Z [agent-process:<scratch>/trial-byterover/brv-project] CipherAgent started (session=agent-session-<uuid>, resume=false)
+2026-09-26 01:29:55.815 [Transport] Agent registered: AsDHzYtAIHQO0Cp-AAAG, project=<scratch>/trial-byterover/brv-project
+2026-09-26T01:29:55.816Z [agent-process:<scratch>/trial-byterover/brv-project] Ready — listening for tasks
+2026-09-26 01:29:55.816 [Daemon] Agent forked for: <scratch>/trial-byterover/brv-project (pid=2634996, pool: 1/10)
+2026-09-26T01:29:55.817Z [agent-process:<scratch>/trial-byterover/brv-project] task:execute received taskId=<uuid> type=curate activeTaskCount=1
+2026-09-26T01:29:55.822Z [agent-process:<scratch>/trial-byterover/brv-project] task:started taskId=<uuid> type=curate
+2026-09-26T01:30:07.918Z [agent-process:<scratch>/trial-byterover/brv-project] task:error taskId=<uuid> error=request (12351 tokens) exceeds the available context size (8192 tokens), try increasing it
+2026-09-26 01:30:07.920 [Transport] Task error: <uuid> - [undefined] request (12351 tokens) exceeds the available context size (8192 tokens), try increasing it
+2026-09-26 01:30:07.922 [Transport] Client disconnected: eUkhObjHTytGC5tGAAAF
+2026-09-26 01:30:07.922 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:30:46.035 [Transport] Client connected: fTXHGKmiua3xKkf2AAAH
+2026-09-26 01:30:46.036 [Transport] Client registered: fTXHGKmiua3xKkf2AAAH (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:30:46.041 [Transport] Client disconnected: fTXHGKmiua3xKkf2AAAH
+2026-09-26 01:30:46.041 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:31:42.627 [Transport] Client connected: Kd8ceN01quTh1oj6AAAI
+2026-09-26 01:31:42.629 [Transport] Client registered: Kd8ceN01quTh1oj6AAAI (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:31:42.633 [Transport] Task accepted: <uuid> (type=query, client=Kd8ceN01quTh1oj6AAAI)
+2026-09-26T01:31:42.637Z [agent-process:<scratch>/trial-byterover/brv-project] task:execute received taskId=<uuid> type=query activeTaskCount=1
+2026-09-26T01:31:42.641Z [agent-process:<scratch>/trial-byterover/brv-project] task:started taskId=<uuid> type=query
+2026-09-26T01:31:42.653Z [agent-process:<scratch>/trial-byterover/brv-project] task:completed taskId=<uuid>
+2026-09-26 01:31:42.654 [Transport] Task completed: <uuid>
+2026-09-26 01:31:42.656 [Transport] Client disconnected: Kd8ceN01quTh1oj6AAAI
+2026-09-26 01:31:42.656 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:31:43.781 [Transport] Client connected: -Xv0TkGk2V2o2UxNAAAJ
+2026-09-26 01:31:43.782 [Transport] Client registered: -Xv0TkGk2V2o2UxNAAAJ (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:31:43.784 [Transport] Task accepted: <uuid> (type=search, client=-Xv0TkGk2V2o2UxNAAAJ)
+2026-09-26T01:31:43.787Z [agent-process:<scratch>/trial-byterover/brv-project] task:execute received taskId=<uuid> type=search activeTaskCount=1
+2026-09-26T01:31:43.789Z [agent-process:<scratch>/trial-byterover/brv-project] task:started taskId=<uuid> type=search
+2026-09-26T01:31:43.790Z [agent-process:<scratch>/trial-byterover/brv-project] task:completed taskId=<uuid>
+2026-09-26 01:31:43.790 [Transport] Task completed: <uuid>
+2026-09-26 01:31:43.792 [Transport] Client disconnected: -Xv0TkGk2V2o2UxNAAAJ
+2026-09-26 01:31:43.792 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:38:07.627 [Transport] Client connected: BbvkjEc0y830QENsAAAK
+2026-09-26 01:38:07.629 [Transport] Client registered: BbvkjEc0y830QENsAAAK (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:38:07.631 [Transport] Client disconnected: BbvkjEc0y830QENsAAAK
+2026-09-26 01:38:07.631 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:38:07.745 [Transport] Client connected: 8HzCSFAxdHqba4eQAAAL
+2026-09-26 01:38:07.746 [Transport] Client registered: 8HzCSFAxdHqba4eQAAAL (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:38:07.767 [Transport] Client disconnected: 8HzCSFAxdHqba4eQAAAL
+2026-09-26 01:38:07.767 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:38:09.325 [Transport] Client connected: -dWQWaTkeFO8-hDLAAAM
+2026-09-26 01:38:09.327 [Transport] Client registered: -dWQWaTkeFO8-hDLAAAM (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:38:09.351 [Transport] Client disconnected: -dWQWaTkeFO8-hDLAAAM
+2026-09-26 01:38:09.351 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:38:22.799 [Transport] Client connected: B-gViQKDzHZOFHpNAAAN
+2026-09-26 01:38:22.801 [Transport] Client registered: B-gViQKDzHZOFHpNAAAN (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:38:22.836 [Transport] Client disconnected: B-gViQKDzHZOFHpNAAAN
+2026-09-26 01:38:22.837 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:38:24.047 [Transport] Client connected: ZcGeJ4TZC9TAWgyIAAAO
+2026-09-26 01:38:24.048 [Transport] Client registered: ZcGeJ4TZC9TAWgyIAAAO (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:38:24.065 [Transport] Client disconnected: ZcGeJ4TZC9TAWgyIAAAO
+2026-09-26 01:38:24.066 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:38:45.839 [Transport] Client connected: Ya8neyOG86BUtzfUAAAP
+2026-09-26 01:38:45.841 [Transport] Client registered: Ya8neyOG86BUtzfUAAAP (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:38:45.847 [Transport] Client disconnected: Ya8neyOG86BUtzfUAAAP
+2026-09-26 01:38:45.847 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:38:47.166 [Transport] Client connected: IlvIH12i1i1fBUv0AAAQ
+2026-09-26 01:38:47.168 [Transport] Client registered: IlvIH12i1i1fBUv0AAAQ (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:38:47.172 [Transport] Client disconnected: IlvIH12i1i1fBUv0AAAQ
+2026-09-26 01:38:47.172 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:38:48.554 [Transport] Client connected: pa9zH4M8XMZBQS-eAAAR
+2026-09-26 01:38:48.558 [Transport] Client registered: pa9zH4M8XMZBQS-eAAAR (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:38:48.599 [Transport] Client disconnected: pa9zH4M8XMZBQS-eAAAR
+2026-09-26 01:38:48.599 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:38:50.003 [Transport] Client connected: mri6JjewJG5QSsVqAAAS
+2026-09-26 01:38:50.005 [Transport] Client registered: mri6JjewJG5QSsVqAAAS (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:38:50.014 [Transport] Client disconnected: mri6JjewJG5QSsVqAAAS
+2026-09-26 01:38:50.014 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:39:04.865 [Transport] Client connected: 1DEEvB4XpGVIVgbfAAAT
+2026-09-26 01:39:04.869 [Transport] Client registered: 1DEEvB4XpGVIVgbfAAAT (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:39:04.873 [Transport] Task accepted: <uuid> (type=search, client=1DEEvB4XpGVIVgbfAAAT)
+2026-09-26T01:39:04.878Z [agent-process:<scratch>/trial-byterover/brv-project] task:execute received taskId=<uuid> type=search activeTaskCount=1
+2026-09-26T01:39:04.883Z [agent-process:<scratch>/trial-byterover/brv-project] task:started taskId=<uuid> type=search
+2026-09-26T01:39:04.893Z [agent-process:<scratch>/trial-byterover/brv-project] task:completed taskId=<uuid>
+2026-09-26 01:39:04.894 [Transport] Task completed: <uuid>
+2026-09-26 01:39:04.896 [Transport] Client disconnected: 1DEEvB4XpGVIVgbfAAAT
+2026-09-26 01:39:04.896 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:39:06.336 [Transport] Client connected: HMZcB13Q2VQYazA5AAAU
+2026-09-26 01:39:06.338 [Transport] Client registered: HMZcB13Q2VQYazA5AAAU (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:39:06.341 [Transport] Task accepted: <uuid> (type=search, client=HMZcB13Q2VQYazA5AAAU)
+2026-09-26T01:39:06.346Z [agent-process:<scratch>/trial-byterover/brv-project] task:execute received taskId=<uuid> type=search activeTaskCount=1
+2026-09-26T01:39:06.351Z [agent-process:<scratch>/trial-byterover/brv-project] task:started taskId=<uuid> type=search
+2026-09-26T01:39:06.352Z [agent-process:<scratch>/trial-byterover/brv-project] task:completed taskId=<uuid>
+2026-09-26 01:39:06.353 [Transport] Task completed: <uuid>
+2026-09-26 01:39:06.358 [Transport] Client disconnected: HMZcB13Q2VQYazA5AAAU
+2026-09-26 01:39:06.358 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:39:20.348 [Transport] Client connected: 3x737stYY5t5bAYAAAAV
+2026-09-26 01:39:20.350 [Transport] Client registered: 3x737stYY5t5bAYAAAAV (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:39:20.357 [Transport] Task accepted: <uuid> (type=query, client=3x737stYY5t5bAYAAAAV)
+2026-09-26T01:39:20.361Z [agent-process:<scratch>/trial-byterover/brv-project] task:execute received taskId=<uuid> type=query activeTaskCount=1
+2026-09-26T01:39:20.367Z [agent-process:<scratch>/trial-byterover/brv-project] task:started taskId=<uuid> type=query
+2026-09-26T01:39:20.378Z [agent-process:<scratch>/trial-byterover/brv-project] task:completed taskId=<uuid>
+2026-09-26 01:39:20.379 [Transport] Task completed: <uuid>
+2026-09-26 01:39:20.382 [Transport] Client disconnected: 3x737stYY5t5bAYAAAAV
+2026-09-26 01:39:20.382 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:39:35.766 [Transport] Client connected: cfPD0DwYIk7u8gV1AAAW
+2026-09-26 01:39:35.768 [Transport] Client registered: cfPD0DwYIk7u8gV1AAAW (type=cli, project=<scratch>/trial-byterover/brv-project)
+2026-09-26 01:39:35.776 [Transport] Task accepted: <uuid> (type=query, client=cfPD0DwYIk7u8gV1AAAW)
+2026-09-26T01:39:35.780Z [agent-process:<scratch>/trial-byterover/brv-project] task:execute received taskId=<uuid> type=query activeTaskCount=1
+2026-09-26T01:39:35.785Z [agent-process:<scratch>/trial-byterover/brv-project] task:started taskId=<uuid> type=query
+2026-09-26T01:39:54.797Z [agent-process:<scratch>/trial-byterover/brv-project] task:error taskId=<uuid> error=request (11192 tokens) exceeds the available context size (8192 tokens), try increasing it
+2026-09-26 01:39:54.797 [Transport] Task error: <uuid> - [undefined] request (11192 tokens) exceeds the available context size (8192 tokens), try increasing it
+2026-09-26 01:39:54.799 [Transport] Client disconnected: cfPD0DwYIk7u8gV1AAAW
+2026-09-26 01:39:54.799 [Daemon] Agent marked idle: <scratch>/trial-byterover/brv-project
+2026-09-26 01:41:15.400 [Transport] Client connected: e37PPi_aNv18aJB-AAAX
+2026-09-26 01:41:15.402 [Transport] Client registered: e37PPi_aNv18aJB-AAAX (type=cli, project=/tmp/tmp.5l9iLqZR33)
+2026-09-26 01:41:15.409 [Transport] Client disconnected: e37PPi_aNv18aJB-AAAX
+2026-09-26 01:41:15.522 [Transport] Client connected: TUbgnUPW2m_-nerxAAAY
+2026-09-26 01:41:15.524 [Transport] Client registered: TUbgnUPW2m_-nerxAAAY (type=cli, project=/tmp/tmp.5l9iLqZR33)
+2026-09-26 01:41:15.536 [Transport] Client disconnected: TUbgnUPW2m_-nerxAAAY
+2026-09-26 01:41:16.885 [Transport] Client connected: v2omF3H7pqvSCp2oAAAZ
+2026-09-26 01:41:16.887 [Transport] Client registered: v2omF3H7pqvSCp2oAAAZ (type=cli, project=/tmp/tmp.5l9iLqZR33)
+2026-09-26 01:41:16.930 [Transport] Client disconnected: v2omF3H7pqvSCp2oAAAZ
+2026-09-26 01:41:18.411 [Transport] Client connected: tUnM1Rjj_W-n7FyFAAAa
+2026-09-26 01:41:18.413 [Transport] Client registered: tUnM1Rjj_W-n7FyFAAAa (type=cli, project=/tmp/tmp.5l9iLqZR33)
+2026-09-26 01:41:18.422 [Transport] Client disconnected: tUnM1Rjj_W-n7FyFAAAa
+2026-09-26 01:41:19.912 [Transport] Client connected: 3oAbBk7_QA7kikfKAAAb
+2026-09-26 01:41:19.914 [Transport] Client registered: 3oAbBk7_QA7kikfKAAAb (type=cli, project=/tmp/tmp.5l9iLqZR33)
+2026-09-26 01:41:19.919 [Transport] Client disconnected: 3oAbBk7_QA7kikfKAAAb
+2026-09-26 01:41:21.345 [Transport] Client connected: Tmy6aMFGY-F5MdEbAAAc
+2026-09-26 01:41:21.348 [Transport] Client registered: Tmy6aMFGY-F5MdEbAAAc (type=cli, project=/tmp/tmp.5l9iLqZR33)
+2026-09-26 01:41:21.378 [Transport] Client disconnected: Tmy6aMFGY-F5MdEbAAAc
+2026-09-26 01:41:22.865 [Transport] Client connected: PNzoxxqeeKaJMce3AAAd
+2026-09-26 01:41:22.868 [Transport] Client registered: PNzoxxqeeKaJMce3AAAd (type=cli, project=/tmp/tmp.5l9iLqZR33)
+2026-09-26 01:41:22.871 [Transport] Task accepted: <uuid> (type=search, client=PNzoxxqeeKaJMce3AAAd)
+2026-09-26 01:41:22.874 [task-history] audit /tmp/tmp.5l9iLqZR33 — 0 live entries, 0 data files. ok.
+2026-09-26 01:41:23.614 [Transport] Client connected: hyxAlpr4qoe0KtoxAAAe
+2026-09-26T01:41:23.615Z [agent-process:/tmp/tmp.5l9iLqZR33] Connected to daemon (clientId=hyxAlpr4qoe0KtoxAAAe)
+2026-09-26 01:41:23.620 [Daemon] Loaded project state: /tmp/tmp.5l9iLqZR33 (config=yes, sessions=0)
+2026-09-26T01:41:23.621Z [agent-process:/tmp/tmp.5l9iLqZR33] Initial config loaded from state server
+2026-09-26T01:41:23.621Z [agent-process:/tmp/tmp.5l9iLqZR33] Provider: openai-compatible, Model: qwen3.8-27b-local
+2026-09-26T01:41:23.637Z [agent-process:/tmp/tmp.5l9iLqZR33] CipherAgent started (session=agent-session-<uuid>, resume=false)
+2026-09-26 01:41:23.638 [Transport] Agent registered: hyxAlpr4qoe0KtoxAAAe, project=/tmp/tmp.5l9iLqZR33
+2026-09-26T01:41:23.640Z [agent-process:/tmp/tmp.5l9iLqZR33] Ready — listening for tasks
+2026-09-26 01:41:23.640 [Daemon] Agent forked for: /tmp/tmp.5l9iLqZR33 (pid=2758783, pool: 2/10)
+2026-09-26T01:41:23.641Z [agent-process:/tmp/tmp.5l9iLqZR33] task:execute received taskId=<uuid> type=search activeTaskCount=1
+2026-09-26T01:41:23.646Z [agent-process:/tmp/tmp.5l9iLqZR33] task:started taskId=<uuid> type=search
+2026-09-26T01:41:23.664Z [agent-process:/tmp/tmp.5l9iLqZR33] task:completed taskId=<uuid>
+2026-09-26 01:41:23.664 [Transport] Task completed: <uuid>
+2026-09-26 01:41:23.666 [Transport] Client disconnected: PNzoxxqeeKaJMce3AAAd
+2026-09-26 01:41:23.666 [Daemon] Agent marked idle: /tmp/tmp.5l9iLqZR33
+2026-09-26 01:41:25.080 [Transport] Client connected: ubRicAmYeC_abRziAAAf
+2026-09-26 01:41:25.082 [Transport] Client registered: ubRicAmYeC_abRziAAAf (type=cli, project=/tmp/tmp.5l9iLqZR33)
+2026-09-26 01:41:25.085 [Transport] Task accepted: <uuid> (type=search, client=ubRicAmYeC_abRziAAAf)
+2026-09-26T01:41:25.088Z [agent-process:/tmp/tmp.5l9iLqZR33] task:execute received taskId=<uuid> type=search activeTaskCount=1
+2026-09-26T01:41:25.092Z [agent-process:/tmp/tmp.5l9iLqZR33] task:started taskId=<uuid> type=search
+2026-09-26T01:41:25.093Z [agent-process:/tmp/tmp.5l9iLqZR33] task:completed taskId=<uuid>
+2026-09-26 01:41:25.094 [Transport] Task completed: <uuid>
+2026-09-26 01:41:25.095 [Transport] Client disconnected: ubRicAmYeC_abRziAAAf
+2026-09-26 01:41:25.095 [Daemon] Agent marked idle: /tmp/tmp.5l9iLqZR33
+2026-09-26 01:44:20.826 [Daemon] SIGTERM received
+2026-09-26T01:44:20.826Z [agent-process:<scratch>/trial-byterover/brv-project] Shutting down...
+2026-09-26T01:44:20.826Z [agent-process:/tmp/tmp.5l9iLqZR33] Shutting down...
+2026-09-26 01:44:20.826 [Daemon] Shutdown initiated
+2026-09-26 01:44:20.826 [Daemon] Idle timeout policy stopped
+2026-09-26 01:44:20.826 [Daemon] Agent idle timeout policy stopped
+2026-09-26T01:44:20.826Z [agent-process:/tmp/tmp.5l9iLqZR33] post-work drain (0ms): drained=0 abandoned=0
+2026-09-26T01:44:20.826Z [agent-process:<scratch>/trial-byterover/brv-project] post-work drain (0ms): drained=0 abandoned=0
+2026-09-26 01:44:20.826 [Daemon] Daemon resilience uninstalled
+2026-09-26 01:44:20.826 [Daemon] Heartbeat stopped
+2026-09-26 01:44:20.843 [Daemon] Agent process exited: /tmp/tmp.5l9iLqZR33 (pid=2758783, code=null)
+2026-09-26 01:44:20.844 [Transport] Client disconnected: hyxAlpr4qoe0KtoxAAAe
+2026-09-26 01:44:20.844 [Transport] Agent disconnected! project=/tmp/tmp.5l9iLqZR33
+2026-09-26 01:44:20.845 [Daemon] Agent process exited: <scratch>/trial-byterover/brv-project (pid=2634996, code=null)
+2026-09-26 01:44:20.845 [Daemon] Agent pool shut down
+2026-09-26 01:44:20.846 [Transport] Client disconnected: AsDHzYtAIHQO0Cp-AAAG
+2026-09-26 01:44:20.846 [Transport] Agent disconnected! project=<scratch>/trial-byterover/brv-project
+2026-09-26 01:44:20.848 [Daemon] Shutdown complete

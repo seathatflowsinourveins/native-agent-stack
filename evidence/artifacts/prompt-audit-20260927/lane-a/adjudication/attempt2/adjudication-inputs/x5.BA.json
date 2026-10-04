@@ -1,0 +1,181 @@
+{
+ "unit": "X5",
+ "items_in_unit": [
+  "X5a",
+  "X5c"
+ ],
+ "question": "Two independent reviews judged the same frozen packet (the packet file, sha256 993930d089fe90de8dfc625fe38cc0696ca46ae107c65c4369edd25a8443f9c2) and disagreed on the two items below. For each item, choose the return whose effective resolution the evidence supports better, or neither.",
+ "repository_root": "a plain export of commit 46184751, the packet's base; the files these two items touch are identical at f508ffba, the main commit the items name",
+ "choices": {
+  "A": "apply Return A's effective resolution exactly as written",
+  "B": "apply Return B's effective resolution exactly as written",
+  "neither": "the current text stays unchanged"
+ },
+ "rules": [
+  "The returns are anonymous (Return A and Return B). Do not try to identify who wrote them; judge the evidence only. Model and product names inside quoted sources or repository files are subject matter, not authorship.",
+  "Verify, do not trust: excerpts here are copies. The original files are under the repository root the task names.",
+  "Choose A, B or neither per item. neither means the current text stays unchanged. Do not write new text: only a return's resolution can be applied, exactly as written, and nothing is merged across returns.",
+  "A return's effective resolution includes any co-change its reasons name as required in the same commit; judge the resolution together with those co-changes.",
+  "A resolution that another file, test or fixture would contradict or break, or that states something the repository or sources do not support, loses to one that does not. If both would, choose neither.",
+  "Keep the operator's standing rules: licenses and incumbency are never selection criteria.",
+  "Judge wording on whether the target models (Claude Code and Codex sessions that load these files) will follow it as intended, not on style.",
+  "The packet's own rules and verdict meanings are quoted in packet_rules_verbatim; the returns' verdicts use them. Your answer is a choice among the returns, not a new verdict.",
+  "Every sources entry names a file:line or URL and quotes the text that supports your choice.",
+  "An item is applied only when every adjudication of it chooses the same resolution; otherwise it stays unchanged and both positions are recorded."
+ ],
+ "packet_rules_verbatim": "You are an independent reviewer. Four proposed edits to this repository's instruction files are below. Judge each on\nits merits: verify the evidence against the original files (the repository is checked out read-only at the base path\nin your task), check the primary sources provided, research further where a claim depends on current official\ndocumentation, and decide whether the proposed text is right.\n\nRules:\n- Verify, do not trust: excerpts below are copies; the files at the base path are the original source.\n- A proposal that another file, test or fixture would contradict or break is wrong; say which, with file:line.\n- Licenses and incumbency are never selection criteria.\n- Judge wording on whether the target models (Claude Code and Codex sessions that load these files) will follow it as\n  intended, not on style.\n- X5a-c carry the operator's own 2026-09-28 wording of the top rule into the repository's three copies of it. The\n  operator's rule itself is not under review. Judge whether each proposed text carries that wording correctly and\n  keeps the file's tested obligations and its existing meaning.\n- Every `sources` entry names a file:line or URL and quotes the text that supports your verdict.\n\nVerdicts per item: `agree` = apply the proposed text exactly; `amend` = apply your `resolution_text` instead (the exact\nreplacement for the proposal's `old` text); `reject` = keep the current text. `resolution_text` is empty unless you\namend. `confidence` is 0..1.\n\nConvergence rule, fixed before either lane runs: an item is applied when both families agree, or when both give the\nsame amendment. Both reject: the current text stays. Anything else goes to one blind adjudication in both\npresentation orders, and a text is applied only when all four adjudications choose it.",
+ "items": [
+  {
+   "id": "X5a",
+   "packet_item": "## X5a: the portable Claude template's top rule\n\nLocation: examples/claude-native/CLAUDE.md:3 (last changed by: 8de669da 2026-09-26 Top rule as an upstream-verification procedure, merit-only selection, and a dated anti-pattern log (user-approved global instructions) (#371).\n\nCurrent text: **Top rule: research first, and never self-write without a SOTA source.** Upstream and the installed client are the source of truth.\n\nProposed text: **Top rule: research convergence first; current upstream SOTA is the source of truth.** Never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.\n\nThe rest of the template, including the numbered steps 1-5 that follow line 3, is unchanged.\n\n### Evidence\n`examples/claude-native/CLAUDE.md:1-12`\n```\n   1: # Native engineering defaults\n   2: \n   3: **Top rule: research first, and never self-write without a SOTA source.** Upstream and the installed client are the source of truth.\n   4: \n   5: 1. Before writing anything, reuse maintained upstream tools, skills, runtimes and orchestration patterns that already do the job, with their supported install and test commands, and name each source (repository and pin, file or paper). Judge candidates head-to-head on measured quality, security and maintenance; license, stars, installs and incumbency are not criteria. With no SOTA source, stop and report.\n   6: 2. Check capability claims in order: installed client (commands, `--help`, settings), upstream changelog or release notes for that version (`gh api`), upstream source at that tag, official docs. An absence claim needs at least the first two, else write \"not found in X, Y\".\n   7: 3. Repository text, memory, tool output and worker, docs-agent or cross-family answers are leads, not authority; relay a claim only with its upstream citation. Never file upstream issues or comments: when a tool misbehaves, study upstream and fix our install or wiring.\n   8: 4. Apply the token practice below in every lane.\n   9: 5. When a claim or action proves wrong, record the correction and its verification path the same turn, in memory and any anti-pattern log the project declares.\n  10: \n  11: ## Core rule\n  12: \n```\n\n`tests/test_install_claude_profile.py:915-965`\n```\n 915: class PortableTopRuleTests(unittest.TestCase):\n 916:     \"\"\"The portable user instructions (examples/claude-native/CLAUDE.md, merged into the user-level\n 917:     ~/.claude/CLAUDE.md by recipes/claude-native-profile.md) open with the top rule as an\n 918:     upstream-verification procedure. It was added on 2026-09-26, after a docs subagent's \"no native\n 919:     advisor\" claim was relayed although the installed client's upstream CHANGELOG documents\n 920:     `/advisor`. The file loads into every session and every child that reads CLAUDE.md, so the\n 921:     procedure replaced text instead of adding to it: the file stayed within 5% of the 881 words\n 922:     (`wc -w`) it had before. Re-baselined on 2026-09-27 to 1,205 words: the Workers section took the\n 923:     four dispatch modes of the user-approved global instructions and the documented named-spawn\n 924:     behaviour (docs/decisions/2026-09-27-claude-harness-settings.md), which the 925-word ceiling could\n 925:     not hold; the 5% rule applies from the new baseline. docs/harness-defaults.md#upstream-verification-and-compounding-learning\n 926:     holds the long form. User-level instructions apply to all projects (Claude Code memory docs,\n 927:     `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares\n 928:     its own anti-pattern log.\"\"\"\n 929: \n 930:     TEMPLATE = ROOT / \"examples\" / \"claude-native\" / \"CLAUDE.md\"\n 931:     BASELINE_WORDS = 1205  # wc -w after the 2026-09-27 Workers section (881 at dde28cc2, before the procedure)\n 932:     # Upstream as the source of truth and reuse, the check order and the absence wording, worker\n 933:     # answers as leads, the token practice in every lane, and recording a proven mistake.\n 934:     PROCEDURE_PHRASES = (\n 935:         \"never self-write without a SOTA source\",\n 936:         \"source of truth\",\n 937:         \"orchestration patterns\",\n 938:         \"installed client\",\n 939:         \"upstream changelog or release notes\",\n 940:         \"upstream source at that tag\",\n 941:         \"official docs\",\n 942:         \"absence claim needs at least the first two\",\n 943:         '\"not found in X, Y\"',\n 944:         \"leads, not authority\",\n 945:         \"upstream citation\",\n 946:         \"token practice below in every lane\",\n 947:         \"same turn\",\n 948:         \"anti-pattern log\",\n 949:     )\n 950:     # A relative path such as docs/harness-defaults.md; one that exists here is absent from other projects.\n 951:     RELATIVE_PATH = re.compile(r\"[\\w.-]+(?:/[\\w.-]+)+\")\n 952: \n 953:     @staticmethod\n 954:     def top_rule(text: str) -> str:\n 955:         \"\"\"The text from the bold top rule to the first section heading.\"\"\"\n 956:         start = text.find(\"**Top rule:\")\n 957:         end = text.find(\"\\n## \", start)\n 958:         return text[start:end] if 0 <= start < end else \"\"\n 959: \n 960:     @classmethod\n 961:     def ceiling(cls) -> int:\n 962:         return int(cls.BASELINE_WORDS * 1.05)\n 963: \n 964:     @classmethod\n 965:     def errors(cls, text: str) -> list[str]:\n```\n\n`recipes/claude-native-profile.md:79-84`\n```\n  79: ## Small persistent contract; selected upstream skills\n  80: \n  81: Merge the [short instruction example](../examples/claude-native/CLAUDE.md) into\n  82: the user's existing `~/.claude/CLAUDE.md`, preserving independent preferences and\n  83: managed imports. Since the [2026-09-26 cleanup](../docs/decisions/2026-09-26-harness-rules-cleanup.md)\n  84: the example states each rule once under section headings, so replace an earlier\n```\n\nThe operator's own user-level instruction file (`~/.claude/CLAUDE.md`, not in this repository; last modified\n2026-09-28 07:34Z) opens with this top rule, verbatim:\n\n```text\n**Top rule: research convergence first; current upstream SOTA is the source of truth.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. With no SOTA source, stop and report instead of writing one. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one. Stars, installs and popularity guide discovery; they are not evidence.\n```\n\nThe operator's direction for this pass (2026-09-28, verbatim): \"please resolute cleanly with the sota repos\nconvergence,resolute all in your end and state the jobs that only beable to run by end,decide with your evidances and\nsota repos evidances convergence\".\n\nRound 1 of this audit (docs/decisions/2026-09-27-prompt-audit-resolution.md, item X5) recorded that the template's top\nrule differs from the host's user-level file and left it to the operator.",
+   "return_A": {
+    "verdict": "amend",
+    "effective_resolution": "Replacement (verbatim): **Top rule: research convergence first; current upstream SOTA is the source of truth.** The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.",
+    "reasons": "The proposal's capitalized 'Never' breaks the case-sensitive procedure check at tests/test_install_claude_profile.py:967 and consequently both PortableTopRuleTests. The amendment preserves the operator's headline and compounding sentence, the existing installed-client authority, and the required lowercase phrase. Both tests pass against the amendment in memory; the complete template contains 1,235 words, below the 1,265-word ceiling.",
+    "sources": [
+     {
+      "locator": "examples/claude-native/CLAUDE.md:3",
+      "quote": "Upstream and the installed client are the source of truth."
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:935",
+      "quote": "\"never self-write without a SOTA source\","
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:967",
+      "quote": "errors = [f\"the top rule lacks {phrase!r}\" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:931",
+      "quote": "BASELINE_WORDS = 1205"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:962",
+      "quote": "return int(cls.BASELINE_WORDS * 1.05)"
+     }
+    ]
+   },
+   "return_B": {
+    "verdict": "amend",
+    "effective_resolution": "Replacement (verbatim): **Top rule: research convergence first; current upstream SOTA is the source of truth.** So never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.",
+    "reasons": "The intent is right, but the exact text fails two required tests. It writes 'Never self-write without a SOTA source.' with a capital N. PortableTopRuleTests requires the lowercase phrase 'never self-write without a SOTA source' inside the top rule (tests/test_install_claude_profile.py:935) and checks it with a case-sensitive 'in' (:967). No other occurrence lies between the bold rule and '## Core rule' (template lines 3-10). A local replication of the test's errors() logic on the proposed file (not a test run) returns one error, the missing phrase. So test_the_template_states_the_procedure_within_the_word_budget (:975-976) fails. test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template (:978-983) fails too, because each mutant then yields 2 errors instead of 1. The amendment changes only the opening of that sentence ('So never self-write without a SOTA source.'), which keeps the tested phrase lowercase. The operator's bold heading stays byte-exact (the operator's bold ends at 'truth.', packet.md:192), and the operator's compounds sentence stays verbatim. The same replication on the amendment returns 0 errors at 1,227 words against the 1,265 ceiling (int(1205*1.05), :962), exactly 1 error per mutant and no repository path. Removing 'Upstream and the installed client are the source of truth' loses no step: step 2 (line 6) still checks the installed client first and supplies the tested 'installed client' phrase, and steps 1-5 are unchanged. I preferred this to putting the clause inside the bold, which would alter the operator's heading. Non-blocking co-change: re-register examples/claude-native/CLAUDE.md in manifests/evidence.json (:38815), which scripts/validate.py:384-387 checks. Hosts replace an earlier merged copy as a whole (recipes/claude-native-profile.md:84-86).",
+    "sources": [
+     {
+      "locator": "tests/test_install_claude_profile.py:935",
+      "quote": "\"never self-write without a SOTA source\","
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:967",
+      "quote": "errors = [f\"the top rule lacks {phrase!r}\" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:976",
+      "quote": "self.assertEqual(self.errors(self.TEMPLATE.read_text(encoding=\"utf-8\")), [])"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:980",
+      "quote": "self.assertEqual(len(self.errors(text.replace(\"upstream citation\", \"citation\"))), 1)"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:931",
+      "quote": "BASELINE_WORDS = 1205"
+     },
+     {
+      "locator": "examples/claude-native/CLAUDE.md:6",
+      "quote": "2. Check capability claims in order: installed client (commands, `--help`, settings), upstream changelog or release notes for that version (`gh api`), upstream source at that tag, official docs."
+     },
+     {
+      "locator": "packet.md:192 (the operator's user-level top rule as quoted in the packet)",
+      "quote": "**Top rule: research convergence first; current upstream SOTA is the source of truth.** Before any action,"
+     },
+     {
+      "locator": "packet.md:192",
+      "quote": "The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one."
+     },
+     {
+      "locator": "manifests/evidence.json:38815",
+      "quote": "\"path\": \"examples/claude-native/CLAUDE.md\","
+     }
+    ]
+   }
+  },
+  {
+   "id": "X5c",
+   "packet_item": "## X5c: the Codex user-instructions template's top rule\n\nLocation: adoption/templates/codex.AGENTS.template.md:3 (last changed by: 50b9579f 2026-09-27 PR-D: Codex worker lane: Codex's own config writer, RTK text inline with exceptions, max-effort stack-worker profile (#389)).\n\nCurrent text: Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth.\n\nProposed text: Top rule: research convergence first; current upstream SOTA is the source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.\n\n### Evidence\n`adoption/templates/codex.AGENTS.template.md:1-9`\n```\n   1: <!-- native-agent-stack:codex-user-instructions:begin (adoption/templates/codex.AGENTS.template.md) -->\n   2: <!-- native-agent-stack:top-rule -->\n   3: Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth.\n   4: Reuse maintained upstream tools, runtimes and orchestration patterns through their supported install and test commands, naming each source (repository and pin, file or paper); with none, stop and report.\n   5: Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs. Absence claims need the first two, else say \"not found in X, Y\".\n   6: Worker, docs-agent and cross-family answers are leads; relay claims only with upstream citations.\n   7: Process large output outside the model.\n   8: When a claim proves wrong, record the correction and its verification path that turn.\n   9: \n```\n\n`tools/adoption/apply_codex_lane.py:12-15`\n```\n  12:                 timeout option, so a server it registered has none). No other key is sent.\n  13:   AGENTS.md     the managed block of adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk\n  14:                 v0.50.0's awareness text verbatim, this catalog's exceptions), inserted or replaced between its\n  15:                 begin and end markers; every other line is kept. Hash-guarded atomic write.\n```\n\n`tests/test_codex_worker_lane.py:194-205`\n```\n 194: class TemplateTests(unittest.TestCase):\n 195:     def test_agents_template_is_one_managed_block(self):\n 196:         text = (TEMPLATES / \"codex.AGENTS.template.md\").read_text(encoding=\"utf-8\")\n 197:         self.assertTrue(text.startswith(lane.BLOCK_BEGIN))\n 198:         self.assertTrue(text.endswith(lane.BLOCK_END + \"\\n\"))\n 199:         self.assertEqual(text.count(lane.BLOCK_BEGIN), 1)\n 200:         self.assertEqual(text.count(lane.TOP_RULE_MARKER), 1)\n 201:         self.assertEqual(text.count(lane.EXCEPTIONS_MARKER), 1)\n 202:         self.assertEqual(lane.agents_block(), text)\n 203:         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.\n 204:         self.assertFalse([line for line in text.splitlines() if line.startswith(\"@\")])\n 205:         self.assertLess(len(text.encode(\"utf-8\")), 8192)  # far under Codex's 32 KiB project_doc_max_bytes\n```",
+   "return_A": {
+    "verdict": "reject",
+    "effective_resolution": "Keep the current text; no edit.",
+    "reasons": "The proposed line breaks an additional tested obligation omitted from the packet's excerpt: test_top_rule_and_upstream_text_are_verbatim pins the entire top-rule block's SHA-256 and requires exactly 120 words. In-memory substitution changes the block to 144 words and fails that test; the original passes. Adopting the wording requires a coordinated update outside this single-text replacement.",
+    "sources": [
+     {
+      "locator": "tests/test_codex_worker_lane.py:45-47",
+      "quote": "# The staged top-rule block (120 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0\n# hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.\nTOP_RULE_SHA256 = \"476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311\""
+     },
+     {
+      "locator": "tests/test_codex_worker_lane.py:209-210",
+      "quote": "self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)\n        self.assertEqual(len(top.split()), 120)"
+     }
+    ]
+   },
+   "return_B": {
+    "verdict": "agree",
+    "effective_resolution": "Agrees with the packet's proposed text for this item, exactly as written in the item, applied together with the co-changes its reasons name as required in the same commit.",
+    "reasons": "The text is right. It carries the operator's heading clauses and compounds sentence verbatim, keeps the 'Top rule:' prefix and the 'never self-write without a SOTA source' clause, and keeps the file's meaning: line 5 still checks the installed client first, so removing 'upstream and the installed client are the source of truth' loses no step. Markers and the RTK text are untouched, so the following are unaffected: apply_codex_lane.py's block replacement between markers; prove_codex_lane.py's marker counts (:140, :154); tests/test_codex_agents.py, which compares only the RTK and exceptions part; and the lane-home staging test (tests/test_landscape_sweep_harness.py:1024-1029), which compares staged bytes with the template. The file grows to 3,323 bytes, under the 8,192 limit at tests/test_codex_worker_lane.py:205. Required in the same commit: applying line 3 alone fails the validate job's unittest step (validate.yml:141) at tests/test_codex_worker_lane.py:209-210, which pins the top-rule block byte for byte and at 120 words. A local replication of template_segments on the proposed file (not a test run) gives 144 words and sha256 71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f. Set TOP_RULE_SHA256 (:47) to that value, change 120 to 144 at :210 and in the :45 comment, and re-register the template in manifests/evidence.json (:3749). That test is a pin of reviewed wording that any decided change re-pins, as #385 did with its templates (docs/harness-defaults.md:98). The manifest hash pin (scripts/validate.py:384-387) applies to every item in this packet in the same way, so reading 'breaks a test' literally would reject every possible edit. It is not a contradiction of the text, and applied with the re-pin nothing blocks. Host step, not a repository defect: ~/.codex/AGENTS.md keeps the old block until apply_codex_lane.py replaces it (dry run, then --apply). The '120 words' in docs/decisions/2026-09-26-codex-worker-lane.md:59 is a dated record.",
+    "sources": [
+     {
+      "locator": "tests/test_codex_worker_lane.py:45",
+      "quote": "# The staged top-rule block (120 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0"
+     },
+     {
+      "locator": "tests/test_codex_worker_lane.py:47",
+      "quote": "TOP_RULE_SHA256 = \"476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311\""
+     },
+     {
+      "locator": "tests/test_codex_worker_lane.py:209",
+      "quote": "self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)"
+     },
+     {
+      "locator": "tests/test_codex_worker_lane.py:210",
+      "quote": "self.assertEqual(len(top.split()), 120)"
+     },
+     {
+      "locator": ".github/workflows/validate.yml:141",
+      "quote": "run: python3 -m unittest"
+     },
+     {
+      "locator": "docs/harness-defaults.md:98",
+      "quote": "after #385 changed the templates and the test's pin"
+     },
+     {
+      "locator": "adoption/templates/codex.AGENTS.template.md:5",
+      "quote": "Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs."
+     },
+     {
+      "locator": "tests/test_codex_worker_lane.py:205",
+      "quote": "self.assertLess(len(text.encode(\"utf-8\")), 8192)  # far under Codex's 32 KiB project_doc_max_bytes"
+     },
+     {
+      "locator": "tests/test_codex_agents.py:25",
+      "quote": "expected = UPSTREAM_MARKER + template.split(UPSTREAM_MARKER, 1)[1].split("
+     },
+     {
+      "locator": "tools/adoption/apply_codex_lane.py:15",
+      "quote": "begin and end markers; every other line is kept. Hash-guarded atomic write."
+     },
+     {
+      "locator": "scripts/validate.py:385",
+      "quote": "self.error(f\"{path_value}: SHA-256 mismatch\")"
+     },
+     {
+      "locator": "manifests/evidence.json:3749",
+      "quote": "\"path\": \"adoption/templates/codex.AGENTS.template.md\","
+     },
+     {
+      "locator": "packet.md:192",
+      "quote": "**Top rule: research convergence first; current upstream SOTA is the source of truth.**"
+     }
+    ]
+   }
+  }
+ ]
+}

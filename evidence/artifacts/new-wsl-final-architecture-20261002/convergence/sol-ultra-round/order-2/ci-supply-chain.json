@@ -1,0 +1,257 @@
+{
+  "layers": [
+    {
+      "layer_id": "ci-supply-chain",
+      "selection": [
+        {
+          "name": "C03 — zizmor",
+          "repository": "https://github.com/zizmorcore/zizmor",
+          "role": "Workflow security: scoped permissions, action pinning, credential handling and injection checks. Callable by agents through its CLI.",
+          "install_command": "uv tool install zizmor==1.30.1",
+          "install_source": "https://github.com/zizmorcore/zizmor/blob/main/docs/installation.md — documented uv installation, with the verified release version substituted.",
+          "basis": [
+            {
+              "url": "https://github.com/zizmorcore/zizmor/blob/7edf1f06b3da7b9093f85b583014a9f9036dc496/docs/audits.md",
+              "shows": "Explicit excessive-permissions and unpinned-uses audits directly match the requirement."
+            },
+            {
+              "url": "https://github.com/zizmorcore/zizmor/blob/7edf1f06b3da7b9093f85b583014a9f9036dc496/.github/workflows/ci.yml",
+              "shows": "Upstream runs feature-enabled Rust tests across Linux, macOS and Windows, plus schema and documentation checks."
+            },
+            {
+              "url": "https://github.com/zizmorcore/zizmor/actions/runs/36816993562",
+              "shows": "Completed, successful CodSpeed benchmark run; establishes maintained performance testing, not superiority over another candidate."
+            },
+            {
+              "url": "https://github.com/zizmorcore/zizmor/actions/runs/36816993610",
+              "shows": "Successful Linux x86_64 and macOS arm64 wheel builds support both target platforms."
+            },
+            {
+              "url": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1",
+              "shows": "Latest release published 2026-09-09, within 90 days."
+            },
+            {
+              "url": "https://api.github.com/repos/zizmorcore/zizmor/commits?per_page=1",
+              "shows": "Latest default-branch commit dated 2026-10-01."
+            },
+            {
+              "url": "https://github.com/zizmorcore/zizmor/issues/2422",
+              "shows": "Recent issue activity through 2026-10-01; does not establish a response-time guarantee."
+            }
+          ],
+          "confidence": "high"
+        },
+        {
+          "name": "C06 — actionlint (kjanat)",
+          "repository": "https://github.com/kjanat/actionlint",
+          "role": "Workflow correctness: syntax, expressions, action inputs, reusable workflows and embedded scripts. Complements zizmor through an agent-callable CLI.",
+          "install_command": "go install actionlint.kjanat.dev/cmd/actionlint@v1.17.0",
+          "install_source": "https://github.com/kjanat/actionlint/blob/f45fbd2f408424ef20fa300d6b8386ba92a3d3d7/README.md — documented @latest command, with the verified release tag substituted.",
+          "basis": [
+            {
+              "url": "https://github.com/kjanat/actionlint/blob/f45fbd2f408424ef20fa300d6b8386ba92a3d3d7/README.md",
+              "shows": "Documents complementary workflow validation. Its generated comparison with rhysd 1.7.12 produces three findings per arm on one fixture, with different diagnostic coverage; this is not general measured superiority."
+            },
+            {
+              "url": "https://github.com/kjanat/actionlint/blob/f45fbd2f408424ef20fa300d6b8386ba92a3d3d7/.github/workflows/ci.yml",
+              "shows": "Defines cross-platform Go tests, race/coverage checks, binary smoke tests and integration fixtures."
+            },
+            {
+              "url": "https://github.com/kjanat/actionlint/commit/f45fbd2f408424ef20fa300d6b8386ba92a3d3d7/checks",
+              "shows": "All six returned HEAD check suites were queued; a passing HEAD CI result was not verified."
+            },
+            {
+              "url": "https://github.com/kjanat/actionlint/releases/tag/v1.17.0",
+              "shows": "Release published 2026-09-13; includes Linux amd64 and Darwin arm64 binaries."
+            },
+            {
+              "url": "https://api.github.com/repos/kjanat/actionlint/commits?per_page=1",
+              "shows": "Latest default-branch commit dated 2026-09-25."
+            },
+            {
+              "url": "https://github.com/kjanat/actionlint/issues/207",
+              "shows": "Issue activity dated 2026-09-29."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C07 — Syft",
+          "repository": "https://github.com/anchore/syft",
+          "role": "Inventory installed packages and built artifacts from filesystems, images and archives; publish SPDX or CycloneDX SBOMs. Agent integration is through its CLI.",
+          "install_command": "curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin v1.54.0",
+          "install_source": "https://github.com/anchore/syft/blob/main/README.md and https://github.com/anchore/syft/blob/main/install.sh — documented installer and supported release-tag argument.",
+          "basis": [
+            {
+              "url": "https://github.com/anchore/syft/blob/c33fa32cf100ae1094f13dd977ce7520717b486b/README.md",
+              "shows": "Dedicated artifact/filesystem inventory with multiple package ecosystems and SPDX/CycloneDX output; does not require adding vulnerability scanning."
+            },
+            {
+              "url": "https://github.com/anchore/syft/actions/runs/36928103466",
+              "shows": "Successful integration, Linux unit/CLI tests, and Linux/macOS acceptance tests at the evaluated commit."
+            },
+            {
+              "url": "https://github.com/anchore/syft/releases/tag/v1.54.0",
+              "shows": "Release published 2026-10-01 with Linux amd64 and macOS arm64 assets."
+            },
+            {
+              "url": "https://api.github.com/repos/anchore/syft/commits?per_page=1",
+              "shows": "Latest default-branch commit dated 2026-10-01."
+            },
+            {
+              "url": "https://github.com/anchore/syft/issues/5357",
+              "shows": "Recent issue activity through 2026-10-01."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C01 — attest",
+          "repository": "https://github.com/actions/attest",
+          "role": "Bind published artifacts and SBOMs to signed workflow provenance. Selected for public GitHub repositories; supplies artifact attribution, not check-log recovery or repair.",
+          "install_command": "permissions:\n  contents: read\n  id-token: write\n  attestations: write\nsteps:\n  - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2\n    with:\n      subject-path: '<PATH TO BUILT ARTIFACT>'",
+          "install_source": "https://github.com/actions/attest/blob/main/README.md — documented workflow installation; immutable v4.2.2 reference corroborated by https://github.com/zizmorcore/zizmor/blob/7edf1f06b3da7b9093f85b583014a9f9036dc496/.github/workflows/release-binaries.yml.",
+          "basis": [
+            {
+              "url": "https://github.com/actions/attest/blob/a0eb68d51f3a5d373e107cfa9c8455ba800479cd/README.md",
+              "shows": "Signed provenance and SBOM attestations with artifact digests, repository association and verification through GitHub CLI. Public repositories are supported on all current plans; private/internal use requires Enterprise Cloud."
+            },
+            {
+              "url": "https://github.com/actions/attest/blob/a0eb68d51f3a5d373e107cfa9c8455ba800479cd/.github/workflows/ci.yml",
+              "shows": "Linux-hosted tests demonstrate job-scoped permissions, locked npm installation and an actual attestation invocation."
+            },
+            {
+              "url": "https://github.com/actions/attest/actions/runs/36040089654",
+              "shows": "TypeScript tests and the hosted attest-action test both completed successfully."
+            },
+            {
+              "url": "https://github.com/actions/attest/releases/tag/v4.2.2",
+              "shows": "Latest release published 2026-08-04, within 90 days."
+            },
+            {
+              "url": "https://api.github.com/repos/actions/attest/commits?per_page=1",
+              "shows": "Latest default-branch commit dated 2026-09-24."
+            },
+            {
+              "url": "https://github.com/actions/attest/issues/495",
+              "shows": "Issue opened and closed on 2026-09-17."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C08",
+          "name": "Grype",
+          "reason": "Current branch and September release, but vulnerability scanning adds no defined artifact/database gap in this packet. https://api.github.com/repos/anchore/grype"
+        },
+        {
+          "key": "C12",
+          "name": "osv-scanner",
+          "reason": "Current branch and September release, but no OSV database or vulnerability-coverage gap is specified. https://api.github.com/repos/google/osv-scanner"
+        },
+        {
+          "key": "C05",
+          "name": "Trivy",
+          "reason": "Current, credible SBOM alternative with substantial upstream tests; retain as the close-call alternative to Syft because inventory superiority was not measured. https://github.com/aquasecurity/trivy/blob/main/.github/workflows/test.yaml"
+        },
+        {
+          "key": "C09",
+          "name": "Dependabot",
+          "reason": "Current dependency-update library, but standalone use requires an additional entrypoint; it does not directly supply the complete clean-host workflow path. https://github.com/dependabot/dependabot-core/blob/main/README.md"
+        },
+        {
+          "key": "C10",
+          "name": "codeql-sarif",
+          "reason": "Current CodeQL/SARIF tooling, but no CodeQL database or SARIF-ingestion gap is specified to justify another hosted integration. https://github.com/github/codeql-action/blob/main/README.md"
+        },
+        {
+          "key": "C04",
+          "name": "gitleaks",
+          "reason": "July default-branch activity satisfies freshness, although its latest release is March; secret detection does not fill a specified gap in the selected set. https://api.github.com/repos/gitleaks/gitleaks"
+        },
+        {
+          "key": "C02",
+          "name": "poutine",
+          "reason": "Fresh July branch and successful Linux/macOS CI, with useful MCP and organization scanning; May release and unmeasured incremental Actions coverage leave it a close-call alternative to zizmor. https://github.com/boostsecurityio/poutine/actions/runs/29041523309"
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C11",
+          "name": "actionlint (rhysd)",
+          "criterion": "stale_or_archived",
+          "fact": "Unarchived, but latest default-branch commit is 2026-04-19, before the 2026-07-03 cutoff. Recent issue closures and July pushed_at do not satisfy the frozen default-branch criterion. https://api.github.com/repos/rhysd/actionlint/commits?per_page=1"
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The set is provisional on capability fit, not measured superiority. On WSL2 x86_64, compare Syft and Trivy against the same digest-pinned images and installed filesystem, measuring package/version recall, false inventory entries, determinism, scan time and memory; repeat installation on macOS arm64. Compare zizmor plus kjanat/actionlint against poutine on identical labelled Actions fixtures, measuring permission/pinning/injection coverage and false positives. When a real Actions check fails, qualify an upstream CI-repair skill separately: recover the correct run/job logs, preserve check attribution, make a minimal repair and obtain a passing rerun. No packet comparison establishes that repair outcome.",
+      "evidence_gaps": [
+        "Exactly 30 GitHub API calls were used, including two GraphQL calls for source, release, issue and check data; no web searches were used. All candidate archive flags and default-branch dates were checked. The 90-day cutoff is 2026-07-03.",
+        "No target-host head-to-head was supplied or executed. Upstream suites and successful checks establish verification practices, not comparative accuracy or speed.",
+        "The selected set does not establish reproducible build hashes, complete application dependency locking, live-process inventory, or CI-repair competence. Syft inventories filesystems/artifacts; scan the actual installed runtime or final artifact rather than only source manifests.",
+        "Linux binaries and upstream Linux tests support expected WSL2 compatibility, but WSL2 execution was not measured. The local CLI selections have macOS arm64 release support; attest was verified on hosted Linux. No selected role requires the RTX 4090.",
+        "Agent-callable CLIs are documented, but end-to-end Claude Code/Codex execution was not tested. Poutine explicitly documents MCP integration. Lower-fit candidates were not exhaustively qualified for installation and platform behavior.",
+        "Version substitutions in installation commands follow documented installation patterns. Syft's bootstrap URL remains mutable. The attest release SHA was corroborated by published upstream usage rather than a separate tag-dereference API call.",
+        "Automatic approval review rejected ctx_fetch_and_index because it requires approval while this session's approval policy is never. No pages were successfully fetched or indexed, and ctx_search retrieval could not be completed. Documentation was instead read from public GitHub API source blobs; the requested webpage-indexing workflow remains unfulfilled."
+      ],
+      "sources_read": [
+        "https://api.github.com/graphql",
+        "https://api.github.com/repos/anchore/grype",
+        "https://api.github.com/repos/anchore/grype/commits?per_page=1",
+        "https://api.github.com/repos/google/osv-scanner",
+        "https://api.github.com/repos/google/osv-scanner/commits?per_page=1",
+        "https://api.github.com/repos/aquasecurity/trivy",
+        "https://api.github.com/repos/aquasecurity/trivy/commits?per_page=1",
+        "https://api.github.com/repos/dependabot/dependabot-core",
+        "https://api.github.com/repos/dependabot/dependabot-core/commits?per_page=1",
+        "https://api.github.com/repos/github/codeql-action",
+        "https://api.github.com/repos/github/codeql-action/commits?per_page=1",
+        "https://api.github.com/repos/rhysd/actionlint",
+        "https://api.github.com/repos/rhysd/actionlint/commits?per_page=1",
+        "https://api.github.com/repos/kjanat/actionlint",
+        "https://api.github.com/repos/kjanat/actionlint/commits?per_page=1",
+        "https://api.github.com/repos/kjanat/actionlint/releases/latest",
+        "https://api.github.com/repos/anchore/syft",
+        "https://api.github.com/repos/anchore/syft/commits?per_page=1",
+        "https://api.github.com/repos/anchore/syft/releases/latest",
+        "https://api.github.com/repos/gitleaks/gitleaks",
+        "https://api.github.com/repos/gitleaks/gitleaks/commits?per_page=1",
+        "https://api.github.com/repos/zizmorcore/zizmor",
+        "https://api.github.com/repos/zizmorcore/zizmor/commits?per_page=1",
+        "https://api.github.com/repos/zizmorcore/zizmor/releases/latest",
+        "https://api.github.com/repos/actions/attest",
+        "https://api.github.com/repos/actions/attest/commits?per_page=1",
+        "https://api.github.com/repos/actions/attest/releases/latest",
+        "https://api.github.com/repos/boostsecurityio/poutine",
+        "https://api.github.com/repos/boostsecurityio/poutine/commits?per_page=1",
+        "https://github.com/zizmorcore/zizmor/blob/main/README.md",
+        "https://github.com/zizmorcore/zizmor/blob/main/docs/installation.md",
+        "https://github.com/zizmorcore/zizmor/blob/main/docs/audits.md",
+        "https://github.com/zizmorcore/zizmor/blob/main/.github/workflows/ci.yml",
+        "https://github.com/zizmorcore/zizmor/blob/main/.github/workflows/benchmark.yml",
+        "https://github.com/zizmorcore/zizmor/blob/main/.github/workflows/release-binaries.yml",
+        "https://github.com/anchore/syft/blob/main/README.md",
+        "https://github.com/anchore/syft/blob/main/install.sh",
+        "https://github.com/anchore/syft/blob/main/.github/workflows/validations.yaml",
+        "https://github.com/anchore/syft/blob/main/.goreleaser.yaml",
+        "https://github.com/actions/attest/blob/main/README.md",
+        "https://github.com/actions/attest/blob/main/action.yml",
+        "https://github.com/actions/attest/blob/main/package.json",
+        "https://github.com/actions/attest/blob/main/.github/workflows/ci.yml",
+        "https://github.com/kjanat/actionlint/blob/master/README.md",
+        "https://github.com/kjanat/actionlint/blob/master/go.mod",
+        "https://github.com/kjanat/actionlint/blob/master/.github/workflows/ci.yml",
+        "https://github.com/kjanat/actionlint/blob/master/.goreleaser.yaml",
+        "https://github.com/boostsecurityio/poutine/blob/main/README.md",
+        "https://github.com/boostsecurityio/poutine/blob/main/Makefile",
+        "https://github.com/dependabot/dependabot-core/blob/main/README.md",
+        "https://github.com/aquasecurity/trivy/blob/main/README.md",
+        "https://github.com/aquasecurity/trivy/blob/main/.github/workflows/test.yaml",
+        "https://github.com/github/codeql-action/blob/main/README.md",
+        "https://github.com/gitleaks/gitleaks/blob/master/README.md"
+      ]
+    }
+  ]
+}

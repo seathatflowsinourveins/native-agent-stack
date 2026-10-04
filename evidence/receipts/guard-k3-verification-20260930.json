@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "guard-k3-verification-20260930",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "The tightened command guard (scripts/hooks/secret_path_guard.py, sha256 a70a056fc27524c65ea5ce4db43fe712cabb44cf9b171866abf805d7306d3b51, PR #511 head 05acdf96) was checked on 2026-09-30 against the installed guard it replaces (sha256 f9be81b240762dc58da874f135040d182ca9fb5e9056ab9b8a977dd909453244). Every check found no command the installed guard refuses that this guard allows: the acceptance oracle (65 cases, 0 mismatches), a side-by-side probe and a launcher option-value probe (0 loosened rows each), and a replay of 1,490 documented repository commands (0 newly blocked, 0 loosened, 0 reason changed). Run through a real hook process, four inputs from the third GPT-6 verification were refused with exit 2, one stderr line and no command echo in 0.06 to 0.14 s; the installed guard timed out at 10 s on three of them and took 4.03 s on the fourth. A read-only GPT-6 verification of this head (the fourth, after one repair round) found no command the installed guard refuses and this guard allows; its one blocking-labelled finding is a command that the installed guard also allows, recorded with a documentation note as residuals for the next guard change.",
+  "limitations": [
+    "Local integration on one host plus read-only cross-family reviews, not a proof: the checks compare two text heuristics on finite corpora (the repository's test tables, fenced commands and generated mutations), and a review that finds nothing does not show that nothing exists.",
+    "Timings are wall-clock times on one host under its load at the time (a load average of about 7 to 20 during the day); the hook timeout of 10 s is this host's settings value, and a slower host has less margin.",
+    "The unit suite's one failure is by design: test_host_profile_copy_is_verbatim compares the installed host copy with the repository file, and the host copy stays the installed guard until the change is merged and reinstalled after the Gate A window closes.",
+    "Residuals carried to the next guard change (K4): `set 0 < /dev/null; set 0</dev/null` and nested forms are allowed by both guards because segment deduplication drops a descriptor-bearing duplicate; the module docstring and docs omit the conservative fallback for commands containing a \\x01 byte."
+  ],
+  "evidence_class": "local integration (the guard's acceptance oracle, probes, a documented-command replay, the unit suite and a real hook process on this host) plus two read-only cross-family reviews by GPT-6 (gpt-6-astra, effort max) through the OmniRoute gateway lane",
+  "recorded_at_utc": "2026-09-30T06:20:00Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the repository checkout at the PR head"
+  },
+  "data": {
+    "guard_sha256": "a70a056fc27524c65ea5ce4db43fe712cabb44cf9b171866abf805d7306d3b51",
+    "installed_guard_sha256": "f9be81b240762dc58da874f135040d182ca9fb5e9056ab9b8a977dd909453244",
+    "pr_head": "05acdf96c7cddc1015d2628f2c61ea1a8acb0eca",
+    "gates": {
+      "acceptance_oracle": "summary: 65 cases, 0 mismatches (phase base)",
+      "side_by_side_probe": "loosened rows: 0",
+      "launcher_option_value_probe": "loosened rows: 0",
+      "documented_command_replay": "replayed 1490 distinct documented commands (1758 lines); newly blocked: 0; loosened: 0; reason changed: 0",
+      "unit_suite": "Ran 46 tests; FAILED (failures=1): test_host_profile_copy_is_verbatim, by design",
+      "validate": "{\"components\": 69, \"hashed_files\": 8296, \"profiles\": 4, \"receipts\": 174, \"status\": \"passed\"} before this receipt"
+    },
+    "real_hook_timing_seconds": {
+      "note": "inert command strings passed to the hook process on stdin as the PreToolUse payload; limit 10 s",
+      "xdg_config_home_default_x6000_102016_chars": {"this_guard": 0.07, "installed_guard": "timeout at 10 s"},
+      "hf_home_default_x6000_54016_chars": {"this_guard": 0.06, "installed_guard": "timeout at 10 s"},
+      "proc_x16000_80017_chars": {"this_guard": 0.06, "installed_guard": "timeout at 10 s"},
+      "find_ok_x49000_196017_chars": {"this_guard": 0.14, "installed_guard": 4.03},
+      "every_refusal": "exit 2, one stderr line, no echo of the command"
+    },
+    "reviews": [
+      {"round": "verification 3 of the pre-repair candidate (sha256 678cd174...)", "reviewer": "GPT-6 gpt-6-astra, effort max, read-only, OmniRoute gateway lane", "result": "all 15 blocking strings of the two earlier reviews fixed; new: 1 blocking (procps personality selectors with the clustered ps loosening), 1 high (store-path regexes quadratic before any work accounting, inherited from the installed guard), 1 medium (a find action prefix walk), 1 low (a separated number read as a descriptor), friction notes, 2 notes"},
+      {"round": "one repair round", "result": "ps loosening removed; every command also read as the installed guard reads it, refused if either reading refuses; four store-path patterns rewritten as linear scans; find prefix walked by index; descriptor adjacency; docs corrected"},
+      {"round": "verification 4 of this head", "reviewer": "GPT-6 gpt-6-astra, effort max, read-only, OmniRoute gateway lane", "result": "every verification 3 finding fixed; no command the installed guard refuses is allowed; 1 blocking-labelled finding against the unmerged pre-repair candidate (a descriptor deduplication case the installed guard also allows) and 1 documentation note, both residuals for K4"}
+    ]
+  },
+  "provenance": {
+    "commands": [
+      "python3 -B guard_oracle.py <checkout>",
+      "python3 -B guard_probe_final.py <installed guard copy> <checkout guard>",
+      "python3 -I probe_launcher_values.py <installed guard copy> <checkout guard>",
+      "python3 -B guard_diff_corpus.py <installed guard copy> <checkout guard> <checkout>",
+      "python3 -I hook_timing.py <guard>",
+      "python3 -m unittest tests.test_secret_path_guard",
+      "python3 scripts/validate.py",
+      "codex exec -p stack-worker -s read-only -m cx/gpt-6-astra -c model_reasoning_effort=max -o review.md - < prompt.txt"
+    ],
+    "withheld": "the harness and review files live in the key-management lane's private state directory; the published values are copied from their outputs",
+    "decision_record": "docs/decisions/2026-09-29-key-management.md and the guard section of docs/secret-storage.md"
+  }
+}

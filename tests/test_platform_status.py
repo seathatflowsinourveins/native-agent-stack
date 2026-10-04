@@ -340,15 +340,282 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class LayerScopeAndSupersedeTests(unittest.TestCase):
+    """A receipt with layer_refs binds only to winners of the layers it names; a superseded generation binds to
+    nothing, so an agreed earlier generation cannot outlive a dissented successor."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.r = _Root(Path(tmp.name))
+
+    def _rewrite(self, path: str, **fields) -> dict:
+        receipt = json.loads((self.r.root / path).read_text(encoding="utf-8"))
+        receipt.update(fields)
+        (self.r.root / path).write_text(json.dumps(receipt), encoding="utf-8")
+        return receipt
+
+    def _status(self, layer=None, platform_id="macos-arm64"):
+        return ps.platform_status(platform_id, _winner(), ps.load_context(self.r.root), layer=layer)
+
+    def test_a_scoped_receipt_binds_only_in_its_layers(self):
+        path = self.r.receipt()
+        self._rewrite(path, layer_refs=[{"catalog": "foundation", "layer_id": "native-clients"}])
+        self.assertEqual(self._status("foundation/native-clients").status, "accepted")
+        self.assertEqual(self._status("foundation/workers").status, "untested")
+        # A caller that names no layer gets no scoped evidence (fail closed).
+        self.assertEqual(self._status(None).status, "untested")
+
+    def test_an_unscoped_receipt_binds_in_every_layer(self):
+        self.r.receipt()
+        for layer in (None, "foundation/native-clients", "foundation/workers"):
+            self.assertEqual(self._status(layer).status, "accepted")
+
+    def test_a_scoped_fail_blocks_only_its_layer(self):
+        self.r.receipt(observed_at="2026-09-23T01:00:00Z", host="mac")
+        fail = self.r.receipt(result="fail", observed_at="2026-09-23T02:00:00Z", host="mac")
+        self._rewrite(fail, layer_refs=[{"catalog": "foundation", "layer_id": "workers"}])
+        self.assertEqual(self._status("foundation/native-clients").status, "accepted")
+        self.assertNotEqual(self._status("foundation/workers").status, "accepted")
+
+    def test_a_superseded_agreed_receipt_does_not_outlive_a_dissented_successor(self):
+        first = self.r.receipt(host="mac")
+        self.assertEqual(self._status().status, "accepted")
+        receipt = json.loads((self.r.root / first).read_text(encoding="utf-8"))
+        receipt["id"] += "-2"
+        receipt["supersedes"] = receipt["id"][:-2]
+        receipt["reviews"][-1]["verdict"] = "needs_changes"
+        second = first.replace(".json", "-2.json")
+        (self.r.root / second).write_text(json.dumps(receipt), encoding="utf-8")
+        derived = self._status()
+        self.assertEqual(derived.status, "not_established")
+        self.assertEqual(derived.receipt_refs, (second,))
+        summary = ps.load_context(self.r.root).summary
+        self.assertEqual(ps.superseded_paths(summary, "widget"), {first})
+        entries = {entry["path"]: entry for entry in ps._platform_receipts(summary, "widget", "macos-arm64")}
+        self.assertEqual(entries[second]["supersedes_path"], first)
+        self.assertIsNone(entries[first]["supersedes_path"])
+
+    # Cross-family review of this change (GPT-6, finding 2): supersession retires acceptance evidence, never a
+    # failure. A native_proven fail keeps blocking until a later native pass for the same host, platform, pin,
+    # stage and layer; a superseding partial, synthetic or other-platform receipt is no such pass.
+    def _successor(self, path: str, **fields) -> str:
+        receipt = json.loads((self.r.root / path).read_text(encoding="utf-8"))
+        predecessor = receipt["id"]
+        receipt.update(id=predecessor + "-2", supersedes=predecessor, observed_at_utc=receipt["observed_at_utc"][:11]
+                       + "05:00:00Z")
+        for review in receipt["reviews"]:
+            review["at_utc"] = receipt["observed_at_utc"]
+        for key, value in fields.items():
+            if key == "host":
+                receipt["host"].update(value)
+            else:
+                receipt[key] = value
+        successor = path.replace(".json", "-2.json")
+        (self.r.root / successor).write_text(json.dumps(receipt), encoding="utf-8")
+        return successor
+
+    def _linux_accepted_by_registered_evidence(self):
+        self.r.register("evidence/receipts/widget-run.json")
+        return ps.platform_status("linux-wsl2-x86_64", _winner(evidence_refs=["evidence/receipts/widget-run.json"]),
+                                  ps.load_context(self.r.root), layer="foundation/workers")
+
+    def test_a_superseded_native_fail_keeps_blocking_without_a_later_native_pass(self):
+        linux_fail = {"platform_id": "linux-wsl2-x86_64", "result": "fail", "host": "wsl"}
+        for label, fields in (
+                ("partial", {"result": "partial"}),
+                ("synthetic", {"result": "pass", "evidence_class": "synthetic"}),
+                ("other platform", {"result": "pass", "host": {"platform_id": "macos-arm64", "os": "macos",
+                                                                "architecture": "arm64"}})):
+            with self.subTest(successor=label):
+                self.setUp()
+                fail = self.r.receipt(**linux_fail)
+                self._successor(fail, **fields)
+                derived = self._linux_accepted_by_registered_evidence()
+                self.assertEqual(derived.status, "conditional", derived)
+                self.assertIn(fail, derived.reason)
+
+    def test_a_later_native_pass_clears_a_superseded_fail(self):
+        fail = self.r.receipt(platform_id="linux-wsl2-x86_64", result="fail", host="wsl")
+        self._successor(fail, result="pass", commands=[{"cmd": "widget run --input sample.json", "exit": 0,
+                                                         "duration_s": 0.1, "output_sha256": "0" * 64,
+                                                         "output_excerpt": "widget"}])
+        self.assertEqual(self._linux_accepted_by_registered_evidence().status, "accepted")
+
+    def test_a_superseded_pass_does_not_clear_an_earlier_fail(self):
+        self.r.receipt(platform_id="linux-wsl2-x86_64", result="fail", host="wsl",
+                       observed_at="2026-09-23T01:00:00Z")
+        later_pass = self.r.receipt(platform_id="linux-wsl2-x86_64", host="wsl")   # 2026-09-24
+        self._successor(later_pass, result="partial")
+        self.assertEqual(self._linux_accepted_by_registered_evidence().status, "conditional")
+
+    def test_a_pass_scoped_to_another_layer_does_not_clear_a_fail(self):
+        self.r.receipt(platform_id="linux-wsl2-x86_64", result="fail", host="wsl")
+        later_pass = self.r.receipt(platform_id="linux-wsl2-x86_64", host="wsl")
+        self._rewrite(later_pass, layer_refs=[{"catalog": "foundation", "layer_id": "native-clients"}])
+        self.assertEqual(self._linux_accepted_by_registered_evidence().status, "conditional")
+
+    # Finding 3: a host receipt cited in a winner's evidence_refs is judged only by the receipt route (binding,
+    # review, layer scope, supersession), never as a generic registered artifact.
+    def test_a_cited_host_receipt_is_not_a_registered_artifact(self):
+        for label, prepare in (
+                ("out of layer", lambda path: self._rewrite(
+                    path, layer_refs=[{"catalog": "foundation", "layer_id": "native-clients"}])),
+                ("superseded", lambda path: self._successor(path, result="partial")),
+                ("unreviewed", lambda path: self._rewrite(path, reviews=json.loads(
+                    (self.r.root / path).read_text(encoding="utf-8"))["reviews"][:1]))):
+            with self.subTest(receipt=label):
+                self.setUp()
+                path = self.r.receipt(platform_id="linux-wsl2-x86_64", host="wsl")
+                prepare(path)
+                self.r.registered.append({"path": path, "sha256": "0" * 64, "bytes": 2})
+                self.r._write_evidence()
+                derived = ps.platform_status("linux-wsl2-x86_64", _winner(evidence_refs=[path]),
+                                             ps.load_context(self.r.root), layer="foundation/workers")
+                self.assertNotEqual(derived.status, "accepted", derived)
+                self.assertNotIn(path, ps.registered_evidence_refs(_winner(evidence_refs=[path]),
+                                                                   ps.load_context(self.r.root).registered_paths))
+
+    # Finding 1: scripts/verdict_review_gate.py derives the base-trusted status from a summary filtered to trusted
+    # receipts. An untrusted successor added by the same pull request must not retire a trusted base failure.
+    def test_an_untrusted_successor_does_not_retire_a_trusted_failure(self):
+        from scripts import verdict_review_gate as gate
+        fail = self.r.receipt(platform_id="linux-wsl2-x86_64", result="fail", host="wsl")
+        self._successor(fail, result="pass", commands=[{"cmd": "widget run --input sample.json", "exit": 0,
+                                                         "duration_s": 0.1, "output_sha256": "0" * 64,
+                                                         "output_excerpt": "widget"}])
+        self.r.register("evidence/receipts/widget-run.json")
+        winner = _winner(evidence_refs=["evidence/receipts/widget-run.json"])
+        context = ps.load_context(self.r.root)
+        self.assertEqual(ps.platform_status("linux-wsl2-x86_64", winner, context).status, "accepted")
+
+        class Trust:   # base-trusted: the failure and the evidence file, not the head's successor
+            def trusted(self, paths):
+                return {path for path in paths if path in {fail, "evidence/receipts/widget-run.json"}}
+
+            def snapshot_entry(self, entry):   # no base receipt changed bytes here
+                return None
+
+        restricted, _untrusted = gate.BaseTrust.context(Trust(), context, winner["evidence_refs"], "widget",
+                                                        "linux-wsl2-x86_64")
+        self.assertEqual(ps.platform_status("linux-wsl2-x86_64", winner, restricted).status, "conditional")
+        # Supersession is recomputed from the receipts that remain, not inherited from the dropped successor.
+        self.assertEqual(ps.superseded_paths(context.summary, "widget"), {fail})
+        self.assertEqual(ps.superseded_paths(restricted.summary, "widget"), set())
+
+
+class SupersedeVersionAndForkTests(unittest.TestCase):
+    """PR #321 verification: a successor retires its predecessor only at the same component version (vllm -3 at
+    0.30.0 must not retire -2's agreed 0.25.0 evidence), and a forked chain (two successors of one receipt) is no
+    acceptance evidence, while a failure on it still blocks."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.r = _Root(Path(tmp.name))
+
+    def _successor(self, path: str, generation: int, supersedes: str, *, verdict="agree", version=None,
+                   result="pass") -> str:
+        receipt = json.loads((self.r.root / path).read_text(encoding="utf-8"))
+        base_id = receipt["id"]
+        receipt.update(id=f"{base_id}-{generation}", supersedes=supersedes, result=result,
+                       observed_at_utc=receipt["observed_at_utc"][:11] + f"0{generation}:30:00Z")
+        receipt["commands"][0]["exit"] = 0 if result == "pass" else 1
+        if version is not None:
+            receipt["tool_versions"]["widget"] = version
+        for review in receipt["reviews"]:
+            review["at_utc"] = receipt["observed_at_utc"]
+        receipt["reviews"][-1]["verdict"] = verdict
+        successor = path.replace(".json", f"-{generation}.json")
+        (self.r.root / successor).write_text(json.dumps(receipt), encoding="utf-8")
+        return successor
+
+    def _status(self, platform_id="macos-arm64", **winner):
+        return ps.platform_status(platform_id, _winner(**winner), ps.load_context(self.r.root))
+
+    def test_a_successor_at_another_version_retires_nothing(self):
+        first = self.r.receipt(host="mac")
+        base_id = json.loads((self.r.root / first).read_text(encoding="utf-8"))["id"]
+        self._successor(first, 2, base_id, verdict="needs_changes", version="2.0.0")
+        self.assertEqual(ps.superseded_paths(ps.load_context(self.r.root).summary, "widget"), set())
+        derived = self._status()
+        self.assertEqual((derived.status, derived.receipt_refs), ("accepted", (first,)))
+        # The 2.0.0 receipt binds only to a 2.0.0 pin, where its dissent withholds acceptance.
+        self.assertNotEqual(self._status(pin="2.0.0").status, "accepted")
+        # The same pair at one version is a correction: the dissented successor retires the agreed first run.
+        self._successor(first, 2, base_id, verdict="needs_changes")
+        self.assertEqual(ps.superseded_paths(ps.load_context(self.r.root).summary, "widget"), {first})
+        self.assertEqual(self._status().status, "not_established")
+
+    def test_a_later_same_version_generation_retires_an_earlier_one_across_another_version(self):
+        # Final check, finding 2: v1 agree <- v2 agree <- v1 needs_changes is a valid linear chain; record forces
+        # superseding the latest generation, so the v1 correction must retire the earlier v1 run through the v2 one.
+        first = self.r.receipt(host="mac")
+        base_id = json.loads((self.r.root / first).read_text(encoding="utf-8"))["id"]
+        other_version = self._successor(first, 2, base_id, version="2.0.0")
+        self._successor(first, 3, base_id + "-2", verdict="needs_changes")
+        summary = ps.load_context(self.r.root).summary
+        self.assertEqual(ps.superseded_paths(summary, "widget"), {first})
+        self.assertEqual(self._status().status, "not_established")
+        derived = self._status(pin="2.0.0")
+        self.assertEqual((derived.status, derived.receipt_refs), ("accepted", (other_version,)))
+
+    def test_a_forked_chain_withholds_acceptance(self):
+        first = self.r.receipt(host="mac")
+        base_id = json.loads((self.r.root / first).read_text(encoding="utf-8"))["id"]
+        agreed = self._successor(first, 2, base_id)
+        dissented = self._successor(first, 3, base_id, verdict="needs_changes")
+        summary = ps.load_context(self.r.root).summary
+        self.assertEqual(ps.non_current_paths(summary, "widget"), {first, agreed, dissented})
+        self.assertEqual(self._status().status, "not_established")
+        # The linear chain A <- A-2 <- A-3 gives the same answer from its last generation.
+        self._successor(first, 3, base_id + "-2", verdict="needs_changes")
+        self.assertEqual(ps.non_current_paths(ps.load_context(self.r.root).summary, "widget"), {first, agreed})
+        self.assertEqual(self._status().status, "not_established")
+
+    def test_a_fail_on_a_forked_chain_still_blocks(self):
+        self.r.register("evidence/receipts/widget-run.json")
+        first = self.r.receipt(platform_id="linux-wsl2-x86_64", host="wsl")
+        base_id = json.loads((self.r.root / first).read_text(encoding="utf-8"))["id"]
+        self._successor(first, 2, base_id, result="fail")
+        self._successor(first, 3, base_id)   # a pass, but on the other branch of the fork: it clears nothing
+        derived = self._status("linux-wsl2-x86_64", evidence_refs=["evidence/receipts/widget-run.json"])
+        self.assertEqual(derived.status, "conditional", derived)
+
+    def test_a_fork_is_recomputed_after_trust_filtering(self):
+        from scripts import verdict_review_gate as gate
+        first = self.r.receipt(host="mac")
+        base_id = json.loads((self.r.root / first).read_text(encoding="utf-8"))["id"]
+        agreed = self._successor(first, 2, base_id)
+        self._successor(first, 3, base_id, verdict="needs_changes")
+        context = ps.load_context(self.r.root)
+        self.assertEqual(ps.platform_status("macos-arm64", _winner(), context).status, "not_established")
+
+        class Trust:   # the base had the linear chain first <- agreed; the head's forking receipt is untrusted
+            def trusted(self, paths):
+                return {path for path in paths if path in {first, agreed}}
+
+            def snapshot_entry(self, entry):   # no base receipt changed bytes here
+                return None
+
+        restricted, _untrusted = gate.BaseTrust.context(Trust(), context, [], "widget", "macos-arm64")
+        self.assertEqual(ps.non_current_paths(restricted.summary, "widget"), {first})
+        self.assertEqual(ps.platform_status("macos-arm64", _winner(), restricted).status, "accepted")
+
+
 class RecorderHandoffContractTests(unittest.TestCase):
     """The interface agent-lab-17's record_verdicts.py imports (agreed 2026-09-23). If this
     changes, that recorder breaks: change both together."""
 
     def test_signature(self):
-        self.assertEqual(list(inspect.signature(ps.platform_status).parameters), ["platform_id", "winner", "context"])
+        # ``layer`` (the winner's "<catalog>/<layer_id>", for receipts with layer_refs) is keyword-only and optional,
+        # so the positional three-argument call record_verdicts.py started with still works.
+        self.assertEqual(list(inspect.signature(ps.platform_status).parameters),
+                         ["platform_id", "winner", "context", "layer"])
+        self.assertEqual(inspect.signature(ps.platform_status).parameters["layer"].kind, inspect.Parameter.KEYWORD_ONLY)
         self.assertEqual(list(inspect.signature(ps.load_context).parameters), ["root"])
         self.assertEqual(list(inspect.signature(ps.declared_status_error).parameters),
-                         ["platform_id", "declared", "winner", "context"])
+                         ["platform_id", "declared", "winner", "context", "layer"])
         self.assertEqual(ps.PlatformStatus._fields, ("status", "reason", "receipt_refs"))
         self.assertEqual(set(ps.STATUS_RANK), {"untested", "not_established", "conditional", "accepted"})
 

@@ -13,6 +13,8 @@ agentsview session list --server http://127.0.0.1:17384 \
   --include-one-shot --include-automated --include-children --json
 ```
 
+Since 2026-09-27 the workstation's archive unit requires a token ([token on the archive API](native-dashboards.md#token-on-the-archive-api-2026-09-27)). Set `AGENTSVIEW_DATA_DIR` to the archive and drop `--server`, or add `--server-token-file`.
+
 This recovery refreshed the same current Codex file and two previously selected Claude files. All three commands returned `synced`. The Codex archive record increased from 2,249 to 2,753 messages, and its latest recorded event advanced from 02:30:21 UTC to 13:27:39 UTC. The completed Claude records remained at 19 and 6 messages. All 17 session identities were preserved; every unselected row was unchanged.
 
 The [native dashboard](http://127.0.0.1:17384/) rendered 17 sessions and 3,697 total messages, matching the native command's records. It displayed the selected Codex session and archive synchronization as “just now.” This is a refreshed snapshot: later conversation events require another explicit refresh. Fourteen top-level rows and seventeen rows including children are different, legitimate scopes.

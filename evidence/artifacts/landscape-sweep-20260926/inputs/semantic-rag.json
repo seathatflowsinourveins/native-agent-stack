@@ -1,0 +1,216 @@
+{
+ "catalog": "foundation",
+ "layer_id": "semantic-rag",
+ "title": "Semantic code retrieval",
+ "requirement": "Answer conceptual code questions using a scoped local index and a compatible embedding service, with recoverable state.",
+ "research_status": "on_requirement_change",
+ "next_action": "Freeze target-project questions and expected source spans; measure retrieval/watcher correctness, latency, memory and restore on the destination hardware.",
+ "requirement_sha256": "3f19f7ecc004bfd0a4a22e68146ddf26ce85e0eca4290a76f9124d4711cd80f9",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "socraticode",
+   "repository": "https://github.com/giancarloerra/SocratiCode",
+   "pin": "1.14.0",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "qdrant",
+   "repository": "https://github.com/qdrant/qdrant",
+   "pin": "1.19.1",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "vllm",
+   "repository": "https://github.com/vllm-project/vllm",
+   "pin": "0.25.0",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Hugging Face Hub native CLI",
+   "repository": "https://github.com/huggingface/huggingface_hub",
+   "disposition": "overlap"
+  },
+  {
+   "name": "code-memory",
+   "repository": "https://github.com/kapillamba4/code-memory",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Haystack",
+   "repository": "https://github.com/deepset-ai/haystack",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "pgvector",
+   "repository": "https://github.com/pgvector/pgvector",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "LanceDB",
+   "repository": "https://github.com/lancedb/lancedb",
+   "disposition": "unqualified"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "ai-memory",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "pin": "2.3.2",
+   "upstream": {
+    "latest": "v2.4.1",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 8428,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "huggingface-hub-native",
+   "repository": "https://github.com/huggingface/huggingface_hub",
+   "pin": "1.32.0",
+   "upstream": {
+    "latest": "v2.0.0",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 3935,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "qdrant",
+   "repository": "https://github.com/qdrant/qdrant",
+   "pin": "1.19.1",
+   "upstream": {
+    "latest": "v1.19.1",
+    "released_at": "2026-09-04",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 34827,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "restic",
+   "repository": "https://github.com/restic/restic",
+   "pin": "0.19.1",
+   "upstream": {
+    "latest": "v0.19.1",
+    "released_at": "2026-07-05",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 36256,
+    "license": "BSD-2-Clause",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "socraticode",
+   "repository": "https://github.com/giancarloerra/SocratiCode",
+   "pin": "1.14.0",
+   "upstream": {
+    "latest": "v1.15.0",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-24",
+    "stars": 3317,
+    "license": "AGPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "vllm",
+   "repository": "https://github.com/vllm-project/vllm",
+   "pin": "0.30.0",
+   "upstream": {
+    "latest": "v0.30.0",
+    "released_at": "2026-09-22",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 92684,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "No held-out or cross-model retrieval-quality benchmark exists. native-rag.json shows one real question answered correctly, and hf-memory-model-qualification.md shows four upstream examples ranked first. Both establish compatibility, not quality.",
+  "SocratiCode index/watcher recovery is not_established (catalogs/foundation/decisions.json, project-semantic-index lifecycle). Restores are established only for Qdrant snapshot/query state: same-host, and a hosted job with synthetic state and local-integration composition.",
+  "Restore on an independent physical host, lost-key/account recovery, native-client rebinding and whole-stack recovery are not established.",
+  "Only vLLM 0.25.0 is accepted on this WSL host. 0.29.0 failed to initialize. The upstream latest, v0.30.0, has not been tested, and untested does not mean failed.",
+  "Freshness after the project changes has to be checked against the current source before retrieved code is relied on. Another project or index needs its own scope."
+ ],
+ "overturn_when": "A sealed project/domain retrieval set shows improved source-grounded quality and acceptable latency, memory and lifecycle costs, or a supported target model cannot run in the current service.",
+ "sweep_20260923": {
+  "survived": [
+   "https://github.com/ollama/ollama"
+  ],
+  "refuted": [
+   "https://github.com/cocoindex-io/cocoindex",
+   "https://github.com/huggingface/text-embeddings-inference",
+   "https://github.com/continuedev/continue"
+  ]
+ },
+ "known_repositories": [
+  "cocoindex-io/cocoindex",
+  "coir-team/coir",
+  "continuedev/continue",
+  "deepset-ai/haystack",
+  "embeddings-benchmark/mteb",
+  "giancarloerra/socraticode",
+  "https://huggingface.co/ibm-granite/granite-embedding-311m-multilingual-r2",
+  "https://huggingface.co/microsoft/harrier-oss-v1-0.6b",
+  "huggingface/huggingface_hub",
+  "huggingface/text-embeddings-inference",
+  "kapillamba4/code-memory",
+  "lancedb/lancedb",
+  "ollama/ollama",
+  "pgvector/pgvector",
+  "qdrant/qdran",
+  "vllm-project/vllm"
+ ],
+ "seeded_candidates_20260926": [
+  "PyLate (ColBERT late interaction; coordinator P2)",
+  "FlagEmbedding/BGE-M3 (coordinator P2)",
+  "HippoRAG (coordinator P2)",
+  "vLLM v0.30.0 already in production for embeddings (winner pin 0.25.0; re-verdict owned by coordinator)",
+  "giancarloerra/SocratiCode v1.15.0 (2026-09-24)"
+ ]
+}

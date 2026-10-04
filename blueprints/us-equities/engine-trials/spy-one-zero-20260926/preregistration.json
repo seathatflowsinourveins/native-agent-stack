@@ -1,0 +1,1032 @@
+{
+  "schema_version": 1,
+  "id": "spy-one-zero-engine-trials-20260926",
+  "kind": "preregistration",
+  "title": "SPY one_zero engine trials: ml4t-backtest 0.1.12 and Lumibot 4.6.1 against the LEAN oracle",
+  "drafted_utc": "2026-09-26T05:03:50Z",
+  "frozen_before_execution": true,
+  "state_at_this_commit": "Nothing has run. No ml4t-backtest or Lumibot environment has been built (a bounded search of ~/.local, ~/code and /opt on the host found no installed distribution of either), neither engine has been installed, imported or executed, and no port, arm manifest, receipt, run record or verdict exists for either arm. Every engine statement below comes from pinned documentation or pinned source, and every expected outcome is a prediction.",
+  "trial_directory": "blueprints/us-equities/engine-trials/spy-one-zero-20260926",
+  "case": "one_zero",
+  "gate_context": "Comparison arms beside the gate G-a SPY/LEAN parity work of the Nautilus arm (blueprints/us-equities/engine-nautilus/spy-parity). This trial changes no gate status, catalog decision or engine selection.",
+  "host": {
+    "id": "nativestack-5975wx-20260925",
+    "compute": "CPU only",
+    "tools_at_drafting": {
+      "bwrap": "0.9.0",
+      "uv": "0.12.17",
+      "base_interpreter": "/usr/bin/python3.12 (CPython 3.12.3)"
+    }
+  },
+  "authorization": {
+    "by": "trading-lane coordinator (e7)",
+    "date": "2026-09-26",
+    "conditions": {
+      "1_scoring": "Score with the unchanged spy-parity compare.py and the unchanged tolerance sheet from one pinned main commit (named in run.json). Register which sheet is used before the first run, use the same sheet for both engines, and change no tolerance after seeing results.",
+      "2_isolation": "One isolated uv environment per engine at a pinned version (ml4t-backtest 0.1.12 with the ml4t package the lean preset needs; lumibot 4.6.1). Run offline under bwrap with the network unshared and the LEAN data read-only, mirroring the spy-parity README invocation. CPU only.",
+      "3_gpl": "Lumibot 4.6.1 is GPL-3.0: evaluation only. Never vendor or copy Lumibot code into the repository; the port imports it from the environment.",
+      "4_no_paper": "No paper step of any kind.",
+      "5_failures_are_results": "A BLOCKED or FAIL verdict with its failing rows is a result to commit, like the Nautilus arm's 25/4. Record every attempt, including broken ports."
+    },
+    "note": "Restated from the coordinator's authorization; this file is not a new approval. Each rule added below narrows these conditions, and none relaxes them."
+  },
+  "declared_deviations": [
+    {
+      "id": "D1_per_arm_mapping_manifest",
+      "condition": "1",
+      "what": "Each arm is scored against its own schema_version 1 mapping manifest, passed with compare.py's existing --manifest option.",
+      "why": "bind() refuses a receipt whose engine.version differs from the bound manifest's. Against the unchanged spy-parity mapping-manifest.json a non-Nautilus receipt is refused before any check (pre-run probe P5: engine_version_disagrees_with_manifest:0.1.12), so without a per-arm manifest neither arm could receive any verdict.",
+      "control": "compare.py and tolerances.json stay unchanged. Every manifest value compare.py reads, including every row status, is frozen in arm_manifests below before any run."
+    },
+    {
+      "id": "D2_v1_contract_only",
+      "condition": "1",
+      "what": "The v2 regime is not used for either arm.",
+      "why": "See sheet_registration.v2_not_usable."
+    },
+    {
+      "id": "D3_lumibot_environment_and_working_directory",
+      "condition": "2",
+      "what": "The Lumibot sandbox adds LUMIBOT_DISABLE_DOTENV=1 and a LUMIBOT_CACHE_FOLDER under /tmp, and runs the engine with its working directory inside /out.",
+      "why": "lumibot/__init__.py (lines 115-132) creates a cache directory at import from LUMIBOT_CACHE_FOLDER, else XDG_CACHE_HOME or ~/.cache, and with no HOME the last resolves relative to the working directory. lumibot/credentials.py (lines 118-173) loads .env and .env.local files found upward from the script directory and the working directory unless LUMIBOT_DISABLE_DOTENV is set. Backtest artifacts go to logs/ under the working directory, while /repo is read-only."
+    },
+    {
+      "id": "D4_ml4t_lean_preset_commission",
+      "condition": "2",
+      "what": "The ml4t lean preset is used with one override: commission model none instead of per_share 0.005 with a 1.00 minimum.",
+      "why": "The frozen plan fixes fee_usd 0 for one_zero and the fee checks have tolerance 0; the preset's commission would charge 1.52 USD per 304-share fill."
+    }
+  ],
+  "pins": {
+    "repository": {
+      "main_commit": "5c1961e49b89dd56ef5626950a5448735caabe4c",
+      "origin_main_at_drafting": "d78d2de9244dd4f67e908920c01bcc600412e732",
+      "note": "d78d2de9 is the only main commit after the pin at drafting. It adds a three-file Alpaca platform landscape and registers it in manifests/evidence.json; every pinned path below is byte-identical at both commits. compare.py re-verifies the spy-parity hashes it binds at comparison time."
+    },
+    "scorer": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "bytes": 67588
+    },
+    "tolerance_sheet": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
+      "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+      "bytes": 2333,
+      "id": "spy-parity-one-zero-default-tolerances",
+      "status": "default",
+      "limits": {
+        "event_seconds_abs": "0",
+        "fill_quantity_abs": "0",
+        "fill_price_usd_abs": "0",
+        "fees_usd_abs": "0",
+        "dividend_usd_abs": "0",
+        "cash_usd_abs": "0.01",
+        "end_cash_usd_abs": "0.01",
+        "final_quantity_abs": "0"
+      }
+    },
+    "converter": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
+      "sha256": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+      "bytes": 14090
+    },
+    "pure_helpers": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
+      "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+      "bytes": 23733,
+      "usable": [
+        "decision_rows",
+        "check_decision_bar_is_session_final",
+        "target_quantity",
+        "check_causality",
+        "check_final_state",
+        "distribution_ledger",
+        "cash_ledger"
+      ],
+      "never_called": "build_strategy, which imports nautilus_trader"
+    },
+    "oracle": {
+      "path": "blueprints/us-equities/historical-simulation/receipt.json",
+      "sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9",
+      "bytes": 56665,
+      "receipt_id": "native-historical-leverage-stress-20260919",
+      "case": "one_zero",
+      "lean_source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+    },
+    "plan": {
+      "path": "blueprints/us-equities/historical-simulation/plan.json",
+      "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+      "bytes": 2740
+    },
+    "row_template": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
+      "sha256": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+      "bytes": 19081,
+      "use": "Row ids and order, status vocabulary, oracle and inputs blocks, and the sessions_and_time declaration for both arm manifests."
+    },
+    "frozen_inputs": {
+      "lean_source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "data_root_on_this_host": "~/.local/share/codex-ecosystem/lean/Lean/Data",
+      "sha256": {
+        "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899",
+        "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+        "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+        "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+        "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf"
+      },
+      "rehashed_on_this_host": "2026-09-26, all five match",
+      "publication": "Host data; the bytes are never committed."
+    },
+    "converted_rows": {
+      "rows": 725,
+      "sessions": 104,
+      "short_sessions": {
+        "2019-12-24": 4
+      },
+      "sha256": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc",
+      "serialization": "json.dumps(rows, indent=2, sort_keys=True, default=str) + newline",
+      "reproduced_on_this_host": "2026-09-26 with the pinned convert.py; no engine involved",
+      "key_rows": [
+        {
+          "role": "entry decision bar",
+          "session_date": "2019-12-31",
+          "local_start": "15:00",
+          "end_utc_seconds": 1577826000,
+          "o": "320.9400",
+          "c": "321.8600"
+        },
+        {
+          "role": "entry fill bar (next session's first)",
+          "session_date": "2020-01-02",
+          "local_start": "09:00",
+          "end_utc_seconds": 1577977200,
+          "o": "323.5800",
+          "c": "323.8700"
+        },
+        {
+          "role": "exit decision bar",
+          "session_date": "2020-04-29",
+          "local_start": "15:00",
+          "end_utc_seconds": 1588190400,
+          "o": "293.9900",
+          "c": "293.2100"
+        },
+        {
+          "role": "exit fill bar (next session's first)",
+          "session_date": "2020-04-30",
+          "local_start": "09:00",
+          "end_utc_seconds": 1588255200,
+          "o": "291.6900",
+          "c": "291.2350"
+        },
+        {
+          "role": "first bar of ex-date 2019-12-20",
+          "session_date": "2019-12-20",
+          "local_start": "09:00",
+          "end_utc_seconds": 1576854000,
+          "o": "320.5400",
+          "c": "320.5900"
+        },
+        {
+          "role": "first bar of ex-date 2020-03-20",
+          "session_date": "2020-03-20",
+          "local_start": "09:00",
+          "end_utc_seconds": 1584712800,
+          "o": "242.5900",
+          "c": "239.1700"
+        }
+      ],
+      "sizing": "floor(100000 * 1 * 0.98 / 321.86) = 304 shares"
+    },
+    "derived_distributions": [
+      {
+        "ex_date": "2019-12-20",
+        "per_share": "1.57",
+        "ex_date_instant_utc_seconds": 1576818000,
+        "ex_date_first_bar_end_utc_seconds": 1576854000,
+        "held_in_one_zero": 0
+      },
+      {
+        "ex_date": "2020-03-20",
+        "per_share": "1.41",
+        "ex_date_instant_utc_seconds": 1584676800,
+        "ex_date_first_bar_end_utc_seconds": 1584712800,
+        "held_in_one_zero": 304
+      }
+    ],
+    "oracle_one_zero": {
+      "intents": [
+        {
+          "utc_seconds": 1577826000,
+          "quantity": 304,
+          "reason": "entry"
+        },
+        {
+          "utc_seconds": 1588190400,
+          "quantity": -304,
+          "reason": "exit"
+        }
+      ],
+      "fills": [
+        {
+          "utc_seconds": 1577977200,
+          "quantity": 304,
+          "price": "323.58",
+          "fee": "0.0"
+        },
+        {
+          "utc_seconds": 1588255200,
+          "quantity": -304,
+          "price": "291.69",
+          "fee": "0.0"
+        }
+      ],
+      "fees_usd": "0.0",
+      "dividends_usd": "428.64",
+      "end_cash_usd": "90734.080",
+      "final_quantity": 0,
+      "source": "compare.oracle_case over the pinned oracle, run 2026-09-26"
+    }
+  },
+  "nautilus_baseline": {
+    "v1": {
+      "verdict": {
+        "path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict.json",
+        "sha256": "b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10",
+        "bytes": 9980
+      },
+      "receipt": {
+        "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt.json",
+        "sha256": "1424b9aa8be9d04f16f7aa5efb6a782759cf915035a461dcfd01e1da601d3a88",
+        "bytes": 11629
+      },
+      "result": "BLOCKED",
+      "checks": 29,
+      "pass": 25,
+      "fail": 4,
+      "complete": true,
+      "blocking_mappings": [
+        "distributions_and_cash",
+        "market_on_open_proxy"
+      ],
+      "unattributed_failures": [],
+      "failing_rows": [
+        {
+          "check": "entry_fill.fill_price_usd#12",
+          "expected": "323.58",
+          "observed": "323.8700",
+          "delta": "0.2900",
+          "blocked_by": "market_on_open_proxy"
+        },
+        {
+          "check": "exit_fill.fill_price_usd#16",
+          "expected": "291.69",
+          "observed": "291.2350",
+          "delta": "-0.4550",
+          "blocked_by": "market_on_open_proxy"
+        },
+        {
+          "check": "end_cash.reconciled_end_cash_usd#21",
+          "expected": "90734.080",
+          "observed": "90507.6000",
+          "delta": "-226.4800",
+          "blocked_by": "market_on_open_proxy"
+        },
+        {
+          "check": "native_end_cash.native_end_cash_usd#22",
+          "expected": "90734.080",
+          "observed": "90078.96",
+          "delta": "-655.120",
+          "blocked_by": "distributions_and_cash,market_on_open_proxy"
+        }
+      ],
+      "scored": "2026-09-22 by compare.py sha256 fc0ed6836add5e2bb9a612b15ca6c57eb3e2d8825af3cad6a39a46f82c441a2e",
+      "rescore_at_pin": "Refused at bind on 2026-09-26 (local_source_sha256_mismatch:compare.py): the receipt binds the earlier compare.py, so this is a dated verdict that cannot be re-scored at this pin."
+    },
+    "v2": {
+      "verdict": {
+        "path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json",
+        "sha256": "1816835f9cf2ea2fa3134e4f5c44a57dc48158499efc7d1fc649e0ed715c9fcd",
+        "bytes": 49296
+      },
+      "receipt": {
+        "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
+        "sha256": "f881ee3208317c9f954639c5229a7c1e2c785b196d6ea7cfbac1e1d3088f041c",
+        "bytes": 48161
+      },
+      "result": "PASS",
+      "checks": 136,
+      "preconditions": 30,
+      "execution_checks": {
+        "pass": 106,
+        "fail": 0,
+        "skipped": 0
+      },
+      "rescore_at_pin": "PASS on 2026-09-26 with --lean-data; every check key and status equals the committed verdict-v2.json.",
+      "contract": "A different 136-check contract under the sealed Nautilus v2 manifest and preregistration. Context only; never compared like-for-like with the 29-check v1 contract."
+    }
+  },
+  "sheet_registration": {
+    "registered_before_first_run": true,
+    "sheet": "v1",
+    "tolerances": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
+      "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
+    },
+    "scoring_branch": "compare.py's schema_version 1 path: a schema_version 1 receipt bound to the arm's schema_version 1 mapping manifest.",
+    "same_sheet_for_both_engines": true,
+    "why_v1": [
+      "There is one tolerance sheet. mapping-manifest-v2.json pins the same tolerances.json, so v1 versus v2 is a choice of manifest regime, not of limits.",
+      "The v1 path gives both arms the same 29-check contract (with converted bars) that produced the Nautilus arm's verdict.json, so both arms are like-for-like with its BLOCKED 25/4."
+    ],
+    "v2_not_usable": [
+      "bind() refuses any schema_version 2 manifest whose sha256 is not the sealed Nautilus v2 manifest (1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67), and any receipt not bound to the sealed PREREGISTRATION-v2.md (4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c).",
+      "A v2 receipt must list the Nautilus harness files (convert.py, fixture_strategy.py, distribution_module.py, run.py, compare.py, both manifests and tolerances.json) in local_source_sha256, and must carry DistributionModule emissions, native OCO order records, a harness review record and replay-history preconditions that only the Nautilus harness produces. Supplying them for another engine would be fabrication.",
+      "deviation-acceptance-v2.json is the gate owner's acceptance of one deviation for the reviewed Nautilus harness, bound to that harness's file hashes. It is not a tolerance sheet and cannot bind another engine."
+    ],
+    "frozen_by_this_file": [
+      "compare.py, convert.py, tolerances.json and fixture_strategy.py at the pinned main commit",
+      "each arm's manifest binding (arm_manifests.<arm>.binding), including every row status",
+      "the float projection rule",
+      "the scorer command and the pass definition",
+      "the failure policy"
+    ],
+    "no_post_result_change": "No tolerance, row status, binding value, projection rule or scoring input changes after an engine has run on the frozen inputs. A needed change starts a new, separately preregistered trial, and this trial's verdicts stay as scored."
+  },
+  "engines": {
+    "ml4t-backtest": {
+      "package": "ml4t-backtest",
+      "version": "0.1.12",
+      "license": "MIT (PyPI license_expression and classifier)",
+      "requires_python": ">=3.12",
+      "pypi": {
+        "wheel": "ml4t_backtest-0.1.12-py3-none-any.whl",
+        "wheel_sha256": "8f5dfe7c2ab96c497136934448bb3211d0d3bf8ec24e71b34229ca5cf53e393b",
+        "wheel_bytes": 240551,
+        "uploaded_utc": "2026-09-24T19:28:52Z",
+        "sdist_sha256": "4a5ce7f4f9c10e0fb56cc9ca61b763c897a694a8d94e0f054abbbe2cdc5cff36",
+        "latest_release_at_drafting": "0.1.12"
+      },
+      "upstream": {
+        "repository": "https://github.com/ml4t/backtest",
+        "tag": "v0.1.12",
+        "commit": "672804b36915742fe18af9cd09b44e9839d39d6f",
+        "annotated_tag_object": "7d8a0fd2a7a4ead255036b13939b6300ee0210a0"
+      },
+      "ml4t_packages_needed": [
+        {
+          "package": "ml4t-specs",
+          "version": "0.1.5",
+          "constraint_from_ml4t_backtest": ">=0.1.4,<0.2",
+          "wheel_sha256": "4c8315f5da52674a1132dafa53568f4e1b02bbd6da400399d61b33d459315117",
+          "wheel_bytes": 34347,
+          "uploaded_utc": "2026-09-19T13:46:22Z",
+          "license": "MIT",
+          "upstream": {
+            "repository": "https://github.com/ml4t/specs",
+            "tag": "v0.1.5",
+            "commit": "07db811feac5541882201440eae4238c9dd9a39e"
+          },
+          "latest_release_at_drafting": "0.1.5",
+          "why": "The only ml4t package ml4t.backtest imports at run time (ml4t.specs, for example in engine.py, broker.py, config.py, datafeed.py, lifecycle.py, preopen.py and sessions.py)."
+        }
+      ],
+      "ml4t_packages_not_needed": {
+        "ml4t-diagnostic": "Only in the all and dev extras; ml4t.backtest names it in docstrings only (analytics/bridge.py, result.py) and never imports it at run time."
+      },
+      "catalog_status": "Referenced only as a research-supplement repository in catalogs/us-equities/decision-index.json; not adopted. This trial does not change that.",
+      "environment": {
+        "location_placeholder": "$ENV = ~/.local/share/codex-ecosystem/engine-trials-20260926/ml4t-backtest-0.1.12 (outside every checkout)",
+        "create": "uv venv --python /usr/bin/python3.12 \"$ENV\"",
+        "why_system_base": "The sandbox binds /usr read-only and nothing under ~/.local/share/uv, so a uv-managed CPython would not exist inside bwrap. The Nautilus environment on this host uses the same base (pyvenv home /usr/bin, CPython 3.12.3).",
+        "requirements_input": [
+          "ml4t-backtest==0.1.12"
+        ],
+        "resolve": "uv pip compile <input> --python-version 3.12 --no-build --generate-hashes --exclude-newer 2026-09-26T04:45:00Z --no-header -o requirements.lock",
+        "install": "uv pip sync --python \"$ENV/bin/python\" --require-hashes --no-build requirements.lock",
+        "network": "Creation, resolution and installation happen before the run and outside the run sandbox. Nothing is installed or fetched inside it.",
+        "indicative_resolution": {
+          "performed": "2026-09-26 with uv 0.12.17: resolution only, no install and no import",
+          "packages": 15,
+          "pins": [
+            "exchange-calendars==4.13.2",
+            "korean-lunar-calendar==0.4.0",
+            "ml4t-backtest==0.1.12",
+            "ml4t-specs==0.1.5",
+            "numpy==2.5.3",
+            "pandas==3.0.6",
+            "pandas-market-calendars==5.4.0",
+            "polars==1.44.2",
+            "polars-runtime-32==1.44.2",
+            "pyluach==2.3.0",
+            "python-dateutil==2.9.0.post0",
+            "pyyaml==6.0.3",
+            "six==1.17.0",
+            "toolz==1.1.0",
+            "tzdata==2026.4"
+          ],
+          "lock_sha256": "e168a18f30b48e50d024b19fd1f734b90dc4cef70627d70e637431fe7505c791",
+          "rule": "The environment builder repeats the resolve command and records the lock it installs. A different lock is recorded as a deviation, never accepted silently."
+        }
+      },
+      "preregistered_configuration": {
+        "preset": "Profile dict from ml4t.backtest.profiles.get_profile_config('lean') with commission replaced by {'model': 'none', 'rate': 0.0}, built with BacktestConfig.from_dict(profile, preset_name='lean', strict=True). No other key of the lean profile changes; the explicit_settings below are additions the profile does not set.",
+        "kept_from_preset": {
+          "execution": {
+            "execution_mode": "next_bar",
+            "execution_price": "open"
+          },
+          "slippage": {
+            "model": "none"
+          },
+          "cash_initial": "100000.0 (equals the plan)",
+          "account": "MARGIN: allow_short_selling, allow_leverage, initial and maintenance margin 0.5",
+          "share_type": "integer",
+          "orders": "reject_on_insufficient_cash, next_bar_submission_precheck and every other preset order setting unchanged"
+        },
+        "explicit_settings": {
+          "data_frequency": "1h (DataFrequency.HOURLY), declared explicitly for hourly bars",
+          "calendar": null,
+          "enforce_sessions": false,
+          "session_column": "none",
+          "feed_timestamps": "each converted row's bar END instant (ts_event_ns) as tz-aware UTC, declared as bar_close timestamp semantics where the feed specification accepts it",
+          "asset": "SPY"
+        },
+        "record": "config.to_dict() of the resolved configuration goes into run.json.",
+        "declared_scope_gap": "docs/user-guide/profiles.md (lines 37-40 at the tag) scopes the lean profile to daily US equities submitted from OnData with DefaultBrokerageModel, a margin account and 2x security leverage. Hourly bars are outside that documented scope; this trial runs the preset outside it and says so."
+      },
+      "market_on_open_mechanism": {
+        "status": "resolved",
+        "mechanism": "An ordinary market order submitted from on_data at the decision bar under NEXT_BAR with execution_price open fills at the next bar's open, stamped with that bar's timestamp.",
+        "evidence": "docs/user-guide/execution-semantics.md lines 11-17 and 43-44 at the tag; in the wheel, engine.py 480-509 and execution/fill_executor.py 244.",
+        "faithfulness": "Equal to LEAN's MarketOnOpenFill only because each decision bar is its session's final bar; the port applies check_decision_bar_is_session_final at each decision.",
+        "not_used": "The pre-open target-intent contract with OPG time-in-force is documented for daily opening auctions and is not used."
+      },
+      "distribution_mechanism": {
+        "status": "resolved",
+        "input": "Engine(..., funding_df=frame) with columns timestamp, asset and amount_per_unit: one row per derived distribution, timestamp = the ex-date session's first converted row (its bar END instant), asset SPY, amount_per_unit = -per_share (the float of the Decimal per-share value). If an ex-date has no converted row the port stops; both one_zero ex-dates are sessions.",
+        "per_share_source": "convert.derive_distributions on the frozen factor file (1.57 for 2019-12-20, 1.41 for 2020-03-20), never the oracle.",
+        "engine_semantics": "docs/user-guide/market-impact.md lines 229-268 at the tag: amount_per_unit is an account-currency amount per unit, multiplied by position quantity and contract multiplier, and negative values reverse the direction. It is applied before the orders eligible at that timestamp and before the strategy callback; a position opened at that timestamp does not pay; a flat asset records a zero transfer; events must match feed timestamps. In the wheel: broker.py 458-498 (cash_delta = -quantity * multiplier * amount_per_unit) and engine.py 474-476.",
+        "engine_posted": "True for an event exactly when the engine recorded a FundingPayment for it. The ledger amount, quantity and instant are that payment's cash_delta, quantity and timestamp.",
+        "declared_repurposing": "The funding input is documented for perpetual futures. Its amount_per_unit semantics are a generic per-unit cash flow, which is what a raw-normalized cash dividend is, and the engine computes the posted amount from its own position.",
+        "declared_timing_difference": "Postings land at the ex-date's first bar end, 10:00 New York (1576854000 and 1584712800), not at LEAN's 00:00 ex-date instants (1576818000 and 1584676800). Funding events must match feed timestamps, and nothing can fill between 00:00 and that bar, so the eligible quantity is the same. The v1 contract compares the distribution total and the receipt's own cash path, not distribution instants against the oracle (pre-run probe P1), so this difference is disclosed rather than scored.",
+        "forbidden": "No other cash input, no second funding row, no amount taken from the oracle and no strategy-side cash adjustment."
+      }
+    },
+    "lumibot": {
+      "package": "lumibot",
+      "version": "4.6.1",
+      "license": {
+        "spdx": "GPL-3.0",
+        "pypi_license_field": "GPL-3.0",
+        "classifier": "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "license_file_at_tag": {
+          "text": "GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007",
+          "sha256": "7d8846232c63c8d5c00a0a4d412df1c69c4339a54e59157164c0916ec0eff24d",
+          "equals_wheel_copy": true
+        },
+        "catalog_note": "catalogs/us-equities/engines-strategies.json recorded a license-file versus package-metadata conflict at 4.5.91. At 4.6.1 the license file and the package metadata both say GPL-3.0."
+      },
+      "requires_python": ">=3.10",
+      "pypi": {
+        "wheel": "lumibot-4.6.1-py3-none-any.whl",
+        "wheel_sha256": "d06b8feb32c8a23026628e9030b9f166a25f4ab3af510d241aaa915516554159",
+        "wheel_bytes": 37945888,
+        "uploaded_utc": "2026-09-26T01:07:45Z",
+        "sdist": "none published for 4.6.1",
+        "latest_release_at_drafting": "4.6.1",
+        "note": "Uploaded hours before this preregistration. The wheel bundles a ThetaTerminal jar that this trial does not use."
+      },
+      "upstream": {
+        "repository": "https://github.com/Lumiwealth/lumibot",
+        "tag": "v4.6.1",
+        "commit": "2dfdda100cdc34e5acb46a7f13e8208a35aede72",
+        "annotated_tag_object": "0f3110d594c7131cda163391c964058ea72257e9"
+      },
+      "catalog_status": "catalogs/us-equities/engines-strategies.json entry lumibot: decision alternative (source_review at 4.5.91). This trial does not change it.",
+      "dependency_without_wheel": {
+        "package": "ibapi",
+        "version": "9.81.1.post1",
+        "pinned_by": "lumibot 4.6.1 requires ibapi==9.81.1.post1",
+        "sdist": "ibapi-9.81.1.post1.tar.gz",
+        "sdist_sha256": "49f6678bf4cced996920f32ad4b48e6897749ac30ba14a661082285f4ec09cd6",
+        "sdist_bytes": 61109,
+        "uploaded_utc": "2020-12-06T03:18:39Z",
+        "license": "IB API Non-Commercial License or the IB API Commercial License (PyPI license field)",
+        "handling": "Built once into a wheel from the hash-checked sdist with the network unshared, and the only distribution built from source. The built wheel's sha256 and the build command go into run.json. Evaluation only; never redistributed."
+      },
+      "environment": {
+        "location_placeholder": "$ENV = ~/.local/share/codex-ecosystem/engine-trials-20260926/lumibot-4.6.1 (outside every checkout)",
+        "create": "uv venv --python /usr/bin/python3.12 \"$ENV\"",
+        "requirements_input": [
+          "lumibot==4.6.1"
+        ],
+        "resolve": "uv pip compile <input> --python-version 3.12 --generate-hashes --exclude-newer 2026-09-26T04:45:00Z, binary distributions only apart from the locally built ibapi wheel (offered with --find-links)",
+        "install": "uv pip sync --require-hashes against that lock, with no source build",
+        "record": "The lock sha256, its package count, the ibapi wheel sha256, and whether the cutoff applied to the local ibapi wheel.",
+        "scale_note": "An indicative resolution on 2026-09-26, made before this file and not binding, found 264 packages, including google-adk, litellm, openai, boto3, databento, ccxt, schwab-py and psycopg2-binary. None of them can open a connection, because the run sandbox has no network.",
+        "network": "Creation, the ibapi build, resolution and installation happen before the run and outside the run sandbox. Nothing is installed or fetched inside it."
+      },
+      "preregistered_configuration": {
+        "data_source": "PandasData through Lumibot's backtest entry point, with pandas_data holding one Data for Asset SPY (stock) built from the converted rows.",
+        "timestep": "hour",
+        "why_hour": "The pinned docsrc/backtesting.pandas.rst (lines 15 and 103) documents only minute and day raw timesteps for PandasData, but lumibot/entities/data.py (lines 148-151 and 198) accepts hour, and tests/test_hour_timestep_support.py at the tag covers hour data. A minute timestep would make the engine pad the hourly rows onto a one-minute grid, creating synthetic rows inside the engine. hour is therefore preregistered, as a declared use of an undocumented PandasData timestep, and minute is excluded from the primary attempt.",
+        "index": "Each converted row is indexed at its bar END instant (ts_event_ns), tz-aware. There is no dividend, stock_splits or other extra column, and the port does no padding, forward fill or resampling.",
+        "window": "The backtest window covers every converted row: it starts no later than the first row's end (2019-12-02 10:00 New York) and ends no earlier than the last row's end (2020-04-30 16:00 New York).",
+        "budget": "100000 (plan initial_cash_usd)",
+        "fees_and_slippage": "buy_trading_fees and sell_trading_fees empty; no slippage configured.",
+        "orders": "One market order per intent with time_in_force gtc, submitted only after the decision bar's end instant. day time-in-force is not used because it elapses at the session close or on a date change (lumibot/backtesting/backtesting_broker.py 3483-3517).",
+        "reporting_side_effects": "benchmark_asset None, because with the default SPY benchmark a PandasData backtest requests benchmark returns from Yahoo (lumibot/strategies/_strategy.py 2459 onward). Tearsheet, plot, indicator, progress-bar and stats outputs are disabled or written only under /out, and no notification path is configured.",
+        "decision_hook": "Chosen by the port author before the first attempt, within the port contract (for example after_market_closes reading the just-completed hour bar), and recorded in the port header and run.json.",
+        "record": "The backtest call's argument names and non-secret values go into run.json."
+      },
+      "market_on_open_mechanism": {
+        "status": "resolved",
+        "mechanism": "A GTC market order submitted after the decision bar completes is filled by the backtesting broker at the open of the bar it selects, stamped with the broker datetime. With end-indexed bars the next session's first bar is indexed 10:00 New York, so the fill is predicted at that bar's open, stamped 10:00.",
+        "evidence": "lumibot/backtesting/backtesting_broker.py 3091-3092 in the wheel (a market order's price is the selected bar's open) and the bar selection before it. Code reading only; the pinned docs do not describe it.",
+        "faithfulness": "Equal to LEAN's MarketOnOpenFill only because each decision bar is session-final; the port applies check_decision_bar_is_session_final and check_causality.",
+        "consequence_if_wrong": "The row is resolved, so a fill at the first bar's close is a rejected attribution and the verdict is FAIL (pre-run probe P3)."
+      },
+      "distribution_mechanism": {
+        "status": "unsupported",
+        "evidence": "Backtest dividends are credited by Strategy._update_cash_with_dividends (lumibot/strategies/_strategy.py 2152 onward) from DataSource.get_yesterday_dividends (lumibot/data_sources/data_source.py 862-910), which caches a dividend column read from day bars. PandasData.find_asset_in_data_store (lumibot/data_sources/pandas_data.py 392-470) serves a day request only from day or minute data, and this arm supplies hour data only. The pinned PandasData docs define no distribution input.",
+        "reporting": "An external Decimal ledger from fixture_strategy.distribution_ledger over the port's native fills: engine_posted false, ex-date instants 1576818000 and 1584676800, per-share values from convert.derive_distributions.",
+        "check": "The port verifies from the engine's own cash series that engine cash changed only at fills. If the engine did post a distribution, the port records that posting as engine_posted true with the engine's own amount and instant, and drops the external entry for that ex-date; it never records both.",
+        "forbidden": "No dividend column, no cash injection and no amount taken from the oracle."
+      },
+      "identifiers": "Order identifiers are uuid4 hex (lumibot/entities/order.py lines 24-27 and 479). The determinism hash replaces them with ordinals, and they never appear in committed files."
+    }
+  },
+  "arm_manifests": {
+    "rules": {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/mapping-manifest.json",
+      "binding": "The values compare.py reads: schema_version, evidence_class, engine.version, oracle.receipt_sha256, oracle.plan_sha256, case_configuration.{case, seed, account_type, use_random_ids, fill_model, fee_model, window}, each row's status by id, sessions_and_time.known_short_sessions, and the derived sorted list of unsupported row ids. The manifest's projection onto these fields must equal arm_manifests.<arm>.binding exactly (JSON equality).",
+      "projection": "For manifest m: {schema_version: m.schema_version, evidence_class: m.evidence_class, engine: {version: m.engine.version}, oracle: {receipt_sha256: m.oracle.receipt_sha256, plan_sha256: m.oracle.plan_sha256}, case_configuration: the seven named keys of m.case_configuration, mapping_status: {row.id: row.status for row in m.mappings}, known_short_sessions: the sessions_and_time row's known_short_sessions, unsupported_mappings: sorted ids of rows whose status is unsupported}.",
+      "rows": "Exactly the eight row ids of spy-parity/mapping-manifest.json, in its order. Each row carries id, lean_concept, engine_concept, status, decision, evidence (pinned citations), validation and limitations; sessions_and_time also carries full_session_rows 7 and known_short_sessions.",
+      "other_blocks": "Copy status_vocabulary, oracle and inputs from spy-parity/mapping-manifest.json. The engine block carries package, version, upstream tag and commit, wheel sha256 and an environment placeholder. The manifest names this preregistration by path and sha256 and sets frozen_before_execution true.",
+      "freeze": "The arm manifest and the port are committed before the first attempt on the frozen inputs, and run.json records that commit together with the environment lock sha256 (the lock itself is committed when it holds no host path). Before the primary attempt the manifest's non-binding documentation may be corrected in a recorded commit; its binding never changes. After the primary attempt the manifest is final: the primary receipt binds its sha256, and compare.py refuses the receipt if the committed manifest differs.",
+      "row_order": [
+        "instrument_identity",
+        "raw_data_decoding",
+        "sessions_and_time",
+        "decision_visibility",
+        "market_on_open_proxy",
+        "distributions_and_cash",
+        "costs_and_rounding",
+        "margin_and_adaptive_state"
+      ]
+    },
+    "ml4t-backtest": {
+      "binding": {
+        "schema_version": 1,
+        "evidence_class": "HIST",
+        "engine": {
+          "version": "0.1.12"
+        },
+        "oracle": {
+          "receipt_sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9",
+          "plan_sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+        },
+        "case_configuration": {
+          "case": "one_zero",
+          "seed": null,
+          "account_type": "MARGIN",
+          "use_random_ids": false,
+          "fill_model": {
+            "profile": "lean",
+            "execution_mode": "next_bar",
+            "execution_price": "open",
+            "slippage_model": "none"
+          },
+          "fee_model": {
+            "profile": "lean",
+            "commission_model": "none"
+          },
+          "window": {
+            "symbol": "SPY",
+            "start": "2019-12-02",
+            "end": "2020-04-30"
+          }
+        },
+        "mapping_status": {
+          "instrument_identity": "resolved",
+          "raw_data_decoding": "resolved",
+          "sessions_and_time": "resolved",
+          "decision_visibility": "resolved",
+          "market_on_open_proxy": "resolved",
+          "distributions_and_cash": "resolved",
+          "costs_and_rounding": "resolved",
+          "margin_and_adaptive_state": "blocked"
+        },
+        "known_short_sessions": {
+          "2019-12-24": 4
+        },
+        "unsupported_mappings": []
+      },
+      "row_rationale": {
+        "instrument_identity": "Asset key SPY in the ml4t feed and broker; integer shares (preset share_type integer); prices reach the engine as floats of the 4-decimal Decimal rows and come back through the float projection rule. SPY is a simulation identifier only, not a broker identity.",
+        "raw_data_decoding": "convert.py, loaded unchanged by path, decodes the frozen inputs; the engine receives exactly the 725 converted rows and nothing else.",
+        "sessions_and_time": "Feed timestamps are each row's bar END instant (ts_event_ns) as tz-aware UTC. calendar stays None and enforce_sessions False, so no session filter can drop the 16:00 or 13:00 bars. The declared short session 2019-12-24 (4 rows) is carried from the Nautilus manifest.",
+        "decision_visibility": "on_data at the decision bar's timestamp (its end, 16:00 New York) forms the intent from that completed bar. Under NEXT_BAR the order is eligible only at the next bar, which check_decision_bar_is_session_final requires to be the next session's first bar; check_causality runs on the native fills.",
+        "market_on_open_proxy": "An ordinary market order from on_data under NEXT_BAR with execution_price open fills at the next bar's open, stamped with that bar's timestamp (docs/user-guide/execution-semantics.md lines 11-17 and 43-44; engine.py 480-509; execution/fill_executor.py 244). Faithful to LEAN's MarketOnOpenFill only because the decision bar is session-final.",
+        "distributions_and_cash": "Engine-posted through the documented funding input: one funding_df row per derived distribution at the ex-date session's first bar end, amount_per_unit = -per_share; the engine computes cash_delta = -quantity * multiplier * amount_per_unit from its own position (broker.py 458-498; docs/user-guide/market-impact.md lines 229-268). Declared repurposing of a perpetual-futures input and a 10-hour posting-instant difference from LEAN's 00:00 ex-date.",
+        "costs_and_rounding": "Commission model none (declared override of the lean preset's per_share 0.005 with a 1.00 minimum) and slippage none (preset). The port reads each native fill's commission back and records any nonzero value as a guard failure.",
+        "margin_and_adaptive_state": "The lean preset's margin account (allow_leverage, initial and maintenance margin 0.5) is not claimed equivalent to LEAN's SecurityMarginModel(2m) or DefaultMarginCallModel. one_zero requests 1x, so no leverage, margin call or latch is exercised or claimed."
+      }
+    },
+    "lumibot": {
+      "binding": {
+        "schema_version": 1,
+        "evidence_class": "HIST",
+        "engine": {
+          "version": "4.6.1"
+        },
+        "oracle": {
+          "receipt_sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9",
+          "plan_sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+        },
+        "case_configuration": {
+          "case": "one_zero",
+          "seed": null,
+          "account_type": "CASH",
+          "use_random_ids": true,
+          "fill_model": {
+            "order_type": "market",
+            "time_in_force": "gtc",
+            "fill_price": "bar_open",
+            "timestep": "hour",
+            "bar_index": "bar_end_instant",
+            "slippage_model": "none"
+          },
+          "fee_model": {
+            "buy_trading_fees": [],
+            "sell_trading_fees": []
+          },
+          "window": {
+            "symbol": "SPY",
+            "start": "2019-12-02",
+            "end": "2020-04-30"
+          }
+        },
+        "mapping_status": {
+          "instrument_identity": "resolved",
+          "raw_data_decoding": "resolved",
+          "sessions_and_time": "resolved",
+          "decision_visibility": "resolved",
+          "market_on_open_proxy": "resolved",
+          "distributions_and_cash": "unsupported",
+          "costs_and_rounding": "resolved",
+          "margin_and_adaptive_state": "blocked"
+        },
+        "known_short_sessions": {
+          "2019-12-24": 4
+        },
+        "unsupported_mappings": [
+          "distributions_and_cash"
+        ]
+      },
+      "row_rationale": {
+        "instrument_identity": "Asset SPY (asset_type stock) with the default USD quote; integer shares; prices reach the engine as floats of the 4-decimal Decimal rows and come back through the float projection rule. SPY is a simulation identifier only.",
+        "raw_data_decoding": "convert.py, loaded unchanged by path, decodes the frozen inputs; the engine receives one pandas DataFrame of exactly the 725 converted rows with columns open, high, low, close and volume only.",
+        "sessions_and_time": "Data with timestep hour, indexed at each row's bar END instant (tz-aware). A pure PandasData backtest derives its trading calendar from the supplied rows (lumibot/strategies/strategy_executor.py 2630-2649), so each session is expected to span its first and last end-indexed rows (10:00 to 16:00 New York; 13:00 on 2019-12-24). No padding, forward fill or resampling. The declared short session is carried from the Nautilus manifest.",
+        "decision_visibility": "The decision reads only the completed decision bar (end 16:00 New York) and submits after that instant; the order may fill only at the next session's first bar. check_decision_bar_is_session_final and check_causality apply, and the engine clock at submission is recorded.",
+        "market_on_open_proxy": "A GTC market order submitted after the decision bar completes is filled by the backtesting broker at the open of the bar it selects, stamped with the broker datetime (lumibot/backtesting/backtesting_broker.py 3091-3092 and the bar selection before it). With end-indexed bars the next session's first bar is indexed 10:00 New York. Code reading only; not documented in the pinned docs.",
+        "distributions_and_cash": "Unsupported under this configuration: backtest dividends are credited from a dividend column of day bars (lumibot/strategies/_strategy.py 2152 onward; lumibot/data_sources/data_source.py 862-910), and PandasData serves a day request only from day or minute data (lumibot/data_sources/pandas_data.py 392-470) while this arm supplies hour data only; the pinned PandasData docs define no distribution input. Reported as an external Decimal ledger with engine_posted false.",
+        "costs_and_rounding": "Empty buy and sell trading-fee lists and no slippage. The port reads each native fill's cost back and records any nonzero value as a guard failure.",
+        "margin_and_adaptive_state": "Lumibot backtests track strategy cash from the budget; no margin model is configured or claimed. one_zero requests 1x, so no leverage, margin call or latch is exercised or claimed."
+      }
+    }
+  },
+  "port_contract": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/fixture_port.py",
+    "header": "Cites the engine's own documentation or example files at the pinned tag commit (ml4t-backtest: docs/user-guide/execution-semantics.md, docs/user-guide/market-impact.md and docs/user-guide/profiles.md at 672804b36915742fe18af9cd09b44e9839d39d6f; Lumibot: docsrc/backtesting.pandas.rst and tests/test_hour_timestep_support.py at 2dfdda100cdc34e5acb46a7f13e8208a35aede72), the engine wheel sha256 and this preregistration. The Lumibot header also states that the file imports GPL-3.0 Lumibot from the isolated environment for evaluation only and contains no Lumibot code.",
+    "invocation": "fixture_port.py --lean-data <root> --out <fresh directory>, run as $ENV/bin/python -I inside the sandbox.",
+    "imports": "convert.py, and optionally the pure helpers of fixture_strategy.py, are loaded by path with importlib from /repo/blueprints/us-equities/engine-nautilus/spy-parity/, as run.py loads its helpers (python -I drops the script directory from sys.path). They are never copied or edited, and build_strategy is never called.",
+    "inputs": "convert.verify_inputs must return exactly the five frozen hashes, or the port exits nonzero before constructing any engine. The port converts with window SPY 2019-12-02 to 2020-04-30 and known_short_sessions {'2019-12-24': 4}, requires 725 rows hashing to 6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc, and writes the rows only to <out>/converted-rows.private.json.",
+    "plan": "Reads blueprints/us-equities/historical-simulation/plan.json after checking its sha256: initial_cash_usd 100000, requested_target_sizing_multiplier 0.98, and the one_zero target 1, fee_usd 0 and slippage 0. The decision dates are 2019-12-31 (entry) and 2020-04-29 (exit), as the plan states.",
+    "strategy": [
+      "Entry intent at the completed 16:00 New York bar of 2019-12-31 (local start 15:00): +fixture_strategy.target_quantity(equity, 1, 0.98, close) shares, where equity is the engine-reported equity at that bar and close is that bar's close.",
+      "Exit intent at the completed 16:00 New York bar of 2020-04-29: minus the engine-reported position.",
+      "Intent utc_seconds is the decision bar's end instant. The engine clock at submission is recorded beside it and must be at or after that instant and before the fill.",
+      "Each order must fill at the next session's first bar. check_decision_bar_is_session_final runs at each decision, check_causality on the native fills, and check_final_state (flat, no open orders, no pending intent) at the end of each run."
+    ],
+    "guards": "Input-hash verification stops the port before any engine exists. Every other guard records its outcome in the receipt's guards block instead of aborting, so a completed pair of runs always yields a receipt to score.",
+    "engine_values_only": "Fills, fees, positions, cash, equity at decision and funding payments come from the engine's own records. The port never opens the oracle receipt, any Nautilus receipt or any verdict, and never writes an oracle value into the engine or the receipt.",
+    "forbidden": [
+      "synthetic or modified bars, ticks or rows beyond the 725 converted rows",
+      "fill re-pricing, custom fill models or edits to engine-reported prices",
+      "cash injection or any cash change outside the preregistered engine mechanisms",
+      "a distribution amount or date not derived by convert.derive_distributions from the frozen factor file",
+      "a second funding row, a dividend column (Lumibot) or a different distribution mechanism in the primary attempt",
+      "network access, credential stores, .env files, broker clients, paper or live endpoints",
+      "copying Lumibot code, docstrings or example strategies into the port"
+    ]
+  },
+  "receipt_contract": {
+    "path": "<out>/receipt.json, published unchanged as blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/receipt.json",
+    "schema_version": 1,
+    "fields": {
+      "case": "one_zero",
+      "evidence_class": "HIST",
+      "engine": "package, version (exactly the binding's), upstream_commit, wheel_sha256, python",
+      "frozen_plan": "path and sha256 of the pinned plan, and the one_zero case",
+      "case_configuration": "initial_cash_usd '100000', sizing_buffer '0.98', target '1', fee_usd '0' and slippage '0', plus seed, account_type, use_random_ids, fill_model, fee_model and window exactly as the arm binding",
+      "mapping_manifest": "path (repository-relative arm manifest) and sha256",
+      "tolerances": "path blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json and its sha256",
+      "local_source_sha256": "Only spy-parity files: compare.py, convert.py, tolerances.json and, if its helpers are used, fixture_strategy.py. compare.py verifies each name inside spy-parity/ and refuses any other.",
+      "port_source_sha256": "fixture_port.py and its sha256. Recorded for run.json and the README; compare.py does not verify it.",
+      "preregistration": "path and sha256 of this file",
+      "unsupported_mappings": "the arm binding's list",
+      "inputs": "sha256: the dict convert.verify_inputs returns",
+      "attribution_evidence": "converted_rows_sha256 6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc, the private file name and the serialization",
+      "intents": "utc_seconds, signed integer quantity, reason (entry or exit), decision_price, decision_equity, session_date",
+      "fills": "In time order: utc_seconds, signed integer quantity, price and fee (projected), their _engine_repr values, order ordinal",
+      "totals": "fees_usd, dividend_cash_usd (sum of the distribution ledger), reconciled_end_cash_usd (last cash-ledger entry), native_end_cash_usd (engine-reported), final_quantity (engine-reported)",
+      "distribution_ledger": "ex_date, utc_seconds, per_share, quantity, amount, engine_posted, source",
+      "cash_ledger": "fixture_strategy.cash_ledger over the fills and the distribution ledger",
+      "two_run_records_equal": "computed as in determinism, never asserted",
+      "guards": "each guard's name, outcome and detail",
+      "isolation": "argv, cwd, environment variable names and socket.if_nameindex() inside the sandbox",
+      "float_projection": "rule, number of values projected and max_abs_adjustment"
+    },
+    "hygiene": "No host path, no engine-generated identifier, no UUID-shaped string, no credential and no log excerpt. scripts/validate.py must pass with the receipt tracked."
+  },
+  "float_projection": {
+    "rule": "For every engine-reported float (fill price, fee, cash, equity, funding cash_delta): d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN). The compared field carries str(value), and a sibling field suffixed _engine_repr carries repr(x).",
+    "integers": "A quantity must equal an integer exactly (x == int(x)); anything else stops the run, as compare.py's strict integer projection would.",
+    "exact_values": "A value the engine already reports as a Decimal or an exact integer is used as reported.",
+    "why": "Both engines keep prices and cash in binary floats, while the oracle and compare.py use Decimal. 0.0001 is the instrument's declared tick and convert.py's quantum, so a fill at a converted bar price is recovered exactly and any deviation of 0.0001 or more survives; only float representation noise below 0.00005 is removed. The tolerance sheet is unchanged.",
+    "audit": "The receipt records max_abs_adjustment over all projected values and the README reports it. An adjustment above 0.000001 USD is reported as a finding, since float noise cannot explain it.",
+    "pre_run_arithmetic": "In IEEE double precision -304.0 * 1.0 * -1.41 == 428.64, and 100000 - 304*323.58 + 428.64 + 304*291.69 evaluates to 90734.08 (90305.44 without the distribution), so no adjustment is predicted for one_zero."
+  },
+  "determinism": {
+    "runs": "Each port invocation performs two runs, each with a freshly constructed engine and no state carried from the other. Each Lumibot run executes in its own child process of the port inside the same sandbox, with its own empty cache directory. ml4t-backtest runs may be constructed in-process only if the port records that the engine keeps no module-level state between runs; otherwise they also use child processes.",
+    "record": "Per run, a normalized economic record (intents, fills, distribution ledger, cash ledger, native end cash, final quantity, and the engine's order and fill sequence) serialized with json.dumps(sort_keys=True) and hashed. two_run_records_equal is true only when the two hashes are equal and a field-by-field diff of the raw per-run reports shows no difference outside the normalized identifier fields.",
+    "normalization": "Only engine-generated random identifiers (Lumibot uuid4 hex order identifiers) are replaced by their ordinal within the run, after format validation; ml4t sequential order ids stay raw. Timing, prices, quantities, fees, distributions, position transitions and decision order are never normalized.",
+    "published": "Both normalized hashes and both raw-report hashes go into the receipt. The raw reports stay private."
+  },
+  "isolation": {
+    "template": "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind \"$ENV\" \"$ENV\" --ro-bind \"$REPO\" /repo --ro-bind \"$LEAN\" /data --bind \"$OUT\" /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 [arm additions] \"$ENV/bin/python\" -I /repo/blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/fixture_port.py --lean-data /data --out /out/port",
+    "placeholders": {
+      "ENV": "the arm environment (engines.<arm>.environment.location_placeholder)",
+      "REPO": "the checkout at the commit that froze the port and manifest",
+      "LEAN": "~/.local/share/codex-ecosystem/lean/Lean/Data on this host",
+      "OUT": "~/.local/state/native-agent-stack/engine-trials-20260926/<arm>/attempt-NN, fresh and empty"
+    },
+    "mirrors": "blueprints/us-equities/engine-nautilus/spy-parity/README.md (Reproduce receipt.json): the same flags, mounts and environment, with the port in place of run.py.",
+    "arm_additions": {
+      "ml4t-backtest": "None expected. Any addition is recorded as a deviation.",
+      "lumibot": [
+        "--setenv LUMIBOT_DISABLE_DOTENV 1",
+        "--setenv LUMIBOT_CACHE_FOLDER /tmp/lumibot-cache (one subdirectory per run)",
+        "the engine's working directory is a private directory under /out, set by the port or with --chdir"
+      ]
+    },
+    "allowed_additional_variables": "Only variables that (a) disable credential discovery, (b) redirect a cache or configuration directory into /tmp or /out (LUMIBOT_CACHE_FOLDER, XDG_CACHE_HOME, MPLCONFIGDIR, HOME=/tmp/home), or (c) pin a thread count to 1 (for example POLARS_MAX_THREADS or RAYON_NUM_THREADS). Each is recorded with its value in run.json and in the receipt's isolation block. No variable may carry a credential, token or network endpoint.",
+    "network": "--unshare-all includes the network namespace. The port records socket.if_nameindex() and refuses to run unless the only interface is lo.",
+    "mounts": "Read-only: /usr, $ENV, the checkout at /repo and the LEAN data at /data. Writable: /out (the attempt directory) and a tmpfs /tmp. Nothing else: no home directory, credential store or /etc. If an engine cannot start without one specific non-secret system file under /etc, a read-only bind of that file alone is a recorded deviation; a directory or file holding credentials is never bound.",
+    "python_isolated_mode": "python -I ignores every PYTHON* variable (so PYTHONDONTWRITEBYTECODE has no effect) and drops the script directory from sys.path; the read-only mounts are what keep bytecode out of the checkout.",
+    "cpu_only": "--dev /dev exposes no GPU device node, and no GPU library is configured.",
+    "installs": "Every package operation happens before the run, outside the run sandbox."
+  },
+  "scoring": {
+    "command": "python3 -B blueprints/us-equities/engine-nautilus/spy-parity/compare.py --receipt blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/receipt.json --manifest blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/mapping-manifest.json --tolerances blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json --lean-data \"$LEAN\" --verdict blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/verdict.json",
+    "run_from": "The repository root of a checkout whose spy-parity and historical-simulation files are byte-identical to main 5c1961e49b89dd56ef5626950a5448735caabe4c. compare.py re-verifies the spy-parity hashes the receipt binds.",
+    "interpreter": "/usr/bin/python3, standard library only. -B keeps convert.py's bytecode out of spy-parity/.",
+    "oracle_and_plan": "compare.py's defaults (blueprints/us-equities/historical-simulation/receipt.json and plan.json), bound by the arm manifest's oracle hashes.",
+    "manifest_required": "--manifest is mandatory. Without it compare.py looks for the receipt's manifest file name inside spy-parity/ and refuses.",
+    "bars": "--lean-data, not --bars, so compare.py re-hashes the five inputs against the receipt and re-derives and re-hashes the 725 rows at comparison time.",
+    "output": "compare.py writes verdict.json, which is committed exactly as written. The exit code and the VERDICT line go into run.json.",
+    "once_per_receipt": "Each receipt is scored once, with exactly this command. The scorer is never re-run with other arguments (for example --bars instead of --lean-data, or another manifest) to obtain a different verdict for the same receipt.",
+    "pass_definition": "PASS means compare.py exits 0 and the verdict says PASS: every check passes inside the registered sheet (tolerances.json c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a), complete is true, no check is skipped, no attribution is rejected, and attribution_evidence is 'converted bars'. With two fills and two distribution ledger entries that is 29 checks. Nothing else is a pass: not BLOCKED, not a subset of passing checks, and not a verdict from another sheet, manifest or scorer.",
+    "other_outcomes": {
+      "BLOCKED": "Every failing check is attributed by measurement to a row the bound arm manifest declares unsupported, and the comparison is complete. A result, not a pass.",
+      "BLOCKED-INCOMPLETE": "A check was skipped, for example with no bars; not expected with --lean-data.",
+      "FAIL": "Any unattributed failure, or any rejected attribution (a measured deviation matching a row the manifest does not declare unsupported).",
+      "REFUSED": "compare.py raised before any check. No verdict exists, and the refusal reason is recorded."
+    }
+  },
+  "private_outputs": {
+    "root": "~/.local/state/native-agent-stack/engine-trials-20260926/<arm>/",
+    "attempt_directory": "<root>/attempt-NN/ (01, 02, ... in order), created fresh with mode 0700 under umask 077, and never reused, overwritten or deleted during the trial.",
+    "contents": "converted-rows.private.json, run-1/ and run-2/ (engine logs, raw native reports as *.private.json, per-run summaries), the port's receipt before publication, and the sandbox's captured stdout and stderr.",
+    "never_in_a_checkout": "Converted rows, raw reports, logs and per-run summaries are never written under any checkout. *.private.json is not gitignored in this repository, so writing them outside every checkout is the only protection.",
+    "published": "receipt.json, verdict.json, run.json, mapping-manifest.json and fixture_port.py, and optionally the environment lock and synthetic probes, each free of host paths, engine identifiers and UUID-shaped strings. Private files appear only as sha256 values."
+  },
+  "run_record": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/run.json",
+    "required": [
+      "scorer pin: main commit, compare.py and tolerances.json sha256",
+      "preregistration path, sha256 and commit",
+      "host id nativestack-5975wx-20260925 and CPU only",
+      "engine version, upstream tag and commit, wheel sha256 checked against PyPI",
+      "environment: base interpreter, uv version, resolve and install commands, cutoff, lock sha256 and package count, anything built from source",
+      "arm manifest path and sha256, whether its projection equals the binding, and the commit that froze it with the port",
+      "port path and sha256",
+      "resolved engine configuration (ml4t config.to_dict(); Lumibot backtest arguments)",
+      "mechanism probes: script sha256 and one-line outcome each",
+      "every attempt, as the failure policy lists",
+      "the primary attempt id and every declared deviation"
+    ],
+    "hygiene": "Host paths appear only as placeholders ($ENV, $REPO, $LEAN, $OUT, ~/...). No UUID-shaped string, engine identifier or credential."
+  },
+  "mechanism_probes": {
+    "allowed": "Before the first attempt, on synthetic bars only (never SPY rows, the frozen inputs or the LEAN data mount), under the same sandbox. They confirm the preregistered mechanisms. For ml4t: the next-bar-open fill and its timestamp, and the funding posting including the zero record for a flat asset. For Lumibot: hour-timestep bar selection, the fill price and stamp of a GTC market order submitted after a session's last bar, the chosen decision hook's timing, and the absence of native dividend crediting with hour data.",
+    "record": "Each probe's script sha256 and one-line observed outcome go into run.json. Probe scripts and sanitized outputs may be committed under blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/probes/.",
+    "effect": "A probe cannot change a row status, the binding, the sheet or the scorer. A probe that contradicts a preregistered mechanism is reported as a pre-run finding. The primary attempt still runs the closest implementation the port contract allows, and its verdict stands as scored."
+  },
+  "predictions": {
+    "basis": "Pinned documentation and source reading plus arithmetic on the converted rows; not observations. The pre-run scorer probe (synthetic receipts, no engine) shows how compare.py scores each predicted shape.",
+    "ml4t-backtest": {
+      "verdict": "PASS",
+      "checks": 29,
+      "pass": 29,
+      "intents": "+304 at 1577826000 (entry), -304 at 1588190400 (exit)",
+      "fills": "304 at 323.58, stamped 1577977200; -304 at 291.69, stamped 1588255200; fees 0",
+      "distributions": "engine-posted 0.00 at 1576854000 (flat) and 428.64 at 1584712800 (304 x 1.41)",
+      "cash": "native and reconciled end cash 90734.08; final quantity 0",
+      "falsified_by": "a fill at any price other than the next session's first-bar open, or stamped at any instant other than that bar's end; no FundingPayment for either event; native end cash more than 0.01 from 90734.080; any unexplained residue; a failed guard; unequal run records"
+    },
+    "lumibot": {
+      "verdict": "BLOCKED",
+      "checks": 29,
+      "pass": 28,
+      "fail": 1,
+      "intents": "+304 at 1577826000 (entry), -304 at 1588190400 (exit)",
+      "fills": "304 at 323.58, stamped 1577977200; -304 at 291.69, stamped 1588255200; fees 0",
+      "distributions": "external ledger (engine_posted false): 0.00 at 1576818000 and 428.64 at 1584676800",
+      "cash": "reconciled end cash 90734.08; native end cash 90305.44; final quantity 0",
+      "only_failure": "native_end_cash: expected 90734.080, observed 90305.44, delta -428.64, blocked_by distributions_and_cash",
+      "falsified_by": "a fill stamped at any instant other than the next session's first-bar end, or at any price other than that bar's open; a native dividend posting; any failure other than the attributed native_end_cash; a failed guard; unequal run records"
+    },
+    "named_alternatives": [
+      "Lumibot fills at the next session's first-bar close: FAIL, 25 of 29, rejected attribution market_on_open_proxy (probe P3 shape; the same fill prices as the Nautilus v1 arm).",
+      "Lumibot fills stamped one bar early or late: FAIL on event_seconds (tolerance 0).",
+      "ml4t funding not posted: FAIL, 28 of 29, rejected attribution distributions_and_cash (probe P4 shape)."
+    ]
+  },
+  "comparison_plan": {
+    "readme": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/README.md shows both arms beside the Nautilus arm.",
+    "like_for_like": "ml4t-backtest and Lumibot against the Nautilus v1 verdict.json: the same 29-check v1 contract, tolerance sheet, oracle, plan and converted rows. The Nautilus v1 verdict is dated (2026-09-22) and cannot be re-scored at this pin.",
+    "context_only": "The Nautilus v2 verdict-v2.json: a different 136-check contract with 30 preconditions under the sealed Nautilus manifest, re-scored PASS at this pin on 2026-09-26. Shown for context, never ranked against the v1-contract arms.",
+    "columns": [
+      "arm",
+      "engine and pin",
+      "contract",
+      "verdict",
+      "checks pass/fail/skipped",
+      "failing checks with expected, observed and delta",
+      "blocking mappings",
+      "unattributed failures",
+      "rejected attributions",
+      "native end cash",
+      "distribution posting (engine or external)",
+      "market-on-open mechanism",
+      "declared deviations"
+    ],
+    "no_ranking": "No engine is ranked, promoted, selected or adopted by this trial. A PASS covers one historical-simulation case on bundled sample data (HIST). It says nothing about one_stress, two_zero or later cases (still blocked by costs_and_rounding_stress and margin_and_adaptive_state), about paper operation or about live trading."
+  },
+  "failure_policy": {
+    "attempt": "One sandboxed invocation of the port on the frozen inputs. Mechanism probes on synthetic bars are not attempts.",
+    "F1_record_everything": "Every attempt gets the next id (attempt-01, attempt-02, ...) and a run.json entry: UTC start, wall seconds, bwrap argv with placeholders, added environment variables, port, manifest and lock sha256, repository commit, port exit code, outcome class (receipt, port_error, engine_error or sandbox_error), receipt sha256, scorer exit code and verdict, and classification (primary, broken, receipt_repair or post_hoc). Broken ports and refused receipts are recorded like any other attempt.",
+    "F2_primary": "The first attempt that produces a receipt is the arm's primary attempt. It is scored at once with the preregistered command, and its receipt.json and verdict.json are committed whatever the verdict. A BLOCKED or FAIL verdict with its failing rows is the arm's result.",
+    "F3_broken": "An attempt in which an engine run cannot complete (sandbox, import, input verification, engine or port exception) is broken and has no verdict. The port may be repaired, committed and run again; the error class (without host paths) and the repair are recorded. A guard failure inside completed runs is not a break: it is recorded in the receipt, which is scored.",
+    "F4_bind_refusal": "If compare.py refuses the primary receipt before any check, the reason is recorded. One structural repair of receipt assembly (key names, types, hash fields or serialization) is allowed, provided the engine configuration, data, strategy logic, projection rule and every engine-reported value stay unchanged. The repaired attempt is labelled receipt_repair and scored as the primary result, and its economic values must equal the refused receipt's.",
+    "F5_post_hoc": "After the primary verdict, every further attempt (a port fix the verdict exposed, or a variant such as ml4t with an external distribution ledger or Lumibot with another hook or timestep) is post_hoc. It is scored with the same command, sheet and arm manifest, using the file names receipt.post-hoc-NN.json and verdict.post-hoc-NN.json, and reported beside the primary verdict, never instead of it. A variant that would need a different row status cannot be scored under this preregistration.",
+    "F6_no_verdict": "An arm whose port never produces a receipt is reported as NO-VERDICT with every attempt and error class. That is a committed result.",
+    "F7_frozen": "compare.py, convert.py, tolerances.json, fixture_strategy.py, the arm bindings, the projection rule, the scorer command and this file do not change during the trial. A needed change starts a new, separately preregistered trial.",
+    "F8_private_attempts": "Private attempt directories are never overwritten, reused or deleted during the trial, and attempt ids are never reused."
+  },
+  "no_paper": "No paper step of any kind. No broker client is constructed, no broker adapter is configured, no paper or live endpoint is contacted, and no broker credential is read or referenced. The Lumibot port uses only its backtesting path (PandasData and the backtesting broker); the Alpaca, IBKR, Tradier, Schwab and other broker modules the environment installs are never configured. The run sandbox has no network, so any connection attempt fails closed. Paper qualification stays a separate scope under docs/paper-lane-policy.md.",
+  "gpl": {
+    "status": "Lumibot 4.6.1 is GPL-3.0 (license file and package metadata at the tag). This trial uses it for evaluation only.",
+    "rules": [
+      "The port imports lumibot from the isolated environment at run time. No Lumibot source, docstring, example strategy, test or data file is copied or vendored into the repository; descriptions of engine behavior cite pinned locations instead of quoting code.",
+      "Citations point to pinned upstream URLs and wheel paths with line numbers. They do not quote code.",
+      "The Lumibot environment, wheel and the built ibapi wheel stay outside every checkout and are never redistributed.",
+      "Published files contain only this repository's code (the port), its outputs (numbers and hashes) and upstream citations."
+    ],
+    "not_assessed": "Whether publishing an MIT-licensed port that imports GPL-3.0 Lumibot creates obligations beyond evaluation use is not assessed here. The coordinator's condition 3 permits the import.",
+    "ibapi": "ibapi 9.81.1.post1 carries the IB API Non-Commercial or Commercial License. It is built and installed only inside the evaluation environment and never redistributed."
+  },
+  "pre_run_evidence": [
+    {
+      "check": "Pinned files re-hashed at 5c1961e4 and at origin/main d78d2de9",
+      "outcome": "compare.py, tolerances.json, convert.py, fixture_strategy.py, both Nautilus manifests, receipts and verdicts, run.py, README.md, deviation-acceptance-v2.json, and the oracle and plan are byte-identical at both commits and in the worktree",
+      "class": "reproduced local check"
+    },
+    {
+      "check": "Five frozen LEAN inputs re-hashed on this host",
+      "outcome": "all five match",
+      "class": "reproduced local check"
+    },
+    {
+      "check": "convert.py re-derivation (no engine)",
+      "outcome": "725 rows, 104 sessions, sha256 6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc; key rows and distributions as recorded under pins",
+      "class": "reproduced local check"
+    },
+    {
+      "check": "Oracle projection with compare.oracle_case",
+      "outcome": "values recorded under pins.oracle_one_zero",
+      "class": "reproduced local check"
+    },
+    {
+      "check": "Nautilus baselines scored with the pinned compare.py and --lean-data",
+      "outcome": "v1 receipt refused at bind (local_source_sha256_mismatch:compare.py); v2 receipt PASS with 136 checks, identical keys and statuses to the committed verdict-v2.json",
+      "class": "reproduced local check"
+    },
+    {
+      "check": "PyPI JSON metadata for ml4t-backtest 0.1.12, ml4t-specs 0.1.5, lumibot 4.6.1 and ibapi 9.81.1.post1",
+      "outcome": "digests, sizes, upload times, licenses and requirements as recorded under engines; each pinned version was the latest release. The wheels downloaded for source reading hash to the PyPI digests. An earlier pre-run report listed an ml4t-specs wheel digest that matched the PyPI digest only in its first 8 hex characters; the PyPI digest recorded here is authoritative.",
+      "class": "primary-source metadata"
+    },
+    {
+      "check": "Upstream tags resolved with git ls-remote",
+      "outcome": "ml4t/backtest v0.1.12 -> 672804b36915742fe18af9cd09b44e9839d39d6f; ml4t/specs v0.1.5 -> 07db811feac5541882201440eae4238c9dd9a39e; Lumiwealth/lumibot v4.6.1 -> 2dfdda100cdc34e5acb46a7f13e8208a35aede72",
+      "class": "primary-source metadata"
+    },
+    {
+      "check": "Upstream documents fetched at the pinned commits",
+      "outcome": "hashes under upstream_documents",
+      "class": "primary-source documentation"
+    },
+    {
+      "check": "Source reading of the two hash-verified wheels (unpacked, never installed or imported)",
+      "outcome": "the file and line citations in engines and arm_manifests",
+      "class": "pinned source review"
+    },
+    {
+      "check": "ml4t indicative resolution with the preregistered resolve command",
+      "outcome": "15 packages; lock sha256 under engines.ml4t-backtest.environment.indicative_resolution; nothing installed",
+      "class": "reproduced local check"
+    },
+    {
+      "check": "Scorer contract probe: synthetic receipts under this file's two bindings, scored by the pinned compare.py with --lean-data",
+      "outcome": "P1 ml4t predicted shape: PASS, 29 of 29. P2 Lumibot predicted shape: BLOCKED, 28 of 29, blocking distributions_and_cash. P3 Lumibot first-bar-close fills: FAIL, 25 of 29, rejected market_on_open_proxy. P4 ml4t unposted distributions: FAIL, 28 of 29, rejected distributions_and_cash. P5 ml4t receipt bound to the unchanged Nautilus manifest: refused at bind (engine_version_disagrees_with_manifest:0.1.12). The worktree stayed clean.",
+      "class": "synthetic fixture (no engine; not parity evidence)"
+    },
+    {
+      "check": "Host tools",
+      "outcome": "bwrap 0.9.0, uv 0.12.17, /usr/bin/python3.12 = CPython 3.12.3",
+      "class": "reproduced local check"
+    },
+    {
+      "check": "Bounded search for existing installations (~/.local, ~/code and /opt, depth 7)",
+      "outcome": "no lumibot, ml4t_backtest or ml4t_specs distribution installed",
+      "class": "reproduced local check"
+    }
+  ],
+  "upstream_documents": {
+    "ml4t-backtest": {
+      "profiles": {
+        "url": "https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/docs/user-guide/profiles.md",
+        "sha256": "ee9aa112f6b44ec9267460b41721b3dfba73710675f3fdbbddf9503a209178ac",
+        "bytes": 21354
+      },
+      "execution_semantics": {
+        "url": "https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/docs/user-guide/execution-semantics.md",
+        "sha256": "0abc331598e4f5fa8dba6003b165bb6e4fac50da3f5d760f3135cf05214c591f",
+        "bytes": 23058
+      },
+      "market_impact_and_funding": {
+        "url": "https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/docs/user-guide/market-impact.md",
+        "sha256": "74c18a25955936e6c66b89cd6384cb32cb3e4b46c45937c1e65c306a011afc41",
+        "bytes": 10823
+      },
+      "costs_and_funding_tutorial": {
+        "url": "https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/docs/tutorials/costs-and-funding.md",
+        "sha256": "5bed400f9fe5576e9e39c887319ea4c0aebbe90a443345dbdddf5e66898dad60",
+        "bytes": 8395
+      }
+    },
+    "lumibot": {
+      "pandas_backtesting": {
+        "url": "https://github.com/Lumiwealth/lumibot/blob/2dfdda100cdc34e5acb46a7f13e8208a35aede72/docsrc/backtesting.pandas.rst",
+        "sha256": "edb110b53f9437257c31a1b2e44e1b7a494e530332a2a28db71cb469d44f3a2b",
+        "bytes": 9484
+      },
+      "hour_timestep_tests": {
+        "url": "https://github.com/Lumiwealth/lumibot/blob/2dfdda100cdc34e5acb46a7f13e8208a35aede72/tests/test_hour_timestep_support.py",
+        "sha256": "820cd040c146faed010daacb08301b9c787aa7f269721391271b6af6b06bd6ac"
+      },
+      "license": {
+        "url": "https://github.com/Lumiwealth/lumibot/blob/2dfdda100cdc34e5acb46a7f13e8208a35aede72/LICENSE",
+        "sha256": "7d8846232c63c8d5c00a0a4d412df1c69c4339a54e59157164c0916ec0eff24d"
+      }
+    }
+  },
+  "needs_registration": {
+    "note": "manifests/evidence.json lies outside this trial's owned paths. The coordinator registers these files with sha256 and byte counts, as the spy-parity files are registered.",
+    "now": [
+      "blueprints/us-equities/engine-trials/spy-one-zero-20260926/preregistration.json"
+    ],
+    "later": [
+      "blueprints/us-equities/engine-trials/spy-one-zero-20260926/README.md",
+      "blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/mapping-manifest.json",
+      "blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/fixture_port.py",
+      "blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/receipt.json",
+      "blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/verdict.json",
+      "blueprints/us-equities/engine-trials/spy-one-zero-20260926/<arm>/run.json"
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+mcp-inspector resolves: ~/.local/share/codex-ecosystem/bin/mcp-inspector -> ~/.local/share/codex-ecosystem/tools/mcp-inspector-2.8.0/lib/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js
+installed version (npm ls, not --version): 2.8.0
+qmd: qmd 2.8.3 (facd35e)
+Shutting down (stdin closed)...
+tools/list OK, tool names: ['get', 'multi_get', 'query', 'status']
+Shutting down (stdin closed)...
+tools/call query OK, hit: scratch/note.md
+positive-control exit code: 5
+positive control OK: exit 5, tool_not_found
+ALL CHECKS PASSED

@@ -1,0 +1,732 @@
+{
+ "generated_at_utc": "2026-10-02T02:12:15Z",
+ "revised_at_utc": "2026-10-03T18:26:54Z",
+ "source": "origin/main definitive manifest, one row per foundation row",
+ "owners": [
+  {
+   "layer": "native-clients",
+   "slot": "claude-code",
+   "owner": "Claude Code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "installed": true,
+   "note": "",
+   "tag_name": "v2.1.287",
+   "published_at": "2026-10-01T18:00:22Z",
+   "pushed_at": "2026-10-01T18:43:10Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "native-clients",
+   "slot": "codex",
+   "owner": "Codex",
+   "repository": "https://github.com/openai/codex",
+   "installed": true,
+   "note": "",
+   "tag_name": "rust-v0.160.0",
+   "published_at": "2026-10-01T20:19:13Z",
+   "pushed_at": "2026-10-02T01:59:59Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "agent-sdks",
+   "slot": "claude-agent-sdk",
+   "owner": "Claude Agent SDK",
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+   "installed": true,
+   "note": "",
+   "tag_name": "v0.2.163",
+   "published_at": "2026-09-30T19:47:45Z",
+   "pushed_at": "2026-10-01T18:01:48Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "agent-sdks",
+   "slot": "codex-sdk-and-codex-exec-app-server",
+   "owner": "Codex SDK and codex exec/app-server",
+   "repository": "https://github.com/openai/codex",
+   "installed": true,
+   "note": "",
+   "tag_name": "rust-v0.160.0",
+   "published_at": "2026-10-01T20:19:13Z",
+   "pushed_at": "2026-10-02T01:59:59Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "instructions-skills",
+   "slot": "trail-of-bits-security-skills-trailofbits-skills",
+   "owner": "Trail of Bits security skills (trailofbits/skills)",
+   "repository": "https://github.com/trailofbits/skills",
+   "installed": true,
+   "note": "",
+   "pushed_at": "2026-09-28T18:06:38Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "instructions-skills",
+   "slot": "engineering-process-skills",
+   "owner": "mattpocock/skills (selected skills, not the bundle)",
+   "repository": "https://github.com/mattpocock/skills",
+   "installed": true,
+   "note": "",
+   "tag_name": "v1.2.3",
+   "published_at": "2026-08-06T14:05:28Z",
+   "pushed_at": "2026-09-29T12:38:37Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "instructions-skills",
+   "slot": "skill-discovery",
+   "owner": "find-skills (vercel-labs/skills)",
+   "repository": "https://github.com/vercel-labs/skills",
+   "installed": true,
+   "note": "added by the layer consensus of 2026-10-02; the pin is the record's commit, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "instructions-skills",
+   "slot": "skill-authoring",
+   "owner": "skill-creator (embedded in Codex; anthropics/skills for Claude Code)",
+   "repository": "https://github.com/anthropics/skills",
+   "installed": true,
+   "note": "added by the layer consensus of 2026-10-02; the pin is the record's commit, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "instructions-skills",
+   "slot": "research-skill",
+   "owner": "Not installed until its activation gate returns (GPT Researcher's own skill with its MCP server)",
+   "repository": "",
+   "installed": false,
+   "note": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing is installed and this plan carries no install command for it until its activation gate returns. The gate, as the record gives it: An activation gate, not a comparison: a resolved and pinned environment for the MCP server, a native protocol handshake over STDIO, discovery of its five tools, a useful research result returned in each client, and a bounded lifecycle (start, stop, removal). The candidate is the GPT Researcher skill (assafelovic/gpt-researcher at 0957c301ed06c2a5857b834358c7227c739041d4, skills/gpt-researcher/SKILL.md) with its dependency gptr-mcp (assafelovic/gptr-mcp at 63884773685b1f12c7f0d9e283b3d71a5b9b5fda); neither is installed, pinned into this plan or run."
+  },
+  {
+   "layer": "mcp-surfaces",
+   "slot": "mcporter",
+   "owner": "mcporter",
+   "repository": "https://github.com/openclaw/mcporter",
+   "installed": true,
+   "note": "",
+   "tag_name": "v0.14.2",
+   "published_at": "2026-10-01T18:24:07Z",
+   "pushed_at": "2026-10-01T18:43:11Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "mcp-surfaces",
+   "slot": "mcp-inspector",
+   "owner": "MCP Inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "installed": false,
+   "note": "run on demand with npx; mcporter owns MCP calls from scripts",
+   "tag_name": "2.9.0",
+   "published_at": "2026-09-30T22:23:56Z",
+   "pushed_at": "2026-10-02T02:10:44Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "workers",
+   "slot": "agent-messaging",
+   "owner": "Not installed until the deciding measurement returns",
+   "repository": "",
+   "installed": false,
+   "note": "native facilities do not cover messaging into a running Codex session, but installing hcom changes how sessions start and what they may do without asking, which is the owner's decision and not a default install"
+  },
+  {
+   "layer": "isolation",
+   "slot": "sandbox-runtime-srt",
+   "owner": "sandbox-runtime (srt)",
+   "repository": "https://github.com/anthropics/sandbox-runtime",
+   "installed": true,
+   "note": "",
+   "tag_name": "v0.0.78",
+   "published_at": "2026-09-30T01:09:22Z",
+   "pushed_at": "2026-10-01T14:23:34Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "isolation",
+   "slot": "isolation-container-boundary",
+   "owner": "No additional component: rootless containers on the container engine that the hosting layer installs",
+   "repository": "",
+   "installed": false,
+   "note": "decided by both families in the decision round: no second container boundary"
+  },
+  {
+   "layer": "code-navigation",
+   "slot": "serena",
+   "owner": "Serena",
+   "repository": "https://github.com/oraios/serena",
+   "installed": true,
+   "note": "",
+   "tag_name": "v1.7.0",
+   "published_at": "2026-08-09T18:38:06Z",
+   "pushed_at": "2026-09-30T21:03:51Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "code-navigation",
+   "slot": "claude-plugins-official-code-intelligence-lsp-pl",
+   "owner": "Not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it",
+   "repository": "",
+   "installed": false,
+   "note": "the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it"
+  },
+  {
+   "layer": "code-navigation",
+   "slot": "structural-search",
+   "owner": "ast-grep",
+   "repository": "https://github.com/ast-grep/ast-grep",
+   "installed": true,
+   "note": "",
+   "tag_name": "0.45.3",
+   "published_at": "2026-08-31T01:42:23Z",
+   "pushed_at": "2026-10-01T19:31:47Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "semantic-rag",
+   "slot": "code-search",
+   "owner": "semble 0.6.1",
+   "repository": "https://github.com/MinishLab/semble",
+   "installed": true,
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pins are the wave-2 code-search ruling's, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "semantic-rag",
+   "slot": "embedding-model",
+   "owner": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
+   "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+   "installed": true,
+   "note": "settled by the local-model measurement of 2026-10-02 and 2026-10-03; the pin is the Ollama library manifest digest, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "semantic-rag",
+   "slot": "reranker-model",
+   "owner": "Not installed: no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever",
+   "repository": "",
+   "installed": false,
+   "note": "no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever"
+  },
+  {
+   "layer": "document-retrieval",
+   "slot": "tobi-qmd",
+   "owner": "tobi/qmd",
+   "repository": "https://github.com/tobi/qmd",
+   "installed": true,
+   "note": "",
+   "tag_name": "v2.8.3",
+   "published_at": "2026-08-16T22:30:34Z",
+   "pushed_at": "2026-10-02T00:41:53Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "document-retrieval",
+   "slot": "mineru",
+   "owner": "MinerU",
+   "repository": "https://github.com/opendatalab/mineru",
+   "installed": true,
+   "note": "",
+   "tag_name": "mineru-4.0.10-released",
+   "published_at": "2026-09-29T07:18:10Z",
+   "pushed_at": "2026-09-30T09:13:37Z",
+   "default_branch": "master"
+  },
+  {
+   "layer": "web-research",
+   "slot": "trafilatura",
+   "owner": "Not installed: text extraction is a sub-step of retrieval that the two agents' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it",
+   "repository": "",
+   "installed": false,
+   "note": "text extraction is a sub-step of retrieval that the two agents' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it"
+  },
+  {
+   "layer": "web-research",
+   "slot": "playwright-cli",
+   "owner": "Playwright CLI",
+   "repository": "https://github.com/microsoft/playwright-cli",
+   "installed": false,
+   "measurement_only": true,
+   "note": "",
+   "tag_name": "v0.1.22",
+   "published_at": "2026-09-28T23:23:13Z",
+   "pushed_at": "2026-09-28T23:23:12Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "web-research",
+   "slot": "web-search-provider",
+   "owner": "Not installed: both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries",
+   "repository": "",
+   "installed": false,
+   "note": "both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries"
+  },
+  {
+   "layer": "durable-memory",
+   "slot": "memory-owner",
+   "owner": "ai-memory 2.5.2",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "installed": true,
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pin is the wave-2 memory dossier's, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "ccusage",
+   "owner": "Not installed: the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it",
+   "repository": "",
+   "installed": false,
+   "note": "the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "context-supply",
+   "owner": "context-mode 1.0.169",
+   "repository": "https://github.com/mksglu/context-mode",
+   "installed": true,
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pins are the wave-2 context ruling's, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "statusline",
+   "owner": "claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line",
+   "repository": "https://github.com/jarrodwatts/claude-hud",
+   "installed": true,
+   "note": "added by the wave-2 batch of the layer consensus (2026-10-03); the pin is the wave-2 usage ruling's, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "observation-inference",
+   "slot": "otel-collector-contrib",
+   "owner": "OTel Collector Contrib",
+   "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+   "installed": true,
+   "note": "",
+   "tag_name": "v0.162.0",
+   "published_at": "2026-09-29T10:11:33Z",
+   "pushed_at": "2026-10-01T20:45:11Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "observation-inference",
+   "slot": "prometheus",
+   "owner": "Prometheus",
+   "repository": "https://github.com/prometheus/prometheus",
+   "installed": true,
+   "note": "",
+   "tag_name": "v3.15.0",
+   "published_at": "2026-09-25T08:56:22Z",
+   "pushed_at": "2026-10-01T23:18:49Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "observation-inference",
+   "slot": "loki",
+   "owner": "Loki",
+   "repository": "https://github.com/grafana/loki",
+   "installed": false,
+   "measurement_only": true,
+   "note": "",
+   "tag_name": "v3.7.8",
+   "published_at": "2026-09-17T15:51:10Z",
+   "pushed_at": "2026-10-02T01:15:06Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "observation-inference",
+   "slot": "grafana",
+   "owner": "Grafana",
+   "repository": "https://github.com/grafana/grafana",
+   "installed": false,
+   "measurement_only": true,
+   "note": "",
+   "tag_name": "v13.2.3",
+   "published_at": "2026-09-29T09:02:18Z",
+   "pushed_at": "2026-10-02T01:55:43Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "observation-inference",
+   "slot": "phoenix",
+   "owner": "Not installed: qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer's requirement has no trace-store job; no blind GPT sample picked it",
+   "repository": "",
+   "installed": false,
+   "note": "qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer's requirement has no trace-store job; no blind GPT sample picked it"
+  },
+  {
+   "layer": "observation-inference",
+   "slot": "local-model-server",
+   "owner": "Ollama",
+   "repository": "https://github.com/ollama/ollama",
+   "installed": true,
+   "note": "",
+   "tag_name": "v0.35.0",
+   "published_at": "2026-09-28T21:23:22Z",
+   "pushed_at": "2026-10-02T02:02:05Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "observation-inference",
+   "slot": "alerting",
+   "owner": "Alertmanager",
+   "repository": "https://github.com/prometheus/alertmanager",
+   "installed": true,
+   "note": "",
+   "tag_name": "v0.34.1",
+   "published_at": "2026-09-17T08:12:07Z",
+   "pushed_at": "2026-10-01T15:09:52Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "observation-inference",
+   "slot": "local-generation-model",
+   "owner": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
+   "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
+   "installed": true,
+   "note": "settled by the local-model measurement of 2026-10-02; the pins are the Hugging Face revision and the file's sha256, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "observation-inference",
+   "slot": "session-analytics",
+   "owner": "Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set",
+   "repository": "",
+   "installed": false,
+   "note": "both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set"
+  },
+  {
+   "layer": "quality-evaluation",
+   "slot": "inspect-ai",
+   "owner": "Inspect AI",
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "installed": true,
+   "note": "",
+   "pushed_at": "2026-10-02T02:05:19Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "quality-evaluation",
+   "slot": "harbor-containerized-agent-e2e-runner",
+   "owner": "Harbor (containerized agent E2E runner)",
+   "repository": "https://github.com/harbor-framework/harbor",
+   "installed": true,
+   "note": "",
+   "tag_name": "v0.23.0",
+   "published_at": "2026-09-12T04:55:17Z",
+   "pushed_at": "2026-10-01T15:35:19Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "quality-evaluation",
+   "slot": "promptfoo",
+   "owner": "Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
+   "repository": "",
+   "installed": false,
+   "note": "prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it"
+  },
+  {
+   "layer": "ci-supply-chain",
+   "slot": "zizmor",
+   "owner": "zizmor",
+   "repository": "https://github.com/zizmorcore/zizmor",
+   "installed": true,
+   "note": "",
+   "tag_name": "v1.30.1",
+   "published_at": "2026-09-09T05:34:10Z",
+   "pushed_at": "2026-10-02T02:11:28Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "ci-supply-chain",
+   "slot": "attest",
+   "owner": "attest",
+   "repository": "https://github.com/actions/attest",
+   "installed": false,
+   "note": "a GitHub-hosted feature configured in a workflow: nothing is installed on the host. Reviewed pointer for repository workflows, not a host installation: uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6. No host installation/acceptance command. Workflows require repository/artifact configuration.",
+   "tag_name": "v4.2.2",
+   "published_at": "2026-08-04T20:36:29Z",
+   "pushed_at": "2026-09-29T22:05:21Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "ci-supply-chain",
+   "slot": "syft",
+   "owner": "Syft",
+   "repository": "https://github.com/anchore/syft",
+   "installed": true,
+   "note": "",
+   "tag_name": "v1.54.0",
+   "published_at": "2026-10-01T20:54:29Z",
+   "pushed_at": "2026-10-01T21:21:13Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "ci-supply-chain",
+   "slot": "dependabot",
+   "owner": "Dependabot",
+   "repository": "https://github.com/dependabot/dependabot-core",
+   "installed": false,
+   "note": "the only owner of dependency update pull requests: none of zizmor, actionlint, Syft or attest moves a pin; one blind GPT sample of three picked it; a GitHub-hosted service configured by .github/dependabot.yml: nothing is installed on the host. Reviewed pointer for repository workflows, not a host installation: Tag resolves to a1750051287d1f3786081d3aa3e6e2b04a72edde. No valid uses: reference: upstream repository has no action entrypoint. Enable GitHub Dependabot through .github/dependabot.yml; no host installation.",
+   "tag_name": "v0.398.0",
+   "published_at": "2026-09-28T03:51:27Z",
+   "pushed_at": "2026-10-02T00:17:33Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "ci-supply-chain",
+   "slot": "codeql-sarif",
+   "owner": "Not installed: a transport, not a scanner: zizmor's own action carries the pinned upload step; no blind GPT sample picked it as a slot",
+   "repository": "",
+   "installed": false,
+   "note": "a transport, not a scanner: zizmor's own action carries the pinned upload step; no blind GPT sample picked it as a slot"
+  },
+  {
+   "layer": "ci-supply-chain",
+   "slot": "actionlint-kjanat",
+   "owner": "actionlint (kjanat)",
+   "repository": "https://github.com/kjanat/actionlint",
+   "installed": true,
+   "note": "",
+   "tag_name": "v1.17.0",
+   "published_at": "2026-09-13T16:07:47Z",
+   "pushed_at": "2026-10-01T14:47:26Z",
+   "default_branch": "master"
+  },
+  {
+   "layer": "scheduling-supervision",
+   "slot": "dagu",
+   "owner": "Dagu",
+   "repository": "https://github.com/dagucloud/dagu",
+   "installed": true,
+   "note": "",
+   "tag_name": "v2.18.1",
+   "published_at": "2026-09-29T15:24:51Z",
+   "pushed_at": "2026-10-02T01:19:01Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "hosting-services",
+   "slot": "docker-compose",
+   "owner": "Docker Compose",
+   "repository": "https://github.com/docker/compose",
+   "installed": true,
+   "note": "",
+   "tag_name": "v5.5.1",
+   "published_at": "2026-09-03T15:53:28Z",
+   "pushed_at": "2026-10-01T16:29:56Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "hosting-services",
+   "slot": "container-engine",
+   "owner": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby",
+   "installed": true,
+   "note": "",
+   "tag_name": "docker-v29.8.2",
+   "published_at": "2026-09-30T20:28:33Z",
+   "pushed_at": "2026-10-01T20:55:12Z",
+   "default_branch": "master"
+  },
+  {
+   "layer": "hosting-services",
+   "slot": "gpu-container-runtime",
+   "owner": "Not installed: no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does",
+   "repository": "",
+   "installed": false,
+   "note": "no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does"
+  },
+  {
+   "layer": "secrets-credentials",
+   "slot": "betterleaks",
+   "owner": "betterleaks",
+   "repository": "https://github.com/betterleaks/betterleaks",
+   "installed": true,
+   "note": "",
+   "tag_name": "v1.9.0",
+   "published_at": "2026-09-29T20:08:06Z",
+   "pushed_at": "2026-09-30T19:05:13Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "secrets-credentials",
+   "slot": "trufflehog",
+   "owner": "Not installed: no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for",
+   "repository": "",
+   "installed": false,
+   "note": "no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for"
+  },
+  {
+   "layer": "secrets-credentials",
+   "slot": "credential-custody",
+   "owner": "Not installed until the deciding measurement returns (the repository's runner and guard stay the practice)",
+   "repository": "",
+   "installed": false,
+   "note": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing is installed until the deciding measurement returns, and the repository's practice stays in use. The measurement, as the record gives it: HASP against the repository's runner and guard on the existing synthetic leak-path fixtures: output and trace checks, audit records, client boundaries, restart and removal. A claim that an agent can never read a value needs direct controls and a stated isolation scope. Native client sign-ins stay native: no import or copy of an authentication store, no real secret, no operating-system grant and no provider call is part of the comparison. HASP 1.0.43 (gethasp/hasp at 624b3b38ac4f7a267e6925c545768c95945d781a) is the challenger arm; it is not installed, and this plan carries no install command for an arm."
+  },
+  {
+   "layer": "git-github-automation",
+   "slot": "git",
+   "owner": "git",
+   "repository": "https://github.com/git/git",
+   "installed": true,
+   "note": "",
+   "pushed_at": "2026-10-01T22:01:02Z",
+   "default_branch": "master"
+  },
+  {
+   "layer": "git-github-automation",
+   "slot": "gh-github-cli",
+   "owner": "gh (GitHub CLI)",
+   "repository": "https://github.com/cli/cli",
+   "installed": true,
+   "note": "",
+   "tag_name": "v2.102.0",
+   "published_at": "2026-09-30T02:40:02Z",
+   "pushed_at": "2026-10-01T16:57:11Z",
+   "default_branch": "trunk"
+  },
+  {
+   "layer": "git-github-automation",
+   "slot": "worktrunk",
+   "owner": "worktrunk",
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "installed": true,
+   "note": "",
+   "tag_name": "v0.80.0",
+   "published_at": "2026-09-27T21:18:46Z",
+   "pushed_at": "2026-10-02T01:15:25Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "git-github-automation",
+   "slot": "difftastic",
+   "owner": "difftastic",
+   "repository": "https://github.com/Wilfred/difftastic",
+   "installed": true,
+   "note": "",
+   "tag_name": "0.71.0",
+   "published_at": "2026-09-18T22:57:29Z",
+   "pushed_at": "2026-09-22T08:42:53Z",
+   "default_branch": "master"
+  },
+  {
+   "layer": "git-github-automation",
+   "slot": "claude-code-action",
+   "owner": "Not installed: it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it",
+   "repository": "",
+   "installed": false,
+   "note": "it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it"
+  },
+  {
+   "layer": "git-github-automation",
+   "slot": "agent-structural-diff",
+   "owner": "Not installed: git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes)",
+   "repository": "",
+   "installed": false,
+   "note": "git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes)"
+  },
+  {
+   "layer": "git-github-automation",
+   "slot": "cross-family-review",
+   "owner": "No additional component: the two clients' native review commands, each family on the other's work",
+   "repository": "",
+   "installed": false,
+   "note": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing additional is installed: the capability is the two clients' native review commands, which the claude-code and codex rows install. The record's open gate is the qualification of the Codex 0.160 review command on the destination, owned by the Codex lane. PR-Agent 0.47.0 is a comparison only for an identified gap and is not installed."
+  },
+  {
+   "layer": "recovery-portability",
+   "slot": "mise",
+   "owner": "mise",
+   "repository": "https://github.com/jdx/mise",
+   "installed": true,
+   "note": "",
+   "tag_name": "v2026.10.0",
+   "published_at": "2026-10-02T01:42:32Z",
+   "pushed_at": "2026-10-02T02:08:56Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "recovery-portability",
+   "slot": "restic",
+   "owner": "Restic",
+   "repository": "https://github.com/restic/restic",
+   "installed": true,
+   "note": "",
+   "tag_name": "v0.19.1",
+   "published_at": "2026-07-05T08:13:33Z",
+   "pushed_at": "2026-10-01T01:44:09Z",
+   "default_branch": "master"
+  },
+  {
+   "layer": "recovery-portability",
+   "slot": "chezmoi",
+   "owner": "Not installed: mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it",
+   "repository": "",
+   "installed": false,
+   "note": "mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it"
+  },
+  {
+   "layer": "cross:wsl-distro",
+   "slot": "base-distribution",
+   "owner": "Ubuntu 26.04.1 LTS (Canonical WSL image), primary",
+   "repository": "https://releases.ubuntu.com/26.04.1/",
+   "installed": false,
+   "note": "The target distribution itself: the plan runs on this image and installs nothing for this row."
+  },
+  {
+   "layer": "cross:gpt6-harnesses",
+   "slot": "gpt-gateway",
+   "owner": "OmniRoute",
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "installed": true,
+   "note": "",
+   "tag_name": "v3.8.51",
+   "published_at": "2026-09-30T01:41:50Z",
+   "pushed_at": "2026-10-02T01:27:47Z",
+   "default_branch": "release/v3.8.52"
+  },
+  {
+   "layer": "cross:runtime-workers",
+   "slot": "agent-runtime-worker",
+   "owner": "OpenHands software-agent-sdk",
+   "repository": "https://github.com/OpenHands/software-agent-sdk",
+   "installed": true,
+   "note": "",
+   "tag_name": "v1.50.1",
+   "published_at": "2026-09-30T19:31:33Z",
+   "pushed_at": "2026-10-02T00:46:58Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "cross:runtime-workers",
+   "slot": "research-harnesses",
+   "owner": "GPT Researcher and DeerFlow, kept as two independent evidence gatherers",
+   "repository": "https://github.com/assafelovic/gpt-researcher ; https://github.com/bytedance/deer-flow",
+   "installed": true,
+   "note": "",
+   "tag_name": "v3.7.0 ; v2.1.0",
+   "published_at": "2026-09-26T17:46:25Z ; 2026-09-24T10:40:44Z",
+   "pushed_at": "2026-10-01T19:33:35Z ; 2026-10-01T23:30:10Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "cross:credential-practice",
+   "slot": "credential-guard",
+   "owner": "Command and secret-path guard (K4)",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "installed": true,
+   "note": "",
+   "tag_name": "v2026.09.26.2",
+   "published_at": "2026-09-26T16:04:55Z",
+   "pushed_at": "2026-10-02T00:34:31Z",
+   "default_branch": "main"
+  },
+  {
+   "layer": "cross:convergence-practice",
+   "slot": "convergence-validators",
+   "owner": "Convergence practice and its validators",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "installed": true,
+   "note": "",
+   "tag_name": "v2026.09.26.2",
+   "published_at": "2026-09-26T16:04:55Z",
+   "pushed_at": "2026-10-02T00:34:31Z",
+   "default_branch": "main"
+  }
+ ]
+}

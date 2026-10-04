@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "sota-refresh-20260925-ai-memory-cutover",
+  "unit": "ai-memory",
+  "host": "nativestack-5975wx-20260925",
+  "date_utc": "2026-09-25",
+  "observed_by": "coordinator",
+  "evidence_class": "Coordinator observations of the production cutover, exported as aggregate facts only. The private window directory (~/.local/state/native-agent-stack/sota-refresh-20260925/ai-memory-cutover/, mode 0700) holds the cold copy and fingerprint files; none of its files, and no store content, is published here.",
+  "from_version": "2.3.2",
+  "to_version": "2.4.0",
+  "authorization": "The user approved the production cutover through AskUserQuestion; live peer sessions were notified before the window.",
+  "sequence": [
+    {
+      "at_utc": "2026-09-25T20:43:48Z",
+      "step": "stop and quiesce",
+      "facts": "systemctl --user stop nativestack-memory.service. Quiesced within 5 s: 0 ai-memory processes and 0 users of the database file."
+    },
+    {
+      "step": "quiescent fingerprint",
+      "facts": "Schema V64 (64 refinery rows), quick_check ok, 36 pages, 77,213 observations."
+    },
+    {
+      "step": "at-rest cold copy",
+      "facts": "db, wiki, config.toml and capture-mode copied at rest: 336 files, 137M, with a SHA256SUMS manifest whose sha256 begins 0246f4121c4104d1. The fingerprint compare of the cold copy against the quiescent live store printed PASS. The copy holds config.toml (auth.token_pepper) and is private."
+    },
+    {
+      "step": "switch the binary",
+      "facts": "bin/ai-memory relinked to tools/ai-memory-2.4.0/ai-memory. A 2.4.0 install-hooks preview (no --apply) left the store at V64."
+    },
+    {
+      "step": "hook rewrite through the upstream installer",
+      "facts": "install-hooks --apply for claude-code and for codex with --server-url http://127.0.0.1:49474 --capture-mode allowlist, plus --no-capture-prompts for Claude. Against the installer's own .bak-1790369060 copies, the diffs changed only the binary path, on 8 Claude and 7 Codex commands. Both files are valid JSON with 0 references to 2.3.2."
+    },
+    {
+      "at_utc": "2026-09-25T20:44:37Z",
+      "step": "start",
+      "facts": "systemctl --user start nativestack-memory.service. The journal shows migrations V65__page_compacted_marker and V66__auto_improve_claim_attempts applied. No pre-migration archive was expected: the research found 2.4.0's snapshot_before_db_migration gated to the 1.x to 2.0 upgrade, and the rehearsal on a restored copy wrote none."
+    },
+    {
+      "step": "live verification",
+      "facts": "GET /healthz returned 200 on the first poll; MainPID up with NRestarts 0; GET /mcp returned 405 with allow: POST (stateless transport). Fingerprint compare V64 -> V66 PASS: 66 rows, quick_check ok, 36 pages with 0 missing or changed, 0 observations missing, 77,330 after; the growth is hook spool that drained after the restart. `ai-memory status --json` reports version 2.4.0. MCP memory_status returns its counts plus scope {workspace local, project native-agent-stack, resolved_by explicit} and evidence_rows. memory_read_page on decisions/nativestack-isolation.md returned an identical body before and after (sha256 prefix 98eb1dfb4fc6b0f5)."
+    },
+    {
+      "at_utc": "2026-09-25T20:45:10Z",
+      "step": "real-client capture",
+      "facts": "A fresh headless `claude -p` session produced claude-code observations after the restart: session-start, pre-tool-use, post-tool-use, stop and session-end. The hook spool held 0 files older than 5 minutes."
+    }
+  ],
+  "pending": [
+    "User-only: review and trust the 7 changed Codex ai-memory hook commands in Codex /hooks. Codex skips changed hooks until they are trusted, so Codex captures nothing until then; Codex is usage-limited until 2026-09-30, so this step was not taken in the window."
+  ],
+  "rollback": "Stop the service and quiesce; set the failed db and wiki aside; copy back the cold V64 copy; relink bin/ai-memory to tools/ai-memory-2.3.2/ai-memory; restore ~/.claude/settings.json and ~/.codex/hooks.json from the installer's .bak-1790369060 files (the user then re-trusts the reverted Codex commands); start the service. Writes made after the cold copy are lost from the live store. Never start 2.3.2 on the V66 store: it exits 1 with DataSchemaAhead.",
+  "writing_worker_readback": "out/readback.out (2026-09-25T20:54:04Z, read-only): bin/ai-memory resolves to tools/ai-memory-2.4.0/ai-memory, `ai-memory --version` prints 'ai-memory 2.4.0', the link target's sha256 is 360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344, /healthz 200, GET /mcp 405 with allow: POST, the service is active with NRestarts=0 since 16:44:37 EDT, 8 Claude and 7 Codex hook commands name tools/ai-memory-2.4.0/ai-memory and 0 name 2.3.2, and the host's installed-versions.txt ai-memory record still reads 'ai-memory 2.3.2'."
+}

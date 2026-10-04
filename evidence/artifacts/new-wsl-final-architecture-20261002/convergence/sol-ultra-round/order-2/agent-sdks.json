@@ -1,0 +1,166 @@
+{
+  "layers": [
+    {
+      "layer_id": "agent-sdks",
+      "selection": [
+        {
+          "name": "C01 — codex",
+          "repository": "https://github.com/openai/codex",
+          "role": "Conditional choice for a Codex worker needing structured progress events and persistent conversation control.",
+          "install_command": "npm install -g @openai/codex\nnpm install @openai/codex-sdk",
+          "install_source": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/README.md",
+              "shows": "Supported TypeScript SDK wraps the CLI, exposes structured events through runStreamed(), supports repeated turns and resumeThread(), and requires Node.js 18+. This establishes event/session capability, not a custom-tool API."
+            },
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/README.md",
+              "shows": "Documents the CLI installation command and Linux x86_64 and macOS arm64 binaries. WSL2 operation is a Linux compatibility inference, not an observed installation result."
+            },
+            {
+              "url": "https://github.com/openai/codex/tree/rust-v0.160.0/sdk/typescript/tests",
+              "shows": "Upstream suite includes streamed-run, abort and MCP-conformance test files; the package manifest specifies Jest. Suite existence does not establish passing results."
+            },
+            {
+              "url": "https://api.github.com/repos/openai/codex/actions/runs?per_page=3",
+              "shows": "Latest sampled blocking-ci and postmerge-ci runs were queued; the successful CLA check is not functional-test evidence."
+            },
+            {
+              "url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+              "shows": "Release published 2026-10-01, including session-resumption and runtime fixes."
+            },
+            {
+              "url": "https://github.com/openai/codex/commit/2635431edbd43279a4da9c1199456758fbbc8ad3",
+              "shows": "Default-branch commit dated 2026-10-01. Repository API confirms it is not archived."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C07 — Claude Agent SDK",
+          "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+          "role": "Conditional choice for a worker concretely needing programmatic Claude Code sessions, Python custom tools or hooks.",
+          "install_command": "pip install claude-agent-sdk==0.2.163",
+          "install_source": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.163",
+          "basis": [
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/README.md",
+              "shows": "Python 3.10+ SDK bundles Claude Code and documents bidirectional ClaudeSDKClient conversations, in-process MCP custom tools and Python hooks. These directly fit programmatic Claude control."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/client.py",
+              "shows": "Implements structured message iteration, interruption, session identifiers and runtime permission-mode changes."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/.github/workflows/test.yml",
+              "shows": "Defines pytest with coverage on Ubuntu, macOS and Windows, MCP dependency-floor testing, real-API end-to-end tests and Docker tests. The README documents platform-specific wheels; arm64-specific validation remains unverified."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/actions/runs/36903779143",
+              "shows": "Latest sampled main Test workflow failed. Cause and relevance to the published release were not inspected; a clean reliability endorsement is unsupported."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.163",
+              "shows": "Release published 2026-09-30; documents the pinned pip command and bundles Claude CLI 2.1.286."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/commit/bfb895c6ef46e095191938b4eda798a025957c09",
+              "shows": "Default-branch commit dated 2026-10-01. Repository API confirms it is not archived."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C02",
+          "name": "OpenHands SDK",
+          "reason": "Strong documented events/tools and remote/container execution, with Linux x86_64 and macOS arm64 release artifacts, but no concrete remote-worker need is supplied; sampled CI contained artifact jobs rather than test results. Current: Oct 1 commit, Sep 30 release. [README](https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/README.md), [release](https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.1), [CI](https://api.github.com/repos/openhands/software-agent-sdk/actions/runs?per_page=3)."
+        },
+        {
+          "key": "C04",
+          "name": "agentproto/ts",
+          "reason": "Operational Claude/Codex adapters and passing current CI make this a credible contender, but its added shared-daemon orchestration is not qualified by the packet; broader SDK packages include scaffolding. Current: Oct 1 commit and release. [Pinned README](https://github.com/agentproto/ts/blob/c2472bf496845004c32fd64ff857ee05045e6360/README.md), [CI](https://github.com/agentproto/ts/actions/runs/36919597760)."
+        },
+        {
+          "key": "C03",
+          "name": "LangGraph",
+          "reason": "Documented durable execution and state inspection fit a checkpointed graph application, which the packet does not establish; sampled CI and benchmark runs were still in progress. Current: Oct 1 commit; latest-release API reports a Sep 23 CLI release, not the core SDK release. [README](https://github.com/langchain-ai/langgraph/blob/157a06dda988d85afeb8751ff27b35ab3f4f8bf4/README.md), [CI](https://api.github.com/repos/langchain-ai/langgraph/actions/runs?per_page=3)."
+        },
+        {
+          "key": "C06",
+          "name": "Temporal",
+          "reason": "This repository supplies the durable workflow server and requires separate language SDKs for workers; no multi-host durability need justifies that stack here, and sampled successful workflows were administrative rather than functional tests. Current: Oct 1 commit, Sep 11 release. [README](https://github.com/temporalio/temporal/blob/v1.32.0/README.md), [CI](https://api.github.com/repos/temporalio/temporal/actions/runs?per_page=3)."
+        },
+        {
+          "key": "C05",
+          "name": "copilot-sdk",
+          "reason": "Provides supported Copilot session/tool control, but the documented runtime does not establish Claude/Codex session control; latest sampled main SDK tests failed. BYOK and a limited free tier defeat mandatory-paid-service exclusion. Current: Oct 1 commit, Sep 30 release. [README](https://github.com/github/copilot-sdk/blob/v1.0.16/README.md), [CI](https://github.com/github/copilot-sdk/actions/runs/36899360472)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "The selections are complementary, conditional capability-fit recommendations, not measured winners. First specify the worker need. On fresh WSL2 Ubuntu x86_64, compare the native Codex SDK with agentproto's Codex adapter for event completeness, cancellation and caller-restart/resume; compare ClaudeSDKClient with agentproto's Claude SDK adapter for deterministic Python tools, hook permission decisions, interruption and retained session context. Hold repository, model, prompt and permission settings constant; record installation success, lost/failed operations, control latency and setup burden. Repeat installation/session checks on macOS arm64. Add OpenHands only for a specified remote/container workload, LangGraph for checkpoint recovery, or Temporal for two-host durable failure recovery. Investigate the Claude CI failure and obtain completed Codex checks before declaring installation reliability.",
+      "evidence_gaps": [
+        "The packet contains no comparison where the contenders ran together. No inspected benchmark establishes comparative worker reliability, latency or quality.",
+        "ctx_fetch_and_index rejected all eight requested page fetches because its approval setting conflicts with this session's never-approval policy. README/source evidence was instead retrieved through two GitHub GraphQL source API calls, indexed with ctx_index and read using source-scoped ctx_search. Research used 30 GitHub API calls and one web search.",
+        "No clean installation or workload ran on either target host. Codex explicitly documents both requested architectures; Claude macOS arm64-specific packaging/testing remains unverified. This layer does not establish a GPU requirement.",
+        "Latest sampled CI snapshots are incomplete evidence: Claude and Copilot tests failed without inspected causes; Codex checks were queued; LangGraph checks were in progress; OpenHands and Temporal samples did not establish functional-test passes.",
+        "All seven repositories were unarchived and had Oct 1 default-branch commits, satisfying the Jul 3 freshness cutoff. Recent releases were verified, but issue response/resolution activity was not inspected; open-issue aggregates were not treated as maintenance quality.",
+        "OpenHands' linked evaluation paper/result sheet was not retrieved. Its README benchmark badge was not used as measured evidence.",
+        "The Codex install commands are upstream-documented but unpinned; a published SDK package version matching the inspected source tag was not independently verified.",
+        "Backend authentication and operating costs were not comprehensively verified. No candidate was excluded merely for offering a hosted or paid service."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/openai/codex",
+        "https://api.github.com/repos/openai/codex/releases/latest",
+        "https://api.github.com/repos/openai/codex/commits?per_page=1",
+        "https://api.github.com/repos/openai/codex/actions/runs?per_page=3",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python/actions/runs?per_page=3",
+        "https://api.github.com/repos/openhands/software-agent-sdk",
+        "https://api.github.com/repos/openhands/software-agent-sdk/releases/latest",
+        "https://api.github.com/repos/openhands/software-agent-sdk/commits?per_page=1",
+        "https://api.github.com/repos/openhands/software-agent-sdk/actions/runs?per_page=3",
+        "https://api.github.com/repos/agentproto/ts",
+        "https://api.github.com/repos/agentproto/ts/releases/latest",
+        "https://api.github.com/repos/agentproto/ts/commits?per_page=1",
+        "https://api.github.com/repos/agentproto/ts/actions/runs?per_page=3",
+        "https://api.github.com/repos/langchain-ai/langgraph",
+        "https://api.github.com/repos/langchain-ai/langgraph/releases/latest",
+        "https://api.github.com/repos/langchain-ai/langgraph/commits?per_page=1",
+        "https://api.github.com/repos/langchain-ai/langgraph/actions/runs?per_page=3",
+        "https://api.github.com/repos/temporalio/temporal",
+        "https://api.github.com/repos/temporalio/temporal/releases/latest",
+        "https://api.github.com/repos/temporalio/temporal/commits?per_page=1",
+        "https://api.github.com/repos/temporalio/temporal/actions/runs?per_page=3",
+        "https://api.github.com/repos/github/copilot-sdk",
+        "https://api.github.com/repos/github/copilot-sdk/releases/latest",
+        "https://api.github.com/repos/github/copilot-sdk/commits?per_page=1",
+        "https://api.github.com/repos/github/copilot-sdk/actions/runs?per_page=3",
+        "https://api.github.com/graphql",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/README.md",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/README.md",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/package.json",
+        "https://github.com/openai/codex/tree/rust-v0.160.0/sdk/typescript/tests",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/app-server/README.md",
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/README.md",
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/pyproject.toml",
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/.github/workflows/test.yml",
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/client.py",
+        "https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/README.md",
+        "https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/DEVELOPMENT.md",
+        "https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/pyproject.toml",
+        "https://github.com/agentproto/ts/blob/c2472bf496845004c32fd64ff857ee05045e6360/README.md",
+        "https://github.com/agentproto/ts/blob/c2472bf496845004c32fd64ff857ee05045e6360/package.json",
+        "https://github.com/langchain-ai/langgraph/blob/157a06dda988d85afeb8751ff27b35ab3f4f8bf4/README.md",
+        "https://github.com/langchain-ai/langgraph/blob/157a06dda988d85afeb8751ff27b35ab3f4f8bf4/libs/langgraph/pyproject.toml",
+        "https://github.com/temporalio/temporal/blob/v1.32.0/README.md",
+        "https://github.com/github/copilot-sdk/blob/v1.0.16/README.md"
+      ]
+    }
+  ]
+}

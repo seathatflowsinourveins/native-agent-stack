@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-09-26T02:24:15Z",
+  "codex_version": "codex-cli 0.155.1",
+  "commands": [
+    {
+      "argv": [
+        "codex",
+        "--version"
+      ],
+      "exit": 0,
+      "stdout_sha256": "556478dd38e6185a3ceef8e5237286acd48d89da460cdbbc054ce7230b0caced",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "codex",
+        "mcp",
+        "get",
+        "headroom",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout_sha256": "9f73f0731e4c71840e1485af6fe33c89eac0f775c7b600016c9a03e73112c273",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "codex",
+        "mcp",
+        "get",
+        "context-mode",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout_sha256": "7e1fdcc5109afbfdd3311b0da23ffefd6e831c3c3c0b29db5f4b0731132f790f",
+      "stderr_bytes": 0
+    }
+  ],
+  "servers": {
+    "headroom": {
+      "enabled": true,
+      "transport": "stdio",
+      "command_basename": "headroom",
+      "args_basenames": [
+        "mcp",
+        "serve",
+        "--proxy-url",
+        "http://127.0.0.1:1"
+      ],
+      "env_names": [
+        "DO_NOT_TRACK",
+        "HEADROOM_OFFLINE"
+      ],
+      "env_vars_forwarded": [],
+      "cwd_set": false
+    },
+    "context-mode": {
+      "enabled": true,
+      "transport": "stdio",
+      "command_basename": "node",
+      "args_basenames": [
+        "start.mjs"
+      ],
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM"
+      ],
+      "env_vars_forwarded": [],
+      "cwd_set": true,
+      "cwd_is_plugin_install_path": true,
+      "cwd_last_five_parts": [
+        "plugins",
+        "cache",
+        "context-mode",
+        "context-mode",
+        "1.0.169"
+      ]
+    }
+  }
+}

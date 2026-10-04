@@ -74,6 +74,16 @@
         "identity_sha256": "a90718ea66d62d8044adb44ee9593c75a88ff91c19671770f1f96bc1a8be7a73",
         "model": "claude-sonnet-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session (claude-opus-5-5); adequacy-checked point 3 and the retained-result rule of docs/acceptance-evidence-policy.md against the receipt JSON. Defects confirmed. (1) Command 2's success path ends with rm -rf of its temporary directory, deleting Inspect's native eval log (logs/*.json) after printing only a custom summary; neither the log nor its hash is retained. (2) Limitation 4 says the component is this host's existing install under ~/.local/share/codex-ecosystem, but command 2 creates a temporary uv venv and installs inspect-ai==0.3.266 and an unpinned openai into it, and limitation 2 says installed ephemerally from PyPI, so the limitations contradict each other. Successor: inspect-ai--use--20260926-2.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T10:22:36Z",
+      "reviewer": {
+        "identity_sha256": "e3e758a4ec14358c858079587aca14d44770aa531b79a646a6b6de49de90efdc",
+        "model": "claude-opus-5-5"
+      }
     }
   ],
   "supersedes": "nativestack-5975wx-20260925--inspect-ai--use--20260925"

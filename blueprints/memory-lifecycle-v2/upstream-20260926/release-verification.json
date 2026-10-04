@@ -1,0 +1,65 @@
+{
+  "started_utc": "2026-09-26T02:58:31.215070+00:00",
+  "finished_utc": "2026-09-26T02:58:35.044901+00:00",
+  "repository": "https://github.com/akitaonrails/ai-memory",
+  "results": [
+    {
+      "tag": "v2.3.2",
+      "release_published_at": "2026-09-20T02:34:33Z",
+      "release_draft": false,
+      "release_prerelease": false,
+      "release_immutable": false,
+      "asset": "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-linux-x86_64.tar.gz",
+      "asset_bytes": 15616958,
+      "asset_sha256_download": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+      "asset_sha256_sidecar": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+      "asset_sha256_github_release_record": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+      "asset_digests_agree": true,
+      "tarball_ai_memory_members_sha256": {
+        "./ai-memory": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0"
+      },
+      "installed_binary": "~/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory",
+      "installed_binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+      "installed_equals_release_binary": true
+    },
+    {
+      "tag": "v2.4.0",
+      "release_published_at": "2026-09-21T23:45:13Z",
+      "release_draft": false,
+      "release_prerelease": false,
+      "release_immutable": false,
+      "asset": "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.0/ai-memory-linux-x86_64.tar.gz",
+      "asset_bytes": 15969555,
+      "asset_sha256_download": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+      "asset_sha256_sidecar": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+      "asset_sha256_github_release_record": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+      "asset_digests_agree": true,
+      "tarball_ai_memory_members_sha256": {
+        "./ai-memory": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344"
+      },
+      "installed_binary": "~/.local/share/codex-ecosystem/tools/ai-memory-2.4.0/ai-memory",
+      "installed_binary_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+      "installed_equals_release_binary": true
+    },
+    {
+      "tag": "v2.4.1",
+      "release_published_at": "2026-09-25T21:46:32Z",
+      "release_draft": false,
+      "release_prerelease": false,
+      "release_immutable": false,
+      "asset": "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.1/ai-memory-linux-x86_64.tar.gz",
+      "asset_bytes": 16026020,
+      "asset_sha256_download": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+      "asset_sha256_sidecar": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+      "asset_sha256_github_release_record": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+      "asset_digests_agree": true,
+      "tarball_ai_memory_members_sha256": {
+        "./ai-memory": "dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd"
+      },
+      "installed_binary": "~/.local/share/codex-ecosystem/tools/ai-memory-2.4.1/ai-memory",
+      "installed_binary_sha256": "dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd",
+      "installed_equals_release_binary": true
+    }
+  ],
+  "all_verified": true
+}

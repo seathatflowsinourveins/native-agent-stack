@@ -1,0 +1,1 @@
+{"output": "<scratch>/trials-gpt6/runs/run-20260926T1131Z/20-search-positive.stdout", "expected": {"total": 10, "path": "auth/notes.md", "text": "fixed-window rate limiter"}, "observed": {"success": true, "status": "completed", "totalFound": 1, "paths": ["auth/notes.md"]}, "pass": false, "failures": ["data.totalFound is 1, expected exactly 10", "1 results returned, expected 10"]}

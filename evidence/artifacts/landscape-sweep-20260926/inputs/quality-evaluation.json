@@ -1,0 +1,322 @@
+{
+ "catalog": "foundation",
+ "layer_id": "quality-evaluation",
+ "title": "Quality and evaluation",
+ "requirement": "Verify the changed behavior using relevant upstream/project checks, independent observations and explicit failure-preserving evidence.",
+ "research_status": "comparison_required",
+ "next_action": "Evaluate semantic advice on fresh independently labeled task cases, retain uncertain disagreements and a safe negative control; do not tune on the existing eight-case diagnostic.",
+ "requirement_sha256": "6b73a569e50fd0c2e3dcf534674115943253b4d66663e50a92d552708d138a97",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "promptfoo",
+   "repository": "https://github.com/promptfoo/promptfoo",
+   "pin": "0.123.1",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "playwright-test",
+   "repository": "https://github.com/microsoft/playwright",
+   "pin": "1.63.0",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "ShellCheck",
+   "repository": "https://github.com/koalaman/shellcheck",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Difftastic",
+   "repository": "https://github.com/Wilfred/difftastic",
+   "disposition": "overlap"
+  },
+  {
+   "name": "MCP Inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "disposition": "conditional"
+  },
+  {
+   "name": "TypeSafe semantic skill",
+   "repository": "https://github.com/typesafe-ai/skills",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Official OpenAI CI and security skills",
+   "repository": "https://github.com/openai/skills",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "Inspect AI",
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "MLflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "disposition": "out_of_scope"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "difftastic",
+   "repository": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+   "pin": "0.71.0",
+   "upstream": {
+    "latest": "0.71.0",
+    "released_at": "2026-09-18",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "stars": 25934,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "fastapi",
+   "repository": "https://github.com/fastapi/fastapi",
+   "pin": "0.141.1",
+   "upstream": {
+    "latest": "0.141.1",
+    "released_at": "2026-07-29",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 102618,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "gitleaks",
+   "repository": "https://github.com/gitleaks/gitleaks",
+   "pin": "8.30.1",
+   "upstream": {
+    "latest": "v8.30.1",
+    "released_at": "2026-03-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "stars": 29486,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "nextjs",
+   "repository": "https://github.com/vercel/next.js",
+   "pin": "16.3.6",
+   "upstream": {
+    "latest": "v16.3.6",
+    "released_at": "2026-09-22",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 142443,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "playwright-test",
+   "repository": "https://github.com/microsoft/playwright",
+   "pin": "1.63.0",
+   "upstream": {
+    "latest": "v1.63.0",
+    "released_at": "2026-09-04",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 96680,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "postgresql",
+   "repository": "https://github.com/postgres/postgres",
+   "pin": "18.6",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-09-26",
+    "stars": 22198,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null,
+    "latest_flag": {
+     "tag": "release-6-3",
+     "reason": "tag_listing_only_not_version_shaped"
+    }
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  },
+  {
+   "id": "promptfoo",
+   "repository": "https://github.com/promptfoo/promptfoo",
+   "pin": "0.123.1",
+   "upstream": {
+    "latest": "0.123.1",
+    "released_at": "2026-09-18",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 25461,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "react",
+   "repository": "https://github.com/react/react",
+   "pin": "19.3.0",
+   "upstream": {
+    "latest": "v19.3.0",
+    "released_at": "2026-09-09",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 250735,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "shellcheck",
+   "repository": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0",
+   "pin": "0.11.0",
+   "upstream": {
+    "latest": "v0.11.0",
+    "released_at": "2025-08-04",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "stars": 40088,
+    "license": "GPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "skills-ref",
+   "repository": "https://github.com/agentskills/agentskills",
+   "pin": "0.1.0",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-08-09",
+    "stars": 25692,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  },
+  {
+   "id": "syft",
+   "repository": "https://github.com/anchore/syft",
+   "pin": "1.52.0",
+   "upstream": {
+    "latest": "v1.52.0",
+    "released_at": "2026-09-17",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 9609,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "zizmor",
+   "repository": "https://github.com/zizmorcore/zizmor",
+   "pin": "1.30.1",
+   "upstream": {
+    "latest": "v1.30.1",
+    "released_at": "2026-09-09",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 6578,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "The Promptfoo evidence is one upstream example with 4 pairs plus a 2-assertion echo fixture. It is not a held-out evaluation of model quality (docs/promptfoo-upstream-retrieval.md lines 20-22).",
+  "The Playwright evidence is one browser test (passed 1 in receipt.json lines 114-126) on the project's own application. It is not an upstream Playwright suite.",
+  "No kept evidence shows a winner catching an injected regression; the decisions.json next_gap still names this as missing.",
+  "ShellCheck has one run on a clean fixture and no kept failing case. Difftastic's exit code signals only whether a diff exists.",
+  "Promptfoo and Inspect AI have not been compared on the same frozen cases."
+ ],
+ "overturn_when": "A defined tool-use/extraction or experiment-tracking requirement cannot be expressed adequately in the current test lane and a challenger passes a representative frozen oracle with usable failure inspection.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/HypothesisWorks/hypothesis",
+   "https://github.com/semgrep/semgrep",
+   "https://github.com/stryker-mutator/stryker-js",
+   "https://github.com/confident-ai/deepeval"
+  ]
+ },
+ "known_repositories": [
+  "agent-sh/agnix",
+  "alibaba/open-code-review",
+  "astral-sh/ruff",
+  "cloudflare/security-audit-skill",
+  "confident-ai/deepeval",
+  "harbor-framework/harbor",
+  "hypothesisworks/hypothesis",
+  "koalaman/shellcheck",
+  "microsoft/playwrigh",
+  "microsoft/skillop",
+  "mlflow/mlflow",
+  "modelcontextprotocol/inspector",
+  "openai/skills",
+  "promptfoo/promptfoo",
+  "semgrep/semgrep",
+  "stryker-mutator/stryker-js",
+  "typesafe-ai/skills",
+  "ukgovernmentbeis/inspect_a",
+  "wilfred/difftastic"
+ ],
+ "seeded_candidates_20260926": [
+  "EleutherAI/lm-evaluation-harness v0.4.13 (coordinator P2)",
+  "UKGovernmentBEIS/inspect_ai 0.3.269 (2026-09-25, litellm-proxy provider; trading lane holds 0.3.266)",
+  "embeddings-benchmark/mteb 2.21.8 (2026-09-23)"
+ ]
+}

@@ -74,6 +74,16 @@
         "identity_sha256": "a90718ea66d62d8044adb44ee9593c75a88ff91c19671770f1f96bc1a8be7a73",
         "model": "claude-sonnet-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session (claude-opus-5-5); adequacy-checked point 3 and the retained-result rule of docs/acceptance-evidence-policy.md against the receipt JSON. Defects confirmed. (1) Command 2 writes promptfoo's native report to $T/results.json and its EXIT trap removes $T, so the native report and its hash are discarded and only the command's own summary line remains; the policy asks for artifact hashes and says parsing a wrapper's own pass field is not independent confirmation. (2) Limitation 4 says the component is this host's existing install under ~/.local/share/codex-ecosystem, but command 2's retained output says 'promptfoo source: ephemeral npm install (no stable install found)' and limitation 2 says ephemeral, so the install-source statement contradicts the receipt's own output. Successor with the native report retained: promptfoo--use--20260926-2.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T10:22:36Z",
+      "reviewer": {
+        "identity_sha256": "e3e758a4ec14358c858079587aca14d44770aa531b79a646a6b6de49de90efdc",
+        "model": "claude-opus-5-5"
+      }
     }
   ],
   "supersedes": "nativestack-5975wx-20260925--promptfoo--use--20260925"

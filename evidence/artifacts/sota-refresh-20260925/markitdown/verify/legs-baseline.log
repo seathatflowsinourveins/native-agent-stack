@@ -1,0 +1,14 @@
+ARM baseline-0.1.7 at 2026-09-25T18:54:49Z
+L1 rc=0 version='markitdown 0.1.7'
+L2 rc=0 greeting.md sha256=6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2 bytes=76
+L3 rc=0 8k.md sha256=b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977 bytes=5610
+L4 rc=0 8k stdout sha256=a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b bytes=5611
+L5 disc.html sha256=932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e bytes=314
+L6 rc=0 disc.md sha256=177abc325d9996496390b3df367eec90f1a5ef2b8bb0d5d59b407a0ab09cec1d
+L6 content=$'FirstwordLast\n\n[example](https://example.com/items/a/b)\n\ngone\n\n![A photo](data:image/gif;base64...)'
+L7 pdf rc=1 grep_markitdown_pdf_rc=0 pdf.md_exists=no exception_line='MissingDependencyException with message: PdfConverter recognized the input as a potential '
+L8 checker rc=1 PASS=8 FAIL=4 failed=[v018_underline,v018_encoded_slash,v018_strike,v018_data_src]
+Using Python 3.13.15 environment at: ~/.local/share/codex-ecosystem/python-tools/markitdown
+L9 uv pip list rc=0 packages=20 extras_grep_rc=1 (1 = no extras) sha256=cbe120b35b622e6a96a1f9dfb2bbffaeedc2c99ba750cf5ccb5a313fb60082ba
+L10 rc=0 has_heading=yes has_scoped_memory=yes stdout_sha256=7bdfac14ff7a01f70a790edbcb5d522475b22aaa4f46ff95c10aa7da28f299fb bytes=70 input_sha256=f6f51dbb81d3a4c68334cb5ef2e4dfe2bfac3807e5508b0ad620c8a5c5967c2e
+END baseline-0.1.7 at 2026-09-25T18:54:53Z

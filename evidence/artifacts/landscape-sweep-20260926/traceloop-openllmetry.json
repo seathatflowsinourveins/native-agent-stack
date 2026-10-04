@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-traceloop-openllmetry",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/traceloop/openllmetry",
+ "reviewed_commit": "f7082c8a99effcd1fcad5099db43bdca7b1ccf4d",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of traceloop/openllmetry at commit f7082c8a99effcd1fcad5099db43bdca7b1ccf4d (license Apache-2.0), read from README.md at that commit. Repository description: \"Open-source observability for your GenAI or LLM application, based on OpenTelemetry\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 7451,
+  "pushed_at": "2026-09-24T08:07:03Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f7082c8a99effcd1fcad5099db43bdca7b1ccf4d",
+   "text": "**🎉 New**: Our semantic conventions are now part of OpenTelemetry! Join the [discussion](https://github.com/open-telemetry/community/blob/1c71595874e5d125ca92ec3b0e948c4325161c8a/projects/llm-semconv.md) and help us shape the future of LLM observability."
+  },
+  {
+   "source": "README.md@f7082c8a99effcd1fcad5099db43bdca7b1ccf4d",
+   "text": "Looking for the JS/TS version? Check out [OpenLLMetry-JS](https://github.com/traceloop/openllmetry-js)."
+  },
+  {
+   "source": "README.md@f7082c8a99effcd1fcad5099db43bdca7b1ccf4d",
+   "text": "OpenLLMetry is a set of extensions built on top of [OpenTelemetry](https://opentelemetry.io/) that gives you complete observability over your LLM application. Because it uses OpenTelemetry under the hood, [it can be connected to your existing observability solutions](https://www.traceloop.com/docs/openllmetry/integrations/introduction) - Datadog, Honeycomb, and others."
+  }
+ ]
+}

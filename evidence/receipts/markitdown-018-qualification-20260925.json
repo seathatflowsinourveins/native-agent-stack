@@ -16,7 +16,8 @@
     "The no-extras grep leg misses some extras (an [az-doc-intel] addition passed it in the verifier's mutation test); only the exact 20-package equality leg gates the package set. Importing onnxruntime 1.30.0 writes $TMPDIR/.ses and an empty mat-debug-<pid>.log on every call, in both versions; the qualification runs left such files in /tmp.",
     "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the document-retrieval winner pin markitdown 0.1.7 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 0.1.8 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
     "Linux x86_64 only: adoption/pins-macos-arm64.json has no markitdown pin and is unchanged; nothing here is macOS evidence.",
-    "One host (NativeStack, WSL2). The first post-switch run aborted before any leg because its run directory already existed; the retained 10-of-10 result is the rerun into a new directory. This receipt, not the 2026-09-23 qualification in evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json (another host, another install kind, a non-discriminating check), is the basis for the 0.1.8 pin."
+    "One host (NativeStack, WSL2). The first post-switch run aborted before any leg because its run directory already existed; the retained 10-of-10 result is the rerun into a new directory. This receipt, not the 2026-09-23 qualification in evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json (another host, another install kind, a non-discriminating check), is the basis for the 0.1.8 pin.",
+    "2026-09-26 retention correction (Codex post-merge review of #291): the claim's 45-of-45 installed-byte figure first rested on a summary line. verify_installed.py, the run directories behind run_arm.py's checker counts (converted documents, PDF stderr with the home directory replaced by ~, package listings) and the independent verifier's integrity and checker outputs are now retained. The 2026-09-25 stdout of verify_installed.py and run_arm.py's raw checker stdout were never written to files. out/verify-installed-rerun-20260926.out, out/installed-files-20260926.json and out/checker-rerun-20260926.out are 2026-09-26 read-only re-runs on the production prefix and the retained directories (results.json corrections and not_retained)."
   ],
   "host_scope": {
     "host": "nativestack-5975wx-20260925",
@@ -115,8 +116,173 @@
       "byte_identical_to_run_copy": false
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify_installed.py",
+      "sha256": "b458645247c70ef6a3a15250aa91f916eaf33dbe5e7e6e89255546efa20e72a2",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/8k.md",
+      "sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/8k.stdout.md",
+      "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/disc.html",
+      "sha256": "932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/disc.md",
+      "sha256": "66a75a8cfa9cf61e0224f43680c915f40805b8a761ce809dc28ec5bc0ef76629",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/pdf.err",
+      "sha256": "d09a6d2024d35a82e14a7d41258346cf720d40b5b29901c59d0c474df726de6b",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/pip-list.txt",
+      "sha256": "7791af4ec9924445fce6ac964903dbfd858c14d7196571f59d1f1331860c50e3",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/8k.md",
+      "sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/8k.stdout.md",
+      "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/disc.html",
+      "sha256": "932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/disc.md",
+      "sha256": "177abc325d9996496390b3df367eec90f1a5ef2b8bb0d5d59b407a0ab09cec1d",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/pdf.err",
+      "sha256": "ae7c22a71a9e40153328d044822f0e7dc201f54828253b8504862a79db900634",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/pip-list.txt",
+      "sha256": "cbe120b35b622e6a96a1f9dfb2bbffaeedc2c99ba750cf5ccb5a313fb60082ba",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/8k.md",
+      "sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/8k.stdout.md",
+      "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/disc.html",
+      "sha256": "932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/disc.md",
+      "sha256": "66a75a8cfa9cf61e0224f43680c915f40805b8a761ce809dc28ec5bc0ef76629",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/pdf.err",
+      "sha256": "10b7f75fa14a73ab6f322b91363696f01fae5adc647d6e9d64500bf435096715",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/pip-list.txt",
+      "sha256": "7791af4ec9924445fce6ac964903dbfd858c14d7196571f59d1f1331860c50e3",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/independent_integrity.py",
+      "sha256": "40b23fa37f0cb2f90ac1379a54b2666d66f26a45d9281ad3fb7450a21e618cb0",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/independent-integrity.json",
+      "sha256": "ab672372fe48cc139e76ef7f974cc004ca9c90c0431a24bee377b546adfb38a4",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/legs_record.sh",
+      "sha256": "13e5fbb556da2c5d93cad6db37d3dbc4bff357ece146ff87f69a0cecf4404ae5",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/legs-candidate.log",
+      "sha256": "5528957943476a7bbad52f6c98f21d7e881b5dab8d332eccfe422d1c6e558333",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/legs-baseline.log",
+      "sha256": "6134751a81da70ebc08659a50a4c1feaf8499df553870f10901164940c171fa4",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/run-candidate/checker.out",
+      "sha256": "986c5993e4d3b41c9d5b370eab103725c994a5eddbc7acb920a0aa40e9f4dcf4",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/run-baseline/checker.out",
+      "sha256": "5f4c1ec58575d16a53005c2e164b6355602695b15045b8e7ff4312e00560d342",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/installed_files.py",
+      "sha256": "9cbdca1a222bf05d1c4eda0d8b70dd602e1938ee84dfbfcc018e0180c396016c",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/verify-installed-rerun-20260926.out",
+      "sha256": "cb2f3ec303d9ef4b38925304ea67be05730913e4f6e24af68fd6405f187b75e8",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/installed-files-20260926.json",
+      "sha256": "c7632e1008c75c6ab0a8de62eb1498d9ee279e70664af0daa8a46a20b5d58105",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/checker-rerun-20260926.out",
+      "sha256": "12909ca549d3753ca7872d629aad19aacef4f5a80806af65d1f241851b96a1b2",
+      "byte_identical_to_run_copy": true
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/results.json",
-      "sha256": "1d16fd89b90fd0798b2ab85f561a2a537567881b8cdd4849adba2bf330b4f84a",
+      "sha256": "1a08f26480efd121c4f0299a19d8b1e0c34477265b2aa0ed98252846e41b5632",
       "byte_identical_to_run_copy": false
     }
   ]

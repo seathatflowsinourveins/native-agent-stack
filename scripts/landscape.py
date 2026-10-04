@@ -1020,7 +1020,8 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             # (tools/sota-convergence/record_verdicts.py), so none may claim more than it derives;
             # grandfathered rows are held to it for ENFORCED_PLATFORMS only.
             if platform in ENFORCED_PLATFORMS or not grandfathered:
-                error = platform_evidence.declared_status_error(platform, value, winner, status_context)
+                error = platform_evidence.declared_status_error(platform, value, winner, status_context,
+                                                                layer=f"{key[0]}/{key[1]}")
                 require(error is None, str(key) + ".winner " + str(winner.get("component_id")) + ": " + str(error))
 
     alternatives = row.get("alternatives")

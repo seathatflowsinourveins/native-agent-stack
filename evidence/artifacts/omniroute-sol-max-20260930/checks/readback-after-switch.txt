@@ -1,0 +1,37 @@
+observed_utc=2026-09-30T06:33:03Z
+--- omniroute.service
+MainPID=3262255
+NRestarts=0
+ExecMainStartTimestamp=Wed 2026-09-30 02:32:50 EDT
+ActiveState=active
+SubState=running
+--- omniroute-fw.service
+MainPID=945817
+NRestarts=0
+ExecMainStartTimestamp=Tue 2026-09-29 20:02:42 EDT
+ActiveState=active
+SubState=running
+--- hindsight-live.service
+MainPID=948478
+NRestarts=0
+ExecMainStartTimestamp=Tue 2026-09-29 20:02:51 EDT
+ActiveState=active
+SubState=running
+--- unit file sha256 (values-free files)
+b7797d7898160c858de7d56695bb97a3ac569c8cfded49affcb66b908528be45  omniroute.service
+fbdace7eeec524e37794432aa4c57ac5a8b4b925ef0b700f70b5e299a951c802  omniroute-fw.service
+--- rollback copies in the switch directory
+899e4fdb06775216094953815ed2836c2df9be12e26b459558a600742694b097  omniroute.service
+drwx------ 4096 .
+drwx------ 4096 ..
+-rw------- 1723 omniroute.service
+--- BUILD_SHA and shim of each prefix
+omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 shim/lsof sha256=b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854
+omniroute-3.8.51-2f42a9ac-pr13788-affinity2 BUILD_SHA=ae5539a56 shim/lsof sha256=b12c64614c54bc86bad8b5cd2778e04c50ae624f47b2d2d525d1a9edc00c8f56
+omniroute-3.8.51-2f42a9ac-pr13788 BUILD_SHA=87c4c488d shim/lsof sha256=b12c64614c54bc86bad8b5cd2778e04c50ae624f47b2d2d525d1a9edc00c8f56
+--- health
+20128: {"status":"ok","timestamp":"2026-09-30T06:33:03.332Z"}
+20129: {"status":"ok","timestamp":"2026-09-30T06:33:03.344Z"}
+--- serve process arguments per unit (prefix names only)
+omniroute: omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167
+omniroute-fw: omniroute-3.8.51-2f42a9ac-pr13788

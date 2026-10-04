@@ -1,0 +1,14 @@
+{
+ "note": "sha256 of each attempt-2 file as the judges received it. The inputs and schema are published byte for byte. The packets and the two judge prompts are published with K4's nine answer heads withheld, because they quote client configuration files; the four prompt files also carry the host path of the repository root, which the published copies replace with <root> or <attempt2>. Only these recorded hashes cover the originals.",
+ "files": {
+  "adjudication-inputs/x9.AB.json": "c223344c1c93a3ffc29829c22bc6aa97531727b170e6284cb7dec48c4595c1c7",
+  "adjudication-inputs/x9.BA.json": "9acabadc63978690c78039d67a6cb46aa2e5741ccd0ba9816df49e2f9df3a7f8",
+  "packets/x9.AB.json": "b82bc147dda4e645e2481d34ae7dd53cb596fb134c8729edcb31e0a3e1acb6aa",
+  "packets/x9.BA.json": "42078ed4f37e63860db2772240a4250f03d26ee29b6a6406926c3cc8a616c63e",
+  "prompts/claude-task-AB.txt": "eb20570e960c4b8d27989c1b3df738223caeec7f51822f38cf3daf4c187159b4",
+  "prompts/claude-task-BA.txt": "8cf47ddb77ccd23d6d3b77a1fa1b4ddfde2b1bed577f2380ec618f0d5298f172",
+  "prompts/judge-AB.txt": "2aea77d49d0956e9051dafda4e87f9e908267b4dfc90b520552c525fe23f18fd",
+  "prompts/judge-BA.txt": "419dc014f420e0dde636e630c863f360ff630cd8c2f7830c77b3c2012eb63813",
+  "schemas/judge.json": "e14c990be245743bb700a882bcb7280781318ea8f6638071d616ca1090c216ad"
+ }
+}

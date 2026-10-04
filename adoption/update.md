@@ -109,13 +109,17 @@ git fetch --tags origin
 old="$(git rev-parse HEAD)"
 tag="$(git show origin/HEAD:adoption/manifest.json | python3 -c "import json,sys;print(json.load(sys.stdin)['source']['release_tag'])")"
 git diff --stat "$old" "$tag" -- adoption/pins-linux-x86_64.json adoption/pins-macos-arm64.json \
-  adoption/manifest.json adoption/templates manifests/stack.json catalogs/landscape
+  adoption/manifest.json adoption/templates adoption/mcp adoption/agents manifests/stack.json catalogs/landscape
 git checkout "$tag"
 ```
 
 1. If a pin file or `adoption/manifest.json` profile changed, rerun the
    bootstrap for each profile this host installed
    ([bootstrap step 2](bootstrap.md)); it installs the new pinned versions.
+   It also repoints each tool's `bin/` link at once, so when the ai-memory pin
+   changed on a host with an existing store, stop the service and take the
+   at-rest copy in [upgrading an existing store](../recipes/README.md#upgrading-an-existing-store)
+   before this re-run.
 2. If `adoption/templates/` changed, render again and compare before
    overwriting ([bootstrap step 4](bootstrap.md), `render_config.py --check`).
 3. Rerun `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json`.
@@ -134,6 +138,21 @@ git checkout "$tag"
    [`receipt-staleness.yml`](../.github/workflows/receipt-staleness.yml) runs
    the same report weekly and uploads it as an artifact; it never fails on a
    flag and writes nothing to the repository.
+5. If `adoption/mcp/` or `adoption/agents/` changed, rerun the client
+   installers from the new checkout, each first as a report. On the Claude
+   side, `python3 tools/adoption/install_claude_profile.py --dry-run`, then
+   without `--dry-run`: it registers the template's servers this host lacks
+   and leaves a differing registration unchanged unless `--replace-mcp` is
+   given, so a server registered by hand is kept. Since 2026-09-30 the
+   template names `socraticode`, `headroom`, `codebase-memory` and `qmd`
+   besides `ai-memory` and `serena`; install each first
+   ([bootstrap step 4a](bootstrap.md)). On the Codex side, the dry run of
+   `python3 tools/adoption/apply_codex_lane.py` plans the role carriers, and
+   `--worker-roles` adds the three worker roles of
+   `adoption/agents/codex/workers/` once the token-adoption E2E's Gate A window
+   has closed
+   ([F4 Codex roles](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md#addendum-2026-09-30-f4-codex-roles));
+   apply what the dry run printed with its `--apply` form.
 
 **4. How the receipts reach the catalog.** Follow
 [the host evidence contribution guide](../docs/contributing-evidence.md): record
@@ -205,11 +224,234 @@ On a host that already adopted the named index:
 
 ```sh
 qmd --index native-agent-stack-catalog update
+qmd --index native-agent-stack-catalog status   # read "Vectors: N embedded"
+qmd --index native-agent-stack-catalog embed    # only when N is above 0
 qmd --index native-agent-stack-catalog search "native worker" \
   -c us-equities-foundation -n 3 --format json
 ```
 
-Use `qmd get` on the exact returned document URI with a bounded range. [Native catalog setup](../catalogs/us-equities/native-workflows.md) records explicit collections; do not index the whole home or authentication directories. The frozen retrieval evaluation retains its original corpus and queries even when the live index grows. A generation-model upgrade does not automatically change embeddings or retrieval quality.
+`update` re-indexes changed files and computes no vectors. Where the index carries embeddings (`status` reports `Vectors:` above 0), `embed` then embeds only the documents still lacking current vectors, such as new or changed ones (`embed -f` would re-embed everything); without it, the `vec` and `hyde` arms of `query` miss those documents. The lexical profile of [native catalog setup](../catalogs/us-equities/native-workflows.md) carries no vectors and skips `embed`; it also avoids a plain `query`, which expands the text with one model and reranks with another, both downloaded on first use. A `query` made of typed lexical searches with `rerank` off is model-free ([recipes](../recipes/README.md)). `update`'s closing "Run 'qmd embed'" notice prints on any index with unembedded documents, lexical ones included, so it is not the signal. Sources, qmd `v2.8.3`: README [L556](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L556), [L644-L651](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L644-L651) and [L1016-L1018](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L1016-L1018); `src/cli/qmd.ts` [L561](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L561) and [L994-L1002](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L994-L1002); `src/store.ts` [L1974-L1978](https://github.com/tobi/qmd/blob/v2.8.3/src/store.ts#L1974-L1978).
+
+Use `qmd get` on the exact returned document URI with a bounded range. [Native catalog setup](../catalogs/us-equities/native-workflows.md) records explicit collections; do not index the whole home or authentication directories. A host that adopted the index before 2026-09-27 adds the two foundation collections, `foundation-adoption` and `foundation-docs`, once with the commands there; the carrier names all four collections in every `query`. The frozen retrieval evaluation retains its original corpus and queries even when the live index grows. A generation-model upgrade does not automatically change embeddings or retrieval quality.
+
+## Apply the skills manifest
+
+On a host that has adopted [`adoption/skills/manifest.json`](skills/manifest.json) (added after
+`v2026.09.25.2`; see [the trial record](../docs/decisions/2026-09-25-skills-trial-and-usage.md)):
+
+```sh
+SKILLS=<tools-root>/skills-1.7.0/bin/skills
+npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0    # the manifest's cli.install (pinned, isolated)
+python3 tools/adoption/install_skills.py --skills-bin "$SKILLS" --dry-run   # prints what would change, changes nothing
+python3 tools/adoption/install_skills.py --skills-bin "$SKILLS"             # installs every manifest entry at its pinned ref
+python3 tools/adoption/install_skills.py --print-codex-config              # [[skills.config]] lines for ~/.codex/config.toml
+python3 scripts/skills_status.py --skills-bin "$SKILLS"                    # per-skill ref, lock, links, listing state, Codex config, on-disk tree (informational)
+claude -p "/skill-doctor" --output-format json                             # native per-skill use count, 0 API tokens
+```
+
+Run the dry run first on a host that has never applied this manifest, and compare its printed
+changes against the manifest before running `--write`. The status script and `/skill-doctor` are
+both read-only and safe to re-run by hand on any schedule; neither installs, removes or updates
+anything, and `/skill-doctor` costs 0 API tokens (`num_turns` 0, model `<synthetic>`). Do not
+wrap either read-only command in a systemd/launchd timer: this project's `automatic_model_calls`
+policy is `false`, and a timer that invokes a model command is exactly what that policy
+excludes, whatever the command's own token cost.
+
+The `skills` step of `--configure-full-profile` (next section) runs the same `install_skills.py`,
+after installing the manifest's pinned CLI under `$ECO_INSTALL_ROOT/tools/skills-<version>` when it is
+missing.
+
+## Refresh the user profile from main
+
+Added after `v2026.09.26.2`. On Linux/WSL2, one command re-applies every user-scope layer this
+catalog manages, instead of the hand steps of [bootstrap](bootstrap.md) steps 4 and 4a and the section
+above:
+
+```sh
+git -C "$MAIN_CLONE" fetch origin && git -C "$MAIN_CLONE" checkout --detach origin/main
+bash "$MAIN_CLONE/adoption/bootstrap-linux.sh" --profile <id> --configure-full-profile --host <name>
+```
+
+`MAIN_CLONE` is a clone used only for this; it must sit at `origin/main`, or the flag refuses and
+prints both commits. The steps, in order, are `claude-profile`, `claude-settings`, `claude-md`,
+`skills`, `codex-lane`, `path-block` and `login-shell` (the table is in
+[bootstrap step 2](bootstrap.md)); each is idempotent and can be left out with `--skip <step>`. It
+writes managed blocks into `~/.claude/CLAUDE.md` and `~/.profile` (backups beside each file), gives
+a Codex home without `config.toml` the rendered user-level one minus the source host's trust state
+(an existing `config.toml` is kept and only gains `features.daemon_auto_start = false` through
+`codex features disable`, after a backup), and ends by checking that `claude` in a login shell is
+the ecosystem launcher. A failed step exits 6
+after the others have run. A host installed from a release tag keeps the per-step commands until
+that release carries the flag.
+
+## Refresh only native instruction blocks
+
+Added after `v2026.09.26.2`. Use an exact reviewed source commit in a separate
+source clone, as [bootstrap's newer-step rule](bootstrap.md) permits. Keep the
+runtime installation checkout at its release pin. For example, with `NAS_SOURCE`
+pointing to that source clone and `NAS_SOURCE_SHA` set to the accepted full SHA:
+
+The full-block commands below are for files this catalog manages. A personal
+file beginning `Generated from config/directives` belongs to its separate
+producer. These commands refuse
+that generated output; use the minimal source handoff below.
+
+```sh
+(
+  set -eu
+  test -n "$NAS_SOURCE_SHA"
+  test -z "$(git -C "$NAS_SOURCE" status --porcelain)"
+  git -C "$NAS_SOURCE" fetch origin main
+  git -C "$NAS_SOURCE" checkout --detach "$NAS_SOURCE_SHA"
+  test "$(git -C "$NAS_SOURCE" rev-parse HEAD)" = "$NAS_SOURCE_SHA"
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" --dry-run claude-md
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" --dry-run codex-md \
+    --codex-home "${CODEX_HOME:-$HOME/.codex}"
+)
+```
+
+Review the printed diffs, then recheck the exact clean source before writing:
+
+```sh
+(
+  set -eu
+  test -z "$(git -C "$NAS_SOURCE" status --porcelain)"
+  test "$(git -C "$NAS_SOURCE" rev-parse HEAD)" = "$NAS_SOURCE_SHA"
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" claude-md
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" codex-md \
+    --codex-home "${CODEX_HOME:-$HOME/.codex}"
+)
+```
+
+These file-only operations
+preserve text outside their owned markers, file modes and backups. Damaged
+markers, detectable unmanaged copies and a nonblank Codex `AGENTS.override.md`
+refuse rather than duplicate or shadow the rules. Select the intended Codex home
+explicitly when this host has multiple clients. No client executable/version,
+configuration, profile, role, authentication or service is changed by this helper.
+The command establishes synchronized files; native client consumption remains
+the host owner's separate readback/acceptance step.
+
+### Minimal routing handoff for an existing instruction source
+
+Added after `v2026.09.26.2`. The [three-line fragment](templates/decision-routing.md)
+contains only the current bounded-discovery and maintained-decision paragraph,
+between its own markers. It includes no model, effort, role, profile or RTK pack.
+From the same exact clean source checkout:
+
+```sh
+(
+  set -eu
+  test -z "$(git -C "$NAS_SOURCE" status --porcelain)"
+  test "$(git -C "$NAS_SOURCE" rev-parse HEAD)" = "$NAS_SOURCE_SHA"
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" decision-md --print
+)
+```
+
+`--print` reads only the canonical source template and fragment. For the Mac
+handoff, give this fragment to the `agent-ecosystem` producer owner. That owner
+integrates it once in its owned `config/directives/shared.md`, renders through
+its own `agent-ecosystem/scripts/directives.py`, and reviews the resulting instruction diff.
+Do not append another full defaults/RTK pack to generated personal files or
+change the producer's source from this cloud task. The owner retains its source
+revision, local rules, imports, profiles, hook trust and installation receipt.
+
+For an instruction source you already own, the helper can preview only
+this paragraph. It prints the target's SHA-256:
+
+```sh
+python3 "$NAS_SOURCE/tools/adoption/managed_block.py" --dry-run decision-md \
+  --target "$OWNED_INSTRUCTION_SOURCE"
+```
+
+Apply the reviewed fragment through the source owner's own guarded workflow.
+`decision-md` exports or previews; it never writes a target, backup or temporary
+file. A hash check followed by replacement cannot provide atomic protection
+against a different writer, so this helper does not offer that write path.
+
+The preview requires an existing nonblank source and proposes keeping every byte
+outside its small block, including line endings, inline RTK and trailing blanks.
+It refuses a generated output, damaged/repeated markers, conflicting
+unmanaged routing text, symlink, nonregular or non-UTF-8 target. A single exact
+current paragraph, including a wrapped paragraph, is already current. Standalone
+native personal files can preview with
+`--client claude` or `--client codex --codex-home PATH` instead of `--target`;
+Codex still refuses a nonblank `AGENTS.override.md`. A later full-pack operation
+refuses a narrow block rather than duplicating its rule.
+When `CLAUDE_CONFIG_DIR` is set, either Claude operation requires an explicit
+`--target` rather than guessing the intended user-memory location.
+The full-profile bootstrap passes `$HOME/.claude/CLAUDE.md` explicitly, consistent
+with its other profile/settings steps; a custom store needs its own native
+scope/readback qualification.
+
+### Installed ecosystem-catalog producer
+
+The installed `ecosystem-catalog/SKILL.md`, `ecosystem-catalog/scripts/catalog.py`
+and `ecosystem-catalog/data/registry.json`
+is generated by a separate repository, not by `native-agent-stack` or QMD.
+The [Mac owner's provenance handoff](https://github.com/seathatflowsinourveins/native-agent-stack/issues/384#issuecomment-5926166036)
+and follow-up identify `seathatflowsinourveins/agent-ecosystem`, with that owner's
+clean source revision `753777ac8163332a3570888680893821439ee4ab`. Preserve that
+source-owner boundary; a registry `catalog_revision` is a content hash, not a
+Git checkout revision.
+
+That producer owns `catalog/registry.json`, host records in `manifest.json`,
+runtime evidence in `acceptance.json`, and its generated skill data. Its
+`agent-ecosystem/scripts/catalog_refresh.py --apply` is a broad managed-file install, not a
+registry-only sync. It also preserves existing decisions/import pins, so a
+metadata refresh alone does not retire VelaNext or turn older ai-memory and
+SocratiCode selections into current Mac deployment facts. Do not hand-edit or
+replace the generated consumer, invent selective flags, or copy around the
+producer's receipt hashes.
+
+The producer owner must reconcile its current source imports and retired-host
+routing, preserve historical evidence and measured/blind promotion gates, then
+use or add a tested receipt-aware selective synchronization path there. A
+source render/check is separate from installing the resulting registry. No
+selective installed-registry command is supplied by this repository.
+
+For an adopted catalog QMD index, verify its selected collection roots point to
+this source revision first. Follow [catalog retrieval](../docs/catalog-retrieval.md)
+for a path-only relocation that preserves masks, contexts, models and unrelated
+collections; `update` alone does not move an old root. Then:
+
+```sh
+qmd --index native-agent-stack-catalog update
+qmd --index native-agent-stack-catalog status
+qmd --index native-agent-stack-catalog embed   # only if this adopted index already carries vectors
+```
+
+A source/text/index refresh is not a runtime re-pin or promotion. Retain reported
+host deployment facts separately from installer pins, historical experiments and
+open measured/blind convergence gates. Do not run a broad bootstrap solely to
+refresh instructions on a host whose verified production versions differ from
+its older installation pins.
+
+## Start a new repository
+
+Added after `v2026.09.26.2`. Scaffold every new repository from this catalog, so it carries the
+standing rule and the `sota-sources` check from its first commit
+([new repositories](bootstrap.md#new-repositories)):
+
+```sh
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run
+python3 tools/adoption/scaffold_repo.py --target <repo>
+```
+
+A rerun changes nothing; a file edited since is skipped (exit 3) unless `--force <path>` names it,
+with the path as the table prints it. To move an existing repository's workflow to a newer gate,
+commit first, then name only the workflow:
+
+```sh
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run --force .github/workflows/sota-sources.yml
+python3 tools/adoption/scaffold_repo.py --target <repo> --force .github/workflows/sota-sources.yml
+```
+
+That replaces the workflow alone (no backup is kept) with one pinned to the current main commit.
+Every other file that differs, such as a filled-in `AGENTS.md` or this host's `.codex/config.toml`,
+is left as it is and reported `skipped`, so the run exits 3. A bare `--force`, or a path that is not
+a scaffold file, is a usage error (exit 2) and writes nothing. The new pin takes effect once that
+commit on GitHub carries `.github/workflows/sota-sources-gate.yml`.
 
 ## Current next moves
 

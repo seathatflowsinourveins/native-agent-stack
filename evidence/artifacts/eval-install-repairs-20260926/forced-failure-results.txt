@@ -1,0 +1,35 @@
+01 promptfoo-cmd1 [pin assertion fails]: rc=1 fails closed | FAIL: manifests/stack.json and the catalogs/landscape winner pins are not all promptfoo 0.123.1
+02 promptfoo-cmd1 [npm view exits 7]: rc=1 fails closed | FAIL: npm view promptfoo@0.123.1 exited 7
+03 promptfoo-cmd1 [registry shasum differs]: rc=1 fails closed | FAIL: the npm registry digests for promptfoo@0.123.1 are not the expected values: {
+04 promptfoo-cmd2 [promptfoo not on PATH]: rc=1 fails closed | FAIL: promptfoo is not on PATH
+05 promptfoo-cmd2 [PATH resolves outside the prefix]: rc=1 fails closed | FAIL: promptfoo on PATH (~/.local/share/codex-ecosystem/bin/promptfoo) resolves to ~/.local/share/codex-ecosystem/tools/promptfoo-
+06 promptfoo-cmd2 [promptfoo --version exits 73]: rc=1 fails closed | FAIL: promptfoo --version exited 73
+07 promptfoo-cmd2 [promptfoo --version mismatch]: rc=1 fails closed | FAIL: promptfoo --version printed '0.123.1', expected 0.123.1
+08 promptfoo-cmd2 [npm ls --depth=0 exits 5]: rc=1 fails closed | FAIL: npm ls --global --prefix ~/.local/share/codex-ecosystem/tools/promptfoo-0.123.1 --depth=0 exited 5
+09 promptfoo-cmd2 [npm ls top-level mismatch]: rc=1 fails closed | FAIL: npm ls --global --prefix ~/.local/share/codex-ecosystem/tools/promptfoo-0.123.1 does not list promptfoo 0.123.1 as its only top-level 
+10 promptfoo-cmd3 [mktemp fails]: rc=1 fails closed | FAIL: mktemp -d
+11 promptfoo-cmd3 [prefix missing (npm ls error)]: rc=1 fails closed | FAIL: npm ls --all over ~/.local/share/codex-ecosystem/tools/promptfoo-0.0.0 (exit 254) is not in the expected state
+12 promptfoo-cmd3 [unexpected npm problem]: rc=1 fails closed | FAIL: npm ls --all over ~/.local/share/codex-ecosystem/tools/promptfoo-0.123.1 (exit 1) is not in the expected state
+13 promptfoo-cmd3 [npm exit status inconsistent]: rc=1 fails closed | FAIL: npm ls --all over ~/.local/share/codex-ecosystem/tools/promptfoo-0.123.1 (exit 0) is not in the expected state
+14 inspect-ai-cmd1 [pin assertion fails]: rc=1 fails closed | FAIL: the catalogs/landscape winner pins for inspect-ai are not exactly inspect-ai0.3.266
+15 inspect-ai-cmd1 [PyPI metadata fetch fails]: rc=1 fails closed | FAIL: PyPI JSON API fetch for inspect-ai 0.3.266 exited 22
+16 inspect-ai-cmd1 [no single wheel]: rc=1 fails closed | FAIL: the PyPI metadata for inspect-ai 0.3.266 does not list exactly one wheel
+17 inspect-ai-cmd1 [declared digest differs]: rc=1 fails closed | FAIL: PyPI declares sha256 e30e1c2abf2844a9db221d5307b9b380e2da5fb1d29a9f2bff9094262c1044e6 for inspect_ai-0.3.266-py3-none-any.whl, not the expected 
+18 inspect-ai-cmd1 [wheel download fails]: rc=1 fails closed | FAIL: downloading inspect_ai-0.3.266-py3-none-any.whl exited 22
+19 inspect-ai-cmd1 [sha256sum fails]: rc=1 fails closed | FAIL: sha256sum exited 1
+20 inspect-ai-cmd1 [downloaded bytes differ]: rc=1 fails closed | FAIL: the downloaded inspect_ai-0.3.266-py3-none-any.whl hashes to bf75822d23a6c6f7938db8399f729ecb5c4e2eaf37cfbe4dac6fb4473b416a21, not the PyPI-decl
+21 inspect-ai-cmd2 [uv tool list exits non-zero]: rc=1 fails closed | FAIL: uv tool list exited 2
+22 inspect-ai-cmd2 [no inspect-ai row]: rc=1 fails closed | FAIL: uv tool list shows no inspect-ai tool
+23 inspect-ai-cmd2 [row specifier differs]: rc=1 fails closed | FAIL: unexpected uv tool list row: inspect-ai v0.3.266 [required: ==0.3.266] [CPython 3.13.15] (~/.local/share/codex-ecosystem/python-tools/
+24 inspect-ai-cmd2 [entrypoint differs]: rc=1 fails closed | FAIL: uv tool list does not show the inspect entrypoint in ~/.local/share/codex-ecosystem/bin: inspect-ai v0.3.266 [required: ==0.3.266] [CP
+25 inspect-ai-cmd2 [uv pip check fails]: rc=1 fails closed | FAIL: uv pip check exited 2: error: No virtual environment or system Python installation found for path `~/.local/share/codex-ecosystem/pyth
+26 inspect-ai-cmd2 [control venv creation fails]: rc=1 fails closed | FAIL: creating the control venv exited 2
+27 inspect-ai-cmd2 [control env has no fault]: rc=1 fails closed | FAIL: uv pip check exited 0 on the control venv, whose ctl-probe requires the absent ctl-absent-dep: Using Python 3.13.15 environment at: /tmp/tmp.Qdi
+28 inspect-ai-cmd2 [control report differs]: rc=1 fails closed | FAIL: uv pip check on the control venv (exit 1) does not report the missing dependency: Using Python 3.13.15 environment at: /tmp/tmp.kVa9uInRKi/v
+29 inspect-ai-cmd3 [inspect not on PATH]: rc=1 fails closed | FAIL: inspect is not on PATH
+30 inspect-ai-cmd3 [PATH resolves elsewhere]: rc=1 fails closed | FAIL: inspect on PATH (~/.local/share/codex-ecosystem/bin/inspect) resolves to ~/.local/share/codex-ecosystem/python-tools/inspect
+31 inspect-ai-cmd3 [inspect --version exits 73]: rc=1 fails closed | FAIL: inspect --version exited 73
+32 inspect-ai-cmd3 [inspect --version mismatch]: rc=1 fails closed | FAIL: inspect --version printed '0.3.266', expected 0.3.266
+33 inspect-ai-cmd3 [importlib.metadata fails]: rc=1 fails closed | FAIL: importlib.metadata in the tool environment exited 1
+34 inspect-ai-cmd3 [importlib.metadata mismatch]: rc=1 fails closed | FAIL: importlib.metadata reports inspect-ai 0.3.266 on CPython 3.13.15, expected 0.3.266
+34 mutations, 0 problem(s)

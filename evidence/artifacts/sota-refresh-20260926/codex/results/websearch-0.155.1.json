@@ -1,0 +1,368 @@
+{
+  "codex": "~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex",
+  "cases": [
+    {
+      "case": "W1-search-flag",
+      "argv": [
+        "~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex",
+        "--search",
+        "exec",
+        "--ignore-user-config",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "-m",
+        "gpt-6-astra",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "model_provider=\"fakeprov\"",
+        "-c",
+        "model_providers.fakeprov.name=\"fake\"",
+        "-c",
+        "model_providers.fakeprov.base_url=\"http://127.0.0.1:18091/v1\"",
+        "-c",
+        "model_providers.fakeprov.wire_api=\"responses\"",
+        "-c",
+        "model_providers.fakeprov.request_max_retries=0",
+        "-c",
+        "model_providers.fakeprov.stream_max_retries=0",
+        "-c",
+        "model_providers.fakeprov.supports_standalone_web_search=true",
+        "--output-schema",
+        "<arm>/W1-search-flag/schema.json",
+        "-o",
+        "<arm>/W1-search-flag/last.json",
+        "--json",
+        "Search the web for the probe, open the documentation page, then return the JSON object the schema requires."
+      ],
+      "exit": 0,
+      "duration_s": 5.68,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.started",
+        "item.completed",
+        "item.started",
+        "item.completed",
+        "item.completed",
+        "turn.completed"
+      ],
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]",
+        "namespace:clock[sleep]",
+        "namespace:collaboration[followup_task,interrupt_agent,list_agents,send_message,spawn_agent,wait_agent]"
+      ],
+      "search_requests": 2,
+      "search_settings_external_web_access": [
+        false,
+        false
+      ],
+      "search_commands": [
+        {
+          "search_query": [
+            {
+              "q": "codex fake query"
+            }
+          ]
+        },
+        {
+          "open": [
+            {
+              "ref_id": "https://example.com/docs"
+            }
+          ]
+        }
+      ],
+      "web_search_items_completed": [
+        {
+          "action": "search",
+          "query": "codex fake query",
+          "has_results": false,
+          "results": null
+        },
+        {
+          "action": "other",
+          "query": "https://example.com/docs",
+          "has_results": false,
+          "results": null
+        }
+      ],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 33,
+          "cached_input_tokens": 9,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 21,
+          "reasoning_output_tokens": 6
+        }
+      ],
+      "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-websearch\"}",
+      "stderr_tail": "Reading additional input from stdin...\n",
+      "provider_requests": [
+        [
+          "POST",
+          "/v1/responses"
+        ],
+        [
+          "POST",
+          "/v1/alpha/search"
+        ],
+        [
+          "POST",
+          "/v1/responses"
+        ],
+        [
+          "POST",
+          "/v1/alpha/search"
+        ],
+        [
+          "POST",
+          "/v1/responses"
+        ]
+      ]
+    },
+    {
+      "case": "W2-no-flag",
+      "argv": [
+        "~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex",
+        "exec",
+        "--ignore-user-config",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "-m",
+        "gpt-6-astra",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "model_provider=\"fakeprov\"",
+        "-c",
+        "model_providers.fakeprov.name=\"fake\"",
+        "-c",
+        "model_providers.fakeprov.base_url=\"http://127.0.0.1:18091/v1\"",
+        "-c",
+        "model_providers.fakeprov.wire_api=\"responses\"",
+        "-c",
+        "model_providers.fakeprov.request_max_retries=0",
+        "-c",
+        "model_providers.fakeprov.stream_max_retries=0",
+        "-c",
+        "model_providers.fakeprov.supports_standalone_web_search=true",
+        "--output-schema",
+        "<arm>/W2-no-flag/schema.json",
+        "-o",
+        "<arm>/W2-no-flag/last.json",
+        "--json",
+        "Search the web for the probe, open the documentation page, then return the JSON object the schema requires."
+      ],
+      "exit": 0,
+      "duration_s": 5.93,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.started",
+        "item.completed",
+        "item.started",
+        "item.completed",
+        "item.completed",
+        "turn.completed"
+      ],
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]",
+        "namespace:clock[sleep]",
+        "namespace:collaboration[followup_task,interrupt_agent,list_agents,send_message,spawn_agent,wait_agent]"
+      ],
+      "search_requests": 2,
+      "search_settings_external_web_access": [
+        false,
+        false
+      ],
+      "search_commands": [
+        {
+          "search_query": [
+            {
+              "q": "codex fake query"
+            }
+          ]
+        },
+        {
+          "open": [
+            {
+              "ref_id": "https://example.com/docs"
+            }
+          ]
+        }
+      ],
+      "web_search_items_completed": [
+        {
+          "action": "search",
+          "query": "codex fake query",
+          "has_results": false,
+          "results": null
+        },
+        {
+          "action": "other",
+          "query": "https://example.com/docs",
+          "has_results": false,
+          "results": null
+        }
+      ],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 33,
+          "cached_input_tokens": 9,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 21,
+          "reasoning_output_tokens": 6
+        }
+      ],
+      "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-websearch\"}",
+      "stderr_tail": "Reading additional input from stdin...\n",
+      "provider_requests": [
+        [
+          "POST",
+          "/v1/responses"
+        ],
+        [
+          "POST",
+          "/v1/alpha/search"
+        ],
+        [
+          "POST",
+          "/v1/responses"
+        ],
+        [
+          "POST",
+          "/v1/alpha/search"
+        ],
+        [
+          "POST",
+          "/v1/responses"
+        ]
+      ]
+    },
+    {
+      "case": "W3-config-live",
+      "argv": [
+        "~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex",
+        "exec",
+        "--ignore-user-config",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "-m",
+        "gpt-6-astra",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "model_provider=\"fakeprov\"",
+        "-c",
+        "model_providers.fakeprov.name=\"fake\"",
+        "-c",
+        "model_providers.fakeprov.base_url=\"http://127.0.0.1:18091/v1\"",
+        "-c",
+        "model_providers.fakeprov.wire_api=\"responses\"",
+        "-c",
+        "model_providers.fakeprov.request_max_retries=0",
+        "-c",
+        "model_providers.fakeprov.stream_max_retries=0",
+        "-c",
+        "model_providers.fakeprov.supports_standalone_web_search=true",
+        "-c",
+        "web_search=\"live\"",
+        "--output-schema",
+        "<arm>/W3-config-live/schema.json",
+        "-o",
+        "<arm>/W3-config-live/last.json",
+        "--json",
+        "Search the web for the probe, open the documentation page, then return the JSON object the schema requires."
+      ],
+      "exit": 0,
+      "duration_s": 5.83,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.started",
+        "item.completed",
+        "item.started",
+        "item.completed",
+        "item.completed",
+        "turn.completed"
+      ],
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]",
+        "namespace:clock[sleep]",
+        "namespace:collaboration[followup_task,interrupt_agent,list_agents,send_message,spawn_agent,wait_agent]"
+      ],
+      "search_requests": 2,
+      "search_settings_external_web_access": [
+        true,
+        true
+      ],
+      "search_commands": [
+        {
+          "search_query": [
+            {
+              "q": "codex fake query"
+            }
+          ]
+        },
+        {
+          "open": [
+            {
+              "ref_id": "https://example.com/docs"
+            }
+          ]
+        }
+      ],
+      "web_search_items_completed": [
+        {
+          "action": "search",
+          "query": "codex fake query",
+          "has_results": false,
+          "results": null
+        },
+        {
+          "action": "other",
+          "query": "https://example.com/docs",
+          "has_results": false,
+          "results": null
+        }
+      ],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 33,
+          "cached_input_tokens": 9,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 21,
+          "reasoning_output_tokens": 6
+        }
+      ],
+      "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-websearch\"}",
+      "stderr_tail": "Reading additional input from stdin...\n",
+      "provider_requests": [
+        [
+          "POST",
+          "/v1/responses"
+        ],
+        [
+          "POST",
+          "/v1/alpha/search"
+        ],
+        [
+          "POST",
+          "/v1/responses"
+        ],
+        [
+          "POST",
+          "/v1/alpha/search"
+        ],
+        [
+          "POST",
+          "/v1/responses"
+        ]
+      ]
+    }
+  ]
+}

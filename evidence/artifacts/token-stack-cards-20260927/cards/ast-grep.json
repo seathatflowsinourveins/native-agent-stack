@@ -1,0 +1,557 @@
+{
+ "tool": "ast-grep",
+ "group": "g5-conversion-packing",
+ "repo": "https://github.com/ast-grep/ast-grep",
+ "pin": "0.45.3 (npm @ast-grep/cli)",
+ "installed_version": "ast-grep 0.45.3 (native `ast-grep --version`; `sg` on PATH is shadow-utils, not ast-grep)",
+ "role": "Structural code search that returns matched nodes instead of whole files, separating real calls from comments and strings. Lanes: CLI in any lane. Landscape: code-navigation alternative.",
+ "lanes": [
+  "CLI: ast-grep run --lang L --pattern P PATH --json=compact"
+ ],
+ "upstream": {
+  "latest_release": "0.45.3",
+  "latest_date": "2026-08-31",
+  "our_pin": "0.45.3 via @ast-grep/cli, declared in manifests/stack.json:138; upstream identity: https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+  "behind_by": "0 published releases (https://github.com/ast-grep/ast-grep/releases/latest); unreleased main is 18 commits ahead at 6602aeb97d387b01e6ef4e49a6d07578dbf645cd: https://github.com/ast-grep/ast-grep/compare/0.45.3...6602aeb97d387b01e6ef4e49a6d07578dbf645cd. The merged custom-language opt-in fix is not in the released pin.",
+  "recommended_install": {
+   "command": "npm install --global @ast-grep/cli",
+   "url": "https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#installation"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "The official ast-grep/agent-skill repository documents `/plugin marketplace add ast-grep/agent-skill` followed by `/plugin install ast-grep`; it also publishes `npx skills add ast-grep/agent-skill`. It advises an explicit structural-search instruction in AGENTS.md or CLAUDE.md because skill discovery alone does not ensure selection.",
+    "url": "https://github.com/ast-grep/agent-skill/blob/f2175aff21f20cfb8e2db30c28febeb3a2d42b61/README.md"
+   },
+   "codex": {
+    "how": "no upstream Codex-specific guidance found; checked https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md, https://github.com/ast-grep/agent-skill/blob/f2175aff21f20cfb8e2db30c28febeb3a2d42b61/README.md, https://github.com/ast-grep/ast-grep.github.io/blob/47a2c45821c05e8d8ec820cbab03f46c54ce3aa5/website/advanced/prompting.md and https://github.com/ast-grep/ast-grep-mcp/blob/main/README.md. Upstream publishes generic AGENTS.md prompting and Skills CLI installation, but the checked guidance does not name a Codex-specific installer or registration command.",
+    "url": "https://github.com/ast-grep/ast-grep.github.io/blob/47a2c45821c05e8d8ec820cbab03f46c54ce3aa5/website/advanced/prompting.md"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "Live GitHub release metadata identifies 0.45.3, published 2026-08-31, as the latest release.",
+    "url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
+   },
+   {
+    "claim": "ast-grep is a CLI for structural search, linting and rewriting. Patterns match syntax-tree structure, with metavariables representing AST nodes rather than arbitrary text.",
+    "url": "https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md"
+   },
+   {
+    "claim": "The implementation uses Tree-sitter and multiple cores, supports YAML rules, and offers library APIs as well as the CLI. These are capability claims, not a workload-independent savings benchmark.",
+    "url": "https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#feature-highlight"
+   },
+   {
+    "claim": "The current release already adds outline support for Markdown headings, improves fallback signature anchoring and adds scan --min-severity. These features are within the pin.",
+    "url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
+   },
+   {
+    "claim": "Upstream offers Claude skills and generic AGENTS.md instructions for syntax-aware search. It also describes an experimental ast-grep-mcp server for iterative rule development and testing.",
+    "url": "https://github.com/ast-grep/ast-grep.github.io/blob/47a2c45821c05e8d8ec820cbab03f46c54ce3aa5/website/advanced/prompting.md"
+   },
+   {
+    "claim": "The official skill README distinguishes installation/discovery from actual preference and recommends explicitly naming ast-grep or setting a persistent structural-search instruction.",
+    "url": "https://github.com/ast-grep/agent-skill/blob/f2175aff21f20cfb8e2db30c28febeb3a2d42b61/README.md#how-to-use"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "Released ProjectConfig setup registers custom-language native libraries from discovered configuration without an opt-in gate. The released source calls register_custom_language during project setup; the later opt-in change must not be attributed to this pin.",
+    "url": "https://github.com/ast-grep/ast-grep/blob/0.45.3/crates/cli/src/config.rs#L98"
+   },
+   {
+    "text": "Merged PR #2960 scans for the explicit --allow-custom-languages opt-in before full CLI argument parsing and requires it before loading native libraries; permitted custom-language registration in ProjectConfig::setup (crates/cli/src/config.rs) still occurs during that preliminary pass, before App::try_parse_from (crates/cli/src/lib.rs), as covered by allowed_custom_language_is_registered_before_cli_parsing in crates/cli/tests/custom_language_trust_test.rs. Its merge commit is 9aafe2d55944389d2070e827c1652ffdcce934ba; the fix is unreleased relative to the latest 0.45.3 tag.",
+    "url": "https://github.com/ast-grep/ast-grep/pull/2960"
+   },
+   {
+    "text": "Open issue #2957 documents incomplete nested-declaration outlines and members attributed to the enclosing declaration. Structural run matches and outline hierarchy are different correctness contracts.",
+    "url": "https://github.com/ast-grep/ast-grep/issues/2957"
+   },
+   {
+    "text": "Open issue #2963 documents silently ignored unknown YAML rule keys; misspelling ignores as ignore can discard intended exclusions. A successful parse does not validate the intended rule scope.",
+    "url": "https://github.com/ast-grep/ast-grep/issues/2963"
+   },
+   {
+    "text": "The companion ast-grep-mcp repository labels its server experimental. Availability of that server does not mean the CLI installs it or that a client has registered it.",
+    "url": "https://github.com/ast-grep/ast-grep-mcp/blob/main/README.md"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "No newer published release was present in the live release list.",
+    "url": "https://github.com/ast-grep/ast-grep/releases"
+   },
+   {
+    "text": "Unreleased main includes the custom-language library opt-in fix at 9aafe2d55944389d2070e827c1652ffdcce934ba, merged on 2026-09-23. Its regression tests distinguish denied library loading, explicit opt-in and harmless CLI paths.",
+    "url": "https://github.com/ast-grep/ast-grep/pull/2960"
+   },
+   {
+    "text": "The exact main comparison also includes Zig support, Java record outline rules, rejection of null relation fields in generated schemas, default-run parsing changes and dependency updates. These are unreleased changes, not capabilities newly available from the installed package.",
+    "url": "https://github.com/ast-grep/ast-grep/compare/0.45.3...6602aeb97d387b01e6ef4e49a6d07578dbf645cd"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "ast-grep",
+   "repository": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+   "version": "0.45.3",
+   "license": "MIT",
+   "profile": "supporting",
+   "role": "Structural source search",
+   "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+  },
+  "how_we_install": "Pinned native CLI through `npm install --global --prefix \"$STACK_HOME/tools/ast-grep-0.45.3\" @ast-grep/cli@0.45.3` (recipes/README.md:84; manifests/stack.json:138). The card records the owned bin/ast-grep link; its host's sg resolves to shadow-utils, so examples correctly use ast-grep rather than assuming sg is this tool (token-cards/cards/ast-grep.json).",
+  "claude_wiring": "The case-insensitive search of adoption/templates/claude.settings.template.json, adoption/templates/codex.config.template.toml, adoption/templates/project.codex.config.template.toml, .codex/config.toml and every file under examples/claude-native/agents/ found no tool-name matches. In these maintained surfaces there is no MCP server registration, no settings.json permission entry and no dedicated example-agent persona. Claude invokes ast-grep directly through Bash for structural source searches (docs/token-session-handbook.md:138); the upstream agent-skill/plugin is not established as installed by this wiring.",
+  "codex_wiring": "The case-insensitive search of adoption/templates/claude.settings.template.json, adoption/templates/codex.config.template.toml, adoption/templates/project.codex.config.template.toml, .codex/config.toml and every file under examples/claude-native/agents/ found no tool-name matches. In these maintained surfaces there is no MCP server registration, no settings.json permission entry and no dedicated example-agent persona. Codex invokes the CLI through CommandExecution, using the handbook's explicit language/pattern example (docs/token-session-handbook.md:138). Generic upstream AGENTS.md guidance does not create an MCP registration.",
+  "lane_rule": "Use ast-grep for structural source patterns, bounded original reads or rg for known locations/exact text, and choose one useful method per artifact (docs/token-session-handbook.md:106; docs/token-session-handbook.md:107; docs/token-session-handbook.md:138). The JavaScript example deliberately uses --stdin because the fixture has a .txt suffix (recipes/README.md:84).",
+  "deviations_from_upstream": [
+   {
+    "what": "The adaptation selects a pinned CLI command rather than the upstream Claude plugin, standalone skill or experimental MCP server.",
+    "why": "The maintained handbook routes structural patterns to the CLI, and the checked configuration/agent files contain no registration. This remains an upstream-supported mode; integration breadth is not evidence of better search quality.",
+    "fix": "Add explicit task-matched CLI guidance where discovery is weak. Qualify an upstream skill or MCP separately only if that integration is selected.",
+    "pr": null
+   },
+   {
+    "what": "The latest released pin lacks the merged custom-language trust gate (https://github.com/ast-grep/ast-grep/pull/2960).",
+    "why": "The retained repro.sh/repro.out and repro2.sh/repro2.out show a discovered sgconfig attempting to load a nonexistent library during run, stdin run, scan and outline. The probes demonstrate attempted loading, not execution of an attacker library. A neutral working directory or an explicit trusted config avoids the attempted load; on this pin the --config/-c option must follow the subcommand.",
+    "fix": "Document a trusted working directory or `ast-grep run --config <trusted-config> ...` / `ast-grep scan --config <trusted-config> ...` for untrusted checkouts. Keep --allow-custom-languages out of current-pin examples because it is unavailable; qualify the first release containing 9aafe2d55944389d2070e827c1652ffdcce934ba and its unchanged trust regression tests.",
+    "pr": "#2960"
+   },
+   {
+    "what": "Structural-search success does not qualify the broader outline and YAML configuration surfaces.",
+    "why": "The retained repros confirm nested Java outline members assigned to the outer class and exclusion changes when unknown YAML keys are accepted. These match upstream #2957 and #2963, whereas the handbook primarily selects run.",
+    "fix": "Use original-source recovery for nested outline questions and positive/negative file-scope checks for YAML rules. Qualify these surfaces separately before extending the current search-lane claims.",
+    "pr": null
+   }
+  ],
+  "pending_fixes": [
+   "Add the released-pin config-discovery caveat beside recipes/README.md:84 and docs/token-session-handbook.md:138, using a trusted config after the subcommand or a trusted neutral working directory.",
+   "Track upstream PR #2960 and qualify the first published release containing 9aafe2d55944389d2070e827c1652ffdcce934ba; the current latest-release match does not mean that fix has shipped.",
+   "Retain positive and negative rule-scope checks for unknown YAML keys, and require source recovery for nested outline hierarchy until the corresponding upstream defects are fixed and qualified.",
+   "Adoption observation only: token-cards/invoke_by_tool.json populations.workflow_children_with_lanes_block.ast-grep records cli_calls=0 and mcp_calls=0 with agents=22. The token MCP-server list in codex-lanes-block.txt does not name ast-grep; that list is not a CLI inventory. Add an explicit task-matched CLI example to the worker guidance and retain a subsequent observation; this population does not establish why the tool was unused."
+  ],
+  "assessment": "The pinned CLI and structural-search lane align with the latest released upstream, while the merged custom-library opt-in fix remains unshipped. token-cards/cards/ast-grep.json records passing selected structural searches and a correct no-match control, supporting the retained matched-node artifact comparisons. That evidence does not establish provider savings or general outline and rule-configuration correctness. The config-discovery mitigation and the retained outline/YAML defects therefore remain concrete limits of the adaptation."
+ },
+ "e2e_returned_results": {
+  "status": "pass",
+  "reason": "passed",
+  "run_utc": "2026-09-26T18:49:55.457Z",
+  "fidelity": {
+   "what": "exact artifact comparison predicate",
+   "result": " 18 calls verified by grep (PASS); verifier: agree, 2 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "timeout -k 5 120 ast-grep --version",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 ast-grep --help",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 ast-grep run --lang python --pattern subprocess.run($$$ARGS) scripts/ --json=compact",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 ast-grep run --lang python --pattern subprocess.run($$$ARGS) scripts/ --json=compact --inspect summary",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 ast-grep run --lang python --pattern zzz_rr_nonexistent($$$ARGS) scripts/ --json=compact",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 ast-grep run --lang python --pattern subprocess.run($$$ARGS) fixtures/ast_grep_calls.py --json=compact",
+    "exit": null,
+    "returned": "passed"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 27,
+  "records_shown": [
+   {
+    "id": "ast-grep-01-git-status-before",
+    "status": "passed",
+    "kind": "baseline and identity plumbing (native output of a system tool, not the component)",
+    "command": "timeout -k 5 120 git status --porcelain=v1 --ignored",
+    "observation": "Evidence class: plumbing (git's own output, not the component). `git status --porcelain=v1 --ignored` in $WT exited 0 and returned 1 line: `!! tools/token-report/__pycache__/`, an ignored bytecode directory that existed before this run. Records 19 and 26 compare the after-state with this one.",
+    "attachments": 2
+   },
+   {
+    "id": "ast-grep-02-git-rev",
+    "status": "passed",
+    "kind": "baseline and identity plumbing (native output of a system tool, not the component)",
+    "command": "timeout -k 5 120 git rev-parse HEAD",
+    "observation": "Evidence class: plumbing. `git rev-parse HEAD` in $WT returned 803bc3514ef05129c57118d8cbad0c61dd4ab141, the fixture revision INVENTORY.md section 0 names (detached origin/main 803bc351).",
+    "attachments": 2
+   },
+   {
+    "id": "ast-grep-03-version",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 ast-grep --version",
+    "observation": "Evidence class: native execution. `ast-grep --version` returned `ast-grep 0.45.3` (exit 0, stderr 0 bytes), matching the pin 0.45.3 (npm @ast-grep/cli).",
+    "attachments": 2
+   },
+   {
+    "id": "ast-grep-04-help",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 ast-grep --help",
+    "observation": "Evidence class: native execution. `ast-grep --help` (exit 0) lists 8 subcommands: run, scan, test, new, lsp, outline, completions, help. INVENTORY.md 2.17 lists only `run`; `outline` (\"Explore code structure for symbols, imports, exports, and members\") is a second token-saving CLI surface in this pin and is exercised in records 20-27. `lsp` starts a language server and needs an LSP client, which this lane does not ha",
+    "attachments": 2
+   },
+   {
+    "id": "ast-grep-05-which",
+    "status": "passed",
+    "kind": "baseline and identity plumbing (native output of a system tool, not the component)",
+    "command": "timeout -k 5 120 which -a ast-grep sg",
+    "observation": "Evidence class: plumbing. `which -a ast-grep sg` returned $HOME/.local/share/codex-ecosystem/bin/ast-grep; /usr/bin/sg; /bin/sg: ast-grep resolves to the owned codex-ecosystem bin link, and `sg` exists only as /usr/bin/sg and /bin/sg. The raw stdout (74 bytes, sha256 51dff510a0469967e57ce2d2f1e0df34701b220137cb1eb761abc691c82f42e1) contains a literal host path and stays private at ast-grep/private/out/05-which.stdout",
+    "attachments": 2
+   },
+   {
+    "id": "ast-grep-06-readlink",
+    "status": "passed",
+    "kind": "baseline and identity plumbing (native output of a system tool, not the component)",
+    "command": "timeout -k 5 120 readlink -f $HOME/.local/share/codex-ecosystem/bin/ast-grep /usr/bin/sg",
+    "observation": "Evidence class: plumbing. `readlink -f` resolves the ast-grep link to $HOME/.local/share/codex-ecosystem/tools/ast-grep-0.45.3/lib/node_modules/@ast-grep/cli/ast-grep (the owned npm @ast-grep/cli 0.45.3 prefix) and `sg` to /usr/bin/newgrp: on this host `sg` is shadow-utils' newgrp, not ast-grep, so no command here invokes `sg`. The raw stdout (119 bytes, sha256 25db6599d0357f32da721fa49cef4c64d8da3d0029ee9a2ccc8223ae",
+    "attachments": 2
+   },
+   {
+    "id": "ast-grep-07-sha256",
+    "status": "passed",
+    "kind": "baseline and identity plumbing (native output of a system tool, not the component)",
+    "command": "timeout -k 5 120 sha256sum $HOME/.local/share/codex-ecosystem/tools/ast-grep-0.45.3/lib/node_modules/@ast-grep/cli/ast-grep",
+    "observation": "Evidence class: plumbing. sha256 of the resolved ast-grep binary: 7a5ab30160186184c0bf8bffc87da4af25123c183964cd98c11b0b354137db0a. Its first 8 hex digits equal the `7a5ab301` prefix recorded for the laptop host's binary in evidence/artifacts/token-e2e-ultracode-laptop-20260926 (that verifier compared its binary byte for byte with the npm tarball @ast-grep/cli-linux-x64-gnu@0.45.3). Only the prefix is recorded there,",
+    "attachments": 2
+   },
+   {
+    "id": "ast-grep-08-run-scripts",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 ast-grep run --lang python --pattern subprocess.run($$$ARGS) scripts/ --json=compact",
+    "observation": "Evidence class: native execution. Plan (1). ast-grep 0.45.3 returned a single-line compact JSON array (36,971 bytes, sha256 1b48dab8b62afe69fae269079e512c6529814ee45aa3a734d02b9ce67fb903d6, exit 0, stderr 0 bytes) of 19 matches in 11 files, read from this output alone: scripts/adoption_status.py 1 (lines 219); scripts/build_ecosystem.py 1 (lines 770); scripts/credential_status.py 1 (lines 160); scripts/freshness_prop",
+    "attachments": 2
+   },
+   {
+    "id": "ast-grep-09-run-scripts-inspect",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 ast-grep run --lang python --pattern subprocess.run($$$ARGS) scripts/ --json=compact --inspect summary",
+    "observation": "Evidence class: native execution. The plan (1) search repeated with `--inspect summary`. Its stderr is ast-grep's only counter, per run: `sg: summary|project: isProject=false` / `sg: summary|file: scannedFileCount=31,skippedFileCount=0`. scannedFileCount 31 equals the 31 .py files under scripts/ (the other 2, scripts/git-hooks/pre-commit, scripts/recount-tokens.cjs, are not Python-extension files). stdout: 19 matches",
+    "attachments": 2
+   },
+   {
+    "id": "ast-grep-10-negative-control",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 ast-grep run --lang python --pattern zzz_rr_nonexistent($$$ARGS) scripts/ --json=compact",
+    "observation": "Evidence class: native execution. Plan (2). Exit 1, stdout \"[]\\n\" (3 bytes), stderr 0 bytes. Zero matches come back as exit 1 with an empty JSON array, as the plan requires; exit 1 is the expected result here.",
+    "attachments": 2
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [
+   {
+    "lane": "claude_subagent",
+    "payload": "Find subprocess.run calls: the 10 files vs ast-grep structural matches; 18 calls verified by grep (PASS)",
+    "before_tokens": 105877,
+    "after_tokens": 10293,
+    "change_pct": -90.3,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-25T21:07:56.582503+00:00",
+    "last_seen": "2026-09-25T21:07:56.582503+00:00"
+   },
+   {
+    "lane": "codex_worker",
+    "payload": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's ast-grep task; answer verified against the baseline (PASS)",
+    "before_tokens": 112899,
+    "after_tokens": 11508,
+    "change_pct": -89.8,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-26T13:51:53.625127+00:00",
+    "last_seen": "2026-09-26T13:51:53.625127+00:00"
+   }
+  ],
+  "native_counter": null,
+  "native_snapshot": [],
+  "shortfall_cause": null,
+  "q3_fixture": null
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 0,
+    "cli_calls": 243,
+    "agents_using": 44,
+    "agents": 1010,
+    "pct_agents_using": 0.0436
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 243,
+    "agents_using": 44,
+    "agents": 988,
+    "pct_agents_using": 0.0445
+   },
+   "agent_subagents": {
+    "mcp_calls": 0,
+    "cli_calls": 22,
+    "agents_using": 3,
+    "agents": 71,
+    "pct_agents_using": 0.0423
+   },
+   "main_sessions": {
+    "mcp_calls": 0,
+    "cli_calls": 13,
+    "agents_using": 2,
+    "agents": 15,
+    "pct_agents_using": 0.1333
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 0,
+    "cli_calls": 7,
+    "agents_using": 2,
+    "agents": 301,
+    "pct_agents_using": 0.0066
+   }
+  },
+  "live_otel": null,
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "defects",
+  "findings": [
+   {
+    "severity": "medium",
+    "field": "upstream.limitations[1].text",
+    "issue": "The claim that merged PR #2960 'defers custom-language registration until after CLI parsing' is false for its cited merge commit 9aafe2d55944389d2070e827c1652ffdcce934ba. In crates/cli/src/lib.rs, main_with_args scans for the opt-in flag, calls setup_project_is_possible at line 143, then calls App::try_parse_from at line 144. ProjectConfig::setup registers permitted custom languages during that earlier call. The merged regression test is explicitly named allowed_custom_language_is_registered_before_cli_parsing. The opt-in requirement and unreleased status are correct; only the asserted ordering is wrong. This wording is identical in ast-grep.upstream.json and the assembled card.",
+    "fix": "Correct ast-grep.upstream.json to describe an explicit opt-in gate discovered by a preliminary argument scan, with permitted custom-language registration still occurring before full CLI parsing. Remove the after-parsing claim and cite the merged implementation and regression test; retain the accurate distinction between the released pin and the unshipped fix.",
+    "source": "https://raw.githubusercontent.com/ast-grep/ast-grep/9aafe2d55944389d2070e827c1652ffdcce934ba/crates/cli/src/lib.rs"
+   }
+  ],
+  "checked": [
+   "token-cards/cards/ast-grep.json",
+   "token-cards/groups/g5-conversion-packing/ast-grep.upstream.json",
+   "token-cards/invoke_by_tool.json",
+   "manifests/stack.json",
+   "recipes/README.md",
+   "docs/token-session-handbook.md",
+   "adoption/templates/claude.settings.template.json",
+   "adoption/templates/codex.config.template.toml",
+   "adoption/templates/project.codex.config.template.toml",
+   ".codex/config.toml",
+   "examples/claude-native/agents/source-scout.md",
+   "examples/claude-native/agents/isolated-builder.md",
+   "examples/claude-native/agents/blind-lane-reviewer.md",
+   "examples/claude-native/agents/evidence-reviewer.md",
+   "examples/claude-native/agents/semantic-evidence-reviewer.md",
+   "examples/claude-native/agents/blind-adjudicator.md",
+   "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+   "https://github.com/ast-grep/ast-grep/releases",
+   "https://github.com/ast-grep/agent-skill/blob/f2175aff21f20cfb8e2db30c28febeb3a2d42b61/README.md",
+   "https://github.com/ast-grep/agent-skill/blob/f2175aff21f20cfb8e2db30c28febeb3a2d42b61/README.md#how-to-use",
+   "https://github.com/ast-grep/ast-grep-mcp/blob/main/README.md",
+   "https://github.com/ast-grep/ast-grep.github.io/blob/47a2c45821c05e8d8ec820cbab03f46c54ce3aa5/website/advanced/prompting.md",
+   "https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md",
+   "https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#feature-highlight",
+   "https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#installation",
+   "https://github.com/ast-grep/ast-grep/blob/0.45.3/crates/cli/src/config.rs#L98",
+   "https://github.com/ast-grep/ast-grep/compare/0.45.3...6602aeb97d387b01e6ef4e49a6d07578dbf645cd",
+   "https://github.com/ast-grep/ast-grep/issues/2957",
+   "https://github.com/ast-grep/ast-grep/issues/2963",
+   "https://github.com/ast-grep/ast-grep/pull/2960",
+   "https://github.com/ast-grep/ast-grep/releases/latest",
+   "https://github.com/ast-grep/ast-grep/tree/main",
+   "https://github.com/ast-grep/ast-grep/compare/0.45.3...6602aeb97d387b01e6ef4e49a6d07578dbf645cd.diff",
+   "https://github.com/ast-grep/ast-grep/pull/2960.diff",
+   "https://raw.githubusercontent.com/ast-grep/ast-grep/0.45.3/README.md",
+   "https://raw.githubusercontent.com/ast-grep/ast-grep/0.45.3/crates/cli/src/config.rs",
+   "https://raw.githubusercontent.com/ast-grep/agent-skill/f2175aff21f20cfb8e2db30c28febeb3a2d42b61/README.md",
+   "https://raw.githubusercontent.com/ast-grep/ast-grep.github.io/47a2c45821c05e8d8ec820cbab03f46c54ce3aa5/website/advanced/prompting.md",
+   "https://raw.githubusercontent.com/ast-grep/ast-grep-mcp/main/README.md",
+   "https://raw.githubusercontent.com/ast-grep/ast-grep/9aafe2d55944389d2070e827c1652ffdcce934ba/crates/cli/src/lib.rs",
+   "https://raw.githubusercontent.com/ast-grep/ast-grep/9aafe2d55944389d2070e827c1652ffdcce934ba/crates/cli/tests/custom_language_trust_test.rs",
+   "https://raw.githubusercontent.com/ast-grep/ast-grep/9aafe2d55944389d2070e827c1652ffdcce934ba/crates/cli/src/config.rs",
+   "Compared all six invoke_rates.populations objects, their method and window exactly against token-cards/invoke_by_tool.json; checked native_adaptation.pending_fixes and assessment against the same populations. cli_calls was treated as command-text matching, which can include path mentions, not verified executable invocations.",
+   "Compared upstream and native_adaptation with the prior upstream file; both match verbatim apart from the assembler-added stack_entry.",
+   "Checked native_adaptation.assessment against e2e_returned_results, adapted_performance.exact_comparisons, invoke_rates and prior_evidence; found no numeric blending across evidence classes in the prior-run prose.",
+   "Ran a case-insensitive grep and recursive JSON field scan of the card and prior upstream file for the prohibited home path, username, temporary paths and UUIDs; no matches."
+  ],
+  "resolutions": [
+   {
+    "field": "upstream.limitations[1].text",
+    "change": "Corrected the ordering claim to describe the preliminary --allow-custom-languages scan and permitted custom-language registration in ProjectConfig::setup before full CLI parsing by App::try_parse_from. Verified the merged implementation in crates/cli/src/lib.rs and crates/cli/src/config.rs and the allowed_custom_language_is_registered_before_cli_parsing regression test at https://raw.githubusercontent.com/ast-grep/ast-grep/9aafe2d55944389d2070e827c1652ffdcce934ba/crates/cli/tests/custom_language_trust_test.rs. Preserved the released-pin/unreleased-fix distinction and every other upstream field.",
+    "verified_at": "https://raw.githubusercontent.com/ast-grep/ast-grep/9aafe2d55944389d2070e827c1652ffdcce934ba/crates/cli/src/lib.rs"
+   }
+  ],
+  "final_verdict": {
+   "tool": "ast-grep",
+   "verdict": "adapted-with-gaps",
+   "summary": "The installed 0.45.3 CLI matches the latest published upstream release and the explicit structural-search lane is supported, but configuration guidance still needs the released-pin limitations recorded in groups/g5-conversion-packing/ast-grep.upstream.json. The card's historical Claude comparison is 105877→10293 tokens (90.28%) and its Codex comparison is 112899→11508 (89.81%); both eligibility fields are null, so these totals alone do not establish an eligible fidelity pass (cards/ast-grep.json). The separately retained call-extraction comparison is 133697→10903 o200k_base tokens (91.84%), eligible only for the checked subprocess-call task because all 19 call ranges and source slices agree with the Python AST oracle (../rr/ast-grep/out/17-compare.stdout; ../rr/ast-grep/check/check.json). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 44/1010 Ultracode workflow children (4.36%, 243 CLI detections), 2/301 Codex workers (0.66%, 7), and 0/22 children given the lanes block (invoke_by_tool.json). Next, document trusted configuration and original-source recovery, qualify the first release containing the existing opt-in fix, and measure successful use on eligible tasks; native saved-token counters and attributable provider savings remain unverified.",
+   "gaps": [
+    {
+     "gap": "The latest released pin predates the merged custom-language opt-in fix; the current structural-search recipe does not close the recorded configuration-discovery and outline/YAML limitations.",
+     "evidence": "groups/g5-conversion-packing/ast-grep.upstream.json",
+     "action": "Document neutral/trusted configuration scope now and qualify the existing upstream fix when released; track https://github.com/ast-grep/ast-grep/pull/2960 without treating that upstream PR as a local owner.",
+     "owner_pr": null
+    },
+    {
+     "gap": "Historical comparison eligibility is null, and a passing call-extraction fixture does not establish general outline or rule-configuration fidelity.",
+     "evidence": "cards/ast-grep.json#adapted_performance",
+     "action": "Preserve the measured sizes, attach task-specific acceptance to each comparison, and require original-source checks for other structural tasks.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The invoke scan has no task-eligible denominator or success validation, and detected adoption is sparse.",
+     "evidence": "invoke_by_tool.py",
+     "action": "Separate command-text detections from successful tool results and measure use only on tasks that benefit from structural search.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "Fresh ast-grep --version returned 0.45.3; the published latest release is 0.45.3 dated 2026-08-31.",
+     "evidence": "groups/g5-g6-verification.json#versions/ast-grep",
+     "result": "holds"
+    },
+    {
+     "claim": "The upstream release supports installing @ast-grep/cli globally; the on-demand CLI lane is a supported integration.",
+     "evidence": "https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md",
+     "result": "holds"
+    },
+    {
+     "claim": "Historical o200k_base sizes reproduce 105877→10293 and 112899→11508, but the card supplies null eligibility for both.",
+     "evidence": "cards/ast-grep.json#adapted_performance/exact_comparisons",
+     "result": "holds"
+    },
+    {
+     "claim": "The newer exact call-extraction comparison reproduces 133697→10903 tokens, with provider_tokens_saved null.",
+     "evidence": "../rr/ast-grep/out/17-compare.stdout",
+     "result": "holds"
+    },
+    {
+     "claim": "All 15 retained call-extraction checks pass, including 19 Python-AST-equivalent ranges, source-slice equality and the negative control.",
+     "evidence": "../rr/ast-grep/check/check.json",
+     "result": "holds"
+    },
+    {
+     "claim": "The separate top-level-outline comparison is 18233→2245 tokens (87.69%); its six retained checks pass only for the two selected files.",
+     "evidence": "groups/g5-g6-verification.json#retained_comparisons/ast-grep-outline",
+     "result": "holds"
+    },
+    {
+     "claim": "The review resolution corrects the merged fix to preliminary opt-in scanning and permitted setup before full CLI parsing, rather than registration after parsing.",
+     "evidence": "groups/g5-conversion-packing/ast-grep.review.json#resolutions",
+     "result": "holds"
+    },
+    {
+     "claim": "Reported invoke detections are 44/1010 workflow children, 0/22 with lanes, and 2/301 Codex workers; 139 negative-control Codex sessions are excluded.",
+     "evidence": "invoke_by_tool.json#populations",
+     "result": "holds"
+    },
+    {
+     "claim": "The retained exact artifact reductions establish attributable provider-token savings for native sessions.",
+     "evidence": "cards/ast-grep.json#adapted_performance",
+     "result": "unverified"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "gpt-tokenizer",
+    "qmd (lookup returned no matching handbook entry)",
+    "serena (symbol lookup unavailable)"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 42
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-c.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 57,
+     "qmd": 1,
+     "serena": 2
+    },
+    "shell_commands": 5,
+    "shell_commands_rtk_prefixed": 4,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "diagnosing-bugs",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 35
+    },
+    "shell_commands": 5,
+    "shell_commands_rtk_prefixed": 4,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296: 105,877->10,293 (90.3%), 18 calls in 10 files. #343 and #316: 112,899->11,508 (89.8%). #338 CI: frozen fixture structural lines [9,13] vs grep text [9,16,17]; negative control exits 1. Hosted C…"
+}

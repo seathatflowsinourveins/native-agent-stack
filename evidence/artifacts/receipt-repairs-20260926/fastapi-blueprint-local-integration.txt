@@ -1,0 +1,42 @@
+Evidence class: local_integration. This is not an upstream test and not native_proven evidence.
+
+What ran: command 2 of nativestack-5975wx-20260925--fastapi--use--20260926 (generation 1), re-run unchanged. It builds the
+application-delivery blueprint's environment with uv sync --frozen --no-build (FastAPI 0.141.1 and
+Uvicorn 0.53.0 from blueprints/convergence-practice/application-delivery/uv.lock), serves this repository's
+own backend (a local synthetic vertical slice, per the blueprint's receipt.json) on a loopback port with its
+database disabled, and judges it with a handwritten 14-check oracle: the live /openapi.json against the
+checked-in openapi.json, schema constraints, three 422 validation cases, /docs, and process-group cleanup.
+
+Why this label: docs/contributing-evidence.md classes execution against this repository's own fixtures as
+local_integration. Generation 1 recorded this check as native_proven in error. nativestack-5975wx-20260925--fastapi--use--20260926-2
+replaces that native claim with FastAPI's unchanged upstream test suite at the 0.141.1 tag, an upstream
+example served by fastapi run, and a discriminating control. This file is integration evidence for the
+blueprint only; it does not qualify FastAPI.
+
+Command source: nativestack-5975wx-20260925--fastapi--use--20260926.json commands[1].cmd, byte-identical (command text sha256
+2e1909c89e2573a0c420b42074174a4d56a26dbbb0d7fb3fe7da1994a85b0719).
+How it ran: /bin/sh -c from the worktree root through scripts/host_receipts.py run_command, at 2026-09-26T06:49:51Z,
+worktree at published origin/main commit 5c1961e49b89dd56ef5626950a5448735caabe4c. TMPDIR and UV_CACHE_DIR pointed into a session
+scratch directory; the command text was not changed.
+Observed: exit 0 in 1.8s; raw output sha256 981023d5ccb86e285a65b84deeb8e4d2599f9c49d828716416234579c04facdd
+(it differs from the receipt's because the output names the server's process id).
+Blueprint files changed by the run (git status --porcelain): none.
+
+Output, sanitized with scripts/host_receipts.py sanitize(); <worktree>, <scratch> and <tmp> stand for the
+checkout, the session scratch directory and mktemp paths:
+
+FASTAPI_SERVE_OK | 14 of 14 checks pass | env from uv sync --frozen --no-build: fastapi/uvicorn 0.141.1 0.53.0 | 422 codes 422 422 422 | /docs 200 | stopped only its own process group (setsid leader, pgid == pid 294577): processes left 0 (KILL needed after TERM: 0) | failed: []
+PASS - serving environment fastapi 0.141.1 uvicorn 0.53.0
+PASS - live /openapi.json == checked-in openapi.json
+PASS - RunCreate.title minLength 1 maxLength 120
+PASS - RunCreate forbids extra properties
+PASS - RunStatus enum matches app.py
+PASS - POST empty title -> 422
+PASS - POST extra field admin -> 422
+PASS - PATCH invalid uuid path -> 422
+PASS - GET /docs -> 200
+PASS - empty-title error names field title
+PASS - extra-field error type extra_forbidden
+PASS - invalid-uuid error type mentions uuid
+PASS - owned process group empty after signalling only it
+PASS - port no longer accepts connections

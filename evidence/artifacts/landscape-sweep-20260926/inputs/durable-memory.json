@@ -1,0 +1,202 @@
+{
+ "catalog": "foundation",
+ "layer_id": "durable-memory",
+ "title": "Durable memory",
+ "requirement": "Keep scoped decisions, handoffs and useful learning available across native Codex and Claude with inspectable capture, deletion and recovery.",
+ "research_status": "comparison_required",
+ "next_action": "Run source-grounded recall and abstention cases with scoped capture, useful-write quality, deletion and isolated restore; compare complete usage without duplicating memory owners.",
+ "requirement_sha256": "7e41c5c3a4b3de9cf7b3c58dc65a2b92b70245a1de65ad3c2f0ecd71572819c1",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "ai-memory",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "pin": "2.3.2",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Basic Memory",
+   "repository": "https://github.com/basicmachines-co/basic-memory",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Mem0",
+   "repository": "https://github.com/mem0ai/mem0",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Letta Code",
+   "repository": "https://github.com/letta-ai/letta-code",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "OpenViking",
+   "repository": "https://github.com/volcengine/OpenViking",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Graphiti",
+   "repository": "https://github.com/getzep/graphiti",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Cognee",
+   "repository": "https://github.com/topoteretes/cognee",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Supermemory",
+   "repository": "https://github.com/supermemoryai/supermemory",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Hindsight",
+   "repository": "https://github.com/vectorize-io/hindsight",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "Claude-mem",
+   "repository": "https://github.com/thedotmack/claude-mem",
+   "disposition": "overlap"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "ai-memory",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "pin": "2.3.2",
+   "upstream": {
+    "latest": "v2.4.1",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 8428,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "claude-code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "pin": "2.1.278",
+   "upstream": {
+    "latest": "v2.1.283",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 148105,
+    "license": null,
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "codex",
+   "repository": "https://github.com/openai/codex",
+   "pin": "0.155.1",
+   "upstream": {
+    "latest": "rust-v0.157.0",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 126487,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "qdrant",
+   "repository": "https://github.com/qdrant/qdrant",
+   "pin": "1.19.1",
+   "upstream": {
+    "latest": "v1.19.1",
+    "released_at": "2026-09-04",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 34827,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "restic",
+   "repository": "https://github.com/restic/restic",
+   "pin": "0.19.1",
+   "upstream": {
+    "latest": "v0.19.1",
+    "released_at": "2026-07-05",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 36256,
+    "license": "BSD-2-Clause",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "No matched semantic-recall or usefulness benchmark between ai-memory and any alternative exists. The only comparative run is a three-note lexical probe that ranks nothing (blueprints/memory-lifecycle-probe/README.md lines 8-9 and 129-132).",
+  "The quality of learned writes is unestablished. The scheduler admitted sessions, but the single model review rejected its proposal for insufficient durable evidence (docs/memory-landscape-maintenance.md lines 135-136 and 161-164).",
+  "In the synthetic probe, ai-memory's native restore/reindex was not run because the process guard enumerates all same-name processes. Deletion covered only current search results, not erasure from history, logs or backups (blueprints/memory-lifecycle-probe/README.md lines 40-45 and 133-134).",
+  "Captured assistant excerpts are sanitized and capped at 2,000 bytes, so they are not complete transcripts. Claude prompt capture remains opted out (docs/memory-landscape-maintenance.md lines 113-116).",
+  "Recovery beyond the synthetic hosted restore is unqualified: independent physical host, lost-key/account recovery, native-client rebinding and whole-stack recovery (packet decision synthetic-offhost-application-restore limitations)."
+ ],
+ "overturn_when": "An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable complete provider use, latency, capture/deletion and restore behavior without ambiguous memory ownership.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/AVIDS2/memorix",
+   "https://github.com/MemTensor/MemOS",
+   "https://github.com/doobidoo/mcp-memory-service"
+  ]
+ },
+ "known_repositories": [
+  "akitaonrails/ai-memory",
+  "avids2/memorix",
+  "basicmachines-co/basic-memory",
+  "doobidoo/mcp-memory-service",
+  "getzep/graph",
+  "https://huggingface.co/nvidia/nemotron-3-embed-1b-bf16",
+  "letta-ai/letta-code",
+  "mem0ai/mem0",
+  "memorilabs/memor",
+  "memtensor/memos",
+  "plastic-labs/honcho",
+  "storybloq/storybloq",
+  "supermemoryai/supermemory",
+  "thedotmack/claude-mem",
+  "topoteretes/cognee",
+  "vectorize-io/hindsigh",
+  "volcengine/openvikin",
+  "xiaowu0162/longmemeval-v2"
+ ],
+ "seeded_candidates_20260926": [
+  "MIRIX (coordinator P1 trial, blueprints/trials-20260926/)",
+  "ByteRover CLI (coordinator P1 trial)",
+  "langmem (coordinator P2)",
+  "HippoRAG (coordinator P2)",
+  "mem0ai/mem0 v2.2.1 (2026-09-25; add() no longer reports vector-store-rejected writes as ADD)",
+  "topoteretes/cognee v1.6.1 (2026-09-24; local-model workflows; GLiNER removed from default image)",
+  "akitaonrails/ai-memory v2.4.1 (retained control; winner pin 2.3.2; owned by #307)",
+  "ai-memory is recorded as the RETAINED CONTROL, not a measured best (2026-09-25): on the Mac's LongMemEval-S run agentmemory D2 scored 0.821 vs the ai-memory C3 arm 0.570; the decisive R1 rerun (C3', C4', D2, D2h) is pending on the workstation (#274). Judge memory systems on measured retrieval/QA quality."
+ ]
+}

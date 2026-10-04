@@ -1,0 +1,30 @@
+"""Sanitized excerpt of a `codex exec --json` event stream: the number of events, the event types in order (collapsed), whether a turn completed, and the text of
+every error or turn.failed event (the provider's message). No command output, no file content, no host path. Usage: event_excerpt.py <events.jsonl>"""
+import collections
+import json
+import sys
+
+types, errors = [], []
+for line in open(sys.argv[1], encoding="utf-8"):
+    try:
+        event = json.loads(line)
+    except ValueError:
+        types.append("unparsable")
+        continue
+    kind = event.get("type", "?")
+    item = event.get("item") or {}
+    types.append(f"{kind}/{item.get('type')}" if item else kind)
+    if kind in ("error", "turn.failed"):
+        errors.append((kind, (event.get("message") or (event.get("error") or {}).get("message") or "")[:300]))
+collapsed, previous, count = [], None, 0
+for name in types + [None]:
+    if name == previous:
+        count += 1
+        continue
+    if previous is not None:
+        collapsed.append(f"{previous} x{count}" if count > 1 else previous)
+    previous, count = name, 1
+print(f"events: {len(types)}; turn completed: {'turn.completed' in types}; counts: {dict(collections.Counter(types))}")
+print("sequence:", " | ".join(collapsed))
+for kind, message in errors:
+    print(f"{kind}: {message}")

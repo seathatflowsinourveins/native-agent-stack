@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "substitutions": [
+    "private run directory -> <run>; scratch root -> <scratch>",
+    "UUID-shaped ids -> fixture-id-N and 40-hex Git checkpoint ids -> fixture-checkpoint-N, numbered by first appearance across the run",
+    "scripts/host_receipts.py sanitize(): home directory -> ~, user name -> <user>"
+  ],
+  "not_retained": [
+    "data/ (the disposable ai-memory store)"
+  ],
+  "store_final_state": {
+    "files": 135,
+    "listing_sha256": "dee9265efdeaabfd88c91cb9c879c0b006d5215da915dc37917a32a5e720ba45",
+    "listing": "sha256 of the JSON list of [relative path, file sha256] pairs"
+  },
+  "aliases": {
+    "fixture-id": 13,
+    "fixture-checkpoint": 15
+  },
+  "published_files": [
+    {
+      "path": "phase-pre/records.json",
+      "sha256": "26b2ce99e7ed4c4013757ffe501aeaef63222159e50ea25c9722b8afc67882a0",
+      "bytes": 147294,
+      "source": "phase-pre/records.json",
+      "source_sha256": "3494da0b665c66d97f6b1e63175ef1a9997098f038732abca29f1278be6b136b",
+      "source_bytes": 148408,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/outcomes.json",
+      "sha256": "7f848eae389228f595f101c8bc46638685fd380fc60ed8f8e48abc4cdedc47b7",
+      "bytes": 27648,
+      "source": "phase-pre/outcomes.json",
+      "source_sha256": "4e875180898853d3c917c0c7659c6aceef2dcee28fefff5d1e8ff069e026385c",
+      "source_bytes": 28762,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/command.json",
+      "sha256": "7880403d0e8c025ef867dee7844ee125fb82618a4b3d55daced87edf4b5edd1d",
+      "bytes": 1351,
+      "source": "phase-pre/command.private.json",
+      "source_sha256": "5ee2afeb6e9cce0f0fe3197d1adc05b831a34c7a4cc84a11215352d95251546d",
+      "source_bytes": 1779,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/driver.stdout",
+      "sha256": "29cc03bd8025f5662cf3a4282ffbbccd099017b8cd065cf65c215f4fc91ad7ac",
+      "bytes": 113,
+      "source": "phase-pre/driver.stdout",
+      "source_sha256": "29cc03bd8025f5662cf3a4282ffbbccd099017b8cd065cf65c215f4fc91ad7ac",
+      "source_bytes": 113,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "phase-pre/driver.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_bytes": 0,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204,
+      "source": "phase-pre/server-argv.json",
+      "source_sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "source_bytes": 204,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/version.json",
+      "sha256": "c9f9c14428cfae2314553c4255347d2b19f78a2bb0a823ba57e217ef88b3c484",
+      "bytes": 53,
+      "source": "phase-pre/version.json",
+      "source_sha256": "c9f9c14428cfae2314553c4255347d2b19f78a2bb0a823ba57e217ef88b3c484",
+      "source_bytes": 53,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/namespace.json",
+      "sha256": "f240540311fd18645388eda4fda399991aa2f0dfdecb4e78f44381ee45c67427",
+      "bytes": 232,
+      "source": "phase-pre/namespace.json",
+      "source_sha256": "f240540311fd18645388eda4fda399991aa2f0dfdecb4e78f44381ee45c67427",
+      "source_bytes": 232,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/mountinfo.txt",
+      "sha256": "b8bdd80eb3bc7ac78650d64d0362c0c6a330c84debfc8699f21b4c2837f65f9e",
+      "bytes": 3503,
+      "source": "phase-pre/mountinfo.txt",
+      "source_sha256": "6117671e0a121983f3b692e12bc440dae2d79adbca699d4faae7ac94d204499a",
+      "source_bytes": 3931,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28,
+      "source": "phase-pre/shutdown.json",
+      "source_sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "source_bytes": 28,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287,
+      "source": "phase-pre/config.toml",
+      "source_sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "source_bytes": 287,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-pre/server.stderr.records.txt",
+      "sha256": "22f6661118a173da024f9c9c04c8a353b6da14a5774e9f05a50548cf975fe53d",
+      "bytes": 11088,
+      "source": "phase-pre/server.stderr",
+      "source_sha256": "4ed22961383140c331d31fb90ff0413ebaba4752e897ea06dff9d03d197ba098",
+      "source_bytes": 174794,
+      "transform": "ANSI codes removed; timestamped log records only; substitutions 1-3"
+    },
+    {
+      "path": "phase-post/records.json",
+      "sha256": "c87d402f499eb9b48a60f23bce1a9a6cb0df1b7f3e7db8e9da56366465a9cbf8",
+      "bytes": 107462,
+      "source": "phase-post/records.json",
+      "source_sha256": "61fe4c9d330d3286e85cd1c482f9826763a2c3ecde71fb1656fa7742271f6cd2",
+      "source_bytes": 107621,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/outcomes.json",
+      "sha256": "f0a5a5f8f9f98f2ac0356c84eb29baa431cb69897f4b45318ec3b780d5f5cd08",
+      "bytes": 6563,
+      "source": "phase-post/outcomes.json",
+      "source_sha256": "071b35ee927a8f84bf7196d8df837709fde0a317d2887c12d81b8a81738fcfd1",
+      "source_bytes": 6722,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/command.json",
+      "sha256": "fc79da503f8a1c0f8d0b943ff4c26e41c918e476bd61844cdaac117b92545bdd",
+      "bytes": 1354,
+      "source": "phase-post/command.private.json",
+      "source_sha256": "5ebb5316e66933b339118f64b3e77e9dc0db7d6db9fbc4d457966eb1bac0002d",
+      "source_bytes": 1782,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/driver.stdout",
+      "sha256": "9f0888319cab240d5b11154758ee7373b64389f8b797bc7116d7ece3dbde461a",
+      "bytes": 114,
+      "source": "phase-post/driver.stdout",
+      "source_sha256": "9f0888319cab240d5b11154758ee7373b64389f8b797bc7116d7ece3dbde461a",
+      "source_bytes": 114,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source": "phase-post/driver.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_bytes": 0,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204,
+      "source": "phase-post/server-argv.json",
+      "source_sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "source_bytes": 204,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/version.json",
+      "sha256": "e7061d6ae80b759cf8b7fc6a91018d502e44d0d8200a3f9e2db4885e5ca31b89",
+      "bytes": 54,
+      "source": "phase-post/version.json",
+      "source_sha256": "e7061d6ae80b759cf8b7fc6a91018d502e44d0d8200a3f9e2db4885e5ca31b89",
+      "source_bytes": 54,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/namespace.json",
+      "sha256": "6ff7ccff83a77d45cbda4be5975a3a684ad40ccdf923576cb490116eba16d7e2",
+      "bytes": 232,
+      "source": "phase-post/namespace.json",
+      "source_sha256": "6ff7ccff83a77d45cbda4be5975a3a684ad40ccdf923576cb490116eba16d7e2",
+      "source_bytes": 232,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/mountinfo.txt",
+      "sha256": "d0a8b47e68d1a75e782e6ce81944a0151a334f5f9334a96d3365a065fb311c78",
+      "bytes": 3504,
+      "source": "phase-post/mountinfo.txt",
+      "source_sha256": "26ab7c91ef1efa92270f32aa288b9043184af69c99a8741b3f4b8145bdd3dbbc",
+      "source_bytes": 3932,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28,
+      "source": "phase-post/shutdown.json",
+      "source_sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "source_bytes": 28,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287,
+      "source": "phase-post/config.toml",
+      "source_sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "source_bytes": 287,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "phase-post/server.stderr.records.txt",
+      "sha256": "676a4b2abbdf26f3f15e86d701ac03498cf201b0e704503479e57f30da067a68",
+      "bytes": 2813,
+      "source": "phase-post/server.stderr",
+      "source_sha256": "825e2b4a28de13a12e0cc3b38fe7fb358934e6d8a3f1f774711aece6cdcb330c",
+      "source_bytes": 3781,
+      "transform": "ANSI codes removed; timestamped log records only; substitutions 1-3"
+    },
+    {
+      "path": "handoff/fixture-state.json",
+      "sha256": "6d62ce6f8dd85c1a86d247f5b5f7fdc1c14899b83ded8701096ca0d03ce7107b",
+      "bytes": 672,
+      "source": "handoff/fixture-state.json",
+      "source_sha256": "566af61883ebd8c29d4f5b44ffaf1054fcc37f1a30f58da3c64cc9eac64cddd6",
+      "source_bytes": 765,
+      "transform": "substitutions 1-3"
+    },
+    {
+      "path": "acceptance.json",
+      "sha256": "aa5e48c09df9b26c841cc251773ca8b0a6232fe7596d21292642b9990708bd23",
+      "bytes": 5998,
+      "source": "acceptance.json",
+      "source_sha256": "0ab4a377318829ac7ff1cfaa913b0d9e52787e765e1ecc86953ad07abe839a7c",
+      "source_bytes": 6187,
+      "transform": "substitutions 1-3"
+    }
+  ],
+  "private_only_files": [
+    {
+      "source": "phase-pre/tools.json",
+      "sha256": "30dabd6aecfef89eb3046e84484d69b9e98c6c562ebc1124fba56238ff023bf0",
+      "bytes": 73207,
+      "reason": "same tools/list response is retained inside records.json"
+    },
+    {
+      "source": "phase-pre/protocol.jsonl",
+      "sha256": "44debed78c33ec9e648276e8389e73372dc95a9fec9f082a95ace9076e2325a4",
+      "bytes": 91609,
+      "reason": "same server output lines are retained as the responses in records.json"
+    },
+    {
+      "source": "phase-post/tools.json",
+      "sha256": "30dabd6aecfef89eb3046e84484d69b9e98c6c562ebc1124fba56238ff023bf0",
+      "bytes": 73207,
+      "reason": "same tools/list response is retained inside records.json"
+    },
+    {
+      "source": "phase-post/protocol.jsonl",
+      "sha256": "c79b0e32f1a7774c8a6fdd50a4b827933d66431ee7da72c3ea46b334f573e760",
+      "bytes": 75487,
+      "reason": "same server output lines are retained as the responses in records.json"
+    }
+  ]
+}

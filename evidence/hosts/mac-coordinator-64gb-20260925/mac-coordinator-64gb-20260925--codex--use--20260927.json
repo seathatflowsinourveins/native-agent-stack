@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--codex--use--20260927",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "1aa9776591847b4860bf258f8953315ae71d7bc4",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "codex",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "D=\"$(mktemp -d)\"\nn=$((3 + RANDOM % 6))\n: > \"$D/fixture.txt\"\nfor i in $(seq 1 \"$n\"); do echo $((RANDOM % 900 + 1)) >> \"$D/fixture.txt\"; done\nreal=$(wc -l < \"$D/fixture.txt\" | tr -d ' ')\n\"$HOME/.local/bin/codex\" exec -C \"$D\" --skip-git-repo-check --sandbox read-only --ephemeral --json \"Count the lines in the file fixture.txt in your working directory using your own tools, then reply with exactly one line of the form COUNT=<n> and nothing else.\" < /dev/null > \"$D/out.jsonl\" 2> \"$D/err.log\"\nrc=$?\npython3 - \"$real\" \"$rc\" \"$D/out.jsonl\" <<'PY'\nimport json, re, sys\nreal, rc, path = sys.argv[1], sys.argv[2], sys.argv[3]\nevents = []\nfor line in open(path):\n    line = line.strip()\n    if not line:\n        continue\n    try:\n        events.append(json.loads(line))\n    except ValueError:\n        continue\nkinds = {}\nfor ev in events:\n    t = ev.get(\"type\")\n    kinds[t] = kinds.get(t, 0) + 1\nran_command = False\ngot = None\nfor ev in events:\n    item = ev.get(\"item\") or {}\n    if ev.get(\"type\") == \"item.completed\" and item.get(\"type\") == \"command_execution\" and item.get(\"exit_code\") == 0:\n        ran_command = True\n    if ev.get(\"type\") == \"item.completed\" and item.get(\"type\") == \"agent_message\":\n        m = re.search(r\"COUNT=(\\d+)\", item.get(\"text\") or \"\")\n        if m:\n            got = m.group(1)\nok = (rc == \"0\") and ran_command and (got == real)\nprint(\"event_kinds=\" + json.dumps(kinds, sort_keys=True))\nprint(\"command_execution_seen=\" + str(ran_command))\nprint(\"positive_control expected=\" + real + \" got=\" + str(got) + \" match=\" + str(got == real))\nraise SystemExit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 9.126,
+      "output_sha256": "7116a800b5182c0768f3ca6f03162ef9e1eebc1ff57cd82668ee0b107c171fc1",
+      "output_excerpt": "event_kinds={\"item.completed\": 3, \"item.started\": 1, \"thread.started\": 1, \"turn.completed\": 1, \"turn.started\": 1}\ncommand_execution_seen=True\npositive_control expected=7 got=7 match=True\n"
+    },
+    {
+      "cmd": "\"$HOME/.local/bin/codex\" mcp list --json < /dev/null 2>&1 | python3 -c \"\nimport json, os, sys, tomllib\nraw = sys.stdin.read()\ntry:\n    data = json.loads(raw)\nexcept ValueError:\n    print('PARSE_ERROR: ' + raw[:120])\n    raise SystemExit(1)\nrows = []\nfor item in data:\n    transport = item.get('transport') or {}\n    rows.append((item.get('name'), item.get('enabled'), transport.get('type')))\nrows.sort(key=lambda r: str(r[0]))\nfor name, enabled, ttype in rows:\n    print(str(name) + ' | enabled=' + str(enabled) + ' | transport=' + str(ttype))\ncfg = tomllib.load(open(os.path.expanduser('~/.codex/config.toml'), 'rb'))\ndeclared = set((cfg.get('mcp_servers') or {}).keys())\nlive = {r[0] for r in rows}\nmissing = sorted(declared - live)\nprint('declared_count=' + str(len(declared)) + ' live_count=' + str(len(rows)) + ' declared_missing_from_live=' + str(missing))\nraise SystemExit(0 if not missing else 1)\n\"",
+      "exit": 0,
+      "duration_s": 0.439,
+      "output_sha256": "69c559f75dd56cc707c91ddf519f03d1e35fa65e6ec29cf6466fd3cc34acfce3",
+      "output_excerpt": "ai-memory | enabled=True | transport=streamable_http\ncodex_app | enabled=False | transport=stdio\ncontext-mode | enabled=True | transport=stdio\ncua_repl | enabled=True | transport=stdio\nheadroom | enabled=True | transport=stdio\nnode_repl | enabled=True | transport=stdio\nopenaiDeveloperDocs | enabled=True | transport=streamable_http\nqmd | enabled=True | transport=stdio\nserena | enabled=True | transp"
+    },
+    {
+      "cmd": "\"$HOME/.local/bin/codex\" features list < /dev/null 2>&1 | python3 -c \"\nimport os, sys, tomllib\nlines = [l.rstrip(chr(10)) for l in sys.stdin if l.strip()]\ntotal = len(lines)\nseen = {}\nfor l in lines:\n    parts = l.split()\n    if len(parts) >= 2 and parts[0] in ('daemon_auto_start', 'hooks'):\n        seen[parts[0]] = parts[-1].lower() == 'true'\ncfg = tomllib.load(open(os.path.expanduser('~/.codex/config.toml'), 'rb'))\ndeclared = cfg.get('features') or {}\nok = True\nfor name in ('daemon_auto_start', 'hooks'):\n    want = bool(declared[name]) if name in declared else None\n    got = seen.get(name)\n    match = (want is None) or (got == want)\n    ok = ok and (got is not None) and match\n    print(name + ': cli=' + str(got) + ' config_declares=' + str(want) + ' match=' + str(match))\nprint('total_features=' + str(total))\nraise SystemExit(0 if ok else 1)\n\"",
+      "exit": 0,
+      "duration_s": 0.052,
+      "output_sha256": "156b7cfc9d55193f581107147102f5435dc4d671b3e707973176a32455d9d237",
+      "output_excerpt": "daemon_auto_start: cli=False config_declares=False match=True\nhooks: cli=True config_declares=True match=True\ntotal_features=150\n"
+    }
+  ],
+  "tool_versions": {
+    "codex": "0.158.0-alpha.2.1"
+  },
+  "observed_at_utc": "2026-09-27T07:21:43Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64), the installed Codex client (codex-cli 0.158.0-alpha.2.1) performs a real `codex exec --skip-git-repo-check --sandbox read-only --ephemeral` turn from a freshly created scratch working directory under this Mac's ~/.codex user-scope profile (approval_policy never, sandbox_mode danger-full-access, its configured MCP servers and hooks feature all loaded from config.toml): given a fixture file it creates itself with a random line count, the run's `--json` event stream contains a real `command_execution` item (the model's own `wc -l < fixture.txt`) that exited 0, and its final agent message reports the correct count. `codex mcp list --json` and `codex features list` from the same install are each cross-checked in the same command against this host's own ~/.codex/config.toml: every MCP server config.toml declares appears in the live listing, and the live `daemon_auto_start`/`hooks` feature booleans match what config.toml declares. All three commands exit 0 only when their respective check passes.",
+  "limitations": [
+    "Recorded from a Claude Code session in a git worktree of this repository at commit 1aa97765 (the catalog_revision), not a pinned install checkout; the installed client is 0.158.0-alpha.2.1, newer than the catalog's codex pin 0.155.1, so this receipt is recorded with --allow-unbound-version and does not count toward the winner's status.",
+    "second_physical_machine is declared, not proven by this file: this host's measured profile (evidence/artifacts/hw-profiles/mac-coordinator-64gb-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "Names, booleans and counts only: no MCP server command, args, env, url or cwd, and no session id or working-directory path, is copied into this receipt; the --json/--json mcp listing are filtered inline in the command itself before anything reaches stdout.",
+    "This receipt exercises the native-clients role (one bounded exec turn plus two read-only listing/feature checks); it does not exercise codex's structured-session-control role in the agent-sdks layer (streamed events here are read for one command_execution item and one final message, not resumed, forked or driven through the SDK).",
+    "codex exec must be run with stdin redirected from /dev/null: with an interactive/inherited stdin attached it blocks indefinitely on \"Reading additional input from stdin...\" before doing any work, on this host and this codex-cli build; every command below already does this."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T07:21:43Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "native-clients"
+    }
+  ]
+}

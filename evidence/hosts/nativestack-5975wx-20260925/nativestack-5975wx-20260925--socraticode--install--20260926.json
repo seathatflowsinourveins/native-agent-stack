@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--socraticode--install--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "a74dd1b60ad5f055cee3e1489a490b7e6e6b056f",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "socraticode",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "check() {\n  p=$(command -v \"$1\") || { echo \"not on PATH: $1\"; return 1; }\n  rp=$(readlink -f \"$p\") || { echo \"unresolvable: $p\"; return 1; }\n  case \"$rp\" in\n    */tools/\"$1\"-\"$2\"/*) echo \"resolves: $p -> $rp\" ;;\n    *) echo \"unexpected prefix: $rp\"; return 1 ;;\n  esac\n}\nctl=$(check socraticode-nsr-absent 1.14.0)\ncrc=$?\nres=$(check socraticode 1.14.0)\nrc=$?\nif [ \"$rc\" -ne 0 ] || [ \"$crc\" -ne 1 ]; then\n  echo \"SOCRATICODE_RESOLVE_FAIL | $res (exit $rc) | control: $ctl (exit $crc)\"\n  exit 1\nfi\npins=$(python3 -c \"import json,glob;c='socraticode';s=[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c];w=sorted({x['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for x in (l.get('winners') or []) if x.get('component_id')==c});a=[t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']==c];print('stack',s,'winner',w,'adoption/pins-linux-x86_64.json',a);raise SystemExit(0 if s==w==a==['1.14.0'] else 1)\") || { echo \"SOCRATICODE_RESOLVE_FAIL: pin records disagree: $pins\"; exit 1; }\nif grep -qx -- '-- socraticode --' \"$HOME/.local/share/codex-ecosystem/installed-versions.txt\" 2>/dev/null; then\n  ledger=\"listed\"\nelse\n  ledger=\"not listed\"\nfi\necho \"SOCRATICODE_RESOLVE_OK | $res | $pins\"\necho \"negative control: the same check for an absent command exits $crc ($ctl) | optional installed-versions.txt ledger: socraticode $ledger\"",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_sha256": "d02028a4452c484e7263e3dca1ad3c824cca8f9d1f5eccbf12a09a6a99755430",
+      "output_excerpt": "SOCRATICODE_RESOLVE_OK | resolves: ~/.local/share/codex-ecosystem/bin/socraticode -> ~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js | stack ['1.14.0'] winner ['1.14.0'] adoption/pins-linux-x86_64.json ['1.14.0']\nnegative control: the same check for an absent command exits 1 (not on PATH: socraticode-nsr-absent) | optional installed-versions.txt l"
+    },
+    {
+      "cmd": "P=\"$HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0\"\nls=$(timeout 30 npm ls --global --prefix \"$P\" --depth=0 2>&1) || { echo \"SOCRATICODE_PACKAGE_FAIL: npm ls failed\"; printf '%s\\n' \"$ls\" | tail -5; exit 1; }\npython3 - \"$P\" \"$ls\" <<'PY'\nimport hashlib, io, json, os, sys, tarfile, urllib.request\nprefix, ls = sys.argv[1], sys.argv[2]\npin = [t for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id'] == 'socraticode'][0]\nstack = [c for c in json.load(open('manifests/stack.json'))['components'] if c['id'] == 'socraticode'][0]\nreadme = open('recipes/README.md').read()\nrecipe_line = 'npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.14.0\" --ignore-scripts socraticode@1.14.0' in readme\ndata = urllib.request.urlopen(pin['url'], timeout=60).read()\nsha = hashlib.sha256(data).hexdigest()\nroot = os.path.join(prefix, 'lib/node_modules/socraticode')\ntar = tarfile.open(fileobj=io.BytesIO(data))\nmembers = [m for m in tar.getmembers() if m.isfile()]\nsame = sum(1 for m in members if os.path.isfile(os.path.join(root, m.name.split('/', 1)[1])) and open(os.path.join(root, m.name.split('/', 1)[1]), 'rb').read() == tar.extractfile(m).read())\npkg = json.load(open(os.path.join(root, 'package.json')))\nok = (sha == pin['sha256'] and pin['version'] == pkg['version'] == stack['version'] == '1.14.0' and members and same == len(members)\n      and 'socraticode@1.14.0' in ls and recipe_line and stack['source_pin'] in readme and pin.get('ignore_scripts') is True)\nprint('SOCRATICODE_PACKAGE_' + ('OK' if ok else 'FAIL'), '| package.json', pkg['name'], pkg['version'], '| npm ls: socraticode@1.14.0', 'socraticode@1.14.0' in ls, '| registry tarball at the pin url: sha256 equals adoption/pins-linux-x86_64.json:', sha == pin['sha256'], '| installed package files identical to that tarball:', same, 'of', len(members))\nprint('recipes/README.md has the exact --ignore-scripts install line:', recipe_line, '| and the stack source_pin', stack['source_pin'] + ':', stack['source_pin'] in readme, '| pin ignore_scripts:', pin.get('ignore_scripts'))\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 1.46,
+      "output_sha256": "d7ae8402226600ba03c484b5eb1c0fb816f5ac65e6ca8ee8f8f7c7ccf4a107d3",
+      "output_excerpt": "SOCRATICODE_PACKAGE_OK | package.json socraticode 1.14.0 | npm ls: socraticode@1.14.0 True | registry tarball at the pin url: sha256 equals adoption/pins-linux-x86_64.json: True | installed package files identical to that tarball: 226 of 226\nrecipes/README.md has the exact --ignore-scripts install line: True | and the stack source_pin 2218f25153d0f3f4a76ee240a5643dbc873e80be: True | pin ignore_scr"
+    }
+  ],
+  "tool_versions": {
+    "socraticode": "1.14.0"
+  },
+  "observed_at_utc": "2026-09-26T02:46:30Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), SocratiCode 1.14.0, the semantic-rag winner, is installed at its pin. The socraticode launcher resolves into this host's tools/socraticode-1.14.0 prefix, and manifests/stack.json, the landscape winner pin and adoption/pins-linux-x86_64.json all read 1.14.0; the same resolution check exits 1 for a command that is not installed (negative control). npm ls and the installed package.json report socraticode 1.14.0. The registry tarball at the adoption pin's URL has the pin's sha256, and every file in it is byte-identical in the installed package. recipes/README.md carries the exact --ignore-scripts install line and the stack source_pin 2218f25153d0f3f4a76ee240a5643dbc873e80be. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "Replaces nativestack-5975wx-20260925--socraticode--install--20260925 as this host's latest SocratiCode install receipt. It is a new dated receipt, not a further generation: record --supersedes links generations only within one date, and the 2026-09-25 receipts stay unchanged. They still count in scripts/platform_status.py, which counts every independently agreed native_proven pass, unless a reviewer records needs_changes on them. The cross-family review of #277 found that its first command ended in '|| echo', which caught a failure anywhere in the preceding && chain: that exact command exits 0 with socraticode absent from PATH (reproduced). Here each required check exits non-zero on failure, the optional installed-versions.txt lookup sits alone inside an if, and a negative control is retained. The same review found that its limitations said a version call showed the build starts, although no command invoked SocratiCode; that wording is gone.",
+    "Install stage, metadata only: a resolved launcher path, pin records, package metadata and a byte comparison with the pinned registry tarball show the pinned package is installed. No command starts SocratiCode (every invocation, --version included, starts its MCP stdio server, as the adoption pin's version_probe note records), so this receipt does not show that it starts or works; it supports conditional at most.",
+    "The tarball comparison downloads the pinned registry tarball over the network; the installed package's own dependency tree is not compared.",
+    "Install source: the pinned registry tarball's contents in ~/.local/share/codex-ecosystem/tools/socraticode-1.14.0, the prefix of the recipes/README.md --ignore-scripts recipe (command 2); the bootstrap's installed-versions.txt ledger does not list socraticode (command 1). Recorded by the workstation coordinator Claude Code session, through a repair worker that shares its session id, from a git worktree at published origin/main (the catalog_revision).",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T02:46:30Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session. Reproduce: Re-ran once in a throwaway cp -a copy of the worktree via host_receipts.run_command. cmd1 byte-identical output sha256; cmd2 is identical to -2 and reproduced byte-identically there. Points 1, 2 and 4 hold as in -2 (install-only, absent-command negative control, bound 1.14.0). needs_changes (point 3): LIM3 says command 1 shows the bootstrap installed-versions.txt ledger does not list socraticode, but the retained 400-character excerpt ends at \"optional installed-versions.txt l\" and the OK status does not assert it; the command also reports \"not listed\" when the ledger file is missing (grep 2>/dev/null). My byte-identical re-run shows the statement is true on this host, but the receipt does not retain it. Superseded by -2, which prints the ledger result in the status line and tells a missing file apart from a missing entry.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T06:15:14Z",
+      "reviewer": {
+        "identity_sha256": "f07a9dfbc09d23994b3810ea11bc96fd931f69f88b9e1b02d24261f4b8dcad04",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

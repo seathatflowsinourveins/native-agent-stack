@@ -1,0 +1,263 @@
+{
+ "catalog": "foundation",
+ "layer_id": "hosting-services",
+ "title": "Application and service hosting",
+ "requirement": "Run the selected local typed application and supporting services reproducibly while keeping accounts, state and deployment scope explicit.",
+ "research_status": "on_requirement_change",
+ "next_action": "Choose deployment requirements first: local development, remote service or GPU job. Qualify one host/container option on data, network, rollback, persistence and measured workload cost.",
+ "requirement_sha256": "48c6a135983cda6c8eefb9848955270b55aed9ef5d6073ff9edeb90c2ba2b624",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "fastapi",
+   "repository": "https://github.com/fastapi/fastapi",
+   "pin": "0.141.1",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "nextjs",
+   "repository": "https://github.com/vercel/next.js",
+   "pin": "16.3.5",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "postgresql",
+   "repository": "https://github.com/postgres/postgres",
+   "pin": "18.6",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "React",
+   "repository": "https://github.com/react/react",
+   "disposition": "overlap"
+  },
+  {
+   "name": "Docker Compose",
+   "repository": "https://github.com/docker/compose",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Podman / Quadlet",
+   "repository": "https://github.com/podman-container-tools/podman",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Dev Containers CLI",
+   "repository": "https://github.com/devcontainers/cli",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Dockerized IB Gateway",
+   "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Modal",
+   "repository": "https://github.com/modal-labs/modal-client",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "BentoML",
+   "repository": "https://github.com/bentoml/BentoML",
+   "disposition": "out_of_scope"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "apple-container",
+   "repository": "https://github.com/apple/container",
+   "pin": "1.4.1",
+   "upstream": {
+    "latest": "1.4.1",
+    "released_at": "2026-09-09",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 50174,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "fastapi",
+   "repository": "https://github.com/fastapi/fastapi",
+   "pin": "0.141.1",
+   "upstream": {
+    "latest": "0.141.1",
+    "released_at": "2026-07-29",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 102618,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "mcp-inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "pin": "2.7.0",
+   "upstream": {
+    "latest": "2.8.0",
+    "released_at": "2026-09-23",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 10960,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "mcporter",
+   "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+   "pin": "0.13.13",
+   "upstream": {
+    "latest": "v0.14.1",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 5028,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "nextjs",
+   "repository": "https://github.com/vercel/next.js",
+   "pin": "16.3.6",
+   "upstream": {
+    "latest": "v16.3.6",
+    "released_at": "2026-09-22",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 142443,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "omniroute",
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "pin": "3.8.50",
+   "upstream": {
+    "latest": "v3.8.50",
+    "released_at": "2026-08-26",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 70212,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "postgresql",
+   "repository": "https://github.com/postgres/postgres",
+   "pin": "18.6",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-09-26",
+    "stars": 22198,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null,
+    "latest_flag": {
+     "tag": "release-6-3",
+     "reason": "tag_listing_only_not_version_shaped"
+    }
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  },
+  {
+   "id": "react",
+   "repository": "https://github.com/react/react",
+   "pin": "19.3.0",
+   "upstream": {
+    "latest": "v19.3.0",
+    "released_at": "2026-09-09",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 250735,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "Recovery is not_established for nextjs, react, fastapi and postgresql (catalogs/foundation/decisions.json lines 1695-1772). No backup/independent-host restore acceptance exists (application-delivery/README.md lines 135-137).",
+  "No production authentication, hosted deployment, production load test or cloud hosting is established. The PostgreSQL build is a synthetic loopback trust-auth fixture without TLS, not a production service (README lines 127-133).",
+  "Migration reversal proves schema reversal only, not user-data recovery or production-safe rollback (README lines 150-152).",
+  "No container lane (Docker/Compose, Podman/Quadlet, Dev Containers) has been run against this workload, so native versus container is unmeasured (docs/hosting-container-practice.md lines 5-6).",
+  "The candidate list omits Dagu/systemd, which hosting-practice.json cites as the retained service-supervision lanes (line 6). This packet does not establish their fit to the application's supervision."
+ ],
+ "overturn_when": "A defined production, remote-team or GPU deployment requirement exceeds the local fixture, and one alternative passes its account, data, networking, rollback and workload-cost acceptance.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/basecamp/kamal",
+   "https://github.com/grafana/k6",
+   "https://github.com/oauth2-proxy/oauth2-proxy",
+   "https://github.com/pgbackrest/pgbackrest"
+  ]
+ },
+ "known_repositories": [
+  "basecamp/kamal",
+  "bentoml/bentoml",
+  "clash-verge-rev/clash-verge-rev",
+  "devcontainers/cl",
+  "docker/compose",
+  "fastapi/fastap",
+  "gnzsnz/ib-gateway-docker",
+  "grafana/k6",
+  "moby/moby",
+  "modal-labs/modal-clien",
+  "oauth2-proxy/oauth2-proxy",
+  "pgbackrest/pgbackres",
+  "podman-container-tools/podman",
+  "postgres/postgres",
+  "react/reac",
+  "tw93/mole",
+  "vercel/next.js"
+ ],
+ "seeded_candidates_20260926": []
+}

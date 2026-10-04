@@ -1,0 +1,75 @@
+{
+ "at": "2026-09-25T19:03:33Z",
+ "extract": {
+  "models_copied": true,
+  "capture_mode_file": "allowlist"
+ },
+ "fingerprint_before": "schema V64 (64 rows) quick_check=ok pages=35 observations=71334",
+ "ready_seconds": 0.6,
+ "status": {
+  "version": "2.3.2",
+  "counts": {
+   "pages_latest": 31,
+   "pages_all": 35,
+   "sessions": 32,
+   "observations": 71334
+  },
+  "derived": {
+   "pages_rows": 35,
+   "pages_fts_rows": 35,
+   "observations_rows": 71334,
+   "observations_fts_rows": 71334,
+   "latest_pages_missing_embeddings": 0,
+   "embedding_rows": 35
+  },
+  "embedding": {
+   "status": "unknown",
+   "provider": "local",
+   "model": "all-MiniLM-L6-v2",
+   "dim": 384
+  },
+  "embedding_keys": [
+   "dim",
+   "last_call_at",
+   "last_error_at",
+   "last_error_message",
+   "last_error_status",
+   "last_success_at",
+   "model",
+   "provider",
+   "retry_hint",
+   "status"
+  ],
+  "capture_mode": "allowlist",
+  "checks": {
+   "version": true,
+   "pages_fts_match": true,
+   "observations_fts_match": true,
+   "embedding_ok": true,
+   "embedding_identity": true,
+   "latest_pages_missing_embeddings_zero": true
+  },
+  "pass": true
+ },
+ "stop": {
+  "rc": 0,
+  "pid_gone": true,
+  "port_closed": true
+ },
+ "killed_leftovers": [],
+ "fingerprint_compare": "V64 -> V64 (64 rows) quick_check=ok | pages before=35 missing_or_changed=0 after=35 | observations before=71334 missing=0 after=71334 | PASS",
+ "archives": {
+  "pre_migration_receipt_present": false,
+  "backup_dir_entries": 0,
+  "scratch_home_archives": 0,
+  "real_home_archives": 0,
+  "data_dir_backups_dir_entries": 0
+ },
+ "checks": {
+  "opens_under_2.3.2": true,
+  "status_pass": true,
+  "still_v64": true,
+  "server_stopped": true
+ },
+ "pass": true
+}

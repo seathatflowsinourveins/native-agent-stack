@@ -5,7 +5,9 @@ one host) into a live ~/.claude/settings.json, in place.
 Never touches ~/.claude.json or any credential store. Backs up the current
 settings file (never overwriting an earlier backup) before writing, refuses
 to operate through a symlink, deep-merges nested objects (template scalars
-win; host-only keys, permission rules and plugins are kept), combines hooks
+win; host-only keys, permission rules and plugins are kept; a list gains a
+missing template entry next to its template neighbours, so a deny rule stays
+ahead of a `!` carve-out), combines hooks
 per event de-duplicated by command, writes atomically, and preserves the
 original file's mode bits. Supports --dry-run (prints the would-be result and exits
 without touching anything).
@@ -61,14 +63,52 @@ def command_key(cmd: str) -> str:
         return cmd
 
 
+def separate_template_hook_groups(base_groups: list, incoming_groups: list) -> list:
+    """Preserve canonical ownership boundaries without reordering hooks.
+
+    ai-memory 2.4.2 replaces a whole entry if any inner command is its own:
+    akitaonrails/ai-memory a0ca8d1a5fbd5920799411fa891fe6d49c90efc1,
+    install_hooks.rs:1513-1565. Its classifier/overlay still does so in v2.5.2
+    (tag object af8c6820; commit 7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83):
+    install_hooks.rs:1583 is_ai_memory_hook_entry and :1619 overlay_event_hooks;
+    uninstall.rs:825 hook_command_is_ours defines native/legacy signatures.
+    The canonical template keeps memory and carrier commands in separate entries.
+    Repair older combined entries by splitting contiguous membership runs;
+    preserve every original hook value, matcher and other outer field.
+    """
+    membership = {}
+    for index, group in enumerate(incoming_groups):
+        if isinstance(group, dict):
+            for hook in hook_list(group):
+                cmd = hook_command(hook)
+                if cmd is not None:
+                    membership.setdefault(command_key(cmd), index)
+    result = []
+    for group in base_groups:
+        if not isinstance(group, dict) or not hook_list(group):
+            result.append(copy.deepcopy(group))
+            continue
+        previous = object()
+        for hook in hook_list(group):
+            cmd = hook_command(hook)
+            owner = membership.get(command_key(cmd)) if cmd is not None else None
+            if owner != previous:
+                part = copy.deepcopy(group)
+                part["hooks"] = []
+                result.append(part)
+                previous = owner
+            result[-1]["hooks"].append(copy.deepcopy(hook))
+    return result
+
+
 def merge_hooks(base: dict, incoming: dict) -> dict:
     """Combine hooks per event, de-duplicated by command across the event.
 
     A template hook is skipped when any base group of the same event already
-    runs the same command (by shell words). Remaining template hooks join the
-    first base group with the identical matcher (an absent matcher and "" are
-    kept distinct, so the host's structure is preserved), or form a new group.
-    Base hooks are never dropped or reordered.
+    runs the same command (by shell words). Canonical ownership boundaries
+    split existing mixed entries before deduplication; remaining template hooks
+    form their own groups even when matchers match. An absent matcher and ""
+    remain distinct. Base hook objects are never dropped or reordered.
     """
     merged: dict = copy.deepcopy(base) if isinstance(base, dict) else {}
     if not isinstance(incoming, dict):
@@ -80,6 +120,7 @@ def merge_hooks(base: dict, incoming: dict) -> dict:
         if not isinstance(base_groups, list):
             merged[event] = copy.deepcopy(incoming_groups)
             continue
+        base_groups = separate_template_hook_groups(base_groups, incoming_groups)
         seen = {command_key(c) for g in base_groups if isinstance(g, dict)
                 for c in map(hook_command, hook_list(g)) if c is not None}
         for incoming_group in incoming_groups:
@@ -96,25 +137,43 @@ def merge_hooks(base: dict, incoming: dict) -> dict:
                     seen.add(command_key(cmd))
             if not fresh:
                 continue
-            has_matcher = "matcher" in incoming_group
-            target = next((g for g in base_groups if isinstance(g, dict)
-                           and ("matcher" in g) == has_matcher
-                           and g.get("matcher") == incoming_group.get("matcher")
-                           and isinstance(g.get("hooks"), list)), None)
-            if target is not None:
-                target["hooks"].extend(fresh)
-            else:
-                group = copy.deepcopy(incoming_group)
-                group["hooks"] = fresh
-                base_groups.append(group)
+            group = copy.deepcopy(incoming_group)
+            group["hooks"] = fresh
+            base_groups.append(group)
         merged[event] = base_groups
+    return merged
+
+
+def union_in_template_order(current: list, incoming: list) -> list:
+    """Union of two lists that keeps every base entry in its order and puts each
+    template entry the base lacks next to its template neighbours: right after
+    the nearest earlier template entry already in the result, else right before
+    the nearest later one, else at the end (so a list with no template entry in
+    it gets the template entries after its own, as a plain union would).
+
+    Order carries meaning in permission lists: a `!` gitignore negation in a
+    Read/Edit deny or ask list carves paths out of only the rules listed before
+    it in the same settings file (code.claude.com/docs/en/permissions). A plain
+    append would put a new template rule after a host's existing carve-outs."""
+    merged = list(current)
+    for position, item in enumerate(incoming):
+        if item in merged:
+            continue
+        earlier = next((prior for prior in reversed(incoming[:position]) if prior in merged), None)
+        if earlier is not None:
+            index = merged.index(earlier) + 1
+        else:
+            later = next((following for following in incoming[position + 1:] if following in merged), None)
+            index = merged.index(later) if later is not None else len(merged)
+        merged.insert(index, copy.deepcopy(item))
     return merged
 
 
 def deep_merge_dict(base: dict, incoming: dict) -> dict:
     """Recursive merge: nested dicts merge key by key, lists union (base
-    entries first, template entries appended when absent), other template
-    values win; base keys the template does not mention are kept."""
+    entries keep their order; an absent template entry joins next to its
+    template neighbours, see union_in_template_order), other template values
+    win; base keys the template does not mention are kept."""
     merged = copy.deepcopy(base) if isinstance(base, dict) else {}
     if not isinstance(incoming, dict):
         return merged
@@ -123,7 +182,7 @@ def deep_merge_dict(base: dict, incoming: dict) -> dict:
         if isinstance(value, dict) and isinstance(current, dict):
             merged[key] = deep_merge_dict(current, value)
         elif isinstance(value, list) and isinstance(current, list):
-            merged[key] = current + [copy.deepcopy(item) for item in value if item not in current]
+            merged[key] = union_in_template_order(current, value)
         else:
             merged[key] = copy.deepcopy(value)
     return merged
@@ -136,7 +195,8 @@ def merge_settings(base: dict, template: dict) -> dict:
       - nested objects (modelSettings, env, permissions, statusLine,
         enabledPlugins, ...): deep-merged, so host-only keys such as extra
         permission rules, plugins or per-model levels are kept
-      - lists: union, host entries first
+      - lists: union; host entries keep their order and a missing template
+        entry joins next to its template neighbours (union_in_template_order)
       - scalars: template wins
       - keys the template does not mention: kept from base
     """

@@ -1,0 +1,638 @@
+{
+ "tool": "qmd",
+ "group": "g4-retrieval-memory",
+ "repo": "https://github.com/tobi/qmd",
+ "pin": "2.8.3 (npm @tobilu/qmd)",
+ "installed_version": "qmd 2.8.3 (facd35e) (native `qmd --version`)",
+ "role": "Scoped BM25 search and get over selected Markdown, returning a document window instead of whole files. Lanes: CLI; Claude and Codex user-scope MCP over the catalog index (native-agent-stack-catalog: 122 docs in 2 us-equities collections, no vectors). Landscape: document-retrieval winner.",
+ "lanes": [
+  "CLI: qmd --index N search/get/update/status/collection",
+  "Claude user-scope MCP (query/get/status)",
+  "Codex user-scope MCP"
+ ],
+ "upstream": {
+  "latest_release": "v2.8.3; live rechecked 2026-09-27T01:17:41Z (2026-09-26 local), unchanged since the earlier research; both GitHub and npm still identify 2.8.3 as latest. Sources: https://api.github.com/repos/tobi/qmd/releases/latest ; https://api.github.com/repos/tobi/qmd/tags?per_page=5 ; https://registry.npmjs.org/@tobilu/qmd .",
+  "latest_date": "2026-08-16; GitHub published_at 2026-08-16T22:30:34Z, npm publication 2026-08-16T22:30:32.642Z. Sources: https://api.github.com/repos/tobi/qmd/releases/latest ; https://registry.npmjs.org/@tobilu/qmd .",
+  "our_pin": "2.8.3; MIT; manifests/stack.json, component qmd, explicitly has source_pin=null, so a manifest-recorded source commit is UNVERIFIED rather than the facd35e value assumed by the earlier narrative. Independently, GitHub's v2.8.3 tag and npm's gitHead both resolve to facd35e01359e59d938bc9418e93fb9318addee3, and npm identifies the repository as https://github.com/tobi/qmd and license MIT. Sources: manifests/stack.json; adoption/pins-linux-x86_64.json, qmd entry; https://api.github.com/repos/tobi/qmd/tags?per_page=5 ; https://registry.npmjs.org/@tobilu/qmd .",
+  "behind_by": "0 published releases; pin and latest release are 2.8.3. main is still 24 unreleased commits ahead at 04e4dbd8245c527a88f1a8f0bda547aef9ca81fb, dated 2026-09-09T20:51:54Z; that is development distance, not a newer release. Nothing changed since the earlier check. Sources: https://api.github.com/repos/tobi/qmd/compare/v2.8.3...main ; https://api.github.com/repos/tobi/qmd/commits/main ; https://api.github.com/repos/tobi/qmd/releases/latest .",
+  "recommended_install": {
+   "command": "npm install -g @tobilu/qmd (upstream default), or bun install -g @tobilu/qmd; use @tobilu/qmd@2.8.3 for a reproducible installation. Upstream also documents npx/bunx execution. Node.js >=22 or Bun is required; macOS setup includes Homebrew SQLite.",
+   "url": "https://github.com/tobi/qmd/blob/v2.8.3/README.md#installation"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "Upstream recommends claude plugin marketplace add tobi/qmd followed by claude plugin install qmd@qmd; the plugin bundles skills and a qmd mcp stdio registration. For this already-wired stack retain the standalone user registration with qmd --index native-agent-stack-catalog mcp instead of adding a duplicate plugin. Upstream's manual example names $HOME/.claude/settings.json, but our actual user MCP registration is in $HOME/.claude.json; do not copy that example's file placement into the host blindly. Sources for the native distinction: $HOME/.claude.json, mcpServers.qmd; full-save/cur/qmd/record.json, upstream_agent_integration.",
+    "url": "https://github.com/tobi/qmd/blob/v2.8.3/README.md#mcp-server"
+   },
+   "codex": {
+    "how": "QMD exposes generic MCP rather than a Codex-specific plugin/worker adapter. Adapt its documented qmd mcp stdio command as codex mcp add qmd -- qmd --index native-agent-stack-catalog mcp, matching adoption/templates/codex.config.template.toml [mcp_servers.qmd]; this is our native Codex wiring, not an upstream QMD-specific command recipe. The optional qmd skill install --global bootstrap is a separate adoption choice and should not silently enable model-backed retrieval on this lexical-only catalog.",
+    "url": "https://github.com/tobi/qmd/blob/v2.8.3/README.md#mcp-server"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "QMD describes an on-device Markdown search engine combining BM25 full-text retrieval, vector search and LLM reranking through local node-llama-cpp/GGUF models. CLI lexical search is a distinct path from the complete model-backed pipeline; this capability claim does not establish a fixed percentage of token savings.",
+    "url": "https://github.com/tobi/qmd/blob/v2.8.3/README.md"
+   },
+   {
+    "claim": "Upstream supplies structured --json/--files output and MCP query, get, multi_get and status tools for agents; selected line ranges can be retrieved using get's path:from:count form. Savings depend on retrieving the correct bounded source and accounting for both search and fetched content.",
+    "url": "https://github.com/tobi/qmd/blob/v2.8.3/skills/qmd/SKILL.md"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "Retrieval is limited to configured collections and indexed files. Semantic retrieval requires embeddings; plain query automatically expands through a model, and reranking defaults on. For a deliberately lexical MCP call use typed lex searches with rerank:false; status/get and CLI search do not by themselves establish semantic readiness or token savings.",
+    "url": "https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts"
+   },
+   {
+    "text": "Issue #991, still open when rechecked, reports that update leaves old content searchable when an indexed file becomes empty or whitespace-only. full-save/cur/qmd/record.json records an isolated reproduction on pinned 2.8.3, beyond the issue's main-branch reproduction; that is prior local synthetic evidence, not a new reproduction in this review.",
+    "url": "https://github.com/tobi/qmd/issues/991"
+   },
+   {
+    "text": "Issue #989, still open when rechecked, reports that update deactivates every document in a missing collection root while reporting success; cleanup can subsequently remove inactive data. full-save/cur/qmd/record.json records the same failure on an isolated 2.8.3 fixture; ordinary exit success is therefore insufficient as a freshness check.",
+    "url": "https://github.com/tobi/qmd/issues/989"
+   },
+   {
+    "text": "Issue #971 reports a 2.8.3 stdio race where a model-free status/get request concurrent with model loading can send its JSON-RPC response to stderr and leave the client waiting. It was also reproduced upstream in CPU mode; this review has not reproduced it locally.",
+    "url": "https://github.com/tobi/qmd/issues/971"
+   },
+   {
+    "text": "Issue #942 reports independent model loads across concurrent 2.8.3 invocations exhausting CPU-host RAM. Separate MCP clients do not automatically share their model processes; this matters if agents invoke expansion or reranking despite the lexical catalog's lack of vectors.",
+    "url": "https://github.com/tobi/qmd/issues/942"
+   },
+   {
+    "text": "Issue #997 reports that MCP/bench can bypass the project-local custom-model trust gate. Our explicit --index selection bypasses project-local config discovery, as confirmed in tagged src/cli/qmd.ts, so this is not an observed failure of our named-index registration; replacing it with the plugin's bare qmd mcp command would remove that scope safeguard.",
+    "url": "https://github.com/tobi/qmd/issues/997"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "No newer published release exists. All following changes are UNRELEASED on main at 04e4dbd8245c527a88f1a8f0bda547aef9ca81fb, 24 commits after v2.8.3; they are not features of our installed pin or released upgrade benefits.",
+    "url": "https://github.com/tobi/qmd/compare/v2.8.3...04e4dbd8245c527a88f1a8f0bda547aef9ca81fb"
+   },
+   {
+    "text": "Unreleased typed document metadata and a common filter AST span CLI, SDK, MCP and HTTP searches. Filters run before fusion/reranking, selective top-K completeness remains best-effort, and result metadata adds payload bytes; existing indexes require update to backfill metadata.",
+    "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/CHANGELOG.md#unreleased"
+   },
+   {
+    "text": "Unreleased embedding generation and legacy-fingerprint adoption tokenize using the store-selected embedding model, avoiding initialization of an unrelated default model and aligning chunk boundaries with the actual embedding model.",
+    "url": "https://github.com/tobi/qmd/commit/143176f8ae0b"
+   },
+   {
+    "text": "Unreleased FTS separator handling fixes punctuation-containing terms, but open issue #966 identifies a combining-mark/NFD regression introduced by that change; the report explicitly says 2.8.3 is unaffected.",
+    "url": "https://github.com/tobi/qmd/issues/966"
+   },
+   {
+    "text": "Other unreleased changes validate malformed/non-object REST bodies, sanitize Windows index/config names, distinguish unreadable GGUF files from confirmed corruption, set Nix executable metadata and adjust MCP tests. They appear in the live compare's individual commits rather than all being listed in the short unreleased changelog.",
+    "url": "https://github.com/tobi/qmd/compare/v2.8.3...04e4dbd8245c527a88f1a8f0bda547aef9ca81fb"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "qmd",
+   "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+   "version": "2.8.3",
+   "license": "MIT",
+   "profile": "core",
+   "role": "Local lexical retrieval over selected documentation",
+   "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+  },
+  "how_we_install": "npm install --global --prefix \"$STACK_HOME/tools/qmd-2.8.3\" @tobilu/qmd@2.8.3, exposed through the owned bin/qmd launcher. Sources: recipes/README.md, component catalog; adoption/pins-linux-x86_64.json and adoption/pins-macos-arm64.json, qmd entries. The installed package identifies @tobilu/qmd 2.8.3 and MIT; token-cards/cards/qmd.json records native qmd --version as qmd 2.8.3 (facd35e). The profile deliberately uses BM25 search/get and does not run embed as part of ordinary catalog retrieval (recipes/README.md#documents-and-selected-artifacts; catalogs/us-equities/native-workflows.md).",
+  "claude_wiring": "User-scope standalone stdio MCP at $HOME/.claude.json, mcpServers.qmd: $HOME/.local/share/codex-ecosystem/bin/qmd --index native-agent-stack-catalog mcp, with an empty environment block; re-read during this review. adoption/templates/claude.settings.template.json contains no qmd registration, so that settings template alone does not install this server. The native user-scope arrangement is documented in docs/decisions/2026-09-25-codex-mcp-scope.md and full-save/cur/qmd/record.json; the upstream QMD plugin is a separate, unadopted path. examples/claude-native/agents/source-scout.md and isolated-builder.md direct scoped QMD CLI searches through their Bash-capable roles, rather than promising a QMD-specific lifecycle hook.",
+  "codex_wiring": "User-scope stdio MCP: adoption/templates/codex.config.template.toml [mcp_servers.qmd] uses command=${ECO_ROOT}/bin/qmd and args=[--index,native-agent-stack-catalog,mcp], and live $HOME/.codex/config.toml matches. The host-only .codex/config.toml has no qmd block. Sources: docs/decisions/2026-09-25-codex-mcp-scope.md, Decision 1; docs/token-session-handbook.md, Codex user-scope MCP servers; direct read of those configuration blocks. This already-explicit index means the earlier full-save/cur/qmd/gpt6.md conditional rewire is unnecessary, as full-save/cur/qmd/record.json also corrects.",
+  "lane_rule": "For indexed Markdown, choose the intended named index and collection, search with bounded results, then get the returned document URI and verify the relevant source lines; use a known-source read when the needed directory is outside the index. Sources: docs/token-session-handbook.md, Choose one useful context method per artifact and per-tool table; recipes/README.md#documents-and-selected-artifacts; catalogs/us-equities/native-workflows.md. The catalog setup covers catalogs/us-equities and blueprints/us-equities, not the entire repository. Codex USER scope makes the server available in fresh worktrees but does not expand its indexed corpus (docs/decisions/2026-09-25-codex-mcp-scope.md, Decision 1).",
+  "deviations_from_upstream": [
+   {
+    "what": "The adopted catalog is deliberately narrower than general repository-document retrieval: live MCP status reports totalDocuments=122, needsEmbedding=122, hasVectorIndex=false, with 22 us-equities-catalog and 100 us-equities-foundation documents. The configuration roots exclude adoption/ and docs/, including the release re-pin answer in adoption/update.md. Sources: $HOME/.config/qmd/native-agent-stack-catalog.yml; live qmd.status during this review; rr/qmd/records.json, qmd-claude-mcp-query-repin and qmd-quality-check; evidence/artifacts/token-e2e-codex-20260926/receipt.json.",
+    "why": "The native workflow intentionally indexes two selected US-equities directories, but the earlier release-repin task assumed broader coverage and accepted text from the wrong document. The correction explicitly distinguishes accurate quotation from a correct answer. Sources: catalogs/us-equities/native-workflows.md; evidence/artifacts/token-e2e-codex-20260926/receipt.json, corrections_to_296.",
+    "fix": "Check status and collection roots before selecting this lane; for adoption/update.md use a bounded original read, or explicitly enroll adoption/ and docs/ in a separate task-appropriate index and verify the expected URI and answer lines. Retain the wrong-document result as failed task evidence rather than a savings success. Sources: docs/token-session-handbook.md; rr/qmd/run.sh and rr/qmd/records.json demonstrate isolated adoption/docs collections with source-verified retrieval.",
+    "pr": "#343"
+   },
+   {
+    "what": "Our intended BM25-only lane has no vectors, while the exposed upstream MCP query still defaults to reranking and auto-expands plain query text; no vectors does not make all query calls model-free. Sources: $HOME/.config/qmd/native-agent-stack-catalog.yml; https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts ; full-save/cur/qmd/record.json, features_disabled_here.",
+    "why": "Native documentation selects lexical search/get to avoid unnecessary model work, but installing the generic server retains upstream query defaults. Upstream reports #971 and #942 therefore remain relevant to model-loading calls even though vector retrieval is inactive. Sources: recipes/README.md, qmd catalog row; https://github.com/tobi/qmd/issues/971 ; https://github.com/tobi/qmd/issues/942 .",
+    "fix": "Use CLI qmd --index native-agent-stack-catalog search with an explicit collection and result limit, or MCP typed lex searches with rerank:false, then bounded get. Treat embedding, expansion, reranking or a shared HTTP daemon as separately qualified feature changes, including concurrent loading and idle-reload checks. Sources: tagged MCP query schema; rr/qmd/run.sh, model-free lexical request arguments; docs/token-session-handbook.md.",
+    "pr": null
+   },
+   {
+    "what": "The stack uses a pinned standalone named-index server instead of the upstream Claude plugin's bare qmd mcp command and bundled skills. Sources: adoption/templates/codex.config.template.toml; $HOME/.claude.json, mcpServers.qmd; https://github.com/tobi/qmd/blob/v2.8.3/.claude-plugin/marketplace.json .",
+    "why": "This keeps collection scope stable across worktrees and bypasses project-local config discovery; the tagged CLI's explicit-index branch calls setConfigSource rather than findLocalConfigPath. It also avoids a duplicate MCP registration. Sources: docs/decisions/2026-09-25-codex-mcp-scope.md; https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts .",
+    "fix": "Retain the explicit --index registration and native search/get lane. If adopting upstream skills or plugin packaging later, preserve the named-index command, remove duplicates and verify scope from a checkout with a conflicting local .qmd config; no rewire is currently required. Sources: full-save/cur/qmd/record.json, recommendation; tagged CLI index-selection source.",
+    "pr": null
+   },
+   {
+    "what": "Our automatic catalog refresh inherits two upstream 2.8.3 defects: empty files can leave stale searchable content, and missing collection roots can deactivate a whole collection while update exits successfully. Prior isolated reproductions are recorded in full-save/cur/qmd/record.json, known_defects_or_holds; upstream primary reports are https://github.com/tobi/qmd/issues/991 and https://github.com/tobi/qmd/issues/989 .",
+    "why": "The host's $HOME/.config/systemd/user/ecosystem-live-clone-sync.service checks a clean Git tree, fetches/checks out main and runs qmd update; its timer uses OnUnitActiveSec=15min. Those checks do not establish that each configured collection root still exists or that newly empty source files were removed from retrieval. Source: direct read of those two unit files; $HOME/.config/qmd/native-agent-stack-catalog.yml.",
+    "fix": "Before a scheduled refresh, verify each enrolled root exists and detect indexed files that became empty; check representative returned documents against disk after update and fail/report stale or missing-root conditions. Qualify an upstream fix on the retained empty-file/missing-root fixtures before upgrading; do not run cleanup while a root is temporarily unavailable. Sources: upstream #989/#991; full-save/cur/qmd/record.json, qualification_plan.",
+    "pr": null
+   },
+   {
+    "what": "manifests/stack.json records version=2.8.3 and MIT but source_pin=null, despite the release and package both identifying commit facd35e01359e59d938bc9418e93fb9318addee3. Sources: manifests/stack.json, component qmd; https://api.github.com/repos/tobi/qmd/tags?per_page=5 ; https://registry.npmjs.org/@tobilu/qmd .",
+    "why": "The package artifact is pinned in the platform manifests, but source-commit provenance is not populated in the component entry; this is a metadata gap, not evidence of a different running release. Sources: adoption/pins-linux-x86_64.json; manifests/stack.json; token-cards/cards/qmd.json, installed_version.",
+    "fix": "In a future manifest maintenance change, populate source_pin with the independently verified release commit and retain the existing package checksum; validate the manifest without claiming a new runtime qualification. Sources: the GitHub tag and npm gitHead responses above; adoption/pins-linux-x86_64.json.",
+    "pr": null
+   }
+  ],
+  "pending_fixes": [
+   "Keep the historical 5756-to-901 artifact comparison labeled as wrong-document task evidence; the assembler's numbers stay unchanged, but the corrected interpretation must accompany them (token-cards/cards/qmd.json, prior_evidence; evidence/artifacts/token-e2e-codex-20260926/receipt.json, corrections_to_296).",
+   "Apply the collection-coverage check before selecting QMD for a repository task; the catalog cannot answer adoption/docs questions until those directories are explicitly enrolled in an appropriate index (catalogs/us-equities/native-workflows.md; rr/qmd/records.json).",
+   "Make the lexical MCP invocation explicit with typed lex searches and rerank:false when BM25 is intended; qualify model-backed concurrency separately (https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts; upstream issues #971 and #942).",
+   "Add missing-root and newly-empty-file freshness checks to the adopted refresh process, and track upstream fixes for #989/#991 before version promotion (full-save/cur/qmd/record.json; $HOME/.config/systemd/user/ecosystem-live-clone-sync.service).",
+   "Fill the component's null source_pin from the verified facd35e01359e59d938bc9418e93fb9318addee3 release/package identity (manifests/stack.json; https://registry.npmjs.org/@tobilu/qmd).",
+   "Arm-B is still pending and capacity-gated; neither the small lanes-block population nor the lexical positive control completes it (token-cards/cards/qmd.json#/invoke_rates/arm_b_native)."
+  ],
+  "assessment": "QMD is aligned with the latest released version and its supported scoped-BM25 interface, while its native adaptation intentionally omits vectors; the card reports status=pass and records_total=31 (the card's own figure, with exact reconciliation against the retained record sources still open) under evidence_class='local integration (upstream commands on this host, returned data retained)', whose retained records include both an isolated correctly scoped success and the production catalog's out-of-scope re-pin query (token-cards/cards/qmd.json#/e2e_returned_results; rr/qmd/records.json; rr/returned-results.json; html-report/savings.json). The card's evidence_class='exact artifact comparison' values before_tokens=5756, after_tokens=901, change_pct=-84.3, encoding=o200k_base are preserved verbatim, but its prior_evidence and the #343 correction establish wrong-document retrieval, so that reduction is not valid evidence of completing the release-repin task (token-cards/cards/qmd.json#/adapted_performance; evidence/artifacts/token-e2e-codex-20260926/receipt.json, corrections_to_296). Separately, invocation evidence_class='local_integration' reports workflow_children agents_using=64, agents=1010 and codex_exec_workers agents_using=11, agents=301; workflow_children_with_lanes_block agents_using=2, agents=22 supports no causal conclusion (token-cards/invoke_by_tool.json; token-cards/cards/qmd.json#/invoke_rates). There were no MCP calls observed in that OTel window, and arm_b_native remains 'pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window'; these observations do not mean the tool is unused, establish a completed Arm-B result or combine into provider-token savings (token-cards/cards/qmd.json#/invoke_rates)."
+ },
+ "e2e_returned_results": {
+  "status": "pass",
+  "reason": "passed",
+  "run_utc": "2026-09-26T17:52:22.238Z",
+  "fidelity": {
+   "what": "exact artifact comparison predicate",
+   "result": " answer verified (PASS); verifier: agree, 2 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "timeout -k 5 120 qmd --version",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 qmd --index rr-docs collection add <scratch>/wt-rr/adoption --name rr-adoption --mask **/*.md",
+    "exit": null,
+    "returned": "completed"
+   },
+   {
+    "cmd": "timeout -k 5 120 qmd --index rr-docs collection add <scratch>/wt-rr/docs --name rr-docs --mask **/*.md",
+    "exit": null,
+    "returned": "completed"
+   },
+   {
+    "cmd": "timeout -k 5 120 qmd --index rr-docs search re-pin release tag new machine -n 5 --json",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 qmd --index rr-docs get qmd://rr-adoption/update.md?index=rr-docs --no-line-numbers",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 qmd --index rr-docs get qmd://rr-adoption/update.md?index=rr-docs:5:80 --no-line-numbers",
+    "exit": null,
+    "returned": "passed"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 31,
+  "records_shown": [
+   {
+    "id": "qmd-cli-version",
+    "status": "passed",
+    "kind": "native execution: upstream qmd CLI",
+    "command": "timeout -k 5 120 qmd --version",
+    "observation": "Exit 0. Returned 'qmd 2.8.3 (facd35e)', the pinned 2.8.3 (context not shown by the attachments: npm @tobilu/qmd, launcher under $HOME/.local/share/codex-ecosystem/tools/qmd-2.8.3).\n\nassembly_review: {\"step\": \"returned-results assembly 2026-09-26T21:31:33Z: record fixed, evidence bytes unchanged except sanitized copies\", \"verifier\": \"agree\", \"corrections\": [{\"field\": \"observation\", \"was\": \"the pinned 2.8.3 (npm @tobil",
+    "attachments": 2
+   },
+   {
+    "id": "qmd-cli-collection-add-adoption",
+    "status": "completed",
+    "kind": "native execution: upstream qmd CLI",
+    "command": "timeout -k 5 120 qmd --index rr-docs collection add $SCRATCH/wt-rr/adoption --name rr-adoption --mask **/*.md",
+    "observation": "Exit 0. Created collection rr-adoption over the fixture adoption/ with mask **/*.md: 'Indexed: 17 new, 0 updated, 0 unchanged, 0 removed'; it notes 17 hashes need vectors (no embedding step ran in this E2E; model files were not inspected). Sanitized: 03-collection-add-adoption.stdout raw (private, qmd/private/raw) 347 bytes sha256 17c761a0de783acd99e7eb0ddc49c86ef79828a694fe1371c8de8704723df47f -> attached 255 bytes ",
+    "attachments": 2
+   },
+   {
+    "id": "qmd-cli-collection-add-docs",
+    "status": "completed",
+    "kind": "native execution: upstream qmd CLI",
+    "command": "timeout -k 5 120 qmd --index rr-docs collection add $SCRATCH/wt-rr/docs --name rr-docs --mask **/*.md",
+    "observation": "Exit 0. Created collection rr-docs over the fixture docs/: 'Indexed: 113 new'; 130 unique hashes now need vectors (not embedded). Sanitized: 04-collection-add-docs.stdout raw (private, qmd/private/raw) 337 bytes sha256 24f22949b238df6e0f8cd23eead0d45752292ea69adb9d3e8cfaeec1e9c823d2 -> attached 245 bytes sha256 b51720a996234a61b75edcced7346298ee0f5d26a9af84011291203e8711e215. Rule: literal substitution of the scratch",
+    "attachments": 2
+   },
+   {
+    "id": "qmd-cli-search",
+    "status": "passed",
+    "kind": "native execution: upstream qmd CLI",
+    "command": "timeout -k 5 120 qmd --index rr-docs search re-pin release tag new machine -n 5 --json",
+    "observation": "Exit 0. BM25 returned 5 hits; top qmd://rr-adoption/update.md?index=rr-docs (score 0.87, best line 25, title 'Refresh and continue the stack'), then qmd://rr-adoption/bootstrap.md, qmd://rr-adoption/README.md, qmd://rr-adoption/platforms/macos-arm64.md, qmd://rr-docs/github-automation.md. Check: the top URI starts with qmd://rr-adoption/update.md (the ?index= suffix is qmd's own) and is not engines-strategies.md, the",
+    "attachments": 2
+   },
+   {
+    "id": "qmd-cli-get-full",
+    "status": "passed",
+    "kind": "native execution: upstream qmd CLI",
+    "command": "timeout -k 5 120 qmd --index rr-docs get qmd://rr-adoption/update.md?index=rr-docs --no-line-numbers",
+    "observation": "Exit 0. Returned header 'qmd://rr-adoption/update.md  #26046b', a '---' separator and the whole document: the body is byte-identical to `cat adoption/update.md` (19,209 bytes) and holds the re-pin PR step (line 82).",
+    "attachments": 2
+   },
+   {
+    "id": "qmd-cli-get-window",
+    "status": "passed",
+    "kind": "native execution: upstream qmd CLI",
+    "command": "timeout -k 5 120 qmd --index rr-docs get qmd://rr-adoption/update.md?index=rr-docs:5:80 --no-line-numbers",
+    "observation": "Exit 0. Returned lines 5-84 only (window rule max(1, line-20), 80 lines, from qmd's MCP query tool description, applied to the search's best line 25). The window equals the baseline's lines 5-84 and holds both the re-pin flow (line 25) and the re-pin PR step (line 82).",
+    "attachments": 2
+   },
+   {
+    "id": "qmd-cli-update",
+    "status": "completed",
+    "kind": "native execution: upstream qmd CLI",
+    "command": "timeout -k 5 120 qmd --index rr-docs update",
+    "observation": "Exit 0. Re-indexed both collections without --pull: rr-adoption 0 new/0 updated/17 unchanged, rr-docs 0 new/0 updated/113 unchanged, 'All collections updated.' Sanitized: 08-update.stdout raw (private, qmd/private/raw) 560 bytes sha256 0713ca504c9ed55bb935cd494e97ff2f9cfda96b116e7d5a5d265c4748a874af -> attached 376 bytes sha256 247824466e2fd1e83367a5c25f66d31b9d893cd128aa7a84caae741fc82bbd1a. Rule: literal substituti",
+    "attachments": 2
+   },
+   {
+    "id": "qmd-cli-status",
+    "status": "completed",
+    "kind": "native execution: upstream qmd CLI",
+    "command": "timeout -k 5 120 qmd --index rr-docs status",
+    "observation": "Exit 0. Index state: 130 files indexed, 0 vectors, 130 pending embedding, collections rr-adoption (17) and rr-docs (113), model URIs listed but not downloaded. This is state, not a savings counter. Sanitized: 09-status.stdout raw (private, qmd/private/raw) 1401 bytes sha256 32bae09d5c5c94f26e2c6f311dbf119b18e2d4e323b7e8dbe0f5cb04a071cb6c -> attached 1309 bytes sha256 dcb1be47cfa87e52b14a66e71f401a848892f1f8d0a3f8da93",
+    "attachments": 2
+   },
+   {
+    "id": "qmd-mcp-mcporter-status",
+    "status": "completed",
+    "kind": "native execution: upstream qmd MCP server via upstream mcporter client",
+    "command": "timeout -k 5 120 mcporter --config $SCRATCH/rr/qmd/mcporter.json call --stdio $HOME/.local/share/codex-ecosystem/bin/qmd --stdio-arg --index --stdio-arg rr-docs --stdio-arg mcp --env PATH=${PATH} --env XDG_CACHE_HOME=$SC",
+    "observation": "Exit 0. structuredContent: totalDocuments 130, needsEmbedding 130, hasVectorIndex false, collections {'rr-docs': 113, 'rr-adoption': 17}. Sanitized: 10-mcp-status.stdout raw (private, qmd/private/raw) 644 bytes sha256 64ad44c15e545faa28924e2a96625ec30d5878b6643199ae370f7cc802105eb5 -> attached 460 bytes sha256 496f330ca987b4e55659dadf559b4eebd35fc55d01408064ce82df77236d958e. Rule: literal substitution of the scratchp",
+    "attachments": 2
+   },
+   {
+    "id": "qmd-mcp-mcporter-query",
+    "status": "passed",
+    "kind": "native execution: upstream qmd MCP server via upstream mcporter client",
+    "command": "timeout -k 5 120 mcporter --config $SCRATCH/rr/qmd/mcporter.json call --stdio $HOME/.local/share/codex-ecosystem/bin/qmd --stdio-arg --index --stdio-arg rr-docs --stdio-arg mcp --env PATH=${PATH} --env XDG_CACHE_HOME=$SC",
+    "observation": "Exit 0. Top result rr-adoption/update.md line 25 (score 1), then rr-docs/github-automation.md, rr-adoption/bootstrap.md, rr-adoption/README.md, rr-adoption/platforms/macos-arm64.md. Below the top the order differs from the CLI search: the MCP tool scores through qmd's structuredSearch path (RRF-scored candidates, best chunk per document) and the CLI through searchFTS directly; the specific cause of the reordering was",
+    "attachments": 2
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [
+   {
+    "lane": "claude_subagent",
+    "payload": "Find the release re-pin step: full document vs QMD BM25 search+get; answer verified (PASS)",
+    "before_tokens": 5756,
+    "after_tokens": 901,
+    "change_pct": -84.3,
+    "encoding": "o200k_base",
+    "eligibility": "retracted: PR #343 found the answer came from the wrong document",
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-25T21:07:55.224527+00:00",
+    "last_seen": "2026-09-25T21:07:55.224527+00:00"
+   }
+  ],
+  "native_counter": null,
+  "native_snapshot": [],
+  "shortfall_cause": "The -84.3% comparison is retracted: PR #343 found it retrieved the wrong document. BM25 retrieval works; semantic search needs `qmd embed`, not run on this host.",
+  "q3_fixture": null
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 16,
+    "cli_calls": 179,
+    "agents_using": 64,
+    "agents": 1010,
+    "pct_agents_using": 0.0634
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 2,
+    "agents_using": 2,
+    "agents": 22,
+    "pct_agents_using": 0.0909
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 16,
+    "cli_calls": 177,
+    "agents_using": 62,
+    "agents": 988,
+    "pct_agents_using": 0.0628
+   },
+   "agent_subagents": {
+    "mcp_calls": 1,
+    "cli_calls": 4,
+    "agents_using": 4,
+    "agents": 71,
+    "pct_agents_using": 0.0563
+   },
+   "main_sessions": {
+    "mcp_calls": 0,
+    "cli_calls": 32,
+    "agents_using": 3,
+    "agents": 15,
+    "pct_agents_using": 0.2
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 42,
+    "cli_calls": 0,
+    "agents_using": 11,
+    "agents": 301,
+    "pct_agents_using": 0.0365
+   }
+  },
+  "live_otel": {
+   "window": {
+    "since": "2026-09-26T22:50:00Z",
+    "until": "2026-09-26T23:37:28Z",
+    "duration": "2848s"
+   },
+   "panel": "U6 panel 31: MCP calls by client and server",
+   "series": [
+    {
+     "client": "claude-code",
+     "mcp_server_name": "qmd",
+     "calls": "3"
+    },
+    {
+     "client": "codex_exec",
+     "mcp_server_name": "qmd",
+     "calls": "3"
+    }
+   ]
+  },
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "defects",
+  "findings": [
+   {
+    "severity": "medium",
+    "field": "adapted_performance.exact_comparisons[0].payload",
+    "issue": "The payload still labels the 5,756-to-901 release-repin comparison 'answer verified (PASS)'. The retained corrections_to_296 explicitly says the retrieved engines-strategies.md did not answer the question; the correct source was adoption/update.md, outside this catalog. The assessment and prior_evidence acknowledge that correction, leaving this row internally contradictory.",
+    "fix": "ASSEMBLER: Replace the success label with an explicit historical wrong-document/task-failed label. Preserve the exact artifact token counts and identify them as ineligible evidence of successful release-repin retrieval.",
+    "source": "$HOME/code/native-agent-stack/evidence/artifacts/token-e2e-codex-20260926/receipt.json"
+   },
+   {
+    "severity": "medium",
+    "field": "e2e_returned_results.fidelity.result",
+    "issue": "The fidelity result repeats 'answer verified (PASS)' from the invalid historical release-repin comparison. That answer was subsequently corrected as wrong-document retrieval. The later isolated-index integration and lexical positive control pass on their own evidence; they do not validate that historical answer.",
+    "fix": "ASSEMBLER: Derive the integration fidelity description from rr/qmd's source-verification checks and label the historical #296 release-repin answer as wrong-document/task-failed. Keep the isolated integration pass distinct.",
+    "source": "$HOME/code/native-agent-stack/evidence/artifacts/token-e2e-codex-20260926/receipt.json"
+   },
+   {
+    "severity": "low",
+    "field": "e2e_returned_results.records_total",
+    "issue": "The card reports 31 records, but rr/qmd/records.json contains 30 records and rr/returned-results.json's qmd component summary also reports records=30. Filtering all returned-results records by component_ids gives 36 because it additionally includes six cross-tool client records; none of these documented scopes gives 31.",
+    "fix": "ASSEMBLER: Recompute records_total from the retained per-tool record set and set it to 30, with any cross-tool client evidence counted and labeled separately.",
+    "source": "<scratch>/rr/qmd/records.json"
+   },
+   {
+    "severity": "low",
+    "field": "native_adaptation.assessment",
+    "issue": "The assessment repeats records_total=31 and cites rr/qmd/records.json and rr/returned-results.json as support, although the per-tool source and its assembled component summary both contain 30. This carries the stale assembler count into the adaptation conclusion.",
+    "fix": "Correct the per-tool record count to 30 after reconciling e2e_returned_results.records_total, retaining the distinction between isolated correctly scoped retrieval, the production out-of-scope result, and historical artifact comparisons.",
+    "source": "<scratch>/rr/returned-results.json"
+   }
+  ],
+  "checked": [
+   "<scratch>/token-cards/cards/qmd.json",
+   "<scratch>/token-cards/groups/g4-retrieval-memory/qmd.upstream.json",
+   "https://api.github.com/repos/tobi/qmd/commits/main",
+   "https://api.github.com/repos/tobi/qmd/compare/v2.8.3...main",
+   "https://api.github.com/repos/tobi/qmd/releases/latest",
+   "https://api.github.com/repos/tobi/qmd/tags?per_page=5",
+   "https://github.com/tobi/qmd",
+   "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/CHANGELOG.md#unreleased",
+   "https://github.com/tobi/qmd/blob/v2.8.3/.claude-plugin/marketplace.json",
+   "https://github.com/tobi/qmd/blob/v2.8.3/README.md",
+   "https://github.com/tobi/qmd/blob/v2.8.3/README.md#installation",
+   "https://github.com/tobi/qmd/blob/v2.8.3/README.md#mcp-server",
+   "https://github.com/tobi/qmd/blob/v2.8.3/skills/qmd/SKILL.md",
+   "https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts",
+   "https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts",
+   "https://github.com/tobi/qmd/commit/143176f8ae0b",
+   "https://github.com/tobi/qmd/compare/v2.8.3...04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+   "https://github.com/tobi/qmd/issues/942",
+   "https://github.com/tobi/qmd/issues/966",
+   "https://github.com/tobi/qmd/issues/971",
+   "https://github.com/tobi/qmd/issues/989",
+   "https://github.com/tobi/qmd/issues/991",
+   "https://github.com/tobi/qmd/issues/997",
+   "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+   "https://registry.npmjs.org/@tobilu/qmd",
+   "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md",
+   "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/.claude-plugin/marketplace.json",
+   "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/skills/qmd/SKILL.md",
+   "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/src/cli/qmd.ts",
+   "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/src/mcp/server.ts",
+   "https://raw.githubusercontent.com/tobi/qmd/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/CHANGELOG.md",
+   "https://api.github.com/repos/tobi/qmd/issues/989",
+   "https://api.github.com/repos/tobi/qmd/issues/991",
+   "https://api.github.com/repos/tobi/qmd/issues/971",
+   "https://api.github.com/repos/tobi/qmd/issues/942",
+   "https://api.github.com/repos/tobi/qmd/issues/997",
+   "https://api.github.com/repos/tobi/qmd/issues/966",
+   "$HOME/code/native-agent-stack/manifests/stack.json",
+   "$HOME/code/native-agent-stack/docs/token-session-handbook.md",
+   "$HOME/code/native-agent-stack/docs/decisions/2026-09-25-codex-mcp-scope.md",
+   "$HOME/code/native-agent-stack/docs/decisions/2026-09-23-claude-user-profile.md",
+   "$HOME/code/native-agent-stack/recipes/README.md",
+   "$HOME/code/native-agent-stack/adoption/templates/codex.config.template.toml",
+   "$HOME/code/native-agent-stack/adoption/templates/claude.settings.template.json",
+   "$HOME/code/native-agent-stack/.codex/config.toml",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/blind-adjudicator.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/blind-lane-reviewer.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/evidence-reviewer.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/isolated-builder.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/semantic-evidence-reviewer.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/source-scout.md",
+   "$HOME/code/native-agent-stack/adoption/pins-linux-x86_64.json",
+   "$HOME/code/native-agent-stack/adoption/pins-macos-arm64.json",
+   "$HOME/code/native-agent-stack/catalogs/us-equities/native-workflows.md",
+   "$HOME/code/native-agent-stack/evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+   "$HOME/.claude.json (qmd registration only)",
+   "$HOME/.codex/config.toml (qmd registration only)",
+   "$HOME/.config/qmd/native-agent-stack-catalog.yml",
+   "$HOME/.config/systemd/user/ecosystem-live-clone-sync.service",
+   "$HOME/.config/systemd/user/ecosystem-live-clone-sync.timer",
+   "<scratch>/full-save/cur/qmd/gpt6.md",
+   "<scratch>/full-save/cur/qmd/record.json",
+   "<scratch>/token-cards/invoke_by_tool.json (qmd in all six populations)",
+   "<scratch>/html-report/savings.json (tools[id=qmd]; report_comparisons[tool=qmd])",
+   "<scratch>/rr/returned-results.json (records filtered by component_ids containing qmd; qmd component summary)",
+   "<scratch>/rr/qmd/records.json",
+   "<scratch>/rr/qmd/run.sh",
+   "<scratch>/rr/qmd/out/21-claude-status.result.txt",
+   "<scratch>/rr/qmd/out/26-check.stdout",
+   "<scratch>/rr/qmd/out/28-compare-B.stdout",
+   "<scratch>/rr/qmd/out/36-validate-inspect.stdout",
+   "Live mcp__qmd__status: 122 documents, 122 need embedding, no vector index; collections contain 100 and 22 documents",
+   "Native qmd --version: qmd 2.8.3 (facd35e), exit 0",
+   "GitHub API URLs above were re-opened successfully through authenticated gh api after unauthenticated HTTP 403 responses"
+  ],
+  "resolutions": [
+   "deferred: ASSEMBLER-owned field, reported to the coordinator, not edited in this repair round",
+   "deferred: ASSEMBLER-owned field, reported to the coordinator, not edited in this repair round",
+   "deferred: ASSEMBLER-owned field, reported to the coordinator, not edited in this repair round",
+   "fixed: assessment identifies records_total as the card's reported figure with exact reconciliation still open"
+  ],
+  "final_verdict": {
+   "tool": "qmd",
+   "verdict": "adapted-with-gaps",
+   "summary": "Installed v2.8.3 matches the latest release, and standalone named-index MCP is supported, but the native catalog covers selected US-equities documents rather than the repository's adoption instructions. The true eligible isolated CLI comparison is 4,373→1,850 o200k_base tokens (57.7%) for search plus a source-verified window; the separate native Claude positive control is 5,756→3,367 (41.5%), while whole-document retrieval and search-plus-whole expand output by 0.3% and 16.9% respectively (../rr/qmd/records.json#qmd-compare-B-search-plus-window; #qmd-compare-D-claude-control; #qmd-compare-A-get-whole; #qmd-compare-C-search-plus-whole). The historical 5,756→901 claim (84.3%) is ineligible because it answered from the wrong document, and neither later valid comparison repairs that task failure or proves provider savings (evidence/artifacts/token-e2e-codex-20260926/receipt.json#corrections_to_296). The fixed scan found invocations in 64/1,010 Ultracode children (6.34%) and 11/301 Codex workers (3.65%), including 2/22 TOKEN LANES children (9.09%); this pass also confirmed a 122-document lexical catalog and used query then bounded get (invoke_by_tool.json; groups/final-verdict-evidence.json#live_probes). Next, check collection coverage before routing, use typed lex queries with rerank:false and bounded get, add refresh guards, and repair the card's stale PASS/count fields while retaining the named-index registration.",
+   "gaps": [
+    {
+     "gap": "The production catalog excludes adoption/update.md, so the release-repin task is outside its scope; the card still embeds the historical PASS despite its retraction.",
+     "evidence": "cards/qmd.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json#corrections_to_296; ../rr/qmd/out/26-check.stdout",
+     "action": "Use a bounded original read for that document or explicitly qualify a task-appropriate index; change historical payload/fidelity labels to wrong-document task failure and retain later correct-source comparisons separately.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The intended lexical lane does not automatically disable model work: generic MCP query defaults to reranking, and plain query text can invoke expansion.",
+     "evidence": "https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts; https://github.com/tobi/qmd/blob/v2.8.3/README.md#mcp-tool-parameters",
+     "action": "Use searches:[{type:'lex',query:...}], an explicit collection, a bounded limit, rerank:false, and then bounded get; qualify embeddings or other model features separately.",
+     "owner_pr": null
+    },
+    {
+     "gap": "Retained isolated reproductions show stale results after a source becomes empty and collection deactivation when its root disappears.",
+     "evidence": "../full-save/cur/qmd/record.json; https://github.com/tobi/qmd/issues/991; https://github.com/tobi/qmd/issues/989",
+     "action": "Guard scheduled refresh against missing roots and newly empty sources, verify representative returned content against disk, and qualify any upstream fix locally without filing a new upstream issue.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The merged card reports 31 records instead of the retained 30 and omits the newer valid/expanding comparisons.",
+     "evidence": "cards/qmd.json; groups/g4-retrieval-memory/qmd.review.json; ../rr/qmd/records.json",
+     "action": "Recompute the per-tool count and derive fidelity from the actual source checks; show the 57.7% isolated result, 41.5% native positive control, and expansion cases with their individual eligibility.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "Latest official release v2.8.3 was published 2026-08-16 and matches the retained native version.",
+     "evidence": "https://api.github.com/repos/tobi/qmd/releases/latest; ../rr/qmd/records.json#qmd-cli-version",
+     "result": "holds"
+    },
+    {
+     "claim": "The existing explicit named-index standalone MCP registration is valid; absence of the upstream Claude plugin does not make it unadapted.",
+     "evidence": "adoption/templates/codex.config.template.toml; https://github.com/tobi/qmd/blob/v2.8.3/README.md",
+     "result": "holds"
+    },
+    {
+     "claim": "The production lexical catalog has 122 documents, all pending embedding, and no vector index; its two collections exclude adoption/ and docs/.",
+     "evidence": "../rr/qmd/out/26-check.stdout; groups/final-verdict-evidence.json#live_probes",
+     "result": "holds"
+    },
+    {
+     "claim": "The 4,373→1,850 comparison is eligible only for correctly scoped search plus lines 5–84 of adoption/update.md, with both required re-pin lines verified against the source.",
+     "evidence": "../rr/qmd/records.json#qmd-compare-B-search-plus-window; ../rr/qmd/out/26-check.stdout; groups/final-verdict-evidence.json#recounts",
+     "result": "holds"
+    },
+    {
+     "claim": "The native Claude 5,756→3,367 positive control is a separate in-scope task, not a successful release-repin answer.",
+     "evidence": "../rr/qmd/records.json#qmd-compare-D-claude-control; ../rr/qmd/out/26-check.stdout",
+     "result": "holds"
+    },
+    {
+     "claim": "Whole get expands 4,373→4,388 tokens and search-plus-whole expands 4,373→5,111; retrieval alone does not guarantee savings.",
+     "evidence": "../rr/qmd/records.json#qmd-compare-A-get-whole; ../rr/qmd/records.json#qmd-compare-C-search-plus-whole",
+     "result": "holds"
+    },
+    {
+     "claim": "The historical 84.3% comparison demonstrates a correct release-repin answer.",
+     "evidence": "evidence/artifacts/token-e2e-codex-20260926/receipt.json#corrections_to_296",
+     "result": "does-not-hold"
+    },
+    {
+     "claim": "All 30 retained records and 92 attachment references were opened with matching attachment hashes and sizes; the card's value 31 is not the per-tool count.",
+     "evidence": "../rr/qmd/records.json; groups/final-verdict-evidence.json#attachments",
+     "result": "holds"
+    },
+    {
+     "claim": "The fixed scan records 16 MCP and 179 CLI invocations across 64/1,010 workflow children, and 42 MCP invocations across 11/301 Codex workers; TOKEN LANES children were 2/22.",
+     "evidence": "invoke_by_tool.json; invoke_by_tool.py",
+     "result": "holds"
+    },
+    {
+     "claim": "A causal provider-savings result or completed task-matched arm-B experiment is available.",
+     "evidence": "cards/qmd.json#invoke_rates/arm_b_native",
+     "result": "unverified"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "gpt-tokenizer",
+    "qmd"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 62,
+     "qmd": 1
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-b.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 37,
+     "qmd": 4,
+     "ai-memory": 1,
+     "socraticode": 1,
+     "serena": 2
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 2,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 49,
+     "qmd": 3,
+     "ai-memory": 1
+    },
+    "shell_commands": 4,
+    "shell_commands_rtk_prefixed": 1,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296 PASS later corrected: wrong-document retrieval, because the catalog index lacks adoption/. #343: wrong scope in 2 attempts. #316: 6,698->8,126 (the artifact bundled the search listing). #338 CI:…"
+}

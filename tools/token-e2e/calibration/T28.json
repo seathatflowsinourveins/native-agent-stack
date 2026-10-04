@@ -1,0 +1,56 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T28",
+ "clauses": [
+  "The opening contract removes the SIGINT/SIGTERM/SIGHUP cleanup sentence and the SIGKILL/status-started exception, retaining the no-overwrite rule and a simpler interrupted-run receipt guarantee."
+ ],
+ "sources": [
+  {
+   "label": "opening hunk of the patch",
+   "text": "@@ -16,10 +16,8 @@\n 0. Refuses to start if any output of this run already exists\n    (``results-<run-id>.json``, ``native-<run-id>.json``,\n    ``report-<run-id>.md``), then reserves ``results-<run-id>.json``\n-   exclusively. No historical result or failed attempt is ever overwritten.\n-   SIGINT, SIGTERM and SIGHUP stop a run cleanly (see \"Interrupts\" below);\n-   only a signal the runner cannot handle, such as SIGKILL, leaves the\n-   reserved receipt at status ``started``.\n+   exclusively. No historical result or failed attempt is ever overwritten,\n+   and an interrupted run still leaves its reserved receipt behind."
+  },
+  {
+   "label": "diff facts",
+   "text": "bytes: 52631; files: ['run.py']; hunks: 31; added: 166; deleted: 581"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "The opening contract drops the sentence that SIGINT, SIGTERM and SIGHUP stop a run cleanly and the exception that only a signal such as SIGKILL leaves the receipt at status started. It keeps the rule that no historical result or failed attempt is overwritten, and adds the simpler guarantee that an interrupted run still leaves its reserved receipt behind.\n\nSource excerpt: @@ -16,10 +16,8 @@\n 0. Refuses to start if any output of this run already exists\n    (``results-<run-id>.json``, ``native-<run-id>.json``,\n    ``report-<run-id>.md``), then reserves ``results-<run-id>.json``\n-   exclusively. No historical result or failed attempt is ever overwritten.\n-   SIGINT, SIGTERM and SIGHUP stop a run cleanly (see \"Interrupts\" below);\n-   only a signal the runner cannot handle, such as SIGKILL, leaves the\n-   reserved receipt at status ``started``.\n+   exclusively. No historical result or failed attempt is ever overwritten,\n+   and an interrupted run still leaves its reserved receipt behind.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "In that first hunk the run-start rule no longer explains how SIGINT, SIGTERM and SIGHUP end a run or that SIGKILL is what leaves a receipt at started; what remains is the never-overwrite rule plus a plainer promise that an interrupted run leaves its reserved receipt.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "The hunk adds a cleanup sentence for SIGINT, SIGTERM and SIGHUP and keeps the SIGKILL exception, so an interrupted run now cleans up its receipt.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "The hunk removes the signal wording and also removes the rule that no historical result or failed attempt is ever overwritten.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

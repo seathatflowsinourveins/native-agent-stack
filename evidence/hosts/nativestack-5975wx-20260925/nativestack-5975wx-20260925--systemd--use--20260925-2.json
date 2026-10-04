@@ -88,6 +88,16 @@
         "identity_sha256": "a90718ea66d62d8044adb44ee9593c75a88ff91c19671770f1f96bc1a8be7a73",
         "model": "claude-sonnet-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session (claude-opus-5-5); adequacy-checked point 3 against the receipt JSON. Defects confirmed. (1) The claim says systemd reports the validator unit's successful result with status 0, but command 2's retained excerpt stops at 'Fi' (400-character cap) before 'Finished with result: success', 'code=exited/status=0' and REAL_WORKLOAD_SUPERVISED_OK; the remaining output has run-varying runtime and CPU lines, so it cannot be rebuilt from output_sha256. The && chain makes exit 0 imply the greps matched, but the claimed result is in no retained output: the same point-3 gap that held generation 1 at needs_changes. (2) Limitation 4 says the component is this host's existing install under ~/.local/share/codex-ecosystem, while command 1 shows the Ubuntu package (dpkg-query systemd 255.4-1ubuntu8.17). Successor: systemd--use--20260926-2.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T10:22:36Z",
+      "reviewer": {
+        "identity_sha256": "e3e758a4ec14358c858079587aca14d44770aa531b79a646a6b6de49de90efdc",
+        "model": "claude-opus-5-5"
+      }
     }
   ],
   "supersedes": "nativestack-5975wx-20260925--systemd--use--20260925"

@@ -6,6 +6,11 @@ Start with the layer needed for the task in [manifest.json](manifest.json), then
 read its scoped capability decision in [decisions.json](decisions.json). A default
 is a selected way to do a task, not permission to install or activate every tool.
 
+The [October 2 two-host architecture decision](../../docs/decisions/2026-10-02-two-host-north-star-architecture.md)
+reconciles the macOS/workstation roles, current native Sol policy, SDK/gateway
+boundary and Pi release review for starting North Star R&D. Its dated source
+review does not promote a new runtime or replace the scoped receipts below.
+
 The [current layer comparisons](../landscape/foundation.json) explain why each
 choice is retained, what happened to named alternatives, and what evidence would
 change the decision. Open Choices & alternatives
@@ -29,6 +34,10 @@ reports, retained exports and live upstream UIs keep their distinct scopes.
 The [September 20 community review](../../docs/community-native-practice.md)
 explains the selected ECC and Claude practice sources across the sixteen layers of
 that date (the four layers added on 2026-09-22 postdate it).
+The [practice references](practice-references.json) pin the 26 Claude Code practice
+repositories the 2026-09-27 community sweep read (22 community, 4 Anthropic);
+`.github/workflows/practice-references-freshness.yml` reports their drift and
+maintenance weekly and never changes a pin.
 Use the [native Claude profile](../../recipes/claude-native-profile.md) for
 terminal entry, small persistent instructions, selected skills and new-PC checks.
 
@@ -57,7 +66,7 @@ and original results remain in the canonical manifests linked below.
 | Hosting and services | FastAPI, Next.js/React, PostgreSQL, MCPorter/Inspector; platform-specific containers | [Native application installation and checks](../../blueprints/convergence-practice/wsl-application/README.md), [application contract](../../blueprints/convergence-practice/application-delivery/README.md) |
 | Recovery and portability | Restic, ai-memory, Qdrant, Dagu, systemd, native session continuation | [Lifecycle operations](../../adoption/lifecycle.md), [off-host application restore](../../blueprints/convergence-practice/offhost-app-state/README.md) |
 | Observation and inference | OpenTelemetry Collector/otel-tui, Prometheus, Grafana, Loki, Alertmanager, ntfy, AgentsView, ccusage; vLLM/llama.cpp | [Observation setup](../../observability/README.md), [native backends](../../observability/backends/README.md), [GPU compatibility evidence](../../blueprints/convergence-practice/gpu-inference/README.md) |
-| Agent SDKs and runtime workers | Codex CLI/SDK; Claude Agent SDK, OpenHands SDK, Temporal, LangGraph remain deferred | [Native client installation](../../recipes/README.md#component-catalog-install-and-check), [SDK table review](../../docs/foundation-closure-20260921.md#sdk-and-runtime-decisions) |
+| Agent SDKs and runtime workers | Native Codex CLI/SDK first; explicit OmniRoute SDK lane for application needs; Pi remains an optional trial | [Current runtime boundaries and release review](../../docs/decisions/2026-10-02-two-host-north-star-architecture.md#runtime-and-model-contract), [historical SDK table](../../docs/foundation-closure-20260921.md#sdk-and-runtime-decisions) |
 | MCP servers and client surfaces | mcporter, mcp-inspector | [Native project MCP](../../recipes/README.md#native-project-mcp), [other native commands](../../recipes/README.md) |
 | Secrets and credentials | Native per-client login, Gitleaks | [Native CI/security verification](../../blueprints/convergence-practice/ci-security/README.md), [lifecycle operations](../../adoption/lifecycle.md) |
 | Git practice and GitHub automation | Worktrunk, gh CLI, Difftastic, codex-for-claude review bridge | [GitHub automation handbook](../../docs/github-automation.md), [optional Codex for Claude](../../recipes/README.md#optional-codex-for-claude) |

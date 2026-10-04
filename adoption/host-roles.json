@@ -41,6 +41,10 @@
       "host_id": "macos-m5pro-20260924",
       "superseded_by": "mac-coordinator-64gb-20260925",
       "source": "PR #253 body: 'the replacement coordinator Mac'"
+    },
+    {
+      "host_id": "wsl-authoring-20260923",
+      "note": "The WSL2 authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU), measured by scripts/hardware_profile.py --record-host. Its host receipts use host_id wsl-authoring-20260923; the older this-host-20260923 profile and the rtx5090-laptop-20260923 receipt describe the same machine."
     }
   ]
 }

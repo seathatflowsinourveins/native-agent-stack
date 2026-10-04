@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "id": "spy-one-zero-engine-trial-ml4t-backtest-mappings",
+  "trial": "spy-one-zero-engine-trials-20260926",
+  "arm": "ml4t-backtest",
+  "gate_context": "Comparison arm beside gate G-a (blueprints/us-equities/engine-nautilus/spy-parity). It changes no gate status, catalog decision or engine selection.",
+  "drafted_utc_date": "2026-09-26",
+  "case": "one_zero",
+  "frozen_before_execution": true,
+  "preregistration": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/preregistration.json",
+    "sha256": "73ea82e9007d92e1b00feb86ba190d5fb8842b7d14962c651b0caf74b8522b38",
+    "commit": "a74ed16d7084a4d84cd31ce3116a95457baa913c",
+    "binding": "arm_manifests.ml4t-backtest.binding. The projection rule in arm_manifests.rules.projection over this file must equal it exactly; fixture_port.py refuses to run otherwise."
+  },
+  "status_vocabulary": {
+    "resolved": "A concrete pinned-engine mapping exists, is implemented here and is checked by a test or by the replay itself.",
+    "unsupported": "The pinned engine cannot express the LEAN behaviour. Recorded as a deviation; never defaulted, approximated silently or absorbed by tolerance.",
+    "blocked": "Not decided here. The dependent comparison cannot pass until it is decided."
+  },
+  "evidence_class": "HIST",
+  "case_configuration": {
+    "case": "one_zero",
+    "seed": null,
+    "account_type": "MARGIN",
+    "use_random_ids": false,
+    "fill_model": {
+      "profile": "lean",
+      "execution_mode": "next_bar",
+      "execution_price": "open",
+      "slippage_model": "none"
+    },
+    "fee_model": {
+      "profile": "lean",
+      "commission_model": "none"
+    },
+    "window": {
+      "symbol": "SPY",
+      "start": "2019-12-02",
+      "end": "2020-04-30"
+    },
+    "plan_owned_fields": [
+      "initial_cash_usd",
+      "sizing_buffer",
+      "target",
+      "fee_usd",
+      "slippage"
+    ],
+    "note": "Preregistered in preregistration.json (arm_manifests.ml4t-backtest.binding) for the choices the frozen plan does not express. compare.py binds the plan-owned fields to historical-simulation/plan.json and the seven fields above to this block, and refuses a receipt that disagrees with either. seed is null because the configuration has no stochastic component; use_random_ids is false because ml4t order ids are sequential per engine."
+  },
+  "engine": {
+    "package": "ml4t-backtest",
+    "version": "0.1.12",
+    "license": "MIT",
+    "upstream_repository": "https://github.com/ml4t/backtest",
+    "upstream_tag": "v0.1.12",
+    "upstream_commit": "672804b36915742fe18af9cd09b44e9839d39d6f",
+    "wheel": "ml4t_backtest-0.1.12-py3-none-any.whl",
+    "wheel_sha256": "8f5dfe7c2ab96c497136934448bb3211d0d3bf8ec24e71b34229ca5cf53e393b",
+    "companion_packages": {
+      "ml4t-specs": {
+        "version": "0.1.5",
+        "wheel_sha256": "4c8315f5da52674a1132dafa53568f4e1b02bbd6da400399d61b33d459315117",
+        "upstream_tag": "v0.1.5",
+        "upstream_commit": "07db811feac5541882201440eae4238c9dd9a39e"
+      }
+    },
+    "environment": "$ENV = ~/.local/share/codex-ecosystem/engine-trials-20260926/ml4t-backtest-0.1.12 (outside every checkout)",
+    "interpreter": "$ENV/bin/python, a uv 0.12.17 venv over /usr/bin/python3.12 (CPython 3.12.3)",
+    "lock": {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock",
+      "sha256": "e168a18f30b48e50d024b19fd1f734b90dc4cef70627d70e637431fe7505c791",
+      "packages": 15
+    },
+    "evidence_basis": "Pinned upstream documentation fetched at the tag commit (sha256 values in preregistration.json upstream_documents) and the hash-verified wheel source; the installed package files equal the unpacked wheel. Mechanism probes on synthetic bars under the run sandbox are recorded in run.json."
+  },
+  "configuration": {
+    "preset": "lean",
+    "construction": "profile = ml4t.backtest.profiles.get_profile_config('lean'); profile['commission'] = {'model': 'none', 'rate': 0.0}; profile['calendar'] = {'calendar': None, 'data_frequency': '1h', 'enforce_sessions': False}; BacktestConfig.from_dict(profile, preset_name='lean', strict=True)",
+    "declared_override": "commission: the whole section is replaced (declared deviation D4). Replacing only the model key would keep per_share 0.005, and Broker.from_config (broker.py lines 344-350 in the wheel) turns a none model with a positive per_share into a per-share commission.",
+    "additions": {
+      "calendar": "config section calendar: calendar None, data_frequency 1h (DataFrequency.HOURLY), enforce_sessions False; timezone stays the from_dict default UTC",
+      "feed": "DataFeed(prices_df=frame, feed_spec=FeedSpec(timestamp_semantics=bar_close)); entity column 'asset' (auto-detected), no session_col",
+      "funding": "Engine(feed, strategy, config, funding_df=frame) with columns timestamp, asset, amount_per_unit"
+    },
+    "record": "config.to_dict() of the engine's resolved configuration goes into run.json and the receipt."
+  },
+  "oracle": {
+    "receipt": "blueprints/us-equities/historical-simulation/receipt.json",
+    "receipt_id": "native-historical-leverage-stress-20260919",
+    "receipt_sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9",
+    "receipt_sha256_source": "acceptance-plan.md section 1 frozen table, row 'Published baseline receipt'",
+    "plan": "blueprints/us-equities/historical-simulation/plan.json",
+    "plan_sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+    "lean_source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+  },
+  "inputs": {
+    "data_root": "<LEAN_DATA>/Data (retained bundled sample; located on this host at ~/.local/share/codex-ecosystem/tools/lean-985ef30/Data)",
+    "frozen_sha256": {
+      "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+      "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+      "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf",
+      "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+      "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899"
+    },
+    "all_five_verified_present_and_matching": true
+  },
+  "inputs_note": "The inputs block is copied unchanged from spy-parity/mapping-manifest.json, as the preregistration requires; its data_root text names the host that block was written on. On nativestack-5975wx-20260925 the data root is ~/.local/share/codex-ecosystem/lean/Lean/Data, where all five inputs were re-hashed on 2026-09-26 and match.",
+  "mappings": [
+    {
+      "id": "instrument_identity",
+      "lean_concept": "SPY US equity, USD, raw normalization, integer shares, resolved through the bundled map file",
+      "engine_concept": "Asset key SPY in the DataFeed entity column 'asset' and in every broker order; integer shares (lean profile share_type integer); contract multiplier 1.0 because no ContractSpec is configured. Prices reach the engine as float(Decimal row string) and come back through the preregistered float projection.",
+      "status": "resolved",
+      "decision": "Asset key SPY in the ml4t feed and broker; integer shares (preset share_type integer); prices reach the engine as floats of the 4-decimal Decimal rows and come back through the float projection rule. SPY is a simulation identifier only, not a broker identity.",
+      "evidence": [
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/profiles.py lines 308-358 (LEAN_PROFILE, position_sizing share_type integer)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/broker.py lines 989-992 (get_multiplier returns 1.0 without a ContractSpec)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/datafeed.py lines 80 and 138-156 (entity column auto-detected from symbol, asset, product, ticker)"
+      ],
+      "validation": "convert.check_map_file refuses a missing or renamed ticker over the window; the frozen map file resolves spy/P for 1998-01-02 through 2050-12-31 with no rename in the window. The port projects every engine-reported price back to the 0.0001 tick and records max_abs_adjustment; a value above 0.000001 is a guard failure.",
+      "limitations": [
+        "SPY here is a simulation identifier only. It is not an IBKR contract ID, an Alpaca asset ID or any broker identity."
+      ]
+    },
+    {
+      "id": "raw_data_decoding",
+      "lean_concept": "ZIP member spy.csv, one row per hourly bar, prices as integer deci-cents scaled by 10,000, volume in whole shares, raw (unadjusted) normalization",
+      "engine_concept": "One Polars DataFrame of exactly the 725 converted rows: timestamp (bar end, Datetime us UTC), asset, open, high, low and close as floats of the 4-decimal Decimal strings, volume as integer shares. No other row, column, padding, forward fill or resampling.",
+      "status": "resolved",
+      "decision": "convert.py, loaded unchanged by path, decodes the frozen inputs; the engine receives exactly the 725 converted rows and nothing else.",
+      "evidence": [
+        "blueprints/us-equities/engine-nautilus/spy-parity/convert.py sha256 08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65 (pinned by the preregistration; the port refuses any other bytes)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/datafeed.py lines 405-525 (per-bar payload built from the frame's own columns)"
+      ],
+      "validation": "The port refuses to construct an engine unless convert.verify_inputs returns the five frozen hashes and the converted rows number 725 and hash to 6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc. compare.py --lean-data re-hashes the inputs and re-derives and re-hashes the rows at comparison time.",
+      "limitations": [
+        "These are bundled upstream sample bytes. Byte identity is not vendor authenticity, point-in-time availability or market-wide coverage."
+      ]
+    },
+    {
+      "id": "sessions_and_time",
+      "lean_concept": "Hourly rows labelled by local New York bar start; a bar is complete at start + 1 hour; XNYS session membership over 2019-12-02 to 2020-04-30",
+      "engine_concept": "Feed timestamps are each row's bar END instant (ts_event_ns) as tz-aware UTC, declared with FeedSpec timestamp_semantics bar_close. Config calendar None, enforce_sessions False, data_frequency 1h; no session_col, so the engine iterates every supplied timestamp and applies no exchange calendar.",
+      "status": "resolved",
+      "decision": "Feed timestamps are each row's bar END instant (ts_event_ns) as tz-aware UTC. calendar stays None and enforce_sessions False, so no session filter can drop the 16:00 or 13:00 bars. The declared short session 2019-12-24 (4 rows) is carried from the Nautilus manifest.",
+      "full_session_rows": 7,
+      "known_short_sessions": {
+        "2019-12-24": 4
+      },
+      "known_short_sessions_reason": "2019-12-24 is the XNYS Christmas Eve half day, closing at 13:00 New York, so it yields the 09:00, 10:00, 11:00 and 12:00 rows only. 104 sessions x 7 rows - 3 missing rows = 725.",
+      "evidence": [
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/engine.py lines 201-345 (calendar session filtering runs only when a calendar is configured) and 359 (session mode only with a session_col)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/datafeed.py lines 297-345 (one feed event per distinct timestamp, in sorted order)"
+      ],
+      "validation": "convert.check_sessions refuses any undeclared short or long session. The port checks that the engine dispatched on_data exactly once for each of the 725 end instants, in order, with skipped_bars 0 and 725 recorded portfolio states.",
+      "limitations": [
+        "Session membership comes from the retained daily file through convert.py; the engine applies no exchange calendar in this configuration.",
+        "Bundled history carries no original availability attestation, so event time is preserved but observation time is not independently attested."
+      ]
+    },
+    {
+      "id": "decision_visibility",
+      "lean_concept": "A completed 16:00 bar may form an intent; the fill must land on a later session",
+      "engine_concept": "Strategy.on_data at the decision bar's timestamp (its end, 16:00 New York) forms the intent from that completed bar and submits a market order. Under NEXT_BAR an order submitted during a bar is excluded from that bar's processing and first becomes eligible at the next bar's open.",
+      "status": "resolved",
+      "decision": "on_data at the decision bar's timestamp (its end, 16:00 New York) forms the intent from that completed bar. Under NEXT_BAR the order is eligible only at the next bar, which check_decision_bar_is_session_final requires to be the next session's first bar; check_causality runs on the native fills.",
+      "evidence": [
+        "docs/user-guide/execution-semantics.md lines 11-17 and 43-44 at 672804b36915742fe18af9cd09b44e9839d39d6f (sha256 0abc331598e4f5fa8dba6003b165bb6e4fac50da3f5d760f3135cf05214c591f)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/core/execution_engine.py lines 650-675 (orders submitted in the current bar are not eligible under NEXT_BAR)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/core/order_book.py line 86 (an order records the engine clock at submission as created_at)"
+      ],
+      "validation": "fixture_strategy.check_decision_bar_is_session_final at each decision, fixture_strategy.check_causality on the native fills of both runs, and the engine clock at submission (order.created_at) recorded beside each intent and required to be at or after the decision instant and before the fill.",
+      "limitations": [
+        "The guard proves the decision bar was not used to execute. Session-final decision bars are what make the next eligible bar an opening bar; that dependency is recorded under market_on_open_proxy."
+      ]
+    },
+    {
+      "id": "market_on_open_proxy",
+      "lean_concept": "MarketOnOpenOrder filled by EquityFillModel.MarketOnOpenFill at the next session's first hourly bar OPEN, stamped at that bar's end (10:00 New York)",
+      "engine_concept": "Ordinary OrderType.MARKET order from on_data under ExecutionMode.NEXT_BAR with ExecutionPrice.OPEN: filled in the next bar's _process_orders(use_open=True) at that bar's open and stamped with that bar's timestamp, the bar end instant.",
+      "status": "resolved",
+      "decision": "An ordinary market order from on_data under NEXT_BAR with execution_price open fills at the next bar's open, stamped with that bar's timestamp (docs/user-guide/execution-semantics.md lines 11-17 and 43-44; engine.py 480-509; execution/fill_executor.py 244). Faithful to LEAN's MarketOnOpenFill only because the decision bar is session-final.",
+      "evidence": [
+        "docs/user-guide/execution-semantics.md lines 11-17 and 43-44 at 672804b36915742fe18af9cd09b44e9839d39d6f",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/engine.py lines 492-509 (NEXT_BAR: _process_orders(use_open=True) before the strategy callback)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/core/fill_engine.py lines 220-241 (fill price from the configured execution_price, open when use_open)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/execution/fill_executor.py line 244 (Fill.timestamp is the current bar time)"
+      ],
+      "validation": "The port records each native fill's price, price source and instant and checks that it lands on the next session's first bar at that bar's open (guards fill_at_next_session_first_bar and fill_price_is_fill_bar_open). compare.py compares price and instant against the oracle with zero tolerance.",
+      "limitations": [
+        "Faithful to LEAN's MarketOnOpenFill only because each decision bar is its session's final bar; a decision on an earlier bar would fill at the next hourly bar's open, which is not an opening auction.",
+        "The pre-open target-intent contract with OPG time-in-force, documented for daily opening auctions, is not used.",
+        "docs/user-guide/profiles.md lines 37-40 scope the lean profile to daily US equities; hourly bars are outside that documented scope and this trial says so."
+      ]
+    },
+    {
+      "id": "distributions_and_cash",
+      "lean_concept": "Raw-normalized cash dividends posted to the account at the ex-date, derived from the bundled factor file; unexpected splits block the fixture",
+      "engine_concept": "Engine(..., funding_df=frame): one row per derived distribution with timestamp = the ex-date session's first converted row (its bar END instant), asset SPY and amount_per_unit = -per_share. The engine posts cash_delta = -quantity * multiplier * amount_per_unit from its own position before the orders eligible at that timestamp and records a FundingPayment, zero when flat.",
+      "status": "resolved",
+      "decision": "Engine-posted through the documented funding input: one funding_df row per derived distribution at the ex-date session's first bar end, amount_per_unit = -per_share; the engine computes cash_delta = -quantity * multiplier * amount_per_unit from its own position (broker.py 458-498; docs/user-guide/market-impact.md lines 229-268). Declared repurposing of a perpetual-futures input and a 10-hour posting-instant difference from LEAN's 00:00 ex-date.",
+      "derivation": "per_share from convert.derive_distributions on the frozen factor file, never the oracle: 1.57 for ex-date 2019-12-20 and 1.41 for ex-date 2020-03-20.",
+      "evidence": [
+        "docs/user-guide/market-impact.md lines 229-269 at 672804b36915742fe18af9cd09b44e9839d39d6f (sha256 74c18a25955936e6c66b89cd6384cb32cb3e4b46c45937c1e65c306a011afc41)",
+        "docs/tutorials/costs-and-funding.md at the same commit (sha256 5bed400f9fe5576e9e39c887319ea4c0aebbe90a443345dbdddf5e66898dad60)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/broker.py lines 458-498 (_apply_funding)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/engine.py lines 474-476 (funding applied after the bar update and before any order processing or strategy callback)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/funding.py lines 36-81 (events must match feed timestamps and feed assets)"
+      ],
+      "validation": "engine_posted is true for an event exactly when the engine recorded a FundingPayment for it, and the ledger carries that payment's cash_delta, quantity and timestamp. The port checks one payment per funding row and no other payment, and that the engine's per-bar cash changes only at fills and nonzero payments. compare.py rebuilds the cash path from the receipt and checks the distribution total and the native end cash against the oracle.",
+      "limitations": [
+        "Declared repurposing: the funding input is documented for perpetual futures; its amount_per_unit semantics are a generic per-unit cash flow, which is what a raw-normalized cash dividend is.",
+        "Postings land at the ex-date's first bar end, 10:00 New York (1576854000 and 1584712800), not at LEAN's 00:00 ex-date instants (1576818000 and 1584676800). Nothing can fill between 00:00 and that bar, so the eligible quantity is the same; the v1 contract does not compare distribution instants against the oracle.",
+        "Bar prices stay raw-normalized. Payable dates, withholding and short-position debits are outside one_zero."
+      ]
+    },
+    {
+      "id": "costs_and_rounding",
+      "lean_concept": "one_zero: zero fees, zero slippage. one_stress and later: 1 USD per order plus 20 bp adverse slippage with an explicit rounding stage",
+      "engine_concept": "lean profile with the commission section replaced by {'model': 'none', 'rate': 0.0} (declared deviation D4 from the preset's per_share 0.005 with a 1.00 minimum) and slippage model none (preset), which Broker.from_config builds as NoCommission and NoSlippage.",
+      "status": "resolved",
+      "decision": "Commission model none (declared override of the lean preset's per_share 0.005 with a 1.00 minimum) and slippage none (preset). The port reads each native fill's commission back and records any nonzero value as a guard failure.",
+      "evidence": [
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/profiles.py lines 308-358 (LEAN_PROFILE commission per_share 0.005, minimum 1.0; slippage none)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/broker.py lines 302-441 (from_config builds the commission and slippage models)",
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/models.py lines 89 and 214 (NoCommission, NoSlippage)"
+      ],
+      "validation": "The port checks the resolved configuration (commission none with zero rate, per_share, per_trade and minimum; slippage none) and the broker's model types, and reads commission and slippage back from every native fill.",
+      "limitations": [
+        "Zero-cost parity says nothing about the stressed cases' quantities or fill schedule."
+      ],
+      "blocked_extension": {
+        "id": "costs_and_rounding_stress",
+        "status": "blocked",
+        "reason": "The 1 USD per order and 20 bp adverse slippage mapping and the rounding stage for the stressed cases are not decided by this trial."
+      }
+    },
+    {
+      "id": "margin_and_adaptive_state",
+      "lean_concept": "SecurityMarginModel(2m) with DefaultMarginCallModel, post-processing marks, hourly peak and a one-way 5% drawdown latch",
+      "engine_concept": "The lean profile's margin account: allow_short_selling and allow_leverage true, initial, long-maintenance and short-maintenance margin 0.5. Not established as equivalent to LEAN's margin models.",
+      "status": "blocked",
+      "decision": "The lean preset's margin account (allow_leverage, initial and maintenance margin 0.5) is not claimed equivalent to LEAN's SecurityMarginModel(2m) or DefaultMarginCallModel. one_zero requests 1x, so no leverage, margin call or latch is exercised or claimed.",
+      "evidence": [
+        "ml4t_backtest-0.1.12 wheel ml4t/backtest/profiles.py lines 308-358 (LEAN_PROFILE account section)"
+      ],
+      "validation": "The port records rejected orders and the account settings; one_zero expects none.",
+      "limitations": [
+        "Equivalence to SecurityMarginModel(2m), DefaultMarginCallModel timing and quantity, the hourly peak and the one-way 5% latch remains undecided and blocks two_zero, two_stress, adaptive_stress and over_limit.",
+        "The account type (MARGIN) differs from the Nautilus arm's CASH account; at 1x with no shorting this has no measured effect on one_zero, and no margin-remaining series is compared."
+      ]
+    }
+  ],
+  "dependent_comparison_status": {
+    "one_zero": "all rows compared by compare.py are resolved in this manifest; margin_and_adaptive_state is blocked but not exercised at 1x",
+    "one_stress": "blocked_by:costs_and_rounding_stress",
+    "two_zero": "blocked_by:margin_and_adaptive_state",
+    "two_stress": "blocked_by:margin_and_adaptive_state,costs_and_rounding_stress",
+    "adaptive_stress": "blocked_by:margin_and_adaptive_state",
+    "over_limit": "blocked_by:margin_and_adaptive_state"
+  },
+  "generated_id_normalization": {
+    "declared_before_execution": true,
+    "applied_fields": [],
+    "rule": "ml4t order ids are sequential within each engine, so nothing is normalized. The private per-run reports and the normalized economic hash keep them raw; published files carry order ordinals only.",
+    "never_normalized": [
+      "timing",
+      "prices",
+      "quantities",
+      "fees",
+      "distributions",
+      "position transitions",
+      "decision order"
+    ]
+  }
+}

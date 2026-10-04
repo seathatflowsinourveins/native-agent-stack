@@ -568,21 +568,21 @@ openai==3.16.2 \
     # via
     #   -c adoption/sdk/accepted-constraints.txt
     #   -r blueprints/us-equities/workers/requirements.txt
-openai-codex==0.154.0 \
-    --hash=sha256:55a2675ab92ad3f900bc6572ab9d7da857d089da4e2008ce3fa8539154e1c2c3 \
-    --hash=sha256:b5f354e1280621d0f5e28313ecf6974d2a98bcf0b088dbe791dc6df5044d2214
+openai-codex==0.160.0 \
+    --hash=sha256:31c94d69a81794aaadfaad371c5f95480a28cd7703d9fc7ca3c574286cacaff3 \
+    --hash=sha256:61d2d855ca2ebedfd51280fbeb60ff31fc47ccbd55ebce186505e3f3da096921
     # via
     #   -c adoption/sdk/accepted-constraints.txt
     #   -r blueprints/us-equities/workers/requirements.txt
-openai-codex-cli-bin==0.154.0 \
-    --hash=sha256:11ba8fbef6f3bafaed39b745a2b0b5648bf00c8d168e241b314d86000d577fcb \
-    --hash=sha256:18c1235f7a3ece9c20ed7b02cba5501e0aec0b4027fed4c3805a703d7d745493 \
-    --hash=sha256:1c1812526b7b1cc497de30392ce018125b017e96010824b4ca598514f44ce5be \
-    --hash=sha256:4f32974a4379e58f5d2677c4d5097aeaeef7e249c04ca8d66b569503999ba53b \
-    --hash=sha256:88f330201b527ee0d740d14aaea336f71e2513ba087bc9429373dc01fcd09f0d \
-    --hash=sha256:ce74d702b77f0e18df24cc47f5f5c14d88ce84a5df59ea07c0169bc92d0a98e2 \
-    --hash=sha256:e850d84a2945f90ceb7fd609468d08fd654a00323f351db6bb2b204b7813ca0c \
-    --hash=sha256:f043e8fe1323246583ee35bf3c4c021cc9bfd21d2715f12fb8a743c8ebf57667
+openai-codex-cli-bin==0.160.0 \
+    --hash=sha256:06571f34b99feee1f1116577f66b82b1b6d582993e07d2099e20e346c73de374 \
+    --hash=sha256:448a9510d4dc7ab74eaefb0c3f9bad8f814a12c4d87f40d1e12bba7a9523df27 \
+    --hash=sha256:64e9a3b64b92babd7cb3c35b5ee518a3983c891ce1fe839ce052eb4040307391 \
+    --hash=sha256:6543e1d7f9ffb3f84c61b0234b62fd95c1d5f896310392cc8b03605100293f32 \
+    --hash=sha256:a1245cc0c7d390d22af4920d512ceae8519dee2cf51d8eec56f3899861a8160a \
+    --hash=sha256:ae2f1c3fca1394046b301c108fd719c9be32f5fab999fc3dcf6002a5d32e03b7 \
+    --hash=sha256:b0664ef64a57f1d00ebac1b783089557b97a53872383bb7cbe288e4015769a15 \
+    --hash=sha256:c9b472e8928d8f94f65e43ba4928e3ecac071ccf8680bbb8281334e32cec409b
     # via
     #   -c adoption/sdk/accepted-constraints.txt
     #   openai-codex

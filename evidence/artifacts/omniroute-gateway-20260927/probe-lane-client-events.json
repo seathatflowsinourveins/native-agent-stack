@@ -1,0 +1,59 @@
+{
+ "probe": "scripts/probe_lane.py runs before run 2, from their Codex events files; the probe's gateway listing for these runs was not kept",
+ "derivation": "scripts/derive_probe_records.py.txt; see the README",
+ "runs": [
+  {
+   "started_utc": "2026-09-27T06:32:01Z",
+   "event_types": {
+    "error": 6,
+    "thread.started": 1,
+    "turn.failed": 1,
+    "turn.started": 1
+   },
+   "item_types": {},
+   "commands": [],
+   "final_is_marker": false,
+   "errors": [
+    "Reconnecting... 1/5 (We\u2019re currently experiencing high demand, which may cause temporary errors.)",
+    "Reconnecting... 2/5 (We\u2019re currently experiencing high demand, which may cause temporary errors.)",
+    "Reconnecting... 3/5 (We\u2019re currently experiencing high demand, which may cause temporary errors.)",
+    "Reconnecting... 4/5 (We\u2019re currently experiencing high demand, which may cause temporary errors.)",
+    "Reconnecting... 5/5 (We\u2019re currently experiencing high demand, which may cause temporary errors.)",
+    "We\u2019re currently experiencing high demand, which may cause temporary errors."
+   ],
+   "turn_failed": "We\u2019re currently experiencing high demand, which may cause temporary errors.",
+   "usage": null
+  },
+  {
+   "started_utc": "2026-09-27T06:58:50Z",
+   "event_types": {
+    "item.completed": 3,
+    "item.started": 1,
+    "thread.started": 1,
+    "turn.completed": 1,
+    "turn.started": 1
+   },
+   "item_types": {
+    "agent_message": 1,
+    "command_execution": 1,
+    "reasoning": 1
+   },
+   "commands": [
+    {
+     "exit_code": 0,
+     "marker_in_output": true
+    }
+   ],
+   "final_is_marker": true,
+   "errors": [],
+   "turn_failed": null,
+   "usage": {
+    "input_tokens": 27996,
+    "cached_input_tokens": 13568,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 374,
+    "reasoning_output_tokens": 293
+   }
+  }
+ ]
+}

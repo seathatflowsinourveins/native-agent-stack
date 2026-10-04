@@ -1,0 +1,157 @@
+[
+ {
+  "type": "thread.started",
+  "thread_id": "<thread-id>"
+ },
+ {
+  "type": "turn.started"
+ },
+ {
+  "type": "item.completed",
+  "item": {
+   "id": "item_0",
+   "type": "agent_message",
+   "text": "I\u2019ll make the three context-mode calls in order and return their outputs verbatim.\n"
+  }
+ },
+ {
+  "type": "item.started",
+  "item": {
+   "id": "item_1",
+   "type": "mcp_tool_call",
+   "server": "context-mode",
+   "tool": "ctx_execute",
+   "arguments": {
+    "language": "shell",
+    "code": "pwd"
+   },
+   "result": null,
+   "error": null,
+   "status": "in_progress"
+  }
+ },
+ {
+  "type": "item.completed",
+  "item": {
+   "id": "item_1",
+   "type": "mcp_tool_call",
+   "server": "context-mode",
+   "tool": "ctx_execute",
+   "arguments": {
+    "language": "shell",
+    "code": "pwd"
+   },
+   "result": {
+    "content": [
+     {
+      "type": "text",
+      "text": "```shell\npwd\n```\n\n/scratch/npm-live/wP1\n"
+     }
+    ],
+    "structured_content": null
+   },
+   "error": null,
+   "status": "completed"
+  }
+ },
+ {
+  "type": "item.started",
+  "item": {
+   "id": "item_2",
+   "type": "mcp_tool_call",
+   "server": "context-mode",
+   "tool": "ctx_execute_file",
+   "arguments": {
+    "path": "/scratch/npm-live/wP1/p1.txt",
+    "language": "javascript",
+    "code": "console.log(FILE_CONTENT.trim())"
+   },
+   "result": null,
+   "error": null,
+   "status": "in_progress"
+  }
+ },
+ {
+  "type": "item.completed",
+  "item": {
+   "id": "item_2",
+   "type": "mcp_tool_call",
+   "server": "context-mode",
+   "tool": "ctx_execute_file",
+   "arguments": {
+    "path": "/scratch/npm-live/wP1/p1.txt",
+    "language": "javascript",
+    "code": "console.log(FILE_CONTENT.trim())"
+   },
+   "result": {
+    "content": [
+     {
+      "type": "text",
+      "text": "path=/scratch/npm-live/wP1/p1.txt\n```javascript\nconsole.log(FILE_CONTENT.trim())\n```\n\nfile of worker P1\n"
+     }
+    ],
+    "structured_content": null
+   },
+   "error": null,
+   "status": "completed"
+  }
+ },
+ {
+  "type": "item.started",
+  "item": {
+   "id": "item_3",
+   "type": "mcp_tool_call",
+   "server": "context-mode",
+   "tool": "ctx_execute",
+   "arguments": {
+    "language": "shell",
+    "code": "echo DENYPROBE"
+   },
+   "result": null,
+   "error": null,
+   "status": "in_progress"
+  }
+ },
+ {
+  "type": "item.completed",
+  "item": {
+   "id": "item_3",
+   "type": "mcp_tool_call",
+   "server": "context-mode",
+   "tool": "ctx_execute",
+   "arguments": {
+    "language": "shell",
+    "code": "echo DENYPROBE"
+   },
+   "result": {
+    "content": [
+     {
+      "type": "text",
+      "text": "Command blocked by security policy: matches deny pattern Bash(echo DENYPROBE*)"
+     }
+    ],
+    "structured_content": null
+   },
+   "error": null,
+   "status": "failed"
+  }
+ },
+ {
+  "type": "item.completed",
+  "item": {
+   "id": "item_4",
+   "type": "agent_message",
+   "text": "/scratch/npm-live/wP1\nfile of worker P1\nCommand blocked by security policy: matches deny pattern Bash(echo DENYPROBE*)"
+  }
+ },
+ {
+  "type": "turn.completed",
+  "usage": {
+   "input_tokens": 68935,
+   "cached_input_tokens": 58240,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 515,
+   "reasoning_output_tokens": 106
+  }
+ }
+]

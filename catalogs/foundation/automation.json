@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-09-22",
+  "reviewed_at": "2026-10-02",
   "purpose": "Selected GitHub automation with source-backed suitability and bounded observed results; not a count of repositories or an instruction to activate optional tools.",
   "handbook": "docs/github-automation.md",
   "resolution_record": "docs/tasks/2026-09-20-automation-resolution.md",
@@ -80,12 +80,12 @@
   },
   "interfaces": [
     {
-      "repository": "rhysd/actionlint",
-      "version": "1.7.12",
-      "revision": "914e7df21a07ef503a81201c76d2b11c789d3fca",
-      "source": "https://github.com/rhysd/actionlint/tree/914e7df21a07ef503a81201c76d2b11c789d3fca",
+      "repository": "kjanat/actionlint",
+      "version": "1.17.0",
+      "revision": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+      "source": "https://github.com/kjanat/actionlint/tree/08bb2c4f0d039744455b87aef1c647fb8b66d37b",
       "command": "actionlint .github/workflows/*.yml",
-      "selection": "Maintained workflow expression, syntax and shell checks in routine validation; binary digest and upstream provenance verified."
+      "selection": "Workflow expression, syntax and shell checks in the required validate job; binary digest and upstream provenance verified. Selected 2026-09-28 (plan move M2): kjanat/actionlint v1.17.0, the maintained fork of rhysd/actionlint (immutable release; annotated tag 2da2ceb4 points to commit 08bb2c4f; SLSA provenance signed by kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0), replaced rhysd/actionlint 1.7.12 (914e7df2) in the required step after the non-required actionlint-successor job and the 1.7.12 step both succeeded in all 25 push runs of validate.yml on main from b60d5182 to f0219263; evidence/artifacts/actionlint-successor-swap-20260928/. Overturn if rhysd/actionlint resumes releases or GitHub ships an official workflow linter CLI. Note of 2026-09-27, kept as history: Upstream stale as re-observed with gh api on 2026-09-27 22:03 EDT (2026-09-28T02:03Z): last commit on main 2026-04-19 (011a6d15), no commit on main since 2026-06-29, latest release still v1.7.12 (2026-03-30), and rhysd/actionlint#719 \"rhysd (the author) inactive. Any active forks?\" open since 2026-08-06. The selection stays 1.7.12 until the non-required validate.yml actionlint-successor job (kjanat/actionlint v1.17.0) shows no unexplained difference; evidence/artifacts/actionlint-successor-parity-20260927/."
     },
     {
       "repository": "zizmorcore/zizmor",
@@ -214,8 +214,8 @@
     {
       "workflow": ".github/workflows/catalog-freshness.yml",
       "job": "freshness",
-      "schedule": "17 6 * * 1",
-      "purpose": "Reruns extract_layers.py + github_freshness.py, rebuilds a manifest with build_manifest.py against an empty lanes.json (skips interactive lane review, still recomputes the real pin/upstream baseline), diffs it against catalogs/sota-convergence/manifest-20260922.json, and appends a fixed-tool pin-drift table to the job summary. Writes and commits nothing; uploads a 30-day artifact.",
+      "schedule": ["17 6 * * 1", "17 6 * * 0,2-6"],
+      "purpose": "Reports daily at 06:17 UTC through disjoint Monday and other-day triggers. Reruns extract_layers.py + github_freshness.py, rebuilds a manifest with build_manifest.py against an empty lanes.json (skips interactive lane review, still recomputes the real pin/upstream baseline), diffs it against catalogs/sota-convergence/manifest-20260922.json, and appends a fixed-tool pin-drift table to the job summary. This freshness job writes and commits nothing; it uploads a 30-day artifact. The separate guarded proposal job is eligible on Monday with CATALOG_FRESHNESS_PROPOSE=true, or by explicit manual open_pr=true dispatch.",
       "required_check": false
     },
     {
@@ -421,5 +421,40 @@
       "replacement": "--fail-on high with a reviewed .grype.yaml (no ignores needed on 2026-09-22).",
       "record": "docs/decisions/2026-09-22-github-automation-closure.md"
     }
-  ]
+  ],
+  "current_practice_20261002": {
+    "observed_at": "2026-10-02",
+    "source": "Read-only gh api GETs of ruleset 23739774 and the repository settings; .github/main-ruleset.json matches",
+    "required_checks": [
+      "validate",
+      "token-report",
+      "secret-scan",
+      "dependency-review",
+      "osv-scanner",
+      "verdict-review-gate",
+      "validate-macos",
+      "sota-sources"
+    ],
+    "strict_required_status_checks": false,
+    "allowed_merge_methods": [
+      "squash"
+    ],
+    "allow_auto_merge": true,
+    "auto_merge_used_for_bot_prs": false,
+    "delete_branch_on_merge": true,
+    "secret_scanning": {
+      "secret_scanning": "enabled",
+      "push_protection": "enabled",
+      "non_provider_patterns": "disabled",
+      "validity_checks": "disabled"
+    },
+    "secret_scan_gate": "gitleaks 8.30.1 in job secret-scan (required)",
+    "secret_scan_trial": "betterleaks v1.8.1 in job secret-scan-betterleaks (not required, report-only)",
+    "merge_guard": "docs/lanes.md#labels-and-prs",
+    "supersedes": [
+      "active_baseline.required_checks (3 checks, 2026-09-22)",
+      "the 2026-09-23 ruleset snapshot in docs/github-automation.md"
+    ],
+    "decision_record": "docs/decisions/2026-10-02-github-automation-practice.md"
+  }
 }

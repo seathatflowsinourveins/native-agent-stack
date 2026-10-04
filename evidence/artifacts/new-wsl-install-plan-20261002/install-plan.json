@@ -1,0 +1,2919 @@
+{
+  "schema_version": 2,
+  "generated_at_utc": "2026-10-02T02:41:24Z",
+  "revised_at_utc": "2026-10-03T18:26:54Z",
+  "base": "Ubuntu 26.04.1 WSL 2",
+  "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable, after their measurement settled them in the manifest: they are created through the running model server, which the plan does not start, so the default run skips them and --only installs each; as plan rows their install and acceptance commands have not run anywhere (the measurement created and ran the same models in a throwaway distribution). Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply as interim installs under amendment 3 of the manifest's decision rule, and the added statusline row), and research-harnesses, tobi-qmd and gpt-gateway are revised; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination.",
+  "owners": [
+    {
+      "layer": "native-clients",
+      "slot": "claude-code",
+      "owner": "Claude Code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "release": "v2.1.287",
+      "installed": true,
+      "route": "native-installer",
+      "commands": [
+        "curl -fsSL https://claude.ai/install.sh | bash",
+        "claude --version"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/anthropics/claude-code/v2.1.287/README.md#L23",
+        "line": 23
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "claude doctor",
+          "kind": "smoke",
+          "source": {
+            "url": "https://code.claude.com/docs/en/setup.md#L184",
+            "line": 184
+          }
+        }
+      },
+      "config_paths": [
+        "$HOME/.claude/settings.json"
+      ],
+      "notes": "Planned. Native installer self-updates; v2.1.287 is the reviewed release, not a runtime lock. Version check documented setup.md:174; doctor is read-only setup.md:187."
+    },
+    {
+      "layer": "native-clients",
+      "slot": "codex",
+      "owner": "Codex",
+      "repository": "https://github.com/openai/codex",
+      "release": "rust-v0.160.0",
+      "installed": true,
+      "route": "native-installer",
+      "commands": [
+        "curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh",
+        "codex --version"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/README.md#L19",
+        "line": 19
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "codex --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli/src/main.rs#L110",
+            "line": 110
+          }
+        },
+        "after_sign_in": {
+          "command": "codex doctor",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli/src/doctor.rs#L1287",
+            "line": 1287
+          }
+        }
+      },
+      "config_paths": [
+        "${CODEX_HOME:-$HOME/.codex}/config.toml"
+      ],
+      "notes": "Planned. Native installer/self-update exception; rust-v0.160.0 reviewed, not locked. --version defined in pinned codex-rs/cli/src/main.rs:116; doctor at :186. Native account sign-in remains separate. Doctor is valid but reports missing credentials as FAIL; retained after sign-in. Post-install verifies the executable version only. CODEX_NON_INTERACTIVE=1 skips the installer's closing Start Codex now? prompt, which otherwise reads /dev/tty and hung for ten minutes on a WSL launch (the earlier container run had no terminal): the installer documents the variable (Set to 1, true, or yes to skip prompts, scripts/install/install.sh:100) and returns before the prompt when it is set (:845-849, :899-904).",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/scripts/install/install.sh#L100",
+          "line": 100
+        },
+        {
+          "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/scripts/install/install.sh#L845",
+          "line": 845
+        }
+      ]
+    },
+    {
+      "layer": "agent-sdks",
+      "slot": "claude-agent-sdk",
+      "owner": "Claude Agent SDK",
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "release": "v0.2.163",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "ensure_venv \"$tool_root/claude-agent-sdk\"",
+        "uv pip install --python \"$tool_root/claude-agent-sdk/bin/python\" claude-agent-sdk==0.2.163"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/v0.2.163/README.md#L5",
+        "line": 5
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "\"$tool_root/claude-agent-sdk/bin/python\" -c 'from claude_agent_sdk import __version__; print(__version__)'",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/src/claude_agent_sdk/__init__.py#L68",
+            "line": 68
+          }
+        },
+        "after_sign_in": {
+          "command": "\"$tool_root/claude-agent-sdk/bin/python\" - <<'PY'\nimport anyio\nfrom claude_agent_sdk import query\n\nasync def main():\n    async for message in query(prompt=\"What is 2 + 2?\"):\n        print(message)\n\nanyio.run(main)\nPY",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/v0.2.163/README.md#L22",
+            "line": 22
+          }
+        }
+      },
+      "config_paths": [
+        "$tool_root/claude-agent-sdk"
+      ],
+      "notes": "Planned. Classification gap: permitted route enum has no Python library/venv label. Upstream pip install package pinned inside dedicated uv-managed virtual environment, NOT uv tool install (library has no CLI). Helpers only create isolated env. uv isolation source docs/pip/environments.md:21,27,100; documented example makes a real authenticated model call."
+    },
+    {
+      "layer": "agent-sdks",
+      "slot": "codex-sdk-and-codex-exec-app-server",
+      "owner": "Codex SDK and codex exec/app-server",
+      "repository": "https://github.com/openai/codex",
+      "release": "rust-v0.160.0",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "mkdir -p \"$tool_root/codex-sdk\"",
+        "(cd \"$tool_root/codex-sdk\" && npm install @openai/codex-sdk@0.160.0)"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/sdk/typescript/README.md#L7",
+        "line": 7
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "cd \"$tool_root/codex-sdk\"\nnpm ls --depth=0 @openai/codex-sdk",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/npm/cli/bfacd33ccbcd908480610703b60455d2da5b57a9/docs/lib/content/commands/npm-ls.md#L13",
+            "line": 13
+          }
+        },
+        "after_sign_in": {
+          "command": "cd \"$tool_root/codex-sdk\"\nnode --input-type=module - <<'JS'\nimport { Codex } from \"@openai/codex-sdk\";\n\nconst codex = new Codex();\nconst thread = codex.startThread({ skipGitRepoCheck: true });\nconst turn = await thread.run(\"Diagnose the test failure and propose a fix\");\n\nconsole.log(turn.finalResponse);\nconsole.log(turn.items);\nJS",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/sdk/typescript/README.md#L15",
+            "line": 15
+          }
+        }
+      },
+      "config_paths": [
+        "$tool_root/codex-sdk/package.json"
+      ],
+      "notes": "Planned. Classification gap: no npm-local route in required enum. Install documented library locally, NOT globally. Published @openai/codex-sdk@0.160.0 verified in npm registry; tagged package.json is 0.0.0-dev. SDK example plus documented skipGitRepoCheck option (README:110) runs in isolated directory and makes authenticated model call. Native codex owns exec/app-server; no separate daemon starts."
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "trail-of-bits-security-skills-trailofbits-skills",
+      "owner": "Trail of Bits security skills (trailofbits/skills)",
+      "repository": "https://github.com/trailofbits/skills",
+      "release": "82fe8226252622fa807643bdca1710901198553a",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "claude plugin marketplace add https://github.com/trailofbits/skills.git",
+        "codex plugin marketplace add trailofbits/skills --ref 82fe8226252622fa807643bdca1710901198553a"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md#L12",
+        "line": 12
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "reviewed=82fe8226252622fa807643bdca1710901198553a\nactual=\"$(git -C \"$HOME/.claude/plugins/marketplaces/trailofbits\" rev-parse HEAD)\"\nprintf 'trailofbits marketplace HEAD %s, reviewed %s\\n' \"$actual\" \"$reviewed\" >&2\n[[ \"$actual\" == \"$reviewed\" ]]\nclaude plugin list && codex plugin list",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md#L28",
+            "line": 28
+          }
+        }
+      },
+      "config_paths": [
+        "$HOME/.claude/plugins",
+        "${CODEX_HOME:-$HOME/.codex}/plugins"
+      ],
+      "notes": "Planned. Classification gap: permitted enum has no marketplace route. The Claude registration is unpinned. The earlier line trailofbits/skills@<commit> failed on a real distribution: the shorthand cloned over SSH (No ED25519 host key is known for github.com) and the client takes a branch or tag after @ or #, not a commit, while this repository has no tag. The full clone URL ending in .git is the documented git form (cli-reference.md:649). The acceptance prints the marketplace clone's HEAD beside the reviewed commit and fails when they differ. The Codex registration stays pinned with --ref (verified native help). Inventory only; individual plugin names not supplied, so do not install every marketplace plugin.",
+      "supporting_sources": [
+        {
+          "url": "https://code.claude.com/docs/en/plugins/cli-reference.md#L649",
+          "line": 649
+        },
+        {
+          "url": "https://code.claude.com/docs/en/plugins/loading.md#L171",
+          "line": 171
+        },
+        {
+          "url": "https://raw.githubusercontent.com/git/git/v2.56.0/Documentation/git.adoc#L63",
+          "line": 63
+        },
+        {
+          "url": "https://raw.githubusercontent.com/git/git/v2.56.0/Documentation/git-rev-parse.adoc#L12",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "engineering-process-skills",
+      "owner": "mattpocock/skills (selected skills, not the bundle)",
+      "repository": "https://github.com/mattpocock/skills",
+      "release": "v1.2.3",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "npm install --global --prefix \"$tool_root/skills-1.7.0\" skills@1.7.0",
+        "python3 -B \"$repo_root/tools/adoption/install_skills.py\" --skills-bin \"$tool_root/skills-1.7.0/bin/skills\" --json"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L44",
+        "line": 44
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "python3 -B \"$repo_root/tools/adoption/install_skills.py\" --skills-bin \"$tool_root/skills-1.7.0/bin/skills\" --check-only --json",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/fd111e59a7480c7910907e5cdc9a32a9e42ec42e/tools/adoption/install_skills.py#L554",
+            "line": 554
+          }
+        }
+      },
+      "config_paths": [
+        "$tool_root/skills-1.7.0",
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills",
+        "$HOME/.agents/skills"
+      ],
+      "notes": "Revised by the wave-2 skills ruling of 2026-10-03, change 7 (evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.skills): the row delegates to tools/adoption/install_skills.py against the reduced, pinned adoption/skills/manifest.json, so install.sh reproduces the destination's skill set instead of installing mattpocock v1.2.3 with the two skills the manifest excludes (domain-modeling, setup-matt-pocock-skills). The skills CLI 1.7.0 is installed in its own prefix (the manifest's cli.install), and the installer adds each manifest skill from its pinned tree URL for both agents, with telemetry off, verifies its SKILL.md sha256 and the lock's tree hash, and rolls back a mismatch; it skips a held skill (agent-browser, held for the browser-tool measurement) and installs skill-creator as a copy for Claude Code only. This row's default, the selected mattpocock skills (tdd, diagnosing-bugs, codebase-design, writing-for-agents at d81f3a18), is part of that one call, and so are the manifest's other shared skills, which no definitive row names; skill-discovery and skill-authoring run the same installer for their one skill each, which is then already in place. grill-me, improve-codebase-architecture and semgrep were retired on 2026-10-03. The acceptance is the installer's read-only check of every selected skill (--check-only): canonical SKILL.md bytes and lock tree hash, or the Claude Code copy for skill-creator; listings and Codex rules are the client configuration's. A host that already holds the v1.2.3 bytes or the excluded skills removes them first (skills ruling, change 8; adoption/skills/lifecycle.md, Retire and remove). UNRUN on every distribution: revised from the wave-2 records of 2026-10-03, after every recorded run of this plan.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/mattpocock/skills/v1.2.3/README.md#L55",
+          "line": 55
+        },
+        {
+          "url": "https://raw.githubusercontent.com/mattpocock/skills/v1.2.3/README.md#L198",
+          "line": 198
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L88",
+          "line": 88
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L111",
+          "line": 111
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L540",
+          "line": 540
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/src/agents.ts#L155",
+          "line": 155
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/src/agents.ts#L224",
+          "line": 224
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/src/source-parser.ts#L284",
+          "line": 284
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/src/source-parser.test.ts#L129",
+          "line": 129
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/src/git.ts#L295",
+          "line": 295
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/src/skill-lock.ts#L20",
+          "line": 20
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/src/list.ts#L113",
+          "line": 113
+        }
+      ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "skill-discovery",
+      "owner": "find-skills (vercel-labs/skills)",
+      "repository": "https://github.com/vercel-labs/skills",
+      "release": "v1.7.0",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "npm install --global --prefix \"$tool_root/skills-1.7.0\" skills@1.7.0",
+        "python3 -B \"$repo_root/tools/adoption/install_skills.py\" --skills-bin \"$tool_root/skills-1.7.0/bin/skills\" --json --only find-skills"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L44",
+        "line": 44
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "want=76a98a285cb0434f3d39e1a873823556330e398b\nlock=\"${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}\"\nlock=\"${lock:-$HOME/.agents/.skill-lock.json}\"\nlisting=\"$(npx --yes skills@1.7.0 list -g -a claude-code codex --json)\"\nfor agent in 'Claude Code' Codex; do\n  jq -e --arg agent \"$agent\" 'any(.[]; .name == \"find-skills\" and (.agents | index($agent) != null))' <<<\"$listing\" >/dev/null\ndone\njq -e --arg hash \"$want\" '.skills[\"find-skills\"].skillFolderHash == $hash' \"$lock\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164",
+            "line": 164
+          }
+        }
+      },
+      "config_paths": [
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills",
+        "${CODEX_HOME:-$HOME/.codex}/skills",
+        "$HOME/.agents/skills"
+      ],
+      "notes": "Planned; the install and acceptance commands of this row have not run anywhere, on any distribution. Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md), after the clean run that VALIDATION.md records; that run does not cover this row. Classification gap: the permitted enum has no skills-CLI route. Only the find-skills folder is installed, for both agents, and no other skill of the repository: -s names the one skill (README.md:89), and -g, -a and -y are the installer's documented non-interactive form (README.md:111). The ref is the record's commit 7407f3893ad4dceab546ac002c3ef806e4000c73, which the record gives as release v1.7.0. A full commit after # is not a branch or tag: the installer first tries clone --depth 1 --branch <ref> and, when that fails with a missing-ref error and the ref is a 40-character commit, fetches that commit and checks out FETCH_HEAD (src/git.ts:295-322 at the installer's commit, with isCommitSha at :30 and cloneAtSha at :65). That path is read from source and has not been exercised by this plan. Telemetry is off through DISABLE_TELEMETRY=1 (README.md:540). The acceptance follows the engineering-process-skills row: the installer's own listing must show find-skills for Claude Code and for Codex, and the skillFolderHash that the installer records in its lock file must equal 76a98a285cb0434f3d39e1a873823556330e398b, the git tree hash of skills/find-skills at that commit (GitHub tree API, read 2026-10-02; the SKILL.md blob there is a41bdd074bb587afd861332cf2f473f3154de4d7, as the record says). It does not hash the installed directories and says nothing about a client loading or invoking the skill: the record's open gates (listing, hash and read-back on the destination, and a useful invocation in each client) stay open. Revised by the wave-2 skills ruling of 2026-10-03, change 7 (evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.skills): the install delegates to tools/adoption/install_skills.py --only find-skills, which adds the manifest's pinned tree for both agents and verifies it; the acceptance is unchanged. UNRUN on every distribution: revised from the wave-2 records of 2026-10-03, after every recorded run of this plan.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89",
+          "line": 89
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540",
+          "line": 540
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L302",
+          "line": 302
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315",
+          "line": 315
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L65",
+          "line": 65
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills/SKILL.md#L2",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "skill-authoring",
+      "owner": "skill-creator (embedded in Codex; anthropics/skills for Claude Code)",
+      "repository": "https://github.com/anthropics/skills",
+      "release": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "npm install --global --prefix \"$tool_root/skills-1.7.0\" skills@1.7.0",
+        "python3 -B \"$repo_root/tools/adoption/install_skills.py\" --skills-bin \"$tool_root/skills-1.7.0/bin/skills\" --json --only skill-creator"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L44",
+        "line": 44
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "want=3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6\nlock=\"${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}\"\nlock=\"${lock:-$HOME/.agents/.skill-lock.json}\"\nlisting=\"$(npx --yes skills@1.7.0 list -g --json)\"\njq -e '[.[] | select(.name == \"skill-creator\") | .agents] == [[\"Claude Code\"]]' <<<\"$listing\" >/dev/null\njq -e --arg hash \"$want\" '.skills[\"skill-creator\"].skillFolderHash == $hash' \"$lock\" >/dev/null\nshared_copy=\"$HOME/.agents/skills/skill-creator\"\ncodex_copy=\"${CODEX_HOME:-$HOME/.codex}/skills/skill-creator\"\n[[ ! -e \"$shared_copy\" && ! -L \"$shared_copy\" && ! -e \"$codex_copy\" && ! -L \"$codex_copy\" ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164",
+            "line": 164
+          }
+        }
+      },
+      "config_paths": [
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills"
+      ],
+      "notes": "Planned; the install and acceptance commands of this row have not run anywhere, on any distribution. Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md), after the clean run that VALIDATION.md records; that run does not cover this row. Classification gap: the permitted enum has no skills-CLI route. For Claude Code only: -a names claude-code alone, and --copy writes the folder into the Claude Code skills directory instead of a shared canonical copy with symlinks (README.md:91, :141-142). Nothing is installed for Codex and no same-name copy is placed for it. Codex carries its own skill-creator, embedded at the selected tag (the record cites codex-rs/skills/src/lib.rs at a956835d020762cb2b570053af06f643a11c0ecc). The installer's shared directory, $HOME/.agents/skills, is the one it uses for Codex's global skills (read in the bundled dist/cli.mjs of the skills 1.7.0 package: getAgentBaseDir and installSkillForAgent), and its README gives ~/.codex/skills/ as Codex's global path (README.md:298; the bundled code reads it as ${CODEX_HOME:-$HOME/.codex}/skills). A copy in either directory would be a same-name copy placed for Codex, which the record rules out, so the acceptance also fails when skill-creator exists in either of them, a dangling symbolic link included. Codex keeps its embedded skills under skills/.system, which the check leaves alone. Only the skill-creator folder is installed, and no other skill of the repository (README.md:89). The record names no release of this repository, so the ref is the record's commit 8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4. A full commit after # is not a branch or tag: the installer first tries clone --depth 1 --branch <ref> and, when that fails with a missing-ref error and the ref is a 40-character commit, fetches that commit and checks out FETCH_HEAD (src/git.ts:295-322 at the installer's commit, with isCommitSha at :30 and cloneAtSha at :65). That path is read from source and has not been exercised by this plan. Telemetry is off through DISABLE_TELEMETRY=1 (README.md:540). The acceptance follows the engineering-process-skills row for one agent: the installer's listing, run without an agent filter so that it reports every agent the installer detects, must name Claude Code as the only agent of skill-creator, and the skillFolderHash in its lock file must equal 3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6, the git tree hash of skills/skill-creator at that commit (GitHub tree API, read 2026-10-02; the SKILL.md blob there is 65b3a402dbd09b8e83f9d637c6b553875189085c, as the record says). It does not hash the installed directory, does not check that the embedded Codex skill is available on the destination and says nothing about a client loading or invoking the skill: those are the record's open gates. Revised by the wave-2 skills ruling of 2026-10-03, change 7 (evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.skills): the install delegates to tools/adoption/install_skills.py --only skill-creator; the manifest entry's agents [\"claude-code\"] and copy true make the installer run the add with --copy -a claude-code, the form this row used, and read the copy back from Claude Code's folder. The acceptance is unchanged. UNRUN on every distribution: revised from the wave-2 records of 2026-10-03, after every recorded run of this plan.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89",
+          "line": 89
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L91",
+          "line": 91
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L141",
+          "line": 141
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540",
+          "line": 540
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L302",
+          "line": 302
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315",
+          "line": 315
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L65",
+          "line": 65
+        },
+        {
+          "url": "https://raw.githubusercontent.com/anthropics/skills/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md#L2",
+          "line": 2
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L298",
+          "line": 298
+        }
+      ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "research-skill",
+      "owner": "Not installed until its activation gate returns (GPT Researcher's own skill with its MCP server)",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing is installed and this plan carries no install command for it until its activation gate returns. The gate, as the record gives it: An activation gate, not a comparison: a resolved and pinned environment for the MCP server, a native protocol handshake over STDIO, discovery of its five tools, a useful research result returned in each client, and a bounded lifecycle (start, stop, removal). The candidate is the GPT Researcher skill (assafelovic/gpt-researcher at 0957c301ed06c2a5857b834358c7227c739041d4, skills/gpt-researcher/SKILL.md) with its dependency gptr-mcp (assafelovic/gptr-mcp at 63884773685b1f12c7f0d9e283b3d71a5b9b5fda); neither is installed, pinned into this plan or run."
+    },
+    {
+      "layer": "mcp-surfaces",
+      "slot": "mcporter",
+      "owner": "mcporter",
+      "repository": "https://github.com/openclaw/mcporter",
+      "release": "v0.14.2",
+      "installed": true,
+      "route": "npm-global",
+      "commands": [
+        "npm install -g mcporter@0.14.2"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/openclaw/mcporter/v0.14.2/README.md#L28",
+        "line": 28
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "mcporter list",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/openclaw/mcporter/v0.14.2/docs/install.md#L52",
+            "line": 52
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. First persistent user-level npm route (docs/install.md:23). Verify section:51-52 lists version and mcporter list; inventory smoke needs no network."
+    },
+    {
+      "layer": "mcp-surfaces",
+      "slot": "mcp-inspector",
+      "owner": "MCP Inspector",
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "release": "2.9.0",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "run on demand with npx; mcporter owns MCP calls from scripts"
+    },
+    {
+      "layer": "workers",
+      "slot": "agent-messaging",
+      "owner": "Not installed until the deciding measurement returns",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "native facilities do not cover messaging into a running Codex session, but installing hcom changes how sessions start and what they may do without asking, which is the owner's decision and not a default install"
+    },
+    {
+      "layer": "isolation",
+      "slot": "sandbox-runtime-srt",
+      "owner": "sandbox-runtime (srt)",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "release": "v0.0.78",
+      "installed": true,
+      "route": "npm-global",
+      "commands": [
+        "npm install -g @anthropic-ai/sandbox-runtime@0.0.78"
+      ],
+      "needs": {
+        "sudo": true,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L14",
+        "line": 14
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "srt echo \"hello world\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L168",
+            "line": 168
+          }
+        }
+      },
+      "config_paths": [
+        "$HOME/.srt-settings.json"
+      ],
+      "notes": "Planned. README first npm route. Key-free documented sandbox smoke; Linux prerequisites bubblewrap, socat, ripgrep documented README:550-558. Optional seccomp helper prerequisites gcc/libseccomp-dev documented README:580; include them in system prerequisites."
+    },
+    {
+      "layer": "isolation",
+      "slot": "isolation-container-boundary",
+      "owner": "No additional component: rootless containers on the container engine that the hosting layer installs",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "decided by both families in the decision round: no second container boundary"
+    },
+    {
+      "layer": "code-navigation",
+      "slot": "serena",
+      "owner": "Serena",
+      "repository": "https://github.com/oraios/serena",
+      "release": "v1.7.0",
+      "installed": true,
+      "route": "uv-tool",
+      "commands": [
+        "uv tool install -p 3.13 serena-agent==1.7.0"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/oraios/serena/v1.7.0/README.md#L229",
+        "line": 229
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "serena init",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/oraios/serena/v1.7.0/README.md#L237",
+            "line": 237
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. README verifies setup with serena init. Acceptance executes in its own empty working directory to avoid project mutation."
+    },
+    {
+      "layer": "code-navigation",
+      "slot": "claude-plugins-official-code-intelligence-lsp-pl",
+      "owner": "Not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it"
+    },
+    {
+      "layer": "code-navigation",
+      "slot": "structural-search",
+      "owner": "ast-grep",
+      "repository": "https://github.com/ast-grep/ast-grep",
+      "release": "0.45.3",
+      "installed": true,
+      "route": "mise",
+      "commands": [
+        "mise use -g ast-grep@0.45.3"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/ast-grep.toml#L1",
+        "line": 1
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "ast-grep --version\nast_grep_probe=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$ast_grep_probe\"' EXIT\nprintf 'callback && callback();\\n' > \"$ast_grep_probe/probe.ts\"\nast-grep -p '$A && $A()' -l ts \"$ast_grep_probe/probe.ts\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ast-grep/ast-grep/0.45.3/README.md#L84",
+            "line": 84
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Choose the mise registry (backend aqua:ast-grep/ast-grep, registry/ast-grep.toml:1) to keep one version manager; ast-grep's own README documents mise use -g ast-grep (README.md:61). Syntax-pattern search and rewrite has no other owner (Serena owns symbols and references). Post-install runs the ast-grep binary, not sg: on Ubuntu /usr/bin/sg is newgrp (login package) and the registry test sg --version only works because mise shims come first on PATH. The structural match uses the README pattern (README.md:84) without --rewrite, on a temporary file; ast-grep run exits 1 when nothing matches (crates/cli/src/run.rs:349), so the check fails without a match.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/ast-grep.toml#L3",
+          "line": 3
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ast-grep/ast-grep/0.45.3/README.md#L61",
+          "line": 61
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ast-grep/ast-grep/0.45.3/crates/cli/src/run.rs#L349",
+          "line": 349
+        }
+      ],
+      "mise_tool": "ast-grep"
+    },
+    {
+      "layer": "semantic-rag",
+      "slot": "code-search",
+      "owner": "semble 0.6.1",
+      "repository": "https://github.com/MinishLab/semble",
+      "release": "v0.6.1",
+      "installed": true,
+      "route": "uv-tool",
+      "commands": [
+        "uv tool install -p 3.13 'semble[mcp]==0.6.1'",
+        "\"$(uv tool dir)/semble/bin/python\" -c \"from huggingface_hub import snapshot_download; print(snapshot_download('minishlab/potion-code-16M-v2', revision='e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b', local_dir='$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c'))\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/README.md#L41",
+        "line": 41
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "semble --version\nprobe=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$probe\"' EXIT\nprintf '%s\\n' 'def parse_invoice_total(lines):' '    return sum(float(line.split(\",\")[2]) for line in lines)' > \"$probe/invoice_probe.py\"\nSEMBLE_MODEL_NAME=\"$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c\" SEMBLE_CACHE_LOCATION=\"$probe/cache\" semble search \"sum the invoice totals\" \"$probe\" --format text | grep -q invoice_probe.py",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/src/semble/cli.py#L269",
+            "line": 269
+          }
+        }
+      },
+      "config_paths": [
+        "$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c",
+        "$HOME/.cache/semble-claude",
+        "$HOME/.cache/semble-codex"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Interim install under amendment 3 of the manifest's decision rule, on the owner's decision of 2026-10-03 (decision 2 lifts the code-search hold); the frozen code-search confirmatory decides and replaces or removes it. Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). The uv tool with the mcp extra at the exact version (README.md:41; docs/installation.md:44 pins semble[mcp]==X.Y.Z; requires-python >=3.10, classifiers up to 3.13, pyproject.toml:12-25). semble loads its model by Hub name with no revision and keys cache validity on that name, so the second command pins minishlab/potion-code-16M-v2 at e9d2a44c into a local snapshot, which SEMBLE_MODEL_NAME names (README.md:285; code-search ruling, change 4); record the resolved dependencies after the install with uv pip freeze --python \"$(uv tool dir)/semble/bin/python\". Each client gets its own absolute SEMBLE_CACHE_LOCATION (code-search ruling, change 5), and the client configuration renders both MCP entries, Codex's enabled_tools and its approval mode, and Claude Code's two exact-name allow rules (the last two only with --with-authorization-settings); never run semble install or mcp add for those entries (synthesis X11). Stdio MCP, CPU only, no port. The acceptance's first line is upstream's documented check (cli.py:269, README.md:114); the probe search after it, on a temporary file with the pinned local model and a scratch cache, is this project's integration check, not upstream acceptance (code-search ruling, change 6). Rollback, with literal targets: the ruling's change 9."
+    },
+    {
+      "layer": "semantic-rag",
+      "slot": "embedding-model",
+      "owner": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
+      "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+      "release": "qwen3-embedding:0.6b, library manifest sha256 ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d",
+      "installed": true,
+      "route": "model-server",
+      "commands": [
+        "OLLAMA_HOST=127.0.0.1:21434 ollama pull qwen3-embedding:0.6b",
+        "curl -fsS http://127.0.0.1:21434/api/tags | jq -e '.models[] | select(.name == \"qwen3-embedding:0.6b\") | .digest == \"ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d\"' >/dev/null",
+        "OLLAMA_HOST=127.0.0.1:21434 ollama create qwen3-embedding-8k -f \"$plan_dir/models/qwen3-embedding-8k.Modelfile\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": true,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L85",
+        "line": 85
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "printf '%s  %s\\n' ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding/0.6b\" | sha256sum --check --status && grep -F sha256:06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding-8k/latest\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/manifest/paths.go#L29",
+            "line": 29
+          }
+        },
+        "service_health": {
+          "command": "out=\"$(OLLAMA_HOST=127.0.0.1:21434 ollama show qwen3-embedding-8k)\" && grep -E '^ +num_ctx +8192 *$' <<<\"$out\" >/dev/null && curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Why is the sky blue?\"}' | jq -e '(.embeddings | length) == 1 and (.embeddings[0] | length) == 1024' >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659",
+            "line": 1659
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Settled by the local-model measurement of 2026-10-02 and 2026-10-03 (evidence/artifacts/new-wsl-local-models-20261002; docs/decisions/2026-10-03-new-wsl-local-models.md). The measured system: the Ollama library model qwen3-embedding:0.6b (Q8_0), pinned by its manifest digest (registry.ollama.ai served that digest on 2026-10-03), and a derived model qwen3-embedding-8k that carries num_ctx 8192 as its own parameter (models/qwen3-embedding-8k.Modelfile, byte-identical to the measured one). No server-wide context is set: with OLLAMA_CONTEXT_LENGTH=64000 the embedder took 5.78 GB. ollama pull checks every layer it downloads against the manifest's digest (server/images.go:1082); the second command stops the row unless the server reports the pinned manifest digest (server/model_list.go:64). The model is created through the running model server, which the plan does not start: the default run skips this row, and bash install.sh --only embedding-model installs it once the server answers on 127.0.0.1:21434 and reports version 0.35.0, the measured one, through GET /api/version (docs/api.md:1824); otherwise install.sh stops the row before the pull. The post-install check reads files only (the library manifest's sha256 and the derived model's model layer, in the server's store under ${OLLAMA_MODELS:-$HOME/.ollama/models}, envconfig/config.go:112). The service check shows num_ctx 8192 and makes one embedding call of 1,024 dimensions (the model card, Qwen/Qwen3-Embedding-0.6B at 97b0c614 README.md:36). The derived model's digest that the measurement recorded (e3c32ffa36019b43b729c6da039b463bd28890b14135e76013bb0c1255766d83) is for comparison, not a check. No reranker is installed (reranker-model). Not run on any distribution as a plan row."
+    },
+    {
+      "layer": "semantic-rag",
+      "slot": "reranker-model",
+      "owner": "Not installed: no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever"
+    },
+    {
+      "layer": "document-retrieval",
+      "slot": "tobi-qmd",
+      "owner": "tobi/qmd",
+      "repository": "https://github.com/tobi/qmd",
+      "release": "v2.8.3",
+      "installed": true,
+      "route": "npm-global",
+      "commands": [
+        "npm install -g @tobilu/qmd@2.8.3"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": true,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L32",
+        "line": 32
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "qmd status",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L671",
+            "line": 671
+          }
+        },
+        "after_sign_in": {
+          "command": "f=\"$HOME/.local/share/qmd/models/Qwen3-Embedding-0.6B-Q8_0.gguf\"\nprintf '%s  %s\\n' 06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 \"$f\" | sha256sum --check --status\ngrep -qxF \"  embed: $f\" \"$HOME/.config/qmd/native-agent-stack-catalog.yml\"\nqmd --index native-agent-stack-catalog status\nqmd --index native-agent-stack-catalog doctor",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L1021",
+            "line": 1021
+          }
+        }
+      },
+      "config_paths": [
+        "$HOME/.config/qmd/native-agent-stack-catalog.yml",
+        "$HOME/.cache/qmd/",
+        "$HOME/.local/share/qmd/models/Qwen3-Embedding-0.6B-Q8_0.gguf"
+      ],
+      "notes": "Planned. Upstream first global npm route; Node >=22; status verifies grammars. Wave-2 retrieval ruling, change 16: needs.gpu reads true, because QMD runs node-llama-cpp with GPU auto: it uses the GPU when there is one and tries a CPU load only when GPU initialization fails, while a failure to create its first embedding context throws (src/llm.ts at facd35e, read by both families); concurrent fit beside the model server is the fit gate's, not this row's. config_paths name the index configuration, the cache and the interim embedder (Qwen3-Embedding-0.6B-Q8_0, sha256 06507c7b..., models.embed by absolute path). The after_sign_in check needs that embedder provisioned and the index embedded (embed -f in the GPU window, synthesis phase 3), as Ollama's check needs its model route; it is the live proof's host part (file hash, the configuration's embed line, status and doctor), and the client parts (each client's MCP query and get) stay with the live proof. UNRUN."
+    },
+    {
+      "layer": "document-retrieval",
+      "slot": "mineru",
+      "owner": "MinerU",
+      "repository": "https://github.com/opendatalab/mineru",
+      "release": "mineru-4.0.10-released",
+      "installed": true,
+      "route": "uv-tool",
+      "commands": [
+        "uv tool install --python 3.13 \"mineru==4.0.10\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": true,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/opendatalab/mineru/mineru-4.0.10-released/README.md#L307",
+        "line": 307
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "mineru --help",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/opendatalab/mineru/mineru-4.0.10-released/README.md#L365",
+            "line": 365
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Pin README's uv-tool version range. README:259 supports Python >=3.10,<3.15, so use architecture's Python 3.13 instead of sample 3.12. GPU passthrough pre-exists; no Windows/GPU driver installation. CLI help does not download models or qualify GPU inference."
+    },
+    {
+      "layer": "web-research",
+      "slot": "trafilatura",
+      "owner": "Not installed: text extraction is a sub-step of retrieval that the two agents' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "text extraction is a sub-step of retrieval that the two agents' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it"
+    },
+    {
+      "layer": "web-research",
+      "slot": "playwright-cli",
+      "owner": "Playwright CLI",
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "release": "v0.1.22",
+      "installed": false,
+      "measurement_only": true,
+      "route": "npm-global",
+      "commands": [
+        "npm install -g @playwright/cli@0.1.22",
+        "playwright-cli install-browser --with-deps chromium"
+      ],
+      "needs": {
+        "sudo": true,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.22/README.md#L26",
+        "line": 26
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "playwright-cli open https://playwright.dev --browser=chromium && playwright-cli close",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/microsoft/playwright/e8149b8257d32dcf8f72573ecc43e72439da7080/packages/playwright-core/src/tools/mcp/config.ts#L285",
+            "line": 285
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Measurement only: the manifest state is split, so the default run installs nothing and prints skipped; --only playwright-cli installs it for the deciding measurement (manifest: both critics agree on one browser tool, not two, and disagree on which: agent-browser's WSL2 launch issues are open upstream (critic 1) against one binary with no Node at run time (critic 2)). Planned. Upstream first global npm route; Node >=18. Browser/system dependencies required; acceptance requires network and a usable browser. Headless is default at README:69. Browser install adapts microsoft/playwright b630e71fcda7885885c459bcbb88e5bfa7c0a1ac docs/src/browsers.md:122 to CLI's package.json:25 dependency pin; close documented README:316. Ubuntu 26.04 native browser dependency support remains unrun. Round1 installed the correctly pinned bundled Chromium, while the unspecified browser selected system Chrome. Use the installed CLI's bundled browser installer and explicitly select chromium; retain the real open/close smoke.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/microsoft/playwright/e8149b8257d32dcf8f72573ecc43e72439da7080/packages/playwright-core/src/tools/cli-client/program.ts#L346",
+          "line": 346
+        }
+      ]
+    },
+    {
+      "layer": "web-research",
+      "slot": "web-search-provider",
+      "owner": "Not installed: both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries"
+    },
+    {
+      "layer": "durable-memory",
+      "slot": "memory-owner",
+      "owner": "ai-memory 2.5.2",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "release": "v2.5.2",
+      "installed": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified https://github.com/akitaonrails/ai-memory/releases/download/v2.5.2/ai-memory-linux-x86_64.tar.gz acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8 \"$HOME/.local/opt/ai-memory-2.5.2/ai-memory-linux-x86_64.tar.gz\"",
+        "tar -xzf \"$HOME/.local/opt/ai-memory-2.5.2/ai-memory-linux-x86_64.tar.gz\" -C \"$HOME/.local/opt/ai-memory-2.5.2\" && ln -sfn \"$HOME/.local/opt/ai-memory-2.5.2/ai-memory\" \"$HOME/.local/bin/ai-memory\"",
+        "if [[ ! -e \"$HOME/.config/ai-memory/config.toml\" ]]; then mkdir -p \"$HOME/.config/ai-memory\" \"$HOME/.local/share/ai-memory\" && ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" init; fi",
+        "f=\"$HOME/.config/ai-memory/config.toml\"; if grep -qx 'bind = \"127.0.0.1:49374\"' \"$f\"; then sed -i 's|^bind = \"127.0.0.1:49374\"$|bind = \"127.0.0.1:29374\"\\nembedding_provider = \"local\"|' \"$f\"; fi; grep -qx 'bind = \"127.0.0.1:29374\"' \"$f\"; grep -qx 'embedding_provider = \"local\"' \"$f\"",
+        "mkdir -p \"$HOME/.config/systemd/user\" && sed 's|^ExecStart=/usr/bin/ai-memory |ExecStart=%h/.local/bin/ai-memory |' \"$HOME/.local/opt/ai-memory-2.5.2/packaging/systemd/ai-memory-user.service\" > \"$HOME/.config/systemd/user/ai-memory.service\" && systemctl --user daemon-reload && systemctl --user enable --now ai-memory.service",
+        "AI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory install-hooks --agent codex --apply"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": true,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1634",
+        "line": 1634
+      },
+      "service": {
+        "form": "upstream systemd user unit packaging/systemd/ai-memory-user.service of the release archive, ExecStart moved to the user prefix",
+        "port": 29374,
+        "port_setting": "bind = \"127.0.0.1:29374\" in ~/.config/ai-memory/config.toml (crates/ai-memory-cli/templates/config.default.toml L10 at 7580b74d; the wave-2 synthesis X5: the port the host template and the client templates carry)"
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "ai-memory --version\njq -e '[(\"SessionStart\", \"UserPromptSubmit\", \"PreToolUse\", \"PostToolUse\", \"PreCompact\", \"Stop\", \"SessionEnd\") as $event | any(.hooks[$event][]?.hooks[]?; (.command // \"\") | contains(\"ai-memory\"))] | all' \"${CODEX_HOME:-$HOME/.codex}/hooks.json\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/render_shared.rs#L907",
+            "line": 907
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:29374/healthz\nAI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory status --json",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/serve.rs#L2712",
+            "line": 2712
+          }
+        }
+      },
+      "config_paths": [
+        "$HOME/.config/ai-memory/config.toml",
+        "$HOME/.config/systemd/user/ai-memory.service",
+        "$HOME/.local/share/ai-memory"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Interim install under amendment 3 of the manifest's decision rule, on the owner's decision of 2026-10-03 (decision 2 lifts the memory hold), with a fresh store; the memory head-to-head decides and replaces or removes it. Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). Route: the release archive and its sha256 (docs/install.md:1634-1636 names the archive and its .sha256 sidecar; the sha256 is the wave-2 memory dossier's, equal to the sidecar on 2026-10-03), extracted in a user prefix with the binary linked into ~/.local/bin, so the archive's sibling hooks/ stay next to it (the dossier's step 1). init writes the upstream config and data layout (docs/install.md:254-261). The config's bind moves from upstream's 127.0.0.1:49374 to 127.0.0.1:29374, the port the host template and the client templates already carry (wave-2 synthesis X5; the memory ruling's 21374 is not used), and embedding_provider = \"local\" makes the in-process all-MiniLM-L6-v2 embedder explicit, so a failed model fetch is a visible start failure (memory ruling, changes 4 and 5); no LLM provider is set (zero-LLM). The unit is upstream's user unit with ExecStart moved to the user prefix; it is enabled and started as upstream documents (docs/install.md:277-283). Linger is the recipe's F2, not this row. Wait for 'embedder enabled' in journalctl --user -u ai-memory.service before the service check. AI_MEMORY_SERVER_URL is needed only by manual CLI commands (memory change 14). Client wiring: the client configuration (tools/adoption/new_wsl_client_config.py) renders both clients' MCP entries, Claude Code's hooks and Codex's tool approval, so never run install-mcp, or install-hooks for Claude Code (synthesis X11). Codex's seven hooks are the one exception X11 allows: the client configuration writes no ~/.codex/hooks.json, so the last command, ai-memory's own installer, writes them once (it merges its seven events into $CODEX_HOME/hooks.json or ~/.codex/hooks.json with a backup and touches no config.toml: crates/ai-memory-cli/src/commands/install_hooks.rs:2071-2093, 2152-2181 and 2211-2229, and render_shared.rs:907-915; with AI_MEMORY_SERVER_URL set it takes the bare server origin, docs/install.md:118-121 and 593-595), after which new_wsl_client_config.py --check must pass; it is recorded in docs/decisions/2026-10-02-new-wsl-client-configuration.md. Their trust follows synthesis X10: read each hook's currentHash back through `codex app-server` hooks/list (no repository tool reads it yet; scripts/adoption_status.py --client-wiring counts the trusted ai-memory hooks the way Codex 0.155.1 to 0.157.1 computes trust), record the reviewed hashes in the client configuration, whose apply then renders the seven [hooks.state] entries; the one-time /hooks review is the fallback until then, and --dangerously-bypass-hook-trust is never used (memory ruling, change 12). The post-install acceptance's hooks.json line is this project's integration check, not upstream acceptance. Backups are staged by the Restic job (synthesis X6). Live proof: the interim's open acceptance gates in the definitive manifest."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "ccusage",
+      "owner": "Not installed: the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it"
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "context-supply",
+      "owner": "context-mode 1.0.169",
+      "repository": "https://github.com/mksglu/context-mode",
+      "release": "6f0cc6841c687e754059f36714a11233fda1a02b ; npm 1.0.169",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "claude plugin marketplace add mksglu/context-mode --scope user",
+        "claude plugin install context-mode@context-mode --scope user",
+        "codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json",
+        "codex plugin add context-mode@context-mode --json",
+        "p=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169\"; d=\"$(mktemp -d)\"; (cd \"$d\" && npm pack context-mode@1.0.169 >/dev/null && printf '%s  %s\\n' 09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c context-mode-1.0.169.tgz | sha256sum --check --status && npm install --global --prefix \"$p\" ./context-mode-1.0.169.tgz); rc=$?; rm -rf -- \"$d\"; exit \"$rc\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L72",
+        "line": 72
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "want=6f0cc6841c687e754059f36714a11233fda1a02b\nsha=\"$(jq -r '[.plugins[\"context-mode@context-mode\"][] | select(.scope == \"user\") | .gitCommitSha][0]' \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/installed_plugins.json\")\"\n[[ \"$sha\" == \"$want\" ]] || [[ \"$(curl -fsSL \"https://api.github.com/repos/mksglu/context-mode/compare/$want...$sha\" | jq -r '[.files[].filename] | unique | join(\",\")')\" == stats.json ]]\ncodex plugin list --json | jq -e 'any(.installed[]; .pluginId == \"context-mode@context-mode\" and .enabled)' >/dev/null\n[[ \"$(jq -r .version \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169/lib/node_modules/context-mode/package.json\")\" == 1.0.169 ]]\nconfig_dir=\"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"\njq -e '(.extraKnownMarketplaces[\"context-mode\"].autoUpdate // false) == false' \"$config_dir/settings.json\" >/dev/null\njq -e '(.[\"context-mode\"].autoUpdate // false) == false' \"$config_dir/plugins/known_marketplaces.json\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L78",
+            "line": 78
+          }
+        }
+      },
+      "config_paths": [
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/installed_plugins.json",
+        "${CODEX_HOME:-$HOME/.codex}/config.toml",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Interim install under amendment 3 of the manifest's decision rule, on the owner's pin (the wave-2 brief quotes the owner: 'context mode'), beside the slot's definitive no-install default; a preregistered end-to-end comparison decides and reports to the owner, and the pin is never removed automatically. Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). Classification gap: the permitted enum has no plugin-marketplace or local-npm route. Claude Code: the plugin from its marketplace (README.md:72-73); a marketplace source takes no commit, so this installs the default branch head and the acceptance gates it: the installed gitCommitSha is the reviewed 6f0cc684, or a descendant whose compare lists only stats.json (context ruling, change 17; recipes/README.md 'Native context mode and hooks'). The compare uses GitHub's public API without a sign-in. The route stays the default-branch head behind that gate, not the context ruling's preferred sha-pinned hand-authored marketplace (change 17; recipes/README.md:143): the client configuration renders this marketplace by its GitHub source (the extraKnownMarketplaces.context-mode piece of claude.settings.template.json that the map wires), so a hand-authored local marketplace would be a second registration of context-mode that it does not render (synthesis X11, one writer); that registration has not been run anywhere, and the change keeps the gate until it is run and its gitCommitSha read back. Between installs nothing moves the plugin: Claude Code updates plugins only from a marketplace with auto-update on, which for a third-party marketplace is off unless autoUpdate is set on its extraKnownMarketplaces entry or its known_marketplaces.json entry (https://code.claude.com/docs/en/plugins/loading, 'Which marketplaces and plugins auto-update', read 2026-10-03); the acceptance's last lines check that neither sets it (this project's integration check). Codex: the plugin's hooks and skills at --ref 6f0cc684 (README.md:593; codex-rs/cli/src/marketplace_cmd.rs:70-72 and plugin_cmd.rs:61 at a956835d), with the plugin's own MCP server off, and one session-bound MCP server from the verified npm tarball (sha256 09c41e4c..., the repository's pin in adoption/pins-linux-x86_64.json) installed under ${ECO_ROOT}/tools/context-mode-1.0.169, the path the Codex template's entry runs (context ruling, change 7, option a; ECO_ROOT is the host template's). start.mjs can re-execute under Bun, run npm installs of its own dependencies and write the Claude configuration (context ruling, changes 6 and 8): record command -v bun and npm ls for each install surface after the first session. The six Codex hook trust entries, the server entry and the plugin settings are the client configuration's; never pass --dangerously-bypass-hook-trust. Live proof: the interim's open acceptance gates in the definitive manifest."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "statusline",
+      "owner": "claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line",
+      "repository": "https://github.com/jarrodwatts/claude-hud",
+      "release": "v0.10.0",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "claude plugin marketplace add jarrodwatts/claude-hud#v0.10.0 --scope user",
+        "claude plugin install claude-hud@claude-hud --scope user",
+        "c=\"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"; set -- \"$c\"/plugins/cache/*/claude-hud/0.10.0; [[ $# == 1 && -f \"$1/scripts/setup.mjs\" ]] || { printf \"claude-hud 0.10.0 is not in exactly one marketplace cache under %s\\n\" \"$c\" >&2; exit 1; }; rt=\"$(command -v bun 2>/dev/null || command -v node 2>/dev/null)\" || { printf \"no node or bun for the claude-hud helper\\n\" >&2; exit 1; }; \"$rt\" \"$1/scripts/setup.mjs\" inspect --shell posix; \"$rt\" \"$1/scripts/setup.mjs\" install --shell posix",
+        "s=\"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json\"; t=\"$(readlink -f -- \"$s\")\"; if jq -e \".statusLine.refreshInterval == null\" \"$t\" >/dev/null; then n=\"$(mktemp \"$t.XXXXXX\")\"; jq \".statusLine.refreshInterval = 5\" \"$t\" > \"$n\" && chmod --reference=\"$t\" -- \"$n\" && mv -f -- \"$n\" \"$t\" || { rm -f -- \"$n\"; exit 1; }; fi"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/README.md#L29",
+        "line": 29
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "config_dir=\"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"\njq -e '[.plugins[\"claude-hud@claude-hud\"][] | select(.scope == \"user\") | .version] == [\"0.10.0\"]' \"$config_dir/plugins/installed_plugins.json\" >/dev/null\nversions=\"$(ls -d \"$config_dir\"/plugins/cache/*/claude-hud/*/ | wc -l)\"\ncmp -s \"$config_dir/plugins/claude-hud/statusline.mjs\" \"$(ls -d \"$config_dir\"/plugins/cache/*/claude-hud/0.10.0)/scripts/statusline.mjs\"\njq -e '.statusLine.type == \"command\" and (.statusLine.refreshInterval | type == \"number\" and . >= 1 and . == floor)' \"$config_dir/settings.json\" >/dev/null\nconfigured=\"$(jq -r '.statusLine.command' \"$config_dir/settings.json\")\"\nlines=\"$(echo '{\"model\":{\"display_name\":\"Opus\"},\"context_window\":{\"used_percentage\":12,\"context_window_size\":200000}}' | bash -c \"$configured\" | wc -l)\"\n[[ \"$versions\" -eq 1 && \"$lines\" -ge 2 && \"$configured\" == *\"$config_dir/plugins/claude-hud/statusline.mjs\"* ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/commands/setup.md#L72",
+            "line": 72
+          }
+        }
+      },
+      "config_paths": [
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/cache",
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/claude-hud"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Added by the wave-2 batch of the layer consensus (2026-10-03; both pull-request acknowledgements owed). Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). Classification gap: the permitted enum has no plugin-marketplace route. The marketplace at the v0.10.0 tag (commit 75683c6d) and the plugin at user scope (README.md:29-30; usage ruling, change 2). The launcher runs the highest claude-hud version in any marketplace cache (scripts/statusline.mjs:29-39), so the pin also needs marketplace auto-update off, the documented default for a third-party marketplace, and no other cached version, which the acceptance checks. Then upstream's helper runs without prompts (usage ruling, change 3): scripts/setup.mjs inspect, then install, with --shell posix, under the runtime commands/setup.md:24 finds (mise's Node here). install copies the launcher to <config dir>/plugins/claude-hud/statusline.mjs and writes statusLine as the quoted runtime, then that launcher (scripts/setup.mjs:19-32 and 69-101), before the client configuration's apply, which keeps a statusLine the file has (keep_existing). setup.mjs keeps earlier statusLine keys only when they were claude-hud's (L94), so refreshInterval 5 is added when absent (change 4). Run the helper again after every mise Node move (change 5). The acceptance runs the configured command through bash with upstream's sample input (commands/setup.md:10 and 69-77), and checks that refreshInterval is a positive integer and that the copied launcher is 0.10.0's; it no longer runs the cached launcher directly, which passed while the configured command's launcher was missing (review of 2026-10-03). The interval check takes any integer of at least 1, the settings schema's type and minimum (SchemaStore claude-code-settings.json at de76181a, L2454), not only 5: install keeps an earlier claude-hud value (L94), and the check had rejected such an installed configuration (review of 2026-10-03 at 99a2e3c6). Kept off: showCost, showDailyCost, showWeeklyCost, showAuth and showAuthUser; CLAUDE_HUD_ALLOW_EXTRA_CMD is never set. Codex needs no install: its footer's six items are a key of its configuration, which the client configuration renders."
+    },
+    {
+      "layer": "observation-inference",
+      "slot": "otel-collector-contrib",
+      "owner": "OTel Collector Contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "release": "v0.162.0",
+      "installed": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified 'https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz' 'fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3' \"$tool_root/otel-collector-contrib/otelcol-contrib_0.162.0_linux_amd64.tar.gz\"",
+        "(cd \"$tool_root/otel-collector-contrib\" && tar -xvf 'otelcol-contrib_0.162.0_linux_amd64.tar.gz')",
+        "install -m 0755 \"$tool_root/otel-collector-contrib/otelcol-contrib\" \"$HOME/.local/bin/otelcol-contrib\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/9f912d59a165ded5dec82d0e1a94c2aef54e5c57/content/en/docs/collector/install/binary/linux.md#L87",
+        "line": 87
+      },
+      "service": {
+        "form": "service form: not documented upstream for systemd user; foreground otelcol-contrib --config",
+        "port": 21333,
+        "port_setting": "health_check.endpoint=127.0.0.1:21333 path=/health/status; OTLP grpc/http endpoint=127.0.0.1:21317/21318; service.telemetry.metrics.readers.pull.exporter.prometheus host=127.0.0.1 port=21888"
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "otelcol-contrib validate --config=\"$config_root/otel.yaml\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector/62cdad2ea133239380b44d20d84eb26e114779b6/otelcol/command_validate.go#L15",
+            "line": 15
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21333/health/status",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/extension/healthcheckextension/README.md#L96",
+            "line": 96
+          }
+        }
+      },
+      "config_paths": [
+        "$config_root/otel.yaml"
+      ],
+      "notes": "Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate. Synthesis X1 (wave 2): on the destination this service runs under the observability ruling's ecosystem-* user unit (its step 7, with its changes 4-6), the only unit set; the lifecycle dossier's otelcol-contrib, prometheus and alertmanager unit texts are dropped (they bind the same ports, and that Prometheus unit lacks --web.enable-otlp-receiver).",
+      "release_asset": {
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz",
+        "sha256": "fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3"
+      },
+      "upstream_install_quote": "curl --proto '=https' --tlsv1.2 -fOL https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v{{% param vers %}}/otelcol_{{% param vers %}}_linux_amd64.tar.gz\ntar -xvf otelcol_{{% param vers %}}_linux_amd64.tar.gz"
+    },
+    {
+      "layer": "observation-inference",
+      "slot": "prometheus",
+      "owner": "Prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "release": "v3.15.0",
+      "installed": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified 'https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz' '2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0' \"$tool_root/prometheus/prometheus-3.15.0.linux-amd64.tar.gz\"",
+        "(cd \"$tool_root/prometheus\" && tar xvfz 'prometheus-3.15.0.linux-amd64.tar.gz')",
+        "install -m 0755 \"$tool_root/prometheus/prometheus-3.15.0.linux-amd64/prometheus\" \"$HOME/.local/bin/prometheus\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/docs/getting_started.md#L18",
+        "line": 18
+      },
+      "service": {
+        "form": "service form: not documented upstream; foreground prometheus",
+        "port": 21090,
+        "port_setting": "--web.listen-address=127.0.0.1:21090 (docs/command-line/prometheus.md:17)"
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "\"$tool_root/prometheus/prometheus-3.15.0.linux-amd64/promtool\" check config \"$config_root/prometheus.yaml\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/prometheus/prometheus/5241a27fe3c6983549fccc32f6e65917408c63cd/docs/command-line/promtool.md#L91",
+            "line": 91
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21090/-/ready",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/docs/management_api.md#L22",
+            "line": 22
+          }
+        }
+      },
+      "config_paths": [
+        "$config_root/prometheus.yaml"
+      ],
+      "notes": "Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate. Synthesis X1 (wave 2): on the destination this service runs under the observability ruling's ecosystem-* user unit (its step 7, with its changes 4-6), the only unit set; the lifecycle dossier's otelcol-contrib, prometheus and alertmanager unit texts are dropped (they bind the same ports, and that Prometheus unit lacks --web.enable-otlp-receiver).",
+      "release_asset": {
+        "url": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
+        "sha256": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0"
+      },
+      "upstream_install_quote": "tar xvfz prometheus-*.tar.gz"
+    },
+    {
+      "layer": "observation-inference",
+      "slot": "loki",
+      "owner": "Loki",
+      "repository": "https://github.com/grafana/loki",
+      "release": "v3.7.8",
+      "installed": false,
+      "measurement_only": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified 'https://github.com/grafana/loki/releases/download/v3.7.8/loki-linux-amd64.zip' '62aea42c9cba52cd1642b3666ab37019a0ce4c24ab50b07e85dccc8d812f7d61' \"$tool_root/loki/loki-linux-amd64.zip\"",
+        "(cd \"$tool_root/loki\" && unzip -o 'loki-linux-amd64.zip')",
+        "install -m 0755 \"$tool_root/loki/loki-linux-amd64\" \"$HOME/.local/bin/loki\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/grafana/loki/v3.7.8/tools/release-note.md#L24",
+        "line": 24
+      },
+      "service": {
+        "form": "service form: not documented upstream for systemd user; foreground loki -config.file",
+        "port": 21300,
+        "port_setting": "server.http_listen_address=127.0.0.1 http_listen_port=21300 grpc_listen_address=127.0.0.1 grpc_listen_port=21396 (docs/sources/shared/configuration.md:6196-6216)"
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "cd \"$tool_root/loki\"\nloki -config.file=\"$config_root/loki.yaml\" -verify-config=true",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/grafana/loki/09e6ce2ff1bdc19763a10265b870c86f51c98655/pkg/loki/config_wrapper.go#L54",
+            "line": 54
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21300/ready",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/grafana/loki/v3.7.8/docs/sources/reference/loki-http-api.md#L1204",
+            "line": 1204
+          }
+        }
+      },
+      "config_paths": [
+        "$config_root/loki.yaml"
+      ],
+      "notes": "Measurement only: the manifest state is split, so the default run installs nothing and prints skipped; --only loki installs it for the deciding measurement (manifest: critic 1: tool results and API errors exist only as log events, so observing outcomes needs an event store and a display; critic 2: the requirement names usage and outcomes, not log search, and the Collector's connectors turn events into counters for Prometheus). Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. Release-note template tools/release-note.md:24-28 supplies exact curl/unzip/chmod commands; release variable pinned to v3.7.8. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
+      "release_asset": {
+        "url": "https://github.com/grafana/loki/releases/download/v3.7.8/loki-linux-amd64.zip",
+        "sha256": "62aea42c9cba52cd1642b3666ab37019a0ce4c24ab50b07e85dccc8d812f7d61"
+      },
+      "upstream_install_quote": "curl -O -L \"https://github.com/grafana/loki/releases/download/${DRONE_TAG}/loki-linux-amd64.zip\"\nunzip \"loki-linux-amd64.zip\"\nchmod a+x \"loki-linux-amd64\""
+    },
+    {
+      "layer": "observation-inference",
+      "slot": "grafana",
+      "owner": "Grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "release": "v13.2.3",
+      "installed": false,
+      "measurement_only": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified 'https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz' '6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235' \"$tool_root/grafana/grafana_13.2.3_36482603486_linux_amd64.tar.gz\"",
+        "(cd \"$tool_root/grafana\" && tar -zxvf 'grafana_13.2.3_36482603486_linux_amd64.tar.gz')",
+        "link_grafana"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux#L2819",
+        "line": 2819
+      },
+      "service": {
+        "form": "service form: not documented upstream for systemd user; upstream system-wide service and foreground grafana server",
+        "port": 21301,
+        "port_setting": "[server] http_addr=127.0.0.1 http_port=21301 (conf/defaults.ini:50-53); [grpc_server] address=127.0.0.1:21302 (conf/defaults.ini:117-119)"
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "grafana cli -v",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/grafana/grafana/6193dc03311b631b9727b560d24369e683dc396e/docs/sources/administration/cli.md#L69",
+            "line": 69
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21301/api/health",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/other.md#L99",
+            "line": 99
+          }
+        }
+      },
+      "config_paths": [
+        "$config_root/grafana.ini"
+      ],
+      "notes": "Measurement only: the manifest state is split, so the default run installs nothing and prints skipped; --only grafana installs it for the deciding measurement (manifest: critic 1: tool results and API errors exist only as log events, so observing outcomes needs an event store and a display; critic 2: the requirement names usage and outcomes, not log search, and the Collector's connectors turn events into counters for Prometheus). Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. Official page quotes wget URL and tar -zxvf archive; use common checksum-verifying HTTPS transport wrapper. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
+      "release_asset": {
+        "url": "https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz",
+        "sha256": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235"
+      },
+      "upstream_install_quote": "wget https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz\ntar -zxvf grafana_13.2.3_36482603486_linux_amd64.tar.gz"
+    },
+    {
+      "layer": "observation-inference",
+      "slot": "phoenix",
+      "owner": "Not installed: qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer's requirement has no trace-store job; no blind GPT sample picked it",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer's requirement has no trace-store job; no blind GPT sample picked it"
+    },
+    {
+      "layer": "observation-inference",
+      "slot": "local-model-server",
+      "owner": "Ollama",
+      "repository": "https://github.com/ollama/ollama",
+      "release": "v0.35.0",
+      "installed": true,
+      "route": "mise",
+      "commands": [
+        "mise use -g ollama@0.35.0"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": true,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/ollama.toml#L1",
+        "line": 1
+      },
+      "service": {
+        "form": "service form: not documented upstream for systemd user; upstream system unit and foreground ollama serve",
+        "port": 21434,
+        "port_setting": "OLLAMA_HOST=127.0.0.1:21434 (ollama v0.35.0 docs/faq.mdx:185)"
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "OLLAMA_HOST=127.0.0.1:21434 ollama --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/cmd/cmd.go#L2181",
+            "line": 2181
+          }
+        },
+        "service_health": {
+          "command": "OLLAMA_HOST=127.0.0.1:21434 ollama ls",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L97",
+            "line": 97
+          }
+        },
+        "after_sign_in": {
+          "command": "curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Hello world\"}' | jq -e '(.embeddings | length) == 1' >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659",
+            "line": 1659
+          }
+        }
+      },
+      "config_paths": [
+        "$config_root/ollama.env.example"
+      ],
+      "notes": "Planned. First Linux installer installs under /usr and needs privileges; prefer registered user-level mise route. Upstream unit is system-wide (docs/linux.mdx:57-89), so do not invent user unit. Foreground start: OLLAMA_HOST=127.0.0.1:21434 ollama serve. Not automatically started. Version mode exits without starting the daemon, warning when it is absent. List checks the running local server. The after_sign_in smoke is one /api/embed call to qwen3-embedding-8k, the settled embedder, once the embedding-model row has created it (until that model's manifest is in the store, accept.sh prints skipped for this stage, which is not a pass); the endpoint answers 404 for a missing model, through GetModel's not-found error, and its handler pulls nothing (server/routes.go:981-984 and 3226-3227 at cc4069396f). It replaced upstream's example `ollama run embeddinggemma` on 2026-10-03, which would pull EmbeddingGemma, a model no row selected. GPU inference on the destination remains unrun.",
+      "mise_tool": "ollama"
+    },
+    {
+      "layer": "observation-inference",
+      "slot": "alerting",
+      "owner": "Alertmanager",
+      "repository": "https://github.com/prometheus/alertmanager",
+      "release": "v0.34.1",
+      "installed": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified 'https://github.com/prometheus/alertmanager/releases/download/v0.34.1/alertmanager-0.34.1.linux-amd64.tar.gz' '265b9d1e55ef0d5306a436018af6d2b686c2ce051f03d968f7464ecb1372a7e8' \"$tool_root/alertmanager/alertmanager-0.34.1.linux-amd64.tar.gz\"",
+        "(cd \"$tool_root/alertmanager\" && tar xvfz 'alertmanager-0.34.1.linux-amd64.tar.gz')",
+        "install -m 0755 \"$tool_root/alertmanager/alertmanager-0.34.1.linux-amd64/alertmanager\" \"$HOME/.local/bin/alertmanager\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/README.md#L14",
+        "line": 14
+      },
+      "service": {
+        "form": "service form: not documented upstream for systemd user; foreground alertmanager",
+        "port": 21093,
+        "port_setting": "--web.listen-address=127.0.0.1:21093 (Procfile:1; cmd/alertmanager/main.go:63); --cluster.listen-address= turns clustering off (README.md:394-396)"
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "\"$tool_root/alertmanager/alertmanager-0.34.1.linux-amd64/amtool\" check-config \"$config_root/alertmanager.yaml\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/docs/configuration.md#L620",
+            "line": 620
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21093/-/ready",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/docs/management_api.md#L22",
+            "line": 22
+          }
+        }
+      },
+      "config_paths": [
+        "$config_root/alertmanager.yaml"
+      ],
+      "notes": "Planned. Documented release-binary route plus the sha256 from the release's own sha256sums.txt (the README describes the precompiled binaries in prose only; it quotes no tar command). Download/checksum/user-prefix operations and the tar form are script transport glue taken from the Prometheus row, not a claimed verbatim upstream installer. amtool is not installed to PATH: it runs from the extracted directory, as promtool does. The minimal configuration has one receiver with no integration, so nothing is ever sent (a receiver is a name plus optional integration lists, docs/configuration.md:821-829; upstream's own fixture config/testdata/conf.nil-match_re-route.yml uses one); the root route must name a receiver (README.md:59-62). Port 21093 is in the plan's 21xxx band beside Prometheus's 21090, and no other row or config file uses it; --cluster.listen-address= leaves no HA listener. No upstream systemd user unit is documented; installed binary and configuration only, foreground service start remains separate. Synthesis X1 (wave 2): on the destination this service runs under the observability ruling's ecosystem-* user unit (its step 7, with its changes 4-6), the only unit set; the lifecycle dossier's otelcol-contrib, prometheus and alertmanager unit texts are dropped (they bind the same ports, and that Prometheus unit lacks --web.enable-otlp-receiver).",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/docs/configuration.md#L821",
+          "line": 821
+        },
+        {
+          "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/config/testdata/conf.nil-match_re-route.yml#L1",
+          "line": 1
+        },
+        {
+          "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/README.md#L59",
+          "line": 59
+        },
+        {
+          "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/README.md#L394",
+          "line": 394
+        },
+        {
+          "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/Procfile#L1",
+          "line": 1
+        },
+        {
+          "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/cmd/alertmanager/main.go#L63",
+          "line": 63
+        }
+      ],
+      "release_asset": {
+        "url": "https://github.com/prometheus/alertmanager/releases/download/v0.34.1/alertmanager-0.34.1.linux-amd64.tar.gz",
+        "sha256": "265b9d1e55ef0d5306a436018af6d2b686c2ce051f03d968f7464ecb1372a7e8"
+      },
+      "upstream_install_quote": "Precompiled binaries for released versions are available in the download section on prometheus.io. Using the latest production release binary is the recommended way of installing Alertmanager."
+    },
+    {
+      "layer": "observation-inference",
+      "slot": "local-generation-model",
+      "owner": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
+      "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
+      "release": "d74895bbe5db4bec1e0024e7cc87d59c02d7631a",
+      "installed": true,
+      "route": "model-server",
+      "commands": [
+        "fetch_verified 'https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF/resolve/d74895bbe5db4bec1e0024e7cc87d59c02d7631a/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf' '1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786' \"$tool_root/ollama-models/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf\"",
+        "install -m 0644 -t \"$tool_root/ollama-models\" \"$plan_dir/models/swift-iq3s-s2o.Modelfile\" \"$plan_dir/models/swift-iq3s-s2o-64k.Modelfile\"",
+        "OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o -f \"$tool_root/ollama-models/swift-iq3s-s2o.Modelfile\"",
+        "OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o-64k -f \"$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": true,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/modelfile.mdx#L120",
+        "line": 120
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "printf '%s  %s\\n' f6522bf4934aaa4f60231a042a8dfb781a7f5b3b1abc5053757f37169772ea9e \"$tool_root/ollama-models/swift-iq3s-s2o.Modelfile\" 6d15fee40e089b73961262647352c3443a03fa643122a92ca7a0b59376793d8e \"$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile\" | sha256sum --check --status && grep -F sha256:1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786 \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/swift-iq3s-s2o-64k/latest\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/create.go#L905",
+            "line": 905
+          }
+        },
+        "service_health": {
+          "command": "out=\"$(OLLAMA_HOST=127.0.0.1:21434 ollama show swift-iq3s-s2o-64k)\" && grep -E '^ +num_ctx +64000 *$' <<<\"$out\" >/dev/null && grep -E '^ +quantization +IQ3_S *$' <<<\"$out\" >/dev/null && curl -fsS http://127.0.0.1:21434/api/generate -d '{\"model\":\"swift-iq3s-s2o-64k\",\"prompt\":\"Reply with the word ready.\",\"stream\":false,\"think\":false,\"options\":{\"num_predict\":32}}' | jq -e '.done == true and (.response | length > 0)' >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L48",
+            "line": 48
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Settled by the local-model measurement of 2026-10-02 (evidence/artifacts/new-wsl-local-models-20261002; docs/decisions/2026-10-03-new-wsl-local-models.md). The measured system: the IQ3_S file of the pinned Hugging Face revision (11,771,546,912 bytes; the publisher's repository is not gated), imported into Ollama 0.35.0 with the library qwen3.8:27b model's Modelfile lines (models/swift-iq3s-s2o.Modelfile: the measured file, sha256 8911245e..., with its FROM line, an absolute path in the throwaway distribution, written relative to the Modelfile as docs/modelfile.mdx:126 allows), and a derived model that carries the context of 64,000 as its own parameter (models/swift-iq3s-s2o-64k.Modelfile, byte-identical to the measured one). No server-wide context is set. fetch_verified and the placement of the two Modelfiles beside the file are plan glue; ollama create (cmd/cmd.go:2422) copies the file into the server's model store, written by the client when a loopback server shares its store and uploaded otherwise (cmd/cmd.go:385 and :523), and the server keeps it as the model layer under its own sha256 (server/create.go:905), so the row needs about 23.5 GB of disk while the downloaded file is kept. The models are created through the running model server, which the plan does not start: the default run skips this row, and bash install.sh --only local-generation-model installs it once the server answers on 127.0.0.1:21434 and reports version 0.35.0, the measured one, through GET /api/version (docs/api.md:1824); otherwise install.sh stops the row before the download. The post-install check reads files only: the placed Modelfiles are the repository's, and the created model's manifest names the pinned file as a layer. The service check shows num_ctx 64000 and quantization IQ3_S and runs one short generation with thinking off, which is not the measured effort (medium). The manifest digests that the measurement recorded (swift-iq3s-s2o eaedf746b10251265e653fae1052c98f3edc7b196f089f1508d8d0fa8820f68c, swift-iq3s-s2o-64k 8b39735c4f973d2192171c5b800a2bbb25cf053a59e5d7d2edcaa9830198cb11) are for comparison, not a check. One RTX 4090 serves the workstation's model services and this server: the measured co-residency (the generation model 14.81 GiB and the embedder 2.66 GiB, each entirely on the GPU) held with no other WSL process holding GPU memory, so which distribution's server holds the card is for the lifecycle design to decide; nothing here decides it. Not run on any distribution as a plan row."
+    },
+    {
+      "layer": "observation-inference",
+      "slot": "session-analytics",
+      "owner": "Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set"
+    },
+    {
+      "layer": "quality-evaluation",
+      "slot": "inspect-ai",
+      "owner": "Inspect AI",
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "release": "0.3.273",
+      "installed": true,
+      "route": "uv-tool",
+      "commands": [
+        "uv tool install --python 3.13 inspect-ai==0.3.273"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/0.3.273/docs/index.qmd#L38",
+        "line": 38
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "inspect --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/0.3.273/src/inspect_ai/_cli/main.py#L23",
+            "line": 23
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Input has no GitHub release tag; resolve upstream tag 0.3.273 to 9e44f1b77ed7c912bf58baf30db8560937e7ce53. Documented pip package isolated using supported uv tool format (uv docs/guides/tools.md:172,275). No credential-free documented install smoke; real evaluation requires provider setup."
+    },
+    {
+      "layer": "quality-evaluation",
+      "slot": "harbor-containerized-agent-e2e-runner",
+      "owner": "Harbor (containerized agent E2E runner)",
+      "repository": "https://github.com/harbor-framework/harbor",
+      "release": "v0.23.0",
+      "installed": true,
+      "route": "uv-tool",
+      "commands": [
+        "uv tool install --python 3.13 harbor==0.23.0"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": true,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/README.md#L22",
+        "line": 22
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "harbor --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/skills/create-adapter/SKILL.md#L30",
+            "line": 30
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. First upstream uv tool route. Python >=3.12. Upstream skill states CLI installed when --version succeeds. Actual E2E requires Docker/provider authentication."
+    },
+    {
+      "layer": "quality-evaluation",
+      "slot": "promptfoo",
+      "owner": "Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it"
+    },
+    {
+      "layer": "ci-supply-chain",
+      "slot": "zizmor",
+      "owner": "zizmor",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "release": "v1.30.1",
+      "installed": true,
+      "route": "mise",
+      "commands": [
+        "mise use -g zizmor@1.30.1"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/zizmor.toml#L1",
+        "line": 1
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "zizmor -h",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/zizmorcore/zizmor/v1.30.1/docs/quickstart.md#L3",
+            "line": 3
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Choose mise registry over Homebrew/PyPI alternatives to keep one version manager. Quickstart explicitly names -h to verify installation.",
+      "mise_tool": "zizmor"
+    },
+    {
+      "layer": "ci-supply-chain",
+      "slot": "attest",
+      "owner": "attest",
+      "repository": "https://github.com/actions/attest",
+      "release": "v4.2.2",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "a GitHub-hosted feature configured in a workflow: nothing is installed on the host. Reviewed pointer for repository workflows, not a host installation: uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6. No host installation/acceptance command. Workflows require repository/artifact configuration."
+    },
+    {
+      "layer": "ci-supply-chain",
+      "slot": "syft",
+      "owner": "Syft",
+      "repository": "https://github.com/anchore/syft",
+      "release": "v1.54.0",
+      "installed": true,
+      "route": "mise",
+      "commands": [
+        "mise use -g syft@1.54.0"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/syft.toml#L1",
+        "line": 1
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "syft alpine:latest",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/anchore/syft/v1.54.0/README.md#L48",
+            "line": 48
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. README first Linux script targets /usr/local/bin via sudo; choose registry mise for user-level ownership. Documented public-container scan needs network; alpine:latest is upstream's smoke input, not a reproducible image pin.",
+      "mise_tool": "syft"
+    },
+    {
+      "layer": "ci-supply-chain",
+      "slot": "dependabot",
+      "owner": "Dependabot",
+      "repository": "https://github.com/dependabot/dependabot-core",
+      "release": "v0.398.0",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "the only owner of dependency update pull requests: none of zizmor, actionlint, Syft or attest moves a pin; one blind GPT sample of three picked it; a GitHub-hosted service configured by .github/dependabot.yml: nothing is installed on the host. Reviewed pointer for repository workflows, not a host installation: Tag resolves to a1750051287d1f3786081d3aa3e6e2b04a72edde. No valid uses: reference: upstream repository has no action entrypoint. Enable GitHub Dependabot through .github/dependabot.yml; no host installation."
+    },
+    {
+      "layer": "ci-supply-chain",
+      "slot": "codeql-sarif",
+      "owner": "Not installed: a transport, not a scanner: zizmor's own action carries the pinned upload step; no blind GPT sample picked it as a slot",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "a transport, not a scanner: zizmor's own action carries the pinned upload step; no blind GPT sample picked it as a slot"
+    },
+    {
+      "layer": "ci-supply-chain",
+      "slot": "actionlint-kjanat",
+      "owner": "actionlint (kjanat)",
+      "repository": "https://github.com/kjanat/actionlint",
+      "release": "v1.17.0",
+      "installed": true,
+      "route": "mise",
+      "commands": [
+        "mise use -g github:kjanat/actionlint@1.17.0"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/kjanat/actionlint/v1.17.0/docs/install.md#L223",
+        "line": 223
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "actionlint -version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/kjanat/actionlint/v1.17.0/docs/install.md#L127",
+            "line": 127
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Explicit upstream-documented github backend; short actionlint selects rhysd and would install the wrong owner (docs/install.md:208). Remove example's ./ prefix because mise exposes the binary on PATH.",
+      "mise_tool": "github:kjanat/actionlint"
+    },
+    {
+      "layer": "scheduling-supervision",
+      "slot": "dagu",
+      "owner": "Dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "release": "v2.18.1",
+      "installed": true,
+      "route": "native-installer",
+      "commands": [
+        "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh | bash -s -- --version v2.18.1 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": true,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/README.md#L105",
+        "line": 105
+      },
+      "service": {
+        "form": "upstream systemd user unit dagu.service (scripts/installer.sh:1635,1666-1697)",
+        "port": 21080,
+        "port_setting": "--host 127.0.0.1 --port 21080; DAGU_HOST/DAGU_PORT in upstream env file. Coordinator default 127.0.0.1:50055 (internal/cmn/config/loader.go:2017); start-all disables extra health listeners."
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "dagu version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/dagucloud/dagu/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/internal/cmd/version.go#L15",
+            "line": 15
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21080/api/v1/health",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh#L1997",
+            "line": 1997
+          }
+        }
+      },
+      "config_paths": [
+        "$HOME/.config/systemd/user/dagu.service",
+        "$HOME/.config/dagu/dagu.env"
+      ],
+      "notes": "Planned. First user-level Linux installer beats mise. Use upstream version/no-prompt/user-service/host/port/browser flags (installer:109-121). No admin bootstrap secrets. Installer owns unit and starts service; may add PATH startup entries, but does not change default shell. Coordinator native default free50055, source loopback verified."
+    },
+    {
+      "layer": "hosting-services",
+      "slot": "docker-compose",
+      "owner": "Docker Compose",
+      "repository": "https://github.com/docker/compose",
+      "release": "v5.5.1",
+      "installed": true,
+      "route": "apt-repo",
+      "commands": [
+        "docker_repository",
+        "docker_compose_package"
+      ],
+      "needs": {
+        "sudo": true,
+        "systemd_user_unit": false,
+        "docker": true,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/docker/docs/f0e4e4790191aaee83f9375dce56ada3971c6773/content/manuals/compose/install/linux.md#L38",
+        "line": 38
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "docker compose version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/docker/docs/f0e4e4790191aaee83f9375dce56ada3971c6773/content/manuals/compose/install/linux.md#L51",
+            "line": 51
+          }
+        }
+      },
+      "config_paths": [
+        "/etc/apt/sources.list.d/docker.sources"
+      ],
+      "notes": "Planned. Special-case official apt docker-compose-plugin; use repository metadata to match5.5.1 exactly, fail if unavailable. Compose uses Docker's rootless user service, has no separate unit. mise entry deliberately not used."
+    },
+    {
+      "layer": "hosting-services",
+      "slot": "container-engine",
+      "owner": "Docker Engine / Moby",
+      "repository": "https://github.com/moby/moby",
+      "release": "docker-v29.8.2",
+      "installed": true,
+      "route": "apt-repo",
+      "commands": [
+        "docker_repository",
+        "docker_engine_packages",
+        "sudo systemctl disable --now docker.service docker.socket",
+        "if [[ ! -f \"$HOME/.config/systemd/user/docker.service\" ]]; then dockerd-rootless-setuptool.sh install; fi",
+        "systemctl --user enable --now docker.service"
+      ],
+      "needs": {
+        "sudo": true,
+        "systemd_user_unit": true,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/docker/docs/dd2797b84208848765705a1518aeee7e47907bd7/content/manuals/engine/install/ubuntu.md#L122",
+        "line": 122
+      },
+      "service": {
+        "form": "upstream rootless systemd user docker.service",
+        "port": null,
+        "port_setting": "Unix socket ${XDG_RUNTIME_DIR}/docker.sock; no TCP listener"
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "dockerd --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/moby/moby/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/command/docker.go#L51",
+            "line": 51
+          }
+        },
+        "service_health": {
+          "command": "docker run hello-world",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/docker/docs/0571430b6a9c6ff1742baede7c265c3c5e9e3322/content/manuals/engine/security/rootless/troubleshoot.md#L212",
+            "line": 212
+          }
+        }
+      },
+      "config_paths": [
+        "/etc/apt/sources.list.d/docker.sources",
+        "$HOME/.config/systemd/user/docker.service",
+        "$HOME/.config/docker/daemon.json"
+      ],
+      "notes": "Planned. Special-case official Docker apt repository on supported Ubuntu Resolute26.04. Version29.8.2 selected from native apt metadata at future execution; fail if absent, do not guess Resolute package revision. uidmap/dbus-user-session prerequisites; docker-ce-rootless-extras required. Disable rootful service/socket before rootless setup. Upstream setup creates unit/context. Package dependencies remain repo-managed. Linger not enabled: unit runs with user session; boot persistence needs OS policy separately."
+    },
+    {
+      "layer": "hosting-services",
+      "slot": "gpu-container-runtime",
+      "owner": "Not installed: no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does"
+    },
+    {
+      "layer": "secrets-credentials",
+      "slot": "betterleaks",
+      "owner": "betterleaks",
+      "repository": "https://github.com/betterleaks/betterleaks",
+      "release": "v1.9.0",
+      "installed": true,
+      "route": "mise",
+      "commands": [
+        "mise use -g betterleaks@1.9.0"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/betterleaks.toml#L1",
+        "line": 1
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "betterleaks dir \"$plan_dir\" -v",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/betterleaks/betterleaks/v1.9.0/README.md#L57",
+            "line": 57
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Registry repository identity checked. Prefer mise over Homebrew cask/Fedora/Go alternatives for user-level executable. Documented directory scan uses the plan folder in place of upstream's path placeholder; this is a functional smoke, not a scan of credentials or unrelated files.",
+      "mise_tool": "betterleaks"
+    },
+    {
+      "layer": "secrets-credentials",
+      "slot": "trufflehog",
+      "owner": "Not installed: no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for"
+    },
+    {
+      "layer": "secrets-credentials",
+      "slot": "credential-custody",
+      "owner": "Not installed until the deciding measurement returns (the repository's runner and guard stay the practice)",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing is installed until the deciding measurement returns, and the repository's practice stays in use. The measurement, as the record gives it: HASP against the repository's runner and guard on the existing synthetic leak-path fixtures: output and trace checks, audit records, client boundaries, restart and removal. A claim that an agent can never read a value needs direct controls and a stated isolation scope. Native client sign-ins stay native: no import or copy of an authentication store, no real secret, no operating-system grant and no provider call is part of the comparison. HASP 1.0.43 (gethasp/hasp at 624b3b38ac4f7a267e6925c545768c95945d781a) is the challenger arm; it is not installed, and this plan carries no install command for an arm."
+    },
+    {
+      "layer": "git-github-automation",
+      "slot": "git",
+      "owner": "git",
+      "repository": "https://github.com/git/git",
+      "release": "Ubuntu 26.04 apt candidate",
+      "installed": true,
+      "route": "apt",
+      "commands": [
+        "sudo apt-get install -y --no-install-recommends git"
+      ],
+      "needs": {
+        "sudo": true,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/git/git-scm.com/422e163b96cdcff929cd63028657597752d4b9d7/content/install/linux.html#L19",
+        "line": 19
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "git --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/git/git/v2.56.0/Documentation/git.adoc#L44",
+            "line": 44
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Ubuntu-managed Git is already supplied by the base image/prerequisite apt packages. Use Ubuntu's own apt candidate without a PPA or a source build; do not claim the reviewed upstream v2.56.0 is the installed pin. This route is idempotent; post-install is git --version."
+    },
+    {
+      "layer": "git-github-automation",
+      "slot": "gh-github-cli",
+      "owner": "gh (GitHub CLI)",
+      "repository": "https://github.com/cli/cli",
+      "release": "v2.102.0",
+      "installed": true,
+      "route": "mise",
+      "commands": [
+        "mise use -g github-cli@2.102.0"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/github-cli.toml#L1",
+        "line": 1
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "gh --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/github-cli.toml#L4",
+            "line": 4
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Registry repository identity checked. Prefer architecture's mise to system package/alternate manager or ad-hoc release downloads. No documented key-free install smoke selected beyond upstream version test.",
+      "mise_tool": "github-cli"
+    },
+    {
+      "layer": "git-github-automation",
+      "slot": "worktrunk",
+      "owner": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "release": "v0.80.0",
+      "installed": true,
+      "route": "mise",
+      "commands": [
+        "mise use -g worktrunk@0.80.0"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/worktrunk.toml#L1",
+        "line": 1
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "cd \"$repo_root\"\nwt list",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/v0.80.0/README.md#L166",
+            "line": 166
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Registry repository identity checked. Prefer architecture's mise to system package/alternate manager or ad-hoc release downloads. wt list runs in this git checkout; shell integration is omitted.",
+      "mise_tool": "worktrunk"
+    },
+    {
+      "layer": "git-github-automation",
+      "slot": "difftastic",
+      "owner": "difftastic",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "release": "0.71.0",
+      "installed": true,
+      "route": "mise",
+      "commands": [
+        "mise use -g difftastic@0.71.0"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/difftastic.toml#L1",
+        "line": 1
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "difft --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/Wilfred/difftastic/0.71.0/.github/ISSUE_TEMPLATE/bug_report.md#L16",
+            "line": 16
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Registry correct owner; release download/Homebrew alternatives use mise for one user-level version manager. Upstream issue template documents version reporting only.",
+      "mise_tool": "difftastic"
+    },
+    {
+      "layer": "git-github-automation",
+      "slot": "claude-code-action",
+      "owner": "Not installed: it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it"
+    },
+    {
+      "layer": "git-github-automation",
+      "slot": "agent-structural-diff",
+      "owner": "Not installed: git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes)",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes)"
+    },
+    {
+      "layer": "git-github-automation",
+      "slot": "cross-family-review",
+      "owner": "No additional component: the two clients' native review commands, each family on the other's work",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing additional is installed: the capability is the two clients' native review commands, which the claude-code and codex rows install. The record's open gate is the qualification of the Codex 0.160 review command on the destination, owned by the Codex lane. PR-Agent 0.47.0 is a comparison only for an identified gap and is not installed."
+    },
+    {
+      "layer": "recovery-portability",
+      "slot": "mise",
+      "owner": "mise",
+      "repository": "https://github.com/jdx/mise",
+      "release": "v2026.10.0",
+      "installed": true,
+      "route": "native-installer",
+      "commands": [
+        "curl -fsSL https://mise.run | MISE_VERSION=v2026.10.0 sh"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/installing-mise.md#L82",
+        "line": 82
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "cd \"$tool_root\"\nPATH=\"${MISE_SHIMS_DIR:-${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/shims}:$PATH\" mise doctor",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/jdx/mise/bc11f90c74eba23bf0d7350efb540e62fb7d9ffd/src/cli/doctor/mod.rs#L532",
+            "line": 532
+          }
+        }
+      },
+      "config_paths": [
+        "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml"
+      ],
+      "notes": "Planned. README's first Linux route; MISE_VERSION pin documented at docs/installing-mise.md:128. Shell activation optional and omitted. Runtimes node 24.21.0, python 3.13.16, uv 0.12.22 are bootstrap prerequisites. Full doctor needs activation or shims; process-scoped mise env alone does not activate the shell. Add the default shims directory to this process's PATH; preserve every doctor check and all version pins. Doctor runs in the owned global tool directory so a selective install does not select the inventory manifest's optional tools."
+    },
+    {
+      "layer": "recovery-portability",
+      "slot": "restic",
+      "owner": "Restic",
+      "repository": "https://github.com/restic/restic",
+      "release": "v0.19.1",
+      "installed": true,
+      "route": "mise",
+      "commands": [
+        "mise use -g restic@0.19.1"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/restic.toml#L1",
+        "line": 1
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "restic version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/restic/restic/v0.19.1/doc/man/restic-version.1#L9",
+            "line": 9
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Planned. Registry repository identity checked. Prefer architecture's mise to system package/alternate manager or ad-hoc release downloads. No documented key-free install smoke selected beyond upstream version test.",
+      "mise_tool": "restic"
+    },
+    {
+      "layer": "recovery-portability",
+      "slot": "chezmoi",
+      "owner": "Not installed: mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it"
+    },
+    {
+      "layer": "cross:wsl-distro",
+      "slot": "base-distribution",
+      "owner": "Ubuntu 26.04.1 LTS (Canonical WSL image), primary",
+      "repository": "https://releases.ubuntu.com/26.04.1/",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "The target distribution itself: the plan runs on this image and installs nothing for this row."
+    },
+    {
+      "layer": "cross:gpt6-harnesses",
+      "slot": "gpt-gateway",
+      "owner": "OmniRoute",
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "release": "v3.8.51",
+      "installed": true,
+      "route": "npm-global",
+      "commands": [
+        "npm install -g omniroute@3.8.51"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/v3.8.51/README.md#L1005",
+        "line": 1005
+      },
+      "service": {
+        "form": "upstream detached daemon; service form: not documented upstream for systemd user",
+        "port": 21128,
+        "port_setting": "OMNIROUTE_SERVER_HOST=127.0.0.1 API_HOST=127.0.0.1 PORT=21128 LIVE_WS_HOST=127.0.0.1 LIVE_WS_PORT=21129 EMBED_WS_PROXY_PORT=21131 (docs/reference/ENVIRONMENT.md:158-190; EMBED_WS_PROXY_PORT per the wave-2 gateway ruling, change 12)"
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "omniroute --output json doctor --no-liveness",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/c1e30b7676975feb298b49eff6ff58923c04b89e/bin/cli/commands/doctor.mjs#L630",
+            "line": 630
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21128/readyz\nomniroute --output json doctor --liveness-url http://127.0.0.1:21128/api/monitoring/health",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/c1e30b7676975feb298b49eff6ff58923c04b89e/src/app/healthz/route.ts#L17",
+            "line": 17
+          }
+        }
+      },
+      "config_paths": [
+        "$config_root/omniroute.env.example"
+      ],
+      "notes": "Planned. First persistent npm route. After provider configuration, run with all loopback env settings: omniroute serve --port 21128 --no-open --daemon (bin/cli/commands/serve.mjs:56-62). No user unit documented. HOSTNAME does not set server bind. Provider configuration remains native; no credential values in plan; daemon not automatically started. The installed doctor rejects --json despite the documentation example. JSON is global --output json. --no-liveness is the upstream local diagnostic mode; full liveness and machine-token HTTP checks remain in service_health. Doctor only warns for unreachable endpoints, so service-health first requires upstream /readyz HTTP success, then retains the full doctor. /readyz aliases the lifecycle 200/503 healthz route. Wave-2 gateway ruling, change 12: config/omniroute.env.example gains EMBED_WS_PROXY_PORT=21131 (the embed-service WebSocket proxy, whose upstream default 20131 is the workstation gateway's), and all its lines are plain NAME=value lines, because systemd's EnvironmentFile= drops export lines; on the destination the ports stay in the unit's Environment= lines or as plain lines in server.env, whose values override them. Synthesis X3: the destination's unit is the gateway ruling's step-6 unit rendered from adoption/templates/systemd/omniroute.service; the lifecycle dossier's omniroute.service text is dropped. The gateway ruling's route for the destination is an owned-prefix canary build (release/v3.8.52 @23a11484 plus pull requests 13788 and 15167) with its own gates; npm 3.8.51 here is its rollback only before accounts exist. That route change is not in this revision.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/c1e30b7676975feb298b49eff6ff58923c04b89e/bin/cli/program.mjs#L18",
+          "line": 18
+        },
+        {
+          "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/cli-doctor-command.test.ts#L74",
+          "line": 74
+        }
+      ]
+    },
+    {
+      "layer": "cross:runtime-workers",
+      "slot": "agent-runtime-worker",
+      "owner": "OpenHands software-agent-sdk",
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "release": "v1.50.1",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "checkout_tag https://github.com/OpenHands/software-agent-sdk.git v1.50.1 \"$tool_root/openhands-source\"",
+        "ensure_venv \"$tool_root/agent-runtime-worker\"",
+        "uv pip install --python \"$tool_root/agent-runtime-worker/bin/python\" \"openhands-sdk==1.50.1\" \"openhands-tools==1.50.1\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/OpenHands/docs/832ad1635431c7711cbfdc9d1f52c2dab9ee7e61/sdk/getting-started.mdx#L80",
+        "line": 80
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "\"$tool_root/agent-runtime-worker/bin/python\" -c 'from importlib.metadata import version; print(version(\"openhands-sdk\")); print(version(\"openhands-tools\"))'",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/1e1390acc8788346ba4804c34323284009bf3f5e/openhands-sdk/openhands/sdk/__init__.py#L113",
+            "line": 113
+          }
+        },
+        "after_sign_in": {
+          "command": "cd \"$tool_root/openhands-source\"\n\"$tool_root/agent-runtime-worker/bin/python\" examples/01_standalone_sdk/01_hello_world.py",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/OpenHands/docs/832ad1635431c7711cbfdc9d1f52c2dab9ee7e61/sdk/getting-started.mdx#L149",
+            "line": 149
+          }
+        }
+      },
+      "config_paths": [
+        "$tool_root/agent-runtime-worker",
+        "$tool_root/openhands-source"
+      ],
+      "notes": "Planned. Classification gap: isolated Python SDK library, not a CLI uv-tool package. Official matching-version pip route wrapped by supported uv pip --python. Tagged working example invoked by the venv interpreter instead of uv run to avoid a second environment. OpenAI-compatible names: LLM_BASE_URL, LLM_API_KEY, LLM_MODEL (tagged example:9-12). Example makes a model call and writes FACTS.txt only in owned source checkout."
+    },
+    {
+      "layer": "cross:runtime-workers",
+      "slot": "research-harnesses",
+      "owner": "GPT Researcher and DeerFlow, kept as two independent evidence gatherers",
+      "repository": "https://github.com/assafelovic/gpt-researcher ; https://github.com/bytedance/deer-flow",
+      "release": "v3.7.0 ; v2.1.0",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "checkout_tag https://github.com/assafelovic/gpt-researcher.git v3.7.0 \"$tool_root/gpt-researcher\"",
+        "ensure_venv \"$tool_root/gpt-researcher/.venv\"",
+        "(cd \"$tool_root/gpt-researcher\" && uv pip install --python .venv/bin/python -r requirements.txt)",
+        "checkout_tag https://github.com/bytedance/deer-flow.git v2.1.0 \"$tool_root/deer-flow\"",
+        "(cd \"$tool_root/deer-flow\" && if [[ ! -e config.yaml && ! -e .env && ! -e frontend/.env ]]; then make config; elif [[ ! -e config.yaml || ! -e .env || ! -e frontend/.env ]]; then printf \"Partial DeerFlow config; repair from upstream recipe.\\n\" >&2; exit 1; fi)",
+        "(cd \"$tool_root/deer-flow/backend\" && uv sync --locked)"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/v3.7.0/README.md#L99",
+        "line": 99
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "cd \"$tool_root/gpt-researcher\"\n.venv/bin/python -c 'import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open(\"pyproject.toml\", \"rb\"))[\"project\"][\"version\"])'\nbash \"$repo_root/tools/research/gpt_researcher.sh\" --preflight-only\n\"$tool_root/deer-flow/backend/.venv/bin/python\" -c 'from deerflow.client import DeerFlowClient'",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/pyproject.toml#L23",
+            "line": 23
+          }
+        },
+        "after_sign_in": {
+          "command": "out=\"$(bash \"$repo_root/tools/research/gpt_researcher.sh\" \"Ubuntu 26.04 WSL news this month\")\"\ngrep -q \"^Report written to 'outputs/\" <<<\"$out\"\nrun=\"$(sed -n 's/^run directory: //p' <<<\"$out\")\"\nrefs=\"$(awk '/^#+ *References/{f=1} f' \"$run\"/outputs/*.md | grep -oE 'https?://[^) >]+' | sort -u | wc -l)\"\n[[ \"$refs\" -ge 5 ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/cli.py#L336",
+            "line": 336
+          }
+        }
+      },
+      "config_paths": [
+        "$tool_root/gpt-researcher/.venv",
+        "$tool_root/deer-flow/config.yaml",
+        "$tool_root/deer-flow/backend/.venv"
+      ],
+      "notes": "One row for the manifest's research-harnesses slot; the two independent evidence gatherers keep their own commands, in order: GPT Researcher (source checkout plus isolated venv) then DeerFlow (source checkout plus its backend's locked uv environment). install.sh attempts both and fails when either fails. Revised by the wave-2 research ruling (2026-10-03; Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2).): DeerFlow runs as the embedded DeerFlowClient, with no HTTP service, port, Compose, nginx, apt or sudo (changes 9 and 10; README.md:1639-1686, the backend's uv sync --locked is Makefile:96), so make docker-init, the 2026 service and its /health/ready check are gone and needs.docker is false; make config still generates config.yaml, which embedded runs read through DEER_FLOW_CONFIG_PATH (app_config.py:398-401 fails closed without it). The HTTP service comes back only if claude-to-deerflow passes the research-skill gate, and only in a loopback-only form. GPT Researcher: Classification gap: source checkout plus isolated Python venv has no permitted route label. Release v3.7.0 declares package 0.16.0; installing gpt-researcher==3.7.0 would invent a version. Install tagged requirements and import source from checkout. Runs go only through tools/research/gpt_researcher.sh (synthesis X18; research changes 2-5): a keyless configuration (tools/research/gpt-researcher.config.json, the measured session-80 values without the key: duckduckgo retriever, keyword context filter, fast cx/gpt-6.1-sol-high, smart and strategic cx/gpt-6.1-sol-max, LLM_KWARGS.max_tokens 12000), its base_url and a per-run x-omniroute-session header written into each run's copy, an env -i scrub with the placeholder key local-loopback inline (the runner cannot rename the gateway entry's OMNIROUTE_API_KEY, and OPENAI_API_KEY is on the inventory's must_not_be_set list), a fail-closed preflight in upstream's own Config with no network call, and --report_type research_report only (detailed_report reaches embeddings). No TAVILY_API_KEY: the duckduckgo retriever needs none (custody ruling, change 12). The post-install check imports both gatherers and runs the preflight; the check after sign-in is one short current-month research run through the destination gateway (127.0.0.1:21128): the success line and at least five distinct http(s) references in the report's reference list (research change 6); the gateway call log's status-200 rows and zero /v1/embeddings rows are read on the gateway's side. Not set by this row: DeerFlow's model entry (cx/gpt-6.1-sol-max through http://127.0.0.1:21128/v1) and OPENAI_API_KEY=local-loopback in its .env, which are the destination's configuration (research step 5). One embedded DeerFlow run that returns a cited answer, with nothing listening on 2026, 8001 or 3000, is the live proof, owed. UNRUN in this form on every distribution.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/README.md#L1658",
+          "line": 1658
+        },
+        {
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Makefile#L96",
+          "line": 96
+        },
+        {
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Install.md#L38",
+          "line": 38
+        },
+        {
+          "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/config/config.py#L158",
+          "line": 158
+        }
+      ]
+    },
+    {
+      "layer": "cross:credential-practice",
+      "slot": "credential-guard",
+      "owner": "Command and secret-path guard (K4)",
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "release": "v2026.09.26.2",
+      "installed": true,
+      "route": "repository-recipe",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap.md#L400",
+        "line": 400
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": null,
+          "kind": "unavailable",
+          "source": {
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap.md#L400",
+            "line": 400
+          },
+          "reason": "Repository adoption practice; no standalone host self-test or version command was found in the cited recipe."
+        }
+      },
+      "config_paths": [
+        "adoption/bootstrap.md",
+        "adoption/hooks/claude",
+        "adoption/codex.config.template.toml"
+      ],
+      "notes": "Planned. Follow adoption/bootstrap.md step 4a guard hooks and settings. No new install command. Recipe source is this checkout commit; selected release metadata retained. No isolated upstream smoke/version command for the combined practice."
+    },
+    {
+      "layer": "cross:convergence-practice",
+      "slot": "convergence-validators",
+      "owner": "Convergence practice and its validators",
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "release": "v2026.09.26.2",
+      "installed": true,
+      "route": "repository-recipe",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/README.md#L58",
+        "line": 58
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "cd \"$repo_root\"\npython3 scripts/validate.py",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/README.md#L68",
+            "line": 68
+          }
+        }
+      },
+      "config_paths": [
+        "adoption/README.md"
+      ],
+      "notes": "Planned. Adoption recipe, no new install command. Check verifies repository evidence, not host installation. Scoped convergence experiments require their own records; not generated for this source-only install inventory."
+    }
+  ]
+}

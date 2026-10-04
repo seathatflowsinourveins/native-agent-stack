@@ -1,0 +1,67 @@
+{
+ "observed_utc": "2026-09-30T05:20:00Z",
+ "url": "https://registry.npmjs.org/-/npm/v1/attestations/omniroute@3.8.51",
+ "attestation_count": 2,
+ "statements": [
+  {
+   "predicateType": "https://github.com/npm/attestation/tree/main/specs/publish/v0.1",
+   "statement_type": "https://in-toto.io/Statement/v0.1",
+   "statement_predicateType": "https://github.com/npm/attestation/tree/main/specs/publish/v0.1",
+   "envelope_payloadType": "application/vnd.in-toto+json",
+   "signature_count_in_envelope": 1,
+   "subject": [
+    {
+     "name": "pkg:npm/omniroute@3.8.51",
+     "digest": {
+      "sha512": "570c12b7e6cff652623c95c524ccf49cd186ba87b03d95379c57b548bb8ed7500381d4b04de8060b1860f0ebfbe7edf59bf72870fc4788eeb7cf2827d5743431"
+     }
+    }
+   ],
+   "predicate_keys": [
+    "name",
+    "registry",
+    "version"
+   ],
+   "predicate": {
+    "name": "omniroute",
+    "version": "3.8.51",
+    "registry": "https://registry.npmjs.org"
+   }
+  },
+  {
+   "predicateType": "https://slsa.dev/provenance/v1",
+   "statement_type": "https://in-toto.io/Statement/v1",
+   "statement_predicateType": "https://slsa.dev/provenance/v1",
+   "envelope_payloadType": "application/vnd.in-toto+json",
+   "signature_count_in_envelope": 1,
+   "subject": [
+    {
+     "name": "pkg:npm/omniroute@3.8.51",
+     "digest": {
+      "sha512": "570c12b7e6cff652623c95c524ccf49cd186ba87b03d95379c57b548bb8ed7500381d4b04de8060b1860f0ebfbe7edf59bf72870fc4788eeb7cf2827d5743431"
+     }
+    }
+   ],
+   "buildType": "https://slsa-framework.github.io/github-actions-buildtypes/workflow/v1",
+   "workflow": {
+    "ref": "refs/tags/v3.8.51",
+    "repository": "https://github.com/diegosouzapw/OmniRoute",
+    "path": ".github/workflows/npm-publish.yml"
+   },
+   "resolvedDependencies": [
+    {
+     "uri": "git+https://github.com/diegosouzapw/OmniRoute@refs/tags/v3.8.51",
+     "digest": {
+      "gitCommit": "c1e30b7676975feb298b49eff6ff58923c04b89e"
+     }
+    }
+   ],
+   "builder_id": "https://github.com/actions/runner/github-hosted",
+   "invocationId": "https://github.com/diegosouzapw/OmniRoute/actions/runs/36656344524/attempts/1"
+  }
+ ],
+ "subject_sha512_equals_expected_tarball_sha512": true,
+ "subject_names": [
+  "pkg:npm/omniroute@3.8.51"
+ ]
+}

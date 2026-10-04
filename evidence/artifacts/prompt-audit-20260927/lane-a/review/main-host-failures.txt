@@ -1,0 +1,13 @@
+The two full-suite failures, run alone in a clean detached worktree of origin/main at 4a610e18 (before this change), 2026-09-28:
+
+$ TMPDIR=<tmp> python3 -B -m unittest tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network tests.test_gpt6_family_tiering_20260926.RunnerTests.test_sigterm_records_the_running_call_as_interrupted_without_counting_it
+ERROR: test_cli_refuses_live_base_url_from_env_file_without_network (tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network)
+safety.SafetyError: credential_file_permissions:worktree
+FAIL: test_sigterm_records_the_running_call_as_interrupted_without_counting_it (tests.test_gpt6_family_tiering_20260926.RunnerTests.test_sigterm_records_the_running_call_as_interrupted_without_counting_it)
+    self.assertEqual(process.returncode, RUN.EXIT_INTERRUPTED, stderr)
+AssertionError: 2 != 5 : run_arm: the temporary directory /tmp must lie outside the state directory and every repository
+Ran 2 tests in 30.088s
+FAILED (failures=1, errors=1)
+
+Both are host conditions of this workstation, not of the change: the same two tests are the only failures of the full
+suite on the change's head b4472998 (Ran 6881 tests, FAILED (failures=1, errors=1, skipped=765)).

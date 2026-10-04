@@ -1,0 +1,762 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "items": [
+    {
+      "id": "search-task-semantics",
+      "claim": "brv search submits a daemon task; on a task error it writes JSON with success:false and status:error but does not set a failing exit code, and an empty result is reported as totalFound 0 with success:true. The process exit code is therefore not evidence; the JSON fields are.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/search.ts",
+      "lines": [
+        138,
+        196
+      ],
+      "blob": "389fb19380246c6c1052593e2d7da7cd67018d9f",
+      "file_sha256": "f2107d6de90c1c60e53b9d02c79564d44e87294ac2583fb9bb85d8006d0dc5a1",
+      "excerpt": "    const completionPromise = waitForTaskCompletion(\n      {\n        client,\n        command: 'search',\n        format,\n        onCompleted: ({result}) => {\n          if (!result) {\n            if (format === 'json') {\n              writeJsonResponse({\n                command: 'search',\n                data: {results: [], status: 'completed', totalFound: 0},\n                success: true,\n              })\n            } else {\n              this.log('\\nNo results.\\n')\n            }\n\n            return\n          }\n\n          try {\n            const searchResult = JSON.parse(result) as SearchKnowledgeResult\n\n            if (format === 'json') {\n              writeJsonResponse({\n                command: 'search',\n                data: {\n                  ...searchResult,\n                  status: 'completed',\n                },\n                success: true,\n              })\n            } else {\n              for (const line of formatSearchTextOutput(searchResult)) {\n                this.log(line)\n              }\n            }\n          } catch {\n            // Fallback: result isn't valid JSON \u2014 display as-is\n            if (format === 'json') {\n              writeJsonResponse({\n                command: 'search',\n                data: {error: 'Invalid search result format', raw: result, status: 'error'},\n                success: false,\n              })\n            } else {\n              this.log(`\\n${result}\\n`)\n            }\n          }\n        },\n        onError({error}) {\n          if (format === 'json') {\n            writeJsonResponse({\n              command: 'search',\n              data: {event: 'error', message: error.message, status: 'error'},\n              success: false,\n            })\n          }\n        },"
+    },
+    {
+      "id": "curate-task-error-exit",
+      "claim": "brv curate reports a failed task as JSON success:false / status:error from its onError handler without setting a failing exit code, consistent with the first pass's exit 0 on the context-size error.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/curate/index.ts",
+      "lines": [
+        434,
+        445
+      ],
+      "blob": "4006e7ddaf8a9b0a6b0e05a2855228a68bc2e029",
+      "file_sha256": "7a26be04496c227248735d9d3c8b1917b70fbb7e8c7ca809cb7afe546aecba08",
+      "excerpt": "          onError({error, logId}) {\n            if (format === 'json') {\n              writeJsonResponse({\n                command: 'curate',\n                data: {event: 'error', logId, message: error.message, status: 'error'},\n                success: false,\n              })\n            }\n          },\n          taskId,\n        },\n        (msg) => this.log(msg),"
+    },
+    {
+      "id": "prompt-environment-context",
+      "claim": "The agent system prompt includes variable environment context (working directory, git state, platform, file tree, .brv structure), so request token totals depend on the project and input; the observed 12,351 and 11,192 totals are not a fixed baseline.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/agent/infra/system-prompt/contributors/environment-contributor.ts",
+      "lines": [
+        30,
+        60
+      ],
+      "blob": "5b75f91421c1a08db0762a725fbbb1eb2587abcf",
+      "file_sha256": "433ed2fdaab5a6909ff057fe856e825b0bacca4ee39858ab029e906e7faff1b5",
+      "excerpt": "  public async getContent(context: ContributorContext): Promise<string> {\n    if (!context.environmentContext) {\n      return ''\n    }\n\n    const env = context.environmentContext\n    const dateOptions: Intl.DateTimeFormatOptions = {\n      day: 'numeric',\n      month: 'short',\n      weekday: 'short',\n      year: 'numeric',\n    }\n    const formattedDate = new Date().toLocaleDateString('en-US', dateOptions)\n\n    let result = '<env>\\n'\n    result += `  Working directory: ${env.workingDirectory}\\n`\n    result += `  Is directory a git repo: ${env.isGitRepository ? 'Yes' : 'No'}\\n`\n    result += `  Platform: ${env.platform}\\n`\n    result += `  OS Version: ${env.osVersion}\\n`\n    result += `  Node Version: ${env.nodeVersion}\\n`\n    result += `  Today's date: ${formattedDate}\\n`\n    result += '</env>'\n\n    if (env.fileTree) {\n      result += '\\n\\n' + env.fileTree\n    }\n\n    if (env.brvStructure) {\n      result += '\\n\\n' + env.brvStructure\n    }\n"
+    },
+    {
+      "id": "xdg-config-path",
+      "claim": "The global config directory is $XDG_CONFIG_HOME/brv, default ~/.config/brv, on Linux.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/server/utils/global-config-path.ts",
+      "lines": [
+        32,
+        41
+      ],
+      "blob": "a7bb8c61942e070c48d2542cb2dd5583be712441",
+      "file_sha256": "0787c617ea1733db73bb0b22c2ca0f09b7299a17b9106894b587c24efc1a71b1",
+      "excerpt": "  // Linux: respect XDG_CONFIG_HOME if set\n  if (currentPlatform === 'linux') {\n    const xdgConfigHome = process.env.XDG_CONFIG_HOME\n    if (xdgConfigHome !== undefined) {\n      return join(xdgConfigHome, GLOBAL_CONFIG_DIR)\n    }\n  }\n\n  // Linux default: ~/.config/brv\n  return join(homedir(), '.config', GLOBAL_CONFIG_DIR)"
+    },
+    {
+      "id": "xdg-data-path",
+      "claim": "The global data directory is BRV_DATA_DIR, else $XDG_DATA_HOME/brv, default ~/.local/share/brv, on Linux; it holds project state, logs and the encrypted provider keychain.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/server/utils/global-data-path.ts",
+      "lines": [
+        16,
+        43
+      ],
+      "blob": "285d551dcfe2108c39b9d6fd1e7ab4d830c0a3ad",
+      "file_sha256": "3e32064e88afb8ce8c33c8f5c4e3afe8571ebadd7c04fb39633a2e216467547a",
+      "excerpt": "export const getGlobalDataDir = (): string => {\n  if (process.env.BRV_DATA_DIR) return process.env.BRV_DATA_DIR\n\n  const currentPlatform = platform()\n\n  if (currentPlatform === 'win32') {\n    const localAppData = process.env.LOCALAPPDATA\n    if (localAppData !== undefined) {\n      return join(localAppData, GLOBAL_DATA_DIR)\n    }\n\n    return join(homedir(), 'AppData', 'Local', GLOBAL_DATA_DIR)\n  }\n\n  if (currentPlatform === 'darwin') {\n    return join(homedir(), 'Library', 'Application Support', GLOBAL_DATA_DIR)\n  }\n\n  // Linux: respect XDG_DATA_HOME if set\n  if (currentPlatform === 'linux') {\n    const xdgDataHome = process.env.XDG_DATA_HOME\n    if (xdgDataHome !== undefined) {\n      return join(xdgDataHome, GLOBAL_DATA_DIR)\n    }\n  }\n\n  // Linux default: ~/.local/share/brv\n  return join(homedir(), '.local', 'share', GLOBAL_DATA_DIR)"
+    },
+    {
+      "id": "xdg-logs-path",
+      "claim": "The global logs directory is $XDG_STATE_HOME/brv/logs, default ~/.local/state/brv/logs, on Linux.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/server/utils/global-logs-path.ts",
+      "lines": [
+        30,
+        37
+      ],
+      "blob": "7a02a5120f846ae3316ee7424234b33cb5d8b165",
+      "file_sha256": "fe7e65d72e0e4f34442cedabf1a58d3fb2b37fd21292b1e4176feddc9f4a94a4",
+      "excerpt": "\n    // Linux: XDG_STATE_HOME/brv/logs\n    const xdgStateHome = process.env.XDG_STATE_HOME\n    if (xdgStateHome) {\n      return join(xdgStateHome, 'brv', 'logs')\n    }\n\n    return join(homedir(), '.local', 'state', 'brv', 'logs')"
+    },
+    {
+      "id": "provider-keychain",
+      "claim": "Provider API keys are stored AES-256-GCM encrypted in <data dir>/provider-credentials with the key in <data dir>/.provider-keys; `brv providers disconnect` deletes the provider's entry.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/server/infra/storage/file-provider-keychain-store.ts",
+      "lines": [
+        9,
+        38
+      ],
+      "blob": "b92eb8a96f53020e3d927ba15d70c7535276d07a",
+      "file_sha256": "0052f05b94a0fd99f6beebc2d890ab2ef6240258143cddbe0c84339ee59e4685",
+      "excerpt": "const KEY_FILE = '.provider-keys'\nconst CREDENTIALS_FILE = 'provider-credentials'\nconst ALGORITHM = 'aes-256-gcm'\nconst KEY_LENGTH = 32\nconst IV_LENGTH = 16\n\n/**\n * Dependencies for FileProviderKeychainStore.\n * Allows injection for testing.\n */\nexport interface FileProviderKeychainStoreDeps {\n  readonly getCredentialsPath: () => string\n  readonly getDataDir: () => string\n  readonly getKeyPath: () => string\n}\n\nconst defaultDeps: FileProviderKeychainStoreDeps = {\n  getCredentialsPath: () => `${getGlobalDataDir()}/${CREDENTIALS_FILE}`,\n  getDataDir: getGlobalDataDir,\n  getKeyPath: () => `${getGlobalDataDir()}/${KEY_FILE}`,\n}\n\n/**\n * File-based encrypted provider keychain store. Used on all platforms.\n *\n * Security:\n * - Random 32-byte key stored in <global-data-dir>/.provider-keys (rotated on each save)\n * - AES-256-GCM authenticated encryption for provider API keys\n * - Both files have 0600 permissions (owner read/write only)\n * - All provider keys stored as encrypted JSON map: { [providerId]: apiKey }"
+    },
+    {
+      "id": "disconnect-deletes-key",
+      "claim": "The daemon's provider disconnect handler deletes the stored API key and OAuth token for the provider.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/server/infra/transport/handlers/provider-handler.ts",
+      "lines": [
+        340,
+        344
+      ],
+      "blob": "92996e93d0ceb775ef66e4fe6ffc6f5e2db77f00",
+      "file_sha256": "b1950969c88417839016615b301b51a3550ab2e804977a0d340aed5ac0602729",
+      "excerpt": "\n        await this.providerConfigStore.disconnectProvider(providerId)\n        await this.providerKeychainStore.deleteApiKey(providerId)\n        await this.providerOAuthTokenStore.delete(providerId)\n"
+    },
+    {
+      "id": "readme-lifecycle-commands",
+      "claim": "README documents `brv providers disconnect`, the command the cleanup used to delete the stored local-provider key.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "README.md",
+      "lines": [
+        177,
+        184
+      ],
+      "blob": "21b06ec3a3ec619be83ce68d2da478d996bccd13",
+      "file_sha256": "57ca305e6681f817d45b87db7ecacb1cdd9841b748782e3ff162624585343d17",
+      "excerpt": "```bash\nbrv providers list       # List available LLM providers\nbrv providers connect    # Connect to an LLM provider\nbrv providers switch     # Switch active provider\nbrv providers disconnect # Disconnect a provider\nbrv model list           # List available models\nbrv model switch         # Switch active model\n```"
+    },
+    {
+      "id": "readme-lifecycle-commands-2",
+      "claim": "README documents `brv logout` (disconnect and clear credentials) and `brv restart`, both run by the cleanup.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "README.md",
+      "lines": [
+        266,
+        272
+      ],
+      "blob": "21b06ec3a3ec619be83ce68d2da478d996bccd13",
+      "file_sha256": "57ca305e6681f817d45b87db7ecacb1cdd9841b748782e3ff162624585343d17",
+      "excerpt": "\n```bash\nbrv mcp              # Start MCP server\nbrv login            # Authenticate to ByteRover\nbrv logout           # Disconnect and clear credentials\nbrv locations        # List registered projects\nbrv restart          # Restart daemon"
+    },
+    {
+      "id": "autoupdate-config",
+      "claim": "package.json registers @oclif/plugin-update with an S3 release host and a 1-day autoupdate debounce.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "package.json",
+      "lines": [
+        153,
+        195
+      ],
+      "blob": "5a7cd02125e68593dab049f7d4a61cc3e1b648f9",
+      "file_sha256": "2c9e6a20885a76c93bfaa5a7f1b29af0b85e074d867e1a7b8d9d53a61df5ebe6",
+      "excerpt": "  \"oclif\": {\n    \"bin\": \"brv\",\n    \"dirname\": \"brv\",\n    \"commands\": \"./dist/oclif/commands\",\n    \"hooks\": {\n      \"init\": [\n        \"./dist/oclif/hooks/init/block-autoupdate-when-off\",\n        \"./dist/oclif/hooks/init/block-command-update-npm\",\n        \"./dist/oclif/hooks/init/welcome\",\n        \"./dist/oclif/hooks/init/update-notifier\",\n        \"./dist/oclif/hooks/init/validate-brv-config\"\n      ],\n      \"command_not_found\": \"./dist/oclif/hooks/command_not_found/handle-invalid-commands\",\n      \"error\": \"./dist/oclif/hooks/error/clean-errors\",\n      \"postrun\": \"./dist/oclif/hooks/postrun/after-update\"\n    },\n    \"plugins\": [\n      \"@oclif/plugin-help\",\n      \"@oclif/plugin-update\"\n    ],\n    \"topicSeparator\": \" \",\n    \"topics\": {\n      \"hub\": {\n        \"description\": \"Browse and manage skills & bundles registry\",\n        \"subtopics\": {\n          \"registry\": {\n            \"description\": \"Manage private hub registries\"\n          }\n        }\n      },\n      \"space\": {\n        \"description\": \"Manage ByteRover spaces\"\n      }\n    },\n    \"update\": {\n      \"s3\": {\n        \"host\": \"https://storage.googleapis.com/brv-releases\"\n      },\n      \"autoupdate\": {\n        \"debounce\": 1\n      },\n      \"node\": {\n        \"version\": \"24.13.1\""
+    },
+    {
+      "id": "oclif-autoupdate-hook",
+      "claim": "@oclif/plugin-update's init hook (4.7.19, the version package-lock.json pins at v3.16.1) returns early only when BRV_DISABLE_AUTOUPDATE is set; otherwise it touches <cache dir>/lastrun on every command and spawns a detached `brv update --autoupdate` when its debounce allows.",
+      "repository": "https://github.com/oclif/plugin-update.git",
+      "commit": "f9960af830dcb0021de1ad77fb04edfda18ce674",
+      "path": "src/hooks/init.ts",
+      "lines": [
+        20,
+        87
+      ],
+      "blob": "71a3870d91a5bbe9f78ed014829cfa709fdb9e37",
+      "file_sha256": "ad7a4ca7b29909c09c4052fe207aef93e42956614e2f463251c2141c73e2f561",
+      "excerpt": "export const init: Interfaces.Hook<'init'> = async function (opts) {\n  if (opts.id === 'update') return\n  if (opts.config.scopedEnvVarTrue('DISABLE_AUTOUPDATE')) return\n\n  const {config, error: throwError} = this\n  const binPath = config.binPath ?? config.bin\n  const lastrunfile = join(config.cacheDir, 'lastrun')\n  const autoupdatefile = join(config.cacheDir, 'autoupdate')\n  const autoupdatelogfile = join(config.cacheDir, 'autoupdate.log')\n  const clientRoot = config.scopedEnvVar('OCLIF_CLIENT_HOME') ?? join(config.dataDir, 'client')\n\n  const autoupdateEnv = {\n    ...process.env,\n    [config.scopedEnvVarKey('SKIP_ANALYTICS')]: '1',\n    [config.scopedEnvVarKey('TIMESTAMPS')]: '1',\n  }\n\n  // Ensure the cache directory exists\n  await mkdir(config.cacheDir, {recursive: true})\n\n  async function autoupdateNeeded(): Promise<boolean> {\n    try {\n      const m = await mtime(autoupdatefile)\n      let days = 1\n      if (opts.config.channel === 'stable') days = 14\n\n      // Check for custom update check interval in configuration\n      const debounce = config.pjson.oclif?.update?.autoupdate?.debounce\n      if (debounce !== undefined && debounce > 0) {\n        days = debounce\n      }\n\n      m.setHours(m.getHours() + days * 24)\n      return m < new Date()\n    } catch (error: unknown) {\n      const err = error as {code: string; stack: string}\n      if (err.code !== 'ENOENT') throwError(err.stack)\n      debug('autoupdate ENOENT')\n      return true\n    }\n  }\n\n  await touch(lastrunfile)\n  const clientDir = join(clientRoot, config.version)\n  if (existsSync(clientDir)) await touch(clientDir)\n  if (!(await autoupdateNeeded())) return\n\n  debug('autoupdate running')\n  await writeFile(autoupdatefile, '')\n\n  debug(`spawning autoupdate on ${binPath}`)\n\n  const fd = await open(autoupdatelogfile, 'a')\n  await writeFile(\n    fd,\n    timestamp(`starting \\`${binPath} update --autoupdate\\` from ${process.argv.slice(1, 3).join(' ')}\\n`),\n  )\n\n  const stream = fd.createWriteStream()\n  spawn(binPath, ['update', '--autoupdate'], {\n    detached: !config.windows,\n    env: autoupdateEnv,\n    stdio: ['ignore', stream, stream],\n    ...(config.windows ? {shell: true} : {}),\n  })\n    .on('error', (e: Error) => process.emitWarning(e))\n    .unref()\n}"
+    },
+    {
+      "id": "oclif-cache-dir",
+      "claim": "@oclif/core 4.5.4 resolves the CLI cache directory from BRV_CACHE_DIR, else $XDG_CACHE_HOME/brv, else ~/.cache/brv; the first self-contained reproduction left XDG_CACHE_HOME unset.",
+      "repository": "https://github.com/oclif/core.git",
+      "commit": "cbd713577069520816641ec38f2ff54ce164f8c0",
+      "path": "src/config/config.ts",
+      "lines": [
+        215,
+        221
+      ],
+      "blob": "17ef33321298b8d9adfff9466a51286179a68285",
+      "file_sha256": "c7a4da4b030c839c1a0e0540844d8960fb14a140f02e0268c2d65ffdfe486148",
+      "excerpt": "  protected dir(category: 'cache' | 'config' | 'data'): string {\n    const base =\n      process.env[`XDG_${category.toUpperCase()}_HOME`] ||\n      (this.windows && process.env.LOCALAPPDATA) ||\n      join(this.home, category === 'data' ? '.local/share' : '.' + category)\n    return join(base, this.dirname)\n  }"
+    },
+    {
+      "id": "oclif-cache-dir-2",
+      "claim": "The cache directory assignment in @oclif/core 4.5.4.",
+      "repository": "https://github.com/oclif/core.git",
+      "commit": "cbd713577069520816641ec38f2ff54ce164f8c0",
+      "path": "src/config/config.ts",
+      "lines": [
+        348,
+        348
+      ],
+      "blob": "17ef33321298b8d9adfff9466a51286179a68285",
+      "file_sha256": "c7a4da4b030c839c1a0e0540844d8960fb14a140f02e0268c2d65ffdfe486148",
+      "excerpt": "    this.cacheDir = this.scopedEnvVar('CACHE_DIR') || this.macosCacheDir() || this.dir('cache')"
+    },
+    {
+      "id": "license-file",
+      "claim": "LICENSE at v3.16.1 is the Elastic License 2.0 (ELv2). Its Limitations section forbids providing the software to third parties as a hosted or managed service, circumventing license-key functionality, and removing licensing notices.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "LICENSE",
+      "lines": [
+        1,
+        14
+      ],
+      "blob": "a71d393ed189e00263a99c7b0ed04896adaf6b0a",
+      "file_sha256": "99cea22154caece32dde4ee3124d0b6ad44a0f9baab9841889841a567245ab1f",
+      "excerpt": "Elastic License 2.0 (ELv2)\n\nAcceptance\nBy using the software, you agree to all of the terms and conditions below.\n\nCopyright License\nThe licensor grants you a non-exclusive, royalty-free, worldwide, non-sublicensable, non-transferable license to use, copy, distribute, make available, and prepare derivative works of the software, in each case subject to the limitations and conditions below.\n\nLimitations\nYou may not provide the software to third parties as a hosted or managed service, where the service provides users with access to any substantial set of the features or functionality of the software.\n\nYou may not move, change, disable, or circumvent the license key functionality in the software, and you may not remove or obscure any functionality in the software that is protected by the license key.\n\nYou may not alter, remove, or obscure any licensing, copyright, or other notices of the licensor in the software. Any use of the licensor's trademarks is subject to applicable law."
+    },
+    {
+      "id": "license-field",
+      "claim": "package.json declares license Elastic-2.0.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "package.json",
+      "lines": [
+        150,
+        150
+      ],
+      "blob": "5a7cd02125e68593dab049f7d4a61cc3e1b648f9",
+      "file_sha256": "2c9e6a20885a76c93bfaa5a7f1b29af0b85e074d867e1a7b8d9d53a61df5ebe6",
+      "excerpt": "  \"license\": \"Elastic-2.0\","
+    },
+    {
+      "id": "readme-benchmark-claims",
+      "claim": "README reports LoCoMo 96.1% and LongMemEval-S 92.8% overall accuracy; at the tag the only other files that mention either benchmark are paper/README.md, paper/main.tex and paper/references.bib (git grep), so no runnable benchmark harness ships with the repository.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "README.md",
+      "lines": [
+        50,
+        57
+      ],
+      "blob": "21b06ec3a3ec619be83ce68d2da478d996bccd13",
+      "file_sha256": "57ca305e6681f817d45b87db7ecacb1cdd9841b748782e3ff162624585343d17",
+      "excerpt": "We evaluate on two long-term conversational memory benchmarks:\n\n- **LoCoMo** - ultra-long conversations (~20K tokens, 35 sessions) testing single-hop, multi-hop, temporal, and open-domain retrieval.\n- **LongMemEval-S** - large-scale benchmark (23,867 docs, ~48 sessions per question) testing 6 memory abilities including knowledge update, temporal reasoning, and multi-session synthesis.\n\n**LoCoMo** - 96.1% overall accuracy (1,982 questions, 272 docs).\n\n**LongMemEval-S** - 92.8% overall accuracy (500 questions, 23,867 docs)."
+    },
+    {
+      "id": "suite-tmpdir-consolidate",
+      "claim": "The upstream unit test consolidate.test.ts creates <os.tmpdir()>/brv-consolidate-test-<epoch ms> before each test; its afterEach only restores the sinon stubs, so the directory is left behind.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "test/unit/infra/dream/operations/consolidate.test.ts",
+      "lines": [
+        96,
+        116
+      ],
+      "blob": "ab4cb2b854c4a61b668900180b69fd7e42c415b0",
+      "file_sha256": "1f9afd3b948fe535a696cb17eff92824295e0bf95f34507d2bb7375956e260a0",
+      "excerpt": "  beforeEach(async () => {\n    ctxDir = join(tmpdir(), `brv-consolidate-test-${Date.now()}`)\n    await mkdir(ctxDir, {recursive: true})\n\n    agent = {\n      createTaskSession: stub().resolves('session-1'),\n      deleteTaskSession: stub().resolves(),\n      executeOnSession: stub().resolves('```json\\n{\"actions\":[]}\\n```'),\n      setSandboxVariableOnSession: stub(),\n    }\n\n    searchService = {\n      search: stub().resolves({message: '', results: [], totalFound: 0}),\n    }\n\n    deps = {agent: agent as unknown as ICipherAgent, contextTreeDir: ctxDir, searchService, taskId: 'test-task'}\n  })\n\n  afterEach(() => {\n    restore()\n  })"
+    },
+    {
+      "id": "suite-tmpdir-synthesize",
+      "claim": "synthesize.test.ts creates <os.tmpdir()>/brv-synthesize-test-<epoch ms> before each test.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "test/unit/infra/dream/operations/synthesize.test.ts",
+      "lines": [
+        69,
+        71
+      ],
+      "blob": "f597df48270f59103cd4808957482c671362b3bf",
+      "file_sha256": "3a83a5ed984fbe3e242267dccd5ea63e8d0d827cbc839204d0148b4b5b97a867",
+      "excerpt": "  beforeEach(async () => {\n    ctxDir = join(tmpdir(), `brv-synthesize-test-${Date.now()}`)\n    await mkdir(ctxDir, {recursive: true})"
+    },
+    {
+      "id": "suite-tmpdir-undo",
+      "claim": "dream-undo.test.ts creates <os.tmpdir()>/brv-undo-test-<epoch ms> before each test.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "test/unit/infra/dream/dream-undo.test.ts",
+      "lines": [
+        33,
+        35
+      ],
+      "blob": "ff1288a8adb8a3c6b6ee4375ef229fdc20aa2138",
+      "file_sha256": "cc89f7ee53469873fc64e7a620254cde6d7559a5f203d0c65168198b3efaa1b1",
+      "excerpt": "  beforeEach(async () => {\n    ctxDir = join(tmpdir(), `brv-undo-test-${Date.now()}`)\n    await mkdir(ctxDir, {recursive: true})"
+    },
+    {
+      "id": "suite-tmpdir-prune",
+      "claim": "prune.test.ts creates a <os.tmpdir()>/brv-prune-test-XXXXXX directory (mkdtemp) before each test.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "test/unit/infra/dream/operations/prune.test.ts",
+      "lines": [
+        67,
+        68
+      ],
+      "blob": "053b7f8b4cbb8a5ae1586983d130277305a940fe",
+      "file_sha256": "0047aa2fc08ba6eb85654f8037b159d5a446b493a9990e7d2e7f9fa97922790e",
+      "excerpt": "  beforeEach(async () => {\n    ctxDir = await mkdtemp(join(tmpdir(), 'brv-prune-test-'))"
+    },
+    {
+      "id": "suite-tmpdir-path",
+      "claim": "path-utils.test.ts creates a <os.tmpdir()>/brv-path-test-XXXXXX directory (mkdtempSync) before each test of its first suite.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "test/unit/utils/path-utils.test.ts",
+      "lines": [
+        12,
+        15
+      ],
+      "blob": "455b50f2a3d33421ae3362ec4f4c93f8b8341eba",
+      "file_sha256": "00a3063b4d7c1e835a22dd755e91928badaf06b0b94aa07aa89d34f799268d8b",
+      "excerpt": "    beforeEach(() => {\n      // Use realpathSync to get canonical path (e.g., /var \u2192 /private/var on macOS)\n      tempDir = realpathSync(mkdtempSync(join(tmpdir(), 'brv-path-test-')))\n    })"
+    },
+    {
+      "id": "suite-tmpdir-projdir",
+      "claim": "path-utils.test.ts creates a <os.tmpdir()>/brv-projdir-test-XXXXXX directory before each test of its getProjectDataDir suite.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "test/unit/utils/path-utils.test.ts",
+      "lines": [
+        150,
+        152
+      ],
+      "blob": "455b50f2a3d33421ae3362ec4f4c93f8b8341eba",
+      "file_sha256": "00a3063b4d7c1e835a22dd755e91928badaf06b0b94aa07aa89d34f799268d8b",
+      "excerpt": "    beforeEach(() => {\n      tempDir = realpathSync(mkdtempSync(join(tmpdir(), 'brv-projdir-test-')))\n    })"
+    },
+    {
+      "id": "suite-tmpdir-migrate-fm",
+      "claim": "migrate-frontmatter-complete.test.ts makes its fixtures with mkdtempSync(<os.tmpdir()>/migrate-fm-XXXXXX).",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "test/unit/scripts/migrate-frontmatter-complete.test.ts",
+      "lines": [
+        8,
+        10
+      ],
+      "blob": "572a4b331190fa79a30cf4b13ae0c14779d589c6",
+      "file_sha256": "b7ad2b53554897cc8d45a23789624b778201443e9f9c21e28c83d32d17620cf3",
+      "excerpt": "function makeTmpDir(): string {\n  return mkdtempSync(join(tmpdir(), 'migrate-fm-'))\n}"
+    },
+    {
+      "id": "suite-tmpdir-folder-pack",
+      "claim": "folder-pack-executor.test.ts creates a project root with mkdtemp(<os.tmpdir()>/folder-pack-executor-XXXXXX).",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "test/unit/infra/executor/folder-pack-executor.test.ts",
+      "lines": [
+        151,
+        151
+      ],
+      "blob": "58a334ea6e2fa5685d413212b67f31bcfe0e064d",
+      "file_sha256": "f2351d12666dabb096110f20d711211328c10ec2d1ff75e21e9a55aacd6f9a88",
+      "excerpt": "    const projectRoot = await mkdtemp(path.join(tmpdir(), 'folder-pack-executor-'))"
+    },
+    {
+      "id": "suite-fixed-tmp-paths",
+      "claim": "cipher-agent.test.ts configures the fixed directories /tmp/brv-test-blobs (blob storage) and /tmp/brv-test-storage (agent state storage).",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "test/unit/agent/cipher-agent.test.ts",
+      "lines": [
+        33,
+        47
+      ],
+      "blob": "087ab60c13a4ab102a1033c28eda660fb926aa1f",
+      "file_sha256": "4c80c2c4a5a750f6b2c59019bce00ba6b54450758469fd7b9e0ee27a7b125c6d",
+      "excerpt": "      blobStorage: {\n        maxBlobSize: 100 * 1024 * 1024,\n        maxTotalSize: 1024 * 1024 * 1024,\n        storageDir: '/tmp/brv-test-blobs',\n      },\n      llm: {\n        maxIterations: 10,\n        maxTokens: 1000,\n        temperature: 0.5,\n      },\n      model: 'gemini-2.5-flash',\n      projectId: 'byterover',\n      sessionKey: 'test-session-key',\n      storagePath: '/tmp/brv-test-storage',\n    }"
+    },
+    {
+      "id": "tool-output-temp-dir",
+      "claim": "ToolOutputProcessor.saveToTempFile writes a full tool output to <os.tmpdir()>/byterover-tool-outputs/<tool name>_<epoch ms>.txt and creates that directory when it is absent.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/agent/infra/llm/tool-output-processor.ts",
+      "lines": [
+        458,
+        470
+      ],
+      "blob": "de9b6769d087b4e5742b16f51d8a9e2f43785a97",
+      "file_sha256": "cef67a3437034e7289d74215f5751a797e1f8aea65bb488783cd3fd77e4f06db",
+      "excerpt": "  private async saveToTempFile(toolName: string, content: string): Promise<string> {\n    // Create temp directory if it doesn't exist\n    const tempDir = join(tmpdir(), 'byterover-tool-outputs')\n\n    if (!existsSync(tempDir)) {\n      mkdirSync(tempDir, { recursive: true })\n    }\n\n    // Generate unique filename\n    const timestamp = Date.now()\n    const sanitizedToolName = toolName.replaceAll(/[^a-z0-9-_]/gi, '_')\n    const filename = `${sanitizedToolName}_${timestamp}.txt`\n    const filePath = join(tempDir, filename)"
+    },
+    {
+      "id": "restart-description",
+      "claim": "brv restart describes itself as stopping everything: all open sessions and background processes are stopped.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/restart.ts",
+      "lines": [
+        19,
+        23
+      ],
+      "blob": "2b6a6989ceb01f2b7ede5c4f1a20592fd509cc7a",
+      "file_sha256": "aeeab937f9468e451a981e16a8d4c3f63295bed97f6a7e2b37d009e206cf4d06",
+      "excerpt": "  static description = `Restart ByteRover \u2014 stop everything and start fresh.\n\nRun this when ByteRover is unresponsive, stuck, or after installing an update.\nAll open sessions and background processes are stopped.\nThe daemon will restart automatically on the next brv command.`"
+    },
+    {
+      "id": "restart-patterns",
+      "claim": "brv restart's server/agent patterns are the bare file names brv-server.js and agent-process.js; only processes running the protected command `update` are spared in the client phase.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/restart.ts",
+      "lines": [
+        25,
+        28
+      ],
+      "blob": "2b6a6989ceb01f2b7ede5c4f1a20592fd509cc7a",
+      "file_sha256": "aeeab937f9468e451a981e16a8d4c3f63295bed97f6a7e2b37d009e206cf4d06",
+      "excerpt": "  /** Commands whose processes must not be killed (e.g. `brv update` calls `brv restart`). */\n  private static readonly PROTECTED_COMMANDS = ['update']\n  /** Server/agent patterns \u2014 cannot match CLI processes, no self-kill risk. */\n  private static readonly SERVER_AGENT_PATTERNS = ['brv-server.js', 'agent-process.js']"
+    },
+    {
+      "id": "restart-cli-patterns",
+      "claim": "The client-phase patterns include the generic substrings bin/brv and byterover-cli/bin/run.js besides paths of the running install, so they match any other ByteRover install's CLI, TUI or MCP client.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/restart.ts",
+      "lines": [
+        74,
+        87
+      ],
+      "blob": "2b6a6989ceb01f2b7ede5c4f1a20592fd509cc7a",
+      "file_sha256": "aeeab937f9468e451a981e16a8d4c3f63295bed97f6a7e2b37d009e206cf4d06",
+      "excerpt": "  static buildCliPatterns(): string[] {\n    const argv1 = resolve(process.argv[1])\n    const brvBinDir = dirname(argv1)\n    return [\n      ...new Set([\n        argv1,\n        join('bin', 'brv'),\n        join('byterover-cli', 'bin', 'run.js'),\n        join(brvBinDir, 'dev.js'),\n        join(brvBinDir, 'run'), // curl install: entry point named 'run' without .js suffix\n        join(brvBinDir, 'run.js'),\n      ]),\n    ]\n  }"
+    },
+    {
+      "id": "restart-proc-scan-kill",
+      "claim": "On Linux brv restart reads the command line of every process listed in /proc and sends SIGKILL to each one whose command line contains any pattern as a substring; processes it may not signal (other users') are skipped silently.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/restart.ts",
+      "lines": [
+        225,
+        251
+      ],
+      "blob": "2b6a6989ceb01f2b7ede5c4f1a20592fd509cc7a",
+      "file_sha256": "aeeab937f9468e451a981e16a8d4c3f63295bed97f6a7e2b37d009e206cf4d06",
+      "excerpt": "  /**\n   * Kill matching brv processes on Linux by scanning /proc/<pid>/cmdline.\n   * Simple substring match \u2014 no cwd resolution needed.\n   * Works on all Linux distros including Alpine \u2014 /proc is a kernel feature.\n   */\n  private static killByProcScan(patterns: string[], excludePids: Set<number>, skipProtected: boolean): void {\n    let entries: string[]\n    try {\n      entries = readdirSync('/proc')\n    } catch {\n      return // /proc not available \u2014 skip\n    }\n\n    for (const entry of entries) {\n      const pid = Number.parseInt(entry, 10)\n      if (Number.isNaN(pid) || excludePids.has(pid)) continue\n      try {\n        const cmdline = readFileSync(join('/proc', entry, 'cmdline'), 'utf8')\n        if (patterns.some((p) => cmdline.includes(p))) {\n          if (skipProtected && Restart.isProtectedCommand(cmdline)) continue\n          process.kill(pid, 'SIGKILL')\n        }\n      } catch {\n        // Process exited or permission denied \u2014 ignore\n      }\n    }\n  }"
+    },
+    {
+      "id": "restart-exclusions",
+      "claim": "patternKill excludes only the restart process itself, its parent and its ancestor chain; on Linux it then runs the /proc scan. Nothing restricts it to the caller's install, data directory or session.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/restart.ts",
+      "lines": [
+        317,
+        341
+      ],
+      "blob": "2b6a6989ceb01f2b7ede5c4f1a20592fd509cc7a",
+      "file_sha256": "aeeab937f9468e451a981e16a8d4c3f63295bed97f6a7e2b37d009e206cf4d06",
+      "excerpt": "  private static patternKill(\n    patterns: string[],\n    skipProtected = false,\n    getPpidOf: (pid: number) => number | undefined = Restart.createDefaultGetPpidOf(),\n  ): void {\n    // Self-exclusion: walk the full ancestor chain (getPpidOf is platform-aware \u2014\n    // Linux /proc, macOS ps, Windows PowerShell CIM). process.pid + process.ppid\n    // are kept as explicit fallbacks in case the walker regresses or returns empty\n    // on an unexpected platform \u2014 Set dedups so there's no cost.\n    const excludePids = new Set<number>([\n      process.pid,\n      process.ppid,\n      ...Restart.ancestorPids(process.pid, getPpidOf),\n    ])\n\n    if (process.platform === 'win32') {\n      const script = Restart.buildWindowsKillScript(patterns, excludePids, skipProtected)\n      spawnSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', script], {stdio: 'ignore', timeout: 10_000, windowsHide: true})\n    } else if (process.platform === 'linux') {\n      Restart.killByProcScan(patterns, excludePids, skipProtected)\n    } else {\n      // macOS (and other Unix): ps -A scan\n      Restart.killByPsScan(patterns, excludePids, skipProtected)\n    }\n  }"
+    },
+    {
+      "id": "restart-phases",
+      "claim": "brv restart runs the client-pattern SIGKILL scan, then SIGTERM to the daemon pid in its own data directory's daemon.json, then the brv-server.js / agent-process.js SIGKILL scan, then removes the daemon files. Redirecting the data directory changes only the SIGTERM target, not the two scans.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/restart.ts",
+      "lines": [
+        389,
+        436
+      ],
+      "blob": "2b6a6989ceb01f2b7ede5c4f1a20592fd509cc7a",
+      "file_sha256": "aeeab937f9468e451a981e16a8d4c3f63295bed97f6a7e2b37d009e206cf4d06",
+      "excerpt": "  async run(): Promise<void> {\n    const dataDir = getGlobalDataDir()\n\n    // Resolve the platform getPpidOf once. On Windows this loads the full\n    // Win32_Process table via PowerShell; share it across Phase 1 and Phase 3\n    // so the spawn happens only once instead of twice.\n    const getPpidOf = Restart.createDefaultGetPpidOf()\n\n    // Phase 1: Kill all client processes first (TUI, MCP, headless commands).\n    // Must happen BEFORE daemon kill \u2014 clients have reconnectors that will\n    // respawn the daemon via ensureDaemonRunning() if they detect disconnection.\n    // Self excluded by process.pid / process.ppid.\n    // Protected commands (e.g. `brv update`) are spared.\n    this.log('Stopping clients...')\n    Restart.patternKill(Restart.buildCliPatterns(), true, getPpidOf)\n    await Restart.sleep(KILL_SETTLE_MS)\n\n    // Phase 2: Graceful daemon kill via daemon.json PID.\n    // SIGTERM triggers ShutdownHandler \u2192 stops agents, transport, releases daemon.json.\n    // Safe now because all clients are dead \u2014 no one can respawn daemon.\n    const info = this.loadDaemonInfo(dataDir)\n    if (info !== undefined) {\n      this.log(`Stopping daemon (PID ${info.pid})...`)\n\n      let stopped = false\n      try {\n        process.kill(info.pid, 'SIGTERM')\n        stopped = await Restart.waitForProcessExit(info.pid, SIGTERM_BUDGET_MS)\n      } catch {\n        stopped = true // ESRCH = already dead\n      }\n\n      if (!stopped) {\n        Restart.killByPid(info.pid)\n        if (process.platform !== 'win32') {\n          await Restart.waitForProcessExit(info.pid, KILL_VERIFY_TIMEOUT_MS)\n        }\n      }\n    }\n\n    // Phase 3: Kill orphaned server/agent processes not tracked in daemon.json.\n    Restart.patternKill(Restart.SERVER_AGENT_PATTERNS, false, getPpidOf)\n    await Restart.sleep(KILL_SETTLE_MS)\n\n    // Phase 4: Clean state files.\n    this.cleanupAllDaemonFiles(dataDir)\n\n    this.log('All ByteRover processes stopped.')"
+    },
+    {
+      "id": "daemon-spawned-detached",
+      "claim": "The daemon entry point is spawned as a detached child process by any client via brv-transport-client.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/server/infra/daemon/brv-server.ts",
+      "lines": [
+        1,
+        9
+      ],
+      "blob": "97a4f980f79ee241dc203344a0fe6164c20b8cf9",
+      "file_sha256": "b9b954d6c573d2522ec40bc7a26adfe5fb2ff9fc9a615b12eb3f7f3e4ce7d353",
+      "excerpt": "/**\n * Daemon entry point \u2014 standalone Node.js process.\n *\n * This file is spawned as a detached child process by any client\n * (TUI, MCP, CLI) via `brv-transport-client`. It does NOT depend\n * on oclif or any CLI framework.\n *\n * Hosts the Socket.IO transport server directly. All clients (TUI, CLI,\n * MCP, agent child processes) connect to this single server."
+    },
+    {
+      "id": "daemon-agent-fork",
+      "claim": "The daemon starts each project's agent with child_process.fork(agent-process.js), so agents are the daemon's children and share its process group.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/server/infra/daemon/brv-server.ts",
+      "lines": [
+        357,
+        381
+      ],
+      "blob": "97a4f980f79ee241dc203344a0fe6164c20b8cf9",
+      "file_sha256": "b9b954d6c573d2522ec40bc7a26adfe5fb2ff9fc9a615b12eb3f7f3e4ce7d353",
+      "excerpt": "    // Agent pool with fork-based factory \u2014 each agent runs in its own process\n    const currentDir = dirname(fileURLToPath(import.meta.url))\n    const agentProcessPath = process.env.BRV_AGENT_PROCESS_PATH ?? join(currentDir, 'agent-process.js')\n\n    agentPool = new AgentPool({\n      agentIdleTimeoutPolicy,\n      agentProcessFactory(projectPath) {\n        // Prevent console window flash on Windows when forking agent processes.\n        // windowsHide is supported at runtime (fork delegates to spawn) but not in ForkOptions types,\n        // so we extract the options to a variable to bypass excess property checking.\n        const e2eStdio: StdioOptions = ['ignore', 'inherit', 'inherit', 'ipc']\n        const forkOptions = {\n          cwd: projectPath,\n          env: {\n            ...process.env,\n            BRV_AGENT_PORT: String(port),\n            BRV_AGENT_PROJECT_PATH: projectPath,\n          },\n          // In E2E mode, inherit stderr to see agent errors\n          stdio: process.env.BRV_E2E_MODE === 'true' ? e2eStdio : undefined,\n          windowsHide: true,\n        }\n        return fork(agentProcessPath, [], forkOptions)\n      },\n      log,"
+    },
+    {
+      "id": "transport-client-bundled",
+      "claim": "package.json lists @campfirein/brv-transport-client under bundleDependencies, so the transport client ships inside the pinned npm tarball.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "package.json",
+      "lines": [
+        223,
+        224
+      ],
+      "blob": "5a7cd02125e68593dab049f7d4a61cc3e1b648f9",
+      "file_sha256": "2c9e6a20885a76c93bfaa5a7f1b29af0b85e074d867e1a7b8d9d53a61df5ebe6",
+      "excerpt": "  \"bundleDependencies\": [\n    \"@campfirein/brv-transport-client\","
+    },
+    {
+      "id": "connect-api-key-flag",
+      "claim": "brv providers connect takes the key as the string flag --api-key (-k), that is, as a process argument.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/providers/connect.ts",
+      "lines": [
+        64,
+        68
+      ],
+      "blob": "d9a45e5a40d6a78d0c531dd5de677c77fb677c67",
+      "file_sha256": "26f18343c480e33d0c12822d39c47003543cbd4797de61ae740169928f4f2db3",
+      "excerpt": "  public static flags = {\n    'api-key': Flags.string({\n      char: 'k',\n      description: 'API key for the provider',\n    }),"
+    },
+    {
+      "id": "connect-masked-prompt",
+      "claim": "The CLI wizard's masked prompt: promptForApiKey uses @inquirer password with mask true.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/providers/connect.ts",
+      "lines": [
+        286,
+        296
+      ],
+      "blob": "d9a45e5a40d6a78d0c531dd5de677c77fb677c67",
+      "file_sha256": "26f18343c480e33d0c12822d39c47003543cbd4797de61ae740169928f4f2db3",
+      "excerpt": "  protected async promptForApiKey(providerName: string, apiKeyUrl?: string, signal?: AbortSignal): Promise<string> {\n    this.log()\n    const hint = apiKeyUrl ? ` (get one at ${apiKeyUrl}):` : ':'\n    return password(\n      {\n        mask: true,\n        message: `Enter API key for ${providerName}${chalk.dim(hint)}`,\n      },\n      {signal},\n    )\n  }"
+    },
+    {
+      "id": "connect-optional-key-prompt",
+      "claim": "promptForOptionalApiKey uses a plain @inquirer input prompt (no mask).",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/providers/connect.ts",
+      "lines": [
+        383,
+        390
+      ],
+      "blob": "d9a45e5a40d6a78d0c531dd5de677c77fb677c67",
+      "file_sha256": "26f18343c480e33d0c12822d39c47003543cbd4797de61ae740169928f4f2db3",
+      "excerpt": "  protected async promptForOptionalApiKey(providerName: string, signal?: AbortSignal): Promise<string | undefined> {\n    this.log()\n    const value = await input(\n      {message: `Enter API key for ${providerName} ${chalk.dim('(optional, press Enter to skip):')}`},\n      {signal},\n    )\n    return value.trim() || undefined\n  }"
+    },
+    {
+      "id": "connect-openai-compatible-prompt",
+      "claim": "In the CLI wizard, openai-compatible gets promptForOptionalApiKey (unmasked); other providers get the masked promptForApiKey.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/providers/connect.ts",
+      "lines": [
+        725,
+        730
+      ],
+      "blob": "d9a45e5a40d6a78d0c531dd5de677c77fb677c67",
+      "file_sha256": "26f18343c480e33d0c12822d39c47003543cbd4797de61ae740169928f4f2db3",
+      "excerpt": "        // API key flow\n        const isOpenAiCompatible = providerId === 'openai-compatible'\n        const baseUrl = isOpenAiCompatible ? await this.promptForBaseUrl(signal) : undefined\n        const apiKey = isOpenAiCompatible\n          ? await this.promptForOptionalApiKey(provider.name, signal)\n          : await this.promptForApiKey(provider.name, provider.apiKeyUrl, signal)"
+    },
+    {
+      "id": "webui-password-field",
+      "claim": "The web UI's provider API-key step renders the key field as an input of type password.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/webui/features/provider/components/provider-flow/api-key-step.tsx",
+      "lines": [
+        46,
+        56
+      ],
+      "blob": "4c9e9623a06980f1608abc289c434b47e4c788b0",
+      "file_sha256": "0a1a4f45936cf6f2e447d16fe6006f761412aea3983807463d778072426e9775",
+      "excerpt": "        <div className=\"flex flex-col gap-2\">\n          <label className=\"text-foreground text-sm font-medium\" htmlFor=\"api-key\">\n            Enter your {provider.name} API key\n          </label>\n          <Input\n            id=\"api-key\"\n            onChange={(e) => setApiKey(e.target.value)}\n            placeholder=\"Enter key\"\n            type=\"password\"\n            value={apiKey}\n          />"
+    },
+    {
+      "id": "webui-openai-compatible-base-url",
+      "claim": "In the web UI, selecting OpenAI Compatible leads to the base_url step.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/webui/features/provider/components/provider-flow/provider-flow-dialog.tsx",
+      "lines": [
+        214,
+        217
+      ],
+      "blob": "fcc00f138417b2ccbe1c38f43a3e73f4db3d4207",
+      "file_sha256": "12859c4f8970ac726ce3de6d360cc6e5cdf8dd9bb0f2fd59dfd1e2185380bfc8",
+      "excerpt": "      // OpenAI Compatible \u2192 base_url step\n      if (provider.id === 'openai-compatible') {\n        setStep('base_url')\n        return"
+    },
+    {
+      "id": "webui-base-url-then-key",
+      "claim": "Submitting the base URL moves the web UI flow to the api_key step.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/webui/features/provider/components/provider-flow/provider-flow-dialog.tsx",
+      "lines": [
+        350,
+        353
+      ],
+      "blob": "fcc00f138417b2ccbe1c38f43a3e73f4db3d4207",
+      "file_sha256": "12859c4f8970ac726ce3de6d360cc6e5cdf8dd9bb0f2fd59dfd1e2185380bfc8",
+      "excerpt": "  const handleBaseUrlSubmit = useCallback((url: string) => {\n    setBaseUrl(url)\n    setStep('api_key')\n  }, [])"
+    },
+    {
+      "id": "webui-key-step-optional",
+      "claim": "The api_key step renders ApiKeyStep (the password field), optional for openai-compatible.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/webui/features/provider/components/provider-flow/provider-flow-dialog.tsx",
+      "lines": [
+        429,
+        438
+      ],
+      "blob": "fcc00f138417b2ccbe1c38f43a3e73f4db3d4207",
+      "file_sha256": "12859c4f8970ac726ce3de6d360cc6e5cdf8dd9bb0f2fd59dfd1e2185380bfc8",
+      "excerpt": "      case 'api_key': {\n        return selectedProvider ? (\n          <ApiKeyStep\n            error={error}\n            isOptional={selectedProvider.id === 'openai-compatible'}\n            isValidating={validateMutation.isPending}\n            onBack={handleApiKeyBack}\n            onSubmit={(key) => handleApiKeySubmit(key)}\n            provider={selectedProvider}\n          />"
+    },
+    {
+      "id": "webui-command",
+      "claim": "brv webui prints the web UI URL (http://localhost:<port>) and tries to open a browser.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/oclif/commands/webui.ts",
+      "lines": [
+        46,
+        51
+      ],
+      "blob": "1beb27df7fc53e173762e1318041b97fab6d221f",
+      "file_sha256": "83a511102dc6b2ddd797b02e8f1c024f71b48b058353e52a820e2e344cac72ac",
+      "excerpt": "    const url = `http://localhost:${webuiPort}`\n    this.log(`ByteRover Web UI: ${url}`)\n\n    await open(url).catch(() => {\n      this.log('Could not open browser automatically. Open the URL above manually.')\n    })"
+    },
+    {
+      "id": "transport-host-loopback",
+      "claim": "The daemon's transport and web UI servers listen on 127.0.0.1.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/server/constants.ts",
+      "lines": [
+        43,
+        43
+      ],
+      "blob": "e882f31e78256d7703478d20213e25f59882d639",
+      "file_sha256": "8b92b11ac73c88e05622dd5c7cd3dca5ac2709749996e6ffbaee3cc85d919462",
+      "excerpt": "export const TRANSPORT_HOST = '127.0.0.1' // Use IP address for better sandbox compatibility"
+    },
+    {
+      "id": "webui-default-port",
+      "claim": "The web UI's default port is 7700.",
+      "repository": "https://github.com/campfirein/byterover-cli.git",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "path": "src/server/constants.ts",
+      "lines": [
+        63,
+        63
+      ],
+      "blob": "e882f31e78256d7703478d20213e25f59882d639",
+      "file_sha256": "8b92b11ac73c88e05622dd5c7cd3dca5ac2709749996e6ffbaee3cc85d919462",
+      "excerpt": "export const WEBUI_DEFAULT_PORT = 7700"
+    },
+    {
+      "id": "transport-client-detached-spawn",
+      "claim": "At tag 1.1.0 of brv-transport-client (the version package.json names and 05-npm-ls.stdout shows bundled; the bundled copy's commit was not compared), the daemon is spawned with detached: true, which on Linux makes it a session and process-group leader; the reproduction's recorded daemons have pgrp and session equal to their pid.",
+      "repository": "https://github.com/campfirein/brv-transport-client.git",
+      "commit": "ad0a0029875e4c952c8c6ba58c224f4ce37c80d7",
+      "path": "src/infra/daemon-spawner.ts",
+      "lines": [
+        109,
+        122
+      ],
+      "blob": "55090cc0e1afd3825df8b19f2af8e26a55facfce",
+      "file_sha256": "5427c46f1d9b6a36abb02f00002662a212e045f62ba6a030feaef054561a2d26",
+      "excerpt": "function spawnDaemonProcess(serverPath?: string): {getSpawnError: () => Error | undefined} {\n  let spawnError: Error | undefined\n\n  try {\n    const resolvedPath = resolveServerPath(serverPath)\n\n    const child = spawn(process.execPath, [resolvedPath], {\n      detached: true,\n      stdio: 'ignore',\n    })\n    child.on('error', (error) => {\n      spawnError = error\n    })\n    child.unref()"
+    },
+    {
+      "id": "oclif-autoupdate-hook-4.8.0-early-return",
+      "claim": "@oclif/plugin-update 4.8.0, the version the reproduction's global tarball install resolved (05-npm-ls.stdout; package-lock.json's 4.7.19 is not used by that install): the init hook returns when BRV_DISABLE_AUTOUPDATE is set, before it creates the cache directory or touches anything.",
+      "repository": "https://github.com/oclif/plugin-update.git",
+      "commit": "2042b58734d7af17227ed23c7633550669df3311",
+      "path": "src/hooks/init.ts",
+      "lines": [
+        20,
+        38
+      ],
+      "blob": "084006dc96364f7cabb744ff39a6856a4deef2d4",
+      "file_sha256": "328c7c05487668d5acadeebeafe836b452b583a164a1814b5975476717be2867",
+      "excerpt": "export const init: Interfaces.Hook<'init'> = async function (opts) {\n  if (opts.id === 'update') return\n  if (opts.config.scopedEnvVarTrue('DISABLE_AUTOUPDATE')) return\n\n  const {config, error: throwError} = this\n  const binPath = config.binPath ?? config.bin\n  const lastrunfile = join(config.cacheDir, 'lastrun')\n  const autoupdatefile = join(config.cacheDir, 'autoupdate')\n  const autoupdatelogfile = join(config.cacheDir, 'autoupdate.log')\n  const clientRoot = config.scopedEnvVar('OCLIF_CLIENT_HOME') ?? join(config.dataDir, 'client')\n\n  const autoupdateEnv = {\n    ...process.env,\n    [config.scopedEnvVarKey('SKIP_ANALYTICS')]: '1',\n    [config.scopedEnvVarKey('TIMESTAMPS')]: '1',\n  }\n\n  // Ensure the cache directory exists\n  await mkdir(config.cacheDir, {recursive: true})"
+    },
+    {
+      "id": "oclif-autoupdate-hook-4.8.0-lastrun-and-spawn",
+      "claim": "Past that return, the hook touches <cache dir>/lastrun on every command and, when it claims the autoupdate marker, writes autoupdate.log and spawns a detached `brv update --autoupdate`. The reproduction's autoupdate-idle check looks for those files.",
+      "repository": "https://github.com/oclif/plugin-update.git",
+      "commit": "2042b58734d7af17227ed23c7633550669df3311",
+      "path": "src/hooks/init.ts",
+      "lines": [
+        62,
+        101
+      ],
+      "blob": "084006dc96364f7cabb744ff39a6856a4deef2d4",
+      "file_sha256": "328c7c05487668d5acadeebeafe836b452b583a164a1814b5975476717be2867",
+      "excerpt": "  await touch(lastrunfile)\n  const clientDir = join(clientRoot, config.version)\n  if (existsSync(clientDir)) await touch(clientDir)\n\n  // Atomically claim the right to spawn an autoupdate.\n  //\n  // The original `if (!(await autoupdateNeeded())) return; await writeFile(...)`\n  // sequence had a non-atomic read-then-write window: several otto invocations\n  // starting in parallel on a machine with no marker file (e.g. a fresh\n  // laptop being set up) could all pass the autoupdateNeeded() check before\n  // any one of them wrote the marker, and each would spawn its own\n  // `<cli> update --autoupdate` child. Those children then pin in debounce()\n  // (which never exits while CLI activity continues) and accumulate until OOM.\n  //\n  // Fix: combine the check and the marker creation into a single atomic step\n  // using O_EXCL (`open(path, 'wx')`). Only one process can create the marker;\n  // others see EEXIST and bail (or, if the marker is stale, race to reclaim it\n  // \u2014 which is bounded to one race per debounce window per machine).\n  if (!(await claimAutoupdate(autoupdatefile))) return\n\n  debug('autoupdate running')\n\n  debug(`spawning autoupdate on ${binPath}`)\n\n  const fd = await open(autoupdatelogfile, 'a')\n  await writeFile(\n    fd,\n    timestamp(`starting \\`${binPath} update --autoupdate\\` from ${process.argv.slice(1, 3).join(' ')}\\n`),\n  )\n\n  const stream = fd.createWriteStream()\n  spawn(binPath, ['update', '--autoupdate'], {\n    detached: !config.windows,\n    env: autoupdateEnv,\n    stdio: ['ignore', stream, stream],\n    ...(config.windows ? {shell: true} : {}),\n  })\n    .on('error', (e: Error) => process.emitWarning(e))\n    .on('close', () => fd.close())\n    .unref()"
+    },
+    {
+      "id": "oclif-cache-dir-4.14.0",
+      "claim": "@oclif/core 4.14.0, the version the reproduction's install resolved (05-npm-ls.stdout): dir() takes XDG_<CATEGORY>_HOME first on Linux.",
+      "repository": "https://github.com/oclif/core.git",
+      "commit": "1d2903e6ea5dbc43ac5636caeb86ed3d19588f34",
+      "path": "src/config/config.ts",
+      "lines": [
+        182,
+        188
+      ],
+      "blob": "a9ed05381211681966b6c2b03ff52d86d04d7095",
+      "file_sha256": "da163217c157c895883f74ca9eaaa6c4b4e83e13e94b900e6aeac5a9be73cfe2",
+      "excerpt": "  protected dir(category: 'cache' | 'config' | 'data'): string {\n    const base =\n      process.env[`XDG_${category.toUpperCase()}_HOME`] ||\n      (this.windows && process.env.LOCALAPPDATA) ||\n      join(this.home, category === 'data' ? '.local/share' : '.' + category)\n    return join(base, this.dirname)\n  }"
+    },
+    {
+      "id": "oclif-cache-dir-4.14.0-assignment",
+      "claim": "@oclif/core 4.14.0: cacheDir is BRV_CACHE_DIR, else the macOS cache dir, else dir('cache'); configDir and dataDir follow BRV_CONFIG_DIR and BRV_DATA_DIR the same way.",
+      "repository": "https://github.com/oclif/core.git",
+      "commit": "1d2903e6ea5dbc43ac5636caeb86ed3d19588f34",
+      "path": "src/config/config.ts",
+      "lines": [
+        315,
+        317
+      ],
+      "blob": "a9ed05381211681966b6c2b03ff52d86d04d7095",
+      "file_sha256": "da163217c157c895883f74ca9eaaa6c4b4e83e13e94b900e6aeac5a9be73cfe2",
+      "excerpt": "    this.cacheDir = this.scopedEnvVar('CACHE_DIR') || this.macosCacheDir() || this.dir('cache')\n    this.configDir = this.scopedEnvVar('CONFIG_DIR') || this.dir('config')\n    this.dataDir = this.scopedEnvVar('DATA_DIR') || this.dir('data')"
+    },
+    {
+      "id": "npm-compile-cache",
+      "claim": "npm 11.19.0 (the host's npm) calls module.enableCompileCache() at startup, which makes Node write compiled npm modules to <os.tmpdir()>/node-compile-cache.",
+      "repository": "https://github.com/npm/cli.git",
+      "commit": "bfacd33ccbcd908480610703b60455d2da5b57a9",
+      "path": "lib/cli.js",
+      "lines": [
+        1,
+        7
+      ],
+      "blob": "00b4fc0bd7fb72c9c2f9717a62755b01e110b3ff",
+      "file_sha256": "67666f06479f9b0bbc01412c198caadd4287d34d5ed74a02871ea78f186451e7",
+      "excerpt": "try {\n  const { enableCompileCache } = require('node:module')\n  /* istanbul ignore next */\n  if (enableCompileCache) {\n    enableCompileCache()\n  }\n} catch (e) { /* istanbul ignore next */ }"
+    },
+    {
+      "id": "curl-header-from-stdin",
+      "claim": "curl -H accepts @filename, one header per line, and @- reads the headers from stdin (since 7.55.0; the host has curl 8.5.0).",
+      "repository": "https://github.com/curl/curl.git",
+      "commit": "7161cb17c01dcff1dc5bf89a18437d9d729f1ecd",
+      "path": "docs/cmdline-opts/header.d",
+      "lines": [
+        40,
+        42
+      ],
+      "blob": "95c1565e8f2ca88924183de0fdcb9d4ded952a36",
+      "file_sha256": "2a9e9e1f928325792ce3edb6d854f3fc8af97266547605fba3a7455732d6a1df",
+      "excerpt": "This option can take an argument in @filename style, which then adds a header\nfor each line in the input file. Using @- makes curl read the header file from\nstdin. Added in 7.55.0."
+    }
+  ]
+}

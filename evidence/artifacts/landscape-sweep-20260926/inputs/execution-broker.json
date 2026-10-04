@@ -1,0 +1,54 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "execution-broker",
+ "title": "Execution and broker adapters",
+ "requirement": "Use the selected NautilusTrader destination with broker-specific execution boundaries, deterministic numeric risk and reproducible equity accounting; preserve the prior LEAN oracle and qualify any strategy with causal data, costs and independent reconciliation.",
+ "research_status": "comparison_required",
+ "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+ "requirement_sha256": "05654fcd99ad74800f9912a667b3e6ec90af3014531c71fea9511dbba1bd72fd",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [],
+ "alternatives": [],
+ "components_vs_upstream_20260926": [],
+ "open_gaps": [
+  "lanes disagreed: claude=adaptive-paper-alpaca-adapter,alpaca-py; codex=adaptive-paper-alpaca-adapter,alpaca-py,nautilus-ibkr-adapter; the counterbalanced adjudication did not agree (claude 2, codex 2, 0 refuted; evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-202"
+ ],
+ "overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers",
+   "https://github.com/Voyz/ibeam",
+   "https://github.com/Voyz/ibind"
+  ]
+ },
+ "known_repositories": [
+  "afrojuju1/nautilus_trader",
+  "ai4finance-foundation/finrl",
+  "alpacahq/alpaca-py",
+  "gnzsnz/ib-gateway-docker",
+  "hkuds/vibe-tradin",
+  "ib-api-reloaded/ib_async",
+  "kernc/backtesting.py",
+  "lumiwealth/lumibo",
+  "mementum/backtrader",
+  "microsoft/qlib",
+  "mitmproxy/mitmproxy",
+  "nautechsystems/nautilus_trader",
+  "polakowo/vectorb",
+  "pydantic/pydantic",
+  "pyportfolio/pyportfolioop",
+  "quantconnect/lean",
+  "quantconnect/lean.brokerages.alpaca",
+  "quantconnect/lean.brokerages.interactivebrokers",
+  "shopify/toxiproxy",
+  "skfolio/skfolio",
+  "stefan-jansen/zipline-reloaded",
+  "tauricresearch/tradingagents",
+  "voyz/ibeam",
+  "voyz/ibind"
+ ],
+ "seeded_candidates_20260926": [
+  "nautilus-ibapi is ARCHIVED upstream (catalog-freshness 36205743492); rust-ibapi pin 3.3.0 vs upstream 4.2.0 (notice-2188 fix in v4.0.0); draft #280 uses official ibapi 10.45.1"
+ ]
+}

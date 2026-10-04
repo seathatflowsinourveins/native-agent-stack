@@ -28,10 +28,29 @@ the reasons for retaining or comparing the CLI, MCP and simulation alternatives.
 Its bounded operational paper lane uses 120 requests/minute against the observed
 200/minute account limit; Elite's advertised 1,000 is API calls, not fills.
 
+The [September 28 mover research refresh](research-20260928-movers.md) records
+historical extreme-mover data sources, the factor evidence for pre-positioning
+versus post-detection continuation, and the layer changes since the September 26
+convergence. No recorded selection changed. The paper series frozen that day
+did not start: its stored paper key was rejected (HTTP 401). New paper keys
+cleared the same evening. The September 29 series on the two paper accounts are
+recorded, mechanics-only, in the
+[pre-market](../../blueprints/us-equities/adaptive-paper/trials/pre-20260929/README.md),
+[regular-hours](../../blueprints/us-equities/adaptive-paper/trials/rth-20260929/README.md) and
+[after-hours](../../blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md)
+receipts.
+
 The [September 24 mover v3 sweep](mover-v3-sweep-20260924.json) records the
 catalog actions behind the [mover v3 research plan](../../blueprints/us-equities/mover-v3/README.md):
 literature and metadata evidence only, with each record's sweep status. Its
 repository records are registered in the decision index.
+
+The [September 26 trading research convergence](convergence-20260926.md) records 13 trading layers researched
+from the starred repositories, 8 awesome lists and per-layer candidate research. Each layer's proposal was
+challenged by a GPT-6 cross-family refutation with live search, and every vote quote is an exact span of
+the [retained vote texts](../../evidence/artifacts/trading-convergence-20260926/README.md). It is an input to
+the verdict wave next to [`manifest-20260926.json`](../sota-convergence/manifest-20260926.json); it selects
+nothing.
 
 The [September 24 local-model workload discovery](local-model-workloads-20260924.json)
 records which local-model workloads beyond memory and RAG are worth measuring on

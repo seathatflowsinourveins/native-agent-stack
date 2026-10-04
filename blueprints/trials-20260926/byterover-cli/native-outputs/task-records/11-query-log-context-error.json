@@ -1,0 +1,10 @@
+{
+  "id": "qry-1790386775778",
+  "matchedDocs": [],
+  "query": "What is the rate limiter policy?",
+  "startedAt": 1790386775777,
+  "status": "error",
+  "taskId": "<uuid>",
+  "completedAt": 1790386794797,
+  "error": "request (11192 tokens) exceeds the available context size (8192 tokens), try increasing it"
+}

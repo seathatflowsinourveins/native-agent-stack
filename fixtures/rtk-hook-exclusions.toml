@@ -1,0 +1,14 @@
+# RTK's Claude-hook exclusions for scripts/native_token_ci.py: the four exclude_commands entries of
+# recipes/README.md#native-context-mode-and-hooks, then "jq". rtk 0.50.0's jq filter
+# (src/filters/jq.toml: max_lines 40, truncate_lines_at 120) cuts exact-value extraction, so the
+# hook must leave a standalone jq native. The harness copies this file to an owned
+# $XDG_CONFIG_HOME/rtk/config.toml and checks `rtk hook check` answers against it; a file rtk cannot
+# read falls back to the defaults without a warning, so those answers are the read-back.
+[hooks]
+exclude_commands = [
+  "^git show [^ ]*:",
+  "diff",
+  '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:',
+  '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)',
+  "jq",
+]

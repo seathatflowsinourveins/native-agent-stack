@@ -1,0 +1,90 @@
+original lock source: Git revision 603027b617b4561363a7a79995c9d349de3ea5de (historical blob)
+original lock: 1834 bytes, sha256 0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9
+environment-record.json sha256 c1939781e6a0f0f67136fb1bf292f69800e543fadb0461a71b42b812ea83fff8
+== no opt-in: advisory IDs printed, exit 2, no files
+exit 2 (expected)
+20 known advisories in this environment (Total 2 packages affected by 20 known vulnerabilities (1 Critical, 15 High, 4 Medium, 0 Low, 0 Unknown) from 1 ecosystem.):
+  PYSEC-2025-203 (torch 2.8.0, High)
+  PYSEC-2025-204 (torch 2.8.0, High)
+  PYSEC-2025-206 (torch 2.8.0, Medium)
+  PYSEC-2026-139 (torch 2.8.0, High)
+  PYSEC-2026-2286 (torch 2.8.0, High)
+  GHSA-qfhq-4f3w-5fph (torch 2.8.0, Medium)
+  GHSA-rrmf-rvhw-rf47 (torch 2.8.0, Medium)
+  GHSA-vgrw-7cvw-pwgx (torch 2.8.0, Medium)
+  PYSEC-2025-211 (transformers 4.53.1, High)
+  PYSEC-2025-212 (transformers 4.53.1, High)
+  PYSEC-2025-213 (transformers 4.53.1, High)
+  PYSEC-2025-214 (transformers 4.53.1, High)
+  PYSEC-2025-215 (transformers 4.53.1, High)
+  PYSEC-2025-216 (transformers 4.53.1, High)
+  PYSEC-2025-217 (transformers 4.53.1, High)
+  PYSEC-2025-218 (transformers 4.53.1, High)
+  PYSEC-2026-2288 / GHSA-69w3-r845-3855 (transformers 4.53.1, High)
+  PYSEC-2026-2289 / GHSA-29pf-2h5f-8g72 (transformers 4.53.1, High)
+  PYSEC-2026-2290 / GHSA-fgcw-684q-jj6r (transformers 4.53.1, Critical)
+  PYSEC-2026-3929 / GHSA-xrqw-3rrv-vx5w (transformers 4.53.1, High)
+refusing: this environment has known vulnerabilities; rerun with --accept-known-advisories to write its lock into a temporary directory
+temporary workspace entries: 0
+== explicit opt-in: warning and byte-identical lock
+20 known advisories in this environment (Total 2 packages affected by 20 known vulnerabilities (1 Critical, 15 High, 4 Medium, 0 Low, 0 Unknown) from 1 ecosystem.):
+  PYSEC-2025-203 (torch 2.8.0, High)
+  PYSEC-2025-204 (torch 2.8.0, High)
+  PYSEC-2025-206 (torch 2.8.0, Medium)
+  PYSEC-2026-139 (torch 2.8.0, High)
+  PYSEC-2026-2286 (torch 2.8.0, High)
+  GHSA-qfhq-4f3w-5fph (torch 2.8.0, Medium)
+  GHSA-rrmf-rvhw-rf47 (torch 2.8.0, Medium)
+  GHSA-vgrw-7cvw-pwgx (torch 2.8.0, Medium)
+  PYSEC-2025-211 (transformers 4.53.1, High)
+  PYSEC-2025-212 (transformers 4.53.1, High)
+  PYSEC-2025-213 (transformers 4.53.1, High)
+  PYSEC-2025-214 (transformers 4.53.1, High)
+  PYSEC-2025-215 (transformers 4.53.1, High)
+  PYSEC-2025-216 (transformers 4.53.1, High)
+  PYSEC-2025-217 (transformers 4.53.1, High)
+  PYSEC-2025-218 (transformers 4.53.1, High)
+  PYSEC-2026-2288 / GHSA-69w3-r845-3855 (transformers 4.53.1, High)
+  PYSEC-2026-2289 / GHSA-29pf-2h5f-8g72 (transformers 4.53.1, High)
+  PYSEC-2026-2290 / GHSA-fgcw-684q-jj6r (transformers 4.53.1, Critical)
+  PYSEC-2026-3929 / GHSA-xrqw-3rrv-vx5w (transformers 4.53.1, High)
+WARNING: regenerating a known-vulnerable environment (torch 2.8.0, transformers 4.53.1) for trial reproduction only; install it only into a disposable, isolated environment.
+regenerated requirements-lock.txt: 1834 bytes, sha256 0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9 (equals the original lock)
+regenerated: 1834 bytes, sha256 0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9
+cmp: regenerated lock is byte-identical to the original
+PASS: all recorded advisory IDs printed on both paths
+temporary workspace entries: 0
+== temporary root inside a Git work tree: refused
+exit 2 (expected)
+refusing: the temporary directory is inside a Git work tree
+== altered pin: mismatch before writing
+exit 1 (expected)
+MISMATCH: regenerated 1834 bytes sha256 831c5ef34ecf6b6790f822afeec5fa6687f7a15727bf1df9a2b6e7f8616291cb; record says 1834 bytes sha256 0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9; nothing written
+temporary workspace entries: 0
+== altered structured version: mismatch before writing
+exit 1 (expected)
+MISMATCH: structured requirement fields differ from the recorded line; nothing written
+temporary workspace entries: 0
+== reproduce-cpu.sh without opt-in: no output directory
+exit 2 (expected)
+temporary workspace entries: 0
+== reproduce-cpu.sh opt-in, synthetic uv mode: venv-fail
+exit 1 (expected)
+start; workspace is a fresh mktemp directory; nproc=48
+temporary lock regenerated from environment-record.json with the original sha256
+FAIL: uv venv
+temporary workspace entries: 0
+== reproduce-cpu.sh opt-in, synthetic uv mode: equal
+exit 1 (expected)
+start; workspace is a fresh mktemp directory; nproc=48
+temporary lock regenerated from environment-record.json with the original sha256
+installed set equals environment-record.json
+FAIL: device check
+temporary workspace entries: 0
+== reproduce-cpu.sh opt-in, synthetic uv mode: mismatch
+exit 1 (expected)
+start; workspace is a fresh mktemp directory; nproc=48
+temporary lock regenerated from environment-record.json with the original sha256
+FAIL: installed set differs from environment-record.json
+temporary workspace entries: 0
+PASS: all lock regeneration and CPU-script integration checks

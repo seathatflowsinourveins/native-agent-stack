@@ -1,0 +1,62 @@
+{
+ "at": "2026-09-25T18:57:13Z",
+ "prefix": "~/.local/share/codex-ecosystem/tools/ai-memory-2.4.0",
+ "release": {
+  "tag": "v2.4.0",
+  "published_at": "2026-09-21T23:45:13Z",
+  "prerelease": false,
+  "draft": false,
+  "immutable": false
+ },
+ "expected_sha256": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+ "sidecar": {
+  "sha256": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+  "name": "ai-memory-linux-x86_64.tar.gz"
+ },
+ "api_asset": {
+  "digest": "sha256:590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+  "size": 15969555,
+  "url_matches": true
+ },
+ "release_body_lists_sha": true,
+ "upstream_sources_agree": true,
+ "download": {
+  "sha256": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+  "bytes": 15969555,
+  "size_matches_api": true
+ },
+ "integrity_verified": true,
+ "tar": {
+  "members": 196,
+  "unsafe_members": 0,
+  "top_level": [
+   ".",
+   "LICENSE",
+   "README.md",
+   "ai-memory",
+   "crates",
+   "docs",
+   "hooks",
+   "packaging"
+  ]
+ },
+ "new_version_stdout": "ai-memory 2.4.0",
+ "new_version_rc": 0,
+ "new_bin_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+ "prefix_entries": [
+  "LICENSE",
+  "README.md",
+  "ai-memory",
+  "crates",
+  "docs",
+  "hooks",
+  "packaging"
+ ],
+ "bin_link_target": "~/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory",
+ "assert": {
+  "version_exact": true,
+  "hooks_dir_exists": true,
+  "bin_link_still_old": true
+ },
+ "pass": true
+}

@@ -20,6 +20,10 @@ The current plan's workflow hash includes the separately qualified setup-python
 Action update from PR31. The accepted run retains its original execution head and
 plan digest in the receipt and captured freeze records; this prospective pin
 refresh does not claim a new recovery execution or rewrite historical evidence.
+Changed after `v2026.09.26.2`: a second such refresh on 2026-09-26 adds
+`step-security/harden-runner` in audit mode as each job's first step and exact-release
+Action comments; the next dispatch is the first run with that step
+([decision](../../../docs/decisions/2026-09-26-token-workflow-hardening.md)).
 
 [plan.json](plan.json) freezes the scope, source inputs, independent query
 expectations, key flow, finite deadlines and failure conditions. The workflow is

@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--affaan-m/ECC--install--20260926-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "9a8257cdca7595bac014066a6377156529e57302",
+  "recorded_by": {
+    "identity_sha256": "1acdb6c10d2024f9f9d290019d4bb0894f1f115068419f1e575c32f8bf2925f7",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "affaan-m/ECC",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "python3 tools/adoption/install_skills.py --skills-bin \"$HOME/.local/share/codex-ecosystem/tools/skills-1.7.0/bin/skills\" --dry-run --only iterative-retrieval --only search-first",
+      "exit": 0,
+      "duration_s": 0.104,
+      "output_sha256": "04c721ff8739889ee580daa7a52cb8425d738c582597c9cc82d9e45be276a0a1",
+      "output_excerpt": "iterative-retrieval: ok (pinned ref already installed and locked)\nsearch-first: ok (pinned ref already installed and locked)\ninstall-skills: 2/2 ok\n"
+    },
+    {
+      "cmd": "python3 scripts/skills_status.py --skills-bin \"$HOME/.local/share/codex-ecosystem/tools/skills-1.7.0/bin/skills\" | grep -E '(iterative-retrieval|search-first) |^lock:|^cli --version|^result'",
+      "exit": 0,
+      "duration_s": 0.119,
+      "output_sha256": "64e3df6b5935e21330304f66db80513c00f85c064b9c9db9520f933a192f0807",
+      "output_excerpt": "ok    iterative-retrieval              canonical=ok lock=ok link=ok(absolute) listing=ok(name-only) codex=ok\nok    search-first                     canonical=ok lock=ok link=ok(absolute) listing=ok(name-only) codex=ok\nlock: source=default state=ok version=3\ncli --version: invoked=True output=1.7.0 matches_manifest=True\nresult: ok\n"
+    },
+    {
+      "cmd": "python3 -c \"import json,os; d=json.load(open(os.path.expanduser('~/.agents/.skill-lock.json'))); [print(n, 'lock ref', d['skills'][n]['ref'], 'tree', d['skills'][n]['skillFolderHash']) for n in ('iterative-retrieval','search-first')]\"",
+      "exit": 0,
+      "duration_s": 0.019,
+      "output_sha256": "8ee1ce37ba20e423cbe1a79d7773fa0232aee68b003cb9c444d05f99eeca9d8a",
+      "output_excerpt": "iterative-retrieval lock ref 2b6e839771e53096d8451a213d40dc64ec8acac0 tree 1f1e8d67cf41d72acf2315dc7e6edeac0fc231a6\nsearch-first lock ref 2b6e839771e53096d8451a213d40dc64ec8acac0 tree 89e0ce14188958a85fbfc7ae0bdc30a0dc9681e1\n"
+    },
+    {
+      "cmd": "for n in iterative-retrieval search-first; do echo \"$n winner-pin tree: $(gh api repos/affaan-m/ECC/git/trees/dd6ee538aee0f548d4a6b520118f875431fd749e?recursive=1 --jq \".tree[] | select(.path==\\\"skills/$n\\\") | .sha\")\"; done",
+      "exit": 0,
+      "duration_s": 0.836,
+      "output_sha256": "5d85ed49f36f3c4fcd24ffd891c9ffa6c2468a1681704baa8e1896987c25d351",
+      "output_excerpt": "iterative-retrieval winner-pin tree: 1f1e8d67cf41d72acf2315dc7e6edeac0fc231a6\nsearch-first winner-pin tree: 89e0ce14188958a85fbfc7ae0bdc30a0dc9681e1\n"
+    }
+  ],
+  "tool_versions": {
+    "affaan-m/ECC": "dd6ee538aee0f548d4a6b520118f875431fd749e"
+  },
+  "observed_at_utc": "2026-09-26T00:20:09Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), the two selected ECC skills (search-first, iterative-retrieval) are installed through the pinned skills CLI 1.7.0 from adoption/skills/manifest.json. tools/adoption/install_skills.py --dry-run reports both 'ok (pinned ref already installed and locked)': the global lock's skillFolderHash equals the manifest tree SHA and the installed SKILL.md sha256 equals the manifest. scripts/skills_status.py reports both 'ok' with canonical=ok lock=ok link=ok(absolute) listing=ok(name-only) codex=ok, CLI 1.7.0, result ok. The lock records ref 2b6e839771e53096d8451a213d40dc64ec8acac0 with trees 1f1e8d67... and 89e0ce14... (third command), and those trees equal the skill-folder trees at the landscape winner pin dd6ee538 (fourth command), so the installed bytes are the winner's. Readiness only. All commands exit 0.",
+  "limitations": [
+    "Install stage: lock, bytes, links, listing state and Codex config are verified; this is readiness, not functional acceptance, and changes no platform_status. Invocation is measured separately by the 30-day skills trial (/skill-doctor showed 0 uses at install).",
+    "The Claude links are the earlier recipe's absolute links, kept by the CLI because they resolve to the canonical folder; a fresh host gets relative links.",
+    "Equality with the winner pin dd6ee538 is by identical git tree SHAs of both skill folders, not by installing at dd6ee538."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T00:20:09Z",
+      "reviewer": {
+        "identity_sha256": "1acdb6c10d2024f9f9d290019d4bb0894f1f115068419f1e575c32f8bf2925f7",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "headless claude -p review 2026-09-26 (re-ran all 4 commands)",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T00:24:20Z",
+      "reviewer": {
+        "identity_sha256": "d902f87d24bb825a0eee54296021f411166aa85ac7aaa29c75b308c7f1c8492b",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--affaan-m/ECC--install--20260926"
+}

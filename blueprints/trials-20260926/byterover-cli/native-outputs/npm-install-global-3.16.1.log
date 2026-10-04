@@ -1,0 +1,13 @@
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn deprecated glob@11.1.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 647 packages in 1m
+npm warn install-scripts 5 packages have install scripts not yet covered by allowScripts:
+npm warn install-scripts   @google/genai@1.52.0 (preinstall: echo 'preinstall: no-op')
+npm warn install-scripts   esbuild@0.27.7 (postinstall: node install.js)
+npm warn install-scripts   protobufjs@7.6.6 (postinstall: node scripts/postinstall)
+npm warn install-scripts   tesseract.js@7.0.0 (postinstall: opencollective-postinstall || true)
+npm warn install-scripts   byterover-cli@3.16.1 (prepare: husky)
+npm warn install-scripts
+npm warn install-scripts Run `npm install -g --allow-scripts=@google/genai,esbuild,protobufjs,tesseract.js,byterover-cli` to allow these scripts once, or `npm config set allow-scripts=@google/genai,esbuild,protobufjs,tesseract.js,byterover-cli --location=user` to allow them for all global installs.
+install_exit=0

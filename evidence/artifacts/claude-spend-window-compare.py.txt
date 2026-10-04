@@ -1,0 +1,124 @@
+# Inputs: out/calls.tsv (count-only per-message usage rows; private input).
+# Inputs: out/files.jsonl (count-only per-file metadata; private input).
+# Source: window_compare.py plus advisor-cohort repair, 2026-10-04; run: python3 <this artifact> <out-directory>.
+#!/usr/bin/env python3
+"""Before/after spend comparison from agg.py output (calls.tsv + files.jsonl).
+Dedup: one API call per message id across all files, per-field max (ccusage rule, as in agg.py).
+IET weights as report.py: in=1, cr=0.1, cw5=1.25, cw1=2, out=5 (relative cost; not dollars)."""
+import json, sys, collections, calendar, time
+D = sys.argv[1]
+WIN = {  # UTC, half-open; local EDT day = UTC-4
+    'C_0926-27': ('2026-09-26T04:00:00', '2026-09-28T04:00:00'),
+    'A_1001-02': ('2026-10-01T04:00:00', '2026-10-03T04:00:00'),
+    'B_1003-04': ('2026-10-03T04:00:00', '2026-10-04T14:00:00'),
+}
+def ep(s):
+    try: return calendar.timegm(time.strptime(s[:19], '%Y-%m-%dT%H:%M:%S'))
+    except Exception: return None
+WE = {k: (ep(a), ep(b)) for k, (a, b) in WIN.items()}
+HOURS = {k: (b - a) / 3600 for k, (a, b) in WE.items()}
+files = {}
+for line in open(f'{D}/files.jsonl'):
+    r = json.loads(line); files[r['file_idx']] = r
+calls = {}
+for line in open(f'{D}/calls.tsv'):
+    p = line.rstrip('\n').split('\t')
+    if len(p) < 13: continue
+    idx, mid, ts, mdl = int(p[0]), p[1], p[2], p[3]
+    v = [int(float(x or 0)) for x in p[4:11]]  # in cw cw5 cw1 cr out think
+    c = calls.get(mid)
+    if c is None:
+        calls[mid] = [idx, ts, mdl, v, p[11], p[12]]
+    else:
+        c[3] = [max(a, b) for a, b in zip(c[3], v)]
+def iet(v):
+    i, cw, cw5, cw1, cr, out, th = v
+    cwr = max(0, cw - cw5 - cw1)
+    return i + 0.1 * cr + 1.25 * (cw5 + cwr) + 2 * cw1 + 5 * out
+def win_of(ts):
+    e = ep(ts) if ts else None
+    if e is None: return None
+    for k, (a, b) in WE.items():
+        if a <= e < b: return k
+    return None
+def advisor_totals_by_window(records):
+    """File-start cohorts; aggregates contain no per-iteration timestamps.
+
+    Advisor rows are separate from calls.tsv executor rows. Keep their iterations
+    out of executor call counts, context means, model shares and effort shares.
+    """
+    result = {w: collections.defaultdict(collections.Counter) for w in WIN}
+    for f in records:
+        w = win_of(f.get('first_ts') or '')
+        if not w: continue
+        for model, tokens in (f.get('tot') or {}).items():
+            if not model.startswith('advisor('): continue
+            for key in ('in', 'out', 'cr', 'cw', 'calls'):
+                result[w][model][key] += tokens.get(key, 0)
+    return result
+def kind_of(f):
+    path = f['path']
+    if f['kind'] == 'main': return 'main'
+    if '/subagents/workflows/' in '/' + path: return 'sub:workflow'
+    return 'sub:agent'
+def atype(f):
+    m = f.get('meta') or {}
+    return (m.get('agentType') or m.get('subagent_type') or m.get('agent_type') or '?') if isinstance(m, dict) else '?'
+agg = {k: collections.defaultdict(lambda: collections.Counter()) for k in WIN}
+sess_iet = {k: collections.Counter() for k in WIN}
+for mid, (idx, ts, mdl, v, eff, side) in calls.items():
+    w = win_of(ts)
+    if not w: continue
+    f = files.get(idx, {})
+    x = iet(v); C = v[0] + v[1] + v[4]
+    for dim, key in [('all', 'all'), ('kind', kind_of(f)), ('model', mdl), ('effort', eff), ('project', f.get('project', '?')[:40]),
+                     ('atype', atype(f) if f.get('kind') != 'main' else 'main')]:
+        cc = agg[w][(dim, key)]
+        cc['calls'] += 1; cc['iet'] += x; cc['ctx'] += C; cc['in'] += v[0]; cc['cw'] += v[1]; cc['cr'] += v[4]; cc['out'] += v[5]; cc['think'] += v[6]
+    sess_iet[w][f.get('session', '?')] += x
+def show(dim, top=12):
+    print(f'\n== {dim}: per-24h IET (M), calls/24h, mean context per call (K), out/24h (M), share of window IET')
+    keys = collections.Counter()
+    for w in WIN:
+        for (d, k), cc in agg[w].items():
+            if d == dim: keys[k] += cc['iet'] / HOURS[w]
+    for k, _ in keys.most_common(top):
+        row = []
+        for w in WIN:
+            cc = agg[w].get((dim, k)); tot = agg[w][('all', 'all')]['iet'] or 1
+            if not cc: row.append(f'{"-":>40}'); continue
+            row.append(f"{cc['iet']/HOURS[w]*24/1e6:8.1f}M {cc['calls']/HOURS[w]*24:8.0f}c {cc['ctx']/max(1,cc['calls'])/1e3:6.0f}K {cc['out']/HOURS[w]*24/1e6:5.1f}o {100*cc['iet']/tot:4.0f}%")
+        print(f'{str(k)[:26]:26} ' + ' | '.join(row))
+print('windows (UTC):', WIN, 'hours', {k: round(h, 1) for k, h in HOURS.items()})
+print('unique calls', len(calls))
+for dim in ['all', 'kind', 'model', 'effort', 'atype', 'project']:
+    show(dim)
+print('\n== top sessions by IET per window (session id prefix, IET M, share)')
+for w in WIN:
+    tot = sum(sess_iet[w].values()) or 1
+    print(w, '; '.join(f"{s[:8]} {v/1e6:.0f}M {100*v/tot:.0f}%" for s, v in sess_iet[w].most_common(8)))
+# subagent first-call context (static prefix proxy) by window of file start
+fc = {k: [] for k in WIN}
+for f in files.values():
+    if f.get('kind') == 'main' or not f.get('calls'): continue
+    w = win_of(f.get('first_ts') or '')
+    if w and not f.get('resumed_start'): fc[w].append(f['ctx_first'])
+print('\n== subagent first-call context (K): n, median, p90')
+for w, xs in fc.items():
+    xs.sort()
+    if xs: print(w, len(xs), round(xs[len(xs)//2]/1e3, 1), round(xs[int(len(xs)*0.9)]/1e3, 1))
+# subagents per day and calls per subagent
+print('\n== subagent files started per 24h, mean calls per subagent')
+for w in WIN:
+    fs = [f for f in files.values() if f.get('kind') != 'main' and win_of(f.get('first_ts') or '') == w]
+    print(w, round(len(fs) / HOURS[w] * 24), round(sum(f['calls'] for f in fs) / max(1, len(fs)), 1))
+advisor = advisor_totals_by_window(files.values())
+print('\n== advisor file-start cohorts: iterations, input, output, IET/24h (M)')
+for w in WIN:
+    advisor_iet = 0
+    for model, tokens in sorted(advisor[w].items()):
+        value = tokens['in'] + 0.1 * tokens['cr'] + 1.25 * tokens['cw'] + 5 * tokens['out']
+        advisor_iet += value
+        print(w, model, tokens['calls'], tokens['in'], tokens['out'], round(value / HOURS[w] * 24 / 1e6, 1))
+    combined = agg[w][('all', 'all')]['iet'] + advisor_iet
+    print(w, 'executor IET plus advisor-cohort estimate/24h (M)', round(combined / HOURS[w] * 24 / 1e6, 1))

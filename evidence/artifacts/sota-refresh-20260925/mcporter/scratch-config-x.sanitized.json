@@ -1,0 +1,80 @@
+{
+ "imports": [],
+ "mcpServers": {
+  "context-mode": {
+   "command": "bwrap",
+   "args": [
+    "--ro-bind",
+    "/",
+    "/",
+    "--dev",
+    "/dev",
+    "--proc",
+    "/proc",
+    "--tmpfs",
+    "/tmp",
+    "--bind",
+    "~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm",
+    "~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm",
+    "--die-with-parent",
+    "--chdir",
+    "~/code/native-agent-stack",
+    "--",
+    "node",
+    "~/.codex/plugins/cache/context-mode/context-mode/1.0.169/server.bundle.mjs"
+   ],
+   "cwd": "~/code/native-agent-stack",
+   "env": {
+    "CODEX_HOME": "~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm/codex",
+    "CONTEXT_MODE_PLATFORM": "codex",
+    "CONTEXT_MODE_PROJECT_DIR": "~/code/native-agent-stack",
+    "CONTEXT_MODE_DIR": "~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm/cm",
+    "CONTEXT_MODE_DATA_DIR": "~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm/data",
+    "CLAUDE_CONFIG_DIR": "~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm/claude",
+    "TMPDIR": "/tmp"
+   },
+   "lifecycle": "keep-alive"
+  },
+  "ai-memory": {
+   "baseUrl": "http://127.0.0.1:49474/mcp"
+  },
+  "socraticode": {
+   "command": "~/.local/share/codex-ecosystem/bin/node",
+   "args": [
+    "~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"
+   ],
+   "env": {
+    "QDRANT_MODE": "external",
+    "QDRANT_URL": "http://127.0.0.1:26333",
+    "EMBEDDING_PROVIDER": "lmstudio",
+    "LMSTUDIO_URL": "http://127.0.0.1:18231/v1",
+    "EMBEDDING_MODEL": "nvidia/Nemotron-3-Embed-1B-BF16",
+    "EMBEDDING_DIMENSIONS": "2048",
+    "EMBEDDING_CONTEXT_LENGTH": "4096",
+    "EMBEDDING_QUERY_PREFIX": "query: ",
+    "EMBEDDING_DOCUMENT_PREFIX": "passage: ",
+    "EMBEDDING_DOCUMENT_INCLUDE_PATH": "true",
+    "RESPECT_GITIGNORE": "true",
+    "INCLUDE_DOT_FILES": "false",
+    "SOCRATICODE_WATCHER": "off",
+    "SEARCH_DEFAULT_LIMIT": "3",
+    "SOCRATICODE_AUTO_RESUME": "off",
+    "TMPDIR": "~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/tmp"
+   },
+   "cwd": "~/code/native-agent-stack",
+   "lifecycle": "keep-alive"
+  },
+  "jcodemunch": {
+   "command": "~/.local/share/codex-ecosystem/bin/jcodemunch-mcp",
+   "cwd": "~/code/native-agent-stack",
+   "env": {
+    "CODE_INDEX_PATH": "~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/code-index",
+    "JCODEMUNCH_SHARE_SAVINGS": "0",
+    "JCODEMUNCH_CONTEXT_PROVIDERS": "false",
+    "JCODEMUNCH_GIT_BLAME_ENABLED": "false",
+    "JCODEMUNCH_USE_AI_SUMMARIES": "false",
+    "TMPDIR": "~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/tmp"
+   }
+  }
+ }
+}

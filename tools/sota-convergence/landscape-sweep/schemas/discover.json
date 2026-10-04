@@ -1,0 +1,139 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "layer_id",
+  "proposed",
+  "calls",
+  "notes",
+  "skills_used"
+ ],
+ "properties": {
+  "layer_id": {
+   "type": "string"
+  },
+  "proposed": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "repository",
+     "proposed_label",
+     "demonstrated_gap",
+     "comparison_that_would_overturn",
+     "evidence",
+     "upstream_now",
+     "source"
+    ],
+    "properties": {
+     "repository": {
+      "type": "string"
+     },
+     "proposed_label": {
+      "type": "string",
+      "enum": [
+       "targeted_candidate",
+       "keep_but_compare",
+       "not_adopted"
+      ]
+     },
+     "demonstrated_gap": {
+      "type": "string"
+     },
+     "comparison_that_would_overturn": {
+      "type": "string"
+     },
+     "evidence": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "upstream_now": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "latest_release",
+       "released_at",
+       "stars",
+       "pushed_at",
+       "archived",
+       "license"
+      ],
+      "properties": {
+       "latest_release": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "released_at": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "stars": {
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "pushed_at": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "archived": {
+        "type": [
+         "boolean",
+         "null"
+        ]
+       },
+       "license": {
+        "type": [
+         "string",
+         "null"
+        ]
+       }
+      }
+     },
+     "source": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "calls": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "web_search",
+    "web_fetch",
+    "gh_api"
+   ],
+   "properties": {
+    "web_search": {
+     "type": "integer"
+    },
+    "web_fetch": {
+     "type": "integer"
+    },
+    "gh_api": {
+     "type": "integer"
+    }
+   }
+  },
+  "notes": {
+   "type": "string"
+  },
+  "skills_used": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  }
+ }
+}

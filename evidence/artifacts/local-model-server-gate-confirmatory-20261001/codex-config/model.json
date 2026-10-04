@@ -1,0 +1,37 @@
+{
+  "models": [
+    {
+      "base_instructions": "",
+      "context_window": 32768,
+      "default_reasoning_level": "high",
+      "default_verbosity": "low",
+      "display_name": "gate-qwen3-8b",
+      "experimental_supported_tools": [],
+      "input_modalities": [
+        "text"
+      ],
+      "priority": 0,
+      "shell_type": "default",
+      "slug": "gate-qwen3-8b",
+      "support_verbosity": true,
+      "supported_in_api": true,
+      "supported_reasoning_levels": [
+        {
+          "description": "Turn thinking off",
+          "effort": "none"
+        },
+        {
+          "description": "Greater thinking depth for complex tasks",
+          "effort": "high"
+        }
+      ],
+      "supports_parallel_tool_calls": false,
+      "supports_reasoning_summaries": false,
+      "truncation_policy": {
+        "limit": 10000,
+        "mode": "bytes"
+      },
+      "visibility": "list"
+    }
+  ]
+}

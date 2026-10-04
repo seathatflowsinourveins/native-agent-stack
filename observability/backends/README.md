@@ -7,7 +7,7 @@ All listeners bind to `127.0.0.1`; Alertmanager cluster gossip is disabled.
 
 | Component | Pinned release | Local endpoint | Persistent state |
 |---|---|---|---|
-| Prometheus | 3.14.0 | `http://127.0.0.1:19090` | TSDB, seven-day / 512 MiB retention |
+| Prometheus | 3.15.0 | `http://127.0.0.1:19090` | TSDB, seven-day / 512 MiB retention |
 | Loki | 3.7.8 | `http://127.0.0.1:13100` | TSDB v13, filesystem chunks, WAL, 72-hour retention |
 | Grafana OSS | 13.2.2 | `http://127.0.0.1:13000` | SQLite settings, provisioned dashboard and data sources |
 | Alertmanager | 0.34.1 | `http://127.0.0.1:19093` | Silences and notification history, 72-hour retention |
@@ -90,7 +90,7 @@ records fresh-session reads and denied administrative access.
 Validate the native configurations before starting services:
 
 ```bash
-"$STACK_TOOLS_ROOT/ecosystem-prometheus-3.14.0/promtool" check config \
+"$STACK_TOOLS_ROOT/ecosystem-prometheus-3.15.0/promtool" check config \
   "$STACK_CONFIG_ROOT/ecosystem-prometheus.yml"
 "$STACK_TOOLS_ROOT/ecosystem-loki-3.7.8/loki-linux-amd64" \
   -config.file="$STACK_CONFIG_ROOT/ecosystem-loki.yml" -verify-config=true
@@ -106,6 +106,46 @@ host, enable system-level lingering, or establish high availability. Stop only
 these units with `systemctl --user stop ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service`;
 retain their data when upgrading or rolling back. Back up stopped stores before
 trying a downgrade that may change their schema.
+
+## Upgrading one backend on an existing host
+
+`install.py` installs every entry of `pins.json` and refuses any prefix that
+already exists, so on a host that already runs the stack it stops at the first
+unchanged component. To add one new version, run the unchanged installer from a
+scratch copy whose `pins.json` holds only that entry; it still checks the
+archive against the pin and the publisher's checksum file. Then render the units
+with `configure.py` into a scratch root (the saved `port-overrides.json` or
+`--port-overrides`), substitute the live roots, and compare with the live unit:
+only the `ExecStart` prefix may differ. Back up the live unit, install the new
+one, then verify, reload, restart only that service and read it back. Move the
+`bin/` links only after every step below has passed; keep the previous prefix
+for rollback.
+
+```bash
+set -e
+systemd-analyze --user verify "$HOME/.config/systemd/user/ecosystem-prometheus.service"
+systemctl --user daemon-reload
+test "$(systemctl --user show -p NeedDaemonReload --value ecosystem-prometheus.service)" = no
+systemctl --user restart ecosystem-prometheus.service
+curl --fail --silent --retry 60 --retry-connrefused --retry-delay 1 http://127.0.0.1:19090/-/ready
+curl --fail --silent http://127.0.0.1:19090/api/v1/status/buildinfo | grep -F '"version":"3.15.0"'
+"$STACK_TOOLS_ROOT/ecosystem-prometheus-3.15.0/promtool" query instant http://127.0.0.1:19090 up
+```
+
+If a step fails, leave the links alone: put the backed-up unit back, run
+`daemon-reload` and `reset-failed` (a new server that keeps exiting exhausts
+the unit's start limit), restart, and read back the old version. Rollback is
+the same sequence with the old prefix in `ExecStart`, followed by moving the
+`bin/` links back.
+[`switch_gated.py`](../../evidence/artifacts/sota-refresh-20260926/prometheus/switch_gated.py)
+scripts this order with a gate at every step and the restore on failure; it was
+rehearsed with injected failures on a scratch unit, not on this service. The
+WSL workstation moved Prometheus from 3.14.0 to 3.15.0 on 2026-09-26 with an
+earlier script that logged the same checks without gating the link change on
+them (all passed), after a side-by-side rehearsal on copies of its TSDB in which
+3.14.0 also reopened the data 3.15.0 had written
+([receipt](../../evidence/receipts/prometheus-3150-qualification-20260926.json)).
+That is one host and one TSDB format generation, not a general downgrade promise.
 
 ## Data flow and dashboard
 
@@ -127,10 +167,49 @@ logs. Codex uses `ecosystem_codex_turn_token_usage_sum` grouped by `token_type`;
 Claude uses `ecosystem_claude_code_token_usage_tokens_total` grouped by `type`.
 The two panels preserve their different native schemas. Histogram bucket/count
 series are excluded. Collector scrapes use `honor_labels: true` to preserve the
-exported service identity. Native token counters are not
+exported service identity. Each Claude session and Codex process is its own
+series (`instance`), so the token panels show `rate()` per minute and range
+totals with `increase()`, summed over writers; writers without an identity
+(`instance="unscoped"`) are excluded and counted by the integrity panel
+(changed after `v2026.09.26.2`; see the
+[Collector writer identity](../collector/README.md#writer-identity-and-counter-integrity)).
+Native token counters are not
 provider invoices or estimates of tokens saved. A missing series is not zero
 usage, and cached tokens may be a subset of input tokens. An empty panel before
 a real client exports data is expected.
+
+The row **Tool, MCP, skill and subagent invoke rates (Loki)** counts `tool_result`,
+`codex.tool_result`, `tool_decision`, `skill_activated`, `subagent_completed`, `api_request` and
+`codex.agent_communication` events with LogQL over the Collector's structured metadata
+(`tool_family`, `actor`, `client`, `mcp_server_name`, `skill_name`, `subagent_type`, `shell_rtk`). It
+shows calls per minute by family, MCP server, skill, client and actor, subagent and workflow launches
+(Claude's accepted `tool_decision`, logged before the tool runs), MCP-consuming API requests, the MCP
+share, ctx and rtk adoption, and an integrity panel whose values should be 0. Every query uses
+`[$__auto]` and `keep`, so per-line timestamps and ids never become series
+([Collector names](../collector/README.md#tool-mcp-skill-and-subagent-invoke-rates)).
+
+Prometheus runs with `--enable-feature=created-timestamp-zero-ingestion,promql-extended-range-selectors`
+(changed after `v2026.09.26.2`). The first makes Prometheus negotiate the
+protobuf scrape format first and inject a zero sample at each counter's start
+timestamp, which the Collector exporter sends. A new per-process series
+otherwise loses its first sample from `increase()`. The second enables the
+experimental `increase(x[w] anchored)`: the difference between the sample at the
+start of the window (the latest one within the lookback) and the last sample in
+it, without extrapolation. Both are feature flags in Prometheus 3.15; on an
+existing host, render the unit, compare it and restart Prometheus as in
+[Upgrading one backend](#upgrading-one-backend-on-an-existing-host).
+The `native-telemetry-integrity` rules alert on repeated resets of one Claude
+counter series (a resumed session resets each of its series once, which stays
+silent), delta points the Collector dropped and token writers without an
+identity. The `collector-native` scrape job also drops the Codex histogram
+bucket series except `ecosystem_codex_turn_token_usage_bucket`
+(`metric_relabel_configs`; changed after `v2026.09.26.2`): every Codex process
+is its own series set, the buckets are read by no panel or rule, and the
+512MB size limit would otherwise delete the oldest data of every job sooner.
+Each histogram keeps its `_sum` and `_count`. An existing host gets the job
+from a rendered `ecosystem-prometheus.yml`, merged as the
+[writer-identity host recipe](../../evidence/artifacts/telemetry-writer-identity-20260926/host/)
+does, then a Prometheus restart.
 
 Prometheus alerts when a normal scrape remains down for two minutes. Four
 Collector HTTP probes expect 2xx from the local OmniRoute, FreeLLMAPI, and
@@ -146,16 +225,27 @@ checks the resolved notification. Never put a production service into this
 fixture or deliberately stop one. The renderer preserves an existing fixture
 file; leave it empty outside acceptance.
 
- Alertmanager sends
-its native webhook directly to
-`http://127.0.0.1:18080/ecosystem-alerts?template=alertmanager`.
-ntfy's bundled `alertmanager` template formats firing and resolved payloads. No
+Alertmanager sends its native webhook directly to two local ntfy topics:
+
+- `http://127.0.0.1:18080/ecosystem-alerts?template=alertmanager` receives
+  every alert except the non-critical Codex lane alerts. The critical lane
+  alert, `CodexLaneUsageLimited`, arrives here.
+- `http://127.0.0.1:18080/ecosystem-lanes?template=alertmanager` receives the
+  other `scope: codex-lanes` alerts: `CodexLaneGoalBlocked`,
+  `CodexLaneToolErrorBurst` and `CodexLaneMcpErrorRatio`. It is a separate
+  topic so that it can be muted on its own.
+
+Both lane routes group by lane, so each notification covers one lane. ntfy's
+bundled `alertmanager` template formats firing and resolved payloads. No
 custom bridge, SMTP, hosted relay, Firebase, or browser Web Push credentials are
-configured. Open `http://127.0.0.1:18080/ecosystem-alerts` locally to subscribe, or
-poll stored notifications:
+configured. Subscribe to both topics: open `http://127.0.0.1:18080/ecosystem-alerts`
+and `http://127.0.0.1:18080/ecosystem-lanes` locally. A subscriber to only the
+first misses the lane warnings, although Alertmanager reports them delivered.
+To verify, poll the stored notifications of both:
 
 ```bash
 curl --fail --silent 'http://127.0.0.1:18080/ecosystem-alerts/json?poll=1&since=all'
+curl --fail --silent 'http://127.0.0.1:18080/ecosystem-lanes/json?poll=1&since=all'
 ```
 
 Grafana anonymous access and sign-up are disabled. Optional Grafana and Loki
@@ -200,7 +290,7 @@ production availability guarantee.
 
 ## Primary references
 
-- [Prometheus 3.14.0 release](https://github.com/prometheus/prometheus/releases/tag/v3.14.0) and [storage semantics](https://prometheus.io/docs/prometheus/latest/storage/).
+- [Prometheus 3.15.0 release](https://github.com/prometheus/prometheus/releases/tag/v3.15.0) and [storage semantics](https://prometheus.io/docs/prometheus/latest/storage/).
 - [Loki 3.7.8 release](https://github.com/grafana/loki/releases/tag/v3.7.8), [OpenTelemetry ingestion](https://grafana.com/docs/loki/latest/send-data/otel/), and [retention](https://grafana.com/docs/loki/latest/operations/storage/retention/).
 - [Grafana OSS 13.2.2 binaries and checksums](https://grafana.com/grafana/download/13.2.2?edition=oss&platform=linux) and [native provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/).
 - [Alertmanager 0.34.1 release](https://github.com/prometheus/alertmanager/releases/tag/v0.34.1) and [webhook configuration](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config).

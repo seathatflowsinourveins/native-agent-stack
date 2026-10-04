@@ -315,9 +315,11 @@ class ReproductionCheck(unittest.TestCase):
         a sample already sealed under the live root is read, never drawn again."""
         changed = ["blueprints/us-equities/mover-v3/study/fetch/transport.py"]
         prefix = "blueprints/us-equities/mover-v3/study/fetch"
+        run_identity = {"study_tree": "t", "protocol_sha256": "p", "runtime_lock_sha256": "r"}
         with tempfile.TemporaryDirectory() as live_root:
             res = transport_check.reproduction_check(self.planner, self.sealed, transports(self.m), changed, prefix,
-                                                     seed="s", live_root=live_root, clock=fixed_clock)
+                                                     seed="s", live_root=live_root, clock=fixed_clock,
+                                                     run_identity=run_identity)
             self.assertTrue(res["passes"], res)
             self.assertEqual(sorted(res["live_snapshots"]), ["stage"])
             again = transport_check.reproduction_from_sealed(self.planner, self.sealed, changed, prefix, "s", (),
@@ -325,8 +327,12 @@ class ReproductionCheck(unittest.TestCase):
             self.assertEqual(again, res)
             dead = {"data": None, "trading": None}           # no transport: a second draw would fail
             reused = transport_check.reproduction_check(self.planner, self.sealed, dead, changed, prefix, seed="s",
-                                                        live_root=live_root, clock=fixed_clock)
+                                                        live_root=live_root, clock=fixed_clock,
+                                                        run_identity=run_identity)
             self.assertEqual(reused, res)
+            with self.assertRaises(ValueError):              # review round 18 repair (H1): no seal without its tree
+                transport_check.reproduction_check(self.planner, self.sealed, dead, changed, prefix, seed="s",
+                                                   live_root=live_root, clock=fixed_clock)
 
     def test_live_sample_detects_different_rows(self):
         other = synth.FakeMarket(self.cal)

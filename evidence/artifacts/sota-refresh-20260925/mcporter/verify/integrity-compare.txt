@@ -1,0 +1,15 @@
+bytes 464028
+computed sha256 8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2
+computed sha512 SRI sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ==
+computed sha1 8dbc86c05013e4dfbfdc155555202a36a3936015
+registry version doc: version 0.14.1 tarball https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz
+  dist.integrity == computed: True
+  dist.shasum == computed sha1: True
+  abbreviated packument integrity == computed: True
+  dist.signatures present: 2 keyids ['SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U', 'SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U']
+  dist.attestations: {"url": "https://registry.npmjs.org/-/npm/v1/attestations/mcporter@0.14.1", "provenance": {"predicateType": "https://slsa.dev/provenance/v1"}}
+GitHub release v0.14.1 published 2026-09-24T13:16:08Z prerelease False
+  asset digest sha256:8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2 == computed: True
+  checksums.txt entry 8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2 == computed: True
+research sha256 == computed: True | research integrity == computed: True
+ALL_MATCH True

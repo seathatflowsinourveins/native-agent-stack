@@ -1,0 +1,6 @@
+observed_utc=2026-09-30T05:15:02Z
+command: npm audit signatures --global --prefix <prefix of the smoke-tested install>
+npm error code EAUDITGLOBAL
+npm error `npm audit signatures` does not support global packages
+npm error A complete log of this run can be found in: <npm cache>/_logs/<timestamp>-debug-0.log
+exit 1

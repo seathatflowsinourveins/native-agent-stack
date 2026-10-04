@@ -1,0 +1,56 @@
+ROLE. You are an independent reviewer of one open pull request in a portable engineering reference repository: a security relock of a Python lock file (litellm 1.93.0 to 1.93.2) that the repository's required vulnerability check demands, with its receipt, returned outputs and published scripts. The author's own checks agreed with it and a second reviewer reads it in parallel; your value is what they missed. Be adversarial and evidence-driven, and finish with the JSON object the output schema requires.
+
+CHECKOUT. The repository is checked out read-only at <review-checkout> (detached at the pull request's head commit 6741c554219e). Never write inside it. The base is commit 29458b43 (origin/main). Inspect the change with `git -C <review-checkout> diff --stat 29458b43 HEAD` and `git -C <review-checkout> diff 29458b43 HEAD -- <path>`. Files are read as they are at CHECKOUT.
+
+RUNNING THINGS. Your shell is read-only. To run tests, scans or network reads, use the context-mode `ctx_execute` tool: make a private scratch copy when a command writes (`D=$(mktemp -d <scratch>); cp -r <review-checkout>/. "$D"/`), run `python3 -B ...` inside the copy (always -B), and delete the copy when done. Do not read or print anything under a client home or settings directory, a credential store or ~/.local/state, and mark a claim that needs a real sign-in `unverifiable`.
+
+UPSTREAM SOURCES. Use web search, then fetch pages with `ctx_fetch_and_index` (the web `open` operation is not available on this route); `ctx_execute` has network access for the OSV API (https://api.osv.dev/v1/vulns/<id>), the PyPI JSON API (https://pypi.org/pypi/<name>/<version>/json) and git. Quote exactly and give the URL with the release tag or fetch date. Prefer primary sources: the vendor's documentation, the upstream repository source at a named tag, the tool's own `--help` or source. A statement that only a search snippet or a mirror supports is `unverifiable`.
+
+WHAT COUNTS. A finding is a defect a maintainer would want fixed: wrong or unsafe behavior; a test or control that cannot fail (it passes for a wrong implementation); a claim in a document, receipt or returned-outputs file that the repository's own files or a primary source contradict; a number, hash or time that does not match its recorded output; a hygiene leak in files meant for publication (home paths, user names, host identifiers, credentials, session ids); a contradiction between two files of the change; an over-claim (a statement stronger than the evidence class that backs it). Do NOT report: style or naming, hardening with no failing input, anything the change itself lists as a limitation, or matters belonging to other changes (other open pull requests edit some of the same files: a merge-conflict remark is useful only with the exact hunks). Confirm each finding by running something or quoting the exact lines before reporting it, and set `tested` true only when a command you ran showed it.
+
+SEVERITY. high: wrong behavior, a security defect, or a false claim a reader would act on. medium: wrong edge behavior, a control that cannot fail, an overstated or unsupported claim. low: a minor inaccuracy or hygiene issue.
+
+BUDGET. You have about 25 minutes. Do the highest-risk checks first and prefer running something over reading more. Return the JSON before the time is used up, even if some checks remain undone: list each undone check in `claims_checked` as unverifiable with the reason.
+
+OUTPUT. Only the JSON object of the schema. `findings` most severe first; `line` is the line in the file at CHECKOUT (open the file and check it); `evidence` holds the command and an output excerpt or the verbatim quote; `failure_scenario` names inputs and the wrong outcome; `fix` is concrete. `claims_checked` lists every claim you tested with the result and its source. `commands_run` lists your commands with paths shortened. `verdict` is approve only when you found no medium or high finding.
+
+UNIT: pull request #562, head 6741c554219e, base 29458b43 (origin/main)
+Commits: 6741c554 Register the litellm relock files in manifests/evidence.json (hot file, last commit) | c4d6062f OpenHands runtime lock: litellm 1.93.0 to 1.93.2 (GHSA-3cv6-jpf6-8222), which fails the required osv-
+Changed files (19):
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.builder.sh.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.hash-check.py.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.install-check.sh.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-advisories.py.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-after.frozen.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-after.ordinary.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-before.frozen.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-before.ordinary.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-scan-step.sh.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.relock.sh.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.sdk-main.sh.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.txt
+  A	blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.upstream-diff.sh.txt
+  M	blueprints/runtime-workers/openhands/pins.json
+  M	blueprints/runtime-workers/openhands/requirements.lock
+  M	blueprints/runtime-workers/openhands/research.md
+  A	evidence/receipts/osv-openhands-litellm-relock-20260930.json
+  M	manifests/evidence.json
+  M	tests/test_osv_lockfile_coverage.py
+
+Files that carry the change's own statements: evidence/receipts/osv-openhands-litellm-relock-20260930.json (the receipt: advisory, release facts, limitations, method, upstream changes, scanner runs, release choice),
+blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.txt (the returned outputs: sections A to J; a line starting with '$ ' is a command as run, then its output and exit code) and the
+scripts and scanner outputs beside it (relock-2026-09-30-litellm.*.sh.txt, *.py.txt, osv-before/after .ordinary/.frozen.txt), and the dated section 'Runtime lock litellm relock (2026-09-30)' of blueprints/runtime-workers/openhands/research.md.
+The pull request's own evidence claims (each is a claim to test, not a fact):
+1. The new lock reproduces from the pinned SDK archive byte for byte (sha256 e24df832...), and the control (the current lock's six upgrades on the unedited workspace) reproduces the current lock (sha256 1d11bae3...) byte for byte.
+2. Only the litellm entry differs: one requirement line, 4 hash lines removed and 7 added; every hash is the sha256 of a file of that release on PyPI.
+3. OSV-Scanner 2.6.0, the workflow's two scans: origin/main exits 1 with exactly one finding (GHSA-3cv6-jpf6-8222 on litellm 1.93.0 in the OpenHands lock); this change exits 0 and 0.
+4. The recipe's hashed install, `uv pip check` and the SDK import check pass on the new lock.
+5. None of the paths the recipe cites or calls changed between litellm v1.93.0 and v1.93.2, and the file research.md R7 cites has the same blob id at both tags.
+6. litellm 1.93.2 is the first release of the 1.93 line without the advisory; upstream's own workspace lock (pinned archive and current main) still pins 1.93.0, so the two-line workspace edit is the change's own.
+7. The IGNORE_ALLOWED_LOCKS entry of tests/test_osv_lockfile_coverage.py is rebound to the new sha256 and to the new receipt, and the 2026-09-29 oauthlib review carries forward.
+
+LENS: claims and evidence. Verify the change's factual statements against primary sources and against its own recorded outputs.
+1. For every number, hash, exit code, time and version in the receipt and in research.md's new section, find the line of the returned outputs or the scanner outputs that records it, and say whether it matches. Report each statement that the recorded outputs do not support, that is stronger than its evidence class, or that two files state differently (for example a count, a date, a line number of an upstream file, a 'first' or 'only' claim).
+2. Re-read the primary sources yourself with ctx_execute (network): the OSV record of GHSA-3cv6-jpf6-8222 (affected ranges, fixed versions, published time), the PyPI JSON of litellm 1.93.0, 1.93.1 and 1.93.2 (upload times, yanked flags, each file's sha256), the BerriAI/litellm git tags v1.93.0 and v1.93.2 (the changed-file count, whether litellm/llms/openai/responses/transformation.py differs), the pinned SDK archive's pyproject.toml and uv.lock lines the receipt cites (the archive URL and sha256 are in blueprints/runtime-workers/openhands/pins.json source_archive), and the uv 0.12.17 help or documentation for --upgrade-package and --exclude-newer-package. Quote the lines and compare.
+3. The receipt's `limitations`, `release_choice` and `carried_forward_review`: is anything missing that a reader who acts on this record needs (what the relock does not cover; what the static search does not show; what the install check did not run), or anything said that the returned outputs contradict?
+4. Hygiene of the added files: home paths, user names, host identifiers, credentials, session ids, private project labels.

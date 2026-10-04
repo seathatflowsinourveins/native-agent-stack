@@ -1,0 +1,16 @@
+[
+  {
+    "id": "[synthetic-message-id]",
+    "to_workspace_id": "[qualification-workspace]",
+    "to_project_id": "[control-project]",
+    "from_workspace_id": "[qualification-workspace]",
+    "from_project_id": "[producer-project]",
+    "from_agent": "other",
+    "from_owner_user": null,
+    "subject": "restore-probe",
+    "body": "Synthetic pending work item restore-probe-v1; owner control; ACK required separately.",
+    "state": "pending",
+    "created_at": "2026-10-02T05:41:40.314756Z",
+    "claimed_at": null
+  }
+]

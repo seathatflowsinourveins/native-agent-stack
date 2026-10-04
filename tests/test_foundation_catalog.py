@@ -3,6 +3,7 @@
 import copy
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -202,6 +203,39 @@ class FoundationCatalogTests(unittest.TestCase):
         result = subprocess.run([sys.executable, str(SCRIPT), "--root", str(ROOT), "--json"],
                                 text=True, capture_output=True, check=False)
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+
+
+class CheckedInAgentLabelTests(unittest.TestCase):
+    """A decision that names a shipped Claude agent with a `(Model/effort)` label, such as "`source-scout`
+    (Sonnet/max)", states the model and effort that agent's definition declares. The adoption copy is the one
+    install_claude_profile.py installs; its `.claude/agents/` and `examples/claude-native/agents/` copies are
+    byte-identical (tests.test_install_claude_profile). Frontmatter is read with a regex so the test needs no PyYAML."""
+
+    AGENTS = ROOT / "adoption" / "agents" / "claude"
+    LABEL = re.compile(r"`([a-z][a-z0-9-]*)` \(([A-Z][a-z]+)/([a-z]+)")
+
+    def frontmatter(self, name):
+        text = (self.AGENTS / f"{name}.md").read_text(encoding="utf-8")
+        head = text.split("---", 2)[1]
+        model = re.search(r"^model:\s*(\S+)\s*$", head, re.M)
+        effort = re.search(r"^effort:\s*(\S+)\s*$", head, re.M)
+        return (model.group(1) if model else None, effort.group(1) if effort else None)
+
+    def test_agent_labels_match_the_agent_definitions(self):
+        agents = {path.stem for path in self.AGENTS.glob("*.md")}
+        decisions = json.loads((ROOT / DECISIONS).read_text(encoding="utf-8"))["decisions"]
+        checked = []
+        for decision in decisions:
+            texts = [decision.get(field) for field in ("capability", "activation", "evidence_scope", "next_gap")]
+            texts += list(decision.get("limitations", []))
+            for text in (value for value in texts if isinstance(value, str)):
+                for name, model, effort in self.LABEL.findall(text):
+                    if name not in agents:
+                        continue
+                    checked.append(name)
+                    with self.subTest(decision=decision["id"], agent=name):
+                        self.assertEqual((model.lower(), effort), self.frontmatter(name))
+        self.assertIn("isolated-builder", checked, "the lean-workflow-child-routing activation names the builder")
 
 
 if __name__ == "__main__":

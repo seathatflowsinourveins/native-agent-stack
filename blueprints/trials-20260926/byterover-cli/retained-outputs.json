@@ -1,0 +1,3135 @@
+{
+  "schema_version": 1,
+  "description": "Sanitized copies of the ByteRover CLI trial's native outputs (including ByteRover's own task and query records, daemon logs and oclif autoupdate log, copied from its host data and cache directories before the trial cleanup removed them), the self-written glue, and the self-contained reproduction runs with the exact script version each run used.",
+  "sanitization_policy": "Private originals are not published; their name, byte count and sha256 are recorded here. They were in this session's scratch directory (the first pass's trees, which the first polish pass deleted on 2026-09-26 at 06:39Z (../host-cleanup-20260926/first-pass-scratch-trees/), or the port's, polish passes' and review-fix rounds' own trees (trials-2, trials-pol, trials-gpt6, fix-v2), which remain (../README.md#host-state)) or, for ByteRover's own task records, logs and autoupdate log, in its host XDG data and cache directories, which the port's cleanup removed (../host-cleanup-20260926/). Published copies replace the session scratch path with <scratch>, the home directory with ~, the user name with <user> (also inside underscore-encoded paths), UUID-shaped identifiers with <uuid>, and credential values with <redacted>; excerpts mark every omitted line range in place. Files marked verbatim are byte-for-byte copies. Each published copy passed scripts/validate.py PRIVATE_CONTENT and a credential-shape check.",
+  "outputs": [
+    {
+      "path": "native-outputs/npm-install-global-3.16.1.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Pinned npm release installed into the trial's host prefix (removed in cleanup); the tarball's sha512 had been checked against dist.integrity first.",
+      "command": "npm install --global --no-audit --no-fund --prefix ~/.local/share/codex-ecosystem/tools/byterover-cli-3.16.1 byterover-cli@3.16.1",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:26:38Z",
+      "private_original": {
+        "name": "npm-install.log",
+        "bytes": 1231,
+        "sha256": "5bc9d6b4cb2dc9adc657b9015193aa150069d067750047fbfd74ef93baabe310"
+      },
+      "published": {
+        "bytes": 1231,
+        "sha256": "5bc9d6b4cb2dc9adc657b9015193aa150069d067750047fbfd74ef93baabe310"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/npm-ci-tag-v3.16.1.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "npm ci in a clone of tag v3.16.1 (commit 1f4609c18ca735810860b3ba9178cae2dd8a67b0).",
+      "command": "git clone --branch v3.16.1 --depth 1 https://github.com/campfirein/byterover-cli.git && npm ci --no-audit --no-fund",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:33:05Z",
+      "private_original": {
+        "name": "npm-ci.log",
+        "bytes": 1509,
+        "sha256": "b048831761daa94ac140acf073f912c23cbaa32786fd997d112dd2ffb2e9f133"
+      },
+      "published": {
+        "bytes": 1509,
+        "sha256": "b048831761daa94ac140acf073f912c23cbaa32786fd997d112dd2ffb2e9f133"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/npm-test-tag-v3.16.1-excerpt.log",
+      "evidence_class": "upstream_test",
+      "what": "Upstream's unchanged suite at the tag (npm test = mocha --forbid-only \"test/**/*.test.ts\"): 8340 passing (39s), 16 pending, 0 failing, exit 0. Published as an excerpt: header, all 16 pending tests with context, and the summary.",
+      "command": "DO_NOT_TRACK=1 npm test",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:35:27Z",
+      "private_original": {
+        "name": "npm-test.log",
+        "bytes": 554800,
+        "sha256": "8edaf2198853d97b72c577f9a3f471ee8c5bdb3acde7267a239b0d89f071dba5"
+      },
+      "published": {
+        "bytes": 2924,
+        "sha256": "0b2dbc5192f6ccd77b57896e5a13b74fb467f123ef7f6cd606b89da54b80854f"
+      },
+      "excerpt_lines": [
+        [
+          1,
+          12
+        ],
+        [
+          140,
+          158
+        ],
+        [
+          896,
+          905
+        ],
+        [
+          4110,
+          4119
+        ],
+        [
+          11130,
+          11142
+        ]
+      ],
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/npm-test-self-contained-rerun.log",
+      "evidence_class": "upstream_test",
+      "what": "Second run of the same suite from a fresh mktemp clone under /bin/sh (local-integration/testsuite-self-contained-cmd.sh): tail shows 8340 passing (1m), 16 pending, exit 0.",
+      "command": "sh -c \"$(cat testsuite-self-contained-cmd.sh)\"",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:46:20Z",
+      "private_original": {
+        "name": "testsuite-receipt-dryrun.log",
+        "bytes": 118,
+        "sha256": "35644197f13f0d5758607a8812bc13189f605c9ef441a0763952be02488c1d30"
+      },
+      "published": {
+        "bytes": 118,
+        "sha256": "35644197f13f0d5758607a8812bc13189f605c9ef441a0763952be02488c1d30"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/llamacpp-v1-models.json",
+      "evidence_class": "host_service_observation",
+      "what": "Read-only GET /v1/models on the host llama.cpp service (:18232) during the trial: model qwen3.8-27b-local, meta.n_ctx 8192 (service setting), meta.n_ctx_train 262144.",
+      "command": "curl -s http://127.0.0.1:18232/v1/models -H 'Authorization: Bearer <local key>'",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:29:17Z",
+      "private_original": {
+        "name": "llamacpp-models.json",
+        "bytes": 625,
+        "sha256": "15b56a02fdbc586f20d70d3caa41bf7996e8f456ef8002eca03d8d037005b114"
+      },
+      "published": {
+        "bytes": 625,
+        "sha256": "15b56a02fdbc586f20d70d3caa41bf7996e8f456ef8002eca03d8d037005b114"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/curate-context-error.ndjson",
+      "evidence_class": "upstream_native_operation",
+      "what": "brv curate --format json against the local llama.cpp provider: the task ends status error, 'request (12351 tokens) exceeds the available context size (8192 tokens)'; the process exit code was 0.",
+      "command": "brv curate \"Auth uses a fixed-window rate limiter ...\" -f src/auth.ts --format json",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:30:07Z",
+      "private_original": {
+        "name": "curate-out.json",
+        "bytes": 400,
+        "sha256": "ba6c169287805d7fa76044c83baf386064d4240513310d1540a379611efbc71c"
+      },
+      "published": {
+        "bytes": 370,
+        "sha256": "d9731fb7a1dc2367df8cdc9e833375b85c1a72e68563a1e5516d20af5f9f1a10"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/query-tier2-no-match.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "brv query answered from its LLM-free tier-2 path (no matched documents, 12 ms) before any note was committed.",
+      "command": "brv query \"How is authentication implemented?\" --format json",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:31:42Z",
+      "private_original": {
+        "name": "query-out.json",
+        "bytes": 624,
+        "sha256": "cac39fea00b7bb6348637ba3b66c2225b4181d364c131f7df461262b08e112ad"
+      },
+      "published": {
+        "bytes": 594,
+        "sha256": "398cfde8cd98355d45235000ddcef23c6409d64ebc21ae767d9a8d2f78fc90c9"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/01-curate-context-error.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "ByteRover's own stored task record for the curate call (status error, 12351-token request).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:30:07Z",
+      "private_original": {
+        "name": "tsk-<uuid>.json",
+        "bytes": 1286,
+        "sha256": "1256e758ec471a593ec1e8b5a8c13f1c3ab9bcea99b9e124a7a861c624fdf631"
+      },
+      "published": {
+        "bytes": 953,
+        "sha256": "b128647a26de16a4cc051465349c75efb9c271b70f6ba8d08262be37501939d0"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 3
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 2
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/02-query-tier2-before-commit.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Task record: query answered without an LLM call (tier 2).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:31:42Z",
+      "private_original": {
+        "name": "tsk-<uuid>.json",
+        "bytes": 1261,
+        "sha256": "b4d1f5441d60c7ceb2c094587b087c7e9cb435b27e80f89e613c97f468dd2e42"
+      },
+      "published": {
+        "bytes": 928,
+        "sha256": "3caa9a5c35ce53cc28910cd2072169ba2fc64c66334a23aee956446261e9f91c"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 3
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 2
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/03-search-empty-tree.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Task record: search before any commit ('Context tree is empty').",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:31:43Z",
+      "private_original": {
+        "name": "tsk-<uuid>.json",
+        "bytes": 956,
+        "sha256": "30adedde674c52ccb696481c99f1dfdc4ce383f1cc2f257ff399c522fae33eec"
+      },
+      "published": {
+        "bytes": 623,
+        "sha256": "b2755afda96d97a8c3a069b80741ad5059c1eef81c59b26f7524196b78c65714"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 3
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 2
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/04-search-rate-limiter.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Task record: search 'rate limiter' after the vc commit; one result, auth/notes.md, score 0.68.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:39:04Z",
+      "private_original": {
+        "name": "tsk-<uuid>.json",
+        "bytes": 1271,
+        "sha256": "d30b66b634ee497581953fff19176cefc1b627ca4b83008640f584fdc5e7184f"
+      },
+      "published": {
+        "bytes": 938,
+        "sha256": "a98f8d1bbd6fdb62b5a20e7b12c4f45f28fedde8eec0c25d498b2c55d1865110"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 3
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 2
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/05-search-nonexistent.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Task record: search for a nonexistent term; totalFound 0.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:39:06Z",
+      "private_original": {
+        "name": "tsk-<uuid>.json",
+        "bytes": 1004,
+        "sha256": "08fc14891e2cf8e55100f280aca002659369dff0164b691e3687c0d348c12c71"
+      },
+      "published": {
+        "bytes": 671,
+        "sha256": "f15753e4b3fa1b301960f5c03c0e9ab2367ae33df7205f63ea97dcdfe7ab5fb3"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 3
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 2
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/06-query-tier2-after-commit.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Task record: the natural-language query still answered from tier 2 with no match after the commit.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:39:20Z",
+      "private_original": {
+        "name": "tsk-<uuid>.json",
+        "bytes": 1261,
+        "sha256": "7772b6bfca66ec8af22f7a00569b731a092d04a8badaa92f9550baa41bb05258"
+      },
+      "published": {
+        "bytes": 928,
+        "sha256": "3250b9b7df01d37d8defcdd8206d48a0aff429c370bcf38a9cfbf80494d08081"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 3
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 2
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/07-query-context-error.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Task record: 'What is the rate limiter policy?' escalated to the LLM and failed with an 11192-token request over the 8192-token context.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:39:54Z",
+      "private_original": {
+        "name": "tsk-<uuid>.json",
+        "bytes": 1153,
+        "sha256": "13978ad29035144f9468068c9b29b71c83c940a6f4128dfafbd7b6c47286d6f6"
+      },
+      "published": {
+        "bytes": 820,
+        "sha256": "b1d5b4c9a3f4f619a54d17da2faf7909141e21e050d2e7f83c50cdcdae612896"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 3
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 2
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/08-curate-log.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "ByteRover curate-log entry for the failed curate (no operations applied).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:30:07Z",
+      "private_original": {
+        "name": "cur-1790386195164.json",
+        "bytes": 602,
+        "sha256": "8c60b2278561514569e99549fb954ecf8c4eef124fefacb2944ba66294c5789b"
+      },
+      "published": {
+        "bytes": 572,
+        "sha256": "f0a431290b1fe695bc0eaa7ccd953a1fb6064a489ebbacca548b374f7b75f2e2"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/09-query-log-tier2-1.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Query-log entry (tier 2, 12 ms, no match).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:31:42Z",
+      "private_original": {
+        "name": "qry-1790386302635.json",
+        "bytes": 784,
+        "sha256": "29a75df05b9a58012113f6a3f5c4d03889b18c9c833aad4ddb543a42cb4558ae"
+      },
+      "published": {
+        "bytes": 754,
+        "sha256": "f045cba2654efb84b210e50a36d25ef929d6dbaf1880f4ffdaa64b0c351701c3"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/10-query-log-tier2-2.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Query-log entry (tier 2, 10 ms, no match).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:39:20Z",
+      "private_original": {
+        "name": "qry-1790386760359.json",
+        "bytes": 784,
+        "sha256": "75b1507535899756ba82b372d95a8a557a546aab6c01c8ed9468a7a896a7f6b0"
+      },
+      "published": {
+        "bytes": 754,
+        "sha256": "a6281f98925ebfa2801cea3aa2b77e9f8751d2750fd561f5190e0497e186294f"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/task-records/11-query-log-context-error.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Query-log entry for the 11192-token context error.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:39:54Z",
+      "private_original": {
+        "name": "qry-1790386775778.json",
+        "bytes": 339,
+        "sha256": "345379386d80c71a6a84d638319a6ee717568b6fc84f5c54424a2df2f3c67e3f"
+      },
+      "published": {
+        "bytes": 309,
+        "sha256": "35f01d905f67916a3d52c8f82d0c6d8b973c49bf43db834ca2280ad7d7e54a35"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/daemon-log-0129Z.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "ByteRover daemon log for the trial's first daemon (01:29Z-01:44Z, stopped by SIGTERM).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:44:20Z",
+      "private_original": {
+        "name": "server-2026-09-26T01-29-19.log",
+        "bytes": 27083,
+        "sha256": "5a3c6c116fe4273e9b7a5f6ea67e4384fbf4281da1296364bc79d7e26afa2e4d"
+      },
+      "published": {
+        "bytes": 19394,
+        "sha256": "1a7d60f3dd5ea819c013438e40eecec6886102be74e5929ffba04546bf4415d5"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 69
+        },
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 47
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/daemon-log-0308Z.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Daemon started by the first pass's receipt-recorder runs at 03:08Z; like the first daemon it started ByteRover's web UI server on port 7700, and it ran until its idle timeout at 03:53:56Z.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T03:53:56Z",
+      "private_original": {
+        "name": "server-2026-09-26T03-08-26.log",
+        "bytes": 12490,
+        "sha256": "54f089e55290f73344ef4abcd2719605e253e67d045d1dbb05db30635c4eccf7"
+      },
+      "published": {
+        "bytes": 11830,
+        "sha256": "dec3dae5c672d2f48c4596b7eae7c1e880e934c67a81c98a14aa04d48d48934c"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "UUID-shaped identifier",
+          "replacements": 22
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/oclif-autoupdate.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Log of the background `brv update --autoupdate` process that byterover-cli's bundled @oclif/plugin-update init hook spawned from the trial's first `brv --version` (01:26:47Z). It waited until 02:26:47Z, then reported 'not updatable'. The hook runs unless BRV_DISABLE_AUTOUPDATE is set, which the trial had not done; NO_UPDATE_NOTIFIER does not cover it. Whether that process contacted the network was not measured. Copied from ~/.cache/brv/autoupdate.log before cleanup.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T02:41:00Z",
+      "private_original": {
+        "name": "brv-autoupdate.log",
+        "bytes": 397,
+        "sha256": "549e503b1e45c7878e9b05d19cbacb03a2e574cd8626590594b5e302d9245890"
+      },
+      "published": {
+        "bytes": 367,
+        "sha256": "c06d4665ef65ac53ee40278798bc4df817dd0598ee3cfa6d54e53fb8b8685ce9"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "home directory",
+          "replacements": 3
+        }
+      ]
+    },
+    {
+      "path": "local-integration/connect-local-llm.sh",
+      "evidence_class": "local_integration_source",
+      "what": "UNSAFE AS RUN. Self-written script that read the local llama.cpp key into a shell variable and then put it into two process argument lists: curl's -H value and `brv providers connect --api-key`. Any local user can read those through /proc/<pid>/cmdline or ps while the commands run; redacting the saved output does not undo that. The published copy carries a warning block after the shebang; its commands are unchanged. The credential location is not published. Safe form: fixed/connect-local-llm-safe.sh.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "connect-local-llm.sh",
+        "bytes": 1187,
+        "sha256": "83b7e528688de4e019414b2079b40ec3a5c9e65fb483779c4a0a6b1f9550cbff"
+      },
+      "published": {
+        "bytes": 2076,
+        "sha256": "0917197eaf8580286b36c68eeec7643e20ee5e00207627a9784979d0320831f0"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        },
+        {
+          "rule": "credential location assignment",
+          "replacements": 2
+        },
+        {
+          "rule": "annotation: unsafe-as-run warning block inserted after the shebang",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "local-integration/testsuite-self-contained-cmd.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Self-contained test-suite command (fresh mktemp clone of the tag, npm ci, npm test, cleanup).",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "testsuite-receipt-cmd.sh",
+        "bytes": 382,
+        "sha256": "4206dc66f29bfcbfe14db392600685bbd17184487bb981cb66f7a350b5235b5c"
+      },
+      "published": {
+        "bytes": 382,
+        "sha256": "4206dc66f29bfcbfe14db392600685bbd17184487bb981cb66f7a350b5235b5c"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/withdrawn-grep-use-check.sh",
+      "evidence_class": "local_integration_source",
+      "what": "The withdrawn use check: it discarded brv output and grepped for '\"totalFound\":1', which also matches 10 and any path. Replaced by reproduction/check_search.py.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "use-receipt-cmd.sh",
+        "bytes": 849,
+        "sha256": "f9e62c1fdb85536110ef8cb1e1a58576624341c1b31ed00c587d93c108d97cf7"
+      },
+      "published": {
+        "bytes": 849,
+        "sha256": "f9e62c1fdb85536110ef8cb1e1a58576624341c1b31ed00c587d93c108d97cf7"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/00-npm-view.stdout",
+      "evidence_class": "registry_observation",
+      "what": "npm registry response to `npm view byterover-cli@3.16.1 dist.integrity`, captured by reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z; superseded because that script version left XDG_CACHE_HOME at the host default): the published dist.integrity, which the script compares with the pinned value before it downloads anything.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "00-npm-view.stdout",
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "published": {
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/01-npm-pack.stderr",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "01-npm-pack.stderr",
+        "bytes": 146002,
+        "sha256": "6afe9d2904e0328b2985563803a5c256de1d380afd96f66fd60f77f4b2fddb3d"
+      },
+      "published": {
+        "bytes": 591,
+        "sha256": "ddd7f32134d6aec5e8c0d73e169c0b70cb348086ff89b4860efe499990ab690d"
+      },
+      "excerpt_lines": [
+        [
+          1,
+          3
+        ],
+        [
+          2322,
+          2334
+        ]
+      ],
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/01-npm-pack.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "01-npm-pack.stdout",
+        "bytes": 25,
+        "sha256": "e6e55341bae0b8f80c2fd8a2c47e06c3a88ad8b7ee32fe093e1225c5f3384d28"
+      },
+      "published": {
+        "bytes": 25,
+        "sha256": "e6e55341bae0b8f80c2fd8a2c47e06c3a88ad8b7ee32fe093e1225c5f3384d28"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/02-tarball-integrity.stdout",
+      "evidence_class": "local_integration",
+      "what": "sha512 of the downloaded tarball in npm's integrity (SRI) form, computed by the script's own `python3 -c` step (lines 59-61) in reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z; superseded because that script version left XDG_CACHE_HOME at the host default), then compared with the pinned integrity; our computation, not output of npm or ByteRover.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "02-tarball-integrity.stdout",
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "published": {
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/03-npm-install.stderr",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "03-npm-install.stderr",
+        "bytes": 1190,
+        "sha256": "f06923a31a1dd49b8c527e423fc9f3922c930d104f0f9a22e02d51af6b88025e"
+      },
+      "published": {
+        "bytes": 1190,
+        "sha256": "f06923a31a1dd49b8c527e423fc9f3922c930d104f0f9a22e02d51af6b88025e"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/03-npm-install.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "03-npm-install.stdout",
+        "bytes": 26,
+        "sha256": "421352c5a3af79693d687a79c52798873f96712e4010e9e43f7798aae0ff726d"
+      },
+      "published": {
+        "bytes": 26,
+        "sha256": "421352c5a3af79693d687a79c52798873f96712e4010e9e43f7798aae0ff726d"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/04-version.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "04-version.stdout",
+        "bytes": 43,
+        "sha256": "fe02064f4a2c875b0bc6b4abd672e1e4f031a1abfe24bbdf9114e53f65a1031b"
+      },
+      "published": {
+        "bytes": 43,
+        "sha256": "fe02064f4a2c875b0bc6b4abd672e1e4f031a1abfe24bbdf9114e53f65a1031b"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/10-vc-init.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "10-vc-init.stdout",
+        "bytes": 92,
+        "sha256": "da589371c6812334e110452d5228e30e8adba635351326c97e1dff9444cb7e59"
+      },
+      "published": {
+        "bytes": 92,
+        "sha256": "da589371c6812334e110452d5228e30e8adba635351326c97e1dff9444cb7e59"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/11-vc-add.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "11-vc-add.stdout",
+        "bytes": 18,
+        "sha256": "5abbc1a501f89c95fd1eaedaa30e1557ec67f28e30dcdc731a90a26c9292e7c7"
+      },
+      "published": {
+        "bytes": 18,
+        "sha256": "5abbc1a501f89c95fd1eaedaa30e1557ec67f28e30dcdc731a90a26c9292e7c7"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/12-vc-config-name.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "12-vc-config-name.stdout",
+        "bytes": 12,
+        "sha256": "367a2d69df5781c6e4babaaa01cf0b2bce228f3a849c6ae1e41205f369bd301f"
+      },
+      "published": {
+        "bytes": 12,
+        "sha256": "367a2d69df5781c6e4babaaa01cf0b2bce228f3a849c6ae1e41205f369bd301f"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/13-vc-config-email.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "13-vc-config-email.stdout",
+        "bytes": 28,
+        "sha256": "f7ac839f3122157c392822ea517f7a2a2c42d56b4b068555e7310e590cd552c6"
+      },
+      "published": {
+        "bytes": 28,
+        "sha256": "f7ac839f3122157c392822ea517f7a2a2c42d56b4b068555e7310e590cd552c6"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/14-vc-commit.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "14-vc-commit.stdout",
+        "bytes": 37,
+        "sha256": "c5656e49fe2e662f4cff63d6b177371b30ce5fe9dd21d6493293f8ce5c8d7898"
+      },
+      "published": {
+        "bytes": 37,
+        "sha256": "c5656e49fe2e662f4cff63d6b177371b30ce5fe9dd21d6493293f8ce5c8d7898"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/15-vc-log.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "15-vc-log.stdout",
+        "bytes": 119,
+        "sha256": "644fb83b1541376bf733f38127e2f017b5b376674c8c4d554ae33b3cca6c8ca4"
+      },
+      "published": {
+        "bytes": 119,
+        "sha256": "644fb83b1541376bf733f38127e2f017b5b376674c8c4d554ae33b3cca6c8ca4"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/16-status.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "16-status.stdout",
+        "bytes": 330,
+        "sha256": "e310be7586b55d0ac2f2beaa89c540e3a79a5ed697749c873e0d3984c9b04529"
+      },
+      "published": {
+        "bytes": 330,
+        "sha256": "e310be7586b55d0ac2f2beaa89c540e3a79a5ed697749c873e0d3984c9b04529"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/20-search-positive.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "20-search-positive.stdout",
+        "bytes": 481,
+        "sha256": "6b8f202c4afb6a7f3655c1e296d6c1c80a165780284c5e50017174c78e8fc046"
+      },
+      "published": {
+        "bytes": 481,
+        "sha256": "6b8f202c4afb6a7f3655c1e296d6c1c80a165780284c5e50017174c78e8fc046"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/21-search-second-positive.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "21-search-second-positive.stdout",
+        "bytes": 461,
+        "sha256": "77ef41f60fe5d8512372dba2cece33b7964c4675e24d8fe735a668bee5ced5f9"
+      },
+      "published": {
+        "bytes": 461,
+        "sha256": "77ef41f60fe5d8512372dba2cece33b7964c4675e24d8fe735a668bee5ced5f9"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/22-search-negative.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "22-search-negative.stdout",
+        "bytes": 240,
+        "sha256": "75cad80c20b38133b389d209c8c7fbccfe71ee7ffa4cedebc375d87790fa4e8d"
+      },
+      "published": {
+        "bytes": 240,
+        "sha256": "75cad80c20b38133b389d209c8c7fbccfe71ee7ffa4cedebc375d87790fa4e8d"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/30-check-positive.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "30-check-positive.stdout",
+        "bytes": 377,
+        "sha256": "679a0c2b090add311de6fe4a5b1806465abd5e8a33034ca0bd375295b9f33358"
+      },
+      "published": {
+        "bytes": 286,
+        "sha256": "fa5688ce288288f3704d1d266ab2cdac8403676dc24c843761fd08355a281bd4"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/31-check-second-positive.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "31-check-second-positive.stdout",
+        "bytes": 381,
+        "sha256": "9527e271ca11dbc4e3771f52b12d848a649e2fb237d03c88c997922491a21d7d"
+      },
+      "published": {
+        "bytes": 290,
+        "sha256": "317cb2a8b118bfb83d4424f871b2362586fc4f376cae93f7dee82bd87590ab7d"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/32-check-negative.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "32-check-negative.stdout",
+        "bytes": 328,
+        "sha256": "ca2cf3a43b2bb13e6cf61f672c80df0883d5dacbe773c486655cf57767a56241"
+      },
+      "published": {
+        "bytes": 237,
+        "sha256": "0ecd6c193f53f755db8c2d10441cfb6f66825f46f7f42c3d170907a0745700aa"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/33-check-wrong-path-must-fail.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "33-check-wrong-path-must-fail.stdout",
+        "bytes": 499,
+        "sha256": "a3fed111a1ab1d8b8eb1a514f78b22aa87fb6e551c2da0fad7a779e4fa041282"
+      },
+      "published": {
+        "bytes": 408,
+        "sha256": "dd3f37712c04584f98b05ac0aa72809c26b94605e4ee9c32d4001100b5afe816"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/34-check-wrong-count-must-fail.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "34-check-wrong-count-must-fail.stdout",
+        "bytes": 457,
+        "sha256": "4e5e16080dced5dc0b1b99dd7c692eff4c073618e6ccf4f0df817fb10fd678c2"
+      },
+      "published": {
+        "bytes": 366,
+        "sha256": "9ecf4a397d69f51be95e72ba6c56e4c8109be5f1cd8d8f4d911d5a0b6a72c91b"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/90-restart.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default. `brv restart` at v3.16.1 sends SIGKILL to every process in /proc (same user) whose command line contains bin/brv, byterover-cli/bin/run.js, brv-server.js or agent-process.js, whatever its install or data directory (source-review.json#restart-*; demonstrated by reproduction/restart-scope-probe-20260926/). The retained records do not show whether another session's process was hit (README.md#brv-restart-in-earlier-runs).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "90-restart.stdout",
+        "bytes": 86,
+        "sha256": "9dcbe926e78dad78d31abe0533e58c1cc3b07f2c76ed2bdca1d2d49158c80aef"
+      },
+      "published": {
+        "bytes": 86,
+        "sha256": "9dcbe926e78dad78d31abe0533e58c1cc3b07f2c76ed2bdca1d2d49158c80aef"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/steps.log",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0424Z/reproduce-vc-search.sh (2026-09-26T04:24Z-04:26Z). Superseded by the later run because that script version left XDG_CACHE_HOME at the host default.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:26:07Z",
+      "private_original": {
+        "name": "steps.log",
+        "bytes": 1963,
+        "sha256": "08b4fecd53181c2b5b77f2fe324b48e6188d2ab8fe8cf3b3cb8fc532ab62a79f"
+      },
+      "published": {
+        "bytes": 1963,
+        "sha256": "08b4fecd53181c2b5b77f2fe324b48e6188d2ab8fe8cf3b3cb8fc532ab62a79f"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "withdrawn-host-receipts/nativestack-5975wx-20260925--byterover-cli--install--20260926.json",
+      "evidence_class": "withdrawn_host_receipt",
+      "what": "Draft host receipt recorded by the first trial pass and withdrawn before merge; copied byte for byte. Why withdrawn: component_id 'byterover-cli' is neither a stack component nor a landscape winner (validate rejects it). Its first command resolved the host install that the cleanup removed.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "nativestack-5975wx-20260925--byterover-cli--install--20260926.json",
+        "bytes": 3891,
+        "sha256": "80282697e4795068f192ee83eaabae26f2274b4bd8887d2f55e19c82e679ab18"
+      },
+      "published": {
+        "bytes": 3891,
+        "sha256": "80282697e4795068f192ee83eaabae26f2274b4bd8887d2f55e19c82e679ab18"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "withdrawn-host-receipts/nativestack-5975wx-20260925--byterover-cli--use--20260926.json",
+      "evidence_class": "withdrawn_host_receipt",
+      "what": "Draft host receipt recorded by the first trial pass and withdrawn before merge; copied byte for byte. Why withdrawn: Same component-id rejection. Its grep oracle accepted '\"totalFound\":10' and any result path (GPT-6 review); replaced by reproduction/check_search.py with deliberately failing expectations.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "nativestack-5975wx-20260925--byterover-cli--use--20260926.json",
+        "bytes": 3688,
+        "sha256": "d09e875b948adaf73362dfd9e1ce288494222729b811d2b76af9ec036abb32d1"
+      },
+      "published": {
+        "bytes": 3688,
+        "sha256": "d09e875b948adaf73362dfd9e1ce288494222729b811d2b76af9ec036abb32d1"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/reproduce-vc-search.sh",
+      "evidence_class": "local_integration_source",
+      "what": "The exact reproduce-vc-search.sh version this run executed. It redirected XDG_CONFIG_HOME, XDG_DATA_HOME and XDG_STATE_HOME but not XDG_CACHE_HOME, so each brv invocation also touched the host's ~/.cache/brv/lastrun (observed mtime 04:26Z). Its header claim that no host ByteRover state is used was therefore false for the oclif cache directory; the later run uses the corrected script. UNSAFE on a shared host: its cleanup runs `brv restart`. `brv restart` at v3.16.1 sends SIGKILL to every process in /proc (same user) whose command line contains bin/brv, byterover-cli/bin/run.js, brv-server.js or agent-process.js, whatever its install or data directory (source-review.json#restart-*; demonstrated by reproduction/restart-scope-probe-20260926/). The retained records do not show whether another session's process was hit (README.md#brv-restart-in-earlier-runs).",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "reproduce-vc-search-run0424Z.sh",
+        "bytes": 5379,
+        "sha256": "970c5923e00763c20a63e060bad13a70f6e9447df2ab98aac19499ec0ffd87cd"
+      },
+      "published": {
+        "bytes": 5379,
+        "sha256": "970c5923e00763c20a63e060bad13a70f6e9447df2ab98aac19499ec0ffd87cd"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0424Z/check_search.py",
+      "evidence_class": "local_integration_source",
+      "what": "The exact check_search.py version this run executed.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "check_search-run0424Z.py",
+        "bytes": 3144,
+        "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534"
+      },
+      "published": {
+        "bytes": 3144,
+        "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/00-npm-view.stdout",
+      "evidence_class": "registry_observation",
+      "what": "npm registry response to `npm view byterover-cli@3.16.1 dist.integrity`, captured by reproduction/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f), 2026-09-26T04:54Z-04:56Z, run after the host cleanup: the published dist.integrity, which the script compares with the pinned value before it downloads anything.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "00-npm-view.stdout",
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "published": {
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/01-npm-pack.stderr",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "01-npm-pack.stderr",
+        "bytes": 146002,
+        "sha256": "6afe9d2904e0328b2985563803a5c256de1d380afd96f66fd60f77f4b2fddb3d"
+      },
+      "published": {
+        "bytes": 591,
+        "sha256": "ddd7f32134d6aec5e8c0d73e169c0b70cb348086ff89b4860efe499990ab690d"
+      },
+      "excerpt_lines": [
+        [
+          1,
+          3
+        ],
+        [
+          2322,
+          2334
+        ]
+      ],
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/01-npm-pack.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "01-npm-pack.stdout",
+        "bytes": 25,
+        "sha256": "e6e55341bae0b8f80c2fd8a2c47e06c3a88ad8b7ee32fe093e1225c5f3384d28"
+      },
+      "published": {
+        "bytes": 25,
+        "sha256": "e6e55341bae0b8f80c2fd8a2c47e06c3a88ad8b7ee32fe093e1225c5f3384d28"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/02-tarball-integrity.stdout",
+      "evidence_class": "local_integration",
+      "what": "sha512 of the downloaded tarball in npm's integrity (SRI) form, computed by the script's own `python3 -c` step (lines 59-61) in reproduction/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f), 2026-09-26T04:54Z-04:56Z, run after the host cleanup, then compared with the pinned integrity; our computation, not output of npm or ByteRover.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "02-tarball-integrity.stdout",
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "published": {
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/03-npm-install.stderr",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "03-npm-install.stderr",
+        "bytes": 1190,
+        "sha256": "f06923a31a1dd49b8c527e423fc9f3922c930d104f0f9a22e02d51af6b88025e"
+      },
+      "published": {
+        "bytes": 1190,
+        "sha256": "f06923a31a1dd49b8c527e423fc9f3922c930d104f0f9a22e02d51af6b88025e"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/03-npm-install.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "03-npm-install.stdout",
+        "bytes": 26,
+        "sha256": "421352c5a3af79693d687a79c52798873f96712e4010e9e43f7798aae0ff726d"
+      },
+      "published": {
+        "bytes": 26,
+        "sha256": "421352c5a3af79693d687a79c52798873f96712e4010e9e43f7798aae0ff726d"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/04-version.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "04-version.stdout",
+        "bytes": 43,
+        "sha256": "fe02064f4a2c875b0bc6b4abd672e1e4f031a1abfe24bbdf9114e53f65a1031b"
+      },
+      "published": {
+        "bytes": 43,
+        "sha256": "fe02064f4a2c875b0bc6b4abd672e1e4f031a1abfe24bbdf9114e53f65a1031b"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/10-vc-init.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "10-vc-init.stdout",
+        "bytes": 92,
+        "sha256": "8eb415f14438ea11bfc95d17a28565a25160da6f4cb932d03b011634912811c4"
+      },
+      "published": {
+        "bytes": 92,
+        "sha256": "8eb415f14438ea11bfc95d17a28565a25160da6f4cb932d03b011634912811c4"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/11-vc-add.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "11-vc-add.stdout",
+        "bytes": 18,
+        "sha256": "5abbc1a501f89c95fd1eaedaa30e1557ec67f28e30dcdc731a90a26c9292e7c7"
+      },
+      "published": {
+        "bytes": 18,
+        "sha256": "5abbc1a501f89c95fd1eaedaa30e1557ec67f28e30dcdc731a90a26c9292e7c7"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/12-vc-config-name.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "12-vc-config-name.stdout",
+        "bytes": 12,
+        "sha256": "367a2d69df5781c6e4babaaa01cf0b2bce228f3a849c6ae1e41205f369bd301f"
+      },
+      "published": {
+        "bytes": 12,
+        "sha256": "367a2d69df5781c6e4babaaa01cf0b2bce228f3a849c6ae1e41205f369bd301f"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/13-vc-config-email.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "13-vc-config-email.stdout",
+        "bytes": 28,
+        "sha256": "f7ac839f3122157c392822ea517f7a2a2c42d56b4b068555e7310e590cd552c6"
+      },
+      "published": {
+        "bytes": 28,
+        "sha256": "f7ac839f3122157c392822ea517f7a2a2c42d56b4b068555e7310e590cd552c6"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/14-vc-commit.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "14-vc-commit.stdout",
+        "bytes": 37,
+        "sha256": "fbb050c0544545e2068151182232d26433819f59bad6265c34cf4b380605da26"
+      },
+      "published": {
+        "bytes": 37,
+        "sha256": "fbb050c0544545e2068151182232d26433819f59bad6265c34cf4b380605da26"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/15-vc-log.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "15-vc-log.stdout",
+        "bytes": 119,
+        "sha256": "a18f5134f21651ad475f42e1a4b104713cb2a43bb055177f8fd3e00aa13ea78a"
+      },
+      "published": {
+        "bytes": 119,
+        "sha256": "a18f5134f21651ad475f42e1a4b104713cb2a43bb055177f8fd3e00aa13ea78a"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/16-status.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "16-status.stdout",
+        "bytes": 330,
+        "sha256": "7ba10b247bd779e89c866ddc121b6fdeacf4282d612e2c05bb81a8f2a3ce22bb"
+      },
+      "published": {
+        "bytes": 330,
+        "sha256": "7ba10b247bd779e89c866ddc121b6fdeacf4282d612e2c05bb81a8f2a3ce22bb"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/20-search-positive.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "20-search-positive.stdout",
+        "bytes": 481,
+        "sha256": "002e74e81918eb7afa6fbb1743ac7f4b21e6e89a53ca062f6a2c27a4b566735a"
+      },
+      "published": {
+        "bytes": 481,
+        "sha256": "002e74e81918eb7afa6fbb1743ac7f4b21e6e89a53ca062f6a2c27a4b566735a"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/21-search-second-positive.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "21-search-second-positive.stdout",
+        "bytes": 461,
+        "sha256": "4310443539ca342f88838af1910f7297999aae7135e597407f30ced8d0e87667"
+      },
+      "published": {
+        "bytes": 461,
+        "sha256": "4310443539ca342f88838af1910f7297999aae7135e597407f30ced8d0e87667"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/22-search-negative.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "22-search-negative.stdout",
+        "bytes": 240,
+        "sha256": "2379a2cf255d107aa41a4497f43b505dd13d886f718df2506b3d420b08d746b9"
+      },
+      "published": {
+        "bytes": 240,
+        "sha256": "2379a2cf255d107aa41a4497f43b505dd13d886f718df2506b3d420b08d746b9"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/30-check-positive.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "30-check-positive.stdout",
+        "bytes": 379,
+        "sha256": "29b03384791a7ea51215816da7e666dbeb577fd0b7586267f28bcf7325030ef3"
+      },
+      "published": {
+        "bytes": 288,
+        "sha256": "95510e0783f1d9970f2a0628b0eb5f572335462b164502f384763dbb52fb5e9e"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/31-check-second-positive.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "31-check-second-positive.stdout",
+        "bytes": 383,
+        "sha256": "c4a74eca6eab63934b9e7e0f4e9d136309db6883c6dcbe13c836ec2214646665"
+      },
+      "published": {
+        "bytes": 292,
+        "sha256": "e020101a83d15926a1cfa21d9dfd0fa67f8941078ae753130f77b73740133cef"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/32-check-negative.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "32-check-negative.stdout",
+        "bytes": 330,
+        "sha256": "d8eafd604fe1404472b4babf8a3f7cb381487491da58271e2534c9e305a76691"
+      },
+      "published": {
+        "bytes": 239,
+        "sha256": "ff84912b3850f546852b483412c43a9c71847e906eed92027b00e205b71e9d5e"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/33-check-wrong-path-must-fail.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "33-check-wrong-path-must-fail.stdout",
+        "bytes": 501,
+        "sha256": "4caeebfb2ca33d44a46e273031dfbd0cd26b1e72006271df7cd0c7b48de14104"
+      },
+      "published": {
+        "bytes": 410,
+        "sha256": "adde44f16f1dcf84a9a05554a792d18dc28194c3aa84fb55eaf9cc2ea6d1c2cf"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/34-check-wrong-count-must-fail.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "34-check-wrong-count-must-fail.stdout",
+        "bytes": 459,
+        "sha256": "5079dcc256240061487ecece9113a01a3c3b5b857e075affb97969a031c337e3"
+      },
+      "published": {
+        "bytes": 368,
+        "sha256": "dcf63a64b0c47785146f00a04cb54d6a5a5399a69b67a57f7aba4f976657de4a"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/90-restart.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled. `brv restart` at v3.16.1 sends SIGKILL to every process in /proc (same user) whose command line contains bin/brv, byterover-cli/bin/run.js, brv-server.js or agent-process.js, whatever its install or data directory (source-review.json#restart-*; demonstrated by reproduction/restart-scope-probe-20260926/). The retained records do not show whether another session's process was hit (README.md#brv-restart-in-earlier-runs).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "90-restart.stdout",
+        "bytes": 86,
+        "sha256": "5b961858a31bc95d2ee4a2d2ee377266e28e9253e673cfd998fdf9066fae6d99"
+      },
+      "published": {
+        "bytes": 86,
+        "sha256": "5b961858a31bc95d2ee4a2d2ee377266e28e9253e673cfd998fdf9066fae6d99"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/steps.log",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/run-20260926T0454Z/reproduce-vc-search.sh (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) with reproduction/check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), 2026-09-26T04:54Z-04:56Z, run after the host cleanup; every ByteRover config/data/state/cache directory pointed into the mktemp workspace and autoupdate disabled.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:31Z",
+      "private_original": {
+        "name": "steps.log",
+        "bytes": 1963,
+        "sha256": "0a2ab31443fbf7882f4e997c6b4b2d5f0e40b316a1f80f2d61408e11db3428aa"
+      },
+      "published": {
+        "bytes": 1963,
+        "sha256": "0a2ab31443fbf7882f4e997c6b4b2d5f0e40b316a1f80f2d61408e11db3428aa"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/host-state-observation.txt",
+      "evidence_class": "independent_observation",
+      "what": "Separate check around the run: every host ByteRover path (~/.config/brv, ~/.local/share/brv, ~/.local/state/brv, ~/.cache/brv, ~/.config/configstore) was absent before the run (after the cleanup) and still absent after it, and no ByteRover process remained.",
+      "command": "test -e on each path before and after; ps for brv-server/agent-process/brv update",
+      "exit_code": null,
+      "observed": "2026-09-26T04:56:43Z",
+      "private_original": {
+        "name": "brv-repro-2-host-observation.txt",
+        "bytes": 408,
+        "sha256": "706c78b16928a5589541df781289ed4565653ae763dab83aff0ad515a174b304"
+      },
+      "published": {
+        "bytes": 408,
+        "sha256": "706c78b16928a5589541df781289ed4565653ae763dab83aff0ad515a174b304"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "source-review.json",
+      "evidence_class": "source_review",
+      "what": "Pinned upstream source lines behind this trial's findings, produced by ../provenance/source_excerpts.py (sha256 8f71c03c3757731ccd60fdd8c8c19d9fd6ae6f95b2ee839b1b290c6050fc61f8) from fresh fetches of each named commit; each item carries the file's blob id and sha256. The cross-family repair round regenerated it with 27 added items (restart-*, daemon-*, transport-client-*, connect-*, webui-*, transport-host-loopback, webui-default-port, the @oclif/plugin-update 4.8.0 and @oclif/core 4.14.0 lines the reproduction actually installed, npm-compile-cache, curl-header-from-stdin); the earlier 27 items are byte-identical.",
+      "command": "python3 ../provenance/source_excerpts.py <items.json>",
+      "exit_code": 0,
+      "observed": "2026-09-26T11:18:44Z",
+      "private_original": {
+        "name": "source-review-byterover-cli-gpt6.json",
+        "bytes": 61142,
+        "sha256": "39afa1ef89edb03ca8a0b1f331461b39d7dcc7f62f3970294816f39a344aff2d"
+      },
+      "published": {
+        "bytes": 61142,
+        "sha256": "39afa1ef89edb03ca8a0b1f331461b39d7dcc7f62f3970294816f39a344aff2d"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/reproduce-vc-search.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Self-contained reproduction of the offline store/retrieve path: pinned npm install into a mktemp prefix after an integrity check, every ByteRover config/data/state/cache directory redirected into the workspace (BRV_*_DIR overrides unset), background autoupdate disabled and checked idle, installed dependency versions recorded (npm ls), `brv vc` commits and `brv search` queries, checks with check_search.py including two deliberately wrong expectations, then a stop of only the processes owned_processes.py recorded (the daemon named by the workspace's own daemon.json and its descendants) and removal of the workspace. It no longer calls `brv restart`. run-20260926T1131Z and the probe's current variant executed this exact version, which is kept byte-identical because their records cite its hash. Superseded by reproduction/fixed/reproduce-vc-search.sh: this version ignored a failed process recording after each command and in its cleanup, so with no ledger its cleanup signalled nothing, removed the workspace and could exit 0 while the daemon kept running (native-outputs/ownership-failure-check-20260926T122516Z-as-run.txt). Our glue around the upstream CLI.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "reproduce-vc-search.sh",
+        "bytes": 9124,
+        "sha256": "619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799"
+      },
+      "published": {
+        "bytes": 9124,
+        "sha256": "619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/check_search.py",
+      "evidence_class": "local_integration_source",
+      "what": "JSON checker used by every reproduction run since run-20260926T0454Z (run-20260926T1131Z and both probe variants executed this exact version): requires success true, status completed, an exact totalFound and, for a hit, the exact first path and excerpt text. Its pass/fail rule is ours, not ByteRover's.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "check_search.py",
+        "bytes": 3144,
+        "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534"
+      },
+      "published": {
+        "bytes": 3144,
+        "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/owned-processes-check-20260926T110019Z.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/owned_processes_check.py (sha256 42e90ec48c75b8d06beeca4aa85672703c39dbf5d3754d7673bd53add0f3fc91) against owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3): five cases with fake processes (graceful stop, SIGKILL fallback after 10 s, foreign daemon file, unreadable daemon file, reused pid), each expectation written before the run; all held. It did not cover a host without usable pidfds; owned-processes-check-20260926T121929Z-as-run.txt does.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:00:19Z",
+      "private_original": {
+        "name": "owned-processes-check-20260926T110019Z.stdout",
+        "bytes": 1023,
+        "sha256": "622a3afd97b25ea9af67cfe34e13b22fc6323b18c591847c8697ed3cdcebbbc6"
+      },
+      "published": {
+        "bytes": 1023,
+        "sha256": "622a3afd97b25ea9af67cfe34e13b22fc6323b18c591847c8697ed3cdcebbbc6"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/credential-argv-probe-20260926T111651Z.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of local-integration/credential-argv-probe.py (sha256 9bcb436009e4ae32e7d5be3e023c610cfba3055ad879239bf3761dad4b08363a) against connect-local-llm-safe.sh (sha256 5b2c54943172b988155f2db9992bc870f7eaf490f20a4ab00e3fb8c5f11eae5f) with a random dummy value and a loopback listener started by the probe (nothing sent to port 18232): the first-pass header form put the value in curl's command line; the safe form delivered the same header with the value in none of the three inspected processes' command lines or environments, exit 0, http_code=200. It did not cover a caller that exported KEY; credential-argv-probe-20260926T121653Z-as-run.txt does.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:16:51Z",
+      "private_original": {
+        "name": "credential-argv-probe-20260926T111651Z.stdout",
+        "bytes": 504,
+        "sha256": "9a2a8b03bd66f1acaca17a495514969e2332f0944d7c6a82c584032ff63b9c7c"
+      },
+      "published": {
+        "bytes": 504,
+        "sha256": "9a2a8b03bd66f1acaca17a495514969e2332f0944d7c6a82c584032ff63b9c7c"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/owned_processes.py",
+      "evidence_class": "local_integration_source",
+      "what": "Records the daemon named by the reproduction's own daemon.json (an argument must be a brv-server.js under the workspace prefix) and that daemon's descendants, each with pid, start time, process group and session, without listing /proc; on exit sends SIGTERM to the recorded daemon and SIGKILL after 10 s to any recorded process still running, each through a pidfd checked against the recorded start time, or, when pidfd_open is missing or fails, by raw pid after that check. Replaces `brv restart`. Kept byte-identical: run-20260926T1131Z, the probe's current variant and owned-processes-check-20260926T110019Z.txt ran it. Superseded by reproduction/fixed/owned_processes.py, because a pid reused between the check and os.kill() would receive the signal (native-outputs/owned-processes-check-20260926T121929Z-as-run.txt). Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "owned_processes.py",
+        "bytes": 8323,
+        "sha256": "e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3"
+      },
+      "published": {
+        "bytes": 8323,
+        "sha256": "e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/owned_processes_check.py",
+      "evidence_class": "local_integration_source",
+      "what": "Five-case check of owned_processes.py against fake processes it starts itself (graceful stop, SIGKILL fallback, foreign daemon file, unreadable daemon file, reused pid), expectations written before the run. Kept byte-identical as the version behind owned-processes-check-20260926T110019Z.txt; the extended copy is reproduction/fixed/owned_processes_check.py. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "owned_processes_check.py",
+        "bytes": 7805,
+        "sha256": "42e90ec48c75b8d06beeca4aa85672703c39dbf5d3754d7673bd53add0f3fc91"
+      },
+      "published": {
+        "bytes": 7805,
+        "sha256": "42e90ec48c75b8d06beeca4aa85672703c39dbf5d3754d7673bd53add0f3fc91"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-with-host-observation.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Wrapper that ran run-20260926T1131Z: `test -e` on the host ByteRover paths before and after, and the entries left in a dedicated TMPDIR; reads no process list. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "run-with-host-observation.sh",
+        "bytes": 1944,
+        "sha256": "87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723"
+      },
+      "published": {
+        "bytes": 1944,
+        "sha256": "87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Runs a reproduce-vc-search.sh version as PID 1's child in a new user and PID namespace with its own /proc, next to four decoy sleepers whose only link to ByteRover is one command-line argument, and reports which decoys survived. Nothing outside the namespace is visible to it or to what it runs. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "restart-scope-probe.sh",
+        "bytes": 4695,
+        "sha256": "1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26"
+      },
+      "published": {
+        "bytes": 4695,
+        "sha256": "1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/connect-local-llm-safe.sh",
+      "evidence_class": "local_integration_source",
+      "what": "First safe form of connect-local-llm.sh, kept byte-identical as the version credential-argv-probe-20260926T111651Z.txt checked; superseded by local-integration/fixed/connect-local-llm-safe.sh, because its KEY=\"\" keeps an export attribute inherited from the caller and, under bash, an allexport option exported through SHELLOPTS exports KEY; in both cases the key reached curl's environment (native-outputs/credential-argv-probe-20260926T121653Z-as-run.txt). As written, it reads the key with the shell's read builtin and gives curl the Authorization header on standard input (-H @-), so the key reaches no argument list, and no environment unless the caller exported KEY or allexport; prints the ByteRover web UI steps for the provider key (a masked password field), because ByteRover 3.16.1 has no stdin, file or environment option for it. Checked by credential-argv-probe.py with a dummy value; not run against the host llama.cpp service. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "connect-local-llm-safe.sh",
+        "bytes": 3796,
+        "sha256": "5b2c54943172b988155f2db9992bc870f7eaf490f20a4ab00e3fb8c5f11eae5f"
+      },
+      "published": {
+        "bytes": 3796,
+        "sha256": "5b2c54943172b988155f2db9992bc870f7eaf490f20a4ab00e3fb8c5f11eae5f"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/credential-argv-probe.py",
+      "evidence_class": "local_integration_source",
+      "what": "Compares the first-pass header form with connect-local-llm-safe.sh using a random dummy value and a loopback listener the probe starts itself: records whether the header arrives and whether the value appears in any client process's command line or environment. Kept byte-identical as the version behind credential-argv-probe-20260926T111651Z.txt; the extended copy is local-integration/fixed/credential-argv-probe.py. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "credential-argv-probe.py",
+        "bytes": 6065,
+        "sha256": "9bcb436009e4ae32e7d5be3e023c610cfba3055ad879239bf3761dad4b08363a"
+      },
+      "published": {
+        "bytes": 6065,
+        "sha256": "9bcb436009e4ae32e7d5be3e023c610cfba3055ad879239bf3761dad4b08363a"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0454Z/reproduce-vc-search.sh",
+      "evidence_class": "local_integration_source",
+      "what": "The exact reproduce-vc-search.sh version run-20260926T0454Z executed (it was the maintained file until this repair round). UNSAFE on a shared host: its cleanup runs `brv restart`. `brv restart` at v3.16.1 sends SIGKILL to every process in /proc (same user) whose command line contains bin/brv, byterover-cli/bin/run.js, brv-server.js or agent-process.js, whatever its install or data directory (source-review.json#restart-*; demonstrated by reproduction/restart-scope-probe-20260926/). The retained records do not show whether another session's process was hit (README.md#brv-restart-in-earlier-runs).",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "reproduce-vc-search.sh",
+        "bytes": 5743,
+        "sha256": "685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f"
+      },
+      "published": {
+        "bytes": 5743,
+        "sha256": "685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/00-npm-view.stdout",
+      "evidence_class": "registry_observation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "00-npm-view.stdout",
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "published": {
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/01-npm-pack.stderr",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "01-npm-pack.stderr",
+        "bytes": 146002,
+        "sha256": "6afe9d2904e0328b2985563803a5c256de1d380afd96f66fd60f77f4b2fddb3d"
+      },
+      "published": {
+        "bytes": 591,
+        "sha256": "ddd7f32134d6aec5e8c0d73e169c0b70cb348086ff89b4860efe499990ab690d"
+      },
+      "excerpt_lines": [
+        [
+          1,
+          3
+        ],
+        [
+          2322,
+          2334
+        ]
+      ],
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/01-npm-pack.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "01-npm-pack.stdout",
+        "bytes": 25,
+        "sha256": "e6e55341bae0b8f80c2fd8a2c47e06c3a88ad8b7ee32fe093e1225c5f3384d28"
+      },
+      "published": {
+        "bytes": 25,
+        "sha256": "e6e55341bae0b8f80c2fd8a2c47e06c3a88ad8b7ee32fe093e1225c5f3384d28"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/02-tarball-integrity.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "02-tarball-integrity.stdout",
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "published": {
+        "bytes": 96,
+        "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/03-npm-install.stderr",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "03-npm-install.stderr",
+        "bytes": 1190,
+        "sha256": "f06923a31a1dd49b8c527e423fc9f3922c930d104f0f9a22e02d51af6b88025e"
+      },
+      "published": {
+        "bytes": 1190,
+        "sha256": "f06923a31a1dd49b8c527e423fc9f3922c930d104f0f9a22e02d51af6b88025e"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/03-npm-install.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "03-npm-install.stdout",
+        "bytes": 26,
+        "sha256": "6804b8e0437308d2824c3a595cc7e136c9ce2b237af7597a711d46713b0e4d49"
+      },
+      "published": {
+        "bytes": 26,
+        "sha256": "6804b8e0437308d2824c3a595cc7e136c9ce2b237af7597a711d46713b0e4d49"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/04-version.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "04-version.stdout",
+        "bytes": 43,
+        "sha256": "fe02064f4a2c875b0bc6b4abd672e1e4f031a1abfe24bbdf9114e53f65a1031b"
+      },
+      "published": {
+        "bytes": 43,
+        "sha256": "fe02064f4a2c875b0bc6b4abd672e1e4f031a1abfe24bbdf9114e53f65a1031b"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/05-npm-ls.stderr",
+      "evidence_class": "upstream_native_operation",
+      "what": "npm ls exit 1 (ELSPROBLEMS): npm marks the bundled transport client 'invalid' against its github: spec; the tree itself is complete. Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "05-npm-ls.stderr",
+        "bytes": 460,
+        "sha256": "6e0fac6784b83c2d08f9a085271539f4f1563993459aad6fc9ef26093cbfa745"
+      },
+      "published": {
+        "bytes": 344,
+        "sha256": "4dd8c5fa90f67da6b7bee63ed4f83899f011d8748c4b5c49250fe00209e8f79c"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "npm-redacted session scratch path",
+          "replacements": 2
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/05-npm-ls.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "npm's own tree of the installed @oclif/core, @oclif/plugin-update and bundled @campfirein/brv-transport-client: the versions this run executed (core 4.14.0, plugin-update 4.8.0, transport client 1.1.0), resolved by the global tarball install from package.json's ranges rather than the tag's package-lock.json. Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "05-npm-ls.stdout",
+        "bytes": 477,
+        "sha256": "fcea68f325a2a034f9d6f83f5d211e4b7a4f7515c6a7ada3231b798c1dd288ba"
+      },
+      "published": {
+        "bytes": 419,
+        "sha256": "3f95fcf714a5f5bd2b49d989702c73a51786ba0ef7ea43aa8154dcac56ea4c02"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "npm-redacted session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/10-vc-init.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "10-vc-init.stdout",
+        "bytes": 209,
+        "sha256": "8e4fc42316f8e77ec3b5cc90b9efe15fa728a06617af1ad8750f2cd8e6c5e558"
+      },
+      "published": {
+        "bytes": 118,
+        "sha256": "cb941e387e2d6401399a179ff780644997b86fc12c6f1d9c32654b5aceadf2b3"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/11-vc-add.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "11-vc-add.stdout",
+        "bytes": 18,
+        "sha256": "5abbc1a501f89c95fd1eaedaa30e1557ec67f28e30dcdc731a90a26c9292e7c7"
+      },
+      "published": {
+        "bytes": 18,
+        "sha256": "5abbc1a501f89c95fd1eaedaa30e1557ec67f28e30dcdc731a90a26c9292e7c7"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/12-vc-config-name.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "12-vc-config-name.stdout",
+        "bytes": 12,
+        "sha256": "367a2d69df5781c6e4babaaa01cf0b2bce228f3a849c6ae1e41205f369bd301f"
+      },
+      "published": {
+        "bytes": 12,
+        "sha256": "367a2d69df5781c6e4babaaa01cf0b2bce228f3a849c6ae1e41205f369bd301f"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/13-vc-config-email.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "13-vc-config-email.stdout",
+        "bytes": 28,
+        "sha256": "f7ac839f3122157c392822ea517f7a2a2c42d56b4b068555e7310e590cd552c6"
+      },
+      "published": {
+        "bytes": 28,
+        "sha256": "f7ac839f3122157c392822ea517f7a2a2c42d56b4b068555e7310e590cd552c6"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/14-vc-commit.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "14-vc-commit.stdout",
+        "bytes": 37,
+        "sha256": "59e7f22061ccc45b385ade5f978f19412e3d7853d2ab68864c767aac9dbe51d5"
+      },
+      "published": {
+        "bytes": 37,
+        "sha256": "59e7f22061ccc45b385ade5f978f19412e3d7853d2ab68864c767aac9dbe51d5"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/15-vc-log.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "15-vc-log.stdout",
+        "bytes": 120,
+        "sha256": "469a87336893468fe0ce084b7249cee26c6be582170481b06380e2b2b23f8e6a"
+      },
+      "published": {
+        "bytes": 120,
+        "sha256": "469a87336893468fe0ce084b7249cee26c6be582170481b06380e2b2b23f8e6a"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/16-status.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "16-status.stdout",
+        "bytes": 681,
+        "sha256": "19bd263bb37e69d33dcbfc921b8c7fbfed1984fcef5dbea40248bbb5117fc83e"
+      },
+      "published": {
+        "bytes": 408,
+        "sha256": "5782b000b5981b56f0b6117d81e3dd69573b4b6862336e5bdc8ec0df2d7a12c8"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 3
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/20-search-positive.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "20-search-positive.stdout",
+        "bytes": 481,
+        "sha256": "3a5812e714cce371702b75fe830f5218afd4bfd415a1b4f4b9c7dd5ccdf8b057"
+      },
+      "published": {
+        "bytes": 481,
+        "sha256": "3a5812e714cce371702b75fe830f5218afd4bfd415a1b4f4b9c7dd5ccdf8b057"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/21-search-second-positive.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "21-search-second-positive.stdout",
+        "bytes": 461,
+        "sha256": "12c662f0be9fd16c68c5bd699427cf2ae056dfc41be01a8a25dbd6ac0b4fcd77"
+      },
+      "published": {
+        "bytes": 461,
+        "sha256": "12c662f0be9fd16c68c5bd699427cf2ae056dfc41be01a8a25dbd6ac0b4fcd77"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/22-search-negative.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "22-search-negative.stdout",
+        "bytes": 240,
+        "sha256": "63ea287cd4cd06b2b86a5eb3ed3b96ddfff1e65f529b975a334a8a285e5e8013"
+      },
+      "published": {
+        "bytes": 240,
+        "sha256": "63ea287cd4cd06b2b86a5eb3ed3b96ddfff1e65f529b975a334a8a285e5e8013"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/30-check-positive.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "30-check-positive.stdout",
+        "bytes": 394,
+        "sha256": "b9c98bc0f03af4715b7da82db56fa928eee1398e075068ac37daa8ab9acd16ca"
+      },
+      "published": {
+        "bytes": 303,
+        "sha256": "1eea0ee00ae11a03f4b36ee229ec38e56a98578ff219e0e8bb3cee27fd94f642"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/31-check-second-positive.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "31-check-second-positive.stdout",
+        "bytes": 398,
+        "sha256": "7cc51daf333a63f6f6f9b9890713f185e5c50fc01b7e732210fbfa899bc82736"
+      },
+      "published": {
+        "bytes": 307,
+        "sha256": "5bf751b90f3b0291c004614fda537a4ef3dd6e08b79d5f8a36480f55618356d4"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/32-check-negative.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "32-check-negative.stdout",
+        "bytes": 345,
+        "sha256": "91778baf7727549235bc5ead9ca21e29c3784b0496abe74dfb2c98c0f329cb8f"
+      },
+      "published": {
+        "bytes": 254,
+        "sha256": "5d93ad4a0a9084e0cc005387f6955c98fce4261ba9b2c8981f655748bacf788f"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/33-check-wrong-path-must-fail.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "33-check-wrong-path-must-fail.stdout",
+        "bytes": 516,
+        "sha256": "5e967f784e5ddbf98717c61e7c9e5654c9227dd96c77ce8fdabced206e32b466"
+      },
+      "published": {
+        "bytes": 425,
+        "sha256": "83e18524bdb775fe8bd38ced0fb265c21209c1fad4658a1253d1641470824f95"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/34-check-wrong-count-must-fail.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "34-check-wrong-count-must-fail.stdout",
+        "bytes": 474,
+        "sha256": "b379e0bf06b635d895477a8ca8159b1d5ba94cbf1a9f498eae9a9c712747630b"
+      },
+      "published": {
+        "bytes": 383,
+        "sha256": "2b4db63b3c3843bbdbced697d44c601f0f06cfe3443d65388a6a2ca8fd07267a"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/80-owned-processes.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "80-owned-processes.stdout",
+        "bytes": 341,
+        "sha256": "a3e7165054e8999bc4f0041274da25151d8da0778c3a21ef96694e89d3483fee"
+      },
+      "published": {
+        "bytes": 341,
+        "sha256": "a3e7165054e8999bc4f0041274da25151d8da0778c3a21ef96694e89d3483fee"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/90-stop.stdout",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "90-stop.stdout",
+        "bytes": 293,
+        "sha256": "174d363381b1725fbb1234c057c09f7a6bf7024427d34ea97022175dfc6c49e5"
+      },
+      "published": {
+        "bytes": 293,
+        "sha256": "174d363381b1725fbb1234c057c09f7a6bf7024427d34ea97022175dfc6c49e5"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/host-state-observation.txt",
+      "evidence_class": "independent_observation",
+      "what": "Separate check around the run by run-with-host-observation.sh: `test -e` on the five host paths where ByteRover keeps state by default plus update-notifier's file, before and after the run, and the entries left in the dedicated TMPDIR (empty before the run). No process list was read. Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "host-state-observation.txt",
+        "bytes": 655,
+        "sha256": "dfe1f869375324281861e807ed730f8e67052ca2d35cc52d5b7e29ccd47c0fa3"
+      },
+      "published": {
+        "bytes": 655,
+        "sha256": "dfe1f869375324281861e807ed730f8e67052ca2d35cc52d5b7e29ccd47c0fa3"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T1131Z/steps.log",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) and check_search.py (sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534), started by reproduction/run-with-host-observation.sh (sha256 87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723), 2026-09-26T11:31Z-11:33Z, in the host PID namespace with TMPDIR and npm_config_cache pointed into the session scratch directory. Its cleanup signalled only the processes it recorded; no process list was read.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:33:02Z",
+      "private_original": {
+        "name": "steps.log",
+        "bytes": 4122,
+        "sha256": "577650e16408c29330bf0fea8be521899bf130b17c48c93d492685595dc5ba10"
+      },
+      "published": {
+        "bytes": 2757,
+        "sha256": "36a2435b8ed59a463f8a1c3a9bea4b2c1ac3c00ce7b77260e730ab0905a135f1"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 15
+        }
+      ]
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/as-run-0454Z/probe.log",
+      "evidence_class": "local_integration",
+      "what": "Probe of the as-run run-20260926T0454Z script (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to four decoy sleepers, 2026-09-26T11:10Z-11:12Z.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:12:21Z",
+      "private_original": {
+        "name": "probe.log",
+        "bytes": 1214,
+        "sha256": "2d0e2344422263522ee6371cbb14de84baaa00239708ee9782dc42dc21a2e36d"
+      },
+      "published": {
+        "bytes": 1214,
+        "sha256": "2d0e2344422263522ee6371cbb14de84baaa00239708ee9782dc42dc21a2e36d"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/as-run-0454Z/run-steps.log",
+      "evidence_class": "local_integration",
+      "what": "Probe of the as-run run-20260926T0454Z script (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to four decoy sleepers, 2026-09-26T11:10Z-11:12Z.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:12:21Z",
+      "private_original": {
+        "name": "steps.log",
+        "bytes": 3671,
+        "sha256": "0fc434bd425e63606815a22b650eca792aeae5ef4e545f4f18521a1d90a915dc"
+      },
+      "published": {
+        "bytes": 2397,
+        "sha256": "1243d5ca41fe516f54ebc7a6dd335c644ea4f9b2c6dc6bd7f9f98a516962ad09"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 14
+        }
+      ]
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/as-run-0454Z/run-90-restart.stdout",
+      "evidence_class": "upstream_native_operation",
+      "what": "Probe of the as-run run-20260926T0454Z script (sha256 685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to four decoy sleepers, 2026-09-26T11:10Z-11:12Z.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:12:21Z",
+      "private_original": {
+        "name": "90-restart.stdout",
+        "bytes": 82,
+        "sha256": "12c0a5e2f1dfeefed4c6fdd1a8f5a37956ae457445c93853bfd6b7e5f4ba751e"
+      },
+      "published": {
+        "bytes": 82,
+        "sha256": "12c0a5e2f1dfeefed4c6fdd1a8f5a37956ae457445c93853bfd6b7e5f4ba751e"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/current/probe.log",
+      "evidence_class": "local_integration",
+      "what": "Probe of the current script (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799, owned_processes.py sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T11:33Z-11:35Z.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:35:16Z",
+      "private_original": {
+        "name": "probe.log",
+        "bytes": 1280,
+        "sha256": "170aa66425236ae7feda1802264814e3947255ff38b37951a40e4c73f399f0c6"
+      },
+      "published": {
+        "bytes": 1280,
+        "sha256": "170aa66425236ae7feda1802264814e3947255ff38b37951a40e4c73f399f0c6"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/current/run-steps.log",
+      "evidence_class": "local_integration",
+      "what": "Probe of the current script (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799, owned_processes.py sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T11:33Z-11:35Z.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:35:16Z",
+      "private_original": {
+        "name": "steps.log",
+        "bytes": 4212,
+        "sha256": "84456262e694653e79c6e42222f7a34bb72b809da461b26a092a4ac85865497c"
+      },
+      "published": {
+        "bytes": 2847,
+        "sha256": "44256313f3b79650ecde52b412621fa057e57ea0cd66f62e9989235f77906092"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 15
+        }
+      ]
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/current/run-80-owned-processes.stdout",
+      "evidence_class": "local_integration",
+      "what": "Probe of the current script (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799, owned_processes.py sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T11:33Z-11:35Z.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:35:16Z",
+      "private_original": {
+        "name": "80-owned-processes.stdout",
+        "bytes": 307,
+        "sha256": "9eb3e277b298c755e99b9fbe5f08b6ff9d57e5b9127df2373ceb491ac43343fe"
+      },
+      "published": {
+        "bytes": 307,
+        "sha256": "9eb3e277b298c755e99b9fbe5f08b6ff9d57e5b9127df2373ceb491ac43343fe"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/current/run-90-stop.stdout",
+      "evidence_class": "local_integration",
+      "what": "Probe of the current script (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799, owned_processes.py sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T11:33Z-11:35Z.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T11:35:16Z",
+      "private_original": {
+        "name": "90-stop.stdout",
+        "bytes": 285,
+        "sha256": "8199ae647b91469030743a640539592c50082373f06c4a1a767274573ed9cb67"
+      },
+      "published": {
+        "bytes": 285,
+        "sha256": "8199ae647b91469030743a640539592c50082373f06c4a1a767274573ed9cb67"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/fixed/connect-local-llm-safe.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Fixed copy of local-integration/connect-local-llm-safe.sh: turns allexport off (set +a) and unsets KEY before reading the key, because KEY=\"\" keeps an export attribute inherited from the caller and read then put the key into curl's environment. Otherwise the same: the read builtin loads the key, curl gets the Authorization header on standard input (-H @-), and the ByteRover web UI steps are printed for the provider key. Checked with a dummy value by local-integration/fixed/credential-argv-probe.py; not run against the host llama.cpp service. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "connect-local-llm-safe.sh",
+        "bytes": 4574,
+        "sha256": "7b7d8b043132cb31aa71e0255053ca781c6d4821d983543f8defc7a2d53fcc36"
+      },
+      "published": {
+        "bytes": 4574,
+        "sha256": "7b7d8b043132cb31aa71e0255053ca781c6d4821d983543f8defc7a2d53fcc36"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/fixed/credential-argv-probe.py",
+      "evidence_class": "local_integration_source",
+      "what": "Extended copy of local-integration/credential-argv-probe.py: the first-pass header form and the safe form as before, plus the safe form under a caller that exported KEY (sh and bash) and under bash with allexport exported through SHELLOPTS; the same dummy value, loopback listener and expectation for every safe form. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "credential-argv-probe.py",
+        "bytes": 7845,
+        "sha256": "016b6f34e8043fbf6792199ee318eb1ea110e239bb18be60f715ced0b06287f3"
+      },
+      "published": {
+        "bytes": 7845,
+        "sha256": "016b6f34e8043fbf6792199ee318eb1ea110e239bb18be60f715ced0b06287f3"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/fixed/reproduce-vc-search.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Fixed copy of reproduction/reproduce-vc-search.sh: runs owned_processes.py preflight before anything is installed and stops with exit 1 without working pidfd support; stops at once with exit 4 when a process recording fails; at exit, fails when ownership was not established (a recording failed, or brv vc init ran and no daemon was ever recorded) and then keeps the workspace for recovery (exit 4; exit 3 when a recorded process outlived the stop). Everything else is unchanged. Ran end to end in reproduction/restart-scope-probe-20260926/fixed/ and against stubs in native-outputs/ownership-failure-check-20260926T122520Z-fixed.txt. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "reproduce-vc-search.sh",
+        "bytes": 11787,
+        "sha256": "fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39"
+      },
+      "published": {
+        "bytes": 11787,
+        "sha256": "fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/fixed/owned_processes.py",
+      "evidence_class": "local_integration_source",
+      "what": "Fixed copy of reproduction/owned_processes.py: no raw-pid fallback; every signal goes through a pidfd opened before the start-time check; preflight exits 1, and stop refuses (exit 1, nothing signalled), unless os.pidfd_open and signal.pidfd_send_signal exist and work (a pidfd for its own process and signal 0). record is unchanged. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "owned_processes.py",
+        "bytes": 10680,
+        "sha256": "f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631"
+      },
+      "published": {
+        "bytes": 10680,
+        "sha256": "f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/fixed/owned_processes_check.py",
+      "evidence_class": "local_integration_source",
+      "what": "Extended copy of reproduction/owned_processes_check.py: the original five cases, a working-preflight case, and three cases in which the helper runs without usable pidfds (os.pidfd_open deleted, os.pidfd_open raising ENOSYS, signal.pidfd_send_signal deleted) next to a live sleeper recorded with its real start time. Takes the helper under test as an optional argument. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "owned_processes_check.py",
+        "bytes": 11162,
+        "sha256": "e89ea78a7b6272fd1457a8b3873fa3286a889aed12b242defc215dbc67408ac0"
+      },
+      "published": {
+        "bytes": 11162,
+        "sha256": "e89ea78a7b6272fd1457a8b3873fa3286a889aed12b242defc215dbc67408ac0"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/fixed/check_search.py",
+      "evidence_class": "local_integration_source",
+      "what": "Byte-identical copy of reproduction/check_search.py, which reproduction/fixed/reproduce-vc-search.sh calls from its own directory.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "check_search.py",
+        "bytes": 3144,
+        "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534"
+      },
+      "published": {
+        "bytes": 3144,
+        "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/fixed/ownership_failure_check.py",
+      "evidence_class": "local_integration_source",
+      "what": "Runs a reproduce-vc-search.sh version with stub npm and brv commands and a fake daemon of its own, inside a new user and PID namespace, in four cases (an owned daemon, a daemon file that record refuses, no daemon file, no os.pidfd_open), with the expectations written before the run. No ByteRover code runs and nothing goes over the network: the real pinned tarball is copied for the script's integrity check, and the stub replays run-20260926T1131Z's search outputs. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "ownership_failure_check.py",
+        "bytes": 11642,
+        "sha256": "6d23646bb5b80253300870f580bb5725ca97dc291be7e411727bdc8fa9671607"
+      },
+      "published": {
+        "bytes": 11642,
+        "sha256": "6d23646bb5b80253300870f580bb5725ca97dc291be7e411727bdc8fa9671607"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/credential-argv-probe-20260926T121653Z-as-run.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of local-integration/fixed/credential-argv-probe.py (sha256 016b6f34e8043fbf6792199ee318eb1ea110e239bb18be60f715ced0b06287f3) against the first safe form, local-integration/connect-local-llm-safe.sh (sha256 5b2c54943172b988155f2db9992bc870f7eaf490f20a4ab00e3fb8c5f11eae5f), with a random dummy value and a loopback listener started by the probe; nothing was sent to port 18232. The first-pass form and the plain safe form held as before. With KEY exported by the caller (under sh and under bash) and with allexport exported through SHELLOPTS (bash), the value was in a client process's environment: 3 of 5 expectations failed. This is the failing-first control for the fix.",
+      "command": "python3 local-integration/fixed/credential-argv-probe.py local-integration/connect-local-llm-safe.sh",
+      "exit_code": 1,
+      "observed": "2026-09-26T12:16:53Z",
+      "private_original": {
+        "name": "credential-argv-probe-20260926T121653Z-as-run.stdout",
+        "bytes": 1356,
+        "sha256": "184a5643df8f27a683f309416c92c59574b8f7d8ddc57edc12779e8c95d74002"
+      },
+      "published": {
+        "bytes": 1356,
+        "sha256": "184a5643df8f27a683f309416c92c59574b8f7d8ddc57edc12779e8c95d74002"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/credential-argv-probe-20260926T121709Z-fixed.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of local-integration/fixed/credential-argv-probe.py (sha256 016b6f34e8043fbf6792199ee318eb1ea110e239bb18be60f715ced0b06287f3) against the fixed copy, local-integration/fixed/connect-local-llm-safe.sh (sha256 7b7d8b043132cb31aa71e0255053ca781c6d4821d983543f8defc7a2d53fcc36), with a random dummy value and a loopback listener started by the probe; nothing was sent to port 18232. All five expectations held: in every safe form the header arrived, the value was in no command line or environment of the inspected processes, the script exited 0 and printed http_code=200.",
+      "command": "python3 local-integration/fixed/credential-argv-probe.py local-integration/fixed/connect-local-llm-safe.sh",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:17:09Z",
+      "private_original": {
+        "name": "credential-argv-probe-20260926T121709Z-fixed.stdout",
+        "bytes": 1355,
+        "sha256": "52817a3c108e6b7dca673f9e398b51f480b451fbb6a8423a4952bcb271281178"
+      },
+      "published": {
+        "bytes": 1355,
+        "sha256": "52817a3c108e6b7dca673f9e398b51f480b451fbb6a8423a4952bcb271281178"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/owned-processes-check-20260926T121929Z-as-run.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/fixed/owned_processes_check.py (sha256 e89ea78a7b6272fd1457a8b3873fa3286a889aed12b242defc215dbc67408ac0) against reproduction/owned_processes.py, the helper run-20260926T1131Z used (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3), with fake processes only. The original five cases held. It has no preflight (exit 2). With os.pidfd_open deleted or raising ENOSYS, stop checked the start time and then sent SIGTERM by raw pid, which stopped the recorded sleeper; with signal.pidfd_send_signal deleted it crashed before signalling. 4 of 9 expectations failed. This is the failing-first control for the fix.",
+      "command": "python3 reproduction/fixed/owned_processes_check.py reproduction/owned_processes.py",
+      "exit_code": 1,
+      "observed": "2026-09-26T12:19:29Z",
+      "private_original": {
+        "name": "owned-processes-check-20260926T121929Z-as-run.stdout",
+        "bytes": 1527,
+        "sha256": "aa93a46619d63158ff4b255ea9a2cdec756e479e40a5dffdd878bad159b012b5"
+      },
+      "published": {
+        "bytes": 1527,
+        "sha256": "aa93a46619d63158ff4b255ea9a2cdec756e479e40a5dffdd878bad159b012b5"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/owned-processes-check-20260926T121949Z-fixed.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/fixed/owned_processes_check.py (sha256 e89ea78a7b6272fd1457a8b3873fa3286a889aed12b242defc215dbc67408ac0) against the fixed helper, reproduction/fixed/owned_processes.py (sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631), with fake processes only. All nine expectations held. In the three cases without usable pidfds, stop sent no signal and exited 1, the sleeper kept running, and preflight exited 1; on this host preflight exited 0.",
+      "command": "python3 reproduction/fixed/owned_processes_check.py",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:19:49Z",
+      "private_original": {
+        "name": "owned-processes-check-20260926T121949Z-fixed.stdout",
+        "bytes": 1502,
+        "sha256": "447681841c85c9ebd597a52e682c2a1da98e60200f641d7a5a451652723cc3a5"
+      },
+      "published": {
+        "bytes": 1502,
+        "sha256": "447681841c85c9ebd597a52e682c2a1da98e60200f641d7a5a451652723cc3a5"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/ownership-failure-check-20260926T122516Z-as-run.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/fixed/ownership_failure_check.py (sha256 6d23646bb5b80253300870f580bb5725ca97dc291be7e411727bdc8fa9671607) against reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with its owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3), the version run-20260926T1131Z ran, with stub npm and brv commands and a fake daemon inside a new user and PID namespace; no ByteRover code ran and nothing went over the network. An owned daemon was stopped with SIGTERM and the script exited 0. When record refused the daemon named by daemon.json, and when no daemon.json appeared, the script still exited 0, removed its workspace and left the daemon running without a signal. Without os.pidfd_open it ran, and its cleanup stopped the daemon by raw pid (SIGTERM). 3 of 4 expectations failed. This is the failing-first control for the fix.",
+      "command": "python3 reproduction/fixed/ownership_failure_check.py reproduction <byterover-cli-3.16.1.tgz from npm pack, sha512 equal to the pin> reproduction/run-20260926T1131Z",
+      "exit_code": 1,
+      "observed": "2026-09-26T12:25:16Z",
+      "private_original": {
+        "name": "ownership-failure-check-20260926T122516Z-as-run.stdout",
+        "bytes": 1566,
+        "sha256": "45919dbe5e8a85f31fb5542ab17a7f6556058f926c05072f61e37541692699ff"
+      },
+      "published": {
+        "bytes": 1566,
+        "sha256": "45919dbe5e8a85f31fb5542ab17a7f6556058f926c05072f61e37541692699ff"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/ownership-failure-check-20260926T122520Z-fixed.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/fixed/ownership_failure_check.py (sha256 6d23646bb5b80253300870f580bb5725ca97dc291be7e411727bdc8fa9671607) against reproduction/fixed/ (reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631), with stub npm and brv commands and a fake daemon inside a new user and PID namespace; no ByteRover code ran and nothing went over the network. All four expectations held: an owned daemon was stopped with SIGTERM, exit 0, workspace removed; when record refused the daemon file, the script stopped after brv vc init and exited 4, keeping the workspace with its daemon.json and sending the daemon no signal; with no daemon file it exited 4 after the searches, kept the workspace and sent no signal; without os.pidfd_open it exited 1 before the daemon started.",
+      "command": "python3 reproduction/fixed/ownership_failure_check.py reproduction/fixed <byterover-cli-3.16.1.tgz from npm pack, sha512 equal to the pin> reproduction/run-20260926T1131Z",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:25:20Z",
+      "private_original": {
+        "name": "ownership-failure-check-20260926T122520Z-fixed.stdout",
+        "bytes": 2226,
+        "sha256": "8eadb5ee1b34de2e0cb410d154a7edad8cf92646384365e90fb8038347ecd751"
+      },
+      "published": {
+        "bytes": 2226,
+        "sha256": "8eadb5ee1b34de2e0cb410d154a7edad8cf92646384365e90fb8038347ecd751"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/fixed/probe.log",
+      "evidence_class": "local_integration",
+      "what": "Probe of the fixed script (reproduction/fixed/reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631, check_search.py sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T12:26Z-12:27Z, with TMPDIR and npm_config_cache pointed into the session scratch directory (the cache a copy of the earlier runs' npm cache). Real ByteRover 3.16.1 on the offline path; no LLM, no port 18232.",
+      "command": "sh reproduction/restart-scope-probe.sh reproduction/fixed <out>",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:27:52Z",
+      "private_original": {
+        "name": "probe.log",
+        "bytes": 1280,
+        "sha256": "525e6c5c10a4d3d3fd11f0b14c3e7da10dbf9978814b2eafc9e6c552b5feb647"
+      },
+      "published": {
+        "bytes": 1280,
+        "sha256": "525e6c5c10a4d3d3fd11f0b14c3e7da10dbf9978814b2eafc9e6c552b5feb647"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/fixed/run-00-pidfd-preflight.stdout",
+      "evidence_class": "local_integration",
+      "what": "Probe of the fixed script (reproduction/fixed/reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631, check_search.py sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T12:26Z-12:27Z, with TMPDIR and npm_config_cache pointed into the session scratch directory (the cache a copy of the earlier runs' npm cache). Real ByteRover 3.16.1 on the offline path; no LLM, no port 18232.",
+      "command": "sh reproduction/restart-scope-probe.sh reproduction/fixed <out>",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:27:52Z",
+      "private_original": {
+        "name": "00-pidfd-preflight.stdout",
+        "bytes": 81,
+        "sha256": "38ba697e03f57483794b7f581e5d94ca89e537799c057e3e9715c00d964f1d96"
+      },
+      "published": {
+        "bytes": 81,
+        "sha256": "38ba697e03f57483794b7f581e5d94ca89e537799c057e3e9715c00d964f1d96"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/fixed/run-80-owned-processes.stdout",
+      "evidence_class": "local_integration",
+      "what": "Probe of the fixed script (reproduction/fixed/reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631, check_search.py sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T12:26Z-12:27Z, with TMPDIR and npm_config_cache pointed into the session scratch directory (the cache a copy of the earlier runs' npm cache). Real ByteRover 3.16.1 on the offline path; no LLM, no port 18232.",
+      "command": "sh reproduction/restart-scope-probe.sh reproduction/fixed <out>",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:27:52Z",
+      "private_original": {
+        "name": "80-owned-processes.stdout",
+        "bytes": 307,
+        "sha256": "09adc72a403be4df91a6a6a6ddd42f171c253efe88c364745d382a0ac3ff43b4"
+      },
+      "published": {
+        "bytes": 307,
+        "sha256": "09adc72a403be4df91a6a6a6ddd42f171c253efe88c364745d382a0ac3ff43b4"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/fixed/run-90-stop.stdout",
+      "evidence_class": "local_integration",
+      "what": "Probe of the fixed script (reproduction/fixed/reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631, check_search.py sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T12:26Z-12:27Z, with TMPDIR and npm_config_cache pointed into the session scratch directory (the cache a copy of the earlier runs' npm cache). Real ByteRover 3.16.1 on the offline path; no LLM, no port 18232.",
+      "command": "sh reproduction/restart-scope-probe.sh reproduction/fixed <out>",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:27:52Z",
+      "private_original": {
+        "name": "90-stop.stdout",
+        "bytes": 285,
+        "sha256": "2459820dea28a8cfbca7ddcaa9d547c0b0e6ccbc5b2141b831e672819c8df879"
+      },
+      "published": {
+        "bytes": 285,
+        "sha256": "2459820dea28a8cfbca7ddcaa9d547c0b0e6ccbc5b2141b831e672819c8df879"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/fixed/run-steps.log",
+      "evidence_class": "local_integration",
+      "what": "Probe of the fixed script (reproduction/fixed/reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631, check_search.py sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T12:26Z-12:27Z, with TMPDIR and npm_config_cache pointed into the session scratch directory (the cache a copy of the earlier runs' npm cache). Real ByteRover 3.16.1 on the offline path; no LLM, no port 18232.",
+      "command": "sh reproduction/restart-scope-probe.sh reproduction/fixed <out>",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:27:52Z",
+      "private_original": {
+        "name": "steps.log",
+        "bytes": 4320,
+        "sha256": "1b88247aa6960803b99d1cbaee9c2bd3d9d18572f2b93637ebeae4d03c52a0ca"
+      },
+      "published": {
+        "bytes": 2864,
+        "sha256": "f8d9e4da87369d1140f363b85cd7a1859c31520247dc87839ea5daa75cefb929"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 16
+        }
+      ]
+    }
+  ]
+}

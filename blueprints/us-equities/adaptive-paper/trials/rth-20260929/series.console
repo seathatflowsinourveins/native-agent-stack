@@ -1,0 +1,69 @@
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+10:00:05 ET rth-20260929 account 1: kill switch absent, clone at b528bb550463991bd3ca554ddf78e2a180aca301, engine files match frozen-b528bb55.SHA256SUMS
+10:00:05 ET key probe account 1: rc=0 http_status=200
+rth-20260929-1 scan start 10:00:05 ET (account 1)
+scan rc=0 end 10:00:14 ET
+{"rule": "10:00|G0.20|V250000|any", "session": "2026-09-29", "fired": 13, "candidates": ["BKYI", "IOVA", "BEX", "YMT", "AXTX"], "regime_factor": 1.0, "sha256": "8022e34e9f795d78a0bedf4468977b9a6066596f80df6b829ed11e49daf5a31d"}
+check rc=0 10:00:14 ET
+synthetic rc=0 10:00:19 ET
+paper start 10:00:19 ET
+paper rc=0 end 11:00:30 ET
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "passed", "flat": true, "evidence_class": "PAPER"}
+11:00:30 ET rth-20260929-1 rc=0: yes
+rth-20260929-2 scan start 11:00:30 ET (account 1)
+scan rc=0 end 11:00:38 ET
+{"rule": "10:00|G0.20|V250000|any", "session": "2026-09-29", "fired": 10, "candidates": ["BKYI", "IOVA", "BEX", "AXTX", "SSTI"], "regime_factor": 1.0, "sha256": "e5fd51e872373af6649c8772c02f0568c9b086d448512b656f89f8dafefcbbc2"}
+check rc=0 11:00:39 ET
+synthetic rc=0 11:00:43 ET
+paper start 11:00:43 ET
+paper rc=0 end 12:00:53 ET
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+{"status": "passed", "flat": true, "evidence_class": "PAPER"}
+12:00:53 ET rth-20260929-2 rc=0: yes
+rth-20260929-3 scan start 12:00:53 ET (account 1)
+scan rc=0 end 12:01:01 ET
+{"rule": "10:00|G0.20|V250000|any", "session": "2026-09-29", "fired": 10, "candidates": ["BKYI", "IOVA", "BEX", "AXTX", "SSTI"], "regime_factor": 1.0, "sha256": "7f9eedb9c7160a132158fce08b35fdb0b406c4e34532731e6bb023d4c416c323"}
+check rc=0 12:01:02 ET
+synthetic rc=0 12:01:06 ET
+paper start 12:01:06 ET
+paper rc=0 end 13:01:15 ET
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "passed", "flat": true, "evidence_class": "PAPER"}
+13:01:15 ET rth-20260929-3 rc=0: yes
+rth-20260929-4 scan start 13:01:15 ET (account 1)
+scan rc=0 end 13:01:23 ET
+{"rule": "10:00|G0.20|V250000|any", "session": "2026-09-29", "fired": 8, "candidates": ["BKYI", "IOVA", "BEX", "NCPL", "SSTI"], "regime_factor": 1.0, "sha256": "f962ad62c2a530cc0b32156b468d11d523ebb0abec77d1ac94c9bf8848985fe3"}
+check rc=0 13:01:23 ET
+synthetic rc=0 13:01:28 ET
+paper start 13:01:28 ET
+paper rc=0 end 14:01:50 ET
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "passed", "flat": true, "evidence_class": "PAPER"}
+14:01:50 ET rth-20260929-4 rc=0: yes
+rth-20260929-5 scan start 14:01:50 ET (account 1)
+scan rc=0 end 14:01:57 ET
+{"rule": "10:00|G0.20|V250000|any", "session": "2026-09-29", "fired": 8, "candidates": ["BKYI", "IOVA", "BEX", "NCPL", "SSTI"], "regime_factor": 1.0, "sha256": "2c63a65ee0a3ed18370f625f6f84f65590af818946e343a9ff7cd402c598f307"}
+check rc=0 14:01:57 ET
+synthetic rc=0 14:02:02 ET
+paper start 14:02:02 ET
+paper rc=0 end 15:02:19 ET
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "passed", "flat": true, "evidence_class": "PAPER"}
+15:02:19 ET rth-20260929-5 rc=0: yes
+rth-20260929-6 scan start 15:02:19 ET (account 1)
+scan rc=0 end 15:02:26 ET
+{"rule": "10:00|G0.20|V250000|any", "session": "2026-09-29", "fired": 8, "candidates": ["BKYI", "IOVA", "BEX", "NCPL", "SSTI"], "regime_factor": 1.0, "sha256": "b67a442b1161406f3b3accc6485bfdab42bda8334b8c2854d5a62dce302c9903"}
+check rc=0 15:02:26 ET
+synthetic rc=0 15:02:31 ET
+paper start 15:02:31 ET
+paper rc=0 end 15:44:16 ET
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "passed", "flat": true, "evidence_class": "PAPER"}
+15:44:16 ET rth-20260929-6 rc=0: yes
+15:44:16 ET series ends: past last start 1540 ET

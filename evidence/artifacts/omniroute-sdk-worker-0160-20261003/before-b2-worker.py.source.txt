@@ -1,0 +1,531 @@
+#!/usr/bin/env -S uv run --locked --script
+# /// script
+# requires-python = ">=3.13,<3.14"
+# dependencies = [
+#     "openai-codex==0.160.0",
+# ]
+# ///
+"""One native Codex SDK turn, or metadata preflight, through OmniRoute.
+
+Derived from openai/codex rust-v0.160.0, commit
+a956835d020762cb2b570053af06f643a11c0ecc, sdk/python/examples/{01,05,14}_*
+and sdk/python/src/openai_codex/{api,client,_run,async_client}.py. Preflight uses
+exactly pinned SDK internals in generated/v2_all.py and the native app-server
+request_processors/mcp_processor.rs. See README.md for sources.
+"""
+
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import os
+import re
+import sys
+import uuid
+from collections import Counter
+from pathlib import Path
+from urllib.parse import urlsplit
+
+from openai_codex import ApprovalMode, AsyncCodex, CodexConfig, Sandbox
+from openai_codex.async_client import AsyncCodexClient
+from openai_codex.generated.v2_all import (
+    ConfigReadResponse,
+    ListMcpServerStatusResponse,
+    SkillsListResponse,
+)
+from openai_codex.types import ReasoningEffort
+
+SDK_VERSION = "0.160.0"
+PROVIDER = "omniroute_runtime"
+DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
+DEFAULT_BASE_URL = "http://127.0.0.1:20128/v1"
+CLEANUP_TIMEOUT = 5.0
+
+
+def gateway_url(value: str) -> str:
+    """Keep the owned gateway and any explicit observer on HTTP loopback /v1."""
+    parsed = urlsplit(value)
+    if (
+        parsed.scheme != "http"
+        or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
+        or parsed.port is None
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.query
+        or parsed.fragment
+        or parsed.path.rstrip("/") != "/v1"
+    ):
+        raise argparse.ArgumentTypeError("expected a port-qualified HTTP loopback /v1 URL")
+    return value.rstrip("/")
+
+
+def request_id(value: str) -> str:
+    if not re.fullmatch(r"[A-Za-z0-9_.:-]{1,96}", value):
+        raise argparse.ArgumentTypeError("request id must be 1–96 ASCII identifier characters")
+    return value
+
+
+def positive_seconds(value: str) -> float:
+    seconds = float(value)
+    if not 0 < seconds <= 3600:
+        raise argparse.ArgumentTypeError(
+            "timeout must be greater than zero and at most 3600 seconds"
+        )
+    return seconds
+
+
+def runtime_config(args: argparse.Namespace) -> CodexConfig:
+    """Only the SDK child receives these supported native CLI overrides."""
+    prefix = f"model_providers.{PROVIDER}."
+    quoted = lambda value: json.dumps(value, ensure_ascii=False)  # noqa: E731
+    overrides = (
+        "model_provider=" + quoted(PROVIDER),
+        "model=" + quoted(args.model),
+        'model_reasoning_effort="max"',
+        # Native curated-plugin startup sync is unused by this worker.
+        # a956835d core-plugins/src/manager.rs:748-763; core/config.schema.json:7038.
+        "features.plugins=false",
+        prefix + 'name="OmniRoute runtime workers"',
+        prefix + "base_url=" + quoted(args.base_url),
+        prefix + 'wire_api="responses"',
+        prefix + "requires_openai_auth=false",
+        prefix + "supports_websockets=false",
+        prefix + 'http_headers={"x-request-id"=' + quoted(args.request_id) + "}",
+    )
+    if args.api_key_env:
+        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", args.api_key_env):
+            raise ValueError("api-key-env must name an environment variable")
+        overrides += (prefix + "env_key=" + quoted(args.api_key_env),)
+    # Native retry settings remain native. The caller may disarm them for a
+    # measured acceptance attempt; there is no wrapper retry or agent loop.
+    if args.no_provider_retries:
+        overrides += (prefix + "request_max_retries=0", prefix + "stream_max_retries=0")
+    env = {"CONTEXT_MODE_PROJECT_DIR": str(args.workspace.resolve())}
+    if args.codex_home:
+        env["CODEX_HOME"] = str(args.codex_home.resolve())
+    return CodexConfig(
+        codex_bin=str(args.codex_bin.resolve()) if args.codex_bin else None,
+        config_overrides=overrides,
+        cwd=str(args.workspace.resolve()),
+        env=env,
+        client_name="omniroute_codex_runtime_worker",
+        client_title="OmniRoute Codex runtime worker",
+    )
+
+
+def result_record(result) -> dict:
+    """Retain native snapshots; total is cumulative and last is not a turn sum."""
+    kinds = Counter(
+        item.model_dump(mode="json", by_alias=True).get("type") for item in result.items
+    )
+    return {
+        "status": result.status.value,
+        "turn_id": result.id,
+        "final_response": result.final_response,
+        "duration_ms": result.duration_ms,
+        "item_counts": dict(kinds),
+        "usage_status": "reported" if result.usage is not None else "unknown",
+        "usage_scope": "native_thread_cumulative" if result.usage is not None else None,
+        "usage": result.usage.model_dump(mode="json", by_alias=True)
+        if result.usage is not None
+        else None,
+    }
+
+
+def emit(value: dict) -> None:
+    print(json.dumps(value, ensure_ascii=False, separators=(",", ":")), flush=True)
+
+
+def initial_record(args: argparse.Namespace) -> dict:
+    return {
+        "request_id": args.request_id,
+        "requested_model": args.model,
+        "requested_effort": "max",
+        "provider": PROVIDER,
+        "model_inference_submitted": False,
+        "usage_status": "unknown",
+        "usage_scope": None,
+        "usage": None,
+    }
+
+
+def native_runtime(metadata) -> dict:
+    # Match the pinned SDK's _initialize_metadata.py normalization using public
+    # response fields. Low-level initialize() returns serverInfo=None on 0.160.0.
+    server = metadata.serverInfo
+    name = (server.name or "").strip() if server is not None else ""
+    version = (server.version or "").strip() if server is not None else ""
+    source = "serverInfo"
+    if not name or not version:
+        source = "userAgent"
+        user_agent = (metadata.userAgent or "").strip()
+        if "/" in user_agent:
+            parsed_name, parsed_version = user_agent.split("/", 1)
+        else:
+            parts = user_agent.split(maxsplit=1)
+            parsed_name = parts[0] if parts else ""
+            parsed_version = parts[1] if len(parts) == 2 else ""
+        name = name or parsed_name.strip()
+        version = version or parsed_version.strip()
+    if not name or not version or version.split()[0] != SDK_VERSION:
+        raise RuntimeError("native runtime does not match the qualified SDK pin")
+    return {"name": name, "version": version.split()[0], "metadata_source": source}
+
+
+def mcp_catalog_ready(server: dict) -> bool:
+    return bool(
+        server["configured"]
+        and server["enabled"]
+        and server["tool_names"]
+        and not server["tools_error"]
+    )
+
+
+def preflight_output(record: dict, *, catalog_details: bool = False) -> dict:
+    """Keep CLI receipts compact; explicit diagnostics retain native catalogs."""
+    if catalog_details:
+        return record
+    compact = dict(record)
+    if "mcp_servers" in record:
+        compact["mcp_servers"] = [
+            {
+                **{key: value for key, value in server.items() if key != "tool_names"},
+                "tool_count": len(server["tool_names"]),
+                "catalog_ready": mcp_catalog_ready(server),
+            }
+            for server in record["mcp_servers"]
+        ]
+    if "skills" in record:
+        available = {skill["name"] for skill in record["skills"] if skill["enabled"]}
+        compact["skills"] = {
+            "total_count": len(record["skills"]),
+            "enabled_count": sum(skill["enabled"] for skill in record["skills"]),
+            "required": {name: name in available for name in record["requirements"]["skills"]},
+        }
+    return compact
+
+
+async def run_preflight(
+    args: argparse.Namespace, *, sdk_factory=AsyncCodexClient, on_event=None
+) -> dict:
+    """Inspect native catalogs without a thread, model turn or tool call.
+
+    Exactly pinned SDK internals own a separate app-server for this invocation.
+    Native 0.160.0 ignores CLI profile selection in app-server mode; configuration
+    comes from CODEX_HOME/config.toml and supported config_overrides instead.
+    """
+    codex = sdk_factory(config=runtime_config(args))
+    phase = "initialize"
+    record = {
+        **initial_record(args),
+        "preflight": True,
+        "evidence_scope": "native_catalog_discovery",
+    }
+    try:
+        async with asyncio.timeout(args.timeout):
+            await codex.start()
+            record["native_runtime"] = native_runtime(await codex.initialize())
+            phase = "configuration_read"
+            effective = await codex.request(
+                "config/read",
+                {"cwd": str(args.workspace.resolve()), "includeLayers": False},
+                response_model=ConfigReadResponse,
+            )
+            record["effective_config"] = {
+                "model": effective.config.model,
+                "model_provider": effective.config.model_provider,
+                "model_reasoning_effort": effective.config.model_reasoning_effort.value
+                if effective.config.model_reasoning_effort is not None
+                else None,
+            }
+            if effective.config.model != args.model or effective.config.model_provider != PROVIDER:
+                raise RuntimeError("native configuration did not retain the requested routing")
+            # Config's public extra fields carry native MCP/agent configuration.
+            # Keep only names, enabled flags and routing metadata, never the
+            # full configuration, environment values, descriptions or paths.
+            extra = effective.config.model_extra or {}
+            configured_mcp = extra.get("mcp_servers") or {}
+            agents = extra.get("agents") or {}
+            record["agent_defaults"] = {
+                key: agents[key]
+                for key in (
+                    "enabled",
+                    "max_concurrent_threads_per_session",
+                    "default_subagent_model",
+                    "default_subagent_reasoning_effort",
+                )
+                if key in agents
+            }
+            record["configured_roles"] = [
+                {"name": name} for name, role in sorted(agents.items()) if isinstance(role, dict)
+            ]
+            phase = "mcp_discovery"
+            servers, cursor, seen_cursors = [], None, set()
+            while True:
+                page = await codex.request(
+                    "mcpServerStatus/list",
+                    {"cursor": cursor, "limit": 100, "detail": "full"},
+                    response_model=ListMcpServerStatusResponse,
+                )
+                for server in page.data:
+                    configured = configured_mcp.get(server.name)
+                    servers.append(
+                        {
+                            "name": server.name,
+                            "configured": isinstance(configured, dict),
+                            "enabled": isinstance(configured, dict)
+                            and configured.get("enabled", True) is True,
+                            # Without threadId, native status is null. Preserve
+                            # unknown; catalog discovery is not tool execution.
+                            "runtime_status": server.runtime_status.value
+                            if server.runtime_status is not None
+                            else None,
+                            "auth_status": server.auth_status.value,
+                            "tool_names": sorted(server.tools),
+                            "tools_error": server.tools_error is not None,
+                        }
+                    )
+                cursor = page.next_cursor
+                if cursor is None:
+                    break
+                if cursor in seen_cursors:
+                    raise RuntimeError("native MCP pagination did not advance")
+                seen_cursors.add(cursor)
+            record["mcp_servers"] = sorted(servers, key=lambda server: server["name"])
+            phase = "skills_discovery"
+            listed = await codex.request(
+                "skills/list",
+                {"cwds": [str(args.workspace.resolve())], "forceReload": True},
+                response_model=SkillsListResponse,
+            )
+            record["skills"] = [
+                {"name": skill.name, "enabled": skill.enabled, "scope": skill.scope.value}
+                for entry in listed.data
+                for skill in entry.skills
+            ]
+            record["skill_error_count"] = sum(len(entry.errors) for entry in listed.data)
+            available_mcp = {server["name"] for server in servers if mcp_catalog_ready(server)}
+            available_skills = {skill["name"] for skill in record["skills"] if skill["enabled"]}
+            record["requirements"] = {
+                "mcp": args.require_mcp,
+                "skills": args.require_skill,
+                "unavailable_mcp": sorted(set(args.require_mcp) - available_mcp),
+                "unavailable_skills": sorted(set(args.require_skill) - available_skills),
+            }
+            if on_event is not None:
+                on_event({"event": "preflight_discovered", **record})
+            phase = "require_capabilities"
+            record["status"] = (
+                "unavailable"
+                if record["requirements"]["unavailable_mcp"]
+                or record["requirements"]["unavailable_skills"]
+                else "ready"
+            )
+    except (TimeoutError, asyncio.CancelledError) as exc:
+        record.update(
+            status="deadline_exceeded" if isinstance(exc, TimeoutError) else "cancelled",
+            phase=phase,
+        )
+        if isinstance(exc, asyncio.CancelledError):
+            raise
+    except Exception as exc:
+        record.update(status="failed", error_type=type(exc).__name__, phase=phase)
+    finally:
+        try:
+            await asyncio.wait_for(codex.close(), CLEANUP_TIMEOUT)
+            record["cleanup_status"] = "closed"
+        except Exception as exc:
+            record.update(status="cleanup_failed", cleanup_status=type(exc).__name__)
+    return record
+
+
+async def run_worker(
+    args: argparse.Namespace, prompt: str, *, sdk_factory=AsyncCodex, on_event=emit
+) -> dict:
+    """Use native start/resume/turn/interrupt/close, with one overall deadline."""
+    codex = sdk_factory(config=runtime_config(args))
+    turn = None
+    phase = "initialize"
+    record = initial_record(args)
+    try:
+        async with asyncio.timeout(args.timeout):
+            await codex.__aenter__()
+            record["native_runtime"] = native_runtime(codex.metadata)
+            options = {
+                "cwd": str(args.workspace.resolve()),
+                "model": args.model,
+                "model_provider": PROVIDER,
+                "sandbox": Sandbox(args.sandbox),
+                "approval_mode": ApprovalMode(args.approval_mode),
+            }
+            phase = "thread_resume" if args.resume else "thread_start"
+            if args.resume:
+                thread = await codex.thread_resume(args.resume, **options)
+            else:
+                thread = await codex.thread_start(ephemeral=False, **options)
+            record["thread_id"] = thread.id
+            record["thread_mode"] = "resumed" if args.resume else "started"
+            selected = (await thread.read()).thread
+            if selected.model != args.model or selected.model_provider != PROVIDER:
+                raise RuntimeError("native thread did not retain the requested model and provider")
+            on_event({"event": "thread_ready", **record})
+            phase = "turn_start"
+            # Codex owns tools, MCP discovery, skills, caching and compaction.
+            # There is no extra skill carrier or Responses prompt rewrite here.
+            record["model_inference_submitted"] = True
+            turn = await thread.turn(prompt, model=args.model, effort=ReasoningEffort.max)
+            phase = "turn_run"
+            result = await turn.run()
+            record.update(result_record(result))
+            phase = "thread_status"
+            record["thread_status"] = (await thread.read()).thread.status.model_dump(
+                mode="json", by_alias=True
+            )
+            if args.native_result:
+                phase = "retain_native_result"
+                native = {
+                    **record,
+                    "items": [item.model_dump(mode="json", by_alias=True) for item in result.items],
+                }
+                fd = os.open(args.native_result, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                with os.fdopen(fd, "w", encoding="utf-8") as output:
+                    json.dump(native, output, ensure_ascii=False, indent=2)
+                    output.write("\n")
+    except (TimeoutError, asyncio.CancelledError) as exc:
+        record.update(
+            status="deadline_exceeded" if isinstance(exc, TimeoutError) else "cancelled",
+            phase=phase,
+        )
+        if turn is not None:
+            try:
+                await asyncio.wait_for(turn.interrupt(), CLEANUP_TIMEOUT)
+                record["interrupt_status"] = "requested"
+            except Exception as interrupt_error:
+                record["interrupt_status"] = type(interrupt_error).__name__
+        if isinstance(exc, asyncio.CancelledError):
+            raise
+    except Exception as exc:
+        # Error messages may carry private tool/provider content. Leave them in
+        # native private state; the public-facing result retains type and phase.
+        record.update(status="failed", error_type=type(exc).__name__, phase=phase)
+    finally:
+        try:
+            await asyncio.wait_for(codex.close(), CLEANUP_TIMEOUT)
+            record["cleanup_status"] = "closed"
+        except Exception as exc:
+            record.update(status="cleanup_failed", cleanup_status=type(exc).__name__)
+    return record
+
+
+def parse_args(argv=None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--workspace", type=Path, default=Path.cwd())
+    parser.add_argument("--prompt", default="-", help="one bounded task, or - to read stdin")
+    parser.add_argument("--resume", help="native thread id from an earlier invocation")
+    parser.add_argument(
+        "--preflight", action="store_true", help="inspect native catalogs without model inference"
+    )
+    parser.add_argument(
+        "--catalog-details",
+        action="store_true",
+        help="preflight includes complete sanitized tool and skill catalogs in its result",
+    )
+    parser.add_argument(
+        "--require-mcp",
+        action="append",
+        default=[],
+        help="preflight requires this enabled server's native tool catalog; repeatable",
+    )
+    parser.add_argument(
+        "--require-skill",
+        action="append",
+        default=[],
+        help="preflight requires this enabled native skill name; repeatable",
+    )
+    parser.add_argument(
+        "--model",
+        default=DEFAULT_MODEL,
+        help="explicit native/gateway model id; default Sol/max route",
+    )
+    parser.add_argument("--base-url", type=gateway_url, default=DEFAULT_BASE_URL)
+    parser.add_argument("--request-id", type=request_id, default=uuid.uuid4().hex)
+    parser.add_argument("--timeout", type=positive_seconds, default=300.0)
+    parser.add_argument(
+        "--sandbox",
+        choices=[Sandbox.read_only.value, Sandbox.workspace_write.value],
+        default=Sandbox.workspace_write.value,
+    )
+    parser.add_argument(
+        "--approval-mode",
+        choices=[mode.value for mode in ApprovalMode],
+        default=ApprovalMode.deny_all.value,
+    )
+    parser.add_argument(
+        "--codex-bin",
+        type=Path,
+        help="explicit native 0.160.0 binary; defaults to the pinned SDK bundle",
+    )
+    parser.add_argument(
+        "--codex-home",
+        type=Path,
+        help="optional private worker config/state; inherited when omitted",
+    )
+    parser.add_argument(
+        "--api-key-env",
+        help="optional gateway credential variable name; no credential value is accepted",
+    )
+    parser.add_argument(
+        "--no-provider-retries",
+        action="store_true",
+        help="disarm native request/stream retries for a measured attempt",
+    )
+    parser.add_argument(
+        "--native-result", type=Path, help="retain full native items in a new private 0600 file"
+    )
+    args = parser.parse_args(argv)
+    if not args.workspace.is_dir():
+        parser.error("workspace must be an existing directory")
+    if args.codex_home and not args.codex_home.is_dir():
+        parser.error("codex-home must be an existing private state directory")
+    if not args.model.strip():
+        parser.error("model must be nonempty")
+    if (args.require_mcp or args.require_skill) and not args.preflight:
+        parser.error("require-mcp and require-skill require --preflight")
+    if args.catalog_details and not args.preflight:
+        parser.error("catalog-details requires --preflight")
+    if any(not name.strip() for name in [*args.require_mcp, *args.require_skill]):
+        parser.error("required capability names must be nonempty")
+    if args.preflight and (args.resume or args.native_result):
+        parser.error("preflight cannot resume a thread or retain turn items")
+    return args
+
+
+def main() -> int:
+    args = parse_args()
+    prompt = ""
+    if not args.preflight:
+        prompt = sys.stdin.read() if args.prompt == "-" else args.prompt
+    if not args.preflight and not prompt.strip():
+        raise SystemExit("prompt must contain a bounded task")
+    try:
+        result = asyncio.run(run_preflight(args) if args.preflight else run_worker(args, prompt))
+    except KeyboardInterrupt:
+        emit(
+            {
+                "event": "cancelled",
+                "request_id": args.request_id,
+                "usage_status": "unknown",
+                "usage": None,
+            }
+        )
+        return 130
+    output = (
+        preflight_output(result, catalog_details=args.catalog_details) if args.preflight else result
+    )
+    emit({"event": "result", **output})
+    return 0 if result["status"] in {"completed", "ready"} else 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

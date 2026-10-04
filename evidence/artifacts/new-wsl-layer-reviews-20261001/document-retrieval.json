@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "layer_id": "document-retrieval",
+  "verdict": "confirmed",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "Representative sealed-corpus recall, repeatable warm/cold latency and index freshness remain unestablished.",
+      "OCR/inferred layouts and combined ingestion-to-grounded-answer quality remain unqualified."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "qmd",
+      "repository": "https://github.com/tobi/qmd",
+      "pin_of_record": "2.8.3",
+      "pin_source": "manifests/stack.json:758; adoption/pins-linux-x86_64.json:87",
+      "source_pinned_url": "https://github.com/tobi/qmd/blob/v2.8.3/README.md",
+      "upstream_currency": "Latest v2.8.3, confirmed by GitHub releases/latest and npm latest metadata.",
+      "native_install": {
+        "command": "npm install --global @tobilu/qmd@2.8.3",
+        "source": "https://github.com/tobi/qmd/blob/v2.8.3/README.md",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "npm test",
+        "source": "https://github.com/tobi/qmd/blob/v2.8.3/package.json",
+        "evidence_class": "source_review"
+      }
+    },
+    {
+      "component_id": "markitdown",
+      "repository": "https://github.com/microsoft/markitdown",
+      "pin_of_record": "0.1.8",
+      "pin_source": "manifests/stack.json:575; adoption/pins-linux-x86_64.json:174",
+      "source_pinned_url": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md",
+      "upstream_currency": "Latest v0.1.8: https://github.com/microsoft/markitdown/releases/tag/v0.1.8; landscape's 0.1.7 remains historical.",
+      "native_install": {
+        "command": "uv tool install markitdown==0.1.8",
+        "source": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "pytest",
+        "source": "https://github.com/microsoft/markitdown/blob/v0.1.8/.github/workflows/tests.yml",
+        "evidence_class": "source_review"
+      }
+    },
+    {
+      "component_id": "poppler",
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "pin_of_record": "26.09.0",
+      "pin_source": "manifests/stack.json:1809,1812; no poppler ID in frozen Linux tools pins",
+      "source_pinned_url": "https://poppler.freedesktop.org/poppler-26.09.0.tar.xz",
+      "upstream_currency": "Official latest stable 26.09.0, released 2026-09-03: https://poppler.freedesktop.org/",
+      "native_install": {
+        "command": "cmake .. -DCMAKE_INSTALL_PREFIX=\"$OWNED_PREFIX\" -DCMAKE_BUILD_TYPE=release && make && make install",
+        "source": "poppler-26.09.0/INSTALL:9-16 in the digest-verified official archive",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "pdftotext -bbox-layout -enc UTF-8 \"$QUALIFIED_PDF\" -",
+        "source": "poppler-26.09.0/utils/pdftotext.1:99,113 in the same archive",
+        "evidence_class": "source_review"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Context Hub",
+      "repository": "https://github.com/andrewyng/context-hub",
+      "verdict": "Current/latest 0.1.4 supplies curated developer docs; complementary to controlled local-document ingestion. Retained content grew by 85 tokens.",
+      "sources": [
+        "https://github.com/andrewyng/context-hub/blob/v0.1.4/README.md"
+      ]
+    },
+    {
+      "name": "Docling",
+      "repository": "https://github.com/docling-project/docling",
+      "verdict": "Preferred source-reviewed challenger when layout/table/OCR is required; models have separate licenses. Must pass the target corpus and provenance/answer oracle.",
+      "sources": [
+        "https://github.com/docling-project/docling/blob/v2.131.0/README.md"
+      ]
+    },
+    {
+      "name": "LlamaIndex",
+      "repository": "https://github.com/run-llama/llama_index",
+      "verdict": "Selective core/connectors remain credible for an actual ingestion gap; no retained comparison justifies broad pipeline adoption for scoped Markdown search.",
+      "sources": [
+        "https://github.com/run-llama/llama_index/blob/v0.14.25/README.md"
+      ]
+    }
+  ],
+  "corrections": [],
+  "evidence_assessment": [
+    "QMD installed --help/--version expose BM25 search, scoped collections and source-body get at 2.8.3. GitHub v2.8.3 release notes add approval/skip handling for project-local update commands; do not bypass that native behavior.",
+    "Reuse evidence/artifacts/foundation-rd-20260921/qmd-comparison.json: BM25/hybrid recall@3 both 0.5 and reported mean latency 5/10328 ms. Retain its timeout exit 124 and incomplete corpus-seal/single-order limitations; no universal ranking follows.",
+    "Poppler archive independently fetched without installation; sha256 8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e matches manifests/stack.json:1812. This source_pin is an archive digest, not a Git commit.",
+    "MarkItDown v0.1.8 README documents optional OCR/LLM plugins. Existing HTML acceptance does not qualify those paths or arbitrary PDF/Office conversion.",
+    "Poppler's retained designed born-digital fixtures are local integration/synthetic evidence, not general layout/OCR or answer-quality acceptance. All listed installation/test commands remain unexecuted in this review."
+  ],
+  "failed_access": [
+    {
+      "source": "https://github.com/tsdgeos/poppler_mirror/tree/poppler-26.09.0",
+      "result": "Guessed mirror tag INSTALL/CMakeLists.txt returned HTTP 404, exit 1. Recovered from the official versioned tarball and verified its digest."
+    }
+  ],
+  "omissions": [
+    "Linux tools pins carry QMD and MarkItDown; Poppler is a separate stack/archive pin, not a bootstrap tools entry.",
+    "No OCR models downloaded, corpus ingestion, embedding or model evaluation performed."
+  ],
+  "next_wave": [
+    "For a concrete OCR/layout gap, compare Docling's upstream converter against the selected MarkItDown/Poppler route on the same sealed corpus with source/geometry and grounded-answer negative cases."
+  ],
+  "reopen_on": [
+    "Representative recall/freshness failure or a qualified layout/OCR comparison can change the scoped selection."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

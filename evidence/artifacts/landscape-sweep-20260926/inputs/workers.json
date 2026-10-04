@@ -1,0 +1,225 @@
+{
+ "catalog": "foundation",
+ "layer_id": "workers",
+ "title": "Workers and task ownership",
+ "requirement": "Delegate bounded independent work, preserve owned edits and actual failed results, and integrate only after relevant review.",
+ "research_status": "comparison_required",
+ "next_action": "Freeze one representative coding/research task with output, cancellation and edit-ownership checks; compare native single-agent and selected worker graph with complete returned usage and independent acceptance.",
+ "requirement_sha256": "84c867267a451e87491d14819310ec956908c15dedc94809e631611a467c6bd0",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "claude-code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "pin": "2.1.278",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "worktrunk",
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "pin": "0.79.0",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Codex native workers",
+   "repository": "https://github.com/openai/codex",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Codex for Claude companion",
+   "repository": "https://github.com/openai/codex-plugin-cc",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Beads",
+   "repository": "https://github.com/gastownhall/beads",
+   "disposition": "conditional"
+  },
+  {
+   "name": "DeerFlow",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Deep Agents",
+   "repository": "https://github.com/langchain-ai/deepagents",
+   "disposition": "conditional"
+  },
+  {
+   "name": "OpenHands SDK",
+   "repository": "https://github.com/OpenHands/software-agent-sdk",
+   "disposition": "conditional"
+  },
+  {
+   "name": "OpenHands Agent Canvas",
+   "repository": "https://github.com/OpenHands/OpenHands",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Microsoft Agent Framework",
+   "repository": "https://github.com/microsoft/agent-framework",
+   "disposition": "conditional"
+  },
+  {
+   "name": "LangGraph",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal",
+   "disposition": "out_of_scope"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "beads",
+   "repository": "https://github.com/gastownhall/beads",
+   "pin": "1.3.0",
+   "upstream": {
+    "latest": "v1.3.0",
+    "released_at": "2026-09-15",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 27430,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "claude-code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "pin": "2.1.278",
+   "upstream": {
+    "latest": "v2.1.283",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 148105,
+    "license": null,
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "codex",
+   "repository": "https://github.com/openai/codex",
+   "pin": "0.155.1",
+   "upstream": {
+    "latest": "rust-v0.157.0",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 126487,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "codex-for-claude",
+   "repository": "https://github.com/openai/codex-plugin-cc/tree/v1.0.6",
+   "pin": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+   "upstream": {
+    "latest": "v1.0.6",
+    "released_at": "2026-07-08",
+    "prerelease": false,
+    "pushed_at": "2026-07-08",
+    "stars": 33593,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "systemd",
+   "repository": "https://github.com/systemd/systemd",
+   "pin": "255.4-1ubuntu8.17",
+   "upstream": {
+    "latest": "v262",
+    "released_at": "2026-09-22",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 16747,
+    "license": "GPL-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  },
+  {
+   "id": "worktrunk",
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "pin": "0.79.0",
+   "upstream": {
+    "latest": "v0.79.0",
+    "released_at": "2026-09-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 8413,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "No executed head-to-head comparison exists between native workers and any challenger. The 2026-09-21 refresh installed none of them (docs/candidate-quality-review-20260921.md lines 55-58).",
+  "No model-child run used a Worktrunk worktree. The fixture used Claude's native isolation: worktree (blueprints/convergence-practice/native-worker/README.md lines 10-11 and 42-44). Worktrunk's dirty-removal refusal was observed on 0.78.0, not the 0.79.0 pin (blueprints/convergence-practice/wsl-native",
+  "Native Workflow hard crash, physical-host reboot, remote provider cancellation and external exactly-once effects are unqualified (docs/foundation-convergence-20260921.md lines 95-100).",
+  "Complete accounting is unresolved: recovery native cumulative usage exceeds deduplicated persisted usage by 205701 tokens (decisions.json line 2624).",
+  "Worker recovery covers one synthetic same-host task. The restricted Bash-only role is unqualified (decisions.json lines 2348-2350)."
+ ],
+ "overturn_when": "A real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and one challenger passes frozen cancellation, replay, ownership and integration cases.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/HKUDS/DeepCode",
+   "https://github.com/gastownhall/gastown",
+   "https://github.com/nimbalyst/nimbalyst"
+  ]
+ },
+ "known_repositories": [
+  "anthropics/claude-code",
+  "bytedance/deer-flow",
+  "gastownhall/beads",
+  "gastownhall/gastown",
+  "generalaction/emdash",
+  "hkuds/deepcode",
+  "johannesjo/parallel-code",
+  "langchain-ai/deepagents",
+  "langchain-ai/langgraph",
+  "loopx-project/loopx",
+  "max-sixty/worktrunk",
+  "microsoft/agent-framework",
+  "nimbalyst/nimbalys",
+  "openai/codex",
+  "openai/codex-plugin-cc",
+  "openhands/openhands",
+  "openhands/software-agent-sdk",
+  "temporalio/temporal"
+ ],
+ "seeded_candidates_20260926": []
+}

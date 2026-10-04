@@ -1,0 +1,22 @@
+{
+  "id": "cur-1790386195164",
+  "input": {
+    "context": "Auth uses a fixed-window rate limiter and issues a JWT-like token with a 24 hour (86400s) expiry via issueToken() in src/auth.ts",
+    "files": [
+      "src/auth.ts"
+    ]
+  },
+  "operations": [],
+  "startedAt": 1790386195163,
+  "status": "error",
+  "summary": {
+    "added": 0,
+    "deleted": 0,
+    "failed": 0,
+    "merged": 0,
+    "updated": 0
+  },
+  "taskId": "<uuid>",
+  "completedAt": 1790386207920,
+  "error": "request (12351 tokens) exceeds the available context size (8192 tokens), try increasing it"
+}

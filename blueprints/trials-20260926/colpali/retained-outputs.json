@@ -1,0 +1,1639 @@
+{
+  "schema_version": 1,
+  "description": "Sanitized historical ColPali/ViDoRe native outputs, environment data and local integration source/checks. Current repairs and synthetic checks are distinguished from the historical model runs; removed installable files are recorded only as provenance.",
+  "sanitization_policy": "Private originals are not published; their name, byte count and sha256 are recorded here. They were in this session's scratch directory: the first pass's trees, which the first polish pass deleted on 2026-09-26 at 06:39Z (../host-cleanup-20260926/first-pass-scratch-trees/), or the port's and polish passes' own trees (trials-2, trials-pol), which remain (../README.md#host-state). Published copies replace the session scratch path with <scratch>, the home directory with ~, the user name with <user> (also inside underscore-encoded paths), UUID-shaped identifiers with <uuid>, and credential values with <redacted>; excerpts mark every omitted line range in place. Files marked verbatim are byte-for-byte copies. Each published copy passed scripts/validate.py PRIVATE_CONTENT and a credential-shape check.",
+  "outputs": [
+    {
+      "path": "native-outputs/install-colpali-engine-0.3.18-with-vidore-benchmark-5.0.0-conflict.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "uv resolver refusal for colpali-engine==0.3.18 together with vidore-benchmark==5.0.0 (transformers>=5.3.0 versus sentence-transformers<4 requiring transformers<5).",
+      "command": "uv pip install colpali-engine==0.3.18 vidore-benchmark==5.0.0",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:23:39Z",
+      "private_original": {
+        "name": "install-colpali-vidore.log",
+        "bytes": 897,
+        "sha256": "783d62b7c0f3de33bf126070f98a9b17cf728ea0c8bd42b15eaca3a4caf7b506"
+      },
+      "published": {
+        "bytes": 897,
+        "sha256": "783d62b7c0f3de33bf126070f98a9b17cf728ea0c8bd42b15eaca3a4caf7b506"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/install-vidore-benchmark-5.0.0-without-extras.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "vidore-benchmark 5.0.0 installed without the colpali-engine extra into a first venv (.venv-vidore).",
+      "command": "uv pip install vidore-benchmark==5.0.0",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:28:40Z",
+      "private_original": {
+        "name": "install-vidore.log",
+        "bytes": 2712,
+        "sha256": "cb997481eb190233e976bdee3a659b46449c993ddc35a4158d8a0539ec634720"
+      },
+      "published": {
+        "bytes": 2712,
+        "sha256": "cb997481eb190233e976bdee3a659b46449c993ddc35a4158d8a0539ec634720"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/venv-vidore-create.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "uv venv for the first environment (.venv-vidore).",
+      "command": "uv venv --python 3.11 .venv-vidore",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:28:31Z",
+      "private_original": {
+        "name": "venv-vidore-create.log",
+        "bytes": 116,
+        "sha256": "25469fb2df9e2afe27b17e0551bb6c8385b9cbac7e76b806cdf282ef8cff3674"
+      },
+      "published": {
+        "bytes": 116,
+        "sha256": "25469fb2df9e2afe27b17e0551bb6c8385b9cbac7e76b806cdf282ef8cff3674"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/install-mteb-2.21.8-colpali-engine-0.3.18.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "An install the first trial pass ran but did not report: into a separate venv (.venv, created 01:23Z) uv resolved colpali-engine 0.3.18 together with mteb 2.21.8, sentence-transformers 6.1.0, transformers 5.17.0 and torch 2.13.0 (93 packages installed; the venv's dist-info directories confirm those versions). The exact command and exit code were not retained. No evaluation ran in that environment, so the MTEB path that vidore-benchmark's main README now points to was installed but not exercised.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:28:31Z",
+      "private_original": {
+        "name": "install-mteb-colpali.log",
+        "bytes": 3202,
+        "sha256": "90e14bd4300e1972ca25bb50817ec125b758ee42c25221a4b2a73b4918d67e7e"
+      },
+      "published": {
+        "bytes": 3202,
+        "sha256": "90e14bd4300e1972ca25bb50817ec125b758ee42c25221a4b2a73b4918d67e7e"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/eval-colqwen2-v1.0-attempt1-missing-extra.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "First colqwen2 attempt ran from the venv without the colpali-engine extra: ImportError asking for vidore-benchmark[colpali-engine]. A setup mistake of the trial, kept as a failed attempt.",
+      "command": "vidore-benchmark evaluate-retriever --model-class colqwen2 --model-name vidore/colqwen2-v1.0 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:36:47Z",
+      "private_original": {
+        "name": "eval-colqwen2-v1.0-tabfquad.log",
+        "bytes": 7228,
+        "sha256": "a8a6c443d1fb5f5d1935b09266a147bb050b841588385c16b2d37df43686be3a"
+      },
+      "published": {
+        "bytes": 6634,
+        "sha256": "ea8cbda9b71814d189648a61e7462a379a44935e8665bfedae1290ce891481c7"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 6
+        },
+        {
+          "rule": "user name",
+          "replacements": 4
+        },
+        {
+          "rule": "wrapped session-id fragment",
+          "replacements": 4
+        },
+        {
+          "rule": "wrapped session-id tail fragment",
+          "replacements": 4
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/venv-combined-create.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "uv venv for the combined environment.",
+      "command": "uv venv --python 3.11 .venv-combined",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:37:26Z",
+      "private_original": {
+        "name": "venv-combined-create.log",
+        "bytes": 120,
+        "sha256": "bd3994fd6bbc072d03333b2f3823416d987878191faabfbe4981c4df7124c1bb"
+      },
+      "published": {
+        "bytes": 120,
+        "sha256": "bd3994fd6bbc072d03333b2f3823416d987878191faabfbe4981c4df7124c1bb"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/install-vidore-benchmark-5.0.0-colpali-engine-extra.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "vidore-benchmark's documented extras install; resolved colpali-engine 0.3.13 and transformers 4.57.6 (94 packages).",
+      "command": "uv pip install --python .venv-combined/bin/python \"vidore-benchmark[colpali-engine]==5.0.0\"",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:37:43Z",
+      "private_original": {
+        "name": "install-combined.log",
+        "bytes": 3312,
+        "sha256": "b7aa96b907b8d0bf850736bd22800a0d71a9f2cdd3eed67154ff7a0f7eb9786f"
+      },
+      "published": {
+        "bytes": 3312,
+        "sha256": "b7aa96b907b8d0bf850736bd22800a0d71a9f2cdd3eed67154ff7a0f7eb9786f"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/eval-colqwen2-v1.0-attempt2.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "colqwen2 retriever with vidore/colqwen2-v1.0 in the combined environment (transformers 4.57.6), run with HF_HUB_OFFLINE=1 before the model was cached with a refs/main pointer: OSError, could not reach huggingface.co to load the files. A setup error of the trial, kept as a failed attempt.",
+      "command": "vidore-benchmark evaluate-retriever --model-class colqwen2 --model-name vidore/colqwen2-v1.0 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:38:42Z",
+      "private_original": {
+        "name": "eval-colqwen2-v1.0-tabfquad-combined.log",
+        "bytes": 22015,
+        "sha256": "687184203781fe0269571a55b9c1995bfee64c82a346ecd139512ae4e7cfeb60"
+      },
+      "published": {
+        "bytes": 21277,
+        "sha256": "5137011de468f6256515f4ea978627357631b273b9d430364bc25778829a507f"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 6
+        },
+        {
+          "rule": "user name",
+          "replacements": 16
+        },
+        {
+          "rule": "wrapped session-id fragment",
+          "replacements": 16
+        },
+        {
+          "rule": "wrapped session-id tail fragment",
+          "replacements": 16
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/eval-colqwen2-v1.0-attempt3.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Same, offline mode on: ConnectionError, couldn't reach 'vidore/tabfquad_test_subsampled' on the Hub (OfflineModeIsEnabled): datasets 5.0.1's load_dataset still asked the Hub for the dataset although its snapshot was cached. A setup issue, kept as a failed attempt.",
+      "command": "vidore-benchmark evaluate-retriever --model-class colqwen2 --model-name vidore/colqwen2-v1.0 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:40:13Z",
+      "private_original": {
+        "name": "eval-colqwen2-v1.0-tabfquad-combined2.log",
+        "bytes": 9743,
+        "sha256": "2e47d136e498acc32591dcfaa094b55a4804d39e7b53d2bdd502962fe41f78bd"
+      },
+      "published": {
+        "bytes": 9125,
+        "sha256": "9ba70aec32abe97ddf353769cd1a233426c26757fbbf40122b70e1fd3a6fb09a"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 6
+        },
+        {
+          "rule": "user name",
+          "replacements": 6
+        },
+        {
+          "rule": "wrapped session-id fragment",
+          "replacements": 6
+        },
+        {
+          "rule": "wrapped session-id tail fragment",
+          "replacements": 6
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/eval-colqwen2-v1.0-attempt4.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Repeat of attempt 3 with the same ConnectionError (OfflineModeIsEnabled).",
+      "command": "vidore-benchmark evaluate-retriever --model-class colqwen2 --model-name vidore/colqwen2-v1.0 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:40:49Z",
+      "private_original": {
+        "name": "eval-colqwen2-v1.0-tabfquad-combined3.log",
+        "bytes": 9798,
+        "sha256": "f95bbfb774c2e33570ced124774c728c8c71f34feb0a0398f09f60301ffc9042"
+      },
+      "published": {
+        "bytes": 9180,
+        "sha256": "20ac740d592cfe8c6f3a72deb4de4b5e476eb5f7dd097e66fb00a67903f0967f"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 6
+        },
+        {
+          "rule": "user name",
+          "replacements": 6
+        },
+        {
+          "rule": "wrapped session-id fragment",
+          "replacements": 6
+        },
+        {
+          "rule": "wrapped session-id tail fragment",
+          "replacements": 6
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/eval-colqwen2-v1.0-attempt5.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Network allowed, transformers 4.57.6: ColQwen2Processor.from_pretrained('vidore/colqwen2-v1.0') raises TypeError: expected str, bytes or os.PathLike object, not NoneType in transformers processing_utils get_processor_dict (traceback lines 1395/1081).",
+      "command": "vidore-benchmark evaluate-retriever --model-class colqwen2 --model-name vidore/colqwen2-v1.0 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:41:43Z",
+      "private_original": {
+        "name": "eval-colqwen2-v1.0-tabfquad-combined4.log",
+        "bytes": 11195,
+        "sha256": "554d6c749b67fce1915b849e679ab81b42dbe8330f7a5c7224348bfea742a1ca"
+      },
+      "published": {
+        "bytes": 10565,
+        "sha256": "32f36acc152e5c6a87214236685d4a65099b9916497db4b8edf91072c3eb0055"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 6
+        },
+        {
+          "rule": "user name",
+          "replacements": 7
+        },
+        {
+          "rule": "wrapped session-id fragment",
+          "replacements": 7
+        },
+        {
+          "rule": "wrapped session-id tail fragment",
+          "replacements": 7
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/eval-colqwen2-v1.0-attempt6.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Same command after the downgrade to transformers 4.53.1 (01:42:21Z): the same TypeError (traceback lines 1307/992 of that version's processing_utils). 4.53.1 and 4.57.6 are the two ends of colpali-engine 0.3.13's range; versions in between were not tried.",
+      "command": "vidore-benchmark evaluate-retriever --model-class colqwen2 --model-name vidore/colqwen2-v1.0 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4",
+      "exit_code": 1,
+      "observed": "2026-09-26T01:42:48Z",
+      "private_original": {
+        "name": "eval-colqwen2-v1.0-tabfquad-combined5.log",
+        "bytes": 11079,
+        "sha256": "08e0015ee7579a5b85ed5418e96d0e74a759539e8790762069f01fcf20c4f0d4"
+      },
+      "published": {
+        "bytes": 10449,
+        "sha256": "91e283091f646becbe99f3d0076537ad8bb051d968d00f32d891ca7884f07636"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 6
+        },
+        {
+          "rule": "user name",
+          "replacements": 7
+        },
+        {
+          "rule": "wrapped session-id fragment",
+          "replacements": 7
+        },
+        {
+          "rule": "wrapped session-id tail fragment",
+          "replacements": 7
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/install-transformers-4.53.1.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Downgrade of the combined environment from transformers 4.57.6 to 4.53.1 (floor of colpali-engine 0.3.13's range) to test the colqwen2 TypeError; every colpali-v1.3 run of the first pass used this environment.",
+      "command": "uv pip install --python .venv-combined/bin/python transformers==4.53.1",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:42:21Z",
+      "private_original": {
+        "name": "install-transformers-pin.log",
+        "bytes": 380,
+        "sha256": "c72ccfa86a5b3356b280085bfc204bada744e7707afeb5fb9eb7f6333dec6d07"
+      },
+      "published": {
+        "bytes": 380,
+        "sha256": "c72ccfa86a5b3356b280085bfc204bada744e7707afeb5fb9eb7f6333dec6d07"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/hf-download-model.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "hf download into the trial's private HF_HOME (printed snapshot path).",
+      "command": "hf download ...",
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "hf-download-model.log",
+        "bytes": 567,
+        "sha256": "7c244c98fefd497044dbf9b99fa6a446f3303c1ff061eeb1bc0a9b2a7665c16e"
+      },
+      "published": {
+        "bytes": 476,
+        "sha256": "88bb0082efaea12764858f8294b57743f99583d99202bac261d3fe3f2affa0d6"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/hf-download-base.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "hf download into the trial's private HF_HOME (printed snapshot path).",
+      "command": "hf download ...",
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "hf-download-base.log",
+        "bytes": 352,
+        "sha256": "b5a635bd627c64cf6465b3b0ff14fad02de113512b63f0aaf745f60066448326"
+      },
+      "published": {
+        "bytes": 261,
+        "sha256": "515e04b71422ae7851236bb9b1c8208ddce03c5335dfa44b543ad6df09a3d0e2"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/hf-download-dataset.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "hf download into the trial's private HF_HOME (printed snapshot path).",
+      "command": "hf download ...",
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "hf-download-dataset.log",
+        "bytes": 365,
+        "sha256": "fdbcc325ed4b6d9470a9002e2ed826a67a26d56c6db8bb62eaafcb5e52f0c668"
+      },
+      "published": {
+        "bytes": 274,
+        "sha256": "7a959cb12b30d8c8f6b8123d0cc538008aee674e77db1f5318865ba8201574cf"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/hf-download-model-main.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "hf download into the trial's private HF_HOME (printed snapshot path).",
+      "command": "hf download ...",
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "hf-download-model-main.log",
+        "bytes": 352,
+        "sha256": "9babf86259d412172d18b7e14c79c8881f8dbbf420d897e61a2a304f329bc84a"
+      },
+      "published": {
+        "bytes": 261,
+        "sha256": "95932dc86abe3f6cfe1849b77a0779590911285feaa3f8fc3ccd553f44de0dff"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/hf-download-base-main.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "hf download into the trial's private HF_HOME (printed snapshot path).",
+      "command": "hf download ...",
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "hf-download-base-main.log",
+        "bytes": 214,
+        "sha256": "43da8c7334477c9d1f8589ce87f54465784b1ffccc062e1985ab70ddb5c4ec89"
+      },
+      "published": {
+        "bytes": 123,
+        "sha256": "2dbd5e150ae016a8ed95627d017287e0a6cdb53d33eb34b82f3d832220d4fbc2"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/hf-download-dataset-main.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "hf download into the trial's private HF_HOME (printed snapshot path).",
+      "command": "hf download ...",
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "hf-download-dataset-main.log",
+        "bytes": 227,
+        "sha256": "f9c057fc4a152c2ed9d8b4841817146e971036ae8fa2fe54ed097147664c41a2"
+      },
+      "published": {
+        "bytes": 136,
+        "sha256": "f1c31b9873549014feb5f190b0e95b9b3f33afa0e88ac3adb4fea529c742d204"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/hf-download-colpali-adapter.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "hf download into the trial's private HF_HOME (printed snapshot path).",
+      "command": "hf download ...",
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "hf-download-colpali-adapter.log",
+        "bytes": 351,
+        "sha256": "bceb5672eb0efebb4b9977b27c5d5a9427a5f126b19e892cc1af17aaeac620b1"
+      },
+      "published": {
+        "bytes": 260,
+        "sha256": "df097e6a7ac4bf7f2b3162d8510341664a57565ccb5b0aa1e7925c11acbfebbd"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/hf-download-colpali-base.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "hf download into the trial's private HF_HOME (printed snapshot path).",
+      "command": "hf download ...",
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "hf-download-colpali-base.log",
+        "bytes": 366,
+        "sha256": "f117dfc7894319fd8635e199b3525b43229fc342097dc614877ca5d8a9191680"
+      },
+      "published": {
+        "bytes": 275,
+        "sha256": "ea310dbd97faf60ea436e1730bde6b8303f259ab397e81565974cffffa84939d"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/eval-colpali-v1.3-full280-cpu-interrupted.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "First pass, full 280-row split on CPU (CUDA_VISIBLE_DEVICES='' in local-integration/run_eval_colpali.sh, whose set -x trace opens this log). Queries finished (7 pre-batches, 5 min 20 s); the CLI then embeds all 280 row images (7 pre-batches x 10 batches of 4). The first 6 of those 70 image batches finished at elapsed 2:42, 5:59, 9:47, 13:24, 17:11 and 21:14 of the document pass: 162, 197, 228, 217, 227 and 243 s per batch. tqdm's s/it column (162.54 to 224.56) is its smoothed rate (a bias-corrected moving average with smoothing 0.3, which these per-batch times reproduce), not a per-batch time. The log then stops without an EVAL_EXIT line, a bash `time` summary or metrics. How the process ended was not retained: the first pass reported a 1700 s timeout, but neither the script nor this log shows one.",
+      "command": "local-integration/run_eval_colpali.sh (vidore-benchmark evaluate-retriever --model-class colpali --model-name vidore/colpali-v1.3 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4 --output-dir outputs); the invocation around the script was not retained",
+      "exit_code": "not retained (the log stops without the script's EVAL_EXIT line)",
+      "observed": "2026-09-26T02:12:01Z",
+      "private_original": {
+        "name": "eval-colpali-v1.3-tabfquad.log",
+        "bytes": 11568,
+        "sha256": "3951f3431375202ea8a1a2ae03185f5f2ff7d41203a3a98f8a7c40b10e6eb96a"
+      },
+      "published": {
+        "bytes": 11022,
+        "sha256": "4f15088db3691414d9ceaf9170b6934e82fcab7ee999cba349d88677c8799ac4"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 6
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/eval-dummy-full280-cpu.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Built-in dummy_vision_retriever (random embeddings) on the full 280-row split: nDCG@5 0.0334.",
+      "command": "vidore-benchmark evaluate-retriever --model-class dummy_vision_retriever --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4 --output-dir outputs-control",
+      "exit_code": 0,
+      "observed": "2026-09-26T01:59:57Z",
+      "private_original": {
+        "name": "eval-dummy-control-tabfquad.log",
+        "bytes": 3132,
+        "sha256": "8f88d5767d91ec6f1c66a13562efe74b6a9a248c9f61944080103c147f7bb612"
+      },
+      "published": {
+        "bytes": 2495,
+        "sha256": "0adb9926b6c5bdda24174318cdaf9fe16c2b3f234b3f5dc2f415cb126d49d04d"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 7
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/metrics-dummy-full280.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Metrics file written by the full-split dummy run.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T01:59:53Z",
+      "private_original": {
+        "name": "dummy_vision_retriever_metrics.json",
+        "bytes": 2589,
+        "sha256": "f0cbfc50993c5ae681cae479f9399d61ad26ee9e364796bce1b17b6299a390dd"
+      },
+      "published": {
+        "bytes": 2589,
+        "sha256": "f0cbfc50993c5ae681cae479f9399d61ad26ee9e364796bce1b17b6299a390dd"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/eval-colpali-v1.3-slice12-cpu-original.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Primary run: 12-row slice on CPU (CUDA_VISIBLE_DEVICES='', private HF_HOME), nDCG@5 0.89682, real 14m3.303s, user 209m31s, sys 5m6s. Its metrics file was later overwritten by the unpinned runs that reused the same --output-dir.",
+      "command": "vidore-benchmark evaluate-retriever --model-class colpali --model-name vidore/colpali-v1.3 --dataset-name <12-row slice dir> --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4 --output-dir outputs-small",
+      "exit_code": 0,
+      "observed": "2026-09-26T02:28:59Z",
+      "private_original": {
+        "name": "eval-colpali-v1.3-tabfquad-SMALL.log",
+        "bytes": 4677,
+        "sha256": "9bc76a45b0da223e4f09ab92b1e65f15e60ce605b9ca456d3e00786879256e9a"
+      },
+      "published": {
+        "bytes": 3767,
+        "sha256": "cadc106ff9eff49ff308b80381625086a5841148b4268b43ef028e2ce9c1c694"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 10
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/eval-dummy-slice12-cpu-original.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Random-embedding control on the same 12-row slice: nDCG@5 0.19678, real 11.0 s.",
+      "command": "vidore-benchmark evaluate-retriever --model-class dummy_vision_retriever --dataset-name <12-row slice dir> --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4 --output-dir outputs-control-small",
+      "exit_code": 0,
+      "observed": "2026-09-26T02:30:10Z",
+      "private_original": {
+        "name": "eval-dummy-control-tabfquad-SMALL.log",
+        "bytes": 2777,
+        "sha256": "d0788bc59439af87531524d820d9e1019abb145e61b6951294d55d48a28081bb"
+      },
+      "published": {
+        "bytes": 1867,
+        "sha256": "60e74c8677cfd172e1adb9e632855f95a0067cea3cd1a4062e0db89f73349af3"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 10
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/recorder-dryrun-slice12-unpinned-device.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "The receipt recorder's dry run of the same two commands with neither CUDA_VISIBLE_DEVICES nor HF_HOME set: 216 s and 12 s. It downloaded both model repositories into the host's default Hugging Face cache (~/.cache/huggingface/hub, still present; see ../README.md#host-state). The device was not logged; vidore-benchmark 5.0.0 resolves device 'auto' to cuda:0 when CUDA is visible, and the document forward passes here took about 0.5 s per batch of 4 images against 149 s per batch in the pinned-CPU reproduction, which indicates GPU execution.",
+      "command": "sh colpali_use_dryrun.sh (see local-integration/)",
+      "exit_code": 0,
+      "observed": "2026-09-26T02:47:33Z",
+      "private_original": {
+        "name": "colpali_use_dryrun.log",
+        "bytes": 7497,
+        "sha256": "d05dc5753df8e12ab46950aa35175e0990b0a0d30bc87fb13302d4282c82ce84"
+      },
+      "published": {
+        "bytes": 5859,
+        "sha256": "3a883c742c51fe02497177f89ab03480238cf0228a95d0ce873f56ea3cf72df1"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 18
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/metrics-colpali-v1.3-slice12-unpinned-device-0314Z.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Metrics file as last written, by the withdrawn receipt's unpinned run at about 03:14Z (the CPU run's file was overwritten). Rank metrics equal the CPU reproduction; naucs_at_1_std and naucs_at_1_diff1 differ, consistent with different score arithmetic.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T03:16:22Z",
+      "private_original": {
+        "name": "colpali_vidore_colpali-v1.3_metrics.json",
+        "bytes": 2281,
+        "sha256": "5d7afd9cf9fe71737f84f20c756bf11b62c62cf3e0c7dc0d8886b8d848c3f3e9"
+      },
+      "published": {
+        "bytes": 2282,
+        "sha256": "331c251c6388efc2862b69af074a521d7e510b2b5a1d412ebcf95a4831c56a2a"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "scratch alias symlink",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/metrics-dummy-slice12-0314Z.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Dummy-control metrics file as last written (about 03:16Z); identical to the CPU reproduction's.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T03:16:39Z",
+      "private_original": {
+        "name": "dummy_vision_retriever_metrics.json",
+        "bytes": 2381,
+        "sha256": "364b406477123045c8537de348040491dfa36a0f2e50909849ed694c41f134ff"
+      },
+      "published": {
+        "bytes": 2382,
+        "sha256": "18ac9333960c0ea0080106138908bc57ce96d020a4a70252b8c9d00a64a3897d"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "scratch alias symlink",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "local-integration/run_eval.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Wrapper used for the first colqwen2 attempt (wrong venv).",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "run_eval.sh",
+        "bytes": 717,
+        "sha256": "b6785de1fe41f87d808f0b8030af4c101ac878272ab8ea5e6a0ac05a61b9b244"
+      },
+      "published": {
+        "bytes": 626,
+        "sha256": "ee6e4f045ff542fded8ffa537849bc5fa52d62578c04030d5a8cea69a976dbcb"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "local-integration/run_eval_combined.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Wrapper for colqwen2 attempts 2-6.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "run_eval_combined.sh",
+        "bytes": 695,
+        "sha256": "4c0b62376b0cee2de6a89f00a8d75ce23729e3632d1424e4b86555a19fe43d8f"
+      },
+      "published": {
+        "bytes": 604,
+        "sha256": "7b9fceab6d066b3bd7daf8b00e14a3016c41dc8fa1f3b01e2e87279261f85d3d"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "local-integration/run_eval_colpali.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Wrapper for the interrupted full-split run (CPU, private HF_HOME).",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "run_eval_colpali.sh",
+        "bytes": 693,
+        "sha256": "3b3616adc881ccda981e047029722dec8184cc3d51ad058fc41dac6ad6e0f0c0"
+      },
+      "published": {
+        "bytes": 602,
+        "sha256": "57ef3790e1ce20139b28e46f0250d5bd0acc8996b4dca70b04118ab477d36d57"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "local-integration/run_eval_dummy.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Wrapper for the full-split dummy control.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "run_eval_dummy.sh",
+        "bytes": 643,
+        "sha256": "74ac0c5fbe2dab1acd3f60a77c71ad08d01c2e74714359f948bc35623eaf54a8"
+      },
+      "published": {
+        "bytes": 552,
+        "sha256": "cbf937cf4c9833592e74a3a4156f1ff0cc92dc918bc9c296de6bac66f692061e"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "local-integration/run_eval_colpali_small.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Wrapper for the primary 12-row CPU run.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "run_eval_colpali_small.sh",
+        "bytes": 700,
+        "sha256": "b59908ef063953b7ca9ff6b4334267ed9e037b9e72bb74b104b6a24b15048e4b"
+      },
+      "published": {
+        "bytes": 609,
+        "sha256": "a68c755b57f26aa35195271c2331ce61d854b721761c364c22e69a96cb7c5097"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "local-integration/run_eval_dummy_small.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Wrapper for the 12-row dummy control.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "run_eval_dummy_small.sh",
+        "bytes": 650,
+        "sha256": "b737d05cc18fe5541748861a981f159d836f7c3170d4eeb634964053a5a6e9a1"
+      },
+      "published": {
+        "bytes": 559,
+        "sha256": "98b1f105ac512ed3805402ee76128594e5fb0e7d022ced7f6fb9fc298d427f87"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 1
+        }
+      ]
+    },
+    {
+      "path": "local-integration/recorder-colpali_use_dryrun.sh",
+      "evidence_class": "local_integration_source",
+      "what": "The receipt recorder's dry-run script: no CUDA_VISIBLE_DEVICES and no HF_HOME.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "colpali_use_dryrun.sh",
+        "bytes": 1521,
+        "sha256": "f42628024afb851b65dab0f9ba5bcef6dfd7b30325960b60c9266632ea67fa15"
+      },
+      "published": {
+        "bytes": 975,
+        "sha256": "d0e48d0f13233fd20823b67b8336ccf5c34339271ce277a74939c325664ee6c0"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 6
+        }
+      ]
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/steps.log",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "steps.log",
+        "bytes": 578,
+        "sha256": "9db244911d1ba673705d93832f6e0fc84eadf9774b74f3cadd92030b13051d94"
+      },
+      "published": {
+        "bytes": 578,
+        "sha256": "9db244911d1ba673705d93832f6e0fc84eadf9774b74f3cadd92030b13051d94"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/venv.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "venv.log",
+        "bytes": 140,
+        "sha256": "6788a902d5b2e53a8ec46658065f1f01206e2ba1aa04d57d6ed47d3b3a89f1d5"
+      },
+      "published": {
+        "bytes": 140,
+        "sha256": "6788a902d5b2e53a8ec46658065f1f01206e2ba1aa04d57d6ed47d3b3a89f1d5"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/install.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "install.log",
+        "bytes": 2239,
+        "sha256": "7c7c170dd769ccbd957a437b2df84526a5c2038d36582d08ba85293d6bada121"
+      },
+      "published": {
+        "bytes": 2239,
+        "sha256": "7c7c170dd769ccbd957a437b2df84526a5c2038d36582d08ba85293d6bada121"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/device-check.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "device-check.txt",
+        "bytes": 54,
+        "sha256": "9424d79b6fb956b27fa8c07c320365c4db64e0e536282f357e366f1a0fc61c03"
+      },
+      "published": {
+        "bytes": 54,
+        "sha256": "9424d79b6fb956b27fa8c07c320365c4db64e0e536282f357e366f1a0fc61c03"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/hf-download-adapter.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "hf-download-adapter.log",
+        "bytes": 6084,
+        "sha256": "e6a2f1999c171522aa6fd601770ff3db4ebfe86fb965b4727a3ddbc1e18dba16"
+      },
+      "published": {
+        "bytes": 6084,
+        "sha256": "e6a2f1999c171522aa6fd601770ff3db4ebfe86fb965b4727a3ddbc1e18dba16"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/hf-download-base.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "hf-download-base.log",
+        "bytes": 3883,
+        "sha256": "3e0be52fe60f67f94570327bbf123bd0555fcdc8db6d26494b1f575a1dc50ecb"
+      },
+      "published": {
+        "bytes": 3883,
+        "sha256": "3e0be52fe60f67f94570327bbf123bd0555fcdc8db6d26494b1f575a1dc50ecb"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/hf-download-dataset.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "hf-download-dataset.log",
+        "bytes": 1418,
+        "sha256": "132c4c1bdffbb12f404ccbdd6d55c2644c496dac1991d8f2ccbe0fb24e5cecbe"
+      },
+      "published": {
+        "bytes": 1418,
+        "sha256": "132c4c1bdffbb12f404ccbdd6d55c2644c496dac1991d8f2ccbe0fb24e5cecbe"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/slice-build.log",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "slice-build.log",
+        "bytes": 351,
+        "sha256": "3bff7410b4ab30015abfce542617022711182fbe19a583ed64bf401ce8668d00"
+      },
+      "published": {
+        "bytes": 351,
+        "sha256": "3bff7410b4ab30015abfce542617022711182fbe19a583ed64bf401ce8668d00"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/slice-summary.json",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "slice-summary.json",
+        "bytes": 2850,
+        "sha256": "dd66f65d8975570699472c6f021410038bdb69f5ca9f5471cf04f3c4189a4bd5"
+      },
+      "published": {
+        "bytes": 2850,
+        "sha256": "dd66f65d8975570699472c6f021410038bdb69f5ca9f5471cf04f3c4189a4bd5"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/colpali.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "colpali.log",
+        "bytes": 3341,
+        "sha256": "bd3607bd5fbbc16235d74492a53cc9d0bc86718866beec387e4fd3e87ae316c4"
+      },
+      "published": {
+        "bytes": 3341,
+        "sha256": "bd3607bd5fbbc16235d74492a53cc9d0bc86718866beec387e4fd3e87ae316c4"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/colpali.time.txt",
+      "evidence_class": "local_integration",
+      "what": "Resource report of the reproduction's measurement wrapper, GNU time (/usr/bin/time -v, which reports %M in KiB), around the colpali-v1.3 run: elapsed 8:49.14 (529 s), user 8905.32 s, system 409.79 s, maximum resident set size 41,712,648 KiB (42.7 GB, 39.8 GiB), exit status 0. Written by reproduction/reproduce-cpu.sh (2026-09-26T04:12Z-04:21Z); our measurement, not the CLI's output.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "colpali.time.txt",
+        "bytes": 1047,
+        "sha256": "087515140af73ef061a1e7d1674be623ae03184e69f9918d7dbdb12b17f93def"
+      },
+      "published": {
+        "bytes": 1047,
+        "sha256": "087515140af73ef061a1e7d1674be623ae03184e69f9918d7dbdb12b17f93def"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/colpali_vidore_colpali-v1.3_metrics.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "colpali_vidore_colpali-v1.3_metrics.json",
+        "bytes": 2263,
+        "sha256": "5ea0562e3e82090530252ba48a5649ca638e470ee0f317f1b9ba1fff67f312c8"
+      },
+      "published": {
+        "bytes": 2263,
+        "sha256": "5ea0562e3e82090530252ba48a5649ca638e470ee0f317f1b9ba1fff67f312c8"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/dummy.log",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "dummy.log",
+        "bytes": 1490,
+        "sha256": "fce4b6af1184d43147c24f826c7a0a9d0f1a9bda3972d3d3c30f2b3cefff2c72"
+      },
+      "published": {
+        "bytes": 1490,
+        "sha256": "fce4b6af1184d43147c24f826c7a0a9d0f1a9bda3972d3d3c30f2b3cefff2c72"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/dummy.time.txt",
+      "evidence_class": "local_integration",
+      "what": "Resource report of the reproduction's measurement wrapper, GNU time (/usr/bin/time -v, which reports %M in KiB), around the dummy_vision_retriever control run: elapsed 0:07.12, user 12.63 s, maximum resident set size 1,040,532 KiB (1.07 GB), exit status 0. Written by reproduction/reproduce-cpu.sh (2026-09-26T04:12Z-04:21Z); our measurement, not the CLI's output.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "dummy.time.txt",
+        "bytes": 1012,
+        "sha256": "0f439167190de785608c7ced3c2f0abea5be03ae777f0836c5bb4307e72cdce7"
+      },
+      "published": {
+        "bytes": 1012,
+        "sha256": "0f439167190de785608c7ced3c2f0abea5be03ae777f0836c5bb4307e72cdce7"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/run-20260926T0412Z/dummy_vision_retriever_metrics.json",
+      "evidence_class": "upstream_native_operation",
+      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T04:21:34Z",
+      "private_original": {
+        "name": "dummy_vision_retriever_metrics.json",
+        "bytes": 2362,
+        "sha256": "77c742f34b1c8f1222f6f88e60ee148583954b16208da064de314c2fc60434f1"
+      },
+      "published": {
+        "bytes": 2362,
+        "sha256": "77c742f34b1c8f1222f6f88e60ee148583954b16208da064de314c2fc60434f1"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "withdrawn-host-receipts/nativestack-5975wx-20260925--colpali-engine--install--20260926.json",
+      "evidence_class": "withdrawn_host_receipt",
+      "what": "Draft host receipt recorded by the first trial pass and withdrawn before merge; copied byte for byte. Why withdrawn: component_id 'colpali-engine' is neither a stack component nor a landscape winner (validate rejects it). Its command used the session-scratch venv through /tmp/nas-colpali-trial.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "nativestack-5975wx-20260925--colpali-engine--install--20260926.json",
+        "bytes": 2868,
+        "sha256": "0d19d30b7ac21b26a14622d0e8ecd4891cfdeb93fb4dd410fc8ec743108cc440"
+      },
+      "published": {
+        "bytes": 2868,
+        "sha256": "0d19d30b7ac21b26a14622d0e8ecd4891cfdeb93fb4dd410fc8ec743108cc440"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "withdrawn-host-receipts/nativestack-5975wx-20260925--colpali-engine--use--20260926.json",
+      "evidence_class": "withdrawn_host_receipt",
+      "what": "Draft host receipt recorded by the first trial pass and withdrawn before merge; copied byte for byte. Why withdrawn: Same component-id rejection. Its claim states 843.3 s on CPU, but its recorded commands ran in 119.1 s and 14.8 s with no CUDA_VISIBLE_DEVICES pin; the CPU reproduction (reproduction/run-20260926T0412Z) needed 529 s wall and 148 CPU-minutes of user time, so the recorded run cannot have been the CPU run it describes.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "nativestack-5975wx-20260925--colpali-engine--use--20260926.json",
+        "bytes": 4364,
+        "sha256": "f880597448749ddabd8209acda556666ca2e84dc2867616dc8fd0385e6e15cda"
+      },
+      "published": {
+        "bytes": 4364,
+        "sha256": "f880597448749ddabd8209acda556666ca2e84dc2867616dc8fd0385e6e15cda"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "withdrawn-host-receipts/nativestack-5975wx-20260925--vidore-benchmark--install--20260926.json",
+      "evidence_class": "withdrawn_host_receipt",
+      "what": "Draft host receipt recorded by the first trial pass and withdrawn before merge; copied byte for byte. Why withdrawn: component_id 'vidore-benchmark' is neither a stack component nor a landscape winner (validate rejects it). Registry introspection through a self-written python -c check.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "nativestack-5975wx-20260925--vidore-benchmark--install--20260926.json",
+        "bytes": 3335,
+        "sha256": "370dd7a9f7cd36560ebe5ef678bf3f1b2426907e87afcebaf9109c79450fb39f"
+      },
+      "published": {
+        "bytes": 3335,
+        "sha256": "370dd7a9f7cd36560ebe5ef678bf3f1b2426907e87afcebaf9109c79450fb39f"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "withdrawn-host-receipts/nativestack-5975wx-20260925--vidore-benchmark--use--20260926.json",
+      "evidence_class": "withdrawn_host_receipt",
+      "what": "Draft host receipt recorded by the first trial pass and withdrawn before merge; copied byte for byte. Why withdrawn: Same component-id rejection and the same device/duration mismatch as the colpali-engine use receipt (105.0 s and 16.0 s recorded, no device pin).",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "nativestack-5975wx-20260925--vidore-benchmark--use--20260926.json",
+        "bytes": 4115,
+        "sha256": "9744841803f44a548e9ebc30fbb2c65fd62ecbc29b98182ad0697689097833ea"
+      },
+      "published": {
+        "bytes": 4115,
+        "sha256": "9744841803f44a548e9ebc30fbb2c65fd62ecbc29b98182ad0697689097833ea"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "source-review.json",
+      "evidence_class": "source_review",
+      "what": "Pinned upstream source lines behind this trial's findings, produced by ../provenance/source_excerpts.py (sha256 8f71c03c3757731ccd60fdd8c8c19d9fd6ae6f95b2ee839b1b290c6050fc61f8) from fresh fetches of each named commit; each item carries the file's blob id and sha256. Regenerated by the second polish pass with 16 items added since the port (the vidore-benchmark 5.0.0 Python API, ColQwen2_5_Processor's base class, and the transformers 4.53.1, 4.57.6 and 5.0.0 lines behind the processor-load TypeError); the port's 15 items are byte-identical to its earlier output.",
+      "command": "python3 ../provenance/source_excerpts.py <items.json>",
+      "exit_code": 0,
+      "observed": "2026-09-26T09:49:49Z",
+      "private_original": {
+        "name": "source-review-colpali-final.json",
+        "bytes": 42205,
+        "sha256": "e17475e68db8d76ecaf1a5fbfde4b90da8b0f1a9f064d6c703d4f2d132a36548"
+      },
+      "published": {
+        "bytes": 42205,
+        "sha256": "e17475e68db8d76ecaf1a5fbfde4b90da8b0f1a9f064d6c703d4f2d132a36548"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/hf-license-chain.txt",
+      "evidence_class": "registry_observation",
+      "what": "Hub API model-card license fields for the evaluated weights and the colqwen2.5 chain: vidore/colpali-v1.3 (mit) on vidore/colpaligemma-3b-pt-448-base (gemma) on google/paligemma-3b-pt-448 (gemma, gated); vidore/colqwen2.5-v0.2 (mit) on vidore/colqwen2.5-base (apache-2.0) on Qwen/Qwen2.5-VL-3B-Instruct (qwen-research).",
+      "command": "see the first lines of the file",
+      "exit_code": 0,
+      "observed": "2026-09-26T05:07:16Z",
+      "private_original": {
+        "name": "hf-license-chain.txt",
+        "bytes": 1113,
+        "sha256": "2171c52ae13be5f5827f3332ff588b8a158fea240dada61db985c71df92d94fc"
+      },
+      "published": {
+        "bytes": 1113,
+        "sha256": "2171c52ae13be5f5827f3332ff588b8a158fea240dada61db985c71df92d94fc"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/colqwen_processor_probe.py",
+      "evidence_class": "local_integration_source",
+      "what": "Diagnostic probe for the colqwen2 processor TypeError of attempts 5 and 6 (polish pass). It calls transformers' list_repo_templates and colpali-engine's ColQwen2Processor / ColQwen2_5_Processor.from_pretrained directly, with every step's expected outcome written in the file before the run. Our driver around upstream functions, not an upstream test; it downloads processor and tokenizer files only, never model weights.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "colqwen_processor_probe.py",
+        "bytes": 4594,
+        "sha256": "777c7f180d53ecae113f5571fd7351d42e77bcf244fb178d5c277dbeecd1926a"
+      },
+      "published": {
+        "bytes": 4594,
+        "sha256": "777c7f180d53ecae113f5571fd7351d42e77bcf244fb178d5c277dbeecd1926a"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/colqwen-processor-probe-20260926T0634Z.ndjson",
+      "evidence_class": "local_integration",
+      "what": "Output (one JSON object per line) of local-integration/colqwen_processor_probe.py, 2026-09-26T06:34:23Z-06:34:37Z, CPU (CUDA_VISIBLE_DEVICES=''), fresh private HF_HOME and HOME, no Hub token, in the first pass's .venv-combined, whose installed set equalled the 94 pins now preserved in reproduction/environment-record.json ( transformers 4.53.1, huggingface_hub 0.36.2, colpali-engine 0.3.13, vidore-benchmark 5.0.0, torch 2.8.0). All five pre-stated expectations held: A list_repo_templates returns ['sentence_transformers.jinja'] (suffix kept) for vidore/colqwen2-v1.0 main; B ColQwen2Processor.from_pretrained at main raises 'TypeError: expected str, bytes or os.PathLike object, not NoneType' at transformers/processing_utils.py:993, as in attempt 6; C it loads at 83a0134c, the last revision without additional_chat_templates/; D ColQwen2_5_Processor at the pinned vidore/colqwen2.5-v0.2 revision dcbe8d9c raises the same TypeError; E it loads at 6f6fcdfd (the last colqwen2.5-v0.2 revision without the template) and has process_images, process_queries and score.",
+      "command": "CUDA_VISIBLE_DEVICES= HF_HOME=<fresh dir> HOME=<fresh dir> <.venv-combined>/bin/python colqwen_processor_probe.py",
+      "exit_code": 0,
+      "observed": "2026-09-26T06:34:37Z",
+      "private_original": {
+        "name": "probe.stdout",
+        "bytes": 1910,
+        "sha256": "7b9657a21c247630cddffe41ba5995181e79458b21911f01ecf46994d2d911c4"
+      },
+      "published": {
+        "bytes": 1910,
+        "sha256": "7b9657a21c247630cddffe41ba5995181e79458b21911f01ecf46994d2d911c4"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/colqwen-processor-probe-20260926T0634Z.stderr",
+      "evidence_class": "local_integration",
+      "what": "stderr of the same probe run: one transformers slow-image-processor warning, no error.",
+      "command": "CUDA_VISIBLE_DEVICES= HF_HOME=<fresh dir> HOME=<fresh dir> <.venv-combined>/bin/python colqwen_processor_probe.py",
+      "exit_code": 0,
+      "observed": "2026-09-26T06:34:37Z",
+      "private_original": {
+        "name": "probe.stderr",
+        "bytes": 324,
+        "sha256": "b5054417b7abcc2c4c70dd355e2c0eaf121cde36c803f2fb8c2639e2e3bcbf41"
+      },
+      "published": {
+        "bytes": 324,
+        "sha256": "b5054417b7abcc2c4c70dd355e2c0eaf121cde36c803f2fb8c2639e2e3bcbf41"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/hf-chat-template-files.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Script behind native-outputs/hf-chat-template-files.txt: unauthenticated Hub API reads of both repositories' commit lists and of their additional_chat_templates/ folders at each named revision.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "hf-chat-template-files.sh",
+        "bytes": 1390,
+        "sha256": "8e2492463d3de95e04fb4b2dbe62abe25206fa0e5b00178575c5d6697eba4c9a"
+      },
+      "published": {
+        "bytes": 1390,
+        "sha256": "8e2492463d3de95e04fb4b2dbe62abe25206fa0e5b00178575c5d6697eba4c9a"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/hf-chat-template-files.txt",
+      "evidence_class": "registry_observation",
+      "what": "Hub API: vidore/colqwen2-v1.0 and vidore/colqwen2.5-v0.2 carry additional_chat_templates/sentence_transformers.jinja from their 'Integrate with Sentence Transformers via MultiVectorEncoder' commits of 2026-08-17 (730ed5b8, 11fee727) through their current revisions (2b6ac8fb, dcbe8d9c); the earlier revisions queried (83a0134c and 530094e8; 6f6fcdfd) have no such folder.",
+      "command": "sh local-integration/hf-chat-template-files.sh",
+      "exit_code": 0,
+      "observed": "2026-09-26T06:42:24Z",
+      "private_original": {
+        "name": "hf-chat-template-files.txt",
+        "bytes": 3994,
+        "sha256": "515b0e9ddf9b5123d69cef5c99cd78d66d9db847e471cb517926b841c1791343"
+      },
+      "published": {
+        "bytes": 3994,
+        "sha256": "515b0e9ddf9b5123d69cef5c99cd78d66d9db847e471cb517926b841c1791343"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/reproduce-cpu.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Current CPU reproduction glue. Requires explicit advisory acceptance, regenerates the original environment record into a private temporary workspace, compares uv pip freeze with that exact recorded set and removes the workspace on exit. It supersedes the as-run script whose hash remains in private_original. The historical model run did not execute these repaired bytes; only synthetic checks of this version ran.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "reproduce-cpu.sh",
+        "bytes": 4450,
+        "sha256": "6f353e4056c80a351262fd758f7d16c39c580b4da1b28366bf180c64516012d7"
+      },
+      "published": {
+        "bytes": 5229,
+        "sha256": "35a07ba345f43878f6b61824a6cb6cb0f61b4f1c116e8ad592c1f369a2a9f4b8"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/build_slice.py",
+      "evidence_class": "local_integration_source",
+      "what": "Slice builder used by reproduce-cpu.sh: loads the test split of the pinned vidore/tabfquad_test_subsampled snapshot, keeps its first 12 rows, writes them with the datasets library's to_parquet, and compares per-row query and image sha256 with slice-expected.json (exit 0 only on a match); our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "build_slice.py",
+        "bytes": 2681,
+        "sha256": "820395f24cf955491448586bfcd0d8328d5edd11612bdbeed58ee093808d7fbc"
+      },
+      "published": {
+        "bytes": 2681,
+        "sha256": "820395f24cf955491448586bfcd0d8328d5edd11612bdbeed58ee093808d7fbc"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/slice-expected.json",
+      "evidence_class": "local_integration_source",
+      "what": "Fingerprint of the first pass's 12-row input (per-row query and image sha256 and the parquet sha256; hashes only) that build_slice.py compares the rebuilt slice with; input to our check.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "slice-expected.json",
+        "bytes": 3160,
+        "sha256": "50164febc1cc925bc8691e130cc372c3ec15e718bad13cc24c6a57ce1b3cd835"
+      },
+      "published": {
+        "bytes": 3160,
+        "sha256": "50164febc1cc925bc8691e130cc372c3ec15e718bad13cc24c6a57ce1b3cd835"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/environment-record.json",
+      "evidence_class": "local_integration_source",
+      "what": "Exact data record of the 94 historical pins, all hash lists, original lock/freeze size and SHA-256, and the 20 known advisories with their retained scanner source. Replaces both removed installable files.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": null,
+      "published": {
+        "bytes": 25051,
+        "sha256": "c1939781e6a0f0f67136fb1bf292f69800e543fadb0461a71b42b812ea83fff8"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/regenerate_lock.py",
+      "evidence_class": "local_integration_source",
+      "what": "Standard-library glue implementing opt-in regeneration, structured-pin and byte checks, private temporary directories and Git-work-tree refusal. Sources: ../security-repair-sources.md.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": null,
+      "published": {
+        "bytes": 4639,
+        "sha256": "24d9cac3898f25af15b9d6afefe0c221effd4608e596322167cc3a0a3f0a66b1"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/lock_regeneration_check.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Local checker of actual regeneration and CPU-script refusal/comparison/cleanup. Uses the original Git blob and synthetic uv; no package installation or model run.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": null,
+      "published": {
+        "bytes": 5766,
+        "sha256": "cb8654e34aa556752047cb8e7ba5e66110b23afc57ed700f5b61f8ea390ab606"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/osv-scanner-requirements-lock-20260926T130641Z.txt",
+      "evidence_class": "upstream_native_operation",
+      "what": "Retained sanitized OSV-Scanner 2.6.0 table output for the historical environment: 20 advisories, including 1 Critical and 15 High. The environment record identifies the scanner and JSON-source digest; no new scan is claimed.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T13:06:41Z",
+      "private_original": null,
+      "published": {
+        "bytes": 5174,
+        "sha256": "d55531ec0c3a1961fea664001c40b61189a83e2f6cf24ede7565735fdd3fc3f8"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "previous worker sanitized temporary paths; private scan bytes not reread"
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/lock-regeneration-check-20260926T131542Z.txt",
+      "evidence_class": "local_integration",
+      "what": "Earlier worker draft check, retained as historical output only. Its fixed/reproduce-cpu.sh and --into commands described a superseded draft, not current entry points. Its environment-record hash differs from the current record. See the final check for current source acceptance.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T13:15:42Z",
+      "private_original": null,
+      "published": {
+        "bytes": 7380,
+        "sha256": "854f6fe4e37928bf21cdd04430355501b979408e37cc94e38c37d074d5a26544"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "previous worker sanitized temporary paths; superseded historical draft output"
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/lock-regeneration-check-20260926-final.txt",
+      "evidence_class": "local_integration",
+      "what": "Actual returned final checker output: original and regenerated locks are byte-identical (1834 bytes, original SHA-256); advisory IDs printed, refusal without opt-in, record tamper detection and workspace cleanup. Synthetic uv checks both outcomes of the installed-set comparison, without installing packages or executing a model.",
+      "command": "sh reproduction/lock_regeneration_check.sh",
+      "exit_code": 0,
+      "observed": "2026-09-26T14:02:04.727098+00:00",
+      "private_original": null,
+      "published": {
+        "bytes": 5028,
+        "sha256": "c5ffe177fa28b894fc604b6e380b87d4d4ca5740a1b71254c8b53d938c0bda5f"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    }
+  ],
+  "removed_artifacts": [
+    {
+      "historical_name": "reproduction/run-20260926T0412Z/installed-freeze.txt",
+      "bytes": 1834,
+      "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9",
+      "status": "Removed from the published tree; exact bytes preserved as data, not an installable lock.",
+      "replacement": "reproduction/environment-record.json"
+    },
+    {
+      "historical_name": "reproduction/requirements-lock.txt",
+      "bytes": 1834,
+      "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9",
+      "status": "Removed from the published tree; exact bytes preserved as data, not an installable lock.",
+      "replacement": "reproduction/environment-record.json"
+    }
+  ]
+}

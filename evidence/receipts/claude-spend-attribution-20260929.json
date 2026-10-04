@@ -1,0 +1,939 @@
+{
+  "schema_version": 1,
+  "id": "claude-spend-attribution-20260929",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "claude-code",
+    "ccusage"
+  ],
+  "claim": "A count-only scan of this host's Claude Code transcripts (the 4,183 transcript files that record a version were written by Claude Code 2.1.280 to 2.1.284; scanned 2026-09-29, ccusage 20.0.26), deduplicated by message.id, covers 186,492 API calls and 1,872 advisor iterations from 2026-09-24 to 2026-09-29 (UTC dates). Its input, output, cache-read and cache-creation (5m plus 1h split) totals each match `ccusage claude daily --json --offline`, run on the same copy of the transcript tree, within 0.001%; the top-level cache_creation_input_tokens field is 2.3% higher because of tokens with no split. At Anthropic API list prices the window is $20,927 (ccusage: $19,829; the $1,098 difference is mostly claude-sonnet-5-5, which ccusage leaves unpriced, plus unsplit cache writes only the scan prices, per data.reconciliation.cost_usd): children (Agent-tool and workflow stages) are 81.3% of it, workflow stages alone 66.1%, and 4 of 710 session trees cover half; in ccusage's session view the 303 workflow runs are 68.1% of its dollars (median run $22, largest $448). Cache reads are 39.5% of dollars, executor output 23.8%, cache writes 22.8%, advisor iterations 14.0%. Children with more than 60 calls are 53.2% of dollars; children of a default agent type are 63.4% of children and 41.1% of dollars; effort max covers 82.2% of calls.",
+  "limitations": [
+    "Local observation of one host's retained transcripts (the independent-observation class of docs/acceptance-evidence-policy.md), not a provider ledger or a bill. Both tools read one copy of the transcript tree taken at data.reconciliation.snapshot_at_utc, so their differences are method differences, not drift; a transcript that was deleted or never written is not counted, and the scan skips a line cut by the copy.",
+    "The transcripts were written by more than one Claude Code release (data.scan.client_versions_by_transcript_file, 151 files without a version field); the scan and ccusage ran with the versions in data.tool_versions.",
+    "Dollar figures apply Anthropic API list prices (data.prices, pricing page fetched 2026-09-29) to counted tokens. They are not what a subscription charges and do not weight the plan meter. Cache-write tokens with no 5m/1h split are priced at the 5-minute rate, and tokens of models absent from the table (data.scan.unpriced_model_tokens) are not priced. The scan-minus-ccusage difference of $1,098 is the sum of the per-model differences in data.reconciliation.cost_usd.by_model: claude-sonnet-5-5 ($1,006, which ccusage leaves unpriced), claude-opus-4-8 (-$6: ccusage prices it and the scan does not) and the unsplit cache writes of the other models ($96, which ccusage does not count), with a residual of $1 that is not attributed.",
+    "Counts only: no path, session identifier or transcript content is retained. A session tree is a main session plus every child below it, derived from the path layout; ccusage lists each workflow run as its own session, so its per-session ranking differs from data.scan.session_trees.",
+    "Invocation counts are attempts, not success rates: each tool population has its own denominator (data.scan.tool_calls, mcp_calls_by_server), and a ToolSearch load is not a call. No per-tool eligible-task success rate follows from them.",
+    "Cache creation: ccusage counts the 5m and 1h split (965,565,309 tokens) and the scan's split matches it. The scan also reports the top-level field (987,672,811 tokens), which is 22,098,490 tokens above the split; after clamping calls whose split exceeds their top-level field to no remainder, the unsplit remainder is 22,133,575 tokens on 1,878 calls (children: 21,760,880 tokens on 1,760 calls; 1 main-session call reports a split larger than its top-level field). Which cache class the remainder belongs to is not established, and the scan prices it at the 5-minute rate. In the split fields children show no 1-hour-class tokens (their unsplit remainder has no established class); main sessions show 142,720,261.",
+    "Inference with no usage record is in neither the scan nor ccusage: session titles, compaction, WebFetch summaries, away summaries and the auto-mode classifier. Advisor inference is counted from usage.iterations only. Rows whose model is <synthetic> carry no usage and are skipped.",
+    "Cache-miss events (data.scan.cache_misses, cache_creation_children) are calls whose cache read fell below half the previous call's context. The gap is measured between the first-written entries of consecutive calls, so it includes the next call's response time (long at effort max), and calls after a compaction also meet the rule; the 5m-1h bin is therefore approximate.",
+    "The scan's rules (one row per message.id with the per-field maximum, advisor iterations, <synthetic> rows and journal files skipped, the --since filter for calls and tool counters) were checked on a synthetic fixture with hand-computed expected values and one mutant run per rule (data.control). The fixture does not check the price table or the run-shape statistics, and the reconciliation covers token totals, not dollars.",
+    "The run-shape statistics describe this host and window. They do not show that fewer or shorter children lower cost at equal quality, and data.derived is arithmetic on generic price ratios; no quality comparison was run."
+  ],
+  "evidence_class": "independent observation: a count-only scan of this host's native Claude Code transcripts, reconciled to the upstream ccusage totals, with a synthetic-fixture check of the scan's rules and one mutant run per rule",
+  "recorded_at_utc": "2026-09-29T08:13:15Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the scanning user's own Claude Code projects tree"
+  },
+  "data": {
+    "scanned_at_utc": "2026-09-29T08:13:15Z",
+    "tool_versions": {
+      "claude_code": "2.1.284",
+      "ccusage": "20.0.26"
+    },
+    "commands": [
+      {
+        "command": "cp -a ~/.claude/projects <snapshot directory>/projects",
+        "started_at_utc": "2026-09-29T08:13:11Z",
+        "ended_at_utc": "2026-09-29T08:13:11Z",
+        "exit_code": 0
+      },
+      {
+        "command": "CLAUDE_CONFIG_DIR=<snapshot directory> ccusage claude daily --json --offline",
+        "started_at_utc": "2026-09-29T08:13:11Z",
+        "ended_at_utc": "2026-09-29T08:13:12Z",
+        "exit_code": 0
+      },
+      {
+        "command": "CLAUDE_CONFIG_DIR=<snapshot directory> ccusage claude session --json --offline",
+        "started_at_utc": "2026-09-29T08:13:12Z",
+        "ended_at_utc": "2026-09-29T08:13:13Z",
+        "exit_code": 0
+      },
+      {
+        "command": "python3 claude_spend_scan.py --root <snapshot directory>/projects",
+        "started_at_utc": "2026-09-29T08:13:13Z",
+        "ended_at_utc": "2026-09-29T08:13:15Z",
+        "exit_code": 0
+      },
+      {
+        "command": "python3 claude_spend_scan.py --control",
+        "started_at_utc": "2026-09-29T08:13:15Z",
+        "ended_at_utc": "2026-09-29T08:13:15Z",
+        "exit_code": 0
+      }
+    ],
+    "ccusage": {
+      "command": "CLAUDE_CONFIG_DIR=<snapshot directory> ccusage claude daily --json --offline",
+      "days": [
+        "2026-09-23",
+        "2026-09-24",
+        "2026-09-25",
+        "2026-09-26",
+        "2026-09-27",
+        "2026-09-28",
+        "2026-09-29"
+      ],
+      "totals": {
+        "cacheCreationTokens": 965565309,
+        "cacheReadTokens": 41295876659,
+        "inputTokens": 378235978,
+        "outputTokens": 298247869,
+        "totalCost": 19829.278430350034,
+        "totalTokens": 42937925815,
+        "unpricedModels": [
+          "claude-sonnet-5-5"
+        ]
+      }
+    },
+    "ccusage_session_view": {
+      "command": "CLAUDE_CONFIG_DIR=<snapshot directory> ccusage claude session --json --offline",
+      "percentile_method": "workflow-run costs sorted descending; median is statistics.median; p90 is the element at index int(0.1 x n), the cost that 10% of runs exceed; top-k shares divide the k largest by the total of all rows",
+      "method": "rows whose sessionId starts with 'wf_' are workflow runs (their transcripts sit under subagents/workflows/<run>); costs are the rows' totalCost",
+      "rows": 960,
+      "workflow_run_rows": 303,
+      "other_rows": 657,
+      "total_cost_usd": 19829.28,
+      "workflow_run_cost_usd": 13508.22,
+      "workflow_run_cost_share": 0.681226,
+      "workflow_run_cost_usd_median": 21.73,
+      "workflow_run_cost_usd_p90": 105.28,
+      "workflow_run_cost_usd_max": 447.85,
+      "top_10_workflow_runs_share_of_all_cost": 0.160315,
+      "top_50_workflow_runs_share_of_all_cost": 0.392731
+    },
+    "reconciliation": {
+      "inputTokens": {
+        "ccusage": 378235978,
+        "scan": 378235980,
+        "scan_minus_ccusage": 2,
+        "relative_difference": 1e-08
+      },
+      "outputTokens": {
+        "ccusage": 298247869,
+        "scan": 298247871,
+        "scan_minus_ccusage": 2,
+        "relative_difference": 1e-08
+      },
+      "cacheReadTokens": {
+        "ccusage": 41295876659,
+        "scan": 41296227212,
+        "scan_minus_ccusage": 350553,
+        "relative_difference": 8.49e-06
+      },
+      "cacheCreationTokens": {
+        "ccusage": 965565309,
+        "scan": 965574321,
+        "scan_minus_ccusage": 9012,
+        "relative_difference": 9.33e-06
+      },
+      "method": "both tools read the same copy of the transcript tree taken at snapshot_at_utc, so the differences below are method differences, not drift",
+      "snapshot_at_utc": "2026-09-29T08:13:11Z",
+      "cost_usd": {
+        "ccusage_total": 19829.28,
+        "ccusage_unpriced_models": [
+          "claude-sonnet-5-5"
+        ],
+        "scan_list_price_total": 20926.87,
+        "scan_minus_ccusage": 1097.59,
+        "by_model": {
+          "claude-fable-5-1": {
+            "ccusage": 1790.54,
+            "scan": 1790.54,
+            "scan_minus_ccusage": -0.0,
+            "unsplit_cache_write_usd_in_scan": 0.0
+          },
+          "claude-haiku-4-5-20251001": {
+            "ccusage": 4.61,
+            "scan": 4.61,
+            "scan_minus_ccusage": -0.0,
+            "unsplit_cache_write_usd_in_scan": 0.0
+          },
+          "claude-opus-4-8": {
+            "ccusage": 6.36,
+            "scan": 0.0,
+            "scan_minus_ccusage": -6.36,
+            "unsplit_cache_write_usd_in_scan": 0.0
+          },
+          "claude-opus-5-5": {
+            "ccusage": 15913.96,
+            "scan": 16007.0,
+            "scan_minus_ccusage": 93.04,
+            "unsplit_cache_write_usd_in_scan": 92.09
+          },
+          "claude-sonnet-5": {
+            "ccusage": 2113.8,
+            "scan": 2118.3,
+            "scan_minus_ccusage": 4.5,
+            "unsplit_cache_write_usd_in_scan": 4.41
+          },
+          "claude-sonnet-5-5": {
+            "ccusage": 0.0,
+            "scan": 1006.41,
+            "scan_minus_ccusage": 1006.41,
+            "unsplit_cache_write_usd_in_scan": 4.88
+          }
+        },
+        "explained_by": {
+          "claude_sonnet_5_5_unpriced_by_ccusage": 1006.41,
+          "claude_opus_4_8_priced_by_ccusage_and_not_by_the_scan": -6.36,
+          "unsplit_cache_writes_of_the_other_models_priced_only_by_the_scan": 96.5,
+          "residual": 1.04
+        }
+      },
+      "top_level_cache_creation_field_over_split": 0.022886
+    },
+    "derived": {
+      "subagent_cache_ttl": {
+        "basis": "children (Agent-tool and workflow stages) only; price ratios to the input price: 5m write 1.25, 1h write 2, read 0.1 (Opus 5.5 reads are 0.05, which moves the break-even from 0.395 to 0.385)",
+        "five_minute_class_tokens_written": 844614940,
+        "of_which_unsplit_remainder": 21760880,
+        "one_hour_class_tokens_written_by_children": 0,
+        "rewritten_after_5m_1h_gaps_5m_class_tokens": 168194401,
+        "rewrite_events_after_5m_1h_gaps": 789,
+        "extra_cost_of_1h_class_input_equivalents": 507315404,
+        "saved_by_turning_rewrites_into_reads_input_equivalents": 193423561,
+        "net_cost_of_1h_class_input_equivalents": 313891843,
+        "observed_rewrite_share": 0.199137,
+        "break_even_rewrite_share": 0.394737,
+        "formula": "0.75 x (W5 - R) - 1.15 x R = 0.75 x W5 - 1.9 x R"
+      }
+    },
+    "prices": {
+      "unit": "USD per million tokens: input, output, cache write 5m, cache write 1h, cache read",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing (fetched 2026-09-29)",
+      "table": {
+        "claude-opus-5-5": [
+          4.0,
+          20.0,
+          5.0,
+          8.0,
+          0.2
+        ],
+        "claude-sonnet-5-5": [
+          2.0,
+          10.0,
+          2.5,
+          4.0,
+          0.2
+        ],
+        "claude-sonnet-5": [
+          2.0,
+          10.0,
+          2.5,
+          4.0,
+          0.2
+        ],
+        "claude-fable-5-1": [
+          10.0,
+          50.0,
+          12.5,
+          20.0,
+          0.25
+        ],
+        "claude-haiku-4-5-20251001": [
+          1.0,
+          5.0,
+          1.25,
+          2.0,
+          0.1
+        ]
+      }
+    },
+    "scan": {
+      "advisor": {
+        "by_model": {
+          "advisor(claude-fable-5-1)": {
+            "cost_usd": 1790.54,
+            "input_tokens": 146566638,
+            "iterations": 750,
+            "output_tokens": 6497522
+          },
+          "advisor(claude-opus-5-5)": {
+            "cost_usd": 1130.31,
+            "input_tokens": 230876457,
+            "iterations": 1122,
+            "output_tokens": 10340373
+          }
+        },
+        "cost_share": 0.139574,
+        "cost_usd": 2920.86,
+        "iterations": 1872,
+        "iterations_by_utc_date": {
+          "2026-09-26": {
+            "advisor(claude-fable-5-1)": 235,
+            "advisor(claude-opus-5-5)": 22
+          },
+          "2026-09-27": {
+            "advisor(claude-fable-5-1)": 498,
+            "advisor(claude-opus-5-5)": 196
+          },
+          "2026-09-28": {
+            "advisor(claude-fable-5-1)": 17,
+            "advisor(claude-opus-5-5)": 509
+          },
+          "2026-09-29": {
+            "advisor(claude-opus-5-5)": 395
+          }
+        }
+      },
+      "api_calls": 186492,
+      "cache_creation": {
+        "calls_where_split_exceeds_reported": 1,
+        "calls_with_unsplit_remainder": 1878,
+        "miss_gap_5m_1h_5m_class_tokens": 168194401,
+        "miss_gap_5m_1h_cache_write_tokens": 197208714,
+        "miss_gap_5m_1h_events": 866,
+        "miss_gap_gt_1h_5m_class_tokens": 3746733,
+        "miss_gap_gt_1h_cache_write_tokens": 26798929,
+        "miss_gap_gt_1h_events": 72,
+        "miss_gap_le_5m_5m_class_tokens": 61233017,
+        "miss_gap_le_5m_cache_write_tokens": 76851169,
+        "miss_gap_le_5m_events": 473,
+        "reported_top_level": 987672811,
+        "split_1h": 142720261,
+        "split_5m": 822854060,
+        "unsplit_remainder": 22133575
+      },
+      "cache_creation_by_population": {
+        "agent_tool": {
+          "calls_where_split_exceeds_reported": 0,
+          "calls_with_unsplit_remainder": 233,
+          "miss_gap_5m_1h_5m_class_tokens": 68523847,
+          "miss_gap_5m_1h_cache_write_tokens": 68523847,
+          "miss_gap_5m_1h_events": 195,
+          "miss_gap_gt_1h_5m_class_tokens": 3746733,
+          "miss_gap_gt_1h_cache_write_tokens": 3746733,
+          "miss_gap_gt_1h_events": 13,
+          "miss_gap_le_5m_5m_class_tokens": 13006500,
+          "miss_gap_le_5m_cache_write_tokens": 13006500,
+          "miss_gap_le_5m_events": 87,
+          "reported_top_level": 174083015,
+          "split_1h": 0,
+          "split_5m": 172335001,
+          "unsplit_remainder": 1748014
+        },
+        "main": {
+          "calls_where_split_exceeds_reported": 1,
+          "calls_with_unsplit_remainder": 118,
+          "miss_gap_5m_1h_5m_class_tokens": 0,
+          "miss_gap_5m_1h_cache_write_tokens": 29014313,
+          "miss_gap_5m_1h_events": 77,
+          "miss_gap_gt_1h_5m_class_tokens": 0,
+          "miss_gap_gt_1h_cache_write_tokens": 23052196,
+          "miss_gap_gt_1h_events": 59,
+          "miss_gap_le_5m_5m_class_tokens": 0,
+          "miss_gap_le_5m_cache_write_tokens": 15618152,
+          "miss_gap_le_5m_events": 108,
+          "reported_top_level": 143057871,
+          "split_1h": 142720261,
+          "split_5m": 0,
+          "unsplit_remainder": 372695
+        },
+        "workflow": {
+          "calls_where_split_exceeds_reported": 0,
+          "calls_with_unsplit_remainder": 1527,
+          "miss_gap_5m_1h_5m_class_tokens": 99670554,
+          "miss_gap_5m_1h_cache_write_tokens": 99670554,
+          "miss_gap_5m_1h_events": 594,
+          "miss_gap_le_5m_5m_class_tokens": 48226517,
+          "miss_gap_le_5m_cache_write_tokens": 48226517,
+          "miss_gap_le_5m_events": 278,
+          "reported_top_level": 670531925,
+          "split_1h": 0,
+          "split_5m": 650519059,
+          "unsplit_remainder": 20012866
+        }
+      },
+      "cache_creation_children": {
+        "calls_where_split_exceeds_reported": 0,
+        "calls_with_unsplit_remainder": 1760,
+        "miss_gap_5m_1h_5m_class_tokens": 168194401,
+        "miss_gap_5m_1h_cache_write_tokens": 168194401,
+        "miss_gap_5m_1h_events": 789,
+        "miss_gap_gt_1h_5m_class_tokens": 3746733,
+        "miss_gap_gt_1h_cache_write_tokens": 3746733,
+        "miss_gap_gt_1h_events": 13,
+        "miss_gap_le_5m_5m_class_tokens": 61233017,
+        "miss_gap_le_5m_cache_write_tokens": 61233017,
+        "miss_gap_le_5m_events": 365,
+        "reported_top_level": 844614940,
+        "split_1h": 0,
+        "split_5m": 822854060,
+        "unsplit_remainder": 21760880
+      },
+      "cache_misses": {
+        "gap_5m_1h_5m_class_tokens": 168194401,
+        "gap_5m_1h_cache_write_tokens": 197208714,
+        "gap_5m_1h_events": 866,
+        "gap_gt_1h_5m_class_tokens": 3746733,
+        "gap_gt_1h_cache_write_tokens": 26798929,
+        "gap_gt_1h_events": 72,
+        "gap_le_5m_5m_class_tokens": 61233017,
+        "gap_le_5m_cache_write_tokens": 76851169,
+        "gap_le_5m_events": 473
+      },
+      "children": {
+        "calls_max": 1489,
+        "calls_p50": 25,
+        "calls_p75": 58,
+        "calls_p90": 100,
+        "calls_p99": 260,
+        "count": 3624,
+        "median_first_call_context_tokens": 38583,
+        "over_60_calls": {
+          "count": 863,
+          "share_of_all_cost": 0.532292
+        }
+      },
+      "children_by_agent_type": {
+        "(40 other types)": {
+          "cost_share": 0.009709,
+          "count": 60,
+          "median_calls": 4,
+          "median_first_call_context_tokens": 23500
+        },
+        "Explore": {
+          "cost_share": 0.007989,
+          "count": 59,
+          "median_calls": 48,
+          "median_first_call_context_tokens": 17258
+        },
+        "blind-adjudicator": {
+          "cost_share": 0.001342,
+          "count": 12,
+          "median_calls": 14,
+          "median_first_call_context_tokens": 8303
+        },
+        "claude": {
+          "cost_share": 0.006018,
+          "count": 7,
+          "median_calls": 120,
+          "median_first_call_context_tokens": 34106
+        },
+        "evidence-reviewer": {
+          "cost_share": 0.069729,
+          "count": 312,
+          "median_calls": 35,
+          "median_first_call_context_tokens": 19461
+        },
+        "general-purpose": {
+          "cost_share": 0.238067,
+          "count": 619,
+          "median_calls": 37,
+          "median_first_call_context_tokens": 40097
+        },
+        "isolated-builder": {
+          "cost_share": 0.124222,
+          "count": 160,
+          "median_calls": 104,
+          "median_first_call_context_tokens": 29764
+        },
+        "landscape-sweep-worker": {
+          "cost_share": 0.030996,
+          "count": 112,
+          "median_calls": 38,
+          "median_first_call_context_tokens": 47908
+        },
+        "security-reviewer": {
+          "cost_share": 0.004697,
+          "count": 18,
+          "median_calls": 31,
+          "median_first_call_context_tokens": 26869
+        },
+        "source-scout": {
+          "cost_share": 0.006711,
+          "count": 79,
+          "median_calls": 17,
+          "median_first_call_context_tokens": 8179
+        },
+        "stack-researcher": {
+          "cost_share": 0.115495,
+          "count": 397,
+          "median_calls": 58,
+          "median_first_call_context_tokens": 21663
+        },
+        "stack-verifier": {
+          "cost_share": 0.038724,
+          "count": 176,
+          "median_calls": 52,
+          "median_first_call_context_tokens": 15200
+        },
+        "workflow-subagent": {
+          "cost_share": 0.159351,
+          "count": 1613,
+          "median_calls": 10,
+          "median_first_call_context_tokens": 39209
+        }
+      },
+      "client_versions_by_transcript_file": {
+        "(none)": 151,
+        "2.1.280": 2,
+        "2.1.281": 549,
+        "2.1.282": 659,
+        "2.1.283": 1995,
+        "2.1.284": 978
+      },
+      "context_bins": {
+        "100-200K": {
+          "cache_read_tokens": 8674788246,
+          "calls": 59358,
+          "cost_usd": 5510.4
+        },
+        "200-400K": {
+          "cache_read_tokens": 15238257870,
+          "calls": 54834,
+          "cost_usd": 7659.27
+        },
+        "400-700K": {
+          "cache_read_tokens": 9567752027,
+          "calls": 18613,
+          "cost_usd": 3493.9
+        },
+        "50-100K": {
+          "cache_read_tokens": 2268977676,
+          "calls": 32591,
+          "cost_usd": 2084.0
+        },
+        "<50K": {
+          "cache_read_tokens": 435714233,
+          "calls": 14741,
+          "cost_usd": 804.96
+        },
+        ">=700K": {
+          "cache_read_tokens": 5110737160,
+          "calls": 6355,
+          "cost_usd": 1374.35
+        }
+      },
+      "cost_share_by_class": {
+        "advisor": 0.139574,
+        "cr": 0.394625,
+        "cw1": 0.047871,
+        "cw5": 0.174824,
+        "cwx": 0.004844,
+        "in": 0.000131,
+        "out": 0.23813
+      },
+      "cost_usd_list_price": 20926.87,
+      "default_typed_children": {
+        "cost_share": 0.411425,
+        "count": 2298,
+        "count_share": 0.634106,
+        "median_calls": 15,
+        "median_first_call_context_tokens": 39528,
+        "types": [
+          "Explore",
+          "claude",
+          "general-purpose",
+          "workflow-subagent"
+        ]
+      },
+      "effort_calls": {
+        "None": {
+          "calls": 243,
+          "output_tokens": 46788
+        },
+        "high": {
+          "calls": 9588,
+          "output_tokens": 10388268
+        },
+        "low": {
+          "calls": 13,
+          "output_tokens": 20569
+        },
+        "max": {
+          "calls": 153387,
+          "output_tokens": 251722777
+        },
+        "medium": {
+          "calls": 6031,
+          "output_tokens": 3811545
+        },
+        "xhigh": {
+          "calls": 17230,
+          "output_tokens": 15420029
+        }
+      },
+      "executor_class_tokens": {
+        "cr": 41296227212,
+        "cw1": 142720261,
+        "cw5": 822854060,
+        "cwx": 22133575,
+        "in": 792885,
+        "out": 281409976
+      },
+      "mcp_calls_by_server": {
+        "ai-memory": 137,
+        "codebase-memory": 27,
+        "headroom": 26,
+        "jcodemunch": 81,
+        "plugin_context-mode": 1,
+        "plugin_context-mode_context-mode": 31331,
+        "qmd": 58,
+        "serena": 28,
+        "socraticode": 68,
+        "ticket-tracker": 17,
+        "wp1probe_cli": 3
+      },
+      "model_cost_share": {
+        "claude-fable-5-1": 0.085562,
+        "claude-haiku-4-5-20251001": 0.00022,
+        "claude-opus-5-5": 0.764902,
+        "claude-sonnet-5": 0.101224,
+        "claude-sonnet-5-5": 0.048092
+      },
+      "model_cost_usd": {
+        "claude-fable-5-1": 1790.54,
+        "claude-haiku-4-5-20251001": 4.61,
+        "claude-opus-5-5": 16007.0,
+        "claude-sonnet-5": 2118.3,
+        "claude-sonnet-5-5": 1006.41
+      },
+      "populations": {
+        "agent_tool": {
+          "api_calls": 28149,
+          "cost_share": 0.152373,
+          "cost_usd": 3188.69,
+          "files": 364
+        },
+        "main": {
+          "api_calls": 29141,
+          "cost_share": 0.186949,
+          "cost_usd": 3912.26,
+          "files": 710
+        },
+        "workflow": {
+          "api_calls": 129202,
+          "cost_share": 0.660678,
+          "cost_usd": 13825.92,
+          "files": 3260
+        }
+      },
+      "scanned": {
+        "files_with_calls": 4334,
+        "projects": 340,
+        "since": null,
+        "transcript_files": 4334
+      },
+      "session_trees": {
+        "count": 710,
+        "top_11_share": 0.799968,
+        "top_1_share": 0.287657,
+        "top_4_share": 0.52098,
+        "trees_covering_50pct": 4,
+        "trees_covering_80pct": 12
+      },
+      "skill_tool_calls": {
+        "top": [
+          [
+            "verification-before-completion",
+            199
+          ],
+          [
+            "supply-chain-risk-auditor",
+            188
+          ],
+          [
+            "fp-check",
+            121
+          ],
+          [
+            "search-first",
+            108
+          ],
+          [
+            "iterative-retrieval",
+            83
+          ],
+          [
+            "workflow-authoring",
+            7
+          ],
+          [
+            "codebase-design",
+            5
+          ],
+          [
+            "property-based-testing",
+            3
+          ]
+        ],
+        "total": 730
+      },
+      "thinking_tokens_share_of_output": 0.609814,
+      "tokens_by_model": {
+        "advisor(claude-fable-5-1)": {
+          "calls": 750,
+          "cr": 0,
+          "cw5": 0,
+          "in": 146566638,
+          "out": 6497522
+        },
+        "advisor(claude-opus-5-5)": {
+          "calls": 1122,
+          "cr": 0,
+          "cw5": 0,
+          "in": 230876457,
+          "out": 10340373
+        },
+        "claude-haiku-4-5-20251001": {
+          "calls": 243,
+          "cr": 5222078,
+          "cw1": 1626227,
+          "cw5": 482532,
+          "cw_reported": 2108759,
+          "cwx": 0,
+          "in": 2360,
+          "out": 46788,
+          "think": 31158,
+          "unsplit_cache_write_usd": 0.0
+        },
+        "claude-opus-4-8": {
+          "calls": 18,
+          "cr": 2270447,
+          "cw1": 0,
+          "cw5": 288247,
+          "cw_reported": 288247,
+          "cwx": 0,
+          "in": 36,
+          "out": 88634,
+          "think": 77596
+        },
+        "claude-opus-5-5": {
+          "calls": 146968,
+          "calls_split_exceeds_reported": 1,
+          "calls_with_unsplit_cache_write": 1607,
+          "cr": 31839350368,
+          "cw1": 108542717,
+          "cw5": 641082189,
+          "cw_reported": 768008178,
+          "cwx": 18418357,
+          "in": 576387,
+          "out": 217033469,
+          "think": 130698934,
+          "unsplit_cache_write_usd": 92.09
+        },
+        "claude-sonnet-5": {
+          "calls": 30032,
+          "calls_with_unsplit_cache_write": 196,
+          "cr": 6178332040,
+          "cw1": 4174070,
+          "cw5": 157250369,
+          "cw_reported": 163186730,
+          "cwx": 1762291,
+          "in": 152058,
+          "out": 46810230,
+          "think": 29768462,
+          "unsplit_cache_write_usd": 4.41
+        },
+        "claude-sonnet-5-5": {
+          "calls": 9231,
+          "calls_with_unsplit_cache_write": 75,
+          "cr": 3271052279,
+          "cw1": 28377247,
+          "cw5": 23750723,
+          "cw_reported": 54080897,
+          "cwx": 1952927,
+          "in": 62044,
+          "out": 17430855,
+          "think": 11031672,
+          "unsplit_cache_write_usd": 4.88
+        }
+      },
+      "tool_calls": {
+        "builtin_top": [
+          [
+            "Bash",
+            125169
+          ],
+          [
+            "Read",
+            19794
+          ],
+          [
+            "Edit",
+            11787
+          ],
+          [
+            "Write",
+            5371
+          ],
+          [
+            "Grep",
+            3937
+          ],
+          [
+            "StructuredOutput",
+            2912
+          ],
+          [
+            "ToolSearch",
+            2472
+          ],
+          [
+            "SendMessage",
+            1656
+          ],
+          [
+            "WebFetch",
+            1637
+          ],
+          [
+            "WebSearch",
+            1413
+          ],
+          [
+            "Skill",
+            730
+          ],
+          [
+            "Glob",
+            541
+          ],
+          [
+            "Monitor",
+            366
+          ],
+          [
+            "Agent",
+            360
+          ]
+        ],
+        "mcp_total": 31777,
+        "total": 210900
+      },
+      "toolsearch_loads_by_server": {
+        "(builtin or unknown)": 1440,
+        "<keyword-search>": 101,
+        "ai-memory": 238,
+        "codebase-memory": 57,
+        "headroom": 119,
+        "jcodemunch": 102,
+        "plugin_context-mode_context-mode": 4963,
+        "qmd": 519,
+        "serena": 694,
+        "socraticode": 132,
+        "ticket-tracker": 32,
+        "wp1probe_cli": 3
+      },
+      "totals_comparable_to_ccusage": {
+        "cacheCreationTokens": 965574321,
+        "cacheReadTokens": 41296227212,
+        "inputTokens": 378235980,
+        "note": "executor plus advisor tokens; cache creation is the 5m plus 1h split, without the unsplit remainder",
+        "outputTokens": 298247871
+      },
+      "unpriced_model_tokens": {
+        "claude-opus-4-8": 2647364
+      },
+      "unsplit_cache_write_cost_usd": 101.38,
+      "window": {
+        "first_call_date": "2026-09-24",
+        "last_call_date": "2026-09-29"
+      }
+    },
+    "control": {
+      "expected": {
+        "advisor_iterations": 1,
+        "agent_tool_calls": 1,
+        "api_calls": 4,
+        "executor_output_tokens": 64,
+        "reported_cache_creation": 100,
+        "serena_loads": 1,
+        "skill_calls": 1,
+        "unsplit_remainder": 20,
+        "workflow_files": 1
+      },
+      "mutants": {
+        "advisor": {
+          "expected_wrong_values": {
+            "advisor_iterations": 0
+          },
+          "moved_as_expected": true,
+          "observed": {
+            "advisor_iterations": 0
+          }
+        },
+        "dedup": {
+          "expected_wrong_values": {
+            "api_calls": 5,
+            "executor_output_tokens": 69
+          },
+          "moved_as_expected": true,
+          "observed": {
+            "api_calls": 5,
+            "executor_output_tokens": 69
+          }
+        },
+        "since": {
+          "expected_wrong_values": {
+            "api_calls": 5,
+            "executor_output_tokens": 73,
+            "skill_calls": 2
+          },
+          "moved_as_expected": true,
+          "observed": {
+            "api_calls": 5,
+            "executor_output_tokens": 73,
+            "skill_calls": 2
+          }
+        },
+        "skip_journal": {
+          "expected_wrong_values": {
+            "api_calls": 5,
+            "executor_output_tokens": 163,
+            "workflow_files": 2
+          },
+          "moved_as_expected": true,
+          "observed": {
+            "api_calls": 5,
+            "executor_output_tokens": 163,
+            "workflow_files": 2
+          }
+        },
+        "skip_synthetic": {
+          "expected_wrong_values": {
+            "api_calls": 5
+          },
+          "moved_as_expected": true,
+          "observed": {
+            "api_calls": 5
+          }
+        }
+      },
+      "observed": {
+        "advisor_iterations": 1,
+        "agent_tool_calls": 1,
+        "api_calls": 4,
+        "executor_output_tokens": 64,
+        "reported_cache_creation": 100,
+        "serena_loads": 1,
+        "skill_calls": 1,
+        "unsplit_remainder": 20,
+        "workflow_files": 1
+      },
+      "passed": true
+    }
+  },
+  "provenance": {
+    "commands": [
+      "cp -a ~/.claude/projects <snapshot directory>/projects",
+      "CLAUDE_CONFIG_DIR=<snapshot directory> ccusage claude daily --json --offline",
+      "CLAUDE_CONFIG_DIR=<snapshot directory> ccusage claude session --json --offline",
+      "cp evidence/artifacts/claude-spend-scan.py.txt claude_spend_scan.py && python3 claude_spend_scan.py --root <snapshot directory>/projects",
+      "python3 claude_spend_scan.py --control"
+    ],
+    "assembly": "data.reconciliation, data.ccusage_session_view and data.derived are computed from those four outputs: reconciliation compares data.scan.totals_comparable_to_ccusage with data.ccusage.totals; the session view counts ccusage session rows whose id starts with 'wf_' as workflow runs; data.derived applies the price ratios in its basis line to data.scan.cache_creation_children.",
+    "script_artifact": "evidence/artifacts/claude-spend-scan.py.txt",
+    "script_sha256": "44be91b27be36efa3fb7b75c565ee6fd6c33d9020abffef69bdf9f845d4e7ab4",
+    "references": [
+      "https://github.com/ccusage/ccusage (the repository pinned in manifests/stack.json; v20.0.26 installed; v20.0.17 release notes: 'claude: Count advisor model usage'): the upstream counter the totals are reconciled to. The scan keeps the per-field maximum across the entries of one message.id; the reconciliation, not the ccusage source, is the evidence that this matches.",
+      "examples/claude-native/workflows/child-usage.mjs at 9ad7bebe (transcriptUsage): the repository's own per-child counter, which keeps the row with the largest counter total per message.id and reads no usage.iterations (receipt claude-advisor-usage-scan-20260928).",
+      "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool#usage-and-billing (read 2026-09-29): 'Top-level `usage` fields reflect executor tokens only.'",
+      "https://code.claude.com/docs/en/advisor (read 2026-09-29): 'The advisor model's own read of the conversation is not cached.'",
+      "https://platform.claude.com/docs/en/about-claude/pricing (fetched 2026-09-29): cache read is 0.1x the base input price, 0.05x on Claude Opus 5.5 and 0.025x on Claude Fable 5.1; the 5m write is 1.25x and the 1h write 2x."
+    ]
+  }
+}

@@ -112,6 +112,8 @@ curl --fail --silent --get http://127.0.0.1:19090/api/v1/query \
 curl --fail --silent --get http://127.0.0.1:13100/loki/api/v1/query_range \
   --data-urlencode 'query={service_name="claude-code"}' --data-urlencode 'limit=5'
 curl --fail --silent 'http://127.0.0.1:18080/ecosystem-alerts/json?poll=1&since=all'
+# The Codex lane warnings' own topic (#671), added after receipt.json was recorded.
+curl --fail --silent 'http://127.0.0.1:18080/ecosystem-lanes/json?poll=1&since=all'
 ```
 
 The exact historical commands, status and counter semantics are recorded in
@@ -127,9 +129,16 @@ hooks and all unrelated settings. Back up configuration without copying auth sto
 Configured future native starts pick up the exporters. This acceptance launched
 fresh native children from the current Desktop task; it did not restart or
 hot-reload the already-running Desktop process. A new Desktop process/session
-needs its own observed exporter/discovery receipt. The installed ecosystem
-launchers assign a fresh `service.instance.id` per native process. For a direct
-upstream command, supply an equivalent fresh opaque ID:
+needs its own observed exporter/discovery receipt.
+
+Every writer needs its own series (changed after `v2026.09.26.2`; see
+[writer identity](collector/README.md#writer-identity-and-counter-integrity)).
+A Claude session is its own writer through `session.id`, which the Collector
+turns into `service.instance.id`. A Codex process gets a fresh
+`service.instance.id` from the identity launcher (appended to an inherited one
+as `<inherited>/<fresh>`), and the installed ecosystem launchers assign one per
+native process. For a direct upstream command without either, supply an
+equivalent fresh opaque ID:
 
 ```bash
 export OTEL_RESOURCE_ATTRIBUTES="service.instance.id=$(cat /proc/sys/kernel/random/uuid),ecosystem.client.scope=native-codex"
@@ -157,7 +166,8 @@ output 11 in the returned Claude stream, Loki and Prometheus. Direct launches
 without writer/task attributes still produced telemetry, but did not support
 the same exact-session join. Do not infer no telemetry from an empty raw-session
 query when session IDs are intentionally suppressed. Prometheus uses the writer
-as its instance; a hashed task label is not a license to publish raw local IDs.
+as its instance (`<writer>/<session.id>` when the process also sends session
+IDs); a hashed task label is not a license to publish raw local IDs.
 
 The SDK and ACP examples also assign per-process IDs. The SDK helper accepts
 `--observation-dir "$STACK_DATA_ROOT/sdk-receipts"` (or the native environment
@@ -177,9 +187,10 @@ These receipt IDs live on each log record, not the shared resource. Replaying a
 receipt must retain its ID. Failed/unknown usage remains unknown. The spool is
 private and has no automatic age-based cleanup yet.
  Task correlation stays in
-private logs; low-cardinality client-scope labels support dashboards. Direct
-clients without an instance ID are labeled `unscoped`; their metrics do not
-establish safe multi-writer accounting. The first CLI calibration predates that
+private logs; low-cardinality client-scope labels support dashboards. A writer
+with neither a session ID nor an instance ID is labeled `unscoped`; its metrics
+do not establish safe multi-writer accounting, so the dashboards exclude it and
+the `EcosystemUnscopedTokenWriters` alert names it. The first CLI calibration predates that
 identity refinement and is reconciled against its own native receipts. The later
 [SDK histogram fix](session-e2e.md#what-fixed-the-sdk-histogram) is persisted in the
 selected user configurations.
@@ -199,9 +210,11 @@ TOKENIZER_PREFIX="$INSTALLED_TOKENIZER_PREFIX" \
   node scripts/recount-tokens.cjs --observability
 ```
 
-The counter uses upstream `gpt-tokenizer@3.4.0`, `o200k_base`. This gives exact
+The counter uses upstream `gpt-tokenizer@4.0.0`, `o200k_base`. This gives exact
 counts for those stored artifacts and that encoding, not an attestation of every
-provider's tokenizer. Keep full source recovery available. Do not add Context
+provider's tokenizer. The pair was first counted with 3.4.0, and 4.0.0 returns the
+same counts ([qualification](../evidence/receipts/gpt-tokenizer-400-qualification-20260929.json)).
+Keep full source recovery available. Do not add Context
 Mode/RTK estimates to cache reuse or subtract them from native provider totals.
 
 Codex cached input is a subset of input; reasoning is a subset of output.

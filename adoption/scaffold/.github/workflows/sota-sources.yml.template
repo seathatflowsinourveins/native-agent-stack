@@ -1,0 +1,24 @@
+name: SOTA sources
+
+# Every pull request description needs a non-empty "## SOTA sources" (or ###) section naming the maintained
+# repository, pin and file, or the published reference, behind each change. The check is the reusable
+# .github/workflows/sota-sources-gate.yml of seathatflowsinourveins/native-agent-stack, pinned to the main commit this
+# file was generated from (its tools/adoption/scaffold_repo.py); make the check it reports a required status check.
+# A repository whose Actions settings allow only selected actions must allow that reusable workflow and the
+# step-security/harden-runner action it runs (its actions/github-script is GitHub-owned).
+
+on:
+  pull_request:
+    # edited also re-runs the check when the description or the base branch changes.
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  sota-sources:
+    uses: seathatflowsinourveins/native-agent-stack/.github/workflows/sota-sources-gate.yml@<sha>

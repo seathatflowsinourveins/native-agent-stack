@@ -66,6 +66,16 @@
         "identity_sha256": "739ff768866f471b76d2597625e6fdcdc20a33829e1c3b6df3b3c8aa754cc057",
         "model": "claude-sonnet-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session (claude-opus-5-5); adequacy-checked points 2 and 3 against the receipt JSON and reproduced once in a throwaway cp -a copy of the worktree. Defect confirmed: command 2 fails open. The primary run's checks and the control run form one && chain, so when the primary run or its statistics check fails the control never runs, crc is nonzero, and '! grep -q' succeeds on the missing control/stdout.txt, so the command exits 0. Re-run with only the primary run's --data-folder pointed at a missing directory: exit 0, grep reported control/stdout.txt missing, and the command still printed its 'every ExpectedStatistics field matched' success sentence. This recording's excerpt does show 28/28 statistics and 6 order events, so the observed run succeeded, but its exit status cannot fail on a failed primary run and 'Every command exits 0 on its own assertions' overstates what exit 0 proves (point 3). Fail-closed successor: lean--use--20260926.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T10:22:35Z",
+      "reviewer": {
+        "identity_sha256": "e3e758a4ec14358c858079587aca14d44770aa531b79a646a6b6de49de90efdc",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }

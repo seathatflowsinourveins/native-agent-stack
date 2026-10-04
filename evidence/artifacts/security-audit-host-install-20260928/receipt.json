@@ -1,0 +1,148 @@
+{
+  "id": "security-audit-host-install-20260928",
+  "kind": "native_host_install_and_upstream_tests",
+  "unit": "Plan M5a host install and the first M5b gate for cloudflare/security-audit-skill (trial row from PR #448)",
+  "repository": "seathatflowsinourveins/native-agent-stack",
+  "catalog_revision": "8315274fee9a9173a28b6115862a7539b4fc3bee",
+  "host_id": null,
+  "measured_at_utc": {
+    "settings_edit": "2026-09-28T09:08:21Z",
+    "install": "2026-09-28T09:08:33Z",
+    "codex_disable": "2026-09-28T09:08:43Z",
+    "node_test_start": "2026-09-28T09:09:19Z",
+    "node_test_end": "2026-09-28T09:09:20Z"
+  },
+  "placeholders": {
+    "~": "the operator's home directory"
+  },
+  "pin": {
+    "repository": "cloudflare/security-audit-skill",
+    "commit": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+    "tree_sha": "ccbc33ed119b28c3ef7b44a7e2081ab191ad63af",
+    "skill_md_sha256": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85"
+  },
+  "clients": {
+    "claude_code": "2.1.283",
+    "skills_cli": "1.7.0",
+    "node": "v24.21.0",
+    "codex_cli": "0.157.1"
+  },
+  "steps": [
+    {
+      "step": "announce",
+      "detail": "Peers native-agent-stack-a9 and token-save-practice-e2e-status were told before the host change; a9 replied it was not mid-edit on the settings file, the skills lock or ~/.agents/skills."
+    },
+    {
+      "step": "claude listing",
+      "command": "jq '.skillOverrides[\"security-audit\"]=\"name-only\"' ~/.claude/settings.json (atomic replace after a backup)",
+      "result": "only that key added (a Python check compared the whole document with the old one plus the key); permissions.deny length 87 unchanged",
+      "evidence_class": "our-integration"
+    },
+    {
+      "step": "dry run",
+      "command": "python3 tools/adoption/install_skills.py --only security-audit --skills-bin <skills 1.7.0> --dry-run --json",
+      "exit": 0,
+      "output": {
+        "dry_run": true,
+        "ok": true,
+        "skills": {
+          "security-audit": "planned"
+        }
+      },
+      "evidence_class": "our-integration"
+    },
+    {
+      "step": "install",
+      "command": "python3 tools/adoption/install_skills.py --only security-audit --skills-bin <skills 1.7.0> --json",
+      "exit": 0,
+      "output": {
+        "dry_run": false,
+        "ok": true,
+        "skills": {
+          "security-audit": "installed"
+        }
+      },
+      "evidence_class": "our-integration (drives the upstream skills CLI unchanged)"
+    },
+    {
+      "step": "codex disable",
+      "command": "append the security-audit block printed by install_skills.py --print-codex-config to ~/.codex/config.toml (after a backup)",
+      "result": "tomllib read-back: {'name': 'security-audit', 'enabled': False}; 17 skills.config entries",
+      "evidence_class": "our-integration"
+    },
+    {
+      "step": "status read-back",
+      "command": "python3 scripts/skills_status.py --json",
+      "output": {
+        "name": "security-audit",
+        "pass": true,
+        "canonical": "ok",
+        "claude_link": "ok (relative)",
+        "claude_listing": "ok (actual name-only)",
+        "codex_disable": "ok (entry present)",
+        "folder_tree": "ok",
+        "lock": "ok"
+      },
+      "evidence_class": "our-integration"
+    },
+    {
+      "step": "native listing read-back",
+      "command": "python3 tools/skill-usage/skill_usage.py --run-skill-doctor --json (headless claude -p \"/skill-doctor\")",
+      "output": {
+        "listing": "name-only",
+        "context_tokens": 20,
+        "in_table": true,
+        "uses": 0,
+        "last_used": "never",
+        "status": "trial"
+      },
+      "evidence_class": "upstream-unchanged (Claude Code's own /skill-doctor)"
+    },
+    {
+      "step": "M5b gate 1",
+      "command": "TMPDIR=/var/tmp node --test validate-findings.test.cjs validate-coverage-ledger.test.cjs, in a byte-identical copy of the installed folder (sha256 of every file compared)",
+      "exit": 0,
+      "output": {
+        "tests": 65,
+        "pass": 65,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "output_file": "node-test.txt",
+      "output_sha256": "5a83b061db631b46bdd450b9949f4f7e85d79df65a81875e606175b23721822a",
+      "evidence_class": "upstream-unchanged"
+    }
+  ],
+  "upstream_identity": {
+    "method": "gh api -H 'Accept: application/vnd.github.raw' repos/cloudflare/security-audit-skill/contents/skills/security-audit/<file>?ref=c1c8a8c1471069fb0e188eeaff69b8e8db6564a8 | sha256sum, compared with the installed file",
+    "files": {
+      "validate-findings.test.cjs": "b92001117a92c4161d43777a0ba2fa182a8a4d97f2304cc8c0cee5331497b73b",
+      "validate-coverage-ledger.test.cjs": "cfb9df26b03469a4279a70e7664a2a5434dd6f8c2c204e91f9b0aeb9dd71e648",
+      "validate-findings.cjs": "e85f232e36bfac0f866f244da50376692d6b45c690beadcb00608b0e6c8b5283",
+      "validate-coverage-ledger.cjs": "2eb280bd2e33c002916f86db9b29f9edfedb6454e5db973c766290465b868ac8"
+    },
+    "result": "all four match"
+  },
+  "m5b": {
+    "gate_1_upstream_tests": "passed (65 of 65)",
+    "gate_2_labelled_fixture": "open: no upstream labelled set checked yet; no pre-registered seeded copy built",
+    "gate_3_budget": "set high by the user on 2026-09-27, but only after Gate A (token-save end to end) and Gate B (settled GPT-6 route); neither has passed (token-save-practice-e2e-status, 2026-09-28)",
+    "m5c": "queued"
+  },
+  "deviations": [
+    "The trial decision says the Codex table goes into ~/.codex/config.toml before the install; it was appended 10 s after it (09:08:33Z install, 09:08:43Z append). The Claude override went in first, as planned."
+  ],
+  "limitations": [
+    "One host; historical receipts do not certify another host.",
+    "Invocation reach is still live-run-pending: whether a typed /security-audit runs, and whether Claude invokes the skill unprompted, were not probed. The skills docs give name-only 'Yes' in the / menu column.",
+    "The node tests check the skill's validators only, not audit quality; M5c decides merit.",
+    "settings and Codex config backups exist on the host only; their contents are not recorded."
+  ],
+  "sources": [
+    "adoption/skills/manifest.json (security-audit row)",
+    "docs/decisions/2026-09-25-skills-trial-and-usage.md (M5a, M5b)",
+    "https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8/skills/security-audit"
+  ]
+}
