@@ -486,7 +486,6 @@ class WorkflowInstallTests(unittest.TestCase):
                 self.assertFalse((home / ".claude").exists())
 
 
-
 class SecretGuardProfileTests(unittest.TestCase):
     """The secret-path guard and its deny rules ship in the user profile for every new host."""
 
