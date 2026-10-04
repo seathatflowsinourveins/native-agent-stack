@@ -1,0 +1,15 @@
+....F.....
+======================================================================
+FAIL: test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 464, in test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines
+    self.fail("\n".join(unpinned) + "\n" + NEW_REFERENCE)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: .claude/agents/x.md:9: sha256 505b51310ac914c53c5dc005550fa7aa33c25316f1ea5423cdaef10ea1620eb0: command: pnpm --dir evidence/artifacts/macos-application-20260924/variant install --frozen-lockfile
+A scanned file newly names the frozen macOS artifact (lines above). Treat it as a use: reopen Dependabot alert 16 and remove the frozen OSV exception (its config .github/osv-scanner-frozen-macos.toml, its inventory key in .github/osv-scanner-lockfiles.json and its FROZEN_LOCKS row in tests/test_osv_lockfile_coverage.py) before installing, building or serving from the lock (docs/decisions/2026-09-22-github-automation-closure.md, 'Dependabot alert 16'). Only a line that describes or checks the artifact without using it may be pinned in PINNED_LINES instead, after review.
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.391s
+
+FAILED (failures=1)

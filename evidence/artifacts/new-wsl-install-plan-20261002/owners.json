@@ -1,6 +1,6 @@
 {
  "generated_at_utc": "2026-10-02T02:12:15Z",
- "revised_at_utc": "2026-10-03T03:56:37Z",
+ "revised_at_utc": "2026-10-03T18:26:54Z",
  "source": "origin/main definitive manifest, one row per foundation row",
  "owners": [
   {
@@ -184,10 +184,10 @@
   {
    "layer": "semantic-rag",
    "slot": "code-search",
-   "owner": "Not installed until the deciding measurement returns (the families split between semble and SocratiCode)",
-   "repository": "",
-   "installed": false,
-   "note": "waits for or was settled by a measurement: outside the combination rule"
+   "owner": "semble 0.6.1",
+   "repository": "https://github.com/MinishLab/semble",
+   "installed": true,
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pins are the wave-2 code-search ruling's, in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "semantic-rag",
@@ -261,10 +261,10 @@
   {
    "layer": "durable-memory",
    "slot": "memory-owner",
-   "owner": "Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory)",
-   "repository": "",
-   "installed": false,
-   "note": "waits for or was settled by a measurement: outside the combination rule"
+   "owner": "ai-memory 2.5.2",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "installed": true,
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pin is the wave-2 memory dossier's, in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "token-efficiency",
@@ -277,10 +277,18 @@
   {
    "layer": "token-efficiency",
    "slot": "context-supply",
-   "owner": "No context-supply layer: the usage meter only",
-   "repository": "",
-   "installed": false,
-   "note": "decided by both families in the decision round on a measured comparison: no context-supply layer"
+   "owner": "context-mode 1.0.169",
+   "repository": "https://github.com/mksglu/context-mode",
+   "installed": true,
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pins are the wave-2 context ruling's, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "statusline",
+   "owner": "claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line",
+   "repository": "https://github.com/jarrodwatts/claude-hud",
+   "installed": true,
+   "note": "added by the wave-2 batch of the layer consensus (2026-10-03); the pin is the wave-2 usage ruling's, in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "observation-inference",
