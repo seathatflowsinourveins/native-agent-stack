@@ -1521,6 +1521,50 @@ class GateDataReadTests(unittest.TestCase):
                     record = self.check({"docs/guide.md": "changed\n"}, fixture=fixture, gate=gate)
                 self.assertEqual((record["status"], record["reasons"]), ("fail", [reason]))
 
+    def test_imported_constant_tree_read_failures_inside_monitor_refuse(self):
+        target = "tests/test_policy.py"
+        files = {**READS_FILES,
+                 target: GATE_FILES[target] + '\nPOLICY_FILE = "policy/probe.json"\n',
+                 "scripts/read_policy.py": READ_POLICY +
+                    '\nfrom tests.test_policy import POLICY_FILE\n(REPO / POLICY_FILE).read_text()\n',
+                 "policy/probe.json": "{}\n"}
+        fixture = GateFixture(self.tmp / f"monitor-read-error-{secrets.token_hex(3)}", files)
+        module = load_gate(fixture.trusted)
+        gate = module.PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        original_read = module.patch_policy.GitTree.read
+        original_reads = module.gate_reads.GateReads.reads
+        cases = ((subprocess.CalledProcessError(1, ["git", "cat-file"]), "gate_error_calledprocesserror"),
+                 (subprocess.TimeoutExpired(["git", "cat-file"], 120), "gate_error_timeoutexpired"),
+                 (KeyError(target), "gate_error_keyerror"))
+        for error, reason in cases:
+            with self.subTest(error=type(error).__name__):
+                inside_reads = False
+                target_reads = []
+
+                def reads(reader, *args):
+                    nonlocal inside_reads
+                    inside_reads = True
+                    try:
+                        return original_reads(reader, *args)
+                    finally:
+                        inside_reads = False
+
+                def read(tree, path):
+                    if path == target:
+                        target_reads.append(inside_reads)
+                        # Other reads must succeed: a later policy_tests() failure
+                        # would otherwise mask the monitor swallowing this error.
+                        if inside_reads:
+                            raise error
+                    return original_read(tree, path)
+
+                with mock.patch.object(module.gate_reads.GateReads, "reads", reads), \
+                        mock.patch.object(module.patch_policy.GitTree, "read", read):
+                    record = self.check({"docs/guide.md": "changed\n"}, fixture=fixture, gate=gate)
+                self.assertTrue(target_reads, "the imported constant must read its module")
+                self.assertTrue(target_reads[0], "the module must first be read inside reads()")
+                self.assertEqual((record["status"], record["reasons"]), ("fail", [reason]))
+
     def test_data_a_gate_script_reads_is_advisory(self):
         cases = {
             "policy/contract/contract.schema.json": '{"type": "object"}\n',  # the requirement dropped

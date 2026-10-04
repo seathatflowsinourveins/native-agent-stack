@@ -25,7 +25,8 @@ GateReads path inventories and evaluator diagnostics are MONITORING ONLY, under
 advisory_gate_reads on stderr and in the receipt. They do not protect paths. The parser
 boundary also checks advisory-followed files: unparseable workflows/scripts and
 RecursionError at GateReads construction fail closed. RecursionError in reads()/executed()
-is advisory. Tree-read GateError/OSError propagates to the existing fail-closed handling.
+is advisory. Tree-read GateError, OSError, subprocess.SubprocessError and KeyError propagate
+to the existing fail-closed handling, including during imported-constant evaluation.
 The resolver entry point is disabled until a later owned-path allowlist gate lands. It
 also refuses a `run:` or `script:` text that interpolates untrusted event text
 (`pr_text_interpolated`), and it runs the zizmor version CI pins on the commit's workflows
@@ -750,7 +751,8 @@ def _add_gate_reads(enforced, tree, blobs, dirs, gate_python, test_modules):
     Every queued Python file is construction/parse-checked outside the advisory try,
     including advisory-followed files. Syntax/Value errors and RecursionError at
     GateReads construction add gate_input_unresolved. RecursionError inside reads()
-    or executed() is advisory. GateError/OSError from tree reads always propagate.
+    or executed() is advisory. GateError, OSError, subprocess.SubprocessError and KeyError
+    from tree reads propagate, including during imported-constant evaluation.
     """
     result = CiProtected()
     result.monitoring_only = True
@@ -888,7 +890,7 @@ def _add_gate_reads(enforced, tree, blobs, dirs, gate_python, test_modules):
                     for name in sorted(executed):
                         if name in blobs and (name.endswith(".py") or is_code(name)):
                             queue.append((name, "gate_reads"))
-                except (GateError, OSError):
+                except (GateError, OSError, subprocess.SubprocessError, KeyError):
                     raise
                 except Exception:  # includes evaluator recursion; continue all pending parse checks
                     result.unresolved.append(f"{path}:0")
@@ -915,7 +917,7 @@ def _add_gate_reads(enforced, tree, blobs, dirs, gate_python, test_modules):
                         result.add_file(found, "ci_import")
                         if found not in done:
                             queue.append((found, "sys_path"))
-            except (GateError, OSError):
+            except (GateError, OSError, subprocess.SubprocessError, KeyError):
                 raise
             except Exception:
                 result.unresolved.append(f"{path}:0")

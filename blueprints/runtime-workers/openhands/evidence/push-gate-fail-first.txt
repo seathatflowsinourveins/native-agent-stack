@@ -4921,3 +4921,108 @@ Command: git diff --check
 Exit code: 0
 --- diff-check-final.txt ---
 (native output empty)
+
+2026-10-04 — Coordinator-reported host run at 677acc449c56c050a85c6f555ca580c2f4792acf: `python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver`, 213 tests, OK (skipped=1), exit 0, with TMPDIR=/tmp/t489; the installed-gitleaks test test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment passed. Gitleaks version and run duration were not supplied. This supplied host observation is distinct from the builder's failed sandbox run above and is not a newly executed run by this builder.
+
+16. Monitor tree-read error propagation, 489-r8 (2026-10-04)
+
+Base: 677acc449c56c050a85c6f555ca580c2f4792acf. The worktree was clean at this round's start. Bounded Claude Opus r4 verdict: ACCEPT, one P2; source verdict-489-opus-r4.json; sha256 c93b0dd3a8e1444673500bf74afd4eb4340777a6409d7035016314e5c85877b4.
+
+Offline source convergence: search-first quick mode selected the existing GitTree.read/_run at resolver/patch_policy.py:67-86 and the installed CPython 3.13.15 Lib/subprocess.py definitions of CalledProcessError and TimeoutExpired, both inheriting SubprocessError. The local integration fixture and unittest/mock seams are reused from tests/test_runtime_worker_openhands_push_gate.py at the base. No network research or installation ran under the coordinator's explicit constraint. No new runner, dependency or reader precision repair is included. The two monitoring boundaries now re-raise subprocess.SubprocessError and KeyError as well as GateError/OSError; evaluator recursion stays advisory. This corrects the four active/historical records rather than claiming GateError/OSError are GitTree's real subprocess failure types.
+
+Discriminating synthetic fixture: a workflow-named script imports POLICY_FILE from tests/test_policy.py; that test module is skipped by the enforced-name queue and is first read during reads(). GitTree.read raises CalledProcessError, TimeoutExpired or KeyError only inside reads(); later reads outside the monitor succeed, so a later policy_tests() failure cannot mask a swallowed monitor error. The benign docs/guide.md edit passed under the pre-fix exception handling in all three cases, and now refuses with the corresponding gate_error_* reason. Six focused controls also retain the advisory derivation/evaluator-recursion and enforced parser/tree-error boundaries. These are our synthetic/local integration checks, not upstream acceptance or a live resolver run. The exception-only change does not change the unclassified baseline.
+
+Native commands use TMPDIR=/tmp/489-r8 and nice -n 19. Complete native stdout/stderr logs are retained in the round scratch directory. Published extracts omit only advisory JSON inventory lines and replace absolute worktree/stdlib traceback paths; omitted-line counts and original log hashes accompany them.
+
+Command: python3 -m unittest tests.test_runtime_worker_openhands_push_gate.GateDataReadTests.test_imported_constant_tree_read_failures_inside_monitor_refuse
+Exit code: 1
+Native log: failing-first.txt; sha256 2fdef5a0fe8147b6cc56f4d92e3899daa4e5eb609fd3f7641021da2549219fd4; bytes 4404; omitted advisory inventory lines 3
+--- failing-first.txt (sanitized native result extract) ---
+F
+======================================================================
+FAIL: test_imported_constant_tree_read_failures_inside_monitor_refuse (tests.test_runtime_worker_openhands_push_gate.GateDataReadTests.test_imported_constant_tree_read_failures_inside_monitor_refuse) (error='CalledProcessError')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_push_gate.py", line 1566, in test_imported_constant_tree_read_failures_inside_monitor_refuse
+    self.assertEqual((record["status"], record["reasons"]), ("fail", [reason]))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('pass', []) != ('fail', ['gate_error_calledprocesserror'])
+
+First differing element 0:
+'pass'
+'fail'
+
+- ('pass', [])
++ ('fail', ['gate_error_calledprocesserror'])
+
+======================================================================
+FAIL: test_imported_constant_tree_read_failures_inside_monitor_refuse (tests.test_runtime_worker_openhands_push_gate.GateDataReadTests.test_imported_constant_tree_read_failures_inside_monitor_refuse) (error='TimeoutExpired')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_push_gate.py", line 1566, in test_imported_constant_tree_read_failures_inside_monitor_refuse
+    self.assertEqual((record["status"], record["reasons"]), ("fail", [reason]))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('pass', []) != ('fail', ['gate_error_timeoutexpired'])
+
+First differing element 0:
+'pass'
+'fail'
+
+- ('pass', [])
++ ('fail', ['gate_error_timeoutexpired'])
+
+======================================================================
+FAIL: test_imported_constant_tree_read_failures_inside_monitor_refuse (tests.test_runtime_worker_openhands_push_gate.GateDataReadTests.test_imported_constant_tree_read_failures_inside_monitor_refuse) (error='KeyError')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_push_gate.py", line 1566, in test_imported_constant_tree_read_failures_inside_monitor_refuse
+    self.assertEqual((record["status"], record["reasons"]), ("fail", [reason]))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('pass', []) != ('fail', ['gate_error_keyerror'])
+
+First differing element 0:
+'pass'
+'fail'
+
+- ('pass', [])
++ ('fail', ['gate_error_keyerror'])
+
+----------------------------------------------------------------------
+Ran 1 test in 1.200s
+
+FAILED (failures=3)
+
+Command: python3 -m unittest tests.test_runtime_worker_openhands_push_gate.GateDataReadTests.test_imported_constant_tree_read_failures_inside_monitor_refuse tests.test_runtime_worker_openhands_push_gate.GateDataReadTests.test_tree_read_errors_keep_fail_closed_handling tests.test_runtime_worker_openhands_push_gate.GateDataReadTests.test_constructor_recursion_refuses_but_evaluator_recursion_is_advisory tests.test_runtime_worker_openhands_push_gate.GateDataReadTests.test_monitor_failure_cannot_skip_queued_parse_checks tests.test_runtime_worker_openhands_push_gate.GateDataReadTests.test_unparseable_advisory_followed_script_still_refuses tests.test_runtime_worker_openhands_push_gate.GateDataReadTests.test_derived_reads_are_advisory_and_cannot_refuse
+Exit code: 0
+Native log: focused-after.txt; sha256 fb39d994387809f45b33c0326a238095c69f4a47a4b25bbd5766b02cddcd1aaf; bytes 4901; omitted advisory inventory lines 11
+--- focused-after.txt (sanitized native result extract) ---
+.
+----------------------------------------------------------------------
+Ran 6 tests in 4.144s
+
+OK
+
+Command: python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver
+Exit code: 1
+Native log: unittest-final.txt; sha256 9449ef47af1a072502b49dfa99fc33fa14796f6e2cc9c62aee48c69a4103cc5d; bytes 84270; omitted advisory inventory lines 118
+--- unittest-final.txt (sanitized native result extract) ---
+======================================================================
+ERROR: test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment (tests.test_runtime_worker_openhands_resolver.OutgoingGuardTests.test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 1771, in test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment
+    self.assertEqual(scan(f"the token {token} was found"), ["gitleaks"])
+                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/blueprints/runtime-workers/openhands/resolver/outgoing_guard.py", line 265, in scan
+    raise RuntimeError("gitleaks_failed")
+RuntimeError: gitleaks_failed
+
+----------------------------------------------------------------------
+Ran 214 tests in 53.737s
+
+FAILED (errors=1, skipped=1)
+
+
+The final two-module run exercised 214 tests, with one installed-gitleaks error and one skip. The error is test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment, RuntimeError(gitleaks_failed); its cause was not independently established. The new three-error regression and the six focused boundary controls passed. The coordinator-supplied 213-test passing host run above remains evidence of 677acc449, distinct from this local run.
+
+Completeness check for this bounded correction: both monitoring exception boundaries name the real GitTree failure classes; the new fault happens on the imported module's first read inside reads(); subsequent reads outside the monitor succeed; evaluator recursion remains advisory and construction/parse checks remain enforced. GateReads precision, the monitoring inventory and the baseline are unchanged. Final structural commands run after all content edits and registration: python3 scripts/validate.py, python3 scripts/evidence_manifest.py --check and git diff --check. Their exact native outputs remain in validate-final.txt, evidence-check-final.txt and diff-check-final.txt in the round scratch directory, with exit codes in the builder handoff.

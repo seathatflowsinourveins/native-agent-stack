@@ -9527,8 +9527,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "c9cfbd3af62b701c3a6be8072f301a6434c21ec10f05414cd1bc99d6c7bc4556",
-      "bytes": 63973
+      "sha256": "cf1285212173effebbeb22631c2ce7fac21119fd2a4837e5c6364b9e174067cf",
+      "bytes": 65171
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -9637,8 +9637,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt",
-      "sha256": "6d741fdba386ab27c77b582c04b47b6d3a462ce3c2603c53585ae5579b8c23bd",
-      "bytes": 697705
+      "sha256": "a5d9cdd21b8620836b598fbd022a9793226d35b1fc60198c5ff40396c411865e",
+      "bytes": 707363
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/receipt-red.txt",
@@ -10092,8 +10092,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
-      "sha256": "a0a2fac5d02bf563ec73fe9628e0405a8b4665cd11d4e0819f8923369e1f0752",
-      "bytes": 61360
+      "sha256": "268a3b33cfdf9082454f3e5eab9db8db1beb93f5f98d529b0061543eaf7c9ff8",
+      "bytes": 61610
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -16142,8 +16142,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
-      "sha256": "55af4e001a790658701a4af675971c067a1379caa34bd4137b9b9c4c9e21f566",
-      "bytes": 77379
+      "sha256": "ef05f248771b554dae6426f67bc2531c0586a3b2a1812423203174b75b941392",
+      "bytes": 79140
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
@@ -52857,8 +52857,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "c1c273418af78ee6ceca0bdcf369853f5ab3ddb186ef383ca0df7cda09e508a5",
-      "bytes": 110221
+      "sha256": "378bc88ca039041e185343772aa25241bb6e6653027b33a2c11c28091fc8cd25",
+      "bytes": 112694
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",

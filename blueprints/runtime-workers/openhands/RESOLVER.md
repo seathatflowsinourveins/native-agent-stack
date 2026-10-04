@@ -36,7 +36,9 @@ workflows, PR- or issue-text interpolation and trusted-checkout/zizmor checks re
 GateReads inventories add no path protection. The independent parser check also covers
 advisory-followed files, so an unparseable such file still adds `gate_input_unresolved`.
 `RecursionError` at GateReads construction is enforced; one inside `reads()`/`executed()`
-is advisory. Tree-read `GateError`/`OSError` propagates to fail-closed handling.
+is advisory. Tree-read `GateError`, `OSError`, `subprocess.SubprocessError` and `KeyError`
+propagate to fail-closed handling, including during imported-constant evaluation inside
+the monitor. `CalledProcessError` and `TimeoutExpired` are `SubprocessError` subclasses.
 
 The refreshed [monitoring baseline](evidence/unclassified-gate-reads-20261004.json) names
 the measured tree `3636e7182b220be945818a367e4daefa643bfc26`. It has 321 unclassified
@@ -67,7 +69,10 @@ their source identifiers are retained rather than presenting this round as a rep
 [Evidence part 14](evidence/push-gate-fail-first.txt) retains the review sources, actual
 failed attempts, refreshed measurements and native results: the two-module suite exited
 1 with installed gitleaks raising `gitleaks_failed`; its cause was not independently
-established. A passing suite at the PR head is still required. The earlier
+established. [Evidence part 15](evidence/push-gate-fail-first.txt) also records the
+coordinator-reported host run at `677acc449`: 213 tests, OK (skipped=1), exit 0, with
+`TMPDIR=/tmp/t489` and the installed-gitleaks test passing. The gitleaks version and run
+duration were not supplied. The earlier
 [set comparison](evidence/gate-reads-set-diff-20261004.json) is historical fixture/tree
 evidence, not a proof of the reader's completeness. The decision's overturn condition
 is: "a derivation that passes an adversarial corpus with no losses against b8eb9352b
@@ -97,6 +102,18 @@ The dormant `run` parser still exposes neither `--gate` nor `--run-id`. The disa
 public driver still exits 3 before parsing or external calls; its control now patches
 both `subprocess.run` and `socket.create_connection`. The later owned-path allowlist
 gate remains the enablement precondition, and the monitoring reader's known gaps remain.
+
+### Tree-read failures during monitoring, 489-r8 (2026-10-04)
+
+The bounded Opus r4 review accepted 489-r7 with one P2: the monitor re-raised
+`GateError`/`OSError`, while `GitTree.read` actually raises `KeyError` or subprocess
+failures from `git cat-file`. Both monitor boundaries now also re-raise
+`subprocess.SubprocessError` and `KeyError` to `check()`'s existing `gate_error_*`
+refusal. The imported-constant control first reads a test module inside `reads()`;
+it refuses for `CalledProcessError`, `TimeoutExpired` and `KeyError`. Evaluator
+recursion remains advisory, and the independent parser boundary remains enforced.
+[Evidence part 16](evidence/push-gate-fail-first.txt) retains the failing-first control
+and this round's local results. No reader precision repair is included.
 
 ## Superseded design and runbook notes (2026-10-04)
 
