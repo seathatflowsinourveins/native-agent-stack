@@ -2021,17 +2021,25 @@ all read 2026-10-04).
   `security-events: write` (sections 3 and 4).
   `PULL_REQUEST_SECRET_SOURCE_ALLOWLIST` is empty. Every workflow must stay in
   the plain block YAML subset the text checks read (`YAML_SUBSET_LINE`).
-  That rules out flow mappings, anchors, aliases, tags, quoted keys,
-  multi-line scalars and any backslash in a double-quoted scalar, whose
-  `\x`, `\u` and `\U` escapes spell any character
+  That rules out non-empty flow mappings, anchors, aliases, tags, quoted
+  keys, multi-line scalars and any backslash in a double-quoted scalar,
+  whose `\x`, `\u` and `\U` escapes spell any character
   ([YAML 1.2.2, 5.7](https://yaml.org/spec/1.2.2/#57-escaped-characters)).
+  An empty `{}` or `[]` holds no key, so it is accepted: `permissions: {}`,
+  GitHub's form that disables every scope, reads as an explicit grant of no
+  scope, never as the repository default (amended 2026-10-04, after the
+  coordinator found the subset rejected it, which would have broken #681).
   Each reachable workflow must also keep the job layout `jobs()` reads.
   Anything else fails rather than being skipped. At `3bdacab` it reads 24
-  jobs in 11 workflows and passes.
+  jobs in 11 workflows and passes. It also passes on #681's 21 workflows at
+  `de0b0043`, which move every workflow to `permissions: {}`.
 - **Evidence class.** A locally authored test, run locally. On planted
-  copies of the workflows it failed for each of 30 mutations and passed
-  unmutated. A `${{ secrets.X }}` step and `contents: write` on a
-  pull-request job passed every earlier test in the module and
+  copies of the workflows it failed for each of 34 mutations. It passed
+  unmutated and on five accepted variants: workflow-level
+  `permissions: {}` with and without job grants, job-level
+  `permissions: {}`, `env: {}`, and #681's workflows. A
+  `${{ secrets.X }}` step and `contents: write` on a pull-request job
+  passed every earlier test in the module and
   `zizmor --offline --persona regular` at this repository's pin, 1.30.1.
 - **Cross-family review (2026-10-04).** A read-only GPT-6.1 Sol review of
   #682 at `5e2f85e5` found three P1 gaps: flow-form jobs went unread,

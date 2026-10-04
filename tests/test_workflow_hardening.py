@@ -2270,21 +2270,25 @@ ACCESS_LEVELS = ("read", "write", "none")
 SECRETS_CONTEXT = re.compile(r"(?<![\w.-])secrets(?![\w-])")
 # The YAML subset these text checks read in full, one line at a time (YAML 1.2.2, https://yaml.org/spec/1.2.2/): a
 # plain key with no space before its colon and an optional value, or a sequence entry, where a value is a plain
-# scalar, a single-quoted scalar, a double-quoted scalar with no backslash, a one-line flow sequence of those, or a
-# block-scalar indicator (`|`, `>`) whose content lines are literal text. Every other form is refused, not misread:
-# a flow mapping (a job, `permissions:` or `env:` written as `{...}`), an anchor, alias, tag or merge key (GitHub
-# resolves anchors and aliases, even for a whole job: docs.github.com, "Reusing workflow configurations"), a quoted
-# key, a multi-line scalar, and any backslash in a double-quoted scalar. Every one of its escapes (5.7, "Escaped
-# Characters") can change what a scan of the source sees: `\x`, `\u` and `\U` spell any character, an escaped line
-# break joins two lines, and even `\t` before a name hides where the name starts. Plain and single-quoted scalars
-# have no backslash escapes (7.3.2, 7.3.3), so they are read as written. The tree used none of the refused forms on
-# 2026-10-04.
+# scalar, a single-quoted scalar, a double-quoted scalar with no backslash, a one-line flow sequence of those, an empty
+# flow mapping `{}`, or a block-scalar indicator (`|`, `>`) whose content lines are literal text. An empty flow mapping
+# or sequence holds no key or item, so it cannot hide a grant, a secret or an event; `permissions: {}` is GitHub's
+# form for "disable permissions for all of the available permissions" (docs.github.com, "Workflow syntax",
+# `permissions`). Every other form is refused, not misread: a non-empty flow mapping (a job, `permissions:` or `env:`
+# written as `{...}`), an anchor, alias, tag or merge key (GitHub resolves anchors and aliases, even for a whole job:
+# docs.github.com, "Reusing workflow configurations"), a quoted key, a multi-line scalar, and any backslash in a
+# double-quoted scalar. Every one of its escapes (5.7, "Escaped Characters") can change what a scan of the source
+# sees: `\x`, `\u` and `\U` spell any character, an escaped line break joins two lines, and even `\t` before a name
+# hides where the name starts. Plain and single-quoted scalars have no backslash escapes (7.3.2, 7.3.3), so they are
+# read as written. The tree used none of the refused forms on 2026-10-04.
 _PLAIN_START = r"(?:[^\s#&*!|>'\"%@`{}\[\],?:-]|[?:-](?=\S))"
 _PLAIN = _PLAIN_START + r"(?:[^\n:#]|:(?=\S)|(?<=\S)#)*"
 _FLOW_PLAIN = _PLAIN_START + r"(?:[^\n:#,\[\]{}]|:(?=[^\s,\[\]{}])|(?<=\S)#)*"
 _QUOTED = r"'(?:[^'\n]|'')*'|\"[^\"\\\n]*\""
 _FLOW_ITEM = rf"(?:{_QUOTED}|{_FLOW_PLAIN})"
-_VALUE = rf"(?:{_QUOTED}|\[ *(?:{_FLOW_ITEM}(?: *, *{_FLOW_ITEM})* *,?)? *\]|[|>][1-9+-]{{0,2}}|{_PLAIN})"
+EMPTY_FLOW_MAPPING = r"\{ *\}"
+_FLOW_SEQUENCE = rf"\[ *(?:{_FLOW_ITEM}(?: *, *{_FLOW_ITEM})* *,?)? *\]"
+_VALUE = rf"(?:{_QUOTED}|{_FLOW_SEQUENCE}|{EMPTY_FLOW_MAPPING}|[|>][1-9+-]{{0,2}}|{_PLAIN})"
 YAML_SUBSET_LINE = re.compile(rf"(?:-[ ]+)*[A-Za-z0-9_][A-Za-z0-9_.-]*:(?:[ ]+{_VALUE})?(?:[ ]+#.*)?[ ]*"
                               rf"|(?:-[ ]+)+{_VALUE}(?:[ ]+#.*)?[ ]*")
 # A line whose value is a block scalar: its content is the following lines indented past the key (or past the dash of
@@ -2385,7 +2389,7 @@ def syntax_lines(text):
 def yaml_form(line):
     """A short name for the form that puts `line` outside YAML_SUBSET_LINE's subset."""
     for pattern, form in ((r"\"[^\"\n]*(?:\\|$)", "a double-quoted scalar with a backslash escape or a line break"),
-                          (r"(?:^|[\s\[{,])\{", "a flow mapping"),
+                          (r"(?:^|[\s\[{,])\{(?! *\})", "a non-empty flow mapping"),
                           (r"(?:^|[\s\[,])[&*!][^\s,\]]|^\s*<<", "an anchor, alias, tag or merge key"),
                           (r"^\s*(?:-[ ]+)*[\"']", "a quoted key or a multi-line quoted scalar")):
         if re.search(pattern, line):
@@ -2538,6 +2542,8 @@ class PullRequestReachableJobsTests(unittest.TestCase):
                 where = f"{name}:{number} ({'job ' + section if section else 'workflow level'}; {how})"
                 if "write-all" in value:
                     problems.append(f"{where} grants write-all")
+                elif re.fullmatch(EMPTY_FLOW_MAPPING + r"(?:[ \t]+#.*)?", value):
+                    pass  # `permissions: {}`: an explicit grant of no scope, which is not the repository default
                 elif value:
                     problems.append(f"{where} has `permissions: {value}`, a form this check does not read")
                 else:
