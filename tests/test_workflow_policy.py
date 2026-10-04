@@ -10,9 +10,10 @@ all carry PyYAML). Any construct outside the subset (anchor, alias, tag, flow ma
 tab indentation, document marker, multi-line flow scalar) is reported as an `unparseable` violation instead of being
 guessed at, and the loader is cross-checked against PyYAML wherever PyYAML is importable. The rules in RULES then run
 on the parsed workflows, so the secrets rule reads values as GitHub does, after YAML decoding (the raw text stays a
-second net); each rule has planted workflows, written to a temporary directory, that fail with exactly that rule
-named. zizmor runs with --no-config --no-ignores, so no file in a commit can suppress its findings; the zizmor
-classes keep that so and add a pedantic-persona pass over the five audits the consensus names.
+second net), and the reachability rules read the directory as a whole, following local reusable-workflow calls
+(reachable(); 2026-10-04, superseding #682); each rule has planted workflows, written to a temporary directory, that
+fail with exactly that rule named. zizmor runs with --no-config --no-ignores, so no file in a commit can suppress its
+findings; the zizmor classes keep that so and add a pedantic-persona pass over the five audits the consensus names.
 """
 
 import hashlib
@@ -37,6 +38,12 @@ RULES = {
     "id-token-write": "id-token: write outside a job that attests provenance on a non-pull_request event",
     "dangerous-trigger": "a pull_request_target or workflow_run trigger",
     "pull-request-secret": "a secret other than GITHUB_TOKEN in a workflow that runs on pull_request",
+    "pull-request-environment": "an `environment:` on a job that a pull_request-family event reaches, whatever its "
+                                "`if:`",
+    "pull-request-remote-workflow": "a job that a pull_request-family event reaches calls a reusable workflow from "
+                                    "outside this repository's commit, whose file this check does not read",
+    "comment-event-secret": "a secret other than GITHUB_TOKEN in a workflow that issue_comment, pull_request_review or "
+                            "pull_request_review_comment triggers",
     "checkout-persist-credentials": "actions/checkout without persist-credentials: false",
     "runner-label": "a runs-on that is not one literal label from GitHub's documented hosted-runner list",
     "job-timeout": "a job without an integer timeout-minutes",
@@ -49,6 +56,22 @@ RULES = {
 # pull_request workflow (sota-sources-gate.yml is called from one).
 PULL_REQUEST_EVENTS = {"pull_request", "workflow_call"}
 DANGEROUS_EVENTS = {"pull_request_target", "workflow_run"}
+# The events a pull request, or text written on one, can start: #682's reachability set, each pull_request* event,
+# issue_comment (a comment on a pull request is an issue comment) and workflow_run, which "is able to access secrets
+# and write tokens, even if the previous workflow was not" (Events that trigger workflows, `workflow_run`).
+# dangerous-trigger bans pull_request_target and workflow_run outright; they stay here so the reachability rules stand
+# on their own.
+PULL_REQUEST_FAMILY = frozenset({"pull_request", "pull_request_target", "pull_request_review",
+                                 "pull_request_review_comment", "issue_comment", "workflow_run"})
+# Events that run on text outside users can write (a comment, or a review and its comments) with the repository's
+# secrets: an issue_comment run uses the workflow on the default branch (Events that trigger workflows,
+# `issue_comment`), and a review run from a same-repository branch gets them as well (a fork's run gets none: same
+# page, "Workflows in forked repositories").
+COMMENT_EVENTS = frozenset({"issue_comment", "pull_request_review", "pull_request_review_comment"})
+# The two documented forms of a call to a reusable workflow in the same repository, which GitHub reads "from the same
+# commit as the caller workflow" (Workflow syntax, `jobs.<job_id>.uses`, where `$/` is the recommended form). Any other
+# value names a workflow at another commit or in another repository, which this module does not read.
+LOCAL_WORKFLOW_PREFIXES = ("./.github/workflows/", "$/.github/workflows/")
 # The one condition accepted as keeping a job or step off pull_request runs: a top-level `&&` conjunct of its `if:`.
 EXCLUDES_PULL_REQUEST = "github.event_name != 'pull_request'"
 # An exact allowlist, not a pattern: the standard GitHub-hosted runner labels in the ubuntu, windows and macos
@@ -393,6 +416,41 @@ def triggers(document):
     raise UnsupportedYAML("`on` is not an event name, a list of them or a mapping")
 
 
+def local_callee(uses):
+    """The file a job-level `uses:` calls through one of LOCAL_WORKFLOW_PREFIXES, or None for any other value."""
+    if isinstance(uses, str):
+        for prefix in LOCAL_WORKFLOW_PREFIXES:
+            if uses.startswith(prefix):
+                return uses[len(prefix):]
+    return None
+
+
+def reachable(documents):
+    """{workflow file: how a pull_request-family run reaches it}, for parsed workflows {file name: document}.
+
+    As #682 computed it, a workflow is reached by its own PULL_REQUEST_FAMILY trigger, and then through each local
+    reusable workflow a reached job calls, transitively and whatever the callee's own triggers: a called workflow runs
+    in its caller's event context (Reusing workflow configurations, "`github` context"). After that, a workflow_call
+    trigger alone counts, as PULL_REQUEST_EVENTS already counts it, because a caller outside this directory can be a
+    pull_request workflow: the scaffold's sota-sources.yml.template calls sota-sources-gate.yml from one."""
+    reached = {}
+    for seeds in (PULL_REQUEST_FAMILY, {"workflow_call"}):
+        pending = []
+        for name, document in sorted(documents.items()):
+            events = sorted(seeds & set(triggers(document)))
+            if events and name not in reached:
+                reached[name] = "on: " + ", ".join(events)
+                pending.append(name)
+        while pending:
+            caller = pending.pop(0)
+            for job_id, job in documents[caller]["jobs"].items():
+                called = local_callee(job.get("uses"))
+                if called in documents and called not in reached:
+                    reached[called] = f"called by {caller}:{job_id}"
+                    pending.append(called)
+    return reached
+
+
 def top_level_conjuncts(expression):
     """The top-level `&&` operands of an expression, or None when a top-level `||` makes no operand binding."""
     parts, depth, quoted, start, k = [], 0, False, 0, 0
@@ -422,20 +480,51 @@ def top_level_conjuncts(expression):
     return [" ".join(part.split()) for part in parts]
 
 
+def expression_end(value):
+    """The index just past the `}}` that closes the `${{` opening `value`, or None when none does: the scan of
+    TemplateReader.ParseScalar, where every `'` opens or closes a string literal (a doubled `''` reads as two) and only
+    a `}}` outside a literal closes the expression."""
+    quoted = False
+    for k in range(3, len(value)):
+        if value[k] == "'":
+            quoted = not quoted
+        elif not quoted and value[k] == "}" and value[k - 1] == "}":
+            return k + 1
+    return None
+
+
+def outside_literals(expression):
+    """The expression's text outside its single-quoted string literals, or None when a literal never closes."""
+    parts = expression.split("'")
+    return " ".join(parts[::2]) if len(parts) % 2 else None
+
+
 def excludes_pull_request(condition):
-    """True only when an `if:` provably keeps its job or step off pull_request runs. The value must be one whole
-    `${{ ... }}` expression or a bare expression. actions/runner splits a value that mixes literal text with `${{ }}`
-    into segments and evaluates it as a `format()` string (TemplateReader.ParseScalar,
-    src/Sdk/DTObjectTemplating/ObjectTemplating/TemplateReader.cs at d7bc179baf11), and a non-empty string is truthy,
-    so a mixed value such as `${{ !cancelled() }} && github.event_name != 'pull_request'` excludes nothing."""
+    """True only when an `if:` provably keeps its job or step off pull_request runs: the decoded value is one bare
+    expression, or one `${{ ... }}` expression from its first character to its last, and a top-level `&&` operand of
+    it is EXCLUDES_PULL_REQUEST. actions/runner splits any other value holding `${{` into literal and expression
+    segments and evaluates it as a `format()` string (TemplateReader.ParseScalar,
+    src/Sdk/DTObjectTemplating/ObjectTemplating/TemplateReader.cs at d7bc179baf11), and a non-empty string is truthy:
+    `${{ !cancelled() }} && github.event_name != 'pull_request'` excludes nothing, and neither does a whole expression
+    with a space before or after it, or with the line break a `|` block scalar keeps. ParseScalar finds the first `${{`
+    whatever the quotes, so a quoted `${{` in a bare value starts a segment too; but it ends an expression at the first
+    `}}` outside a string literal, so a quoted `}}` inside one is plain text (both: repair round 2)."""
     if not isinstance(condition, str):
         return False
-    expression = condition.strip()
-    if expression.startswith("${{") and expression.endswith("}}"):
-        expression = expression[3:-2]
-    if "${{" in expression or "}}" in expression:
-        return False
-    conjuncts = top_level_conjuncts(expression.strip())
+    start = condition.find("${{")
+    if start > 0:
+        return False  # literal text before the expression
+    if start == 0:
+        end = expression_end(condition)
+        if end != len(condition):
+            return False  # never closed, or literal text after the expression
+        expression = condition[3:end - 2]
+    else:
+        expression = condition  # a bare expression: GitHub evaluates the whole value, and whitespace is insignificant
+    bare = outside_literals(expression)
+    if bare is None or "${{" in bare or "}}" in bare:
+        return False  # not an expression GitHub can parse
+    conjuncts = top_level_conjuncts(expression)
     return conjuncts is not None and EXCLUDES_PULL_REQUEST in conjuncts
 
 
@@ -537,13 +626,15 @@ class Violation(tuple):
         return f"{self[1]}{':' + self[2] if self[2] else ''}: {self[0]} ({RULES[self[0]]}): {self[3]}"
 
 
-def raw_violations(name, text):
-    """Every rule a workflow breaks, before exemptions."""
+def raw_violations(name, text, reached=None):
+    """Every rule a workflow breaks, before exemptions. `reached` is reachable() over the workflow's directory; without
+    it the workflow is read alone."""
     try:
         document = load_workflow(text)
         events = triggers(document)
     except UnsupportedYAML as error:
         return [Violation("unparseable", name, "", str(error))]
+    how = (reachable({name: document}) if reached is None else reached).get(name)
     found = []
     add = lambda rule, where, detail: found.append(Violation(rule, name, where, detail))
     pull_request = bool(PULL_REQUEST_EVENTS & set(events))
@@ -560,6 +651,9 @@ def raw_violations(name, text):
     if pull_request:
         for reference in workflow_secret_references(document, text):
             add("pull-request-secret", "", reference)
+    if COMMENT_EVENTS & set(events):
+        for reference in workflow_secret_references(document, text):
+            add("comment-event-secret", "", reference)
     workflow_cache_mode = document.get("cache-mode")
     for job_id, job in document["jobs"].items():
         on_pull_request = pull_request and not excludes_pull_request(job.get("if"))
@@ -570,6 +664,12 @@ def raw_violations(name, text):
         granted = writes(permissions)
         if on_pull_request and granted:
             add("pull-request-write-scope", job_id, ", ".join(granted))
+        # A reached job counts whatever its `if:`: EXCLUDES_PULL_REQUEST still lets issue_comment and review runs
+        # through, and in a called workflow github.event_name is the caller's.
+        if how and "environment" in job:
+            add("pull-request-environment", job_id, f"environment: {job['environment']!r} ({how})")
+        if how and "uses" in job and local_callee(job["uses"]) is None:
+            add("pull-request-remote-workflow", job_id, f"uses: {job['uses']!r} ({how})")
         steps = job.get("steps") or []
         if not isinstance(steps, list) or not all(isinstance(step, dict) for step in steps):
             add("unparseable", job_id, "steps is not a list of mappings")
@@ -608,8 +708,8 @@ def exempt(violation):
     return violation.workflow in names or f"{violation.workflow}:{job}" in names
 
 
-def violations(name, text):
-    return [violation for violation in raw_violations(name, text) if not exempt(violation)]
+def violations(name, text, reached=None):
+    return [violation for violation in raw_violations(name, text, reached) if not exempt(violation)]
 
 
 def workflow_files(directory):
@@ -617,9 +717,23 @@ def workflow_files(directory):
     return sorted(path for pattern in ("*.yml", "*.yaml") for path in directory.glob(pattern))
 
 
+def raw_check_directory(directory):
+    """Every rule each workflow in `directory` breaks, before exemptions, with reachability read across its files."""
+    texts = {path.name: path.read_text(encoding="utf-8") for path in workflow_files(directory)}
+    documents = {}
+    for name, text in texts.items():
+        try:
+            document = load_workflow(text)
+            triggers(document)
+        except UnsupportedYAML:
+            continue  # raw_violations reports it as unparseable
+        documents[name] = document
+    reached = reachable(documents)
+    return [violation for name, text in texts.items() for violation in raw_violations(name, text, reached)]
+
+
 def check_directory(directory):
-    return [violation for path in workflow_files(directory)
-            for violation in violations(path.name, path.read_text(encoding="utf-8"))]
+    return [violation for violation in raw_check_directory(directory) if not exempt(violation)]
 
 
 # --------------------------------------------------------------------------- planted controls
@@ -710,11 +824,41 @@ CACHE_STEPS = """      - name: Restore
           path: model.bin
           key: ${{ steps.restore.outputs.cache-primary-key }}
 """
+PULL_REQUEST_AND_PUSH = "  pull_request:\n  push:\n    branches: [main]\n"
+REMOTE_WORKFLOW = "octo-org/other-repo/.github/workflows/reusable.yml@0123456789abcdef0123456789abcdef01234567"
+CALL_JOB = """
+  call:
+    uses: {uses}
+    permissions:
+      contents: read
+"""
+CALLED = """name: Planted reusable workflow
+
+on:
+  workflow_call:
+
+permissions: {}
+cache-mode: none
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Build
+        run: echo build
+"""
 
 
 def mutate(text, old, new):
     assert text.count(old) == 1, f"the planted base no longer contains {old!r} exactly once"
     return text.replace(old, new)
+
+
+def planted_files(name, text, extension=".yml"):
+    """A planted or accepted entry as {file name: text}: an entry for the reachability rules can be a mapping of
+    several workflow files, which are checked together as one directory."""
+    return dict(text) if isinstance(text, dict) else {f"{name}{extension}": text}
 
 
 # (name, rule the planted file breaks, its text). Each fails with exactly that rule and nothing else.
@@ -733,6 +877,17 @@ PLANTED = [
     ("upload-guard-mixed-literal-and-expression", "pull-request-write-scope",
      mutate(BASE + EXTRA_JOB, "if: ${{ !cancelled() && github.event_name != 'pull_request' }}",
             "if: ${{ !cancelled() }} && github.event_name != 'pull_request'")),
+    # Repair round 2 (the coordinator's P2 residual on #681): one space before or after a whole expression, or the line
+    # break a `|` block scalar keeps, is a literal segment of a format() string too.
+    ("upload-guard-with-a-leading-space", "pull-request-write-scope",
+     mutate(BASE + EXTRA_JOB, "if: ${{ !cancelled() && github.event_name != 'pull_request' }}",
+            "if: \" ${{ !cancelled() && github.event_name != 'pull_request' }}\"")),
+    ("upload-guard-with-a-trailing-space", "pull-request-write-scope",
+     mutate(BASE + EXTRA_JOB, "if: ${{ !cancelled() && github.event_name != 'pull_request' }}",
+            "if: \"${{ !cancelled() && github.event_name != 'pull_request' }} \"")),
+    ("upload-guard-in-a-clipped-block-scalar", "pull-request-write-scope",
+     mutate(BASE + EXTRA_JOB, "if: ${{ !cancelled() && github.event_name != 'pull_request' }}",
+            "if: |\n      ${{ !cancelled() && github.event_name != 'pull_request' }}")),
     ("id-token-without-attestation", "id-token-write",
      mutate(ATTEST_WORKFLOW, "      - name: Attest\n        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 "
                              "# v4.2.2\n        with:\n          subject-path: dist/archive.tar.gz\n", "")),
@@ -762,6 +917,34 @@ PLANTED = [
     ("secrets-inherit-under-an-escaped-key", "pull-request-secret",
      BASE + '\n  called:\n    uses: ./.github/workflows/called.yml\n    permissions:\n      contents: read\n'
             '    "\\u0073ecrets": inherit\n'),
+    # The reachability rules (2026-10-04, superseding #682). An environment brings its own secrets and approvals, and
+    # counts whatever the job's `if:`; a reusable workflow called into another job keeps the caller's reachability.
+    ("environment-on-a-pull-request-job", "pull-request-environment",
+     mutate(BASE, "    timeout-minutes: 5\n", "    timeout-minutes: 5\n    environment: preview\n")),
+    ("environment-behind-an-if-guard", "pull-request-environment",
+     mutate(BASE + EXTRA_JOB, "    if: ${{ !cancelled() && github.event_name != 'pull_request' }}\n",
+            "    if: ${{ !cancelled() && github.event_name != 'pull_request' }}\n    environment: production\n")),
+    ("environment-on-a-comment-job", "pull-request-environment",
+     mutate(mutate(BASE, PULL_REQUEST_AND_PUSH, "  issue_comment:\n    types: [created]\n"),
+            "    timeout-minutes: 5\n", "    timeout-minutes: 5\n    environment: preview\n")),
+    ("environment-in-a-called-workflow", "pull-request-environment",
+     {"caller.yml": BASE + CALL_JOB.format(uses="./.github/workflows/called.yml"),
+      "called.yml": mutate(CALLED, "    timeout-minutes: 5\n", "    timeout-minutes: 5\n    environment: preview\n")}),
+    # Pinned by commit SHA, so zizmor's unpinned-uses passes it; its file is still never read here.
+    ("remote-reusable-workflow", "pull-request-remote-workflow", BASE + CALL_JOB.format(uses=REMOTE_WORKFLOW)),
+    ("remote-call-in-a-reusable-workflow", "pull-request-remote-workflow",
+     CALLED + CALL_JOB.format(uses=REMOTE_WORKFLOW)),
+    # One per event: a named secret, `secrets: inherit`, and a reference that only YAML decoding reveals.
+    ("issue-comment-secret", "comment-event-secret",
+     mutate(mutate(BASE, PULL_REQUEST_AND_PUSH, "  issue_comment:\n    types: [created]\n"),
+            'run: echo "$GITHUB_SHA"', 'run: echo "$TOKEN"\n        env:\n          TOKEN: ${{ secrets.NPM_TOKEN }}')),
+    ("review-secrets-inherit", "comment-event-secret",
+     mutate(BASE, PULL_REQUEST_AND_PUSH, "  pull_request_review:\n    types: [submitted]\n")
+     + CALL_JOB.format(uses="./.github/workflows/called.yml") + "    secrets: inherit\n"),
+    ("review-comment-secret-behind-an-escape", "comment-event-secret",
+     mutate(mutate(BASE, PULL_REQUEST_AND_PUSH, "  pull_request_review_comment:\n    types: [created]\n"),
+            'run: echo "$GITHUB_SHA"', 'run: echo "$TOKEN"\n        env:\n'
+                                        '          TOKEN: "${{ \\u0073ecrets.NPM_TOKEN }}"')),
     ("checkout-without-with", "checkout-persist-credentials",
      mutate(BASE, "        with:\n          persist-credentials: false\n", "")),
     ("checkout-persisting", "checkout-persist-credentials",
@@ -784,6 +967,16 @@ PLANTED = [
      mutate(BASE, "      - name: Test\n", CACHE_STEPS.replace(
          "if: github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true'",
          "if: ${{ steps.restore.outputs.cache-hit != 'true' }} && github.event_name != 'pull_request'")
+            + "      - name: Test\n")),
+    ("save-guard-with-a-leading-space", "pull-request-cache-write",
+     mutate(BASE, "      - name: Test\n", mutate(
+         CACHE_STEPS, "if: github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true'",
+         "if: \" ${{ github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true' }}\"")
+            + "      - name: Test\n")),
+    ("save-guard-with-a-trailing-space", "pull-request-cache-write",
+     mutate(BASE, "      - name: Test\n", mutate(
+         CACHE_STEPS, "if: github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true'",
+         "if: \"${{ github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true' }} \"")
             + "      - name: Test\n")),
     ("setup-go-default-cache", "pull-request-cache-write",
      mutate(BASE, "      - name: Test\n", "      - name: Go\n        uses: actions/setup-go@"
@@ -819,6 +1012,28 @@ ACCEPTED = [
      mutate(mutate(BASE, "  pull_request:\n  push:\n    branches: [main]\n", "  workflow_call:\n"),
             "concurrency:\n  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}\n"
             "  cancel-in-progress: ${{ github.event_name == 'pull_request' }}\n\n", "")),
+    # Repair round 2: a `}}` inside a string literal does not end an expression, at job and at cache-step level.
+    ("upload-guard-with-a-quoted-closing-marker",
+     mutate(BASE + EXTRA_JOB, "if: ${{ !cancelled() && github.event_name != 'pull_request' }}",
+            "if: ${{ !cancelled() && github.event_name != 'pull_request' && !contains('a}}b', 'c') }}")),
+    ("save-guard-with-a-quoted-closing-marker",
+     mutate(mutate(BASE, "      - name: Test\n",
+                   mutate(CACHE_STEPS, "cache-hit != 'true'\n", "cache-hit != 'true' && !contains('a}}b', 'c')\n")
+                   + "      - name: Test\n"), "cache-mode: none\n", "cache-mode: read\n")),
+    # The reachability rules' boundaries: off the pull_request family, a local call, the job's own token.
+    ("environment-off-the-pull-request-family",
+     mutate(mutate(BASE, PULL_REQUEST_AND_PUSH, "  push:\n    branches: [main]\n"),
+            "    timeout-minutes: 5\n", "    timeout-minutes: 5\n    environment: production\n")),
+    ("remote-call-off-the-pull-request-family",
+     mutate(BASE, PULL_REQUEST_AND_PUSH, "  push:\n    branches: [main]\n") + CALL_JOB.format(uses=REMOTE_WORKFLOW)),
+    ("local-reusable-workflow-call",
+     {"caller.yml": BASE + CALL_JOB.format(uses="./.github/workflows/called.yml"), "called.yml": CALLED}),
+    ("same-commit-call-with-the-dollar-form",
+     {"caller.yml": BASE + CALL_JOB.format(uses="$/.github/workflows/called.yml"), "called.yml": CALLED}),
+    ("comment-workflow-with-the-job-token",
+     mutate(mutate(BASE, PULL_REQUEST_AND_PUSH, "  issue_comment:\n    types: [created]\n"),
+            'run: echo "$GITHUB_SHA"',
+            'run: echo "$TOKEN"\n        env:\n          TOKEN: ${{ secrets.GITHUB_TOKEN }}')),
 ]
 
 
@@ -868,7 +1083,9 @@ class StrictLoaderTests(unittest.TestCase):
         if yaml is None:
             self.skipTest("PyYAML not importable here; the strict loader is the only parser")
         texts = [(path.name, path.read_text(encoding="utf-8")) for path in workflow_files(WORKFLOWS)]
-        texts += [(name, text) for name, rule, text in PLANTED if rule != "unparseable"] + ACCEPTED
+        entries = [(name, text) for name, rule, text in PLANTED if rule != "unparseable"] + ACCEPTED
+        texts += [(f"{name}/{file_name}", content) for name, text in entries
+                  for file_name, content in planted_files(name, text).items()]
         for name, text in texts:
             with self.subTest(workflow=name):
                 self.assertTrue(same(load_workflow(text), yaml.safe_load(text)), name)
@@ -904,8 +1121,7 @@ class RepositoryPolicyTests(unittest.TestCase):
     def test_each_exemption_is_still_needed(self):
         # An exemption whose rule no longer fires is dead and must go, so this set cannot grow silently.
         raw = {(violation.rule, violation.workflow, violation.where.split(":", 1)[0])
-               for path in workflow_files(WORKFLOWS)
-               for violation in raw_violations(path.name, path.read_text(encoding="utf-8"))}
+               for violation in raw_check_directory(WORKFLOWS)}
         for rule, names in EXEMPTIONS.items():
             for name in names:
                 workflow, _, job = name.partition(":")
@@ -959,11 +1175,13 @@ class RepositoryPolicyTests(unittest.TestCase):
 
 
 class PlantedViolationTests(unittest.TestCase):
-    """Negative controls: each planted workflow sits alone in a temporary directory and fails with its rule named."""
+    """Negative controls: each planted workflow, or set of workflows for a reachability rule, sits alone in a temporary
+    directory and fails with its rule named."""
 
     def check_planted(self, name, text, extension=".yml"):
         with tempfile.TemporaryDirectory() as temporary:
-            (Path(temporary) / f"{name}{extension}").write_text(text, encoding="utf-8")
+            for file_name, content in planted_files(name, text, extension).items():
+                (Path(temporary) / file_name).write_text(content, encoding="utf-8")
             return check_directory(Path(temporary))
 
     def test_every_rule_has_a_planted_violation(self):
@@ -992,12 +1210,29 @@ class PlantedViolationTests(unittest.TestCase):
         accepted = ("github.event_name != 'pull_request'",
                     "${{ github.event_name != 'pull_request' }}",
                     "${{ !cancelled() && github.event_name != 'pull_request' }}",
-                    "github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true'")
+                    "github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true'",
+                    # Repair round 2: whitespace around a bare expression is insignificant, and inside a string
+                    # literal of an expression a `}}` ends nothing and a `${{` opens nothing
+                    # (TemplateReader.ParseScalar).
+                    "  github.event_name != 'pull_request'\n",
+                    "github.event_name != 'pull_request' && contains('a}}b', 'a')",
+                    "${{ github.event_name != 'pull_request' && contains('a}}b', 'a') }}",
+                    "${{ github.event_name != 'pull_request' && !contains(github.head_ref, '${{') }}")
         refused = ("${{ !cancelled() }} && github.event_name != 'pull_request'",
                    "github.event_name != 'pull_request' && ${{ !cancelled() }}",
                    "${{ !cancelled() }} && ${{ github.event_name != 'pull_request' }}",
                    "${{ always() || github.event_name != 'pull_request' }}",
-                   "github.event_name!='pull_request'", None, "")
+                   "github.event_name!='pull_request'", None, "",
+                   # Repair round 2: any literal text around a whole expression is a format() segment, even one space
+                   # or a block scalar's line break, and ParseScalar finds a `${{` in a bare value whatever the quotes.
+                   " ${{ github.event_name != 'pull_request' }}",
+                   "${{ github.event_name != 'pull_request' }} ",
+                   "${{ github.event_name != 'pull_request' }}\n",
+                   "github.event_name != 'pull_request' && contains(github.head_ref, '${{ github.sha }}')",
+                   # Not an expression GitHub parses: an unterminated literal, an unclosed or a stray delimiter.
+                   "github.event_name != 'pull_request' && 'open",
+                   "${{ github.event_name != 'pull_request' ",
+                   "github.event_name != 'pull_request' }}")
         for condition in accepted:
             with self.subTest(accepted=condition):
                 self.assertTrue(excludes_pull_request(condition))
@@ -1008,11 +1243,29 @@ class PlantedViolationTests(unittest.TestCase):
     def test_an_escaped_reference_hides_from_the_raw_scan_but_not_from_the_rule(self):
         # Repair round 1 (job-005, P1): the rule reads decoded values; the raw scan stays as a second net.
         for name in ("secret-behind-a-u-escape", "secret-behind-an-x-escape", "secrets-inherit-under-a-quoted-key",
-                     "secrets-inherit-under-an-escaped-key"):
+                     "secrets-inherit-under-an-escaped-key", "review-comment-secret-behind-an-escape"):
             text = next(text for planted, _, text in PLANTED if planted == name)
             with self.subTest(planted=name):
                 self.assertEqual(secret_references(text), [], "the raw text alone shows no reference")
                 self.assertTrue(workflow_secret_references(load_workflow(text), text))
+
+    def test_reachability_follows_local_calls_and_names_the_caller(self):
+        # #682's computation: a local call, in either documented form, carries its caller's reachability to the callee,
+        # transitively and whatever the callee's own triggers; a workflow_call trigger alone counts after that.
+        found = self.check_planted("chain", next(text for name, _, text in PLANTED
+                                                 if name == "environment-in-a-called-workflow"))
+        self.assertEqual([(violation.workflow, violation.where) for violation in found], [("called.yml", "build")])
+        self.assertIn("(called by caller.yml:call)", str(found[0]))
+        texts = {
+            "caller.yml": BASE + CALL_JOB.format(uses="./.github/workflows/middle.yml"),
+            "middle.yml": CALLED + CALL_JOB.format(uses="$/.github/workflows/leaf.yml"),
+            "leaf.yml": mutate(BASE, PULL_REQUEST_AND_PUSH, "  workflow_dispatch:\n"),
+            "orphan.yml": CALLED,
+            "push.yml": mutate(BASE, PULL_REQUEST_AND_PUSH, "  push:\n    branches: [main]\n"),
+        }
+        self.assertEqual(reachable({name: load_workflow(text) for name, text in texts.items()}),
+                         {"caller.yml": "on: pull_request", "middle.yml": "called by caller.yml:call",
+                          "leaf.yml": "called by middle.yml:call", "orphan.yml": "on: workflow_call"})
 
     def test_the_runner_allowlist_is_exact(self):
         # Repair round 1 (job-005, P2): a set of documented labels, not a prefix pattern.
