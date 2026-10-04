@@ -3,9 +3,11 @@
 This directory is retired for installation and source/QMD replay. [run.py](run.py)
 fails both old modes before launching a subprocess or creating an output directory.
 The dependency-free [package.json](package.json) is a retirement guard; the original
-manifest and recording aid are preserved as text artifacts. The retained lock
-stays at its original path and remains in scanner inventory. Retirement neither
-patches the dependency nor establishes a scanner exception.
+manifest and recording aid are preserved as text artifacts. Since 2026-10-04 the
+retained lock is stored byte-identical as [package-lock.json.frozen](package-lock.json.frozen),
+a name no dependency scanner reads ([below](#lock-renamed-out-of-scanner-discovery-2026-10-04)).
+Neither the retirement nor the rename patches the dependency, and no scanner
+exception remains for it.
 
 The separate current QMD recipe is in [recipes/README.md](../../../recipes/README.md#component-catalog-install-and-check),
 with current native fixture guidance in [docs/native-token-ci.md](../../../docs/native-token-ci.md).
@@ -35,7 +37,7 @@ The source fixture contains the frozen planner from repository revision
 `6f74bc503ccecaaf6ccebd53677b23aedab50921`. Its selected ripgrep **15.2.0** and
 ast-grep **0.45.3** results contain exact file lines, byte spans and source text.
 The QMD **2.8.3** fixture reports Node **24.21.0**, better-sqlite3 **13.0.3** and
-sqlite-vec **0.1.9**, with the retained [package lock](package-lock.json). It covers
+sqlite-vec **0.1.9**, with the retained [package lock](package-lock.json.frozen). It covers
 five positive and two negative queries, Unicode, a one-line `get`, process reopen,
 update and deletion in a three-document primary collection plus one decoy.
 The final recorded database has integrity `ok`, three active documents and zero
@@ -107,6 +109,12 @@ The companion `current_retirement_assessment` checks the exact new archives,
 retained lock, retirement manifest and current entrypoint hashes. Regressions reject
 changed recording-aid or manifest archives, restored dependencies/scripts and a
 missing runtime guard. Both old modes must stop before output or subprocess work.
+It also requires the lock to exist only as `package-lock.json.frozen` at its digest,
+tracked in Git, and no `package-lock.json`, `npm-shrinkwrap.json`, `yarn.lock`,
+`pnpm-lock.yaml`, `bun.lock` or `deno.lock` anywhere in this directory, in any letter
+case, on disk or in the Git index; it fails closed when Git cannot list the files.
+Scenario regressions on scratch Git repositories and code mutants of the guard
+(`LockDiscoveryGuardTests`) show each of those requirements is enforced.
 These are local integration and artifact checks; they do not establish native npm
 guard acceptance or a scanner exception.
 
@@ -130,3 +138,30 @@ Recovered historical invocation evidence could reopen the incomplete acceptance
 assessment. A current QMD trial belongs to the separate maintained recipe and
 current status, with supported installation and complete command capture. Whole-task
 provider, parent/child/retry/cache usage remains unknown; no savings claim is made.
+
+## Lock renamed out of scanner discovery (2026-10-04)
+
+The retained lock moved from `package-lock.json` to `package-lock.json.frozen` with
+`git mv`. Its bytes are unchanged: 82,463 bytes, SHA-256
+`5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb`.
+
+GitHub's dependency graph, Scorecard's OSV-Scanner run and OSV-Scanner itself find
+lockfiles by file name. Under its npm name this lock raised Dependabot alert 17
+(braces 3.0.3, GHSA-vfj7-8cjw-p6xm, high, no patched release) and the Scorecard
+code-scanning alert 19 that carries the same advisory. It also needed a dedicated
+OSV-Scanner grant that expired on 2026-10-17. No scanner reads the `.frozen` name,
+so that grant and its scan group are deleted. "Fixed" means the lock was removed
+from discovery, not that braces was patched: the archived bytes still pin braces
+3.0.3. Active QMD's own exposure to the advisory is unchanged and unresolved.
+
+The receipts, the install inventory and the 2026-10-03 retirement assessment still
+name the lock `package-lock.json`. The audit resolves that name to the archive, as it
+resolves `package.json` to `package-original.json.txt`, and no receipt was rewritten.
+The convergence record changes only the lock's path, with the same SHA-256, and the
+evaluation digests of `audit.py` and `tests/test_wsl_retrieval.py`. This directory
+still offers no supported way to restore or install the lock.
+
+Decision: the 2026-10-04 addendum to
+[2026-09-25-longmemeval-frozen-npm-lock.md](../../../docs/decisions/2026-09-25-longmemeval-frozen-npm-lock.md).
+OSV-Scanner controls and the guard's mutants:
+[wsl-lock-frozen-rename-20261004.json](../../../evidence/receipts/wsl-lock-frozen-rename-20261004.json).
