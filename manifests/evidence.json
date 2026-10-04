@@ -4587,6 +4587,36 @@
       "bytes": 20932
     },
     {
+      "path": "adoption/new-wsl/claude-user-instructions.md",
+      "sha256": "fdc3823c4a905937e08d9aba033f5b67937f1632b955062402bbd25a74eab04e",
+      "bytes": 13372
+    },
+    {
+      "path": "adoption/new-wsl/client-config-map.json",
+      "sha256": "de9503b9662c5e60710499e905cf4ac9b6fb041973bd3ac72a3f3b4a4fccdf7c",
+      "bytes": 48327
+    },
+    {
+      "path": "adoption/new-wsl/codex-user-instructions.md",
+      "sha256": "d6e9d8067fdf492a2f2f97ccfe93af3a12e01b360c6d73ed84eef4df081a4ec5",
+      "bytes": 7977
+    },
+    {
+      "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
+      "sha256": "e49bdf7ceed1e63344485d38f2a421f4371aed9fedebd00eb413361076de38e5",
+      "bytes": 1331
+    },
+    {
+      "path": "adoption/new-wsl/templates/claude.settings.additions.json",
+      "sha256": "86a51eb928ef3d38033f2630bbaa06447a0c9c7a62cdfdd6a6d77614591aa646",
+      "bytes": 2197
+    },
+    {
+      "path": "adoption/new-wsl/templates/codex.config.additions.toml",
+      "sha256": "bbcb0e73b42b218a37808d1b31e7f39c4c309300297fb56117acb5b0ce566deb",
+      "bytes": 5643
+    },
+    {
       "path": "adoption/paired/README.md",
       "sha256": "b187875b97595cd975ddb161464c995cda6690399f0bd0b488b0019394016cf3",
       "bytes": 5825
@@ -15383,6 +15413,11 @@
       "bytes": 105311
     },
     {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "sha256": "35306c969c85d2cd3234d0dae17fcdc31673e729f1c7d2cfe625d5fcd7fd4813",
+      "bytes": 306165
+    },
+    {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
       "sha256": "37636424b34850e43e2655136b6daf90624f6633efa1b60a8b5175f65fc6815c",
       "bytes": 11875
@@ -16268,6 +16303,11 @@
       "bytes": 84655
     },
     {
+      "path": "docs/decisions/2026-10-03-macos-full-suite-coverage.md",
+      "sha256": "6c1099993e992b8bdfaf1d9d582fb9f2dace0d8b48846072ac44548bb8b928a8",
+      "bytes": 23777
+    },
+    {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
@@ -16356,6 +16396,11 @@
       "path": "docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md",
       "sha256": "c213f14dcee47a9e1755fe58601929058e0f54d5d6bacba400f81c21ebe280c7",
       "bytes": 6203
+    },
+    {
+      "path": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md",
+      "sha256": "51bb422d713c5df21d6228f7e83440dafa48a576e424a02db5e867dfd8d7b2c5",
+      "bytes": 10057
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
@@ -16499,8 +16544,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "cd5706bf4112eb179810f59f941b69eb94fefdb0caa7cac9bd615d9806ba8800",
-      "bytes": 181106
+      "sha256": "5ea6aab2571aa0f7d4077666473271cd89e46440b60134606415214818803b7a",
+      "bytes": 184183
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -32656,6 +32701,16 @@
       "path": "evidence/artifacts/gh-upstream-qualification-20261002/qualification.json",
       "sha256": "d28841a9bba66869bb8aaea59ad852d3000ec7a7ca06e49a4e1d6619e19bdf8e",
       "bytes": 15832
+    },
+    {
+      "path": "evidence/artifacts/github-ci-measurements-20261003/input.json",
+      "sha256": "d01f9b6398988964dec35bdb567f5b0f72fe5419255818fbf49beea81ebc127c",
+      "bytes": 15399
+    },
+    {
+      "path": "evidence/artifacts/github-ci-measurements-20261003/later-reads-20261003.json",
+      "sha256": "b100809511623c4cc13ef62939f7cf52e3113b40eae63952146657ed47f56ab3",
+      "bytes": 56770
     },
     {
       "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
@@ -50518,6 +50573,11 @@
       "bytes": 5836
     },
     {
+      "path": "evidence/receipts/github-ci-measurements-20261003.json",
+      "sha256": "49c572546389a9384423a3b90d6b22384d293b354a73522903d7ff2ab7a6718a",
+      "bytes": 53971
+    },
+    {
       "path": "evidence/receipts/gitleaks-macos-memory-bound-20260924.json",
       "sha256": "d368ccd2e8ff264b4ee7033e851983632822911d7cf8ed746669e1557def5be0",
       "bytes": 43255
@@ -52893,6 +52953,11 @@
       "bytes": 18369
     },
     {
+      "path": "tests/test_new_wsl_client_config.py",
+      "sha256": "78cb1d7b07b88dd7c26b7a0394c44e975cfeaa8f7b3c1b7a3987f7282c4f0d1e",
+      "bytes": 246096
+    },
+    {
       "path": "tests/test_new_wsl_definitive_defaults.py",
       "sha256": "6737c1b521a73030ab5df93549f1a8b3bb7acac74a6a645193950cbbb0119462",
       "bytes": 156386
@@ -53316,6 +53381,11 @@
       "path": "tools/adoption/managed_block.py",
       "sha256": "4a5d7c2001be450209aa903af691e653b39989af654bf0e61d70b2199012bba8",
       "bytes": 23567
+    },
+    {
+      "path": "tools/adoption/new_wsl_client_config.py",
+      "sha256": "ff5ae788cfa9196f83e35fcedfe985e43a2767ac429936c2eac639961d368784",
+      "bytes": 151287
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
