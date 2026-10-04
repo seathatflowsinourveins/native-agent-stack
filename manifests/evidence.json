@@ -11487,8 +11487,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-mover.md",
-      "sha256": "9b078007a0eb66dfa5f0c758034ad8fea9678520336cf8dc4f945159fa1f0a18",
-      "bytes": 23432
+      "sha256": "b9599ec91fc0406be2f9ccc10b295d32aa23deef0266895c5539594f218d403d",
+      "bytes": 24307
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-native.md",
@@ -11507,8 +11507,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-safety.md",
-      "sha256": "659a2838d3171d1e83b5cf4bacc56c67ae9ee68e21584ed3067ac86c7917fa24",
-      "bytes": 38336
+      "sha256": "414f0569ad8181de8c7c11e5d537947844df5a67406a6910d6b010738a20f028",
+      "bytes": 38751
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-transport.md",

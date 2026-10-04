@@ -263,10 +263,14 @@ The mover uses the saved `fee_window_start` of a continuing lineage (legacy:
 `started_at`); a new lineage takes L immediately before the checkpoint. It books
 F2 before `begin_next_trial` and before taking the accounting snapshot. Only the
 first trial computes `baseline_cash = checkpoint account cash - ledger cash_delta`;
-every next trial keeps the lineage's original baseline and compares checkpoint
-cash with `baseline_cash + ledger cash_delta` after booking fees. An unexplained
-difference above 0.01 USD refuses with `next_trial_cash_mismatch` (`not_started`),
-before consuming a new trial identity or building a port. `--allow-shared-account`
+every next trial keeps the `baseline_cash` stored in `trial.json`. That is the first
+trial's value for lineages started on this engine, and the last saved value for a
+lineage migrated from an engine that recomputed it each trial. The mover compares
+checkpoint cash with that stored baseline plus ledger `cash_delta` after booking fees.
+An unexplained difference above 0.01 USD refuses with `next_trial_cash_mismatch` (`not_started`),
+before consuming a new trial identity or building a port. An admitted trial's receipt
+sets `inter_trial_cash_changed` to `false` for every admitted next trial and `null`
+for a lineage's first trial. `--allow-shared-account`
 only bypasses the adaptive-directory guard: another lane's cash activity between
 mover trials that leaves such a difference permanently blocks the retained mover
 lineage, whose baseline stays fixed. `trial.json` saves L as epoch seconds;
@@ -279,7 +283,8 @@ Mover `recover` must receive `--config` with the trial's exact frozen config byt
 The SHA-256 covers the whole file; a changed config refuses with
 `recovery_config_differs_from_frozen_trial`, including when recovering a finished
 trial to book later fees. See README-mover.md, "Frozen recovery config", for the
-watchdog decision and the dated recovery-only copy.
+comparison of whole-file binding with binding only risk-relevant config fields,
+its reopen condition and the dated recovery-only copy.
 
 Assumption: a FEE activity is visible in the activity list exactly when its
 amount is in account cash. Under that assumption, every fee in F2 is in both
