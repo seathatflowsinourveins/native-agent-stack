@@ -627,6 +627,16 @@ class CodexHomeCutTests(unittest.TestCase):
                                                   "features": {"daemon_auto_start": False},
                                                   "shell_environment_policy": {"set": {"PATH": f"{eco}/bin:/usr/bin"}}})
         self.assertTrue(written.endswith(f'\nPATH = "{eco}/bin:/usr/bin"\n'), written[-80:])  # one newline at the end
+        # --keep-hook-trust (the new-WSL client-configuration tool's render): the hook approvals stay, the grants go.
+        kept, grants, approvals = codex_home.fresh_config(text, eco, keep_hook_trust=True)
+        self.assertEqual((grants, approvals), (1, 1))
+        self.assertEqual(tomllib.loads(kept), {"mcp_servers": {"x": {"args": [["nested", "array"]]}},
+                                               "features": {"daemon_auto_start": False},
+                                               "shell_environment_policy": {"set": {"PATH": f"{eco}/bin:/usr/bin"}},
+                                               "hooks": {"state": {"/b:stop:0:0": {"trusted_hash": "sha256:00"}}}})
+        self.assertNotIn("trust_level", kept)
+        self.assertIn("hook approval(s), the hooks whose hashes that tool's map wires, are kept", " ".join(
+            line.lstrip("# ") for line in kept.splitlines()[:4]))
 
     def test_refusals_write_nothing(self):
         broken_string = self.rendered.replace('model = "', 'note = """\n[projects."/x"]\n"""\nmodel = "', 1)

@@ -1,0 +1,1316 @@
+{
+ "since": "2026-09-20",
+ "api_calls": 276,
+ "bootstrap_runs": 1000,
+ "validate_runs": 1000,
+ "runs_with_jobs_fetched": 256,
+ "bootstrap_conclusions": {
+  "null": 18,
+  "failure": 69,
+  "cancelled": 267,
+  "success": 645,
+  "action_required": 1
+ },
+ "jobs": {
+  "changes": {
+   "queue": {
+    "n": 239,
+    "median": 0.0,
+    "p90": 0.3,
+    "max": 2.6,
+    "sum": -293.0
+   },
+   "run": {
+    "n": 239,
+    "median": 0.4,
+    "p90": 0.5,
+    "max": 0.6,
+    "sum": 92.7
+   },
+   "conclusions": {
+    "success": 239,
+    "skipped": 17
+   }
+  },
+  "validate-macos": {
+   "queue": {
+    "n": 256,
+    "median": 4.1,
+    "p90": 70.4,
+    "max": 230.1,
+    "sum": 6083.4
+   },
+   "run": {
+    "n": 256,
+    "median": 33.25,
+    "p90": 39.7,
+    "max": 225.7,
+    "sum": 7849.3
+   },
+   "conclusions": {
+    "failure": 70,
+    "cancelled": 74,
+    "success": 112
+   }
+  },
+  "bootstrap-macos": {
+   "queue": {
+    "n": 235,
+    "median": 0.2,
+    "p90": 134.9,
+    "max": 373.0,
+    "sum": 9106.0
+   },
+   "run": {
+    "n": 235,
+    "median": 2.3,
+    "p90": 54.2,
+    "max": 208.4,
+    "sum": 4245.3
+   },
+   "conclusions": {
+    "skipped": 21,
+    "cancelled": 74,
+    "success": 159,
+    "failure": 2
+   }
+  },
+  "bootstrap-macos-brew": {
+   "queue": {
+    "n": 235,
+    "median": 0.5,
+    "p90": 129.0,
+    "max": 367.6,
+    "sum": 9303.1
+   },
+   "run": {
+    "n": 235,
+    "median": 2.3,
+    "p90": 53.5,
+    "max": 208.4,
+    "sum": 4085.2
+   },
+   "conclusions": {
+    "skipped": 21,
+    "cancelled": 70,
+    "success": 165
+   }
+  },
+  "bootstrap-linux": {
+   "queue": {
+    "n": 235,
+    "median": 0.0,
+    "p90": 0.1,
+    "max": 1.3,
+    "sum": -299.5
+   },
+   "run": {
+    "n": 235,
+    "median": 1.1,
+    "p90": 1.1,
+    "max": 1.9,
+    "sum": 247.6
+   },
+   "conclusions": {
+    "skipped": 21,
+    "success": 232,
+    "failure": 2,
+    "cancelled": 1
+   }
+  }
+ },
+ "failures": [
+  {
+   "run_id": 37138521861,
+   "created": "2026-10-03T16:53:34Z",
+   "event": "pull_request",
+   "branch": "foundation/retire-pr515-catalog-index-20261003",
+   "head_sha": "90ca07ae98579ed42891c153ce56c89beeff699e",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate manifests and evidence integrity",
+     "job_id": 111247916167
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 37112688327,
+   "created": "2026-10-03T09:20:04Z",
+   "event": "pull_request",
+   "branch": "foundation/local-model-results-20261003",
+   "head_sha": "ae90cb2b30756a6a7d93025618a62f503009710f",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 111173581589
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 37109532368,
+   "created": "2026-10-03T08:23:23Z",
+   "event": "pull_request",
+   "branch": "foundation/macos-suite-parallelism-trial-20261003",
+   "head_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+   "failed_jobs": [
+    {
+     "job": "bootstrap-macos",
+     "step": "Run the macOS bootstrap into a disposable prefix",
+     "job_id": 111164665853
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 37103824254,
+   "created": "2026-10-03T06:40:24Z",
+   "event": "pull_request",
+   "branch": "foundation/practice-citations-alert16-20261003",
+   "head_sha": "406a7e916508cfa25a2863a6e33c3124dd76c21f",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 111148390751
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success",
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 37102921056,
+   "created": "2026-10-03T06:24:01Z",
+   "event": "pull_request",
+   "branch": "foundation/currency-w1-20261003",
+   "head_sha": "ea10c096e8fbc59cf528f9fb600d8b0b261c288b",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 111145842791
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 37100416149,
+   "created": "2026-10-03T05:37:25Z",
+   "event": "push",
+   "branch": "main",
+   "head_sha": "dcae68bd08a191f37ba564eceda9fc4a9d6d4a6e",
+   "failed_jobs": [
+    {
+     "job": "bootstrap-linux",
+     "step": "Run the bootstrap into a disposable prefix",
+     "job_id": 111138674932
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 37096459099,
+   "created": "2026-10-03T04:24:56Z",
+   "event": "pull_request",
+   "branch": "foundation/codex-0160-pin-20261003",
+   "head_sha": "ad9787c313c05e4325416060a8737641d4cd714d",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 111127292170
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 37093976373,
+   "created": "2026-10-03T03:40:14Z",
+   "event": "pull_request",
+   "branch": "foundation/retrieval-retirement-completion-20261003",
+   "head_sha": "b4a7a0c9fb81fd250b5ae5ade5fa5437e79de063",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 111120003517
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 37091135421,
+   "created": "2026-10-03T02:49:38Z",
+   "event": "pull_request",
+   "branch": "foundation/frozen-retrieval-retirement-20261003",
+   "head_sha": "bf750c9f52abfc09e9331aac0c5b642f62bedc1f",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate declared convergence evidence",
+     "job_id": 111111543599
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 37091096228,
+   "created": "2026-10-03T02:48:55Z",
+   "event": "pull_request",
+   "branch": "foundation/retrieval-retirement-completion-20261003",
+   "head_sha": "3f862a489f1fd0c397169d684cb4657ad90d260f",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 111111722501
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 37090864271,
+   "created": "2026-10-03T02:44:50Z",
+   "event": "pull_request",
+   "branch": "foundation/retrieval-retirement-completion-20261003",
+   "head_sha": "0218ad8970eddf213100abed3fe0b004482f1cc9",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate declared convergence evidence",
+     "job_id": 111110726967
+    }
+   ],
+   "linux_validate_same_sha": [
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 37086313980,
+   "created": "2026-10-03T01:29:56Z",
+   "event": "pull_request",
+   "branch": "impl/north-star-closure-20261002",
+   "head_sha": "122700335726e9782633ce13a03d5c08cc99e1b8",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 111097262551
+    }
+   ],
+   "linux_validate_same_sha": [
+    "cancelled",
+    "failure"
+   ]
+  },
+  {
+   "run_id": 37067723566,
+   "created": "2026-10-02T21:35:17Z",
+   "event": "push",
+   "branch": "main",
+   "head_sha": "0eb47187925bf8134660b7a305aa32b0d44b9e17",
+   "failed_jobs": [
+    {
+     "job": "bootstrap-linux",
+     "step": "Run the bootstrap into a disposable prefix",
+     "job_id": 111039575286
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 37042100443,
+   "created": "2026-10-02T17:38:37Z",
+   "event": "pull_request",
+   "branch": "foundation/new-wsl-client-config-20261002",
+   "head_sha": "a372ab3b2463ad9f52be44f7f9e07098171c2cf9",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110954455132
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 37022193159,
+   "created": "2026-10-02T14:46:15Z",
+   "event": "pull_request",
+   "branch": "feat/native-memory-qualification",
+   "head_sha": "9ac024a40325178dd2b78a7f4d19b49fb76ff078",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110887777698
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 37002729964,
+   "created": "2026-10-02T11:45:08Z",
+   "event": "pull_request",
+   "branch": "claude/upkeep-sandbox-runtime-0.0.78-20261001",
+   "head_sha": "7c6c5fa857d8180b30657aca099e80eaaf3cad4b",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110823892149
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure",
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 37002282570,
+   "created": "2026-10-02T11:40:18Z",
+   "event": "pull_request",
+   "branch": "codex/runtime-qualification-20260930",
+   "head_sha": "a36cb4627a1062199a7b4ed5a4abca2d349baf27",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110822480547
+    }
+   ],
+   "linux_validate_same_sha": [
+    "cancelled",
+    "failure",
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 36990686621,
+   "created": "2026-10-02T09:35:46Z",
+   "event": "pull_request",
+   "branch": "codex/runtime-qualification-20260930",
+   "head_sha": "1060f09fd7ab318a487a38015c072b2f4f5f46f1",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110785930942
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36988634952,
+   "created": "2026-10-02T09:14:27Z",
+   "event": "pull_request",
+   "branch": "claude/terminal-profiles-refresh-20261002",
+   "head_sha": "5830aa2666e06a4d042b6e2bd82292274ccfd5bc",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate declared convergence evidence",
+     "job_id": 110779371891
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36974618582,
+   "created": "2026-10-02T06:39:36Z",
+   "event": "pull_request",
+   "branch": "feat/native-memory-qualification",
+   "head_sha": "da162565fb4ae30881a053da80c69a060e2b318b",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110735728973
+    }
+   ],
+   "linux_validate_same_sha": [
+    "cancelled",
+    "cancelled",
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36946376402,
+   "created": "2026-10-02T00:30:55Z",
+   "event": "pull_request",
+   "branch": "foundation/new-wsl-handbook-generator-20261001",
+   "head_sha": "424871d3516cb6d80976fbd4f259744bd053f50b",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110649337077
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success",
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 36940301756,
+   "created": "2026-10-01T23:20:45Z",
+   "event": "pull_request",
+   "branch": "foundation/new-wsl-handbook-generator-20261001",
+   "head_sha": "79b2fdd0631a45a7ece6d2e182e61fc20c6c2e80",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Check the new-host grand list",
+     "job_id": 110629986800
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36902094631,
+   "created": "2026-10-01T17:48:20Z",
+   "event": "pull_request",
+   "branch": "foundation/seamless-local-production-20261001",
+   "head_sha": "1a4afc9f9b5d7313c1816c83ae6dc8ce242e31cf",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110503487077
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36896700809,
+   "created": "2026-10-01T17:04:37Z",
+   "event": "pull_request",
+   "branch": "foundation/seamless-local-production-20261001",
+   "head_sha": "bbf5e531f101787b5ce33a200e75b9c5f4b5f787",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Gate on the adoption test modules",
+     "job_id": 110485377820
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36878114436,
+   "created": "2026-10-01T14:39:57Z",
+   "event": "pull_request",
+   "branch": "foundation/seamless-local-production-20261001",
+   "head_sha": "89e8d732dac154c5abfff8d5a4816500ca7d8382",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Gate on the adoption test modules",
+     "job_id": 110422678424
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure",
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 36870924800,
+   "created": "2026-10-01T13:44:27Z",
+   "event": "pull_request",
+   "branch": "foundation/seamless-local-production-20261001",
+   "head_sha": "8938ecebdaf1dee388765918c323c41162877883",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate landscape choices and alternative evidence",
+     "job_id": 110398185047
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36867111096,
+   "created": "2026-10-01T13:13:23Z",
+   "event": "push",
+   "branch": "main",
+   "head_sha": "b8dd81ddc04e723da3f9fb9d97d850d11820e491",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110385241618
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36859543314,
+   "created": "2026-10-01T12:06:03Z",
+   "event": "pull_request",
+   "branch": "claude/upkeep-sandbox-runtime-0.0.78-20261001",
+   "head_sha": "344ca4f6c8b6665bfc9d7e229173129c9d172a3a",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate landscape choices and alternative evidence",
+     "job_id": 110360084430
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure",
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 36833587488,
+   "created": "2026-10-01T07:59:34Z",
+   "event": "pull_request",
+   "branch": "claude/guard-k4-20260930",
+   "head_sha": "bd99e8f610dfbec46f8afc4cc4395a0affcf1802",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110275569930
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36829361647,
+   "created": "2026-10-01T07:16:19Z",
+   "event": "pull_request",
+   "branch": "claude/guard-k4-20260930",
+   "head_sha": "86bf06cb67f7b204fe44aec8679069195a228b7b",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110262412773
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success",
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 36825377925,
+   "created": "2026-10-01T06:33:09Z",
+   "event": "push",
+   "branch": "main",
+   "head_sha": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110249776440
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36796300379,
+   "created": "2026-10-01T00:27:47Z",
+   "event": "pull_request",
+   "branch": "claude/sota-defaults-a1-20260930",
+   "head_sha": "a4b78594804d4085f0d5901c7ef1951fb8cc4487",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110160670319
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36782834471,
+   "created": "2026-09-30T21:58:59Z",
+   "event": "workflow_dispatch",
+   "branch": "token-native-profile-completion-20260930",
+   "head_sha": "11810a054546f50962270d93564afad36f3e0c60",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Gate on the adoption test modules",
+     "job_id": 110117065934
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36780372819,
+   "created": "2026-09-30T21:35:08Z",
+   "event": "workflow_dispatch",
+   "branch": "token-native-profile-completion-20260930",
+   "head_sha": "1ac1f7d2fc76df85a083a7f2ddb70d92b9ae3102",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate declared convergence evidence",
+     "job_id": 110108825865
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36776670615,
+   "created": "2026-09-30T21:01:28Z",
+   "event": "pull_request",
+   "branch": "token-native-profile-completion-20260930",
+   "head_sha": "938b737f67d9382227a40910479bf62533873862",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate general foundation capability claims",
+     "job_id": 110096205955
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36769683925,
+   "created": "2026-09-30T20:01:12Z",
+   "event": "pull_request",
+   "branch": "claude/sota-defaults-a4-20260930",
+   "head_sha": "69f3e9ed4cb03cd2668d4b867bd33fe33c534153",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110072600657
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36768476923,
+   "created": "2026-09-30T19:50:42Z",
+   "event": "pull_request",
+   "branch": "claude/gpt6-lane-capacity-retry-idle-watchdog-20260930",
+   "head_sha": "ed8186250c8604ec26dea9bd0a6a794e1507c3c7",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110068536952
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success",
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 36763451365,
+   "created": "2026-09-30T19:07:27Z",
+   "event": "pull_request",
+   "branch": "codex/gpt-native-lifecycle-20260930",
+   "head_sha": "b5b0ac8908656b0ce264dc3455cc851624b75b79",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110051567024
+    }
+   ],
+   "linux_validate_same_sha": [
+    "cancelled",
+    "success",
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 36760289190,
+   "created": "2026-09-30T18:40:41Z",
+   "event": "pull_request",
+   "branch": "dependabot/npm_and_yarn/evidence/artifacts/macos-application-20260924/variant/next-16.3.6",
+   "head_sha": "6eb35af2f98dbd32c2f58394dfa5df11a73b969e",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate manifests and evidence integrity",
+     "job_id": 110040815692
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36752399506,
+   "created": "2026-09-30T17:34:49Z",
+   "event": "pull_request",
+   "branch": "claude/sota-defaults-a2-20260930",
+   "head_sha": "47f68fdfec10c05bebd89b0225b20b779122fb25",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110014380578
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36751526079,
+   "created": "2026-09-30T17:27:38Z",
+   "event": "pull_request",
+   "branch": "claude/terminal-lane-final-review-20260930",
+   "head_sha": "cecb3fa5dd1afe33d2b00a7e83228ba56699e287",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110011094970
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success",
+    "success",
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 36746549097,
+   "created": "2026-09-30T16:45:36Z",
+   "event": "pull_request",
+   "branch": "codex/gpt-native-lifecycle-20260930",
+   "head_sha": "3fb8294fcedc38204018af0502ece244af7b2807",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109994071881
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36745793168,
+   "created": "2026-09-30T16:39:25Z",
+   "event": "pull_request",
+   "branch": "claude/sota-defaults-f4-20260930",
+   "head_sha": "20616cba5964b46d92adb71e15dfa4b65c178b71",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 110010303039
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36745162026,
+   "created": "2026-09-30T16:34:12Z",
+   "event": "pull_request",
+   "branch": "codex/gpt-native-lifecycle-20260930",
+   "head_sha": "acccff2a64cc64cce4586831259cf56b84e2f5d7",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate declared convergence evidence",
+     "job_id": 109989373925
+    }
+   ],
+   "linux_validate_same_sha": [
+    "cancelled",
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36743424532,
+   "created": "2026-09-30T16:20:04Z",
+   "event": "pull_request",
+   "branch": "claude/gpt6-lane-capacity-retry-idle-watchdog-20260930",
+   "head_sha": "cc00dbd9443bd02cf661db29947f07d3318516fd",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109983439178
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36733726477,
+   "created": "2026-09-30T15:02:47Z",
+   "event": "pull_request",
+   "branch": "claude/sota-defaults-a4-20260930",
+   "head_sha": "c8f934c6d854e33efd16c75e6e9bfe5170151f1c",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109949820597
+    }
+   ],
+   "linux_validate_same_sha": [
+    "cancelled",
+    "success"
+   ]
+  },
+  {
+   "run_id": 36728291629,
+   "created": "2026-09-30T14:19:51Z",
+   "event": "pull_request",
+   "branch": "claude/sota-defaults-a4-20260930",
+   "head_sha": "8ca7895415cd17feca6085600a6ac34a50f897a0",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Gate on the adoption test modules",
+     "job_id": 109930797673
+    }
+   ],
+   "linux_validate_same_sha": [
+    "cancelled"
+   ]
+  },
+  {
+   "run_id": 36690153586,
+   "created": "2026-09-30T08:30:43Z",
+   "event": "pull_request",
+   "branch": "codex/runtime-qualification-20260930",
+   "head_sha": "bb3d00dc1ed493726481d0d3d746f6b0b46ed8bd",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109805172026
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36667219887,
+   "created": "2026-09-30T04:04:16Z",
+   "event": "pull_request",
+   "branch": "claude/retire-polaris-20260929",
+   "head_sha": "0700299c765258c69d1a22120d90e36e369a991d",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109734351910
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36618373211,
+   "created": "2026-09-29T19:19:05Z",
+   "event": "pull_request",
+   "branch": "claude/pra-u1-cmdpos-2d-20260928",
+   "head_sha": "fe9f511b34a5029fdfc221fc91844932d81d5000",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109577135324
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36617653643,
+   "created": "2026-09-29T19:13:03Z",
+   "event": "pull_request",
+   "branch": "claude/catalog-index-ranking-20260929",
+   "head_sha": "3d4a9510136c8f38b636b70b04e0ac53060b2fa9",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109574692808
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36582564811,
+   "created": "2026-09-29T14:25:30Z",
+   "event": "pull_request",
+   "branch": "claude/landscape-sweep-20260929",
+   "head_sha": "6126f28413b188cd4b7cc5fb41a7e78cdb33c5e5",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109454263387
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36541207804,
+   "created": "2026-09-29T08:11:48Z",
+   "event": "pull_request",
+   "branch": "claude/paper-ext-20260928-receipt",
+   "head_sha": "55abf9a6392017984e332a670d095154137df9cb",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109317304259
+    }
+   ],
+   "linux_validate_same_sha": [
+    "failure"
+   ]
+  },
+  {
+   "run_id": 36524134513,
+   "created": "2026-09-29T05:00:16Z",
+   "event": "pull_request",
+   "branch": "claude/openhands-resolver-20260928",
+   "head_sha": "501bcc9e50bf3ffa3acc82b6ecf20aa4e23c593b",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109263298833
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36514090096,
+   "created": "2026-09-29T02:45:36Z",
+   "event": "pull_request",
+   "branch": "claude/qmd-refresh-embed-20260927",
+   "head_sha": "61680c9b38a3c9ee0f0784c81001daab8e9059cc",
+   "failed_jobs": [
+    {
+     "job": "bootstrap-macos",
+     "step": "Upload the macOS adoption status report",
+     "job_id": 109232657467
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36512404577,
+   "created": "2026-09-29T02:23:57Z",
+   "event": "pull_request",
+   "branch": "claude/max-default-effort-20260929",
+   "head_sha": "1da14a5835f38b900bb8008ecfb37747c9ef6006",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109227223240
+    }
+   ],
+   "linux_validate_same_sha": [
+    "success"
+   ]
+  },
+  {
+   "run_id": 36445626196,
+   "created": "2026-09-28T15:42:31Z",
+   "event": "pull_request",
+   "branch": "claude/runtime-worker-skills-20260927",
+   "head_sha": "534af74f43925203f6df4f85b1fb695062d04b9e",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 109007072736
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36404782077,
+   "created": "2026-09-28T09:38:22Z",
+   "event": "pull_request",
+   "branch": "claude/cc-practice-resolution-20260928",
+   "head_sha": "79b27f02f1b3311ef812dfa7c0ee0463d64d9de5",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate manifests and evidence integrity",
+     "job_id": 108870781288
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36354429337,
+   "created": "2026-09-27T22:11:44Z",
+   "event": "pull_request",
+   "branch": "claude/w5-codex-mcp-required-20260927",
+   "head_sha": "b18d9f031fdf854e74f59586529df1022e805975",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 108719281490
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36351247715,
+   "created": "2026-09-27T21:18:42Z",
+   "event": "pull_request",
+   "branch": "claude/runtime-worker-openhands-20260927",
+   "head_sha": "2fd937a1418cdcf868f5dc4c3fb171ccffc2de56",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 108710223808
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36350481386,
+   "created": "2026-09-27T21:06:33Z",
+   "event": "pull_request",
+   "branch": "claude/runtime-worker-gpt-researcher-20260927",
+   "head_sha": "7106685559007bf44dc6c62e74d9493f25ed7174",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 108708085615
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36349458060,
+   "created": "2026-09-27T20:49:40Z",
+   "event": "pull_request",
+   "branch": "claude/runtime-worker-skills-20260927",
+   "head_sha": "c6c114f8327161997dfc2fd91e1a063f2bc5ac48",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 108705158562
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36345271545,
+   "created": "2026-09-27T19:41:20Z",
+   "event": "pull_request",
+   "branch": "claude/runtime-worker-crawl4ai-20260927",
+   "head_sha": "b14a110fb64b63255c374860b038b4879a611be4",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 108693065695
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36345267061,
+   "created": "2026-09-27T19:41:15Z",
+   "event": "pull_request",
+   "branch": "claude/runtime-worker-deerflow-20260927",
+   "head_sha": "b98a1cd5f91ac2fe738b1a803664a686c7c10877",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 108693052067
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36345263220,
+   "created": "2026-09-27T19:41:11Z",
+   "event": "pull_request",
+   "branch": "claude/runtime-worker-gpt-researcher-20260927",
+   "head_sha": "177472394f31a1ca0af28fa043d44c7cd6973f6e",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 108693040482
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36345259179,
+   "created": "2026-09-27T19:41:07Z",
+   "event": "pull_request",
+   "branch": "claude/runtime-worker-openhands-20260927",
+   "head_sha": "17460572ddded44db988f71984dbaf8c44f023b8",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 108693028586
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36343393495,
+   "created": "2026-09-27T19:10:42Z",
+   "event": "pull_request",
+   "branch": "claude/compaction-window-ab-prereg-20260927",
+   "head_sha": "f7cc409a3df212375c76f957700b1ebb16ce1e73",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Run the full test suite (gating on macOS)",
+     "job_id": 108687720611
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36329129034,
+   "created": "2026-09-27T15:19:31Z",
+   "event": "push",
+   "branch": "main",
+   "head_sha": "f68d13c086a381a8bfc7214b90278bf2d03cc3b9",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate host receipts",
+     "job_id": 108647563351
+    }
+   ],
+   "linux_validate_same_sha": []
+  },
+  {
+   "run_id": 36327304546,
+   "created": "2026-09-27T14:49:23Z",
+   "event": "pull_request",
+   "branch": "claude/mac-token-efficiency-receipts-20260927",
+   "head_sha": "87b1b6158743ef390999954d91a9372f40c7bb0d",
+   "failed_jobs": [
+    {
+     "job": "validate-macos",
+     "step": "Validate host receipts",
+     "job_id": 108642426231
+    }
+   ],
+   "linux_validate_same_sha": []
+  }
+ ],
+ "macos_only_failures_linux_green": [
+  37112688327,
+  37109532368,
+  37103824254,
+  37096459099,
+  37093976373,
+  37042100443,
+  36946376402,
+  36867111096,
+  36833587488,
+  36829361647,
+  36825377925,
+  36768476923,
+  36763451365,
+  36752399506,
+  36751526079,
+  36745793168,
+  36743424532,
+  36733726477,
+  36690153586,
+  36667219887,
+  36618373211,
+  36617653643,
+  36524134513,
+  36514090096,
+  36512404577
+ ]
+}

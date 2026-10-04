@@ -1,0 +1,1074 @@
+{
+ "clone_head": "a447a5114337b471ef1aae11013063a40db0a201",
+ "results": [
+  {
+   "id": "M0",
+   "origin": "baseline",
+   "mutant": "unmutated tree",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.388s",
+    "OK"
+   ]
+  },
+  {
+   "id": "M1a",
+   "origin": "round 2 (reconstructed)",
+   "mutant": "step in security-scan.yml: pnpm install with working-directory = the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.391s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "M1b",
+   "origin": "round 2 (reconstructed)",
+   "mutant": "new workflow: pnpm install && pnpm build in the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.391s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "M2",
+   "origin": "round 2 (reconstructed)",
+   "mutant": "variant/src/index.ts on disk, untracked",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_the_artifact_directory_holds_nothing_beyond_its_three_files_on_disk"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.392s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "M3",
+   "origin": "round 2 (reconstructed)",
+   "mutant": "variant/src/index.ts, tracked (git add)",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_git_tracks_nothing_beyond_the_three_files_there",
+    "test_the_artifact_directory_holds_nothing_beyond_its_three_files_on_disk"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.395s",
+    "FAILED (failures=2)"
+   ]
+  },
+  {
+   "id": "M4",
+   "origin": "round 2 (reconstructed)",
+   "mutant": "the lock's next 16.3.5 changed to 16.3.6 (importer and package keys)",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_package_json_and_the_lock_still_pin_next_16_3_5_or_are_absent",
+    "test_the_lock_has_the_sha256_that_frozen_locks_binds_or_is_absent"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.396s",
+    "FAILED (failures=2)"
+   ]
+  },
+  {
+   "id": "M5",
+   "origin": "round 3",
+   "mutant": "new workflow: working-directory = the parent directory, pnpm --dir variant install/start",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.396s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "M6",
+   "origin": "round 3",
+   "mutant": "root pnpm-workspace.yaml listing the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.391s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "M7",
+   "origin": "round 3",
+   "mutant": "root docker-compose.yml mounting the variant and running install/build/start",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.397s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "M8",
+   "origin": "round 3",
+   "mutant": "new line in tests/test_osv_lockfile_coverage.py running pnpm install in the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.390s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "M9",
+   "origin": "round 3",
+   "mutant": "new script joining Path parts: \"evidence\" / \"artifacts\" / <name> / \"variant\"",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.391s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "X1",
+   "origin": "extra",
+   "mutant": "tracked symlink apps/frozen -> the variant, and a workflow running pnpm in apps/frozen",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.393s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "X2",
+   "origin": "extra",
+   "mutant": "script under evidence/** (excluded class) running pnpm install in the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.395s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "X3",
+   "origin": "extra",
+   "mutant": "blueprints/**/package.json building the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.388s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "X4",
+   "origin": "extra",
+   "mutant": "blueprints/**/.devcontainer/devcontainer.json installing the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.394s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "X5",
+   "origin": "extra",
+   "mutant": "root Makefile target installing the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.396s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "X6",
+   "origin": "extra",
+   "mutant": "pinned line changed: security-scan.yml's assignment line also names package.json",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_every_pinned_file_is_scanned_with_its_pinned_lines",
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": true,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.392s",
+    "FAILED (failures=2)"
+   ]
+  },
+  {
+   "id": "X7",
+   "origin": "extra (scope break)",
+   "mutant": "this module's excluded classes wrongly include .github/** (drops the inventory pins)",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_every_pinned_file_is_scanned_with_its_pinned_lines",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes"
+   ],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": true,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.401s",
+    "FAILED (failures=2)"
+   ]
+  },
+  {
+   "id": "X8",
+   "origin": "extra (git unavailable)",
+   "mutant": "git not on PATH",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_git_tracks_nothing_beyond_the_three_files_there",
+    "test_every_pinned_file_is_scanned_with_its_pinned_lines",
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": true,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.023s",
+    "FAILED (failures=3)"
+   ]
+  },
+  {
+   "id": "N1",
+   "origin": "round 4",
+   "mutant": "new blueprints/x/launch.json: an mcpServers entry whose command runs pnpm start with cwd = the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.398s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "N2",
+   "origin": "round 4",
+   "mutant": "new macOS workflow running pnpm install and start with working-directory = the variant path with the directory's name upper-cased",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.398s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "N3",
+   "origin": "round 4",
+   "mutant": "the frozen TOML's ignoreUntil changed from 2026-12-24 to 2027-03-24",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date"
+   ],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": true,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.389s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "X9",
+   "origin": "extra (scope break)",
+   "mutant": "this module's excluded classes include blueprints/**/*.json again (round 3's rule)",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_every_pinned_file_is_scanned_with_its_pinned_lines",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes"
+   ],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": true,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.399s",
+    "FAILED (failures=4)"
+   ]
+  },
+  {
+   "id": "X10",
+   "origin": "extra (scope break)",
+   "mutant": "this module matches the name case-sensitively again (round 3's rule)",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_the_name_is_matched_in_any_letter_case",
+    "test_the_name_is_matched_in_any_letter_case",
+    "test_the_name_is_matched_in_any_letter_case",
+    "test_the_name_is_matched_in_any_letter_case"
+   ],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.331s",
+    "FAILED (failures=4)"
+   ]
+  },
+  {
+   "id": "X11",
+   "origin": "extra",
+   "mutant": "the frozen TOML's exception removed (header comments kept)",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_every_pinned_file_is_scanned_with_its_pinned_lines",
+    "test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date"
+   ],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": true,
+   "git_message": false,
+   "recheck_message": true,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.392s",
+    "FAILED (failures=2)"
+   ]
+  },
+  {
+   "id": "X12",
+   "origin": "extra",
+   "mutant": "the frozen TOML's reason edited (its live-lock clause 16.3.6 -> 16.3.8), date unchanged",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_every_pinned_file_is_scanned_with_its_pinned_lines",
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": true,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.408s",
+    "FAILED (failures=2)"
+   ]
+  },
+  {
+   "id": "L1",
+   "origin": "known limit",
+   "mutant": "root pnpm-workspace.yaml with a glob evidence/artifacts/*/variant",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.392s",
+    "OK"
+   ]
+  },
+  {
+   "id": "L2",
+   "origin": "known limit",
+   "mutant": "workflow iterating the OSV inventory's frozen-config paths and installing each",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.389s",
+    "OK"
+   ]
+  },
+  {
+   "id": "L3",
+   "origin": "known limit",
+   "mutant": "script assembling the name from fragments",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.393s",
+    "OK"
+   ]
+  },
+  {
+   "id": "L4",
+   "origin": "known limit (excluded class)",
+   "mutant": "Markdown recipe whose command block installs and builds the variant",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.400s",
+    "OK"
+   ]
+  },
+  {
+   "id": "L5",
+   "origin": "known limit (excluded class)",
+   "mutant": "evidence/**/launch.json: the N1 launch configuration kept under evidence/**",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.398s",
+    "OK"
+   ]
+  },
+  {
+   "id": "P1",
+   "origin": "allowed",
+   "mutant": ".DS_Store and Thumbs.db in the variant directory on disk",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.392s",
+    "OK"
+   ]
+  },
+  {
+   "id": "P2",
+   "origin": "allowed",
+   "mutant": "variant removed (both files deleted and staged): the exit path",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.383s",
+    "OK"
+   ]
+  },
+  {
+   "id": "N4",
+   "origin": "round 5 (section 2)",
+   "mutant": "rebuild.sh beside variant/ (cd variant && pnpm install), tracked (git add)",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_git_tracks_nothing_beyond_the_three_files_there",
+    "test_the_artifact_directory_holds_nothing_beyond_its_three_files_on_disk"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.395s",
+    "FAILED (failures=2)"
+   ]
+  },
+  {
+   "id": "N5",
+   "origin": "round 5 (section 2)",
+   "mutant": "the same rebuild.sh beside variant/ on disk, untracked",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_the_artifact_directory_holds_nothing_beyond_its_three_files_on_disk"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.396s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "N6",
+   "origin": "round 5 (section 2)",
+   "mutant": "the same rebuild.sh, tracked under the artifact directory's name upper-cased (another directory on this case-sensitive file system, the same one on a case-insensitive one)",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_git_tracks_nothing_beyond_the_three_files_there"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.392s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "N7",
+   "origin": "round 5 (section 1)",
+   "mutant": "new .claude/agents/x.md whose frontmatter hooks: entry runs pnpm install in the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.391s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "N8",
+   "origin": "round 5 (section 4)",
+   "mutant": "the frozen TOML's exception gains a key besides id, ignoreUntil and reason (effectiveUntil = 2027-03-24), date and reason unchanged",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date"
+   ],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": true,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.421s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "X13",
+   "origin": "extra",
+   "mutant": "new .agents/skills/frozen-app/SKILL.md whose instructions run pnpm install in the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.389s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "X14",
+   "origin": "extra (scope break)",
+   "mutant": "this module's recogniser drops the client directories again (round 4's rule)",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes"
+   ],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.398s",
+    "FAILED (failures=50)"
+   ]
+  },
+  {
+   "id": "X15",
+   "origin": "extra (scope break)",
+   "mutant": "this module compares tracked artifact paths case-sensitively",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_tracked_paths_are_compared_in_any_ascii_letter_case",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes"
+   ],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.376s",
+    "FAILED (failures=19)"
+   ]
+  },
+  {
+   "id": "N9",
+   "origin": "round 6",
+   "mutant": "new .CLAUDE/skills/frozen-app/SKILL.md (upper-cased client directory) whose instructions run pnpm install in the variant",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines"
+   ],
+   "errors": 0,
+   "reopen_message": true,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.389s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "id": "X16",
+   "origin": "extra (scope break)",
+   "mutant": "this module compares client configuration directory names case-sensitively again (round 5's rule)",
+   "expected": "fail",
+   "observed": "fail",
+   "exit_code": 1,
+   "as_expected": true,
+   "failing_tests": [
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes",
+    "test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes"
+   ],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.397s",
+    "FAILED (failures=18)"
+   ]
+  },
+  {
+   "id": "P3",
+   "origin": "allowed",
+   "mutant": ".DS_Store and Thumbs.db beside variant/, on disk and tracked (git add -f, since .gitignore's *.db ignores Thumbs.db)",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.393s",
+    "OK"
+   ]
+  },
+  {
+   "id": "P4",
+   "origin": "allowed",
+   "mutant": "the whole artifact directory removed (its three files deleted and staged)",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.388s",
+    "OK"
+   ]
+  }
+ ]
+}
