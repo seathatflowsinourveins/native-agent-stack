@@ -401,6 +401,19 @@ locally with `GH_TOKEN` set and no `--offline`, using
   `.github/osv-scanner-frozen-macos.toml` (`ignoreUntil` 2026-12-24) is renewed, changed or removed, which that
   module's review-date test (or, for a changed reason, its pinned reason line) turns into a failure, or when the
   tripwire fails.
+  **Recheck, tripwire failure on #673 (2026-10-04).** After main merged into the OSV split-scan hardening port (#673,
+  porting #555), CI's full unittest run failed the tripwire on two new lines that name the frozen lock:
+  - the port's retained copy of the split-scan control
+    (`blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-osv-split-hardening.osv-split-controls.py.txt`),
+    its `FROZEN` constant;
+  - `tests/test_osv_lockfile_coverage.py`, a copy of the workflow's assignment check that the split-scan mutants use to
+    prove the frozen config keeps this lock alone.
+
+  Both only scan or check the lock, and nothing builds, runs or serves an application from it, so the dismissal
+  stands. Both lines are pinned in `PINNED_LINES` under the hashes of their already-pinned originals: the 2026-09-30
+  relock control's `FROZEN` constant, and `SCAN_ASSIGNMENT`. The change adds pins only; no recogniser, scope rule or
+  excluded class changes. The receipt's `guard_mutation_checks.module_sha256` stays the dated hash of the module as
+  mutation-tested on 2026-10-03.
   **Retired historical WSL retrieval partition (2026-10-03).** The original
   `blueprints/convergence-practice/wsl-retrieval/package-lock.json` remains at
   SHA256 `5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb`.
