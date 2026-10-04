@@ -143,6 +143,39 @@ def sdk_dts(settings_extra=(), hooks=HOOKS, interface=TRAP_INTERFACE, settings=T
     return "\n".join(parts) + "\n"
 
 
+REFERENCE_KEYS = [*FILLER_SETTINGS, "docsOnlySetting"]
+
+
+def reference_page(keys=REFERENCE_KEYS, title=True, global_section=True) -> str:
+    """settings-reference.md shaped like the real page: its title, "## " sections of "### `key`" entries (a Scope
+    bullet and a fenced example each), a dotted heading, a removed and a deprecated entry, a Global config key outside
+    its section, fenced lines that look like headings, and the `## Global config settings` section, whose keys are
+    not settings keys. It documents ``keys`` plus fillerSetting00 (dotted) and deprecatedSetting."""
+    def entry(key: str, scope: str = "Any file", warning: str | None = None) -> list[str]:
+        lines = [f"### `{key}`", ""]
+        if warning:
+            lines += ["<Warning>", f"  {warning}", "</Warning>", ""]
+        return lines + ["A synthetic setting.", "", f"* **Scope**: [`{scope}`](#scopes)", "* **Type**: Boolean", "",
+                        "```json settings.json theme={null}", "{", f'  "{key}": true', "}", "```", ""]
+
+    lines = ["> ## Documentation Index", "", "# All settings" if title else "# Something else", "",
+             "## Settings index", "", "| Key | Description | Topic | Scope |", "| :- | :- | :- | :- |", "",
+             "## Model and responses", ""]
+    for key in keys:
+        lines += entry(key)
+    lines += entry("fillerSetting00.nested")
+    lines += entry("removedSetting", warning="Removed in v2.1.200, together with the tool it sized.")
+    lines += entry("deprecatedSetting", warning="Deprecated since v2.1.100. Claude Code still reads it.")
+    lines += entry("scopeMarkedElsewhere", scope="Global config")
+    lines += ["```text", "## Not a section", "### `fencedFake`", "```", ""]
+    if global_section:
+        lines += ["## Global config settings", "", "Save these keys in `~/.claude.json`, not in a settings file.", ""]
+        lines += entry("globalOnlyKey", scope="Global config")
+        lines += entry("sectionOnlyGlobal")  # in the section, whatever its Scope bullet says
+        lines += ["```text", "# a comment line of an example", "```", ""]
+    return "\n".join([*lines, "## See also", "", "- [Settings](/docs/en/settings)", ""])
+
+
 def env_page(extra=(), heading=True, names=ENV_NAMES) -> str:
     lines = ["# Environment variables" if heading else "# Something else", "", "## Variables", ""]
     lines += [f"- `{name}`: a synthetic variable." for name in [*names, *extra]]
@@ -171,7 +204,12 @@ def codex_schema(extra_top=(), features=None) -> dict:
     properties["model"] = {"anyOf": [{"$ref": "#/definitions/Model"}, {"type": "null"}]}
     properties["bulk"] = {"type": "object", "properties": {f"entry_{index:03d}": {"type": "integer"}
                                                            for index in range(150)}}
+    # Named profiles repeat root keys (ConfigProfile); only profile_only is a profile's own key.
+    properties["profiles"] = {"type": "object", "additionalProperties": {"$ref": "#/definitions/Profile"}}
     definitions = {
+        "Profile": {"type": "object", "properties": {
+            "top_00": {"type": "string"}, "tui": {"$ref": "#/definitions/Tui"}, "profile_only": {"type": "boolean"},
+            "features": {"type": "object", "properties": {name: {"type": "boolean"} for name in names}}}},
         "Tui": {"type": "object", "properties": {"theme": {"type": "string"},
                                                  "notifications": {"allOf": [{"$ref": "#/definitions/Note"}]}}},
         "Note": {"type": "object", "properties": {"enabled": {"type": "boolean"}}},
@@ -218,7 +256,8 @@ def env_table_page(names) -> str:
 STRUCTURED_PATHS = {"features", "tui", "tui.theme", "tui.notifications", "tui.notifications.enabled", "mcp_servers",
                     "mcp_servers.*.command", "mcp_servers.*.env", "hooks", "hooks.PreToolUse",
                     "hooks.PreToolUse[].matcher", "hooks.PreToolUse[].hooks", "hooks.PreToolUse[].hooks[].command",
-                    "hooks.PreToolUse[].hooks[].timeout", "model", "model.name", "model.fallback", "bulk"}
+                    "hooks.PreToolUse[].hooks[].timeout", "model", "model.name", "model.fallback", "bulk", "profiles",
+                    "profiles.*.profile_only"}
 
 
 def expected_paths(extra_top=()) -> set[str]:
@@ -251,6 +290,8 @@ class Upstream:
         self.settings_extra: list[str] = []
         self.hooks = list(HOOKS)
         self.dts_override: str | None = None
+        self.reference_keys = list(REFERENCE_KEYS)
+        self.reference_override: str | None = None
         self.env_extra: list[str] = []
         self.env_override: str | None = None
         self.mods = list(MODS)
@@ -294,6 +335,8 @@ class Upstream:
             usw.PACKUMENT_URL.format(package=usw.SDK_PACKAGE): json.dumps({"name": usw.SDK_PACKAGE, "versions": {
                 sdk: {"name": usw.SDK_PACKAGE, "version": sdk, "claudeCodeVersion": code, "types": "sdk.d.ts"}
                 for sdk, code in self.sdk_pairs}}).encode(),
+            usw.SETTINGS_REFERENCE_URL: (self.reference_override if self.reference_override is not None
+                                         else reference_page(self.reference_keys)).encode("utf-8"),
             usw.ENV_VARS_URL: (self.env_override if self.env_override is not None
                                else env_page(self.env_extra)).encode("utf-8"),
             usw.MODS_URL: (self.mods_override if self.mods_override is not None else mods_page(self.mods)).encode(),
@@ -433,6 +476,20 @@ class ParserTests(unittest.TestCase):
             with self.subTest(body=body):
                 self.assertEqual(members(body), expected)
 
+    def test_settings_reference_keys_follow_the_page_structure(self):
+        keys = usw.parse_settings_reference(reference_page())
+        self.assertEqual(keys, sorted({*REFERENCE_KEYS, "deprecatedSetting"}))
+        for absent in ("removedSetting", "scopeMarkedElsewhere", "globalOnlyKey", "sectionOnlyGlobal", "fencedFake",
+                       "fillerSetting00.nested"):
+            self.assertNotIn(absent, keys)
+
+    def test_fenced_heading_lines_neither_start_nor_end_a_section(self):
+        entries = usw.reference_entries(reference_page())
+        self.assertEqual({entry["key"] for entry in entries if entry["section"] == usw.GLOBAL_CONFIG_SECTION},
+                         {"globalOnlyKey", "sectionOnlyGlobal"})
+        self.assertNotIn("fencedFake", {entry["key"] for entry in entries})
+        self.assertEqual({entry["section"] for entry in entries}, {"Model and responses", "Global config settings"})
+
     def test_hook_events_read_a_multiline_array_with_both_quotes_and_comments(self):
         self.assertEqual(usw.parse_hook_events(sdk_dts()), sorted(HOOKS))
         self.assertEqual(usw.parse_hook_events(sdk_dts(multiline_hooks=False)), sorted(HOOKS))
@@ -452,6 +509,12 @@ class ParserTests(unittest.TestCase):
         self.assertNotIn("mcp_servers.*", paths)
         self.assertNotIn("mcp_servers.*.env.*", paths)
         self.assertNotIn("model.fallback.name", paths)  # the recursive $ref is not followed again
+
+    def test_profile_paths_that_mirror_root_paths_are_left_out(self):
+        paths = set(usw.flatten_codex_schema(json.dumps(codex_schema()).encode()))
+        self.assertIn("profiles.*.profile_only", paths)  # a profile's own key stays
+        self.assertFalse({path for path in paths if path.startswith("profiles.*.") and path != "profiles.*.profile_only"})
+        self.assertTrue({"top_00", "tui.theme", "features.feature_00"} <= paths)
 
     def test_a_ref_with_sibling_properties_counts_both(self):
         schema = codex_schema()
@@ -507,6 +570,14 @@ class AnchorTests(unittest.TestCase):
         ("too few settings", lambda u: setattr(u, "dts_override", sdk_dts(interface="export declare interface "
                                                                          "Settings {\n    only?: string;\n}\n")),
          "anchor missing: sdk.d.ts:interface Settings (count"),
+        ("settings reference without its title", lambda u: setattr(u, "reference_override",
+                                                                    reference_page(title=False)),
+         "anchor missing: settings-reference.md:# All settings"),
+        ("settings reference without its global config section",
+         lambda u: setattr(u, "reference_override", reference_page(global_section=False)),
+         "anchor missing: settings-reference.md:## Global config settings"),
+        ("settings reference with too few keys", lambda u: setattr(u, "reference_keys", FILLER_SETTINGS[:10]),
+         "anchor missing: settings-reference.md:key headings (count"),
         ("env page without its title", lambda u: setattr(u, "env_override", env_page(heading=False)),
          "anchor missing: env-vars.md:# Environment variables"),
         ("env page with too few names", lambda u: setattr(u, "env_override", env_page(names=ENV_NAMES[:5])),
@@ -550,13 +621,13 @@ class FloorTests(unittest.TestCase):
     shipped, never lifted). Each degraded count still passes its absolute bound, so only the 80%-of-baseline floor
     catches it; the run exits 3, names the kind and writes nothing."""
 
-    def degraded_run(self, prepare, degrade, message: str, absolute):
+    def degraded_run(self, prepare, degrade, message: str, absolute, bound: str):
         watch, upstream = Watch(self), Upstream()
         prepare(upstream)
         watch.seed(self, upstream)
         before = watch.latest.read_bytes()
         degrade(upstream)
-        self.assertGreaterEqual(absolute(upstream), 200 if "codex" in message else 100)  # the absolute bound passes
+        self.assertGreaterEqual(absolute(upstream), usw.BOUNDS[bound][0])  # the absolute bound passes
         code, _, stderr = watch.run("--network", upstream=upstream)
         self.assertEqual(code, 3, stderr)
         self.assertIn(message, stderr)
@@ -569,7 +640,7 @@ class FloorTests(unittest.TestCase):
             lambda u: setattr(u, "schema_override", json.dumps(schema).encode()),
             lambda u: setattr(u, "schema_override", json.dumps(dict(schema, definitions={})).encode()),
             "anchor missing: codex:config below 80% of baseline (count ",
-            lambda u: len(usw.flatten_codex_schema(u.schema_override)))
+            lambda u: len(usw.flatten_codex_schema(u.schema_override)), "codex:config")
 
     def test_a_schema_read_without_its_combinators_fails_the_floor(self):
         schema = real_shaped_schema()
@@ -577,7 +648,7 @@ class FloorTests(unittest.TestCase):
             lambda u: setattr(u, "schema_override", json.dumps(schema).encode()),
             lambda u: setattr(u, "schema_override", json.dumps(without_combinators(schema)).encode()),
             "anchor missing: codex:config below 80% of baseline",
-            lambda u: len(usw.flatten_codex_schema(u.schema_override)))
+            lambda u: len(usw.flatten_codex_schema(u.schema_override)), "codex:config")
 
     def test_an_env_page_cut_at_half_its_table_fails_the_floor(self):
         names = [f"CLAUDE_CODE_TABLE_{index:03d}" for index in range(400)]
@@ -585,7 +656,21 @@ class FloorTests(unittest.TestCase):
             lambda u: setattr(u, "env_override", env_table_page(names)),
             lambda u: setattr(u, "env_override", env_table_page(names[:200])),
             "anchor missing: claude:env below 80% of baseline (count 200, baseline 400",
-            lambda u: len(usw.parse_env_names(u.env_override)))
+            lambda u: len(usw.parse_env_names(u.env_override)), "claude:env")
+
+    def test_a_settings_reference_cut_at_half_fails_its_own_floor_while_the_union_holds(self):
+        # The SDK also types the cut keys, so claude:setting (the union) keeps its count; the per-source floor fires.
+        extra = [f"documentedSetting{index:03d}" for index in range(100)]
+
+        def prepare(upstream):
+            upstream.settings_extra = list(extra)
+            upstream.reference_keys = [*FILLER_SETTINGS, *extra]
+
+        self.degraded_run(prepare, lambda u: setattr(u, "reference_keys", list(FILLER_SETTINGS)),
+                          "anchor missing: claude:setting from settings-reference.md below 80% of baseline "
+                          "(count 61, baseline 161",
+                          lambda u: len(usw.parse_settings_reference(reference_page(u.reference_keys))),
+                          "claude:setting/settings-reference")
 
     def test_a_removal_under_the_floor_is_reported_and_counted(self):
         # One mod of six gone (17%) passes the floor: removed is in the line, in coverage.counts and in latest.json.
@@ -827,6 +912,35 @@ class DiffTests(unittest.TestCase):
         self.assertTrue(document["summary_line"].startswith(
             "surface watch: 2 unreviewed of 3 new, 1 removed, 1 stage change"), document["summary_line"])
 
+    def test_new_settings_keys_carry_the_sources_that_hold_them(self):
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        upstream.settings_extra = ["typedOnly", "inBoth"]
+        upstream.reference_keys += ["documentedOnly", "inBoth"]
+        document = watch.document("--network", upstream=upstream)
+        self.assertEqual({item["name"]: item["sources"] for item in document["new"]},
+                         {"documentedOnly": ["settings-reference.md"], "inBoth": ["sdk.d.ts", "settings-reference.md"],
+                          "typedOnly": ["sdk.d.ts"]})
+        held = document["coverage"]["key_sources"]["claude:setting"]
+        self.assertEqual(held["settings-reference.md"]["only_here"], ["deprecatedSetting", "docsOnlySetting",
+                                                                      "documentedOnly"])
+        self.assertIn("typedOnly", held["sdk.d.ts"]["only_here"])
+        self.assertEqual((held["sdk.d.ts"]["observed"], held["sdk.d.ts"]["baseline"]),
+                         (len(FILLER_SETTINGS) + len(TRAP_SETTINGS) + 2, len(FILLER_SETTINGS) + len(TRAP_SETTINGS)))
+        _, text, _ = watch.run("--dry-run", upstream=upstream)
+        self.assertIn("new: claude:setting:documentedOnly (unreviewed) (from settings-reference.md)", text)
+
+    def test_a_new_feature_flag_is_one_unreviewed_key_per_kind(self):
+        # L1: profiles.*.features.<name> mirrors features.<name> and is no key of its own.
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        upstream.schema_override = json.dumps(codex_schema(
+            features=[*(f"feature_{index:02d}" for index in range(25)), "brand_new_flag"])).encode()
+        upstream.features["brand_new_flag"] = ("under development", False)
+        document = watch.document("--network", upstream=upstream)
+        self.assertEqual(document["unreviewed"], ["codex:config:features.brand_new_flag",
+                                                  "codex:feature:brand_new_flag"])
+
     def test_an_unobserved_kind_is_left_out_of_the_diff(self):
         watch, upstream = Watch(self), Upstream()
         watch.seed(self, upstream)
@@ -939,6 +1053,9 @@ class WriteTests(unittest.TestCase):
         self.assertEqual(usw.validate_baseline(baseline), [])
         self.assertEqual(stat.S_IMODE(watch.baseline.stat().st_mode), 0o644)
         self.assertEqual(baseline["kinds"]["claude:mod"], sorted(MODS))
+        self.assertEqual(baseline["source_counts"], {"claude:setting": {
+            "sdk.d.ts": len(FILLER_SETTINGS) + len(TRAP_SETTINGS), "settings-reference.md": len(REFERENCE_KEYS) + 1}})
+        self.assertEqual(len(baseline["kinds"]["claude:setting"]), len(FILLER_SETTINGS) + len(TRAP_SETTINGS) + 2)
         for source, entry in baseline["sources"].items():
             self.assertEqual(set(entry) - {"url", "command"}, {"version", "fetched_utc", "sha256", "bytes"}, source)
             self.assertRegex(entry["sha256"], r"^[0-9a-f]{64}$")

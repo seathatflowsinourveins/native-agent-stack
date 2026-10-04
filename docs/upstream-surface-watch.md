@@ -47,6 +47,7 @@ All URLs were re-read on 2026-10-04 (curl, HTTP 200); `S5` is report-only text.
 | --- | --- | --- | --- |
 | S1 | trigger, versions | <https://registry.npmjs.org/-/package/@anthropic-ai/claude-code/dist-tags>, `.../@openai/codex/dist-tags` | a `latest` version |
 | S2 | `claude:setting`, `claude:hook` | the `sdk.d.ts` of the `@anthropic-ai/claude-agent-sdk` release whose `claudeCodeVersion` equals the watched version, resolved through <https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk> and read from `https://unpkg.com/@anthropic-ai/claude-agent-sdk@<version>/sdk.d.ts` | `interface Settings` (top-level keys, 50-2000); `HOOK_EVENTS: readonly [...]` (10-300) |
+| S2b | `claude:setting` (second source) | <https://code.claude.com/docs/en/settings-reference.md>: the top-level keys of its key headings, without the `## Global config settings` section's keys and the entries marked removed | the `# All settings` title and a key heading in the `## Global config settings` section; 50-2000 keys |
 | S3 | `claude:env`, `claude:mod` | <https://code.claude.com/docs/en/env-vars.md> (backticked upper-case tokens of two or more characters, page-wide); <https://code.claude.com/docs/en/plugins/mods/overview.md> (`cc-plugin-*`) | the `# Environment variables` title (100-5000 names); a built-in mods heading (1-300) |
 | S4 | `codex:config`, `codex:feature` | `gh api repos/openai/codex/releases/latest` (one REST call, gh's own sign-in as in `tools/sota-convergence/github_freshness.py`), its `config-schema.json` asset verified against the sha256 digest GitHub publishes for it (a release without one is read unverified: the source's `digest_check` and a coverage note say so); `codex features list` of the installed binary | root `properties` with `features` (200-50000 paths, 30+ top-level, 20+ `features.*`); name/stage/enabled rows (30-5000) |
 | S5 | changelog delta | <https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md>; Codex stable release notes (one `gh api graphql` call for the newest 100 releases, made only when the stable tag has moved past the baseline) | `## X.Y.Z` headings |
@@ -54,15 +55,38 @@ All URLs were re-read on 2026-10-04 (curl, HTTP 200); `S5` is report-only text.
 
 The parsing rules:
 
-- `claude:setting` takes the top-level members of `interface Settings` with a comment- and string-aware scanner
-  (quoted and `$` keys, nested object types, type arguments such as `Record<string, Array<string>>`, function types,
-  index, call and construct signatures, literals, and members that end at a line break rather than `;`).
+- `claude:setting` is the union of two sources, and `coverage.key_sources` and each new item's `sources` say which
+  source holds a key, so a key that one source lacks is visible on every run. From `sdk.d.ts` it takes the top-level
+  members of `interface Settings` with a comment- and string-aware scanner (quoted and `$` keys, nested object
+  types, type arguments such as `Record<string, Array<string>>`, function types, index, call and construct
+  signatures, literals, and members that end at a line break rather than `;`). From the settings reference it takes
+  every key heading outside fenced code blocks; a dotted heading such as `` `sandbox.enabled` `` gives its first
+  segment. It leaves out the keys of the `## Global config settings` section, or whose `**Scope**` bullet says
+  `Global config`: they go in `~/.claude.json`, not in a settings file. It also leaves out an entry that opens with
+  a `<Warning>` saying `Removed in v...`. That only drops the docs heading: a key that `sdk.d.ts` still types, such as
+  `taskOutputMaxChars`, stays (with `sources` `["sdk.d.ts"]`). Each source has its own 80% floor.
 - `codex:config` takes every named property's dotted path through `$ref`, `allOf`/`anyOf`/`oneOf`, map values (`*`)
-  and array items (`[]`); a bare map or array container adds no path of its own.
+  and array items (`[]`); a bare map or array container adds no path of its own. A named profile repeats most root
+  keys (`profiles.*.<path>` beside `<path>`), and such a mirror is left out, so one new Codex feature flag is at most
+  one unreviewed key per kind: `codex:config:features.<name>` and `codex:feature:<name>`. A key that only a profile
+  has stays.
 - `codex:feature` runs `codex features list` with an empty temporary `HOME` and `CODEX_HOME`. The host's Codex home is
   neither read nor written, and `enabled` is the binary's default, not this host's choice.
 - An unobserved kind is left out of the diff and named in `coverage.kinds_not_observed`, so it never shows as
   removed. A missing binary, for example, leaves `codex:feature` unobserved.
+
+## What the watch does not cover
+
+It compares names from the sources above and nothing else:
+
+- Claude Code's global-config keys in `~/.claude.json`: the settings reference's `## Global config settings` section
+  (12 keys on 2026-10-04), left out on purpose.
+- Claude Code CLI flags and subcommands, slash commands, keybindings, and the fields inside hook input and output or
+  plugin and MCP manifests.
+- Codex environment variables, CLI flags and slash commands, `requirements.toml` keys, and config keys that the Codex
+  docs describe but `config-schema.json` does not hold (an independent extraction on 2026-10-04 counted 59).
+- A change of a key's type, default, scope or meaning: only names are compared, apart from the `codex:feature` stage.
+- Anything in the changelogs (S5) beyond the report-only entry titles, and any source not listed above.
 
 ## Exit codes
 

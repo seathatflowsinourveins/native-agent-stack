@@ -2,6 +2,8 @@
 
 **Decided by:** session native-agent-stack-99's unit U4, from the coordinator's source research of 2026-10-04 (first
 party, third-party trackers, what nothing maintained covers). The sources were re-read with curl on 2026-10-04.
+Revised the same day by unit U4-REPAIR, the one repair round after an independent review of the series: a second
+settings source, an 80% floor per kind, cache-aged reports, profile mirrors dropped and the baseline regenerated.
 
 **Scope:**
 
@@ -23,9 +25,17 @@ signal when a release adds a switch. The repository's daily machinery (`scripts/
 
 - **Claude Code settings keys and hook events:** the Agent SDK's `sdk.d.ts`, whose `interface Settings` is "auto-generated
   from the settings JSON schema". It is matched to the Claude Code version by its package.json `claudeCodeVersion`
-  through the npm packument (2.1.289 resolves to SDK 0.3.289). This is the only machine-readable, versioned
-  first-party form of the settings keys. Anthropic publishes no settings schema of its own (request:
-  anthropics/claude-code#94232).
+  through the npm packument (2.1.289 resolves to SDK 0.3.289). It is machine-readable and versioned, but it is not
+  the whole documented surface: on 2026-10-04 the settings reference documented 10 settings keys that sdk.d.ts
+  0.3.289 does not type (among them `autoMode`, `sshHostAllowlist`, `useAutoModeDuringPlan`). Anthropic publishes no
+  settings schema of its own (request: anthropics/claude-code#94232).
+- **Claude Code settings keys, second source:** the key headings of
+  <https://code.claude.com/docs/en/settings-reference.md> (live docs, no version stamp). `claude:setting` is the union
+  of both sources, and each run records which source holds each key. The page's own structure decides what is not a
+  settings key: the `## Global config settings` section, whose keys go in `~/.claude.json` and whose `**Scope**`
+  bullets say `Global config` (12 keys, the same 12 by both rules on the 14:31Z copy), and the entries that open with
+  a `<Warning>` "Removed in v...". There are three of those: `taskOutputMaxChars`, `permissionExplainerEnabled` and
+  `teammateDefaultModel`; the last two are global-config keys.
 - **Environment variables and built-in mods:** the docs pages `env-vars.md` and `plugins/mods/overview.md`. No
   first-party machine-readable list exists, so the watch greps backticked names. It is page-wide, so a new section
   is not missed.
@@ -41,14 +51,16 @@ signal when a release adds a switch. The repository's daily machinery (`scripts/
 
 ## Third-party trackers: cross-checks, not baselines
 
-The trackers are compared report-only (`--cross-check`). A cross-check failure never fails the run. The version gaps,
-the SchemaStore sync point and the two READMEs below come from the coordinator's research of 2026-10-04 and were not
-re-read in this unit. This unit observed the amitray007 release v2.1.288 (16 assets, sha256 digests) and the
-chenrui333 `lifecycle.json` (codex-cli 0.160.0).
+The trackers are compared report-only (`--cross-check`). A cross-check failure never fails the run. The SchemaStore
+sync point and the two READMEs below come from the coordinator's research of 2026-10-04 and were not re-read in this
+unit. The unit's 14:00Z cross-check read the amitray007 release v2.1.289 and the chenrui333 `lifecycle.json`
+(codex-cli 0.160.0).
 
 - **amitray007/claude-code-schema** (per-release settings and environment catalogs, digest-published). Its releases
-  skip versions (none for 2.1.274-279 and 2.1.284-286). On 2026-10-04 its newest release was v2.1.288, while 2.1.289
-  was current.
+  skip versions: `gh api .../releases` at 2026-10-04T15:05Z lists none for 2.1.274-279 or 2.1.284-286. Its newest
+  release, v2.1.289 (16 assets, each with a sha256 digest), was published 2026-10-04T08:29:40Z, and v2.1.288 on
+  2026-10-03T08:09:34Z (`gh api .../releases/latest`, read 14:36Z). An earlier draft of this record called v2.1.288
+  the newest; that held only before 08:29Z.
 - **chenrui333/codex-docs** `lifecycle.json` (key, stage, enabled per feature). It is a daily third-party extraction,
   without release assets.
 - **SchemaStore's claude-code-settings.json.** It was last synced "to Claude Code v2.1.220", about 69 releases behind.
@@ -62,26 +74,42 @@ feed or action. Per the same research, `getsentry/json-schema-diff` describes it
 nvchecker is a version trigger only. The watch is therefore stdlib-only glue: fetch, anchor-checked parse, name diff, cache. It has no
 judgment of its own; the dispositions catalog and the resolver loop hold the judgments.
 
-## Measured at the baseline (2026-10-04T10:44Z, the tool's own run)
+## Measured at the baseline (2026-10-04T15:03Z, the tool's own run)
 
-The baseline holds:
+The first baseline (10:44Z) was regenerated with the tool after the review round: the settings reference joined
+`claude:setting`, and profile mirrors left `codex:config`. The versions are unchanged. The baseline holds:
 
-- 173 `claude:setting`, 33 `claude:hook`, 407 `claude:env` and 6 `claude:mod` names;
-- 1,341 `codex:config` paths;
+- 183 `claude:setting` names, the union of 173 in `sdk.d.ts` and 171 in the settings reference. 161 are in both, 12
+  only in `sdk.d.ts` (among them `$schema` and `taskOutputMaxChars`, which the reference marks removed) and 10 only
+  in the reference;
+- 33 `claude:hook`, 407 `claude:env` and 6 `claude:mod` names (unchanged);
+- 1,034 `codex:config` paths: the 1,341 of 10:44Z without the 307 `profiles.*.<path>` mirrors of a root `<path>`;
 - 152 `codex:feature` names (codex-cli 0.159.3 was installed; the release under watch was rust-v0.160.0).
 
 The independent extraction of the same morning differs as follows:
 
-- **Settings.** 161 of the 183 top-level keys the settings reference documents are common. Of the 22 keys only in the
-  docs, 12 are global-config keys kept in `~/.claude.json`, not in settings files, and 2 are documented as removed.
-  The 12 keys only in the SDK include `$schema` and `remote`.
+- **Settings.** 171 of the 183 top-level keys the settings reference documents are in the baseline. Its 12 others are
+  the global-config keys, two of them marked removed. The review round's count of 8 settings keys missing from the
+  SDK (22 docs-only keys, minus 12 global-config, minus 2 removed) subtracted the two removed global-config keys
+  twice; the live page gives 10. The baseline's 12 keys outside the extraction are 11 that only `sdk.d.ts` holds and
+  `remote`, which the page documents only through `remote.defaultEnvironmentId`.
 - **Hooks and mods.** Equal.
 - **Environment variables.** All 382 table names are included. The 25 extra names are 11 that the scrub section lists
   (names Claude Code removes from subprocess environments) and 14 that variable descriptions mention (OpenTelemetry's
   standard variables, `PATH`, `TERM`).
-- **Codex config paths.** All 1,341 are in the extraction's 1,417. Its 76 extra paths are bare map and array
+- **Codex config paths.** All 1,034 are in the extraction's 1,417 schema paths. Its 383 others are 311 under
+  `profiles.*` (the 310 mirrors of a root path and the bare `profiles.*` container) and 72 other bare map and array
   containers (`x.*`, `x[]`).
 - **Codex features.** The two features missing from the binary were added in rust-v0.160.0.
+
+The degraded artifacts of the review round, re-run on the real artifacts fetched at 15:03Z against this baseline,
+each pass the absolute bounds and stop at the 80% floor (exit 3):
+
+- `config-schema.json` without its definitions gives 266 paths, and without `allOf`/`anyOf`/`oneOf` 361 (553 before
+  the mirrors were dropped);
+- `env-vars.md` cut at half its table gives 218 names.
+
+This was a local integration check in scratch, not an upstream test.
 
 These are integrity checks of the parsers, not savings or quality measurements; no token-savings claim is made.
 

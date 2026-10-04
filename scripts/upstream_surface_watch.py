@@ -19,13 +19,17 @@ Sources (each URL re-read 2026-10-04):
       and claude:hook, the HOOK_EVENTS tuple, from the sdk.d.ts of the @anthropic-ai/claude-agent-sdk version whose
       package.json claudeCodeVersion equals the watched version (resolved through the npm packument, read from
       https://unpkg.com/<package>@<version>/<types>). With no exact match the highest SDK version with a lower
-      claudeCodeVersion is read and the run says so (versions.claude_agent_sdk.matched is false).
+      claudeCodeVersion is read and the run says so (versions.claude_agent_sdk.matched is false). claude:setting is
+      the union with the top-level keys of the key headings of https://code.claude.com/docs/en/settings-reference.md
+      (S2b), without its global-config keys (~/.claude.json) and the entries it marks removed; key_sources keeps which
+      source holds each key.
 - S3  claude:env, every backticked upper-case token of at least two characters (ENV_TOKEN) on
       https://code.claude.com/docs/en/env-vars.md, and claude:mod, the cc-plugin-* names on
       https://code.claude.com/docs/en/plugins/mods/overview.md.
 - S4  codex:config, the key paths of the stable release's config-schema.json asset (top-level keys, nested table keys
-      and features.* keys; `*` stands for a map entry and `[]` for an array item, and a path is emitted only for a
-      named property), found through one `gh api repos/openai/codex/releases/latest` call (the gh convention of
+      and features.* keys; `*` stands for a map entry and `[]` for an array item, a path is emitted only for a named
+      property, and a profiles.*.<path> that repeats a root <path> is left out), found through one
+      `gh api repos/openai/codex/releases/latest` call (the gh convention of
       tools/sota-convergence/github_freshness.py) and verified against the asset's published sha256 digest (a
       release without one is read unverified, and the source's digest_check and a coverage note say so); and
       codex:feature, (name, stage, enabled) from `codex features list` of the installed binary, run with an empty
@@ -112,11 +116,14 @@ SEMVER_RE = re.compile(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?")
 
 KINDS = ("claude:setting", "claude:hook", "claude:env", "claude:mod", "codex:config", "codex:feature")
 STAGED_KIND = "codex:feature"
-# Sane count bounds (observed 2026-10-04: 173 settings keys, 33 hook events, 407 env names, 6 mods, 1,341 Codex config
-# paths of which 101 top-level and 163 features.*, 152 features of codex-cli 0.159.3, 411 changelog versions). A
-# count outside its bound is a parser or format failure, never a surface change.
+# Sane count bounds (observed 2026-10-04T15:03Z: 183 settings keys, the union of 173 in sdk.d.ts and 171 in the
+# settings reference; 33 hook events, 407 env names, 6 mods; 1,034 Codex config paths after the 307 profiles.* mirrors
+# are dropped, of which 101 are top-level and 259 lie under features., 163 of them direct features.<name> keys and the
+# rest nested below them; 152 features of codex-cli 0.159.3; 411 changelog versions). A count outside its bound is a
+# parser or format failure, never a surface change.
 BOUNDS = {
     "claude:setting": (50, 2000),
+    "claude:setting/settings-reference": (50, 2000),
     "claude:hook": (10, 300),
     "claude:env": (100, 5000),
     "claude:mod": (1, 300),
@@ -140,12 +147,15 @@ SDK_PACKAGE = "@anthropic-ai/claude-agent-sdk"
 DIST_TAGS_URL = "https://registry.npmjs.org/-/package/{package}/dist-tags"
 PACKUMENT_URL = "https://registry.npmjs.org/{package}"
 UNPKG_URL = "https://unpkg.com/{package}@{version}/{path}"
+SETTINGS_REFERENCE_URL = "https://code.claude.com/docs/en/settings-reference.md"
+SETTING_SOURCES = ("sdk.d.ts", "settings-reference.md")  # the two sources of claude:setting (key_sources order)
 ENV_VARS_URL = "https://code.claude.com/docs/en/env-vars.md"
 MODS_URL = "https://code.claude.com/docs/en/plugins/mods/overview.md"
 CHANGELOG_URL = "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
 CODEX_LATEST_PATH = "repos/openai/codex/releases/latest"
 CODEX_LATEST_URL = "https://api.github.com/" + CODEX_LATEST_PATH
 CODEX_SCHEMA_ASSET = "config-schema.json"
+PROFILE_MIRROR = "profiles.*."  # ConfigToml.profiles: a map of ConfigProfile, which repeats most root keys
 GRAPHQL_URL = "https://api.github.com/graphql"
 CODEX_RELEASES_QUERY = ("query($owner:String!,$name:String!){repository(owner:$owner,name:$name){releases(first:100,"
                         "orderBy:{field:CREATED_AT,direction:DESC}){nodes{tagName isPrerelease isDraft publishedAt "
@@ -166,6 +176,18 @@ ENV_ANCHOR = re.compile(r"(?im)^#[ \t]+environment variables[ \t]*$")
 MODS_ANCHOR = re.compile(r"(?im)^#{2,4}[ \t]+[^\n]*\bbuilt[- ]in(?:to)?\b")
 SETTINGS_ANCHOR = re.compile(r"(?m)^(?:export[ \t]+)?(?:declare[ \t]+)?interface[ \t]+Settings\b[^{;]*\{")
 HOOKS_ANCHOR = re.compile(r"\bHOOK_EVENTS\s*:\s*readonly\s*\[")
+# S2b: the settings reference's own structure. Its title, one "### `key`" heading per documented key (a dotted one,
+# such as `sandbox.enabled`, documents a key of its first segment), the `## Global config settings` section, whose
+# keys belong in ~/.claude.json and not in a settings file (each also says so in its "**Scope**: `Global config`"
+# bullet), and a "<Warning> Removed in vX" note that opens the entry of a removed key. Fenced code blocks hold
+# example lines that start with '#', which are no headings.
+REFERENCE_TITLE = re.compile(r"(?m)^#[ \t]+All settings[ \t]*$")
+REFERENCE_KEY = re.compile(r"^###[ \t]+`([^`\s]+)`[ \t]*$")
+REFERENCE_HEADING = re.compile(r"^(#{1,3})[ \t]+(.*?)[ \t]*$")
+FENCE_OPEN = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})")
+GLOBAL_CONFIG_SECTION = "Global config settings"
+GLOBAL_CONFIG_SCOPE = re.compile(r"^[ \t]*[*-][ \t]+\*\*Scope\*\*:.*`Global config`")
+REMOVED_NOTE = re.compile(r"^Removed in v\d")
 CHANGELOG_HEADING = re.compile(r"(?m)^##[ \t]+(\d+\.\d+\.\d+)[ \t]*$")
 FEATURE_ROW = re.compile(r"^(\S+)\s+(\S.*?)\s+(true|false)\s*$")
 # S5 selection (report-only): the entry starts with Added/New after an optional "[Platform] " tag, sits under a
@@ -695,6 +717,57 @@ def resolve_sdk(body: bytes, claude_version: str) -> dict:
             "types": types}
 
 
+def reference_entries(text: str) -> list[dict]:
+    """[{key, section, lines}] for each key heading (REFERENCE_KEY: "###" and a backticked key) of the settings
+    reference outside fenced code blocks (CommonMark fences of three or more backticks or tildes); an entry runs to the
+    next heading of level 1-3 outside a fence, and section is the "## " heading above it."""
+    entries, section, current, fence = [], None, None, None
+    for line in text.splitlines():
+        if fence is not None:
+            stripped = line.strip()
+            if stripped and set(stripped) == {fence[0]} and len(stripped) >= len(fence):
+                fence = None
+        elif (opening := FENCE_OPEN.match(line)) is not None:
+            fence = opening.group(1)
+        elif (key := REFERENCE_KEY.match(line)) is not None:
+            current = {"key": key.group(1), "section": section, "lines": []}
+            entries.append(current)
+            continue
+        elif (heading := REFERENCE_HEADING.match(line)) is not None:
+            current = None
+            if len(heading.group(1)) == 2:
+                section = heading.group(2)
+            continue
+        if current is not None:
+            current["lines"].append(line)
+    return entries
+
+
+def removed_entry(lines: list[str]) -> bool:
+    """True when the entry opens with a <Warning> whose text starts "Removed in v<version>"."""
+    body = [line.strip() for line in lines if line.strip()]
+    if not body or not body[0].startswith("<Warning>"):
+        return False
+    first = body[0][len("<Warning>"):].strip() or (body[1] if len(body) > 1 else "")
+    return REMOVED_NOTE.match(first) is not None
+
+
+def parse_settings_reference(text: str) -> list[str]:
+    """claude:setting, second source: the top-level keys of the settings reference's key headings (a dotted heading
+    gives its first segment), leaving out the keys of the `## Global config settings` section or with a `Global
+    config` scope (they go in ~/.claude.json, not in a settings file) and the entries the page marks removed. Both the
+    title and that section are anchors: without the section the exclusion rule could not hold."""
+    if REFERENCE_TITLE.search(text) is None:
+        raise AnchorMissing("settings-reference.md:# All settings")
+    entries = reference_entries(text)
+    if not any(entry["section"] == GLOBAL_CONFIG_SECTION for entry in entries):
+        raise AnchorMissing("settings-reference.md:## Global config settings", "no key heading in that section")
+    keys = {entry["key"].split(".")[0] for entry in entries
+            if entry["section"] != GLOBAL_CONFIG_SECTION and not removed_entry(entry["lines"])
+            and not any(GLOBAL_CONFIG_SCOPE.match(line) for line in entry["lines"])}
+    return bounded("settings-reference.md:key headings", sorted(keys), "claude:setting/settings-reference")
+
+
 def parse_env_names(text: str) -> list[str]:
     """claude:env: every backticked span of the env-vars page that is entirely ENV_TOKEN (page-wide, so a variable a
     later page section adds is not missed; names the page only mentions, such as the scrub list, are included)."""
@@ -735,7 +808,9 @@ def flatten_codex_schema(body: bytes) -> list[str]:
     """codex:config: every named property's dotted path in the ConfigToml JSON schema, through $ref (#/definitions/
     and #/$defs/), allOf/anyOf/oneOf, map values (additionalProperties as a schema: segment `*`) and array items
     (items: the parent segment gains `[]`). A $ref already on the current path is not followed again (recursive
-    definitions), and a bare map or array container adds no path of its own (its key already has one)."""
+    definitions), a bare map or array container adds no path of its own (its key already has one), and a profile
+    path that mirrors a root path (profiles.*.<path> beside <path>) is left out, so one new feature flag is one
+    codex:config key (features.<name>) beside its one codex:feature key."""
     schema = load_json(body, "config-schema.json:properties")
     if not isinstance(schema, dict) or not isinstance(schema.get("properties"), dict):
         raise AnchorMissing("config-schema.json:properties")
@@ -779,6 +854,9 @@ def flatten_codex_schema(body: bytes) -> list[str]:
                 walk(items, [*prefix[:-1], prefix[-1] + "[]"], trail)
 
     walk(schema, [], frozenset())
+    # A named profile (profiles.<name>) takes most root keys again (ConfigProfile): profiles.*.<path> repeats <path>,
+    # so one new root key would be two config keys. Such mirrors are dropped; a key only a profile has stays.
+    paths -= {path for path in paths if path.startswith(PROFILE_MIRROR) and path[len(PROFILE_MIRROR):] in paths}
     bounded("config-schema.json:top-level keys", [path for path in paths if "." not in path and "[]" not in path],
             "codex:config/top-level")
     bounded("config-schema.json:features", [path for path in paths if path.startswith("features.")],
@@ -916,6 +994,11 @@ def validate_baseline(document) -> list[str]:
     for field in ("versions", "sources"):
         if not isinstance(document.get(field), dict):
             errors.append(f"baseline: {field} must be an object")
+    held = (document.get("source_counts") or {}).get("claude:setting") if isinstance(
+        document.get("source_counts"), dict) else None
+    if not isinstance(held, dict) or set(held) != set(SETTING_SOURCES) or not all(
+            isinstance(count, int) and not isinstance(count, bool) and count >= 0 for count in held.values()):
+        errors.append(f"baseline: source_counts['claude:setting'] must count each of {', '.join(SETTING_SOURCES)}")
     return errors
 
 
@@ -1028,7 +1111,12 @@ def observe(fetcher: Fetcher, channel: str, codex_binary: str | None) -> dict:
     url = UNPKG_URL.format(package=SDK_PACKAGE, version=sdk["version"], path=sdk["types"])
     declarations = fetcher.obtain("claude-agent-sdk-types", url, http_fetch(url), version=sdk["version"])
     declarations = declarations.decode("utf-8", "replace")
-    names = {"claude:setting": parse_settings_keys(declarations), "claude:hook": parse_hook_events(declarations)}
+    typed = parse_settings_keys(declarations)
+    page = fetcher.obtain("claude-settings-reference-page", SETTINGS_REFERENCE_URL, http_fetch(SETTINGS_REFERENCE_URL))
+    documented = parse_settings_reference(page.decode("utf-8", "replace"))
+    # claude:setting is the union of both sources; key_sources keeps which source holds each key.
+    key_sources = {"claude:setting": dict(zip(SETTING_SOURCES, (typed, documented)))}
+    names = {"claude:setting": sorted({*typed, *documented}), "claude:hook": parse_hook_events(declarations)}
     page = fetcher.obtain("claude-env-vars-page", ENV_VARS_URL, http_fetch(ENV_VARS_URL))
     names["claude:env"] = parse_env_names(page.decode("utf-8", "replace"))
     page = fetcher.obtain("claude-mods-overview-page", MODS_URL, http_fetch(MODS_URL))
@@ -1052,7 +1140,7 @@ def observe(fetcher: Fetcher, channel: str, codex_binary: str | None) -> dict:
             binary_version = fetcher.records["codex-features-list"].get("version")
             names[STAGED_KIND] = sorted(features)
     return {"names": names, "features": features, "release": release, "sdk": sdk, "claude_tags": claude_tags,
-            "codex_tags": codex_tags, "watched": watched, "codex_binary": binary_version}
+            "codex_tags": codex_tags, "watched": watched, "codex_binary": binary_version, "key_sources": key_sources}
 
 
 def floor_failure(label: str, observed: int, held: int) -> AnchorMissing | None:
@@ -1064,28 +1152,40 @@ def floor_failure(label: str, observed: int, held: int) -> AnchorMissing | None:
                          f"--write-baseline --force")
 
 
-def check_floors(names: dict, baseline: dict) -> None:
-    """AnchorMissing (exit 3) for the first observed kind whose count is below FLOOR_PERCENT % of its baseline count;
-    an unobserved kind is not checked. BOUNDS stay the absolute guard inside each parser."""
+def check_floors(names: dict, baseline: dict, key_sources: dict | None = None) -> None:
+    """AnchorMissing (exit 3) for the first observed kind, or source of a two-source kind (key_sources against the
+    baseline's source_counts), whose count is below FLOOR_PERCENT % of its baseline count; an unobserved kind is not
+    checked. BOUNDS stay the absolute guard inside each parser."""
     for kind in KINDS:
-        if kind in names:
-            failure = floor_failure(kind, len(names[kind]), len(baseline["kinds"].get(kind, [])))
-            if failure is not None:
-                raise failure
+        if kind not in names:
+            continue
+        failures = [floor_failure(kind, len(names[kind]), len(baseline["kinds"].get(kind, [])))]
+        held = (baseline.get("source_counts") or {}).get(kind, {})
+        for source, keys in ((key_sources or {}).get(kind) or {}).items():
+            if source in held:
+                failures.append(floor_failure(f"{kind} from {source}", len(keys), held[source]))
+        failure = next((item for item in failures if item is not None), None)
+        if failure is not None:
+            raise failure
 
 
-def diff_surface(names: dict, features: dict | None, baseline: dict) -> tuple[list, list, list]:
-    """new, removed and stage_changed of the observed kinds against the baseline (an unobserved kind is skipped)."""
+def diff_surface(names: dict, features: dict | None, baseline: dict,
+                 key_sources: dict | None = None) -> tuple[list, list, list]:
+    """new, removed and stage_changed of the observed kinds against the baseline (an unobserved kind is skipped). A
+    new name of a two-source kind carries the sources that hold it (key_sources), so a key one source lacks shows."""
     new, removed, stage_changed = [], [], []
     for kind in KINDS:
         if kind not in names:
             continue
         surface, _, short = kind.partition(":")
         before, now = set(baseline["kinds"].get(kind, [])), set(names[kind])
+        holders = {source: set(keys) for source, keys in ((key_sources or {}).get(kind) or {}).items()}
         for name in sorted(now - before):
             item = {"key": f"{kind}:{name}", "surface": surface, "kind": short, "name": name}
             if kind == STAGED_KIND and features and name in features:
                 item.update(features[name])
+            if holders:
+                item["sources"] = [source for source, keys in holders.items() if name in keys]
             new.append(item)
         removed += [{"key": f"{kind}:{name}", "surface": surface, "kind": short, "name": name}
                     for name in sorted(before - now)]
@@ -1242,6 +1342,21 @@ def summary_line(counts: list[str], tail: str, candidates: list[str], label: str
     return prefix + text + suffix
 
 
+def key_source_coverage(key_sources: dict, baseline: dict) -> dict:
+    """Per source of a two-source kind: its observed and baseline counts and the keys only it holds (the first 50), so a
+    key that one source lacks is visible on every run."""
+    result = {}
+    for kind, sources in key_sources.items():
+        held = (baseline.get("source_counts") or {}).get(kind, {})
+        result[kind] = {}
+        for source, keys in sources.items():
+            others = set().union(*(set(other) for name, other in sources.items() if name != source))
+            only = sorted(set(keys) - others)
+            result[kind][source] = {"observed": len(keys), "baseline": held.get(source), "only_here_count": len(only),
+                                    "only_here": only[:50]}
+    return result
+
+
 def build_baseline(observed: dict, fetcher: Fetcher, now_text: str, channel: str) -> dict:
     names = observed["names"]
     missing = [kind for kind in KINDS if kind not in names]
@@ -1261,13 +1376,16 @@ def build_baseline(observed: dict, fetcher: Fetcher, now_text: str, channel: str
         "generated_utc": now_text,
         "generator": "python3 scripts/upstream_surface_watch.py --network --write-baseline",
         "description": ("Names-only snapshot of the user-switchable surface of Claude Code and Codex at the versions "
-                        "below: sorted names per kind, the codex:feature stages that stage_changed compares, and per "
-                        "fetched artifact its URL, version, fetch time, sha256 and size, never its content. "
-                        "docs/upstream-surface-watch.md."),
+                        "below: sorted names per kind, the codex:feature stages that stage_changed compares, the "
+                        "per-source counts of claude:setting (the union of sdk.d.ts and settings-reference.md) that "
+                        "the 80% floor compares, and per fetched artifact its URL, version, fetch time, sha256 and "
+                        "size, never its content. docs/upstream-surface-watch.md."),
         "versions": {"claude_code": observed["watched"], "claude_code_channel": channel,
                      "claude_agent_sdk": sdk["version"], "claude_agent_sdk_claude_code_version":
                          sdk["claude_code_version"], "codex": release["tag"], "codex_binary": observed["codex_binary"]},
         "counts": {kind: len(names[kind]) for kind in KINDS},
+        "source_counts": {kind: {source: len(keys) for source, keys in sources.items()}
+                          for kind, sources in observed["key_sources"].items()},
         "sources": sources,
         "kinds": {kind: sorted(names[kind]) for kind in KINDS},
         "stages": {STAGED_KIND: [[name, observed["features"][name]["stage"]] for name in sorted(observed["features"])]},
@@ -1309,14 +1427,15 @@ def run(args) -> tuple[dict, str]:
     fetcher = Fetcher(state, args.network, now_text)
     observed = observe(fetcher, args.claude_channel, codex_binary)
     if baseline is not None:
-        check_floors(observed["names"], baseline)
+        check_floors(observed["names"], baseline, observed["key_sources"])
     changelog_body = fetcher.obtain("claude-changelog", CHANGELOG_URL, http_fetch(CHANGELOG_URL))
     if args.write_baseline:
         baseline = build_baseline(observed, fetcher, now_text, args.claude_channel)
     changelog = {"claude": claude_changelog_delta(changelog_body.decode("utf-8", "replace"),
                                                   baseline["versions"]["claude_code"]),
                  "codex": codex_changelog(fetcher, observed["release"], baseline["versions"]["codex"])}
-    new, removed, stage_changed = diff_surface(observed["names"], observed["features"], baseline)
+    new, removed, stage_changed = diff_surface(observed["names"], observed["features"], baseline,
+                                               observed["key_sources"])
     reviewed = {row["key"] for row in dispositions["rows"]}
     unreviewed = [item["key"] for item in new if item["key"] not in reviewed]
     crossed = cross_check(fetcher, observed) if args.cross_check else None
@@ -1360,6 +1479,7 @@ def run(args) -> tuple[dict, str]:
                           "new": sum(1 for item in new if item["key"].startswith(kind + ":")),
                           "removed": sum(1 for item in removed if item["key"].startswith(kind + ":"))}
                    for kind in KINDS},
+        "key_sources": key_source_coverage(observed["key_sources"], baseline),
         "dispositions_rows": len(dispositions["rows"]),
         "notes": notes,
     }
@@ -1407,9 +1527,14 @@ def render_text(document: dict, action: str) -> str:
         observed = "not observed" if count["observed"] is None else str(count["observed"])
         lines.append(f"  {kind}: {observed} (baseline {count['baseline']}), {count['new']} new, "
                      f"{count['removed']} removed")
+        for source, held in coverage["key_sources"].get(kind, {}).items():
+            lines.append(f"    from {source}: {held['observed']} (baseline {held['baseline']}), "
+                         f"{held['only_here_count']} only here" + (
+                             f": {', '.join(held['only_here'][:12])}" if held["only_here"] else ""))
     unreviewed = set(document["unreviewed"])
     for item in document["new"][:40]:
-        lines.append(f"  new: {item['key']}" + (" (unreviewed)" if item["key"] in unreviewed else ""))
+        lines.append(f"  new: {item['key']}" + (" (unreviewed)" if item["key"] in unreviewed else "") + (
+            f" (from {' and '.join(item['sources'])})" if item.get("sources") else ""))
     for item in document["removed"][:40]:
         lines.append(f"  removed: {item['key']}")
     for item in document["stage_changed"]:
