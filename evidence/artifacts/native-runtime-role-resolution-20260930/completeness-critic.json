@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "completeness_critic",
+  "north_star_action": "Resolve the foundation runtime workers that will build and review the subsequent US-equities research and historical-simulation systems; trading execution remains later.",
+  "scope": "Coordinator completeness review of the19-role dated packet and concrete supported native capability trials.",
+  "findings": [
+    {
+      "class": "runtime_roles",
+      "resolution": "Native parents and coding/SolMax/AstraMax orchestration retained; CLI/SDK/persistent research qualified only for observed tasks; typed application, explicit graph, durable execution, server/editor and external evaluator alternatives have recorded entry conditions."
+    },
+    {
+      "class": "skills_lifecycle",
+      "resolution": "Task-selected upstream skill body loading observed in DeepAgents and prior enhanced coding lane; new SDK installed native skill/plugin interfaces tested. No blanket installation or paired quality claim for every skill.",
+      "next_sweep": "Discovery, source verification, install, activation, upgrade, rollback and recovery skills keyed by lifecycle task; use current coordinator search-first/find-skills/skill-creator policy."
+    },
+    {
+      "class": "mcp_and_automation",
+      "resolution": "Prior scoped coding lane's selected MCP/Dagu evidence retained; new OH upstream MCP/condenser tests and configuration only. A production MCP or plugin handshake is not inferred.",
+      "next_sweep": "Selected native MCP handshakes, automation restart/recovery and exact task information contracts."
+    },
+    {
+      "class": "modalities_and_platforms",
+      "resolution": "This bounded follow-up exercises local text/code research and native LLM APIs. Browser/computer-use, multimodal, GPU/remote sandbox, Windows/macOS and mobile roles are not newly executed here.",
+      "next_sweep": "Add a modality/platform only when an intended system task supplies its frozen contract; compare maintained native candidates and executable oracle."
+    },
+    {
+      "class": "evaluation_and_usage",
+      "resolution": "Actual deterministic task/oracle controls and raw usage retained; Harbor/Inspect source-reviewed; no full comparative benchmark or complete provider billing.",
+      "next_sweep": "Common frozen task envelopes and native upstream evaluators with total failed/retry coverage before savings/winner claims."
+    },
+    {
+      "class": "peers_and_owners",
+      "resolution": "Astra architecture and independent OH setup reviews completed; root post-provider validation completed. Native Claude review timed out and later peers hit account usage limits; delivered new owner handoff remains unacknowledged.",
+      "next_sweep": "Owner native review of the concrete published receipt and role choices when the peer is available; keep global O1/default decisions under their own gates."
+    }
+  ],
+  "overall": "Scoped completion with explicit next decision-changing sweeps; no exhaustive ecosystem, universal highest-quality runtime, isolation or unmeasured token-savings assertion.",
+  "sources": [
+    "catalogs/foundation/native-runtime-role-resolution-20260930.json",
+    "evidence/receipts/native-runtime-role-resolution-20260930.json",
+    "docs/decisions/2026-09-30-sota-native-finalization.md"
+  ]
+}
