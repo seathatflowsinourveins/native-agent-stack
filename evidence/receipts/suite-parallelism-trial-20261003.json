@@ -3066,12 +3066,12 @@
     },
     "retained_files": {
       "evidence/artifacts/suite-parallelism-trial-20261003/README.md": {
-        "sha256": "00e177142a8c38fd6e403e0e11039684a4ac13b9463ffa330722400562cc360f",
-        "bytes": 8901
+        "sha256": "0a9faceaf4268eb54b76c174609ea8e597d50a9ea39170317944f62caea474e4",
+        "bytes": 9207
       },
       "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json": {
-        "sha256": "c28f4da87ad53d7d18af5c996031cd54e7558e06982d40c467e2d279b1f6d55e",
-        "bytes": 122854
+        "sha256": "0853aab40b7745a9afb54afb30589633ebbb387da730260f44e1274cff03c35b",
+        "bytes": 123174
       },
       "evidence/artifacts/suite-parallelism-trial-20261003/checkout-status.json": {
         "sha256": "cf7037bb37995b6563e6f4ac26fe1c13080e18affe5506576a062a472aced23c",
