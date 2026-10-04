@@ -9,10 +9,10 @@
   "endpoint": "https://paper-api.alpaca.markets",
   "paper_only": true,
   "evidence_classes": [
-    "upstream_example_or_native_operation",
-    "local_integration_check",
-    "independent_observation",
-    "structural_validation"
+    "retained_native_paper_execution",
+    "local_integration_acceptance_review",
+    "independent_process_and_state_observation",
+    "fresh_native_read_only_observation"
   ],
   "sources": {
     "engine_revision": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
@@ -49,8 +49,7 @@
     "limits_changed": false,
     "gross_loss_cap_usd_account2": "480",
     "drawdown_cap_usd_account2": "475",
-    "permanent_halt_retained": true,
-    "permanent_halt_scope": "original Account 2 ledger and lineage"
+    "permanent_halt_retained": true
   },
   "original_trials": [
     {
@@ -423,7 +422,7 @@
     "trigger_behavior": "not_exercised"
   },
   "account2_fresh_read_only_observation": {
-    "evidence_class": "local_integration_check",
+    "evidence_class": "fresh_native_paper_account_observation",
     "trial": false,
     "broker": "alpaca",
     "account_slot": 2,
@@ -454,12 +453,11 @@
     "frozen_lifetime_gross_loss_cap_usd": "480",
     "halt_cleared": false,
     "new_root_created": false,
-    "halt_and_root_claim_scope": "Original Account 2 ledger and lineage; this reconciliation did not inspect a successor lineage.",
     "engine_recover_run": false,
     "orders_submitted_by_observation": 0,
     "limitations": [
       "Read-only SDK snapshot, not a new engine recovery trial",
-      "Permanent numeric halt remains in the original Account 2 ledger and lineage",
+      "Permanent numeric halt remains",
       "Source CLI did not print an exact timestamp"
     ],
     "sanitization": "Only account_ref removed from original native stdout; all other native field values preserved.",
@@ -468,7 +466,7 @@
     "new_model_trial": false
   },
   "independent_original_account2_ledger_observation": {
-    "evidence_class": "independent_observation",
+    "evidence_class": "independent_read_only_state_observation",
     "read_at_utc": "2026-10-03T03:36:18.774750+00:00",
     "sqlite_connection_mode": "ro",
     "source_label": "original-account2-ledger.sqlite3",
@@ -530,7 +528,6 @@
     "command_sanitization": "Private lock, existing credential pointer and output path replaced with placeholders; no credential values read or retained by this receipt.",
     "existing_stored_credentials_reused": true,
     "credential_rotation_or_remapping": false,
-    "credential_statement_scope": "This HTTP 401 recheck only; excludes the later user credential store and HTTP 200 follow-up.",
     "authentication_failure_cause": "undetermined",
     "disposition": "admission_failed_HTTP_401",
     "orders_submitted": 0
@@ -591,7 +588,7 @@
     "Trial 2 retains four average-invariant observations; their count alone does not establish a defect. The no-halt frozen acceptance failure is independently decisive.",
     "Known effects retained by the October 2 freeze: issue 215 part 2, trial C run-loop stall, and issue 543; this review does not requalify them.",
     "Fresh account 2 operation is a read-only SDK snapshot, not an engine recovery run or a new trading/model trial; exact native snapshot timestamp was not printed.",
-    "The original Account 2 ledger and lineage retain their permanent numeric halt and root. Account 1 authentication was unsuccessful at the initial recheck with undetermined cause; the later readmission is recorded in the follow-up, without strategy qualification.",
+    "Permanent numeric halt and original root remain. Account 1 authentication remains unsuccessful with undetermined cause; no strategy qualification is established.",
     "No unchanged official upstream test suite was run by this evidence task. Repository validation covers structural consistency only.",
     "Broker paper fills are simulated and do not establish exchange execution quality, live slippage, queue position or live trading performance.",
     "Historical and fresh provider/model usage are unmeasured; no provider usage or new model execution is inferred from these artifacts."
@@ -739,5 +736,54 @@
       "The assembled receipt and both helper snapshots are Local integration checks retaining native operation output, not unchanged official upstream test acceptance.",
       "Readmission establishes observed paper identity, flatness and SIP admission. No paper or strategy qualification is promoted, and no Monday order outcome is recorded."
     ]
+  },
+  "evidence_class_mapping_20261004": {
+    "recorded_at_utc": "2026-10-04T21:16:26.744539940Z",
+    "recorded_at_scope": "Additive policy classification and scope clarification recorded in round 631-p3; not a native-operation observation timestamp.",
+    "policy_source": "docs/acceptance-evidence-policy.md",
+    "canonical_vocabulary_source": "scripts/build_ecosystem.py:59",
+    "original_section_revision": "2673696c94037b0d9454b9fa108ac7eb32618858",
+    "original_section_boundary": "Receipt start through limitations, before follow_up_2026_10_03_account1_readmission_and_monday_scheduling",
+    "original_section_preservation": "byte_for_byte",
+    "correction": "Round 631-p2 renamed original receipt-authored labels and limitations. This round restores the entire original section from the named revision and records derived policy labels and scope clarifications separately.",
+    "canonical_policy_classes": [
+      "upstream_example_or_native_operation",
+      "local_integration_check",
+      "independent_observation",
+      "structural_validation"
+    ],
+    "original_label_to_policy_class": {
+      "retained_native_paper_execution": "upstream_example_or_native_operation",
+      "local_integration_acceptance_review": "local_integration_check",
+      "independent_process_and_state_observation": "independent_observation",
+      "fresh_native_read_only_observation": "local_integration_check",
+      "fresh_native_paper_account_observation": "local_integration_check",
+      "independent_read_only_state_observation": "independent_observation",
+      "fresh_native_paper_admission_observation": "local_integration_check"
+    },
+    "section_policy_classes": {
+      "original_trials": "upstream_example_or_native_operation",
+      "account2_fresh_read_only_observation": "local_integration_check",
+      "account1_fresh_admission_observation": "local_integration_check",
+      "independent_original_account2_ledger_observation": "independent_observation",
+      "original_series_process_records[].independent_journal_observation": "independent_observation",
+      "follow_up_2026_10_03_account1_readmission_and_monday_scheduling": "local_integration_check",
+      "follow_up_2026_10_03_account1_readmission_and_monday_scheduling.later_native_probe_original_json": "local_integration_check",
+      "follow_up_2026_10_03_account1_readmission_and_monday_scheduling.corrected_native_read_only_snapshot": "local_integration_check",
+      "private_original_artifacts_sha256": "structural_validation",
+      "follow_up_2026_10_03_account1_readmission_and_monday_scheduling.private_followup_sources_sha256": "structural_validation"
+    },
+    "claim_boundaries": {
+      "upstream_example_or_native_operation": "Retained native paper execution output; no unchanged official upstream test acceptance is claimed.",
+      "local_integration_check": "Local frozen-acceptance review, both SDK helper snapshots and both admission probes; no paper or strategy qualification is established.",
+      "independent_observation": "Separate SQLite read and process-journal inspections corroborate only the inspected properties.",
+      "structural_validation": "Source hashes, registry bindings, JSON syntax and repository validation establish artifact consistency, not successful trading acceptance."
+    },
+    "scope_clarifications": {
+      "frozen_acceptance.permanent_halt_retained": "original Account 2 ledger and lineage",
+      "account2_fresh_read_only_observation.halt_and_root_claim_scope": "Original Account 2 ledger and lineage; this reconciliation did not inspect a successor lineage.",
+      "account1_fresh_admission_observation.credential_statement_scope": "This HTTP 401 recheck only; excludes the later user credential store and HTTP 200 follow-up.",
+      "original_limitations_temporal_scope": "The original authentication limitation describes the initial HTTP 401 recheck. The later HTTP 200 readmission remains a separate follow-up after the recorded user credential store."
+    }
   }
 }

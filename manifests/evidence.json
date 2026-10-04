@@ -12381,13 +12381,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/series-20261002/README.md",
-      "sha256": "21374f2bad40d8bae6bfcb337f93fb4efe1becb43aa6ca3663ff8c3fe9492477",
-      "bytes": 10280
+      "sha256": "5390eebb57ec278a9598dadacbcdd4d520af0c23c665933ba770d9f3f807bd83",
+      "bytes": 10891
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/series-20261002/receipt.json",
-      "sha256": "f2e66bf339643d0820392efcb81c82583d65174ecdec408c0d56366aac564f8f",
-      "bytes": 35069
+      "sha256": "c40f2301584c85c88e6d457cfa7923d51d69f9448fcd370198ed2c6896dd34fc",
+      "bytes": 38668
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
