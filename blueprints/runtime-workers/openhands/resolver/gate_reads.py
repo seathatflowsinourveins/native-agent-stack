@@ -47,6 +47,15 @@ reads() turns the values into protection:
   computed part with no static shape selects subjects. An unknown one is unresolved, and the
   gate fails closed on it.
 
+executed() tells running from reading, so the derivation follows only code CI runs (a code
+file that gate code hashes or copies is data). A file runs when its location, or text read
+from it, is inside the arguments of a call that executes code: a call EXECUTING names, whatever
+its receiver; a call of a function or method of this module that passes a parameter on to such
+a call (by name, to a fixpoint); or a call of a function imported from outside the standard
+library, whose body is not read here. An executing call whose argument is a computed location
+may run any file under it, so it is reported, and the gate fails closed on it as on an
+unresolved read.
+
 Names follow Python's scopes: module, class, function, lambda and comprehension, with a
 comprehension's first iterable evaluated in the enclosing scope (Python Language Reference
 6.2.4) and an assignment expression in a comprehension binding in the containing scope
@@ -63,7 +72,12 @@ Path.iterdir; tomllib.load ("a readable and binary file object"), json.load (a
 file-like object"), so each is reached through a handle opened on a path the code builds;
 fnmatch ("the filename separator ('/' on Unix) is not special to this module"), so a shape's
 `*` also matches across directories, as Protected.rule's fnmatch.fnmatchcase applies it; the
-Language Reference 6.2.4 and PEP 572 for the scopes above; ast for the node types.
+Language Reference 6.2.4 and PEP 572 for the scopes above; ast for the node types. For
+executed(), read 2026-10-05: subprocess (run, call, check_call, check_output, Popen,
+getoutput, getstatusoutput), os "Process Management" (system, popen, startfile, posix_spawn,
+the exec* and spawn* families), asyncio subprocesses, pty.spawn, runpy (run_path,
+run_module), importlib.util.spec_from_file_location and importlib.machinery.SourceFileLoader,
+the builtins exec and compile, and sys.stdlib_module_names ("New in version 3.10").
 """
 from __future__ import annotations
 
@@ -72,6 +86,7 @@ from collections import namedtuple
 import itertools
 import posixpath
 import re
+import sys
 
 Value = namedtuple("Value", "kind path exact tail assumed shape node")
 DATA = Value("data", "", False, "data", False, None, None)
@@ -85,6 +100,25 @@ CONTAINER_CALLS = frozenset({"sorted", "list", "tuple", "set", "frozenset", "rev
 ENUMERATING = frozenset({"glob", "rglob", "iglob", "iterdir", "listdir", "scandir", "walk"})
 RECEIVED_ATTRIBUTES = frozenset({"stdout", "stderr", "environ", "argv"})
 WILDCARD = re.compile(r"[*?\[]")
+# Calls that run the code they are given, matched by their final name whatever the receiver
+# (docs.python.org/3.13): subprocess's run, call, check_call, check_output, Popen, getoutput and
+# getstatusoutput; os's system, popen, startfile, posix_spawn, posix_spawnp and the exec* and
+# spawn* families; asyncio's create_subprocess_exec and create_subprocess_shell; pty.spawn;
+# runpy.run_path and run_module; importlib.util.spec_from_file_location and
+# importlib.machinery.SourceFileLoader; the builtins exec and compile.
+EXECUTING = frozenset({
+    "run", "call", "check_call", "check_output", "Popen", "getoutput", "getstatusoutput",
+    "system", "popen", "startfile", "posix_spawn", "posix_spawnp",
+    "execl", "execle", "execlp", "execlpe", "execv", "execve", "execvp", "execvpe",
+    "spawnl", "spawnle", "spawnlp", "spawnlpe", "spawnv", "spawnve", "spawnvp", "spawnvpe",
+    "create_subprocess_exec", "create_subprocess_shell", "spawn",
+    "run_path", "run_module", "spec_from_file_location", "SourceFileLoader", "exec", "compile",
+})
+
+
+def standard_library(module, level=0):
+    """Whether an absolute import names a standard-library module (sys.stdlib_module_names, 3.10+)."""
+    return not level and module.split(".")[0] in sys.stdlib_module_names
 
 
 def loc(path, exact=True, tail=None, assumed=False, shape=None):
@@ -700,6 +734,82 @@ class GateReads:
                 results.append(loc(directory if directory is not None else base.path, False, "enum", base.assumed,
                                    _shape_join(base.path, glob) if name in ("glob", "rglob") else None))
         return _dedupe(results)
+
+    # -- Execution
+
+    def _arguments(self, call):
+        return [*call.args, *(keyword.value for keyword in call.keywords)]
+
+    def _executes(self, call, executors):
+        """Whether `call` runs code it is given: an EXECUTING call; a call, by name, of a function or
+        method of this module that passes a parameter on to one (`executors`); or a call of a function
+        imported from outside the standard library, whose body is not read here."""
+        func = call.func
+        name = self._call_name(call)
+        if name in EXECUTING or (isinstance(func, ast.Attribute) and func.attr in executors):
+            return True
+        if isinstance(func, ast.Name):
+            entries = self._entries(func.id, call) or []
+            if func.id in executors and any(kind == "function" for kind, _ in entries):
+                return True
+            return any(kind == "import" and not standard_library(payload[0], payload[2]) for kind, payload in entries)
+        if isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name):
+            entries = self._entries(func.value.id, call) or []
+            return any(kind == "module" and not standard_library(payload[0], payload[1]) for kind, payload in entries)
+        return False
+
+    def _executors(self):
+        """Names of this module's functions and methods that pass a parameter on to a call that
+        executes code, to a fixpoint (a wrapper of a wrapper counts)."""
+        if getattr(self, "_executor_names", None) is None:
+            functions = [node for node in ast.walk(self.module)
+                         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))]
+            executors, changed = set(), True
+            while changed:
+                changed = False
+                for function in functions:
+                    if function.name in executors:
+                        continue
+                    arguments = function.args
+                    parameters = {item.arg for item in [*arguments.posonlyargs, *arguments.args, *arguments.kwonlyargs,
+                                                        *(extra for extra in (arguments.vararg, arguments.kwarg) if extra)]}
+                    for call in (node for node in ast.walk(function) if isinstance(node, ast.Call)):
+                        if self._executes(call, executors) and any(
+                                isinstance(node, ast.Name) and node.id in parameters
+                                for argument in self._arguments(call) for node in ast.walk(argument)):
+                            executors.add(function.name)
+                            changed = True
+                            break
+            self._executor_names = executors
+        return self._executor_names
+
+    def executed(self, blobs, dirs):
+        """(paths, computed) that this file runs: the repository files spelled inside the arguments of a
+        call that executes code (`_executes`), and "<file>:<line>" of such calls whose argument is a
+        computed location under the repository, which may run any file there."""
+        executors = self._executors()
+        top_dirs = {path.split("/", 1)[0] for path in blobs if "/" in path}
+        paths, computed = set(), set()
+        for call in (node for node in ast.walk(self.module) if isinstance(node, ast.Call)):
+            if not self._executes(call, executors):
+                continue
+            for argument in self._arguments(call):
+                for node in ast.walk(argument):
+                    if not isinstance(node, ast.expr):
+                        continue
+                    for value in self.value(node):
+                        if value.kind == "str" and value.exact:
+                            candidate = value.path[2:] if value.path.startswith("./") else value.path
+                            path = normal("", candidate) if candidate and not any(c.isspace() for c in candidate) else None
+                            if plausible(path, blobs, dirs, top_dirs):
+                                paths.add(path)
+                        elif value.kind == "loc" and value.exact:
+                            if value.path and value.path not in dirs and (
+                                    not value.assumed or plausible(value.path, blobs, dirs, top_dirs)):
+                                paths.add(value.path)
+                        elif value.kind == "loc" and not value.assumed:
+                            computed.add(f"{self.path}:{getattr(node, 'lineno', 0)}")
+        return paths, computed
 
     # -- Protection
 

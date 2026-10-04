@@ -742,13 +742,20 @@ def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
     repository module is resolved in that module, as patch_policy.resolve_module finds it
     (CPython's import order). A code file in another language counts the tracked paths its
     text names (patch_policy.names_in_text, the run-step rule, without pattern-only lists).
-    A code file that gate code names or reads is followed in turn, to a fixpoint: its reads,
-    its imports (patch_policy.python_references, rule ci_import) or the names in its text.
-    Test modules are protected but not followed: what they read, like what they import, is
-    mostly the code and data under test (decision record, residual risks). The gate fails
-    closed (PushGate.check, gate_input_unresolved) on a read the reader leaves unresolved and
-    on a gate Python file it cannot parse or that nests too deeply for it, since CI's
-    interpreter may run what this one cannot read."""
+    Every file gate code reads is protected (ci_read). A code file is gate code too, and is
+    followed in turn to a fixpoint (its reads, its imports through
+    patch_policy.python_references, rule ci_import, or the names in its text), only when gate
+    code runs it: a code file in another language runs, or hands on, every code file its text
+    names; a Python file runs what reaches a call that executes code
+    (gate_reads.GateReads.executed). A code file that Python gate code only reads, such as a
+    workflow script it hashes and copies, is data: protected, not followed (2026-10-05, after
+    main's #679 made tools/adoption/install_claude_profile.py read
+    examples/claude-native/workflows/*.js). Test modules are protected but not followed: what
+    they read, like what they import, is mostly the code and data under test (decision
+    record, residual risks). The gate fails closed (PushGate.check, gate_input_unresolved) on
+    a read the reader leaves unresolved, on an executing call whose argument is a computed
+    location (any file there may run), and on a gate Python file it cannot parse or that
+    nests too deeply for it, since CI's interpreter may run what this one cannot read."""
     analyzers, active, entries = {}, set(), tree.entries()
 
     def analyzer(path):
@@ -797,13 +804,14 @@ def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
         if path in done or path not in blobs:
             continue
         done.add(path)
-        named = []
+        named, runs = [], []
         if path.endswith(".py"):
             reader = analyzer(path)
             try:
                 if reader is None:
                     raise RecursionError  # unparseable here or too deep: unresolved
                 files, prefixes, globs, unresolved = reader.reads(blobs, dirs)
+                executed, computed = reader.executed(blobs, dirs)
             except RecursionError:
                 result.unresolved.append(f"{path}:0")
                 continue
@@ -811,8 +819,8 @@ def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
                 result.add_prefix(name, "ci_read")
             for pattern in globs:
                 result.add_glob(pattern, "ci_read")
-            result.unresolved.extend(sorted(unresolved))
-            named = sorted(files)
+            result.unresolved.extend(sorted(unresolved | computed))
+            named, runs = sorted(files | executed), sorted(executed)
             if path not in followed:  # reached by a name or a read: its imports run too
                 try:
                     imports, import_dirs = patch_policy.python_references(path, tree.read(path), blobs, dirs)
@@ -831,8 +839,10 @@ def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
                     result.add_prefix(name, "ci_read")
                 else:
                     named.append(name)
+            runs = named
         for name in named:
             result.add_file(name, "ci_read")
+        for name in runs:
             if name in blobs and name not in done and (name.endswith(".py") or is_code(name)):
                 queue.append(name)
 

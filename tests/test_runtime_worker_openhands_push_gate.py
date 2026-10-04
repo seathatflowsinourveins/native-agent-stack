@@ -337,12 +337,47 @@ def main():
     return schema, workflow, limits, checks, subjects
 '''
 
+# A gate script that reads one code file as data (hashes and copies a workflow script, as
+# tools/adoption/install_claude_profile.py does since main's #679) and runs another through a
+# module-local wrapper. The data file's text names src/app.py and docs/a.md; neither is read by CI.
+INSTALL_LANES = '''import hashlib
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+LANE = ROOT / "tools" / "lane.js"
+
+
+def run_check(script):
+    return subprocess.run([sys.executable, str(script)], check=True)
+
+
+def main(dest):
+    digest = hashlib.sha256(LANE.read_bytes()).hexdigest()
+    shutil.copy2(LANE, Path(dest) / LANE.name)
+    run_check(ROOT / "scripts" / "lane_check.py")
+    return digest
+
+
+if __name__ == "__main__":
+    print(main(sys.argv[1]))
+'''
+
 READS_FILES = {
     ".github/workflows/ci.yml": CI_WORKFLOW + """      - name: Gate data
         run: |
           python3 scripts/read_policy.py
           bash scripts/check_shell.sh
+          python3 scripts/install_lanes.py "$RUNNER_TEMP"
 """,
+    "scripts/install_lanes.py": INSTALL_LANES,
+    "tools/lane.js": "const target = 'src/app.py';\nconst notes = require('fs').readFileSync('docs/a.md');\n",
+    "scripts/lane_check.py": ('import json\nfrom pathlib import Path\n\n'
+                              'print(json.loads((Path(__file__).resolve().parents[1] / "policy" / "lane.json")'
+                              '.read_text()))\n'),
+    "policy/lane.json": "{}\n",
     "scripts/read_policy.py": READ_POLICY,
     "scripts/gate_paths.py": 'CONTRACT_DIR = "policy/contract"\n',
     "scripts/check_shell.sh": "grep -q strict policy/shell.txt\npython3 scripts/inner_check.py\n",
@@ -358,6 +393,45 @@ READS_FILES = {
     "policy/checks/one.json": "{}\n",
     "policy/shell.txt": "strict\n",
 }
+
+# Calls that execute code, and reads of code as data, for GateReads.executed alone.
+EXEC_FORMS = '''import hashlib
+import importlib.util
+import runpy
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+from helpers import run_it
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def run_script(path):
+    return subprocess.run([sys.executable, str(path)], check=True)
+
+
+class Runner:
+    def command(self, label, argv):
+        return subprocess.run(argv, check=False)
+
+
+def main(name, dest):
+    subprocess.run([sys.executable, str(ROOT / "scripts" / "direct.py")], check=True)
+    subprocess.run(["bash", "scripts/direct.sh"], check=True)
+    run_script(ROOT / "scripts" / "wrapped.py")
+    Runner().command("lane", ["node", str(ROOT / "tools" / "lane.mjs")])
+    run_it(ROOT / "scripts" / "helped.py")
+    runpy.run_path(str(ROOT / "scripts" / "run_path.py"))
+    spec = importlib.util.spec_from_file_location("loaded", ROOT / "scripts" / "loaded.py")
+    exec(compile((ROOT / "scripts" / "compiled.py").read_text(), "compiled", "exec"))
+    digest = hashlib.sha256((ROOT / "tools" / "hashed.js").read_bytes()).hexdigest()
+    shutil.copy2(ROOT / "tools" / "copied.js", dest)
+    source = (ROOT / "scripts" / "parsed.py").read_text()
+    subprocess.run([sys.executable, str(ROOT / "scripts" / name)], check=True)
+    return spec, digest, source
+'''
 
 # A read the reader cannot resolve: the name is bound through globals(), which it does not model.
 UNRESOLVED_FILES = {
@@ -546,16 +620,49 @@ class GateReadsTests(unittest.TestCase):
         expected = {"policy/contract/contract.schema.json": "ci_read", "policy/rules.toml": "ci_read",
                     "policy/ci.yaml": "ci_read", "policy/shell.txt": "ci_read", "scripts/read_policy.py": "ci_named",
                     "scripts/check_shell.sh": "ci_named", "scripts/gate_paths.py": "ci_import",
-                    "scripts/inner_check.py": "ci_read", "policy/inner.json": "ci_read"}
+                    "scripts/inner_check.py": "ci_read", "policy/inner.json": "ci_read",
+                    # The workflow script read as data is protected; the check run through a wrapper is
+                    # followed, so what it reads is protected too.
+                    "scripts/install_lanes.py": "ci_named", "tools/lane.js": "ci_read",
+                    "scripts/lane_check.py": "ci_read", "policy/lane.json": "ci_read"}
         for path, rule in expected.items():
             with self.subTest(path=path):
                 self.assertEqual(derived.files.get(path), rule)
         self.assertEqual(derived.globs, {"policy/limits-*.json": "ci_read", "policy/checks/*.json": "ci_read"})
         protected = self.g.Protected([derived], set())
+        # src/app.py and docs/a.md are only named in the text of tools/lane.js, which no gate code runs.
         for path, rule in (("policy/checks/added.json", "ci_read"), ("policy/limits-lax.json", "ci_read"),
-                           ("docs/guide.md", None), ("src/app.py", None)):
+                           ("docs/guide.md", None), ("src/app.py", None), ("docs/a.md", None)):
             with self.subTest(path=path):
                 self.assertEqual(protected.rule(path), rule)
+
+    def test_only_code_a_gate_script_runs_is_followed(self):
+        # Merge round of 2026-10-05: main's #679 made tools/adoption/install_claude_profile.py read
+        # three examples/claude-native/workflows/*.js files to hash and copy them. Following every
+        # code file gate code reads took the names in their text, so all of blueprints/ became
+        # protected. A code file is followed only when a call that executes code receives it.
+        tracked = {"scripts/direct.py", "scripts/direct.sh", "scripts/wrapped.py", "tools/lane.mjs",
+                   "scripts/helped.py", "scripts/run_path.py", "scripts/loaded.py", "scripts/compiled.py",
+                   "tools/hashed.js", "tools/copied.js", "scripts/parsed.py", "scripts/helpers.py"}
+        blobs = {"scripts/check.py", *tracked}
+        dirs = self.g.patch_policy.parent_dirs(blobs)
+        reader = self.gr.GateReads("scripts/check.py", EXEC_FORMS)
+        executed, computed = reader.executed(blobs, dirs)
+        self.assertEqual(executed, {
+            "scripts/direct.py",  # subprocess.run with sys.executable
+            "scripts/direct.sh",  # a path string in an argv list
+            "scripts/wrapped.py",  # through a module-local wrapper function
+            "tools/lane.mjs",  # through a method that passes its argv on
+            "scripts/helped.py",  # a function imported from outside the standard library
+            "scripts/run_path.py", "scripts/loaded.py",  # runpy.run_path, importlib's file loader
+            "scripts/compiled.py",  # exec(compile(...)) of the file's text
+        })
+        line = EXEC_FORMS.splitlines().index(
+            '    subprocess.run([sys.executable, str(ROOT / "scripts" / name)], check=True)') + 1
+        self.assertEqual(computed, {f"scripts/check.py:{line}"})  # any file under scripts/ may run
+        # Hashed, copied or parsed code is data: protected as a file, not followed.
+        self.assertLessEqual({"tools/hashed.js", "tools/copied.js", "scripts/parsed.py"},
+                             reader.reads(blobs, dirs)[0])
 
     def test_reads_the_reader_cannot_resolve_are_reported(self):
         self.assertEqual(self.derive(UNRESOLVED_FILES).unresolved, ["scripts/read_unknown.py:5"])
@@ -571,6 +678,12 @@ class GateReadsTests(unittest.TestCase):
         # newer and run it.
         broken = {**READS_FILES, "scripts/inner_check.py": "def check(:\n    pass\n"}
         self.assertEqual(self.derive(broken).unresolved, ["scripts/inner_check.py:0"])
+        # A gate script that runs a file chosen at run time may run any file under the directory.
+        chosen = INSTALL_LANES.replace('run_check(ROOT / "scripts" / "lane_check.py")',
+                                       'run_check(ROOT / "scripts" / sys.argv[2])')
+        line = chosen.splitlines().index('    run_check(ROOT / "scripts" / sys.argv[2])') + 1
+        self.assertEqual(self.derive({**READS_FILES, "scripts/install_lanes.py": chosen}).unresolved,
+                         [f"scripts/install_lanes.py:{line}"])
 
 
 class RepositoryWorkflowTests(unittest.TestCase):
@@ -941,6 +1054,8 @@ class GateDataReadTests(unittest.TestCase):
             "policy/checks/added.json": "{}\n",  # a new file the glob reads
             "policy/shell.txt": "lax\n",  # named by the shell script the step runs
             "policy/inner.json": '{"skip": true}\n',  # read by a script that script runs
+            "tools/lane.js": "// replaced\n",  # read as data: hashed and copied
+            "policy/lane.json": '{"skip": true}\n',  # read by a script a gate script runs through a wrapper
         }
         for name, data in cases.items():
             with self.subTest(path=name):
@@ -950,8 +1065,9 @@ class GateDataReadTests(unittest.TestCase):
 
     def test_the_files_the_data_selects_and_unrelated_files_stay_editable(self):
         # docs/guide.md is the subject policy/rules.toml selects: the check reads it to judge it, so it
-        # stays editable while the file that selects it is protected.
-        for name in ("docs/guide.md", "src/app.py"):
+        # stays editable while the file that selects it is protected. src/app.py and docs/a.md are only
+        # named in tools/lane.js, which gate code reads as data and never runs.
+        for name in ("docs/guide.md", "src/app.py", "docs/a.md"):
             with self.subTest(path=name):
                 record = self.check({name: "changed\n"})
                 self.assertEqual((record["status"], record["reasons"], record["paths"]), ("pass", [], []), record)
