@@ -124,6 +124,9 @@ EXCEPTIONS_MARKER = "native-agent-stack:rtk-exceptions"
 # writer at 0.157.1 and 0.159.2. The selected 0.160.0 SDK/CLI pair has its separate qualification; --apply requires
 # that exact Linux pin and refuses on a host still running 0.159.3 until the coordinated switch.
 CODEX_VERSION = "0.160.0"
+# That pin's file. A host on one of its codex row's dated holds (docs/decisions/2026-10-04-codex-dated-holds.md) is
+# refused like any other version; the refusal only names the hold and its until date (codex_hold).
+PINS_FILE = ROOT / "adoption" / "pins-linux-x86_64.json"
 CONTEXT_MODE_VERSION = "1.0.169"
 # start.mjs of context-mode 1.0.169: the npm install and the plugin pin 6f0cc684 carry the same file.
 START_MJS_SHA256 = "0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26e57b"
@@ -401,6 +404,14 @@ def codex_version(codex: str, env: dict) -> str | None:
     return match.group(1) if result.returncode == 0 and match else None
 
 
+def codex_hold(version: str | None) -> dict | None:
+    """adoption_status.hold_result of the PINS_FILE codex row's dated hold of this version, or None (no version, no
+    such hold, or no readable pins file). Only the refusal's text uses it: --apply needs CODEX_VERSION either way."""
+    entry = adoption_status.read_pins(PINS_FILE).get("codex") if version else None
+    hold = adoption_status.matching_hold(entry, version) if entry else None
+    return adoption_status.hold_result(hold, adoption_status.utc_today()) if hold else None
+
+
 class AppServer:
     """A `codex app-server --listen stdio://` session over scripts/codex_quota.py's client (its own process group,
     bounded reads, a deadline per request, server requests answered): `initialize` with the experimental API,
@@ -661,8 +672,11 @@ class Plan:
         """[(level, name, detail)]; level ok|warn|fail. Apply refuses on any fail; the dry run reports."""
         checks = []
         version = codex_version(codex, codex_env(self.codex_home))
+        hold = codex_hold(version) if version != CODEX_VERSION else None
         checks.append(("ok" if version == CODEX_VERSION else "fail", "codex version",
-                       f"codex-cli {version} (pin {CODEX_VERSION})"))
+                       f"codex-cli {version} (pin {CODEX_VERSION})"
+                       + (f"; dated hold in adoption/pins-linux-x86_64.json: {adoption_status.hold_text(hold)}; "
+                          "the lane still needs the pin" if hold else "")))
         start_mjs = Path(self.eco_root) / f"tools/context-mode-{CONTEXT_MODE_VERSION}/lib/node_modules/context-mode/start.mjs"
         digest = sha256_file(start_mjs)
         checks.append(("ok" if digest == START_MJS_SHA256 else "fail", "context-mode start.mjs",

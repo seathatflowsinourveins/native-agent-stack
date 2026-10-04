@@ -18,7 +18,9 @@ version_probe only (never one declared "npm-metadata" or another method, since t
 method exists exactly because running the tool starts a server or a UI), each in its
 own process group that is killed once the probe exits, times out or is interrupted,
 and emits booleans, counts, component ids and version strings from the checked-in
-manifest and pins file and the output of a probe that exited 0. The opt-in --login-shell looks at the metadata of the
+manifest and pins file and the output of a probe that exited 0; a probe that names a dated hold of its pin (the pins
+file's holds[]) also gets that hold's version, until date and reason, as written in the pins file. The opt-in
+--login-shell looks at the metadata of the
 three personal startup files a Bash login shell reads (~/.bash_profile, ~/.bash_login, ~/.profile) without opening or
 executing any of them, and emits a fixed state per file, never a value, path or environment value. The opt-in
 --launcher-resolution is the one check that runs them: a bounded Bash login shell from a fixed environment reports
@@ -31,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import datetime
 import hashlib
 import json
 import os
@@ -92,6 +95,11 @@ PINNED_VERSION_KILL_GRACE_SECONDS = 2
 # other argument starts its MCP stdio server) and any future undeclared method are reported unchecked instead;
 # see adoption/bootstrap-linux.sh's write_version_report, which this reuses the pins file's schema from (#251).
 SUPPORTED_VERSION_PROBE_METHODS = ("exec",)
+# A pin's dated holds (docs/decisions/2026-10-04-codex-dated-holds.md): a pins entry's holds[] names an older version
+# that a host not yet switched keeps, with a reason and an until date. A probe that names a hold's version is held
+# before that date and mismatched from it on, the way an OSV-Scanner ignoreUntil stops applying on its date
+# (.github/osv-scanner.toml); the date compared is today's UTC date.
+HOLD_DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}\Z")
 # --pinned-versions replaces NO_PINNED_VERSION with this statement.
 PINNED_VERSION_LIMITATIONS = [
     "--pinned-versions execs a selected profile's component_ids that have an \"exec\" version_probe in this "
@@ -104,7 +112,10 @@ PINNED_VERSION_LIMITATIONS = [
     "pinned version; a nonzero exit is reported as not matching. A component with no pins entry for this "
     "platform, or whose declared method is not \"exec\" (for example context-mode's \"npm-metadata\", declared "
     "because any other argument starts its MCP stdio server), is reported unchecked; this never execs a probe "
-    "whose declared method is not \"exec\".",
+    "whose declared method is not \"exec\". A probe that exits 0 naming the version of a dated hold of its pin (the "
+    "pins file's holds[], by the exact rule) is reported held, with the hold's until date and reason, before that "
+    "UTC date and mismatched from it on; a hold is a reviewed exception and verifies nothing about the held "
+    "installation.",
 ]
 # --login-shell: the personal files a Bash login shell reads, in bash(1) INVOCATION order. GNU bash 5.3 shell.c
 # execute_profile_file (1116-1127) runs ~/.bash_profile and, only while maybe_execute_file returns 0, ~/.bash_login and
@@ -1190,6 +1201,54 @@ def version_output_matches(expected: str, match: str, output: str) -> bool:
     return False
 
 
+def utc_today() -> datetime.date:
+    """The date a hold's until is compared with: today's UTC date, as for an OSV-Scanner ignoreUntil
+    (docs/decisions/2026-09-22-github-automation-closure.md)."""
+    return datetime.datetime.now(datetime.timezone.utc).date()
+
+
+def pin_holds(entry: dict) -> list[dict]:
+    """The usable holds[] items of one pins entry: objects whose version and reason are non-empty strings and whose
+    until is a real YYYY-MM-DD date. Any other item is skipped, so a malformed hold never turns drift into a hold;
+    tests/test_pin_holds.py keeps the checked-in holds complete and unexpired."""
+    holds = entry.get("holds")
+    usable = []
+    for hold in holds if isinstance(holds, list) else []:
+        if not isinstance(hold, dict):
+            continue
+        version, until, reason = hold.get("version"), hold.get("until"), hold.get("reason")
+        if not (isinstance(version, str) and version.strip() and isinstance(reason, str) and reason.strip()
+                and isinstance(until, str) and HOLD_DATE.fullmatch(until)):
+            continue
+        try:
+            datetime.date.fromisoformat(until)
+        except ValueError:
+            continue
+        usable.append(hold)
+    return usable
+
+
+def matching_hold(entry: dict, output: str) -> dict | None:
+    """The first usable hold of a pins entry whose version the output names, by the "exact" rule whatever the pin's
+    own rule: a hold names one older version, never a floor."""
+    return next((hold for hold in pin_holds(entry) if version_output_matches(hold["version"], "exact", output)), None)
+
+
+def hold_result(hold: dict, today: datetime.date) -> dict:
+    """What a held component adds to its result: the hold's version, until and reason as the pins file writes them,
+    and whether until has come. On that date the hold stops applying, as an OSV-Scanner ignoreUntil does."""
+    return {"hold_version": hold["version"], "hold_until": hold["until"], "hold_reason": hold["reason"],
+            "hold_expired": datetime.date.fromisoformat(hold["until"]) <= today}
+
+
+def hold_text(result: dict) -> str:
+    """'<version> held until <until> (<reason>)', or the expiry once until has come."""
+    if result["hold_expired"]:
+        return (f"{result['hold_version']} hold expired {result['hold_until']} ({result['hold_reason']}); "
+                "reported as drift")
+    return f"{result['hold_version']} held until {result['hold_until']} ({result['hold_reason']})"
+
+
 def signal_group(group: int, signum: int) -> None:
     """Signal a probe's whole process group; a group with nothing left in it is not an error."""
     try:
@@ -1325,10 +1384,11 @@ def signals_interrupt_probes():
             signal.signal(signum, previous)
 
 
-def probe_pinned_version(entry: dict) -> dict:
+def probe_pinned_version(entry: dict, today: datetime.date | None = None) -> dict:
     """One component's pinned-version result. Never execs a probe whose declared method is not "exec": a
     "npm-metadata" method (context-mode) is declared exactly because any other argument starts its MCP
-    stdio server, and any future undeclared method is left unchecked the same way."""
+    stdio server, and any future undeclared method is left unchecked the same way. A probe that exits 0 without
+    the pin but naming a dated hold's version also gets hold_result's fields, against today (default: utc_today)."""
     pinned = entry.get("version")
     result = {"pinned_version": pinned if isinstance(pinned, str) else None, "checked": False, "matches_pin": None}
     probe = table(entry.get("version_probe"))
@@ -1358,36 +1418,55 @@ def probe_pinned_version(entry: dict) -> dict:
     # As the bootstrap's "FAILED (exit N)": a failing probe never matches, even if its diagnostics name the pin.
     result["matches_pin"] = status == 0 and isinstance(expected, str) and version_output_matches(expected, match,
                                                                                                output)
+    # Likewise a dated hold applies only to a probe that exited 0, and only when it did not observe the pin.
+    hold = matching_hold(entry, output) if status == 0 and not result["matches_pin"] else None
+    if hold is not None:
+        result.update(hold_result(hold, utc_today() if today is None else today))
     return result
 
 
-def pinned_versions(component_ids: list[str], pins: dict) -> list[dict]:
+def pinned_versions(component_ids: list[str], pins: dict, today: datetime.date | None = None) -> list[dict]:
     """Opt-in per-component pinned-version result for one profile's component_ids; {} pins (no platform
     file for this host) reports every component unchecked, same as one simply absent from it."""
-    return [{"id": identifier, **(probe_pinned_version(pins[identifier]) if identifier in pins else
+    today = utc_today() if today is None else today
+    return [{"id": identifier, **(probe_pinned_version(pins[identifier], today) if identifier in pins else
              {"pinned_version": None, "checked": False, "matches_pin": None})}
             for identifier in component_ids]
 
 
+def held(item: dict) -> bool:
+    """A checked component that is not its pin but the version of a dated hold whose until has not come."""
+    return item["checked"] and not item["matches_pin"] and item.get("hold_expired") is False
+
+
 def pinned_versions_summary(results: list[dict]) -> dict:
-    """One profile's component ids by outcome: matched, mismatched (checked, not the pin) and unchecked."""
-    return {"matched": [item["id"] for item in results if item["checked"] and item["matches_pin"]],
-            "mismatched": [item["id"] for item in results if item["checked"] and not item["matches_pin"]],
-            "unchecked": [item["id"] for item in results if not item["checked"]]}
+    """One profile's component ids by outcome: matched, mismatched (checked, neither the pin nor an unexpired dated
+    hold of it) and unchecked, and held (an unexpired dated hold), a key present only when a component is held."""
+    summary = {"matched": [item["id"] for item in results if item["checked"] and item["matches_pin"]],
+               "mismatched": [item["id"] for item in results
+                              if item["checked"] and not item["matches_pin"] and not held(item)],
+               "unchecked": [item["id"] for item in results if not item["checked"]]}
+    held_ids = [item["id"] for item in results if held(item)]
+    if held_ids:
+        summary["held"] = held_ids
+    return summary
 
 
 def pinned_versions_match(profiles: list[dict]) -> bool | None:
-    """False when any selected profile has a checked component that differs from its pin, True when at least one
-    was checked and none differs, None when nothing could be checked. Unchecked components do not count."""
+    """False when any selected profile has a checked component that differs from its pin and is not held, True when
+    at least one was checked and none differs that way, None when nothing could be checked. Unchecked components do
+    not count; a held one (an unexpired dated hold) counts as checked without a difference."""
     summaries = [profile["pinned_versions_summary"] for profile in profiles]
     if any(summary["mismatched"] for summary in summaries):
         return False
-    return True if any(summary["matched"] for summary in summaries) else None
+    return True if any(summary["matched"] or summary.get("held") for summary in summaries) else None
 
 
 def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None,
                      *, with_client_wiring: bool = False, with_pinned_versions: bool = False,
-                     with_login_shell: bool = False, with_launcher_resolution: bool = False, env=None) -> dict:
+                     with_login_shell: bool = False, with_launcher_resolution: bool = False, env=None,
+                     today: datetime.date | None = None) -> dict:
+    """The bounded report; today is the date dated holds compare with (default: utc_today, read once)."""
     manifest = manifest.absolute()
     root = (root or manifest.parent.parent).resolve()
     host = {"os": platform.system().lower(), "architecture": platform.machine().lower(),
@@ -1401,6 +1480,7 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
                                  if item != NO_CLIENT_STATE] + CLIENT_WIRING_LIMITATIONS
     pins = read_pins(pins_file_path(root, host)) if with_pinned_versions else {}
     if with_pinned_versions:
+        today = utc_today() if today is None else today
         result["limitations"] = [item for item in result["limitations"]
                                  if item != NO_PINNED_VERSION] + PINNED_VERSION_LIMITATIONS
     if with_login_shell:
@@ -1450,7 +1530,7 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
         if identifier in source_profiles:
             entry["source_profile"] = source_profiles[identifier]
         if with_pinned_versions:
-            entry["pinned_versions"] = pinned_versions(profile["component_ids"], pins)
+            entry["pinned_versions"] = pinned_versions(profile["component_ids"], pins, today)
             entry["pinned_versions_summary"] = pinned_versions_summary(entry["pinned_versions"])
         result["profiles"].append(entry)
     if with_pinned_versions:
@@ -1482,7 +1562,10 @@ def main(argv: list[str] | None = None) -> int:
                              "each profile's matched, mismatched and unchecked ids, and a top-level "
                              "pinned_versions_match that is false when any checked component differs from its pin "
                              "(booleans, ids and version strings only; never execs a probe whose declared "
-                             "method is not \"exec\", and the exit code is unchanged)")
+                             "method is not \"exec\", and the exit code is unchanged). A component that names an "
+                             "unexpired dated hold of its pin (holds[] in the pins file) is listed as held, with "
+                             "the hold's until date and reason, and does not make pinned_versions_match false; "
+                             "from its until date (UTC) it is mismatched again, with the expiry stated")
     parser.add_argument("--login-shell", action="store_true",
                         help="Also report, from file metadata alone (never a read or an exec), which of "
                              "~/.bash_profile, ~/.bash_login and ~/.profile a Bash login shell reads first and "
@@ -1513,7 +1596,11 @@ def main(argv: list[str] | None = None) -> int:
                 summary = profile["pinned_versions_summary"]
                 print(f"  pinned versions: {len(summary['matched'])} matched"
                       + (f", mismatched: {', '.join(summary['mismatched'])}" if summary["mismatched"] else "")
+                      + (f", held: {', '.join(summary['held'])}" if summary.get("held") else "")
                       + (f", unchecked: {', '.join(summary['unchecked'])}" if summary["unchecked"] else ""))
+                for item in profile["pinned_versions"]:
+                    if "hold_version" in item:
+                        print(f"    {item['id']}: {hold_text(item)}")
         if "pinned_versions_match" in report:
             print(f"Pinned versions match: {json.dumps(report['pinned_versions_match'])}")
         if "client_wiring" in report:
