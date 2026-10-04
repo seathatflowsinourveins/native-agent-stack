@@ -48,8 +48,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    config (`adoption/new-wsl/templates/`, the 2026-10-03 addendum); the two instruction blocks; and six steps of the tool
    itself (the launcher, the login-shell PATH block, the skills step, the two PATH directories and the remote plugin
    rules). A piece goes to the first entry that matches it. A piece no entry
-   matches, and an entry no piece reaches, fail the check. Today: 387 pieces, 294 wired (200 practice, 94 through a slot),
-   80 not wired (41 through a slot that does not install, 39 by their own entry) and 13 authorization pieces (the four
+   matches, and an entry no piece reaches, fail the check. Today: 389 pieces, 318 wired (214 practice, 104 through a slot),
+   58 not wired (30 through a slot that does not install, 28 by their own entry) and 13 authorization pieces (the four
    settings, the main checkout's Codex trust grant of the 2026-10-04 addendum, the six tool approval modes of Decision 14
    and semble's two allow rules, which also wait for their slots),
    each listed below; a slot whose install is another owner (an interim install, the 2026-10-03 addendum) counts as one
@@ -303,7 +303,7 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
       config and the stack-worker profile), semble and context-mode and semble's two allow rules, because their slots
       install those owners as interim installs; SocratiCode's and headroom's wait, because their slots install another
       owner. Since the 2026-10-04 addendum the option also writes the main checkout's Codex trust grant. Thirteen pieces
-      are in the class (`--check` counts `authorization: 13`, and 80 pieces are not wired).
+      are in the class (`--check` counts `authorization: 13`, and 58 pieces are not wired).
     - **The default.** `--render` and `--apply` neither render nor write the four, and an existing value of those keys in a
       person's files is never touched: the render lacks the keys, so the Claude merge leaves the file's keys as they are,
       and so does the Codex merge.
@@ -849,7 +849,7 @@ unchanged.
   without a suffix). Claude Code resolves the same model as before; what changes is that the new distribution keeps it
   when the shared template moves. `advisorModel` stays the template's `fable`.
   2026-10-04 (~15:10Z): the user changed the advisor to Opus 5.5; the template now carries `advisorModel: "opus"` (see [Advisor model](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model)).
-- **Counts.** 385 pieces, 293 wired, 79 not wired and 13 authorization pieces (Decisions 2 and 14 above).
+- **Counts.** 389 pieces, 318 wired, 58 not wired and 13 authorization pieces (Decisions 2 and 14 above).
 
 What would overturn it: Codex matching a project's trust by a parent directory or by another key form; a decision that
 the repository's root should ask again (the entry returns to `not_wired`); the user choosing another main model, or the
@@ -902,8 +902,7 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `codex/config/mcp_servers.headroom.env.HF_HUB_OFFLINE` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
 | `codex/config/mcp_servers.headroom.env.TRANSFORMERS_OFFLINE` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
 | `codex/config/mcp_servers.headroom.env.DO_NOT_TRACK` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
-| `codex/config/mcp_servers.codebase-memory.command` | `not_wired` | no slot of the manifest names a code-graph tool (the code-navigation slot's owner is Serena) |
-| `codex/config/mcp_servers.context-mode.env.RTK_TELEMETRY_DISABLED` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'rtk' |
+| `codex/config/mcp_servers.codebase-memory.command` | `not_wired` | no slot of the manifest names a code-graph or symbol-index tool such as codebase-memory or jCodeMunch (the code-navigation slot's owner is Serena) |
 | `codex/config/projects."${HOME}/code/native-agent-stack-publication".trust_level` | `not_wired` | trust grants belong to one host; adoption/bootstrap.md step 4 and tools/adoption/codex_home.py leave them out, and Codex asks on this host |
 | `codex/config/tui.model_availability_nux.gpt-6-astra` | `not_wired` | a counter of how often Codex showed a model notice on the source host, which is client state and not configuration |
 | `codex/config/tui.model_availability_nux."gpt-6.1-sol"` | `not_wired` | a counter of how often Codex showed a model notice on the source host, which is client state and not configuration |

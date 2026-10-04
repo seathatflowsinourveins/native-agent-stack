@@ -354,7 +354,11 @@ GitHub-hosted macOS runner; see
    installed by the **guard hooks** step of `install_claude_profile.py` below, so
    every non-blind subagent except `semantic-evidence-reviewer` receives the token-lanes block matched to its role
    ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)); while that
-   file is absent the command exits 0 and adds nothing.
+   file is absent the command exits 0 and adds nothing. The same template then also gained a `SessionStart` group
+   (matcher `startup|resume|clear|compact|fork`) that runs `~/.claude/hooks/token-lanes-session-start.py`, which hands the
+   main session its own block before the first prompt
+   ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-10-04-main-session-carrier));
+   it is silent for `blind-*` roles and `semantic-evidence-reviewer`, and while its file is absent the command exits 0 and adds nothing.
    `claude.settings.template.json` also changed after `v2026.09.26.2`: it sets `MCP_TIMEOUT` to `"120000"`, the startup timeout of every MCP server (default 30 s, [environment variables](https://code.claude.com/docs/en/env-vars)); the value is global because Claude Code 2.1.285 and 2.1.286 have no per-server startup setting (`claude mcp add --help` lists no timeout option, and a server's `timeout` field bounds tool calls only), and 120 s matches the Codex template's slowest `startup_timeout_sec` ([decision](../docs/decisions/2026-09-30-mcp-startup-timeout.md)). It also denies, in every session, the Skills CLI's install, remove and update commands and `Edit(~/.agents/**)`, so skills install only through `tools/adoption/install_skills.py` ([lifecycle](skills/lifecycle.md#install-and-inspect)).
    `codex.config.template.toml` changed after `v2026.09.26`: it turns the context-mode plugin's own MCP server off and registers context-mode at user scope with no `cwd`, running the pinned npm install's `start.mjs`, so each Codex session's server binds that session's own directory ([recipe](../recipes/README.md#retained-context-mode)), and its `headroom` entry adds `HF_HUB_OFFLINE` and `TRANSFORMERS_OFFLINE`; `project.codex.config.template.toml` changed after `v2026.09.26` in its comments only.
    The recipe's project-scoped alternative changed after `v2026.09.26.2`: it adds `default_tools_approval_mode = "approve"` and a `CLAUDE_PROJECT_DIR` equal to its project directory, as upstream `start.mjs` sets, so a project entry keeps Codex tool approvals and the server-side project `Bash(...)` denies ([recipe](../recipes/README.md#retained-context-mode)).
@@ -429,7 +433,10 @@ GitHub-hosted macOS runner; see
      and its sibling [`adoption/hooks/claude/token-lanes-block.md`](hooks/claude/token-lanes-block.md)
      with the five role blocks `adoption/hooks/claude/token-lanes-block.<role>.md`
      (`builder`, `researcher`, `reviewer`, `scout`, `verifier`)
-     into `~/.claude/hooks/` (all seven files added after `v2026.09.26.2`).
+     into `~/.claude/hooks/` (all seven files added after `v2026.09.26.2`), and the main-session pair
+     [`adoption/hooks/claude/token-lanes-session-start.py`](hooks/claude/token-lanes-session-start.py) and
+     [`adoption/hooks/claude/token-lanes-block.main.md`](hooks/claude/token-lanes-block.main.md) beside them
+     (added after the pair above, with the same sha256 rule; [main-session carrier](../docs/token-session-handbook.md#token-lanes-carried-into-the-main-session)).
      The hook supplies token-lane guidance before each non-blind subagent's first prompt
      through the [SubagentStart context contract](https://code.claude.com/docs/en/hooks#subagentstart):
      a shipped role with a `tools:` allowlist receives the role block that names only the lanes it grants,

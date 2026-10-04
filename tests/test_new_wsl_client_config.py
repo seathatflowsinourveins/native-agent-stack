@@ -655,7 +655,7 @@ class RenderTests(unittest.TestCase):
         # Each hook runs a file the repository copies, ai-memory (an interim install) at the link the plan's
         # memory-owner row makes, or rtk (the owner's directive of 2026-10-04); context-mode writes its own cache-heal hook.
         ai_memory = "/home/example/.local/bin/ai-memory "
-        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 5)
+        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 6)
         self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) or command == "rtk hook claude"
                             for command in commands), commands)
         self.assertTrue(any(command.startswith(ai_memory) for command in events["SessionStart"]), events)
@@ -860,7 +860,7 @@ class RenderTests(unittest.TestCase):
                     for hook in group["hooks"]:
                         referenced.update(re.findall(r"\.claude/hooks/([A-Za-z0-9_.-]+)", hook["command"]))
         self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py", "currency-due-notice.py",
-                                      "token-lanes-subagent-start.py"})
+                                      "token-lanes-subagent-start.py", "token-lanes-session-start.py"})
         for name in referenced:
             source = icp.HOOKS[name]
             self.assertTrue(source.is_file(), name)

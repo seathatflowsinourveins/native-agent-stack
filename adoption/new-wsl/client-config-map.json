@@ -145,19 +145,22 @@
     {
       "match": [
         "claude/settings/hook/*/*token-lanes-subagent-start.py*",
+        "claude/settings/hook/*/*token-lanes-session-start.py*",
         "claude/profile/hook-file/token-lanes-block.md",
+        "claude/profile/hook-file/token-lanes-block.main.md",
         "claude/profile/hook-file/token-lanes-block.builder.md",
         "claude/profile/hook-file/token-lanes-block.researcher.md",
         "claude/profile/hook-file/token-lanes-block.reviewer.md",
         "claude/profile/hook-file/token-lanes-block.scout.md",
         "claude/profile/hook-file/token-lanes-block.verifier.md",
+        "claude/profile/hook-file/token-lanes-session-start.py",
         "claude/profile/hook-file/token-lanes-subagent-start.py"
       ],
       "wiring": "practice",
       "names": [
         "token-lanes"
       ],
-      "note": "The SubagentStart token-lane carrier: python3 and the seven files install_claude_profile.py copies, byte-pinned in adoption/hooks/claude/SHA256SUMS, wired by the owner's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-token-layer-default.md). The shared carrier also names lanes this distribution does not install (SocratiCode, jCodeMunch, headroom, codebase-memory, TOON); ToolSearch returns only the tools a client exposes, and a carrier filtered to the installed lanes is the record's follow-up."
+      "note": "The token-lane carriers: python3 and the nine files install_claude_profile.py copies (the SubagentStart hook with its default block and five role blocks, and the SessionStart hook with its main-session block), byte-pinned in adoption/hooks/claude/SHA256SUMS, wired by the owner's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-token-layer-default.md). The SessionStart hook injects the main-session block at startup, resume, clear, compact and fork. The shared carrier also names lanes this distribution does not install (SocratiCode, jCodeMunch, headroom, codebase-memory, TOON); ToolSearch returns only the tools a client exposes, and a carrier filtered to the installed lanes is the record's follow-up."
     },
     {
       "match": [
