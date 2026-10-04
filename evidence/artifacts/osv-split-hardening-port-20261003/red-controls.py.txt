@@ -1,0 +1,92 @@
+import copy
+from datetime import date, timedelta
+import io
+import json
+import os
+from pathlib import Path
+import subprocess
+import tempfile
+import time
+import unittest
+from unittest.mock import patch
+
+import tests.test_osv_lockfile_coverage as module
+
+ARTIFACTS = Path('evidence/artifacts/osv-split-hardening-port-20261003')
+original = module.WORKFLOW.read_text(encoding='utf-8')
+outcomes = []
+
+
+def stamp():
+    return subprocess.check_output(['date', '-u', '+%Y-%m-%dT%H:%M:%SZ'], text=True).strip()
+
+
+def run(label, expectation, build_suite, workflow=None, config=None):
+    started = stamp()
+    clock = time.monotonic()
+    output = io.StringIO()
+    with tempfile.TemporaryDirectory() as directory:
+        scratch = Path(directory)
+        workflow_path = scratch / 'security-scan.yml'
+        workflow_path.write_text(workflow or original, encoding='utf-8')
+        config_path = scratch / 'osv-scanner.toml'
+        config_path.write_text(module.CONFIG.read_text(encoding='utf-8'), encoding='utf-8')
+        with patch.object(module, 'WORKFLOW', workflow_path), \
+             patch.object(module.FrozenScanTests, 'workflow', workflow or original):
+            if config is not None:
+                with patch.object(module, 'CONFIG', config_path), \
+                     patch.object(module.FrozenScanTests, 'ordinary_config', config), \
+                     patch.object(module.tomllib, 'loads', wraps=module.tomllib.loads) as loads:
+                    loads.side_effect = lambda text: config if text == config_path.read_text() else loads._mock_wraps(text)
+                    result = unittest.TextTestRunner(stream=output, verbosity=2).run(build_suite())
+            else:
+                result = unittest.TextTestRunner(stream=output, verbosity=2).run(build_suite())
+    exit_code = 0 if result.wasSuccessful() else 1
+    outcome = dict(id=label, expectation=expectation, started_utc=started, finished_utc=stamp(),
+                   command='rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py',
+                   exit_code=exit_code, tests_run=result.testsRun, skipped=result.skipped,
+                   failing_tests=[test.id() for test, trace in result.failures + result.errors],
+                   wall_seconds=round(time.monotonic() - clock, 3), evidence_class='synthetic',
+                   output=f'{ARTIFACTS}/red-{label}.txt')
+    ARTIFACTS.mkdir(parents=True, exist_ok=True)
+    (ARTIFACTS / f'red-{label}.txt').write_text(output.getvalue() + f'\nexit_code={exit_code}\n', encoding='utf-8')
+    outcomes.append(outcome)
+    (ARTIFACTS / 'red-runs.json').write_text(json.dumps(outcomes, indent=2) + '\n', encoding='utf-8')
+    print(json.dumps(outcome), flush=True)
+    expected_code = 0 if expectation == 'survives' else 1
+    if exit_code != expected_code or result.errors or result.skipped:
+        raise SystemExit('Contract red run differed; stop and report')
+
+
+def mutant(old, new):
+    assert original.count(old) == 1, old
+    return original.replace(old, new, 1)
+
+
+all_tests = lambda: unittest.defaultTestLoader.loadTestsFromModule(module)
+invocations = lambda: unittest.defaultTestLoader.loadTestsFromTestCase(module.SyntheticWorkflowInvocationTests)
+run('R1', 'survives', all_tests,
+    workflow=mutant('          "${scan[@]}"\n          status=$?\n',
+                    '          scan+=(--config "$frozen_config")\n          "${scan[@]}"\n          status=$?\n'))
+changed = mutant('| select(has("config") | not) |',
+                 '| select(has("config") | not) | select(.path != ".github/requirements-ci.txt") |')
+old = '-eq "$(jq \'.lockfiles | length\' "$inventory")"'
+assert changed.count(old) == 1
+run('R2', 'caught', invocations, workflow=changed.replace(old, old.replace('-eq', '-le'), 1))
+run('R3', 'caught', invocations,
+    workflow=mutant('          statuses+=("$sarif_status" "$frozen_sarif_status" "$frozen_wsl_sarif_status")\n', ''))
+good = copy.deepcopy(module.FrozenScanTests.ordinary_config)
+entry = {'name': 'nex[t]', 'nameIsRegex': True, 'ecosystem': 'npm', 'ignore': True,
+         'reason': 'synthetic red control', 'effectiveUntil': date.today() + timedelta(days=30)}
+override = copy.deepcopy(good)
+override.setdefault('PackageOverrides', []).append(entry)
+policy_suite = lambda: unittest.TestSuite([
+    module.FrozenScanTests('test_the_ordinary_config_has_no_exception_for_a_frozen_advisory'),
+    module.IgnorePolicyTests('test_no_other_suppression_mechanism_bypasses_the_policy')])
+run('R4-override', 'survives', policy_suite, config=override)
+aliased = copy.deepcopy(good)
+aliased['IgnoredVulns'][0]['ID'] = 'GHSA-vfj7-8cjw-p6xm'
+run('R4-key', 'survives', lambda: unittest.TestSuite([
+    module.IgnorePolicyTests('test_every_ignore_has_id_reason_and_a_near_expiry'),
+    module.FrozenScanTests('test_the_ordinary_config_has_no_exception_for_a_frozen_advisory')]), config=aliased)
+print('All R1–R4 observations match the contract; exit_code=0')

@@ -1,0 +1,18 @@
+{
+  "observed_utc": "2026-10-03T19:22:01Z",
+  "target_advisory": "GHSA-vcvr-r3jv-pc5j",
+  "runs": {
+    "baseline": {
+      "exit_code": 1,
+      "advisory_ids": [
+        "GHSA-vcvr-r3jv-pc5j"
+      ]
+    },
+    "case-alias": {
+      "exit_code": 0,
+      "advisory_ids": []
+    }
+  },
+  "reproduced": true,
+  "limitation": "Single native observation. Source map iteration does not establish which alias wins. If absent, the exact-key guard remains defense-in-depth."
+}

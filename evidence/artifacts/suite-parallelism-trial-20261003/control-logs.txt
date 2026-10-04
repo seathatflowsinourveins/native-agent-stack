@@ -1,0 +1,272 @@
+===== ubuntu-24.04-S-controls: python3 -m unittest -v under timeout --kill-after=30 300; exit 1
+test_error (test_zz_trial_controls.TrialControlsA.test_error) ... ERROR
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail) ... FAIL
+test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok
+test_skip (test_zz_trial_controls.TrialControlsA.test_skip) ... skipped 'control: skipped on purpose'
+test_expected_failure (test_zz_trial_controls.TrialControlsB.test_expected_failure) ... expected failure
+test_multiline_docstring (test_zz_trial_controls.TrialControlsB.test_multiline_docstring)
+Control: this first docstring line becomes a second description line. ... ok
+test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails)
+Control: subtest i=1 fails; i=0 and i=2 pass. ... 
+  test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails) (i=1)
+Control: subtest i=1 fails; i=0 and i=2 pass. ... FAIL
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success) ... unexpected success
+ERROR
+
+======================================================================
+ERROR: test_error (test_zz_trial_controls.TrialControlsA.test_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 25, in test_error
+    raise RuntimeError("control: errors on purpose")
+RuntimeError: control: errors on purpose
+
+======================================================================
+ERROR: setUpClass (test_zz_trial_controls.TrialControlsFixture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 57, in setUpClass
+    raise RuntimeError("control: setUpClass errors on purpose")
+RuntimeError: control: setUpClass errors on purpose
+
+======================================================================
+FAIL: test_fail (test_zz_trial_controls.TrialControlsA.test_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 22, in test_fail
+    self.assertEqual(1, 2, "control: fails on purpose")
+AssertionError: 1 != 2 : control: fails on purpose
+
+======================================================================
+FAIL: test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails) (i=1)
+Control: subtest i=1 fails; i=0 and i=2 pass.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 33, in test_subtest_fails
+    self.assertNotEqual(i, 1, "control: subtest i=1 fails on purpose")
+AssertionError: 1 == 1 : control: subtest i=1 fails on purpose
+
+======================================================================
+UNEXPECTED SUCCESS: test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success)
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+===== ubuntu-24.04-S-crash: python3 -m unittest -v under timeout --kill-after=30 300; exit 3
+test_crash (test_crash.CrashControl.test_crash) ... 
+===== ubuntu-24.04-L4-controls: python3 -m unittest_parallel -j 4 --level module -v under timeout --kill-after=30 300; exit 5
+Running 1 test suites (9 total tests) across 1 workers
+
+test_error (test_zz_trial_controls.TrialControlsA.test_error) ...
+test_error (test_zz_trial_controls.TrialControlsA.test_error) ... ERROR
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail) ...
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail) ... FAIL
+test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ...
+test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok
+test_skip (test_zz_trial_controls.TrialControlsA.test_skip) ...
+test_skip (test_zz_trial_controls.TrialControlsA.test_skip) ... skipped 'control: skipped on purpose'
+test_expected_failure (test_zz_trial_controls.TrialControlsB.test_expected_failure) ...
+test_expected_failure (test_zz_trial_controls.TrialControlsB.test_expected_failure) ... expected failure
+test_multiline_docstring (test_zz_trial_controls.TrialControlsB.test_multiline_docstring)
+Control: this first docstring line becomes a second description line. ...
+test_multiline_docstring (test_zz_trial_controls.TrialControlsB.test_multiline_docstring)
+Control: this first docstring line becomes a second description line. ... ok
+test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails)
+Control: subtest i=1 fails; i=0 and i=2 pass. ...
+  test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails) (i=1)
+Control: subtest i=1 fails; i=0 and i=2 pass. ... FAIL
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success) ...
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success) ... unexpected success
+setUpClass (test_zz_trial_controls.TrialControlsFixture) ... ERROR
+
+======================================================================
+test_error (test_zz_trial_controls.TrialControlsA.test_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 25, in test_error
+    raise RuntimeError("control: errors on purpose")
+RuntimeError: control: errors on purpose
+
+======================================================================
+setUpClass (test_zz_trial_controls.TrialControlsFixture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 57, in setUpClass
+    raise RuntimeError("control: setUpClass errors on purpose")
+RuntimeError: control: setUpClass errors on purpose
+
+======================================================================
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 22, in test_fail
+    self.assertEqual(1, 2, "control: fails on purpose")
+AssertionError: 1 != 2 : control: fails on purpose
+
+======================================================================
+test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails) (i=1)
+Control: subtest i=1 fails; i=0 and i=2 pass.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 33, in test_subtest_fails
+    self.assertNotEqual(i, 1, "control: subtest i=1 fails on purpose")
+AssertionError: 1 == 1 : control: subtest i=1 fails on purpose
+
+======================================================================
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success)
+----------------------------------------------------------------------
+UNEXPECTED SUCCESS
+----------------------------------------------------------------------
+Ran 8 tests in 0.107s
+
+FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+===== ubuntu-24.04-L4-crash: python3 -m unittest_parallel -j 4 --level module -v under timeout --kill-after=30 300; exit 124
+Running 1 test suites (1 total tests) across 1 workers
+
+test_crash (test_crash.CrashControl.test_crash) ...
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 11 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+===== ubuntu-24.04-L4F-controls: python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v under timeout --kill-after=30 300; exit 5
+Running 1 test suites (9 total tests) across 1 workers
+
+test_error (test_zz_trial_controls.TrialControlsA.test_error) ...
+test_error (test_zz_trial_controls.TrialControlsA.test_error) ... ERROR
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail) ...
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail) ... FAIL
+test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ...
+test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok
+test_skip (test_zz_trial_controls.TrialControlsA.test_skip) ...
+test_skip (test_zz_trial_controls.TrialControlsA.test_skip) ... skipped 'control: skipped on purpose'
+test_expected_failure (test_zz_trial_controls.TrialControlsB.test_expected_failure) ...
+test_expected_failure (test_zz_trial_controls.TrialControlsB.test_expected_failure) ... expected failure
+test_multiline_docstring (test_zz_trial_controls.TrialControlsB.test_multiline_docstring)
+Control: this first docstring line becomes a second description line. ...
+test_multiline_docstring (test_zz_trial_controls.TrialControlsB.test_multiline_docstring)
+Control: this first docstring line becomes a second description line. ... ok
+test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails)
+Control: subtest i=1 fails; i=0 and i=2 pass. ...
+  test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails) (i=1)
+Control: subtest i=1 fails; i=0 and i=2 pass. ... FAIL
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success) ...
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success) ... unexpected success
+setUpClass (test_zz_trial_controls.TrialControlsFixture) ... ERROR
+
+======================================================================
+test_error (test_zz_trial_controls.TrialControlsA.test_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 25, in test_error
+    raise RuntimeError("control: errors on purpose")
+RuntimeError: control: errors on purpose
+
+======================================================================
+setUpClass (test_zz_trial_controls.TrialControlsFixture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 57, in setUpClass
+    raise RuntimeError("control: setUpClass errors on purpose")
+RuntimeError: control: setUpClass errors on purpose
+
+======================================================================
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 22, in test_fail
+    self.assertEqual(1, 2, "control: fails on purpose")
+AssertionError: 1 != 2 : control: fails on purpose
+
+======================================================================
+test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails) (i=1)
+Control: subtest i=1 fails; i=0 and i=2 pass.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 33, in test_subtest_fails
+    self.assertNotEqual(i, 1, "control: subtest i=1 fails on purpose")
+AssertionError: 1 == 1 : control: subtest i=1 fails on purpose
+
+======================================================================
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success)
+----------------------------------------------------------------------
+UNEXPECTED SUCCESS
+----------------------------------------------------------------------
+Ran 8 tests in 0.109s
+
+FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+===== ubuntu-24.04-L4F-crash: python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v under timeout --kill-after=30 300; exit 124
+Running 1 test suites (1 total tests) across 1 workers
+
+test_crash (test_crash.CrashControl.test_crash) ...
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 11 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+===== ubuntu-24.04-L4C-controls: python3 -m unittest_parallel -j 4 --level class -v under timeout --kill-after=30 300; exit 5
+Running 3 test suites (9 total tests) across 3 workers
+
+test_error (test_zz_trial_controls.TrialControlsA.test_error) ...
+test_error (test_zz_trial_controls.TrialControlsA.test_error) ... ERROR
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail) ...
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail) ... FAIL
+test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ...
+test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok
+test_skip (test_zz_trial_controls.TrialControlsA.test_skip) ...
+test_skip (test_zz_trial_controls.TrialControlsA.test_skip) ... skipped 'control: skipped on purpose'
+test_expected_failure (test_zz_trial_controls.TrialControlsB.test_expected_failure) ...
+test_expected_failure (test_zz_trial_controls.TrialControlsB.test_expected_failure) ... expected failure
+test_multiline_docstring (test_zz_trial_controls.TrialControlsB.test_multiline_docstring)
+Control: this first docstring line becomes a second description line. ...
+test_multiline_docstring (test_zz_trial_controls.TrialControlsB.test_multiline_docstring)
+Control: this first docstring line becomes a second description line. ... ok
+test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails)
+Control: subtest i=1 fails; i=0 and i=2 pass. ...
+  test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails) (i=1)
+Control: subtest i=1 fails; i=0 and i=2 pass. ... FAIL
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success) ...
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success) ... unexpected success
+setUpClass (test_zz_trial_controls.TrialControlsFixture) ... ERROR
+
+======================================================================
+test_error (test_zz_trial_controls.TrialControlsA.test_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 25, in test_error
+    raise RuntimeError("control: errors on purpose")
+RuntimeError: control: errors on purpose
+
+======================================================================
+setUpClass (test_zz_trial_controls.TrialControlsFixture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 57, in setUpClass
+    raise RuntimeError("control: setUpClass errors on purpose")
+RuntimeError: control: setUpClass errors on purpose
+
+======================================================================
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 22, in test_fail
+    self.assertEqual(1, 2, "control: fails on purpose")
+AssertionError: 1 != 2 : control: fails on purpose
+
+======================================================================
+test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails) (i=1)
+Control: subtest i=1 fails; i=0 and i=2 pass.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<runner-home>/work/_temp/control-controls/test_zz_trial_controls.py", line 33, in test_subtest_fails
+    self.assertNotEqual(i, 1, "control: subtest i=1 fails on purpose")
+AssertionError: 1 == 1 : control: subtest i=1 fails on purpose
+
+======================================================================
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success)
+----------------------------------------------------------------------
+UNEXPECTED SUCCESS
+----------------------------------------------------------------------
+Ran 8 tests in 0.144s
+
+FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)
+===== ubuntu-24.04-L4C-crash: python3 -m unittest_parallel -j 4 --level class -v under timeout --kill-after=30 300; exit 124
+Running 1 test suites (1 total tests) across 1 workers
+
+test_crash (test_crash.CrashControl.test_crash) ...
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 11 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

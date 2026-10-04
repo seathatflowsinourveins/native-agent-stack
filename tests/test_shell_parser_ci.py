@@ -62,7 +62,7 @@ PROVISIONING_JOB = "validate"
 PROVISIONING_KEY = f"{PROVISIONING_WORKFLOW}:{PROVISIONING_JOB}"
 # Whole-suite jobs that do not provision the parser yet: adoption-bootstrap.yml runs the suite on macOS in its
 # validate-macos job (step "Run the full test suite (gating on macOS)"; the job is a required check in
-# .github/main-ruleset.json) and catalog-freshness.yml runs it weekly in its freshness job (step "Run project test
+# .github/main-ruleset.json) and catalog-freshness.yml runs it daily in its freshness job (step "Run project test
 # suite"). Their lane tests skip today, and the runtime tripwire skips in exactly these jobs and says so. To close a
 # gap, add a provisioning step to that job in its own workflow and delete its entry here, nothing else: until the entry
 # is deleted the ratchet reports it as stale (test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap),
@@ -416,6 +416,17 @@ def step_span(lines, index):
     return start, end
 
 
+def suite_step_span(lines):
+    """The [start, end) line range of the first step that runs the whole suite (runs_suite), found by what the step runs
+    rather than by how its `run:` line is spelled, which a `run: |` block or a timeout wrapper changes."""
+    for index, line in enumerate(lines):
+        if line.startswith("      - "):
+            start, end = step_span(lines, index)
+            if runs_suite("\n".join(lines[start:end])):
+                return start, end
+    raise AssertionError("no step of the workflow runs the whole suite")
+
+
 def provisioning_span(lines):
     index = next((i for i, line in enumerate(lines) if PIN_PATH in line and not line.lstrip().startswith("#")), None)
     if index is None:
@@ -486,7 +497,7 @@ class ProvisioningControls(unittest.TestCase):
         package = next(iter(pin["packages"]))
         pinned = f"{package}@{pin['packages'][package]['version']}"
         run_index = next(i for i, line in enumerate(step) if line.startswith("        run: |"))
-        suite_end = step_span(lines, next(i for i, line in enumerate(lines) if line.strip() == "run: python3 -m unittest"))[1]
+        suite_end = suite_step_span(lines)[1]
         return {
             "removed step": ("missing", "\n".join(lines[:start] + lines[end:])),
             "step after the suite": ("order", "\n".join(lines[:start] + lines[end:suite_end] + step + lines[suite_end:])),

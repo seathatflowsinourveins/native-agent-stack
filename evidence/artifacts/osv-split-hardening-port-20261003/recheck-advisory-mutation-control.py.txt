@@ -1,0 +1,130 @@
+"""Discriminating control for the strengthened 'advisory' mutation (PR #673 re-check, minor 1).
+
+FrozenPolicyMutationTests.test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs
+must fail when the frozen-id check in
+FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory is removed, and
+pass when it is present. The check is removed only from an in-memory scratch copy of the module
+source; the repository file is hashed before and after and must be unchanged. The prior head
+4d7f4dd0e, whose mutation had no reason and no ignoreUntil, is run the same way to show the
+defect the re-check reported.
+
+Run from the repository root:
+TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 <scratch>/advisory-mutation-control.py
+"""
+import hashlib
+import io
+import subprocess
+import sys
+import types
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+MODULE = Path('tests/test_osv_lockfile_coverage.py')
+PRIOR = '4d7f4dd0e41aafb2e0f9ce1dabda93e3c1b2ea36'
+FROZEN_ID_CHECK = ('        self.assertEqual(ids & frozen_ids, set(), "the exception belongs in the frozen config, '
+                   'which only the frozen scan uses")\n')
+MUTATION_TEST = 'test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs'
+GUARDED_TEST = 'test_the_ordinary_config_has_no_exception_for_a_frozen_advisory'
+LEAKED_ID = 'GHSA-vfj7-8cjw-p6xm'
+
+
+def stamp():
+    return subprocess.check_output(['date', '-u', '+%Y-%m-%dT%H:%M:%SZ'], text=True).strip()
+
+
+def digest():
+    return hashlib.sha256(MODULE.read_bytes()).hexdigest()
+
+
+def check_line(source, label):
+    if source.count(FROZEN_ID_CHECK) != 1:
+        raise SystemExit(f'{label}: the frozen-id check is not present exactly once')
+    line = source[:source.index(FROZEN_ID_CHECK)].count('\n') + 1
+    print(f'{stamp()} {label}: frozen-id check present once, at line {line}')
+    return line
+
+
+def load(name, source, label):
+    module = types.ModuleType(name)
+    module.__file__ = str(MODULE.resolve())  # ROOT = parents[1], the repository root
+    sys.modules[name] = module  # check() patches __name__ + '.ROOT', which imports the module by name
+    exec(compile(source, label, 'exec'), module.__dict__)
+    return module
+
+
+def run(label, expectation, test):
+    output = io.StringIO()
+    result = unittest.TextTestRunner(stream=output, verbosity=2).run(test)
+    observed = 'pass' if result.wasSuccessful() else 'fail'
+    print(f'{stamp()} {label}: expected {expectation}, observed {observed}; '
+          f'ran {result.testsRun}, failures {len(result.failures)}, errors {len(result.errors)}')
+    for line in output.getvalue().splitlines():
+        if line.startswith(('AssertionError', 'FAIL:', 'ERROR:')) or line.endswith((' ... ok', ' ... FAIL', ' ... ERROR')):
+            print('   ' + line.strip())
+    return observed == expectation, result
+
+
+matches = []
+before = digest()
+print(f'{stamp()} {MODULE} sha256 before {before}')
+head_source = MODULE.read_text(encoding='utf-8')
+prior_source = subprocess.check_output(['git', 'show', f'{PRIOR}:{MODULE}'], text=True)
+head_line = check_line(head_source, f'{MODULE} (this head)')
+prior_line = check_line(prior_source, f'{PRIOR[:9]}:{MODULE} (prior head)')
+
+head = load('head', head_source, str(MODULE))
+without = load('scratch_without_frozen_id_check', head_source.replace(FROZEN_ID_CHECK, ''),
+               f'<scratch copy of {MODULE} without line {head_line}>')
+prior_without = load('prior_4d7f4dd0e_without_frozen_id_check', prior_source.replace(FROZEN_ID_CHECK, ''),
+                     f'<scratch copy of {PRIOR[:9]}:{MODULE} without line {prior_line}>')
+
+# 1. Frozen-id check present: the mutation test passes. Record the exact configs it feeds the guard.
+fed = []
+original = head.FrozenPolicyMutationTests.assert_rejected
+
+
+def recording(self, method, **attributes):
+    fed.append(attributes.get('ordinary_config'))
+    return original(self, method, **attributes)
+
+
+with patch.object(head.FrozenPolicyMutationTests, 'assert_rejected', recording):
+    ok, _ = run(f'frozen-id check present (line {head_line}), mutation test', 'pass',
+                head.FrozenPolicyMutationTests(MUTATION_TEST))
+matches.append(ok)
+
+# 2. The advisory input it fed is well formed, so only the frozen-id check rejects it.
+config = fed[0]
+leaked = config['IgnoredVulns'][-1]
+days = (leaked['ignoreUntil'] - head.date.today()).days
+print(f'{stamp()} advisory input: leaked entry id {leaked["id"]}, keys {sorted(leaked)}, ignoreUntil in {days} days; '
+      f'ignore_entry_problems {head.ignore_entry_problems(config)}; override_problems {head.override_problems(config)}')
+matches.append(leaked['id'] == LEAKED_ID and 0 < days <= 90
+               and head.ignore_entry_problems(config) == [] and head.override_problems(config) == [])
+case = head.FrozenScanTests(GUARDED_TEST)
+case.ordinary_config = config
+ok, result = run('advisory input against the guarded preflight test', 'fail', case)
+messages = [trace.strip().splitlines()[-1] for _, trace in result.failures]
+for message in messages:
+    print(f'   last line: {message}')
+matches.append(ok and len(messages) == 1 and 'the exception belongs in the frozen config' in messages[0])
+
+# 3. Frozen-id check removed from the scratch copy: the mutation test fails, on the advisory subtest only.
+ok, result = run(f'frozen-id check removed (scratch copy, line {head_line}), mutation test', 'fail',
+                 without.FrozenPolicyMutationTests(MUTATION_TEST))
+failed = [test.id() for test, _ in result.failures]
+only_advisory = bool(failed) and all("mutation='advisory'" in name for name in failed) and not result.errors
+print(f'{stamp()} failures are the advisory subtest only: {only_advisory} ({len(failed)} failure)')
+matches.append(ok and only_advisory)
+
+# 4. The prior head's mutation, with the same check removed, still passes: the defect the re-check reported.
+ok, _ = run(f'prior head {PRIOR[:9]}, frozen-id check removed (scratch copy, line {prior_line}), mutation test', 'pass',
+            prior_without.FrozenPolicyMutationTests(MUTATION_TEST))
+matches.append(ok)
+
+after = digest()
+print(f'{stamp()} {MODULE} sha256 after {after}; unchanged: {after == before}')
+matches.append(after == before)
+print(f'{stamp()} all observations match expectations: {all(matches)}')
+raise SystemExit(0 if all(matches) else 1)

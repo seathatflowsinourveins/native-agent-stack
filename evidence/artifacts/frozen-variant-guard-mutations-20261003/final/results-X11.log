@@ -1,0 +1,30 @@
+...F...F..
+======================================================================
+FAIL: test_every_pinned_file_is_scanned_with_its_pinned_lines (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_every_pinned_file_is_scanned_with_its_pinned_lines)
+Not vacuous: each pinned file, this module included, is read by the scan and holds each pinned line.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 479, in test_every_pinned_file_is_scanned_with_its_pinned_lines
+    self.fail("\n".join(missing) + "\n" + STALE_PIN)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: .github/osv-scanner-frozen-macos.toml: the exception's reason (sha256 28cf96a6b02e884b9ea3fdd019309d8126202a0687cce8f84d871224ecd15206)
+A pinned line was not found where PINNED_LINES expects it (above): the scope rules no longer read that file, or the line changed or was removed. Restore the scope, or re-pin after review; if the variant and its frozen OSV exception were removed together (the closure record's exit path), remove this module with them.
+
+======================================================================
+FAIL: test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date (tests.test_frozen_macos_variant_no_use.FrozenOsvExceptionReviewTests.test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date)
+The recheck of alert 16 is tied to this exception: removing it, renewing or otherwise changing its
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 520, in test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date
+    self.assertEqual(
+    ~~~~~~~~~~~~~~~~^
+        len(entries), 1, f"{FROZEN_CONFIG} holds {len(entries)} exceptions for {ADVISORY}, not one: {RECHECK}.",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: 0 != 1 : .github/osv-scanner-frozen-macos.toml holds 0 exceptions for GHSA-vcvr-r3jv-pc5j, not one: recheck Dependabot alert 16 (reopen it unless the renewed exception's reasoning still holds) and update this pinned date.
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.392s
+
+FAILED (failures=2)

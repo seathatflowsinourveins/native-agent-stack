@@ -1,0 +1,413 @@
+{
+  "schema_version": 1,
+  "kind": "native_install_original_evidence",
+  "scope": "Native DeepAgents install and selected unchanged upstream no-provider tests; integration and upstream-lock environments remain separate. Original stdout/stderr privately retained, public excerpts sanitize private paths.",
+  "versions": {
+    "deepagents": "0.7.21",
+    "langchain-openai": "1.6.7",
+    "langgraph": "1.2.12",
+    "langgraph-checkpoint-sqlite": "3.1.1",
+    "langchain": "1.4.3",
+    "langchain-core": "1.6.6"
+  },
+  "integration_environment": {
+    "python": "3.13.15",
+    "packages": 62,
+    "adapter": "langchain-openai1.6.7",
+    "pip_check_exit_code": 0,
+    "require_hashes_install_exit_code": 0
+  },
+  "upstream_test_environment": {
+    "adapter": "langchain-openai1.1.14",
+    "source_revision": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+    "passed": 361,
+    "xfailed": 1,
+    "exit_code": 0,
+    "supported_command": "make test TEST_FILE=<five named original files> PYTEST_EXTRA=-n 2",
+    "original_lock_and_test_hashes": [
+      {
+        "path": "libs/deepagents/uv.lock",
+        "sha256": "ad8a0c5aa54ecdd76a0381618736a9f3b1dcdc5aeca79c3b0dcfb4e45b791802",
+        "original_blob_match": true,
+        "comparison_exit_code": 0
+      },
+      {
+        "path": "libs/deepagents/pyproject.toml",
+        "sha256": "7f7c0a04d082cf7e1f09987f613b845b4d90d5c1c2f94f911c09c3339864b7b1",
+        "original_blob_match": true,
+        "comparison_exit_code": 0
+      },
+      {
+        "path": "libs/deepagents/tests/unit_tests/middleware/test_skills_middleware.py",
+        "sha256": "1df8a6c72a4395c9c01aa22924ace2822e0faa3dbc5bc67201b978b5940c765c",
+        "original_blob_match": true,
+        "comparison_exit_code": 0
+      },
+      {
+        "path": "libs/deepagents/tests/unit_tests/middleware/test_skills_middleware_async.py",
+        "sha256": "b3b80a68a3ac807d40310639f992ebefb1ea9e94d4db166011813ac441833c23",
+        "original_blob_match": true,
+        "comparison_exit_code": 0
+      },
+      {
+        "path": "libs/deepagents/tests/unit_tests/middleware/test_subagent_middleware_init.py",
+        "sha256": "cbba49bcb527d2233843304d71848c06d8d4a1f2f6e656725b880db6a11aa971",
+        "original_blob_match": true,
+        "comparison_exit_code": 0
+      },
+      {
+        "path": "libs/deepagents/tests/unit_tests/test_subagents.py",
+        "sha256": "2b1697d844a2d460cb3d75a1bd7493f387a74a6d1bdd18614d84171e35334772",
+        "original_blob_match": true,
+        "comparison_exit_code": 0
+      },
+      {
+        "path": "libs/deepagents/tests/unit_tests/test_graph.py",
+        "sha256": "c2daed07952a2d4fa076956a8829397436552b447d14dc14136392aa643b1224",
+        "original_blob_match": true,
+        "comparison_exit_code": 0
+      }
+    ],
+    "output_recovery": "Native rtk recall5e2e0d8459a8 recovered retained truncated output without a test rerun."
+  },
+  "sqlite_source_binding": {
+    "revision": "b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4",
+    "installed_init_sha256": "b577c44d44e72b270d78caee4b7aacc5d2521dbbc1a33d39fb3240e20a830439",
+    "source": "https://github.com/langchain-ai/langgraph/tree/b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4/libs/checkpoint-sqlite",
+    "sdist_sha256": "6fcb20db4c37ef7aad52f29b539eb98c38e2dad6fab7c2446a2a9db24f37a70e",
+    "wheel_sha256": "8505c54c94a658080525d7e6780fdd4e0c078ff2566b30d399c02cc9f9af1c63",
+    "correction": "Same3.1.1 in LangGraph49cce does not establish release-byte identity. Published sdist native init.py,aio.py,pyproject match b292."
+  },
+  "dependency_scan": {
+    "runtime": "OSV2.6.0",
+    "packages": 62,
+    "exit_code": 0,
+    "native_results": [],
+    "ignores": [],
+    "preserved_first_failure": "requirements.lock extractor not recognized, exit127; identical native requirements.txt input succeeds."
+  },
+  "command_records": [
+    {
+      "argv": [
+        "rtk",
+        "<native-user-home>/.local/share/uv/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13",
+        "-c",
+        "import importlib.metadata as m,json; names=[\"deepagents\",\"langchain-openai\",\"langgraph-checkpoint-sqlite\"]; out={};\nfor n in names:\n try: out[n]=m.version(n)\n except m.PackageNotFoundError: out[n]=None\nprint(json.dumps(out,sort_keys=True))"
+      ],
+      "cwd": "<owned-private-state>/deepagents",
+      "started_at": "2026-09-30T22:55:28.187Z",
+      "ended_at": "2026-09-30T22:55:28.323Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "e53e9e35eb9c77cb31d463a907cec1a5b169e92f60ba06035f26632cb3193235",
+      "stdout_bytes": 84,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "uv",
+        "--version"
+      ],
+      "cwd": "<owned-private-state>/deepagents",
+      "started_at": "2026-09-30T22:55:28.325Z",
+      "ended_at": "2026-09-30T22:55:28.359Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "dd643ebda7165a77a7fe3c9f445ec1a2cfebe1bfe0329015937763dce919c33d",
+      "stdout_bytes": 38,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "compile",
+        "examples/deepagents-omniroute/requirements.in",
+        "--python-version",
+        "3.13",
+        "--generate-hashes",
+        "--output-file",
+        "examples/deepagents-omniroute/requirements.lock",
+        "--no-emit-index-url"
+      ],
+      "cwd": "<owned-private-state>/deepagents-worker",
+      "environment_overrides": {
+        "UV_CACHE_DIR": "<owned-private-state>/deepagents/uv-cache"
+      },
+      "started_at": "2026-09-30T22:58:21.714Z",
+      "ended_at": "2026-09-30T22:58:22.490Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11",
+      "stdout_bytes": 137489,
+      "stderr_sha256": "b11224d3c299444eb2541de25598abc56b1263b7f157377c20ca85973e8eeb84",
+      "stderr_bytes": 30
+    },
+    {
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "sync",
+        "--python",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "--require-hashes",
+        "<owned-private-state>/deepagents-worker/examples/deepagents-omniroute/requirements.lock"
+      ],
+      "cwd": "<owned-private-state>/deepagents",
+      "environment_overrides": {
+        "UV_CACHE_DIR": "<owned-private-state>/deepagents/uv-cache"
+      },
+      "started_at": "2026-09-30T22:58:22.542Z",
+      "ended_at": "2026-09-30T22:58:23.747Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stderr_sha256": "1797893d26aad4b21e9c8ec3db6092fa54e1984c5d895ed1dac97295df69d363",
+      "stderr_bytes": 1885
+    },
+    {
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<owned-private-state>/deepagents/integration-venv/bin/python"
+      ],
+      "cwd": "<owned-private-state>/deepagents",
+      "started_at": "2026-09-30T22:59:26.433Z",
+      "ended_at": "2026-09-30T22:59:26.544Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stdout_returned_excerpt": "",
+      "stderr_sha256": "dc5d3094110c060c4be7a99b555c69f916e27da0ee73f3d1d58f2ad834c40e18",
+      "stderr_bytes": 120,
+      "stderr_returned_excerpt": "Using Python 3.13.15 environment at: integration-venv\nChecked 62 packages in 56ms\nAll installed packages are compatible\n"
+    },
+    {
+      "argv": [
+        "rtk",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "-c",
+        "import hashlib,inspect,importlib.metadata as m,json; import deepagents; from deepagents import create_deep_agent,HarnessProfile,GeneralPurposeSubagentProfile,register_harness_profile; from deepagents.middleware.subagents import SubAgent; from langchain.agents.middleware import ToolCallLimitMiddleware; from langchain_openai import ChatOpenAI; from langgraph.checkpoint.sqlite import SqliteSaver; import langgraph.checkpoint.sqlite as sqlite; print(json.dumps({\"versions\":{n:m.version(n) for n in [\"deepagents\",\"langchain-openai\",\"langgraph\",\"langgraph-checkpoint-sqlite\",\"langchain\",\"langchain-core\"]},\"tool_limit_signature\":str(inspect.signature(ToolCallLimitMiddleware)),\"sqlite_signature\":str(inspect.signature(SqliteSaver.from_conn_string)),\"sqlite_source\":sqlite.__file__,\"sqlite_source_sha256\":hashlib.sha256(open(sqlite.__file__,\"rb\").read()).hexdigest(),\"subagent_keys\":sorted(SubAgent.__annotations__),\"chat_fields\":{n:str(ChatOpenAI.model_fields[n].annotation) for n in [\"use_responses_api\",\"use_previous_response_id\",\"reasoning\",\"request_timeout\",\"max_retries\",\"openai_api_base\"]}},indent=2)); print(inspect.getsource(ToolCallLimitMiddleware.__init__))"
+      ],
+      "cwd": "<owned-private-state>/deepagents",
+      "started_at": "2026-09-30T22:59:26.546Z",
+      "ended_at": "2026-09-30T22:59:30.958Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "9d75c7145bf2af3a243bf45a761d45572c833b779c885b4013090ec2e2365716",
+      "stdout_bytes": 3679,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "uv",
+        "sync",
+        "--locked",
+        "--python",
+        "3.13",
+        "--group",
+        "test"
+      ],
+      "cwd": "<owned-private-state>/deepagents/sources/deepagents/libs/deepagents",
+      "environment_overrides": {
+        "UV_CACHE_DIR": "<owned-private-state>/deepagents/uv-cache",
+        "UV_PROJECT_ENVIRONMENT": "<owned-private-state>/deepagents/upstream-venv"
+      },
+      "started_at": "2026-09-30T23:00:25.042Z",
+      "ended_at": "2026-09-30T23:00:26.880Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stderr_sha256": "1764814cf015b15b7d923a18577f4cdfe8c543fdb15779a8a573b787b418f91a",
+      "stderr_bytes": 3457
+    },
+    {
+      "argv": [
+        "rtk",
+        "make",
+        "test",
+        "TEST_FILE=tests/unit_tests/middleware/test_skills_middleware.py tests/unit_tests/middleware/test_skills_middleware_async.py tests/unit_tests/middleware/test_subagent_middleware_init.py tests/unit_tests/test_subagents.py tests/unit_tests/test_graph.py",
+        "PYTEST_EXTRA=-n 2"
+      ],
+      "cwd": "<owned-private-state>/deepagents/sources/deepagents/libs/deepagents",
+      "environment_overrides": {
+        "UV_CACHE_DIR": "<owned-private-state>/deepagents/uv-cache",
+        "UV_PROJECT_ENVIRONMENT": "<owned-private-state>/deepagents/upstream-venv",
+        "UV_FROZEN": "true"
+      },
+      "started_at": "2026-09-30T23:05:11.586Z",
+      "ended_at": "2026-09-30T23:05:31.463Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "62c23e4cdc76a539dc3db4091f579bcfbf06bd724ea08f9e22f9dc506013570a",
+      "stdout_bytes": 5643,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "recall",
+        "5e2e0d8459a8"
+      ],
+      "started_at": "2026-09-30T23:06:59.062Z",
+      "ended_at": "2026-09-30T23:06:59.090Z",
+      "exit_code": 0,
+      "original_command_log": "13-upstream-selected-tests.json",
+      "stdout_sha256": "a5cc39443632bf3c90a85138c0d6c229652354057a6f1e5ca19293fab63ec618",
+      "stdout_bytes": 96791,
+      "stdout_returned_excerpt": [
+        "======================= 361 passed, 1 xfailed in 12.93s ========================"
+      ],
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "stderr_returned_excerpt": []
+    },
+    {
+      "argv": [
+        "rtk",
+        "<owned-private-state>/deepagents/tools/osv-scanner-2.6.0/osv-scanner_linux_amd64",
+        "scan",
+        "source",
+        "--lockfile",
+        "examples/deepagents-omniroute/requirements.lock",
+        "--format",
+        "json"
+      ],
+      "cwd": "<owned-private-state>/deepagents-worker",
+      "started_at": "2026-09-30T23:05:31.613Z",
+      "ended_at": "2026-09-30T23:05:31.760Z",
+      "exit_code": 127,
+      "signal": null,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stdout_returned_excerpt": "",
+      "stderr_sha256": "3713fef693d9447960003dd234ad17673f5782e86a3ff9d59ba3d6db86ea0025",
+      "stderr_bytes": 343,
+      "stderr_returned_excerpt": "Starting filesystem walk for root: /\nEnd status: 0 dirs visited, 1 inodes visited, 0 Extract calls, 63.012µs elapsed, 63.092µs wall time\ncould not determine extractor suitable to this file: \"<owned-private-state>/deepagents-worker/examples/deepagents-omniroute/requirements.lock\"\n"
+    },
+    {
+      "argv": [
+        "rtk",
+        "cp",
+        "<owned-private-state>/deepagents-worker/examples/deepagents-omniroute/requirements.lock",
+        "<owned-private-state>/deepagents/scan-input/requirements.txt"
+      ],
+      "exit_code": 0,
+      "source_sha256": "3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11",
+      "copy_sha256": "3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11"
+    },
+    {
+      "argv": [
+        "rtk",
+        "<owned-private-state>/deepagents/tools/osv-scanner-2.6.0/osv-scanner_linux_amd64",
+        "scan",
+        "source",
+        "--lockfile",
+        "<owned-private-state>/deepagents/scan-input/requirements.txt",
+        "--format",
+        "json"
+      ],
+      "cwd": "<owned-private-state>/deepagents",
+      "started_at": "2026-09-30T23:06:58.114Z",
+      "ended_at": "2026-09-30T23:06:58.588Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "stdout_bytes": 124,
+      "stdout_returned_excerpt": "{\n  \"results\": [],\n  \"experimental_config\": {\n    \"licenses\": {\n      \"summary\": false,\n      \"allowlist\": null\n    }\n  }\n}\n",
+      "stderr_sha256": "93bc97a13a9665d27d3bc0e44ddc2eae6fcfb7c0cfffa52a3a387f886c515690",
+      "stderr_bytes": 300,
+      "stderr_returned_excerpt": "Starting filesystem walk for root: /\nScanned <owned-private-state>/deepagents/scan-input/requirements.txt file and found 62 packages\nEnd status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 11.727627ms elapsed, 11.727687ms wall time\n"
+    },
+    {
+      "argv": [
+        "rtk",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "-c",
+        "import json\nfrom deepagents.backends import FilesystemBackend\nfrom deepagents.middleware.skills import SkillsMiddleware\nfrom langgraph.runtime import Runtime\nbackend = FilesystemBackend(root_dir=\"<owned-private-state>/deepagents/trial-workspace\", virtual_mode=True)\npositive = SkillsMiddleware(backend=backend, sources=[\"/skills\"]).before_agent({}, Runtime(), {})\nnegative = SkillsMiddleware(backend=backend, sources=[\"/absent-skills\"]).before_agent({}, Runtime(), {})\nwrong_root = SkillsMiddleware(backend=backend, sources=[\"/skills/research\"]).before_agent({}, Runtime(), {})\nassert [entry[\"name\"] for entry in positive[\"skills_metadata\"]] == [\"research\"], positive\nassert negative[\"skills_metadata\"] == [], negative\nassert wrong_root[\"skills_metadata\"] == [], wrong_root\nprint(json.dumps({\"positive\": positive, \"absent_source\": negative, \"old_incorrect_root\": wrong_root}, sort_keys=True))\n"
+      ],
+      "cwd": "<owned-private-state>/deepagents-worker",
+      "started_at": "2026-09-30T23:20:28.590Z",
+      "finished_at": "2026-09-30T23:20:32.845Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "1f83aae5a9fc25a1c2c9fce49304a4945b61b1741b3953aed4ec282fda27d033",
+      "stdout_bytes": 677,
+      "stdout_returned_excerpt": "{\"absent_source\": {\"skills_load_errors\": [\"Cannot load skills from '/absent-skills': Path '/absent-skills': path_not_found\"], \"skills_metadata\": []}, \"old_incorrect_root\": {\"skills_load_errors\": [], \"skills_metadata\": []}, \"positive\": {\"skills_load_errors\": [], \"skills_metadata\": [{\"allowed_tools\": [], \"compatibility\": null, \"description\": \"Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent.\", \"license\": null, \"metadata\": {}, \"name\": \"research\", \"path\": \"/skills/research/SKILL.md\"}]}}\n",
+      "stderr_sha256": "825096ee756c010bb81db589df77154d7a125c62df5912f7f1694b153789f1da",
+      "stderr_bytes": 184,
+      "stderr_returned_excerpt": "Cannot load skills from '/absent-skills': Path '/absent-skills': path_not_found\nSkills load errors: [\"Cannot load skills from '/absent-skills': Path '/absent-skills': path_not_found\"]\n"
+    },
+    {
+      "argv": [
+        "rtk",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/deepagents-worker/examples/deepagents-omniroute/worker.py",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--checkpoint",
+        "<owned-private-state>/deepagents/offline/state.sqlite",
+        "--thread-id",
+        "offline-skill-control",
+        "--skill",
+        "/skills",
+        "--api-key-env",
+        "OMNIROUTE_WORKER_API_KEY",
+        "--base-url",
+        "http://127.0.0.1:25371/v1",
+        "--inspect"
+      ],
+      "cwd": "<owned-private-state>/deepagents-worker",
+      "started_at": "2026-09-30T23:21:25.291Z",
+      "finished_at": "2026-09-30T23:21:30.301Z",
+      "exit_code": 0,
+      "signal": null,
+      "credential_pointer": "OMNIROUTE_WORKER_API_KEY",
+      "offline_placeholder_source": "blueprints/runtime-workers/openhands/config/worker.json",
+      "stdout_sha256": "b378e35f8783555d9fcad7b34ac0fe5f8d45e5ce250ded0a52782589430b0d27",
+      "stdout_bytes": 69,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "-c",
+        "import importlib.util\nimport json\nfrom unittest.mock import patch\nfrom langgraph.checkpoint.sqlite import SqliteSaver\nimport httpx\nspec=importlib.util.spec_from_file_location(\"native_worker\", \"<owned-private-state>/deepagents-worker/examples/deepagents-omniroute/worker.py\")\nmodule=importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodels=[]\noriginal=module.chat_model\ndef tracked(env, base):\n    model=original(env,base)\n    models.append(model)\n    return model\nmodule.chat_model=tracked\nwith patch.object(httpx.Client, \"send\", side_effect=AssertionError(\"Offline check attempted network\")), patch.object(httpx.AsyncClient, \"send\", side_effect=AssertionError(\"Offline check attempted network\")):\n    with SqliteSaver.from_conn_string(\"<owned-private-state>/deepagents/offline/model-fields.sqlite\") as saver:\n        graph=module.build_graph(\"<owned-private-state>/deepagents/trial-workspace\", [\"/skills\"], saver, \"OMNIROUTE_WORKER_API_KEY\", \"http://127.0.0.1:25371/v1\")\n        state=graph.get_state({\"configurable\": {\"thread_id\": \"offline-field-control\"}})\n        assert state.values == {}\nassert len(models)==2\nsafe=[]\nfor model in models:\n    item={name:getattr(model,name) for name in (\"model_name\", \"openai_api_base\", \"reasoning\", \"use_responses_api\", \"use_previous_response_id\", \"request_timeout\", \"max_retries\")}\n    assert item[\"openai_api_base\"] == \"http://127.0.0.1:25371/v1\"\n    assert item[\"reasoning\"] == {\"effort\": \"max\"}\n    assert item[\"use_responses_api\"] is True\n    assert item[\"use_previous_response_id\"] is False\n    safe.append(item)\nprint(json.dumps({\"configured_model_instances\":safe,\"native_checkpoint_values\":state.values,\"http_send_calls\":0},sort_keys=True))\n"
+      ],
+      "cwd": "<owned-private-state>/deepagents-worker",
+      "started_at": "2026-09-30T23:21:30.301Z",
+      "finished_at": "2026-09-30T23:21:36.364Z",
+      "exit_code": 0,
+      "signal": null,
+      "credential_pointer": "OMNIROUTE_WORKER_API_KEY",
+      "offline_placeholder_source": "blueprints/runtime-workers/openhands/config/worker.json",
+      "stdout_sha256": "ce30e0be1582313ba3866391904d1e50f24235072f3723b59c65683d9952b5e3",
+      "stdout_bytes": 535,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    }
+  ],
+  "limits": [
+    "Original mocked/native tests do not establish live provider acceptance.",
+    "Integration adapter1.6.7 differs from unchanged upstream locked test adapter1.1.14.",
+    "Native local filesystem root is not OS confinement.",
+    "Offline patched-send failure guard passed; literal http_send_calls0 was not a measured request counter.",
+    "Original broad09 metadata output is not valid whole JSON; only its intact versions block is extracted, and installed SQLite source is hashed separately."
+  ]
+}

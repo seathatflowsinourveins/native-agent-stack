@@ -57,8 +57,8 @@ README_HEADING = "## 2026-09-29: Stack role carriers"
 # section of 2026-09-29 repeats these rows verbatim, and Amendment 4 copies them; any later change to a
 # carrier needs a new dated amendment and new rows here.
 STACK_ROLE_ROWS = (
-    "| `stack-researcher.toml` | `ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00` |",
-    "| `stack-verifier.toml` | `281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd` |",
+    "| `stack-researcher.toml` | `48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77` |",
+    "| `stack-verifier.toml` | `18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b` |",
 )
 
 # The spawn_agent tool text shows a role's description to every parent in every arm (role.rs:294-334), so each
@@ -639,7 +639,8 @@ class CustomAgentInstructionsTests(unittest.TestCase):
             ("section missing", good.replace(README_HEADING, "## 2026-09-28: Other"), ["dated_section", "hash_rows",
                                                                                          "supersession"]),
             ("supersession missing", good.replace("supersedes", "repeats"), ["supersession"]),
-            ("row digest changed", good.replace("`ac77b162", "`bc77b162"), ["hash_rows"]),
+            ("row digest changed", good.replace(rows_by_name(STACK_ROLE_ROWS)["stack-researcher.toml"],
+                                                "0" * 64), ["hash_rows"]),
             ("row missing", good.replace(STACK_ROLE_ROWS[1] + "\n", ""), ["hash_rows"]),
         )
         for label, text, expected in cases:

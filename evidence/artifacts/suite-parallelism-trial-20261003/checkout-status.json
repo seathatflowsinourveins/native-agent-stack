@@ -1,0 +1,128 @@
+{
+  "dirty": [],
+  "ok": true,
+  "rule": "every run directory's git-status.txt exists and is empty",
+  "runs": [
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4-controls",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4-crash",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4-r1",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4-r2",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4-r3",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4C-controls",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4C-crash",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4C-r1",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4C-r2",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4C-r3",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4F-controls",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4F-crash",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4F-r1",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4F-r2",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-L4F-r3",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-S-controls",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-S-crash",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-S-r1",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-S-r2",
+      "reason": null,
+      "status": ""
+    },
+    {
+      "clean": true,
+      "name": "ubuntu-24.04-S-r3",
+      "reason": null,
+      "status": ""
+    }
+  ],
+  "schema": "suite-parallelism-checkout-status/1"
+}

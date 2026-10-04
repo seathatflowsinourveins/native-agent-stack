@@ -44,8 +44,10 @@
   "cross_family_boundary": "One model family judged (Claude Opus 5.5). The GPT-6.1 Sol reviews of 2026-10-01 (PR #575) reviewed the source host's record, not these blind packets, so they are not a second blind judgment; a blind GPT-6.1 Sol run on the same packets is requested from the Codex lane. Where both families agree, the recommendation stands as an arm; where they differ, both picks enter the comparison.",
   "default_decisions": {
     "inventory": {
+      "amendments": 8,
       "by_row_kind": {
         "added": 10,
+        "consensus": 6,
         "first_round": 53,
         "judged": 11,
         "no_blind_default_today": 2,
@@ -54,23 +56,34 @@
       },
       "by_state": {
         "definitive": 31,
-        "measurement": 2,
+        "measurement": 6,
         "open": 25,
-        "resolved": 19,
-        "split": 7
+        "resolved": 23,
+        "split": 5
       },
       "definitive": 31,
-      "installed": 54,
+      "installed": 59,
+      "interim": 3,
       "layers": 37,
       "measurements_pending": 8,
-      "measurements_returned": 1,
-      "not_installed": 30,
-      "slots": 84
+      "measurements_returned": 3,
+      "not_installed": 31,
+      "slots": 90
     },
     "metadata": {
+      "consensus_wave2": {
+        "acknowledgements": [],
+        "acknowledgements_owed": [
+          "claude",
+          "gpt"
+        ],
+        "date_utc": "2026-10-03",
+        "meaning": "the wave-2 batch of 2026-10-03: one row added and two amendments recorded by direct consensus of both model families, and three interim installs under amendment 3 on the owner's decisions of that day; selection records only: no comparison named here has run, and this record changes nothing on any host"
+      },
       "counts": {
         "by_row_kind": {
           "added": 10,
+          "consensus": 6,
           "first_round": 53,
           "judged": 11,
           "no_blind_default_today": 2,
@@ -79,18 +92,19 @@
         },
         "by_state": {
           "definitive": 31,
-          "measurement": 2,
+          "measurement": 6,
           "open": 25,
-          "resolved": 19,
-          "split": 7
+          "resolved": 23,
+          "split": 5
         },
         "definitive": 31,
-        "installed": 54,
+        "installed": 59,
+        "interim": 3,
         "layers": 37,
-        "slots": 84
+        "slots": 90
       },
       "date_utc": "2026-10-01",
-      "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name.",
+      "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name. A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides. Amendment 3 (wave 2, 2026-10-03): a row whose decided default installs nothing may carry an interim install, recorded in the row's interim field beside the fields the rounds decided, which stay as they were. The interim names what it installs and at which pin, the measurement or comparison that replaces or removes it, the authority that installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision, as the record that relays it states it, or a direct consensus with both families' acknowledgements on record. On the owner's decision an interim may sit on a definitive row whose default installs nothing: the definitive verdict stays recorded beside it, and the named measurement reports to the owner instead of removing the interim by itself. An interim is never definitive and is neither a blind result nor a measurement; no other installed row may own its job; its label starts with 'interim install', names its authority and says what decides it. The install plan installs it as the row's owner, and the client configuration wires what it installs while the row carries it.",
       "decision_rule_before_amendment_2": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
       "kind": "new-wsl-definitive-manifest",
       "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, agreed by both model families, and is not a merit acceptance",
@@ -109,6 +123,7 @@
         ]
       },
       "no_install_rule": "an option that installs nothing extra is the default unless measured evidence shows a challenger's gain on the requirement's own metric with an interval that excludes zero",
+      "no_install_rule_exception": "Amendment 3 makes one exception to the no-install rule: an interim install puts something extra on the destination before measured evidence shows a gain, on documented fit and the authority it names, and only until its named measurement decides; the row's decided default, which installs nothing, stays recorded beside it.",
       "not_claimed": "no candidate is installed or measured by these rounds; a default decided on documented fit says so; a definitive default is the slot's install decision, not a merit acceptance: the full-field re-vote, the measured comparison and new-host acceptance stay separate",
       "pinned_requirements": {
         "us-equities": [
@@ -147,6 +162,10 @@
           "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json",
           "sha256": "8b8234eabf4f3f66b9acc6e1b74e0809bccd79b70ca381635c2eae5ae8527b25"
         },
+        "consensus": {
+          "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+          "sha256": "e6897728fd866a4d17583109f0d48bcd578c59b237e7186e31ec8ff09e83abf4"
+        },
         "convergence": {
           "file": "convergence.json",
           "sha256": "2c1df503112cb02816e80231728a3d54d57165190dc863e15e0d15c2118f9c45"
@@ -161,7 +180,7 @@
         },
         "settlements": {
           "file": "settlements.json",
-          "sha256": "2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24"
+          "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3"
         },
         "us-equities": {
           "file": "trading/trading-definitive.compact.json",
@@ -226,6 +245,17 @@
           "installed": true,
           "not_installed_reason": null,
           "record": {
+            "amendments": [
+              {
+                "by": "direct consensus of both model families",
+                "date_utc": "2026-10-02",
+                "decision": "keep",
+                "sources": [
+                  "https://github.com/earendil-works/pi/blob/v1.0.0/packages/ai/src/providers/openai.ts"
+                ],
+                "text": "No comparison establishes a better outcome for the interactive job. pi 1.0.0 (released 2026-10-01) is admitted as a comparison lead, with its own native sign-in and no credential copying."
+              }
+            ],
             "catalog": "foundation",
             "claude": "returned",
             "coincides_with_lane_record": null,
@@ -257,6 +287,17 @@
           "installed": true,
           "not_installed_reason": null,
           "record": {
+            "amendments": [
+              {
+                "by": "direct consensus of both model families",
+                "date_utc": "2026-10-02",
+                "decision": "keep",
+                "sources": [
+                  "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/README.md"
+                ],
+                "text": "No comparison establishes a better outcome for the interactive job. The native CLI at 0.160 is also an agent arm of the task-worker comparison; the Codex SDK is a consumer surface of the CLI, not an arm of its own."
+              }
+            ],
             "catalog": "foundation",
             "claude": "returned",
             "coincides_with_lane_record": null,
@@ -427,6 +468,152 @@
             "state": "resolved"
           },
           "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "proposed on 2026-10-02 from facts read on GitHub",
+            "coincides_with_lane_record": null,
+            "default": "find-skills (vercel-labs/skills)",
+            "definitive": false,
+            "gpt": "agreed on 2026-10-02 after its own primary-source review",
+            "installs_nothing_extra": false,
+            "job": "finding and adding a skill from inside a session, in both clients",
+            "label": "both families by direct consensus on primary sources (2026-10-02); not a blind round, not a measurement",
+            "layer_id": "instructions-skills",
+            "measurement": null,
+            "repository": "https://github.com/vercel-labs/skills",
+            "resolution": {
+              "by": "direct consensus of both model families",
+              "open_acceptance_gates": [
+                "listing, hash and read-back of the installed folder on the destination",
+                "a useful invocation in each client"
+              ],
+              "outcome": "added_by_consensus",
+              "pin": {
+                "blob": "a41bdd074bb587afd861332cf2f473f3154de4d7",
+                "commit": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+                "path": "skills/find-skills/SKILL.md",
+                "release": "v1.7.0"
+              },
+              "reason": "discovery, authoring and research are three distinct capabilities with different dependencies and activation, so each has its own row; the skills installer's own repository carries the discovery skill, and only that named folder is installed, never the bundle; popularity counts serve discovery only",
+              "sources": [
+                "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills/SKILL.md"
+              ]
+            },
+            "row_kind": "consensus",
+            "slot_id": "skill-discovery",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "proposed on 2026-10-02 from facts read on GitHub",
+            "coincides_with_lane_record": null,
+            "default": "skill-creator (embedded in Codex; anthropics/skills for Claude Code)",
+            "definitive": false,
+            "gpt": "agreed on 2026-10-02 after its own primary-source review",
+            "installs_nothing_extra": false,
+            "job": "writing and evaluating a new skill, in both clients",
+            "label": "both families by direct consensus on primary sources (2026-10-02); not a blind round, not a measurement",
+            "layer_id": "instructions-skills",
+            "measurement": null,
+            "repository": "https://github.com/anthropics/skills",
+            "resolution": {
+              "by": "direct consensus of both model families",
+              "codex_embedded_at": {
+                "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+                "path": "codex-rs/skills/src/lib.rs",
+                "repository": "https://github.com/openai/codex"
+              },
+              "installs_for": [
+                "claude-code"
+              ],
+              "open_acceptance_gates": [
+                "that the embedded Codex skill is available on the destination (source availability is not target availability)",
+                "listing, hash and read-back of the installed Claude Code folder on the destination",
+                "a useful invocation in each client"
+              ],
+              "outcome": "added_by_consensus",
+              "pin": {
+                "blob": "65b3a402dbd09b8e83f9d637c6b553875189085c",
+                "commit": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+                "path": "skills/skill-creator/SKILL.md"
+              },
+              "reason": "Codex ships its own authoring skill embedded at the selected tag, so nothing is installed for Codex and no same-name copy is placed beside it; Claude Code takes the maintained authoring folder, which carries its own evaluation workflow",
+              "sources": [
+                "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/skills/src/lib.rs#L55",
+                "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md"
+              ]
+            },
+            "row_kind": "consensus",
+            "slot_id": "skill-authoring",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": false,
+          "not_installed_reason": "the research runtime's own repository carries a small skill that drives it through an MCP server; it is an entry point, not a convergence procedure, so the validation duties of the repository's search-first practice stay where they are; both clients count as wired only after the server's environment, handshake and results are qualified",
+          "record": {
+            "catalog": "foundation",
+            "claude": "proposed on 2026-10-02 from facts read on GitHub",
+            "coincides_with_lane_record": null,
+            "default": "Not installed until its activation gate returns (GPT Researcher's own skill with its MCP server)",
+            "definitive": false,
+            "gpt": "agreed on 2026-10-02 after its own primary-source review, with the activation gate",
+            "installs_nothing_extra": true,
+            "job": "starting a research run on the research runtime from inside a session, in both clients",
+            "label": "both families by direct consensus on primary sources (2026-10-02); an activation gate decides the install, nothing installed until it returns",
+            "layer_id": "instructions-skills",
+            "measurement": {
+              "receipts": [],
+              "returned": false
+            },
+            "repository": "",
+            "resolution": {
+              "by": "direct consensus of both model families",
+              "candidate": {
+                "blob": "828782a6ffd842634fbffc267c61207009585df0",
+                "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+                "name": "GPT Researcher skill",
+                "path": "skills/gpt-researcher/SKILL.md",
+                "repository": "https://github.com/assafelovic/gpt-researcher"
+              },
+              "comparison_source": {
+                "name": "DeerFlow deep-research skill",
+                "path": "skills/public/deep-research/SKILL.md",
+                "ref": "v2.1.0",
+                "repository": "https://github.com/bytedance/deer-flow"
+              },
+              "deciding_measurement": "An activation gate, not a comparison: a resolved and pinned environment for the MCP server, a native protocol handshake over STDIO, discovery of its five tools, a useful research result returned in each client, and a bounded lifecycle (start, stop, removal).",
+              "dependency": {
+                "commit": "63884773685b1f12c7f0d9e283b3d71a5b9b5fda",
+                "licence": "MIT",
+                "name": "gptr-mcp",
+                "notes": "ranges in its requirements are not pinned; a direct STDIO start prints text that is not protocol output; the server needs a provider key of its own and its default search needs a second credential, so a native client sign-in is not that readiness; its SSE tester does not prove STDIO acceptance",
+                "repository": "https://github.com/assafelovic/gptr-mcp"
+              },
+              "measurement_id": "research-skill-activation",
+              "outcome": "gated_by_consensus",
+              "reason": "the research runtime's own repository carries a small skill that drives it through an MCP server; it is an entry point, not a convergence procedure, so the validation duties of the repository's search-first practice stay where they are; both clients count as wired only after the server's environment, handshake and results are qualified",
+              "sources": [
+                "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/skills/gpt-researcher/SKILL.md",
+                "https://github.com/assafelovic/gptr-mcp/tree/63884773685b1f12c7f0d9e283b3d71a5b9b5fda",
+                "https://github.com/bytedance/deer-flow/blob/v2.1.0/skills/public/deep-research/SKILL.md"
+              ]
+            },
+            "row_kind": "consensus",
+            "slot_id": "research-skill",
+            "state": "measurement"
+          },
+          "state": "measurement"
         }
       ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
@@ -513,6 +700,39 @@
           "installed": false,
           "not_installed_reason": "native facilities do not cover messaging into a running Codex session, but installing hcom changes how sessions start and what they may do without asking, which is the owner's decision and not a default install",
           "record": {
+            "amendments": [
+              {
+                "arms": [
+                  {
+                    "name": "the clients' native facilities only",
+                    "repository": "",
+                    "role": "control"
+                  },
+                  {
+                    "name": "hcom 0.7.27",
+                    "repository": "https://github.com/aannoo/hcom",
+                    "role": "arm"
+                  },
+                  {
+                    "name": "agmsg 1.5.2, each delivery mode named separately",
+                    "repository": "https://github.com/fujibee/agmsg",
+                    "role": "arm; its Codex monitor adds an app-server bridge, startup priming and cleanup limits, so it is not described as daemon-free"
+                  }
+                ],
+                "by": "the owner's decision, then direct consensus of both model families on the arms",
+                "contract": "Persisted, delivered and acknowledged are counted separately; duplicates and order; latency, nudges and context added; orphan cleanup; across idle, busy, restart, interruption and project isolation. Existing daemon and session ownership is preserved.",
+                "date_utc": "2026-10-02",
+                "decision": "the owner wants messaging between sessions and between the two clients; the transport is measured before one is selected",
+                "owner_verbatim": "need to be passwardless seamless workflow,passwardmangement and llm native is a must,bypasspremission seamless across session messaging, claude-codex messaging etc",
+                "sources": [
+                  "https://code.claude.com/docs/en/cross-session-messaging.md",
+                  "https://github.com/aannoo/hcom/blob/v0.7.27/README.md",
+                  "https://github.com/fujibee/agmsg/blob/v1.5.2/docs/codex-monitor-beta.md",
+                  "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server-daemon/README.md"
+                ],
+                "text": "The row's first condition, the owner's decision on the permission posture, is answered. Native Claude Code covers Claude to Claude; cross-vendor delivery was not established by the reviewed native sources. Concord MCP, an arm of the earlier text, is not among the agreed arms. The earlier message-count contract is amended with the owner before a run."
+              }
+            ],
             "catalog": "foundation",
             "claude": "not judged in the first round",
             "coincides_with_lane_record": null,
@@ -1141,6 +1361,52 @@
             "definitive": false,
             "gpt": "converged",
             "installs_nothing_extra": true,
+            "interim": {
+              "authority": {
+                "date_utc": "2026-10-03",
+                "decision": "install semble now: decision 2 of the wave-2 synthesis lifts the code-search hold",
+                "kind": "owner_decision",
+                "relayed_by": "wave2-records.json owner_decisions[0]"
+              },
+              "configuration": {
+                "caches": "SEMBLE_CACHE_LOCATION = $HOME/.cache/semble-claude for Claude Code and $HOME/.cache/semble-codex for Codex, absolute",
+                "claude_allow_rules": "mcp__semble__search and mcp__semble__find_related, exact names, written only with --with-authorization-settings",
+                "codex_tools": "enabled_tools = [\"search\", \"find_related\"]; default_tools_approval_mode = \"approve\", written only with --with-authorization-settings, because semble's tools carry no annotations and Codex 0.160.0 asks before each such call",
+                "model": "SEMBLE_MODEL_NAME = $HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c (the local snapshot at the pinned revision)",
+                "transport": "stdio MCP server 'semble', CPU only, no port and no GPU"
+              },
+              "date_utc": "2026-10-03",
+              "decided_by": "the frozen code-search confirmatory (its section 6): semble selected, it becomes final once its pins equal the executable annex's; SocratiCode or ColGREP selected, that one replaces it; no selection, semble is removed and the slot returns to empty",
+              "default": "semble 0.6.1",
+              "label": "interim install on the owner's decision (amendment 3); not a blind result and not a measurement; the frozen code-search confirmatory decides, and its result replaces or removes it",
+              "open_acceptance_gates": [
+                "each client's cache holds <sha256>/index/metadata.json whose model_path is the local snapshot",
+                "Codex lists both tools, and a codex exec --json search completes without 'requires approval'",
+                "a fresh Claude Code session's mcp__semble__search shows no prompt",
+                "an edit is returned after waiting longer than three times the first build's duration",
+                "no new listener and no GPU process"
+              ],
+              "pin": "tag v0.6.1 = commit 24497845460960db1839c8485319df189a889225; PyPI semble-0.6.1-py3-none-any.whl sha256 fea96cf60d93555966d57f26604b8ef935bf3f876757568cec9fe655dd651256; model minishlab/potion-code-16M-v2 at revision e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b, loaded from a local snapshot",
+              "records": [
+                {
+                  "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
+                  "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+                }
+              ],
+              "repository": "https://github.com/MinishLab/semble",
+              "reviews": {
+                "claude": "the wave-2 ruling for the code-search layer: nothing in the slot until amendment 3 exists, then semble 0.6.1 as the interim engine, MCP only, with the model pinned and one cache per client",
+                "gpt": "the GPT family's check agreed with conditions (gpt-6-astra). The whole-wave read (https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965501630), before the owner's decision, recommended keeping the search hold with the clients' built-in search"
+              },
+              "sources": [
+                "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.code-search: the dossier default, the GPT check and its conditions, the ruling's changes 1-7 and 9)",
+                "https://github.com/MinishLab/semble/releases/tag/v0.6.1",
+                "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/src/semble/mcp.py",
+                "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md",
+                "https://huggingface.co/minishlab/potion-code-16M-v2/tree/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b",
+                "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/mcp_tool_call.rs"
+              ]
+            },
             "job": "semantic code search",
             "label": "split between the model families; the measurement the critics named decides, before the clean install",
             "layer_id": "semantic-rag",
@@ -1160,24 +1426,33 @@
           "state": "split"
         },
         {
-          "installed": false,
-          "not_installed_reason": "one blind GPT order selected nothing and the other three models that each add a second server; the critic's choice was not among the judged candidates",
+          "installed": true,
+          "not_installed_reason": null,
           "record": {
             "catalog": "foundation",
             "claude": "not judged in the first round",
             "coincides_with_lane_record": null,
-            "default": "Not installed until the deciding measurement returns",
+            "default": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
             "definitive": false,
             "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
-            "installs_nothing_extra": true,
+            "installs_nothing_extra": false,
             "job": "local embedding model",
-            "label": "split: decided by the named measurement, nothing installed until it returns",
+            "label": "settled by the preregistered measurement: nDCG@10 0.49827 on CQADupstackUnixRetrieval against 0.41394 for EmbeddingGemma (difference 0.084331, 95% interval 0.067738 to 0.100656), with the generation model resident; Nemotron-3-Embed-1B tied (difference 0.003124, interval -0.012194 to 0.018141) and needs a second model server, and WeMM-Embedding-2B ran out of GPU memory; measured on one workstation; not a merit acceptance",
             "layer_id": "semantic-rag",
             "measurement": {
-              "receipts": [],
-              "returned": false
+              "receipts": [
+                {
+                  "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+                  "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
+                },
+                {
+                  "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
+                  "sha256": "6f5dfbf83c5116e38b42d38ddd5fdbb1a27cf23b5ef7e8ac12d4071c9173a541"
+                }
+              ],
+              "returned": true
             },
-            "repository": "",
+            "repository": "https://github.com/QwenLM/Qwen3-Embedding",
             "resolution": {
               "arms": [
                 {
@@ -1212,9 +1487,9 @@
             },
             "row_kind": "added",
             "slot_id": "embedding-model",
-            "state": "split"
+            "state": "measurement"
           },
-          "state": "split"
+          "state": "measurement"
         },
         {
           "installed": false,
@@ -1354,6 +1629,52 @@
             "definitive": false,
             "gpt": "converged",
             "installs_nothing_extra": true,
+            "interim": {
+              "authority": {
+                "date_utc": "2026-10-03",
+                "decision": "install ai-memory with a fresh store now: decision 2 of the wave-2 synthesis lifts the memory hold",
+                "kind": "owner_decision",
+                "relayed_by": "wave2-records.json owner_decisions[0]"
+              },
+              "configuration": {
+                "backup": "staged by the Restic backup job (synthesis X6): no ai-memory timer and no copy under /mnt/c",
+                "codex_tool_approval": "default_tools_approval_mode = \"approve\", written by the client configuration only with --with-authorization-settings (memory change 13)",
+                "embedding_provider": "local: all-MiniLM-L6-v2, 384 dimensions, in process, set explicitly, so a failed model fetch is a visible start failure",
+                "listen": "127.0.0.1:29374, the port the host template and the client templates carry (synthesis X5); the ruling's 21374 is not used",
+                "llm": "none (zero-LLM)",
+                "service": "the upstream systemd user unit packaging/systemd/ai-memory-user.service at the pin, under linger",
+                "store": "fresh: no seed from another host, whose open handoffs a seed would carry"
+              },
+              "date_utc": "2026-10-03",
+              "decided_by": "the memory head-to-head at its frozen revision (D3r2 or later), binding once its hash is posted and the Codex lane has read it; it checks that each arm actually uses its vectors, and its best eligible system takes the slot with no protected incumbent",
+              "default": "ai-memory 2.5.2",
+              "label": "interim install on the owner's decision (amendment 3), with a fresh store; not a blind result and not a measurement; the memory head-to-head decides, and its result replaces or removes it",
+              "open_acceptance_gates": [
+                "the user unit is active, /healthz on 127.0.0.1:29374 returns 200, and ai-memory status reports 2.5.2 with the local embedder",
+                "claude mcp list shows it connected at :29374/mcp, codex mcp list lists it, and the hooks admit capture",
+                "a canary typed in an ordinary session of one client is returned by memory_query in a fresh session of the other, in both directions, without memory_write_page",
+                "a handoff survives an unrelated session started in between; restart, spool drain and cold boot pass",
+                "across every hook source of both clients, only ai-memory fills the memory slot"
+              ],
+              "pin": "tag v2.5.2 (tag object af8c6820bbbcca0b8d3604d7b2d59c0e0263ea85) = commit 7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83; release asset ai-memory-linux-x86_64.tar.gz sha256 acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8",
+              "records": [
+                {
+                  "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
+                  "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+                }
+              ],
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "reviews": {
+                "claude": "the wave-2 ruling for the memory layer: ai-memory 2.5.2 as the one memory owner of both clients, zero-LLM with its in-process embedder set explicitly, installed only after the owner lifts the hold (its change 1), which the owner's decision of 2026-10-03 does",
+                "gpt": "the GPT family's check agreed with conditions (gpt-6-astra): a provisional operational choice, not the established best retriever; its first condition kept the measurement-first hold unless the owner explicitly supersedes it, which the owner's decision does. The whole-wave read (https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965501630), before that decision, recommended keeping the memory hold"
+              },
+              "sources": [
+                "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.memory: the dossier default, the GPT check and its conditions, the ruling's changes 1, 3-5 and 12-15; synthesis_extracts X5)",
+                "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
+                "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md",
+                "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/local-embeddings.md"
+              ]
+            },
             "job": "long-term memory across sessions and clients",
             "label": "decided by measurement at the user's request: the best-scoring eligible system of the memory head-to-head is installed, with no protected incumbent",
             "layer_id": "durable-memory",
@@ -1737,6 +2058,50 @@
             "definitive": true,
             "gpt": "converged",
             "installs_nothing_extra": true,
+            "interim": {
+              "authority": {
+                "date_utc": "2026-10-03",
+                "decision": "use context-mode in both clients of the destination (the owner's pin that the wave-2 ruling for the context layer adopts)",
+                "kind": "owner_decision",
+                "relayed_by": "wave2-records.json owner_decisions[1]",
+                "verbatim": "please always use the sota gpt powered sota sdks, runtime for the research, context mode etc, we are evolve beyond simple action of web search"
+              },
+              "configuration": {
+                "claude": "the plugin from the marketplace at the reviewed revision, with the compare gate (only stats.json changed) before every update",
+                "codex_hooks": "the six plugin hooks trusted by their hashes, read back through codex app-server hooks/list and rendered by the client configuration; never --dangerously-bypass-hook-trust",
+                "codex_plugin": "marketplace add --ref 6f0cc6841c687e754059f36714a11233fda1a02b, then plugin add; its own MCP server stays off",
+                "codex_server": "one session-bound MCP server running start.mjs from the verified npm tarball, installed with npm install --global --prefix ${ECO_ROOT}/tools/context-mode-1.0.169"
+              },
+              "date_utc": "2026-10-03",
+              "decided_by": "a preregistered multi-agent end-to-end comparison against the clients' native output limits (none is on file yet): if the paired ratio interval of raw tool-output tokens entering context per agent does not lie wholly below 1, or the one-sided 95% lower bound of the task-success difference is below -0.10, the recommendation reverts to the native base and the result goes to the owner; the pin is never removed automatically",
+              "default": "context-mode 1.0.169",
+              "label": "interim install on the owner's pin (amendment 3), beside the definitive no-install default; not a measured selection and not a blind result, with no saving or superiority claim; a preregistered end-to-end comparison decides and reports to the owner",
+              "open_acceptance_gates": [
+                "the Claude plugin shows 1.0.169, its compare against 6f0cc684 lists only stats.json, /mcp shows it connected and ctx-doctor passes",
+                "stream-json shows ctx_* tool_use counts in a parent and a subagent, and one ctx_search recall",
+                "on Codex only the user-config context-mode server is enabled; hooks/list shows the six hooks trusted without the bypass flag",
+                "an mcp_tool_call to ctx_execute completes; two concurrent sessions and one older than six minutes each get their own directory",
+                "one compaction completes in each client with no repeated PreCompact or SessionStart cycle"
+              ],
+              "pin": "Claude Code plugin context-mode@context-mode at commit 6f0cc6841c687e754059f36714a11233fda1a02b, or a descendant whose compare against it lists only stats.json; Codex plugin hooks and skills at --ref 6f0cc684 with the plugin's own MCP server off; the Codex session server from the npm tarball context-mode@1.0.169, sha256 09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
+              "records": [
+                {
+                  "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
+                  "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+                }
+              ],
+              "repository": "https://github.com/mksglu/context-mode",
+              "reviews": {
+                "claude": "the wave-2 ruling for the context layer adopts the owner's pin as the slot's interim, status interim_until_measurement, and keeps the decision round's verdict and the Harbor result as the reason the slot waits on a measurement",
+                "gpt": "the GPT family's check disagreed (gpt-6-astra): its alternative is no additional context-supply layer, with context-mode kept as the user-mandated exception until the client acceptance tests and a comparison support promotion. The whole-wave read (https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965501630): preserve the explicit user pin; bind the actual plugin, npm, source and hook identities and fresh-session behaviour"
+              },
+              "sources": [
+                "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.token-context: the dossier default, the GPT check and its alternative, the ruling's changes 1-3, 6-10 and 17; owner_decisions[1])",
+                "https://github.com/mksglu/context-mode/commit/6f0cc6841c687e754059f36714a11233fda1a02b",
+                "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/start.mjs",
+                "https://www.npmjs.com/package/context-mode/v/1.0.169"
+              ]
+            },
             "job": "context-supply layer between tools and the model",
             "label": "no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero",
             "layer_id": "token-efficiency",
@@ -1751,6 +2116,55 @@
             "state": "definitive"
           },
           "state": "definitive"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "proposed and ruled on 2026-10-03 from sources read at their pins (wave 2)",
+            "coincides_with_lane_record": null,
+            "default": "claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line",
+            "definitive": false,
+            "gpt": "agreed with conditions on 2026-10-03 after its own primary-source check (gpt-6-astra); the whole-wave read keeps the row conditional on the destination's readback",
+            "installs_nothing_extra": false,
+            "job": "the interactive status line of the two clients (context and plan usage at a glance)",
+            "label": "both families by direct consensus on primary sources (wave 2, 2026-10-03; both pull-request acknowledgements owed); not a blind round, not a measurement",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/jarrodwatts/claude-hud",
+            "resolution": {
+              "batch": "wave2",
+              "by": "direct consensus of both model families",
+              "codex_footer": "[tui] status_line = [\"model-with-reasoning\", \"project-name\", \"git-branch\", \"context-used\", \"five-hour-limit\", \"weekly-limit\"]",
+              "kept_off": "showCost, showDailyCost, showWeeklyCost, showAuth and showAuthUser false; externalUsageWritePath empty; CLAUDE_HUD_ALLOW_EXTRA_CMD never set",
+              "layer": "token-efficiency, beside the usage meter whose context and plan-usage readings the status line shows; it adds a display, not a second meter",
+              "open_acceptance_gates": [
+                "claude-hud is 0.10.0, enabled, from marketplace ref v0.10.0, the only cached version, with marketplace auto-update off",
+                "statusLine in the Claude settings runs the helper's launcher with an executable runtime path and refreshInterval 5",
+                "after one reply the HUD shows the Context and Usage lines; an API-key or gateway session shows no Usage line",
+                "the Codex footer shows the six items, and /status and /usage daily work"
+              ],
+              "outcome": "added_by_consensus",
+              "overturn": "replace claude-hud only if the destination's live proof fails (no Context or Usage line after the first reply with a subscriber sign-in), a pin move adds a network call or a credential read, or the project goes unmaintained while claude-powerline, with 'today' off and no pricing fetch, passes the same constraint",
+              "pin": "tag v0.10.0 = commit 75683c6de1ac07f6bbef00d739001679dba0740c, installed from marketplace jarrodwatts/claude-hud#v0.10.0 at user scope; the launcher runs the highest claude-hud version in any marketplace cache, so the pin also needs marketplace auto-update off and no other cached version",
+              "reason": "Claude Code's status line is a bare command with no content of its own, so one tool owns it. claude-hud 0.10.0 was the one candidate read at its latest tag that installs as a pinnable plugin, makes no network call, reads no credential file and takes plan usage from the documented stdin rate_limits; its cost, daily-cost, weekly-cost and identity segments are off by default and stay off. Codex needs no tool: its native footer shows the six items once they are set. The usage meter stays none by design.",
+              "runner_up": "claude-powerline 1.32.1: its default 'today' cost segment is a second cost meter, and it fetches an unpinned pricing file",
+              "sources": [
+                "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.analytics-statusline: the dossier default, the GPT check, the ruling's changes 1, 3-9 and 15)",
+                "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+                "https://github.com/jarrodwatts/claude-hud/blob/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/setup.mjs",
+                "https://github.com/jarrodwatts/claude-hud/blob/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/statusline.mjs#L29-L39",
+                "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/tui/src/bottom_pane/status_line_setup.rs#L54-L76",
+                "https://code.claude.com/docs/en/statusline"
+              ],
+              "wiring": "the upstream helper scripts/setup.mjs writes statusLine (inspect, then install, with --shell posix) and refreshInterval 5 is kept; the client configuration renders the same command, so a re-render keeps statusLine and refreshInterval"
+            },
+            "row_kind": "consensus",
+            "slot_id": "statusline",
+            "state": "resolved"
+          },
+          "state": "resolved"
         }
       ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
@@ -3117,24 +3531,33 @@
           "state": "resolved"
         },
         {
-          "installed": false,
-          "not_installed_reason": "the two blind GPT orders and the Claude critic chose different models, and the fit of the critic's choice is inferred, not measured",
+          "installed": true,
+          "not_installed_reason": null,
           "record": {
             "catalog": "foundation",
             "claude": "not judged in the first round",
             "coincides_with_lane_record": null,
-            "default": "Not installed until the deciding measurement returns",
+            "default": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
             "definitive": false,
             "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
-            "installs_nothing_extra": true,
+            "installs_nothing_extra": false,
             "job": "local generation model",
-            "label": "split: decided by the named measurement, nothing installed until it returns",
+            "label": "settled by the preregistered measurement: first-pass valid tool calls 200 of 200 against 175 of 200 for gpt-oss:20b (difference 0.125, 95% interval 0.065 to 0.19) on 100 BFCL cases through the server's chat and responses surfaces, both arms entirely on the GPU at 64,000 tokens with the embedder resident; Bonsai and Swift on PrismML's llama.cpp failed the function gate and qwen3.8:27b did not fit on the GPU; measured on one workstation; not a merit acceptance",
             "layer_id": "observation-inference",
             "measurement": {
-              "receipts": [],
-              "returned": false
+              "receipts": [
+                {
+                  "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+                  "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
+                },
+                {
+                  "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
+                  "sha256": "55ac6ff05f4437dffb2623117c71fb8d6f786d71e63a44b46973b145b1d29577"
+                }
+              ],
+              "returned": true
             },
-            "repository": "",
+            "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
             "resolution": {
               "arms": [
                 {
@@ -3164,9 +3587,9 @@
             },
             "row_kind": "added",
             "slot_id": "local-generation-model",
-            "state": "split"
+            "state": "measurement"
           },
-          "state": "split"
+          "state": "measurement"
         },
         {
           "installed": false,
@@ -3664,6 +4087,70 @@
             "state": "resolved"
           },
           "state": "resolved"
+        },
+        {
+          "installed": false,
+          "not_installed_reason": "a local secret broker built for coding agents exists and is maintained, but nothing measured shows a gain over the practice in use, so the practice stays and the comparison decides",
+          "record": {
+            "amendments": [
+              {
+                "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements owed)",
+                "date_utc": "2026-10-03",
+                "decision": "keep the measurement; gate each arm on eligibility before it is scored; HASP 1.0.44 is ineligible on Linux as documented; systemd-creds --user becomes the deciding storage comparison",
+                "sources": [
+                  "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.custody: the ruling's change 15, with changes 1-3 as the synthesis carries them)",
+                  "https://github.com/gethasp/hasp/blob/v1.0.44/apps/server/internal/store/keyring_default.go#L1-L7",
+                  "https://github.com/gethasp/hasp/blob/v1.0.44/apps/server/internal/app/agentops/launch.go#L85"
+                ],
+                "text": "The row's state stays measurement and it still installs nothing extra. Before any arm is scored it passes an eligibility gate: resuming after a restart needs no interactive input and no stored or exported unlock secret; no unlock secret sits in an environment or client configuration an agent can see; the delivery path has no approval prompt. At v1.0.44 HASP's documented Linux keyring default and launch path predict that it fails the gate, so the practice stays; its arm reopens only when a release adds a Linux unlock that needs no stored or exported password. systemd-creds --user, scoped to the storage part alone (the runner reading a --user ciphertext against the 0600 file, the other six parts of the practice kept), is the deciding storage comparison. Its gain is limited to passive reads as the distribution's default user and to partial copies that leave out the host's credential secret; there is none against a same-user agent or a process that can start the distribution as root."
+              }
+            ],
+            "catalog": "foundation",
+            "claude": "proposed on 2026-10-02 from facts read on GitHub",
+            "coincides_with_lane_record": null,
+            "default": "Not installed until the deciding measurement returns (the repository's runner and guard stay the practice)",
+            "definitive": false,
+            "gpt": "agreed on 2026-10-02 after its own primary-source review",
+            "installs_nothing_extra": true,
+            "job": "custody and injection of provider keys for agents",
+            "label": "both families by direct consensus on primary sources (2026-10-02); the named measurement decides, nothing installed until it returns",
+            "layer_id": "secrets-credentials",
+            "measurement": {
+              "receipts": [],
+              "returned": false
+            },
+            "repository": "",
+            "resolution": {
+              "arms": [
+                {
+                  "name": "the repository's practice: one 0600 file per provider, pointer variables, the value-free status check, the id-based runner and the guard hook",
+                  "repository": "",
+                  "support": "the practice in use; kept unless the challenger shows a measured gain"
+                },
+                {
+                  "commit": "624b3b38ac4f7a267e6925c545768c95945d781a",
+                  "licence": "FCL-1.0-ALv2 in its licence file; GitHub reports no standard identifier",
+                  "name": "HASP 1.0.43",
+                  "repository": "https://github.com/gethasp/hasp",
+                  "support": "source-supported local vault, run, inject, MCP and audit commands; nothing installed or accepted"
+                }
+              ],
+              "by": "direct consensus of both model families",
+              "deciding_measurement": "HASP against the repository's runner and guard on the existing synthetic leak-path fixtures: output and trace checks, audit records, client boundaries, restart and removal. A claim that an agent can never read a value needs direct controls and a stated isolation scope. Native client sign-ins stay native: no import or copy of an authentication store, no real secret, no operating-system grant and no provider call is part of the comparison.",
+              "measurement_id": "credential-custody",
+              "outcome": "measure_by_consensus",
+              "reason": "a local secret broker built for coding agents exists and is maintained, but nothing measured shows a gain over the practice in use, so the practice stays and the comparison decides",
+              "sources": [
+                "https://github.com/gethasp/hasp/releases/tag/v1.0.43",
+                "https://github.com/gethasp/hasp/blob/624b3b38ac4f7a267e6925c545768c95945d781a/LICENSE",
+                "https://github.com/gethasp/hasp/blob/624b3b38ac4f7a267e6925c545768c95945d781a/README.md#L44"
+              ]
+            },
+            "row_kind": "consensus",
+            "slot_id": "credential-custody",
+            "state": "measurement"
+          },
+          "state": "measurement"
         }
       ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
@@ -3955,6 +4442,46 @@
             },
             "row_kind": "first_round",
             "slot_id": "agent-structural-diff",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": false,
+          "not_installed_reason": "the practice becomes an explicit capability: a review binds the author and reviewer families, the model and effort, an immutable base and head, source-located findings, independent dispositions and a later verification; a local review neither implies local inference nor authorizes publication by itself",
+          "record": {
+            "catalog": "foundation",
+            "claude": "proposed on 2026-10-02 from facts read on GitHub",
+            "coincides_with_lane_record": null,
+            "default": "No additional component: the two clients' native review commands, each family on the other's work",
+            "definitive": false,
+            "gpt": "agreed on 2026-10-02 after its own primary-source review",
+            "installs_nothing_extra": true,
+            "job": "review of a change by the other model family before merge",
+            "label": "both families by direct consensus on primary sources (2026-10-02); not a blind round, not a measurement",
+            "layer_id": "git-github-automation",
+            "measurement": null,
+            "repository": "",
+            "resolution": {
+              "by": "direct consensus of both model families",
+              "challenger": {
+                "name": "PR-Agent 0.47.0",
+                "repository": "https://github.com/The-PR-Agent/pr-agent",
+                "support": "a comparison only for an identified gap; its own README describes a community-maintained legacy project"
+              },
+              "open_acceptance_gates": [
+                "qualification of the Codex 0.160 review command on the destination, owned by the Codex lane"
+              ],
+              "outcome": "added_by_consensus",
+              "reason": "the practice becomes an explicit capability: a review binds the author and reviewer families, the model and effort, an immutable base and head, source-located findings, independent dispositions and a later verification; a local review neither implies local inference nor authorizes publication by itself",
+              "sources": [
+                "https://code.claude.com/docs/en/code-review.md#review-a-diff-locally",
+                "https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli",
+                "https://github.com/The-PR-Agent/pr-agent/blob/v0.47.0/README.md"
+              ]
+            },
+            "row_kind": "consensus",
+            "slot_id": "cross-family-review",
             "state": "resolved"
           },
           "state": "resolved"
@@ -5690,6 +6217,41 @@
           "installed": true,
           "not_installed_reason": null,
           "record": {
+            "amendments": [
+              {
+                "arms": [
+                  {
+                    "name": "OpenHands software-agent-sdk 1.50.1",
+                    "repository": "https://github.com/OpenHands/software-agent-sdk",
+                    "role": "baseline, the selection in use"
+                  },
+                  {
+                    "name": "Codex CLI 0.160 (native)",
+                    "repository": "https://github.com/openai/codex",
+                    "role": "agent arm"
+                  },
+                  {
+                    "name": "pi 1.0.0",
+                    "repository": "https://github.com/earendil-works/pi",
+                    "role": "challenger"
+                  },
+                  {
+                    "name": "mini-swe-agent 2.4.6",
+                    "repository": "https://github.com/SWE-agent/mini-swe-agent",
+                    "role": "only for an identified remaining gap"
+                  }
+                ],
+                "by": "direct consensus of both model families",
+                "contract": "Tasks, base, model, route, effort, tools, attempt budget, environment and independent graders are frozen through the existing owner of the runtime qualification, and failed attempts are preserved. Sealed tasks, questions, model, routes, metrics and arms of the earlier gate are kept unless an amendment declares the change. A subscription route that cannot match the model and gateway contract is a separate operational control, not an arm.",
+                "date_utc": "2026-10-02",
+                "decision": "keep the selection meanwhile; measure the alternatives",
+                "sources": [
+                  "https://github.com/OpenHands/software-agent-sdk/blob/1e1390acc8788346ba4804c34323284009bf3f5e/examples/01_standalone_sdk/01_hello_world.py",
+                  "https://github.com/SWE-agent/mini-swe-agent/blob/v2.4.6/README.md"
+                ],
+                "text": "The owner's pin was never compared. OpenHands software-agent-sdk 1.50.1 stays the selection and is the baseline of a comparison."
+              }
+            ],
             "catalog": "foundation",
             "claude": "not judged",
             "coincides_with_lane_record": null,
@@ -5716,6 +6278,32 @@
           "installed": true,
           "not_installed_reason": null,
           "record": {
+            "amendments": [
+              {
+                "arms": [
+                  {
+                    "name": "DeerFlow 2.1.0",
+                    "repository": "https://github.com/bytedance/deer-flow",
+                    "role": "the selected second gatherer"
+                  },
+                  {
+                    "name": "Onyx 4.8.3",
+                    "repository": "https://github.com/onyx-dot-app/onyx",
+                    "role": "challenger"
+                  }
+                ],
+                "by": "direct consensus of both model families",
+                "contract": "Questions, as-of date, model, search and budgets match across arms. Judged on claim-to-source support, numeric units and denominators, accessible citations and coverage, plus usage, time and footprint. Fetching a citation is not an entailment verdict.",
+                "date_utc": "2026-10-02",
+                "decision": "keep GPT Researcher 3.7.0; measure the second gatherer",
+                "sources": [
+                  "https://github.com/assafelovic/gpt-researcher/blob/v3.7.0/README.md",
+                  "https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md",
+                  "https://github.com/onyx-dot-app/onyx/blob/v4.8.3/README.md"
+                ],
+                "text": "GPT Researcher stays and is the baseline. DeerFlow 2 is a ground-up rewrite into a general harness, with the older research behaviour on another branch; it stays the selected second gatherer until the comparison returns."
+              }
+            ],
             "catalog": "foundation",
             "claude": "not judged",
             "coincides_with_lane_record": null,
@@ -5933,6 +6521,44 @@
           "installed": true,
           "not_installed_reason": null,
           "record": {
+            "amendments": [
+              {
+                "arms": [
+                  {
+                    "name": "the repository's command and secret-path guard",
+                    "repository": "",
+                    "role": "the practice in use"
+                  },
+                  {
+                    "commit": "85090ce61ed5bb5457104b5a73cb2bbc9443fda0",
+                    "licence": "Apache-2.0",
+                    "name": "HOL Guard 3.17.1",
+                    "repository": "https://github.com/hashgraph-online/hol-guard",
+                    "role": "held for a scoped enforcement comparison"
+                  }
+                ],
+                "by": "direct consensus of both model families",
+                "date_utc": "2026-10-02",
+                "decision": "keep the guard; hold one enforcement comparison",
+                "qualifications": [
+                  "The comparison pins HOL Guard 3.17.2 or later: v3.17.2 was released on 2026-10-02 at 21:12:17Z, after the note named 3.17.1 (https://github.com/hashgraph-online/hol-guard/releases/tag/v3.17.2; claude-review-held-topics.md, topic 1, claim 10)."
+                ],
+                "sources": [
+                  "https://github.com/hashgraph-online/hol-guard/blob/85090ce61ed5bb5457104b5a73cb2bbc9443fda0/docs/guard/harness-support.md#L9"
+                ],
+                "text": "HOL Guard 3.17.1 declares native interception and managed launches beyond the guard's text check of Claude Code shell commands; the managed launch is declared for Codex only, and for Claude Code it declares hooks alone, in the project's local settings file. Its support matrix is a source claim: native client compatibility, failure behaviour and the preservation of existing hooks are not qualified. The comparison is about enforcement and stays separate from the custody comparison; the two are not merged into one winner."
+              },
+              {
+                "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements owed)",
+                "date_utc": "2026-10-03",
+                "decision": "cover the destination gateway's ports 21128 and 21129 with the guard's gateway rule before that gateway holds accounts",
+                "sources": [
+                  "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.custody: the ruling's change 11; synthesis_extracts X16)",
+                  "scripts/hooks/secret_path_guard.py (K4_GW_HEAD, K4_GW_FIND, K4_GW_ROWS)"
+                ],
+                "text": "The guard's gateway rule recognised 20128 and 20129 only. The destination's own OmniRoute listens on 21128 (with its live socket on 21129), so the rule takes both ports before any account is signed in there: a management route on 21128 is held to the same frozen matrix as on 20128, and every management route on 21129 is refused. The guard's documented scope stays Claude Code's Bash tool: a context-mode ctx_execute call and a Codex shell are not covered, which belongs to the enforcement comparison already held on this row."
+              }
+            ],
             "catalog": "foundation",
             "claude": "not judged",
             "coincides_with_lane_record": null,
@@ -6202,11 +6828,11 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "1e08ba8e879b0c52fd5c53341ea60bb27ca70ebc64cb9af655d9ba5ae0a21cb0"
+      "sha256": "381645d1470125614137eef39a3b802e0a91ec480f6453a45051fbe99c743f21"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "bddd59c0cd2b7c6a5c2fb5357dd7a74c5a396a73cd3989b06914203343c97f80"
+      "sha256": "ff94e93390875a4c6d2baa352fa7075e66acc7a966b33f1ef62338fb9988b7f3"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
@@ -6214,7 +6840,7 @@
     },
     {
       "path": "catalogs/landscape/research-state.json",
-      "sha256": "f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1"
+      "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a"
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -6322,7 +6948,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "894dff866e2e6f332d6927879ca89b81a7da67d066664122f163e23707c4205b"
+      "sha256": "ee6aa8f87396528de2157270bb50d523524879c4e86196b535784f259eccea28"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -6330,7 +6956,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json",
-      "sha256": "2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24"
+      "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-definitive.compact.json",
@@ -6343,6 +6969,10 @@
     {
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json",
       "sha256": "8b8234eabf4f3f66b9acc6e1b74e0809bccd79b70ca381635c2eae5ae8527b25"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+      "sha256": "e6897728fd866a4d17583109f0d48bcd578c59b237e7186e31ec8ff09e83abf4"
     }
   ],
   "stage_order": [
@@ -6524,8 +7154,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://registry.npmjs.org/%40openai%2Fcodex/0.159.3",
-        "value": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79"
+        "source": "https://registry.npmjs.org/%40openai%2Fcodex/0.160.0",
+        "value": "373517768e912eeb5054024ae9215e2c90a1420957b66fe134ef745a00948d4a"
       },
       "documented_install": [
         {
@@ -6542,16 +7172,17 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/native-clients.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/openai/codex/blob/rust-v0.159.3/README.md",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/README.md",
         "https://developers.openai.com/codex/noninteractive",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "evidence/artifacts/runtime-sdk-20261003/receipt.json"
       ],
       "install": {
-        "command": "npm install -g @openai/codex@0.159.3",
+        "command": "npm install -g @openai/codex@0.160.0",
         "execution_status": "UNRUN",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
         "scope": "Upstream npm install form with the accepted package version supplied using npm documented version syntax. This is a reviewed example; the selected bootstrap keeps its existing isolated-prefix installation path.",
-        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/README.md"
+        "source": "https://github.com/openai/codex/blob/rust-v0.160.0/README.md"
       },
       "name": "Codex",
       "native_update": {
@@ -6563,7 +7194,7 @@
         "order": "It runs after the bootstrap has installed the pin and before this client's acceptance command.",
         "receipt_fields": {
           "acceptance_result_on_that_version": "The result of this entry's acceptance command on that version.",
-          "floor": "The pin of this entry, 0.159.3: the release the bootstrap installs.",
+          "floor": "The pin of this entry, 0.160.0: the release the bootstrap installs.",
           "version_after_native_update": "The version that PATH resolves to after the native update, or after the updater's refusal."
         },
         "sources": [
@@ -6573,7 +7204,7 @@
       "owner_layer_id": "native-clients",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "npm:@openai/codex",
-      "pin": "0.159.3",
+      "pin": "0.160.0",
       "position": 1,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/openai/codex",
@@ -10411,7 +11042,7 @@
           "Existing authorized native Codex authentication and the intended repository context."
         ],
         "scope": "The Python body is the unchanged upstream quickstart; the here-document is only its shell carrier. No SDK/provider/model execution or output-quality acceptance occurred.",
-        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md#quickstart"
+        "source": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md#quickstart"
       },
       "aliases": [
         "Codex Python SDK"
@@ -10420,8 +11051,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
-        "value": "5148065fb13cfb3f106c6493f3a5dc26457da98f6350e193e85eda8b65263b8f"
+        "source": "https://pypi.org/pypi/openai-codex/0.160.0/json",
+        "value": "61d2d855ca2ebedfd51280fbeb60ff31fc47ccbd55ebce186505e3f3da096921"
       },
       "documented_install": [],
       "evidence_refs": [
@@ -10429,22 +11060,23 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "evidence/artifacts/runtime-sdk-20261003/receipt.json"
       ],
       "install": {
-        "command": "python -m pip install openai-codex==0.159.3",
+        "command": "python -m pip install openai-codex==0.160.0",
         "execution_status": "UNRUN",
-        "package_source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+        "package_source": "https://pypi.org/pypi/openai-codex/0.160.0/json",
         "pinning_source": "https://pip.pypa.io/en/stable/cli/pip_install/",
         "scope": "Upstream package installed using pip documented module invocation and exact version syntax; run in the owned Python environment, never the OS Python.",
-        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md"
+        "source": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md"
       },
       "name": "Codex Python SDK",
       "owner_layer_id": "agent-sdks",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "pypi:openai-codex",
-      "pin": "0.159.3",
+      "pin": "0.160.0",
       "position": 3,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/openai/codex",

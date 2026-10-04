@@ -1149,10 +1149,10 @@ class WorkflowTests(unittest.TestCase):
         self.assertNotRegex(self.text, r"(?m)^\s+(pull_request_target|workflow_run|issue_comment):")
 
     def test_top_level_read_only_and_issues_write_only_on_the_final_job(self):
+        # The workflow grants no scope (docs/decisions/2026-10-04-ci-least-privilege.md); each job grants its own.
         blocks = permission_blocks(self.text)
-        self.assertEqual(blocks[0], {"contents": "read"})
-        self.assertRegex(self.text, r"(?m)^permissions:\n  contents: read\n")
-        self.assertEqual(len(blocks), 4)
+        self.assertRegex(self.text, r"(?m)^permissions: \{\}\n")
+        self.assertEqual(len(blocks), 3)
         job_map = jobs(self.text)
         self.assertEqual(list(job_map), ["report", "plan", "issue"])
         # scopes() strips the same-line `# reason` comment zizmor's undocumented-permissions audit asks for.

@@ -446,9 +446,63 @@ this choice.
 
 Limits: a session started before the settings change stays `unscoped` until
 it exits. A codex started from the real binary instead of `bin/codex` gets no
-id of its own: `unscoped`, or the id it inherited, shared with its parent. A
-Codex version switch re-links `bin/codex` and removes the launcher until it is
-installed again.
+id of its own (`unscoped`, or the id it inherited, shared with its parent) and
+no lane from `ECOSYSTEM_LANE`. A Codex version switch re-links `bin/codex` and
+removes the launcher until it is installed again.
+
+## Codex lane label
+
+Changed in #671. Prometheus labels each Codex series with its lane name,
+`ecosystem_lane`, which the backend dashboard's Codex lanes row and the
+`ecosystem-lanes` alert rules group by. The label comes from the resource
+attribute `ecosystem.lane`: `transform/privacy` keeps it only when it matches
+`^[a-z][a-z0-9_-]{0,31}$`, and the Prometheus exporter's
+`resource_constant_labels` makes it the only resource label. A writer without
+a lane shows as `unattributed`.
+
+The [identity launcher](codex-identity-launcher.sh.example) sets the attribute
+from `ECOSYSTEM_LANE`, so a lane's launch only names its lane:
+
+```bash
+ECOSYSTEM_LANE=root codex
+ECOSYSTEM_LANE=trading codex exec '<task>'
+```
+
+- A terminal profile puts the assignment in its command line, for example
+  `bash -lc 'ECOSYSTEM_LANE=runtime exec codex'`. A lane relaunch script
+  exports `ECOSYSTEM_LANE=<lane>` before it starts `codex`. Both must start
+  the `codex` on `PATH`, the installed launcher, not the real binary.
+- The value must match the Collector's pattern. The launcher drops any other
+  value: it prints one warning on stderr, without the value, and still starts
+  codex, with no lane. An empty value names no lane.
+- An `ecosystem.lane` entry already in `OTEL_RESOURCE_ATTRIBUTES` wins, and
+  `ECOSYSTEM_LANE` is not read. An entry counts when its key trims to
+  `ecosystem.lane` and it has an `=`, which is what the SDK reads as the
+  attribute ([`env.rs` L45-58 at v0.31.0](https://github.com/open-telemetry/opentelemetry-rust/blob/v0.31.0/opentelemetry-sdk/src/resource/env.rs#L45-L58)).
+  A codex started through the launcher inside a lane process therefore keeps
+  that lane. To name another lane there, replace the entry.
+
+Validation: `tests.test_observability_writer_identity.LauncherTests` under
+bash, sh and dash. `ECOSYSTEM_LANE=root` yields the attribute after any
+inherited entries. Malformed values are dropped with the warning, including a
+comma that would otherwise add a second `service.instance.id`. An explicit
+entry wins. As a negative control, the launcher before this change (`1f5a791b`
+on main) sets no lane for the same variable. This is local integration with a
+stand-in codex, not a host launch.
+
+Residuals:
+
+- **Per-lane values.** This repository ships the variable and the recipe, not
+  the lane assignments. The per-lane values come with the command center's
+  relaunch scripts, its lane registry and terminal profiles. Until those set
+  `ECOSYSTEM_LANE`, every lane exports no lane and shows as `unattributed`.
+- **Host launcher.** The host's installed `bin/codex` is a render of the
+  previous template. The installation block above replaces only the
+  bootstrap's link. Over an installed launcher, the
+  [host recipe](../../evidence/artifacts/telemetry-writer-identity-20260926/host/)'s
+  `apply.sh --only codex-launcher` shows the change, and `--apply` installs
+  it with a backup. Until then the host ignores `ECOSYSTEM_LANE`, and
+  `prove.py` reports `equals_repository_template` as false.
 
 ## Tool, MCP, skill and subagent invoke rates
 

@@ -2842,12 +2842,12 @@
       ],
       "evidence_scope": "Reuses the existing native Codex CLI/SDK inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
       "limitations": [
-        "Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain unqualified candidates here; their version metadata is source review only, not fresh execution."
+        "Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain unqualified candidates here; their version metadata is source review only, not fresh execution. The 2026-10-03 source revisit also records OpenAI Agents SDK as unqualified; its experimental codex_tool and SDK requests through OmniRoute have no measured qualification."
       ],
       "source_paths": [
         "docs/foundation-closure-20260921.md"
       ],
-      "next_gap": "The SDK table in docs/foundation-closure-20260921.md lines 78-84 has not been revisited by any lane since 2026-09-21; qualify a concrete application need before promoting Claude Agent SDK, OpenHands SDK, Temporal or LangGraph.",
+      "next_gap": "The 2026-09-21 SDK table in docs/foundation-closure-20260921.md has its header at line 80 and candidate rows at lines 82-86, with no OpenAI Agents SDK row. The 2026-10-03 source revisit corrects the table citation and records OpenAI Agents SDK as unqualified in the current catalogs; it supplies no new execution. Qualify a concrete application need before promoting Claude Agent SDK, OpenHands SDK, Temporal, LangGraph or OpenAI Agents SDK; the latter's codex_tool adoption hold and newly preregistered comparison path are defined in docs/decisions/2026-10-03-foundation-catalog-drift.md.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Only the listed canonical stage and its original host/operation scope apply. No new execution was run for this taxonomy freeze.",

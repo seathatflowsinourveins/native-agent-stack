@@ -19,7 +19,7 @@
 #
 # The configuration this points at must give `--rtk`, `--headroom` and, if
 # set, "toon" their absolute installed paths (for example
-# "$REPORT_TOOLS/rtk-0.50.0/rtk" and
+# "$REPORT_TOOLS/rtk-0.51.0/rtk" and
 # "$REPORT_TOOLS/headroom-0.37.0/bin/headroom" at `init-config` time, or
 # edited directly into an existing config's "rtk", "headroom" and "toon"
 # keys). `initialize_config` (tools/token-report/token_manifest.py) stores

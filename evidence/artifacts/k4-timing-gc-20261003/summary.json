@@ -1,0 +1,376 @@
+{
+ "artifact": "k4-timing-gc-20261003",
+ "recorded_utc": "2026-10-03T16:05:49Z",
+ "revised_utc": "2026-10-03T16:37:09Z",
+ "revision": "review round 1: per-round vs per-size-minimum figures, CI interpreter line, attribution scope, overturn conditions",
+ "subject": "tests/test_secret_path_guard.py K4GuardTests.test_k4_timing: the in-process timed guard.check(text) calls of the helper growth rounds (measure_round) and of the nesting probe",
+ "change": "Each of those calls runs with gc.disable() and restores the prior gc.isenabled() state in finally, as timeit.Timer.timeit does by default. Nothing else in the test changes.",
+ "base": {
+  "origin_main_12": "59f8a1e36e1f",
+  "test_sha256_before": "5cb82aa2cd0a37da70c19bda336bb8bfe320c1c40a9f1904bed9daccdc4753fb",
+  "test_sha256_after": "3850fa34c2938595c9ef911197afe66f055ee3127273ae936137a09a525643ba"
+ },
+ "unchanged": {
+  "scripts/hooks/secret_path_guard.py_sha256": "33a11fc01ee35dc4b157b04eee4a8524460bb3fe74375ee32485bc3b2530782f",
+  "criterion": "sizes 25k, 50k and 100k; at most 3 rounds; test exponent below 1.5 over per-size raw minima; 5 ms allowance never scaled; absolute bound 0.5 s times the host factor min(4.0, max(1.0, min(reference samples) / 0.188))",
+  "named_rows": "still timed in fresh child processes, with the collector on"
+ },
+ "upstream_sources": [
+  {
+   "repository": "https://github.com/python/cpython",
+   "pin": "58ed60b7415e218ce3d608302e39b5e55bfb0e88 (3.12 branch head)",
+   "file": "Lib/timeit.py",
+   "lines": "177-183",
+   "content": "Timer.timeit saves gc.isenabled(), calls gc.disable(), runs the timed loop and calls gc.enable() in finally only if the collector was enabled"
+  },
+  {
+   "repository": "https://github.com/python/cpython",
+   "pin": "58ed60b7415e218ce3d608302e39b5e55bfb0e88",
+   "file": "Doc/library/timeit.rst",
+   "lines": "136-141",
+   "content": "timeit turns off garbage collection during the timing by default, which makes independent timings more comparable; the disadvantage is that GC may be an important component of the measured function's performance"
+  },
+  {
+   "repository": "https://github.com/python/cpython",
+   "pin": "58ed60b7415e218ce3d608302e39b5e55bfb0e88",
+   "file": "Modules/gcmodule.c",
+   "lines": "1248, 1441, 1455, 1479 (comment 1450-1472)",
+   "content": "objects promoted into the oldest generation add to long_lived_pending (1248); a full collection runs only when the oldest generation's count exceeds its threshold (1441) and long_lived_pending has reached a quarter of long_lived_total (1455, 1479); its cost is proportional to the total number of long-lived objects (1460-1461)"
+  }
+ ],
+ "upstream_copy_check": "the sha256 of each reviewed local copy equals the file served by raw.githubusercontent.com at the pin",
+ "python": {
+  "local": "3.12.3 (/usr/bin/python3)",
+  "ci": "CPython 3.12.3: each failing job's log prints the line in ci_failures[].interpreter_log_line (numbered as in gh run view <run> --attempt 1 --job <job> --log), from uv building the promotion gate's isolated venv with --python /usr/bin/python3; the unittest step runs python3 with no setup-python step"
+ },
+ "evidence_classes": [
+  {
+   "class": "recorded_ci_log",
+   "policy_class": "independent observation (platform records)",
+   "covers": "ci_failures, python.ci, and the allowance arithmetic in rejected_alternatives, computed from those minima"
+  },
+  {
+   "class": "local_integration",
+   "covers": "on this host, Python 3.12.3: local_reproduction (the real test_k4_timing after discovery imported every test module, as python3 -m unittest does); gc_callback_attribution (a replay of measure_round with the test module's own decision functions); linearity_collector_off and collector_on_direct_calls (direct helper calls)"
+  },
+  {
+   "class": "synthetic",
+   "covers": "the simulated heaps (refs, prefill, and the extra live objects of the *_plus_300k rows) and the quadratic k4_shell_words mutant, constructed by the session-0c diagnosis on 2026-10-03"
+  },
+  {"class": "source_review", "covers": "upstream_sources"}
+ ],
+ "exponent_definitions": {
+  "test_exponent": "the test's criterion, ln((t100k + 0.005) / (t25k + 0.005)) / ln(4) over per-size raw helper minima; a value of 1.5 or more fails",
+  "raw_pair_exponent": "ln(t2n / tn) / ln(2) for direct helper calls at doubling sizes, without the allowance; 1 is linear"
+ },
+ "ci_job": {"job_name": "validate", "runner": "ubuntu-24.04", "command": "python3 -m unittest"},
+ "ci_failures": [
+  {
+   "run": 37128354547,
+   "pr": 660,
+   "job": 111218211508,
+   "attempt": 1,
+   "attempt_2": "success",
+   "failed_helpers": [
+    {
+     "helper": "k4_f_header",
+     "rounds": 3,
+     "host_factor": 1.0,
+     "helper_min_ms": {"25k": 9.85, "50k": 19.41, "100k": 115.12},
+     "test_exponent": 1.508,
+     "minima_ratio_50k_over_25k": 1.97,
+     "minima_ratio_100k_over_50k": 5.93,
+     "minima_excess_ms_100k_over_twice_50k": 76.29,
+     "per_round_helper_ms": [[10.61, 20.28, 121.32], [10.03, 19.77, 119.35], [9.85, 19.41, 115.12]]
+    },
+    {
+     "helper": "k4_shell_words",
+     "rounds": 3,
+     "host_factor": 1.0,
+     "helper_min_ms": {"25k": 5.8, "50k": 11.49, "100k": 92.62},
+     "test_exponent": 1.588,
+     "minima_ratio_50k_over_25k": 1.98,
+     "minima_ratio_100k_over_50k": 8.06,
+     "minima_excess_ms_100k_over_twice_50k": 69.63,
+     "per_round_helper_ms": [[5.83, 11.49, 92.62], [5.97, 11.65, 99.43], [5.8, 11.56, 98.17]]
+    }
+   ],
+   "interpreter_log_line": {"line": 1503, "text": "Using CPython 3.12.3 interpreter at: /usr/bin/python3"},
+   "tests_ran": 9943,
+   "suite_seconds": 1201.487,
+   "result": "FAILED (failures=2, skipped=967)",
+   "head_sha_12": "5bb34519eb2e"
+  },
+  {
+   "run": 37120736604,
+   "pr": 651,
+   "job": 111196172237,
+   "attempt": 1,
+   "attempt_2": "success",
+   "failed_helpers": [
+    {
+     "helper": "k4_shell_words",
+     "rounds": 3,
+     "host_factor": 1.0781,
+     "helper_min_ms": {"25k": 7.93, "50k": 15.68, "100k": 103.45},
+     "test_exponent": 1.534,
+     "minima_ratio_50k_over_25k": 1.98,
+     "minima_ratio_100k_over_50k": 6.6,
+     "minima_excess_ms_100k_over_twice_50k": 72.09,
+     "per_round_helper_ms": [[8.14, 15.77, 103.45], [8.2, 15.68, 106.31], [7.93, 15.98, 104.69]]
+    }
+   ],
+   "interpreter_log_line": {"line": 1509, "text": "Using CPython 3.12.3 interpreter at: /usr/bin/python3"},
+   "tests_ran": 9943,
+   "suite_seconds": 1391.859,
+   "result": "FAILED (failures=1, skipped=967)",
+   "head_sha_12": "21497f9e6a95"
+  }
+ ],
+ "ci_signature": {
+  "per_round": "over all 9 failing rounds, the 50k/25k ratio is 1.91 to 2.01 and the 100k/50k ratio 5.93 to 8.54; the 100k time exceeds twice the same round's 50k time by 69.63 to 80.76 ms, and twice the 50k minimum by 69.63 to 82.49 ms",
+  "per_size_minima": "over the per-size minima the test decides on, the 50k/25k ratio is 1.97 to 1.98, the 100k/50k ratio 5.93 to 8.06 and the excess over twice the 50k minimum 69.63 to 76.29 ms",
+  "reading": "every failing round carries the 100k excess, so the minimum over rounds cannot clear it: a fixed pause, not growth"
+ },
+ "local_reproduction": {
+  "host": "Linux x86_64 (WSL2)",
+  "heap_simulation": {
+   "refs_N": "one live list holding N untracked ints, [list(range(10**6, 10**6 + N))]: each full collection traverses it, so the pause grows without changing the tracked-object count",
+   "prefill_K": "[[i] for i in range(K)] then gc.collect(1) before the test: shifts when the quarter-of-long-lived trigger fires",
+   "tracked_objects_after_discovery": 104507
+  },
+  "unchanged_test_diagnosis": {
+   "heaps": 6,
+   "failed": 3,
+   "columns": ["refs", "prefill", "test_sha256_12", "passed", "failed_helper", "rounds", "test_exponent", "helper_min_ms_25k_50k_100k"],
+   "rows": [
+    [8000000, 12000, "5cb82aa2cd0a", true, null, null, null, null],
+    [8000000, 36000, "5cb82aa2cd0a", false, "k4_shell_words", 3, 1.819, [7.2, 14.1, 147.2]],
+    [4000000, 36000, "5cb82aa2cd0a", false, "k4_shell_words", 3, 1.652, [6.9, 13.5, 112.3]],
+    [8000000, 0, "5cb82aa2cd0a", true, null, null, null, null],
+    [8000000, 24000, "5cb82aa2cd0a", true, null, null, null, null],
+    [4000000, 12000, "5cb82aa2cd0a", false, "k4_shell_words", 3, 1.617, [6.9, 13.9, 107.1]]
+   ]
+  },
+  "diagnosis_patch": {"scope": "measure_round wrapper only", "test_sha256_12": "49e3ca5b4512", "heaps": 6, "passed": 6},
+  "final_test_rerun": {
+   "command": "nice -n 19 /usr/bin/python3 -B, the real test after discovery, in the heaps that failed the unchanged test",
+   "columns": ["refs", "prefill", "test_sha256_12", "passed"],
+   "rows": [[8000000, 36000, "3850fa34c293", true], [4000000, 36000, "3850fa34c293", true], [4000000, 12000, "3850fa34c293", true]]
+  },
+  "paired_exponent_capture": {
+   "method": "the same run with the test module's k4_timing_passes wrapped to record the arguments of the final per-helper call made by test_k4_timing (outside every timed window); the unchanged and the final test alternate in each heap",
+   "helpers_decided_per_run": 67,
+   "columns": [
+    "refs",
+    "prefill",
+    "test_sha256_12",
+    "passed",
+    "k4_shell_words_rounds",
+    "k4_shell_words_test_exponent",
+    "k4_shell_words_min_ms",
+    "k4_f_header_rounds",
+    "k4_f_header_test_exponent",
+    "k4_f_header_min_ms",
+    "max_exponent_helper",
+    "max_test_exponent",
+    "helpers_needing_another_round"
+   ],
+   "rows": [
+    [
+     8000000,
+     36000,
+     "5cb82aa2cd0a",
+     false,
+     3,
+     1.722,
+     [7.1, 13.9, 126.4],
+     1,
+     0.193,
+     [120.2, 24.2, 158.5],
+     "k4_shell_words",
+     1.722,
+     ["k4_resume_contexts", "k4_runner_mentions", "k4_shell_words"]
+    ],
+    [8000000, 36000, "3850fa34c293", true, 1, 0.696, [6.3, 12.5, 24.8], 1, 0.843, [11.6, 23.5, 48.5], "k4_tightenings", 0.96, []],
+    [
+     4000000,
+     36000,
+     "5cb82aa2cd0a",
+     false,
+     3,
+     1.529,
+     [7.1, 14.8, 95.7],
+     1,
+     0.225,
+     [99.6, 24.4, 137.9],
+     "k4_shell_words",
+     1.529,
+     ["k4_resume_contexts", "k4_shell_words", "k4_store_text"]
+    ],
+    [4000000, 36000, "3850fa34c293", true, 1, 0.834, [9.1, 17.8, 39.9], 1, 1.023, [12.4, 30.7, 67.0], "k4_interpreter_reason", 1.051, []],
+    [
+     4000000,
+     12000,
+     "5cb82aa2cd0a",
+     true,
+     1,
+     0.715,
+     [7.2, 97.3, 28.0],
+     2,
+     1.475,
+     [12.6, 24.9, 130.6],
+     "k4_code_tokens",
+     1.485,
+     ["k4_f_header", "k4_tail_reason"]
+    ],
+    [4000000, 12000, "3850fa34c293", true, 1, 0.704, [6.5, 13.1, 25.5], 1, 0.822, [11.7, 23.7, 47.2], "k4_tightenings", 0.944, []]
+   ]
+  },
+  "collector_can_also_mask_growth": {
+   "note": "with the collector on, a pause that lands in the 25k window lowers the exponent instead of raising it",
+   "columns": ["refs", "prefill", "test_sha256_12", "helper", "helper_min_ms_25k_50k_100k", "test_exponent"],
+   "rows": [
+    [8000000, 36000, "5cb82aa2cd0a", "k4_f_header", [120.2, 24.2, 158.5], 0.193],
+    [4000000, 36000, "5cb82aa2cd0a", "k4_f_header", [99.6, 24.4, 137.9], 0.225]
+   ]
+  },
+  "quadratic_control_final_test": {
+   "mutant": "k4_shell_words wrapped to run text[i:].count(\"'\") for i in range(0, len(text), 10) before the original: O(n^2 / 10) work",
+   "columns": ["refs", "prefill", "test_sha256_12", "k4_shell_words_passed", "rounds", "test_exponent", "helper_min_ms_25k_50k_100k", "other_failed_helpers"],
+   "rows": [
+    [0, 0, "3850fa34c293", false, 3, 1.63, [18.3, 60.7, 218.0], ["k4_literal_input", "k4_store_reason", "k4_store_text", "k4_visible_words"]],
+    [
+     8000000,
+     36000,
+     "3850fa34c293",
+     false,
+     3,
+     1.635,
+     [18.7, 62.4, 223.8],
+     ["k4_literal_input", "k4_store_reason", "k4_store_text", "k4_visible_words"]
+    ]
+   ],
+   "other_helpers_note": "the mutation is the only difference from the passing runs, so check() also reaches the mutated k4_shell_words on those helpers' texts; their test exponents stay under 1.5 and their helper minima under 0.5 s, so their whole-check minima are what cross the 0.5 s absolute bound"
+  }
+ },
+ "gc_callback_attribution": {
+  "method": "a replay of measure_round with the test module's own k4_run_timing_rounds and k4_timing_passes after discovery, with gc.callbacks recording each collection's generation and duration inside every timed helper window; gc on, then gc off as in the fix, in the same simulated heap",
+  "scope": "14 replays: 7 heaps, each replayed with gc on and with gc off, each replay deciding both helpers",
+  "collector_on_decisions": 14,
+  "collector_on_failures": 7,
+  "collector_on_failures_with_one_gen2_in_the_100k_window_every_round": 7,
+  "gen2_pause_ms_range": [72.1, 110.4],
+  "collector_off_decisions": 14,
+  "collector_off_passed_in_round_1": 14,
+  "collector_off_gen2_in_any_window": 0,
+  "collector_off_test_exponent_range_all": [0.665, 0.848],
+  "rows_note": "rows list each collector-on failure followed by its collector-off twin (same heap, same helper); the 7 twins span test exponents 0.708 to 0.841; the other 7 collector-off decisions (the other helper in each heap) are counted above, not listed",
+  "columns": [
+   "refs",
+   "prefill",
+   "helper",
+   "gc",
+   "passed",
+   "rounds",
+   "test_exponent",
+   "helper_min_ms_25k_50k_100k",
+   "gen2_collections_in_100k_window_per_round",
+   "gen2_ms_in_100k_window_per_round"
+  ],
+  "rows": [
+   [4000000, 36000, "k4_shell_words", "on", false, 3, 1.584, [6.96, 13.64, 102.43], [1, 1, 1], [73.7, 96.8, 86.8]],
+   [4000000, 36000, "k4_shell_words", "off", true, 1, 0.71, [6.86, 13.37, 26.71], [0], [0.0]],
+   [4000000, 42000, "k4_shell_words", "on", false, 3, 1.584, [6.75, 13.65, 100.64], [1, 1, 1], [72.1, 77.7, 77.4]],
+   [4000000, 42000, "k4_shell_words", "off", true, 1, 0.708, [6.97, 13.55, 26.91], [0], [0.0]],
+   [8000000, 6000, "k4_f_header", "on", false, 3, 1.529, [12.19, 24.4, 138.13], [1, 1, 1], [89.0, 98.2, 89.3]],
+   [8000000, 6000, "k4_f_header", "off", true, 1, 0.841, [11.66, 23.94, 48.48], [0], [0.0]],
+   [8000000, 12000, "k4_f_header", "on", false, 3, 1.511, [11.95, 24.16, 132.72], [1, 1, 1], [91.2, 91.1, 84.9]],
+   [8000000, 12000, "k4_f_header", "off", true, 1, 0.829, [12.14, 24.1, 49.11], [0], [0.0]],
+   [8000000, 18000, "k4_f_header", "on", false, 3, 1.535, [12.2, 25.06, 139.52], [1, 1, 1], [89.5, 95.1, 102.2]],
+   [8000000, 18000, "k4_f_header", "off", true, 1, 0.818, [12.05, 24.18, 48.0], [0], [0.0]],
+   [8000000, 36000, "k4_shell_words", "on", false, 3, 1.746, [6.96, 14.05, 129.6], [1, 1, 1], [105.0, 110.4, 101.7]],
+   [8000000, 36000, "k4_shell_words", "off", true, 1, 0.712, [6.77, 13.22, 26.56], [0], [0.0]],
+   [8000000, 42000, "k4_shell_words", "on", false, 3, 1.711, [6.83, 13.64, 121.85], [1, 1, 1], [96.6, 94.4, 95.6]],
+   [8000000, 42000, "k4_shell_words", "off", true, 1, 0.722, [6.98, 13.52, 27.59], [0], [0.0]]
+  ],
+  "quadratic_mutant_replay": {
+   "columns": ["mutant_step", "gc", "passed", "rounds", "test_exponent", "helper_min_ms_25k_50k_100k", "gen2_collections_in_100k_window"],
+   "rows": [
+    [10, "on", false, 3, 1.625, [19.01, 62.29, 223.32], 0],
+    [10, "off", false, 3, 1.64, [18.32, 61.38, 221.53], 0],
+    [5, "on", false, 3, 1.771, [31.02, 110.9, 414.61], 0],
+    [5, "off", false, 3, 1.788, [30.24, 114.14, 415.34], 0]
+   ]
+  }
+ },
+ "linearity_collector_off": {
+  "method": "direct helper calls (outside check()) at 25k, 50k, 100k, 200k and 400k, minimum of 5 repeats",
+  "raw_pair_exponent_range": [0.984, 1.054],
+  "by_heap": {
+   "heap0": {
+    "k4_shell_words": {"25k-50k": 1.0, "50k-100k": 1.014, "100k-200k": 0.998, "200k-400k": 1.054},
+    "k4_f_header": {"25k-50k": 0.997, "50k-100k": 1.008, "100k-200k": 0.997, "200k-400k": 0.988}
+   },
+   "discover": {
+    "k4_shell_words": {"25k-50k": 1.005, "50k-100k": 1.013, "100k-200k": 0.999, "200k-400k": 1.036},
+    "k4_f_header": {"25k-50k": 1.002, "50k-100k": 1.027, "100k-200k": 0.984, "200k-400k": 0.991}
+   },
+   "discover_plus_300k": {
+    "k4_shell_words": {"25k-50k": 1.002, "50k-100k": 0.996, "100k-200k": 1.01, "200k-400k": 1.012},
+    "k4_f_header": {"25k-50k": 1.009, "50k-100k": 0.997, "100k-200k": 1.003, "200k-400k": 0.999}
+   }
+  }
+ },
+ "collector_on_direct_calls": {
+  "discover": {
+   "k4_shell_words": {
+    "raw_pair_exponents": {"25k-50k": 1.004, "50k-100k": 1.022, "100k-200k": 1.902, "200k-400k": 1.094},
+    "sizes_with_a_gen2_collection": [25000, 100000, 200000, 400000]
+   },
+   "k4_f_header": {
+    "raw_pair_exponents": {"25k-50k": 1.023, "50k-100k": 1.038, "100k-200k": 1.609, "200k-400k": 1.036},
+    "sizes_with_a_gen2_collection": [25000, 50000, 100000, 200000, 400000]
+   }
+  },
+  "discover_plus_300k": {
+   "k4_shell_words": {
+    "raw_pair_exponents": {"25k-50k": 1.021, "50k-100k": 1.009, "100k-200k": 1.009, "200k-400k": 1.84},
+    "sizes_with_a_gen2_collection": [200000, 400000]
+   },
+   "k4_f_header": {
+    "raw_pair_exponents": {"25k-50k": 1.022, "50k-100k": 1.017, "100k-200k": 0.988, "200k-400k": 1.451},
+    "sizes_with_a_gen2_collection": [50000, 100000, 200000, 400000]
+   }
+  }
+ },
+ "rejected_alternatives": [
+  {
+   "alternative": "larger sizes",
+   "reason": "the pause belongs to whichever window the collector's phase selects: with the collector on, direct calls met generation-2 collections at every size from 25k to 400k (collector_on_direct_calls), so larger sizes move the failure and lengthen every helper's rounds"
+  },
+  {
+   "alternative": "a larger allowance",
+   "reason": "the recorded CI minima need an allowance of at least 6.6 ms to pass; at that allowance the quadratic controls of test_k4_growth_criterion_controls (16 times the 25k time at 100k) score 1.412 from 4.5 ms and 1.663 from 10 ms, so the 4.5 ms control passes and that test breaks",
+   "computed_from": "ci_failures helper minima (arithmetic, not a new run)"
+  },
+  {
+   "alternative": "gc.collect() before each timed size",
+   "reason": "a full collection per size per round outside the window, 201 to 603 of them for 67 helpers, each costing about the 72.1 to 110.4 ms pause measured in the simulated heaps; the collector also stays on inside the window; not measured"
+  },
+  {
+   "alternative": "gc.freeze()",
+   "reason": "changes process-wide collector state for the rest of the suite (it resets the generation counts and hides the frozen heap from every collection until gc.unfreeze()); Doc/library/gc.rst documents it for fork() memory sharing, and timeit's practice for timing is gc.disable(); a choice of practice, not a failed experiment: with the heap frozen after setup the diagnosis measured raw pair exponents 0.978 to 1.051"
+  }
+ ],
+ "overturn_conditions": [
+  "a CI full-suite run in which the fixed test still fails a helper on growth: the cause is then input-dependent work or something this diagnosis does not explain",
+  "a guard change whose cost is dominated by allocation-heavy work that creates cyclic garbage, so that the collector's own cost grows with the input: collector-off timing would not see it, and that helper would need a collector-on control",
+  "upstream timeit changing its practice, so that Timer.timeit no longer disables the collector while timing"
+ ],
+ "limitations": [
+  "CI's own heap was not instrumented: the CI attribution rests on the matching signature (in each of the 9 failing rounds the 100k time exceeds twice that round's 50k time by 69.63 to 80.76 ms) and on the local gc-callback attribution in simulated heaps.",
+  "With the collector off, cyclic-garbage collection cost is excluded from the measured helper time, the disadvantage Doc/library/timeit.rst L136-141 names; the guard's reference cycles are still collected once the collector is re-enabled.",
+  "The simulated heaps and the mutant are synthetic fixtures; they reproduce the failure mode, not CI's exact heap."
+ ]
+}

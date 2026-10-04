@@ -1,0 +1,30 @@
+.......F..
+======================================================================
+FAIL: test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date (tests.test_frozen_macos_variant_no_use.FrozenOsvExceptionReviewTests.test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date)
+The recheck of alert 16 is tied to this exception: removing it, renewing or otherwise changing its
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 524, in test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date
+    self.assertEqual(
+    ~~~~~~~~~~~~~~~~^
+        unexpected, [],
+        ^^^^^^^^^^^^^^^
+        f"{FROZEN_CONFIG}: the exception for {ADVISORY} has keys {unexpected} besides {sorted(EXCEPTION_KEYS)}: "
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f"{RECHECK}.",
+        ^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: Lists differ: ['effectiveUntil'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'effectiveUntil'
+
+- ['effectiveUntil']
++ [] : .github/osv-scanner-frozen-macos.toml: the exception for GHSA-vcvr-r3jv-pc5j has keys ['effectiveUntil'] besides ['id', 'ignoreUntil', 'reason']: recheck Dependabot alert 16 (reopen it unless the renewed exception's reasoning still holds) and update this pinned date.
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.421s
+
+FAILED (failures=1)
