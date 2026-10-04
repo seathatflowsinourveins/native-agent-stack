@@ -1,0 +1,385 @@
+{
+ "schema": "token-stack-fresh-session-e2e/1",
+ "recorded_utc": "2026-10-04T22:20:00Z",
+ "evidence_class": "local_integration: native execution on one host, in a fresh project directory and in scratch Codex homes; not an A/B, not an upstream test; one run per arm",
+ "versions": {
+  "rtk": "0.51.0",
+  "claude_code": "2.1.289",
+  "codex_cli": "0.159.3"
+ },
+ "nativestack_before_snapshot": {
+  "recorded_utc": "2026-10-04T21:44Z",
+  "claude_git_status": {
+   "model": "claude-haiku-4-5-20251001",
+   "claude_code_version": "2.1.289",
+   "tools": 117,
+   "mcp_servers": {
+    "plugin:context-mode:context-mode": "connected",
+    "ai-memory": "connected",
+    "serena": "connected",
+    "jcodemunch": "connected",
+    "codebase-memory": "connected",
+    "qmd": "connected",
+    "headroom": "connected",
+    "hindsight": "connected"
+   },
+   "hook_events": {
+    "PostToolUse|PostToolUse:Bash|success": 2,
+    "PreToolUse|PreToolUse:Bash|success": 4,
+    "SessionStart|SessionStart:startup|success": 7,
+    "Stop|Stop|success": 4,
+    "UserPromptSubmit|UserPromptSubmit|success": 2
+   },
+   "asked": [
+    "git status"
+   ],
+   "rewritten_to": [
+    {
+     "reason": "RTK auto-rewrite",
+     "command": "rtk git status"
+    }
+   ],
+   "turns": 2,
+   "is_error": false,
+   "tokens": {
+    "input": 18,
+    "output": 185,
+    "cache_read": 46150
+   }
+  },
+  "claude_grep": {
+   "model": "claude-haiku-4-5-20251001",
+   "claude_code_version": "2.1.289",
+   "tools": 117,
+   "mcp_servers": {
+    "plugin:context-mode:context-mode": "connected",
+    "ai-memory": "connected",
+    "serena": "connected",
+    "jcodemunch": "connected",
+    "codebase-memory": "connected",
+    "qmd": "connected",
+    "headroom": "connected",
+    "hindsight": "connected"
+   },
+   "hook_events": {
+    "PostToolUse|PostToolUse:Bash|success": 2,
+    "PreToolUse|PreToolUse:Bash|success": 4,
+    "SessionStart|SessionStart:startup|success": 7,
+    "Stop|Stop|success": 4,
+    "UserPromptSubmit|UserPromptSubmit|success": 2
+   },
+   "asked": [
+    "grep -rl needle ."
+   ],
+   "rewritten_to": [
+    {
+     "reason": "RTK auto-rewrite",
+     "command": "rtk grep -rl needle ."
+    }
+   ],
+   "turns": 2,
+   "is_error": false,
+   "tokens": {
+    "input": 20,
+    "output": 262,
+    "cache_read": 50141
+   }
+  },
+  "codex_git_status": {
+   "executed": "/bin/bash -lc 'rtk git status'",
+   "exit_code": 0,
+   "usage": {
+    "input_tokens": 39197,
+    "cached_input_tokens": 19328,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 49,
+    "reasoning_output_tokens": 0
+   }
+  },
+  "rtk_gain_json_summary": {
+   "commands_before": 262568,
+   "commands_after": 262601,
+   "saved_before": 124711599,
+   "saved_after": 124711896,
+   "note": "host-wide counters; other sessions ran during the probe"
+  },
+  "mcp_user_scope_gap": "SocratiCode registered at local scope only for Claude Code on this host (a fresh project lacks it)"
+ },
+ "codex_hook_qualification": {
+  "live_hooks_json_unchanged": true,
+  "arms": [
+   {
+    "arm": "R0-probe-only",
+    "trust_after": [
+     "trusted"
+    ],
+    "commands_executed": [
+     "/bin/bash -lc 'git status --short'",
+     "/bin/bash -lc 'ls /nonexistent'",
+     "/bin/bash -lc 'grep -rl nomatch .'",
+     "/bin/bash -lc 'grep -rl needle .'",
+     "/bin/bash -lc 'git diff --exit-code'",
+     "/bin/bash -lc 'git status --short && echo done'"
+    ],
+    "exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "shell_exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "exit_codes_match_shell": true,
+    "executed_with_rtk": 0,
+    "model_asked_with_rtk": 0,
+    "second_hook_saw_commands": 6,
+    "double_prefix": 0,
+    "input_tokens": 91649
+   },
+   {
+    "arm": "R1-hook-trusted",
+    "trust_after": [
+     "trusted",
+     "trusted"
+    ],
+    "commands_executed": [
+     "/bin/bash -lc 'rtk git status --short'",
+     "/bin/bash -lc 'rtk ls /nonexistent'",
+     "/bin/bash -lc 'rtk grep -rl nomatch .'",
+     "/bin/bash -lc 'rtk grep -rl needle .'",
+     "/bin/bash -lc 'rtk git diff --exit-code'",
+     "/bin/bash -lc 'rtk git status --short && echo done'"
+    ],
+    "exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "shell_exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "exit_codes_match_shell": true,
+    "executed_with_rtk": 6,
+    "model_asked_with_rtk": 0,
+    "second_hook_saw_commands": 6,
+    "double_prefix": 0,
+    "input_tokens": 91816
+   },
+   {
+    "arm": "R1u-hook-untrusted",
+    "trust_after": [
+     "untrusted",
+     "untrusted"
+    ],
+    "commands_executed": [
+     "/bin/bash -lc 'git status --short'",
+     "/bin/bash -lc 'ls /nonexistent'",
+     "/bin/bash -lc 'grep -rl nomatch .'",
+     "/bin/bash -lc 'grep -rl needle .'",
+     "/bin/bash -lc 'git diff --exit-code'",
+     "/bin/bash -lc 'git status --short && echo done'"
+    ],
+    "exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "shell_exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "exit_codes_match_shell": true,
+    "executed_with_rtk": 0,
+    "model_asked_with_rtk": 0,
+    "second_hook_saw_commands": 0,
+    "double_prefix": 0,
+    "input_tokens": 91479
+   },
+   {
+    "arm": "R2-hook-and-prefix",
+    "trust_after": [
+     "trusted",
+     "trusted"
+    ],
+    "commands_executed": [
+     "/bin/bash -lc 'rtk git status --short'",
+     "/bin/bash -lc 'rtk ls /nonexistent'",
+     "/bin/bash -lc 'rtk grep -rl nomatch .'",
+     "/bin/bash -lc 'rtk grep -rl needle .'",
+     "/bin/bash -lc 'rtk git diff --exit-code'",
+     "/bin/bash -lc 'rtk git status --short && echo done'"
+    ],
+    "exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "shell_exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "exit_codes_match_shell": true,
+    "executed_with_rtk": 6,
+    "model_asked_with_rtk": 0,
+    "second_hook_saw_commands": 6,
+    "double_prefix": 0,
+    "input_tokens": 92481
+   },
+   {
+    "arm": "B2-hook-battery2",
+    "trust_after": [
+     "trusted",
+     "trusted"
+    ],
+    "commands_executed": [
+     "/bin/bash -lc 'rtk git log --oneline -3 | cat'",
+     "/bin/bash -lc 'rtk grep -rn \"needle two\" a'",
+     "/bin/bash -lc 'rtk find /nonexistent -name x'",
+     "/bin/bash -lc 'diff /nonexistent a/x/util.py'",
+     "/bin/bash -lc 'rtk read a/x/util.py'"
+    ],
+    "exit_codes": [
+     0,
+     0,
+     1,
+     2,
+     0
+    ],
+    "shell_exit_codes": [
+     0,
+     0,
+     1,
+     2,
+     0
+    ],
+    "exit_codes_match_shell": true,
+    "executed_with_rtk": 4,
+    "model_asked_with_rtk": 0,
+    "second_hook_saw_commands": 5,
+    "double_prefix": 0,
+    "input_tokens": 78274
+   },
+   {
+    "arm": "R2b-prefix-instruction-and-hook",
+    "trust_after": [
+     "trusted",
+     "trusted"
+    ],
+    "commands_executed": [
+     "/bin/bash -lc 'rtk git status --short'",
+     "/bin/bash -lc 'rtk ls /nonexistent'",
+     "/bin/bash -lc 'rtk grep -rl nomatch .'",
+     "/bin/bash -lc 'rtk grep -rl needle .'",
+     "/bin/bash -lc 'rtk git diff --exit-code'",
+     "/bin/bash -lc 'rtk git status --short && rtk echo done'"
+    ],
+    "exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "shell_exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "exit_codes_match_shell": true,
+    "executed_with_rtk": 6,
+    "model_asked_with_rtk": 6,
+    "second_hook_saw_commands": 6,
+    "double_prefix": 0,
+    "input_tokens": 92965
+   },
+   {
+    "arm": "R1p-hook-trusted-rtk-not-on-path",
+    "trust_after": [
+     "trusted",
+     "trusted"
+    ],
+    "commands_executed": [
+     "/bin/bash -lc 'git status --short'",
+     "/bin/bash -lc 'ls /nonexistent'",
+     "/bin/bash -lc 'grep -rl nomatch .'",
+     "/bin/bash -lc 'grep -rl needle .'",
+     "/bin/bash -lc 'git diff --exit-code'",
+     "/bin/bash -lc 'git status --short && echo done'"
+    ],
+    "exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "shell_exit_codes": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     0
+    ],
+    "exit_codes_match_shell": true,
+    "executed_with_rtk": 0,
+    "model_asked_with_rtk": 0,
+    "second_hook_saw_commands": 6,
+    "double_prefix": 0,
+    "input_tokens": 91674
+   }
+  ],
+  "ground_truth_exit_codes": {
+   "battery_1": [
+    0,
+    2,
+    1,
+    0,
+    1,
+    0
+   ],
+   "battery_2": [
+    0,
+    0,
+    1,
+    2,
+    0
+   ]
+  }
+ }
+}

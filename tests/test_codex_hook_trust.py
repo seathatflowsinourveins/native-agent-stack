@@ -1,0 +1,235 @@
+"""tools/adoption/codex_hook_trust.py: trust the named hooks of one Codex home through config/batchWrite and read it back.
+
+The app-server is a fake that answers hooks/list and config/batchWrite the way the released codex-cli 0.159.3 does (the field
+names are those of its hooks/list response; the write shape is the TUI's write_hook_trusts); no real Codex, no real home, no
+network: local integration checks, not upstream tests. The real client was run against scratch homes in
+evidence/artifacts/token-stack-fresh-session-e2e-20261004/.
+"""
+
+from __future__ import annotations
+
+import contextlib
+import copy
+import io
+import os
+import stat
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+from unittest import mock
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools" / "adoption"))
+
+import apply_codex_lane as lane  # noqa: E402
+import codex_hook_trust as trust  # noqa: E402
+
+RTK = "rtk hook codex"
+KEY = "/home/example/.codex/hooks.json:pre_tool_use:1:0"
+MEMORY_KEY = "/home/example/.codex/hooks.json:pre_tool_use:0:0"
+
+
+def hook(key: str, command: str, status: str = "untrusted", **changes) -> dict:
+    row = {"key": key, "command": command, "trustStatus": status, "source": "user", "isManaged": False,
+           "eventName": "preToolUse", "matcher": "Bash", "currentHash": "sha256:" + "b" * 64, "handlerType": "command",
+           "enabled": True}
+    row.update(changes)
+    return row
+
+
+class FakeServer:
+    """hooks/list, config/batchWrite and the user layer of one in-memory Codex home."""
+
+    def __init__(self, hooks, *, fail_write: dict | None = None, ignore_write: bool = False):
+        self.hooks, self.version, self.requests = hooks, "v1", []
+        self.fail_write, self.ignore_write = fail_write, ignore_write
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def user_layer(self):
+        return self.version, {}
+
+    def request(self, method, params):
+        self.requests.append((method, copy.deepcopy(params)))
+        if method == "hooks/list":
+            return {"data": [{"cwd": params["cwds"][0], "hooks": copy.deepcopy(self.hooks), "errors": [], "warnings": []}]}
+        if method == "config/batchWrite":
+            if self.fail_write:
+                raise lane.AppServerError(method, self.fail_write)
+            if not self.ignore_write:
+                for edit in params["edits"]:
+                    for key, state in edit["value"].items():
+                        for row in self.hooks:
+                            if row["key"] == key:
+                                row["trustStatus"] = "trusted" if state["trusted_hash"] == row["currentHash"] else "modified"
+            self.version = "v2"
+            return {"status": "ok", "version": self.version}
+        raise AssertionError(method)
+
+    def writes(self):
+        return [params for method, params in self.requests if method == "config/batchWrite"]
+
+
+class Case(unittest.TestCase):
+    def setUp(self):
+        self._scratch = tempfile.TemporaryDirectory()
+        self.addCleanup(self._scratch.cleanup)
+        self.dir = Path(self._scratch.name)
+        self.home = self.dir / "home"
+        self.home.mkdir()
+        self.config = self.home / "config.toml"
+        self.config.write_text('model = "x"\n', encoding="utf-8")
+        self.codex = self.dir / "codex"
+        self.codex.write_text("#!/bin/sh\nexit 9\n", encoding="utf-8")
+        self.codex.chmod(0o700)
+
+    def run_tool(self, server, *extra: str, running=()):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err), \
+                mock.patch.object(trust.lane, "AppServer", return_value=server), \
+                mock.patch.object(trust.lane, "codex_processes", return_value=list(running)):
+            code = trust.main(["--codex", str(self.codex), "--codex-home", str(self.home), "--command", RTK, *extra])
+        return code, out.getvalue(), err.getvalue()
+
+
+class DryRunTests(Case):
+    def test_a_dry_run_lists_the_match_and_writes_nothing(self):
+        server = FakeServer([hook(MEMORY_KEY, "ai-memory --data-dir x", "trusted"), hook(KEY, RTK)])
+        code, out, err = self.run_tool(server)
+        self.assertEqual(code, 0, err)
+        self.assertIn(f"{KEY}: preToolUse Bash 'rtk hook codex' is untrusted", out)
+        self.assertNotIn(MEMORY_KEY, out)  # a hook whose command was not named is not even listed
+        self.assertIn("1 hook(s) would be trusted", out)
+        self.assertEqual(server.writes(), [])
+        self.assertEqual([p.name for p in self.home.iterdir()], ["config.toml"])
+
+    def test_every_named_hook_already_trusted_is_nothing_to_do(self):
+        server = FakeServer([hook(KEY, RTK, "trusted")])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertIn("nothing to do", out)
+        self.assertEqual(server.writes(), [])
+        self.assertEqual([p.name for p in self.home.iterdir()], ["config.toml"])  # not even a backup
+
+    def test_no_hook_with_the_named_command_is_exit_4(self):
+        server = FakeServer([hook(MEMORY_KEY, "ai-memory --data-dir x", "trusted")])
+        code, _, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 4)
+        self.assertIn("register it first", err)
+        self.assertEqual(server.writes(), [])
+
+
+class ApplyTests(Case):
+    def test_apply_backs_up_writes_the_tuis_edit_and_reads_back(self):
+        server = FakeServer([hook(MEMORY_KEY, "ai-memory --data-dir x", "trusted"), hook(KEY, RTK)])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+        (write,) = server.writes()
+        self.assertEqual(write["expectedVersion"], "v1")
+        self.assertEqual(write["edits"], [{"keyPath": "hooks.state", "mergeStrategy": "upsert",
+                                           "value": {KEY: {"trusted_hash": "sha256:" + "b" * 64}}}])
+        self.assertEqual([row["trustStatus"] for row in server.hooks], ["trusted", "trusted"])
+        self.assertIn("trusted 1 hook(s)", out)
+        (backup,) = [p for p in self.home.iterdir() if p.name.startswith("config.toml.bak.")]
+        self.assertEqual(backup.read_text(encoding="utf-8"), 'model = "x"\n')
+        self.assertEqual(stat.S_IMODE(backup.stat().st_mode), 0o600)
+
+    def test_only_the_named_hooks_are_trusted(self):
+        other = hook("/home/example/.codex/hooks.json:stop:0:0", "ai-memory --data-dir x", eventName="stop", matcher="")
+        server = FakeServer([other, hook(KEY, RTK)])
+        code, _, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+        (write,) = server.writes()
+        self.assertEqual(list(write["edits"][0]["value"]), [KEY])
+        self.assertEqual(server.hooks[0]["trustStatus"], "untrusted")
+
+    def test_a_modified_hook_is_trusted_again_at_its_current_hash(self):
+        server = FakeServer([hook(KEY, RTK, "modified", currentHash="sha256:" + "c" * 64)])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(server.writes()[0]["edits"][0]["value"][KEY]["trusted_hash"], "sha256:" + "c" * 64)
+        self.assertEqual(server.hooks[0]["trustStatus"], "trusted")
+
+    def test_a_project_hook_a_managed_hook_and_a_non_command_handler_are_never_trusted(self):
+        rows = [hook("/p/.codex/hooks.json:pre_tool_use:0:0", RTK, source="project"),
+                hook("managed:pre_tool_use:0:0", RTK, "managed", source="system", isManaged=True),
+                hook("/home/example/.codex/config.toml:pre_tool_use:0:0", RTK, handlerType="mcp_tool")]
+        server = FakeServer(rows)
+        code, _, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 4, err)
+        self.assertEqual(server.writes(), [])
+
+    def test_two_commands_may_be_named(self):
+        second = hook("/home/example/.codex/hooks.json:stop:1:0", "other-hook", eventName="stop", matcher="")
+        server = FakeServer([hook(KEY, RTK), second])
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err), \
+                mock.patch.object(trust.lane, "AppServer", return_value=server), \
+                mock.patch.object(trust.lane, "codex_processes", return_value=[]):
+            code = trust.main(["--codex", str(self.codex), "--codex-home", str(self.home), "--command", RTK,
+                               "--command", "other-hook", "--apply"])
+        self.assertEqual(code, 0, err.getvalue())
+        self.assertEqual(sorted(server.writes()[0]["edits"][0]["value"]), sorted([KEY, second["key"]]))
+
+    def test_a_running_codex_refuses_before_any_write(self):
+        server = FakeServer([hook(KEY, RTK)])
+        code, _, err = self.run_tool(server, "--apply", running=["4242"])
+        self.assertEqual(code, 2)
+        self.assertIn("4242", err)
+        self.assertEqual(server.writes(), [])
+        self.assertEqual([p.name for p in self.home.iterdir()], ["config.toml"])
+
+    def test_a_running_codex_does_not_block_a_dry_run_or_a_no_op(self):
+        for hooks, extra in (([hook(KEY, RTK)], ()), ([hook(KEY, RTK, "trusted")], ("--apply",))):
+            with self.subTest(extra=extra):
+                code, _, err = self.run_tool(FakeServer(hooks), *extra, running=["4242"])
+                self.assertEqual(code, 0, err)
+
+    def test_a_failed_write_is_exit_3_and_names_the_backup(self):
+        server = FakeServer([hook(KEY, RTK)], fail_write={"message": "version conflict", "code": -32600})
+        code, _, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 3)
+        self.assertIn("version conflict", err)
+        self.assertIn("config.toml.bak.", err)
+        self.assertEqual(server.hooks[0]["trustStatus"], "untrusted")
+
+    def test_a_hook_the_writer_still_reports_untrusted_is_a_failure(self):
+        server = FakeServer([hook(KEY, RTK)], ignore_write=True)
+        code, _, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 3)
+        self.assertIn("still reports not trusted", err)
+        self.assertIn(KEY, err)
+
+    def test_a_home_without_a_config_file_gets_no_backup(self):
+        self.config.unlink()
+        server = FakeServer([hook(KEY, RTK)])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertNotIn("backup:", out)
+        self.assertEqual(os.listdir(self.home), [])
+
+    def test_no_codex_executable_is_refused(self):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err), \
+                mock.patch.object(trust.shutil, "which", return_value=None):
+            code = trust.main(["--codex-home", str(self.home), "--command", RTK])
+        self.assertEqual(code, 2)
+        self.assertIn("no codex executable", err.getvalue())
+
+    def test_two_backups_in_one_second_do_not_overwrite_each_other(self):
+        with mock.patch.object(trust.lane, "utc_stamp", return_value="20261004T000000Z"):
+            first = trust.write_backup(self.config)
+            self.config.write_text('model = "y"\n', encoding="utf-8")
+            second = trust.write_backup(self.config)
+        self.assertNotEqual(first, second)
+        self.assertEqual(first.read_text(encoding="utf-8"), 'model = "x"\n')
+        self.assertEqual(second.read_text(encoding="utf-8"), 'model = "y"\n')
+
+
+if __name__ == "__main__":
+    unittest.main()
