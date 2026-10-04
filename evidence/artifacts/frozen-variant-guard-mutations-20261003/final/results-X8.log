@@ -1,0 +1,153 @@
+F..FF.....
+======================================================================
+FAIL: test_git_tracks_nothing_beyond_the_three_files_there (tests.test_frozen_macos_variant_no_use.ArtifactDirectoryTests.test_git_tracks_nothing_beyond_the_three_files_there)
+Paths compared in any ASCII letter case; OS metadata files aside. Fewer files pass: removing the variant or
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 267, in tracked_entries
+    listing = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files", "--stage", "-z"], env=environment, capture_output=True, check=True,
+    )
+  File "<python>/lib/python3.13/subprocess.py", line 555, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "<python>/lib/python3.13/subprocess.py", line 1040, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python>/lib/python3.13/subprocess.py", line 1992, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'git'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 288, in tracked_or_fail
+    return tracked_entries()
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 273, in tracked_entries
+    raise GitUnavailable(
+    ...<3 lines>...
+    ) from error
+tests.test_frozen_macos_variant_no_use.GitUnavailable: git ls-files could not run in <clone> ([Errno 2] No such file or directory: 'git'). This tripwire reads the tracked files and fails instead of skipping without them (a skipped guard is no guard in the required job): run it in a Git checkout with git on PATH.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 392, in test_git_tracks_nothing_beyond_the_three_files_there
+    extra = beyond_artifact_files(artifact_relative_paths(name for name, _ in tracked_or_fail(self)))
+                                                                              ~~~~~~~~~~~~~~~^^^^^^
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 290, in tracked_or_fail
+    test.fail(str(error))
+    ~~~~~~~~~^^^^^^^^^^^^
+AssertionError: git ls-files could not run in <clone> ([Errno 2] No such file or directory: 'git'). This tripwire reads the tracked files and fails instead of skipping without them (a skipped guard is no guard in the required job): run it in a Git checkout with git on PATH.
+
+======================================================================
+FAIL: test_every_pinned_file_is_scanned_with_its_pinned_lines (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_every_pinned_file_is_scanned_with_its_pinned_lines)
+Not vacuous: each pinned file, this module included, is read by the scan and holds each pinned line.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 267, in tracked_entries
+    listing = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files", "--stage", "-z"], env=environment, capture_output=True, check=True,
+    )
+  File "<python>/lib/python3.13/subprocess.py", line 555, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "<python>/lib/python3.13/subprocess.py", line 1040, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python>/lib/python3.13/subprocess.py", line 1992, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'git'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 313, in scan_or_fail
+    return scan()
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 298, in scan
+    for name, mode in tracked_entries():
+                      ~~~~~~~~~~~~~~~^^
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 273, in tracked_entries
+    raise GitUnavailable(
+    ...<3 lines>...
+    ) from error
+tests.test_frozen_macos_variant_no_use.GitUnavailable: git ls-files could not run in <clone> ([Errno 2] No such file or directory: 'git'). This tripwire reads the tracked files and fails instead of skipping without them (a skipped guard is no guard in the required job): run it in a Git checkout with git on PATH.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 468, in test_every_pinned_file_is_scanned_with_its_pinned_lines
+    found = scan_or_fail(self)
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 315, in scan_or_fail
+    test.fail(str(error))
+    ~~~~~~~~~^^^^^^^^^^^^
+AssertionError: git ls-files could not run in <clone> ([Errno 2] No such file or directory: 'git'). This tripwire reads the tracked files and fails instead of skipping without them (a skipped guard is no guard in the required job): run it in a Git checkout with git on PATH.
+
+======================================================================
+FAIL: test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 267, in tracked_entries
+    listing = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files", "--stage", "-z"], env=environment, capture_output=True, check=True,
+    )
+  File "<python>/lib/python3.13/subprocess.py", line 555, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "<python>/lib/python3.13/subprocess.py", line 1040, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python>/lib/python3.13/subprocess.py", line 1992, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'git'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 313, in scan_or_fail
+    return scan()
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 298, in scan
+    for name, mode in tracked_entries():
+                      ~~~~~~~~~~~~~~~^^
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 273, in tracked_entries
+    raise GitUnavailable(
+    ...<3 lines>...
+    ) from error
+tests.test_frozen_macos_variant_no_use.GitUnavailable: git ls-files could not run in <clone> ([Errno 2] No such file or directory: 'git'). This tripwire reads the tracked files and fails instead of skipping without them (a skipped guard is no guard in the required job): run it in a Git checkout with git on PATH.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 455, in test_no_scanned_file_names_the_artifact_beyond_its_pinned_lines
+    for name, lines in sorted(scan_or_fail(self).items()):
+                              ~~~~~~~~~~~~^^^^^^
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 315, in scan_or_fail
+    test.fail(str(error))
+    ~~~~~~~~~^^^^^^^^^^^^
+AssertionError: git ls-files could not run in <clone> ([Errno 2] No such file or directory: 'git'). This tripwire reads the tracked files and fails instead of skipping without them (a skipped guard is no guard in the required job): run it in a Git checkout with git on PATH.
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.023s
+
+FAILED (failures=3)

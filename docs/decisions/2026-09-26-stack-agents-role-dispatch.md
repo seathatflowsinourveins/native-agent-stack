@@ -253,10 +253,15 @@ Codex parity is a template only, not applied by any installer; B1 applies no Cod
 B1 is the host-apply unit that follows this change.
 `adoption/templates/codex.hooks.template.json` holds the one group that would run the same script under Codex, and
 it can only be used by hand-appending that group after ai-memory's one SessionStart group in the user `hooks.json`.
-The config template ships no trust entry for it: Codex keys a hand-appended group by its position
-(`session_start:1:0` after ai-memory's one SessionStart group, `session_start:2:0` or later after more), and at
-every position the handler stays untrusted, and is skipped, until it is reviewed in `/hooks` (Codex's trust rule
-for hooks; the keys were measured for the second and third positions with Codex 0.157.1 and 0.159.2; see Sources).
+Codex's persisted key includes the discovered source path and the group/handler indexes:
+`<source-path>:session_start:G:H`. The suffix is `session_start:1:0` after ai-memory's one SessionStart group,
+or `session_start:2:0` after two groups. The second and third positions were measured with Codex 0.157.1 and
+0.159.2 (see Sources). The current template handler is not trusted at any position: an absent trust entry is
+untrusted, while the different hash at position zero is modified. Both are skipped until reviewed in native
+`/hooks`; no trust setting is changed here. The full key and trust states follow
+[key construction](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/lib.rs#L113)
+and [discovery](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/engine/discovery.rs#L795)
+at the destination-selected Codex 0.160.0 source; the repository stack pin remains separately recorded.
 
 The hook prints only `summary_line`, and prints nothing for a missing or stale (over 8 days) due-file. It also
 prints nothing for a malformed or unreadable file, one more than a day ahead, one that is not a regular file, or one

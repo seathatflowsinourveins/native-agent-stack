@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "kind": "native_llm_interoperability_evidence",
+  "native_exit_code": 0,
+  "normalized_sdk_returned_output": {
+    "assistant_text_only": true,
+    "contract": {
+      "api_key_kind": "public-local-loopback-placeholder",
+      "api_mode": "responses",
+      "base_url": "http://127.0.0.1:25371/v1",
+      "expected_output": "OH_NATIVE_LLM_OK_20260930",
+      "generate_calls": 1,
+      "litellm_version": "1.93.2",
+      "max_output_tokens": 1024,
+      "model": "openai/cx/gpt-6.1-sol-max",
+      "model_canonical_name": "gpt-6.1-sol",
+      "num_retries": 0,
+      "outer_deadline_seconds": 240,
+      "prompt_sha256": "dd6f400b842836fe57042634311c53afc349d902fcbe78674dc589f6aa3eb29b",
+      "reasoning_effort": "max",
+      "sdk_version": "1.50.1",
+      "store": false,
+      "stream": false,
+      "timeout_seconds": 180,
+      "tools": 0,
+      "transport_max_retries": 0,
+      "wire_model": "cx/gpt-6.1-sol-max"
+    },
+    "exact_output_passed": true,
+    "mode": "generate",
+    "native_persistence_scoped": true,
+    "native_provider": "openai",
+    "output_characters": 25,
+    "output_sha256": "4e9dbe9256aceed4d92da786101de74633e7e99a5856f75cfe2972a75e217010",
+    "provider_usage": {
+      "cost": null,
+      "input_tokens": 36,
+      "input_tokens_details": {
+        "audio_tokens": null,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "text_tokens": null
+      },
+      "output_tokens": 49,
+      "output_tokens_details": {
+        "reasoning_tokens": 34,
+        "text_tokens": null
+      },
+      "total_tokens": 85
+    }
+  },
+  "stdout_sha256": "1c797b823b62295bd7663581a879f072eb9b9e800e819a9743410f73c165f5b6",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_bytes": 0,
+  "wire_observation": {
+    "event_count": 3,
+    "request_count": 1,
+    "request_metadata": [
+      {
+        "event": "request",
+        "path": "/v1/responses",
+        "request_keys": [
+          "include",
+          "input",
+          "max_output_tokens",
+          "model",
+          "reasoning",
+          "store",
+          "tool_choice"
+        ],
+        "model": "cx/gpt-6.1-sol-max",
+        "effort": "max",
+        "request_bytes": 322,
+        "request_sha256": "ca5ea68692a2957bc18a7580914eac95635b6e5c1ffc5a11428d8a25b8ad8211",
+        "cache_key_sha256": null,
+        "tool_count": null,
+        "tool_names": [],
+        "tool_source": null,
+        "cache_markers_present": false
+      }
+    ],
+    "response_status_codes": [
+      200
+    ],
+    "native_before_prefix_sha256": "d5cb683a19963b2190cc71dac44acf7d6104dc980f1cc59bf104a472e5dd0f6f",
+    "scope": "Distinct appended observer window after27 DeepAgents requests; no headers or credential values retained. Non-SSE observer does not supply returned usage."
+  },
+  "scope": "One actual native SDK LLM.generate exact-output generation through existing OmniRoute; source/metadata/predeclared control evidence stays separate from Conversation, MCP, skills or condenser execution.",
+  "limits": [
+    "One API interoperability task, not comparative agent quality or universal highest-quality qualification.",
+    "Returned reasoning tokens are included in output and total; no savings or complete billing claim."
+  ],
+  "started_at": "2026-10-01 00:45:25 UTC",
+  "completed_observed_at": "2026-10-01 00:48:32 UTC",
+  "native_duration_seconds": null,
+  "command": "rtk proxy env PYTHONDONTWRITEBYTECODE=1 OPENHANDS_SUPPRESS_BANNER=1 timeout --signal=TERM --kill-after=5s 240s '<owned-private-state>/openhands/sdk-venv/bin/python' examples/openhands-native-capabilities/native-llm-trial.py --mode generate --persistence-dir '<owned-private-state>/openhands/sdk-state/.openhands' > '<owned-private-state>/openhands/logs/root-native-llm-generate.stdout' 2> '<owned-private-state>/openhands/logs/root-native-llm-generate.stderr'",
+  "controls": [
+    {
+      "command": "rtk proxy '<owned-private-state>/openhands/sdk-venv/bin/python' examples/openhands-native-capabilities/native-llm-trial.py --mode check-output --output OH_NATIVE_LLM_OK_20260930",
+      "exit_code": 0,
+      "actual_returned_stdout": "{\"exact_output_passed\": true, \"mode\": \"check-output\", \"output_characters\": 25, \"output_sha256\": \"4e9dbe9256aceed4d92da786101de74633e7e99a5856f75cfe2972a75e217010\"}\n"
+    },
+    {
+      "command": "rtk proxy '<owned-private-state>/openhands/sdk-venv/bin/python' examples/openhands-native-capabilities/native-llm-trial.py --mode check-output --output wrong",
+      "exit_code": 2,
+      "actual_returned_stdout": "{\"exact_output_passed\": false, \"mode\": \"check-output\", \"output_characters\": 5, \"output_sha256\": \"8810ad581e59f2bc3928b261707a71308f7e139eb04820366dc4d5c18d980225\"}\n"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+start 2026-10-03T00:01:16Z bootstrap sha256 3b02d65098646d2aa38cfd39a2fc2a48d31c0858fd2727d282e61b9e683cc5a4
+E1-pb1 summary: {
+ "arm": "E1",
+ "queries": 1072,
+ "with_judgement": 1072,
+ "scored": 1072,
+ "mean_ndcg_at_10": 0.4982735928708161,
+ "mteb_ndcg_at_10": 0.49827,
+ "gate_c": true,
+ "missing_predictions": 0
+}
+
+E2-pb1 summary: {
+ "arm": "E2",
+ "queries": 1072,
+ "with_judgement": 1072,
+ "scored": 1072,
+ "mean_ndcg_at_10": 0.41394307352901416,
+ "mteb_ndcg_at_10": 0.41394,
+ "gate_c": true,
+ "missing_predictions": 0
+}
+
+E3-pb2 summary: {
+ "arm": "E3",
+ "queries": 1072,
+ "with_judgement": 1072,
+ "scored": 1072,
+ "mean_ndcg_at_10": 0.5013976633185602,
+ "mteb_ndcg_at_10": 0.5014,
+ "gate_c": true,
+ "missing_predictions": 0
+}
+
+E4-pb2 summary: none
+
+== E1 minus E2
+{"challenger": "E1-pb1", "baseline": "E2-pb1", "queries": 1072, "mean_challenger": 0.498274, "mean_baseline": 0.413943, "difference": 0.084331, "interval_95": [0.067738, 0.100656], "resamples": 10000, "seed": 20260927, "tie": false, "above_zero": true}
+exit 0
+== E3 minus E1
+{"challenger": "E3-pb2", "baseline": "E1-pb1", "queries": 1072, "mean_challenger": 0.501398, "mean_baseline": 0.498274, "difference": 0.003124, "interval_95": [-0.012194, 0.018141], "resamples": 10000, "seed": 20260927, "tie": true, "above_zero": false}
+exit 0
+== E3 minus E2 (recorded, not deciding)
+{"challenger": "E3-pb2", "baseline": "E2-pb1", "queries": 1072, "mean_challenger": 0.501398, "mean_baseline": 0.413943, "difference": 0.087455, "interval_95": [0.072733, 0.102348], "resamples": 10000, "seed": 20260927, "tie": false, "above_zero": true}
+exit 0
+end 2026-10-03T00:01:28Z

@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "id": "claude-hud-0100-qualification-20261004",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-04T08:06:10Z",
+  "component_ids": [
+    "claude-hud"
+  ],
+  "claim": "The retained NativeStack WSL2 run on 2026-10-04 installed claude-hud 0.10.0 from tag v0.10.0 through native Claude plugin commands after an initial marketplace-source mismatch failed. Native marketplace remove/add and plugin install succeeded; plugin list showed version 0.10.0 enabled at user scope. Direct and configured statusline commands rendered a sample payload with exit 0. This is historical plugin and sample-render evidence, not a new interactive terminal session or model run.",
+  "limitations": [
+    "No macOS execution and no upstream test suite run. There are no release assets for this tag; the supported installation remains a native Claude Code plugin, not a tarball bootstrap kind.",
+    "First marketplace add failed with exit 1 due to the old source entry; native remove/add/install recovered it. Sample statusline rendering does not establish a fresh interactive Claude session or provider usage.",
+    "The host note reports a five-second refresh effect, but these retained records do not include a new interactive terminal observation. Plugin details reported approximately zero always-on tokens; this is a native projection, not measured provider counts."
+  ],
+  "data": {
+    "observed_date_utc": "2026-10-04",
+    "host_scope": "NativeStack, WSL2 Linux x86_64; historical user-level installation",
+    "previous_version": "0.8.0",
+    "version": "0.10.0",
+    "release": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+    "tag_commit": "75683c6de1ac07f6bbef00d739001679dba0740c",
+    "host_recorded_at_utc": "2026-10-04T08:06:10Z",
+    "verify_exit": 0,
+    "evidence_classes": [
+      "upstream_native_operation",
+      "local_integration",
+      "artifact_check"
+    ],
+    "host_source_locator": "$HOME/.local/state/native-agent-stack/coordination/token-layer-20261004/nativestack-exec",
+    "sanitization": "Only component-scoped commands, exit codes, times, versions, checksums and bounded verification summaries are published. Private installation prefixes become <stack-home>, the execution directory becomes <host-run>, worktree paths become <owned-worktree>, and home paths become $HOME. No credentials, raw transcripts, user names or email addresses are copied.",
+    "steps": [
+      {
+        "step": "mp_add",
+        "cmd": "timeout 180 claude plugin marketplace add jarrodwatts/claude-hud@v0.10.0 --scope user --json",
+        "rc": 1,
+        "at": "2026-10-04T07:51:37Z"
+      },
+      {
+        "step": "mp_remove",
+        "cmd": "timeout 120 claude plugin marketplace remove claude-hud",
+        "rc": 0,
+        "at": "2026-10-04T07:51:39Z"
+      },
+      {
+        "step": "mp_add2",
+        "cmd": "timeout 180 claude plugin marketplace add jarrodwatts/claude-hud@v0.10.0 --scope user --json",
+        "rc": 0,
+        "at": "2026-10-04T07:51:40Z"
+      },
+      {
+        "step": "plugin_install",
+        "cmd": "timeout 240 claude plugin install claude-hud@claude-hud --scope user --json",
+        "rc": 0,
+        "at": "2026-10-04T07:51:41Z"
+      },
+      {
+        "step": "render_direct",
+        "cmd": "bash -c COLUMNS=116 '<stack-home>/bin/node' '$HOME/.claude/plugins/cache/claude-hud/claude-hud/0.10.0/dist/index.js' < '<host-run>/sample_statusline.json'",
+        "rc": 0,
+        "at": "2026-10-04T07:51:50Z"
+      },
+      {
+        "step": "render_configured_statusline",
+        "cmd": "bash -c COLUMNS=116 bash -c \"$0\" < '<host-run>/sample_statusline.json' bash -c 'cols=${COLUMNS:-}; case \"$cols\" in \"\"|*[!0-9]*) cols=$(stty size 2>/dev/null </dev/tty | awk '\"'\"'{print $2}'\"'\"');; esac; case \"$cols\" in \"\"|*[!0-9]*) cols=120;; esac; export COLUMNS=$(( cols > 4 ? cols - 4 : 1 )); plugin_dir=$(ls -d \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"/plugins/cache/*/claude-hud/*/ 2>/dev/null | awk -F/ '\"'\"'{ print $(NF-1) \"\\t\" $(0) }'\"'\"' | grep -E '\"'\"'^[0-9]+\\.[0-9]+\\.[0-9]+[[:space:]]'\"'\"' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | tail -1 | cut -f2-); export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=diff.autoRefreshIndex GIT_CONFIG_VALUE_0=false; exec \"<stack-home>/bin/node\" \"${plugin_dir}dist/index.js\"'",
+        "rc": 0,
+        "at": "2026-10-04T07:51:50Z"
+      },
+      {
+        "step": "details",
+        "cmd": "timeout 90 claude plugin details claude-hud@claude-hud",
+        "rc": 0,
+        "at": "2026-10-04T07:51:50Z"
+      },
+      {
+        "step": "verify_list",
+        "cmd": "bash -c set -o pipefail; claude plugin list --json | python3 '<host-run>/plugin_version_check.py' claude-hud@claude-hud 0.10.0",
+        "rc": 0,
+        "at": "2026-10-04T08:06:09Z"
+      }
+    ],
+    "artifact_checks": [
+      {
+        "tag": "v0.10.0",
+        "tag_commit": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "release_asset_count": 0,
+        "scope": "Native plugin from tag; no release asset, checksum or unsupported bootstrap kind."
+      }
+    ],
+    "verification_summaries": {
+      "initial_marketplace_add": "Exit 1: source does not match existing marketplace entry",
+      "native_recovery": "Marketplace remove/add and plugin install returned 0",
+      "plugin_list": "0.10.0; user scope; enabled",
+      "render_direct_exit": 0,
+      "render_configured_statusline_exit": 0,
+      "sample_source": "sample_statusline.json; constructed stdin sample, not a live session",
+      "plugin_details": "0 skills, 0 agents, 0 hooks, 0 MCP servers; projected always-on cost approximately 0 tokens"
+    },
+    "research": {
+      "workflow": "Installed search-first/SKILL.md; bounded selection from the four requested maintained upstream stable releases, with source checks retained in catalogs/landscape/upstream-snapshot.json.",
+      "template_commit": "3058b2379086677871d092cc6197e907445a03a9",
+      "upstream_check_source": "upstream-checks.json; recorded 2026-10-04; private locator $HOME/.local/state/native-agent-stack/coordination/bounded-jobs-20261004/job-009-token-pin-move/upstream",
+      "completeness_critic": "Covered stable release/tag commits, Linux execution, Darwin artifacts, npm integrity/provenance, native plugin installation and RTK positional-shell migration. Missing modalities remain explicit: macOS execution, new live-client/provider acceptance and upstream suites. No alternative tool adoption, skill installation, gateway route or account changes are needed for this bounded pin move."
+    },
+    "private_source_hashes": [
+      {
+        "file": "RECORD.json",
+        "sha256": "14d4be237b5498c78839dcf314eec1dd1f1521a9a4065df87000c0d8ed651388"
+      },
+      {
+        "file": "claude-hud.note.txt",
+        "sha256": "66bbcfbb4f31f6829cfbe29dcbadef40d12cb10bd82b6f1986932feca397857c"
+      },
+      {
+        "file": "claude_hud.log",
+        "sha256": "e12ac3f65f0d8d841d991088ac1460f7b3e5f26f96dbb546f38d8bf5665438e5"
+      },
+      {
+        "file": "components/claude-hud.json",
+        "sha256": "2d0e6897dd80d0c0020f64be7b79a8a6957e26f4feff2228a3b8d7f0e97b03a3"
+      },
+      {
+        "file": "steps.jsonl",
+        "sha256": "93c27b4653da9418185f0c9abe154327340e908e3bd29bc0ee5335e81658297e"
+      }
+    ]
+  }
+}

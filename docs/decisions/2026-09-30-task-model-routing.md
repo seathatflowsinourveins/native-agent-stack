@@ -111,7 +111,7 @@ lines up to its 2026-09-28 addendum are the same at both. A later edit can move 
 | Task class | Client | Model | Effort | Enforced today | Rule source |
 | --- | --- | --- | --- | --- | --- |
 | Coordinator: requirements, decomposition, integration | Claude Code | Opus 5.5 (`opus[1m]`); a Sonnet 5.5 coordinator is supported and hands each judgment to an `opus` stage | max in a terminal session started through the ecosystem launcher; otherwise the saved xhigh | **Client settings and launcher**: `adoption/templates/claude.settings.template.json:124` says `"model": "opus[1m]"`; `adoption/templates/claude.settings.template.json:300` says `"effortLevel": "xhigh"`; for the `modelSettings` keys `claude-opus-5-5` and `claude-sonnet-5-5`, `adoption/templates/claude.settings.template.json:303` says `"effortLevel": "xhigh"`; `adoption/templates/claude.settings.template.json:306` says `"effortLevel": "xhigh"`; `.claude/settings.json:5` says `"effortLevel": "xhigh"`; the launcher adds its flag only when nothing chose an effort (`adoption/bootstrap-linux.sh:395`), and `adoption/bootstrap-linux.sh:408` says `--effort max` | `examples/claude-native/workflows/README.md:896`; `docs/decisions/2026-09-29-sonnet-5-5-dispatch.md:31`; `docs/decisions/2026-09-29-max-default-effort.md:33` |
-| Escalation advisor (`/advisor`) for hard calls | Claude Code | Fable 5.1 (`fable`) | no template key | **Client settings**: `adoption/templates/claude.settings.template.json:125` says `"advisorModel": "fable"` | `docs/decisions/2026-09-27-model-currency.md:42`; `examples/claude-native/workflows/README.md:896` |
+| Escalation advisor (`/advisor`) for hard calls | Claude Code | Fable 5.1 (`fable`) | no template key | **Client settings**: `docs/decisions/2026-09-27-model-currency.md:132` says `"advisorModel": "fable"` | `docs/decisions/2026-09-27-model-currency.md:42`; `examples/claude-native/workflows/README.md:896` |
 | Design and architecture | Claude Code | Opus 5.5 (`opus`) | max | **Instruction only** for the coordinator and ad-hoc stages; a stage that names no model and has no definition falls back to **`CLAUDE_CODE_SUBAGENT_MODEL`**, and `adoption/templates/claude.settings.template.json:27` says `"CLAUDE_CODE_SUBAGENT_MODEL": "opus"` | `examples/claude-native/workflows/README.md:835`; `examples/claude-native/workflows/README.md:869`; `docs/decisions/2026-09-29-sonnet-5-5-dispatch.md:26` |
 | Research, first-pass breadth | Claude Code | Sonnet 5.5 (`sonnet`) as a per-stage override | max | **Instruction only**: a stage's own `model: 'sonnet'`, with every claim checked by a later Opus stage | `examples/claude-native/workflows/README.md:867`; `docs/decisions/2026-09-29-sonnet-5-5-dispatch.md:30` |
 | Research, judgment: web, documentation, repository and catalog research | Claude Code | Opus 5.5 (`opus`) | max | **Agent frontmatter**: `.claude/agents/stack-researcher.md:5-6` says `model: opus` and `effort: max` | `examples/claude-native/workflows/README.md:851`; `examples/claude-native/workflows/README.md:898` |
@@ -323,3 +323,25 @@ Anthropic, as the workflows README cites them (`:869`, `:872`, `:873`); each ret
 - [Sub-agents](https://code.claude.com/docs/en/sub-agents#run-every-subagent-on-one-model) and
   [environment variables](https://code.claude.com/docs/en/env-vars): a stage's model, then the definition's, then
   `CLAUDE_CODE_SUBAGENT_MODEL`, then the lead's.
+
+### Addendum 2026-10-04: advisor selection supersedes the Fable row
+
+The user chose Opus 5.5 as the advisor on 2026-10-04 at about 15:10Z. The template
+`adoption/templates/claude.settings.template.json` now carries `"advisorModel": "opus"`, as recorded in
+[the October 4 advisor decision](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model) and
+[PR #691](https://github.com/seathatflowsinourveins/native-agent-stack/pull/691). The
+[native advisor setting](https://code.claude.com/docs/en/advisor#set-advisormodel-in-settings) supports this alias.
+The north-star action is to preserve research and historical-simulation capacity while attributing coordinator spend.
+Post-change savings and quality remain unmeasured.
+
+The original escalation-advisor row retains its September 30 Fable route and quote as history. Its quote citation now
+points to the unchanged September 27 statement at `docs/decisions/2026-09-27-model-currency.md:132`, where
+`"advisorModel": "fable"` remains recorded, instead of the mutable template's former line 125. The table's
+"Enforced today" heading dates that row to the original decision; this addendum supplies the current selection.
+The September 27 record's October 4 addendum carries the same forward pointer. No quote-check exemption is added:
+the existing test continues to require every quoted value in its cited file, while the template's Opus value is
+checked by the template integration tests and `tests/test_claude_spend_window.py`.
+
+The alternatives were to erase the historical Fable value or add a superseded-row parser to the test. Keeping the
+dated source citation preserves the history with no new parser. A future change that removes that historical source
+or supersedes another route must retain a valid historical citation and append its replacement decision.

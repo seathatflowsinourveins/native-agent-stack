@@ -82,7 +82,7 @@
     "sources": [
       {
         "path": "adoption/platforms/linux-wsl2-new-distro.md",
-        "sha256": "bddd59c0cd2b7c6a5c2fb5357dd7a74c5a396a73cd3989b06914203343c97f80"
+        "sha256": "7fdb79e02c0a2a670bc59e6ad86d4fe43132b93fb003763c1ce4e983505e23f4"
       },
       {
         "path": "adoption/templates/wsl/cloud-init.user-data.template",
@@ -110,7 +110,7 @@
       },
       {
         "path": "tests/test_wsl_new_distro_recipe.py",
-        "sha256": "b1c8b52f4358d03b00c6bb3ffdc5171febaa187ab5ff538fcf6bc2963096ac58"
+        "sha256": "20cbc7e07820a85700749d350a25779047fdb5de97ea9b0243c41d3f965d82ee"
       }
     ]
   },

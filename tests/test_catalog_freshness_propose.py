@@ -49,7 +49,8 @@ EXPECTED_PROPOSE_IF = (
     "github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' && "
     "(inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' && "
     "needs.freshness.outputs.partial_errors == '0' && "
-    "(inputs.open_pr == true || (github.event_name == 'schedule' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))"
+    "(inputs.open_pr == true || (github.event_name == 'schedule' && "
+    "github.event.schedule == '17 6 * * 1' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))"
 )
 EXPECTED_PROPOSE_CONCURRENCY_GROUP = (
     "${{ github.workflow }}-propose-${{ inputs.open_pr == true && 'manual' || 'scheduled' }}"
@@ -818,6 +819,12 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertIsNotNone(match, f"{job_id} job not found")
         return match.group(1)
 
+    def test_daily_report_schedules_partition_all_seven_days_at_0617_utc(self):
+        top_level = self.text.split("\njobs:\n", 1)[0]
+        schedules = re.findall(r"(?m)^    - cron: '([^']+)'$", top_level)
+        # Disjoint day sets cover Sunday (0) through Saturday (6) exactly once.
+        self.assertCountEqual(schedules, ["17 6 * * 1", "17 6 * * 0,2-6"])
+
     def test_open_pr_dispatch_input_is_a_boolean_defaulting_false(self):
         match = re.search(
             r"open_pr:\s*\n\s*description:[^\n]*\n\s*type:\s*boolean\s*\n\s*default:\s*false", self.text,
@@ -892,8 +899,10 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertNotIn("actions: write", body)
 
     def test_top_level_permissions_stay_read_only(self):
+        # The workflow grants no scope (docs/decisions/2026-10-04-ci-least-privilege.md); freshness reads only.
         top_level = self.text.split("\njobs:\n", 1)[0]
-        self.assertIn("permissions:\n  contents: read", top_level)
+        self.assertRegex(top_level, r"(?m)^permissions: \{\}$")
+        self.assertIn("\n    permissions:\n      contents: read\n    outputs:\n", self._job_body("freshness"))
 
     def test_propose_job_never_references_forbidden_catalog_paths_for_writing(self):
         body = self._job_body("propose")

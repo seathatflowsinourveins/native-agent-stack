@@ -9,8 +9,9 @@ on:
     types: [opened, synchronize, reopened, edited]
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope and no cache access by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
+cache-mode: none
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
@@ -28,7 +29,14 @@ jobs:
     # measurement tooling still to merge for the #381 token E2E (units U1 to U5, U9, U10, U13) adds an
     # estimated 600 to 900s of unit tests (one of them alone runs about 190s locally), which would
     # pass the old limit; the limit stays a hang guard, not a test-time budget.
-    timeout-minutes: 40
+    # Raised to 60 on 2026-10-03: the job took 1727 to 1745s in runs 37088360538, 37086567708 and
+    # 37085570699 (limit 2400s), and the three serial runs of run 37109532421 took 1186s to 1688s for the
+    # unittest step alone; the suite grew about fourfold in a week, and a hosted trial of a parallel runner
+    # (unittest-parallel 1.8.6, run 37109532421) could not run it (it pickles live test instances), so the
+    # job stays serial for now. The limit remains a hang guard.
+    timeout-minutes: 60
+    permissions:
+      contents: read # the checkout, and the read-only token zizmor's online audits use
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -216,7 +224,28 @@ jobs:
               env_file.write("LANDSCAPE_SWEEP_SKILLS_YAML=" + directory + "\n")
           PYEOF
       - name: Test validation failure modes
-        run: python3 -m unittest
+        # --durations 50 lists the 50 slowest tests at the end of the run (Python 3.12+; this job runs the image's
+        # CPython 3.12.3). GNU timeout sends SIGABRT at 55 minutes, five under the job's limit, and SIGKILL 60 s later;
+        # with PYTHONFAULTHANDLER faulthandler first prints every thread's Python traceback, so a hang names the test it
+        # stopped in. A timeout fails the step with status 124. The steps before this one took 70 to 99 s in the five
+        # passing runs 37183894365 to 37186357296. -v names each test before it runs; tee keeps that log for the upload
+        # below, and pipefail keeps the exit status of timeout and unittest as the step's.
+        env:
+          PYTHONFAULTHANDLER: '1'
+        run: |
+          set -o pipefail
+          mkdir -p "$RUNNER_TEMP/suite"
+          timeout --signal=ABRT --kill-after=60s 55m \
+            python3 -m unittest -v --durations 50 2>&1 | tee "$RUNNER_TEMP/suite/unittest-verbose.log"
+      - name: Upload the verbose test suite log
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: validate-unittest-verbose-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/suite/unittest-verbose.log
+          if-no-files-found: warn
+          include-hidden-files: false
+          retention-days: 30
       - name: Test semantic evidence contract boundaries
         run: node --test blueprints/native-skill-practice/test-contract.cjs
 
@@ -332,6 +361,8 @@ jobs:
   secret-scan:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1

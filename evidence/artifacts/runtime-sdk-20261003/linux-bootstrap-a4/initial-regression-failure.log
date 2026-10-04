@@ -1,0 +1,43 @@
+....................<PYTHON_INSTALL>/lib/python3.13/subprocess.py:1140: ResourceWarning: subprocess 135 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.............ssssssssss...............................................................................................................ssssssssssssss..........................s.............E.....ssssssss...........E...............sss.........s.........................sssss......................
+======================================================================
+ERROR: setUpClass (tests.test_adoption_bootstrap_macos.PlatformDependencyInstallTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_adoption_bootstrap_macos.py", line 2199, in setUpClass
+    cls.setUpClassWithNpm()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "<WORKTREE>/tests/test_adoption_bootstrap_macos.py", line 2144, in setUpClassWithNpm
+    pack(verified_dir, tmp_path)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKTREE>/tests/test_adoption_bootstrap_macos.py", line 2136, in pack
+    subprocess.run([NPM, "pack", "--silent", "--pack-destination", str(dest)],
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    cwd=directory, capture_output=True, text=True, timeout=60, check=True)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PYTHON_INSTALL>/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['<HOST_TOOLCHAIN>/bin/npm', 'pack', '--silent', '--pack-destination', '<FIXTURE_ROOT>']' returned non-zero exit status 226.
+
+======================================================================
+ERROR: test_global_prefix_install_of_an_optional_dependency_writes_no_lockfile_or_integrity_field (tests.test_adoption_bootstrap_macos.RealNpmLockfileEvidenceTests.test_global_prefix_install_of_an_optional_dependency_writes_no_lockfile_or_integrity_field)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_adoption_bootstrap_macos.py", line 2084, in test_global_prefix_install_of_an_optional_dependency_writes_no_lockfile_or_integrity_field
+    subprocess.run([NPM, "pack", "--silent", "--pack-destination", str(tmp_path)],
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    cwd=platform_dir, capture_output=True, text=True, timeout=60, check=True)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PYTHON_INSTALL>/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['<HOST_TOOLCHAIN>/bin/npm', 'pack', '--silent', '--pack-destination', '<FIXTURE_ROOT>']' returned non-zero exit status 226.
+
+----------------------------------------------------------------------
+Ran 313 tests in 59.867s
+
+FAILED (errors=2, skipped=42)
+Installed dashboard and two units; service activation remains explicit.

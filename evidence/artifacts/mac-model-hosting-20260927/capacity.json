@@ -1,0 +1,104 @@
+{
+  "co_resident_during_probe": "this Claude Code session and its subagents, the com.native-stack.llama-embed LaunchAgent (embeddinggemma-300M on port 8232), Qdrant (local.agent-ecosystem.qdrant, port 6333), ai-memory and Ollama services (their models were idle-unloaded at the time), and ordinary desktop applications",
+  "hardware": "Apple M5 Pro, 64 GB unified memory",
+  "host_id": "mac-coordinator-64gb-20260925",
+  "jetsam": {
+    "log_show_self_reference": 1,
+    "matched_lines": 66,
+    "memorystatus_kill_events": 0,
+    "other_runningboard_diagnostics": 2,
+    "runningboard_ignoring_jetsam_update": 63
+  },
+  "kind": "mac_capacity_probe",
+  "llama_bench": {
+    "argv": "llama-bench -m <model> -p 512,4096 -n 128 -ngl 99 -fa on -r 3 -o json",
+    "evidence_class": "native_proven",
+    "flash_attn": true,
+    "model_params": 27320697856,
+    "n_gpu_layers": 99,
+    "tests": [
+      {
+        "n_gen": 0,
+        "n_prompt": 512,
+        "repetitions": 3,
+        "stddev": 1.11,
+        "tokens_per_second": 371.52
+      },
+      {
+        "n_gen": 0,
+        "n_prompt": 4096,
+        "repetitions": 3,
+        "stddev": 15.34,
+        "tokens_per_second": 341.68
+      },
+      {
+        "n_gen": 128,
+        "n_prompt": 0,
+        "repetitions": 3,
+        "stddev": 0.62,
+        "tokens_per_second": 15.9
+      }
+    ],
+    "threads": 6
+  },
+  "llama_server": {
+    "argv": "llama-server -m <model> -c 32768 -ngl 99 -fa on --host 127.0.0.1 --port 18080 (server defaults: 4 slots sharing one unified 32768-token context)",
+    "cache_prompt": false,
+    "evidence_class": "local_integration",
+    "long_prompt": {
+      "predicted_ms": 435.11,
+      "predicted_n": 7,
+      "predicted_per_second": 13.79,
+      "prompt_ms": 15122.6,
+      "prompt_n": 5189,
+      "prompt_per_second": 343.13
+    },
+    "median_decode_tokens_per_second": 15.84,
+    "median_prompt_tokens_short": 1603.0,
+    "median_ttft_ms_short": 4672,
+    "peak_rss_mib": 22941,
+    "requests": 9,
+    "rss_samples": 72,
+    "why_local_integration": "the prompts are this repository's own docs/token-session-handbook.md chunks behind the li26 prompt header, not a production workload"
+  },
+  "memory": {
+    "after_bench": {
+      "free_percent": 71,
+      "swap_used": "16.81M"
+    },
+    "after_requests": {
+      "free_percent": 61,
+      "swap_used": "16.81M"
+    },
+    "after_stop": {
+      "free_percent": 89,
+      "swap_used": "16.81M"
+    },
+    "baseline": {
+      "free_percent": 89,
+      "swap_used": "16.81M"
+    },
+    "server_loaded": {
+      "free_percent": 61,
+      "swap_used": "16.81M"
+    }
+  },
+  "model": {
+    "bytes": 16464440224,
+    "filename": "Qwen3.8-27B-UD-Q4_K_M.gguf",
+    "repository": "unsloth/Qwen3.8-27B-GGUF",
+    "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+    "sha256": "322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482"
+  },
+  "runtime": {
+    "backends": "MTL,BLAS",
+    "commit": "59657a613",
+    "gpu": "Apple M5 Pro",
+    "llama_cpp_build": 11057,
+    "source": "manifest-pinned macOS bootstrap install (adoption/pins-macos-arm64.json)"
+  },
+  "window": {
+    "end_local": "2026-09-27 08:41:27",
+    "start_local": "2026-09-27 08:38:53"
+  }
+}
