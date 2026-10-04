@@ -112,6 +112,12 @@ def block_if(block_text):
     return " ".join(parts)
 
 
+# The top-level `permissions: {}` that grants no scope (docs/decisions/2026-10-04-ci-least-privilege.md), and an
+# inline permissions form other than that empty mapping (a read-all/write-all string or a flow mapping).
+NO_SCOPE = r"(?m)^permissions: \{\}[ \t]*$"
+INLINE_GRANT = r"(?m)permissions:[ \t]*(?!\{\}[ \t]*$)[^\s#]"
+
+
 def permission_blocks(text):
     """Every block-form permissions mapping in a workflow, as {scope: access} dicts."""
     blocks = []
@@ -223,10 +229,13 @@ class ScorecardTests(unittest.TestCase):
         self.assertNotIn("publish_results: true", self.text)
 
     def test_only_the_analysis_job_may_write_code_scanning_results(self):
-        self.assertEqual(scopes(self.text.split("\njobs:\n", 1)[0]), [{"contents": "read"}])
+        # The workflow grants no scope; the analysis job grants its own.
+        top_level = self.text.split("\njobs:\n", 1)[0]
+        self.assertEqual(scopes(top_level), [])
+        self.assertRegex(top_level, NO_SCOPE)
         job = jobs(self.text)["analysis"]
         self.assertEqual(scopes(job), [{"contents": "read", "security-events": "write"}])
-        self.assertNotRegex(self.text, r"(?m)permissions:[ \t]*[^\s#]", "no inline read-all/write-all form")
+        self.assertNotRegex(self.text, INLINE_GRANT, "no inline read-all/write-all form")
 
     def test_sarif_goes_to_code_scanning_and_stays_an_artifact(self):
         job = jobs(self.text)["analysis"]
@@ -243,11 +252,12 @@ class DependencyReviewTests(unittest.TestCase):
         self.assertEqual([line.strip() for line in trigger.splitlines() if line.strip()], ["pull_request:"])
         self.assertIn("fail-on-severity: high", self.text)
         self.assertNotIn("warn-only:", self.text)
+        self.assertRegex(self.text.split("\njobs:\n", 1)[0], NO_SCOPE)
         blocks = permission_blocks(self.text)
         self.assertGreaterEqual(len(blocks), 1)
         for block in blocks:
             self.assertEqual(block, {"contents": "read"})
-        self.assertNotRegex(self.text, r"(?m)permissions:[ \t]*[^\s#]", "no inline read-all/write-all form")
+        self.assertNotRegex(self.text, INLINE_GRANT, "no inline read-all/write-all form")
 
 
 def scopes(text):
@@ -266,13 +276,15 @@ class SecurityScanTests(unittest.TestCase):
             self.assertIn(event, trigger)
 
     def test_write_scope_is_job_local_and_limited_to_security_events(self):
-        self.assertEqual(scopes(self.text.split("\njobs:\n", 1)[0]), [{"contents": "read"}])
+        top_level = self.text.split("\njobs:\n", 1)[0]
+        self.assertEqual(scopes(top_level), [])
+        self.assertRegex(top_level, NO_SCOPE)
         expected = {"osv-scanner": [{"contents": "read"}],
                     "osv-sarif-upload": [{"contents": "read", "security-events": "write"}],
                     "zizmor-online": [{"contents": "read"}],
                     "zizmor-sarif-upload": [{"contents": "read", "security-events": "write"}]}
         self.assertEqual({job_id: scopes(job) for job_id, job in jobs(self.text).items()}, expected)
-        self.assertNotRegex(self.text, r"(?m)permissions:[ \t]*[^\s#]", "no inline read-all/write-all form")
+        self.assertNotRegex(self.text, INLINE_GRANT, "no inline read-all/write-all form")
 
     def test_the_write_token_never_reaches_an_installed_tool(self):
         self.assertIn("GH_TOKEN: ${{ github.token }}", jobs(self.text)["zizmor-online"])
@@ -416,10 +428,12 @@ class ValidateZizmorGateTests(unittest.TestCase):
 
     def test_online_audits_get_the_read_only_job_token(self):
         self.assertIn("GH_TOKEN: ${{ github.token }}", self.step)
-        self.assertEqual(scopes((WORKFLOWS / "validate.yml").read_text(encoding="utf-8").split("\njobs:\n", 1)[0]),
-                         [{"contents": "read"}])
-        self.assertIsNone(re.search(r"(?m)^    permissions:", jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))["validate"]),
-                          "the validate job adds no job-level scope")
+        text = (WORKFLOWS / "validate.yml").read_text(encoding="utf-8")
+        # The workflow grants no scope (docs/decisions/2026-10-04-ci-least-privilege.md); the token the online
+        # audits use is the validate job's own read-only grant.
+        self.assertEqual(scopes(text.split("\njobs:\n", 1)[0]), [])
+        self.assertRegex(text.split("\njobs:\n", 1)[0], NO_SCOPE)
+        self.assertEqual(scopes(jobs(text)["validate"]), [{"contents": "read"}])
 
     def test_findings_fail_the_required_check(self):
         command = uncommented(self.step)
@@ -443,7 +457,8 @@ class PublishReleaseTests(unittest.TestCase):
         self.assertIn("needs: publish", job)
         self.assertIn("startsWith(github.ref, 'refs/tags/v')", job.split("\n    if:", 1)[1].split("\n", 1)[0])
         self.assertEqual(scopes(job), [{"contents": "write"}])
-        self.assertEqual(scopes(self.text.split("\njobs:\n", 1)[0]), [{"contents": "read"}])
+        self.assertEqual(scopes(self.text.split("\njobs:\n", 1)[0]), [])
+        self.assertRegex(self.text.split("\njobs:\n", 1)[0], NO_SCOPE)
         self.assertNotIn("contents: write", jobs(self.text)["publish"])
 
     def test_release_rechecks_attested_digests_and_attaches_files_at_creation(self):
@@ -2198,13 +2213,15 @@ class NoWorkflowApprovesPullRequestsTests(unittest.TestCase):
 
     def test_every_permissions_key_is_a_parsed_block(self):
         # permission_blocks() only parses block-form mappings; any other form would slip past the
-        # scope checks below, so every non-comment `permissions:` key must be one it parsed.
+        # scope checks below, so every non-comment `permissions:` key must be one it parsed, or the
+        # empty mapping `{}`, which grants nothing.
         for name, text in self.texts.items():
             body = uncommented(text)
             self.assertNotIn("write-all", body, name)
-            self.assertNotRegex(body, r"(?m)^\s*permissions:[ \t]*[^\s#]", f"{name}: inline permissions form")
+            self.assertNotRegex(body, r"(?m)^\s*permissions:[ \t]*(?!\{\}[ \t]*$)[^\s#]", f"{name}: inline permissions form")
             keys = len(re.findall(r"(?m)^\s*permissions:", body))
-            self.assertEqual(keys, len(permission_blocks(body)), f"{name}: unparsed permissions key")
+            empty = len(re.findall(r"(?m)^\s*permissions:[ \t]*\{\}[ \t]*$", body))
+            self.assertEqual(keys, len(permission_blocks(body)) + empty, f"{name}: unparsed permissions key")
 
     def test_pull_requests_write_is_granted_only_to_the_propose_job(self):
         grants = set()

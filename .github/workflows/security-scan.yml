@@ -24,8 +24,9 @@ on:
     - cron: '37 5 * * 3' # Weekly Wednesday 05:37 UTC, 40 minutes before the daily catalog report
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope and no cache access by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
+cache-mode: none
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
