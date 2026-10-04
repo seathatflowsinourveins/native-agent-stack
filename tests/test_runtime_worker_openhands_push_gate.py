@@ -217,6 +217,40 @@ def installed_zizmor():
     return path if version.strip() == f"zizmor {PIN}" else None
 
 
+# The construct of adoption-bootstrap.yml's `changes` step (main e0c329ae9): path globs in bash arrays,
+# compared with `git diff --name-only` output through `case` patterns. The listed files are neither
+# run nor read; the gate must not protect them, and must keep protecting any list used another way.
+FILTER_SCRIPT = """PATTERNS=(
+  'scripts/listed_only.py'
+  'tools/listed/*'
+)
+OTHER=(
+  "docs/a.md"
+)
+match=false
+while IFS= read -r -d '' file; do
+  for pattern in "${PATTERNS[@]}"; do
+    case "$file" in
+      $pattern) match=true ;;
+    esac
+  done
+  for pattern in "${OTHER[@]}"; do
+    case "$file" in
+      ${pattern})
+        other=true
+        break ;;
+    esac
+  done
+done < "$diff_file"
+echo "Matched (PATTERNS): $match" >> "$GITHUB_STEP_SUMMARY"
+"""
+
+FILTER_STEP = """      - name: Detect changed paths
+        shell: bash
+        run: |
+""" + "".join(f"          {line}\n" if line else "\n" for line in FILTER_SCRIPT.splitlines())
+
+
 class WorkflowReaderTests(unittest.TestCase):
     """push_gate's text-level workflow reader, interpolation scan and unittest discovery."""
 
@@ -282,6 +316,52 @@ class WorkflowReaderTests(unittest.TestCase):
         for text in safe:
             with self.subTest(text=text):
                 self.assertEqual(self.g.untrusted_interpolations(text), [])
+
+    def lists(self, script):
+        return [script[start:end].split("=", 1)[0] for start, end in self.g.pattern_lists(script)]
+
+    def test_lists_used_only_as_case_patterns_are_set_aside(self):
+        self.assertEqual(self.lists(FILTER_SCRIPT), ["PATTERNS", "OTHER"])
+        blanked = self.g._without_pattern_lists(FILTER_SCRIPT)
+        self.assertNotIn("scripts/listed_only.py", blanked)
+        self.assertIn("for pattern in", blanked)  # only the list literals are blanked
+
+    def test_a_list_used_any_other_way_keeps_its_names(self):
+        loop = 'for pattern in "${PATTERNS[@]}"; do\n'
+        variants = {
+            "the loop variable is run": FILTER_SCRIPT.replace(loop, loop + '  python3 "$pattern"\n', 1),
+            "the loop variable is read elsewhere": FILTER_SCRIPT + 'echo "$pattern"\n',
+            "the list is expanded outside a loop": FILTER_SCRIPT + 'printf "%s\\n" "${PATTERNS[@]}" > list.txt\n',
+            "an element is expanded directly": FILTER_SCRIPT + 'cat "${PATTERNS[0]}"\n',
+            "the list is appended to": FILTER_SCRIPT + "PATTERNS+=('scripts/more.py')\n",
+            "an element is assigned": FILTER_SCRIPT + "PATTERNS[2]='scripts/more.py'\n",
+            "the list is read into": FILTER_SCRIPT + 'read -ra PATTERNS <<< "a b"\n',
+            "the script uses eval": FILTER_SCRIPT + 'eval "true"\n',
+            "the script uses indirect expansion": FILTER_SCRIPT + 'ref=PATTERNS; echo "${!ref}"\n',
+            "the script uses a nameref": FILTER_SCRIPT + "declare -n ref=PATTERNS\n",
+            "an element expands": FILTER_SCRIPT.replace("'tools/listed/*'", '"$HOME/listed"'),
+            "an element substitutes": FILTER_SCRIPT.replace("'tools/listed/*'", "$(ls scripts)"),
+            "the list has no loop": FILTER_SCRIPT.replace(loop, 'for pattern in "${OTHER[@]}"; do\n', 1),
+        }
+        for name, script in variants.items():
+            with self.subTest(variant=name):
+                self.assertNotIn("PATTERNS", self.lists(script))
+                self.assertIn("scripts/listed_only.py", self.g._without_pattern_lists(script))
+
+    def test_the_recorded_rule_is_the_most_specific_whatever_the_order(self):
+        for order in (("ci_named", "ci_discovered", "ci_import"), ("ci_import", "ci_discovered", "ci_named")):
+            with self.subTest(order=order):
+                item = self.g.CiProtected()
+                for rule in order:
+                    item.add_prefix("tests", rule)
+                    item.add_file("tests/test_a.py", rule)
+                self.assertEqual((item.prefixes["tests"], item.files["tests/test_a.py"]),
+                                 ("ci_discovered", "ci_discovered"))
+                first, second = self.g.CiProtected(), self.g.CiProtected()
+                first.add_prefix("tools/x", order[0])
+                second.add_prefix("tools/x", order[-1])
+                merged = self.g.Protected([first, second], set())
+                self.assertEqual(merged.rule("tools/x/y.py"), "ci_named")
 
     def test_unittest_discovery_follows_packages_only(self):
         blobs = {"tests/__init__.py", "tests/test_a.py", "tests/helpers.py", "tests/sub/__init__.py",
@@ -364,10 +444,14 @@ class RepositoryWorkflowTests(unittest.TestCase):
         for path, rule in expected.items():
             with self.subTest(path=path):
                 self.assertEqual(protected.rule(path), rule)
-        # Test modules are protected but not traced: a test's sys.path entry (tools/, scripts/)
-        # protects no whole directory; a gate script's helper directory stays protected.
+        # Over-breadth checks. Test modules are protected but not traced: a test's sys.path entry
+        # (tools/, scripts/) protects no whole directory. Files a step only lists as `case` patterns
+        # (adoption-bootstrap.yml's `changes` step and its PATTERNS and MACOS_PATTERNS globs, main
+        # e0c329ae9) are not traced either, so their sys.path entries (scripts/, tools/adoption/)
+        # protect no whole directory. A gate script's helper directory stays protected.
         self.assertNotIn("tools", derived.prefixes)
         self.assertNotIn("scripts", derived.prefixes)
+        self.assertNotIn("tools/adoption", derived.prefixes)
         self.assertEqual(derived.prefixes.get("tools/sota-convergence"), "ci_import")
         # The schedule-only workflow's script is not reachable from a push or its PR.
         self.assertNotIn(".github/workflows/practice-references-freshness.yml", derived.workflows)
@@ -436,6 +520,34 @@ class PushGateTests(unittest.TestCase):
             with self.subTest(path=name):
                 record, _ = self.check({name: "print('changed')\n"})
                 self.assertEqual((record["status"], record["reasons"]), ("pass", []), record)
+
+    def filter_fixture(self, step):
+        listed = {"scripts/listed_only.py": ("import sys\nfrom pathlib import Path\n\n"
+                                             "sys.path.insert(0, str(Path(__file__).resolve().parent))\n"),
+                  "scripts/neighbour.py": "VALUE = 2\n", "tools/listed/run.py": "print('listed')\n"}
+        fixture = GateFixture(self.tmp / f"filter-{secrets.token_hex(3)}",
+                              {".github/workflows/ci.yml": CI_WORKFLOW + step, **listed})
+        return fixture, self.gate(module=load_gate(fixture.trusted))
+
+    def test_paths_a_step_only_lists_as_case_patterns_stay_editable(self):
+        fixture, gate = self.filter_fixture(FILTER_STEP)
+        for name in ("scripts/listed_only.py", "scripts/neighbour.py", "tools/listed/run.py"):
+            with self.subTest(path=name):
+                record, _ = self.check({name: "print('changed')\n"}, fixture=fixture, gate=gate)
+                self.assertEqual((record["status"], record["reasons"]), ("pass", []), record)
+        # The step's real gate script stays protected beside the list.
+        record, _ = self.check({"scripts/check_gate.py": "print('weakened')\n"}, fixture=fixture, gate=gate)
+        self.assertIn({"path": "scripts/check_gate.py", "rule": "ci_named", "known": True}, record["paths"])
+
+    def test_a_list_the_step_also_runs_stays_protected(self):
+        loop = '          for pattern in "${PATTERNS[@]}"; do\n'
+        runs = FILTER_STEP.replace(loop, loop + '            python3 "$pattern"\n', 1)
+        fixture, gate = self.filter_fixture(runs)
+        for name, rule in (("scripts/listed_only.py", "ci_named"), ("scripts/neighbour.py", "ci_import")):
+            with self.subTest(path=name):
+                record, _ = self.check({name: "print('changed')\n"}, fixture=fixture, gate=gate)
+                self.assertEqual((record["status"], record["reasons"]), ("fail", ["protected_path"]))
+                self.assertIn({"path": name, "rule": rule, "known": True}, record["paths"])
 
     def test_zizmor_audits_exactly_the_commits_workflows_and_actions_with_the_trusted_flags(self):
         zizmor, log = fake_zizmor(self.tmp)

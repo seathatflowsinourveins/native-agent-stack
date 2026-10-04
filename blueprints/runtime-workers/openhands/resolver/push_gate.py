@@ -487,6 +487,93 @@ def _rooted(blobs, dirs, root):
             {path[len(prefix):] for path in dirs if path.startswith(prefix)})
 
 
+ARRAY_LITERAL = re.compile(r"(?m)^[ \t]*([A-Za-z_][A-Za-z0-9_]*)=\(")
+FILTER_HAZARDS = re.compile(r"\beval\b|\$\{!|\b(?:declare|typeset|local)[ \t]+-[A-Za-z]*n")
+
+
+def _literal_list_end(code, start):
+    """The index of the `)` that closes a bash array literal holding only literal words, or None.
+
+    Single-quoted words, double-quoted words without `$`, backquote or backslash, and plain
+    words are literal; anything else (an expansion, a substitution, an escape, an operator)
+    makes the list not literal.
+    """
+    quote, index = None, start
+    while index < len(code):
+        char = code[index]
+        if quote:
+            if char == quote:
+                quote = None
+            elif quote == '"' and char in "$`\\":
+                return None
+        elif char in "'\"":
+            quote = char
+        elif char == ")":
+            return index
+        elif char in "$`\\(;&|<>":
+            return None
+        index += 1
+    return None
+
+
+def pattern_lists(code):
+    """Spans of the bash array literals a script uses only as `case` patterns.
+
+    Such a list names paths to compare with other paths, as the `changes` step of
+    adoption-bootstrap.yml compares `git diff --name-only` output with its PATTERNS and
+    MACOS_PATTERNS globs; the step neither runs nor reads the listed files. A list
+    qualifies only when every condition below holds; otherwise its words stay names, so
+    the derivation keeps failing closed:
+    - the script has no `eval`, no indirect expansion (`${!`) and no nameref;
+    - the array is assigned once, as a literal list (_literal_list_end), and nothing else
+      writes it (`NAME=`, `NAME+=`, `NAME[i]=`, read, mapfile, readarray, unset, declare);
+    - each expansion of the array is `"${NAME[@]}"` in a `for VAR in "${NAME[@]}"` header;
+    - each expansion of each such VAR is a `case` arm pattern: `$VAR)` or `${VAR})` at the
+      start of a line.
+    """
+    if FILTER_HAZARDS.search(code):
+        return []
+    spans = []
+    for found in ARRAY_LITERAL.finditer(code):
+        name = found.group(1)
+        end = _literal_list_end(code, found.end())
+        if end is None:
+            continue
+        span = (found.start(1), end + 1)
+        outside = code[:span[0]] + " " * (span[1] - span[0]) + code[span[1]:]
+        if re.search(rf"(?:^|[\s;&|(]){name}(?:\[[^\]\n]*\])?\+?=", outside, re.M):
+            continue
+        if re.search(rf"\b(?:read|mapfile|readarray|unset|declare|typeset|local|readonly)\b[^\n;]*\b{name}\b", outside):
+            continue
+        expansions = re.findall(rf"\$\{{[#!]?{name}\b[^}}]*\}}|\${name}\b", outside)
+        loops = re.findall(rf"\bfor[ \t]+([A-Za-z_][A-Za-z0-9_]*)[ \t]+in[ \t]+\"\$\{{{name}\[@\]\}}\"", outside)
+        if not loops or len(expansions) != len(loops):
+            continue
+        if all(len(re.findall(rf"\$\{{?{var}\b", outside))
+               == len(re.findall(rf"(?m)^[ \t]*\$\{{?{var}\}}?[ \t]*\)", outside)) for var in set(loops)):
+            spans.append(span)
+    return spans
+
+
+def _without_pattern_lists(code):
+    """`code` with the words of its pattern-only lists blanked (pattern_lists), for name extraction."""
+    for start, end in pattern_lists(code):
+        code = code[:start] + " " * (end - start) + code[end:]
+    return code
+
+
+# When several rules derive the same path or prefix, the record names the most specific reason,
+# whatever order the workflows are read in: a local action or unittest discovery runs the file,
+# a step names it, or a gate script imports it.
+RULE_PRECEDENCE = ("ci_local_action", "ci_discovered", "ci_named", "ci_import")
+
+
+def _stronger(current, rule):
+    if current is None or RULE_PRECEDENCE.index(rule) < RULE_PRECEDENCE.index(current):
+        return rule
+    return current
+
+
 class CiProtected:
     """The derived set for one tree: exact files and directory prefixes, each with its rule."""
 
@@ -494,11 +581,11 @@ class CiProtected:
         self.files, self.prefixes, self.workflows, self.interpolations = {}, {}, [], []
 
     def add_file(self, path, rule):
-        self.files.setdefault(path, rule)
+        self.files[path] = _stronger(self.files.get(path), rule)
 
     def add_prefix(self, path, rule):
         if path:
-            self.prefixes.setdefault(path, rule)
+            self.prefixes[path] = _stronger(self.prefixes.get(path), rule)
 
 
 def derive_ci_protected(tree):
@@ -508,7 +595,8 @@ def derive_ci_protected(tree):
     UNREACHABLE_TRIGGERS (or unlisted triggers), plus the local reusable workflows and
     actions they use. For each `run:` or `script:` text, without its whole-line comments
     (patch_policy.executable_lines): the names patch_policy.names_in_text finds from the
-    repository root, from each working directory and from each `cd` target; unittest
+    repository root, from each working directory and from each `cd` target, leaving out the
+    words of lists used only as `case` patterns (pattern_lists); unittest
     discovery (its start directory and the packages it enters); and the import closure
     (patch_policy.python_references) of each Python file named that is not a test module.
     Raises WorkflowSyntaxError when a reachable file cannot be read.
@@ -546,9 +634,10 @@ def derive_ci_protected(tree):
                 if relative and relative in dirs:
                     text_roots.append(relative)
                     result.add_prefix(relative, "ci_named")
+            named_code = _without_pattern_lists(code)
             for root in dict.fromkeys(text_roots):
                 rooted_blobs, rooted_dirs = _rooted(blobs, dirs, root)
-                for kind, name in patch_policy.names_in_text(code, rooted_blobs, rooted_dirs):
+                for kind, name in patch_policy.names_in_text(named_code, rooted_blobs, rooted_dirs):
                     full = f"{root}/{name}" if root else name
                     if kind == "dir":
                         result.add_prefix(full, "ci_named")
@@ -659,9 +748,11 @@ class Protected:
         self.files, self.prefixes = {}, {}
         for item in derived:
             for path, rule in item.files.items():
-                self.files.setdefault(patch_policy.fold(path), rule)
+                key = patch_policy.fold(path)
+                self.files[key] = _stronger(self.files.get(key), rule)
             for path, rule in item.prefixes.items():
-                self.prefixes.setdefault(patch_policy.fold(path), rule)
+                key = patch_policy.fold(path)
+                self.prefixes[key] = _stronger(self.prefixes.get(key), rule)
         for path in tests:
             self.files[patch_policy.fold(path)] = "workflow_policy_test"
 
