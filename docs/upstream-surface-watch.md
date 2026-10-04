@@ -51,7 +51,8 @@ All URLs were re-read on 2026-10-04 (curl, HTTP 200); `S5` is report-only text.
 The parsing rules:
 
 - `claude:setting` takes the top-level members of `interface Settings` with a comment- and string-aware scanner
-  (quoted and `$` keys, nested object types, function types, index signatures and literals).
+  (quoted and `$` keys, nested object types, type arguments such as `Record<string, Array<string>>`, function types,
+  index, call and construct signatures, literals, and members that end at a line break rather than `;`).
 - `codex:config` takes every named property's dotted path through `$ref`, `allOf`/`anyOf`/`oneOf`, map values (`*`)
   and array items (`[]`); a bare map or array container adds no path of its own.
 - `codex:feature` runs `codex features list` with an empty temporary `HOME` and `CODEX_HOME`. The host's Codex home is

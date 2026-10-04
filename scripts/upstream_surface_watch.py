@@ -427,21 +427,29 @@ IDENT = re.compile(r"[A-Za-z_$][A-Za-z0-9_$]*")
 NUMBER = re.compile(r"\d+")
 
 
-def ts_tokens(text: str, start: int):
+def ts_tokens(text: str, start: int, newlines: bool = False):
     """(kind, value) tokens of a TypeScript declaration from ``start``: comments are skipped, a string or template
-    literal is one token (escapes and nested ${...} included), identifiers may hold $ (IDENT)."""
+    literal is one token (escapes and nested ${...} included), identifiers may hold $ (IDENT). With ``newlines``, a
+    line break outside a string (in whitespace, ending a // comment or inside a /* */ comment, as TypeScript's
+    scanner counts it) yields ("nl", "")."""
     index, size = start, len(text)
     while index < size:
         char = text[index]
         if char in " \t\r\n":
+            if newlines and char == "\n":
+                yield "nl", ""
             index += 1
         elif text.startswith("//", index):
             end = text.find("\n", index)
+            if newlines and end >= 0:
+                yield "nl", ""
             index = size if end < 0 else end + 1
         elif text.startswith("/*", index):
             end = text.find("*/", index + 2)
             if end < 0:
                 raise ValueError("unterminated comment")
+            if newlines and "\n" in text[index:end]:
+                yield "nl", ""
             index = end + 2
         elif char in "'\"":
             end = index + 1
@@ -485,32 +493,60 @@ def ts_tokens(text: str, start: int):
 
 
 MODIFIERS = frozenset({"readonly", "get", "set"})
+# A line break ends a member only after a token that can end a type (TypeScript's parseTypeMemberSemicolon accepts a
+# preceding line break once the type is complete): a name or literal that is not a type operator keyword, or a closing
+# bracket. After an operator such as ':', '|', '&', '=>' or '?' the type continues on the next line.
+TYPE_END_OPS = frozenset(")]}>")
+TYPE_OPERATOR_WORDS = frozenset({"extends", "keyof", "typeof", "infer", "is", "asserts", "unique", "readonly", "new",
+                                 "as"})
+
+
+def ends_type(token) -> bool:
+    if token is None:
+        return False
+    kind, value = token
+    if kind in ("str", "num", "tpl"):
+        return True
+    if kind == "id":
+        return value not in TYPE_OPERATOR_WORDS
+    return kind == "op" and value in TYPE_END_OPS
 
 
 def interface_members(text: str, start: int) -> list[str]:
     """The top-level member names of the interface body that opens just before ``start``: a member starts after the
-    opening brace, ';' or ',' at depth one, and its name (an identifier, a quoted string or a number, after an
-    optional readonly/get/set modifier) is followed by '?', ':', '(' or '<'. Nested object types, parameter lists,
-    index signatures and literals are skipped by depth."""
+    opening brace, after ';' or ',' at depth one, or after a line break that follows a complete type, and its name
+    (an identifier, a quoted string or a number, after an optional readonly/get/set modifier) is followed by '?',
+    ':', '(' or '<'. Nested object types, parameter lists, type arguments (<...>), index signatures, literals and
+    construct signatures (`new (...)`, `new <T>(...)`) are skipped; `new?:` and `new:` are properties."""
     keys: list[str] = []
-    depth, paren, bracket = 1, 0, 0
-    member_start, pending, modifier = True, None, False
-    for kind, value in ts_tokens(text, start):
-        if depth == 1 and paren == 0 and bracket == 0:
+    depth, paren, bracket, angle = 1, 0, 0, 0
+    member_start, pending, pending_kind, modifier, optional = True, None, None, False, False
+    line_break, previous = False, None
+    for kind, value in ts_tokens(text, start, newlines=True):
+        if kind == "nl":
+            line_break = True
+            continue
+        top = depth == 1 and paren == 0 and bracket == 0 and angle == 0
+        if top and line_break and not member_start and ends_type(previous):
+            member_start, pending, modifier, optional = True, None, False, False  # a newline-terminated member
+        line_break = False
+        if top:
             if kind == "op" and value in ";,":
-                member_start, pending, modifier = True, None, False
+                member_start, pending, modifier, optional = True, None, False, False
             elif member_start:
                 if pending is None and kind == "id" and value in MODIFIERS:
-                    pending, modifier = value, True
+                    pending, pending_kind, modifier = value, kind, True
                 elif kind in ("id", "str", "num") and (pending is None or modifier):
-                    pending, modifier = value, False
+                    pending, pending_kind, modifier = value, kind, False
                 elif pending is not None and kind == "op" and value == "?":
-                    pass
+                    optional = True
                 elif pending is not None and kind == "op" and value in ":(<":
-                    keys.append(pending)
-                    member_start, pending, modifier = False, None, False
+                    construct = pending == "new" and pending_kind == "id" and not optional and value in "(<"
+                    if not construct:
+                        keys.append(pending)
+                    member_start, pending, modifier, optional = False, None, False, False
                 else:
-                    member_start, pending, modifier = False, None, False
+                    member_start, pending, modifier, optional = False, None, False, False
         if kind == "op":
             if value == "{":
                 depth += 1
@@ -526,6 +562,11 @@ def interface_members(text: str, start: int) -> list[str]:
                 bracket += 1
             elif value == "]":
                 bracket -= 1
+            elif value == "<":
+                angle += 1
+            elif value == ">" and angle:
+                angle -= 1
+        previous = (kind, value)
     raise ValueError("unterminated interface body")
 
 

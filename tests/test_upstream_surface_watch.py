@@ -4,9 +4,9 @@ Every upstream artifact here is a small synthetic stand-in shaped like the real 
 Agent SDK's sdk.d.ts, the env-vars and mods pages, the Codex release JSON and config-schema.json, `codex features
 list`, CHANGELOG.md, the GraphQL release list); none is a recorded observation. A fake replaces the network layer
 (http_get, gh_api, probe_codex), and the offline tests make socket creation raise. NegativeControlTests run small mutant
-parsers, each with one known defect, and require every mutant to fail a fixture that the real parser passes, so a
-parser regression cannot pass silently (precedent: a regex that missed `$` in minified identifiers read 15 of 17
-values with exit 0). TestCommittedCatalogs checks the two committed catalogs; it is the only test that reads repository
+parsers, each with a known defect and none built by filtering the real parser's output, and require every mutant to
+agree with the real parser on a plain fixture and fail a fixture that the real parser passes, so a parser regression
+cannot pass silently (precedent: a regex that missed `$` in minified identifiers read 15 of 17 values with exit 0). TestCommittedCatalogs checks the two committed catalogs; it is the only test that reads repository
 data rather than fixtures.
 """
 
@@ -39,8 +39,9 @@ CODEX_BIN = "/synthetic/bin/codex"
 # ----------------------------------------------------------------------------------------------- fixture builders
 
 FILLER_SETTINGS = [f"fillerSetting{index:02d}" for index in range(60)]
-TRAP_SETTINGS = ["$schema", "quoted-key", "double-quoted", "policyHelper", "afterNested", "literal", "onEvent",
-                 "frozen", "readonly", "conditional", "resolve"]
+TRAP_SETTINGS = ["$schema", "quoted-key", "double-quoted", "recordOfArrays", "mapOfSets", "recordOfPartials",
+                 "newlineFirst", "newlineSecond", "unionAcrossLines", "genericOnNextLine", "afterGeneric",
+                 "policyHelper", "afterNested", "literal", "onEvent", "frozen", "readonly", "conditional", "resolve"]
 HOOKS = ["PreToolUse", "PostToolUse", "Notification", "UserPromptSubmit", "SessionStart", "SessionEnd", "Stop",
          "SubagentStart", "SubagentStop", "PreCompact", "PostCompact", "ConfigChange"]
 MODS = ["cc-plugin-agents-md", "cc-plugin-diff", "cc-plugin-you-should-know"]
@@ -50,10 +51,12 @@ FEATURES = {f"feature_{index:02d}": (("under development", "stable", "removed")[
 CLAUDE_TAGS = {"stable": "2.1.285", "latest": "2.1.289", "next": "2.1.289"}
 CODEX_TAGS = {"latest": "0.160.0", "alpha": "0.162.0-alpha.12", "linux-x64": "0.160.0-linux-x64"}
 
-# The traps: braces and "word:" text inside JSDoc, `$` and quoted keys, a nested object type followed by more keys, a
-# string literal holding } and ;, a template literal type, a function type with an object parameter, modifiers, an
-# index signature, a conditional type and a method. An indented interface of the same name inside a namespace and a
-# longer interface name must not count.
+# The traps: braces and "word:" text inside JSDoc, `$` and quoted keys, commas inside type arguments (<...>), a
+# construct signature, members that end at a line break (after a complete type, never after ':' or '|'), a multi-line
+# union and a type on the line after its colon, a nested object type followed by more keys, a string literal holding }
+# and ;, a template literal type, a function type with an object parameter, modifiers, an index signature, a
+# conditional type and a method. An indented interface of the same name inside a namespace and a longer interface
+# name must not count.
 TRAP_INTERFACE = """/**
  * AUTO-GENERATED - DO NOT EDIT
  *
@@ -66,6 +69,18 @@ export declare interface Settings {
     $schema?: string;
     'quoted-key'?: boolean;
     "double-quoted"?: number;
+    recordOfArrays?: Record<string, Array<string>>;
+    mapOfSets?: Map<string, Set<number>>;
+    recordOfPartials?: Record<string, Partial<Foo>>;
+    new (x: string): Foo;
+    newlineFirst: string
+    newlineSecond: number
+    unionAcrossLines?:
+        | Array<string>
+        | Map<string, number>
+    genericOnNextLine?:
+        Partial<Foo>
+    afterGeneric?: boolean;
     /**
      * Executable that computes managed settings.
      */
@@ -363,8 +378,29 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(set(keys), {*TRAP_SETTINGS, *FILLER_SETTINGS})
         self.assertEqual(keys, sorted(keys))
         for absent in ("path", "timeoutMs", "intervalMs", "kind", "k", "innerOnly", "notASettingsKey", "key",
-                       "Example", "Default", "event", "detail"):
+                       "Example", "Default", "event", "detail", "Array", "Set", "Partial", "Map", "Foo", "new"):
             self.assertNotIn(absent, keys)
+
+    def test_member_rules_for_type_arguments_construct_signatures_and_line_breaks(self):
+        def members(body: str) -> list[str]:
+            text = "export declare interface Settings {\n" + body + "\n}\n"
+            return usw.interface_members(text, usw.SETTINGS_ANCHOR.search(text).end())
+
+        cases = {
+            "env?: Record<string, Array<string>>;": ["env"],
+            "m?: Map<string, Set<number>>;": ["m"],
+            "new (x: string): Foo;\nnew <T>(x: T): Foo;": [],  # construct signatures
+            "new?: boolean;": ["new"],  # a property named new
+            "new?(): void;\n'new'(): void;": ["new", "new"],  # methods named new
+            "a: string\nb: number": ["a", "b"],
+            "u?:\n  | Array<string>\n  | Map<string, number>\nnext?: string": ["u", "next"],
+            "c?: A extends\n  B<C> ? D : E\nd: string": ["c", "d"],
+            "x: string // trailing\ny: number /* a\nblock */ w: boolean": ["x", "y", "w"],
+            "<T>(x: T): T\n[k: string]: unknown\nafter: string": ["after"],  # call and index signatures
+        }
+        for body, expected in cases.items():
+            with self.subTest(body=body):
+                self.assertEqual(members(body), expected)
 
     def test_hook_events_read_a_multiline_array_with_both_quotes_and_comments(self):
         self.assertEqual(usw.parse_hook_events(sdk_dts()), sorted(HOOKS))
@@ -922,11 +958,14 @@ def mutant_first_brace(text: str) -> list[str]:
     return sorted({match.group(1) for match in re.finditer(r"(?m)^\s*['\"]?([$A-Za-z_][\w$-]*)['\"]?\??\s*:", body)})
 
 
-def mutant_plain_identifiers(text: str) -> list[str]:
-    """Defect: a key must be a plain identifier ([A-Za-z_][A-Za-z0-9_]*), so `$` and quoted keys are lost."""
-    with mock.patch.object(usw, "IDENT", re.compile(r"[A-Za-z_][A-Za-z0-9_]*")):
-        keys = usw.interface_members(text, usw.SETTINGS_ANCHOR.search(text).end())
-    return sorted(key for key in set(keys) if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", key))
+def mutant_regex_lines(text: str) -> list[str]:
+    """A genuinely different parser, regular expressions only and no tokenizer: the body runs from the anchor to the
+    first column-0 '}', and a member is any line that starts with a name followed by '?', ':', '(' or '<'. Defects:
+    it is blind to nesting and to what a line continues, so nested members (path, timeoutMs), a construct signature
+    (new) and a type on the line after its colon (Partial) all read as keys."""
+    body = re.search(r"interface Settings \{(.*?)^\}", text, re.S | re.M).group(1)
+    return sorted({match.group(2) for match in re.finditer(
+        r"(?m)^[ \t]*(?:readonly[ \t]+)?(['\"]?)([$\w-]+)\1[ \t]*\??[ \t]*[:(<]", body)})
 
 
 def mutant_counts_comments(text: str) -> list[str]:
@@ -957,7 +996,7 @@ class NegativeControlTests(unittest.TestCase):
         trap = sdk_dts()
         self.assertEqual(usw.parse_settings_keys(plain), sorted(FILLER_SETTINGS))
         self.assertEqual(set(usw.parse_settings_keys(trap)), {*TRAP_SETTINGS, *FILLER_SETTINGS})
-        for mutant in (mutant_first_brace, mutant_plain_identifiers, mutant_counts_comments):
+        for mutant in (mutant_first_brace, mutant_regex_lines, mutant_counts_comments):
             with self.subTest(mutant=mutant.__name__):
                 self.assertEqual(mutant(plain), sorted(FILLER_SETTINGS))
                 self.assertNotEqual(set(mutant(trap)), {*TRAP_SETTINGS, *FILLER_SETTINGS})
@@ -965,7 +1004,7 @@ class NegativeControlTests(unittest.TestCase):
     def test_each_mutant_misses_what_its_defect_predicts(self):
         trap = sdk_dts()
         self.assertNotIn("afterNested", mutant_first_brace(trap))
-        self.assertTrue({"$schema", "quoted-key", "double-quoted"}.isdisjoint(mutant_plain_identifiers(trap)))
+        self.assertTrue({"path", "timeoutMs", "intervalMs", "new", "Partial"} <= set(mutant_regex_lines(trap)))
         self.assertTrue({"key", "Default"} & set(mutant_counts_comments(trap)))
 
     def test_the_hook_mutant_fails_the_multiline_fixture(self):
