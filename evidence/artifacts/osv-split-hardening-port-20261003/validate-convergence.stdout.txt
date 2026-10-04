@@ -1,0 +1,2 @@
+record[0]: invalid
+  record discovery: invalid, changed or empty evidence manifest
