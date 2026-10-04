@@ -409,6 +409,14 @@ installation recipe follow main's
 W1's [2026-10-03 HUD receipt](../../evidence/receipts/claude-hud-0100-qualification-20261003.json)
 remains dated history, outside the component's current `evidence_ids`.
 
+This merge also retains three W1 claude-hud integration edits: the guarded
+`statusLine` command in `adoption/templates/claude.settings.template.json`,
+the 0.8.0-to-0.10.0 existing-installation upgrade block in
+`adoption/bootstrap.md`, and the guarded-template/M14 amendment link in
+`docs/community-native-practice.md`. These edits have their W1 fixture and
+source-review scopes; main's 2026-10-04 receipt remains the current selection
+evidence. The bootstrap upgrade block still names host verification as pending.
+
 RTK follows main at 0.51.0 and mcporter follows main at 0.14.2. W1 retains its
 seven unique moves and their original 2026-10-03 receipts: jcodemunch-mcp
 1.108.327, mcp-inspector 2.9.0, openresearch 0.2.15,
@@ -436,8 +444,10 @@ The source comparison uses this worktree's merge-index stages 1, 2 and 3,
 with PR head `4367dd46addc8fa424a754ee84b0167cfa8365b1` and main
 `14048b840425c2569e0df60a6596e94e601da15b`. Component rows follow the policy
 above; other changes retain both branches' nonconflicting edits. Summary
-counters use main plus W1's delta from stage 1: `api_commands` is 274 + 0 =
-274, and `selected_component_api_commands` is 257 + 0 = 257.
+counters use main plus the check-entry delta contributed by the retained W1
+rows: `api_commands` is 274 + 3 = 277, and
+`selected_component_api_commands` is 257 + 3 = 260. The 2026-10-04 review
+repair below records the correction to the original field-delta calculation.
 
 Generated projections use the merged repository's supported generators and
 documented default inputs. Correction to the receipt-generation assumption:
@@ -455,3 +465,45 @@ manifest registrations before registering every file differing from main.
 No new upstream adoption or landscape judgment is made in this bounded offline
 merge; the dated mcporter hold and main receipt limitations remain inputs to
 their owners' next qualification sweep.
+
+
+## Merge review repair, 2026-10-04
+
+The review of `4c468bb38305166129bf15ac03a309efdd047fb9` found stale current
+mcporter wording in the W1 bootstrap paragraph, outdated HUD selection
+attribution in the community row, and missing W1 command-count deltas. The
+bootstrap paragraph now states W1's 2026-10-03 hold as history and points to
+main's 2026-10-04 mcporter selection and receipt limitations. The community
+row credits main's #693 HUD selection and keeps the W1 link for the guarded
+template and M14 amendment. Both 2026-10-03 receipts retain their original
+bytes and dated scopes. This repair supports the same foundation tooling and
+north-star research action named above.
+
+Correction and verification path: the first merge used changes in the summary
+counter fields as the W1 delta, although W1 had not updated those fields.
+Read `catalogs/landscape/upstream-snapshot.json` directly with `git show` at
+W1 `4367dd46addc8fa424a754ee84b0167cfa8365b1`, main
+`14048b840425c2569e0df60a6596e94e601da15b`, and their common base
+`59f8a1e36e1f2870d9de18a16c42f1e72cdae1c6`. The mcp-inspector,
+opentelemetry-collector-contrib and playwright-cli rows already match W1
+exactly: each has four checks in W1 and three in main and the base. Their
+fourth `commits/<sha>` checks originated in W1, rather than in the merge.
+Main did not change those rows. Retain those exact W1 rows and add their
+three checks to main's counters, producing 277 and 260. No new API calls
+were made for this repair.
+
+The retained arrays contain 261 check entries, compared with main's 258.
+The base already contained 255 check entries against a selected-component
+summary counter of 254. This repair carries that dated one-entry discrepancy
+forward while adding the measured W1 delta; it does not relabel the historical
+summary as a newly reconciled count of every array entry.
+
+Completeness critic: inspect all 55 PR paths differing from main for the same
+current-tense pin contradiction, while recognizing dated decisions and
+qualification artifacts as history. The operational mcporter paragraph and
+HUD row were the remaining matching statements. Compare all seven retained
+snapshot rows to W1 and main's moved rows to main, regenerate the handbook
+from its supported default inputs, verify its receipt hashes, run the named
+acceptance checks, and report the names and reasons of any skipped tests.
+The general lesson is to compare native check entries before trusting unchanged
+summary fields, and to review current guide wording alongside selection rows.

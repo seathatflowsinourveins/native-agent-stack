@@ -4612,8 +4612,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "a1b3175b349864475c34c390683cd7fa2afa92e14b5436304add77b351c36111",
-      "bytes": 66718
+      "sha256": "e014bf80f20192e3a9446b6444cf1efa39c6bd6b0b2c76c5cdac1f5ea8e2a284",
+      "bytes": 66876
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -15623,7 +15623,7 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "d8693629f50582cdabe9a8acdc4635339e47164648d2c603c6f79f8b71d6ab87",
+      "sha256": "8312bf92a96b1e1899ae6c816b7b45d2d9757b65f8f69899268c492071840a85",
       "bytes": 280716
     },
     {
@@ -16083,8 +16083,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "bf7ec0855824fe11c18826fcc6a0e3e6efde68dbbfd4c69d4d8cf7d2f1f34612",
-      "bytes": 56726
+      "sha256": "4334eda38f9961f971e4c5394cd6fef418cef236d3ad73c34a0e080b5b71be21",
+      "bytes": 56958
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -16383,8 +16383,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-currency-wave-w1.md",
-      "sha256": "55b8017598f99b4ba705bd31f5223d0e8207d676b05324983193ce3bcd99de0f",
-      "bytes": 33686
+      "sha256": "a34de606804ec323dc10830a08e33c5f4dd72056a4a54ae85ba606f84eb2d907",
+      "bytes": 36867
     },
     {
       "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
@@ -16608,8 +16608,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "e404039f0ff6e51a62d88d11e00271b435569969b457e51a3b33762cff357927",
-      "bytes": 176430
+      "sha256": "b1934f3677f293a32d6ec07d52a885e752aa4baeee0d936ac51aa37cdf87417d",
+      "bytes": 177812
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",

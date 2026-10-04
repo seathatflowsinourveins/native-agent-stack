@@ -173,7 +173,15 @@ GitHub-hosted macOS runner; see
    retain the host failures and limits. Darwin artifacts are
    artifact-checked only; the Mac host collects its own execution evidence.
 
-   On 2026-10-03, `pins-linux-x86_64.json` changed again after `v2026.09.26.2`: `orx` 0.2.7 to 0.2.15 (URLs, hashes and install notes). A host at that tag retains OpenResearch 0.2.7. mcporter stays at the accepted Linux 0.14.1 pin; its 0.14.2 compatibility attempt is held. The W1 scratch qualification and its functional limits are in [the dated decision](../docs/decisions/2026-10-03-currency-wave-w1.md). The Claude HUD marketplace recipe and template now select v0.10.0 at `75683c6de1ac07f6bbef00d739001679dba0740c`; hosts at the tag keep v0.8.0.
+   On 2026-10-03, `pins-linux-x86_64.json` changed again after `v2026.09.26.2`:
+   `orx` 0.2.7 to 0.2.15 (URLs, hashes and install notes). A host at that tag
+   retains OpenResearch 0.2.7. W1 held the mcporter 0.14.2 candidate on
+   2026-10-03 because its resolved tree was inconsistent and its persistent
+   daemon/`serve` role was unqualified; the selected Linux pin then remained
+   0.14.1. Main's 2026-10-04 move in #693 selected Linux mcporter 0.14.2; see
+   [that receipt's limitations](../evidence/receipts/mcporter-0142-qualification-20261004.json).
+   The W1 scratch qualification and its functional limits remain dated history
+   in [the decision](../docs/decisions/2026-10-03-currency-wave-w1.md).
 
    `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
    The Linux pins file gained `repomix`, `toon`,
