@@ -4043,6 +4043,186 @@ class ConvertTests(unittest.TestCase):
         self.assertNotIn(encoded, done.stdout)
         self.assertEqual(json.loads(done.stdout)["run"]["runId"], "projects/<project-dir>")
 
+    def assert_anchored_profile_redaction(self, encoded_home):
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            for suffix in ("", "-code-project"):
+                with self.subTest(prefix=prefix, suffix=suffix):
+                    work = temp_dir(self)
+                    encoded = encoded_home + suffix
+                    path = prefix + encoded
+                    res = healthy_result()
+                    res["first"][0]["claude_discover"]["notes"] = {
+                        "string": "read " + path + ". Next.", path: "retained note"}
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    expected = prefix + "<project-dir>"
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                     {"string": "read " + expected + ". Next.", expected: "retained note"})
+                    for name in ("returns", "lanes", "layers", "survivors"):
+                        self.assertNotIn(encoded_home, (work / f"out/{name}.json").read_text())
+                    self.assertNotIn(encoded_home, done.stdout)
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+
+    def test_cli_redacts_anchored_linux_profile_in_strings_keys_and_summary(self):
+        self.assert_anchored_profile_redaction("-".join(("", "home", "fixtureuser")))
+
+    def test_cli_redacts_anchored_macos_profile_in_strings_keys_and_summary(self):
+        self.assert_anchored_profile_redaction("-".join(("", "Users", "fixtureuser")))
+
+    def test_cli_redacts_anchored_wsl_profile_in_strings_keys_and_summary(self):
+        for drive, users in (("c", "Users"), ("D", "uSeRs")):
+            with self.subTest(drive=drive, users=users):
+                self.assert_anchored_profile_redaction("-".join(("", "mnt", drive, users, "fixtureuser")))
+
+    def test_cli_redacts_anchored_windows_profile_in_strings_keys_and_summary(self):
+        # The validator accepts multiple separators after the drive colon.
+        for drive, users, separators in (("D", "Users", 1), ("c", "uSeRs", 1), ("E", "Users", 2)):
+            with self.subTest(drive=drive, users=users, separators=separators):
+                self.assert_anchored_profile_redaction(drive + "-" * (separators + 1) + users + "-fixtureuser")
+
+    def test_cli_preserves_anchored_example_profiles(self):
+        # PRIVATE_CONTENT exempts example (case-insensitively for Windows/WSL).
+        homes = (("", "home", "example"), ("", "Users", "example"),
+                 ("", "mnt", "c", "Users", "example"), ("D", "", "Users", "example"),
+                 ("", "mnt", "c", "Users", "ExAmPlE"), ("D", "", "Users", "ExAmPlE"))
+        for parts in homes:
+            for prefix in ("projects/", "claude-1000/"):
+                with self.subTest(parts=parts, prefix=prefix):
+                    work = temp_dir(self)
+                    path = prefix + "-".join(parts) + "-code-project"
+                    res = healthy_result()
+                    notes = {"string": "read " + path + ". Next.", path: "retained note"}
+                    res["first"][0]["claude_discover"]["notes"] = notes
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], path)
+        # The exemption must not include a distinct username that starts with 'example'.
+        self.assert_anchored_profile_redaction("-".join(("", "home", "exampleuser")))
+
+    def test_cli_preserves_unanchored_profile_prose(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        notes = "home-assistant and " + ", ".join("-".join(parts) + "-code-project" for parts in homes)
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+
+    def assert_bare_profile_conversion(self, encoded_home, expected_home="<project-dir>"):
+        for suffix in ("/session-fixture", '" quoted', "' quoted", " continued", "\tcontinued", "\ncontinued", ""):
+            with self.subTest(suffix=suffix):
+                work = temp_dir(self)
+                path = encoded_home + suffix
+                expected = expected_home + suffix
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = {"details": [{"string": "read " + path,
+                                                                           path: "retained note"}]}
+                done = self.cli(work, res, run_id=path)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"details": [{"string": "read " + expected, expected: "retained note"}]})
+                self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+                if expected_home != encoded_home:
+                    for name in ("returns", "lanes", "layers", "survivors"):
+                        self.assertNotIn(encoded_home, (work / f"out/{name}.json").read_text())
+                    self.assertNotIn(encoded_home, done.stdout)
+
+    def test_cli_redacts_generic_bare_linux_home_for_each_terminator(self):
+        self.assert_bare_profile_conversion("-".join(("", "home", "fixtureuser")))
+
+    def test_cli_redacts_generic_bare_macos_home_for_each_terminator(self):
+        self.assert_bare_profile_conversion("-".join(("", "Users", "fixtureuser")))
+
+    def test_cli_redacts_generic_bare_wsl_home_for_each_terminator(self):
+        for drive, users in (("c", "Users"), ("D", "uSeRs")):
+            with self.subTest(drive=drive, users=users):
+                self.assert_bare_profile_conversion("-".join(("", "mnt", drive, users, "fixtureuser")))
+
+    def test_cli_redacts_generic_bare_windows_home_for_each_terminator(self):
+        for drive, users in (("D", "Users"), ("c", "uSeRs")):
+            with self.subTest(drive=drive, users=users):
+                self.assert_bare_profile_conversion("-".join((drive, "", users, "fixtureuser")))
+
+    def test_cli_preserves_generic_bare_home_prose_and_boundaries(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        controls = ["home-assistant", "my-home-page", "-".join(("", "home", ""))]
+        for parts in homes:
+            slug = "-".join(parts)
+            # '_' is a word character, but is not an alphanumeric token in a canonical dash encoding.
+            controls.extend((slug + "_", "word" + slug, "." + slug, "-" + slug,
+                             slug + "-code-project", slug + "."))
+        work = temp_dir(self)
+        res = healthy_result()
+        notes = {"strings": controls, "keys": {control: "retained control" for control in controls}}
+        res["first"][0]["claude_discover"]["notes"] = notes
+        run_id = " | ".join(controls)
+        done = self.cli(work, res, run_id=run_id)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], run_id)
+
+    def test_cli_preserves_generic_bare_example_homes_for_each_terminator(self):
+        homes = (("", "home", "example"), ("", "Users", "example"),
+                 ("", "mnt", "c", "Users", "example"), ("D", "", "Users", "example"),
+                 ("", "mnt", "c", "Users", "ExAmPlE"), ("D", "", "Users", "ExAmPlE"))
+        for parts in homes:
+            with self.subTest(parts=parts):
+                slug = "-".join(parts)
+                self.assert_bare_profile_conversion(slug, expected_home=slug)
+        self.assert_bare_profile_conversion("-".join(("", "home", "exampleuser")))
+
+    def test_cli_redacts_unanchored_wsl_checkout_with_linux_home(self):
+        work = temp_dir(self)
+        linux_home = Path("/") / "home" / "fixturelinux"
+        wsl_root = Path("/") / "mnt" / "c" / "Users" / "fixtureuser" / "code" / "project"
+        encoded = "-".join(("", "mnt", "c", "Users", "fixtureuser", "code", "project"))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            "bare": encoded, "string": "read " + encoded + "-nested. Next.", encoded: "retained note"}
+        run_file = write_json(work / "run.json", {"runId": encoded, "status": "completed", "result": res})
+        scope = write_json(work / "scope.json", scope_for())
+        # Use the actual validator's patterns while the checkout root is a synthetic WSL profile.
+        patterns = sweep_common.private_content(ROOT)
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(convert.Path, "home", return_value=linux_home), \
+                mock.patch.object(convert, "REPO_ROOT", wsl_root), \
+                mock.patch.object(convert, "private_content", return_value=patterns), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                 "--out", str(work / "out")])
+        self.assertEqual(code, 0, stderr.getvalue())
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"bare": "<project-dir>", "string": "read <project-dir>. Next.",
+                          "<project-dir>": "retained note"})
+        for name in ("returns", "lanes", "layers", "survivors"):
+            self.assertNotIn(encoded, (work / f"out/{name}.json").read_text())
+        self.assertNotIn(encoded, stdout.getvalue())
+        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], "<project-dir>")
+
+    def test_cli_redacts_unanchored_encoded_work_directory(self):
+        work = temp_dir(self)
+        encoded = re.sub(r"[^a-zA-Z0-9]", "-", str(work.resolve()))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            "string": "read " + encoded + "-nested. Next.", encoded: "retained note"}
+        done = self.cli(work, res, run_id=encoded)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"string": "read <project-dir>. Next.", "<project-dir>": "retained note"})
+        self.assertNotIn(encoded, done.stdout)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], "<project-dir>")
+
     def test_cli_preserves_home_substrings_inside_ordinary_words(self):
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
         notes = "word" + encoded + " and component-home-widget; unchanged"

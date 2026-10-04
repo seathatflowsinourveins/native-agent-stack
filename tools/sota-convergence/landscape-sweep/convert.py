@@ -39,10 +39,12 @@ Models and effort: each Claude vote names the resolved model and the effort its 
 (child-usage.mjs output; a call the runtime re-ran is measured by the attempt that returned, and the client-written
 <synthetic> rows name no model); without it, the requested alias and effort null (not measured). The GPT-6 vote
 names the model and effort its job reported.
-Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. The dash-encoded local home from
-Path.home() (non-alphanumerics become '-') and its project-directory suffix become <project-dir>, including bare
-home segments. Other hosts' -home- forms need a projects/ or claude-<uid>/ path anchor. Redaction traverses nested
-strings and dict keys and preserves sentence-ending periods. Ordinary words and unanchored prose stay unchanged. Any string still matching
+Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. Their dash encodings
+(non-alphanumerics become '-') and project-directory suffixes become <project-dir>, including bare home segments.
+Other hosts' Linux, macOS, WSL and Windows project-directory forms need a projects/ or claude-<uid>/ path anchor.
+Generic bare homes with a single alphanumeric username token are also redacted when followed by a slash, quote,
+whitespace or end of string. Both generic forms keep the validator's example-user exemption. Redaction traverses nested strings and dict keys and preserves
+sentence-ending periods. Ordinary words and unanchored prose stay unchanged. Any string still matching
 scripts/validate.py PRIVATE_CONTENT is listed by pointer and kind (never its text), and the exit code is 3.
 Integrity: with --work-dir, every GPT-6 output is compared with the file Codex wrote (gpt6/<job>/last.json). Exit 4
 when the workflow used an output that differs from that file (mismatch), that Codex never wrote (no_file) or that
@@ -85,9 +87,19 @@ SYNTHETIC_MODEL = "<synthetic>"  # child-usage.mjs: the model of client-written 
 COPY_FAILURES = ("mismatch", "no_file", "file_unparseable", "file_only")
 VOTE_ROLES = (("facts", "facts"), ("fit_claude", "Claude fit"), ("fit_gpt6", "GPT-6 fit"))
 SKILLS_CATALOG = "skills"  # build_inputs.SKILLS: the catalog of a skills-* layer, whose proposals are skill refs
-# Generic homes need a native directory anchor; local encoded homes are derived at the redaction call site.
+# Generic project directories need a native anchor; bare homes use the terminators below. Local paths are
+# derived at the redaction call site.
+# Match scripts/validate.py's personal home and Windows user roots and example exemption. Windows/WSL roots
+# and their example exemption are case-insensitive, as in the validator. A Windows drive begins the segment.
+# Share roots and exemptions so the anchored and bare rules stay consistent.
+ENCODED_PROFILE_ROOT = (
+    r"(?:-(?:home|Users)-(?!example(?:-|\b))"
+    r"|(?i:(?:-mnt-[a-z]-Users-|[a-z]-{2,}Users-)(?!example(?:-|\b))))")
 # Ending on a word character or dash preserves any sentence-ending periods.
-ENCODED_PROJECT_DIR = re.compile(r"(?<![\w.-])(?P<prefix>projects/|claude-\d+/)-home-[\w.-]*[\w-](?![\w-])")
+ENCODED_PROJECT_DIR = re.compile(
+    r"(?<![\w.-])(?P<prefix>projects/|claude-\d+/)" + ENCODED_PROFILE_ROOT + r"[\w.-]*[\w-](?![\w-])")
+# A dash after the username starts a longer slug, which still requires an anchor or a local path match.
+ENCODED_BARE_HOME = re.compile(r"(?<![\w.-])" + ENCODED_PROFILE_ROOT + r"[A-Za-z0-9]+(?=[/\"'\s]|$)")
 
 
 def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
@@ -682,22 +694,24 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                         "gpt6_by_status": gpt6_usage["by_status"], "gpt6_copy_check": checks}}
 
 
-def redact_project_dirs(value):
-    """Redact local encoded homes and native directory-anchored homes in strings and keys.
+def redact_project_dirs(value, work: Path | None = None, repo_root: Path | None = REPO_ROOT):
+    """Redact local encoded paths and native directory-anchored user profiles in strings and keys.
 
-    Use the same home and realpath forms as host_replacements; a bare encoded home is also private. Generic
-    forms require projects/ or claude-<uid>/ so prose such as an unrelated home-assistant repo is preserved.
+    Use host_replacements' home, checkout, optional work directory and realpath forms; a bare encoded home is
+    also private. Generic Linux/macOS/WSL/Windows project slugs require projects/ or claude-<uid>/. Bare slugs with
+    one alphanumeric username token need a slash, quote, whitespace or end terminator. Both rules share the
+    validator's example exemption; longer unanchored prose such as an unrelated home-assistant repo is preserved.
     """
-    home = str(Path.home())
-    encoded_homes = sorted({re.sub(r"[^a-zA-Z0-9]", "-", form) for form in (home, os.path.realpath(home))
-                            if form and form != "/"}, key=lambda form: -len(form))
-    local = (re.compile(r"(?<![\w.-])(?:" + "|".join(re.escape(form) for form in encoded_homes)
-                        + r")(?:-(?:[\w.-]*[\w-])?)?(?![\w-])") if encoded_homes else None)
+    encoded_paths = sorted({re.sub(r"[^a-zA-Z0-9]", "-", prefix)
+                            for prefix, _ in host_replacements(work, repo_root)}, key=lambda form: -len(form))
+    local = (re.compile(r"(?<![\w.-])(?:" + "|".join(re.escape(form) for form in encoded_paths)
+                        + r")(?:-(?:[\w.-]*[\w-])?)?(?![\w-])") if encoded_paths else None)
 
     def fix(text):
         if local:
             text = local.sub("<project-dir>", text)
-        return ENCODED_PROJECT_DIR.sub(lambda match: match["prefix"] + "<project-dir>", text)
+        text = ENCODED_PROJECT_DIR.sub(lambda match: match["prefix"] + "<project-dir>", text)
+        return ENCODED_BARE_HOME.sub("<project-dir>", text)
 
     def walk(item):
         if isinstance(item, str):
@@ -737,17 +751,18 @@ def main(argv=None) -> int:
     except (ValueError, OSError, KeyError) as error:
         print(f"convert.py: {error}", file=sys.stderr)
         return 2
-    replacements = host_replacements(work, args.repo_root.resolve())
+    repo_root = args.repo_root.resolve()
+    replacements = host_replacements(work, repo_root)
     args.out.mkdir(parents=True, exist_ok=True)
     findings = []
     for name in ("returns", "lanes", "layers", "survivors"):
-        document = redact_project_dirs(sanitize(out[name], replacements))
+        document = redact_project_dirs(sanitize(out[name], replacements), work, repo_root)
         write_json(args.out / f"{name}.json", document)
         findings.extend((f"{name}.json#{pointer}", kind) for pointer, kind in private_findings(document, patterns))
     summary = {**out["summary"], "run": meta}
     if meta.get("status") not in (None, "completed"):
         summary["warning"] = f"the run record's status is {meta.get('status')!r}, not completed"
-    print(json.dumps(redact_project_dirs(summary), indent=1))
+    print(json.dumps(redact_project_dirs(summary, work, repo_root), indent=1))
     if findings:
         print("possible private content (redact before registering; text not shown):", file=sys.stderr)
         for pointer, kind in findings:

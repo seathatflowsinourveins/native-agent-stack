@@ -689,15 +689,23 @@ provider/model run or upstream end-to-end qualification. This recovery serves co
 records and the North Star R&D readiness they support.
 
 **2026-10-04, step 8 project-directory redaction.** Before writing converted artifacts or printing the summary,
-`convert.py` derives the local encoded home from `Path.home()` and its realpath, replacing each non-alphanumeric
-character with `-`, following [sweep_common.host_replacements](sweep_common.py)'s native home lookup. It replaces
-that whole segment, bare or with a project-directory suffix, with `<project-dir>` even without a directory prefix.
-A generic `-home-<user>...` segment is redacted only after `projects/` or `claude-<uid>/`. Redaction covers deeper
+`convert.py` derives encoded local paths from the home, resolved checkout, optional work directory and their
+realpaths, replacing each non-alphanumeric character with `-`, following
+[sweep_common.host_replacements](sweep_common.py). It replaces each whole segment, bare or with a
+project-directory suffix, with `<project-dir>` even without a directory prefix. Generic Linux, macOS, WSL and
+Windows project-directory segments require `projects/` or `claude-<uid>/`, matching the private profile
+roots and `example` exemption in `scripts/validate.py`. To match the coordinating publication-rule extension
+in #697, generic bare homes with a single alphanumeric username token are also redacted without an anchor
+when followed by `/`, a double or single quote, whitespace or the end of the string. They use the same
+`(?<![\w.-])` left boundary and example exemption; a longer project-directory slug still requires an anchor
+or a known local path. WSL checkouts under a Windows profile are covered even
+when the native home is a Linux path; encoded Windows segments can begin with the drive letter. Redaction covers deeper
 strings and nested JSON fields and keys and preserves sentence-ending periods. Ordinary words and unanchored
 prose remain unchanged. The implementation follows the recursive string/key traversal of
 [sweep_common.sanitize](sweep_common.py) at the same `8c32a84b2` source baseline; it uses Python's standard-library
 regular expressions and the existing angle-bracket placeholder style. Fixtures cover notes, nested strings,
-bare local and anchored homes, dict keys, the printed summary, prose and sentence endings.
+bare local and anchored homes, all four profile forms, WSL checkouts, work directories, dict keys, the printed
+summary, bare-home terminators in strings and keys, example-user exemptions, prose and sentence endings.
 UUIDs retain the checkout's existing exit-3 publication
 gate. The separate CC change to `scripts/validate.py` owns detection of encoded home paths; this repair
 sanitizes them before that gate without editing the validator.
