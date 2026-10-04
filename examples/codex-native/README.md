@@ -143,8 +143,13 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 
 | File | SHA-256 |
 | --- | --- |
-| `stack-researcher.toml` | `ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00` |
-| `stack-verifier.toml` | `281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd` |
+| `stack-researcher.toml` | `ca136d13748d72c6e794aa9f63ad5364a2bb4a5fcfcca3eaf682975995da6a83` |
+| `stack-verifier.toml` | `b2d6dfe9e8c48674a99b1809d25dcad4017bfcde2e820ede9244c3ba5712da28` |
+
+### 2026-10-04: RTK pin guidance amendment
+
+The maintained carriers now describe RTK 0.51.0's missing-file diff exit 2 ([bf23cff](https://github.com/rtk-ai/rtk/commit/bf23cff467aa3b4aa314d6a4b956630f1e275a5f)). Both installed versions reject environment assignments and shell builtins after `proxy` with exit 1, so verifier guidance places assignments before the prefix or invokes `env`, and leaves builtins in the calling shell. The upstream v0.50.0 awareness block remains byte-identical; the earlier freeze digests were ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00 (researcher) and 281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd (verifier). The table above carries current carrier digests, not a new frozen E2E or spawned-role acceptance.
+
 
 The adoption source and its mirror hold these bytes; a later change to either needs a new dated section here, new rows in `SHA256SUMS` and new rows in the test.
 

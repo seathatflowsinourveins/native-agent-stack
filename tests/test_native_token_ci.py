@@ -1080,7 +1080,8 @@ class NativeTokenCIContracts(unittest.TestCase):
 
     @staticmethod
     def _rtk_exactness_cases():
-        # Synthetic native/0.50.0/proxy arms from rtk_exactness_fixture and its frozen predicates;
+        # Synthetic native/0.51.0/proxy arms; diff status follows upstream bf23cff.
+        # Remaining outcomes come from the 0.50.0 rtk_exactness_fixture predicates;
         # the committed port cites full-save/rtk/exactness.sh (2026-09-26 scratch, not committed).
         blob = "".join(f"line {number:05d} abcdefghijklmnopqrstuvwxyz0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ\n"
                        for number in range(1, 401))
@@ -1101,7 +1102,7 @@ class NativeTokenCIContracts(unittest.TestCase):
                  "... (+300 lines) [see remaining: rtk proxy git show HEAD:big.txt]\n"),
                 ("t1b-git-c-show-blob", 0, blob, 0, "".join(blob.splitlines(keepends=True)[:100]) +
                  "... (+300 lines) [see remaining: rtk proxy git -C . show HEAD:big.txt]\n"),
-                ("t2-diff-missing-file", 2, "", 1, ""),
+                ("t2-diff-missing-file", 2, "", 2, ""),
                 ("t2b-diff-two-files", 1, diff, 1, diff),
                 ("t3-git-branch-all", 0, "+ feature\n* main\n  remotes/origin/feature\n  remotes/origin/main\n",
                  0, "  remote-only (1):\n    feature\n"),
@@ -1116,10 +1117,10 @@ class NativeTokenCIContracts(unittest.TestCase):
         return cases, blob
 
     def test_rtk_exactness_checks_reject_passthrough_and_broken_recovery(self):
-        # Mock-free check of the eight frozen outcomes in rtk_exactness_checks (rtk 0.50.0).
+        # Mock-free check of the eight exactness outcomes; v0.51.0 diff status repair is included.
         labels = (
             "rtk-exactness-git-show-blob-window-changes-its-tail",
-            "rtk-exactness-diff-missing-file-exit-code-changes",
+            "rtk-exactness-diff-missing-file-preserves-native-exit-code",
             "rtk-exactness-branch-list-misreports-a-worktree-branch-as-remote-only",
             "rtk-exactness-log-caps-at-ten-commits-and-drops-the-merge",
             "rtk-exactness-find-on-a-missing-directory-masks-the-exit-code",
@@ -1133,10 +1134,14 @@ class NativeTokenCIContracts(unittest.TestCase):
         variants = []
         for case, failing in (
                 ("t1-git-show-blob", labels[0]), ("t1b-git-c-show-blob", labels[0]),
-                ("t2-diff-missing-file", labels[1]), ("t3-git-branch-all", labels[2]),
+                ("t3-git-branch-all", labels[2]),
                 ("t4-git-log", labels[3]), ("t4b-git-log-subjects", labels[3]),
                 ("t5-find-missing-dir", labels[4]), ("t7-jq-rows", labels[5])):
             variants.append((case, "rtk", dict(cases[case]["native"]), failing))
+        # Upstream v0.51.0 tests/diff_byte_accuracy_test.rs: missing_operand_exits_two_and_names_the_failed_path.
+        # Reject the former exit=1 result and a broken native control.
+        variants.append(("t2-diff-missing-file", "rtk", {"exit": 1, "stdout": ""}, labels[1]))
+        variants.append(("t2-diff-missing-file", "native", {"exit": 1, "stdout": ""}, labels[1]))
         for case in ("t1-git-show-blob", "t1b-git-c-show-blob"):
             variants.append((case, "rtk", {"exit": 0, "stdout": ""}, labels[0]))
         for case in ("t2b-diff-two-files", "t6-grep-file-list"):
@@ -1149,6 +1154,8 @@ class NativeTokenCIContracts(unittest.TestCase):
             with self.subTest(case=case, arm=arm, response=wrong):
                 changed = deepcopy(cases)
                 changed[case][arm] = wrong
+                if arm == "native":
+                    changed[case]["proxy"] = dict(wrong)
                 checks = ci.rtk_exactness_checks(changed, blob)
                 self.assertEqual(checks, {label: label != failing for label in labels})
                 # The fixture feeds these exact booleans and labels to Run.check -> require.

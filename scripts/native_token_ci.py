@@ -56,8 +56,8 @@ ROOT = Path(__file__).resolve().parents[1]
 # Serena declares 2.0.0.dev0 for every commit, so its manifest version names the commit after " @ "
 # and the commit is its identity (adoption/pins-linux-x86_64.json, kind uv-tool-from-git).
 SERENA_COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
-PINS = {"rtk": "0.50.0", "qmd": "2.8.3", "repomix": "1.18.1", "toon": "4.1.1",
-        "mcporter": "0.14.1", "markitdown": "0.1.8", "ast-grep": "0.45.3",
+PINS = {"rtk": "0.51.0", "qmd": "2.8.3", "repomix": "1.18.1", "toon": "4.1.1",
+        "mcporter": "0.14.2", "markitdown": "0.1.8", "ast-grep": "0.45.3",
         "ccusage": "20.0.26", "codebase-memory-mcp": "0.11.0", "headroom": "0.37.0",
         "jcodemunch-mcp": "1.108.319", "context-mode": "1.0.169",
         "serena": f"2.0.0.dev0 @ {SERENA_COMMIT}", "ai-memory": "2.4.1", "context-hub": "0.1.4",
@@ -200,7 +200,7 @@ RTK_HOOK_JQ_PROBES = ("jq -r .x f.json", "git status && jq .")
 # RTK exactness arms: each inexact rewrite the exclusions route around, run natively, through
 # `rtk <command>` (what the hook would produce) and through `rtk proxy <command>` (the raw recovery).
 # Ported from the 2026-09-26 RTK coverage study's exactness script (checks T1-T7) without its
-# development-build arm; the frozen outcomes are rtk 0.50.0's.
+# development-build arm; remaining outcomes are rtk 0.50.0's, with the v0.51.0 diff repair below.
 RTK_EXACT_BLOB_LINES = 400
 RTK_EXACT_JQ_ROWS = 60
 RTK_EXACT_JQ_FILTER = '.[] | "\\(.id) \\(.name) \\(.note)"'
@@ -1498,7 +1498,11 @@ def rtk_exactness_fixture(run: Run) -> None:
 
 
 def rtk_exactness_checks(cases: dict[str, dict[str, dict]], blob: str) -> dict[str, bool]:
-    """Frozen rtk 0.50.0 outcomes of the exactness arms, each held against the native arm."""
+    """Exactness arms at the current pin; v0.51.0 fixes missing-file diff status.
+
+    Upstream: rtk-ai/rtk@e001f773, src/cmds/git/diff_cmd.rs; repair bf23cff.
+    Remaining predicates retain the 0.50.0 fixture and must still be observed natively.
+    """
     def lines(case: str, arm: str) -> list[str]:
         return cases[case][arm]["stdout"].splitlines()
 
@@ -1512,8 +1516,8 @@ def rtk_exactness_checks(cases: dict[str, dict[str, dict]], blob: str) -> dict[s
             cases[case]["native"]["stdout"] == blob and cases[case]["rtk"]["exit"] == 0
             and tail_lines(cases[case]["rtk"]["stdout"], 5) != tail_lines(blob, 5)
             and bool(lines(case, "rtk")) and window.fullmatch(lines(case, "rtk")[-1]) is not None for case in blob_cases),
-        "rtk-exactness-diff-missing-file-exit-code-changes": (
-            cases["t2-diff-missing-file"]["native"]["exit"] == 2 and cases["t2-diff-missing-file"]["rtk"]["exit"] == 1),
+        "rtk-exactness-diff-missing-file-preserves-native-exit-code": (
+            cases["t2-diff-missing-file"]["native"]["exit"] == 2 and cases["t2-diff-missing-file"]["rtk"]["exit"] == 2),
         "rtk-exactness-branch-list-misreports-a-worktree-branch-as-remote-only": (
             "+ feature" in lines("t3-git-branch-all", "native")
             and "  remotes/origin/feature" in lines("t3-git-branch-all", "native")

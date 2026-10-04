@@ -614,7 +614,7 @@ class PluginRevisionCheckTests(unittest.TestCase):
             "renamed plugin key": (self.revision_errors,
                                    bootstrap.replace('"claude-hud@claude-hud":', '"claude-hud@hud":'), recipe),
             "bootstrap command": (self.command_errors,
-                                  bootstrap.replace("claude-hud@v0.8.0 --scope user", "claude-hud@v0.7.0 --scope user"), recipe),
+                                  bootstrap.replace("claude-hud@v0.10.0 --scope user", "claude-hud@v0.7.0 --scope user"), recipe),
             "missing install": (self.command_errors,
                                 bootstrap.replace("claude plugin install codex@openai-codex --scope user --json\n", ""), recipe),
         }

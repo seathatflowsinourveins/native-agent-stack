@@ -242,8 +242,8 @@
     },
     {
       "id": "claude-hud",
-      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
-      "version": "0.8.0",
+      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+      "version": "0.10.0",
       "license": "MIT",
       "profile": "optional",
       "role": "Claude statusline rendering",
@@ -259,12 +259,13 @@
         "token-practice-gap-followup-20260920",
         "native-claude-hud-interactive-20260920",
         "current-session-observation-20260920",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "claude-hud-0100-qualification-20261004"
       ],
       "upstream_sources": [
-        "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0"
+        "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0"
       ],
-      "source_pin": null,
+      "source_pin": "75683c6de1ac07f6bbef00d739001679dba0740c",
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core.",
       "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
@@ -626,8 +627,8 @@
     },
     {
       "id": "mcporter",
-      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
-      "version": "0.14.1",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.2",
+      "version": "0.14.2",
       "license": "MIT",
       "profile": "core",
       "role": "Native CLI bridge with persistent MCP daemon connection",
@@ -641,13 +642,14 @@
         "current-session-observation-20260920",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "mcporter-0141-qualification-20260925"
+        "mcporter-0141-qualification-20260925",
+        "mcporter-0142-qualification-20261004"
       ],
       "upstream_sources": [
-        "https://github.com/openclaw/mcporter/tree/v0.14.1"
+        "https://github.com/openclaw/mcporter/tree/v0.14.2"
       ],
-      "source_pin": null,
-      "freshness": "0.14.1 serves bin/mcporter on the NativeStack WSL2 host since 2026-09-25 after a matched 37-step comparison against 0.13.13 (independent review). 0.14.x runs ps from PATH, so whatever launches the daemon needs ps on its PATH. 0.13.13 is kept for rollback. The Mac pin stays 0.13.13, and the landscape winner pin stays 0.13.13 until a new verdict wave."
+      "source_pin": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+      "freshness": "0.14.2 serves bin/mcporter on the NativeStack WSL2 host since 2026-10-04; the qualification receipt retains failed configured-daemon calls and successful ad-hoc stdio calls, with no daemon recovery attempted. 0.14.x runs ps from PATH, so whatever launches the daemon needs ps on its PATH. 0.14.1 is kept for rollback. The Mac pin stays 0.13.13 until a Mac qualifies 0.14.2, and the landscape winner pin stays 0.13.13 until a new verdict wave."
     },
     {
       "id": "openresearch",
@@ -823,8 +825,8 @@
     },
     {
       "id": "rtk",
-      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-      "version": "0.50.0",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+      "version": "0.51.0",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Compact supported command outputs, retain failure/raw recovery",
@@ -848,13 +850,14 @@
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "rtk-050-qualification-20260925"
+        "rtk-050-qualification-20260925",
+        "rtk-051-qualification-20261004"
       ],
       "upstream_sources": [
-        "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0"
+        "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0"
       ],
-      "source_pin": null,
-      "freshness": "0.50.0 runs the Claude Code hook on the NativeStack WSL2 host since 2026-09-25 after qualification against 0.49.0 (hash-pinned hook acceptance, independent review); that host excludes `git show <rev>:<path>` and `diff` from rewriting through ~/.config/rtk/config.toml, which the bootstrap does not render. 0.49.0 is kept for rollback. The landscape winner pin stays 0.49.0 until a new verdict wave."
+      "source_pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "freshness": "0.51.0 runs the Claude Code hook on the NativeStack WSL2 host since 2026-10-04; its qualification receipt retains the native verify, hook and deny-rule comparisons. That host keeps the explicit exclusions, including `git show <rev>:<path>` and `diff`, through ~/.config/rtk/config.toml, which the bootstrap does not render. 0.50.0 is kept for rollback. The landscape winner pin stays 0.49.0 until a new verdict wave."
     },
     {
       "id": "sandbox-runtime",

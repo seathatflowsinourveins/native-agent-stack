@@ -517,32 +517,32 @@
     {
       "component_id": "claude-hud",
       "repository": "https://github.com/jarrodwatts/claude-hud",
-      "selected_repository_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
-      "selected_version": "0.8.0",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+      "selected_version": "0.10.0",
+      "selected_source_pin": "75683c6de1ac07f6bbef00d739001679dba0740c",
       "checks": [
         {
           "endpoint": "repos/jarrodwatts/claude-hud",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:49.299526+00:00",
-          "ended_at": "2026-09-21T22:30:49.703719+00:00",
-          "stdout_sha256": "6e2cbb809f5d65907d9a422b29a2c5723bfe60a92035a81300a397fecd6b7665",
+          "started_at": "2026-10-04T13:59:39.373364+00:00",
+          "ended_at": "2026-10-04T13:59:39.670092+00:00",
+          "stdout_sha256": "8a16cecd2e719e98493f6760effc16224ebe6277c650b8d47b29c4c7e9623c9f",
           "status": "ok"
         },
         {
           "endpoint": "repos/jarrodwatts/claude-hud/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:49.703816+00:00",
-          "ended_at": "2026-09-21T22:30:50.029959+00:00",
-          "stdout_sha256": "292aaa5740254116774836f04a4fb4edc2ca2ddecd1c75d4884eb56485fe4985",
+          "started_at": "2026-10-04T13:59:39.670214+00:00",
+          "ended_at": "2026-10-04T13:59:39.918599+00:00",
+          "stdout_sha256": "6a227a56e88b9680c31a36105086e7bd403a3fe19de83f88c30bacc95e7e1953",
           "status": "ok"
         },
         {
-          "endpoint": "repos/jarrodwatts/claude-hud/commits/v0.8.0",
+          "endpoint": "repos/jarrodwatts/claude-hud/commits/v0.10.0",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:50.030138+00:00",
-          "ended_at": "2026-09-21T22:30:50.601153+00:00",
-          "stdout_sha256": "66174593d5a241eac00582b9b17e17d57beed7ab23d107152aa96ac77282b528",
+          "started_at": "2026-10-04T13:59:39.918736+00:00",
+          "ended_at": "2026-10-04T13:59:40.251395+00:00",
+          "stdout_sha256": "91a438d860f1044f8b9e712ef25f81e5081f71c7e07ee27e174a7d692d1275ad",
           "status": "ok"
         }
       ],
@@ -550,27 +550,33 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-19T21:32:54Z",
+      "pushed_at": "2026-10-03T21:32:41Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v0.8.0",
-        "published_at": "2026-08-18T14:20:35Z",
-        "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+        "tag_name": "v0.10.0",
+        "published_at": "2026-10-01T19:11:24Z",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.8.0",
-        "sha": "ef5f1c8b167572ad1443c70629763ea8780af96b",
-        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/ef5f1c8b167572ad1443c70629763ea8780af96b",
-        "committed_at": "2026-08-18T14:18:36Z"
+        "ref": "v0.10.0",
+        "sha": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/75683c6de1ac07f6bbef00d739001679dba0740c",
+        "committed_at": "2026-10-01T19:09:48Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "commit",
       "primary_repository": "https://github.com/jarrodwatts/claude-hud",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_source": {
+        "ref": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "sha": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/75683c6de1ac07f6bbef00d739001679dba0740c",
+        "committed_at": "2026-10-01T19:09:48Z"
+      }
     },
     {
       "component_id": "codebase-memory-mcp",
@@ -1395,32 +1401,32 @@
     {
       "component_id": "mcporter",
       "repository": "https://github.com/openclaw/mcporter",
-      "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.1",
-      "selected_version": "0.14.1",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.2",
+      "selected_version": "0.14.2",
+      "selected_source_pin": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
       "checks": [
         {
           "endpoint": "repos/openclaw/mcporter",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:59:21.515671+00:00",
-          "ended_at": "2026-09-25T20:59:21.923837+00:00",
-          "stdout_sha256": "b3f524e759af70b735b18ba3265fd11367d905d57137133f3d8b5a0e6e8f6b98",
+          "started_at": "2026-10-04T13:59:37.304076+00:00",
+          "ended_at": "2026-10-04T13:59:37.645309+00:00",
+          "stdout_sha256": "c34fc2c98b2f4984bcc1106b3b77f25780f4610d1126d65f06fc854c4ef54379",
           "status": "ok"
         },
         {
           "endpoint": "repos/openclaw/mcporter/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:59:21.924008+00:00",
-          "ended_at": "2026-09-25T20:59:22.256453+00:00",
-          "stdout_sha256": "849eaa7722b314c1c79ace3ac1bd374b6a4f6b24a78c3cd24b2077d4fe7f050c",
+          "started_at": "2026-10-04T13:59:37.645474+00:00",
+          "ended_at": "2026-10-04T13:59:37.913634+00:00",
+          "stdout_sha256": "bb15c4f7e49e27e8aa78ebfb4e529206562678ad06606381a216e9883f930a3c",
           "status": "ok"
         },
         {
-          "endpoint": "repos/openclaw/mcporter/commits/v0.14.1",
+          "endpoint": "repos/openclaw/mcporter/commits/v0.14.2",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:59:22.256612+00:00",
-          "ended_at": "2026-09-25T20:59:22.618318+00:00",
-          "stdout_sha256": "d3d837ff22ae29f38338f6d5fd42009829326f89457a9c7fe73f29970f98904d",
+          "started_at": "2026-10-04T13:59:37.913797+00:00",
+          "ended_at": "2026-10-04T13:59:38.331553+00:00",
+          "stdout_sha256": "24ce8c193ab2a8cdf608ac6225ab408ca52254ae55683cb699aeab2ec175110b",
           "status": "ok"
         }
       ],
@@ -1428,27 +1434,33 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-25T11:19:38Z",
+      "pushed_at": "2026-10-01T18:43:11Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v0.14.1",
-        "published_at": "2026-09-24T13:16:08Z",
-        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
+        "tag_name": "v0.14.2",
+        "published_at": "2026-10-01T18:24:07Z",
+        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.14.1",
-        "sha": "93e0916cafe2d624b94271e31b75ca681a016514",
-        "html_url": "https://github.com/openclaw/mcporter/commit/93e0916cafe2d624b94271e31b75ca681a016514",
-        "committed_at": "2026-09-24T11:06:02Z"
+        "ref": "v0.14.2",
+        "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "committed_at": "2026-10-01T05:29:15Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "commit",
       "primary_repository": "https://github.com/openclaw/mcporter",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_source": {
+        "ref": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "committed_at": "2026-10-01T05:29:15Z"
+      }
     },
     {
       "component_id": "openresearch",
@@ -1846,32 +1858,32 @@
     {
       "component_id": "rtk",
       "repository": "https://github.com/rtk-ai/rtk",
-      "selected_repository_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-      "selected_version": "0.50.0",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+      "selected_version": "0.51.0",
+      "selected_source_pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
       "checks": [
         {
           "endpoint": "repos/rtk-ai/rtk",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:09:06.688018+00:00",
-          "ended_at": "2026-09-25T20:09:07.077689+00:00",
-          "stdout_sha256": "1743ded3363d2bdcf86ff118d0575a487b8bed71941dcf8fded67b043fa739bf",
+          "started_at": "2026-10-04T13:59:36.402720+00:00",
+          "ended_at": "2026-10-04T13:59:36.753096+00:00",
+          "stdout_sha256": "1d6b0f01162c859e97040449cf67fa81ec59ed685992ea384387884bc3f556bd",
           "status": "ok"
         },
         {
           "endpoint": "repos/rtk-ai/rtk/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:09:07.077794+00:00",
-          "ended_at": "2026-09-25T20:09:07.344426+00:00",
-          "stdout_sha256": "247043896c94397b0ad595b176f21b70b80967c84bcb85ee2bdcb97cf9f104a4",
+          "started_at": "2026-10-04T13:59:36.753258+00:00",
+          "ended_at": "2026-10-04T13:59:37.002034+00:00",
+          "stdout_sha256": "5443d352f9cbbe0b25f8b15ebb6538cbbc5f6cc43ed690cfaac197fd7db8b0bb",
           "status": "ok"
         },
         {
-          "endpoint": "repos/rtk-ai/rtk/commits/v0.50.0",
+          "endpoint": "repos/rtk-ai/rtk/commits/v0.51.0",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:09:07.344600+00:00",
-          "ended_at": "2026-09-25T20:09:07.664062+00:00",
-          "stdout_sha256": "3ed900f60361792b8c8fa84b1be35988bed740390f9b352ac99f31d26c24d1b9",
+          "started_at": "2026-10-04T13:59:37.002234+00:00",
+          "ended_at": "2026-10-04T13:59:37.303596+00:00",
+          "stdout_sha256": "d0136d235bf918c3d9e300bd0371123518db91b63797aba37c450ee285d7616d",
           "status": "ok"
         }
       ],
@@ -1879,27 +1891,33 @@
       "archived": false,
       "disabled": false,
       "default_branch": "develop",
-      "pushed_at": "2026-09-25T10:14:06Z",
+      "pushed_at": "2026-10-03T16:10:25Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.50.0",
-        "published_at": "2026-09-24T10:02:31Z",
-        "html_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-        "target_commitish": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+        "tag_name": "v0.51.0",
+        "published_at": "2026-10-02T13:33:54Z",
+        "html_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+        "target_commitish": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.50.0",
-        "sha": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
-        "html_url": "https://github.com/rtk-ai/rtk/commit/1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
-        "committed_at": "2026-09-24T10:01:59Z"
+        "ref": "v0.51.0",
+        "sha": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "html_url": "https://github.com/rtk-ai/rtk/commit/e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "committed_at": "2026-10-02T13:33:07Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "commit",
       "primary_repository": "https://github.com/rtk-ai/rtk",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_source": {
+        "ref": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "sha": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "html_url": "https://github.com/rtk-ai/rtk/commit/e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "committed_at": "2026-10-02T13:33:07Z"
+      }
     },
     {
       "component_id": "sandbox-runtime",

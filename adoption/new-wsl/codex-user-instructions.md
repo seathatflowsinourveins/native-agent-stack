@@ -21,4 +21,8 @@ Run a long command with `yield_time_ms` 30000; while a `session_id` comes back, 
 Web research: where the stack installs GPT Researcher, run `bash ~/code/native-agent-stack/tools/research/gpt_researcher.sh "<short current-month query>"` as a long command (it stops after 1,500 s); ask short, unseeded current-month queries and treat the report as leads whose facts you re-read from primary sources.
 To message a Claude Code session, run as one long command: set `msg` through a quoted heredoc (`msg=$(cat <<'MSG'`, then the text, `MSG` and `)` on lines of their own), then `printf '%s\n\nreply: codex queue --thread %s\n' "$msg" "$CODEX_THREAD_ID" | claude -p -n "codex-$(printf '%.8s' "$CODEX_THREAD_ID")" --permission-mode bypassPermissions --max-turns 3 --output-format stream-json --verbose "Send the text on stdin, complete and verbatim, to the session named <name> with exactly one SendMessage call, then stop."`.
 Codex receives queued messages between turns, never mid-turn; expect up to about 20 s delay when it is idle.
+
+# Command output
+
+The other observations below retain their 0.50.0 evidence; they have not all been requalified at 0.51.0.
 <!-- native-agent-stack:codex-user-instructions:end -->
