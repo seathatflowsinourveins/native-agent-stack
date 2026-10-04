@@ -45,10 +45,14 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The staged top-rule block (595 words by Python `str.split()`, marker line included; 153 before the standing
-# clauses, routing and skill-matching lines of docs/decisions/2026-09-30-rule-text-every-layer.md) and rtk-ai/rtk
-# v0.50.0 hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.
-TOP_RULE_SHA256 = "7bd43c95e8452c2cede88d84562f9aedb8d01828b49bbf7bb1a6aac8b46b5362"
+# The staged top-rule block (827 words by Python `str.split()`, marker line included; 153 before the standing
+# clauses, routing and skill-matching lines of docs/decisions/2026-09-30-rule-text-every-layer.md, 595 before the
+# wave-2 records of 2026-10-03 added semble to the token lanes and the session-lanes lines: context-mode's working
+# directory, semble, GPT Researcher and Claude Code messaging, and 800 before the long-command line that runs the
+# research script and the messaging courier with yield_time_ms and write_stdin polling, wave-2 messaging ruling,
+# change 1) and rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec),
+# both byte for byte.
+TOP_RULE_SHA256 = "3201144dccd9d134110a2459a1e795d55e8cb747a9592e779e4c4778d8b8bc1c"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
@@ -281,7 +285,7 @@ class TemplateTests(unittest.TestCase):
     def test_top_rule_and_upstream_text_are_verbatim(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
-        self.assertEqual(len(top.split()), 595)
+        self.assertEqual(len(top.split()), 827)
         self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
 
     # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them,

@@ -167,3 +167,7 @@ the native Codex source path, pin-priority crowding, and the older portable
 2.3.2 schema needing an ordinary scoped-query fallback. Those corrections feed
 the next memory/discovery landscape sweep; that sweep must also check native
 Windows execution and official-control quality reproduction, still absent here.
+
+## Subsequent runtime checkpoint
+
+The [October 1 sealed runtime/candidate follow-up](2026-10-01-mac-runtime-memory-candidates.md) records official 2.5.2 and later scoped evidence. Earlier 2.5.0 observations and original failures above remain historical evidence.
