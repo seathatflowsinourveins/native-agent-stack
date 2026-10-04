@@ -5,11 +5,31 @@ The selected research runtime installed successfully on NativeStack2604 and all
 **21:17:20Z to 21:23:33Z**. This is historical host-local execution of native
 software. The [run receipt](../../../evidence/receipts/native-trading-runtime-2604-20261004.json)
 retains the recorded results and failed attempts; packaging these files does not
-repeat installation or acceptance. No paper or broker execution occurred.
+repeat installation or acceptance. That recorded run used **EdgarTools 5.58.0**
+and lock SHA256 `c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086`.
+No paper or broker execution occurred.
 
-Packaging updates the installer's provenance comment and expresses the acceptance
-script's synthetic sandbox home through a variable, preserving its actual mount
-and environment arguments. The runtime project files remain unchanged.
+The current bundle selects **EdgarTools 5.60.0**, matching the catalog after
+[native SEC index acceptance on NativeStack](../catalyst-provenance/native-network-edgartools-5600-20261004.json).
+NativeStack2604's own installation and 25 offline checks at this pin are **pending
+the command center's rerun**, which must receive a separate receipt. The existing
+receipt continues to describe its 5.58.0 execution.
+
+The current lock SHA256 is
+`6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1`.
+The [lock comparison](../../../evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json)
+records only the EdgarTools version/artifact change and the project requirement
+metadata; all other 240 entries are unchanged. The
+[this-host import smoke](../../../evidence/artifacts/edgartools-5600-20261004/this-host-import-smoke.json)
+passes the exact acceptance import/version assertion in a hash-locked 42-package
+CPython 3.12.3 environment with networking disabled; its old-version control
+fails as expected. The affected recipe tests and dependency check pass.
+
+The packaging worker has native uv 0.12.17 but no Linux mise executable. The
+requested mise relock route exits 127 here; resolution and `uv lock --check`
+succeed with that native binary and the identical settings below. Verification
+through mise remains pending. The target-host invocation still uses mise and
+the installer still enforces uv 0.12.17. No shim or host-guard bypass is used.
 
 This recipe serves the US-equities research and historical-simulation north star:
 [NautilusTrader 2.0.0rc5](../../../catalogs/us-equities/runtime-target.json), its
@@ -29,12 +49,18 @@ matrix below. These supplemental pins remain subject to trading-lane ratificatio
 ## Files and use
 
 Keep the two scripts beside `trading-2604-runtime/`. Its `pyproject.toml` and
-`uv.lock` are byte-identical to the reviewed staged project. The lock contains
+`uv.lock` now carry the directed 5.60.0 pin move from the original staged project.
+The lock contains
 242 package entries, including project metadata; it is not a claim of 242
 installed distributions. The installer checks both embedded SHA256 values and
-refuses modified project metadata on rerun. It uses locked sync, rather than a
-fresh target-host resolution. The retained `exclude-newer` cutoff is
-`2026-10-06T04:00:00Z`, after the run date; the delivered lock freezes the set.
+refuses arbitrary modified project metadata on rerun. It can migrate the exact
+previously recorded project/lock hashes, including a partly completed migration;
+both files are checked before either is replaced atomically. It checks the lock,
+runs `uv sync --locked --no-dev`, then runs `uv pip check` on the project
+environment, failing closed at every step. The mise route below supplies uv
+0.12.17, enforced by the installer's version gate. The retained `exclude-newer`
+cutoff is `2026-10-06T04:00:00Z`, after 5.60.0's October 2 publication, so it needs
+no change. The delivered lock freezes the set.
 
 Both scripts require NativeStack2604, Linux x86_64 and a non-root user. Foundation
 prerequisites are uv **0.12.17**, Git, curl, core utilities, an already responding
@@ -72,7 +98,7 @@ both images. An incomplete install blocks all 25 checks.
 | NautilusTrader / IBKR adapter | 2.0.0rc5; source `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`; in-tree Rust ibapi 3.3.0 | [Installation](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/installation.md), [IBKR integration](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/integrations/interactive_brokers.md) |
 | alpaca-py | 0.44.0 | [README at cc4cb3b7](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md) |
 | Separate Alpaca adapter | `dca821cca85dce3647fa7b488d5a23fbe5b85d4a` | [Native adapter source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/native_adapter.py) |
-| EdgarTools | 5.58.0 | [README at abe44344](https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md) |
+| EdgarTools | 5.60.0; source `1e7a61b3a142dbf5d19bc82444f85239c1786348` | [Release](https://github.com/dgunning/edgartools/releases/tag/v5.60.0), [README at the tag commit](https://github.com/dgunning/edgartools/blob/1e7a61b3a142dbf5d19bc82444f85239c1786348/README.md), [native SEC index receipt](../catalyst-provenance/native-network-edgartools-5600-20261004.json) |
 | exchange_calendars | 4.13.2 | [README at dbe38b1f](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md) |
 | DVC | 3.67.1 | [README at 356dfa03](https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst) |
 | DuckDB | 1.5.5 | [Python README at b236c819](https://github.com/duckdb/duckdb-python/blob/b236c8194ed14c7a7c685e0534dde501cc855b3a/README.md) |
@@ -130,17 +156,68 @@ blocked. The second install exited 2 because `--managed-python` conflicted with
 attempt supplied uv 0.12.17 through mise and used the corrected Python discovery
 command. Both final scripts exited 0.
 
+## EdgarTools pin move — 2026-10-04
+
+The [5.60.0 tag](https://github.com/dgunning/edgartools/tree/1e7a61b3a142dbf5d19bc82444f85239c1786348)
+resolves to the full commit shown in the table. [PyPI metadata](https://pypi.org/pypi/edgartools/5.60.0/json)
+and the [retained source verification](../../../evidence/artifacts/edgartools-5600-20261004/release-evidence.json)
+record both artifact hashes, upload times, complete check-suite results and exact
+open-issue searches. Those searches found one recent MCP Registry metadata issue
+and no bug/regression issue naming the requested versions; that registry issue
+does not concern the runtime's native SEC APIs.
+
+| CI evidence | Commit and result |
+| --- | --- |
+| [Build and Test 37032606429](https://github.com/dgunning/edgartools/actions/runs/37032606429) | Release-day push, October 2, tag commit: SUCCESS |
+| [Regression Tests 37032606490](https://github.com/dgunning/edgartools/actions/runs/37032606490) | Release-day push, October 2, tag commit: SUCCESS |
+| [Scheduled Build and Test 37122012086](https://github.com/dgunning/edgartools/actions/runs/37122012086) | October 3, same tag commit: FAILURE in the clock-dependent cassette tests described below |
+| [Scheduled Build and Test 37204026582](https://github.com/dgunning/edgartools/actions/runs/37204026582) | October 4, later main `237e866a80ab3013cf5aa25a2557cf73c4eb61e4`: SUCCESS; separate from tag CI |
+
+The failed run names the same two tests in all three affected jobs:
+`tests/issues/regression/test_issue_893_ttm_staleness.py::test_goog_ttm_revenue_tracks_recent_window`
+and `::test_amzn_ttm_revenue_matches_reference`. `test-strict-errors` fails
+`assert ttm.is_stale is False`: the cassette's newest period ends at Q1 2026,
+while staleness uses the live clock. `test-fast` on 3.10 and 3.13 fails the offline
+audit, which identifies those two fast-marked tests as requiring the SEC. The
+[first clock fix](https://github.com/dgunning/edgartools/commit/9ea5def31b73816a12fe6ce1a2f3ff68cbdbb33b)
+and [calculator-only clock fix](https://github.com/dgunning/edgartools/commit/156c45b327a65e4c86ebfc7652edb778de5cecd8)
+each change only that test file, verified through GitHub's commit file lists.
+The coordinator's diagnosis identifies a clock-dependent test defect rather than
+a library regression. `Company.get_facts().get_ttm_revenue()` staleness is outside
+this runtime's filing index, filing documents, SGML headers, company/CIK lookup
+and XBRL fact-extraction paths.
+
+Later main also changes `edgar/documents/utils/section_slicer.py` and
+`edgar/httprequests.py`; those library changes are **absent from 5.60.0**. The
+October 4 main pass is corroborating test-repair evidence, not a new pass of the
+release binary or a claim that those changes are delivered here.
+
+The [5.59.0](https://github.com/dgunning/edgartools/releases/tag/v5.59.0),
+[5.59.1](https://github.com/dgunning/edgartools/releases/tag/v5.59.1) and
+[5.60.0](https://github.com/dgunning/edgartools/releases/tag/v5.60.0) notes cover
+filing section boundaries and breadcrumbs, SGML error propagation, XBRL debt and
+liability corrections, current-feed timeouts, combined TOC items, paragraph
+whitespace and exact exhibit selection. These changes matter to reproducible
+SEC research; previously pinned text and values need their version provenance.
+
+The [supplied offline-fixture evidence](../../../evidence/receipts/edgartools-5600-pin-move-20261004.json)
+records a complete two-member index fixture and document parsing in a 42-package
+scratch environment on NativeStack, with no SEC identity or SEC request. Markdown
+is 5,308 bytes at 5.60.0 versus 5,325 at 5.58.0 and 5.59.1; the change removes
+source-HTML soft line breaks, with identical whitespace-normalized text at 5,218
+characters. That local fixture evidence is distinct from
+[native-sec-edgartools-5600-20261004](../catalyst-provenance/native-network-edgartools-5600-20261004.json):
+the latter records one HTTP 200, zero retries, 371 index rows and five matching
+selected CIK/accession rows on NativeStack with CPython 3.12.3. Together with the
+directed move, it supersedes the 5.59.1 overturn item and moves `data-edgartools`
+to 5.60.0. It does not qualify broader data, strategy or broker gates, or replace
+the pending NativeStack2604 rerun.
+
 ## Open qualification
 
 - Ratify supplemental **CPython 3.12.3 against 3.13**, including the foundation's
   3.13.15 alternative, and ratify the complete runtime matrix on frozen matching
   engine/adapter inputs. A successful 3.12.3 smoke does not complete this comparison.
-- Complete the **EdgarTools 5.59.1 overturn test** before moving catalog 5.58.0:
-  compare the relevant 10-K/10-Q section-boundary and 10-K breadcrumb cases. The
-  [5.59.0](https://github.com/dgunning/edgartools/releases/tag/v5.59.0) and
-  [5.59.1](https://github.com/dgunning/edgartools/releases/tag/v5.59.1) release
-  references and the [definitive comparison](../../../evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-definitive.compact.json)
-  remain preparation evidence; this run did not parse or acquire SEC filings.
 - Qualify point-in-time US-equity/filing data, rights, identities, revisions,
   corporate actions, delistings, cost/liquidity assumptions and chronological
   evaluation. The already inspected 2021 control is not an untouched holdout.

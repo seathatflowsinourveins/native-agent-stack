@@ -1403,11 +1403,11 @@
         {
           "component_id": "edgartools",
           "repository": "https://github.com/dgunning/edgartools",
-          "pin": "5.58.0",
+          "pin": "5.60.0",
           "pin_source": "manifests/stack.json:1516",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
-          "acceptance": {"command": "native_edgar.py with the private SEC contact as EDGAR_IDENTITY: upstream edgar.get_filings and native bounded Filings.to_context completed the full quarterly-index request (EdgarTools 5.58.0; 371 8-K/8-K/A index rows for 2020-03-02; repeated on a second WSL2 host on 2026-09-24)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/access-resolution.md"},
-          "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
+          "acceptance": {"command": "2026-10-04: native_edgar.py with operator-supplied SEC identity completed upstream get_filings and bounded Filings.to_context at EdgarTools 5.60.0 on NativeStack, CPython 3.12.3: one GET answered 200, zero retries, 371 index rows for 2020-03-02 and the same five selected CIK/accession rows as the historical receipts (native-sec-edgartools-5600-20261004)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"},
+          "upstream_currency": {"latest_release": "v5.60.0 (2026-10-02)", "checked_at": "2026-10-04", "pin_is_latest": "yes", "url": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0"}
         },
         {
           "component_id": "exchange-calendars",
@@ -1480,11 +1480,11 @@
         {
           "component_id": "edgartools",
           "repository": "https://github.com/dgunning/edgartools",
-          "pin": "5.58.0",
+          "pin": "5.60.0",
           "pin_source": "manifests/stack.json:1516",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
-          "acceptance": {"command": "native_edgar.py with the private SEC contact as EDGAR_IDENTITY: upstream edgar.get_filings and native bounded Filings.to_context completed the full quarterly-index request (EdgarTools 5.58.0; 371 8-K/8-K/A index rows for 2020-03-02; repeated on a second WSL2 host on 2026-09-24)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/access-resolution.md"},
-          "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
+          "acceptance": {"command": "2026-10-04: native_edgar.py with operator-supplied SEC identity completed upstream get_filings and bounded Filings.to_context at EdgarTools 5.60.0 on NativeStack, CPython 3.12.3: one GET answered 200, zero retries, 371 index rows for 2020-03-02 and the same five selected CIK/accession rows as the historical receipts (native-sec-edgartools-5600-20261004)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"},
+          "upstream_currency": {"latest_release": "v5.60.0 (2026-10-02)", "checked_at": "2026-10-04", "pin_is_latest": "yes", "url": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0"}
         },
         {
           "component_id": "duckdb",
@@ -1575,11 +1575,11 @@
         {
           "component_id": "edgartools",
           "repository": "https://github.com/dgunning/edgartools",
-          "pin": "5.58.0",
+          "pin": "5.60.0",
           "pin_source": "manifests/stack.json:1516",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
-          "acceptance": {"command": "native_edgar.py with the private SEC contact as EDGAR_IDENTITY: upstream edgar.get_filings and native bounded Filings.to_context completed the full quarterly-index request (EdgarTools 5.58.0; 371 8-K/8-K/A index rows for 2020-03-02; repeated on a second WSL2 host on 2026-09-24)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/access-resolution.md"},
-          "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
+          "acceptance": {"command": "2026-10-04: native_edgar.py with operator-supplied SEC identity completed upstream get_filings and bounded Filings.to_context at EdgarTools 5.60.0 on NativeStack, CPython 3.12.3: one GET answered 200, zero retries, 371 index rows for 2020-03-02 and the same five selected CIK/accession rows as the historical receipts (native-sec-edgartools-5600-20261004)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"},
+          "upstream_currency": {"latest_release": "v5.60.0 (2026-10-02)", "checked_at": "2026-10-04", "pin_is_latest": "yes", "url": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0"}
         },
         {
           "component_id": "exchange-calendars",
@@ -1615,13 +1615,13 @@
       ],
       "new_host_steps": [
         "These install with row market-data-reference; the promotion gate needs its own environment from blueprints/us-equities/data/requirements.lock.",
-        "Decide whether to keep DuckDB 1.5.5 and EdgarTools 5.58.0 or re-pin to 1.5.6 and 5.59.1 before collecting receipts, then run the promotion gate on a retained snapshot."
+        "EdgarTools 5.60.0 is selected after native-sec-edgartools-5600-20261004; collect the new distribution's own receipts. Decide separately whether to keep DuckDB 1.5.5 or re-pin to 1.5.6, then run the promotion gate on a retained snapshot."
       ],
       "gates": [
         {"text": "The comparison's licensed inputs need the same paid-data decision as market-data-reference.", "kind": "user_side", "source_path": "catalogs/us-equities/gates-20260922.json"}
       ],
       "owner_lane": "trading",
-      "notes": "Owner's verdict: selection of record, open, distance 5. Blocking item: c3, a representative comparison (frozen universe, history, latency, rights, correction and availability semantics). A re-pin decision is pending: DuckDB 1.5.6 and EdgarTools 5.59.1 are published."
+      "notes": "Owner's verdict: selection of record, open, distance 5. Blocking item: c3, a representative comparison (frozen universe, history, latency, rights, correction and availability semantics). The DuckDB 1.5.6 re-pin decision remains pending. EdgarTools moved to 5.60.0 on native-sec-edgartools-5600-20261004; the new distribution still needs its own acceptance."
     },
     {
       "layer_id": "data-quality-orchestration",
@@ -1762,11 +1762,11 @@
           "component_id": "edgartools",
           "role": "SEC filing acquisition and parsing",
           "repository": "https://github.com/dgunning/edgartools",
-          "pin": "5.58.0",
+          "pin": "5.60.0",
           "pin_source": "manifests/stack.json:1516",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
-          "acceptance": {"command": "native_edgar.py with the private SEC contact as EDGAR_IDENTITY: upstream edgar.get_filings and native bounded Filings.to_context completed the full quarterly-index request (EdgarTools 5.58.0; 371 8-K/8-K/A index rows for 2020-03-02; repeated on a second WSL2 host on 2026-09-24)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/access-resolution.md"},
-          "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
+          "acceptance": {"command": "2026-10-04: native_edgar.py with operator-supplied SEC identity completed upstream get_filings and bounded Filings.to_context at EdgarTools 5.60.0 on NativeStack, CPython 3.12.3: one GET answered 200, zero retries, 371 index rows for 2020-03-02 and the same five selected CIK/accession rows as the historical receipts (native-sec-edgartools-5600-20261004)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"},
+          "upstream_currency": {"latest_release": "v5.60.0 (2026-10-02)", "checked_at": "2026-10-04", "pin_is_latest": "yes", "url": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0"}
         },
         {
           "component_id": "skfolio",
@@ -1786,7 +1786,7 @@
         "c3": "partial",
         "c4": "unmet",
         "c5": "partial",
-        "missing": "c1: The selection of record is the owner's decision of 2026-10-01 (PR #578); the layer entry in catalogs/landscape/us-equities.json is not yet re-recorded with it.; c2: the candidate set is not refrozen with dispositions for the GPT-6 missed names and the sweep survivors; c3: the overturn-protocol arms have not run under one contract, the current upstream releases (skfolio 1.4.10, EdgarTools 5.59.1) are not qualified, and no fresh-host lifecycle run exists; c4: no review after these items; c5: no closure record."
+        "missing": "c1: The selection of record is the owner's decision of 2026-10-01 (PR #578); the layer entry in catalogs/landscape/us-equities.json is not yet re-recorded with it.; c2: the candidate set is not refrozen with dispositions for the GPT-6 missed names and the sweep survivors; c3: the overturn-protocol arms have not run under one contract, skfolio 1.4.10 is not qualified; EdgarTools 5.60.0 has bounded SEC-index acceptance (native-sec-edgartools-5600-20261004), not the layer's representative comparison, and no fresh-host lifecycle run exists; c4: no review after these items; c5: no closure record."
       },
       "reasons": [
         {"text": "The trading lane owner's decision of 2026-10-01 selects EdgarTools 5.58.0 for SEC filing acquisition and parsing and skfolio 1.2.9 for portfolio models and chronological evaluation; it closes nothing, and items 2 to 5 stay open.", "source_path": "docs/decisions/2026-10-01-trading-layer-verdicts.md"},
@@ -1811,7 +1811,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "Owner's verdict (2026-10-01): comparison required, with a selection of record: EdgarTools 5.58.0 and skfolio 1.2.9. Alphalens Reloaded is a conditional candidate, Qlib and tsfresh are deferred, and skfolio 1.4.10 and EdgarTools 5.59.1 are upgrade candidates. The decision lands with PR #578 and closes nothing; the blocking item is the layer's re-record."
+      "notes": "Owner's verdict (2026-10-01): comparison required, with a selection of record: EdgarTools 5.58.0 and skfolio 1.2.9. Alphalens Reloaded is a conditional candidate, Qlib and tsfresh are deferred, and skfolio 1.4.10 and EdgarTools 5.59.1 are upgrade candidates. The decision lands with PR #578 and closes nothing; the blocking item is the layer's re-record. Update 2026-10-04: the current EdgarTools selection is 5.60.0 on native-sec-edgartools-5600-20261004; the earlier 5.58.0 choice and 5.59.1 candidate remain dated history."
     },
     {
       "layer_id": "backtesting-engine",

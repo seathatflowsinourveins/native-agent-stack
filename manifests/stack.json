@@ -1521,10 +1521,10 @@
     {
       "id": "edgartools",
       "repository": "https://github.com/dgunning/edgartools",
-      "version": "5.58.0",
+      "version": "5.60.0",
       "license": "MIT",
       "role": "Native SEC filing-index acquisition and local parsing; bounded raw-source provenance with historical strategy availability still gated",
-      "source_pin": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "source_pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
       "commands": [
         "uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock",
         "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_edgar.py --help",
@@ -1537,14 +1537,17 @@
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
         "native-lifecycle-sample-20260920",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "native-sec-edgartools-5600-20261004"
       ],
       "profile": "supporting",
       "upstream_sources": [
         "https://github.com/dgunning/edgartools",
-        "https://pypi.org/project/edgartools/5.58.0/"
+        "https://pypi.org/project/edgartools/5.58.0/",
+        "https://github.com/dgunning/edgartools/releases/tag/v5.60.0",
+        "https://pypi.org/pypi/edgartools/5.60.0/json"
       ],
-      "freshness": "Contact-corrected native request returned HTTP200 on2026-09-19 and selected371indexrows. Separate42-package Linux/WSL environment; dependency wheels are not hash-locked. See follow-up receipt for raw-source and temporal-gate scope."
+      "freshness": "Native SEC acceptance recorded 2026-10-04 at 5.60.0: one HTTP 200, zero retries, 371 index rows and five matching selected CIK/accessions, on NativeStack with CPython 3.12.3. The accepted 42-package freeze is requirements.lock; earlier 5.58.0 evidence remains historical. NativeStack2604 locked-runtime install/offline acceptance is pending."
     },
     {
       "id": "exchange-calendars",

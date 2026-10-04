@@ -411,5 +411,17 @@
     "installer": "Provenance comment points to repository README and receipt; executable statements unchanged.",
     "acceptance": "A named synthetic sandbox_home replaces literal spellings in mount/HOME/cache arguments to avoid the publication scanner false positive. Its expanded argv remains unchanged; this is not a rerun of the published script.",
     "runtime_project": "pyproject.toml and uv.lock are byte-identical to staged copies."
+  },
+  "bundle_update_20261004": {
+    "recorded_run_edgartools": "5.58.0",
+    "recorded_run_lock_sha256": "c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086",
+    "current_bundle_edgartools": "5.60.0",
+    "current_bundle_lock_sha256": "6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1",
+    "current_bundle_project_sha256": "f71b08811eb580cf5c3772da7327ec5554154b81839b80c6259d69eae6bd1338",
+    "superseded_open_item": "The historical 5.59.1 overturn item is superseded by native SEC acceptance native-sec-edgartools-5600-20261004 on NativeStack; the original limitations above describe the recorded 5.58.0 run.",
+    "native_sec_receipt": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
+    "native_stack_2604_rerun": "pending; current bundle installation and offline acceptance require a separate receipt",
+    "worker_check": "evidence/artifacts/edgartools-5600-20261004/this-host-import-smoke.json",
+    "worker_uv_route": "Native uv 0.12.17; Linux mise unavailable here, so prescribed wrapper verification remains pending."
   }
 }

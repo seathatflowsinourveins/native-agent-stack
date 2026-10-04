@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "id": "edgartools-5600-pin-move-20261004",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "edgartools"
+  ],
+  "claim": "Directed EdgarTools 5.60.0 pin move retains primary-source release/CI assessment, supplied NativeStack local offline-fixture results and the separate supplied native SEC index acceptance; the NativeStack2604 5.60.0 install/offline rerun is pending.",
+  "limitations": [
+    "The two supplied offline checks used a synthetic index and a pinned upstream HTML fixture; they are local integration evidence, not SEC network acceptance or historical information availability.",
+    "The separate native-sec-edgartools-5600-20261004 receipt qualifies one SEC index request on NativeStack, CPython 3.12.3. This packaging worker makes no SEC request and does not promote that receipt into another host's acceptance.",
+    "The coordinator reports identical whitespace-normalized Markdown at 5218 characters. The builder received the diff, byte counts and hashes but not the full Markdown inputs; this comparison is attributed, not newly reproduced.",
+    "The failed scheduled tag workflow remains recorded. Its diagnosed cassette/live-clock defect and later test-only fixes support the directed move; later main CI is not a new pass at the tag, and two post-tag library files are absent from 5.60.0.",
+    "The historical NativeStack2604 runtime run used 5.58.0 and its original lock hash; a 5.60.0 rerun must produce its own receipt. No strategy, point-in-time data, paper or broker gate is advanced.",
+    "This worker could not execute the prescribed mise route (exit 127: Linux mise unavailable). Resolution and lock validation used the installed native uv 0.12.17 with identical settings; verification through mise remains pending."
+  ],
+  "recorded_at_utc": "2026-10-04T22:53:15.407551+00:00",
+  "evidence_class": "local_integration",
+  "offline_observations": {
+    "host": "NativeStack",
+    "runtime": "scratch uv environment, 42 packages, no SEC identity",
+    "native_index_fixture": {
+      "status": "complete",
+      "cohort": 2,
+      "evidence_class": "local_integration",
+      "input_class": "synthetic"
+    },
+    "native_document_fixture": {
+      "status": "complete",
+      "markdown_bytes_5600": 5308,
+      "markdown_bytes_5580_5591": 5325,
+      "difference": "Whitespace only: source HTML soft line breaks collapse inside paragraphs.",
+      "normalized_text_characters": 5218,
+      "normalized_text_equal": "reported by the recording coordinator",
+      "evidence_class": "local_integration",
+      "input_class": "pinned upstream fixture"
+    },
+    "sec_network_requests": 0
+  },
+  "release_evidence": "evidence/artifacts/edgartools-5600-20261004/release-evidence.json",
+  "native_sec_acceptance": {
+    "receipt_id": "native-sec-edgartools-5600-20261004",
+    "path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
+    "evidence_class": "native_proven",
+    "host": "NativeStack",
+    "not_native_stack_2604": true
+  },
+  "artifacts": [
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/freeze-5.60.0.txt",
+      "sha256": "8249d798431f0499970b68a34690060f48c50a2fef98322b4fb1706f30eb5a8c",
+      "bytes": 737
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/md-5.58.0-vs-5.60.0.diff",
+      "sha256": "8f4e8960c4999ff16e76c3eb428c2589ff0e81147b2c832f1ce3eb1de374db83",
+      "bytes": 7487
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/md-sha256.txt",
+      "sha256": "85f569e552fda69a707aea56b8c7b9d73defa6e6565be007f77672f095b6b611",
+      "bytes": 237
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/native-document-5600.json",
+      "sha256": "8c0ff90b2d141af9fd57dfbc3833ba049ac3206f43e657030c2913f5ddca5028",
+      "bytes": 2371
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/native-offline-5600.json",
+      "sha256": "bf1b6f78acdb3cae1e419424fd4734d1a790b15061a06b9e7675122333e55b59",
+      "bytes": 1371
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json",
+      "sha256": "b063f472873e545e0b674b233c10a6b7baf8121650c5700a96f3547c38f219ca",
+      "bytes": 104645
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/release-evidence.json",
+      "sha256": "90a5b00c88f9dbc59c280d77338c01eebb619ea709c4af23ff516e787343601e",
+      "bytes": 11617
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json",
+      "sha256": "61849c069a85b833f27487365635f3dc1836a013e5d3cb96ad9801c98bfee6f1",
+      "bytes": 2041
+    },
+    {
+      "path": "evidence/artifacts/edgartools-5600-20261004/this-host-import-smoke.json",
+      "sha256": "af9b3da08c0c56e18c9c9e2578d3852a2dfcb6bb95e110398572676f5afe566f",
+      "bytes": 6411
+    }
+  ],
+  "pin_classification": "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json",
+  "runtime_2604_rerun": {
+    "status": "pending",
+    "version": "5.60.0",
+    "receipt": "separate receipt required"
+  },
+  "sanitization": "Published bounded source metadata and supplied fixture artifacts contain no personal home paths, private staging locators, native sign-ins, SEC identity or contact-derived hashes. The supplied native SEC receipt and freeze are unchanged.",
+  "runtime_lock_change": "evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json",
+  "this_host_import_smoke": "evidence/artifacts/edgartools-5600-20261004/this-host-import-smoke.json"
+}

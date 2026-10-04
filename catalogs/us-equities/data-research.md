@@ -156,3 +156,16 @@ The existing [receipt](../../blueprints/us-equities/data/receipt.json), [convers
 ```
 
 That receipt supports the two `native_proven` labels only. It supplies neither an entitled live feed, a point-in-time financial dataset, a profitable strategy nor measured token savings. The catalog adds no token-saving measurement and does not change Desktop MCP loading, login state or future-session activation. Any later adoption should replace prospective status with a sanitized receipt that states the exact command, reviewed input identity, direct result, cost/usage source and remaining limits.
+
+## EdgarTools pin acceptance — 2026-10-04
+
+The current `data-edgartools` entry selects
+[v5.60.0](https://github.com/dgunning/edgartools/releases/tag/v5.60.0), source
+`1e7a61b3a142dbf5d19bc82444f85239c1786348`. The
+[native SEC receipt](../../blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json)
+records one GET answered 200 with zero retries, 371 index rows and five matching
+selected CIK/accession rows on NativeStack, CPython 3.12.3. Earlier 5.58.0
+receipts remain historical. The separate offline document/index fixture results
+qualify local parsing only. NativeStack2604 installation and offline acceptance
+at 5.60.0 are pending a host rerun; point-in-time data and strategy gates remain
+unchanged.

@@ -1,0 +1,156 @@
+{
+ "schema_version": 1,
+ "id": "native-sec-edgartools-5600-20261004",
+ "kind": "native_cli_e2e",
+ "component_ids": [
+  "edgartools"
+ ],
+ "claim": "Pin-move acceptance on the WSL2 Threadripper workstation: native EdgarTools 5.60.0 (tag v5.60.0, 1e7a61b3a142dbf5d19bc82444f85239c1786348), in a scratch CPython 3.12.3 environment whose 42 installed packages equal requirements.lock as updated with this receipt, completed the bounded get_filings request for 2020-03-02 with one SEC archive GET answered 200, no automatic retries, 371 8-K/8-K/A index rows and the same five selected CIK/accession rows as the 2026-09-19 and 2026-09-24 receipts. It adds a version; it replaces neither earlier receipt.",
+ "limitations": [
+  "One native upstream metadata request (the quarterly form index) on one host at one time. The provenance adapter (catalyst.py acquire and packet) was not run, so no daily index, header bytes or temporal packets are observed here.",
+  "Unique-accession counts, forms breakdown and the complete compressed source's bytes and gzip validation were measured on 2026-09-19 and are not re-measured by this output, which records only the cohort count and five selected rows.",
+  "The run used a scratch uv environment (`uv venv --python 3.12`, then `uv pip install edgartools==5.60.0`) and native_edgar.py from a read-only checkout of main, as reported by the recording coordinator; the README recipe's catalyst runtime uses Python 3.13. The environment's 42-package freeze was read from that environment after the request and equals the updated requirements.lock; against the 5.58.0 lock, four versions changed (edgartools 5.58.0 to 5.60.0, filelock 4.0.1 to 4.0.10, markupsafe 3.0.3 to 3.0.4, soupsieve 2.9.2 to 2.10) and no package was added or removed.",
+  "The declared contact was supplied by the operator at run time for this run only; the private output and its run log were checked and contain no email address, host path or contact text. The output's unsalted SHA-256 of the contact is withheld from the committed copy, because a guessed contact could be confirmed against it.",
+  "Successful access does not establish historical availability, as-known data or a strategy result; 2020 filing dates do not imply this runtime observed the filings then.",
+  "Not a host_receipts.py receipt: that recorder executes its own commands, so it cannot import an earlier output. The catalog's data-edgartools selection moves to 5.60.0 on this evidence together with the NativeStack2604 runtime pin; no trading gate changes because of this file."
+ ],
+ "recorded_at_utc": "2026-10-04T22:32:40Z",
+ "relation_to_earlier": {
+  "earlier_receipt": "blueprints/us-equities/catalyst-provenance/new-host-native-network-20260924.json",
+  "earlier_receipt_id": "native-sec-new-host-20260924",
+  "replaces_earlier": false,
+  "same_cohort_count": true,
+  "same_five_selected_cik_accessions": true,
+  "selected": [
+   "12208-0001193125-20-059087",
+   "13239-0000013239-20-000002",
+   "16918-0000016918-20-000035",
+   "18349-0000018349-20-000014",
+   "2186-0001654954-20-002156"
+  ]
+ },
+ "host": {
+  "host_class": "WSL2 Threadripper workstation (Linux x86_64 under Windows)",
+  "platform_id": "linux-wsl2-x86_64",
+  "new_host_for_this_component": false,
+  "note": "The same workstation as the 2026-09-24 receipt, in its NativeStack distribution, not NativeStack2604."
+ },
+ "native_upstream": {
+  "package": "edgartools",
+  "version": "5.60.0",
+  "source_pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+  "release": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0",
+  "pypi_wheel_sha256": "4db917f3833f6b105fe78d22639172410c800ad6da260432884d86b53b88439b",
+  "runtime": "scratch CPython 3.12.3 uv environment; uv pip freeze (42 packages) equals blueprints/us-equities/catalyst-provenance/requirements.lock as updated with this receipt",
+  "requirements_lock_sha256": "8249d798431f0499970b68a34690060f48c50a2fef98322b4fb1706f30eb5a8c",
+  "native_edgar_py_sha256_at_recording": "72af6528dad542842f63fc3c765c3a3c21867d36942126f69f3f03c298983df7",
+  "api": "get_filings(2020, 1, form='8-K', amendments=True, filing_date='2020-03-02')",
+  "status": "complete",
+  "mode": "native_network",
+  "http_observations": [
+   {
+    "method": "GET",
+    "status": 200,
+    "url": "https://www.sec.gov/Archives/edgar/full-index/2020/QTR1/form.gz"
+   }
+  ],
+  "automatic_retries": 0,
+  "cohort_rows": 371,
+  "selected_context_rows": 5,
+  "context_truncated": false,
+  "started_at_utc": "2026-10-04T22:29:40.417432Z",
+  "finished_at_utc": "2026-10-04T22:29:42.321533Z",
+  "ci_at_tag": {
+   "release_day_push_runs": [
+    "https://github.com/dgunning/edgartools/actions/runs/37032606429 (Build and Test, success)",
+    "https://github.com/dgunning/edgartools/actions/runs/37032606490 (Regression Tests, success)"
+   ],
+   "scheduled_run_2026_10_03": "https://github.com/dgunning/edgartools/actions/runs/37122012086 failed on the same commit: the two clock-dependent cassette tests in tests/issues/regression/test_issue_893_ttm_staleness.py (TTM revenue staleness), in all three jobs",
+   "upstream_fix": "test-only commits 9ea5def31b and 156c45b327 pin the clock in that test file; the scheduled run on main 237e866a80 succeeded on 2026-10-04"
+  }
+ },
+ "evidence_class": "native_proven",
+ "not_run": [
+  "catalyst.py acquire / packet",
+  "any SEC request beyond the one recorded GET",
+  "host_receipts.py record / review",
+  "the NativeStack2604 runtime's install and offline acceptance (a separate re-run)"
+ ],
+ "output": {
+  "private_original": "<private>/sec-5600/native-network-5600.json",
+  "private_original_mode": "0600",
+  "private_original_sha256": "ec8120ed887b4621449624d470787e709692fbe980a5308434e40cafa60c14dc",
+  "private_original_bytes": 2145,
+  "private_content_check": "read in full before copying: no email address, host path or contact text; the only identity-derived field is identity_sha256",
+  "withheld_fields": [
+   "identity_sha256"
+  ],
+  "committed_copy_sha256": "c8bca5515b2c7e7e8c966a7ec6aa2e26af89ab293c870c6e3acc74bb8346dcba",
+  "committed_copy_note": "native_output below is the private output with identity_sha256 removed, serialized as native_edgar.py writes it (indent 2, sorted keys); committed_copy_sha256 is over that serialization",
+  "native_output": {
+   "automatic_retries": 0,
+   "cohort_count": 371,
+   "day": "2020-03-02",
+   "edgartools": "5.60.0",
+   "finished_at": "2026-10-04T22:29:42.321533Z",
+   "first_observed_at": "2026-10-04T22:29:42.317488Z",
+   "forms": [
+    "8-K",
+    "8-K/A"
+   ],
+   "historical_point_in_time": false,
+   "http_observations": [
+    {
+     "method": "GET",
+     "status": 200,
+     "url": "https://www.sec.gov/Archives/edgar/full-index/2020/QTR1/form.gz"
+    }
+   ],
+   "method": "get_filings(2020, 1, form='8-K', amendments=True, filing_date='2020-03-02')",
+   "mode": "native_network",
+   "native_context": "FILINGS COLLECTION\n\nTotal: 5 filings\nForms: 8-K\nDate Range: 2020-03-02 to 2020-03-02\n\nAVAILABLE ACTIONS:\n  - Use .latest() to get most recent filing\n  - Use [index] to access specific filing (e.g., filings[0])\n  - Use .filter(form='C') to narrow by form type\n  - Use .docs for detailed API documentation",
+   "native_context_truncated": false,
+   "omitted_empty_proxy_variables": [],
+   "schema_version": 1,
+   "selected": [
+    {
+     "accession_number": "0001654954-20-002156",
+     "cik": 2186,
+     "company": "BK Technologies Corp",
+     "filing_date": "2020-03-02T00:00:00.000",
+     "form": "8-K"
+    },
+    {
+     "accession_number": "0001193125-20-059087",
+     "cik": 12208,
+     "company": "BIO-RAD LABORATORIES, INC.",
+     "filing_date": "2020-03-02T00:00:00.000",
+     "form": "8-K"
+    },
+    {
+     "accession_number": "0000013239-20-000002",
+     "cik": 13239,
+     "company": "HEXION INC.",
+     "filing_date": "2020-03-02T00:00:00.000",
+     "form": "8-K"
+    },
+    {
+     "accession_number": "0000016918-20-000035",
+     "cik": 16918,
+     "company": "CONSTELLATION BRANDS, INC.",
+     "filing_date": "2020-03-02T00:00:00.000",
+     "form": "8-K"
+    },
+    {
+     "accession_number": "0000018349-20-000014",
+     "cik": 18349,
+     "company": "SYNOVUS FINANCIAL CORP",
+     "filing_date": "2020-03-02T00:00:00.000",
+     "form": "8-K"
+    }
+   ],
+   "started_at": "2026-10-04T22:29:40.417432Z",
+   "status": "complete"
+  }
+ }
+}

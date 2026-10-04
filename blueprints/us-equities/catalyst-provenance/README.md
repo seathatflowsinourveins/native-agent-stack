@@ -1,9 +1,26 @@
 # Native EdgarTools and catalyst provenance
 
-**Current follow-up:** [SEC access is working for the tested archive path](access-resolution.md)
-after the user supplied a monitored contact. Native acquisition and the real
-daily-index compatibility fix have separate evidence from the initial wave below.
-The original failure receipts remain unchanged.
+**Current pin — 2026-10-04:** **EdgarTools 5.60.0** at
+`1e7a61b3a142dbf5d19bc82444f85239c1786348`, with the accepted 42-package
+[freeze](requirements.lock). The
+[native SEC receipt](native-network-edgartools-5600-20261004.json) records one
+HTTP 200, zero retries, 371 index rows and the same five selected CIK/accession
+rows as the September 19 and September 24 receipts, on NativeStack with CPython
+3.12.3. It adds bounded acceptance at this version; original availability and
+the broader provenance adapter remain separate. The release notes are
+[v5.60.0](https://github.com/dgunning/edgartools/releases/tag/v5.60.0).
+
+The supplied October 4 [offline fixture evidence](../../../evidence/receipts/edgartools-5600-pin-move-20261004.json)
+records the two-member synthetic index and pinned document parser at 5.60.0,
+without SEC requests. Its 5,308-byte Markdown differs from the 5,325-byte
+5.58.0/5.59.1 outputs only by paragraph whitespace; normalized text is identical
+at 5,218 characters. This is local offline-fixture evidence.
+
+[Earlier access resolution](access-resolution.md), the daily-index compatibility
+fix and the initial failure receipts below retain their original dates, versions
+and scope. The NativeStack2604 runtime
+[install and offline acceptance](../runtime-2604/README.md) at 5.60.0 remain
+pending a separate host rerun and receipt.
 
 ## Initial wave
 

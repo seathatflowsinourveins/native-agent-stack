@@ -1,0 +1,2298 @@
+{
+  "schema_version": 1,
+  "base_revision": "29da752f5bc4b2871e77b31efabaf5e410619b25",
+  "inventory_scope": "Every 5.58.0 text match returned by the bounded repository rg search at the unchanged round-1 base, including historical mentions rather than only dependency requirements; line numbers are from that base. The earlier other_pin_sites list is a subset.",
+  "current_release": "5.60.0",
+  "records": [
+    {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
+      "line_at_base": 28,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen dated experiment plan or ledger; preserve original controls, runtime inputs and historical comparisons."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/README.md",
+      "line_at_base": 85,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/README.md",
+      "line_at_base": 161,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
+      "line_at_base": 4,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
+      "line_at_base": 44,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
+      "line_at_base": 335,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
+      "line_at_base": 49,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
+      "line_at_base": 52,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
+      "line_at_base": 118,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
+      "line_at_base": 149,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
+      "line_at_base": 184,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/plan.json",
+      "line_at_base": 387,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/plan.json",
+      "line_at_base": 388,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/plan.json",
+      "line_at_base": 409,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/plan.json",
+      "line_at_base": 565,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/acquisition-summary.json",
+      "line_at_base": 11,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Frozen experiment inputs and recipe are hash-bound by plan.json and experiment.json; the original 5.58.0 acquisition must remain reproducible."
+    },
+    {
+      "path": "blueprints/token-native-focus/saturation-audit.json",
+      "line_at_base": 3209,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/README-research.md",
+      "line_at_base": 111,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-dataset/README.md",
+      "line_at_base": 23,
+      "classification": "recipe or code pin",
+      "action": "move_with_historical_note",
+      "reason": "The current parser recipe follows accepted 5.60.0; the earlier measured 5.58.0 execution and hashes remain explicitly historical."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-dataset/README.md",
+      "line_at_base": 60,
+      "classification": "recipe or code pin",
+      "action": "move_with_historical_note",
+      "reason": "The current parser recipe follows accepted 5.60.0; the earlier measured 5.58.0 execution and hashes remain explicitly historical."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-dataset/README.md",
+      "line_at_base": 61,
+      "classification": "recipe or code pin",
+      "action": "move_with_historical_note",
+      "reason": "The current parser recipe follows accepted 5.60.0; the earlier measured 5.58.0 execution and hashes remain explicitly historical."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-dataset/dataset.py",
+      "line_at_base": 23,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
+      "line_at_base": 30,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
+      "line_at_base": 33,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/README.md",
+      "line_at_base": 10,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/README.md",
+      "line_at_base": 146,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+      "line_at_base": 33,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/access-resolution.md",
+      "line_at_base": 4,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/access-resolution.md",
+      "line_at_base": 29,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/access-resolution.md",
+      "line_at_base": 105,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/new-host-native-network-20260924.json",
+      "line_at_base": 8,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/new-host-native-network-20260924.json",
+      "line_at_base": 42,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/new-host-native-network-20260924.json",
+      "line_at_base": 80,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/receipt.json",
+      "line_at_base": 8,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/receipt.json",
+      "line_at_base": 25,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/receipt.json",
+      "line_at_base": 77,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/receipt.json",
+      "line_at_base": 101,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/receipt.json",
+      "line_at_base": 137,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/receipt.json",
+      "line_at_base": 175,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/receipt.json",
+      "line_at_base": 229,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/receipt.json",
+      "line_at_base": 282,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/requirements.lock",
+      "line_at_base": 6,
+      "classification": "recipe or code pin",
+      "action": "preserve_supplied_update",
+      "reason": "Accepted 42-package freeze is supplied unchanged at 5.60.0; its four observed version movements are recorded in the native SEC receipt."
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/README.md",
+      "line_at_base": 50,
+      "classification": "recipe or code pin",
+      "action": "move_with_historical_note",
+      "reason": "The current parser recipe follows accepted 5.60.0; the earlier measured 5.58.0 execution and hashes remain explicitly historical."
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+      "line_at_base": 19,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+      "line_at_base": 23,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/sample.py",
+      "line_at_base": 138,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/sample.py",
+      "line_at_base": 144,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/sample.py",
+      "line_at_base": 303,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "line_at_base": 75,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current runtime bundle or readiness; recorded old host evidence remains separately scoped."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "line_at_base": 138,
+      "classification": "live selection or plan row",
+      "action": "supersede",
+      "reason": "The 5.59.1 overturn item is superseded by native SEC acceptance at 5.60.0, while the original 2604 execution remains 5.58.0 history."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
+      "line_at_base": 25,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current runtime bundle or readiness; recorded old host evidence remains separately scoped."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
+      "line_at_base": 163,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current runtime bundle or readiness; recorded old host evidence remains separately scoped."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml",
+      "line_at_base": 10,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current runtime bundle or readiness; recorded old host evidence remains separately scoped."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+      "line_at_base": 877,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current runtime bundle or readiness; recorded old host evidence remains separately scoped."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+      "line_at_base": 902,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current runtime bundle or readiness; recorded old host evidence remains separately scoped."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+      "line_at_base": 904,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current runtime bundle or readiness; recorded old host evidence remains separately scoped."
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+      "line_at_base": 3294,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current runtime bundle or readiness; recorded old host evidence remains separately scoped."
+    },
+    {
+      "path": "blueprints/us-equities/simulation-research/README.md",
+      "line_at_base": 55,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1406,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1409,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1483,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1486,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1578,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1581,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1618,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1765,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1768,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1792,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "line_at_base": 1814,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "line_at_base": 8079,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "line_at_base": 8100,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "line_at_base": 8760,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "line_at_base": 8781,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/gap-resolution-20260922.json",
+      "line_at_base": 3389,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "catalogs/landscape/gap-resolution-20260922.json",
+      "line_at_base": 3390,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "line_at_base": 2642,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "line_at_base": 2658,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "line_at_base": 2660,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "line_at_base": 2679,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "line_at_base": 2716,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "line_at_base": 2819,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "line_at_base": 2829,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "line_at_base": 2831,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "line_at_base": 2850,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "catalogs/landscape/upstream-snapshot.json",
+      "line_at_base": 3496,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/landscape/upstream-snapshot.json",
+      "line_at_base": 3524,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/landscape/upstream-snapshot.json",
+      "line_at_base": 3539,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/landscape/upstream-snapshot.json",
+      "line_at_base": 3541,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/landscape/upstream-snapshot.json",
+      "line_at_base": 3553,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "line_at_base": 211,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Verdict rows belong to the frozen 20260922 wave; build_verdicts.py rejects changing them without a new verdict wave, which this pin move does not perform."
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "line_at_base": 232,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Verdict rows belong to the frozen 20260922 wave; build_verdicts.py rejects changing them without a new verdict wave, which this pin move does not perform."
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "line_at_base": 234,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Verdict rows belong to the frozen 20260922 wave; build_verdicts.py rejects changing them without a new verdict wave, which this pin move does not perform."
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "line_at_base": 257,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Verdict rows belong to the frozen 20260922 wave; build_verdicts.py rejects changing them without a new verdict wave, which this pin move does not perform."
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "line_at_base": 1737,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Verdict rows belong to the frozen 20260922 wave; build_verdicts.py rejects changing them without a new verdict wave, which this pin move does not perform."
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "line_at_base": 1752,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Verdict rows belong to the frozen 20260922 wave; build_verdicts.py rejects changing them without a new verdict wave, which this pin move does not perform."
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "line_at_base": 1754,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Verdict rows belong to the frozen 20260922 wave; build_verdicts.py rejects changing them without a new verdict wave, which this pin move does not perform."
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "line_at_base": 2050,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Verdict rows belong to the frozen 20260922 wave; build_verdicts.py rejects changing them without a new verdict wave, which this pin move does not perform."
+    },
+    {
+      "path": "catalogs/sota-convergence/README.md",
+      "line_at_base": 61,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/README.md",
+      "line_at_base": 65,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 6537,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 6542,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 6710,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 6715,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 6722,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 6734,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 7412,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 7417,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 7764,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 7777,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 7782,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "line_at_base": 7789,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260922.json",
+      "line_at_base": 4682,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260922.json",
+      "line_at_base": 4684,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260922.json",
+      "line_at_base": 4699,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260922.json",
+      "line_at_base": 5621,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260922.json",
+      "line_at_base": 5623,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "line_at_base": 10564,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "line_at_base": 10566,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "line_at_base": 10590,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "line_at_base": 10596,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "line_at_base": 10602,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "line_at_base": 12397,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "line_at_base": 12399,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 1116,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 1118,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 1120,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 1121,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 1122,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 1123,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 1124,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 1126,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 1131,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 1147,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 11732,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 11734,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 13854,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "line_at_base": 13856,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260929.json",
+      "line_at_base": 12028,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260929.json",
+      "line_at_base": 12774,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated SOTA manifest/verdict wave; retain its original release and comparison evidence."
+    },
+    {
+      "path": "catalogs/us-equities/authenticated-data-review.json",
+      "line_at_base": 22,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "line_at_base": 4726,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "line_at_base": 4759,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "line_at_base": 4773,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "line_at_base": 4774,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "line_at_base": 4789,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "line_at_base": 4790,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "line_at_base": 5567,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "line_at_base": 7261,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "line_at_base": 7308,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/data-readiness-review.json",
+      "line_at_base": 16,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "catalogs/us-equities/data-readiness-review.json",
+      "line_at_base": 18,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "catalogs/us-equities/data-research.json",
+      "line_at_base": 157,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "catalogs/us-equities/data-research.json",
+      "line_at_base": 181,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/data-research.json",
+      "line_at_base": 189,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/data-research.json",
+      "line_at_base": 190,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/data-research.md",
+      "line_at_base": 58,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/lifecycle-source-review.json",
+      "line_at_base": 85,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "catalogs/us-equities/lifecycle-source-review.json",
+      "line_at_base": 171,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "catalogs/us-equities/lifecycle-source-review.md",
+      "line_at_base": 30,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "catalogs/us-equities/runtime-target.json",
+      "line_at_base": 238,
+      "classification": "live selection or plan row",
+      "action": "resolve",
+      "reason": "The 5.59.1 overturn item is superseded and resolved by native-sec-edgartools-5600-20261004; Python qualification remains open."
+    },
+    {
+      "path": "catalogs/us-equities/simulation-data-review.json",
+      "line_at_base": 47,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "catalogs/us-equities/simulation-data-review.md",
+      "line_at_base": 28,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "catalogs/us-equities/star-audit.json",
+      "line_at_base": 5240,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "catalogs/us-equities/star-audit.json",
+      "line_at_base": 5241,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "docs/decisions/2026-10-01-trading-layer-verdicts.md",
+      "line_at_base": 63,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "docs/decisions/2026-10-01-trading-layer-verdicts.md",
+      "line_at_base": 64,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "docs/decisions/2026-10-01-trading-layer-verdicts.md",
+      "line_at_base": 68,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "docs/decisions/2026-10-01-trading-layer-verdicts.md",
+      "line_at_base": 118,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "docs/decisions/2026-10-04-trading-2604-preparation.md",
+      "line_at_base": 159,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "docs/ecosystem/claude-repository-evidence.html",
+      "line_at_base": 98,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "line_at_base": 1692,
+      "classification": "generated",
+      "action": "check_frozen_generation",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "line_at_base": 1695,
+      "classification": "generated",
+      "action": "check_frozen_generation",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "line_at_base": 1990,
+      "classification": "generated",
+      "action": "check_frozen_generation",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "line_at_base": 1995,
+      "classification": "generated",
+      "action": "check_frozen_generation",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "line_at_base": 1999,
+      "classification": "generated",
+      "action": "check_frozen_generation",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "line_at_base": 2008,
+      "classification": "generated",
+      "action": "check_frozen_generation",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "line_at_base": 2098,
+      "classification": "generated",
+      "action": "check_frozen_generation",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "line_at_base": 2108,
+      "classification": "generated",
+      "action": "check_frozen_generation",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "line_at_base": 2115,
+      "classification": "generated",
+      "action": "check_frozen_generation",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "line_at_base": 2154,
+      "classification": "generated",
+      "action": "check_frozen_generation",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/new-host-grand-list.md",
+      "line_at_base": 121,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "docs/new-host-grand-list.md",
+      "line_at_base": 126,
+      "classification": "generated",
+      "action": "regenerate",
+      "reason": "Use supported builders. Winner pins and historical reasons derive from frozen verdict waves, so remaining 5.58.0 values describe those waves rather than current stack selection."
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+      "line_at_base": 926,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+      "line_at_base": 1335,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+      "line_at_base": 1465,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json",
+      "line_at_base": 1097,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+      "line_at_base": 1,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-20260923/manifest-20260923.json",
+      "line_at_base": 3006,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-20260923/manifest-20260923.json",
+      "line_at_base": 3008,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-20260923/manifest-20260923.json",
+      "line_at_base": 3752,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-20260923/manifest-20260923.json",
+      "line_at_base": 3754,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+      "line_at_base": 7323,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+      "line_at_base": 7347,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+      "line_at_base": 7371,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+      "line_at_base": 7372,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+      "line_at_base": 10401,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/component-coverage.json",
+      "line_at_base": 3845,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/component-coverage.json",
+      "line_at_base": 3890,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/component-coverage.json",
+      "line_at_base": 3893,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/selected-upstream-releases.json",
+      "line_at_base": 1581,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/selected-upstream-releases.json",
+      "line_at_base": 1596,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/selected-upstream-releases.json",
+      "line_at_base": 1601,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/selected-upstream-releases.json",
+      "line_at_base": 1604,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/lockfile-audit.json",
+      "line_at_base": 38,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/market-data-reference.json",
+      "line_at_base": 24,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/research-factors-ml.json",
+      "line_at_base": 24,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
+      "line_at_base": 444,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
+      "line_at_base": 446,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
+      "line_at_base": 448,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
+      "line_at_base": 449,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
+      "line_at_base": 450,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
+      "line_at_base": 451,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
+      "line_at_base": 452,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
+      "line_at_base": 454,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
+      "line_at_base": 7009,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
+      "line_at_base": 7014,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 2966,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 2970,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 2987,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 2989,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 2990,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 3013,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 3014,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 20566,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 20567,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 20569,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 20570,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 20571,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 20572,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 20573,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 20575,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 27481,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 28557,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "line_at_base": 28741,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-synthesis.md",
+      "line_at_base": 28,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-synthesis.md",
+      "line_at_base": 29,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-synthesis.md",
+      "line_at_base": 36,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-synthesis.md",
+      "line_at_base": 37,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-synthesis.md",
+      "line_at_base": 85,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-synthesis.md",
+      "line_at_base": 119,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 44,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 85,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 131,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 174,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 192,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 222,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 343,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 392,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 454,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 458,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 685,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "line_at_base": 729,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-market-data-reference-20260922.json",
+      "line_at_base": 183,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-research-factors-ml-20260922.json",
+      "line_at_base": 282,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-research-factors-ml-20260922.json",
+      "line_at_base": 306,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__market-data-reference.json",
+      "line_at_base": 142,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__market-data-reference.json",
+      "line_at_base": 155,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__market-data-reference.json",
+      "line_at_base": 163,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__research-factors-ml.json",
+      "line_at_base": 332,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__research-factors-ml.json",
+      "line_at_base": 345,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__research-factors-ml.json",
+      "line_at_base": 353,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/README.md",
+      "line_at_base": 133,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/nativestack-20260924/agent-research-handoff.md",
+      "line_at_base": 10,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/nativestack-20260924/agent-research-handoff.md",
+      "line_at_base": 18,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/nativestack-20260924/host-receipts-20260924/threadripper4090-nativestack-20260924--edgartools--use--20260924.json",
+      "line_at_base": 29,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/identity-provenance.json",
+      "line_at_base": 242,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/identity-provenance.json",
+      "line_at_base": 260,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/identity-provenance.json",
+      "line_at_base": 262,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/identity-provenance.json",
+      "line_at_base": 264,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/identity-provenance.json",
+      "line_at_base": 313,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/identity-provenance.json",
+      "line_at_base": 331,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/market-data-reference.json",
+      "line_at_base": 137,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/market-data-reference.json",
+      "line_at_base": 155,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/market-data-reference.json",
+      "line_at_base": 157,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/market-data-reference.json",
+      "line_at_base": 159,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/market-data-reference.json",
+      "line_at_base": 208,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/market-data-reference.json",
+      "line_at_base": 226,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/research-factors-ml.json",
+      "line_at_base": 174,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/research-factors-ml.json",
+      "line_at_base": 192,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/research-factors-ml.json",
+      "line_at_base": 194,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/research-factors-ml.json",
+      "line_at_base": 196,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/research-factors-ml.json",
+      "line_at_base": 245,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/research-factors-ml.json",
+      "line_at_base": 263,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/selection-gap-convergence-followup.json",
+      "line_at_base": 25,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/storage-compute.json",
+      "line_at_base": 260,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/storage-compute.json",
+      "line_at_base": 278,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/storage-compute.json",
+      "line_at_base": 280,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/storage-compute.json",
+      "line_at_base": 282,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/storage-compute.json",
+      "line_at_base": 331,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/storage-compute.json",
+      "line_at_base": 349,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/skills-agents-layer-20260926/delta.json",
+      "line_at_base": 4246,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/skills-agents-layer-20260926/delta.json",
+      "line_at_base": 4247,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/sota-convergence-review-20260923/manifest-citation-review.json",
+      "line_at_base": 161,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Dated source/peer review; preserve what that review examined."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/market-data-reference--gpt-6-live.md",
+      "line_at_base": 13,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/market-data-reference--gpt-6-live.md",
+      "line_at_base": 25,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/market-data-reference.json",
+      "line_at_base": 6,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/market-data-reference.json",
+      "line_at_base": 16,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/market-data-reference.json",
+      "line_at_base": 148,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/market-data-reference.json",
+      "line_at_base": 150,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/market-data-reference.json",
+      "line_at_base": 152,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/market-data-reference.json",
+      "line_at_base": 581,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "line_at_base": 6,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "line_at_base": 16,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "line_at_base": 219,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "line_at_base": 226,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "line_at_base": 227,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "line_at_base": 229,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "line_at_base": 231,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "line_at_base": 248,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "line_at_base": 250,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "line_at_base": 449,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/run-3.log",
+      "line_at_base": 138,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/hosts/native-stack-2604-20261004/native-stack-2604-20261004--nautilustrader--use--20261004.json",
+      "line_at_base": 48,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-edgartools--use--20260925.json",
+      "line_at_base": 21,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-edgartools--use--20260925.json",
+      "line_at_base": 25,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-edgartools--use--20260925.json",
+      "line_at_base": 32,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-edgartools--use--20260925.json",
+      "line_at_base": 39,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-edgartools--use--20260925.json",
+      "line_at_base": 42,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-edgartools--use--20260925.json",
+      "line_at_base": 46,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-edgartools--use--20260925.json",
+      "line_at_base": 57,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-edgartools--use--20260925.json",
+      "line_at_base": 61,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/receipts/native-trading-runtime-2604-20261004.json",
+      "line_at_base": 22,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "evidence/receipts/native-trading-runtime-2604-20261004.json",
+      "line_at_base": 59,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical measured output or receipt; preserve the observed software version."
+    },
+    {
+      "path": "manifests/stack.json",
+      "line_at_base": 1524,
+      "classification": "live selection or plan row",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "manifests/stack.json",
+      "line_at_base": 1545,
+      "classification": "dated historical snapshot",
+      "action": "keep_history",
+      "reason": "Historical source link, behavior observation or prior qualification prose; current readiness is recorded separately."
+    },
+    {
+      "path": "tests/test_catalyst_dataset.py",
+      "line_at_base": 64,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    },
+    {
+      "path": "tests/test_lifecycle_sample.py",
+      "line_at_base": 181,
+      "classification": "recipe or code pin",
+      "action": "move",
+      "reason": "Current selection, environment check or recipe follows the accepted 5.60.0 release; no broader gate status changes."
+    }
+  ],
+  "frozen_generation_rule": "No dated SOTA manifest or verdict document is edited. Frozen rows and their generated narrative retain their original pin; current selections are catalogs/us-equities/data-research.json, manifests/stack.json and the current new-WSL plan."
+}

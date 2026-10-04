@@ -235,8 +235,20 @@
     "host_receipt": "evidence/hosts/native-stack-2604-20261004/native-stack-2604-20261004--nautilustrader--use--20261004.json",
     "open": [
       "Ratify CPython 3.12.3 against 3.13 and the complete canonical runtime matrix.",
-      "Complete EdgarTools 5.59.1 filing-fix overturn comparison before moving catalog 5.58.0.",
       "Independent post-run host-receipt review, per-check outputs and all existing data, strategy, oracle and broker gates remain separate."
-    ]
+    ],
+    "edgartools_pin_move_20261004": {
+      "runtime_pin": "5.60.0",
+      "catalog_entry": "data-edgartools",
+      "catalog_pin": "5.60.0",
+      "source_pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+      "resolved_item": "EdgarTools 5.59.1 filing-fix overturn comparison before moving catalog 5.58.0",
+      "resolution": "Superseded by directed 5.60.0 pin move and native SEC acceptance native-sec-edgartools-5600-20261004; the repository runtime bundle and current catalog now select the same release.",
+      "receipt_id": "native-sec-edgartools-5600-20261004",
+      "evidence_ref": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
+      "historical_2604_run_edgartools": "5.58.0",
+      "native_stack_2604_rerun": "pending; install and offline acceptance at 5.60.0 require a separate receipt",
+      "scope": "Bounded SEC index acceptance on NativeStack; no strategy, point-in-time data, paper or broker gate changes."
+    }
   }
 }
