@@ -76,7 +76,30 @@
           "path": "vendor/x86_64-unknown-linux-musl/bin/codex",
           "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad"
         }
-      }
+      },
+      "holds": [
+        {
+          "version": "0.159.3",
+          "until": "2026-11-04",
+          "reason": "X18: hosts not yet switched stay on 0.159.3 until retired (#626 landing exception)",
+          "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz",
+          "sha256": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79",
+          "checksum_ref": "URL and SHA-256 are this row's 0.159.3 values before f77a35eb2 (#626), introduced by 85543efe5 (#580). Re-verified 2026-10-04: npm view @openai/codex@0.159.3 dist.integrity = sha512-hg4nlqCwRb87GocxNnHvz4sadOrdJ71mO0a4CUYWXjAozJe2gtuAdRFldKGSQXw9m7SgR4ydis12KDVVPgzDkQ== and dist.shasum = b49833a850e61217e62b7992e251a385462a6dac, and the 4,904-byte tarball downloaded from the registry matched both and this SHA-256. A hold records what a host not yet switched runs; the bootstrap installs only the row's version, and scripts/adoption_status.py --pinned-versions reports a probe that names this version as held before the until date and as drift on or after it (docs/decisions/2026-10-04-codex-dated-holds.md).",
+          "platform_dependency": {
+            "name": "@openai/codex-linux-x64",
+            "resolved_package": "@openai/codex",
+            "version": "0.159.3-linux-x64",
+            "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3-linux-x64.tgz",
+            "sha256": "0719027cfe326e248971a2dff0a391c3532a3d838b4e3cc660bf93b2a606d2ce",
+            "integrity": "sha512-xlHydfOksnNt/qz4BEVFvjMWunweaVSNtha/DkVUwWZnVZxbqiJwsXSl2iZDk04b6k/g0OI7jU06XqzHB2s5og==",
+            "checksum_ref": "npm view @openai/codex@0.159.3 optionalDependencies maps this alias to npm:@openai/codex@0.159.3-linux-x64, and npm view @openai/codex@0.159.3-linux-x64 gives the integrity above and dist.shasum = 62a9c71b5086d6aea6cd0cde61178a6d39f0eeba (2026-10-04). The 162,464,331-byte archive downloaded from the registry matched SHA-512, SHA-1 and this SHA-256; its package.json names @openai/codex 0.159.3-linux-x64 with no scripts or dependencies, and the executable SHA-256 is read from the same archive. First recorded here: no earlier repository record carries this archive's hashes, and no held host's installed executable was compared with it.",
+            "installed_binary_check": {
+              "path": "vendor/x86_64-unknown-linux-musl/bin/codex",
+              "sha256": "8bf204b36a2f6dd0dab73aa2f639892e67ef9ac8befccb4a05b1496ebf25c479"
+            }
+          }
+        }
+      ]
     },
     {
       "id": "claude-code",
