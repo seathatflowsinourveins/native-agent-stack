@@ -6,8 +6,9 @@ list`, CHANGELOG.md, the GraphQL release list); none is a recorded observation. 
 (http_get, gh_api, probe_codex), and the offline tests make socket creation raise. NegativeControlTests run small mutant
 parsers, each with a known defect and none built by filtering the real parser's output, and require every mutant to
 agree with the real parser on a plain fixture and fail a fixture that the real parser passes, so a parser regression
-cannot pass silently (precedent: a regex that missed `$` in minified identifiers read 15 of 17 values with exit 0). TestCommittedCatalogs checks the two committed catalogs; it is the only test that reads repository
-data rather than fixtures.
+cannot pass silently (precedent: a regex that missed `$` in minified identifiers read 15 of 17 values with exit 0).
+TestCommittedCatalogs checks the two committed catalogs. CachedArtifactTests optionally reads real vendor artifacts
+from UPSTREAM_SURFACE_TEST_CACHE (or the default watch cache); those are local integration checks, not upstream tests.
 """
 
 from __future__ import annotations
@@ -37,6 +38,16 @@ from scripts import upstream_surface_watch as usw
 ROOT = Path(__file__).resolve().parents[1]
 NOW = "2026-10-04T12:00:00Z"
 CODEX_BIN = "/synthetic/bin/codex"
+
+
+def cached_artifact(test: unittest.TestCase, source: str) -> bytes:
+    """Read optional real upstream inputs for local integration checks, never upstream tests.
+    UPSTREAM_SURFACE_TEST_CACHE selects a read-only cache copy; ordinary fixture tests need no cache."""
+    cache = Path(os.environ.get("UPSTREAM_SURFACE_TEST_CACHE", usw.default_state_dir() / usw.CACHE_DIR))
+    path = cache / f"{source}.body"
+    if not path.is_file():
+        test.skipTest(f"cached upstream input unavailable: {source}; set UPSTREAM_SURFACE_TEST_CACHE")
+    return path.read_bytes()
 
 # ----------------------------------------------------------------------------------------------- fixture builders
 
@@ -158,9 +169,13 @@ def reference_page(keys=REFERENCE_KEYS, title=True, global_section=True) -> str:
         return lines + ["A synthetic setting.", "", f"* **Scope**: [`{scope}`](#scopes)", "* **Type**: Boolean", "",
                         "```json settings.json theme={null}", "{", f'  "{key}": true', "}", "```", ""]
 
+    indexed = [*keys, "fillerSetting00.nested", "removedSetting", "deprecatedSetting", "scopeMarkedElsewhere"]
+    if global_section:
+        indexed += ["globalOnlyKey", "sectionOnlyGlobal"]
     lines = ["> ## Documentation Index", "", "# All settings" if title else "# Something else", "",
-             "## Settings index", "", "| Key | Description | Topic | Scope |", "| :- | :- | :- | :- |", "",
-             "## Model and responses", ""]
+             "## Settings index", "", "| Key | Description | Topic | Scope |", "| :- | :- | :- | :- |",
+             *(f"| [`{key}`](#{key.lower()}) | A synthetic setting | Settings | Any file |" for key in indexed),
+             "", "## Model and responses", ""]
     for key in keys:
         lines += entry(key)
     lines += entry("fillerSetting00.nested")
@@ -447,6 +462,80 @@ def row(key: str, disposition: str = "declined", **changes) -> dict:
 
 
 class ParserTests(unittest.TestCase):
+    def test_typescript_string_escapes_are_decoded_for_hooks_and_settings(self):
+        """Synthetic fixtures, not upstream tests: TypeScript literal spellings denote decoded member names."""
+        cases = [(r"\x50reToolUse", "PreToolUse"), (r"\u0050reToolUse", "PreToolUse"),
+                 (r"\u{50}reToolUse", "PreToolUse"), (r"Pre\nToolUse", "Pre\nToolUse"),
+                 (r"Pre\rToolUse", "Pre\rToolUse"), (r"Pre\tToolUse", "Pre\tToolUse"),
+                 (r"Pre\bToolUse", "Pre\bToolUse"), (r"Pre\fToolUse", "Pre\fToolUse"),
+                 (r"Pre\vToolUse", "Pre\vToolUse"), (r"Pre\0ToolUse", "Pre\0ToolUse"),
+                 (r"Pre\\ToolUse", "Pre\\ToolUse"), (r"Pre\'ToolUse", "Pre'ToolUse"),
+                 (r'Pre\"ToolUse', 'Pre"ToolUse'), ("Pre\\\nToolUse", "PreToolUse"),
+                 ("Pre\\\r\nToolUse", "PreToolUse"), ("Pre\\\rToolUse", "PreToolUse"),
+                 ("Pre\\\u2028ToolUse", "PreToolUse"), ("Pre\\\u2029ToolUse", "PreToolUse"),
+                 (r"\u{1F600}", "\U0001f600"), (r"\uD83D\uDE00", "\U0001f600"),
+                 (r"Pre\qToolUse", "PreqToolUse")]
+        for spelling, value in cases:
+            with self.subTest(spelling=spelling):
+                text = sdk_dts().replace("'PreToolUse'", f"'{spelling}'", 1)
+                text = text.replace("'quoted-key'?:", f'"{spelling}"?:', 1)
+                self.assertEqual(set(usw.parse_hook_events(text)), (set(HOOKS) - {"PreToolUse"}) | {value})
+                self.assertEqual(set(usw.parse_settings_keys(text)),
+                                 ({*TRAP_SETTINGS, *FILLER_SETTINGS} - {"quoted-key"}) | {value})
+
+    def test_invalid_typescript_string_escapes_fail_both_name_parsers(self):
+        """Synthetic fixtures, not upstream tests: malformed numeric escapes are parse errors, never new names."""
+        for spelling in (r"\x", r"\x4G", r"\u12", r"\uZZZZ", r"\u{}", r"\u{GG}", r"\u{110000}",
+                         r"\01", r"\8", r"\9", "Pre\nToolUse"):
+            with self.subTest(spelling=spelling):
+                hooks = sdk_dts().replace("'PreToolUse'", f"'{spelling}'", 1)
+                settings = sdk_dts().replace("'quoted-key'?:", f'"{spelling}"?:', 1)
+                with self.assertRaisesRegex(usw.AnchorMissing, r"anchor missing: sdk\.d\.ts:HOOK_EVENTS"):
+                    usw.parse_hook_events(hooks)
+                with self.assertRaisesRegex(usw.AnchorMissing, r"anchor missing: sdk\.d\.ts:interface Settings"):
+                    usw.parse_settings_keys(settings)
+
+    def test_unresolved_local_schema_refs_are_integrity_errors(self):
+        """Synthetic fixtures, not upstream tests: even one dangling local reference must fail integrity."""
+        for reference in ("#/definitions/Missing", "#/$defs/Missing", "#/properties/missing"):
+            with self.subTest(reference=reference):
+                schema = codex_schema()
+                schema["properties"]["top_00"] = {"$ref": reference}
+                with self.assertRaisesRegex(usw.AnchorMissing, r"anchor missing: config-schema\.json:\$ref"):
+                    usw.flatten_codex_schema(json.dumps(schema).encode())
+
+    def test_local_schema_refs_resolve_defs_json_pointers_and_named_anchors(self):
+        """Synthetic fixtures, not upstream tests: valid local reference targets retain the known property paths."""
+        for reference in ("#/$defs/Alias", "#/definitions/Alias~1~0", "#/examples/0", "#tui"):
+            with self.subTest(reference=reference):
+                schema = codex_schema()
+                target = schema["definitions"]["Tui"]
+                schema["$defs"] = {"Alias": dict(target, **{"$anchor": "tui"})}
+                schema["definitions"]["Alias/~"] = target
+                schema["examples"] = [target]
+                schema["properties"]["tui"] = {"$ref": reference}
+                self.assertEqual(set(usw.flatten_codex_schema(json.dumps(schema).encode())), expected_paths())
+
+    def test_an_unvisited_definition_with_a_dangling_ref_is_an_integrity_error(self):
+        """Synthetic fixture, not an upstream test: integrity covers references outside observed config paths."""
+        schema = codex_schema()
+        schema["definitions"]["Unused"] = {"$ref": "#/definitions/Missing"}
+        with self.assertRaisesRegex(usw.AnchorMissing, r"config-schema\.json:\$ref"):
+            usw.flatten_codex_schema(json.dumps(schema).encode())
+
+    def test_settings_index_disagreement_allows_two_keys_but_rejects_three(self):
+        """Synthetic fixtures, not upstream tests: two distinct top-level keys is the documented editorial tolerance."""
+        for count in (1, 2, 3):
+            with self.subTest(differing_keys=count):
+                rows = "\n".join(f"| `indexOnly{index}` | Description with `notAKey` | Settings | Any file |"
+                                 for index in range(count))
+                page = reference_page().replace("## Model and responses", rows + "\n\n## Model and responses", 1)
+                if count <= 2:
+                    self.assertEqual(usw.parse_settings_reference(page), sorted({*REFERENCE_KEYS, "deprecatedSetting"}))
+                else:
+                    with self.assertRaisesRegex(usw.AnchorMissing, r"key headings/settings index"):
+                        usw.parse_settings_reference(page)
+
     def test_settings_keys_survive_comments_quotes_dollar_nesting_literals_and_modifiers(self):
         keys = usw.parse_settings_keys(sdk_dts())
         self.assertEqual(set(keys), {*TRAP_SETTINGS, *FILLER_SETTINGS})
@@ -618,8 +707,8 @@ class AnchorTests(unittest.TestCase):
 
 class FloorTests(unittest.TestCase):
     """M1: the reviewer's degraded artifacts, real-shaped, against the deployed bounds (BOUNDS and FLOOR_PERCENT as
-    shipped, never lifted). Each degraded count still passes its absolute bound, so only the 80%-of-baseline floor
-    catches it; the run exits 3, names the kind and writes nothing."""
+    shipped, never lifted). Missing definitions fail reference integrity before the floor; the other degraded counts
+    still pass their absolute bounds and fail the 80%-of-baseline floor. Every failed run writes nothing."""
 
     def degraded_run(self, prepare, degrade, message: str, absolute, bound: str):
         watch, upstream = Watch(self), Upstream()
@@ -635,12 +724,21 @@ class FloorTests(unittest.TestCase):
         self.assertEqual(watch.latest.read_bytes(), before)
 
     def test_a_schema_read_without_its_definitions_fails_the_floor(self):
+        """Synthetic fixture, not an upstream test: the historic floor control now fails earlier on integrity."""
         schema = real_shaped_schema()
-        self.degraded_run(
-            lambda u: setattr(u, "schema_override", json.dumps(schema).encode()),
-            lambda u: setattr(u, "schema_override", json.dumps(dict(schema, definitions={})).encode()),
-            "anchor missing: codex:config below 80% of baseline (count ",
-            lambda u: len(usw.flatten_codex_schema(u.schema_override)), "codex:config")
+        watch, upstream = Watch(self), Upstream()
+        upstream.schema_override = json.dumps(schema).encode()
+        watch.seed(self, upstream)
+        latest_before, baseline_before = watch.latest.read_bytes(), watch.baseline.read_bytes()
+        upstream.schema_override = json.dumps(dict(schema, definitions={})).encode()
+        for arguments in (("--network",), ("--network", "--write-baseline", "--force")):
+            with self.subTest(arguments=arguments):
+                code, _, stderr = watch.run(*arguments, upstream=upstream)
+                self.assertEqual(code, 3, stderr)
+                self.assertIn("anchor missing: config-schema.json:$ref", stderr)
+                self.assertNotIn("below 80%", stderr)
+                self.assertEqual(watch.latest.read_bytes(), latest_before)
+                self.assertEqual(watch.baseline.read_bytes(), baseline_before)
 
     def test_a_schema_read_without_its_combinators_fails_the_floor(self):
         schema = real_shaped_schema()
@@ -699,6 +797,117 @@ class FloorTests(unittest.TestCase):
 
 
 # ----------------------------------------------------------------------------------------------- run tests
+
+
+class CachedArtifactTests(unittest.TestCase):
+    """Local integration checks using optional cached vendor artifacts; these are not upstream tests."""
+
+    def test_equivalent_string_escapes_preserve_the_real_sdk_hook_and_settings_sets(self):
+        """Local integration check, not an upstream test: escaped hook and quoted $schema spellings preserve names."""
+        sdk = cached_artifact(self, "claude-agent-sdk-types").decode("utf-8")
+        hooks, settings = usw.parse_hook_events(sdk), usw.parse_settings_keys(sdk)
+        self.assertEqual((len(hooks), len(settings)), (33, 173))
+        escaped = sdk.replace("'PreToolUse'", r"'\u0050reToolUse'", 1)
+        anchor = usw.SETTINGS_ANCHOR.search(escaped)
+        key = re.compile(r"(?m)^([ \t]+)\$schema(\??[ \t]*:)").search(escaped, anchor.end())
+        self.assertIsNotNone(key)
+        escaped = escaped[:key.start()] + key.group(1) + r'"\x24sch\u0065ma"' + key.group(2) + escaped[key.end():]
+        self.assertEqual(usw.parse_hook_events(escaped), hooks)
+        self.assertEqual(usw.parse_settings_keys(escaped), settings)
+
+    def test_escaped_quoted_setting_preserves_the_real_sdk_settings_set(self):
+        """Local integration check, not an upstream test: quote a real SDK key and decode its hexadecimal escapes."""
+        sdk = cached_artifact(self, "claude-agent-sdk-types").decode("utf-8")
+        original = usw.parse_settings_keys(sdk)
+        self.assertEqual(len(original), 173)
+        anchor = usw.SETTINGS_ANCHOR.search(sdk)
+        key = re.compile(r"(?m)^([ \t]+)\$schema(\??[ \t]*:)").search(sdk, anchor.end())
+        self.assertIsNotNone(key)
+        escaped = sdk[:key.start()] + key.group(1) + r'"\x24sch\u0065ma"' + key.group(2) + sdk[key.end():]
+        self.assertEqual(usw.parse_settings_keys(escaped), original)
+
+    def test_commonmark_closing_markers_on_every_heading_preserve_the_real_settings(self):
+        """Local integration check, not an upstream test: CommonMark ATX formatting preserves all 171 keys."""
+        page = cached_artifact(self, "claude-settings-reference-page").decode("utf-8")
+        expected = usw.parse_settings_reference(page)
+        self.assertEqual(len(expected), 171)
+        for indent in range(4):
+            with self.subTest(leading_spaces=indent):
+                reformatted = re.sub(r"(?m)^(#{1,6})([ \t]+.*)$",
+                                     lambda match: " " * indent + match.group() + "\t" + match.group(1) + " \t", page)
+                self.assertEqual(usw.parse_settings_reference(reformatted), expected)
+
+    def test_closing_markers_on_the_ten_docs_only_headings_preserve_the_real_settings(self):
+        """Local integration check, not an upstream test: the SDK union cannot mask lost docs-only headings."""
+        page = cached_artifact(self, "claude-settings-reference-page").decode("utf-8")
+        expected = usw.parse_settings_reference(page)
+        sdk = usw.parse_settings_keys(cached_artifact(self, "claude-agent-sdk-types").decode("utf-8"))
+        docs_only = set(expected) - set(sdk)
+        self.assertEqual(len(docs_only), 10)
+        headings = re.findall(r"(?m)^### `([^`]+)`$", page)
+        self.assertEqual({key.split(".")[0] for key in headings if key.split(".")[0] in docs_only}, docs_only)
+        reformatted = re.sub(r"(?m)^### `([^`]+)`$",
+                             lambda match: match.group() + " ###" if match.group(1).split(".")[0] in docs_only
+                             else match.group(), page)
+        self.assertEqual(usw.parse_settings_reference(reformatted), expected)
+
+    def test_setext_docs_only_headings_trip_the_independent_index_guard(self):
+        """Local integration check, not an upstream test: an unsupported heading form cannot silently lose ten keys."""
+        page = cached_artifact(self, "claude-settings-reference-page").decode("utf-8")
+        sdk = usw.parse_settings_keys(cached_artifact(self, "claude-agent-sdk-types").decode("utf-8"))
+        docs_only = set(usw.parse_settings_reference(page)) - set(sdk)
+        self.assertEqual(len(docs_only), 10)
+        unsupported = re.sub(r"(?m)^### `([^`]+)`$",
+                             lambda match: f"`{match.group(1)}`\n---" if match.group(1).split(".")[0] in docs_only
+                             else match.group(), page)
+        with self.assertRaisesRegex(usw.AnchorMissing, r"anchor missing: settings-reference\.md:key headings/settings index"):
+            usw.parse_settings_reference(unsupported)
+
+    def test_incomplete_schema_is_rejected_daily_and_when_writing_baseline(self):
+        """Local integration check, not an upstream test: corrupt the real rust-v0.160.0 schema offline."""
+        original = cached_artifact(self, "codex-config-schema")
+        self.assertEqual(len(usw.flatten_codex_schema(original)), 1034)
+        missing_definitions = json.loads(original)
+        del missing_definitions["definitions"]
+        dangling = json.loads(original)
+        dangling["properties"]["model"]["$ref"] = "#/$defs/Missing"
+        for label, schema in (("definitions deleted", missing_definitions), ("one dangling ref", dangling)):
+            for mode in ("daily", "write-baseline"):
+                with self.subTest(schema=label, mode=mode):
+                    watch, upstream = Watch(self), Upstream()
+                    upstream.schema_override = original
+                    watch.seed(self, upstream)
+                    code, _, stderr = watch.run()
+                    self.assertEqual(code, 0, stderr)
+                    baseline_before = watch.baseline.read_bytes()
+                    latest_before = watch.latest.read_bytes()
+                    cache = watch.state / usw.CACHE_DIR
+                    body = json.dumps(schema).encode()
+                    (cache / "codex-config-schema.body").write_bytes(body)
+                    meta_path = cache / "codex-config-schema.json"
+                    meta = json.loads(meta_path.read_text())
+                    meta.update(sha256=sha256(body), bytes=len(body))
+                    meta_path.write_text(json.dumps(meta))
+                    release_path = cache / "github-codex-latest-release.body"
+                    release = json.loads(release_path.read_bytes())
+                    release["assets"][-1]["digest"] = "sha256:" + sha256(body)
+                    release_body = json.dumps(release).encode()
+                    release_path.write_bytes(release_body)
+                    release_meta_path = cache / "github-codex-latest-release.json"
+                    release_meta = json.loads(release_meta_path.read_text())
+                    release_meta.update(sha256=sha256(release_body), bytes=len(release_body))
+                    release_meta_path.write_text(json.dumps(release_meta))
+                    if mode == "write-baseline":
+                        watch.baseline.unlink()
+                    code, _, stderr = watch.run(*(["--write-baseline"] if mode == "write-baseline" else []))
+                    self.assertEqual(code, 3, stderr)
+                    self.assertIn("anchor missing: config-schema.json:$ref", stderr)
+                    self.assertNotIn("below 80%", stderr)
+                    if mode == "write-baseline":
+                        self.assertFalse(watch.baseline.exists())
+                    else:
+                        self.assertEqual(watch.baseline.read_bytes(), baseline_before)
+                    self.assertEqual(watch.latest.read_bytes(), latest_before)
 
 
 class SourceAvailabilityTests(unittest.TestCase):
@@ -1349,7 +1558,17 @@ class NegativeControlTests(unittest.TestCase):
         # Mutant: $ref not followed (the definitions emptied), so every property behind a definition is lost.
         body = json.dumps(codex_schema()).encode()
         self.assertEqual(set(usw.flatten_codex_schema(body)), expected_paths())
-        missed = expected_paths() - set(_flatten_unbounded(dict(json.loads(body), definitions={})))
+        broken = dict(json.loads(body), definitions={})
+        with self.assertRaisesRegex(usw.AnchorMissing, r"config-schema\.json:\$ref"):
+            _flatten_unbounded(broken)
+
+        # Keep the original missing-path control even for a mutant that drops dangling references to evade integrity.
+        def without_refs(node):
+            if isinstance(node, dict):
+                return {key: without_refs(value) for key, value in node.items() if key != "$ref"}
+            return [without_refs(item) for item in node] if isinstance(node, list) else node
+
+        missed = expected_paths() - set(_flatten_unbounded(without_refs(broken)))
         self.assertTrue({"tui.theme", "mcp_servers.*.command", "hooks.PreToolUse[].matcher"} <= missed)
 
 

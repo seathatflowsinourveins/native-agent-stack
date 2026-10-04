@@ -102,14 +102,23 @@ The independent extraction of the same morning differs as follows:
   containers (`x.*`, `x[]`).
 - **Codex features.** The two features missing from the binary were added in rust-v0.160.0.
 
-The degraded artifacts of the review round, re-run on the real artifacts fetched at 15:03Z against this baseline,
-each pass the absolute bounds and stop at the 80% floor (exit 3):
+The degraded artifacts of the review round, re-run with that round's parser on the real artifacts fetched at 15:03Z
+against this baseline, each passed the absolute bounds and stopped at the 80% floor (exit 3):
 
 - `config-schema.json` without its definitions gives 266 paths, and without `allOf`/`anyOf`/`oneOf` 361 (553 before
   the mirrors were dropped);
 - `env-vars.md` cut at half its table gives 218 names.
 
 This was a local integration check in scratch, not an upstream test.
+
+The later offline repair records five anti-patterns and their regression checks: unresolved local Codex references
+now fail integrity before any floor or baseline write; an existing watch state directory preserves prior findings
+when its report disappears; CommonMark ATX headings are checked against all top-level Settings index names with a
+two-key symmetric-difference tolerance before global/removed exclusions; bounded malformed JSON and Unicode inputs
+remain unreadable records; and TypeScript hook and quoted-setting names use decoded escapes. The checks use cached
+SDK 0.3.289, Codex rust-v0.160.0 and settings-reference artifacts plus synthetic mutations in
+`tests/test_upstream_surface_watch.py` and `tests/test_currency_due.py`; they are local integration checks and
+synthetic fixtures, not upstream tests.
 
 These are integrity checks of the parsers, not savings or quality measurements; no token-savings claim is made.
 

@@ -87,6 +87,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -181,9 +182,12 @@ HOOKS_ANCHOR = re.compile(r"\bHOOK_EVENTS\s*:\s*readonly\s*\[")
 # keys belong in ~/.claude.json and not in a settings file (each also says so in its "**Scope**: `Global config`"
 # bullet), and a "<Warning> Removed in vX" note that opens the entry of a removed key. Fenced code blocks hold
 # example lines that start with '#', which are no headings.
-REFERENCE_TITLE = re.compile(r"(?m)^#[ \t]+All settings[ \t]*$")
-REFERENCE_KEY = re.compile(r"^###[ \t]+`([^`\s]+)`[ \t]*$")
-REFERENCE_HEADING = re.compile(r"^(#{1,3})[ \t]+(.*?)[ \t]*$")
+REFERENCE_TITLE = re.compile(r"(?m)^ {0,3}#[ \t]+All settings(?:[ \t]+#+)?[ \t]*$")
+REFERENCE_KEY = re.compile(r"`([^`\s]+)`")
+REFERENCE_HEADING = re.compile(r"^ {0,3}(#{1,6})(?:[ \t]+(.*)|$)")
+REFERENCE_CLOSING = re.compile(r"(?:^|[ \t]+)#+[ \t]*$")
+# The index and headings currently agree exactly; allow two distinct top-level keys of editorial lag.
+REFERENCE_INDEX_TOLERANCE = 2
 FENCE_OPEN = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})")
 GLOBAL_CONFIG_SECTION = "Global config settings"
 GLOBAL_CONFIG_SCOPE = re.compile(r"^[ \t]*[*-][ \t]+\*\*Scope\*\*:.*`Global config`")
@@ -488,6 +492,51 @@ class Fetcher:
 
 IDENT = re.compile(r"[A-Za-z_$][A-Za-z0-9_$]*")
 NUMBER = re.compile(r"\d+")
+TS_ESCAPES = {"n": "\n", "r": "\r", "t": "\t", "b": "\b", "f": "\f", "v": "\v", "0": "\0",
+              "'": "'", '"': '"', "\\": "\\"}
+HEX_DIGITS = re.compile(r"[0-9a-fA-F]+")
+
+
+def ts_string_value(text: str) -> str:
+    """Decode TypeScript string contents by the ECMAScript StringLiteral escape grammar (no legacy octal).
+    NonEscapeCharacter identity escapes are valid; malformed numeric escapes and unescaped newlines are not."""
+    chars, index, size = [], 0, len(text)
+    while index < size:
+        char = text[index]
+        index += 1
+        if char != "\\":
+            if char in "\r\n":
+                raise ValueError("unescaped newline in string")
+            chars.append(char)
+            continue
+        if index >= size:
+            raise ValueError("unterminated string escape")
+        char = text[index]
+        index += 1
+        if char in "\r\n\u2028\u2029":
+            if char == "\r" and index < size and text[index] == "\n":
+                index += 1
+            continue
+        if char in "xu":
+            if char == "u" and index < size and text[index] == "{":
+                end = text.find("}", index + 1)
+                digits = text[index + 1:end] if end >= 0 else ""
+                index = end + 1
+            else:
+                width = 2 if char == "x" else 4
+                digits = text[index:index + width]
+                index += width
+                if len(digits) != width:
+                    raise ValueError("incomplete numeric string escape")
+            if HEX_DIGITS.fullmatch(digits) is None or int(digits, 16) > 0x10ffff:
+                raise ValueError("invalid numeric string escape")
+            chars.append(chr(int(digits, 16)))
+        elif char in "123456789" or (char == "0" and index < size and text[index] in "0123456789"):
+            raise ValueError("legacy numeric string escape")
+        else:
+            chars.append(TS_ESCAPES.get(char, char))
+    # JavaScript strings hold UTF-16 code units; equivalent surrogate-pair and code-point spellings share a name.
+    return "".join(chars).encode("utf-16-le", "surrogatepass").decode("utf-16-le", "surrogatepass")
 
 
 def ts_tokens(text: str, start: int, newlines: bool = False):
@@ -520,7 +569,7 @@ def ts_tokens(text: str, start: int, newlines: bool = False):
                 end += 2 if text[end] == "\\" else 1
             if end >= size:
                 raise ValueError("unterminated string")
-            yield "str", text[index + 1:end]
+            yield "str", ts_string_value(text[index + 1:end])
             index = end + 1
         elif char == "`":
             end, depth = index + 1, 0
@@ -719,8 +768,16 @@ def resolve_sdk(body: bytes, claude_version: str) -> dict:
             "types": types}
 
 
+def reference_heading(line: str) -> tuple[int, str] | None:
+    """CommonMark 0.31.2 section 4.2: ATX headings, including optional closing hashes and up to three spaces."""
+    match = REFERENCE_HEADING.fullmatch(line)
+    if match is None:
+        return None
+    return len(match.group(1)), REFERENCE_CLOSING.sub("", match.group(2) or "").strip(" \t")
+
+
 def reference_entries(text: str) -> list[dict]:
-    """[{key, section, lines}] for each key heading (REFERENCE_KEY: "###" and a backticked key) of the settings
+    """[{key, section, lines}] for each ATX key heading (a backticked key) of the settings
     reference outside fenced code blocks (CommonMark fences of three or more backticks or tildes); an entry runs to the
     next heading of level 1-3 outside a fence, and section is the "## " heading above it."""
     entries, section, current, fence = [], None, None, None
@@ -731,18 +788,41 @@ def reference_entries(text: str) -> list[dict]:
                 fence = None
         elif (opening := FENCE_OPEN.match(line)) is not None:
             fence = opening.group(1)
-        elif (key := REFERENCE_KEY.match(line)) is not None:
-            current = {"key": key.group(1), "section": section, "lines": []}
-            entries.append(current)
-            continue
-        elif (heading := REFERENCE_HEADING.match(line)) is not None:
-            current = None
-            if len(heading.group(1)) == 2:
-                section = heading.group(2)
-            continue
+        elif (heading := reference_heading(line)) is not None:
+            level, title = heading
+            if (key := REFERENCE_KEY.fullmatch(title)) is not None:
+                current = {"key": key.group(1), "section": section, "lines": []}
+                entries.append(current)
+                continue
+            if level <= 3:
+                current = None
+                if level == 2:
+                    section = title
+                continue
         if current is not None:
             current["lines"].append(line)
     return entries
+
+
+def reference_index_keys(text: str) -> set[str]:
+    """Independent second reading: first-column backticked keys of the Settings index, including removed/global keys.
+    Fences are excluded; descriptions and scope columns cannot invent keys."""
+    keys, indexed, fence = set(), False, None
+    for line in text.splitlines():
+        if fence is not None:
+            stripped = line.strip()
+            if stripped and set(stripped) == {fence[0]} and len(stripped) >= len(fence):
+                fence = None
+            continue
+        if (opening := FENCE_OPEN.match(line)) is not None:
+            fence = opening.group(1)
+        elif (heading := reference_heading(line)) is not None and heading[0] <= 2:
+            indexed = heading == (2, "Settings index")
+        elif indexed and line.lstrip().startswith("|"):
+            first = line.split("|", 2)[1]
+            keys.update(span.split(".")[0] for span in BACKTICK_SPAN.findall(first)
+                        if REFERENCE_KEY.fullmatch(f"`{span}`"))
+    return keys
 
 
 def removed_entry(lines: list[str]) -> bool:
@@ -764,6 +844,12 @@ def parse_settings_reference(text: str) -> list[str]:
     entries = reference_entries(text)
     if not any(entry["section"] == GLOBAL_CONFIG_SECTION for entry in entries):
         raise AnchorMissing("settings-reference.md:## Global config settings", "no key heading in that section")
+    heading_keys = {entry["key"].split(".")[0] for entry in entries}
+    index_keys = reference_index_keys(text)
+    disagreement = len(heading_keys ^ index_keys)
+    if disagreement > REFERENCE_INDEX_TOLERANCE:
+        raise AnchorMissing("settings-reference.md:key headings/settings index",
+                            f"{disagreement} differing top-level keys, tolerance {REFERENCE_INDEX_TOLERANCE}")
     keys = {entry["key"].split(".")[0] for entry in entries
             if entry["section"] != GLOBAL_CONFIG_SECTION and not removed_entry(entry["lines"])
             and not any(GLOBAL_CONFIG_SCOPE.match(line) for line in entry["lines"])}
@@ -816,10 +902,38 @@ def flatten_codex_schema(body: bytes) -> list[str]:
     schema = load_json(body, "config-schema.json:properties")
     if not isinstance(schema, dict) or not isinstance(schema.get("properties"), dict):
         raise AnchorMissing("config-schema.json:properties")
-    definitions = {}
-    for container in ("definitions", "$defs"):
-        if isinstance(schema.get(container), dict):
-            definitions.update({f"#/{container}/{key}": value for key, value in schema[container].items()})
+    # Validate every local reference before counting, including references in otherwise unused definitions.
+    # A reviewed re-baseline skips the removal floor, but must never accept an incomplete schema.
+    references, anchors, pending = {}, {}, [schema]
+    while pending:
+        node = pending.pop()
+        if isinstance(node, dict):
+            reference = node.get("$ref")
+            if isinstance(reference, str) and reference.startswith("#"):
+                references[reference] = None
+            if isinstance(node.get("$anchor"), str):
+                anchors[node["$anchor"]] = node
+            pending.extend(node.values())
+        elif isinstance(node, list):
+            pending.extend(node)
+    for reference in references:
+        fragment = urllib.parse.unquote(reference[1:])
+        try:
+            target = schema
+            if fragment.startswith("/"):
+                for token in fragment[1:].split("/"):
+                    if re.search(r"~(?![01])", token):
+                        raise ValueError("invalid JSON pointer escape")
+                    token = token.replace("~1", "/").replace("~0", "~")
+                    if isinstance(target, list) and re.fullmatch(r"0|[1-9][0-9]*", token):
+                        target = target[int(token)]
+                    else:
+                        target = target[token]
+            elif fragment:
+                target = anchors[fragment]
+        except (KeyError, IndexError, TypeError, ValueError):
+            raise AnchorMissing("config-schema.json:$ref", f"unresolved local reference {reference!r}") from None
+        references[reference] = target
     features = schema["properties"].get("features")
     if not isinstance(features, dict):
         raise AnchorMissing("config-schema.json:features")
@@ -832,8 +946,8 @@ def flatten_codex_schema(body: bytes) -> list[str]:
             if not isinstance(current, dict):
                 continue
             reference = current.get("$ref")
-            if isinstance(reference, str) and reference not in trail and reference in definitions:
-                pending.append((definitions[reference], trail | {reference}))
+            if isinstance(reference, str) and reference not in trail and reference in references:
+                pending.append((references[reference], trail | {reference}))
             found.append((current, trail))  # a $ref's siblings (properties beside it) count too
             for combinator in ("allOf", "anyOf", "oneOf"):
                 if isinstance(current.get(combinator), list):

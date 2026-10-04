@@ -1088,6 +1088,41 @@ class SurfaceWatchTests(unittest.TestCase):
     watch output; tests/test_upstream_surface_watch.py FreshnessTests feeds real watch output to surface_findings)."""
 
     KEYS = ["claude:setting:newSetting", "claude:env:CLAUDE_CODE_NEW", "codex:feature:brand_new"]
+    MALFORMED_BYTES = {"huge integer": (b'{"integer":' + b"9" * 5000 + b"}", {"error": "not JSON"}),
+                       "lone surrogate": (b'{"value":"\xed\xa0\x80"}', {"error": "unreadable (UnicodeDecodeError)"}),
+                       "NUL": (b'{"value":"\x00"}', {"error": "not JSON"}),
+                       "BOM": (b"\xef\xbb\xbf{}", {"error": "not JSON"})}
+
+    def test_bounded_malformed_json_inputs_are_unreadable_records(self):
+        """Synthetic fixtures, not upstream tests: integer limits and malformed UTF-8/JSON cannot escape read_record."""
+        for label, (raw, expected) in self.MALFORMED_BYTES.items():
+            with self.subTest(report=label):
+                checkout = Checkout(self)
+                self.report(checkout)
+                path = checkout.state / cd.SURFACE_DIR / cd.SURFACE_FILE
+                self.assertLess(len(raw), cd.RECORD_MAX_BYTES)
+                path.write_bytes(raw)
+                self.assertEqual(cd.read_record(path), expected)
+
+    def test_bounded_malformed_reports_do_not_crash_currency_or_clear_the_notice(self):
+        """Local integration check, not an upstream test: every malformed report keeps known findings and exits zero."""
+        for label, (raw, _) in self.MALFORMED_BYTES.items():
+            with self.subTest(report=label):
+                checkout = Checkout(self)
+                self.report(checkout)
+                checkout.due_file.write_bytes(b'{"earlier": true}\n')
+                before = checkout.due_file.read_bytes()
+                (checkout.state / cd.SURFACE_DIR / cd.SURFACE_FILE).write_bytes(raw)
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertEqual(checkout.due_file.read_bytes(), before)
+                self.assertIn("surface watch unreadable", stdout)
+                self.assertLessEqual(len(stdout.split(" (kept ", 1)[0]), 160)
+
+    def test_a_path_encoding_error_is_an_unreadable_record(self):
+        """Synthetic fixture, not an upstream test: a UnicodeError during file access is an unreadable record."""
+        checkout = Checkout(self)
+        self.assertEqual(cd.read_record(checkout.state / "\ud800"), {"error": "unreadable (UnicodeEncodeError)"})
 
     @staticmethod
     def source(name: str, origin: str, fetched_utc: str, cross_check: bool = False) -> dict:
@@ -1121,6 +1156,51 @@ class SurfaceWatchTests(unittest.TestCase):
                          ("surface watch not run", "no latest.json"))
         _, text, _ = checkout.run("--dry-run")
         self.assertIn("surface watch not run (no latest.json)", text)
+
+    def test_a_lost_report_after_a_watch_run_keeps_the_previous_findings(self):
+        """Local integration check, not an upstream test: deleting latest.json preserves the earlier notice."""
+        checkout = Checkout(self)
+        self.report(checkout)
+        code, _, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        before = checkout.due_file.read_bytes()
+        report = checkout.state / cd.SURFACE_DIR / cd.SURFACE_FILE
+        report.unlink()
+        self.assertEqual(stat.S_IMODE(report.parent.stat().st_mode), 0o700)
+        code, stdout, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertTrue(checkout.due_file.exists(), stdout)
+        self.assertEqual(checkout.due_file.read_bytes(), before)
+        line = stdout.split(" (kept ", 1)[0]
+        self.assertEqual(line, f"stack currency: nothing known due, surface watch stale; details: {checkout.command()}")
+        self.assertLessEqual(len(line), 160)
+        document = self.document(checkout)
+        self.assertEqual(document["details"][-1]["surface_watch"], "surface watch stale")
+
+    def test_an_observed_watch_without_a_usable_report_writes_no_empty_notice(self):
+        """Synthetic fixtures, not upstream tests: missing, unreadable and non-regular reports are gaps."""
+        for label, contents in (("missing", None), ("unreadable", b"{not json"), ("directory", None),
+                                ("fifo", None), ("dangling symlink", None)):
+            with self.subTest(report=label):
+                checkout = Checkout(self)
+                report = checkout.state / cd.SURFACE_DIR / cd.SURFACE_FILE
+                report.parent.mkdir(mode=0o700, parents=True)
+                if contents is not None:
+                    report.write_bytes(contents)
+                elif label == "directory":
+                    report.mkdir()
+                elif label == "fifo":
+                    os.mkfifo(report)
+                elif label == "dangling symlink":
+                    report.symlink_to(report.parent / "lost.json")
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertFalse(checkout.due_file.exists())
+                self.assertTrue(stdout.startswith("stack currency: nothing known due, surface watch "), stdout)
+                self.assertIn("(no due-file)", stdout)
+                line = stdout.split(" (no due-file)", 1)[0]
+                self.assertTrue(line.endswith(f"; details: {checkout.command()}"), line)
+                self.assertLessEqual(len(line), 160)
 
     def test_a_fresh_report_adds_the_sixth_count_and_writes_the_notice(self):
         checkout = Checkout(self)

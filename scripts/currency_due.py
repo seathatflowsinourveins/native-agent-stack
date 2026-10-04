@@ -29,8 +29,9 @@ aggregates five counts, and a sixth when the upstream-surface watch ran recently
   script never fetches and never runs the watch; the timer's upstream-surface-watch.service runs before it). It is a
   count only while the report's data is at most SURFACE_MAX_AGE_DAYS (3) days old: its generated_at and the
   fetched_utc of every source it took from the cache (coverage.sources; a failed --network fetch falls back to the
-  cache), and no report time is more than an hour ahead of the clock. A missing file is the coverage note "surface
-  watch not run" (the watch unit may not be installed on the host). A file that exists but is stale or future-dated
+  cache), and no report time is more than an hour ahead of the clock. With no watch state directory, a missing file is
+  the coverage note "surface watch not run" (the watch unit may not be installed on the host). A missing report in an
+  existing watch state directory is stale. A file that exists but is stale or future-dated
   ("surface watch stale") or unreadable ("surface watch output unreadable") is a check that could not answer, as an
   incomplete skill check is (below). None of these is a count or an error (docs/upstream-surface-watch.md).
 
@@ -108,8 +109,9 @@ SURFACE_FILE = "latest.json"
 SURFACE_MAX_AGE_DAYS = 3
 SURFACE_FUTURE_SKEW = timedelta(hours=1)  # a report time further ahead of the clock than this is not trusted
 SURFACE_SAMPLES = 10  # unreviewed keys kept in the details
-# The report's states in the coverage entry. No report is only a coverage note: the watch unit may not be installed on
-# this host. A report that exists but cannot answer (stale, future-dated or unreadable) is an incomplete check, as an
+# The report's states in the coverage entry. No watch state directory is only a coverage note: the watch unit may not
+# be installed on this host. A report that cannot answer (missing after observation, stale, future-dated or unreadable)
+# is an incomplete check, as an
 # incomplete skill check is: it keeps an earlier due-file and is never "nothing due"; SURFACE_GAPS is its line phrase.
 SURFACE_NOT_RUN = "surface watch not run"
 SURFACE_STALE = "surface watch stale"
@@ -243,7 +245,7 @@ def read_record(path: Path):
     """A status record: None when the host has none, {"error": why} when it cannot be read as a JSON object, otherwise
     the object. An unreadable record is an alert, never an error of the run: the job that writes it is what failed.
     The read is bounded: a path that is not a regular file is not opened, at most RECORD_MAX_BYTES are read, and JSON
-    nested too deeply for the parser (RecursionError) is "not JSON"."""
+    nested too deeply or exceeding a parser conversion limit (RecursionError or ValueError) is "not JSON"."""
     try:
         if not stat.S_ISREG(path.stat().st_mode):
             return {"error": "not a regular file"}
@@ -251,15 +253,15 @@ def read_record(path: Path):
             data = stream.read(RECORD_MAX_BYTES + 1)
     except FileNotFoundError:
         return None
-    except OSError as error:
+    except (OSError, UnicodeError) as error:
         return {"error": f"unreadable ({type(error).__name__})"}
     if len(data) > RECORD_MAX_BYTES:
         return {"error": f"larger than {RECORD_MAX_BYTES} bytes"}
     try:
         value = json.loads(data.decode("utf-8"))
-    except UnicodeError as error:
+    except (OSError, UnicodeError) as error:
         return {"error": f"unreadable ({type(error).__name__})"}
-    except (json.JSONDecodeError, RecursionError):
+    except (ValueError, RecursionError):
         return {"error": "not JSON"}
     return value if isinstance(value, dict) else {"error": "not a JSON object"}
 
@@ -313,7 +315,12 @@ def collect(root: Path, now_text: str, network: bool, state: Path | None = None)
     if state is not None:
         host = {"backup": read_record(state / BACKUP_RECORD), "restore": read_record(state / RESTORE_RECORD),
                 "units": query_units((*STAGE2_UNITS, DAGU_UNIT))}
-        surface = {"record": read_record(state / SURFACE_DIR / SURFACE_FILE)}  # a file read; never a fetch
+        surface_dir = state / SURFACE_DIR
+        try:
+            observed_before = surface_dir.is_dir()
+        except OSError:
+            observed_before = True  # an inaccessible state directory cannot prove that the watch never ran
+        surface = {"record": read_record(surface_dir / SURFACE_FILE), "observed_before": observed_before}
     return {"receipts": receipts, "layers": layers, "pins": pins, "skills": skills, "sweep_dates": sweep_dates(root),
             "host": host, "surface": surface}
 
@@ -496,13 +503,17 @@ def surface_data_time(record: dict, generated: datetime) -> tuple[datetime | Non
 def surface_findings(surface, now: datetime) -> tuple[int | None, list[dict], dict]:
     """(count or None, details, coverage fields) from collect()'s ``surface``: the watch's unreviewed list while the
     oldest data in its report (surface_data_time()) is at most SURFACE_MAX_AGE_DAYS old. None (a caller that collected
-    no state) checks nothing; a missing report is the coverage note SURFACE_NOT_RUN; a stale, future-dated or
+    no state) checks nothing; a missing report without a watch state directory is the coverage note SURFACE_NOT_RUN;
+    a report lost after observation is SURFACE_STALE, and a stale, future-dated or
     unreadable one is SURFACE_STALE or SURFACE_UNREADABLE, an incomplete check (incomplete()). None of them is a
     count or an error of the run."""
     if surface is None:
         return None, [], {"surface_watch": None}
     record = surface.get("record")
     if record is None:
+        if surface.get("observed_before") is True:
+            return None, [], {"surface_watch": SURFACE_STALE,
+                              "surface_watch_reason": "no latest.json in an observed watch state directory"}
         return None, [], {"surface_watch": SURFACE_NOT_RUN, "surface_watch_reason": "no latest.json"}
     if set(record) == {"error"}:
         return None, [], {"surface_watch": SURFACE_UNREADABLE, "surface_watch_reason": record["error"]}

@@ -75,6 +75,14 @@ The parsing rules:
 - An unobserved kind is left out of the diff and named in `coverage.kinds_not_observed`, so it never shows as
   removed. A missing binary, for example, leaves `codex:feature` unobserved.
 
+Integrity checks apply before the baseline floor in every mode: all local Codex `$ref` targets must resolve before
+`--write-baseline` can write. Settings headings follow [CommonMark ATX rules](https://spec.commonmark.org/0.31.2/#atx-headings);
+their top-level names, including global and removed entries before exclusion, must agree with the Settings index's
+first-column backticked names within two distinct keys. TypeScript hook and quoted-setting literals decode
+[string escapes](https://tc39.es/ecma262/#sec-literals-string-literals), including line continuations; malformed
+numeric escapes fail the anchor. These are local integration checks against cached SDK 0.3.289, Codex rust-v0.160.0
+and docs artifacts, with synthetic malformed-input controls.
+
 ## What the watch does not cover
 
 It compares names from the sources above and nothing else:
@@ -95,7 +103,7 @@ It compares names from the sources above and nothing else:
 | 0 | the run finished, with or without new names |
 | 1 | the baseline or dispositions catalog is invalid (or missing), `--check-dispositions` found errors, or a write failed |
 | 2 | usage error, including a state directory inside the checkout and a summary that cannot fit 160 characters |
-| 3 | `anchor missing: <name>`: an anchor was not found, or a count was outside its bound; or `anchor missing: <kind> below 80% of baseline`: an observed kind holds fewer than 80% of its baseline names, which an artifact read in part gives (the real `config-schema.json` without its definitions gives 266 of 1,341 paths, both inside the absolute bound) and so does a real removal of more than 20% at once, which needs a reviewed `--network --write-baseline --force` (that mode skips this check) |
+| 3 | `anchor missing: <name>`: an anchor was not found, a local schema reference was unresolved, a string literal was malformed, the settings index guard failed, or a count was outside its bound; or `anchor missing: <kind> below 80% of baseline`: an observed kind holds fewer than 80% of its baseline names. A reviewed removal of more than 20% at once needs `--network --write-baseline --force`, which skips the floor while retaining source integrity checks |
 | 4 | `source unavailable: <name> (...)`: the source could not be fetched and has no usable cache |
 
 ## latest.json and the resolver
@@ -118,9 +126,12 @@ counts. Applying the decision itself (a settings template, a Codex profile) is t
 script's. `scripts/currency_due.py` reads the same file offline and adds `surface_unreviewed` to the session notice
 while the report's data is at most three days old (its `generated_at`, and the fetch time of every source it took
 from the cache, which it re-reads from `coverage.sources`; report-only cross-checks do not count) and neither
-`generated_at` nor `run_at` is more than one hour ahead of its clock. No `latest.json` is only the coverage note
-`surface watch not run` (the unit may not be installed on that host). A report that exists but is older, future-dated
-or unreadable is `surface watch stale` or `surface watch output unreadable`: a check that could not answer, handled
+`generated_at` nor `run_at` is more than one hour ahead of its clock. A missing `latest.json` without a watch state
+directory is only the coverage note `surface watch not run` (the unit may not be installed on that host). An existing
+watch state directory means observed before: a missing report is `surface watch stale`; an unreadable or non-regular
+report is `surface watch output unreadable`. File-access errors, Unicode errors and JSON parsing `ValueError`s,
+including integer conversion limits, are unreadable records. These and an older or future-dated report are checks
+that could not answer, handled
 as an incomplete skill check is. The earlier due-file stays, and with nothing else due the line says
 `stack currency: nothing known due, surface watch stale; details: <command>` instead of "nothing due".
 
