@@ -1644,11 +1644,15 @@ def plan_run(args, *, runner, now, gate=None):
                              else type(error).__name__.lower()) from None
     finally:
         shutil.rmtree(workroot, ignore_errors=True)
-    trusted_commit = None
     if gate is None:
         try:
-            # Every attempt's workspace and clone live under the state directory.
-            trusted_commit = push_gate.PushGate(git=git, zizmor=zizmor).trusted_identity([str(args.state)])
+            # Every attempt's workspace and clone live under the state directory. Only the check's
+            # outcome enters the printed plan, never its return value: the trusted commit is kept per
+            # pushed commit in the gate record (resolver-outcome.json). CodeQL's
+            # py/clear-text-logging-sensitive-data classifies values from `trusted`-named sources as
+            # secrets by name (SensitiveDataHeuristics.maybeSecret); the commit id authenticates
+            # nothing, and the plan carries no value from that source.
+            push_gate.PushGate(git=git, zizmor=zizmor).trusted_identity([str(args.state)])
         except push_gate.GateError as error:
             raise RunRefused("preflight", "push_gate_" + error.reason) from None
     instruction = resolver_instruction(selected, task=task, owned_paths=owned)
@@ -1657,7 +1661,8 @@ def plan_run(args, *, runner, now, gate=None):
             "kept_comments": selected["kept_comments"], "dropped_comments": selected["dropped_comments"],
             "dropped_reasons": selected["dropped_reasons"], "preflight": identity, "repository": repository,
             "gates": "passed", "resolver_skill": skill, "resolver_skills": skill_check,
-            "reviewer_argv_sha256": reviewer_sha256, "push_gate_trusted_commit": trusted_commit,
+            "reviewer_argv_sha256": reviewer_sha256,
+            "push_gate": "trusted_copy_checked" if gate is None else "injected",
             "instruction_chars": len(instruction),
             "instruction_sha256": hashlib.sha256(instruction.encode("utf-8")).hexdigest()}
     attempt = ResolverAttempt(

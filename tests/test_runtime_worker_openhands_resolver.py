@@ -3778,6 +3778,14 @@ class ResolverAttemptTests(unittest.TestCase):
         self.assertEqual(exit_code(planted), 1)
 
 
+# Every field `run --dry-run` prints (plan_run). Pinned so that no field, such as a value from a
+# sensitive-named source, joins the printed plan unnoticed.
+DRY_RUN_PLAN_KEYS = {"status", "run_id", "issue", "base_sha", "branch", "branch_rules", "owned_paths", "lane", "arm",
+                     "port", "kept_comments", "dropped_comments", "dropped_reasons", "preflight", "repository", "gates",
+                     "resolver_skill", "resolver_skills", "reviewer_argv_sha256", "push_gate", "instruction_chars",
+                     "instruction_sha256"}
+
+
 class ResolverRunTests(unittest.TestCase):
     """`resolver.py run`: the read-only plan, and end-to-end fake runs through host.run and dispatch.
 
@@ -3940,6 +3948,8 @@ class ResolverRunTests(unittest.TestCase):
         check = mocks["check_resolver_skills"]
         self.assertEqual(check.call_args.args[:2], (ROOT, SKILL_PIN))
         self.assertIn("non_fast_forward", plan["branch_rules"])
+        self.assertEqual(set(plan), DRY_RUN_PLAN_KEYS)
+        self.assertEqual(plan["push_gate"], "injected")  # a test's injected gate; the CLI has no way to inject one
         self.assertEqual(plan["preflight"]["gh_version"], "2.101.0")
         self.assertEqual(plan["repository"], {"full_name": REPOSITORY_JSON["full_name"], "default_branch": "main"})
         self.assertRegex(plan["instruction_sha256"], r"^[0-9a-f]{64}$")
@@ -3953,6 +3963,41 @@ class ResolverRunTests(unittest.TestCase):
                          {("--version",), ("auth", "status"), ("api", API), ("api", f"{API}/issues/12"),
                           ("api", "--paginate"), ("api", "graphql"), ("ls-remote", ORIGIN), ("ls-remote", "--heads"),
                           ("api", f"{API}/rules/branches/openhands/issue-12")})
+
+    def test_the_printed_dry_run_plan_carries_no_value_from_the_trusted_identity(self):
+        # CodeQL py/clear-text-logging-sensitive-data (alert 90, CodeQL 2.27.1) traced two sources
+        # into the printed plan: the assignment `trusted_commit = None` and the call
+        # `trusted_identity(...)`, both classified "secret" because their names contain "trusted"
+        # (SensitiveDataHeuristics.maybeSecret). The value was a commit id, which authenticates
+        # nothing; the plan now prints only the check's outcome, and the gate record keeps the
+        # commit. A sentinel return value must not reach the printed plan, nor may planted
+        # credentials from the environment.
+        sentinel, planted = "5e" * 20, "planted-" + secrets.token_hex(8)
+        github = ResolverGitHub(base=self.base)
+        self.gate = None  # the real gate class, with only its trusted-identity check replaced
+        with mock.patch.object(self.r.push_gate.PushGate, "trusted_identity", autospec=True,
+                               return_value=sentinel) as identity, \
+                mock.patch.dict(os.environ, {"GH_TOKEN": planted, "GITHUB_TOKEN": planted}):
+            code, plan, _ = self.run_cli(github, dry_run=True)
+        self.assertEqual(code, 0, plan)
+        identity.assert_called_once()
+        self.assertEqual(identity.call_args.args[1], [str(self.state)])
+        self.assertEqual(plan["push_gate"], "trusted_copy_checked")
+        self.assertEqual(set(plan), DRY_RUN_PLAN_KEYS)
+        printed = json.dumps(plan, sort_keys=True)
+        for value in (sentinel, planted):
+            self.assertNotIn(value, printed)
+
+    def test_a_trusted_copy_the_gate_refuses_stops_the_plan_before_any_container(self):
+        github = ResolverGitHub(base=self.base)
+        self.gate = None
+        refusal = self.r.push_gate.GateError("gate_file_modified")
+        with mock.patch.object(self.r.push_gate.PushGate, "trusted_identity", autospec=True, side_effect=refusal):
+            code, printed, mocks = self.run_cli(github, dry_run=True)
+        self.assertEqual((code, printed), (3, {"reason": "push_gate_gate_file_modified", "stage": "preflight",
+                                               "status": "refused"}))
+        for name in ("run", "prepare_native_dispatch", "execute_container"):
+            mocks[name].assert_not_called()
 
     def test_end_to_end_fake_run_opens_one_draft_pr_reviews_it_once_and_stops(self):
         github = ResolverGitHub(base=self.base, checks=[(0, check_list("pass"), "")] * 2)
