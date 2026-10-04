@@ -276,8 +276,8 @@ class SecurityScanTests(unittest.TestCase):
 
     def test_the_write_token_never_reaches_an_installed_tool(self):
         self.assertIn("GH_TOKEN: ${{ github.token }}", jobs(self.text)["zizmor-online"])
-        # OSV uploads the ordinary, frozen macOS and retired WSL reports under separate categories.
-        for tool_job, upload_job, uploads in (("osv-scanner", "osv-sarif-upload", 3), ("zizmor-online", "zizmor-sarif-upload", 1)):
+        # OSV uploads the ordinary and frozen macOS reports under separate categories.
+        for tool_job, upload_job, uploads in (("osv-scanner", "osv-sarif-upload", 2), ("zizmor-online", "zizmor-sarif-upload", 1)):
             upload = jobs(self.text)[upload_job]
             self.assertIn(f"needs: {tool_job}", upload, upload_job)
             self.assertNotRegex(upload, r"(?m)^\s+(- )?run:", f"{upload_job} (write scope) runs no shell step")
@@ -300,13 +300,14 @@ class SecurityScanTests(unittest.TestCase):
         self.assertIn(UPLOAD_SARIF, upload)
         self.assertIn("category: osv-scanner\n", upload)
         self.assertIn("category: osv-scanner-frozen-macos", upload)
-        self.assertIn("category: osv-scanner-frozen-wsl-retrieval", upload)
         # Every group writes a report; all primary and SARIF statuses participate in the final status.
-        for report in ("osv-scanner.sarif", "osv-scanner-frozen-macos.sarif", "osv-scanner-frozen-wsl-retrieval.sarif"):
+        for report in ("osv-scanner.sarif", "osv-scanner-frozen-macos.sarif"):
             self.assertIn(report, job)
             self.assertIn(report, upload)
         self.assertIn("frozen_status", job)
-        self.assertIn("frozen_wsl_status", job)
+        # The retired WSL group's scan and upload went with its lock's rename out of discovery (2026-10-04).
+        self.assertNotIn("frozen-wsl", self.text)
+        self.assertNotIn("frozen_wsl", self.text)
 
     def test_zizmor_online_skips_pull_requests_and_reports_without_failing(self):
         job = jobs(self.text)["zizmor-online"]
@@ -334,8 +335,7 @@ class SecurityScanTests(unittest.TestCase):
         # The artifact step and the downstream upload job both need it.
         osv_job = jobs(self.text)["osv-scanner"]
         upload = jobs(self.text)["osv-sarif-upload"]
-        for name in ("Upload the frozen-artifact OSV-Scanner SARIF to code scanning",
-                     "Upload the retired WSL artifact OSV-Scanner SARIF to code scanning"):
+        for name in ("Upload the frozen-artifact OSV-Scanner SARIF to code scanning",):
             guard = block_if(step_block(upload, name))
             self.assertIsNotNone(guard, f"{name} must run after an earlier upload fails")
             self.assertRegex(guard, r"!\s*cancelled\(\)", name)
