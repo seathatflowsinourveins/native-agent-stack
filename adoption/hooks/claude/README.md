@@ -22,9 +22,10 @@ repository, byte-pinned in `SHA256SUMS`:
 - the SessionStart hook `token-lanes-session-start.py` and its block `token-lanes-block.main.md`.
 
 The template registers neither hook, `install_claude_profile.py` copies none of these files unless `--hook NAME` names
-it, and `apply_claude_settings.py` removes a live hook entry that runs one of the two hook files (as its executable or as the
-script operand of a python interpreter, with at most a trailing `|| true`; a hook that only mentions the path is kept), so a
-host that applied an older template ends up clean.
+it, and `apply_claude_settings.py` removes a live hook entry whose whole command is a plain invocation of one of the two hook
+files (an optional python interpreter with its options, the file, its arguments, `2>/dev/null` and a trailing `|| true`); a
+hook that names the path in any other way, wraps it, chains another command or substitutes into it is the host's and is kept,
+so a host that applied an older template ends up clean unless it edited the entry itself.
 
 ### Opt in on one host
 

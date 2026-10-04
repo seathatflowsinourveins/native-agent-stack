@@ -30,11 +30,18 @@ left the shared template unchanged.
    dropped a base hook, so changing the template alone would leave NativeStack's live SubagentStart entry running. A merge
    now removes the hook objects that run `token-lanes-subagent-start.py` or `token-lanes-session-start.py` from a
    `.claude/hooks/` directory, unless the template passed carries the same command or `--keep-held-out-hooks` is given. "Run"
-   means the file is the executable or the script operand of a python interpreter (the first word that is not an option) and
-   nothing else runs but a trailing `|| true`, the shape of the shipped entries; a hook that merely mentions the path
-   (`sha256sum <path>`, an argument of another script, an `echo`) or runs something else beside the carrier is the host's own and
-   is kept (a cross-family read found that the first matcher, any shell word naming the file, deleted such a hook; the
-   replacement is tested against nine commands that mention a path and eight that run one). A group
+   is decided by one anchored pattern over the whole command string (`CARRIER_COMMAND`), not by parsing shell: the command is
+   variable assignments, an optional python interpreter (bare or an absolute path) with the options that leave the script
+   operand in place (`-B -E -I -O -S -b -d -q -s -u`, `-X` and `-W` with a value, `--`; never `-c` or `-m`), the carrier file as
+   the script operand or as the executable (unquoted with `$HOME`, `${HOME}`, `~` or an absolute path, double-quoted with
+   `$HOME` or an absolute path, single-quoted with an absolute path), its arguments (plain words, or quoted words that hold no
+   expansion), `2>/dev/null`, and a trailing `|| true`, and nothing else. A hook that merely mentions the path
+   (`sha256sum <path>`, an argument of another script, an `echo`), wraps the carrier (`bash -c`, `exec`, `nohup`, `timeout`,
+   `env`), chains another command, or substitutes a command into an argument or a redirection is the host's own and is kept,
+   even when it also runs a carrier. Two cross-family reads found a defect in each of the three earlier matchers (any shell word
+   naming the file; the first word that is not an option; shlex tokens, which glue `;(` and `&&(`); the pattern replaces them
+   and is tested against the second read's 25 command shapes, whose expectations came from executing them in a shell, and
+   against a timing bound (see the addendum at the end). A group
    or event left empty is dropped, every other hook keeps its value and order, and a second merge changes nothing. On a copy
    of NativeStack's live settings of 2026-10-04 the merge removes exactly one hook, the SubagentStart carrier, and with
    `--keep-held-out-hooks` it stays.
@@ -97,3 +104,26 @@ left the shared template unchanged.
 - The user's instruction to restore a carrier, or to remove jCodeMunch or narrow its scope.
 - The command center's A/B at the operating point measuring a carrier arm with a net saving: the two hook entries move back into
   the template from `held-out-hook-entries.json`, and the applier's retirement list shrinks to the file that is not restored.
+
+## Addendum (2026-10-04, evening): the cross-family reads of this change and the extra round
+
+Two cross-family reads of this change found a defect in the retirement matcher: the first found one P2, the second two more. The
+bounded loop allows one review and one repair round; the second repair is an extra round, taken because each finding was a way
+for a re-apply to delete a hook that the host wrote for itself, which the change promises never to do.
+
+| Read (head) | Finding | Matcher before the fix | Fix |
+| --- | --- | --- | --- |
+| first, `91118a302` | a hook that merely mentions a carrier path is deleted (`sha256sum <path>` reproduced against the committed template) | any shell word that names the file | the file must be the executable or the python script operand |
+| second, `998420e9f`, P2 | python option values are not the script operand: `python3 -c '... # <path>'` and `python3 -X <path> -c ...` deleted, `python3 -X utf8 <path>` and `python3 -W ignore <path>` kept | the first word that is not an option | python's own option grammar, then the pattern below |
+| second, `998420e9f`, P2 | compound commands and substitutions: `python3 <path>;(printf host)`, `&&(`, `$(...)` and `> >(tee ...)` deleted although they run host commands | shlex tokens (it glues `;(` and `&&(`) | one anchored pattern over the whole command, no shell parsing |
+
+The pattern (`CARRIER_COMMAND` in `tools/adoption/apply_claude_settings.py`, decision 3 above) fails closed: a command that is not
+exactly a carrier invocation is the host's, and a carrier it also runs keeps running until the host removes that hook. The second
+read's 25 command shapes are `HeldOutHookTests.ADVERSARIAL`, each with the expectation that executing the shape in a shell
+established: the shapes that run only a carrier are retired (quoted and unquoted paths, an absolute interpreter, variable
+assignments, `-X utf8`, `-W ignore`, a redirection before the script, a quoted `";"` argument, `2>/dev/null || true`) and the shapes
+that wrap it, chain or substitute are kept. Nineteen syntax tails and a timing bound guard the closure (the worst of nine
+pathological inputs of up to 240,000 characters took 36 ms), and the merge against a copy of this host's live settings still
+removes exactly one hook. Residual: a host hook that wraps the carrier (`bash -c`, `exec`, `nohup`, `timeout`, `env`) or chains it
+with other commands is left in place, so a carrier can keep running on such a host until its owner edits that hook by hand; the
+applier does not report such hooks, and an operator who wants a list can search the live settings for the two file names.

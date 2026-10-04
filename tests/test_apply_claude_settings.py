@@ -7,6 +7,7 @@ import json
 import os
 import stat
 import sys
+import time
 import unittest
 from pathlib import Path
 
@@ -287,6 +288,72 @@ class HeldOutHookTests(unittest.TestCase):
         'FOO=1 python3 "$HOME/.claude/hooks/token-lanes-session-start.py"',
         '"/home/example/.claude/hooks/token-lanes-session-start.py" 2>/dev/null',
     )
+
+    # The second cross-family read's 25 command shapes (job-052, 2026-10-04), each with whether the hook runs a carrier and
+    # nothing else the host cares about: {c} is the carrier path. The expectations come from executing the shapes in a shell
+    # (the read's harness), so they are about what the command does, not about how the matcher is written.
+    ADVERSARIAL = (
+        ("adjacent_subshell", "python3 {c};(printf host)", False),
+        ("adjacent_and_subshell", "python3 {c} &&(printf host)", False),
+        ("argument_substitution", 'python3 {c} "$(printf host > /home/example/marker)"', False),
+        ("redirection_substitution", 'python3 {c} > "$(printf host > /home/example/marker)"', False),
+        ("process_substitution", "python3 {c} > >(tee /home/example/log)", False),
+        ("inline_python_path_comment", "python3 -c 'print(\"host\") # {c}'", False),
+        ("xoption_data_argument", "python3 -X {c} -c 'print(\"host\")'", False),
+        ("xoption_before_script", "python3 -X utf8 {c}", True),
+        ("warning_option_before_script", "python3 -W ignore {c}", True),
+        ("redirection_before_script", "python3 2>/dev/null {c}", True),
+        ("quoted_control_argument", 'python3 {c} ";" echo host', True),
+        ("double_quoted_path", 'python3 "{c}"', True),
+        ("single_quoted_path", "python3 '{c}'", True),
+        ("absolute_interpreter", "/usr/bin/python3 {c}", True),
+        ("assignment", 'FOO=1 BAR="two words" python3 {c}', True),
+        ("trailing_redirection", "python3 {c} 2>/dev/null || true", True),
+        ("bash_c", "bash -c 'python3 {c}'", False),
+        ("sh_script", "sh {c}", False),
+        ("exec_wrapper", "exec python3 {c}", False),
+        ("nohup_wrapper", "nohup python3 {c}", False),
+        ("timeout_wrapper", "timeout 5 python3 {c}", False),
+        ("env_wrapper", "env FOO=1 python3 {c}", False),
+        ("redirection_data", "cat < {c}", False),
+        ("multiline", "python3 {c}\nprintf host", False),
+        ("ordinary_compound", "python3 {c}; printf host", False),
+    )
+
+    def test_the_second_reads_adversarial_shapes_are_retired_or_kept_as_the_shell_runs_them(self):
+        carrier = "/home/example/.claude/hooks/token-lanes-session-start.py"
+        for label, template, retire in self.ADVERSARIAL:
+            with self.subTest(shape=label):
+                hook = {"type": "command", "command": template.format(c=carrier)}
+                self.assertEqual(acs.runs_held_out_hook(hook), retire)
+                base = {"hooks": {"SessionStart": [{"matcher": "startup", "hooks": [hook]}]}}
+                merged = acs.merge_settings(base, {"hooks": {}})
+                if retire:
+                    self.assertEqual(merged.get("hooks", {}), {})
+                else:
+                    self.assertEqual(merged["hooks"]["SessionStart"], base["hooks"]["SessionStart"])
+
+    def test_the_matcher_reads_no_shell_syntax_it_cannot_match_whole(self):
+        # Fail closed: a command is retired only when the whole string is a carrier invocation. Syntax a shell would act on
+        # (a control operator, a substitution, a backslash, a comment, a wrong separator) anywhere makes it the host's.
+        carrier = "/home/example/.claude/hooks/token-lanes-session-start.py"
+        for tail in ("; printf host", "&& printf host", "| tee x", "& printf host", " # note", " \\ ", "\n", " $(printf host)",
+                     " `printf host`", " $((1))", " <(printf host)", " 2>&1", ">/dev/null", " 2> /dev/null", "  2>/dev/null",
+                     " || false", " || true ", " || true;", " |  | true"):
+            with self.subTest(tail=tail):
+                self.assertFalse(acs.runs_held_out_hook({"command": f"python3 {carrier}{tail}"}))
+
+    def test_the_matcher_fails_fast_on_long_commands(self):
+        # One anchored pattern over closed character classes: no input makes it backtrack badly (the worst of these took
+        # about 40 ms where it was written); a generous bound still catches a regression to exponential time.
+        carrier = "/home/example/.claude/hooks/token-lanes-session-start.py"
+        started = time.perf_counter()
+        for command in (f"python3 {carrier} " + "a " * 20000 + "$", "A=1 " * 20000 + f"python3 {carrier} ;",
+                        "python3 " + "-u " * 20000 + f"{carrier} ;", "python3 " + "2>/dev/null " * 10000 + f"{carrier} ;",
+                        "python3 " + "/a" * 20000 + "/.claude/hooks/token-lanes-session-start.py ;",
+                        'python3 "' + "/a b" * 10000 + '/.claude/hooks/x.py"', f"python3 {carrier}" + " ||" * 10000):
+            self.assertFalse(acs.runs_held_out_hook({"command": command}))
+        self.assertLess(time.perf_counter() - started, 5.0)
 
     def test_a_hook_that_merely_mentions_a_carrier_path_is_kept(self):
         for command in self.MENTIONS:

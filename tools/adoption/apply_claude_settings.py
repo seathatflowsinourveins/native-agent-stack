@@ -72,49 +72,42 @@ def command_key(cmd: str) -> str:
         return cmd
 
 
-HOOK_INTERPRETER = re.compile(r"python(?:3(?:\.\d+)?)?")  # what the carrier entries run under
-SHELL_CONTROL = frozenset({";", ";;", "&", "&&", "|", "||", "|&"})  # shlex(punctuation_chars=True) tokens that end a command
-ENV_ASSIGNMENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=")
+# A carrier invocation as one anchored pattern over the whole command string. It reads no shell: every part is a closed
+# character class, so a control operator, a substitution, a backslash, a comment, a newline or a wrapper command anywhere in
+# the string leaves it unmatched and the hook the host's own (fail closed). Matched by CARRIER_COMMAND.fullmatch().
+_WORD = r"[A-Za-z0-9_./:=@%+,-]+"  # an unquoted word: no shell syntax can occur in it
+_DQ_WORD = r'"[^"$`\\]*"'  # double quotes holding no expansion and no escape
+_SQ_WORD = r"'[^']*'"  # single quotes hold anything, literally
+_ANY_WORD = rf"(?:{_WORD}|{_DQ_WORD}|{_SQ_WORD})"
+_REDIRECT = r"2>/dev/null"  # the one redirection the shipped entries carry
+_ASSIGNMENT = rf"[A-Za-z_][A-Za-z0-9_]*=(?:{_WORD}|{_DQ_WORD}|{_SQ_WORD})?"
+_INTERPRETER = r"(?:/(?:[A-Za-z0-9_.-]+/)*)?python(?:3(?:\.[0-9]+)?)?"
+# CPython's own options that leave the script operand where it is: flags that change no semantics, -X and -W with a value,
+# and `--`. Absent on purpose: -c and -m (no script runs), -i, -x, -V and -h.
+_PYTHON_OPTION = r"(?:-[BEIOSbdqsu]+|-[XW] ?[A-Za-z0-9_][A-Za-z0-9_=.:*,-]*|--)"
+_FILES = "|".join(re.escape(name) for name in HELD_OUT_HOOK_FILES)
+_ABSOLUTE = r"(?:/[A-Za-z0-9_@+.-]+)+"
+_ABSOLUTE_QUOTED = r"(?:/[A-Za-z0-9_@+. -]+)+"
+_HOOK_FILE = rf"/\.claude/hooks/(?:{_FILES})"
+_SCRIPT = (rf"(?:(?:\$HOME|\$\{{HOME\}}|~|{_ABSOLUTE}){_HOOK_FILE}"  # unquoted: $HOME, ${HOME}, ~ and an absolute path
+           rf"|\"(?:\$HOME|\$\{{HOME\}}|{_ABSOLUTE_QUOTED}){_HOOK_FILE}\""  # double quotes expand $HOME but not ~
+           rf"|'{_ABSOLUTE_QUOTED}{_HOOK_FILE}')")  # single quotes expand nothing
+CARRIER_COMMAND = re.compile(
+    rf"(?:{_ASSIGNMENT} )*"  # variable assignments before the command
+    rf"(?:{_INTERPRETER} (?:(?:{_PYTHON_OPTION}|{_REDIRECT}) )*)?"  # a python interpreter and its options, or none
+    rf"{_SCRIPT}"  # the carrier: the script operand, or the executable itself
+    rf"(?: (?:{_ANY_WORD}|{_REDIRECT}))*"  # its arguments, and the redirection
+    r"(?: \|\| true)?")  # the tail of the shipped entries
 
 
 def runs_held_out_hook(entry: dict) -> bool:
-    """True when a hooks-array entry runs one of HELD_OUT_HOOK_FILES from a `.claude/hooks/` directory: the file is the
-    executable, or the script operand of a python interpreter (the first word that is not an option), whatever options,
-    arguments and redirections follow, and nothing else runs but a trailing `|| true`, the shape of the shipped entries.
-    A command that merely mentions the path (`sha256sum <path>`, an argument of another script, an `echo`) does not run
-    it, and neither does a compound or multi-line command that runs something else as well, so retiring never deletes a
-    host's own hook; such an entry is left alone, and a carrier it also runs stays the host's to remove."""
+    """True when a hooks-array entry runs one of HELD_OUT_HOOK_FILES from a `.claude/hooks/` directory and does nothing
+    else: the whole command is a carrier invocation (CARRIER_COMMAND). A command that merely mentions the path
+    (`sha256sum <path>`, an argument of another script, an `echo`), wraps the carrier (`bash -c`, `exec`, `nohup`, `timeout`,
+    `env`), chains another command after or before it, or substitutes a command into an argument or a redirection is the
+    host's own and is kept, so retiring never deletes a hook that does more than run a carrier."""
     cmd = hook_command(entry)
-    if cmd is None or "\n" in cmd:
-        return False
-    try:
-        lexer = shlex.shlex(cmd, posix=True, punctuation_chars=True)
-        lexer.whitespace_split = True
-        lexer.commenters = ""
-        tokens = list(lexer)
-    except ValueError:
-        return False
-    commands, current = [], []
-    for token in tokens:
-        if token in SHELL_CONTROL:
-            commands.append(current)
-            current = []
-        else:
-            current.append(token)
-    commands.append(current)
-    first, rest = commands[0], commands[1:]
-    if any(words not in ([], ["true"], [":"]) for words in rest):
-        return False
-    words = list(first)
-    while words and ENV_ASSIGNMENT.match(words[0]):
-        words.pop(0)
-    if not words:
-        return False
-    if HOOK_INTERPRETER.fullmatch(words[0].rsplit("/", 1)[-1]):
-        operand = next((word for word in words[1:] if not word.startswith("-")), None)
-    else:
-        operand = words[0]
-    return operand is not None and "/.claude/hooks/" in operand and operand.rsplit("/", 1)[-1] in HELD_OUT_HOOK_FILES
+    return cmd is not None and CARRIER_COMMAND.fullmatch(cmd) is not None
 
 
 def retire_held_out_hooks(base_hooks, incoming_hooks):
