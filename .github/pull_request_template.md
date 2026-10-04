@@ -48,8 +48,8 @@ Only relevant when this PR adds or changes files under `evidence/hosts/`. See
 
 - [ ] New/changed GitHub Actions are pinned to a full commit SHA with a
       version comment (no floating tags).
-- [ ] New/changed workflows declare top-level `permissions: contents: read`
-      (or a narrower, explicitly justified addition).
+- [ ] New/changed workflows declare top-level `permissions: {}` and grant each job
+      only what it needs (`contents: read`, or an explicitly justified addition).
 - [ ] No secrets are printed, logged or committed; no new required secret was
       added without a documented owner.
 - [ ] No new paid hosting, subscription or billing surface was introduced.

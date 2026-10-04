@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "kind": "local_bootstrap_security_repair",
+  "checked_at": "2026-10-03",
+  "north_star_action": "Reproducible native Codex foundation for complex systems and US-equities research/historical simulation.",
+  "base_commit": "ad9787c313c05e4325416060a8737641d4cd714d",
+  "source_refs": {
+    "codex": {
+      "repository": "openai/codex",
+      "ref": "rust-v0.160.0",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc"
+    },
+    "npm": {
+      "repository": "npm/cli",
+      "version": "11.19.0",
+      "sources": [
+        "installed help package-spec",
+        "installed help rebuild",
+        "node_modules/@npmcli/config/lib/definitions/definitions.js"
+      ]
+    },
+    "node": {
+      "repository": "nodejs/node",
+      "version": "24.21.0",
+      "source": "require.resolve and fs APIs exercised through the native integration fixtures"
+    },
+    "reference": {
+      "path": "adoption/bootstrap-macos.sh",
+      "base_commit": "511168f4a"
+    }
+  },
+  "decision_ref": "docs/decisions/2026-10-03-linux-bootstrap-security-repair.md",
+  "repairs": {
+    "S1": "Exact installed wrapper alias mapping, permitted package inventories, Node-resolved identity/version, and new contained fallback alias before publication.",
+    "S2": "Linux Codex ignore_scripts=true, retained installed-binary hash gate, and complete content/type/permission comparison for any permitted rebuild.",
+    "S3": "Five byte-identical shared helpers and install_npm parity apart from comment lines; macOS pin/platform installer unchanged.",
+    "M1_M2": "Explicit python3 apt/prerequisite entry and python3 -I SHA-512 verification.",
+    "M3": "Platform archive verified before npm; unpublished trees removed by EXIT cleanup.",
+    "M4": "Fallback alias must be new and resolve inside the fresh prefix.",
+    "M5": "Recovery state cleared immediately after a successful swap; leftover migration reported for deletion; Linux migration/restore use mv -T.",
+    "M6": "Exclusive versioned-prefix creation and protection of the newly published tree during pruning.",
+    "M7": "Exact integrity diagnostics and logged migration negative controls; version/resolution, malformed binary pin, containment/executability and failed swap cases."
+  },
+  "discriminating_controls": {
+    "class": "Synthetic local faults using native npm and the exact committed Linux bootstrap functions",
+    "source_sha256": "3b88f15a45c8a8ea72a9d79e461408771fd022a94207bc87df4a8389dcfdc14a",
+    "framework": "Python unittest.TextTestRunner, identical regression methods with SCRIPT_PATH set to a valid snapshot of the committed baseline",
+    "exit_code": 1,
+    "tests": 3,
+    "failures": 3,
+    "errors": 0,
+    "decisive_output": [
+      "UNVERIFIED_PLATFORM_BINARY unexpectedly found in the published launcher's output",
+      "Auxiliary rebuild corruption returned exit 0 instead of refusing publication",
+      "Missing Python prerequisite reached the network-refusing curl fixture and returned 88 instead of exit 4"
+    ],
+    "output_ref": "red-controls.log",
+    "network": "npm offline with local tarballs; curl refuses network in the prerequisite control"
+  },
+  "acceptance": [
+    {
+      "command": "python3 -m unittest -v tests.test_adoption_bootstrap_linux_platform tests.test_adoption_bootstrap tests.test_adoption_bootstrap_parity",
+      "exit_code": 0,
+      "tests": 112,
+      "skipped": 0,
+      "seconds": 49.441,
+      "native_npm_integration_tests": 28,
+      "native_npm_integration_skipped": 0,
+      "output_ref": "platform-tests.log"
+    },
+    {
+      "command": "python3 -B -m unittest tests.test_adoption_contract tests.test_codex_worker_lane tests.test_render_config tests.test_adoption_bootstrap_macos tests.test_stack_lifecycle tests.test_grand_dashboard",
+      "exit_code": 0,
+      "tests": 337,
+      "skipped": 42,
+      "seconds": 89.567,
+      "output_ref": "regression-tests.log",
+      "npm_environment": {
+        "npm_config_offline": "true",
+        "npm_config_allow_scripts": "fixture-claude-like,fixture-claude-like-wrong",
+        "npm_config_cache": "<BUILD_ROOT>/A4-test-scope/npm-cache",
+        "npm_config_userconfig": "<BUILD_ROOT>/A4-test-scope/empty-npmrc",
+        "npm_config_globalconfig": "<BUILD_ROOT>/A4-test-scope/empty-global-npmrc"
+      }
+    },
+    {
+      "command": "python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "output_ref": "registry-tests.log"
+    }
+  ],
+  "native_installation_ref": "native-installation.json",
+  "retained_failures": [
+    {
+      "exit_code": 1,
+      "output_ref": "initial-regression-failure.log",
+      "reason": "Two unchanged macOS npm pack fixture invocations returned exit 226 under ambient cache/configuration; rerun with isolated writable npm state."
+    },
+    {
+      "exit_code": 1,
+      "output_ref": "macos-parity-regression-failure.log",
+      "reason": "GNU mv -T in the macOS cleanup bypassed its existing BSD rollback-failure shim; restored native macOS rollback command/diagnostic and reran the exact test and full suite."
+    },
+    {
+      "exit_code": 1,
+      "output_ref": "publication-validation-failure.json",
+      "reason": "register_file updated hashes/sizes but left the existing publication registration claim/limitations stale. Synchronize the existing metadata from the updated payload before final registration."
+    }
+  ],
+  "unchanged_upstream_tests": [],
+  "evidence_class": "Repository integration checks and synthetic fault injections; separate native installation operation",
+  "sanitization_ref": "sanitization.json",
+  "limits": [
+    "No unchanged upstream suite or provider/model run was performed; no package signature/attestation verification or model-quality claim.",
+    "macOS mechanics are tested on Linux with local fixtures; no new macOS-host acceptance.",
+    "The native operation used a Codex-only fixture manifest and the unmodified script mandatory base prerequisites; other full profiles were not exercised.",
+    "The native operation launch/completion timestamps are coordinator observation bounds, not exact instrumented process start/end.",
+    "The SDK/gateway record remains compatibility_attempt with its original missing invocation/timing/backend evidence.",
+    "The broad suite has 42 declared skips and a returned ResourceWarning from an existing subprocess test; the Linux npm integration class has zero skips.",
+    "Shellcheck was not installed (command exited 127); both bootstrap scripts passed bash -n."
+  ],
+  "completeness_critic": {
+    "covered": [
+      "nested and alias package placement",
+      "exact wrapper alias mapping",
+      "unexpected nested/global packages",
+      "NODE_PATH decoys",
+      "all platform executable bytes and modes after rebuild",
+      "version/identity mismatches",
+      "missing/malformed binary pins",
+      "containment and executable bit",
+      "SHA-256 and SHA-512 failures",
+      "missing interpreter and PYTHONPATH poisoning",
+      "failed publication and migration rollback",
+      "successful swap with deletion leftover",
+      "prefix collision and active-prefix pruning",
+      "Linux/macOS shared publication parity"
+    ],
+    "next_sweep": "Any future pinned platform package with lifecycle scripts or additional runtime dependencies needs a new pin/source review and the same negative controls; broader installation or recovery acceptance remains separate."
+  },
+  "files": [
+    {
+      "path": "bootstrap.log",
+      "sha256": "d2354220da06487ccd63bb96b2f20f5098a7ced75e1b7a257ef057e5ceeca077",
+      "bytes": 2540
+    },
+    {
+      "path": "initial-regression-failure.log",
+      "sha256": "bb4766ea862584eb2106294b7e7c1fa26e8484ac46b5f1e7271712550f5d0bc1",
+      "bytes": 3377
+    },
+    {
+      "path": "installed-versions.txt",
+      "sha256": "305f8b6ee81b8102f2f8c651fe8fa53cdfc4459501c75a61c9bd5e9822ec0672",
+      "bytes": 1055
+    },
+    {
+      "path": "macos-parity-regression-failure.log",
+      "sha256": "a5f6bbccccc1ec631f2990a4de3cbaf6226ab3e7341c7512c820b69ca9e5b19c",
+      "bytes": 1722
+    },
+    {
+      "path": "native-installation.json",
+      "sha256": "a844e065e1ba31e29b2693681659299227dd07d42ecaf92c2fc438d73252931f",
+      "bytes": 2095
+    },
+    {
+      "path": "platform-tests.log",
+      "sha256": "3ba5edc4d104d18caf0c358404aad3de3a4f394d8a05f732fb58dd6c9a6deaca",
+      "bytes": 19882
+    },
+    {
+      "path": "publication-validation-failure.json",
+      "sha256": "73df23a90b43a188d8dc3f9555ca27a347bd9d3c8734f5afd005da07c0a1f277",
+      "bytes": 501
+    },
+    {
+      "path": "red-controls.log",
+      "sha256": "032453fa92b377922619316ad1c4845e0b4e3fd1cf09f57124a537f7f022971d",
+      "bytes": 3719
+    },
+    {
+      "path": "registry-tests.log",
+      "sha256": "7581cbd4b21705bfbb22f87e01cf8c5cb2ed559c0dd31cf503596abb2ea22d15",
+      "bytes": 101
+    },
+    {
+      "path": "regression-tests.log",
+      "sha256": "99cf9409ef66c0b9d795fde306e2202cc3a210514cc6e8ba7154d53816a39e30",
+      "bytes": 752
+    },
+    {
+      "path": "sanitization.json",
+      "sha256": "ce3623709ade44688c4ec54e1753a717d3f49d48c981ac26b1fe6854cbdf639a",
+      "bytes": 409
+    },
+    {
+      "path": "toolchain.json",
+      "sha256": "73e9c9f7884c2be7a2335047cad41bbd7a41312e118b152f0f1c3f33766f8d75",
+      "bytes": 325
+    }
+  ],
+  "toolchain_ref": "toolchain.json"
+}

@@ -45,8 +45,9 @@ on:
     - cron: '47 6 * * 1' # Weekly Monday 06:47 UTC re-check of live pinned downloads.
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md). cache-mode is set
+# per job, not here: bootstrap-macos saves its model cache on trusted events, and cache-mode takes no expression.
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
@@ -74,6 +75,9 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    permissions:
+      contents: read
+    cache-mode: none
     outputs:
       bootstrap: ${{ steps.filter.outputs.bootstrap }}
       macos: ${{ steps.filter.outputs.macos }}
@@ -371,6 +375,9 @@ jobs:
     if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.bootstrap != 'false') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    permissions:
+      contents: read
+    cache-mode: none
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -447,6 +454,10 @@ jobs:
     if: ${{ !cancelled() && (github.event_name != 'pull_request' || (needs.changes.outputs.bootstrap != 'false' && needs.changes.outputs.macos != 'false')) }}
     runs-on: macos-15
     timeout-minutes: 30
+    permissions:
+      contents: read
+    # No cache-mode: the save step below runs on push, schedule and workflow_dispatch only, and cache-mode takes no
+    # expression, so the job keeps GitHub's trigger default; a pull_request run only restores.
     steps:
       # step-security/harden-runner's pinned version supports macOS runners
       # in audit mode (its README: "GitHub-hosted runners (Windows, macOS):
@@ -503,8 +514,11 @@ jobs:
       # transparently re-downloads and re-verifies on any mismatch --
       # exactly the same path a genuine cache miss takes, so a restored
       # cache is never treated any differently from a fresh download.
+      # Restore only (actions/cache/restore): this step never writes. The save step after the bootstrap writes the
+      # entry on trusted events alone (docs/decisions/2026-10-04-ci-least-privilege.md).
       - name: Restore the cached pinned embedding model
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: embed-model-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/eco/state/models/embeddinggemma-300M-Q8_0.gguf
           key: macos-embed-model-${{ steps.embed-model-pin.outputs.sha256 }}
@@ -514,6 +528,15 @@ jobs:
           set -euo pipefail
           export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
           bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation --skip-system-packages
+      # Written after bootstrap's own checksum verification, on a cache miss, and never from a pull_request run: a
+      # pull_request run restores the default branch's entry read-only. The key is the restore step's primary key
+      # (actions/cache save/README.md, "Always save cache"), so a save can never key different bytes.
+      - name: Save the verified embedding model to the cache (trusted events only)
+        if: github.event_name != 'pull_request' && steps.embed-model-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/eco/state/models/embeddinggemma-300M-Q8_0.gguf
+          key: ${{ steps.embed-model-cache.outputs.cache-primary-key }}
       - name: Read the read-only adoption status report
         shell: bash
         run: |
@@ -741,6 +764,9 @@ jobs:
     if: ${{ !cancelled() && (github.event_name != 'pull_request' || (needs.changes.outputs.bootstrap != 'false' && needs.changes.outputs.macos != 'false')) }}
     runs-on: macos-15
     timeout-minutes: 30
+    permissions:
+      contents: read
+    cache-mode: none
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -814,6 +840,9 @@ jobs:
     # Raised from 30 to 60 on 2026-09-29: after #502 this job took 1148s in run 36572588263 (limit 1800s) and
     # the #381 token-E2E tooling still to merge adds an estimated 900 to 1300s of tests on this slower runner.
     timeout-minutes: 60
+    permissions:
+      contents: read
+    cache-mode: none
     env:
       # 'full' is the fallback branch: only a pull_request whose changes job succeeded and wrote macos=false runs
       # changed-tests.
