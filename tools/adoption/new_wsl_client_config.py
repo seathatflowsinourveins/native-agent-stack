@@ -35,8 +35,8 @@ requirement needs, so the shared templates stay what render_config.py and the bo
              mcp-servers.json, codex.config.toml, codex.hooks.json and the two Codex profiles for that host value file,
              with wired pieces only; the authorization settings (the ones that grant a permission or suppress a
              confirmation: Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy
-             and sandbox_mode, and the tool approval mode of a Codex MCP server, which also needs its server wired) only
-             with the option. Placeholders
+             and sandbox_mode, a Codex project's trust_level, and the tool approval mode of a Codex MCP server, which
+             also needs its server wired) only with the option. Placeholders
              are filled by tools/adoption/render_config.py. The telemetry endpoint, the gateway port and AI_MEMORY_BIN
              (the ai-memory executable the plan's memory-owner row links) come from the install plan; HOST_PATH gains
              the directories of the wired path pieces.
@@ -170,7 +170,11 @@ AUTHORIZATION_PIECES = (
     "codex/config/approval_policy",
     "codex/config/sandbox_mode",
 )
-AUTHORIZATION_PATTERNS = ("claude/*/permission/allow/*",)   # an allow rule grants a permission too
+# An allow rule grants a permission too. A Codex project's trust_level is the saved answer to the folder-trust question:
+# a trusted project's own .codex/config.toml layers load instead of loading disabled (codex-rs/config/src/loader/mod.rs
+# L131-133 at rust-v0.160.0), and the TUI asks nothing for it (codex-rs/tui/src/config_update.rs L338-366); see the
+# addendum of 2026-10-04 in docs/decisions/2026-10-02-new-wsl-client-configuration.md.
+AUTHORIZATION_PATTERNS = ("claude/*/permission/allow/*", "codex/*/projects.*.trust_level")
 # Codex's tool approval modes (config.schema.json at rust-v0.160.0, AppToolApproval: auto, prompt, writes, approve). The key
 # `default_tools_approval_mode` is an authorization piece whatever its value; `approval_mode` (one tool's) is one when the
 # value approves. They sit under the table of an MCP server, so the map ties them to the slot that wires the server too.
@@ -2025,9 +2029,10 @@ class Apply:
         because its step was skipped or failed."""
         if not self.args.with_authorization_settings:
             print("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode and "
-                  "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, and the tool approval modes "
-                  "and allow rules of the wired MCP servers are not written, and a value of theirs that a file has is not "
-                  f"touched; {AUTHORIZATION_OPTION} adds the ones a file lacks)")
+                  "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, the trust_level of the wired "
+                  "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
+                  f"and a value of theirs that a file has is not touched; {AUTHORIZATION_OPTION} adds the ones a file "
+                  "lacks)")
             return
         verdict_of = {v.piece.key: v for v in self.results if v.authorization and v.wired}
         by_status = {status: [authorization_label(key) for key in verdict_of if self.authorization.get(key) == status]
@@ -2236,10 +2241,12 @@ class Apply:
             return
         if running:
             self.say("codex-config", f"  DRY RUN: {self.codex_dry_note(running, how).strip()}")
-        # --keep-hook-trust: the render's [hooks.state] approvals are the ones the map wires, which the merge into an
-        # existing config.toml adds too, so a new home and a second run end with the same file.
+        # --keep-hook-trust and --keep-project-trust: the render's [hooks.state] approvals and [projects] trust grants are
+        # the ones the map wires (a grant only with --with-authorization-settings), which the merge into an existing
+        # config.toml adds too, so a new home and a second run end with the same file.
         argv = [str(ROOT / "tools/adoption/codex_home.py"), "--rendered", str(self.stage / "codex.config.toml"),
-                "--eco-root", str(self.eco), "--codex-home", str(self.codex_home), "--keep-hook-trust"]
+                "--eco-root", str(self.eco), "--codex-home", str(self.codex_home), "--keep-hook-trust",
+                "--keep-project-trust"]
         codex = self.binary("codex", self.args.codex_bin)
         if codex:
             argv += ["--codex", codex]
@@ -2288,9 +2295,13 @@ class Apply:
         found = {}
         for verdict in self.results:
             if verdict.authorization and verdict.wired and verdict.piece.group == "codex/config":
-                have = lane.get_path(existing, list(verdict.piece.path))
+                # A piece's path is the template's: a key that names a placeholder (a project's trust grant under
+                # projects."${PROJECT_ROOT}") is looked up as the render filled it.
+                path = [string.Template(part).safe_substitute(self.values) if isinstance(part, str) else part
+                        for part in verdict.piece.path]
+                have = lane.get_path(existing, path)
                 found[verdict.piece.key] = ("added" if not have[0] else "same" if strict_equal(
-                    have[1], lane.get_path(rendered, list(verdict.piece.path))[1]) else "kept")
+                    have[1], lane.get_path(rendered, path)[1]) else "kept")
         changes = new_text is not None or writer is not None
         label = "merged with conflicts kept" if plan.conflicts else "applied"
         if not changes:
@@ -2482,8 +2493,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--with-authorization-settings", action="store_true",
                         help="--render and --apply: also render and write the authorization settings, the ones that grant "
                              "a permission or suppress a confirmation (Claude Code permissions.defaultMode and "
-                             "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, and the tool "
-                             "approval mode of a Codex MCP server whose slot installs it). By default they "
+                             "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, the trust_level "
+                             "of the host's main checkout in Codex, and the tool approval mode of a Codex MCP server "
+                             "whose slot installs it). By default they "
                              "are neither rendered nor written and a value a file already has is never touched; with this "
                              "option a missing one is added and a differing one is kept and printed beside the render's. "
                              "Use it only on a host whose owner asked for the repository's permission practice.")
