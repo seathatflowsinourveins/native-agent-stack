@@ -387,3 +387,117 @@ tools/adoption/managed_block.py edit: fail protected_path [ci_read]. Part 6's re
 new test module (tests/test_resolver_added.py): fail protected_path [ci_discovered]
 scripts/validate.py edit: fail protected_path [ci_named]
 .github/workflows/adoption-bootstrap.yml edit: fail protected_path [github]
+
+
+8. Merge with main 6af8e55bd (#681, CI least privilege), 2026-10-04 (merge 4f963c9b2, fix 57d0dc065)
+
+The merge brought four main commits: #672, #626, #679 and #681. #681 rewrote 19 workflows
+(top-level permissions {}, job-level contents: read, cache-mode none on pull requests,
+concurrency groups) and added tests/test_workflow_policy.py. It changed neither CI's zizmor
+command lines (validate.yml and security-scan.yml keep --no-config --no-ignores --persona regular
+--strict-collection) nor the zizmor pin (1.30.1). On the merged tree, the gate's workflow reader
+still finds 14 reachable workflows and no untrusted interpolation, and it matches PyYAML 6.0.1 on
+all 21 workflows:
+$ /usr/bin/python3 -m unittest ...push_gate.RepositoryWorkflowTests.test_the_reader_matches_pyyaml_on_every_workflow
+exit 0; ok.
+
+What moved the derivation was #679. tools/adoption/install_claude_profile.py, which the
+bootstrap scripts run, now reads examples/claude-native/workflows/{readiness-audit,review-changes,
+layer-verdict-lane}.js (checked_workflows: read_bytes, a sha256 check, then a copy into the Claude
+profile). The round-3 fixpoint followed every code file that gate code read, and
+names_in_text over layer-verdict-lane.js found the directories blueprints and fixtures. On the
+merged tree the repository breadth test then failed. The fix (57d0dc065) follows a code file only
+when gate code runs it (gate_reads.GateReads.executed); a code file that is only read stays
+protected as a file.
+
+Breadth on the merged tree 4f963c9b2 (10,591 tracked files), 2026-10-04:
+                                          21b24dede's gate   4eb6b4cc9's gate   57d0dc065's gate
+derived files                             307                551                527
+derived prefixes                          5                  20                 18
+derived globs                             0                  10                 10
+unresolved reads or executing calls       -                  0                  0
+tracked files protected                   444 (4.2%)         10,218 (96.5%)     7,617 (71.9%)
+  of 3,447 outside evidence/, tests/,
+  .github/                                122 (3.5%)         3,233 (93.8%)      632 (18.3%)
+  of 2,608 in blueprints/ outside gate
+  code                                    5                  2,608              12
+seconds to derive one tree                0.61               2.91               2.6
+4eb6b4cc9's gate had the prefixes blueprints (2,614 files) and fixtures (16), both from
+layer-verdict-lane.js. Of the 12 code files that gate code reaches only through Python reads, all
+stay protected (11 ci_read; tools/sota-convergence/adjudication-lane.js ci_import, under its
+directory). The executing calls on the merged tree: 55 gate Python files, 11 code files run.
+Two are the scripts' own paths (scripts/build_ecosystem.py reruns itself; scripts/validate.py's
+own path is inside its importlib call). The others: scripts/validate.py loads
+scripts/credential_status.py through importlib;
+tools/sota-convergence/lane_packets.py loads scripts/saturation_ledger.py;
+scripts/verdict_review_gate.py runs scripts/landscape.py and
+tools/sota-convergence/build_verdicts.py; scripts/native_token_ci.py hands the two
+fixtures/ast_grep_*.py files to ast-grep through its run.command wrapper, which counts as running
+them and adds nothing; tools/sota-convergence/blind_checkout.py runs three test modules, which stay
+unfollowed. No executing call has a computed argument. On the pre-merge tree 4a03dd796, the change
+alone unprotects 4 files: blueprints/convergence-practice/service-reboot/plan.json,
+blueprints/us-equities/research-evaluation/receipt.json, catalogs/foundation/automation.json and
+catalogs/us-equities/runtime-target.json. tools/sota-convergence/blind_checkout.py and
+export_isolation_check.py read them; scripts/verdict_review_gate.py lists those two scripts as
+trust paths without running them, and CI runs them only through tests/test_blind_checkout.py.
+
+Failing first, 2026-10-04T08:25:46Z to 08:26:36Z. Method of part 7: the working tree copied into
+<scratch> and committed there, with resolver/push_gate.py and resolver/gate_reads.py restored from
+4eb6b4cc9.
+$ python3 -m unittest tests.test_runtime_worker_openhands_push_gate
+exit 1; Ran 46 tests; FAILED (failures=7, errors=1, skipped=1):
+- test_only_code_a_gate_script_runs_is_followed: AttributeError, no GateReads.executed;
+- src/app.py and docs/a.md, named only in the text of the copied workflow script, were refused
+  (ci_read), in the gate test and in the derivation test;
+- the run of a computed path (scripts/install_lanes.py:18) was not reported;
+- on this repository, blueprints/runtime-workers/openhands/README.md was ci_read, and the breadth
+  test failed: 3228 of 3442 files outside evidence/, tests/ and .github/ against a bound of 860.
+The data a script runs through a wrapper (policy/lane.json) was refused there too, by the old
+rule's over-following; test_only_code_a_gate_script_runs_is_followed and the mutations below
+pin that it comes from running. The unchanged copy passed (46 tests, OK).
+
+Planted defects on the fixed tree, 2026-10-04T08:26:43Z to 08:29:59Z, with the runner and method
+of part 2: the unmutated copy passes (exit 0). M1 to M42 are as in part 7, each exit 1 again.
+The new ones:
+M43 a code file Python gate code only reads is followed again: exit 1, failures=6;
+    test_the_derivation_follows_imported_constants_and_script_text,
+    test_the_files_the_data_selects_and_unrelated_files_stay_editable,
+    test_the_gate_reads_stay_resolved_and_bounded_on_this_repository,
+    test_the_derivation_protects_the_ci_gate_files
+M44 the files a Python gate script runs are not followed: exit 1, failures=2;
+    test_the_derivation_follows_imported_constants_and_script_text, test_data_a_gate_script_reads_is_refused
+M45 a module-local wrapper function does not count as executing: exit 1, failures=3;
+    test_only_code_a_gate_script_runs_is_followed, the same two tests
+M46 an executing call with a computed argument is not reported: exit 1, failures=2;
+    test_only_code_a_gate_script_runs_is_followed, test_reads_the_reader_cannot_resolve_are_reported
+M47 a function imported from outside the standard library does not count as executing: exit 1,
+    failures=1; test_only_code_a_gate_script_runs_is_followed
+M48 a method that passes its argv on does not count as executing: exit 1, failures=1; the same test
+Detected 48 of 48.
+
+#681's tests on the merged tree:
+$ python3 -m unittest tests.test_workflow_policy          exit 0; Ran 27 tests; OK (skipped=1, PyYAML)
+$ /usr/bin/python3 -m unittest tests.test_workflow_policy exit 0; Ran 27 tests; OK
+$ python3 -m unittest tests.test_workflow_hardening       exit 0; Ran 109 tests; OK (skipped=2)
+$ python3 -m unittest tests.test_workflow_security_coverage exit 0; Ran 10 tests; OK
+$ python3 -m unittest tests.test_sota_sources_gate        exit 0; Ran 11 tests; OK
+#489 changes no workflow, and its gate and tests meet #681's rules unchanged.
+
+Local rehearsal on the merged tree, 2026-10-04T08:30:25Z to 08:32:49Z. Method of part 4: the gate
+loaded from 57d0dc065 with real zizmor 1.30.1, on #681's workflows. Each record had 14 reachable
+workflows, 527 protected files, 18 prefixes and 10 globs; the new-test case had 528 files. Every
+record named the trusted commit, zizmor found nothing, and each check took 8.6 to 10.0 seconds.
+benign blueprint edit (blueprints/runtime-workers/openhands/README.md): pass
+examples/claude-native/workflows/layer-verdict-lane.js edit (copied by install_claude_profile.py):
+  fail protected_path [ci_read]
+blueprints/convergence-practice/README.md edit (a directory the copied script names): pass. Under
+  4eb6b4cc9's gate every blueprints/ file was protected.
+blueprints/convergence-practice/contract.schema.json edit: fail protected_path [ci_read]
+adoption/pins-linux-x86_64.json edit: fail protected_path [ci_read]
+catalogs/foundation/manifest.json edit: fail protected_path [ci_read]
+docs/token-practice.md edit: fail protected_path [ci_read]
+evidence/artifacts/mac-model-hosting-20260927/gate.json edit: fail protected_path [ci_read]
+tools/adoption/managed_block.py edit: fail protected_path [ci_read]
+new test module (tests/test_resolver_added.py): fail protected_path [ci_discovered]
+scripts/validate.py edit: fail protected_path [ci_named]
+.github/workflows/adoption-bootstrap.yml edit: fail protected_path [github]

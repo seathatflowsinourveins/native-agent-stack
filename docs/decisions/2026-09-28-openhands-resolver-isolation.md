@@ -374,24 +374,37 @@ assignments, which can only add protection. The reads become protection as follo
   editable, while the file that selects them is protected wherever the code spells it;
 - a gate script in another language protects the paths its text names, by the same rule as a
   `run:` step;
-- a code file that gate code runs or reads is gate code too, followed to a fixpoint: its reads,
-  its imports or the names in its text. `adoption/bootstrap-linux.sh`, which
-  `adoption-bootstrap.yml` runs, runs `tools/adoption/*.py`; `managed_block.py` puts `scripts/`
-  and `tools/adoption/` on `sys.path`, so both are protected (`ci_import`);
+- a code file that gate code runs is gate code too, followed to a fixpoint: its reads, its
+  imports or the names in its text. `adoption/bootstrap-linux.sh`, which `adoption-bootstrap.yml`
+  runs, runs `tools/adoption/*.py`; `managed_block.py` puts `scripts/` and `tools/adoption/` on
+  `sys.path`, so both are protected (`ci_import`). A code file in another language runs, or hands
+  on, every code file its text names. A Python file runs a file when the file's location, or text
+  read from it, reaches a call that executes code (`gate_reads.GateReads.executed`): the
+  subprocess, os exec, spawn and system, asyncio subprocess, `pty.spawn`, runpy, importlib
+  file-loader and `exec`/`compile` calls, matched by name; a function or method of the same
+  module that passes a parameter on to one; or a function imported from outside the standard
+  library (`sys.stdlib_module_names`), whose body the reader does not read;
+- a code file that gate code only reads, such as a workflow script it hashes and copies, is data:
+  protected as a file, but what its text names is not followed. The merge round of 2026-10-05
+  added this line. Main's #679 made `tools/adoption/install_claude_profile.py`, which the
+  bootstrap runs, read the three `examples/claude-native/workflows/*.js` files to install them,
+  and their text names `blueprints` and `fixtures`. Following every code file that gate code
+  read made all of `blueprints/` protected;
 - a read the reader cannot resolve (a computed path at the root with a part of unknown origin,
   such as a name bound through `globals()`) fails closed by refusing: every commit is refused
   (`gate_input_unresolved`, rule `unresolved_read`), and the record names the script and line.
-  So does a gate Python file that the gate's interpreter cannot parse or that nests too deeply for
+  So does an executing call whose argument is a computed location, which may run any file under
+  it, and a gate Python file that the gate's interpreter cannot parse or that nests too deeply for
   the reader, since CI's interpreter may run what the gate's cannot read.
 
 Refusing was chosen over protecting conservatively, because protecting the directory such a read
 resolves under means protecting the whole tree. A refusal blocks every commit just as surely, and
-it says which read to fix. On the merged tree no read is unresolved, and a repository test keeps
-it so.
+it says which read to fix. On the merged tree no read and no executing call is unresolved, and a
+repository test keeps it so.
 
 Test modules stay protected but unfollowed, as for their imports: what a test reads is mostly the
 code and data it tests. Following their reads as well was measured and not adopted. It would
-protect 9,155 of the merged tree's 10,528 files, and leave 83 reads in 13 test modules
+protect 9,217 of the merged tree's 10,591 files, and leave 83 reads in 13 test modules
 unresolved, so every push would be refused.
 
 The resolver skill and the generated instruction name every category the gate refuses. They
@@ -489,23 +502,35 @@ The tripwire stays a regression check there; it does not stand in for the gate.
   Paths that appear only inside echoed text still count as names (the `changes` step's summary
   names `docs/decisions/2026-10-03-macos-ci-scope.md`). That over-protects in the safe direction.
   Narrowing the list is a reviewed change to the gate on main.
-- Following gate reads made the list much broader. On the merged tree `4a03dd796` (10,528 tracked
-  files) the gate protected 441 files (4.2%) before the change and protects 7,559 (71.8%) after.
-  Leaving out `evidence/`, `tests/` and `.github/`, it was 122 of 3,444 (3.5%) and is 633 (18.4%).
-  The derived set went from 304 files and 5 prefixes to 545 files, 18 prefixes and 10 globs, with
-  no unresolved read. One read accounts for most of it: `tools/sota-convergence/gap_wave_ledger.py`
-  joins `root / "evidence/artifacts" / wave` with `wave` from its arguments, so all 6,422 files
-  under `evidence/artifacts` are protected. The same script's `root / f"docs/{doc['id']}.md"`
-  protects `docs/*.md` (193 files), so a resolver task on most documents is now refused at the
-  gate. `blueprints/` outside the gate code stays editable (14 of 2,608 protected). Two narrowings
-  are left for a later reviewed change, each with its own failing-first controls. One would trace
+- Following gate reads made the list much broader. The merged tree `4f963c9b2` (main
+  `6af8e55bd`, #681) has 10,591 tracked files. There the gate protected 444 files (4.2%) before
+  the change and protects 7,617 (71.9%) after. Leaving out `evidence/`, `tests/` and `.github/`,
+  it was 122 of 3,447 (3.5%) and is 632 (18.3%). The derived set went from 307 files and 5
+  prefixes to 527 files, 18 prefixes and 10 globs, with no unresolved read or executing call. One
+  read accounts for most of it: `tools/sota-convergence/gap_wave_ledger.py` joins
+  `root / "evidence/artifacts" / wave` with `wave` from its arguments, so all 6,478 files under
+  `evidence/artifacts` are protected. The same script's `root / f"docs/{doc['id']}.md"` protects
+  `docs/*.md` (196 files), so a resolver task on most documents is now refused at the gate.
+  `blueprints/` outside the gate code stays editable (12 of 2,608 protected). Two narrowings are
+  left for a later reviewed change, each with its own failing-first controls. One would trace
   argument values to the literal arguments of the step that runs the script; validate.yml passes
   `--wave gap-wave2-20260923 --wave gap-wave3-20260923`, so two wave directories and one ledger
   page would remain. The other would recognise files a check only compares with its own output.
   Until then the breadth is the price of failing closed, and a repository test bounds it
-  (18.4% of the tree outside `evidence/`, `tests/` and `.github/` against a ceiling of 25%; 14
-  `blueprints/` files against 52). Deriving a tree now takes about 3.2 s on this host (three
-  trees per check), and a gate check with zizmor about 11 s, up from 2.2 s.
+  (18.3% of the tree outside `evidence/`, `tests/` and `.github/` against a ceiling of 25%; 12
+  `blueprints/` files against 52). That bound caught the merge with main `6af8e55bd`: the gate of
+  `4eb6b4cc9`, which followed every code file gate code read, protected 10,218 of the merged
+  tree's files (96.5%) and all 2,608 in `blueprints/`. Deriving a tree takes about 2.6 s on this
+  host, and each check derives three.
+- The execution model is by name and within one module. A code file run through a construct it
+  does not model is not followed: a method of an object from another module whose name is not an
+  executing call, a call through a variable or a decorator, or an installed copy that a later
+  step runs. Such a file stays protected as a file, but what it reads is not. The narrowing
+  unprotected 4 files on the pre-merge tree `4a03dd796`: 2 under `blueprints/`,
+  `catalogs/foundation/automation.json` and `catalogs/us-equities/runtime-target.json`.
+  `tools/sota-convergence/blind_checkout.py` and `export_isolation_check.py` read them, and
+  `scripts/verdict_review_gate.py` lists both scripts among its trust paths without running them.
+  CI runs them only through `tests/test_blind_checkout.py`, a test module.
 - What the reader treats as a subject stays editable. Where the data selecting a policy file is
   itself received rather than spelled in the code (a path taken from a file the script finds by
   enumeration, for example), that policy file is not protected. The reader also does not model
@@ -528,15 +553,21 @@ The tripwire stays a regression check there; it does not stand in for the gate.
   covers the round after main's `e0c329ae9` and CodeQL alert 90. Its part 7 covers the gate-data
   repair: the new tests failing against `21b24dede`'s gate, with the planted schema commit pushed,
   19 more planted defects (42 of 42 detected), the breadth before and after, and a rehearsal on the
-  merged tree.
+  merged tree. Its part 8 covers the merge with main `6af8e55bd` (#681): the breadth under three
+  gates on the merged tree, the run-versus-read tests failing against `4eb6b4cc9`'s gate, the
+  planted defects again with the new ones, #681's workflow-policy tests and a rehearsal.
 - The gate-data tests: every modelled read form on one script, in the unit tests (a module-constant
   schema, TOML, YAML, CSV, f-string, glob, `iterdir`, a literal-tuple loop, destructuring, `/=`, a
   received base, a received subject and a `globals()` name). A fixture whose gate step reads a
   schema through an imported constant: each of its data files, a new file under the glob, the
   shell script's data file and the data of a script that shell script runs are refused, and the
-  subject and unrelated files pass. A read the reader cannot resolve, and a gate script it cannot
-  parse, refuse every commit. The repository test checks that `contract.schema.json` is `ci_read`,
-  that no read is unresolved, and the breadth bound.
+  subject and unrelated files pass. A read the reader cannot resolve, a gate script it cannot
+  parse and an executing call with a computed argument refuse every commit. The run-versus-read
+  tests: each modelled executing form on one script, with hashed, copied and parsed code left as
+  data; in the fixture, a workflow script that a gate script hashes and copies is refused while
+  the files its text names stay editable, and a check that the gate script runs through a
+  wrapper has its data refused. The repository test checks that `contract.schema.json` is
+  `ci_read`, that nothing is unresolved, and the breadth bound.
 
 **Proposed, not adopted (2026-10-04): the owned paths as an allowlist in the gate as well.** The
 task's owned paths already act as an allowlist, applied before the gate. `patch_policy.validate_patch`
@@ -554,7 +585,7 @@ still protects CI inputs inside owned paths:
 
 Adopt the first when the plan's owned paths can reach `PushGate.check` through the harness without
 passing through anything the agent can influence. Adopt the second once the derivation's cost is
-acceptable at plan time: about 3.2 s per tree on this host. Neither replaces the derivation,
+acceptable at plan time: about 2.6 s per tree on this host. Neither replaces the derivation,
 because within the owned paths it is the only rule that knows what CI reads.
 
 **Overturn.** If the pre-push gate cannot be kept immutable to the agent, switch to option 2
@@ -563,8 +594,11 @@ the push credential, when a gate check is bypassed, or when the gate cannot run 
 Before switching, verify that the fork's policy withholds secrets and write tokens from its PR
 runs; a fork still needs safe caches, artifacts and privileged downstream consumers. Reopen the
 list of protected files if a workflow change adds a path the derivation does not read, or if a gate
-script reads data through a form `gate_reads.py` does not model (the repository test fails on main
-when a read becomes unresolved). Reopen the zizmor flags if CI's pinned version or flags change.
+script reads data or runs code through a form `gate_reads.py` does not model (the repository test
+fails on main when a read or an executing call becomes unresolved, or when the breadth passes its
+bound). Reopen the zizmor flags if CI's pinned version or flags change; #681 changed neither
+(`validate.yml` and `security-scan.yml` keep `--no-config --no-ignores --persona regular
+--strict-collection` and zizmor 1.30.1).
 
 **First live run.** The narrowing above covers resolver mode's CI execution only on these terms.
 The first live run waits until three things hold: this gate has landed on main, its negative
@@ -768,6 +802,20 @@ its versioned primary sources. Do not weaken or skip the validator's refusal ass
   Each path rule was also checked on the installed CPython 3.13.15 (`PurePosixPath("a") / "/b"`
   and `os.path.join("a", "/b")` give `/b`; `fnmatchcase("docs/decisions/x.md", "docs/*.md")` is
   true).
+- Merge round of 2026-10-05, the calls `GateReads.executed` treats as running code, from
+  docs.python.org/3.13 (read 2026-10-05, HTTP 200): [subprocess](https://docs.python.org/3.13/library/subprocess.html)
+  (`run`, `call`, `check_call`, `check_output`, `Popen`, `getoutput`, `getstatusoutput`),
+  [os](https://docs.python.org/3.13/library/os.html) "Process Management" (`system`, `popen`,
+  `posix_spawn`, the `exec*` and `spawn*` families), [asyncio
+  subprocesses](https://docs.python.org/3.13/library/asyncio-subprocess.html),
+  [pty.spawn](https://docs.python.org/3.13/library/pty.html), [runpy](https://docs.python.org/3.13/library/runpy.html)
+  ("Execute the code at the named filesystem location"), [importlib](https://docs.python.org/3.13/library/importlib.html)
+  (`util.spec_from_file_location`, `machinery.SourceFileLoader`), the builtins
+  [exec and compile](https://docs.python.org/3.13/library/functions.html), and
+  [sys.stdlib_module_names](https://docs.python.org/3.13/library/sys.html#sys.stdlib_module_names)
+  ("A frozenset of strings containing the names of standard library modules", new in 3.10).
+  In-repository: main's #679 (`tools/adoption/install_claude_profile.py` `checked_workflows`) and
+  #681 (`docs/decisions/2026-10-04-ci-least-privilege.md`, `tests/test_workflow_policy.py`).
 - Repository, for the gate: `.github/requirements-ci.txt` (the zizmor pin) and
   `.github/workflows/validate.yml` (CI's zizmor flags and the whole-suite `python3 -m unittest`
   run). The gate also reuses `blueprints/runtime-workers/openhands/resolver/patch_policy.py`

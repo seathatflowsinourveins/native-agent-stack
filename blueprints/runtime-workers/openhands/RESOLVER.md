@@ -77,8 +77,10 @@ PyYAML cross-check of the workflow reader, and a local rehearsal of the gate on 
 repository's own trees with the real zizmor 1.30.1. Its part 7 does the same for the
 repair round after the cross-family read: the gate-data tests failing against the
 earlier gate, which pushed a planted schema commit, 42 planted defects, and the
-derivation's breadth before and after. The rehearsals ran no resolver, no container and
-no GitHub call.
+derivation's breadth before and after. Its part 8 covers the merge with main's #681: the
+breadth under three gates on the merged tree, the run-versus-read narrowing with its
+failing-first run and planted defects, and #681's workflow-policy tests. The rehearsals
+ran no resolver, no container and no GitHub call.
 
 ## Issue selection
 
@@ -471,8 +473,11 @@ command center adopted that refinement. The gate:
   `blueprints/convergence-practice/contract.schema.json` unprotected). `resolver/gate_reads.py`
   evaluates each gate script's expressions to the paths they spell. An exact path is a
   protected file; a computed one protects the directory or glob it resolves under; a gate
-  script in another language protects the paths its text names. A read it cannot
-  resolve refuses every commit (`gate_input_unresolved`);
+  script in another language protects the paths its text names. Code that gate code runs
+  is followed in turn; code it only reads, such as a workflow script it hashes and
+  copies, is protected but not followed (`GateReads.executed`, since the merge with
+  main's #681, whose base carried #679). A read it cannot resolve, or a run of a computed
+  path, refuses every commit (`gate_input_unresolved`);
 - refuses a step that interpolates untrusted event text;
 - runs the zizmor version CI pins, with the gate's own flags. Its excessive-permissions,
   dangerous-triggers, cache-poisoning, artipacked and template-injection findings refuse,
@@ -600,8 +605,8 @@ free branch name.
     accepted.
   - The gate's protected list is broad by design. All of `tests/**` is protected,
     because validate.yml runs the whole suite, and so is every file a reachable step
-    names or a gate script reads. On the merged tree that is 7,559 of 10,528 tracked
-    files, including all of `evidence/artifacts` and `docs/*.md`, against 441 before the
+    names or a gate script reads. On the merged tree that is 7,617 of 10,591 tracked
+    files, including all of `evidence/artifacts` and `docs/*.md`, against 444 before the
     gate followed reads ([record](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md),
     residual risks). A task whose owned paths need those files fails at the gate with no
     push, and the agent's instructions tell it to stop and report such a change.
