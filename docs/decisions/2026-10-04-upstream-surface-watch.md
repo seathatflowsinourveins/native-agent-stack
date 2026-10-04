@@ -145,13 +145,16 @@ closed here.
    a report with `coverage.kinds_not_observed` set, exited 0, and the currency run cleared an existing due-file and printed
    "nothing due". An unobserved kind, or a non-cross-check source with origin `unavailable` or `skipped`, is now
    `surface watch incomplete` (`SURFACE_PARTIAL`): an incomplete check that keeps the earlier due-file and is never "nothing
-   due"; a malformed `coverage` is unreadable. Nine regression tests fail on the earlier code ("stack currency: nothing due")
-   and pass now; the controls (a complete report still clears, an unavailable cross-check does not matter) stay.
+   due"; a malformed `coverage` is unreadable. Six of the nine regression tests fail on the earlier code
+   (18 assertion failures, "stack currency: nothing due") and pass now; the other three pass on both as controls (a complete
+   report still clears, an unavailable cross-check does not matter).
 2. **The persistent catch-up could start the networked watch during a paper session**
    (`adoption/templates/systemd/upstream-surface-watch.service`). The service now has an `ExecCondition=` that defers the run on
    weekdays from 09:00 to 16:30 America/New_York (`upstream_surface_watch.py --paper-window-check`); the guide's "Daily run"
    section gives the reasons and the systemd.service(5) semantics. The window is the US regular session with a margin; the
-   repository has no machine-readable paper-window marker, so this is the one the lane's own market hours define.
+   repository has no machine-readable paper-window marker, so this is the one the lane's own market hours define; the live paper
+   timers (`paper-recover-a2-gate-20261005`, `paper-alpaca-a1-preflight-20261005`, `ibkr-paper-readonly-20261005`, read
+   2026-10-04 from `systemctl --user list-timers`) carry none either.
 3. **A decision inferred from an unrelated field of the same spelling** (`catalogs/foundation/upstream-surface-dispositions.json`).
    `history.max_bytes` was "declined" on a citation about the result-carrier metric of a workflow tool, and the generated
    sentence "off on both hosts although the upstream default is on" had been written for every row the ledger classed
@@ -169,3 +172,27 @@ closed here.
 Residual: whether a cited record is a decision, as opposed to a mention of the key, is still the judged ledger's call; the
 checks above catch a citation that does not name the key for the right client, not a record that names it and decides nothing.
 No deployed unit or scheduled catch-up has been exercised (the templates stay uninstalled).
+
+## Addendum (2026-10-04, later): the six connector review threads
+
+Six threads of the code-review connector, posted at 17:56Z on the head before the repairs above, were still unresolved on the
+current diff. One is answered as already fixed and five are closed here; every closure has a test that fails on the earlier code.
+
+| Thread | Disposition | Tests |
+| --- | --- | --- |
+| P1 `stack-currency.service`: the canonical lifecycle never installs the watch unit | `adoption/lifecycle.md` renders and verifies `upstream-surface-watch.service` beside the service that `Wants=` it, and says why | `LifecycleUnitTests`: 1 of 2 fails on the earlier block, 1 control |
+| P2 `upstream_surface_watch.py` `run()`: the baseline is replaced before the cache and report writes | the cache and `latest.json` are written first and the baseline last; a failed baseline write puts the earlier report back, or removes this run's | `BaselineWriteTests` |
+| P2 `run()`: a baseline made from stale data | `--write-baseline` needs `--network`, and a recorded source that came from the cache or was unavailable refuses it (exit 4) | `BaselineWriteTests` |
+| P2 `read_json_file()`: a JSON conversion failure is a traceback | `JSON_FAILURES = (ValueError, RecursionError)` at the four sites that caught `JSONDecodeError` (the catalog and baseline reader, a cache record, a fetched body, the release list) | `JsonConversionTests`: 3 tests, 6 subtests fail |
+| P2 `currency_due.py`: an unobserved Codex surface counted as fresh | closed in the second round above (item 1); answered, no change | the nine tests of that round |
+| P2 `currency_due.py`: any `schema_version` accepted | `SURFACE_SCHEMA_VERSION`; another version, none, a string, a boolean or a float is `surface watch output unreadable` | `SurfaceWatchTests`: 7 subtests fail |
+
+`BaselineWriteTests` has eight tests, six of which fail on the earlier code (offline write, a source from the cache, a failed cache
+write, a failed report write, and the two restore messages); the other two are controls (a run that fetched every source still
+makes the baseline, and a first baseline write that fails leaves no report). The seven hand-written reports of
+`tests/test_currency_due.py` now carry `schema_version` 1 so that each still reaches the branch it names, and the real-schema
+integration test sends its corrupt schema over the synthetic network, since an offline baseline write is refused.
+
+Residual: the rollback restores `latest.json` only; the cache entries a failed run committed stay, being inputs and not claims, and a
+rollback that fails is reported, not retried. The tests drive a synthetic network and a patched `write_atomic`; no real
+`--write-baseline` run against the live upstream was made in this round, and no unit is installed on any host by this change.

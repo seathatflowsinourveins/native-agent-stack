@@ -32,7 +32,12 @@ gh sign-out or an outage cannot keep an old report looking fresh. A cache entry 
 `--dry-run` writes nothing, not even the cache, and creates no
 directory. Otherwise a successful run writes the cache and then `latest.json` atomically (temporary file in the same
 directory, fsync, mode 0600, `os.replace`). `--write-baseline` writes the baseline from the run's observations: it
-refuses to replace an existing file without `--force`, and refuses when a kind was not observed. `--claude-channel`
+needs `--network` (a usage error without it), refuses to replace an existing file without `--force`, refuses when a kind
+was not observed, and refuses (exit 4) when any recorded source came from the cache or was unavailable, because a baseline
+made from a cached artifact would grandfather every switch added since that fetch. It writes the cache and `latest.json`
+first and the baseline last: a failed earlier write leaves the old baseline, and a failed baseline write puts the earlier
+`latest.json` back (or removes this run's when there was none), because a re-baselining run's report says "nothing new"
+and must not sit beside the old baseline. `--claude-channel`
 selects the npm dist-tag under watch (default `latest`, the channel of `autoUpdatesChannel` in
 `adoption/templates/claude.settings.template.json`). `--codex-bin none` skips the Codex probe.
 
@@ -104,7 +109,7 @@ It compares names from the sources above and nothing else:
 | 1 | the baseline or dispositions catalog is invalid (or missing), `--check-dispositions` found errors, or a write failed |
 | 2 | usage error, including a state directory inside the checkout and a summary that cannot fit 160 characters |
 | 3 | `anchor missing: <name>`: an anchor was not found, a local schema reference was unresolved, a string literal was malformed, the settings index guard failed, or a count was outside its bound; or `anchor missing: <kind> below 80% of baseline`: an observed kind holds fewer than 80% of its baseline names. A reviewed removal of more than 20% at once needs `--network --write-baseline --force`, which skips the floor while retaining source integrity checks |
-| 4 | `source unavailable: <name> (...)`: the source could not be fetched and has no usable cache |
+| 4 | `source unavailable: <name> (...)`: the source could not be fetched and has no usable cache, or `--write-baseline` found a source that came from the cache |
 
 ## latest.json and the resolver
 
@@ -130,7 +135,10 @@ from the cache, which it re-reads from `coverage.sources`; report-only cross-che
 empty and no non-cross-check source in `coverage.sources` has origin `unavailable` or `skipped`. Unobserved kinds or
 unavailable or skipped required or probed sources make the check `surface watch incomplete`; report-only sources
 with `cross_check: true` do not make it incomplete. Malformed kinds or sources coverage is
-`surface watch output unreadable`. A missing `latest.json` without a watch state
+`surface watch output unreadable`, and so is a report whose `schema_version` is not the integer that the reader
+understands (`SURFACE_SCHEMA_VERSION`, 1, kept equal to the watch's `SCHEMA_VERSION` by a test; absent, a string, a
+boolean or a float are refused too), so that a rollback or a partly updated checkout never reads a report whose fields may
+mean something else. A missing `latest.json` without a watch state
 directory is only the coverage note `surface watch not run` (the unit may not be installed on that host). An existing
 watch state directory means observed before: a missing report is `surface watch stale`; an unreadable or non-regular
 report is `surface watch output unreadable`. File-access errors, Unicode errors and JSON parsing `ValueError`s,
@@ -166,7 +174,9 @@ Validation is linear in the rows: about 1,200 rows check well under a second (th
 `upstream_surface_watch.py --network`. [`stack-currency.service`](../adoption/templates/systemd/stack-currency.service)
 pulls it in with `Wants=` and orders itself `After=` it, so the existing daily
 [`stack-currency.timer`](../adoption/templates/systemd/stack-currency.timer) runs the watch first. `Wants=` is weak, so
-a failed, timed-out or uninstalled watch never blocks the currency run. Installing the units is host wiring:
+a failed, timed-out or uninstalled watch never blocks the currency run, which then records the surface check as not run.
+Installing the units is host wiring; [`adoption/lifecycle.md`](../adoption/lifecycle.md) carries the same block as the
+canonical installation:
 
 ```sh
 sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/upstream-surface-watch.service > ~/.config/systemd/user/upstream-surface-watch.service
@@ -184,7 +194,10 @@ deferred too) and 0 otherwise, and 2 on a bad `--now`. `systemd.service(5)` says
 1 to 254 skips the remaining commands and the unit "is not marked as failed", so the watch is deferred to the next daily
 run, and `stack-currency.service`, which only `Wants=` it, still runs and counts the last report (at most three days old; an
 older one is `surface watch stale`). A host without a time-zone database runs the watch rather than never running it, with a
-note on stderr. `--now YYYY-MM-DDTHH:MM:SSZ` evaluates the check at another instant.
+note on stderr. `--now YYYY-MM-DDTHH:MM:SSZ` evaluates the check at another instant. The live paper schedule on this host
+(`systemctl --user list-timers`, read 2026-10-04) is three user timers, `paper-recover-a2-gate-20261005.timer` (Monday
+06:45 EDT), `paper-alpaca-a1-preflight-20261005.timer` (09:30) and `ibkr-paper-readonly-20261005.timer` (09:35); none is a
+repository marker the check could read, so market hours plus the margin stay the definition.
 
 ## Overturn conditions
 
