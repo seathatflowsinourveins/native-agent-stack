@@ -494,15 +494,23 @@ provides it.
   (with `superseded_by`), not among the children, and still counts its usage in `by_resolved_model`. Usage such an
   attempt holds that `by_resolved_model` cannot count (an assistant message without provider usage or without a
   resolved model, or no transcript) is its `usage_issues` and makes the status `incomplete`.
-  `make_result.py` also needs every child and superseded attempt measured at effort `max` alone, or recorded as an
-  `effort_deviation` retained failure, and `measurement.exit_code` 0 (1 only for such recorded deviations). Every
+  Since 2026-10-04, `usage_record.py` also links incomplete children to later complete attempts with the same label
+  when earlier stages' changed returns changed the call key. It uses the tool's journal order, retains
+  `superseded_by` and the reason, and leaves `by_resolved_model` unchanged. The wrapper's exit code follows the
+  post-processed status and uncovered effort mismatches; `measurement.exit_code` remains the raw tool exit and
+  `raw_output_sha256` remains the hash of its original stdout. `measurement.post_processing` records the linking
+  and covered mismatches. A linked attempt's `usage_issues` still keep the record incomplete.
+  `make_result.py` also needs every attempt measured at effort `max` alone, covered by its completed same-label
+  max-effort re-run, or recorded as an `effort_deviation` retained failure. It accepts `measurement.exit_code` 0,
+  or 1 explained by recovered superseded attempts or such recorded deviations. Every
   child and attempt must also carry a measured `web_search`, and each one with a capped WebSearch call must be a
   `web_search_capped` retained failure. Both are checked per worker and per layer: a `<role>:<layer>` worker's
   failure in its own layer, the critic's in every layer of the record.
 - **Failures.** A failed part of the lane never leaves a clean layer. `convert.py` lists each layer's retained
   failures under `failures/<layer>` in `returns.json`: a lost round, a discovery family that did not return, a
   missing vote, a lost critic, a critic-flagged layer beyond the follow-up cap, a GPT-6 copy problem, and (with
-  `--usage`) a worker measured at another effort than max (`effort_deviation`) or a worker with a WebSearch call
+  `--usage`) a worker measured at another effort than max without a completed same-label max-effort re-run
+  (`effort_deviation`) or a worker with a WebSearch call
   the session's cap refused (`web_search_capped`); the critic's belongs to every layer. It gives
   that layer the reopen entry `{"trigger": "retained_failure", "ref": "<returns_ref>#/failures/<layer>"}`, which
   resets the layer's clean count. `make_result.py` refuses a layer whose failures lack that entry.
@@ -648,12 +656,49 @@ the report and the run; they are added to the `retained_failure` entries `conver
 Record a stopped run by hand, as recipe section 4 describes (`status: stopped`, `lower_bound_usage: true`,
 `votes: not_returned`, `lost_workers`). Retain the smoke's usage record under `$A-attempts/` as a run of its own.
 
+**2026-10-04, step 7 resume recovery.** Run step 7 again after a usage-limit resume, including when changed
+earlier-stage outputs changed the waiting agents' call keys (`wf_7e4cef36-e0c` exposed two critics and one
+follow-up facts refuter in this condition). The wrapper links only to later complete same-label attempts in
+this run. With no incomplete children or superseded usage-integrity gaps left, it reports complete, states the
+number linked, and can exit 0 while preserving the tool's raw exit 1 in the measurement. Superseded attempts
+whose re-run completed at max remain under `superseded_retained` per layer; they do not reopen a layer for effort.
+Uncovered effort deviations and capped WebSearch calls still retain their failures and reopen entries.
+
+Offline source review extended agent-lab's `summarizeRun` and `effortMismatches` in the unchanged
+[vendored child-usage.mjs](../../../examples/claude-native/workflows/child-usage.mjs), as retained at
+native-agent-stack `8c32a84b246da66e43a6188c973741b09329e223`, SHA256
+`3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4`.
+The selected `search-first`, `diagnosing-bugs` and `tdd` skills informed the bounded integration repair; the
+builder's no-network scope precluded a live registry or upstream search. Twelve local regression fixtures ran
+before the implementation changed: seven failed (four assertions, three errors) and five controls passed;
+all twelve passed after the repair. The completeness critic covered same-key and changed-key resumes, critic
+and follow-up labels, earlier and unfinished attempts, usage-integrity gaps, and max-effort qualification.
+The native transcript fixtures execute the unchanged tool locally; they are integration evidence, not a new
+provider/model run or upstream end-to-end qualification. This recovery serves completed foundation landscape
+records and the North Star R&D readiness they support.
+
+**2026-10-04, step 8 project-directory redaction.** Before writing converted artifacts or printing the summary,
+`convert.py` replaces a path segment beginning `-home-<user>-...` with `<project-dir>`. It covers the encoded
+directory inside `~/.claude/projects/` or standing alone, including deeper in strings and nested JSON fields
+and keys. An ordinary word containing the substring remains unchanged. The implementation follows the recursive
+string/key traversal of [sweep_common.sanitize](sweep_common.py) at the same `8c32a84b2` source baseline;
+it uses Python's standard-library regular expressions and the existing angle-bracket placeholder style.
+The notes and nested-string fixtures failed first, with and without the projects prefix; the ordinary-word
+control passed, and all three passed after redaction. UUIDs retain the checkout's existing exit-3 publication
+gate. The separate CC change to `scripts/validate.py` owns detection of encoded home paths; this repair
+sanitizes them before that gate without editing the validator.
+
 Read these fields of `convert.py`'s summary before appending:
 
 - **`retained_failures`** and **`reopened_layers`**: each layer's failures (`<round>:<cause>`), all of them reopened.
   `degraded_discovery`, `critic_lost`, `effort_deviations` and each vote's `notes` give the detail.
   `effort_deviations_unmapped` lists a worker at another effort whose label names no layer of this sweep;
   `make_result.py` refuses the record until it is resolved.
+- **`superseded_retained`** (2026-10-04): each layer's superseded attempts whose same-label re-run completed at
+  max, with `round`, `child`, `agent_id` when present, `superseded_by` and `reason`. The same field is retained
+  in `returns.json`. These attempts' usage remains counted, but their earlier effort is covered by the re-run
+  and creates no `effort_deviation`. The critic is listed for every layer; a follow-up worker only in its own
+  layer's follow-up round. `superseded_retained_unmapped` lists a covered attempt whose label names no layer.
 - **`web_search`**, **`web_search_capped`** and **`web_search_capped_unmapped`**: the run's WebSearch calls and
   capped calls, the workers with a capped call (each a retained failure of its layer), and any capped worker whose
   label names no layer of this sweep (`make_result.py` refuses the record until it is resolved). A capped worker
@@ -1061,6 +1106,16 @@ The deliberate changes:
   - `make_result.py` checked failure coverage over all layers at once, so one layer could lose its critic failure
     and its reopen entry (and count as clean) while another layer's `critic` failure satisfied the check. Coverage
     is now checked per worker and per layer.
+- **Usage-limit resume repairs (2026-10-04).** Changed upstream-stage returns changed three waiting agents'
+  call keys, so same-key supersession left a completed run incomplete. Empty effort lists of recovered killed
+  attempts also reopened every layer. The wrapper now links by label only to later complete attempts in this
+  run, keeps raw measurement provenance and usage-integrity gaps, and the consumers require an identified,
+  complete same-label max-effort re-run before treating an earlier effort mismatch as covered. The attempts
+  remain visible under `superseded_retained`; missing, unfinished or non-max re-runs cover no deviation.
+- **Project-directory redaction repair (2026-10-04).** Literal host-prefix replacement missed the encoded home
+  directory in returned notes, and the publication gate matched only the slash form. Conversion now redacts
+  the encoded segment before writing artifacts or printing the summary, with fixtures for bare and prefixed
+  paths, embedded text, nested fields, and an ordinary-word control.
 
 ## Tests
 

@@ -10,16 +10,23 @@ which Claude Code keeps under <config dir>/projects/<project>/<session id>/subag
 writes {schema_version, measurement, child_usage} in the shape of
 evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-*.json:
   measurement  tool, tool_commit (null when the tool differs from HEAD), tool_sha256, command, exit_code,
-               raw_output_sha256 (of the unsanitized stdout), measured_at_utc, note
-  child_usage  the tool's output with transcript_dir rewritten to <session-transcripts>/subagents/workflows/<run id>
+               raw_output_sha256 (of the unsanitized stdout), measured_at_utc, note, post_processing when applicable
+  child_usage  the post-processed output with transcript_dir rewritten to <session-transcripts>/subagents/workflows/<run id>
 The ledger needs child_usage.status "complete" for a completed sweep, reads workflow_run from the last segment of
 transcript_dir, and requires lost_workers to equal the incomplete children. An attempt the runtime re-ran under the
-same call key (after a usage-limit pause) is under child_usage.superseded_attempts, not a lost child; its usage
-counts in by_resolved_model. Refuses to write (exit 3) when the
+same call key (after a usage-limit pause) is under child_usage.superseded_attempts, not a lost child. Before
+sanitizing, this wrapper also links incomplete children to later complete attempts with the same label, using
+the journal order that child-usage.mjs summarizeRun preserves in children. These changed-key attempts keep their
+superseded_by and reason; their usage already counts in by_resolved_model and is never added again. With no
+incomplete children or superseded usage_issues left, status becomes complete and reason counts the new links.
+An effort mismatch of a superseded attempt is covered only by its same-label re-run completed at the required
+effort. measurement.exit_code and raw_output_sha256 remain the tool's raw result; post_processing names the
+links and covered mismatches. Refuses to write (exit 3) when the
 sanitized record still matches a scripts/validate.py PRIVATE_CONTENT pattern. Exit 1, with the record still written
-(a stopped run keeps it as a lower bound), when the usage is incomplete, when child-usage.mjs exited non-zero, or
-when a child ran at another effort than --require-effort (effort_mismatches): every worker of this lane runs at
-effort max, and make_result.py refuses such a record. The summary it prints also names the children whose WebSearch
+(a stopped run keeps it as a lower bound), when the post-processed usage is incomplete, when the raw tool exit
+cannot be explained by these recoveries, or when an uncovered attempt ran at another effort than --require-effort.
+The summary exit_code is the wrapper's exit code. Every worker of this lane runs at effort max; convert.py retains
+uncovered effort_deviations and make_result.py checks them. The summary also names the children whose WebSearch
 calls the session's cap refused (child_usage.web_search, measured by child-usage.mjs); convert.py --usage makes each a
 web_search_capped retained failure.
 """
@@ -43,6 +50,76 @@ NOTE = ("Per-request provider usage of the Claude workflow children, from the re
         "ids counted once). web_search counts each child's WebSearch calls and those the session's WebSearch cap "
         "refused (capped). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and "
         "gpt6_usage); the two counters are never summed.")
+CHANGED_KEY_REASON = "re-run under a changed call key after a usage-limit pause"
+
+
+def superseded_at_required_effort(attempt: dict, output: dict, required: str = "max") -> bool:
+    """Whether this attempt's superseded_by chain ends at a complete same-label re-run at `required` effort.
+
+    Follow agent ids, never just a repeated label; an absent target, another label or a cycle covers nothing.
+    child-usage.mjs can chain same-key re-runs through an intermediate attempt that also returned nothing.
+    """
+    if not isinstance(attempt, dict):
+        return False
+    label = attempt.get("label") or attempt.get("child") or attempt.get("agent_id")
+    if not label:
+        return False
+    attempts = [*(output.get("children") or []), *(output.get("superseded_attempts") or [])]
+    by_id = {c["agent_id"]: c for c in attempts if isinstance(c, dict) and c.get("agent_id")}
+    seen = {attempt.get("agent_id")}
+    target_id = attempt.get("superseded_by")
+    while target_id and target_id not in seen:
+        seen.add(target_id)
+        target = by_id.get(target_id)
+        if not target or (target.get("label") or target.get("agent_id")) != label:
+            return False
+        if target.get("complete") is True:
+            return target.get("efforts") == [required]
+        target_id = target.get("superseded_by")
+    return False
+
+
+def post_process(output: dict, required: str) -> dict:
+    """Extend summarizeRun's same-key supersession with later same-label complete attempts in journal order."""
+    children = output.get("children") or []
+    linked, retained = [], []
+    for i, child in enumerate(children):
+        if not isinstance(child, dict) or child.get("complete") is True or not child.get("label"):
+            retained.append(child)
+            continue
+        later = next((c for c in children[i + 1:] if isinstance(c, dict) and c.get("complete") is True
+                      and c.get("label") == child["label"] and c.get("agent_id")
+                      and c["agent_id"] != child.get("agent_id")), None)
+        if later:
+            linked.append(dict(child, superseded_by=later["agent_id"], reason=CHANGED_KEY_REASON))
+        else:
+            retained.append(child)
+    source_status = output["status"]
+    if linked:
+        output["children"] = retained
+        output["superseded_attempts"] = [*(output.get("superseded_attempts") or []), *linked]
+        incomplete = sum(not isinstance(c, dict) or c.get("complete") is not True for c in retained)
+        uncounted = sum(bool(c.get("usage_issues")) for c in output["superseded_attempts"] if isinstance(c, dict))
+        output["status"] = "incomplete" if incomplete or uncounted else "complete"
+        gaps = [f"{incomplete} child(ren) incomplete" if incomplete else None,
+                f"{uncounted} superseded attempt(s) with usage_issues" if uncounted else None]
+        output["reason"] = (f"{len(linked)} incomplete attempt(s) linked to later complete same-label attempts: "
+                            f"{CHANGED_KEY_REASON}; " + ("; ".join(g for g in gaps if g) or "every remaining child is complete"))
+    # The raw tool's mismatches name labels, not agent ids. Bind each newly linked finding to its re-run before
+    # filtering; other mismatches with that label (including an unsuperseded non-max attempt) remain uncovered.
+    mismatches = [dict(item) if isinstance(item, dict) else item for item in output.get("effort_mismatches") or []]
+    for child in linked:
+        finding = next((item for item in mismatches if isinstance(item, dict) and not item.get("superseded_by")
+                        and item.get("child") == (child.get("label") or child.get("agent_id"))
+                        and item.get("efforts") == child.get("efforts")), None)
+        if finding is not None:
+            finding["superseded_by"] = child["superseded_by"]
+    uncovered = [item for item in mismatches if not superseded_at_required_effort(item, output, required)]
+    covered = len(mismatches) - len(uncovered)
+    if "effort_mismatches" in output:
+        output["effort_mismatches"] = uncovered
+    return {"name": "link_incomplete_children_to_later_complete_same_label", "linked_attempts": len(linked),
+            "effort_mismatches_covered": covered, "source_status": source_status}
 
 
 def sanitize_transcript_dir(path: str) -> str:
@@ -65,18 +142,20 @@ def tool_commit(repo_root: Path) -> str | None:
     return head.stdout.strip()
 
 
-def record(raw: bytes, exit_code: int, command: str, repo_root: Path, measured_at: str | None = None) -> dict:
+def record(raw: bytes, exit_code: int, command: str, repo_root: Path, measured_at: str | None = None,
+           required_effort: str = "max") -> dict:
     output = json.loads(raw)
     if not isinstance(output, dict) or "status" not in output:
         raise ValueError("child-usage output is not a run summary (no status)")
     output = dict(output)
+    processing = post_process(output, required_effort)
     output["transcript_dir"] = sanitize_transcript_dir(output.get("transcript_dir") or "")
     return {"schema_version": 1,
             "measurement": {"tool": f"native-agent-stack {TOOL}", "tool_commit": tool_commit(repo_root),
                             "tool_sha256": sha256_bytes((repo_root / TOOL).read_bytes()), "command": command,
                             "exit_code": exit_code, "raw_output_sha256": sha256_bytes(raw),
                             "measured_at_utc": measured_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                            "note": NOTE},
+                            "note": NOTE, "post_processing": processing},
             "child_usage": output}
 
 
@@ -105,7 +184,7 @@ def main(argv=None) -> int:
             raw, code = args.raw_output.read_bytes(), args.exit_code
             run_dir = json.loads(raw).get("transcript_dir") or ""
         command = f"node {TOOL} {sanitize_transcript_dir(run_dir)} --require-effort {args.require_effort}"
-        document = record(raw, code, command, repo)
+        document = record(raw, code, command, repo, required_effort=args.require_effort)
         findings = private_findings(document, private_content(repo))
     except (ValueError, OSError) as error:
         print(f"usage_record.py: {error}", file=sys.stderr)
@@ -120,7 +199,14 @@ def main(argv=None) -> int:
     usage = document["child_usage"]
     children = usage.get("children") or []
     mismatches = usage.get("effort_mismatches") or []
-    print(json.dumps({"out": str(args.out), "status": usage.get("status"), "exit_code": code,
+    attempts = [*children, *(usage.get("superseded_attempts") or [])]
+    off = any(isinstance(c, dict) and c.get("efforts") != [args.require_effort]
+              and not superseded_at_required_effort(c, usage, args.require_effort) for c in attempts)
+    processing = document["measurement"]["post_processing"]
+    recovered = processing["linked_attempts"] or processing["effort_mismatches_covered"]
+    wrapper_code = 0 if (usage.get("status") == "complete" and not mismatches and not off
+                         and (code == 0 or code == 1 and recovered)) else 1
+    print(json.dumps({"out": str(args.out), "status": usage.get("status"), "exit_code": wrapper_code,
                       "workflow_run": usage["transcript_dir"].rsplit("/", 1)[-1], "children": len(children),
                       "incomplete": [c.get("label") for c in children if isinstance(c, dict) and c.get("complete") is not True],
                       "superseded_attempts": [c.get("label") for c in usage.get("superseded_attempts") or []
@@ -132,7 +218,7 @@ def main(argv=None) -> int:
                       "effort_mismatches": mismatches,
                       "web_search": usage.get("web_search")},
                      indent=1))
-    return 0 if usage.get("status") == "complete" and code == 0 and not mismatches else 1
+    return wrapper_code
 
 
 if __name__ == "__main__":

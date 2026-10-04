@@ -270,6 +270,24 @@ SYNTHETIC_LABELS = [f"{role}:{layer}" for layer in ("alpha", "beta") for role in
 ] + ["critic"]
 
 
+def paused_child_usage(label):
+    """Synthetic child-usage stdout in journal order: a killed attempt, then its changed-key re-run.
+
+    child-usage.mjs summarizeRun preserves started-row order in children, but only links equal call keys.
+    Its effortMismatches reports the killed attempt's empty effort list too.
+    """
+    raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS, status="incomplete"))
+    for i, child in enumerate(raw["children"]):
+        child["agent_id"] = f"b{i}"
+    retry = next(c for c in raw["children"] if c["label"] == label)
+    killed = dict(retry, agent_id="killed", efforts=[], complete=False, requests=0, usage_by_model={},
+                  issues=["no result entry in journal", "no assistant usage in transcript"])
+    raw["children"].insert(0, killed)
+    raw["reason"] = "1 child(ren) incomplete"
+    raw["effort_mismatches"] = [{"child": label, "efforts": []}]
+    return raw
+
+
 # --------------------------------------------------------------------------- templates and skills
 
 
@@ -3825,6 +3843,46 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
                                                        "ref": "@RETURNS@#/failures/alpha"}])
 
+    def test_superseded_empty_effort_attempt_with_max_retry_is_retained_separately(self):
+        # The upstream tool already supersedes same-key attempts; their empty effort is not an uncovered deviation.
+        raw = paused_child_usage("critic")
+        killed = raw["children"].pop(0)
+        retry = next(c for c in raw["children"] if c["label"] == "critic")
+        raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+        raw["effort_mismatches"][0]["superseded_by"] = retry["agent_id"]
+        raw["status"] = "complete"
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        out = convert.convert(healthy_two_layers(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"], [])
+        self.assertEqual(out["summary"]["retained_failures"], {})
+        self.assertEqual(out["summary"]["reopened_layers"], [])
+        for layer in ("alpha", "beta"):
+            retained = out["returns"]["superseded_retained"][layer]
+            self.assertEqual([(r["round"], r["child"], r["superseded_by"]) for r in retained],
+                             [("critic", "critic", retry["agent_id"])])
+            self.assertTrue(retained[0]["reason"])
+
+    def test_superseded_attempt_needs_a_matching_complete_max_retry(self):
+        for condition in ("missing", "another label", "incomplete", "xhigh"):
+            with self.subTest(condition=condition):
+                raw = paused_child_usage("critic")
+                killed = raw["children"].pop(0)
+                retry = next(c for c in raw["children"] if c["label"] == "critic")
+                raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+                if condition == "missing":
+                    raw["children"].remove(retry)
+                elif condition == "another label":
+                    retry["label"] = "discover:alpha"
+                elif condition == "incomplete":
+                    retry["complete"] = False
+                else:
+                    retry["efforts"] = ["xhigh"]
+                document = {"child_usage": raw}
+                out = convert.convert(healthy_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+                failures = out["returns"]["failures"]["alpha"]
+                self.assertTrue(any(f.get("superseded_by") == raw["superseded_attempts"][0]["superseded_by"]
+                                    and f["cause"] == "effort_deviation" for f in failures))
+
     def test_a_worker_with_a_capped_web_search_is_a_retained_failure_of_its_layer(self):
         # The session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION): child-usage.mjs counts capped calls.
         raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS + ["refute-fit:zeta"]))
@@ -3878,6 +3936,49 @@ class ConvertTests(unittest.TestCase):
         self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: local session identifier", done.stderr)
         self.assertNotIn(identifier, done.stderr + done.stdout)
 
+    def test_cli_redacts_dash_encoded_project_directory_in_notes(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        for prefix in ("~/.claude/projects/", ""):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = prefix + encoded + "/session-fixture/notes"
+                done = self.cli(work, res)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 prefix + "<project-dir>/session-fixture/notes")
+
+    def test_cli_redacts_dash_encoded_project_directory_deeper_in_strings(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        for prefix in ("~/.claude/projects/", ""):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                notes = 'trace: (file="' + prefix + encoded + '/session-fixture/notes"); continued'
+                res["first"][0]["claude_discover"]["notes"] = {"details": [{"note": notes}]}
+                done = self.cli(work, res, "--limit", notes)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                expected = 'trace: (file="' + prefix + '<project-dir>/session-fixture/notes"); continued'
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"details": [{"note": expected}]})
+                lanes = json.loads((work / "out/lanes.json").read_text())
+                self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], expected)
+                for name in ("returns", "lanes", "layers", "survivors"):
+                    self.assertNotIn(encoded, (work / f"out/{name}.json").read_text())
+
+    def test_cli_preserves_home_substrings_inside_ordinary_words(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        notes = "word" + encoded + " and component-home-widget; unchanged"
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+
     def test_cli_compares_each_gpt6_output_with_the_file_codex_wrote(self):
         work = temp_dir(self)
         res = synthetic_result()
@@ -3922,6 +4023,138 @@ class ConvertTests(unittest.TestCase):
 
 
 class UsageRecordTests(unittest.TestCase):
+    def measure_paused(self, raw):
+        work = temp_dir(self)
+        stdout = json.dumps(raw).encode("utf-8")
+        (work / "raw.json").write_bytes(stdout)
+        done = run([sys.executable, HARNESS / "usage_record.py", "--raw-output", work / "raw.json", "--exit-code", "1",
+                    "--out", work / "usage.json"])
+        document = json.loads((work / "usage.json").read_text())
+        self.assertEqual(document["measurement"]["exit_code"], 1)
+        self.assertEqual(document["measurement"]["raw_output_sha256"], hashlib.sha256(stdout).hexdigest())
+        return done, document
+
+    def test_killed_critic_rerun_under_changed_call_key_is_superseded(self):
+        raw = paused_child_usage("critic")
+        # Aggregate usage is already over all attempts; moving a child must never add it a second time.
+        raw["by_resolved_model"] = {"claude-opus-5-5": {"children": 2, "output_tokens": 17}}
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        usage = document["child_usage"]
+        retry = next(c for c in usage["children"] if c["label"] == "critic")
+        self.assertEqual(usage["status"], "complete")
+        self.assertEqual([(c["agent_id"], c["superseded_by"], c["reason"]) for c in usage["superseded_attempts"]],
+                         [("killed", retry["agent_id"], "re-run under a changed call key after a usage-limit pause")])
+        self.assertEqual(usage["by_resolved_model"], {"claude-opus-5-5": {"children": 2, "output_tokens": 17}})
+        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 1)
+        self.assertIn("1", usage["reason"])
+        out = convert.convert(healthy_two_layers(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["retained_failures"], {})
+        for layer in ("alpha", "beta"):
+            self.assertEqual(out["returns"]["superseded_retained"][layer][0]["child"], "critic")
+        self.assertEqual(make_result.check_usage(document, "fixture", out["returns"], ("alpha", "beta")), usage)
+
+    def test_killed_followup_refuter_rerun_is_superseded(self):
+        label = "refute-facts:beta:followup"
+        done, document = self.measure_paused(paused_child_usage(label))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "complete")
+        self.assertEqual([c["label"] for c in usage["superseded_attempts"]], [label])
+        out = convert.convert(synthetic_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"], [])
+        self.assertEqual(set(out["returns"]["superseded_retained"]), {"beta"})
+        retained = out["returns"]["superseded_retained"]["beta"]
+        self.assertEqual([(r["round"], r["child"]) for r in retained], [("followup", label)])
+        self.assertEqual(make_result.check_usage(document, "fixture", out["returns"], ("alpha", "beta")), usage)
+
+    def test_incomplete_child_without_later_same_label_stays_incomplete(self):
+        raw = paused_child_usage("critic")
+        next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])["label"] = "critic:other"
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual([c["agent_id"] for c in usage["children"] if not c["complete"]], ["killed"])
+        self.assertEqual(usage.get("superseded_attempts", []), [])
+
+    def test_later_same_label_incomplete_attempt_links_nothing(self):
+        raw = paused_child_usage("critic")
+        next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])["complete"] = False
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual(len([c for c in usage["children"] if not c["complete"]]), 2)
+        self.assertEqual(usage.get("superseded_attempts", []), [])
+
+    def test_unsuperseded_nonmax_attempt_stays_an_effort_deviation(self):
+        raw = paused_child_usage("critic")
+        raw["children"].pop(0)
+        next(c for c in raw["children"] if c["label"] == "critic")["efforts"] = ["xhigh"]
+        raw["status"] = "complete"
+        raw["effort_mismatches"] = [{"child": "critic", "efforts": ["xhigh"]}]
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+        out = convert.convert(healthy_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"], ["critic"])
+        self.assertEqual(out["summary"]["retained_failures"], {"alpha": ["critic:effort_deviation"]})
+        self.assertEqual(make_result.check_usage(document, "fixture", out["returns"], ("alpha",))["status"], "complete")
+        with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
+            make_result.check_usage(document, "fixture", {"failures": {}}, ("alpha",))
+
+    def test_an_earlier_complete_attempt_cannot_supersede_a_child(self):
+        raw = paused_child_usage("critic")
+        raw["children"].append(raw["children"].pop(0))
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        self.assertEqual(document["child_usage"]["status"], "incomplete")
+        self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+
+    def test_superseded_usage_issues_keep_the_record_incomplete(self):
+        raw = paused_child_usage("critic")
+        raw["children"][0]["usage_issues"] = ["1 assistant message(s) without provider usage"]
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual(usage["superseded_attempts"][0]["usage_issues"], raw["children"][0]["usage_issues"])
+
+    @unittest.skipUnless(NODE, "node not installed")
+    def test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once(self):
+        transcripts = temp_dir(self) / "subagents" / "workflows" / "wf_changed-keys"
+        transcripts.mkdir(parents=True)
+        followup = "refute-facts:scheduling-supervision:followup"
+        attempts = [("c0", "critic", "old-critic"), ("f0", followup, "old-facts"),
+                    ("c1", "critic", "changed-critic"), ("c2", "critic", "final-critic"),
+                    ("f1", followup, "changed-facts")]
+        journal = []
+        zero = {"input_tokens": 0, "output_tokens": 0, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}
+        for agent, label, key in attempts:
+            journal.append({"type": "started", "agentId": agent, "label": label, "key": key})
+            if agent in ("c2", "f1"):
+                journal.append({"type": "result", "agentId": agent, "result": {"ok": True}})
+            rows = []
+            if agent in ("c0", "c2", "f1"):
+                rows = [{"type": "assistant", "effort": "max", "message": {
+                    "id": f"m-{agent}", "model": "claude-opus-5-5", "usage": dict(zero, output_tokens=7 if agent == "c0" else 5)}}]
+            write_json(transcripts / f"agent-{agent}.meta.json", {"model": "opus"})
+            (transcripts / f"agent-{agent}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+        (transcripts / "journal.jsonl").write_text("".join(json.dumps(e) + "\n" for e in journal), encoding="utf-8")
+        out = temp_dir(self) / "usage.json"
+        done = run([sys.executable, HARNESS / "usage_record.py", "--transcript-dir", transcripts, "--out", out])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        document = json.loads(out.read_text())
+        usage = document["child_usage"]
+        self.assertEqual(document["measurement"]["exit_code"], 1)
+        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 3)
+        self.assertEqual(usage["status"], "complete")
+        self.assertEqual([(c["agent_id"], c["superseded_by"]) for c in usage["superseded_attempts"]],
+                         [("c0", "c2"), ("f0", "f1"), ("c1", "c2")])
+        self.assertEqual([c["agent_id"] for c in usage["children"]], ["c2", "f1"])
+        self.assertEqual(usage["by_resolved_model"]["claude-opus-5-5"]["output_tokens"], 17)
+
     def test_record_sanitizes_the_transcript_dir_and_hashes_the_raw_output(self):
         work = temp_dir(self)
         raw = child_usage_raw("wf_fixture-1", ["discover:alpha"])
@@ -4172,6 +4405,26 @@ class LedgerIntegrationTests(unittest.TestCase):
         returns["failures"] = {}
         with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
             self.result(out, reviews, returns=returns)
+
+    def test_make_result_accepts_superseded_effort_mismatch_covered_by_max_retry(self):
+        raw = paused_child_usage("critic")
+        killed = raw["children"].pop(0)
+        retry = next(c for c in raw["children"] if c["label"] == "critic")
+        raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+        raw["effort_mismatches"][0]["superseded_by"] = retry["agent_id"]
+        raw["status"] = "complete"
+        usage = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        self.assertEqual(make_result.check_usage(usage, "fixture", {"failures": {}}, ("alpha", "beta"))["status"],
+                         "complete")
+
+    def test_superseded_critic_rerun_keeps_completed_layers_clean(self):
+        usage = usage_record.record(json.dumps(paused_child_usage("critic")).encode("utf-8"), 1, "cmd", ROOT)
+        out, reviews = self.evidence(healthy_two_layers(), usage=usage)
+        result = self.result(out, reviews)
+        self.assertTrue(all(layer["reopen"] == [] for layer in result["layers"]))
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), result)
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        self.assertEqual({key[1]: value["count"] for key, value in sl.derive(ledger).items()}, {"alpha": 1, "beta": 1})
 
     def test_a_capped_web_search_reopens_every_layer_through_the_critic(self):
         raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
