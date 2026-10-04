@@ -32561,11 +32561,6 @@
       "bytes": 22807
     },
     {
-      "path": "evidence/artifacts/gh-upstream-qualification-20261002/qualification.json",
-      "sha256": "d28841a9bba66869bb8aaea59ad852d3000ec7a7ca06e49a4e1d6619e19bdf8e",
-      "bytes": 15832
-    },
-    {
       "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
       "sha256": "619afdd1e30773633498215af9a0c881b1ab24632172879ef65421586ec749ab",
       "bytes": 5904
