@@ -1,0 +1,42 @@
+{
+  "observed_utc": "2026-10-03T19:22:05Z",
+  "exit_code": 0,
+  "six_statuses": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "script_sha256": "4863ee1116f0fe26c1a15aea284121e063ae7704b6f7b0be97fb5db5ddc4eace",
+  "preflight": "real repository unittest classes",
+  "command_environment": {
+    "TMPDIR": "/var/tmp",
+    "WRITE_SARIF": "true",
+    "RUNNER_TEMP": "<runner-temp>"
+  },
+  "reports": [
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-macos.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168,
+      "runs": 1,
+      "results": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-wsl-retrieval.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168,
+      "runs": 1,
+      "results": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168,
+      "runs": 1,
+      "results": 0
+    }
+  ]
+}
