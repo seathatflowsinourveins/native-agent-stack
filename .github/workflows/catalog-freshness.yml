@@ -17,13 +17,15 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: read
+# No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
 
 jobs:
   freshness:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    permissions:
+      contents: read
     outputs:
       drift: ${{ steps.diff.outputs.drift }}
       upstream_errors: ${{ steps.diff.outputs.upstream_errors }}

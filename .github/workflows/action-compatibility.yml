@@ -16,8 +16,10 @@ on:
       - .github/workflows/native-service-reboot.yml
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope and no cache access by default (docs/decisions/2026-10-04-ci-least-privilege.md). Neither job checks
+# out this repository or calls its API, so neither grants a scope; setup-python and setup-go read public manifests.
+permissions: {}
+cache-mode: none
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
