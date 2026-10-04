@@ -4850,8 +4850,8 @@
     },
     {
       "path": "blueprints/convergence-practice/clean-resolution-20261002/open-work.json",
-      "sha256": "0b987db92cca4dc40b9ef2f35e2d015db16c4dba136ac2c32324374da30e0c77",
-      "bytes": 8487
+      "sha256": "e157abd153bed629b0e1525223ff29299d909a0d702be0e7df4d5097fe3c20df",
+      "bytes": 8741
     },
     {
       "path": "blueprints/convergence-practice/container-storage/README.md",
@@ -48281,8 +48281,8 @@
     },
     {
       "path": "examples/native-sdk-acceptance/README.md",
-      "sha256": "f95f4ee5f1f8322ec2bdbab623b0dbbd62549180d31656e97d9fad67308bf2f2",
-      "bytes": 11266
+      "sha256": "8a3661e5b62709f75afa0a96fafd42213f829b64bbaa6141c9b4a59b8312d501",
+      "bytes": 11241
     },
     {
       "path": "examples/native-stack-embeddings.service.example",

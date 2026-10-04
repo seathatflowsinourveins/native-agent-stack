@@ -9,9 +9,10 @@
     {
       "id": "github-practice",
       "state": "partially_verified_followups_open",
-      "evidence": "Read-only remote audit found eight app-bound required checks, full-SHA action policy, restricted publishers and no ruleset bypass at the observed main. Isolated legacy-host qualification of gh 2.102.0 passed the unchanged upstream race/integration command (250 packages: 245 native cached results and five fresh executions; 60 packages without tests), native build and local binary smoke. Original failed conditions and source/output bindings were retained and independently reviewed. Catalog metadata source review is accepted; hosted behavior and current-head publication gates remain separate. Catalog metadata fix merged as5803017 after reviewed-head required checks; hosted catalog observation remains with its existing owner.",
+      "evidence": "Read-only remote audit found eight app-bound required checks, full-SHA action policy, restricted publishers and no ruleset bypass at the observed main. Isolated legacy-host qualification of gh 2.102.0 passed the unchanged upstream race/integration command (250 packages: 245 native cached results and five fresh executions; 60 packages without tests), native build and local binary smoke. Original failed conditions and source/output bindings were retained and independently reviewed. Catalog metadata source review is accepted; hosted behavior and current-head publication gates remain separate.",
       "remaining": [
         "Integrate the gh 2.102.0 source qualification through the installation owner without inferring host adoption",
+        "Require complete current-head coverage before landing the catalog metadata fix",
         "Observe the next authorized hosted catalog proposal and its source/lane metadata"
       ],
       "sources": [
@@ -39,22 +40,25 @@
     {
       "id": "native-clients-and-harness",
       "state": "owned_runtime_qualification_open",
-      "evidence": "Legacy-host installed clients and selected target source revisions were observed; they have different scopes. Builder safe handoff was received and bounded owned-directory SDK tasks ran. Historical Claude CLI2.1.287 capture is distinct from current2.1.288 release reconciliation.",
+      "evidence": "Legacy-host installed clients and selected target source revisions were observed; they have different scopes. Bounded owned-directory SDK task outcomes are retained in the dated receipt; public evidence of the builder's safe handoff remains open. Historical Claude CLI2.1.287 capture is distinct from current2.1.288 release reconciliation.",
       "remaining": [
+        "Builder's selected readiness and safe ownership handoff with a public, value-free reference",
         "Configuration owner reconciles current Claude2.1.288 before the next role trial",
         "Native CLI useful-work, role, MCP and lifecycle qualification by existing owner"
       ],
       "sources": [
         "https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc",
         "https://github.com/anthropics/claude-code/blob/816ec211a648f17a411f63a45cfd44ddf8db00d9/CHANGELOG.md",
-        "https://github.com/anthropics/claude-code/releases/tag/v2.1.288"
+        "https://github.com/anthropics/claude-code/releases/tag/v2.1.288",
+        "evidence/receipts/native-sdk-acceptance-20261002.json"
       ]
     },
     {
       "id": "sdk-workers-researchers-reviewers",
       "state": "partially_verified_followups_open",
-      "evidence": "Source/oracle preparation was independently accepted and published as73ca1e8b53383f5bd5e1a59a06eade50a0086370, with source-status correction merged as21521f19f8a50b41f68528425406c960c0a89bca. After the builder safe handoff, the actual Claude SDK task exited0 but failed the unchanged independent oracle (3passes/1error). A separately reviewed informed Codex repair exited0 and passed all4 cases. Original failure, native usage, source bindings and independent artifact reviews are retained in the dated receipt. These are narrow task outcomes, not role/lifecycle closure.",
+      "evidence": "Source/oracle preparation was independently accepted and published as73ca1e8b53383f5bd5e1a59a06eade50a0086370, with source-status correction merged as21521f19f8a50b41f68528425406c960c0a89bca. The actual Claude SDK task exited0 but failed the unchanged independent oracle (3passes/1error). A separately reviewed informed Codex repair exited0 and passed all4 cases. Original failure, native usage, source bindings and independent artifact reviews are retained in the dated receipt. These are narrow task outcomes, not role/lifecycle closure.",
       "remaining": [
+        "Builder's selected readiness and safe ownership handoff with a public, value-free reference",
         "Claude useful-task success remains unqualified by the failed original trial",
         "OpenHands FACTS provider execution after destination route/custody binding",
         "Codex resolved model/provider identity was not returned in the retained task capture",
