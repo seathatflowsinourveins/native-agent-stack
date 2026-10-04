@@ -13,7 +13,7 @@ import unittest
 from unittest.mock import patch
 import zlib
 
-from scripts.validate import InvalidPublication, scan_file_for_private_content, validate
+from scripts.validate import PRIVATE_CONTENT, InvalidPublication, scan_file_for_private_content, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATE_SCRIPT = ROOT / "scripts/validate.py"
@@ -165,6 +165,20 @@ class PublicationValidationTests(unittest.TestCase):
     def test_generic_variable_paths_are_allowed(self):
         self.write("README.md", 'Use "${HOME}/.codex" and "${PROJECT_ROOT}"; /dev/null is valid. Anonymized /home/example and /mnt/c/Users/example are permitted.')
         validate(self.root)
+
+    def test_encoded_home_paths_rejected_without_echoing(self):
+        paths = (
+            "/tmp/claude-1000/" + "-".join(("", "home", "alice", "code", "proj")) + "/<id>/scratchpad/",
+            "~/.claude/projects/" + "-".join(("", "Users", "bob", "src", "app")) + "/",
+            "-".join(("C", "", "Users", "carol", "repo")),
+        )
+        for index, content in enumerate(paths):
+            with self.subTest(form=index):
+                self.write("README.md", content)
+                with self.assertRaises(InvalidPublication) as error:
+                    validate(self.root)
+                self.assertIn("encoded home path", str(error.exception))
+                self.assertNotIn(content, str(error.exception))
 
     def test_session_identifiers_rejected_even_when_glued_to_words(self):
         session_id = "-".join(("01234567", "89ab", "cdef", "0123", "456789abcdef"))
@@ -490,6 +504,44 @@ class PublicationValidationTests(unittest.TestCase):
                 self.assert_invalid("unsupported PDF framing")
 
 
+class EncodedHomePathTests(unittest.TestCase):
+    def test_posix_and_windows_forms_match(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        paths = (
+            "/tmp/claude-1000/" + "-".join(("", "home", "alice", "code", "proj")) + "/<id>/scratchpad/",
+            "~/.claude/projects/" + "-".join(("", "Users", "bob", "src", "app")) + "/",
+            "-".join(("C", "", "Users", "carol", "repo")),
+        )
+        for index, content in enumerate(paths):
+            with self.subTest(form=index):
+                self.assertIsNotNone(pattern.search(content))
+
+    def test_placeholders_examples_options_and_words_do_not_match(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        for content in (
+            "-home-<user>-code", "-home-example-code", "--home-dir", "pre-home-run",
+            "C--Users-example-x", "-Users-<user>-src", "-Users-example-src",
+            "C--Users-<user>-repo", "-home-", "-Users-", "C--Users-",
+        ):
+            with self.subTest(content=content):
+                self.assertIsNone(pattern.search(content))
+
+    def test_encoded_path_boundary_is_required(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        paths = (
+            "-".join(("", "home", "alice", "code")),
+            "-".join(("", "Users", "bob", "src")),
+            "-".join(("C", "", "Users", "carol", "repo")),
+        )
+        for index, content in enumerate(paths):
+            for prefix in ("a", "Z", "0", "_", "-", "é", "９"):
+                with self.subTest(form=index, prefix=prefix):
+                    self.assertIsNone(pattern.search(prefix + content))
+            for prefix in ("", "/", " ", "`", "("):
+                with self.subTest(form=index, prefix=prefix):
+                    self.assertIsNotNone(pattern.search(prefix + content))
+
+
 class ScanFileForPrivateContentTests(unittest.TestCase):
     """`scan_publication()` only walks git-tracked/listed paths; a generated,
     gitignored artifact built fresh right before publication (e.g.
@@ -555,6 +607,16 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
         self.assertEqual(report, {"status": "passed", "scanned_files": 1})
+
+    def test_cli_scan_file_fails_on_an_encoded_home_path_without_echoing_it(self):
+        content = "-".join(("C", "", "Users", "carol", "repo"))
+        path = self.write("explorer.html", f"<html>{content}</html>")
+        findings = scan_file_for_private_content(path)
+        self.assertEqual(findings, [f"{path}: contains possible encoded home path"])
+        result = self.run_cli("--scan-file", str(path))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("encoded home path", result.stdout)
+        self.assertNotIn(content, result.stdout + result.stderr)
 
     def test_cli_scan_file_fails_on_a_planted_secret_without_echoing_it(self):
         secret = ("sk-ant-" + "b" * 30)
