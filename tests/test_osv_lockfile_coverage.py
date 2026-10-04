@@ -1011,7 +1011,11 @@ class FrozenPolicyMutationTests(unittest.TestCase):
             with self.subTest(mutation=mutation):
                 config = {key: list(value) for key, value in original.items()}
                 if mutation == 'advisory':
-                    config.setdefault('IgnoredVulns', []).append({'id': 'GHSA-vfj7-8cjw-p6xm'})
+                    # Well formed, so the frozen-id check is the only one that can reject it.
+                    config.setdefault('IgnoredVulns', []).append({
+                        'id': 'GHSA-vfj7-8cjw-p6xm', 'reason': 'synthetic leaked exception',
+                        'ignoreUntil': date.today() + timedelta(days=30)})
+                    self.assertEqual(ignore_entry_problems(config), [])
                 else:
                     config.setdefault('PackageOverrides', []).append(overrides[mutation])
                 self.assert_rejected('test_the_ordinary_config_has_no_exception_for_a_frozen_advisory',

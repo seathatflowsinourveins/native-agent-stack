@@ -567,8 +567,8 @@
     "overturn": "A maintained native scanner and smaller harness demonstrate the same path/key/override boundaries and reject all eleven mutations without preflight re-entry"
   },
   "independent_review": {
-    "status": "not run",
-    "reason": "Exact-head independent review and one repair round are coordinator-owned steps, recorded on PR #673; see repair_round"
+    "status": "run on 48bbe5c5f, verdict repair; repair re-check at 4d7f4dd0e, verdict clear (recorded on PR #673)",
+    "reason": "Exact-head independent review and one repair round are coordinator-owned steps, recorded on PR #673; see repair_round and recheck_round"
   },
   "follow_up": "Coordinator commits content first and registry last, rebases for #626/current main, coordinates with #615 (#628 already merged), creates port PR, completes eight exact-head contexts and independent Opus review, posts #555 custody notice, waits two hours without objection, and only then closes #555 citing port URL/head/findings.",
   "registrations": [
@@ -1651,7 +1651,17 @@
           "repair double-alias override_problems: [\"'lib': unknown key 'Ecosystem'\", \"'lib': unknown key 'Name'\"]",
           "repair regex+Ecosystem override_problems: [\"'nex[t]': unknown key 'Ecosystem'\"]"
         ],
-        "exit_codes": [0, 0]
+        "exit_codes": [0, 0],
+        "retained_rerun": {
+          "evidence_class": "synthetic",
+          "observed_utc": "2026-10-04T00:47:27Z",
+          "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 <scratch>/override-key-function.py",
+          "script": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.py.txt",
+          "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.stdout.txt",
+          "stderr": "empty",
+          "exit_code": 0,
+          "result": "The original probe kept no command or script. This re-run loads both functions from the committed blobs at 48bbe5c5f and 4d7f4dd0e, feeds the same two inputs and prints four lines equal to before and after above; its own comparison with this record as committed at 4d7f4dd0e prints True."
+        }
       },
       {
         "id": "repair-round-controls",
@@ -1670,7 +1680,19 @@
         "started_utc": "2026-10-03T20:58:21Z",
         "finished_utc": "2026-10-03T20:58:32Z",
         "exit_code": 0,
-        "result": "Ran 164 tests in 11.339s; OK (skipped=2)"
+        "result": "Ran 164 tests in 11.339s; OK (skipped=2)",
+        "retained_rerun": {
+          "evidence_class": "local_integration",
+          "checked_commit": "4d7f4dd0e41aafb2e0f9ce1dabda93e3c1b2ea36",
+          "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_wsl_retrieval -v",
+          "started_utc": "2026-10-04T00:46:56Z",
+          "finished_utc": "2026-10-04T00:47:08Z",
+          "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stdout.txt",
+          "stderr": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stderr.txt",
+          "exit_code": 0,
+          "result": "Ran 164 tests in 11.475s; OK (skipped=2)",
+          "note": "The same command on the committed repair head with a clean worktree. The 20:58:21Z run's own output was not retained."
+        }
       }
     ],
     "bindings_after_repair": [
@@ -1705,6 +1727,103 @@
       "Main moved to 6112d14d40f7, one commit past the reviewed base 463a57b98, touching manifests/evidence.json and tests/test_landscape_sweep_harness.py. Rebase right before merge and rebuild manifests/evidence.json from the new main, as contract step 7 requires.",
       "The build-time PR body's exact-head re-run lines have no retained output; the PR body labels them as unretained confirmations.",
       "Final acceptance exit codes on the repaired head are recorded on PR #673."
+    ]
+  },
+  "recheck_round": {
+    "observed_utc": "2026-10-04T00:46:56Z",
+    "observed_until_utc": "2026-10-04T00:49:49Z",
+    "rechecked_head": "4d7f4dd0e41aafb2e0f9ce1dabda93e3c1b2ea36",
+    "recheck": "Bounded read-only re-check of the repair round by a separate Claude Opus 5.5 session (2026-10-04T00:21:29Z to 00:36:39Z): verdict clear, with three new minor findings. Its result is recorded on PR #673.",
+    "per_finding": [
+      "should-fix 1, case-aliased override keys: resolved",
+      "should-fix 2, lost overturn trigger: resolved",
+      "minor 1, unretained exact-head output: partly; receipt half resolved, PR-body half not read by the re-check",
+      "minor 2, missing discriminating controls: resolved",
+      "minor 3, paraphrased helper line: partly; receipt half resolved, PR-body half not read by the re-check",
+      "minor 4, unpublished authority reference: resolved",
+      "minor 5, main moved: not resolved; the pre-merge rebase of contract step 7"
+    ],
+    "pr_body_halves": "Read at 2026-10-04T00:49:41Z from the PR body at head 4d7f4dd0e: line 33 heads the build-time exact-head block '(unretained confirmations)', and line 94 quotes 'sum check: 0 == 53'; no line says '0 + 0 == 53'. Both PR-body halves are resolved.",
+    "new_minors": [
+      {
+        "id": "weak-advisory-mutation",
+        "where": "tests/test_osv_lockfile_coverage.py:1014, with :609 and :612",
+        "problem": "Pre-existing since 476f60099. The 'advisory' mutation had no reason and no ignoreUntil, so ignore_entry_problems (:609) rejected it before the frozen-id check (:612) could; deleting :612 left every test green.",
+        "disposition": "fixed; see changes and controls"
+      },
+      {
+        "id": "stale-review-status",
+        "where": "independent_review.status",
+        "problem": "The status still said 'not run' after the review and its repair round.",
+        "disposition": "fixed; the status states both verdicts"
+      },
+      {
+        "id": "unretained-repair-controls",
+        "where": "repair_round.controls override-key-function and three-module-unittest",
+        "problem": "Neither control retained its inputs or outputs.",
+        "disposition": "fixed; both were re-run and their script or command and output retained, see each entry's retained_rerun"
+      }
+    ],
+    "changes": [
+      "tests/test_osv_lockfile_coverage.py: the 'advisory' mutation in FrozenPolicyMutationTests.test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs adds a well-formed exception (reason 'synthetic leaked exception', ignoreUntil 30 days out) and asserts that ignore_entry_problems accepts the mutated config, so the frozen-id check at :612 is the only check that can reject it.",
+      "This receipt: independent_review.status states the review and re-check verdicts; the override-key-function and three-module-unittest entries in repair_round.controls gain retained re-runs; this section."
+    ],
+    "controls": [
+      {
+        "id": "advisory-mutation-control",
+        "evidence_class": "synthetic",
+        "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 <scratch>/advisory-mutation-control.py",
+        "script": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.py.txt",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.stdout.txt",
+        "stderr": "empty",
+        "observed_utc": "2026-10-04T00:48:40Z",
+        "exit_code": 0,
+        "module_sha256": "86f372452299daf1be59452c3e0c13691a1c00058154d17a8a594a914c19dbe6",
+        "result": "With the frozen-id check (line 612) present, the mutation test passes; its advisory input has no ignore_entry_problems or override_problems, and the guarded preflight test rejects it only with line 612's message. With line 612 removed from an in-memory scratch copy of the module source, the mutation test fails on the advisory subtest only: 'the actual preflight guard accepted the changed input'. The prior head 4d7f4dd0e's mutation, with the same line removed, still passes, which reproduces the reported defect. The repository file's sha256 is the same before and after the run.",
+        "earlier_attempt": "A first run at 2026-10-04T00:48:28Z, before the script printed the guarded test's last message line, returned the same observations and exit 0; this run's output replaced it."
+      }
+    ],
+    "bindings_after_recheck": [
+      {
+        "path": "tests/test_osv_lockfile_coverage.py",
+        "sha256": "86f372452299daf1be59452c3e0c13691a1c00058154d17a8a594a914c19dbe6",
+        "bytes": 75774
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.py.txt",
+        "sha256": "023b555522e1291b8e978326eaac31b31834b26fce74e7606ba1f31478888933",
+        "bytes": 6335
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.stdout.txt",
+        "sha256": "6c14c74d306c2a672fad9a94767ba9c10d7f453163c58802611a1b5d485daad6",
+        "bytes": 2895
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.py.txt",
+        "sha256": "b1449383dcfc2f5799d9bc1a5f144a1bd063f08dc6b776dac5f22d0af0135c7f",
+        "bytes": 2558
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.stdout.txt",
+        "sha256": "e71767e753c536e0e7cc4eab58723cef0e59844be9a2fc9dee992f44397df19a",
+        "bytes": 530
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stderr.txt",
+        "sha256": "824676798b6e82d6695738d40180680c6b160b905334435aaf55ffed745af77d",
+        "bytes": 28944
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    ],
+    "bindings_note": "evidence_paths, registrations and artifact_bindings remain the build-time lists, and bindings_after_repair the repair round's bytes; bindings_after_recheck holds the bytes this round changed or added and supersedes the earlier test-module rows. This receipt cannot bind its own bytes; manifests/evidence.json does.",
+    "residuals": [
+      "Main is e0c329ae98ef at 2026-10-04T00:49:49Z, eight commits past the base 463a57b98. git merge-tree conflicts only in manifests/evidence.json, but #677 (e0c329ae9) also changes two PR-owned paths: tests/test_workflow_hardening.py (imports, and from line 1235) and docs/decisions/2026-09-22-github-automation-closure.md (line 1421). Both changes are region-disjoint from this PR's hunks and merge cleanly as text. The landing check stops at its first condition on the registry conflict; its drift condition (3) would flag both paths, and artifact_bindings hold their pre-merge bytes. This round did not merge main, because its merge allowance covered only a registry-only failure. Rebase or merge main right before merge, as contract step 7 requires.",
+      "Exact-head acceptance exit codes for this round are recorded on PR #673."
     ]
   }
 }
