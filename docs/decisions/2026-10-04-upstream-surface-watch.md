@@ -1,0 +1,219 @@
+# Decision: a zero-token watch for new Claude Code and Codex switches (2026-10-04)
+
+**Decided by:** session native-agent-stack-99's unit U4, from the coordinator's source research of 2026-10-04 (first
+party, third-party trackers, what nothing maintained covers). The sources were re-read with curl on 2026-10-04.
+Revised the same day by unit U4-REPAIR, the one repair round after an independent review of the series: a second
+settings source, an 80% floor per kind, cache-aged reports, profile mirrors dropped and the baseline regenerated.
+
+**Scope:**
+
+- `scripts/upstream_surface_watch.py`;
+- `catalogs/foundation/upstream-surface-baseline.json` and `upstream-surface-dispositions.json`;
+- the `surface_unreviewed` count in `scripts/currency_due.py` and its handling of a stale or unreadable report;
+- `adoption/templates/systemd/upstream-surface-watch.service` and the `Wants=`/`After=` lines of
+  `stack-currency.service`;
+- the tests, `docs/upstream-surface-watch.md` and this record.
+
+## Requirement
+
+The user, to session 99 on 2026-10-04: "for the sota features form changelogs, make sure we enabled all latest sota
+ones into our wsl and new wsl and keep maitnaced updated latest sota aligned". Keeping that aligned needs a standing
+signal when a release adds a switch. The repository's daily machinery (`scripts/currency_due.py`,
+`tools/sota-convergence/github_freshness.py`) catches version drift only.
+
+## Sources chosen (first party, no model, no account beyond gh's own sign-in)
+
+- **Claude Code settings keys and hook events:** the Agent SDK's `sdk.d.ts`, whose `interface Settings` is "auto-generated
+  from the settings JSON schema". It is matched to the Claude Code version by its package.json `claudeCodeVersion`
+  through the npm packument (2.1.289 resolves to SDK 0.3.289). It is machine-readable and versioned, but it is not
+  the whole documented surface: on 2026-10-04 the settings reference documented 10 settings keys that sdk.d.ts
+  0.3.289 does not type (among them `autoMode`, `sshHostAllowlist`, `useAutoModeDuringPlan`). Anthropic publishes no
+  settings schema of its own (request: anthropics/claude-code#94232).
+- **Claude Code settings keys, second source:** the key headings of
+  <https://code.claude.com/docs/en/settings-reference.md> (live docs, no version stamp). `claude:setting` is the union
+  of both sources, and each run records which source holds each key. The page's own structure decides what is not a
+  settings key: the `## Global config settings` section, whose keys go in `~/.claude.json` and whose `**Scope**`
+  bullets say `Global config` (12 keys, the same 12 by both rules on the 14:31Z copy), and the entries that open with
+  a `<Warning>` "Removed in v...". There are three of those: `taskOutputMaxChars`, `permissionExplainerEnabled` and
+  `teammateDefaultModel`; the last two are global-config keys.
+- **Environment variables and built-in mods:** the docs pages `env-vars.md` and `plugins/mods/overview.md`. No
+  first-party machine-readable list exists, so the watch greps backticked names. It is page-wide, so a new section
+  is not missed.
+- **Codex config keys:** the `config-schema.json` asset of the stable GitHub release (generated from `ConfigToml`).
+  It is reached through one `gh api .../releases/latest` call and verified against the asset's published sha256
+  digest; GitHub published one for rust-v0.160.0 (read 2026-10-04T14:36Z). A release without a digest is read
+  unverified, and its coverage record and a note say so.
+- **Codex features:** `codex features list` of the installed binary, run under an empty temporary `CODEX_HOME`.
+- **Changelogs:** Claude Code's `CHANGELOG.md`, and the Codex stable release notes. The notes come from GraphQL,
+  because the REST release list carries about 176 assets per release, 9 MB for 30 releases.
+- **Trigger and versions:** the npm dist-tags. The Claude channel under watch is `latest`, which the settings template
+  selects. npm's `stable` tag (2.1.285 on 2026-10-04) lags it.
+
+## Third-party trackers: cross-checks, not baselines
+
+The trackers are compared report-only (`--cross-check`). A cross-check failure never fails the run. The SchemaStore
+sync point and the two READMEs below come from the coordinator's research of 2026-10-04 and were not re-read in this
+unit. The unit's 14:00Z cross-check read the amitray007 release v2.1.289 and the chenrui333 `lifecycle.json`
+(codex-cli 0.160.0).
+
+- **amitray007/claude-code-schema** (per-release settings and environment catalogs, digest-published). Its releases
+  skip versions: `gh api .../releases` at 2026-10-04T15:05Z lists none for 2.1.274-279 or 2.1.284-286. Its newest
+  release, v2.1.289 (16 assets, each with a sha256 digest), was published 2026-10-04T08:29:40Z, and v2.1.288 on
+  2026-10-03T08:09:34Z (`gh api .../releases/latest`, read 14:36Z). An earlier draft of this record called v2.1.288
+  the newest; that held only before 08:29Z.
+- **chenrui333/codex-docs** `lifecycle.json` (key, stage, enabled per feature). It is a daily third-party extraction,
+  without release assets.
+- **SchemaStore's claude-code-settings.json.** It was last synced "to Claude Code v2.1.220", about 69 releases behind.
+- **marckrenn/claude-code-changelog.** Its README says it costs server time and tokens to run.
+
+## What no maintained tool covers (why the glue exists)
+
+No maintained tool diffs the Claude Code settings surface, environment variables or mods between versions, apart
+from amitray007's repository script, which is not released for every version. Neither vendor publishes a feature-change
+feed or action. Per the same research, `getsentry/json-schema-diff` describes itself as a work in progress, and
+nvchecker is a version trigger only. The watch is therefore stdlib-only glue: fetch, anchor-checked parse, name diff, cache. It has no
+judgment of its own; the dispositions catalog and the resolver loop hold the judgments.
+
+## Measured at the baseline (2026-10-04T15:03Z, the tool's own run)
+
+The first baseline (10:44Z) was regenerated with the tool after the review round: the settings reference joined
+`claude:setting`, and profile mirrors left `codex:config`. The versions are unchanged. The baseline holds:
+
+- 183 `claude:setting` names, the union of 173 in `sdk.d.ts` and 171 in the settings reference. 161 are in both, 12
+  only in `sdk.d.ts` (among them `$schema` and `taskOutputMaxChars`, which the reference marks removed) and 10 only
+  in the reference;
+- 33 `claude:hook`, 407 `claude:env` and 6 `claude:mod` names (unchanged);
+- 1,034 `codex:config` paths: the 1,341 of 10:44Z without the 307 `profiles.*.<path>` mirrors of a root `<path>`;
+- 152 `codex:feature` names (codex-cli 0.159.3 was installed; the release under watch was rust-v0.160.0).
+
+The independent extraction of the same morning differs as follows:
+
+- **Settings.** 171 of the 183 top-level keys the settings reference documents are in the baseline. Its 12 others are
+  the global-config keys, two of them marked removed. The review round's count of 8 settings keys missing from the
+  SDK (22 docs-only keys, minus 12 global-config, minus 2 removed) subtracted the two removed global-config keys
+  twice; the live page gives 10. The baseline's 12 keys outside the extraction are 11 that only `sdk.d.ts` holds and
+  `remote`, which the page documents only through `remote.defaultEnvironmentId`.
+- **Hooks and mods.** Equal.
+- **Environment variables.** All 382 table names are included. The 25 extra names are 11 that the scrub section lists
+  (names Claude Code removes from subprocess environments) and 14 that variable descriptions mention (OpenTelemetry's
+  standard variables, `PATH`, `TERM`).
+- **Codex config paths.** All 1,034 are in the extraction's 1,417 schema paths. Its 383 others are 311 under
+  `profiles.*` (the 310 mirrors of a root path and the bare `profiles.*` container) and 72 other bare map and array
+  containers (`x.*`, `x[]`).
+- **Codex features.** The two features missing from the binary were added in rust-v0.160.0.
+
+The degraded artifacts of the review round, re-run with that round's parser on the real artifacts fetched at 15:03Z
+against this baseline, each passed the absolute bounds and stopped at the 80% floor (exit 3):
+
+- `config-schema.json` without its definitions gives 266 paths, and without `allOf`/`anyOf`/`oneOf` 361 (553 before
+  the mirrors were dropped);
+- `env-vars.md` cut at half its table gives 218 names.
+
+This was a local integration check in scratch, not an upstream test.
+
+The later offline repair records five anti-patterns and their regression checks: unresolved local Codex references
+now fail integrity before any floor or baseline write; an existing watch state directory preserves prior findings
+when its report disappears; CommonMark ATX headings are checked against all top-level Settings index names with a
+two-key symmetric-difference tolerance before global/removed exclusions; bounded malformed JSON and Unicode inputs
+remain unreadable records; and TypeScript hook and quoted-setting names use decoded escapes. The checks use cached
+SDK 0.3.289, Codex rust-v0.160.0 and settings-reference artifacts plus synthetic mutations in
+`tests/test_upstream_surface_watch.py` and `tests/test_currency_due.py`; they are local integration checks and
+synthetic fixtures, not upstream tests.
+
+These are integrity checks of the parsers, not savings or quality measurements; no token-savings claim is made.
+
+## Alternatives and overturn
+
+- **Read SchemaStore or amitray007 as the baseline.** Rejected: they lag or skip versions.
+- **Grep the changelog for "Added" only.** Kept as report-only context: prose cannot list names reliably.
+- **Run the watch as `ExecStartPre=-` of `stack-currency.service`.** Rejected. That would make the currency unit
+  networked (its description and tests say offline) and would share its 900 s start budget.
+
+Overturn this record when:
+
+- Anthropic ships an official settings schema or a listing command (it replaces S2/S3);
+- amitray007 publishes every version over a sustained window (it becomes the env-var source);
+- OpenAI ships a machine-readable feature or env registry per release.
+
+## Addendum (2026-10-04): the second repair round, after the full read of PR 695
+
+An independent full read at `b4cd191c` (287 tests passing, the negative controls included) found three P2 defects; each is
+closed here.
+
+1. **A report with an unobserved kind counted as fresh** (`scripts/currency_due.py`). `surface_findings()` checked only
+   timestamps, so a watch that lost a source (the Codex binary removed, or its probe failing after the cache was deleted) wrote
+   a report with `coverage.kinds_not_observed` set, exited 0, and the currency run cleared an existing due-file and printed
+   "nothing due". An unobserved kind, or a non-cross-check source with origin `unavailable` or `skipped`, is now
+   `surface watch incomplete` (`SURFACE_PARTIAL`): an incomplete check that keeps the earlier due-file and is never "nothing
+   due"; a malformed `coverage` is unreadable. Six of the nine regression tests fail on the earlier code
+   (18 assertion failures, "stack currency: nothing due") and pass now; the other three pass on both as controls (a complete
+   report still clears, an unavailable cross-check does not matter).
+2. **The persistent catch-up could start the networked watch during a paper session**
+   (`adoption/templates/systemd/upstream-surface-watch.service`). The service now has an `ExecCondition=` that defers the run on
+   weekdays from 09:00 to 16:30 America/New_York (`upstream_surface_watch.py --paper-window-check`); the guide's "Daily run"
+   section gives the reasons and the systemd.service(5) semantics. The window is the US regular session with a margin; the
+   repository has no machine-readable paper-window marker, so this is the one the lane's own market hours define; the live paper
+   timers (`paper-recover-a2-gate-20261005`, `paper-alpaca-a1-preflight-20261005`, `ibkr-paper-readonly-20261005`, read
+   2026-10-04 from `systemctl --user list-timers`) carry none either.
+3. **A decision inferred from an unrelated field of the same spelling** (`catalogs/foundation/upstream-surface-dispositions.json`).
+   `history.max_bytes` was "declined" on a citation about the result-carrier metric of a workflow tool, and the generated
+   sentence "off on both hosts although the upstream default is on" had been written for every row the ledger classed
+   covered-declined without reading any default: the released features list and schema contradict it for eight Codex features
+   and for `History.max_bytes` (default null). The sentence is gone (121 rows touched), `history.max_bytes`,
+   `tools.web_search`, its two sub-keys and twelve more rows whose citation named another client's or tool's field are
+   `baseline-unreviewed` or keep `enabled` with the upstream registry as source, the stale locators of `otelHeadersHelper` and
+   `otel.metrics_exporter` are fixed, `plugin_hooks` is `not-applicable` (`Stage::Removed`, rust-v0.160.0
+   `codex-rs/features/src/lib.rs` L1474-L1479), and the command center's four parity decisions of the same day are recorded
+   (`service_tier`, `analytics_plan_history`, `crossSessionInbound`, `advisorModel`). `DispositionCitationTests` now checks the
+   committed catalog against the cited files (the key named in the cited lines, not only in a comment, its parent near a
+   dotted key, its own client near a one-word key) and refuses the unread-default sentence; run against the earlier catalog
+   it fails 127 times.
+
+Residual: whether a cited record is a decision, as opposed to a mention of the key, is still the judged ledger's call; the
+checks above catch a citation that does not name the key for the right client, not a record that names it and decides nothing.
+No deployed unit or scheduled catch-up has been exercised (the templates stay uninstalled).
+
+## Addendum (2026-10-04, later): the six connector review threads
+
+Six threads of the code-review connector, posted at 17:56Z on the head before the repairs above, were still unresolved on the
+current diff. One is answered as already fixed and five are closed here; every closure has a test that fails on the earlier code.
+
+| Thread | Disposition | Tests |
+| --- | --- | --- |
+| P1 `stack-currency.service`: the canonical lifecycle never installs the watch unit | `adoption/lifecycle.md` renders and verifies `upstream-surface-watch.service` beside the service that `Wants=` it, and says why | `LifecycleUnitTests`: 1 of 2 fails on the earlier block, 1 control |
+| P2 `upstream_surface_watch.py` `run()`: the baseline is replaced before the cache and report writes | the cache and `latest.json` are written first and the baseline last; a failed baseline write puts the earlier report back, or removes this run's | `BaselineWriteTests` |
+| P2 `run()`: a baseline made from stale data | `--write-baseline` needs `--network`, and a recorded source that came from the cache or was unavailable refuses it (exit 4) | `BaselineWriteTests` |
+| P2 `read_json_file()`: a JSON conversion failure is a traceback | `JSON_FAILURES = (ValueError, RecursionError)` at the four sites that caught `JSONDecodeError` (the catalog and baseline reader, a cache record, a fetched body, the release list) | `JsonConversionTests`: 3 tests, 6 subtests fail |
+| P2 `currency_due.py`: an unobserved Codex surface counted as fresh | closed in the second round above (item 1); answered, no change | the nine tests of that round |
+| P2 `currency_due.py`: any `schema_version` accepted | `SURFACE_SCHEMA_VERSION`; another version, none, a string, a boolean or a float is `surface watch output unreadable` | `SurfaceWatchTests`: 7 subtests fail |
+
+`BaselineWriteTests` has eight tests, six of which fail on the earlier code (offline write, a source from the cache, a failed cache
+write, a failed report write, and the two restore messages); the other two are controls (a run that fetched every source still
+makes the baseline, and a first baseline write that fails leaves no report). The seven hand-written reports of
+`tests/test_currency_due.py` now carry `schema_version` 1 so that each still reaches the branch it names, and the real-schema
+integration test sends its corrupt schema over the synthetic network, since an offline baseline write is refused.
+
+Residual: the rollback restores `latest.json` only; the cache entries a failed run committed stay, being inputs and not claims, and a
+rollback that fails is reported, not retried. The tests drive a synthetic network and a patched `write_atomic`; no real
+`--write-baseline` run against the live upstream was made in this round, and no unit is installed on any host by this change.
+
+## Addendum (2026-10-04, evening): the delta read of `e513181c` and one more fix, a second repair round beyond the bounded loop
+
+A cross-family delta read at `e513181c` (523 tests in eight modules, exit 0; the old-head controls red) verified all six
+threads fixed or already fixed and found one P2 in the fix of the second thread. When the baseline write and the restore of the
+earlier report both fail (a full filesystem fails every rewrite), `restore_report()` returned a diagnostic and left the new
+report in place. That report is built against the new baseline and says "nothing new", so beside the baseline that was not
+replaced it is a fresh report with nothing unreviewed: the currency job read it so and cleared the notice that the earlier
+report had earned (the read reproduced this with the repository's fixtures; the head before the fix of the second thread did not
+have the defect, because it wrote the baseline first and nothing after it).
+
+`restore_report()` now removes the failed run's report when it cannot put the earlier one back, and when there was none, so that
+`scripts/currency_due.py` finds a lost report, an incomplete check that keeps the notice (`surface watch stale`); a report that
+can be neither restored nor removed is named with its path and the instruction to delete it. `BaselineWriteTests` gains two
+tests: the first drives the currency job's own reader (`surface_findings()`) over the state after both writes fail and fails on
+the earlier code with the count 0 and `fresh`, and the second covers a removal that also fails.
+
+This is a second repair round, past the bounded loop's one review and one repair round, taken because the finding is a
+regression that the first round introduced. The loop stops here. Residual: the report and the baseline are still two writes, so
+a process killed between them leaves the new report beside the old baseline until the next daily run, which compares against the
+old baseline and reports the new switches again; no unit is installed on any host by this change.

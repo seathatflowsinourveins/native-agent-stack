@@ -1,0 +1,50 @@
+# Drafted, not run: no host has loaded, enabled or started this unit (the worktree that authored it made no host
+# changes). stack-currency.service pulls it in (Wants=) and orders itself after it (After=), so the daily
+# stack-currency.timer runs the watch first and scripts/currency_due.py then counts its fresh latest.json. It has no
+# [Install] section and no timer of its own, matching this directory's timer-triggered oneshot convention.
+#
+# Wants= is the weak dependency of systemd.unit(5) (systemd 255.4-1ubuntu8.17 on the workstation): "if the listed
+# units fail to start or cannot be added to the transaction, this has no impact on the validity of the transaction
+# as a whole, and this unit will still be started". For a service, After= waits until "all its configured start-up
+# commands have been invoked and they either failed or reported start-up success" (the same page), so a failed,
+# timed-out or missing watch never blocks the currency run. currency_due.py then counts the last report whose data is
+# at most three days old (a source the watch took from the cache after a failed fetch keeps its fetch time); an older,
+# future-dated or unreadable report is "surface watch stale" or "surface watch unreadable", a check that could not
+# answer (the earlier notice stays and the line never says "nothing due"), and no report is the coverage note "surface
+# watch not run".
+#
+# @REPOSITORY@ is the live clone, as for stack-currency.service (never the working checkout or a build worktree).
+# Install both services and the timer together and verify them (adoption/lifecycle.md):
+#   sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/upstream-surface-watch.service > ~/.config/systemd/user/upstream-surface-watch.service
+#   systemd-analyze --user verify ~/.config/systemd/user/upstream-surface-watch.service ~/.config/systemd/user/stack-currency.service ~/.config/systemd/user/stack-currency.timer
+#
+# The run fetches public sources (npm registry, unpkg, code.claude.com, raw.githubusercontent.com, GitHub release
+# downloads) and makes `gh api` calls with gh's own stored sign-in; it makes no model call, reads no credential and
+# writes only ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/surface-watch/ (cache/ and latest.json, mode
+# 0600). It runs `codex features list` with an empty temporary HOME and CODEX_HOME, so the host's Codex home is
+# neither read nor written. PATH holds the ecosystem bin directory for gh and codex, as in stack-currency.service.
+# The paper window: stack-currency.timer is Persistent=true with RandomizedDelaySec=15m, so after a day the host was down the
+# catch-up can start this networked run within 15 minutes of WSL starting, which can be during a paper session. ExecCondition=
+# runs `upstream_surface_watch.py --paper-window-check` first: it exits 1 on a weekday from 09:00 to 16:30 America/New_York (the
+# US regular session with a 30-minute margin each side) and 0 otherwise. systemd.service(5), ExecCondition=: an exit status of
+# 1 to 254 skips the remaining commands and "the unit is not marked as failed", so the watch is deferred to the next daily run,
+# and stack-currency.service, which only Wants= this unit, still runs and counts the last report (at most three days old; an
+# older one is "surface watch stale"). The check reads no state and makes no request.
+# TimeoutStartSec=600 is the bound on the whole run. The script's 60 s HTTP timeout is urllib's timeout for each
+# blocking socket operation (the connect, each read), not for a whole fetch, so a slow body can outlast it; each
+# subprocess (a gh api call, codex --version, codex features list) has a 60 s timeout. docs/upstream-surface-watch.md.
+[Unit]
+Description=Write the upstream-surface watch report for the currency notice (public fetches, no model call)
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=600
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecCondition=/usr/bin/python3 @REPOSITORY@/scripts/upstream_surface_watch.py --paper-window-check
+ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/upstream_surface_watch.py --network

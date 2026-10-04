@@ -64,6 +64,30 @@ gateway-forwarded effort and backend identity are separate evidence; the worker
 does not verify the latter two. Preserving the native prefix is important for
 cache reuse; no prompt rewrite, extra skill carrier or outer agent loop is added.
 
+`--effort` accepts `max` and `ultra`, with `max` retained as the compatibility
+default. Ultra requires a suffixless model. Add
+`--model cx/gpt-6.1-sol --effort ultra` to the command above or to
+a resumed invocation to select native Ultra. The worker passes the selection to
+its child launch configuration and the SDK's native `ReasoningEffort` at turn start, and emits
+it as `requested_effort`. The worker preserves accepted model and effort inputs;
+the default model remains `cx/gpt-6.1-sol-max`. The checked OmniRoute HTTP carry
+prioritizes force rules, then recognized model suffixes, then body effort.
+Before native startup, the worker applies a lexical fail-closed check: Ultra is
+refused for any model ID ending in `-none`, `-low`, `-medium`, `-high`, `-xhigh`,
+`-max`, `-ultra`, `(max)` or `(ultra)`. Gateway alias sets change between builds,
+so this check also refuses IDs whose own name ends in these tokens, such as
+`cx/gpt-5.1-codex-max`, even when the gateway parser treats that ID as suffixless.
+This includes the default model paired with `--effort ultra`; supply the
+suffixless model explicitly.
+Qualify the gateway's installed build and force rules separately.
+
+Native model metadata controls ordinary inference normalization. The bundled
+Sol6.1 metadata maps Ultra to `xhigh`; other models can resolve it differently.
+Native orchestration mode depends on V2 and its native hint/catalog messages.
+A preflight `effective_config.model_reasoning_effort` value records native
+config-read selection; delivered effort and active orchestration require
+separate observation. See the pinned effort and orchestration sources below.
+
 Pass one bounded task on stdin. The worker emits a compact `thread_ready` JSON
 line before the turn, then a result with the final answer, item counts and native
 usage. To retain the actual full tool items, add `--native-result` with a new
@@ -184,7 +208,19 @@ post-turn read failure preserves the completed native result already saved.
 Six additional B3 tests cover the gateway credential filters and search switches
 in the process overrides/starter template, refusal of an existing native-result
 destination before thread creation, and a private failure record after an
-incomplete turn. The final suite contains 25 tests.
+incomplete turn.
+The effort checks use native config-read for both selections, observe the
+unchanged SDK turn receiving its native enum, and inspect the synthetic wire
+request after model-owned normalization. Start/resume subtests include starting
+with the default Max route, then resuming that thread with
+`--model cx/gpt-6.1-sol --effort ultra`. They observe the real thread read passing
+the worker's model/provider check, the resumed `requested_effort`, native
+`ReasoningEffort.ultra` turn argument and normalized wire effort `xhigh`.
+These fixtures retain the real pinned SDK/CLI and return authored SSE responses;
+they do not qualify model switching at a live gateway. Argument checks reject
+invalid effort and Ultra with every listed suffix token, including a non-alias
+`-max` ID, accept suffixless Ultra, and retain the default/resume `max` behavior.
+The suite contains 31 tests.
 The other fixture homes also disable plugins, and teardown checks that no
 `.tmp/plugins-clone-*` directories remain. No descendant-process or global egress
 assertion is made. Missing terminal events and an
@@ -221,6 +257,18 @@ formatter-driver test failure; no whole-suite passing claim is made here.
   and [native provider fields](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/model-provider-info/src/lib.rs):
   child-only CLI overrides, native lifecycle, Responses, headers and optional
   environment-key authentication.
+- [Native effort enum](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/src/openai_codex/generated/v2_all.py#L3694),
+  [SDK turn input](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/src/openai_codex/api.py#L724)
+  and [unchanged enum serialization test](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/tests/test_client_rpc_methods.py#L267):
+  native `max` and `ultra` selections through the maintained SDK API.
+- [Native Ultra normalization](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/openai_models/reasoning_effort.rs#L10)
+  and [native orchestration mode conditions](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/session/multi_agents.rs#L77):
+  supported model-owned effort override, then native fallback, with orchestration
+  separately conditional on V2 and native hint/catalog messages.
+- [OmniRoute effort precedence](https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex.ts#L1414)
+  and [recognized model suffixes](https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts):
+  force rule, then model suffix, then body effort at the declared owner carry;
+  input selection alone does not establish its installed state or actual delivery.
 - [Native namespaced model matching](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/src/manager.rs#L873)
   and [bundled model metadata](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/models.json):
   the single `cx/` namespace and `-max` suffix retain the longest-matching native

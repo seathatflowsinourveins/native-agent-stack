@@ -35,6 +35,7 @@ import tomllib
 import worker
 from openai_codex import AsyncCodex, AsyncThread
 from openai_codex.client import CodexClient
+from openai_codex.types import ReasoningEffort
 
 MCP_FIXTURE = r"""
 import json
@@ -296,11 +297,14 @@ class NativeTransportTests(unittest.TestCase):
             first, events = self.run_worker(self.args(gateway))
             self.assert_accepted(first)
             self.assertEqual(first["final_response"], "fixture answer 0")
+            self.assertEqual(first["requested_effort"], "max")
             self.assertEqual(events[0]["event"], "thread_ready")
+            self.assertEqual(events[0]["requested_effort"], "max")
             second, _ = self.run_worker(self.args(gateway, "--resume", first["thread_id"]))
             self.assert_accepted(second)
             self.assertEqual(second["thread_id"], first["thread_id"])
             self.assertEqual(second["thread_mode"], "resumed")
+            self.assertEqual(second["requested_effort"], "max")
             self.assertEqual(len(gateway.requests), 2)
             for request in gateway.requests:
                 self.assertEqual(request["path"], "/v1/responses")
@@ -335,6 +339,157 @@ class NativeTransportTests(unittest.TestCase):
             # Cached/reasoning counters are subsets; never add them to total.
             self.assertEqual(second_total["totalTokens"], 60)
             self.assertEqual(second["usage"]["last"]["totalTokens"], 36)
+
+    def test_explicit_effort_reaches_native_launch_configuration(self):
+        with FixtureGateway() as gateway:
+            for selected, model in [
+                ("max", "cx/gpt-6.1-sol-max"),
+                ("ultra", "cx/gpt-6.1-sol"),
+            ]:
+                with self.subTest(effort=selected):
+                    result, _ = self.run_worker(
+                        self.args(gateway, "--preflight", "--model", model, "--effort", selected)
+                    )
+                    self.assertEqual(result["status"], "ready", result)
+                    self.assertEqual(result["cleanup_status"], "closed", result)
+                    self.assertEqual(result["requested_effort"], selected)
+                    self.assertEqual(result["requested_model"], model)
+                    self.assertEqual(result["effective_config"]["model"], model)
+                    self.assertEqual(
+                        result["effective_config"]["model_reasoning_effort"], selected
+                    )
+                    self.assertFalse(result["model_inference_submitted"])
+                    self.assertIsNone(result.get("delivered_effort"))
+            self.assertFalse(gateway.requests)
+
+    def test_explicit_effort_reaches_native_turn_enum(self):
+        native_turn = AsyncThread.turn
+        native_read = AsyncThread.read
+        observed_efforts = []
+        observed_models = []
+
+        async def observe_turn(thread, *args, **options):
+            observed_efforts.append(options.get("effort"))
+            return await native_turn(thread, *args, **options)
+
+        async def observe_read(thread, *args, **options):
+            result = await native_read(thread, *args, **options)
+            observed_models.append((result.thread.model, result.thread.model_provider))
+            return result
+
+        # The native Sol6.1 metadata selects xhigh for ordinary Ultra inference.
+        # a956835d protocol/src/openai_models/reasoning_effort.rs:10-35.
+        for selected, model, enum_value, wire_value in [
+            ("max", "cx/gpt-6.1-sol-max", ReasoningEffort.max, "max"),
+            ("ultra", "cx/gpt-6.1-sol", ReasoningEffort.ultra, "xhigh"),
+        ]:
+            for thread_mode in ("started", "resumed"):
+                with (
+                    self.subTest(effort=selected, thread_mode=thread_mode),
+                    FixtureGateway() as gateway,
+                ):
+                    resume_options = []
+                    if thread_mode == "resumed":
+                        first, _ = self.run_worker(self.args(gateway))
+                        self.assert_accepted(first)
+                        resume_options = ["--resume", first["thread_id"]]
+                    observed_efforts.clear()
+                    observed_models.clear()
+                    with (
+                        patch.object(AsyncThread, "turn", observe_turn),
+                        patch.object(AsyncThread, "read", observe_read),
+                    ):
+                        result, events = self.run_worker(
+                            self.args(gateway, *resume_options, "--model", model, "--effort", selected)
+                        )
+                    self.assert_accepted(result)
+                    self.assertEqual(result["thread_mode"], thread_mode)
+                    if thread_mode == "resumed":
+                        self.assertEqual(result["thread_id"], first["thread_id"])
+                    # Observe the real read used by the worker's pre-turn model check.
+                    self.assertEqual(observed_models[0], (model, worker.PROVIDER))
+                    self.assertEqual(result["requested_effort"], selected)
+                    self.assertEqual(events[0]["requested_effort"], selected)
+                    self.assertEqual(result["requested_model"], model)
+                    self.assertEqual(events[0]["requested_model"], model)
+                    self.assertEqual(len(observed_efforts), 1)
+                    self.assertIs(observed_efforts[0], enum_value)
+                    self.assertEqual(len(gateway.requests), 2 if resume_options else 1)
+                    request = gateway.requests[-1]["body"]
+                    self.assertEqual(request["model"], model)
+                    self.assertEqual(request["reasoning"]["effort"], wire_value)
+                    self.assertIsNone(result.get("effective_effort"))
+                    self.assertIsNone(result.get("delivered_effort"))
+
+    def test_ultra_effort_rejects_recognized_model_suffixes(self):
+        # OmniRoute 0585aba5 open-sse/executors/codex/reasoningSuffix.ts.
+        suffixes = (
+            "-none", "-low", "-medium", "-high", "-xhigh", "-max", "-ultra", "(max)", "(ultra)"
+        )
+        for model in [None, *("cx/gpt-6.1-sol" + suffix for suffix in suffixes)]:
+            with self.subTest(model=model):
+                argv = ["--workspace", str(self.project), "--effort", "ultra"]
+                if model is not None:
+                    argv.extend(["--model", model])
+                stderr = io.StringIO()
+                with contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as rejected:
+                    worker.parse_args(argv)
+                self.assertEqual(rejected.exception.code, 2)
+                self.assertIn("--effort ultra requires a suffixless --model", stderr.getvalue())
+
+    def test_ultra_effort_lexically_rejects_non_alias_model_id(self):
+        # OmniRoute 0585aba5 reasoningSuffix.ts excludes this base from its
+        # Max alias set. The worker's lexical policy deliberately refuses it.
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as rejected:
+            worker.parse_args(
+                [
+                    "--workspace", str(self.project),
+                    "--model", "cx/gpt-5.1-codex-max",
+                    "--effort", "ultra",
+                ]
+            )
+        self.assertEqual(rejected.exception.code, 2)
+        self.assertIn("lexical fail-closed check", stderr.getvalue())
+        self.assertIn("own name ends", stderr.getvalue())
+
+    def test_ultra_effort_accepts_suffixless_model(self):
+        args = worker.parse_args(
+            ["--workspace", str(self.project), "--model", "cx/gpt-6.1-sol", "--effort", "ultra"]
+        )
+        self.assertEqual(args.model, "cx/gpt-6.1-sol")
+        self.assertEqual(args.effort, "ultra")
+        defaults = worker.parse_args(["--workspace", str(self.project)])
+        self.assertEqual(defaults.model, "cx/gpt-6.1-sol-max")
+        self.assertEqual(defaults.effort, "max")
+
+    def test_invalid_effort_is_rejected_before_native_startup(self):
+        native_start = CodexClient.start
+        starts = []
+
+        def observe_start(client):
+            starts.append(client)
+            return native_start(client)
+
+        argv = [
+            worker.__file__,
+            "--workspace",
+            str(self.project),
+            "--codex-home",
+            str(self.home),
+            "--prompt",
+            "Unused fixture task.",
+            "--effort",
+            "xhigh",
+        ]
+        stderr = io.StringIO()
+        with patch.object(sys, "argv", argv), patch.object(CodexClient, "start", observe_start):
+            with contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as rejected:
+                worker.main()
+        self.assertEqual(rejected.exception.code, 2)
+        self.assertIn("invalid choice", stderr.getvalue())
+        self.assertIn("--effort", stderr.getvalue())
+        self.assertFalse(starts)
 
     def test_explicit_astra_model_is_preserved(self):
         with FixtureGateway() as gateway:
