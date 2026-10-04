@@ -79,7 +79,7 @@ step gain-project rtk gain -p
   echo "## Codex fresh session: codex-git"
   jq -r 'select(.type=="item.completed" and .item.type=="command_execution") | "- executed: \(.item.command) (exit \(.item.exit_code)): \(.item.aggregated_output|tostring|.[0:120])"' "$out/codex-git.jsonl"
   jq -r 'select(.type=="turn.completed") | "- usage: input \(.usage.input_tokens), cached \(.usage.cached_input_tokens), output \(.usage.output_tokens)"' "$out/codex-git.jsonl"
-  echo "## rtk gain (upstream counter, whole host; the E2E's own commands are the delta)"
+  echo "## rtk gain (upstream counter, whole host: the delta spans the E2E's interval and includes any other session's commands; the project-scoped block below is this E2E's own)"
   jq -n --slurpfile b "$out/gain-before.out" --slurpfile a "$out/gain-after.out" \
     '"- commands \($b[0].summary.total_commands) -> \($a[0].summary.total_commands) (+\($a[0].summary.total_commands - $b[0].summary.total_commands)); saved tokens \($b[0].summary.total_saved) -> \($a[0].summary.total_saved) (+\($a[0].summary.total_saved - $b[0].summary.total_saved)); average saving \($a[0].summary.avg_savings_pct)%"' -r
   echo "- rtk gain -p (this fresh project only):"

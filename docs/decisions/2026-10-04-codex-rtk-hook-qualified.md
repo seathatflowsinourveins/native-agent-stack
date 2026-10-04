@@ -38,15 +38,20 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
    tool sends the edit the TUI's `/hooks` review sends, `config/batchWrite` of `hooks.state`, mergeStrategy upsert,
    `{"<key>": {"trusted_hash": <currentHash>}}` (`codex-rs/tui/src/hooks_rpc.rs` write_hook_trusts L58-L91), for the user-layer hooks whose command
    equals one named with `--command` and for no other hook; a dry run is the default, `--apply` backs up `config.toml` (mode 0600), refuses
-   while a codex process runs and reads the result back through `hooks/list`. This grant is the trust decision for the hook that sees every
-   Bash command; the user's "yes frictionless" above is its authority.
+   while a codex process runs and reads every named hook back through `hooks/list` by key and hash (a hook that vanished, moved or
+   changed during the write, or a discovery error that was not there before it, is exit 3: `expectedVersion` guards `config.toml`, not the
+   hooks file). This grant is the trust decision for the hook that sees every Bash command; the user's "yes frictionless" above is its authority.
 2. The row's acceptance is `rtk init --show --codex` with every line `[ok]`, `codex_hook_trust.py --command "rtk hook codex"` reporting the
    hook trusted, a fresh `codex exec --json --ephemeral` probe whose executed command carries the `rtk` prefix from each real launcher (the
    hook is the bare command `rtk hook codex` and fails open and silent when `rtk` is not on the launcher's PATH), the fresh-session E2E
-   (`fresh_session_e2e.sh`) and the Codex arm of `codex_hook_qual.py`.
+   (`fresh_session_e2e.sh`) and the Codex arm of `codex_hook_qual.py`, with the five `exclude_commands` of
+   `fixtures/rtk-hook-exclusions.toml` in rtk's config file (`rtk rewrite "diff a b"` printing nothing shows them in place).
 3. The awareness block of the Codex `AGENTS.md` template stays (with the hook the model's own prefix is left alone: no `rtk rtk`) and its
-   exceptions are reconciled with rtk 0.51.0 as measured: the hook path leaves `git show REV:path`, `diff`, `jq` and `git branch` alone
-   (rtk's own table, `rtk rewrite`), `find` on a missing path now exits 1 like find, and default `git log` caps at 10 commits with a notice.
+   exceptions are reconciled with rtk 0.51.0 as measured (`rtk_behaviour_probe.py`): the hook leaves `git show REV:path`, `diff`, `jq` and
+   `git branch` alone only under the five `exclude_commands` of `fixtures/rtk-hook-exclusions.toml`, which the bootstrap installs for the
+   Claude hook and the Codex hook reads from the same rtk config (with upstream defaults rtk rewrites all four); `find` on a missing path
+   exits 1 like find; bare `git log` caps at 10 commits without a notice and drops merge commits, and `git log --stat` caps at 10 with the
+   notice.
 4. The hold-out in the handbook and in the token-efficiency card becomes this decision and its evidence.
 
 ## Evidence (`evidence/artifacts/token-stack-fresh-session-e2e-20261004/`)
@@ -54,9 +59,11 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
 | Claim | Evidence class | Source |
 | --- | --- | --- |
 | `rtk init -g --codex` appends one PreToolUse group after the existing ones, changes no other byte, is idempotent, reversible with `--uninstall`, and Codex's `hooks/list` loads it without error | `local_integration`: the upstream commands on a scratch copy of the host's hooks.json; the live file was hashed before and after | README, "Codex rtk hook qualification" |
-| With the hook trusted, 22 of the 23 commands of the four arms that exercise it (R1, R2, B2, R2b) ran with the `rtk` prefix (the 23rd, `diff`, is one rtk does not rewrite), exit codes equal to the shell's in all seven arms (0 2 1 0 1 0 and 0 0 1 2 0), nothing blocked, a second PreToolUse hook ran in every trusted arm | `local_integration`: real codex-cli 0.159.3 and rtk 0.51.0 through the loopback gateway, one run per arm | `receipt.json`, `codex_hook_qual.py` |
+| With the hook trusted, 22 of the 23 commands of the four arms that exercise it (R1, R2, B2, R2b) ran with the `rtk` prefix (the 23rd, `diff`, is excluded by the host's `exclude_commands`, which the arms ran with), exit codes equal to the shell's in all seven arms (0 2 1 0 1 0 and 0 0 1 2 0), nothing blocked, a second PreToolUse hook ran in every trusted arm | `local_integration`: real codex-cli 0.159.3 and rtk 0.51.0 through the loopback gateway, one run per arm | `receipt.json`, `codex_hook_qual.py` |
 | An untrusted hook is skipped, in that arm together with the other hook; a hook with `rtk` off the PATH fails open; a model-prefixed command gets no second prefix | same | same |
-| The trust edit works through `codex_hook_trust.py` on the real binary: dry run, apply with backup, idempotent second run, exit 4 when no hook has the command | `local_integration`: a scratch home | the arms above ran with it; its fake-server tests are `synthetic` (15 tests) |
+| The trust edit works through `codex_hook_trust.py` on the real binary: dry run, apply with backup, idempotent second run, exit 4 when no hook has the command | `local_integration`: a scratch home | the arms above ran with it; its fake-server tests are `synthetic` (22 tests) |
+| The trust tool's read-back, when the hook's definition changes right after the write, on the real binary: the tool at `c8613fe16` reported success (exit 0), the fixed tool exits 3 and names the hook | `local_integration`: real `codex app-server` 0.159.3, a scratch home, one run each | `trust_readback_race.py`; `receipt.json`, `trust_readback_race` |
+| rtk 0.51.0's rewrite table with upstream defaults and with the five `exclude_commands`, and its compact forms against the shell's (the log cap and its notice, dropped merges, the trailing newline, `/usr/bin/ls`, `find` exit 1) | `local_integration`: one run, one host, a scratch repository and scratch homes | `rtk_behaviour_probe.py`; `rtk-behaviour-probe.json` |
 | `rtk-ai/rtk` v0.51.0 and `openai/codex` rust-v0.159.3 behave as the citations above say | `source_review` | the pinned README and source lines |
 | A fresh Claude and Codex session on NativeStack picks the token stack up with nothing per project, and rtk rewrites show in the hook events | `local_integration` | `nativestack-before-snapshot.summary.md` |
 
@@ -67,7 +74,11 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
 - **Copy the hook entry from a template** instead of running `rtk init -g --codex`. Rejected: it is not upstream's command, and the entry
   would drift from what rtk writes (rtk owns the hooks.json patch, its idempotence and its `--uninstall`).
 - **Trust through the interactive `/hooks` review.** Not automatable on a fresh distribution; kept as the way a user reviews or revokes.
-- **`--dangerously-bypass-hook-trust`.** Described in the Codex docs for one-off automation, absent from `codex exec` of 0.159.3, and per invocation only.
+- **`--dangerously-bypass-hook-trust`.** Present in 0.159.3 (`codex exec --help`; `codex-rs/utils/cli/src/shared_options.rs` L61-L64 and
+  `codex-rs/exec/src/cli.rs` L145 at `01fc69f4`): "Run enabled hooks without requiring persisted hook trust for this invocation.
+  DANGEROUS." Rejected as the install path: it persists nothing, so every launcher (the TUI, each `codex exec`, a wrapper) would have to
+  carry it, and it skips trust for every enabled hook, where the persisted grant is bound to one hook's hash and `/hooks` shows and revokes it.
+  An earlier draft of this record said the flag was absent; that came from a `head`-truncated filter of the help text (anti-pattern log).
 - **Trust every hook of the home.** Rejected: the tool names the command it trusts and ignores every other hook, a managed one and a project's.
 - **An absolute path in the hook command** to survive a launcher without `rtk` on its PATH. Rejected: it departs from upstream's command; the acceptance
   probes each real launcher instead.
@@ -82,7 +93,12 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
 
 ## Residuals
 
-One run per arm, one host, the loopback gateway route and not the host's ChatGPT sign-in; no claim about tokens saved. The hook is skipped
+One run per arm, one host, the loopback gateway route and not the host's ChatGPT sign-in; no claim about tokens saved. Native probes ran on
+codex-cli 0.159.3 only: no 0.160.0 binary was run, so 0.160.0 is checked from source only. The hook is skipped
 again whenever its definition or its group index changes (the key carries the index), so the acceptance probe is the check, not the grant. The
 2604 after snapshot, the PATH of each real launcher and the grant on a real host are later steps that this decision schedules and does not
-run. Cosmetic differences remain (a dropped trailing newline in `rtk git status --short`, `/usr/bin/ls` in an `rtk ls` error).
+run. Cosmetic differences remain (a dropped trailing newline in `rtk git status --short`, `/usr/bin/ls` in an `rtk ls` error), and so do
+content differences in rtk's compact `git log` (merge commits dropped, a 10-commit cap), which the awareness reconcile carries. A dry run of
+the trust tool makes no trust or config edit but is not read-only: starting the app-server creates its own state files in the Codex home.
+The NativeStack counter delta of the snapshot (+33 commands, +297 saved tokens) spans other sessions' commands; the project-scoped block of
+its summary is the E2E's own.

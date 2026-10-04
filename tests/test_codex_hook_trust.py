@@ -41,9 +41,14 @@ def hook(key: str, command: str, status: str = "untrusted", **changes) -> dict:
 class FakeServer:
     """hooks/list, config/batchWrite and the user layer of one in-memory Codex home."""
 
-    def __init__(self, hooks, *, fail_write: dict | None = None, ignore_write: bool = False):
+    def __init__(self, hooks, *, fail_write: dict | None = None, ignore_write: bool = False, after_write=None,
+                 errors: list | None = None, errors_after_write: list | None = None):
         self.hooks, self.version, self.requests = hooks, "v1", []
         self.fail_write, self.ignore_write = fail_write, ignore_write
+        # after_write(server) runs once the write has been applied: a change of the hooks file that lands during it
+        # (expectedVersion guards config.toml, not the file a hook is defined in). errors are the discovery errors hooks/list
+        # reports, and errors_after_write the ones it reports once the write is done.
+        self.after_write, self.errors, self.errors_after_write, self.written = after_write, errors or [], errors_after_write, False
 
     def __enter__(self):
         return self
@@ -57,7 +62,9 @@ class FakeServer:
     def request(self, method, params):
         self.requests.append((method, copy.deepcopy(params)))
         if method == "hooks/list":
-            return {"data": [{"cwd": params["cwds"][0], "hooks": copy.deepcopy(self.hooks), "errors": [], "warnings": []}]}
+            errors = self.errors_after_write if self.written and self.errors_after_write is not None else self.errors
+            return {"data": [{"cwd": params["cwds"][0], "hooks": copy.deepcopy(self.hooks), "errors": copy.deepcopy(errors),
+                              "warnings": []}]}
         if method == "config/batchWrite":
             if self.fail_write:
                 raise lane.AppServerError(method, self.fail_write)
@@ -67,7 +74,9 @@ class FakeServer:
                         for row in self.hooks:
                             if row["key"] == key:
                                 row["trustStatus"] = "trusted" if state["trusted_hash"] == row["currentHash"] else "modified"
-            self.version = "v2"
+            self.version, self.written = "v2", True
+            if self.after_write:
+                self.after_write(self)
             return {"status": "ok", "version": self.version}
         raise AssertionError(method)
 
@@ -98,7 +107,7 @@ class Case(unittest.TestCase):
 
 
 class DryRunTests(Case):
-    def test_a_dry_run_lists_the_match_and_writes_nothing(self):
+    def test_a_dry_run_lists_the_match_and_makes_no_trust_or_config_edit(self):
         server = FakeServer([hook(MEMORY_KEY, "ai-memory --data-dir x", "trusted"), hook(KEY, RTK)])
         code, out, err = self.run_tool(server)
         self.assertEqual(code, 0, err)
@@ -204,6 +213,79 @@ class ApplyTests(Case):
         self.assertEqual(code, 3)
         self.assertIn("still reports not trusted", err)
         self.assertIn(KEY, err)
+
+    def test_a_hook_whose_definition_changed_during_the_write_is_a_failure(self):
+        # The second hooks/list is read by key and hash, not by command again: a hook that now has another command is `modified`
+        # (trusted_hash was written for the old definition) and must not drop out of the check.
+        def change(server):
+            server.hooks[0].update(command="rtk hook other", currentHash="sha256:" + "d" * 64, trustStatus="modified")
+
+        server = FakeServer([hook(KEY, RTK)], after_write=change)
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 3)
+        self.assertIn(KEY, err)
+        self.assertIn("changed during the write", err)
+        self.assertNotIn("trusted 1 hook", out)
+        self.assertIn("config.toml.bak.", err)
+
+    def test_a_hook_that_vanished_during_the_write_is_a_failure(self):
+        server = FakeServer([hook(KEY, RTK)], after_write=lambda s: s.hooks.clear())
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 3)
+        self.assertIn(KEY, err)
+        self.assertIn("no longer listed", err)
+        self.assertNotIn("trusted 1 hook", out)
+
+    def test_a_hook_that_left_the_user_layer_during_the_write_is_a_failure(self):
+        for change in ({"source": "project"}, {"isManaged": True}, {"handlerType": "prompt"}):
+            with self.subTest(change=change):
+                server = FakeServer([hook(KEY, RTK)], after_write=lambda s, c=change: s.hooks[0].update(c))
+                code, out, err = self.run_tool(server, "--apply")
+                self.assertEqual(code, 3)
+                self.assertIn("no longer a user-layer command hook", err)
+                self.assertNotIn("trusted 1 hook", out)
+
+    def test_an_already_trusted_hook_that_vanished_during_the_write_is_a_failure(self):
+        other = hook("/home/example/.codex/hooks.json:stop:0:0", "other-hook", "trusted", eventName="stop", matcher="")
+
+        def drop_other(server):
+            server.hooks[:] = [row for row in server.hooks if row["key"] == KEY]
+
+        server = FakeServer([hook(KEY, RTK), other], after_write=drop_other)
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err), \
+                mock.patch.object(trust.lane, "AppServer", return_value=server), \
+                mock.patch.object(trust.lane, "codex_processes", return_value=[]):
+            code = trust.main(["--codex", str(self.codex), "--codex-home", str(self.home), "--command", RTK,
+                               "--command", "other-hook", "--apply"])
+        self.assertEqual(code, 3, out.getvalue())
+        self.assertIn(other["key"], err.getvalue())
+        self.assertIn("no longer listed", err.getvalue())
+
+    def test_a_discovery_error_that_appears_with_the_write_is_a_failure(self):
+        error = {"path": "/home/example/.codex/hooks.json", "message": "expected value at line 3 column 1"}
+        server = FakeServer([hook(KEY, RTK)], errors_after_write=[error])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 3)
+        self.assertIn("expected value at line 3 column 1", err)
+        self.assertIn("/home/example/.codex/hooks.json", err)
+        self.assertNotIn("trusted 1 hook", out)
+
+    def test_a_discovery_error_that_was_already_there_is_reported_and_is_not_a_failure(self):
+        error = {"path": "/work/proj/.codex/hooks.json", "message": "unrelated parse error"}
+        server = FakeServer([hook(KEY, RTK)], errors=[error])
+        for extra in ((), ("--apply",)):
+            with self.subTest(extra=extra):
+                code, out, err = self.run_tool(server, *extra)
+                self.assertEqual(code, 0, err)
+                self.assertIn("unrelated parse error", out)
+                self.assertIn("/work/proj/.codex/hooks.json", out)
+
+    def test_the_read_back_names_the_hash_it_trusted(self):
+        server = FakeServer([hook(KEY, RTK)])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertIn("read back from hooks/list by key and hash", out)
 
     def test_a_home_without_a_config_file_gets_no_backup(self):
         self.config.unlink()

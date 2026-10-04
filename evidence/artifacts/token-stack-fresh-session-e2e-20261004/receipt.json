@@ -107,6 +107,7 @@
  },
  "codex_hook_qualification": {
   "live_hooks_json_unchanged": true,
+  "rtk_configuration": "The arms ran with the host's HOME, so rtk read the host's own configuration: a [hooks] exclude_commands of the five entries of fixtures/rtk-hook-exclusions.toml (git show REV:path, diff, git branch, jq). That is why arm B2's diff was not rewritten; with upstream defaults rtk rewrite rewrites those four too (rtk-behaviour-probe.json, rewrite.upstream_defaults against rewrite.repository_exclusions).",
   "arms": [
    {
     "arm": "R0-probe-only",
@@ -380,6 +381,24 @@
     2,
     0
    ]
+  }
+ },
+ "trust_readback_race": {
+  "recorded_utc": "2026-10-04T23:25Z",
+  "script": "trust_readback_race.py",
+  "what": "the hooks file changes ('echo named-hook' to 'echo different-hook') as soon as config/batchWrite returns, against the real codex app-server in a scratch Codex home",
+  "codex": "codex-cli 0.159.3",
+  "before_the_fix": {
+   "tool": "tools/adoption/codex_hook_trust.py at c8613fe16",
+   "exit": 0,
+   "stdout": "hooks named in <scratch>/codex-home:\n  <scratch>/codex-home/hooks.json:pre_tool_use:0:0: preToolUse Bash 'echo named-hook' is untrusted\nbackup: <scratch>/codex-home/config.toml.bak.<stamp>\ntrusted 1 hook(s) in <scratch>/codex-home/config.toml; read back from hooks/list",
+   "stderr": ""
+  },
+  "after_the_fix": {
+   "tool": "tools/adoption/codex_hook_trust.py of this pull request",
+   "exit": 3,
+   "stdout": "hooks named in <scratch>/codex-home:\n  <scratch>/codex-home/hooks.json:pre_tool_use:0:0: preToolUse Bash 'echo named-hook' is untrusted\nbackup: <scratch>/codex-home/config.toml.bak.<stamp>",
+   "stderr": "failed: hooks/list after the write: <scratch>/codex-home/hooks.json:pre_tool_use:0:0: changed during the write ('echo different-hook' is modified); the backup is <scratch>/codex-home/config.toml.bak.<stamp>"
   }
  }
 }

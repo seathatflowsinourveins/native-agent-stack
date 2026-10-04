@@ -62,7 +62,7 @@
 ?? c/
 
 - usage: input 39197, cached 19328, output 49
-## rtk gain (upstream counter, whole host; the E2E's own commands are the delta)
+## rtk gain (upstream counter, whole host: the delta spans the E2E's interval and includes any other session's commands; the project-scoped block below is this E2E's own)
 - commands 262568 -> 262601 (+33); saved tokens 124711599 -> 124711896 (+297); average saving 9.02291465765439%
 - rtk gain -p (this fresh project only):
     RTK Token Savings (Project Scope)

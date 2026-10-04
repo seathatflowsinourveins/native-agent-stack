@@ -9,12 +9,15 @@ out at the 0.50.0 pin because it was not qualified, be installed with `rtk init 
 | --- | --- | --- |
 | Fresh-session E2E | `fresh_session_e2e.sh <label>` | `rtk --version`, `rtk init --show`, `rtk gain -f json` before and after, `claude mcp list`, `codex mcp list`, two fresh `claude -p --output-format stream-json --verbose --include-hook-events` sessions (git status, grep -rl), one fresh `codex exec --json --ephemeral` session, all in a new empty project directory, summarised with jq |
 | Codex hook qualification | `codex_hook_qual.py [outdir [arm ...]]` | `rtk init -g --codex`, `rtk init --show --codex`, Codex's own `hooks/list`, `tools/adoption/codex_hook_trust.py`, `codex exec --json --ephemeral` through the loopback OmniRoute gateway (no credential needed or copied), `rtk gain` |
+| rtk behaviour probe | `rtk_behaviour_probe.py [outfile]` | `rtk rewrite` and rtk's compact forms against the shell, in a scratch repository and scratch homes (no host configuration, no host counter): `rtk-behaviour-probe.json` |
+| Read-back race | `trust_readback_race.py [tool file]` | `tools/adoption/codex_hook_trust.py` against the real `codex app-server` when the hook's definition changes right after the write |
 
 Run the first inside a distribution (about 30 s, about 8 cents of Haiku for two probes plus one low-effort Codex probe). Run the
 second from the repository (about 5 min for seven arms of one or two sessions each): it builds scratch Codex homes and a fixture
 repository under `~/.cache/native-agent-stack-e2e`, never writes the live `~/.codex` (it hashes the live hooks.json before and
-after), and deletes its work directory. Files here: `receipt.json` (the sanitized results below) and
-`nativestack-before-snapshot.summary.md` (the E2E's own summary, home paths replaced).
+after), and deletes its work directory. Files here: `receipt.json` (the sanitized results below),
+`nativestack-before-snapshot.summary.md` (the E2E's own summary, home paths replaced) and `rtk-behaviour-probe.json` (the
+probe's output).
 
 ## NativeStack before snapshot (2026-10-04 21:44Z, before the NativeStack host steps of docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md)
 
@@ -28,7 +31,8 @@ after), and deletes its work directory. Files here: `receipt.json` (the sanitize
 - Gap found: SocratiCode is registered for Claude Code at local scope for one checkout (`claude mcp get socraticode`: "Local config"),
   so a fresh project does not get it although `adoption/mcp/claude-user.json` carries it at user scope; Codex lacks jcodemunch until the
   host step registers it.
-- `rtk gain -f json` moved by 33 commands and 297 saved tokens across the probes; the counter is host-wide and other sessions ran.
+- `rtk gain -f json` moved by 33 commands and 297 saved tokens over the interval of the probes; the counter is host-wide and other
+  sessions ran, so that delta is not the probes' alone (the project-scoped `rtk gain -p` block of the summary is).
 
 ## Codex rtk hook qualification (rtk 0.51.0, codex-cli 0.159.3)
 
@@ -38,7 +42,9 @@ other byte, so the existing hooks keep their keys (`hooks.json:pre_tool_use:0:0`
 trust; a second run is "already present"; `--uninstall` removes the entry (the JSON equals the original after normalising; rtk
 reserialises the file and leaves a `.bak`); Codex's own `hooks/list` loads it with no error or warning.
 
-Dynamic, seven arms over six commands (and five more in arm B2), a probe hook at group 0 standing for ai-memory:
+Dynamic, seven arms over six commands (and five more in arm B2), a probe hook at group 0 standing for ai-memory. The arms ran with
+the host's HOME, so rtk read the host's own configuration, a `[hooks] exclude_commands` of the five entries of
+`fixtures/rtk-hook-exclusions.toml` (`git show REV:path`, `diff`, `git branch`, `jq`); the Codex hook honours it:
 
 | Arm | Hook | Trusted | Executed with `rtk` | Exit codes equal to the shell's |
 | --- | --- | --- | --- | --- |
@@ -47,28 +53,43 @@ Dynamic, seven arms over six commands (and five more in arm B2), a probe hook at
 | R1u | rtk | no | 0 of 6; the probe, also untrusted, never ran | yes |
 | R2 | rtk, awareness text present, prompt forbids a prefix | yes | 6 of 6 | yes |
 | R2b | rtk, awareness text present, prompt silent | yes | 6 of 6, all prefixed by the model; no `rtk rtk` | yes |
-| B2 | rtk | yes | 4 of 5: `diff` is not rewritten, `cat` becomes `rtk read` | yes |
+| B2 | rtk | yes | 4 of 5: `diff` is excluded by that configuration, `cat` becomes `rtk read` | yes |
 | R1p | rtk, `rtk` not on the launcher's PATH | yes | 0 of 6: the hook fails open, silently | yes |
 
 The six commands and their shell exit codes: `git status --short` 0, `ls /nonexistent` 2, `grep -rl nomatch .` 1, `grep -rl needle .`
 0, `git diff --exit-code` 1, `git status --short && echo done` 0; battery 2: `git log --oneline -3 | cat` 0, `grep -rn "needle two" a` 0,
 `find /nonexistent -name x` 1, `diff /nonexistent a/x/util.py` 2, `cat a/x/util.py` 0.
 
-Findings: the hook fires, preserves exit status, blocks nothing and coexists with another PreToolUse hook; it differs only in
-output form (`rtk git status --short` drops the trailing newline, so a compound prints `...util.pydone`; `rtk ls` names `/usr/bin/ls` in
-its error). Codex skips a hook until its current hash equals `[hooks.state."<key>"].trusted_hash` (upstream, rust-v0.159.3:
+Findings: the hook fires, preserves exit status, blocks nothing and coexists with another PreToolUse hook. Codex skips a hook until
+its current hash equals `[hooks.state."<key>"].trusted_hash` (upstream, rust-v0.159.3:
 codex-rs/hooks/src/engine/discovery.rs hook_hash L775 and hook_trust_status L794-L815), so `rtk init -g --codex` alone changes
 nothing; the TUI's `/hooks` review persists the grant with `config/batchWrite` of `hooks.state` (upsert) and
 `tools/adoption/codex_hook_trust.py` sends the same edit for the hooks named with `--command` only (codex-rs/tui/src/hooks_rpc.rs
-write_hook_trusts L58-L91). `codex exec` of 0.159.3 has no `--dangerously-bypass-hook-trust`, which the Codex docs describe.
-`rtk rewrite "<cmd>"` shows what the hook rewrites: git status and log, ls, cat, grep, find and the first segment of a pipe or `&&` chain; not
-`git show REV:path`, `diff`, `jq`, `git branch`, `echo` or `bash -c ...`. Two exceptions of the awareness text do not hold at 0.51.0 (shell
-against `rtk`, measured here): `find` on a missing path exits 1 like find, and default `git log` and `git log --stat` cap at 10 commits but
-print `[rtk] capped at 10 commits; pass -n <count> for more`.
+write_hook_trusts L58-L91). `codex exec --help` of 0.159.3 does list `--dangerously-bypass-hook-trust` ("Run enabled hooks without
+requiring persisted hook trust for this invocation. DANGEROUS."; openai/codex rust-v0.159.3, commit 01fc69f4,
+codex-rs/utils/cli/src/shared_options.rs L61-L64 and codex-rs/exec/src/cli.rs L145; this repository's capture
+`evidence/artifacts/runtime-sdk-20261003/exec-help-0.159.3.txt` L65). It persists nothing and skips trust for every enabled hook, so
+it is not the hash-bound grant this tool writes. (An earlier draft of this README said the flag was absent: it had filtered the help
+text through `head -8`; see the anti-pattern log in docs/harness-defaults.md.)
+
+What rtk does is in `rtk-behaviour-probe.json` (rtk 0.51.0, git 2.43.0; a scratch repository of 16 commits with one merge and
+scratch homes, so no host configuration applies). `rtk rewrite "<cmd>"` with upstream defaults rewrites `git status`, `git log`,
+`git diff`, `ls`, `cat` (to `rtk read`), `grep`, `find`, `git show REV:path`, `diff`, `jq`, `git branch` and the first segment of a
+pipe or `&&` chain, and leaves `echo` and `bash -c ...` alone (exit 1, no output); with the five `exclude_commands` of
+`fixtures/rtk-hook-exclusions.toml` as rtk's config file it also leaves `git show REV:path`, `diff`, `jq` and `git branch` alone.
+The compact forms differ from the shell's: `rtk git status --short` drops the trailing newline and `rtk ls /nonexistent` names
+`/usr/bin/ls` in its error. Exit codes are the shell's, `find` on a missing path included (1: the awareness text's "exits 0" does
+not hold at 0.51.0). Bare `rtk git log` prints at most 10 commits, one `<hash> <subject> (<age>) <author>` line each, drops the
+merge commit and prints no notice; `rtk git log --stat` caps at 10 commits, keeps the merge and prints `[rtk] capped at 10 commits;
+pass -n <count> for more` on stderr; with `--oneline`, `--format=%s` or `--graph --oneline` it prints every non-merge commit (15 of
+16) and no cap; `-n 16` keeps all 16.
 
 ## What this does not show
 
 One run per arm: no variance, no cost comparison, no claim about tokens saved (the A/B of the folding of `grep -l` output is a separate
 measurement). The dynamic arms ran through the loopback gateway route `cx/gpt-6.1-sol-max`, not the host's own ChatGPT sign-in, and in scratch
-homes; the live `~/.codex` was neither written nor read for credentials. The 2604 after snapshot, the PATH of each real launcher and a
-hook trust grant on a real host are separate, later steps.
+Codex homes (CODEX_HOME), with the host's HOME for rtk's configuration; the live `~/.codex` was neither written nor read for
+credentials. The native probes ran on codex-cli 0.159.3 only: no 0.160.0 binary was run here, so 0.160.0 is checked from source
+only. The trust tool's dry run makes no trust or config edit but is not read-only: starting the app-server creates its own state
+files in the Codex home. The 2604 after snapshot, the PATH of each real launcher and a hook trust grant on a real host are
+separate, later steps.

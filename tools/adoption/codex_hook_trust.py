@@ -13,6 +13,9 @@ hooks of the base user layer whose command equals one named with --command, neve
   python3 tools/adoption/codex_hook_trust.py --command "rtk hook codex"            # dry run: each match, its status, its hash
   python3 tools/adoption/codex_hook_trust.py --command "rtk hook codex" --apply    # back up config.toml (0600), trust, read back
 
+A dry run makes no trust or config edit and no backup. It is not read-only: starting the app-server creates its own state files in
+the Codex home (SQLite databases, an installation id, the bundled skills; measured on a scratch home, 2026-10-04).
+
 The grant is a trust decision about a hook that sees every tool call it matches (rtk's sees each Bash command), so it belongs to
 the host's owner: a plan row runs it only under a recorded decision (docs/decisions/2026-10-04-codex-rtk-hook-qualified.md). A
 hook whose command changed is a different hook: this tool trusts the command it is told to, at its current definition, and a later
@@ -20,7 +23,10 @@ change of the hook (a moved group index changes the key) returns it to `untruste
 
 --apply refuses while a codex process runs (as apply_codex_lane.py does), writes config.toml.bak.<UTC stamp> beside the config first
 (never overwriting one), sends the edit with the user layer's version as expectedVersion (a changed file is refused) and then
-asks hooks/list again: every match must be `trusted`. It is idempotent: with every match already trusted it writes nothing.
+asks hooks/list again. expectedVersion guards config.toml, not the file a hook is defined in, so the read-back does not search
+for the command again: every hook that was named must still be listed under its key as a user-layer command hook, at the hash
+it had, and `trusted`; a hook that vanished, moved or changed during the write, and a discovery error that was not there before
+the write, are failures. It is idempotent: with every match already trusted it makes no edit.
 Exit status: 0 done or nothing to do, 2 refused before any write, 3 a write or the read-back failed, 4 no hook of the user layer
 has a named command (register it first), 1 unexpected.
 """
@@ -37,10 +43,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import apply_codex_lane as lane  # noqa: E402
 
 
-def listed_hooks(server, cwd: Path) -> list[dict]:
-    """The hooks Codex loads for ``cwd`` (hooks/list), every config layer."""
-    answer = server.request("hooks/list", {"cwds": [str(cwd)]})
-    return [hook for entry in answer.get("data") or [] for hook in entry.get("hooks") or []]
+def inventory(server, cwd: Path) -> tuple[list[dict], list[tuple[str, str]]]:
+    """The hooks Codex loads for ``cwd`` (hooks/list), every config layer, and the discovery errors it reports for them as
+    (path, message) pairs."""
+    entries = server.request("hooks/list", {"cwds": [str(cwd)]}).get("data") or []
+    hooks = [hook for entry in entries for hook in entry.get("hooks") or []]
+    errors = [(error.get("path") or "", error.get("message") or "") for entry in entries for error in entry.get("errors") or []]
+    return hooks, errors
 
 
 def matches(hooks: list[dict], commands: set[str]) -> list[dict]:
@@ -48,6 +57,25 @@ def matches(hooks: list[dict], commands: set[str]) -> list[dict]:
     chosen = [hook for hook in hooks if hook.get("handlerType") == "command" and hook.get("command") in commands
               and hook.get("source") == "user" and not hook.get("isManaged")]
     return sorted(chosen, key=lambda hook: hook.get("key") or "")
+
+
+def read_back_problems(named: list[dict], listed: list[dict]) -> list[str]:
+    """What the read-back finds wrong with the hooks that were named, each looked up by its key: it must still be listed, still a
+    user-layer command hook, at the hash it had (a changed definition has another hash and a trust written for the old one no
+    longer applies) and trusted."""
+    by_key = {hook.get("key"): hook for hook in listed}
+    problems = []
+    for before in named:
+        now = by_key.get(before.get("key"))
+        if now is None:
+            problems.append(f"{before.get('key')}: no longer listed")
+        elif now.get("handlerType") != "command" or now.get("source") != "user" or now.get("isManaged"):
+            problems.append(f"{before.get('key')}: no longer a user-layer command hook")
+        elif now.get("currentHash") != before.get("currentHash"):
+            problems.append(f"{before.get('key')}: changed during the write ({now.get('command')!r} is {now.get('trustStatus')})")
+        elif now.get("trustStatus") != "trusted":
+            problems.append(f"{before.get('key')}: still reports not trusted ({now.get('trustStatus')})")
+    return problems
 
 
 def describe(hook: dict) -> str:
@@ -99,7 +127,8 @@ def run(args: argparse.Namespace) -> int:
     backup = None
     try:
         with lane.AppServer(codex, lane.codex_env(home), cwd) as server:
-            found = matches(listed_hooks(server, cwd), commands)
+            listed, errors_before = inventory(server, cwd)
+            found = matches(listed, commands)
             if not found:
                 print(f"no user-layer hook of {home} has a command named ({', '.join(sorted(commands))}): register it first, "
                       f"for rtk `rtk init -g --codex`", file=sys.stderr)
@@ -107,6 +136,8 @@ def run(args: argparse.Namespace) -> int:
             print(f"hooks named in {home}:")
             for hook in found:
                 print(describe(hook))
+            for path, message in errors_before:
+                print(f"  note: hooks/list reports a discovery error before any write: {path}: {message}")
             todo = [hook for hook in found if hook.get("trustStatus") != "trusted"]
             if not todo:
                 print("nothing to do: every named hook is trusted")
@@ -126,15 +157,18 @@ def run(args: argparse.Namespace) -> int:
                 "edits": [{"keyPath": "hooks.state", "mergeStrategy": "upsert",
                            "value": {hook["key"]: {"trusted_hash": hook["currentHash"]} for hook in todo}}],
                 "expectedVersion": version})
-            left = [hook for hook in matches(listed_hooks(server, cwd), commands) if hook.get("trustStatus") != "trusted"]
+            listed_after, errors_after = inventory(server, cwd)
     except (lane.Failed, lane.AppServerError) as error:
         print(f"failed: {error}" + (f"; the backup is {backup}" if backup else ""), file=sys.stderr)
         return 3
-    if left:
-        print("failed: hooks/list still reports not trusted after the write: " + "; ".join(describe(h).strip() for h in left)
-              + (f"; the backup is {backup}" if backup else ""), file=sys.stderr)
+    problems = read_back_problems(found, listed_after)
+    problems += [f"discovery error after the write: {path}: {message}" for path, message in errors_after
+                 if (path, message) not in errors_before]
+    if problems:
+        print("failed: hooks/list after the write: " + "; ".join(problems) + (f"; the backup is {backup}" if backup else ""),
+              file=sys.stderr)
         return 3
-    print(f"trusted {len(todo)} hook(s) in {config}; read back from hooks/list")
+    print(f"trusted {len(todo)} hook(s) in {config}; read back from hooks/list by key and hash")
     return 0
 
 
