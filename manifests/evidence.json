@@ -48281,8 +48281,8 @@
     },
     {
       "path": "examples/native-sdk-acceptance/README.md",
-      "sha256": "8a3661e5b62709f75afa0a96fafd42213f829b64bbaa6141c9b4a59b8312d501",
-      "bytes": 11241
+      "sha256": "d68e0ef071fce0d4f2b0a2285c2f246c6c95bdd8215e0a679232ac9b503ab6bd",
+      "bytes": 11239
     },
     {
       "path": "examples/native-stack-embeddings.service.example",

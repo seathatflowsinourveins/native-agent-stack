@@ -13,7 +13,7 @@ The existing [selected acceptance plan](https://github.com/seathatflowsinourvein
 | Codex TypeScript SDK | `openai/codex` rust-v0.160.0, `a956835d020762cb2b570053af06f643a11c0ecc` | Bind the documented diagnosis example to a frozen failing condition and inspect returned items/final response/usage. Adapting the Quickstart fixture to this lane requires independent review; no model-quality equivalence is inferred. |
 | OpenHands SDK | `OpenHands/software-agent-sdk` v1.50.1, `1e1390acc8788346ba4804c34323284009bf3f5e` | Run the unchanged `01_hello_world.py` only after readiness. Its three project facts must be independently verified against the assigned source revision. |
 
-The live WSL builder owns destination installations/configuration. Existing native CLI qualification stays with its assigned owner. This unit owns the source/oracle artifacts and the bounded SDK trials executed after the builder's safe handoff. No target entry, provider run, route selection or configuration mutation is authorized by this document alone. The user's existing task authorization and the actual builder handoff govern execution.
+The live WSL builder owns destination installations/configuration. Existing native CLI qualification stays with its assigned owner. This unit owns the source/oracle artifacts and the bounded SDK trials recorded in the dated execution receipt. No target entry, provider run, route selection or configuration mutation is authorized by this document alone. The user's existing task authorization and the actual builder handoff govern execution.
 
 ## Required result retention
 
