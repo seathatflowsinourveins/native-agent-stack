@@ -4357,28 +4357,28 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "9c5ebc195a0b3aae6d7732eb7eb12ad2fddb68c318383c7a3bbf988e4e846528",
+      "sha256": "cb5b70d1bc86d6a8b5049e82e3136301b1e30a5b9a50ceb254e276c789db1ecf",
       "bytes": 950
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
-      "sha256": "c81a91c4ffb2fa906feb403d5a11bd294b6cf2db45795d80f9acd662c5004973",
-      "bytes": 2877
+      "sha256": "2f7a53031e6eabf6b9d08989b619b74204fa36dac2559e520fb72b06225a81d3",
+      "bytes": 2888
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.md",
-      "sha256": "d6c3c19d6e94d3f48d2788963c8c9be45ec57e6bb81cab92b2c30d9fd5c8e8d6",
-      "bytes": 4088
+      "sha256": "dcd6996e9247f3c8f3d543545eb958518236b21449492ddf92721590aa3f60c8",
+      "bytes": 4099
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.researcher.md",
-      "sha256": "47cc80b262468557b8cfe5c243598030757270674bc7bf286fba8c0c573abc28",
-      "bytes": 3075
+      "sha256": "149ac69352a788ad67c84b4d545cab461015c4e73a9ba4c8675259402c955e4a",
+      "bytes": 3086
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.reviewer.md",
-      "sha256": "19857a44a201948aa1d1fc9be3e24d5f3f7cc385f333ab3893411889258af4ed",
-      "bytes": 2088
+      "sha256": "ec7c6b2a80c58e0156daab25b7cfd4eea6f2e3eac77137067051601045f9d2f8",
+      "bytes": 2099
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.scout.md",
@@ -4592,8 +4592,8 @@
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
-      "sha256": "cf8adbabcd3db19ed32f53d9868e98bbb3b774cb6d1a7f2ab3e709a930ae227e",
-      "bytes": 2701
+      "sha256": "a6822a173f78b007478480f9e681c012ef60e75f17f36091ad1d1470fd6258af",
+      "bytes": 2941
     },
     {
       "path": "adoption/templates/systemd/omniroute-fw.service",
@@ -15948,8 +15948,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
-      "sha256": "9a300299c01e31908b754bf4d003fe80e8fd279b5ca881c0e86d57d61b8f9762",
-      "bytes": 56858
+      "sha256": "423b886bef0774ecc4a2835a55e6a0d6d8f50ed55c0a53ed77d855dd241289d6",
+      "bytes": 69053
     },
     {
       "path": "docs/decisions/2026-09-28-an13-m4-m5.md",
@@ -16268,8 +16268,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "a9d6524f3e32e3531aecbb389999c76566491a227d04c2d2eda031794c733161",
-      "bytes": 159253
+      "sha256": "639be2646a936cfb5e75eef075ce48c85f7f4b6f50d4d8716d262963a89a63c9",
+      "bytes": 160463
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16518,8 +16518,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "173fe5e0cf2121eb7d3ad76bf397843e24f52a2fd388a17a133e2691d61fc3d5",
-      "bytes": 90784
+      "sha256": "b85424755d2152313a6a7cfcbef8871c98f0f8f756e932287fa1aa1bf7e49a46",
+      "bytes": 92944
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -32505,6 +32505,16 @@
       "path": "evidence/artifacts/hw-profiles/wsl-authoring-20260923/profile.json",
       "sha256": "c3926e64aa7bc852dd3ab2034aafb41486192584818b7303e8f0aa2508a9d51c",
       "bytes": 2065
+    },
+    {
+      "path": "evidence/artifacts/jcodemunch-route-args-20260927/README.md",
+      "sha256": "3691f77945bc13b05210623bc68c34f293a52e6736365eb3ba92f6c12f98eeb9",
+      "bytes": 5147
+    },
+    {
+      "path": "evidence/artifacts/jcodemunch-route-args-20260927/probes.json",
+      "sha256": "b7d415ab6119eeb6ed31bff86a0a805dca14dda5a2fde20389d97a112e2e241f",
+      "bytes": 3031
     },
     {
       "path": "evidence/artifacts/jev-p1-20261003/README.md",
@@ -52028,8 +52038,8 @@
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
-      "sha256": "13276b5068067da4786c6ac4c020562a10fb4de22c3d7e4345c4662932d0366e",
-      "bytes": 23034
+      "sha256": "8d2ed091ed91928e88b74806f38eb146c30dd5fde3faf6fb43e52381163e7ae7",
+      "bytes": 24974
     },
     {
       "path": "tests/test_token_measurement.py",
