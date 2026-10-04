@@ -48,12 +48,13 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    config (`adoption/new-wsl/templates/`, the 2026-10-03 addendum); the two instruction blocks; and six steps of the tool
    itself (the launcher, the login-shell PATH block, the skills step, the two PATH directories and the remote plugin
    rules). A piece goes to the first entry that matches it. A piece no entry
-   matches, and an entry no piece reaches, fail the check. Today: 385 pieces, 293 wired (200 practice, 93 through a slot),
+   matches, and an entry no piece reaches, fail the check. Today: 386 pieces, 294 wired (200 practice, 94 through a slot),
    79 not wired (41 through a slot that does not install, 38 by their own entry) and 13 authorization pieces (the four
    settings, the main checkout's Codex trust grant of the 2026-10-04 addendum, the six tool approval modes of Decision 14
    and semble's two allow rules, which also wait for their slots),
    each listed below; a slot whose install is another owner (an interim install, the 2026-10-03 addendum) counts as one
-   that does not install the piece's owner.
+   that does not install the piece's owner. On 2026-10-04 the counts moved from 385 pieces, 293 wired and 93 through a
+   slot because #674 adds Serena's `required = true` key to the stack-worker profile, a piece the serena slot wires.
 3. **A piece follows its slot.** A piece mapped to a slot that does not install is not wired; it is wired when the manifest
    says the slot installs the owner its entry names. So the memory slot, once its head-to-head returns with ai-memory,
    wires the ai-memory pieces, and brings back the sentences of the instruction blocks that name it, without an edit to the
