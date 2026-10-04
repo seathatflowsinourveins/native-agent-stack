@@ -1432,6 +1432,10 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
 
 ## validate-macos required (2026-09-25)
 
+> **Superseded in part 2026-10-03:** flake overturn met 09-30; the prescribed non-required lane was rejected; see
+> [2026-10-03-macos-ci-scope.md](2026-10-03-macos-ci-scope.md). `validate-macos` stays required; on a pull request it
+> now runs in full, runs only the changed test modules, or is skipped, as the `changes` job decides.
+
 - **Evidence.** PR #219's shared fail-closed credential guard did run `validate-macos` (the PR
   touched `manifests/evidence.json`, which was already in the `pull_request` `paths:` filter) and
   failed there: 5 failures and 13 errors, because `/var` and `/tmp` are OS-level symlinks on macOS

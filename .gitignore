@@ -42,6 +42,9 @@ node_modules/
 # seed-log-symbol tasks, evidence/artifacts/token-adoption-e2e-20260926/preregistration.json):
 # clearly labelled synthetic content, not host history.
 !evidence/artifacts/token-adoption-e2e-20260926/fixtures/*.jsonl
+# The GraphQL pull-request pages (P) that docs/decisions/2026-10-03-macos-ci-scope.md's replay reads, inventoried by
+# hash in evidence/artifacts/macos-ci-scope-20261003/README.md.
+!evidence/artifacts/macos-ci-scope-20261003/prs_graphql.jsonl
 adoption/hosts/*.json
 !adoption/hosts/example.json
 !adoption/hosts/macos-example.json

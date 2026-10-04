@@ -1020,10 +1020,11 @@ sets), so each client keeps its own defaults and a value a person set is never t
 
 After the `--apply` line, run `codex login`, then `claude`, by hand (leave it once it is signed in). Then run the plan's
 after-sign-in checks one owner at a time, `bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only <slot>
---stage after_sign_in`, for `codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`, `local-model-server`,
-`agent-runtime-worker` and `research-harnesses`, the owners whose plan row has that stage. No trust grant or hook
-approval of another host is carried over, so a project's own `.codex/config.toml` stays disabled until Codex
-trusts its directory; Codex has no hook wired here.
+--stage after_sign_in`, for `codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`, `tobi-qmd`,
+`local-model-server`, `agent-runtime-worker` and `research-harnesses`, the owners whose plan row has that stage. No trust
+grant or hook approval of another host is carried over, so a project's own `.codex/config.toml` stays disabled until
+Codex trusts its directory; the only Codex hooks wired here are the context-mode plugin's six, whose approvals the tool
+writes once their hashes were read back and compared on this host.
 
 Proof: `accept.sh` exits 0 (a `skipped` line is not a pass); `--check` ends with `check passed`; `--apply` ends with a
 `summary:` line in which no step is `failed` (`merged with conflicts kept` is not a failure: the step printed each key
