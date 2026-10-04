@@ -1,0 +1,17 @@
+{
+  "source": "Coordinator-provided Sonnet allow-path oracle, PR #685 round 3",
+  "source_sha256": "9ddec5d73feb5f4aeb36ee8a0661af3afe8a94c37dc5ab0a3f1263993abacb46",
+  "cases": {
+    "R1": "env -S '-a printenv' EXAMPLE_OTHER",
+    "R2": "env EXAMPLE_OTHER=1 -S 'ls -l' printenv",
+    "R3": "env --split 'systemd-run --description kernel_keyring.py exec name X -- cat .env' EXAMPLE_OTHER",
+    "R4": "env --un EXAMPLE_NAME -S 'systemd-run --description kernel_keyring.py exec name X -- cat .env' EXAMPLE_OTHER",
+    "R5": "coreutils --coreutils-prog=sudo -u kernel_keyring.py exec a B -- cat .env",
+    "R5b": "coreutils --coreutils-prog-shebang=true kernel_keyring.py exec name X -- cat .env"
+  },
+  "prefixes": [
+    "",
+    "rtk proxy ",
+    "timeout 5 -- "
+  ]
+}
