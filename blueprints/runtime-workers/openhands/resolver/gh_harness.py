@@ -4,7 +4,9 @@ Every GitHub read and write the driver makes goes through GhHarness.run, which
 checks the argv against a denylist and then against fixed templates before any
 subprocess starts. Children get an environment built from an allowlist, run from
 an empty 0700 directory, and never see a token: the driver never calls `gh auth
-token`, and a push takes its credential only through git's helper pipe.
+token`, and a push takes its credential only through git's helper pipe. A push names
+an exact commit, and runs only after the trusted pre-push gate (resolver/push_gate.py)
+passed that commit in this harness.
 
 Upstream behaviour this follows, read at cli/cli@0cf10924 (gh v2.101.0):
 - pkg/cmd/root/help_topic.go:45-58: GH_TOKEN, GITHUB_TOKEN and the enterprise
@@ -39,6 +41,7 @@ import pwd
 import re
 import stat
 import subprocess
+import sys
 import tempfile
 
 REPO = "seathatflowsinourveins/native-agent-stack"
@@ -238,11 +241,13 @@ def op_push_urls(clone):
     return ["git", "-C", clone, "remote", "get-url", "--push", "--all", "origin"]
 
 
-def op_push(clone, branch, *, gh):
+def op_push(clone, branch, commit, *, gh):
     """Plan section 3's push: one refspec, the token only on git's helper pipe.
 
     The empty values reset every inherited helper (gitcredentials(7)); the last value
     is the helper gh itself installs (helper_config.go:36-56), scoped to github.com.
+    The source is the exact commit the trusted pre-push gate passed (git-push(1): a
+    <src> may be any commit name when <dst> is a full ref), never HEAD.
     """
     return ["git", "-C", clone,
             "-c", "credential.helper=",
@@ -251,7 +256,7 @@ def op_push(clone, branch, *, gh):
             "-c", "core.hooksPath=/dev/null",
             "-c", "push.followTags=false",
             "-c", "remote.origin.mirror=false",
-            "push", "--no-verify", "origin", f"HEAD:refs/heads/{branch}"]
+            "push", "--no-verify", "origin", f"{commit}:refs/heads/{branch}"]
 
 
 def op_pr_create(branch, title, body_file, label):
@@ -444,7 +449,7 @@ def _templates(gh):
         "push": (["git", "-C", clone, "-c", "credential.helper=", "-c", f"{HELPER_KEY}=",
                   "-c", f"{HELPER_KEY}=!{gh} auth git-credential", "-c", "core.hooksPath=/dev/null",
                   "-c", "push.followTags=false", "-c", "remote.origin.mirror=false",
-                  "push", "--no-verify", "origin", re.compile(f"HEAD:refs/heads/{BRANCH}")], None),
+                  "push", "--no-verify", "origin", re.compile(f"(?P<commit>{SHA}):refs/heads/{BRANCH}")], None),
         "pr_create": (["gh", "pr", "create", "--draft", "--base", "main", "--head", re.compile(BRANCH),
                        "--title", re.compile(rf"(?P<title>\[#(?P<title_number>{NUMBER})\] [^\x00-\x1f\x7f]+)"),
                        "--body-file", body, "--label", re.compile("|".join(map(re.escape, LANE_LABELS)))],
@@ -633,6 +638,16 @@ def check_repository(text):
     return {"full_name": REPO, "default_branch": "main"}
 
 
+def _inside(path, trees):
+    """True when `path` resolves into one of `trees` (os.path.realpath, then commonpath)."""
+    resolved = os.path.realpath(path)
+    for tree in trees:
+        root = os.path.realpath(tree)
+        if os.path.commonpath([resolved, root]) == root:
+            return True
+    return False
+
+
 class GhHarness:
     """Runs allowlisted gh and git operations with the pinned executables.
 
@@ -641,19 +656,33 @@ class GhHarness:
     `writes` journals each GitHub write (GITHUB_WRITES) as its operation name and the
     exit status of gh or git, which is non-zero when GitHub answers with an error. An
     entry is added before the write runs, so one that raised keeps exit_code None.
+
+    `push_gate` is the trusted pre-push gate (resolver/push_gate.py); without one every
+    push is refused. `gates` journals one gate record per commit checked, and a push
+    runs only for a commit in this harness's passed set (decision record amendment of
+    2026-10-04: enforcement before execution, in trusted harness code).
     """
 
     def __init__(self, gh, *, base_env, workdir, git="/usr/bin/git", runner=subprocess.run, guard=None,
-                 timeout=600):
+                 timeout=600, push_gate=None):
         self.gh = _executable(gh, "unsafe_gh_path")
         self.git = _executable(git, "unsafe_git_path")
         self.workdir = check_workdir(workdir)
         self.env = child_env(base_env, gh_path=self.gh, workdir=self.workdir)
         self.runner, self.guard, self.timeout = runner, guard, timeout
-        self.writes = []
+        self.push_gate = push_gate
+        self.writes, self.gates = [], []
+        self._gated = set()
 
     def run(self, argv):
         op = check_argv(argv, gh=self.gh, guard=self.guard)
+        if op == "push":
+            # Only the exact commit the trusted gate passed in this harness is ever pushed.
+            if self.push_gate is None:
+                raise HarnessRefused("push_gate_missing")
+            _, values = _match(list(argv), self.gh)
+            if values.get("commit") not in self._gated:
+                raise HarnessRefused("push_not_gated")
         check_workdir(self.workdir)
         executable = self.gh if argv[0] == "gh" else self.git
         record = None
@@ -701,9 +730,33 @@ class GhHarness:
             raise HarnessRefused("auth_status_failed")
         return {"gh_version": found, **check_auth_status(status.stdout)}
 
-    def push(self, clone, branch):
-        """Check that origin pushes only to this repository, then push one refspec."""
+    def push(self, clone, branch, *, base, head, agent_trees=()):
+        """Check that origin pushes only to this repository, gate the exact commit, then push it.
+
+        The gate runs before the push, from trusted code: a push starts `push` workflows
+        from the pushed commit, and its pull request runs without a fork boundary, so a
+        check inside CI would come too late (resolver/push_gate.py). The gate's module must
+        lie outside `clone` and every agent tree (the attempt's result directory holds the
+        agent's workspace and this clone). Its record is journaled before any refusal.
+        """
+        if self.push_gate is None:
+            raise HarnessRefused("push_gate_missing")
         urls = self.run(op_push_urls(clone))
         if urls.returncode != 0 or urls.stdout.splitlines() != [ORIGIN_URL]:
             raise HarnessRefused("origin_url_mismatch")
-        return self.run(op_push(clone, branch, gh=self.gh))
+        trees = (clone, *agent_trees)
+        module = sys.modules.get(type(self.push_gate).__module__)
+        gate_file = getattr(module, "__file__", None)
+        if not isinstance(gate_file, str) or _inside(gate_file, trees):
+            record = {"commit": head, "base": base, "status": "fail", "reasons": ["gate_inside_agent_tree"],
+                      "paths": [], "trusted_commit": None, "protected": None,
+                      "zizmor": {"version": None, "findings": None, "failing": []}}
+        else:
+            record = self.push_gate.check(clone, base=base, head=head, agent_trees=tuple(agent_trees))
+        self.gates.append(dict(record) if isinstance(record, dict) else {"commit": head, "status": "fail",
+                                                                         "reasons": ["gate_record_invalid"]})
+        if not (isinstance(record, dict) and record.get("status") == "pass" and record.get("commit") == head
+                and not record.get("reasons")):
+            raise HarnessRefused("push_gate_refused")
+        self._gated.add(head)
+        return self.run(op_push(clone, branch, head, gh=self.gh))

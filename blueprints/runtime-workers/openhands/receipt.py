@@ -239,6 +239,46 @@ def _matching(value, pattern):
     return value if isinstance(value, str) and pattern.fullmatch(value) else None
 
 
+# The trusted pre-push gate's records (resolver/push_gate.py, journaled by GhHarness.gates).
+# The rules a path can break, and zizmor's audit names (docs.zizmor.sh/audits).
+PUSH_GATE_RULES = frozenset({"github", "codeowners", "gate_code", "workflow_policy_test", "ci_named", "ci_import",
+                             "ci_discovered", "ci_local_action", "pr_text_interpolation", "zizmor_finding"})
+AUDIT_NAME = re.compile(r"[a-z][a-z0-9-]{0,63}")
+SEMVER = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
+REPOSITORY_PATH = re.compile(r"[A-Za-z0-9._@+-][A-Za-z0-9._@+/-]{0,254}")
+
+
+def push_gate_summary(records):
+    """Each gate record as codes, hashes and counts. A triggering path is named only when the
+    gate marked it `known` (the base or trusted tree already has it, so it is a repository
+    name, not text the model chose); every other one is only counted."""
+    summary = []
+    for record in records if isinstance(records, list) else []:
+        if not isinstance(record, dict):
+            continue
+        entries = record.get("paths") if isinstance(record.get("paths"), list) else []
+        named = [{"path": entry["path"], "rule": entry["rule"]} for entry in entries
+                 if isinstance(entry, dict) and entry.get("known") is True and entry.get("rule") in PUSH_GATE_RULES
+                 and _matching(entry.get("path"), REPOSITORY_PATH) and ".." not in entry["path"].split("/")]
+        zizmor = record.get("zizmor") if isinstance(record.get("zizmor"), dict) else {}
+        omitted = record.get("paths_omitted")
+        summary.append({
+            "status": record.get("status") if record.get("status") in ("pass", "fail") else None,
+            "commit": _matching(record.get("commit"), HEX40),
+            "base": _matching(record.get("base"), HEX40),
+            "trusted_commit": _matching(record.get("trusted_commit"), HEX40),
+            "reasons": sorted({reason for reason in record.get("reasons") or [] if _matching(reason, REASON_CODE)})
+            if isinstance(record.get("reasons"), list) else [],
+            "paths": named,
+            "unnamed_paths": len(entries) - len(named) + (omitted if type(omitted) is int and omitted > 0 else 0),
+            "zizmor": {"version": _matching(zizmor.get("version"), SEMVER),
+                       "findings": zizmor.get("findings") if type(zizmor.get("findings")) is int else None,
+                       "failing": sorted({name for name in zizmor.get("failing") or [] if _matching(name, AUDIT_NAME)})
+                       if isinstance(zizmor.get("failing"), list) else []},
+        })
+    return summary
+
+
 # Plan acceptance A7 (review item D7): the containment evidence an attempt leaves on the host.
 # The environment names come from host.record_env_names; forbidden are the plan's GH_*, GITHUB_*,
 # OMNIROUTE_* and *_TOKEN. The proxy's access log (host.teardown_attempt's proxy.log) has two
@@ -382,6 +422,8 @@ def resolver_summary(result, window):
                    for write in outcome.get("writes") or []
                    if isinstance(write, dict) and write.get("op") in RESOLVER_WRITES]
         if isinstance(outcome.get("writes"), list) else [],
+        # The trusted pre-push gate, one record per commit checked (push_gate_summary).
+        "push_gate": push_gate_summary(outcome.get("push_gate")),
         "gates": {"stage_gates_sha256": _matching(window.get("stage_gates_sha256"), HEX64),
                   "isolation_probe_sha256": probe,
                   # Gate G4's qualified reviewer argv (host.verify_reviewer_gate), by hash only.

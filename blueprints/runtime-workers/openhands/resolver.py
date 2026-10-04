@@ -62,6 +62,7 @@ def _load(name):
 patch_policy = _load("patch_policy")
 gh_harness = _load("gh_harness")
 outgoing_guard = _load("outgoing_guard")
+push_gate = _load("push_gate")
 
 
 # -- Unit 1: issue selection and the untrusted-input block (plan section 2, steps 1 and 4)
@@ -1261,13 +1262,16 @@ class ResolverAttempt:
 
     def __init__(self, *, number, title, base_sha, branch, owned_paths, lane, instruction, run_id, gh, git, gitleaks,
                  gitleaks_config, host_paths, user_name, base_env, runner=subprocess.run, clone_url=None,
-                 reviewer_argv=None, reviewer_argv_sha256=None):
+                 reviewer_argv=None, reviewer_argv_sha256=None, zizmor=None, gate=None):
         if not isinstance(base_sha, str) or not SHA.fullmatch(base_sha):
             raise ValueError("base_sha_required")
         self.number, self.title, self.base_sha, self.branch = number, title, base_sha, branch
         self.owned_paths = patch_policy.normalize_owned(owned_paths)
         self.lane, self.instruction, self.run_id = lane, instruction, run_id
         self.gh, self.git, self.gitleaks, self.gitleaks_config = gh, git, gitleaks, gitleaks_config
+        # The trusted pre-push gate: by default push_gate.PushGate from this checkout's resolver/
+        # directory (_session). `gate` replaces it only through the Python API, for tests.
+        self.zizmor, self.gate = zizmor, gate
         self.host_paths, self.user_name, self.base_env, self.runner = list(host_paths), user_name, base_env, runner
         self.clone_url = clone_url or CLONE_URL
         # The G4-qualified reviewer argv (host.verify_reviewer_gate), in memory; only its hash is written.
@@ -1295,9 +1299,10 @@ class ResolverAttempt:
         self.guard = outgoing_guard.OutgoingGuard(
             directory=outgoing_guard.private_directory(str(private)), session_key=self._key,
             host_paths=[*self.host_paths, str(private)], user_name=self.user_name, scanners=[scanner])
+        gate = self.gate if self.gate is not None else push_gate.PushGate(git=self.git, zizmor=self.zizmor)
         self.harness = gh_harness.GhHarness(self.gh, git=self.git, base_env=self.base_env,
                                             workdir=gh_harness.private_workdir(str(private)), runner=self.runner,
-                                            guard=self.guard)
+                                            guard=self.guard, push_gate=gate)
         return private
 
     def _commit_message(self):
@@ -1357,9 +1362,10 @@ class ResolverAttempt:
 
         Order: fresh clone; validate the patch at the base (GitTree); guard what the patch
         adds (patch_content_refusal); guard every other text GitHub would receive (commit
-        message, title, PR body) before any write; apply; commit; branch; push; draft PR
-        and its read-back. Each outcome is host-written; a refusal means no GitHub write,
-        only a receipt.
+        message, title, PR body) before any write; apply; commit; branch; the trusted
+        pre-push gate on the exact commit (GhHarness.push, resolver/push_gate.py); push;
+        draft PR and its read-back. Each outcome is host-written; a refusal means no GitHub
+        write, only a receipt. `push_gate` keeps one gate record per commit checked.
         """
         outcome = {"status": None, "failure_stage": None, "reasons": [], "writes": []}
         if not patch_text.strip():
@@ -1417,7 +1423,9 @@ class ResolverAttempt:
             branch = next_branch(self.harness, self.number)
             if branch != self.branch:
                 self.harness.branch_rules(branch)  # a new name: its rules are read again before the push
-            pushed = self.harness.push(str(clone), branch)
+            # The attempt's result directory holds the agent's workspace and this clone: the gate
+            # refuses to run from inside it (decision record amendment of 2026-10-04).
+            pushed = self.harness.push(str(clone), branch, base=self.base_sha, head=head, agent_trees=(str(result),))
             if pushed.returncode != 0:
                 raise LoopStopped("push_failed")
             outcome.update(branch=branch, head=head)
@@ -1442,6 +1450,7 @@ class ResolverAttempt:
         finally:
             if self.harness is not None:
                 outcome["writes"] = [dict(write) for write in self.harness.writes]
+                outcome["push_gate"] = [dict(record) for record in self.harness.gates]
         return outcome
 
 
@@ -1551,11 +1560,15 @@ def _host_paths(state, prefix):
     return [path for path in paths if len([part for part in path.split("/") if part]) >= 2]
 
 
-def plan_run(args, *, runner, now):
+def plan_run(args, *, runner, now, gate=None):
     """The read-only half of `run`: preflight, gates, issue selection, base read and plan.
 
     Nothing here starts a container or writes to GitHub. The stage gates and G5 are
     read here, before any container; host.run and the dispatch gate read them again.
+    The trusted pre-push gate's location and files are checked last
+    (push_gate.PushGate.trusted_identity), so a driver checkout that is not a clean
+    checkout of reviewed code refuses before any container; the push re-checks
+    everything against the clone. `gate` replaces the gate only through the Python API.
     """
     host = _recipe("host")
     if args.lane not in gh_harness.LANE_LABELS:
@@ -1565,6 +1578,7 @@ def plan_run(args, *, runner, now):
     gh = _absolute_executable(args.gh, "gh_path_required")
     git = _absolute_executable(args.git, "git_path_required")
     gitleaks = _absolute_executable(args.gitleaks, "gitleaks_path_required")
+    zizmor = _absolute_executable(args.zizmor, "zizmor_path_required")
     reviewer = None
     if args.reviewer_command:
         # Review item F3: the reviewer's argv as it will run; gate G4 below binds it by hash.
@@ -1630,24 +1644,32 @@ def plan_run(args, *, runner, now):
                              else type(error).__name__.lower()) from None
     finally:
         shutil.rmtree(workroot, ignore_errors=True)
+    trusted_commit = None
+    if gate is None:
+        try:
+            # Every attempt's workspace and clone live under the state directory.
+            trusted_commit = push_gate.PushGate(git=git, zizmor=zizmor).trusted_identity([str(args.state)])
+        except push_gate.GateError as error:
+            raise RunRefused("preflight", "push_gate_" + error.reason) from None
     instruction = resolver_instruction(selected, task=task, owned_paths=owned)
     plan = {"status": "planned", "run_id": run_id, "issue": args.issue, "base_sha": base, "branch": branch,
             "branch_rules": rules, "owned_paths": owned, "lane": args.lane, "arm": args.arm, "port": args.port,
             "kept_comments": selected["kept_comments"], "dropped_comments": selected["dropped_comments"],
             "dropped_reasons": selected["dropped_reasons"], "preflight": identity, "repository": repository,
             "gates": "passed", "resolver_skill": skill, "resolver_skills": skill_check,
-            "reviewer_argv_sha256": reviewer_sha256, "instruction_chars": len(instruction),
+            "reviewer_argv_sha256": reviewer_sha256, "push_gate_trusted_commit": trusted_commit,
+            "instruction_chars": len(instruction),
             "instruction_sha256": hashlib.sha256(instruction.encode("utf-8")).hexdigest()}
     attempt = ResolverAttempt(
         number=args.issue, title=selected["title"], base_sha=base, branch=branch, owned_paths=owned, lane=args.lane,
         instruction=instruction, run_id=run_id, gh=gh, git=git, gitleaks=gitleaks,
         gitleaks_config=str(HERE.parents[2] / ".gitleaks.toml"), host_paths=_host_paths(args.state, args.prefix),
         user_name=pwd.getpwuid(os.getuid()).pw_name, base_env=base_env, runner=runner, reviewer_argv=reviewer,
-        reviewer_argv_sha256=reviewer_sha256)
+        reviewer_argv_sha256=reviewer_sha256, zizmor=zizmor, gate=gate)
     return plan, attempt
 
 
-def _cmd_run(args, *, runner=subprocess.run, clock=time.monotonic, sleep=time.sleep, now=None, **_):
+def _cmd_run(args, *, runner=subprocess.run, clock=time.monotonic, sleep=time.sleep, now=None, gate=None, **_):
     """Plan section 2 steps 0-12 for one attempt (RESOLVER.md "Stage 2").
 
     The read-only plan first (plan_run); --dry-run prints it and stops. Otherwise
@@ -1662,7 +1684,7 @@ def _cmd_run(args, *, runner=subprocess.run, clock=time.monotonic, sleep=time.sl
     try:
         if not args.dry_run and not args.reviewer_command:
             raise RunRefused("preflight", "reviewer_command_required")
-        plan, attempt = plan_run(args, runner=runner, now=now)
+        plan, attempt = plan_run(args, runner=runner, now=now, gate=gate)
     except RunRefused as refused:
         print(json.dumps({"status": "refused", "stage": refused.stage, "reason": refused.reason}, sort_keys=True))
         return 4 if refused.stage == "issue" else 3
@@ -1785,6 +1807,9 @@ def build_parser():
     run.add_argument("--git", default=shutil.which("git"), help="absolute path of git")
     run.add_argument("--gitleaks", default=shutil.which("gitleaks"),
                      help="absolute path of gitleaks, the outgoing guard's scanner")
+    run.add_argument("--zizmor", default=shutil.which("zizmor"),
+                     help="absolute path of zizmor at the version .github/requirements-ci.txt pins; the trusted "
+                     "pre-push gate runs it on the commit's workflows and actions, and refuses the push without it")
     run.add_argument("--reviewer-command",
                      help="the reviewer, shell-split and run with the diff on stdin (required unless --dry-run); its "
                      "executable must be an absolute path, and the SHA-256 of its argv (each element NUL-terminated) "
@@ -1797,7 +1822,8 @@ def build_parser():
 
 def main(argv=None, *, session_key=None, **injected):
     """Entry point. `session_key` lets a caller (a test) pass a fake-mode key in memory;
-    `injected` (runner, clock, sleep, now) replaces the run command's gh runner and clocks in tests."""
+    `injected` (runner, clock, sleep, now, gate) replaces the run command's gh runner, clocks and
+    pre-push gate in tests. The command line has no way to replace the gate."""
     args = build_parser().parse_args(argv)
     if args.command == "run":
         return args.handler(args, **injected)

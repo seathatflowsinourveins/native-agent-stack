@@ -928,6 +928,20 @@ class StubGuard:
         return self.text_ok
 
 
+class PassingGate:
+    """Stands in for the trusted pre-push gate (resolver/push_gate.py) where a fixture origin
+    carries no gate files; tests/test_runtime_worker_openhands_push_gate.py exercises the real
+    gate. It records each check and passes exactly the commit it was given."""
+
+    def __init__(self):
+        self.calls = []
+
+    def check(self, clone, *, base, head, agent_trees=()):
+        self.calls.append({"clone": clone, "base": base, "head": head, "agent_trees": tuple(agent_trees)})
+        return {"commit": head, "base": base, "status": "pass", "reasons": [], "paths": [], "trusted_commit": "f" * 40,
+                "protected": None, "zizmor": {"version": "1.30.1", "findings": 0, "failing": []}}
+
+
 def recording_runner(calls, stdout=""):
     def run(args, **kwargs):
         calls.append({"args": list(args), "cwd": kwargs.get("cwd"), "env": kwargs.get("env")})
@@ -965,9 +979,9 @@ class GhHarnessTests(unittest.TestCase):
         self.body = str(self.tmp / "body.md")
         self.clone = str(self.tmp / "clone")
 
-    def harness(self, runner=subprocess.run, guard=None, base=None):
+    def harness(self, runner=subprocess.run, guard=None, base=None, gate=None):
         return self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=base or planted_base(self.home),
-                                workdir=self.workdir, runner=runner, guard=guard)
+                                workdir=self.workdir, runner=runner, guard=guard, push_gate=gate)
 
     def test_child_environment_is_an_allowlist_that_drops_planted_credentials(self):
         base = planted_base(self.home, xdg=self.tmp / "xdg")
@@ -1010,12 +1024,12 @@ class GhHarnessTests(unittest.TestCase):
             "ls_remote": (h.op_ls_remote(12), ["git", "ls-remote", "--heads", ORIGIN, "openhands/issue-12*"]),
             "push_urls": (h.op_push_urls(self.clone),
                           ["git", "-C", self.clone, "remote", "get-url", "--push", "--all", "origin"]),
-            "push": (h.op_push(self.clone, "openhands/issue-12-2", gh=self.fake.gh),
+            "push": (h.op_push(self.clone, "openhands/issue-12-2", head, gh=self.fake.gh),
                      ["git", "-C", self.clone, "-c", "credential.helper=",
                       "-c", "credential.https://github.com.helper=", "-c", helper,
                       "-c", "core.hooksPath=/dev/null", "-c", "push.followTags=false",
                       "-c", "remote.origin.mirror=false",
-                      "push", "--no-verify", "origin", "HEAD:refs/heads/openhands/issue-12-2"]),
+                      "push", "--no-verify", "origin", f"{head}:refs/heads/openhands/issue-12-2"]),
             "pr_create": (h.op_pr_create("openhands/issue-12", "[#12] Fix the widget", self.body, "lane:foundation"),
                           ["gh", "pr", "create", "--draft", "--base", "main", "--head", "openhands/issue-12",
                            "--title", "[#12] Fix the widget", "--body-file", self.body, "--label", "lane:foundation"]),
@@ -1037,7 +1051,7 @@ class GhHarnessTests(unittest.TestCase):
                 self.assertEqual(h.check_argv(argv, gh=self.fake.gh, guard=guard), op)
 
     def test_denied_operations_are_refused_before_any_subprocess(self):
-        push = self.h.op_push(self.clone, "openhands/issue-12", gh=self.fake.gh)
+        push = self.h.op_push(self.clone, "openhands/issue-12", "c" * 40, gh=self.fake.gh)
         before, refspec = push[:-1], push[-1]
 
         def config(value):
@@ -1116,7 +1130,7 @@ class GhHarnessTests(unittest.TestCase):
             return ["gh", "pr", "create", "--draft", "--base", "main", "--head", fields["head"], "--title",
                     fields["title"], "--body-file", self.body, "--label", fields["label"]]
 
-        push = self.h.op_push(self.clone, "openhands/issue-12", gh=self.fake.gh)
+        push = self.h.op_push(self.clone, "openhands/issue-12", "c" * 40, gh=self.fake.gh)
         cases = [
             [], ["python3", "-c", "print(1)"], ["gh"], ["gh", "issue", "close", "12"],
             ["gh", "api", "repos/someone/fork/issues/12"], ["gh", "api", f"{API}/issues/012"],
@@ -1136,6 +1150,12 @@ class GhHarnessTests(unittest.TestCase):
             [word.replace("core.hooksPath=/dev/null", "core.hooksPath=.githooks") for word in push],
             ["git", "push", "origin", "HEAD:refs/heads/openhands/issue-12"],
             push[:-1] + ["HEAD:refs/heads/main"],
+            # The push names the exact gated commit (resolver/push_gate.py): HEAD, a short or an
+            # uppercase object name, and a symbolic ref are outside the template.
+            push[:-1] + ["HEAD:refs/heads/openhands/issue-12"],
+            push[:-1] + ["c" * 39 + ":refs/heads/openhands/issue-12"],
+            push[:-1] + ["C" * 40 + ":refs/heads/openhands/issue-12"],
+            push[:-1] + ["main:refs/heads/openhands/issue-12"],
         ]
         calls = []
         harness = self.harness(runner=recording_runner(calls), guard=StubGuard(files=[self.body]))
@@ -1349,24 +1369,59 @@ class GhHarnessTests(unittest.TestCase):
         self.assertEqual(caught.exception.reason, "unsafe_workdir")
         self.assertEqual(self.fake.calls(), [])
 
-    def test_push_checks_the_origin_push_url_then_pushes_one_refspec(self):
+    def test_push_checks_the_origin_push_url_then_gates_and_pushes_one_refspec(self):
+        base, head = "a" * 40, "c" * 40
         urls = self.h.op_push_urls(self.clone)
-        push = self.h.op_push(self.clone, "openhands/issue-12", gh=self.fake.gh)
+        push = self.h.op_push(self.clone, "openhands/issue-12", head, gh=self.fake.gh)
         self.fake.respond(urls[1:], ORIGIN + "\n")
         self.fake.respond(push[1:], "")
-        self.assertEqual(self.harness().push(self.clone, "openhands/issue-12").returncode, 0)
+        gate = PassingGate()
+        harness = self.harness(gate=gate)
+        self.assertEqual(harness.push(self.clone, "openhands/issue-12", base=base, head=head).returncode, 0)
         calls = self.fake.calls()
         self.assertEqual([(call["tool"], call["argv"]) for call in calls], [("git", urls[1:]), ("git", push[1:])])
+        self.assertEqual(gate.calls, [{"clone": self.clone, "base": base, "head": head, "agent_trees": ()}])
+        self.assertEqual([(record["status"], record["commit"]) for record in harness.gates], [("pass", head)])
         names = sorted(self.h.child_env(planted_base(self.home), gh_path=self.fake.gh, workdir=self.workdir))
         for call in calls:
             assert_environment_names(self, call["env"], names)
         for listing in ("https://github.com/someone/fork.git\n", f"{ORIGIN}\nhttps://example.invalid/x.git\n", ""):
             self.fake.forget_calls()
             self.fake.respond(urls[1:], listing)
+            gate = PassingGate()
             with self.subTest(listing=listing), self.assertRaises(self.h.HarnessRefused) as caught:
-                self.harness().push(self.clone, "openhands/issue-12")
+                self.harness(gate=gate).push(self.clone, "openhands/issue-12", base=base, head=head)
             self.assertEqual(caught.exception.reason, "origin_url_mismatch")
             self.assertEqual([call["argv"] for call in self.fake.calls()], [urls[1:]])
+            self.assertEqual(gate.calls, [])
+
+    def test_a_gate_record_that_is_not_a_pass_for_the_exact_commit_refuses_the_push(self):
+        base, head = "a" * 40, "c" * 40
+        self.fake.respond(self.h.op_push_urls(self.clone)[1:], ORIGIN + "\n")
+
+        class Answers(PassingGate):
+            def __init__(self, record):
+                super().__init__()
+                self.record = record
+
+            def check(self, clone, *, base, head, agent_trees=()):
+                super().check(clone, base=base, head=head, agent_trees=agent_trees)
+                return self.record
+
+        passing = PassingGate().check(self.clone, base=base, head=head)
+        for name, record in (("fail", {**passing, "status": "fail", "reasons": ["protected_path"]}),
+                             ("another commit", {**passing, "commit": "d" * 40}),
+                             ("pass with reasons", {**passing, "reasons": ["protected_path"]}),
+                             ("not a record", None)):
+            with self.subTest(case=name):
+                self.fake.forget_calls()
+                harness = self.harness(gate=Answers(record))
+                with self.assertRaises(self.h.HarnessRefused) as caught:
+                    harness.push(self.clone, "openhands/issue-12", base=base, head=head)
+                self.assertEqual(caught.exception.reason, "push_gate_refused")
+                self.assertEqual(len(harness.gates), 1)
+                self.assertFalse(any("push" in call["argv"] for call in self.fake.calls()))
+                self.assertEqual(harness.writes, [])
 
     def test_push_helper_chain_resets_inherited_helpers_and_serves_only_github(self):
         """gitcredentials(7): an empty helper value resets the list; command-line config is read last.
@@ -1389,7 +1444,7 @@ class GhHarnessTests(unittest.TestCase):
         self.fake.respond(["auth", "git-credential", "get"],
                           f"protocol=https\nhost=github.com\nusername=fixture-login\npassword={served_value}\n")
         env = self.h.child_env(planted_base(self.home), gh_path=self.fake.gh, workdir=self.workdir)
-        push = self.h.op_push(str(clone), "openhands/issue-12", gh=self.fake.gh)
+        push = self.h.op_push(str(clone), "openhands/issue-12", "c" * 40, gh=self.fake.gh)
         pairs = list(zip(push[3:push.index("push"):2], push[4:push.index("push"):2]))
         self.assertTrue(pairs and all(flag == "-c" for flag, _ in pairs))
 
@@ -2404,9 +2459,10 @@ class CommandLineTests(unittest.TestCase):
                                  text=True, timeout=60, env=hermetic_git_environment())
         self.assertEqual(options.returncode, 0)
         for option in ("--issue", "--owned-path", "--task", "--task-file", "--lane", "--arm", "--port", "--prefix",
-                       "--state", "--gh", "--git", "--gitleaks", "--reviewer-command", "--dry-run"):
+                       "--state", "--gh", "--git", "--gitleaks", "--zizmor", "--reviewer-command", "--dry-run"):
             self.assertIn(option, options.stdout)
         self.assertNotIn("--run-id", options.stdout)
+        self.assertNotIn("--gate", options.stdout)  # the trusted gate cannot be replaced from the command line
 
 
 class ResolverSkillTests(unittest.TestCase):
@@ -2453,9 +2509,9 @@ class Stage2HarnessTests(unittest.TestCase):
         self.home = self.tmp / "home"
         self.home.mkdir()
 
-    def harness(self, runner=subprocess.run, guard=None):
+    def harness(self, runner=subprocess.run, guard=None, gate=None):
         return self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=planted_base(self.home),
-                                workdir=self.h.private_workdir(self.tmp), runner=runner, guard=guard)
+                                workdir=self.h.private_workdir(self.tmp), runner=runner, guard=guard, push_gate=gate)
 
     def test_base_and_repository_reads_are_fixed_read_only_templates(self):
         h = self.h
@@ -2539,12 +2595,14 @@ class Stage2HarnessTests(unittest.TestCase):
         statuses = iter([0, 1, 0, 0])
 
         def runner(args, **kwargs):
+            if list(args[-5:]) == ["remote", "get-url", "--push", "--all", "origin"]:
+                return completed(args, ORIGIN + "\n")
             write = args[1:3] in (["pr", "create"], ["pr", "comment"]) or "push" in args or "POST" in args
             return completed(args, "", next(statuses) if write else 0)
 
-        harness = self.harness(runner, guard)
+        harness = self.harness(runner, guard, gate=PassingGate())
         harness.run(self.h.op_pr_view(3))
-        harness.run(self.h.op_push(str(self.tmp / "clone"), "openhands/issue-12", gh=self.fake.gh))
+        harness.push(str(self.tmp / "clone"), "openhands/issue-12", base="a" * 40, head="c" * 40)
         harness.run(self.h.op_pr_create("openhands/issue-12", "[#12] Fix the widget", body, "lane:foundation"))
         harness.run(self.h.op_review(3, "c" * 40, body))
         harness.run(self.h.op_pr_comment(3, body))
@@ -3496,12 +3554,15 @@ class ResolverAttemptTests(unittest.TestCase):
         return full_export(work, self.base)
 
     def attempt(self, github):
+        # This fixture origin carries no gate files, so a recording stand-in passes every commit;
+        # tests/test_runtime_worker_openhands_push_gate.py runs the real gate through finish().
+        self.gate = PassingGate()
         attempt = self.r.ResolverAttempt(
             number=12, title="Fix the widget", base_sha=self.base, branch="openhands/issue-12", owned_paths=["docs"],
             lane="lane:foundation", instruction="Resolve issue 12.\n", run_id=RUN_ID, gh=self.fake.gh, git=REAL_GIT,
             gitleaks=str(self.gitleaks), gitleaks_config=str(ROOT / ".gitleaks.toml"),
             host_paths=[str(self.tmp / "state")], user_name="fixtureuser", base_env=planted_base(self.home),
-            runner=github, clone_url=str(self.bare))
+            runner=github, clone_url=str(self.bare), gate=self.gate)
         attempt.session_sink(self.key)
         return attempt
 
@@ -3509,10 +3570,15 @@ class ResolverAttemptTests(unittest.TestCase):
         patch = self.patch_for({"docs/a.md": "a\nnew line\n"})
         github = ResolverGitHub(base=self.base)
         attempt = self.attempt(github)
-        outcome = attempt.finish(self.result_for("accepted"), patch_text=patch, final_message=FINAL_MESSAGE)
+        result = self.result_for("accepted")
+        outcome = attempt.finish(result, patch_text=patch, final_message=FINAL_MESSAGE)
         self.assertEqual(outcome["status"], "pr_opened", outcome)
         head = github.pushes[0]["head"]
-        self.assertEqual(github.pushes, [{"refspec": "HEAD:refs/heads/openhands/issue-12", "head": head}])
+        self.assertEqual(github.pushes, [{"refspec": f"{head}:refs/heads/openhands/issue-12", "head": head}])
+        # The trusted gate saw the exact pushed commit, its base, and the attempt's result directory.
+        self.assertEqual(self.gate.calls, [{"clone": str(attempt.clone), "base": self.base, "head": head,
+                                            "agent_trees": (str(result),)}])
+        self.assertEqual([(record["status"], record["commit"]) for record in outcome["push_gate"]], [("pass", head)])
         self.assertEqual({key: outcome[key] for key in ("failure_stage", "branch", "pr", "head", "paths_changed",
                                                          "sota_sources", "patch_sha256", "writes")},
                          {"failure_stage": None, "branch": "openhands/issue-12", "pr": 34, "head": head,
@@ -3742,11 +3808,18 @@ class ResolverRunTests(unittest.TestCase):
             "exit_code": 0, "requirements_sha256": self.pins["requirements_sha256"]}))
         review = "import sys; sys.stdin.read(); print('low docs/a.md:2 a heading would help')"
         self.reviewer = f"{shlex.quote(sys.executable)} -c {shlex.quote(review)}"
+        # `--zizmor` must name an absolute executable. The injected PassingGate never runs it: this
+        # fixture origin carries no gate files (the real gate: test_runtime_worker_openhands_push_gate).
+        stub = self.tmp / "bin/zizmor"
+        stub.write_text("#!/bin/sh\nexit 97\n", encoding="utf-8")
+        stub.chmod(0o755)
+        self.zizmor, self.gate = str(stub), PassingGate()
 
     def argv(self, *extra):
         return ["run", "--issue", "12", "--owned-path", "docs", "--task", "Fix the widget as the issue asks.",
                 "--lane", "lane:foundation", "--arm", "control", "--prefix", str(self.prefix), "--state", str(self.state),
-                "--gh", self.fake.gh, "--git", REAL_GIT, "--gitleaks", str(self.gitleaks), *extra]
+                "--gh", self.fake.gh, "--git", REAL_GIT, "--gitleaks", str(self.gitleaks), "--zizmor", self.zizmor,
+                *extra]
 
     def record_g4(self, reviewer=None, **changes):
         """<state>/stage-gates.json holding gate G4 for `reviewer` (default self.reviewer): the SHA-256
@@ -3845,7 +3918,7 @@ class ResolverRunTests(unittest.TestCase):
                 mocks["time"] = enter(mock.patch.object(dispatch, "time", dispatch_time))
             enter(contextlib.redirect_stdout(out))
             extra = ["--dry-run"] if dry_run else ["--reviewer-command", self.reviewer]
-            code = self.r.main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep)
+            code = self.r.main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep, gate=self.gate)
         return code, json.loads(out.getvalue()), mocks
 
     def receipt(self, printed):
