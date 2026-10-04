@@ -287,6 +287,30 @@ The wave-2 batch of the layer consensus made `memory-owner`, `code-search` and `
 - Whether claude-hud 0.10.0's helper, run through mise's `node` shim, records the runtime path the client configuration renders (`process.execPath`, setup.mjs line 32), and whether its launcher prints two lines on the destination: read in its source, not run.
 - Anything about a client: no Claude Code or Codex session ran, no hook was trusted and no marketplace was added.
 
+## Wave 3 (2026-10-04): static checks and artifact checks only
+
+### Evidence class
+
+Repository checks of the plan's files, plus artifact checks in a scratch folder on the coordinating workstation (NativeStack), from the branch's worktree. No install command of the plan ran, nothing was installed on any host and no distribution was touched. The artifact checks show that the recorded downloads are the published ones and that four version checks hold against those archives' own binaries, not that an install or an acceptance check works on the destination.
+
+### What changed
+
+The wave-3 batch of the layer consensus, on the owner's decision of 2026-10-04 (amendment 4), added ten owner rows in token-efficiency, gave `ccusage`, `session-analytics` and `context-supply` owner defaults, and widened the `code-search` interim to semble and SocratiCode (README.md, section "Wave 3"; sources in SOURCES.md, section "Wave 3"). `interim_acknowledged` reads every wave batch; `context-supply` no longer calls it; `check_plan.py` refuses a gate call on a row without an interim.
+
+### Checks run
+
+- `python3 -B check_plan.py`: exit 0, `OK: 80 rows: 56 installed (54 by the default run, 2 only when named), 3 measurement-only, 21 not installed; 115 commands and 78 acceptance entries agree with the scripts`.
+- `bash -n install.sh` and `bash -n accept.sh`: exit 0 each; `bash -n -c` on every command and acceptance program of the new and changed rows: exit 0 each. `bash install.sh --list`: exit 0, 80 lines, 21 of them `excluded` (`ccusage` and `session-analytics` no longer).
+- Downloads, 2026-10-04: the four release archives (RTK 0.50.0, codebase-memory-mcp 0.11.0, otel-tui 0.7.5, agentsview 0.43.0) and the five npm tarballs (Repomix 1.18.1, TOON 4.1.1, Context Hub 0.1.4, ccusage 20.0.26, SocratiCode 1.15.0), fetched into a scratch folder: each matched the sha256 the plan records. The agentsview digest also equals the GitHub asset digest of its release (API, read 2026-10-04). Each archive's member list is the one the rows' notes give.
+- Version checks against the archives' binaries, with a scratch `HOME`: `rtk --version` printed `rtk 0.50.0`, `codebase-memory-mcp --version` `codebase-memory-mcp 0.11.0`, `otel-tui --version` `otel-tui version 0.7.5` and `agentsview --version` `agentsview v0.43.0 (commit 9be7745ad1906ee24e04eb05bb86c872ef0939a1, ...)`, exit 0 each. The four acceptance programs of `command-output`, `code-graph`, `trace-viewer` and `session-analytics`, run with `ECO_ROOT` on a scratch folder whose `bin` links to those binaries: exit 0 each; the `command-output` program with an expected version of 0.51.0: exit 1 (negative control). The extraction command of each of the four rows, run with the downloaded archive in a scratch `ECO_ROOT`: exit 0, the link points into the versioned prefix; with an archive that lacks the binary: exit 1 and no link.
+- `tests/test_new_wsl_definitive_defaults.py`, class `InterimPlanChecks`: the gate function, cut from `install.sh` and run with `bash` and `jq` against scratch `consensus.json` files, refuses while any wave batch owes an acknowledgement (naming each batch), passes when none does, and refuses a batch that cannot be read, a key that starts with `wave` and is not `wave<n>`, and a missing file; `check_plan.py` refuses a gate call put on `context-supply` or on an owner row.
+
+### Not established
+
+- Any install: no `fetch_verified`, `npm install`, `uv tool install` or extraction into a real ecosystem root ran, and the npm and uv routes resolve dependencies at install time that no recorded digest pins.
+- The acceptance programs of the npm and uv rows: their packages were not installed here, so their version lines and probes are read in the packages' sources (SOURCES.md), not run.
+- Anything about a client: no MCP server was registered or started, no hook was written, and SocratiCode has no Qdrant store or embedding endpoint on the destination.
+
 ## Round 1 install-plan repair (historical)
 
 The coordinator ran 34 slots as uid 1000 in a disposable `ubuntu:26.04` container (Ubuntu 26.04.1 LTS), with passwordless sudo, no systemd/user bus, no bubblewrap user namespaces, no service started by the validation procedure and no sign-in. The repository was read-only at `/repo`; the mounted worktree's Git metadata was outside the container. This file quotes only nonprivate evidence. Log locations below are relative to the supplied read-only `round1/` results directory.

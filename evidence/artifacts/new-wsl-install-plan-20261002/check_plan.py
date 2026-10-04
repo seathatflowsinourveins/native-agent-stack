@@ -133,7 +133,8 @@ def main():
 
     # one row per foundation row of the manifest, with its layer, default and repository. A manifest row with an interim
     # (amendment 3 of the decision rule) is installed as its interim: the plan row names the interim's owner and repository,
-    # and the row's decided default, which installs nothing, stays as the rounds recorded it.
+    # and the row's decided default, which installs nothing, stays as the rounds recorded it. A row the owner added, or gave
+    # an owner default (amendment 4), carries its owner's default and repository as the row's own.
     for slot in manifest:
         if slot not in by_slot:
             bad("manifest", f"manifest row {slot} has no row in install-plan.json")
@@ -187,11 +188,12 @@ def main():
         if not active and (r["commands"] or r["acceptance"]):
             bad("rows", f"row {slot} is not installed but keeps commands or acceptance")
 
-    # an interim install waits for the acknowledgements of its rule amendment (the wave-2 batch of the layer consensus):
-    # its install function calls the gate before anything else, and the gate reads the owed acknowledgements
+    # an interim install waits for the acknowledgements of the layer consensus's batches (wave2, wave3, ...): its install
+    # function calls the gate before anything else, and the gate reads the owed acknowledgements. Only an interim row is
+    # gated: a row whose owner default (amendment 4) replaced its interim carries none and installs on the owner's decision.
     gated = [r for r in rows if (manifest.get(r["slot"]) or {}).get("interim")]
     if gated and "acknowledgements_owed" not in install_funcs.get(GATE, ""):
-        bad("interim", f"install.sh has no {GATE} function that reads the wave-2 batch's acknowledgements_owed, the gate "
+        bad("interim", f"install.sh has no {GATE} function that reads the wave batches' acknowledgements_owed, the gate "
                        "every interim install calls first")
     for r in gated:
         body = [line.strip() for line in install_funcs.get(r["slot"], "").splitlines()
@@ -199,6 +201,10 @@ def main():
         if body[:1] != [f'{GATE} {r["slot"]} || return "$?"']:
             bad("interim", f"row {r['slot']}: its install function in install.sh does not call `{GATE} {r['slot']}` "
                            "before anything else, so an interim install would run while an acknowledgement is owed")
+    for r in rows:
+        if r not in gated and re.search(r"^\s*" + re.escape(GATE) + r"\b", install_funcs.get(r["slot"], ""), re.M):
+            bad("interim", f"row {r['slot']}: its install function in install.sh calls `{GATE}`, but the manifest records no "
+                           "interim for it")
 
     # commands and acceptance in the scripts are the ones in the JSON; every command has a source URL
     for r in rows:
