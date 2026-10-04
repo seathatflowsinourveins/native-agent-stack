@@ -16,17 +16,22 @@ So no read sink needs to be modelled, and no helper's parameter needs to be trac
 What the code spells:
 - a string literal;
 - a module, class or `self.X` constant;
-- an f-string or `+` over those;
+- an f-string, `+`, `%` or `str.format` over those;
 - a `Path(__file__)` chain: `.parent`, `.parents[k]`, `/`, Path(a, b, ...), os.path.join,
-  joinpath, with_name, os.path.dirname;
+  joinpath, with_name, with_suffix, with_stem, os.path.dirname;
 - an element of a literal tuple, list, set or dict constant, including a destructured
   `for a, (b, *c) in CONSTANT`;
 - `from module import NAME` of a repository module.
 
 A path the code receives from outside its text is the subject the gate checks: a parameter,
 `self.X` not set from a constant, argparse, os.environ, sys.argv, file content, subprocess
-output, or the result of any other call. Where the data that selects it is a file, the code
-spells that file's location, so that file is protected.
+output, or the result of any other call, received as the whole path. Where the data that
+selects it is a file, the code spells that file's location, so that file is protected.
+That subject rule does not apply to a computed path with a fixed directory: its fixed parts
+form a glob, with `*` for each runtime segment. An environment value or an unfollowed call
+used as a computed base is opaque; joining a tail to it is recorded as unclassified. The
+gate reports that residual without refusing the commit; it must be classified before the
+resolver's first live run (cross-family read 489b, repair exception of 2026-10-04).
 
 Each expression evaluates to a bounded set of alternatives (Value):
 - ("loc", path, exact): a repository location, "" for the root. exact False means somewhere
@@ -36,16 +41,16 @@ Each expression evaluates to a bounded set of alternatives (Value):
 - ("seq",) and ("map",): a literal container (its AST node); ("data",): received;
   ("unknown",): not determined here; ("outside",): outside the repository.
 
-`tail` names what a computed part came from (data, enum, literal, unknown). `assumed` marks a
+`tail` names what a computed part came from (data, enum, literal, unknown, unclassified). `assumed` marks a
 location whose base was received, read as repository-relative only where the literal tail
 names a tracked path.
 
 reads() turns the values into protection:
 - an exact location is a file;
 - a computed location under a non-root directory is its shape, else the directory;
-- at the root, a shape whose static part is not empty is protected. A received or enumerated
-  computed part with no static shape selects subjects. An unknown one is unresolved, and the
-  gate fails closed on it.
+- at the root, a shape with a fixed directory is protected. A received or enumerated whole
+  path selects subjects. The pre-round unknown, unassumed location remains unresolved and
+  fails closed. Newly unclassifiable computed reads are retained in `unclassified`.
 
 executed() tells running from reading, so the derivation follows only code CI runs (a code
 file that gate code hashes or copies is data). A file runs when its location, or text read
@@ -53,8 +58,8 @@ from it, is inside the arguments of a call that executes code: a call EXECUTING 
 its receiver; a call of a function or method of this module that passes a parameter on to such
 a call (by name, to a fixpoint); or a call of a function imported from outside the standard
 library, whose body is not read here. An executing call whose argument is a computed location
-may run any file under it, so it is reported, and the gate fails closed on it as on an
-unresolved read.
+may run any file under it. The pre-round computed-execution refusals remain fail-closed;
+newly opaque constructions join the unclassified residual.
 
 Names follow Python's scopes: module, class, function, lambda and comprehension, with a
 comprehension's first iterable evaluated in the enclosing scope (Python Language Reference
@@ -90,6 +95,8 @@ import sys
 
 Value = namedtuple("Value", "kind path exact tail assumed shape node")
 DATA = Value("data", "", False, "data", False, None, None)
+# Received whole, but not a repository-relative base: an environment value or an unfollowed call.
+OPAQUE = DATA._replace(tail="unclassified")
 UNKNOWN = Value("unknown", "", False, "unknown", False, None, None)
 OUTSIDE = Value("outside", "", False, None, False, None, None)
 MAX_ALTERNATIVES = 32
@@ -100,6 +107,9 @@ SAME_PATH = frozenset({"str", "fspath", "abspath", "realpath", "normpath", "expa
 CONTAINER_CALLS = frozenset({"sorted", "list", "tuple", "set", "frozenset", "reversed", "iter"})
 ENUMERATING = frozenset({"glob", "rglob", "iglob", "iterdir", "listdir", "scandir", "walk"})
 RECEIVED_ATTRIBUTES = frozenset({"stdout", "stderr", "environ", "argv"})
+READ_RESULTS = frozenset({"open", "input", "read", "readline", "readlines", "read_text", "read_bytes",
+                          "load", "loads", "safe_load", "parse_args", "parse_known_args"})
+TEXT_DATA = frozenset({"strip", "lstrip", "rstrip", "split", "splitlines", "decode"})
 WILDCARD = re.compile(r"[*?\[]")
 # Calls that run the code they are given, matched by their final name whatever the receiver
 # (docs.python.org/3.13): subprocess's run, call, check_call, check_output, Popen, getoutput and
@@ -180,7 +190,9 @@ def collapse(values):
         paths = [value.path for value in locations]
         common = posixpath.commonpath(paths) if all(paths) else ""
         unknown = any(value.kind == "unknown" or value.tail == "unknown" for value in values)
-        return loc(common, False, "unknown" if unknown else "literal", all(value.assumed for value in locations))
+        residual = any(value.tail == "unclassified" for value in values)
+        tail = "unknown" if unknown else "unclassified" if residual else "literal"
+        return loc(common, False, tail, all(value.assumed for value in locations))
     texts = [value for value in values if value.kind == "str"]
     if texts and len(texts) == len(values):
         return text(posixpath.commonprefix([value.path for value in texts]), False, "literal")
@@ -192,7 +204,7 @@ def as_location(value):
     if value.exact:
         joined = normal("", value.path)
         return OUTSIDE if joined is None else loc(joined, True, None, True)
-    return loc(static_dir(value.path) if "/" in value.path else "", False, value.tail, True, value.shape)
+    return loc(static_dir(value.shape or value.path), False, value.tail, True, value.shape)
 
 
 def join1(left, right):
@@ -206,6 +218,9 @@ def join1(left, right):
         if left.kind != "loc":
             return left
     if left.kind != "loc":
+        if left.kind == "unknown" or left.tail in ("unknown", "unclassified"):
+            # `/` is also numeric division. Only a path component makes this a path construction.
+            return loc("", False, "unclassified") if right.kind in ("str", "loc") else left
         if right.kind != "str":
             return UNKNOWN if "unknown" in (left.kind, right.kind) else DATA
         left = loc("", True, None, True)  # a received base: the literal tail is read as repository-relative
@@ -223,7 +238,7 @@ def join1(left, right):
             return OUTSIDE
         return loc(directory, False, right.tail, left.assumed, _shape_join(left.path, right.shape))
     tail = "literal" if right.kind == "loc" else ("data" if right.kind in ("data", "seq", "map") else "unknown")
-    return loc(left.path, False, tail, left.assumed, None)
+    return loc(left.path, False, tail, left.assumed, _shape_join(left.path, "*"))
 
 
 def concat1(pieces):
@@ -235,7 +250,10 @@ def concat1(pieces):
         return OUTSIDE
     anchored = first.kind == "loc"
     if anchored and not first.exact:
-        return first
+        if first.shape is None:
+            return first
+        combined = concat1([text(first.path, False, first.tail, first.shape), *rest])
+        return loc(static_dir(combined.shape or combined.path), False, combined.tail, first.assumed, combined.shape)
     static, shape, exact, tail = "", "", True, None
     for piece in (rest if anchored else pieces):
         if piece.kind == "str" and piece.exact:
@@ -246,7 +264,8 @@ def concat1(pieces):
             if exact:
                 if piece.kind == "str":
                     static += piece.path
-                exact, tail = False, ("data" if piece.kind in ("data", "seq", "map") else
+                exact, tail = False, (piece.tail if piece.tail in ("unknown", "unclassified") else
+                                      "data" if piece.kind in ("data", "seq", "map") else
                                       piece.tail if piece.kind == "str" else "unknown")
             shape += piece.shape if piece.kind == "str" and piece.shape else "*"
     if anchored:
@@ -293,6 +312,7 @@ class GateReads:
         self.module = ast.parse(source, filename=path)
         self.imported = imported or (lambda module, name, level: (UNKNOWN,))
         self.cache, self.bindings, self.synthetic = {}, {None: {}}, []
+        self.unclassified = {}  # script:line -> computed shapes already known to the evaluator
         self.scope_of, self.parent_scope, self.class_of = {}, {}, {}
         for child in ast.iter_child_nodes(self.module):
             self._visit(child, None)
@@ -550,11 +570,13 @@ class GateReads:
         if isinstance(node, ast.BinOp):
             left, right = self.value(node.left), self.value(node.right)
             if isinstance(node.op, ast.Div):
-                return product(join1, left, right)
+                joined = product(join1, left, right)
+                return _dedupe([item._replace(node=node) if item.kind == "data" else item for item in joined])
             if isinstance(node.op, ast.Add):
                 return product(lambda a, b: concat1([a, b]) if "seq" not in (a.kind, b.kind) else DATA, left, right)
             if isinstance(node.op, ast.Mod):
-                return _dedupe([self._template(item.path, "%") if item.kind == "str" and item.exact else DATA
+                return _dedupe([self._template(item.path, "%") if item.kind == "str" and item.exact else
+                                OPAQUE._replace(node=node)
                                 for item in left])
             return (DATA,)
         if isinstance(node, ast.IfExp):
@@ -593,7 +615,7 @@ class GateReads:
             entries = self.bindings.get(klass, {}).get(node.attr) if klass is not None else None
             return _dedupe([item for entry in entries for item in self._binding(entry)]) if entries else (DATA,)
         if node.attr in RECEIVED_ATTRIBUTES:
-            return (DATA,)
+            return (OPAQUE if node.attr == "environ" else DATA,)
         if isinstance(node.value, ast.Name):
             entries = self._entries(node.value.id, node) or []
             modules = [payload for kind, payload in entries if kind == "module"]
@@ -610,7 +632,7 @@ class GateReads:
             elif base.kind == "unknown":
                 results.append(UNKNOWN)
             else:
-                results.append(DATA)
+                results.append(OPAQUE if base.tail in ("unknown", "unclassified") else DATA)
         return _dedupe(results)
 
     def _subscript(self, node):
@@ -642,13 +664,16 @@ class GateReads:
             elif base.kind == "unknown":
                 results.append(UNKNOWN)
             else:
-                results.append(DATA)
+                results.append(OPAQUE if base.tail in ("unknown", "unclassified") else DATA)
         return _dedupe(results)
 
     def _fold(self, alternatives_list):
         value = alternatives_list[0]
         for following in alternatives_list[1:]:
             value = product(join1, value, following)
+        if len(alternatives_list) > 1:
+            value = _dedupe([loc("", False, "unclassified") if item.kind in ("data", "unknown") else item
+                             for item in value])
         return value
 
     def _call(self, node):
@@ -671,17 +696,24 @@ class GateReads:
             results = []
             for base in receiver:
                 if base.kind != "loc":
+                    results.append(OUTSIDE if base.kind == "outside" else loc("", False, "unclassified"))
+                    continue
+                pattern = base.path if base.exact else base.shape
+                if pattern is None:
                     results.append(base)
                     continue
-                above = parent(base)
+                directory = posixpath.dirname(pattern)
+                above = loc(directory, True, None, base.assumed) if not WILDCARD.search(directory) else \
+                    loc(static_dir(directory), False, base.tail, base.assumed, directory)
                 if name == "with_name" and arguments:
                     results += [join1(above, item) for item in arguments[0]]
-                elif above.kind == "loc":
-                    stem = posixpath.splitext(posixpath.basename(base.path))[0] if base.exact else "*"
-                    results.append(loc(above.path, False, "literal", base.assumed,
-                                       _shape_join(above.path, f"{stem}*")))
-                else:
-                    results.append(above)
+                elif arguments:
+                    stem, suffix = posixpath.splitext(posixpath.basename(pattern))
+                    fixed = stem if name == "with_suffix" else (suffix if base.exact or suffix else "*")
+                    fixed = text(fixed, not WILDCARD.search(fixed), base.tail, fixed)
+                    for item in arguments[0]:
+                        pieces = [fixed, item] if name == "with_suffix" else [item, fixed]
+                        results.append(join1(above, concat1(pieces)))
             return _dedupe(results)
         if name in ENUMERATING:
             return self._enumeration(name, receiver, arguments)
@@ -690,8 +722,15 @@ class GateReads:
         if name in CONTAINER_CALLS:
             return arguments[0] if arguments else (DATA,)
         if name == "format" and receiver is not None:
-            return _dedupe([self._template(item.path, "{") if item.kind == "str" and item.exact else DATA
+            return _dedupe([self._template(item.path, "{") if item.kind == "str" and item.exact else
+                            OPAQUE._replace(node=node)
                             for item in receiver])
+        if name in READ_RESULTS:
+            return (DATA,)
+        if name in TEXT_DATA and receiver is not None:
+            return _dedupe([item if item.kind == "data" else OPAQUE for item in receiver])
+        if receiver is not None and all(item.kind == "data" and item.tail == "data" for item in receiver):
+            return (DATA,)  # selecting a field from received content keeps it a whole runtime subject
         if isinstance(func, ast.Name):
             for kind, payload in self._entries(func.id, node) or []:
                 if kind == "function" and not (payload.args.args or payload.args.posonlyargs or payload.args.vararg
@@ -700,7 +739,7 @@ class GateReads:
                     return _dedupe([value for item in returns for value in self.value(item)]) if returns else (DATA,)
         # Any other call computes its result at run time: received. A helper given a code-spelled
         # location and a literal may join them; that join is a candidate, kept where it is tracked.
-        candidates = [DATA]
+        candidates = [OPAQUE]
         locations = [item for alternatives in arguments for item in alternatives if item.kind == "loc" and item.exact]
         literals = [item for alternatives in arguments for item in alternatives if item.kind == "str" and item.exact]
         for base, leaf in itertools.islice(itertools.product(locations, literals), MAX_ALTERNATIVES):
@@ -842,10 +881,19 @@ class GateReads:
                                     not value.assumed or plausible(value.path, blobs, dirs, top_dirs)):
                                 paths.add(value.path)
                         elif value.kind == "loc" and not value.assumed:
-                            computed.add(f"{self.path}:{getattr(node, 'lineno', 0)}")
+                            if value.tail == "unclassified":
+                                self._note_unclassified(node, value)
+                            else:
+                                computed.add(f"{self.path}:{getattr(node, 'lineno', 0)}")
         return paths, computed
 
     # -- Protection
+
+    def _note_unclassified(self, node, value):
+        location = f"{self.path}:{getattr(node, 'lineno', 0)}"
+        shapes = self.unclassified.setdefault(location, set())
+        if value.shape:
+            shapes.add(value.shape)
 
     def reads(self, blobs, dirs):
         """(files, prefixes, globs, unresolved) that this file's expressions address.
@@ -855,24 +903,43 @@ class GateReads:
           under a received base) counts where it is plausible (see `plausible`).
         - A computed location under a non-root directory protects its shape, else that
           directory as a prefix.
-        - At the root, a shape whose static part is not empty is protected. Otherwise a
-          received, enumerated or literal computed part selects subjects; an unknown one is
-          unresolved.
-        - A string counts where it is plausible and has no whitespace.
+        - At the root, a shape with a fixed directory is protected. Otherwise a
+          whole received or enumerated part selects subjects. The root's unknown, unassumed
+          location remains unresolved as at 7c1d24cc5. New unclassifiable computed reads are
+          recorded in self.unclassified with their existing shapes, without a refusal.
+        - An exact string counts where it is plausible and has no whitespace. A computed
+          relative string with a fixed directory uses the same glob representation as Path.
         """
         files, prefixes, globs, unresolved = set(), set(), set(), set()
+        self.unclassified = {}
         top_dirs = {path.split("/", 1)[0] for path in blobs if "/" in path}
+        path_inputs = set()
+        for call in (node for node in ast.walk(self.module) if isinstance(node, ast.Call)):
+            name = self._call_name(call)
+            if name == "open" and call.args:
+                path_inputs.add(call.args[0])
+            if name in ("open", "read_text", "read_bytes") and isinstance(call.func, ast.Attribute):
+                path_inputs.add(call.func.value)
         for node in ast.walk(self.module):
             if not isinstance(node, ast.expr):
                 continue
             for value in self.value(node):
+                if value.kind == "data" and value.node is not None and node in path_inputs:
+                    self._note_unclassified(node, value)
+                    continue
                 if value.kind == "str":
                     candidate = value.path[2:] if value.path.startswith("./") else value.path
                     if value.exact and candidate and not any(char.isspace() for char in candidate):
                         path = normal("", candidate)
                         if plausible(path, blobs, dirs, top_dirs):
                             files.add(path)
-                    continue
+                        continue
+                    shape = value.shape or value.path
+                    if not value.exact and ((static_dir(shape) and not any(c.isspace() for c in shape))
+                                            or node in path_inputs):
+                        value = as_location(value)
+                    else:
+                        continue
                 if value.kind != "loc":
                     continue
                 path = value.path
@@ -882,8 +949,6 @@ class GateReads:
                     continue
                 if path in blobs:
                     path = posixpath.dirname(path)
-                if value.assumed and path and path not in dirs:
-                    continue
                 shape = value.shape if value.shape and static_dir(value.shape) else None
                 if path:
                     if shape:
@@ -894,4 +959,6 @@ class GateReads:
                     globs.add(shape)
                 elif value.tail == "unknown" and not value.assumed:
                     unresolved.add(f"{self.path}:{getattr(node, 'lineno', 0)}")
+                elif value.tail in ("unknown", "unclassified") or (value.shape and value.shape.strip("*")):
+                    self._note_unclassified(node, value)
         return files, prefixes, globs, unresolved

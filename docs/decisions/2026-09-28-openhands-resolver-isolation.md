@@ -845,3 +845,75 @@ its versioned primary sources. Do not weaken or skip the validator's refusal ass
   `tests/test_workflow_hardening.py` (the text-level workflow reading and `runs_whole_suite`).
 - Repository: `docs/decisions/2026-09-25-host-request-lane.md:176-178`,
   `docs/github-automation.md:479-481,493-494`, `.github/tag-ruleset.json` (the JSON shape).
+
+## Computed relative path repair exception (2026-10-04; cross-family read 489b)
+
+The coordinator authorized one bounded round at `b8eb9352b16f1ad2d9e1fe9b8a2cbb534f1c597c`
+for the computed relative-path finding at `7c1d24cc5`. This round is a recorded exception to
+the one-repair-round rule. It serves the foundation's trusted resolver gate, which must
+preserve CI's checks while a worker builds the complex systems used by the north-star R&D.
+The implementation and local synthetic checks remain subject to the coordinator's independent
+review; the builder has made no worktree commit or push and has issued no network command.
+
+The three rules for this round are:
+
+1. A whole path received at runtime remains the subject being checked. An argv, stdin or
+   file-content subject stays editable, and any repository file selecting it is protected.
+2. A computed path with a fixed directory protects the glob made of its fixed parts, with
+   `*` for every runtime segment, using the gate's existing fnmatch representation. This
+   includes relative strings and Path construction: f-strings, `+`, `%`, `str.format`,
+   `os.path.join`, `/`, `joinpath`, `with_name`, `with_suffix` and `with_stem`.
+3. Any other unclassifiable computed path is unresolved, naming the script and line, so the
+   gate refuses every commit. An environment value or an unfollowed function result used as
+   a base with a tail is opaque; it cannot be silently promoted to a received subject.
+
+The first five tests ran before changing `gate_reads.py`. The planted relative f-string,
+`os.path.join` glob and environment-base refusal failed; the Path-division and whole-argv
+subject controls already passed at this head. All five pass after the patch. Additional
+controls cover the other construction forms, multiple runtime segments, opaque bases,
+unclassifiable templates, whole stdin/file-content subjects, and a real fixture refusal
+record naming `scripts/check.py:2`. These are local integration checks with synthetic
+repositories, not upstream or provider acceptance.
+
+The real-tree result is a blocking failure, retained rather than weakening the rule. On the
+same `b8eb9352` tree, the working derivation reports 222 unresolved locations, including
+`scripts/credential_status.py:526` and `tools/adoption/render_config.py:93`. The repository
+test fails its unresolved-read assertion. The counts themselves remain below both caps:
+
+| Measure on the unchanged tracked tree | Before this round | After this round | Bound |
+| --- | ---: | ---: | ---: |
+| Protected tracked files | 7,621 / 10,591 | 7,628 / 10,591 | — |
+| Outside `evidence/`, `tests/`, `.github/` | 636 / 3,447 (18.5%) | 643 / 3,447 (18.7%) | 25% (861 files) |
+| Blueprints outside gate code | 14 / 2,608 | 14 / 2,608 | 52 files |
+| Derived files / prefixes / globs | 552 / 18 / 10 | 552 / 12 / 140 | — |
+| Unresolved locations | 0 | 222 | 0 |
+
+[Evidence part 10](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt)
+retains the returned failing-first output, the complete unresolved list, intermediate failed
+conditions, breadth snapshots and acceptance exit codes. The full two-module suite also
+reported `gitleaks_failed` in the installed-gitleaks outgoing-guard test, whose code is
+unchanged by this round. Neither failure is represented as passing acceptance.
+
+Offline research used the installed `search-first`, `diagnosing-bugs` and `tdd` skill bodies,
+the existing Value/glob model and fixture seam at `b8eb9352`, and the installed CPython
+3.13.15 source. The path reference implementation is
+[CPython v3.13.15 `Lib/posixpath.py:72`](https://github.com/python/cpython/blob/v3.13.15/Lib/posixpath.py#L72),
+[Path joining at `Lib/pathlib/_local.py:140`](https://github.com/python/cpython/blob/v3.13.15/Lib/pathlib/_local.py#L140),
+and [filename/stem/suffix replacement at `Lib/pathlib/_abc.py:204`](https://github.com/python/cpython/blob/v3.13.15/Lib/pathlib/_abc.py#L204).
+The builder extended the existing integration; no dependency or tool was installed. The
+user's no-network instruction excluded live registry, skills and upstream-currency searches,
+so this round makes no new convergence claim. Provider usage is unknown.
+
+Anti-pattern correction for 489b: silently ignoring a non-exact relative string, or treating
+an opaque computed base as the whole received subject, can bypass the trusted gate. The
+five-case failing-first run proves the relative f-string, joined filename and environment
+base gaps, and the repaired tests enforce their glob or unresolved outcomes. The repository
+test retains the resulting incompatibility with the current CI tree as a failure.
+
+Completeness critic: the bounded checks cover the named Python string/Path constructions,
+whole argv/stdin/file-content subjects, selector protection and unknown bases. Existing
+scope, import, execution and non-Python behavior remains covered by the original tests.
+Unresolved host-path builders and validator expressions in the real derivation remain an
+independent-review item; they are not waived, rewritten or called accepted by fixture passes.
+
+2026-10-04 — The narrow round for cross-family read 489b is a recorded exception to the one-repair-round rule; the coordinator selects option (ii), landing with rule (3)'s residual visible as an unclassified list and count in every gate run and receipt, without refusing for that list and with all pre-round refusals retained. Option (i), refining rule (3) by anchoring computed paths on the repository, was considered and measured at 222 unresolved reads in 22 scripts, mostly host reads by host-configuration tools; it is deferred to the blocking resolver-enablement precondition that every unclassified read must be classified before the first live run. The [dated baseline](../../blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json) records the current 222 locations, shapes and base commit; [evidence part 11](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) records zero legacy unresolved reads and the passing unchanged breadth bounds. The coordinator's reason is no extra exception round, quality first, and no security over-engineering.

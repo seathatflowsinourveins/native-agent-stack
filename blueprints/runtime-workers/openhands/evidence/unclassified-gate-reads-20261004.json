@@ -1,0 +1,349 @@
+{
+  "base_commit": "b8eb9352b16f1ad2d9e1fe9b8a2cbb534f1c597c",
+  "count": 222,
+  "date": "2026-10-04",
+  "unclassified": [
+    "scripts/adoption_status.py:1017",
+    "scripts/adoption_status.py:1019",
+    "scripts/adoption_status.py:1068",
+    "scripts/adoption_status.py:1116",
+    "scripts/adoption_status.py:1117",
+    "scripts/adoption_status.py:1119",
+    "scripts/adoption_status.py:1135",
+    "scripts/adoption_status.py:1138",
+    "scripts/adoption_status.py:1141",
+    "scripts/credential_status.py:526",
+    "scripts/credential_status.py:533",
+    "scripts/credential_status.py:536",
+    "scripts/host_receipts.py:1174",
+    "scripts/host_receipts.py:1175",
+    "scripts/host_receipts.py:1205",
+    "scripts/host_receipts.py:1207",
+    "scripts/host_receipts.py:1208",
+    "scripts/host_receipts.py:1211",
+    "scripts/host_receipts.py:1477",
+    "scripts/host_receipts.py:910",
+    "scripts/landscape.py:702",
+    "scripts/landscape.py:703",
+    "scripts/landscape.py:704",
+    "scripts/landscape.py:716",
+    "scripts/landscape.py:717",
+    "scripts/landscape.py:729",
+    "scripts/landscape.py:730",
+    "scripts/landscape.py:733",
+    "scripts/landscape.py:742",
+    "scripts/landscape.py:743",
+    "scripts/landscape.py:749",
+    "scripts/landscape.py:750",
+    "scripts/landscape.py:752",
+    "scripts/landscape.py:755",
+    "scripts/native_token_ci.py:1116",
+    "scripts/native_token_ci.py:1787",
+    "scripts/native_token_ci.py:1789",
+    "scripts/release_due.py:155",
+    "scripts/release_due.py:156",
+    "scripts/release_due.py:159",
+    "scripts/release_due.py:162",
+    "scripts/verdict_review_gate.py:427",
+    "scripts/verdict_review_gate.py:428",
+    "tools/adoption/apply_claude_settings.py:223",
+    "tools/adoption/apply_claude_settings.py:225",
+    "tools/adoption/apply_claude_settings.py:226",
+    "tools/adoption/apply_claude_settings.py:228",
+    "tools/adoption/apply_claude_settings.py:300",
+    "tools/adoption/apply_codex_lane.py:1005",
+    "tools/adoption/apply_codex_lane.py:1006",
+    "tools/adoption/apply_codex_lane.py:1026",
+    "tools/adoption/apply_codex_lane.py:1027",
+    "tools/adoption/apply_codex_lane.py:1028",
+    "tools/adoption/apply_codex_lane.py:1030",
+    "tools/adoption/apply_codex_lane.py:1031",
+    "tools/adoption/apply_codex_lane.py:1043",
+    "tools/adoption/apply_codex_lane.py:1044",
+    "tools/adoption/apply_codex_lane.py:1046",
+    "tools/adoption/apply_codex_lane.py:1047",
+    "tools/adoption/apply_codex_lane.py:1080",
+    "tools/adoption/apply_codex_lane.py:1081",
+    "tools/adoption/apply_codex_lane.py:1082",
+    "tools/adoption/apply_codex_lane.py:459",
+    "tools/adoption/apply_codex_lane.py:460",
+    "tools/adoption/apply_codex_lane.py:461",
+    "tools/adoption/apply_codex_lane.py:462",
+    "tools/adoption/apply_codex_lane.py:463",
+    "tools/adoption/apply_codex_lane.py:464",
+    "tools/adoption/apply_codex_lane.py:465",
+    "tools/adoption/apply_codex_lane.py:467",
+    "tools/adoption/apply_codex_lane.py:468",
+    "tools/adoption/apply_codex_lane.py:469",
+    "tools/adoption/apply_codex_lane.py:475",
+    "tools/adoption/apply_codex_lane.py:479",
+    "tools/adoption/apply_codex_lane.py:480",
+    "tools/adoption/apply_codex_lane.py:481",
+    "tools/adoption/apply_codex_lane.py:489",
+    "tools/adoption/apply_codex_lane.py:490",
+    "tools/adoption/apply_codex_lane.py:498",
+    "tools/adoption/apply_codex_lane.py:506",
+    "tools/adoption/apply_codex_lane.py:510",
+    "tools/adoption/apply_codex_lane.py:519",
+    "tools/adoption/apply_codex_lane.py:522",
+    "tools/adoption/apply_codex_lane.py:594",
+    "tools/adoption/apply_codex_lane.py:663",
+    "tools/adoption/apply_codex_lane.py:666",
+    "tools/adoption/apply_codex_lane.py:667",
+    "tools/adoption/apply_codex_lane.py:669",
+    "tools/adoption/apply_codex_lane.py:670",
+    "tools/adoption/apply_codex_lane.py:671",
+    "tools/adoption/apply_codex_lane.py:675",
+    "tools/adoption/apply_codex_lane.py:679",
+    "tools/adoption/apply_codex_lane.py:690",
+    "tools/adoption/apply_codex_lane.py:691",
+    "tools/adoption/apply_codex_lane.py:695",
+    "tools/adoption/apply_codex_lane.py:696",
+    "tools/adoption/apply_codex_lane.py:879",
+    "tools/adoption/apply_codex_lane.py:880",
+    "tools/adoption/apply_codex_lane.py:881",
+    "tools/adoption/apply_codex_lane.py:882",
+    "tools/adoption/apply_codex_lane.py:883",
+    "tools/adoption/apply_codex_lane.py:884",
+    "tools/adoption/apply_codex_lane.py:885",
+    "tools/adoption/apply_codex_lane.py:887",
+    "tools/adoption/apply_codex_lane.py:888",
+    "tools/adoption/apply_codex_lane.py:893",
+    "tools/adoption/apply_codex_lane.py:910",
+    "tools/adoption/apply_codex_lane.py:916",
+    "tools/adoption/apply_codex_lane.py:926",
+    "tools/adoption/codex_home.py:250",
+    "tools/adoption/codex_home.py:251",
+    "tools/adoption/codex_home.py:253",
+    "tools/adoption/codex_home.py:254",
+    "tools/adoption/codex_home.py:256",
+    "tools/adoption/install_skills.py:403",
+    "tools/adoption/install_skills.py:404",
+    "tools/adoption/install_skills.py:587",
+    "tools/adoption/install_skills.py:614",
+    "tools/adoption/install_skills.py:615",
+    "tools/adoption/managed_block.py:367",
+    "tools/adoption/managed_block.py:368",
+    "tools/adoption/managed_block.py:371",
+    "tools/adoption/managed_block.py:375",
+    "tools/adoption/managed_block.py:379",
+    "tools/adoption/managed_block.py:380",
+    "tools/adoption/managed_block.py:383",
+    "tools/adoption/managed_block.py:384",
+    "tools/adoption/managed_block.py:386",
+    "tools/adoption/managed_block.py:387",
+    "tools/adoption/managed_block.py:391",
+    "tools/adoption/managed_block.py:392",
+    "tools/adoption/managed_block.py:394",
+    "tools/adoption/render_config.py:285",
+    "tools/adoption/render_config.py:287",
+    "tools/adoption/render_config.py:289",
+    "tools/adoption/render_config.py:293",
+    "tools/adoption/render_config.py:294",
+    "tools/adoption/render_config.py:295",
+    "tools/adoption/render_config.py:304",
+    "tools/adoption/render_config.py:307",
+    "tools/adoption/render_config.py:328",
+    "tools/adoption/render_config.py:93",
+    "tools/adoption/render_config.py:94",
+    "tools/adoption/render_config.py:95",
+    "tools/sota-convergence/blind_checkout.py:1004",
+    "tools/sota-convergence/blind_checkout.py:538",
+    "tools/sota-convergence/blind_checkout.py:546",
+    "tools/sota-convergence/blind_checkout.py:556",
+    "tools/sota-convergence/blind_checkout.py:567",
+    "tools/sota-convergence/blind_checkout.py:740",
+    "tools/sota-convergence/blind_checkout.py:776",
+    "tools/sota-convergence/blind_checkout.py:996",
+    "tools/sota-convergence/blind_checkout.py:999",
+    "tools/sota-convergence/build_verdicts.py:540",
+    "tools/sota-convergence/codex_lane.py:1228",
+    "tools/sota-convergence/codex_lane.py:1230",
+    "tools/sota-convergence/codex_lane.py:1233",
+    "tools/sota-convergence/codex_lane.py:1305",
+    "tools/sota-convergence/codex_lane.py:1306",
+    "tools/sota-convergence/codex_lane.py:1308",
+    "tools/sota-convergence/codex_lane.py:1314",
+    "tools/sota-convergence/codex_lane.py:1324",
+    "tools/sota-convergence/codex_lane.py:1329",
+    "tools/sota-convergence/codex_lane.py:1348",
+    "tools/sota-convergence/codex_lane.py:1356",
+    "tools/sota-convergence/codex_lane.py:1358",
+    "tools/sota-convergence/codex_lane.py:1362",
+    "tools/sota-convergence/codex_lane.py:1365",
+    "tools/sota-convergence/codex_lane.py:1369",
+    "tools/sota-convergence/codex_lane.py:1374",
+    "tools/sota-convergence/codex_lane.py:1379",
+    "tools/sota-convergence/codex_lane.py:1383",
+    "tools/sota-convergence/codex_lane.py:1398",
+    "tools/sota-convergence/codex_lane.py:1422",
+    "tools/sota-convergence/codex_lane.py:518",
+    "tools/sota-convergence/codex_lane.py:523",
+    "tools/sota-convergence/codex_lane.py:541",
+    "tools/sota-convergence/codex_lane.py:542",
+    "tools/sota-convergence/codex_lane.py:543",
+    "tools/sota-convergence/codex_lane.py:549",
+    "tools/sota-convergence/codex_lane.py:550",
+    "tools/sota-convergence/codex_lane.py:551",
+    "tools/sota-convergence/codex_lane.py:564",
+    "tools/sota-convergence/codex_lane.py:622",
+    "tools/sota-convergence/codex_lane.py:629",
+    "tools/sota-convergence/codex_lane.py:630",
+    "tools/sota-convergence/codex_lane.py:632",
+    "tools/sota-convergence/codex_lane.py:633",
+    "tools/sota-convergence/export_isolation_check.py:495",
+    "tools/sota-convergence/export_isolation_check.py:497",
+    "tools/sota-convergence/export_isolation_check.py:523",
+    "tools/sota-convergence/gap_crosswalk.py:65",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1327",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1328",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1330",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1335",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1336",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1337",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1339",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1340",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:798",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:801",
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:810",
+    "tools/sota-convergence/lane_packets.py:1359",
+    "tools/sota-convergence/lane_packets.py:408",
+    "tools/sota-convergence/lane_packets.py:447",
+    "tools/sota-convergence/record_verdicts.py:1486",
+    "tools/sota-convergence/record_verdicts.py:179",
+    "tools/sota-convergence/record_verdicts.py:658",
+    "tools/sota-convergence/record_verdicts.py:659",
+    "tools/sota-convergence/record_verdicts.py:668",
+    "tools/sota-convergence/record_verdicts.py:828",
+    "tools/sota-convergence/record_verdicts.py:874",
+    "tools/sota-convergence/transcript_audit.py:177",
+    "tools/sota-convergence/transcript_audit.py:298",
+    "tools/sota-convergence/transcript_audit.py:299",
+    "tools/sota-convergence/transcript_audit.py:301",
+    "tools/sota-convergence/transcript_audit.py:306",
+    "tools/sota-convergence/transcript_audit.py:308",
+    "tools/sota-convergence/transcript_audit.py:309",
+    "tools/sota-convergence/transcript_audit.py:310",
+    "tools/sota-convergence/transcript_audit.py:312"
+  ],
+  "unclassified_shapes": {
+    "scripts/adoption_status.py:1017": [
+      "*/.claude"
+    ],
+    "scripts/adoption_status.py:1019": [
+      "*/.codex"
+    ],
+    "scripts/credential_status.py:526": [
+      "*/.claude"
+    ],
+    "scripts/credential_status.py:533": [
+      "*/.codex"
+    ],
+    "scripts/credential_status.py:536": [
+      "*/.codex"
+    ],
+    "scripts/native_token_ci.py:1116": [
+      "cbm-daemon-*"
+    ],
+    "scripts/verdict_review_gate.py:427": [
+      "*__*.json"
+    ],
+    "scripts/verdict_review_gate.py:428": [
+      "*__*.json"
+    ],
+    "tools/adoption/install_skills.py:587": [
+      "/*"
+    ],
+    "tools/sota-convergence/blind_checkout.py:1004": [
+      "*.hmac-key"
+    ],
+    "tools/sota-convergence/blind_checkout.py:996": [
+      "*.hmac-key"
+    ],
+    "tools/sota-convergence/blind_checkout.py:999": [
+      "*.hmac-key"
+    ],
+    "tools/sota-convergence/codex_lane.py:1305": [
+      "*__*.out.tmp"
+    ],
+    "tools/sota-convergence/codex_lane.py:1306": [
+      "*__*.out.tmp"
+    ],
+    "tools/sota-convergence/codex_lane.py:1308": [
+      "*__*.jsonl"
+    ],
+    "tools/sota-convergence/codex_lane.py:1314": [
+      "*__*.jsonl"
+    ],
+    "tools/sota-convergence/codex_lane.py:1324": [
+      "*__*.out.tmp"
+    ],
+    "tools/sota-convergence/codex_lane.py:1329": [
+      "*__*.jsonl"
+    ],
+    "tools/sota-convergence/codex_lane.py:1348": [
+      "*__*.out.tmp"
+    ],
+    "tools/sota-convergence/codex_lane.py:1356": [
+      "*__*.out.tmp"
+    ],
+    "tools/sota-convergence/codex_lane.py:1358": [
+      "*__*.out.tmp"
+    ],
+    "tools/sota-convergence/codex_lane.py:1362": [
+      "*__*.out.tmp"
+    ],
+    "tools/sota-convergence/codex_lane.py:1365": [
+      "*__*.out.tmp"
+    ],
+    "tools/sota-convergence/codex_lane.py:1369": [
+      "*__*.out.tmp"
+    ],
+    "tools/sota-convergence/codex_lane.py:1374": [
+      "*__*.out.tmp"
+    ],
+    "tools/sota-convergence/codex_lane.py:1379": [
+      "*__*.jsonl"
+    ],
+    "tools/sota-convergence/codex_lane.py:1398": [
+      "*__*.jsonl"
+    ],
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1327": [
+      "*.json"
+    ],
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1328": [
+      "*.json"
+    ],
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1330": [
+      "*.json"
+    ],
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1335": [
+      "*.json",
+      "*.json already holds a review of another repository; not overwritten"
+    ],
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1336": [
+      "*.json already holds a review of another repository; not overwritten"
+    ],
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1337": [
+      "*.json already holds a review of another repository; not overwritten"
+    ],
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1339": [
+      "*.json"
+    ],
+    "tools/sota-convergence/landscape-sweep/source_reviews.py:1340": [
+      "*.json"
+    ],
+    "tools/sota-convergence/record_verdicts.py:658": [
+      "*__*.json"
+    ],
+    "tools/sota-convergence/record_verdicts.py:659": [
+      "*__*.json"
+    ],
+    "tools/sota-convergence/record_verdicts.py:668": [
+      "*__*.json"
+    ],
+    "tools/sota-convergence/record_verdicts.py:828": [
+      "*-*-*.json"
+    ]
+  }
+}

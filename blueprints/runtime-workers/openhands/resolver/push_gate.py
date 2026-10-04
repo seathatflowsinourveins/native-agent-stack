@@ -606,11 +606,13 @@ def _stronger(current, rule):
 
 class CiProtected:
     """The derived set for one tree: exact files, directory prefixes and path globs (fnmatch,
-    `*` also matching "/"), each with its rule."""
+    `*` also matching "/"), each with its rule, legacy unresolved reads and the visible
+    unclassified residual."""
 
     def __init__(self):
         self.files, self.prefixes, self.globs, self.workflows, self.interpolations = {}, {}, {}, [], []
-        self.unresolved = []  # "<gate file>:<line>" of reads gate_reads.GateReads could not resolve
+        self.unresolved = []  # legacy fail-closed reads and parse/computed-execution failures
+        self.unclassified, self.unclassified_shapes = [], {}
         self.syspath = set()  # directories gate code puts on sys.path (each also a ci_import prefix)
 
     def add_file(self, path, rule):
@@ -832,6 +834,11 @@ def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
                 for pattern in globs:
                     result.add_glob(pattern, "ci_read")
                 result.unresolved.extend(sorted(unresolved | computed))
+                result.unclassified = sorted(set(result.unclassified) | reader.unclassified.keys())
+                for location, shapes in reader.unclassified.items():
+                    if shapes:
+                        existing = result.unclassified_shapes.get(location, [])
+                        result.unclassified_shapes[location] = sorted(set(existing) | shapes)
                 named, runs = sorted(files | executed), sorted(executed)
                 if path not in followed:  # reached by a name, a read or a sys.path import: its imports run too
                     try:
@@ -1008,6 +1015,7 @@ class PushGate:
         """One record for the exact commit `head` of `clone` against `base`. Never raises."""
         record = {"commit": head, "base": base, "status": "fail", "reasons": [], "paths": [],
                   "trusted_commit": None, "protected": None,
+                  "unclassified": [], "unclassified_count": 0, "unclassified_shapes": {},
                   "zizmor": {"version": None, "findings": None, "failing": []}}
         reasons, paths = [], {}
         try:
@@ -1022,6 +1030,12 @@ class PushGate:
             changed = self._changed(clone, base, head)
             try:
                 derived = [derive_ci_protected(tree) for tree in (trusted_tree, base_tree, head_tree)]
+                record["unclassified"] = sorted(set().union(*(item.unclassified for item in derived)))
+                record["unclassified_count"] = len(record["unclassified"])
+                for location in record["unclassified"]:
+                    shapes = sorted(set().union(*(item.unclassified_shapes.get(location, []) for item in derived)))
+                    if shapes:
+                        record["unclassified_shapes"][location] = shapes
                 shared = {}
                 protected = Protected(derived, set().union(*(policy_tests(tree, shared) for tree in
                                                               (trusted_tree, base_tree, head_tree))))
@@ -1034,9 +1048,8 @@ class PushGate:
                         paths.setdefault(path, rule)
                 if any(rule for rule in paths.values()):
                     reasons.append("protected_path")
-                # A gate read the reader could not resolve (gate_reads: a computed path at the root
-                # whose part is of unknown origin) could be any file, so the gate fails closed by
-                # refusing the commit rather than protecting the whole tree.
+                # Keep the pre-round refusals: parse failures, unknown unassumed root reads
+                # and computed execution. The new unclassified residual is reported above.
                 unresolved = sorted(set().union(*(item.unresolved for item in derived)))
                 if unresolved:
                     reasons.append("gate_input_unresolved")
@@ -1065,6 +1078,8 @@ class PushGate:
             record["paths_omitted"] = len(ordered) - MAX_PATHS
         record["reasons"] = list(dict.fromkeys(reasons))
         record["status"] = "pass" if not record["reasons"] else "fail"
+        print(json.dumps({key: record[key] for key in ("unclassified_count", "unclassified", "unclassified_shapes")},
+                         sort_keys=True), file=sys.stderr)
         return record
 
     def _check_commit(self, clone, base, head, trusted, reasons):
