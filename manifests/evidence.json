@@ -15999,8 +15999,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-pr561-token-lifecycle-retirement.md",
-      "sha256": "3a11ebcc71ef4426d883d2ca2f21682c57c8bda607b6d54c67f041e8f9873e13",
-      "bytes": 59865
+      "sha256": "17ef165b5f4837e5f303f64581d878bfde12bb600423833e58450268c07a53a8",
+      "bytes": 61167
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
@@ -16154,8 +16154,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5f95c06058c2387f0dec75ae140a3521cccef8f7215e5bf5bf07a42e1a941389",
-      "bytes": 153110
+      "sha256": "a247845ac282824731273ca8c214f74be27ebc9fe1d0d0eb864d309f6d8b98d0",
+      "bytes": 154970
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -50814,8 +50814,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "0230d2a66c258c64716079da4e5d685b9368d8eb3cbcac8483ff95095548671f",
-      "bytes": 114887
+      "sha256": "a12319ac847bff624b1124246e28be3d58d27bf64e002fe3aa17646bfb9a3ef1",
+      "bytes": 114886
     },
     {
       "path": "tests/test_install_skills.py",
