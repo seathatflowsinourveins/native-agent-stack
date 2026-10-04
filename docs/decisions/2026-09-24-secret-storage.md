@@ -330,6 +330,9 @@ and the reported P2 controls from that revision's review. A second authorized
 round starts at `a7888d3107d5d5cec1868ca08b67522a026dda83` (round-one content
 `f33afee2`, pin and registry `a7888d31`) and corrects the independent Opus
 review's uutils findings, including an incorrect harmless-command allowance.
+A third authorized round starts at `0e3807587f38b11b188f5ffb6c02e0ad3806d4bf`,
+which combines round two (`ec382e21`) and main `07a6a0a7`. The supplied
+Sonnet allow-path oracle disproved round two's broader preservation claim.
 
 **Sources selected with search-first.** GNU coreutils `v9.12`
 (`c0f8514d9891`), uutils coreutils `0.8.0`, `0.10.0` and `0.12.0`, and glibc
@@ -359,21 +362,32 @@ fit this repair; the agreed seam is `check()` in the existing unittest module.
   split spellings but discards their payload without expansion; no remaining
   program means an environment dump. Generated split options are likewise
   consumed by clap rather than recursively pre-expanded.
-  The guard's current reading expands GNU argv; its prior reading provides
-  the independent uutils backstop. Either refusal wins. Their literal string
+  The guard's current reading expands GNU argv. Its prior reading retains
+  GNU expansion, adds the uutils candidate, and locates command tails with
+  the historical `ENV_ARG_OPTIONS` table over every raw and generated argv
+  that its exact-name wrapper stripper reaches.
+  Uutils's final option reading also contributes its command or dump. A work
+  list keeps every candidate when another branch continues or ends; identical
+  segments reuse their reading. Any candidate's refusal wins. Value widths
+  for inferred long options such as `--un` follow `env_option_takes_value` in
+  this conservative guard reading. Their literal string
   splitter handles quotes, ASCII whitespace, comments and env escapes from
   GNU env.c and [uutils split_iterator.rs](https://github.com/uutils/coreutils/blob/0.12.0/src/uu/env/src/split_iterator.rs).
   P2 acceptance: `env -vS "ls -l"` passes; `env --split "ls -l"` is refused
   because uutils dumps the environment. Invalid split strings and inherited
   variable expansion are refused as `env_split_unclassified`; the guard does
   not inspect inherited values. The prior raw env no-command backstop also
-  remains to preserve main's refusals, including conservative refusals of
-  supported split syntax without a separate command operand.
+  remains, alongside the historical table's command tail; preserving only
+  the no-command check missed round-two R1/R2 regressions. Supported split
+  syntax without a separate command operand can retain conservative refusals.
 - [GNU coreutils.c](https://github.com/coreutils/coreutils/blob/v9.12/src/coreutils.c#L145-L176)
   specifies `--coreutils-prog=NAME` and `--coreutils-prog-shebang=NAME`.
   The guard reads the selected utility and its arguments, discarding the
   shebang's script operand. The existing `find` file-reader check recognizes
   the selected reader without copying each action's remaining argv.
+  The prior reading also scans the raw dispatch words for a keyring exec
+  before following the selected utility, retaining the started command even
+  when the dispatch or a wrapper consumes the script word as an option value.
 
 These changes close the earlier addendum's split-string and GNU dispatch
 open notes. The other launcher families remain outside this bounded repair.
@@ -434,11 +448,72 @@ acceptance is claimed.
   Corpus SHA256:
   `8b075817aff195ca28e7d1fcc723517737b3732d5e83d4a7c8618762cf2fc028`.
 - With `CI=true` and the requested `TMPDIR`, the full guard suite returns
-  **89 tests, 3 skips, 0 failures**. CI skips the installed-hook comparison;
+  **89 tests, 3 skips, 0 failures** in round two. CI skips the installed-hook comparison;
   two other skips are the existing mutation-driver adapter controls. The
   requested temporary directory is absent and outside this worker's
   writable roots, so Python uses its `/tmp` fallback. The host hook and
   temporary-directory configuration are not changed.
+
+**Round-three returned evidence.** The round-two numbers above describe a
+finite corpus that missed the new oracle spellings; they did not prove the
+general contract. Round three preserves refusals from both `f77a35eb2` and
+`a7888d31` over the oracle, every existing test row and the 5,452-command
+replay corpus, apart from the documented harmless corrections. It is not a
+general guarantee. The prior reading strips wrappers only by exact name, so
+six launcher spellings that `f77a35eb2` refuses are allowed here and at
+`a7888d31` (Sonnet read of `b5dac4d14`, confirmed by running the three guards):
+`/usr/bin/nice env EXAMPLE_OTHER=1 -S 'ls -l' printenv`,
+`/usr/bin/timeout 5 env EXAMPLE_OTHER=1 -S 'ls -l' printenv`,
+`systemd-run --user env EXAMPLE_OTHER=1 -S 'ls -l' printenv`,
+`env -S 'ls -l' /usr/bin/nice printenv EXAMPLE_TOKEN`,
+`/usr/bin/nice --adj printenv EXAMPLE_TOKEN` and
+`env EXAMPLE_OTHER=1 < /dev/null -u EXAMPLE_NAME printenv`. Each is inert at run
+time: GNU env stops option parsing at the assignment and tries to run `-S` or
+`-u` as a program, `nice --adj` takes `printenv` as its adjustment value, and
+`env -S 'ls -l' …` runs `ls`. They are recorded as harmless corrections, not
+as covered refusals; the control `nice env EXAMPLE_OTHER=1 -S 'ls -l' printenv`
+stays refused by all three guards. Adding path-qualified and systemd-run
+prefixes to the oracle loops is a follow-up. Inert strings remain the only
+inputs; no credential file or refused command is executed.
+
+- The new rows cover R1/R2's historical command tails, R3/R4's GNU split
+  branch and abbreviated value options, and R5/R5b's raw keyring start before
+  dispatch. The tests run the supplied oracle's three prefixes. Against
+  `ec382e21`, four selected methods return **92 assertion failures and
+  2 work-budget errors**; the repaired methods pass. The two errors are the
+  existing `rtk proxy` R3/R4 K4 fallthrough, which this repair short-circuits
+  with the restored prior dotenv refusal. An initial test collector rejected
+  tuple-shaped substitution fixtures; it is corrected and the earlier failed
+  artifact is retained separately.
+- `test_review_685_monotonicity_against_pinned_baselines` compares **5,149**
+  fixture rows, literal check inputs and oracle variants with byte-identical,
+  hash-pinned guard snapshots under `tests/fixtures/guard_685/`. It checks
+  both baseline refusals and needs no Git history or network in CI. Five
+  targeted tests, including this comparison, returned in **3.015 seconds**.
+- The supplied executable oracle returns **18 working refusals**, no
+  exceptions and **0 loosened** against either baseline. In the table below,
+  each triple follows prefixes empty, `rtk proxy`, `timeout 5 --`; A means
+  allow and R means refuse.
+
+| Case | Main `f77a35eb2` | Round one `a7888d31` | Working guard | Working reason |
+| --- | --- | --- | --- | --- |
+| R1 | A/A/A | R/R/R | R/R/R | `environment_dump` |
+| R2 | R/R/A | R/R/R | R/R/R | `environment_dump` |
+| R3 | A/A/A | R/R/R | R/R/R | `dotenv_read` |
+| R4 | A/A/A | R/R/R | R/R/R | `dotenv_read` |
+| R5 | R/R/R | R/R/R | R/R/R | `dotenv_read` |
+| R5b | R/R/R | R/R/R | R/R/R | `dotenv_read` |
+
+- The regenerated native unittest replay retains the frozen round-one
+  corpus and adds current fixture rows, R spellings, variants and all five
+  review methods: **5,452 distinct commands**. It returns **271 newly
+  refused, 0 loosened** against main and **95 newly refused, 0 loosened**
+  against round one, with **0 reason changes and 0 errors** in both.
+  Corpus SHA256:
+  `9394c97fdd22dd81bd2905775cbcd6856485ff645634cc55091a01309e1851a3`.
+- With `TMPDIR=/tmp/guard685-r3` and `CI=true`, the full guard suite returns
+  **90 tests, 3 skips, 0 failures**. The skips are unchanged. This owned
+  temporary directory is available; no fallback is needed in round three.
 
 **Completeness check.** This round covers GNU abbreviated/clustered split
 options, uutils literal prefixes, assignment continuation, original versus
@@ -447,7 +522,10 @@ retains the independent raw env fallback and the round-one timeout and GNU
 dispatch protections. The original historical replay corpus and live target
 host execution remain unavailable evidence; the scoped replay and pinned
 source review do not substitute for them. The two proven testing/parser
-mistakes are recorded in the [anti-pattern log](../harness-defaults.md#anti-pattern-log).
+mistakes and the candidate-replacement regression are recorded in the
+[anti-pattern log](../harness-defaults.md#anti-pattern-log). The permanent
+baseline comparison and replay cover the supplied oracle and existing
+fixture rows; they do not establish coverage of every possible shell string.
 - The temporary repair artifacts retain the returned red/green logs and
   `replay.py` / `replay.json`. `python3 scripts/validate.py` is required
   after the final scoped evidence hash registration. It checks structural

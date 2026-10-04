@@ -5,7 +5,10 @@ pass-through cases below record known bypasses so no reader mistakes the
 hook for a security boundary.
 """
 
+import ast
 import gc
+import hashlib
+import importlib.util
 import io
 import itertools
 import json
@@ -1977,6 +1980,47 @@ def fenced_lines(path):
             for line in block.splitlines()]
 
 
+def review_685_monotonicity_commands():
+    """Existing fixture rows and literal check inputs, plus the supplied oracle and launcher variants. No command is executed."""
+    commands = set(BLOCKED) | set(KEYRING_BLOCKED) | set(LAUNCHER_GRAMMAR_BLOCKED)
+    for table in (ALLOWED, LAUNCHER_GRAMMAR_ALLOWED, SAFE_CORPUS, EXPECTED_PASS_THROUGH, SUBSTITUTION_BODIES,
+                  REAL_COMMIT_MESSAGES, PATHOLOGICAL, ORACLE_MUST_BLOCK, ORACLE_MUST_ALLOW, ORACLE_MUST_STAY,
+                  ORACLE_STAY_ALLOWED, K4_F_ALLOW, K4_F_REJECT, K4_PRIOR_ONLY, K4_BASE_REFUSED):
+        commands.update(row if isinstance(row, str) else row[0] for row in table)
+    commands.update(command for rows in K4_CASES.values() for command, _ in rows)
+    commands.update(command for command, _ in K4_REVIEW_CONTROLS.values())
+    commands.update(command for command, _ in K4_F_LABELED)
+    commands.update(command for _, command in K4_DOCUMENTED_GATEWAY)
+    for _, command, _, control in K4_REPAIR_CASES.values():
+        commands.update((command, control))
+    tree = ast.parse(Path(__file__).read_text())
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == "blocked" for target in node.targets) \
+                and isinstance(node.value, ast.Dict):
+            commands.update(key.value for key in node.value.keys if isinstance(key, ast.Constant) and isinstance(key.value, str))
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "check" \
+                and isinstance(node.func.value, ast.Name) and node.func.value.id == "guard" and node.args \
+                and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
+            commands.add(node.args[0].value)
+    oracle = json.loads((ROOT / "tests/fixtures/guard_685/monotonicity.json").read_text())
+    variants = (
+        "env -vS '-a printenv' EXAMPLE_OTHER",
+        "env --split-string='-a printenv' EXAMPLE_OTHER",
+        "env EXAMPLE_OTHER=1 -vS 'ls -l' printenv",
+        "env EXAMPLE_OTHER=1 --split-string='ls -l' printenv",
+        "env --split-string 'systemd-run --description kernel_keyring.py exec name X -- cat .env' EXAMPLE_OTHER",
+        "env --unset EXAMPLE_NAME -S 'systemd-run --description kernel_keyring.py exec name X -- cat .env' EXAMPLE_OTHER",
+        "coreutils --coreutils-prog=sudo -u /tmp/kernel_keyring.py exec name X -- cat .env",
+        "coreutils --coreutils-prog-shebang=true /tmp/kernel_keyring.py exec name X -- cat .env",
+    )
+    for command in (*oracle["cases"].values(), *variants):
+        for prefix in (*oracle["prefixes"], "env ", "rtk proxy timeout 5 -- "):
+            commands.add(prefix + command)
+    for command in BLOCKED:
+        commands.update(prefix + command for prefix in ("rtk proxy ", "rtk -v proxy --skip-env ", EXEC + " "))
+    return commands
+
+
 class SecretPathGuardTests(unittest.TestCase):
     def test_blocked_commands(self):
         for command, reason in {**BLOCKED, **KEYRING_BLOCKED}.items():
@@ -2128,7 +2172,12 @@ class SecretPathGuardTests(unittest.TestCase):
             "env -S '\"printenv\" EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
             "env -vS'-- -/printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
             "env --split 'EXAMPLE_OTHER=1 -/printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
-            # Keep the pre-existing raw env no-command backstop: required replay must loosen no main-baseline refusal.
+            # R1-R4: preserve the prior table's command and the GNU expansion alongside the uutils reading.
+            "env -S '-a printenv' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 -S 'ls -l' printenv": "environment_dump",
+            "env --split 'systemd-run --description kernel_keyring.py exec name X -- cat .env' EXAMPLE_OTHER": "dotenv_read",
+            "env --un EXAMPLE_NAME -S 'systemd-run --description kernel_keyring.py exec name X -- cat .env' EXAMPLE_OTHER": "dotenv_read",
+            # The raw no-command check retains these specific historical refusals; the union test below covers other command tails.
             'env --split-string "ls -l"': "environment_dump",
             'env -S "ls -l"': "environment_dump",
             "env -vS'ls -l'": "environment_dump",
@@ -2204,6 +2253,8 @@ class SecretPathGuardTests(unittest.TestCase):
             "coreutils --coreutils-prog-shebang=env /tmp/example-script": "environment_dump",
             "coreutils --coreutils-prog-shebang=env /tmp/example-script -S 'cat' .env": "dotenv_read",
             r"find . -exec coreutils --coreutils-prog=cat .env \;": "dotenv_read",
+            "coreutils --coreutils-prog=sudo -u kernel_keyring.py exec a B -- cat .env": "dotenv_read",
+            "coreutils --coreutils-prog-shebang=true kernel_keyring.py exec name X -- cat .env": "dotenv_read",
         }
         for command, reason in blocked.items():
             for prefix in ("", "rtk proxy ", "timeout 5 -- "):
@@ -2215,6 +2266,39 @@ class SecretPathGuardTests(unittest.TestCase):
                         r"find . -exec coreutils --coreutils-prog=cat README.md \;"):
             with self.subTest(command=command):
                 self.assertIsNone(guard.check(command))
+
+    def test_review_685_monotonicity_against_pinned_baselines(self):
+        # These immutable repository guard snapshots avoid a Git-history/network dependency in shallow CI checkouts.
+        pins = {
+            "f77a35eb2": "7b1ec8fa5c6127060c81e23b80e5fe9f7dfec9af045960e928e38763bbb95790",
+            "a7888d31": "ac4e4ac67b27bd0a3406665d21f9899e45dba8f7b75d34ddfe1e945acfcd4933",
+        }
+        baselines = []
+        for revision, digest in pins.items():
+            path = ROOT / "tests/fixtures/guard_685" / revision / "secret_path_guard.py"
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
+            name = "guard685_baseline_" + revision
+            spec = importlib.util.spec_from_file_location(name, path)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[name] = module
+            spec.loader.exec_module(module)
+            baselines.append((revision, module))
+        for command in sorted(review_685_monotonicity_commands()):
+            # The separately quoted harmless -vS control is the documented correction; every other baseline refusal must remain.
+            if command == 'env -vS "ls -l"':
+                continue
+            for revision, baseline in baselines:
+                try:
+                    before = baseline.check(command)
+                except baseline.WorkBudgetExceeded:
+                    before = "command_too_complex"
+                if before is not None:
+                    with self.subTest(revision=revision, command=command):
+                        try:
+                            after = guard.check(command)
+                        except guard.WorkBudgetExceeded:
+                            after = "command_too_complex"
+                        self.assertIsNotNone(after)
 
     def test_the_current_reading_reads_gnu_and_uutils_env_and_the_multicall_binary(self):
         # The current reading reads env's value options of both implementations, clusters and long-option prefixes, and the multi-call
@@ -2228,6 +2312,8 @@ class SecretPathGuardTests(unittest.TestCase):
         self.assertEqual(guard.prior_env_command_start("env -a printenv X".split()), 2)
         self.assertEqual(guard.strip_prefix("/usr/bin/coreutils printenv X".split()), ["printenv", "X"])
         self.assertEqual(guard.prior_strip_prefix("coreutils printenv X".split()), ["coreutils", "printenv", "X"])
+        self.assertEqual(guard.uutils_env_argv(shlex.split("env --un EXAMPLE_OTHER -S 'cat' .env")),
+                         ["env", "--un", "EXAMPLE_OTHER", "cat", ".env"])
 
     def test_every_secret_name_is_caught_by_a_search(self):
         for name in guard.SECRET_NAMES:
