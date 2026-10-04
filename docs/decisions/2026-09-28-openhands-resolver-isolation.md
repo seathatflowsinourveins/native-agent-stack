@@ -391,7 +391,7 @@ it so.
 
 Test modules stay protected but unfollowed, as for their imports: what a test reads is mostly the
 code and data it tests. Following their reads as well was measured and not adopted. It would
-protect 9,083 of the merged tree's 10,455 files, and leave 83 reads in 13 test modules
+protect 9,155 of the merged tree's 10,528 files, and leave 83 reads in 13 test modules
 unresolved, so every push would be refused.
 
 The resolver skill and the generated instruction name every category the gate refuses. They
@@ -489,23 +489,23 @@ The tripwire stays a regression check there; it does not stand in for the gate.
   Paths that appear only inside echoed text still count as names (the `changes` step's summary
   names `docs/decisions/2026-10-03-macos-ci-scope.md`). That over-protects in the safe direction.
   Narrowing the list is a reviewed change to the gate on main.
-- Following gate reads made the list much broader. On the merged tree `db287ea72` (10,455 tracked
-  files) the gate protected 440 files (4.2%) before the change and protects 7,493 (71.7%) after.
-  Leaving out `evidence/`, `tests/` and `.github/`, it was 121 of 3,436 (3.5%) and is 631 (18.4%).
+- Following gate reads made the list much broader. On the merged tree `4a03dd796` (10,528 tracked
+  files) the gate protected 441 files (4.2%) before the change and protects 7,559 (71.8%) after.
+  Leaving out `evidence/`, `tests/` and `.github/`, it was 122 of 3,444 (3.5%) and is 633 (18.4%).
   The derived set went from 304 files and 5 prefixes to 545 files, 18 prefixes and 10 globs, with
   no unresolved read. One read accounts for most of it: `tools/sota-convergence/gap_wave_ledger.py`
-  joins `root / "evidence/artifacts" / wave` with `wave` from its arguments, so all 6,358 files
+  joins `root / "evidence/artifacts" / wave` with `wave` from its arguments, so all 6,422 files
   under `evidence/artifacts` are protected. The same script's `root / f"docs/{doc['id']}.md"`
-  protects `docs/*.md` (192 files), so a resolver task on most documents is now refused at the
-  gate. `blueprints/` outside the gate code stays editable (14 of 2,602 protected). Two narrowings
+  protects `docs/*.md` (193 files), so a resolver task on most documents is now refused at the
+  gate. `blueprints/` outside the gate code stays editable (14 of 2,608 protected). Two narrowings
   are left for a later reviewed change, each with its own failing-first controls. One would trace
   argument values to the literal arguments of the step that runs the script; validate.yml passes
   `--wave gap-wave2-20260923 --wave gap-wave3-20260923`, so two wave directories and one ledger
   page would remain. The other would recognise files a check only compares with its own output.
   Until then the breadth is the price of failing closed, and a repository test bounds it
   (18.4% of the tree outside `evidence/`, `tests/` and `.github/` against a ceiling of 25%; 14
-  `blueprints/` files against 52). Deriving three trees now takes about 3.3 s each on this host,
-  and a gate check with zizmor about 11 to 12 s, up from 2.2 s.
+  `blueprints/` files against 52). Deriving a tree now takes about 3.2 s on this host (three
+  trees per check), and a gate check with zizmor about 11 s, up from 2.2 s.
 - What the reader treats as a subject stays editable. Where the data selecting a policy file is
   itself received rather than spelled in the code (a path taken from a file the script finds by
   enumeration, for example), that policy file is not protected. The reader also does not model
@@ -548,13 +548,13 @@ still protects CI inputs inside owned paths:
   passed from the trusted plan. That would catch a `patch_policy` defect, or a commit that differs
   from the validated patch, which the current gate would let through wherever the derivation has
   no rule;
-- `plan_run` refuses, before any container, owned paths that the derivation protects. With 71% of
+- `plan_run` refuses, before any container, owned paths that the derivation protects. With 72% of
   the tree now protected, such a task would otherwise end in a refused push, and this saves the
   run.
 
 Adopt the first when the plan's owned paths can reach `PushGate.check` through the harness without
 passing through anything the agent can influence. Adopt the second once the derivation's cost is
-acceptable at plan time: about 3.3 s per tree on this host. Neither replaces the derivation,
+acceptable at plan time: about 3.2 s per tree on this host. Neither replaces the derivation,
 because within the owned paths it is the only rule that knows what CI reads.
 
 **Overturn.** If the pre-push gate cannot be kept immutable to the agent, switch to option 2

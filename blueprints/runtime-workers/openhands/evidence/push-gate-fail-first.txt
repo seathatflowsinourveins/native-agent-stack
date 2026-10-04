@@ -261,8 +261,8 @@ new test module (tests/test_resolver_added.py): fail protected_path [ci_discover
 .github/workflows/adoption-bootstrap.yml edit: fail protected_path [github]
 
 
-7. Cross-family review P1 and P2: gate data and the agent's instructions, 2026-10-04 (merge
-   db287ea72 of main 3bdacabd5, fix 86688e1e1)
+7. Cross-family review P1 and P2: gate data and the agent's instructions, 2026-10-04 (merges
+   db287ea72 of main 3bdacabd5 and 4a03dd796 of main ba0e8c48f, fix 86688e1e1)
 
 The GPT-6.1 Sol full read of 40f12ba51 returned two findings:
 - P1: the derivation missed data that CI-run gate code reads. scripts/validate_convergence.py
@@ -271,10 +271,10 @@ The GPT-6.1 Sol full read of 40f12ba51 returned two findings:
 - P2: skills/resolver/SKILL.md and resolver.resolver_instruction omitted the gate's categories
   and still asked the agent to add or update tests, while tests/** is protected.
 
-Failing first, 2026-10-04T05:49:25Z to 05:49:51Z. Method: the working tree copied into <scratch>
-and committed there, with push_gate.py, receipt.py, resolver.py and skills/resolver/SKILL.md
-restored from 21b24dede, the round-2 head. gate_reads.py stays in the copy; that push_gate.py
-never loads it.
+Failing first, 2026-10-04T05:49:25Z to 05:49:51Z, on the fix's content over the first merge
+(db287ea72). Method: the working tree copied into <scratch> and committed there, with
+push_gate.py, receipt.py, resolver.py and skills/resolver/SKILL.md restored from 21b24dede, the
+round-2 head. gate_reads.py stays in the copy; that push_gate.py never loads it.
 $ python3 -m unittest tests.test_runtime_worker_openhands_push_gate \
     tests.test_runtime_worker_openhands_resolver.IssueSelectionTests.test_the_agent_instructions_state_every_category_the_push_gate_refuses
 exit 1; Ran 42 tests; FAILED (failures=14, errors=5, skipped=1):
@@ -297,8 +297,8 @@ gate's category phrases was there (.github/, CODEOWNERS, the gate's own director
 or reads, tests/, pull-request or issue text, a workflow or action), nor the stop-and-report
 sentence, and the instruction still said "Add or update tests".
 
-Planted defects on the fixed tree, 2026-10-04T05:46:08Z to 05:49:06Z, with the runner and method
-of part 2: the unmutated copy passes (exit 0). M1 to M23 are as in part 6, each exit 1 again;
+Planted defects on the fixed tree (the fix's content over db287ea72), 2026-10-04T05:46:08Z to
+05:49:06Z, with the runner and method of part 2: the unmutated copy passes (exit 0). M1 to M23 are as in part 6, each exit 1 again;
 M13 now fails four subtests, one per enforcing file. The new ones:
 M24 exact gate reads are not protected: exit 1, failures=6; test_every_read_form_resolves_to_repository_paths,
     test_data_a_gate_script_reads_is_refused, test_a_planted_schema_edit_is_refused_before_any_push,
@@ -344,32 +344,33 @@ The gate tests under /usr/bin/python3 3.12.3 with PyYAML 6.0.1:
 $ /usr/bin/python3 -m unittest tests.test_runtime_worker_openhands_push_gate
 exit 0; Ran 44 tests; OK. The PyYAML cross-check ran; under CPython 3.13.15 it is the one skip.
 
-Breadth on the merged tree db287ea72 (10,455 tracked files), the derivation of 21b24dede's gate
-against this one, 2026-10-04:
+Breadth on the final merged tree 4a03dd796 (10,528 tracked files), the derivation of 21b24dede's
+gate against this one, 2026-10-04 (on the first merge, db287ea72, the figures were within 66 files
+of these, with the same derived sets):
                                               before (21b24dede)   after (86688e1e1)
 derived files                                 304                  545
 derived prefixes                              5                    18
 derived globs                                 0                    10
 unresolved reads                              -                    0
-tracked files protected                       440 (4.2%)           7,493 (71.7%)
-  of 3,436 outside evidence/, tests/, .github/ 121 (3.5%)          631 (18.4%)
-  of 2,602 in blueprints/ outside gate code   5                    14
-seconds to derive one tree                    0.75                 3.3
-The largest entries after: evidence/artifacts, 6,358 files
+tracked files protected                       441 (4.2%)           7,559 (71.8%)
+  of 3,444 outside evidence/, tests/, .github/ 122 (3.5%)          633 (18.4%)
+  of 2,608 in blueprints/ outside gate code   5                    14
+seconds to derive one tree                    0.72                 3.23
+The largest entries after: evidence/artifacts, 6,422 files
 (tools/sota-convergence/gap_wave_ledger.py: root / "evidence/artifacts" / wave, wave from its
-arguments); tests, 282 (unittest discovery); docs/*.md, 192 (the same script's
+arguments); tests, 282 (unittest discovery); docs/*.md, 193 (the same script's
 root / f"docs/{doc['id']}.md"); evidence/hosts, 182 (scripts/host_receipts.py); tools, 140, and
 examples, 93 (named in adoption/bootstrap-*.sh and examples/claude-native/workflows/test-envelope.mjs);
 evidence/artifacts/layer-verdicts-*, 122; scripts, 38 (ci_import: adoption/bootstrap-linux.sh runs
 tools/adoption/managed_block.py, which puts scripts/ on sys.path). Following the 246 test modules'
-reads as well, the alternative not adopted, would protect 9,083 files (86.9%), 2,204 of the
-3,436, and leave 83 reads in 13 modules unresolved.
+reads as well, the alternative not adopted, would protect 9,155 files (87.0%), 2,212 of the
+3,444, and leave 83 reads in 13 modules unresolved.
 
-Local rehearsal on the merged tree, 2026-10-04T05:50:33Z to 05:53:02Z. Method of part 4: the gate
-loaded from 86688e1e1 with real zizmor 1.30.1, one planted commit per clone, the clone removed
+Local rehearsal on the final merged tree, 2026-10-04T05:56:36Z to 05:58:58Z. Method of part 4: the
+gate loaded from 4a03dd796 with real zizmor 1.30.1, one planted commit per clone, the clone removed
 after each check. Each record had 14 reachable workflows, 545 protected files, 18 prefixes and 10
 globs; the new-test case had 546 files. Every record named the trusted commit, and each check took
-11.1 to 12.3 seconds.
+10.6 to 11.6 seconds. A first run on 86688e1e1 over db287ea72 gave the same outcomes.
 benign blueprint edit (blueprints/runtime-workers/openhands/README.md): pass; zizmor 0 findings
 blueprints/convergence-practice/contract.schema.json edit (P1's example): fail protected_path [ci_read]
 adoption/pins-linux-x86_64.json edit: fail protected_path [ci_read]

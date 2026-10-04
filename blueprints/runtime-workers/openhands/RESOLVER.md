@@ -600,8 +600,8 @@ free branch name.
     accepted.
   - The gate's protected list is broad by design. All of `tests/**` is protected,
     because validate.yml runs the whole suite, and so is every file a reachable step
-    names or a gate script reads. On the merged tree that is 7,493 of 10,455 tracked
-    files, including all of `evidence/artifacts` and `docs/*.md`, against 440 before the
+    names or a gate script reads. On the merged tree that is 7,559 of 10,528 tracked
+    files, including all of `evidence/artifacts` and `docs/*.md`, against 441 before the
     gate followed reads ([record](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md),
     residual risks). A task whose owned paths need those files fails at the gate with no
     push, and the agent's instructions tell it to stop and report such a change.
