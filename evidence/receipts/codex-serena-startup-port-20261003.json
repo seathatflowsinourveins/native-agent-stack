@@ -1698,7 +1698,9 @@
     "Concurrent origin/main advanced to 463a57b983eec540ae90eb45c2b1a7c6fc469aed while builder HEAD remained cac8700ba914950266272347468bff7ad630a4bf. Sandbox forbids rebase; latest-main manifest registration must be repeated after coordinator rebase.",
     "Resolution note 2026-10-03 for the previous residual and registry_checks[4]: in coordinator custody the content was rebased onto 6112d14d40f741855f0b961124d98939daaad00e (build_args.py citation L355-356 moved to L356-357) and the registry redone at fd252afcac09fbe49fcc31dfed789e314f47d9d6, where the independent review reproduced scripts/validate.py and scripts/evidence_manifest.py --check with exit 0 and status passed. The post-#626 rebase, 0.160.0 rerun and final registration (first residual) remain open.",
     "Driver deviation from #436's race test: no process-group kill after proc.wait, and the bwrap wrapper unshares only the network, so a codex reaching the 120 s timeout, or a background child it leaves, can outlive the test. No retained run reached the timeout (longest 8.433619 s). Restoring the kill is due with the 0.160.0 rerun.",
-    "The apply_codex_lane.py dry run's required-serena read-back has run only against a fixture serena; a real --dry-run belongs in the post-merge capability-gate rerun, and relaxed_required_flags is ported only if that run fails."
+    "The apply_codex_lane.py dry run's required-serena read-back has run only against a fixture serena; a real --dry-run belongs in the post-merge capability-gate rerun, and relaxed_required_flags is ported only if that run fails.",
+    "Resolution note 2026-10-04 for residuals[0], [2] and [4]: the branch merged main 6af8e55bd9e8 (carrying #626's 0.160.0 pin at f77a35eb2) and reran its native checks with the pinned codex-cli 0.160.0, verified against both tarball hashes and the vendored binary hash (rerun_0160_20261004); the 0.159.3 rows above keep their label. A scratch check now starts the real Serena transport the config template renders, under 0.160.0 and 0.159.3; host apply, a model run, token measurement, upstream Rust execution and other-host acceptance remain unestablished. The configuration owner's two expectations were updated in this branch under the owner's Option 2 (coordinator ACK 2026-10-04), and tests.test_new_wsl_client_config exits 0.",
+    "Status 2026-10-04 of residuals[8] and [9]: both remain open. The 0.160.0 rerun used the unchanged RESPONSES_DRIVER (driver_sha256 83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59, as in the 0.159.3 rows), so its hash stays recomputable from HEAD, and restoring the process-group kill is left to the coordinator; no run reached the driver's 120 s timeout. The real --dry-run read-back still belongs to the capability-gate rerun."
   ],
   "integration_checks": [
     {
@@ -3149,5 +3151,624 @@
       "returned_output": "Publication validation failed: latest-main evidence entries refer to 21 absent files and five stale unrebased files.",
       "scope": "expected unrebased-base limitation; privacy findings repaired; final validator output retained in custody"
     }
-  ]
+  ],
+  "rerun_0160_20261004": {
+    "date": "2026-10-04",
+    "kind": "codex_serena_startup_rerun",
+    "evidence_class": "local_integration",
+    "inputs": "the PR's own instrument (synthetic stdio MCP fixture, loopback fake Responses endpoint) and scratch checks; b4/b5 use the default provider with no credentials and no network; c1/c2 start the real Serena transport the config template renders",
+    "codex_version": "0.160.0",
+    "comparison_codex_version": "0.159.3",
+    "provider_execution": false,
+    "host_apply": false,
+    "token_measurements": null,
+    "base": {
+      "merge_commit": "e3ce7466a62aa9f2c6de50084b2900d41a210431",
+      "main": "6af8e55bd9e8f51aaafbf0304e510c11aaa71a6a",
+      "codex_pin": {
+        "pr": 626,
+        "commit": "f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5"
+      }
+    },
+    "codex_binary": {
+      "version_output": "codex-cli 0.160.0",
+      "source": "adoption/pins-linux-x86_64.json codex row and its platform_dependency (registry.npmjs.org tarballs)",
+      "install": "adoption/bootstrap-linux.sh install_npm and platform-dependency steps mirrored into a scratch prefix: both tarballs verified, npm install --global --ignore-scripts --prefix <SCRATCH_PREFIX> <wrapper tgz>, then the nested platform package replaced from the verified tarball. The host's default codex stayed 0.159.3.",
+      "integrity": [
+        {
+          "artifact": "@openai/codex 0.160.0 wrapper tgz",
+          "bytes": 4902,
+          "sha256": "373517768e912eeb5054024ae9215e2c90a1420957b66fe134ef745a00948d4a",
+          "sha512": "sha512-kEtVGzjRAYAMOwJxN39bGcna7LT3IDQgq64NNJ/dDTfu4OzZaocJcyNb5/gGJ/IVF/Vj7oK7E2m3nmTan7lpjg==",
+          "matches_pin": true
+        },
+        {
+          "artifact": "@openai/codex 0.160.0-linux-x64 tgz",
+          "bytes": 163273896,
+          "sha256": "37a41d61c3399182b8c727b77090cc7a1566bd849d0f09070a0bbc6fec4c58dc",
+          "sha512": "sha512-KI/73OqGrHmR18s7ya7E1NqV6rT0y3lxr0s8S1qR2m6zU6QRF/HlR529jALLh5vjdUnsRT4Ahoxt0axb4kY99g==",
+          "matches_pin": true
+        },
+        {
+          "artifact": "vendor/x86_64-unknown-linux-musl/bin/codex",
+          "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+          "matches_pin": true,
+          "note": "npm's own resolved copy had the same hash before the verified replacement"
+        },
+        {
+          "artifact": "platform package.json",
+          "name": "@openai/codex",
+          "version": "0.160.0-linux-x64",
+          "matches_pin": true
+        }
+      ]
+    },
+    "isolation": "bwrap --unshare-net with a private /tmp around each scratch root; scratch HOME and CODEX_HOME; nice -n 19; no sign-in, credential file, gateway or model",
+    "native_checks": [
+      {
+        "command": "NAS_CODEX_INTEGRATION=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests",
+        "codex": "0.160.0",
+        "exit_code": 0,
+        "returned_output": "Ran 12 tests in 122.232s\nOK (skipped=1)",
+        "skipped": "test_serena_startup_trial (opt-in)"
+      },
+      {
+        "command": "NAS_CODEX_INTEGRATION=1 NAS_CODEX_STARTUP_TRIAL=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests.test_serena_startup_trial",
+        "codex": "0.160.0",
+        "exit_code": 0,
+        "returned_output": "Ran 1 test in 128.086s\nOK"
+      }
+    ],
+    "first_turn_regression": {
+      "test": "test_required_serena_starts_before_the_first_turn_on_a_custom_provider (fixture serena delays initialize 2.5 s)",
+      "profile_sha256": "8e5fc36343b9db548aeadd15578342a59eb22f955f591e5086cdf7e7fa848462",
+      "runs": [
+        {
+          "case": "profile",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 3.036006,
+          "fixture_tool_in_first_turn": true,
+          "started_at_utc": "2026-10-04T08:26:21Z",
+          "ended_at_utc": "2026-10-04T08:26:30Z"
+        },
+        {
+          "case": "control",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 1.494847,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:26:30Z",
+          "ended_at_utc": "2026-10-04T08:26:37Z"
+        },
+        {
+          "case": "cannot start",
+          "exit": 1,
+          "requests": 0,
+          "first_request_sec": null,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:26:37Z",
+          "ended_at_utc": "2026-10-04T08:26:43Z",
+          "error": "thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request (code -32603)"
+        }
+      ]
+    },
+    "trial": {
+      "preregistration": "docs/decisions/2026-09-26-codex-worker-lane.md#addendum-2026-10-03-serena-at-the-first-turn-port-of-436 (unchanged)",
+      "arm_profile_sha256": {
+        "control": "27538be2ac9956186138e554793c4040d8d4cc94ada026821509d991a28cb7ab",
+        "A": "36b05236ad4829fc94189e05f7165668a0f37db3c7d588ae68eed505bffa9733",
+        "B": "98246bece671c5263b0603ef0bc40e7d0acb6251268bad62fbd616a579231efd"
+      },
+      "arm_profiles_note": "TOML-equal to the 0.159.3 arms (sha256 prefixes d5e673fd82fc, 2e3a95ef2dfa and 29010349b297); the P2 repair changed template comments only",
+      "driver_sha256": "83a3346746d1d103027274e3342b37090aa6fc8e42ce036a9d56cf05a83f0e59",
+      "mcp_fixture_sha256": "7d1920d4ddb5a05158b879f8bc16c562f944a5efb8af654e8d8ef770c833b14c",
+      "runs": [
+        {
+          "arm": "control",
+          "fixture": "delayed_initialize",
+          "run": 1,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 1.452866,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:27:34Z",
+          "ended_at_utc": "2026-10-04T08:27:40Z"
+        },
+        {
+          "arm": "control",
+          "fixture": "delayed_initialize",
+          "run": 2,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 1.505992,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:27:41Z",
+          "ended_at_utc": "2026-10-04T08:27:47Z"
+        },
+        {
+          "arm": "control",
+          "fixture": "delayed_initialize",
+          "run": 3,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 1.597376,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:27:48Z",
+          "ended_at_utc": "2026-10-04T08:27:55Z"
+        },
+        {
+          "arm": "control",
+          "fixture": "cannot_start",
+          "run": 1,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.517077,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:27:55Z",
+          "ended_at_utc": "2026-10-04T08:28:01Z"
+        },
+        {
+          "arm": "control",
+          "fixture": "cannot_start",
+          "run": 2,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.518078,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:28:01Z",
+          "ended_at_utc": "2026-10-04T08:28:07Z"
+        },
+        {
+          "arm": "control",
+          "fixture": "cannot_start",
+          "run": 3,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.511584,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:28:07Z",
+          "ended_at_utc": "2026-10-04T08:28:13Z"
+        },
+        {
+          "arm": "A",
+          "fixture": "delayed_initialize",
+          "run": 1,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 3.057482,
+          "fixture_tool_in_first_turn": true,
+          "started_at_utc": "2026-10-04T08:28:13Z",
+          "ended_at_utc": "2026-10-04T08:28:22Z"
+        },
+        {
+          "arm": "A",
+          "fixture": "delayed_initialize",
+          "run": 2,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 3.069528,
+          "fixture_tool_in_first_turn": true,
+          "started_at_utc": "2026-10-04T08:28:22Z",
+          "ended_at_utc": "2026-10-04T08:28:30Z"
+        },
+        {
+          "arm": "A",
+          "fixture": "delayed_initialize",
+          "run": 3,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 3.141734,
+          "fixture_tool_in_first_turn": true,
+          "started_at_utc": "2026-10-04T08:28:31Z",
+          "ended_at_utc": "2026-10-04T08:28:39Z"
+        },
+        {
+          "arm": "A",
+          "fixture": "cannot_start",
+          "run": 1,
+          "exit": 1,
+          "requests": 0,
+          "first_request_sec": null,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:28:40Z",
+          "ended_at_utc": "2026-10-04T08:28:45Z",
+          "error": "thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request (code -32603)"
+        },
+        {
+          "arm": "A",
+          "fixture": "cannot_start",
+          "run": 2,
+          "exit": 1,
+          "requests": 0,
+          "first_request_sec": null,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:28:46Z",
+          "ended_at_utc": "2026-10-04T08:28:51Z",
+          "error": "thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request (code -32603)"
+        },
+        {
+          "arm": "A",
+          "fixture": "cannot_start",
+          "run": 3,
+          "exit": 1,
+          "requests": 0,
+          "first_request_sec": null,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:28:52Z",
+          "ended_at_utc": "2026-10-04T08:28:57Z",
+          "error": "thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: handshaking with MCP server failed: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request: Send message error Transport [codex_rmcp_client::stdio_server_launcher::StdioServerTransport] error: Broken pipe (os error 32), when send initialize request (code -32603)"
+        },
+        {
+          "arm": "B",
+          "fixture": "delayed_initialize",
+          "run": 1,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 2.916433,
+          "fixture_tool_in_first_turn": true,
+          "started_at_utc": "2026-10-04T08:28:57Z",
+          "ended_at_utc": "2026-10-04T08:29:05Z"
+        },
+        {
+          "arm": "B",
+          "fixture": "delayed_initialize",
+          "run": 2,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 2.912427,
+          "fixture_tool_in_first_turn": true,
+          "started_at_utc": "2026-10-04T08:29:06Z",
+          "ended_at_utc": "2026-10-04T08:29:14Z"
+        },
+        {
+          "arm": "B",
+          "fixture": "delayed_initialize",
+          "run": 3,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 2.940639,
+          "fixture_tool_in_first_turn": true,
+          "started_at_utc": "2026-10-04T08:29:14Z",
+          "ended_at_utc": "2026-10-04T08:29:22Z"
+        },
+        {
+          "arm": "B",
+          "fixture": "cannot_start",
+          "run": 1,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.660055,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:29:23Z",
+          "ended_at_utc": "2026-10-04T08:29:29Z"
+        },
+        {
+          "arm": "B",
+          "fixture": "cannot_start",
+          "run": 2,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.5034,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:29:29Z",
+          "ended_at_utc": "2026-10-04T08:29:35Z"
+        },
+        {
+          "arm": "B",
+          "fixture": "cannot_start",
+          "run": 3,
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.707492,
+          "fixture_tool_in_first_turn": false,
+          "started_at_utc": "2026-10-04T08:29:35Z",
+          "ended_at_utc": "2026-10-04T08:29:41Z"
+        }
+      ],
+      "result": "Selection A holds at 0.160.0: A and B expose Serena on 3/3 delayed starts; A fails explicitly with no request on 3/3 failed starts; B and the control continue silently on failure; the control never waits. The transport detail after the required-server prefix varies with the /bin/false exit race: both forms appear in the 0.159.3 rows.",
+      "longest_run_sec": 8.282446
+    },
+    "scratch_checks": {
+      "harness": "an uncommitted scratch script that imports this branch's tests/test_codex_worker_lane.py (RESPONSES_DRIVER, FIXTURE_MCP_SERVER, the bwrap isolation, lane.worker_pins) and runs each check once per binary, sequentially",
+      "commands": {
+        "a1": "codex -p stack-worker mcp get serena --json (the shipped profile over a base serena transport)",
+        "a2": "codex --strict-config exec -c model_providers.nasfake.base_url=\"{BASE_URL}\" -m gpt-6.1-sol -c model_reasoning_effort=\"max\" -c web_search=\"live\" -s read-only --skip-git-repo-check \"reply ok\" (a whole base config whose serena table sets required = true; no profile, since strict mode refuses the partial profile file)",
+        "a3": "a2 with the key misspelled requird = true (control)",
+        "a4": "codex --strict-config mcp get serena --json (observation)",
+        "b1": "codex exec -p stack-worker -c model_providers.nasfake.base_url=\"{BASE_URL}\" -m gpt-6.1-sol -c model_reasoning_effort=\"max\" -c web_search=\"live\" -s read-only --skip-git-repo-check \"reply ok\", base serena command <SCRATCH>/missing/serena (does not exist)",
+        "b2": "b1 with -c mcp_servers.serena.required=false (control)",
+        "b3": "b1 with the profile minus its required = true line (the trial's control arm), same nonexistent command (negative control)",
+        "b4": "codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort=\"max\" -c web_search=\"live\" -s read-only --skip-git-repo-check \"reply ok\" on the default provider with no credentials and no network, the shipped profile (required = true), same nonexistent command",
+        "b5": "b4 with the profile minus its required = true line (negative control); the harness stops it after 100 s",
+        "b6": "b1 with the loopback provider marked requires_openai_auth = true and no credentials",
+        "b7": "b6 with the profile minus its required = true line (negative control)",
+        "c1": "b1's command with the real serena transport that adoption/templates/codex.config.template.toml renders (<ECO_ROOT>/bin/serena start-mcp-server --transport stdio --project-from-cwd --context codex ..., its env table) in a scratch git project",
+        "c2": "c1 with -c mcp_servers.serena.required=false (control)"
+      },
+      "rows": [
+        {
+          "check": "a1-profile-mcp-get",
+          "codex": "0.160.0",
+          "exit": 0,
+          "enabled": true
+        },
+        {
+          "check": "a2-strict-exec-required",
+          "codex": "0.160.0",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.58053,
+          "first_turn_tools": 12,
+          "serena_tools_in_first_turn": 1
+        },
+        {
+          "check": "a3-strict-exec-misspelled-control",
+          "codex": "0.160.0",
+          "exit": 1,
+          "requests": 0,
+          "first_request_sec": null,
+          "first_turn_tools": 0,
+          "serena_tools_in_first_turn": 0,
+          "error": "Error loading config.toml: <CODEX_HOME>/config.toml:16:1: unknown configuration field `mcp_servers.serena.requird`"
+        },
+        {
+          "check": "a4-observation-strict-mcp-get",
+          "codex": "0.160.0",
+          "exit": 1,
+          "error": "Error: `--strict-config` is not supported for `codex mcp`"
+        },
+        {
+          "check": "b1-missing-command-required",
+          "codex": "0.160.0",
+          "exit": 1,
+          "requests": 0,
+          "first_request_sec": null,
+          "first_turn_tools": 0,
+          "serena_tools_in_first_turn": 0,
+          "error": "Error: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: No such file or directory (os error 2) (code -32603)"
+        },
+        {
+          "check": "b2-missing-command-required-false-control",
+          "codex": "0.160.0",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.398211,
+          "first_turn_tools": 11,
+          "serena_tools_in_first_turn": 0
+        },
+        {
+          "check": "b3-missing-command-without-required-control",
+          "codex": "0.160.0",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.412483,
+          "first_turn_tools": 11,
+          "serena_tools_in_first_turn": 0
+        },
+        {
+          "check": "b4-missing-command-required-no-auth",
+          "codex": "0.160.0",
+          "exit": 1,
+          "error": "Error: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: No such file or directory (os error 2) (code -32603)"
+        },
+        {
+          "check": "b5-missing-command-without-required-no-auth-control",
+          "codex": "0.160.0",
+          "exit": null,
+          "outcome": "no exit within the harness's 100 s; it was still reconnecting when the harness stopped it and swept the leftover processes",
+          "error": "ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: failed to lookup address information: Try again, url: wss://api.openai.com/v1/responses | warning: Falling back from WebSockets to HTTPS transport. stream disconnected before completion: failed to lookup address information: Try again | ERROR: Reconnecting... waiting for network"
+        },
+        {
+          "check": "b6-missing-command-required-auth-required-provider",
+          "codex": "0.160.0",
+          "exit": 1,
+          "requests": 0,
+          "first_request_sec": null,
+          "first_turn_tools": 0,
+          "serena_tools_in_first_turn": 0,
+          "error": "Error: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: No such file or directory (os error 2) (code -32603)"
+        },
+        {
+          "check": "b7-missing-command-without-required-auth-required-provider-control",
+          "codex": "0.160.0",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.391782,
+          "first_turn_tools": 11,
+          "serena_tools_in_first_turn": 0
+        },
+        {
+          "check": "c1-real-serena-profile",
+          "codex": "0.160.0",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 1.171467,
+          "first_turn_tools": 35,
+          "serena_tools_in_first_turn": 24
+        },
+        {
+          "check": "c2-real-serena-required-false-control",
+          "codex": "0.160.0",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 1.079014,
+          "first_turn_tools": 35,
+          "serena_tools_in_first_turn": 24
+        },
+        {
+          "check": "a1-profile-mcp-get",
+          "codex": "0.159.3",
+          "exit": 0,
+          "enabled": true
+        },
+        {
+          "check": "a2-strict-exec-required",
+          "codex": "0.159.3",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.623387,
+          "first_turn_tools": 12,
+          "serena_tools_in_first_turn": 1
+        },
+        {
+          "check": "a3-strict-exec-misspelled-control",
+          "codex": "0.159.3",
+          "exit": 1,
+          "requests": 0,
+          "first_request_sec": null,
+          "first_turn_tools": 0,
+          "serena_tools_in_first_turn": 0,
+          "error": "Error loading config.toml: <CODEX_HOME>/config.toml:16:1: unknown configuration field `mcp_servers.serena.requird`"
+        },
+        {
+          "check": "a4-observation-strict-mcp-get",
+          "codex": "0.159.3",
+          "exit": 1,
+          "error": "Error: `--strict-config` is not supported for `codex mcp`"
+        },
+        {
+          "check": "b1-missing-command-required",
+          "codex": "0.159.3",
+          "exit": 1,
+          "requests": 0,
+          "first_request_sec": null,
+          "first_turn_tools": 0,
+          "serena_tools_in_first_turn": 0,
+          "error": "Error: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: No such file or directory (os error 2) (code -32603)"
+        },
+        {
+          "check": "b2-missing-command-required-false-control",
+          "codex": "0.159.3",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.466689,
+          "first_turn_tools": 11,
+          "serena_tools_in_first_turn": 0
+        },
+        {
+          "check": "b3-missing-command-without-required-control",
+          "codex": "0.159.3",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.450983,
+          "first_turn_tools": 11,
+          "serena_tools_in_first_turn": 0
+        },
+        {
+          "check": "b4-missing-command-required-no-auth",
+          "codex": "0.159.3",
+          "exit": 1,
+          "error": "Error: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: No such file or directory (os error 2) (code -32603)"
+        },
+        {
+          "check": "b5-missing-command-without-required-no-auth-control",
+          "codex": "0.159.3",
+          "exit": null,
+          "outcome": "no exit within the harness's 100 s; it was still reconnecting when the harness stopped it and swept the leftover processes",
+          "error": "ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: failed to lookup address information: Try again, url: wss://api.openai.com/v1/responses | warning: Falling back from WebSockets to HTTPS transport. stream disconnected before completion: failed to lookup address information: Try again | ERROR: Reconnecting... waiting for network"
+        },
+        {
+          "check": "b6-missing-command-required-auth-required-provider",
+          "codex": "0.159.3",
+          "exit": 1,
+          "requests": 0,
+          "first_request_sec": null,
+          "first_turn_tools": 0,
+          "serena_tools_in_first_turn": 0,
+          "error": "Error: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: serena: No such file or directory (os error 2) (code -32603)"
+        },
+        {
+          "check": "b7-missing-command-without-required-auth-required-provider-control",
+          "codex": "0.159.3",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 0.473444,
+          "first_turn_tools": 11,
+          "serena_tools_in_first_turn": 0
+        },
+        {
+          "check": "c1-real-serena-profile",
+          "codex": "0.159.3",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 1.202098,
+          "first_turn_tools": 35,
+          "serena_tools_in_first_turn": 24
+        },
+        {
+          "check": "c2-real-serena-required-false-control",
+          "codex": "0.159.3",
+          "exit": 0,
+          "requests": 2,
+          "first_request_sec": 1.226786,
+          "first_turn_tools": 35,
+          "serena_tools_in_first_turn": 24
+        }
+      ],
+      "c1_real_serena_tools_0_160_0": [
+        "mcp__serena__activate_project",
+        "mcp__serena__delete_memory",
+        "mcp__serena__edit_memory",
+        "mcp__serena__find_declaration",
+        "mcp__serena__find_implementations",
+        "mcp__serena__find_referencing_symbols",
+        "mcp__serena__find_symbol",
+        "mcp__serena__get_current_config",
+        "mcp__serena__get_diagnostics_for_file",
+        "mcp__serena__get_symbols_overview",
+        "mcp__serena__initial_instructions",
+        "mcp__serena__insert_after_symbol",
+        "mcp__serena__insert_before_symbol",
+        "mcp__serena__list_memories",
+        "mcp__serena__onboarding",
+        "mcp__serena__open_dashboard",
+        "mcp__serena__read_memory",
+        "mcp__serena__rename_memory",
+        "mcp__serena__rename_symbol",
+        "mcp__serena__replace_in_files",
+        "mcp__serena__replace_symbol_body",
+        "mcp__serena__safe_delete_symbol",
+        "mcp__serena__search_for_pattern",
+        "mcp__serena__write_memory"
+      ],
+      "note": "c2's control also lists Serena's tools: the real server answered within the optional startup window here (first request about 1.1 s), so c1/c2 show that the real transport passes the MCP stage, not the required wait; the fixture's 2.5 s delay in the trial and the first-turn regression shows the wait.",
+      "fail_closed_controls": "b1, b4 and b6 (required = true, nonexistent command) exit 1 with only the required-server error, on a loopback provider that needs no auth (b1), the default provider with no credentials (b4) and a loopback provider marked requires_openai_auth = true (b6); b1 and b6 send no request to the loopback endpoint, and b4's stderr logs no connection attempt (b5 logs its attempts). Their negative controls without required = true get past MCP startup: b3 and b7 complete the turn (exit 0, 2 requests; the optional server's failed start prints nothing), and b5 reaches the model call (websocket connect to the default endpoint fails on DNS inside the network namespace, then HTTPS fallback and 'Reconnecting... waiting for network'). So the exit 1 comes from the required gate, not missing auth; no auth check preceded MCP startup in these runs."
+    },
+    "version_comparison": "0.159.3 and 0.160.0 returned the same exit codes, request counts, error text and first-turn tool counts on all thirteen scratch checks (timings differ).",
+    "upstream_required_source": [
+      {
+        "source": "openai/codex@rust-v0.160.0:codex-rs/config/src/mcp_types.rs:248-252",
+        "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/config/src/mcp_types.rs#L248-L252",
+        "file_sha256": "08bdfe6bcc0ca607b1ead8b373029f895528604290f94bf1ba18c2dc83db8fd8",
+        "fact": "the resolved server field: \"When `true`, `codex exec` exits with an error if this MCP server fails to initialize\"; serde default false (raw Option<bool> at L414, unwrap_or_default at L590)"
+      },
+      {
+        "source": "openai/codex@rust-v0.160.0:codex-rs/core/config.schema.json:3725-3728",
+        "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/config.schema.json#L3725-L3728",
+        "file_sha256": "7ce31bde1ed6ef15c53a96ba460bb1d0fb7b99fd9ab719b567c94c474f62b023",
+        "fact": "RawMcpServerConfig.required, a boolean (the definition starts at L3608)"
+      },
+      {
+        "source": "openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/connection_manager.rs:270-275",
+        "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/codex-mcp/src/connection_manager.rs#L270-L275",
+        "file_sha256": "88ffc14d95837a4f905b6e47721121a3d47246f4ca95fecb9142035687c40dfe",
+        "fact": "the required set is the servers with enabled() && required()"
+      },
+      {
+        "source": "openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/connection_manager/required.rs:17-63",
+        "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/codex-mcp/src/connection_manager/required.rs#L17-L63",
+        "file_sha256": "21af5592c5bbb35e2b296c23b02f331bc3a50a7ed21378a59b18eb3cb8d9c1b2",
+        "fact": "validate_required_servers: the cached-catalog skip at L29-33 and the failure text at L61"
+      },
+      {
+        "source": "openai/codex@rust-v0.160.0:codex-rs/core/src/session/session.rs:1890-1897",
+        "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/session/session.rs#L1890-L1897",
+        "file_sha256": "2da4c0288596269fbb6df6d9a04a389e8ce0184be77ee2bcce765521e63702a5",
+        "fact": "install_initial_mcp_runtime(...).await? propagates the error out of session start"
+      }
+    ],
+    "tag_commit": "a956835d020762cb2b570053af06f643a11c0ecc (git ls-remote, peeled rust-v0.160.0)",
+    "private_custody": "full sanitized stderr, retained observations and the scratch harness stay outside the repository"
+  }
 }

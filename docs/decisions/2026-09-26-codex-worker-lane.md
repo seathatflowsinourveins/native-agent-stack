@@ -1067,3 +1067,15 @@ registry was then redone as the last commit, `fd252afcac09fbe49fcc31dfed789e314f
 review of that head reproduced `python3 scripts/validate.py` and `python3 scripts/evidence_manifest.py --check`
 with exit 0 and `status: passed`. That base still precedes #626, so the 0.160.0 rebase, native rerun and final
 registration remain open, and each later registry commit's exact-head results are recorded on the PR.
+
+**Resolution 2026-10-04 (the 0.160.0 rerun after #626).** The records above stay as written. The branch merged main
+`6af8e55bd9e8f51aaafbf0304e510c11aaa71a6a`, which carries #626's 0.160.0 pin (`f77a35eb2`), in merge
+`e3ce7466a62aa9f2c6de50084b2900d41a210431`, so `lane.CODEX_VERSION` is 0.160.0. The pinned codex-cli 0.160.0 was
+installed into a scratch prefix and matched both pinned tarball hashes and the vendored binary hash. With it,
+`CodexIntegrationTests` exited 0 (12 run, 1 skipped) and the preregistered trial exited 0: arm A again exposed Serena
+on 3/3 delayed starts and failed explicitly before any request on 3/3 failed starts, so selection A holds. A scratch
+check also started the real Serena transport that the config template renders, and its tools reached the first turn
+under 0.160.0 and 0.159.3 alike. The rerun kept the driver unchanged (hash `83a33467…`, as in the 0.159.3 rows), so
+restoring the process-group kill described above remains open; no run reached the 120 s timeout (the longest took
+8.28 s). The real `--dry-run` of the capability-gate rerun also remains open. Results, hashes and the evidence class
+are in the receipt's `rerun_0160_20261004`.
