@@ -637,6 +637,17 @@ class CodexHomeCutTests(unittest.TestCase):
         self.assertNotIn("trust_level", kept)
         self.assertIn("hook approval(s), the hooks whose hashes that tool's map wires, are kept", " ".join(
             line.lstrip("# ") for line in kept.splitlines()[:4]))
+        # --keep-project-trust as well (that tool's render holds the main checkout's grant only when its map wires it):
+        # the grant stays too, and nothing else changes.
+        both, grants, approvals = codex_home.fresh_config(text, eco, keep_hook_trust=True, keep_project_trust=True)
+        self.assertEqual((grants, approvals), (1, 1))
+        self.assertEqual(tomllib.loads(both), {**tomllib.loads(kept), "projects": {"/a": {"trust_level": "trusted"}}})
+        self.assertTrue(both.startswith("# Written by tools/adoption/codex_home.py --keep-hook-trust --keep-project-trust "
+                                        "from the user config\n"), both[:120])
+        self.assertIn("trust grant(s), the projects that tool's map wires, are kept", " ".join(
+            line.lstrip("# ") for line in both.splitlines()[:4]))
+        # The bootstrap passes neither flag, and its file is what it was: every grant and approval goes.
+        self.assertEqual(codex_home.fresh_config(text, eco), (written, 1, 1))
 
     def test_refusals_write_nothing(self):
         broken_string = self.rendered.replace('model = "', 'note = """\n[projects."/x"]\n"""\nmodel = "', 1)

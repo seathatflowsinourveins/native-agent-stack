@@ -17,7 +17,9 @@ and passes the lane the host value file's HOST_PATH itself. Two cases:
                    0600, in a Codex home made 0700 when this run creates it. --keep-hook-trust keeps the
                    [hooks.state] tables (the [projects] grants still go): tools/adoption/new_wsl_client_config.py
                    passes it, because its render holds only the hook approvals its map wires and its merge into an
-                   existing config.toml adds the same ones.
+                   existing config.toml adds the same ones. --keep-project-trust keeps the [projects] tables for the
+                   same tool and the same reason: its render holds a project's trust grant only when its map wires
+                   it (an authorization setting, rendered only with its --with-authorization-settings).
   config.toml      never rewritten by this tool. When features.daemon_auto_start is not false, it is backed up beside
                    itself (<name>.bak.<UTC stamp>, never over an earlier backup) and set through Codex's own config
                    writer, `codex features disable daemon_auto_start` (codex-rs/cli/src/main.rs
@@ -85,13 +87,14 @@ def header_key(line: str) -> list[str] | None:
     return path or None
 
 
-def trust_table(path: list[str], keep_hook_trust: bool = False) -> bool:
-    """[projects.*] trust grants and [hooks.state] / [hooks.state.*] hook approvals (only the first with
-    keep_hook_trust)."""
-    return path[:1] == ["projects"] or (path[:2] == ["hooks", "state"] and not keep_hook_trust)
+def trust_table(path: list[str], keep_hook_trust: bool = False, keep_project_trust: bool = False) -> bool:
+    """[projects.*] trust grants (not with keep_project_trust) and [hooks.state] / [hooks.state.*] hook approvals (not
+    with keep_hook_trust)."""
+    return ((path[:1] == ["projects"] and not keep_project_trust)
+            or (path[:2] == ["hooks", "state"] and not keep_hook_trust))
 
 
-def without_trust_state(text: str, keep_hook_trust: bool = False) -> str:
+def without_trust_state(text: str, keep_hook_trust: bool = False, keep_project_trust: bool = False) -> str:
     """text without the trust tables and the comment lines directly above each. A table runs from its header to the
     comment block directly above the next header, so a kept table's own comments stay with it."""
     lines = text.splitlines(keepends=True)
@@ -104,16 +107,17 @@ def without_trust_state(text: str, keep_hook_trust: bool = False) -> str:
         starts.append(start)
     dropped = set()
     for number, (_, key) in enumerate(headers):
-        if trust_table(key, keep_hook_trust):
+        if trust_table(key, keep_hook_trust, keep_project_trust):
             end = starts[number + 1] if number + 1 < len(headers) else len(lines)
             dropped.update(range(starts[number], end))
     kept = "".join(line for index, line in enumerate(lines) if index not in dropped)
     return kept.rstrip("\n") + "\n"
 
 
-def expected_without_trust(config: dict, keep_hook_trust: bool = False) -> dict:
+def expected_without_trust(config: dict, keep_hook_trust: bool = False, keep_project_trust: bool = False) -> dict:
     expected = copy.deepcopy(config)
-    expected.pop("projects", None)
+    if not keep_project_trust:
+        expected.pop("projects", None)
     hooks = expected.get("hooks")
     if isinstance(hooks, dict) and not keep_hook_trust:
         hooks.pop("state", None)
@@ -122,21 +126,22 @@ def expected_without_trust(config: dict, keep_hook_trust: bool = False) -> dict:
     return expected
 
 
-def fresh_config(rendered: str, eco_root: str, keep_hook_trust: bool = False) -> tuple[str, int, int]:
-    """(text to write, trust grants left out, hook approvals left out or, with keep_hook_trust, kept) for a Codex home
-    without config.toml."""
+def fresh_config(rendered: str, eco_root: str, keep_hook_trust: bool = False,
+                 keep_project_trust: bool = False) -> tuple[str, int, int]:
+    """(text to write, trust grants left out or, with keep_project_trust, kept, hook approvals left out or, with
+    keep_hook_trust, kept) for a Codex home without config.toml."""
     try:
         source = tomllib.loads(rendered)
     except tomllib.TOMLDecodeError as error:
         raise Refused(f"the rendered codex.config.toml does not parse: {error}") from None
     grants = len(source.get("projects") or {})
     approvals = len((source.get("hooks") or {}).get("state") or {})
-    body = without_trust_state(rendered, keep_hook_trust)
+    body = without_trust_state(rendered, keep_hook_trust, keep_project_trust)
     try:
         result = tomllib.loads(body)
     except tomllib.TOMLDecodeError as error:
         raise Refused(f"the render without its trust state does not parse ({error}); nothing written") from None
-    if result != expected_without_trust(source, keep_hook_trust):
+    if result != expected_without_trust(source, keep_hook_trust, keep_project_trust):
         raise Refused("leaving out the trust state would change more than the [projects] and [hooks.state] tables; "
                       "nothing written")
     if not daemon_disabled(result):
@@ -146,11 +151,17 @@ def fresh_config(rendered: str, eco_root: str, keep_hook_trust: bool = False) ->
     if not first or os.path.realpath(first) != os.path.realpath(os.path.join(eco_root, "bin")):
         raise Refused(f"the rendered shell_environment_policy.set.PATH does not start with {eco_root}/bin: the host "
                       "value file's ECO_ROOT is not this run's ecosystem root (ECO_INSTALL_ROOT); make them agree")
-    if keep_hook_trust:
-        note = ("# Written by tools/adoption/codex_home.py --keep-hook-trust from the user config\n"
-                "# tools/adoption/new_wsl_client_config.py rendered for this host: its "
-                f"{grants} [projects] trust grant(s) were left out, and\n# its {approvals} [hooks.state] hook "
-                "approval(s), the hooks whose hashes that tool's map wires, are kept.\n")
+    if keep_hook_trust or keep_project_trust:
+        flags = " ".join(flag for flag, kept in (("--keep-hook-trust", keep_hook_trust),
+                                                 ("--keep-project-trust", keep_project_trust)) if kept)
+        grants_text = (f"its {grants} [projects] trust grant(s), the projects that tool's map wires, are kept"
+                       if keep_project_trust else f"its {grants} [projects] trust grant(s) were left out")
+        approvals_text = (f"its {approvals} [hooks.state] hook approval(s), the hooks whose hashes that tool's map "
+                          "wires, are kept" if keep_hook_trust else
+                          f"its {approvals} [hooks.state] hook approval(s) were left out")
+        note = (f"# Written by tools/adoption/codex_home.py {flags} from the user config\n"
+                f"# tools/adoption/new_wsl_client_config.py rendered for this host: {grants_text}, and\n"
+                f"# {approvals_text}.\n")
     else:
         note = ("# Written by adoption/bootstrap-linux.sh --configure-full-profile (tools/adoption/codex_home.py) from\n"
                 "# adoption/templates/codex.config.template.toml as tools/adoption/render_config.py rendered it for this\n"
@@ -161,13 +172,17 @@ def fresh_config(rendered: str, eco_root: str, keep_hook_trust: bool = False) ->
 
 
 def install_fresh(codex_home: Path, config: Path, rendered: str, eco_root: str, dry_run: bool,
-                  keep_hook_trust: bool = False) -> int:
-    text, grants, approvals = fresh_config(rendered, eco_root, keep_hook_trust)
+                  keep_hook_trust: bool = False, keep_project_trust: bool = False) -> int:
+    text, grants, approvals = fresh_config(rendered, eco_root, keep_hook_trust, keep_project_trust)
     if os.path.lexists(codex_home) and not codex_home.is_dir():
         raise Refused(f"{codex_home} exists and is not a directory")
-    left_out = (f"{grants} [projects] trust grant(s) left out and {approvals} [hooks.state] approval(s) kept"
-                if keep_hook_trust else
-                f"{grants} [projects] trust grant(s) and {approvals} [hooks.state] approval(s) left out")
+    if keep_project_trust:
+        left_out = (f"{grants} [projects] trust grant(s) kept and {approvals} [hooks.state] approval(s) "
+                    + ("kept" if keep_hook_trust else "left out"))
+    elif keep_hook_trust:
+        left_out = f"{grants} [projects] trust grant(s) left out and {approvals} [hooks.state] approval(s) kept"
+    else:
+        left_out = f"{grants} [projects] trust grant(s) and {approvals} [hooks.state] approval(s) left out"
     if dry_run:
         print(f"{config}: absent; DRY RUN, would write the rendered user config ({left_out}, "
               f"sha256 {lane.sha256_bytes(text.encode('utf-8'))[:12]}), mode 0600; nothing written")
@@ -242,6 +257,10 @@ def build_parser() -> argparse.ArgumentParser:
                         help="keep the render's [hooks.state] hook approvals in a config.toml this run creates "
                              "([projects] trust grants still go): for tools/adoption/new_wsl_client_config.py, whose "
                              "render holds only the approvals its map wires, so a new home and a merge end the same")
+    parser.add_argument("--keep-project-trust", action="store_true",
+                        help="keep the render's [projects] trust grants in a config.toml this run creates: for "
+                             "tools/adoption/new_wsl_client_config.py, whose render holds a project's grant only when "
+                             "its map wires it, so a new home and a merge end the same")
     return parser
 
 
@@ -252,7 +271,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if not os.path.lexists(config):
             return install_fresh(codex_home, config, args.rendered.read_text(encoding="utf-8"), args.eco_root,
-                                 args.dry_run, args.keep_hook_trust)
+                                 args.dry_run, args.keep_hook_trust, args.keep_project_trust)
         return disable_daemon(codex_home, config, args.codex or shutil.which("codex"), args.dry_run,
                               args.codex_process_name)
     except (Refused, file_io.ApplyError) as error:
