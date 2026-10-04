@@ -6,7 +6,8 @@ workflow's exact bytes are pinned by retained evidence; Scorecard is unpublished
 may write code-scanning results; dependency review runs on pull requests only and fails on high
 advisories; security-scan.yml and publish-catalog.yml's release job keep write scopes job-local
 (docs/decisions/2026-09-22-github-automation-closure.md); every third-party action is pinned by
-a full commit SHA.
+a full commit SHA; no job a pull request can start reads a secret or holds a write scope beyond
+security-scan.yml's two SARIF uploads (2026-10-04).
 """
 
 from datetime import date
@@ -2221,6 +2222,232 @@ class NoWorkflowApprovesPullRequestsTests(unittest.TestCase):
             body = uncommented(text)
             for pattern in patterns:
                 self.assertNotRegex(body, pattern, name)
+
+
+# Pull-request reachability (2026-10-04; docs/decisions/2026-09-22-github-automation-closure.md, "Pull-request
+# secrets and write-scope tripwire (2026-10-04)"). A job's token starts at the repository default and takes the
+# workflow's, then the job's, `permissions:`; only a pull request from a fork has its write scopes turned to read
+# and, apart from GITHUB_TOKEN, its secrets withheld (docs.github.com, "Workflow syntax", "How permissions are
+# calculated for a workflow job"; "Events that trigger workflows", "Workflows in forked repositories"). So a pull
+# request from a same-repository branch, where the OpenHands resolver (#489) pushes agent-written commits, gets
+# both. These are the events whose runs a pull request can cause: each pull_request* event, issue_comment (a
+# comment on one) and workflow_run, which "is able to access secrets and write tokens, even if the previous
+# workflow was not".
+PULL_REQUEST_EVENTS = frozenset({"pull_request", "pull_request_target", "pull_request_review",
+                                 "pull_request_review_comment", "issue_comment", "workflow_run"})
+# The only jobs reachable from those events that may hold a write scope, each with exactly this scope. Changing
+# this mapping is a security decision: give each entry its reason here and in the decision record above.
+PULL_REQUEST_WRITE_ALLOWLIST = {
+    # Uploads OSV-Scanner's SARIF to code scanning and runs no shell step or installed tool (decision record
+    # section 3, "Write scope (2026-09-23 split)"; SecurityScanTests.test_the_write_token_never_reaches_an_installed_tool).
+    ("security-scan.yml", "osv-sarif-upload"): {"security-events": "write"},
+    # Uploads zizmor's online-audit SARIF the same way (decision record section 4).
+    ("security-scan.yml", "zizmor-sarif-upload"): {"security-events": "write"},
+}
+PULL_REQUEST_EXPOSURE = ("a pull_request run from a same-repository branch, where the OpenHands resolver (#489) pushes "
+                         "agent-written commits, receives the repository's secrets and its job's token scopes; only a "
+                         "fork's pull request has them withheld")
+ACCESS_LEVELS = ("read", "write", "none")
+# The `secrets` context itself, not a property that happens to be named secrets (env.secrets).
+SECRETS_CONTEXT = re.compile(r"(?<![\w.-])secrets(?![\w-])")
+# An anchor or alias after a key or a sequence dash, or a merge key. GitHub resolves anchors and aliases, even for a
+# whole job (docs.github.com, "Reusing workflow configurations", "YAML anchors and aliases"); jobs() does not.
+YAML_ANCHOR_OR_ALIAS = re.compile(r"(?:^[ \t]*-|:)[ \t]+[&*][A-Za-z0-9_-]+(?:[ \t]|$)|^[ \t]*<<[ \t]*:")
+
+
+def workflow_events(text):
+    """The event names of a workflow's top-level `on:` key, written as a scalar (`on: push`), a flow sequence
+    (`on: [push, pull_request]`), or a block sequence or mapping, whose events are its least-indented entries.
+    Words nested in a flow mapping are read as events too, which can only add names."""
+    match = re.search(r"(?m)^[\"']?on[\"']?:[ \t]*([^#\n]*?)[ \t]*(?:#[^\n]*)?\n((?:(?:[ \t-][^\n]*|#[^\n]*)?\n)*)", text)
+    if not match:
+        return set()
+    inline, body = match.group(1), uncommented(match.group(2))
+    if inline:
+        return set(re.findall(r"[A-Za-z_]+", inline + "\n" + body))
+    entries = [line for line in body.splitlines() if line.strip()]
+    indent = min((len(line) - len(line.lstrip(" ")) for line in entries), default=0)
+    found = (re.match(rf" {{{indent}}}(?:- +)?[\"']?([A-Za-z_]+)", line) for line in entries)
+    return {event.group(1) for event in found if event}
+
+
+def reusable_workflows_called(job_text):
+    """The local reusable workflows a job calls with its own `uses:` key (`./.github/workflows/<file>`)."""
+    return re.findall(r"(?m)^    uses:[ \t]*[\"']?\./\.github/workflows/([^\s\"'#]+)", job_text)
+
+
+def pull_request_reachable(texts):
+    """{workflow file: how a pull request reaches it}: each workflow whose `on:` names a PULL_REQUEST_EVENTS event,
+    then, transitively, each local reusable workflow one of their jobs calls, which runs in its caller's event
+    context (docs.github.com, "Reusing workflow configurations")."""
+    reached = {}
+    for name, text in texts.items():
+        events = sorted(workflow_events(text) & PULL_REQUEST_EVENTS)
+        if events:
+            reached[name] = "on: " + ", ".join(events)
+    pending = sorted(reached)
+    while pending:
+        caller = pending.pop()
+        for job_id, job_text in jobs(texts[caller]).items():
+            for called in reusable_workflows_called(job_text):
+                if called not in reached:
+                    reached[called] = f"called by {caller}:{job_id}"
+                    if called in texts:
+                        pending.append(called)
+    return reached
+
+
+def job_of_line(text):
+    """The job each line of a workflow belongs to (index 0 is line 1), or None at the workflow level. Job headers
+    are matched as jobs() matches them."""
+    owners, in_jobs, job = [], False, None
+    for line in text.splitlines():
+        if re.match(r"[^\s#]", line):
+            in_jobs, job = line.startswith("jobs:"), None
+        elif in_jobs:
+            header = re.match(r"  ([A-Za-z0-9_-]+):[ \t]*(?:#.*)?$", line)
+            job = header.group(1) if header else job
+        owners.append(job)
+    return owners
+
+
+def secret_references(text):
+    """(line, text) for each read of the `secrets` context in a workflow: every `${{ }}` expression that names it
+    (`secrets.X`, `secrets['X']`, `toJSON(secrets)`), and every `secrets:` key (a reusable-workflow call's
+    `secrets: inherit` or mapping, or a `workflow_call` declaration). Comment lines are read too: a `#` line inside
+    a `run: |` script is script text, and its expressions are still expanded."""
+    found = [(text.count("\n", 0, match.start()) + 1, " ".join(match.group(0).split()))
+             for match in re.finditer(r"\$\{\{.*?\}\}", text, re.S) if SECRETS_CONTEXT.search(match.group(0))]
+    found += [(number, line.strip()) for number, line in enumerate(text.splitlines(), 1)
+              if re.match(r"[ \t]*(?:- +)?[\"']?secrets[\"']?[ \t]*:(?:\s|$)", line)]
+    return sorted(found)
+
+
+def compact(text):
+    """`text` without blank or full-line comment lines: inside a permissions block, a blank line ends
+    permission_blocks()'s capture early and a comment line would be read as an entry."""
+    return "".join(line + "\n" for line in text.splitlines() if line.strip() and not line.lstrip().startswith("#"))
+
+
+class PullRequestReachableJobsTests(unittest.TestCase):
+    """No job a pull request can start reads a secret or holds a write scope beyond PULL_REQUEST_WRITE_ALLOWLIST
+    (2026-10-04; PULL_REQUEST_EVENTS gives the reason). A job is reachable when its workflow's `on:` names one of
+    those events, or when a reachable job calls its workflow as a local reusable workflow (none does today). A
+    remote reusable workflow is not read, but it receives only the secrets its caller job passes, and its token
+    "can be only downgraded (not elevated)" from that job's (docs.github.com, "Reusing workflow configurations");
+    both are checked on the caller. Every job of a reachable workflow counts, whatever its `if:` says: a condition
+    is not a boundary this text check can verify, so a job that needs a secret or a write scope belongs in a
+    workflow no pull request starts. The workflows are read as text, as this module reads them elsewhere (CI has no
+    PyYAML), and a form the reader does not handle fails instead of passing."""
+
+    texts = {path.name: path.read_text(encoding="utf-8") for path in sorted(WORKFLOWS.glob("*.y*ml"))}
+
+    def report(self, problems, remedy):
+        if problems:
+            self.fail("\n".join(problems) + f"\nWhy: {PULL_REQUEST_EXPOSURE}.\nFix: {remedy}")
+
+    def test_every_trigger_and_reachable_workflow_is_read(self):
+        problems = [f"{name}: no event read from its `on:` key" for name, text in self.texts.items()
+                    if not workflow_events(text)]
+        for name, how in sorted(pull_request_reachable(self.texts).items()):
+            text = self.texts.get(name)
+            if text is None:
+                problems.append(f"{name} ({how}) is not a file in .github/workflows")
+                continue
+            if re.findall(r"(?m)^([^\s#][^:\n]*):", text)[-1:] != ["jobs"] or "\njobs:\n" not in text:
+                problems.append(f"{name} ({how}): `jobs:` is not the last top-level key, so the keys after it would be "
+                                "read as part of a job")
+            for number, line in enumerate(text.splitlines(), 1):
+                if YAML_ANCHOR_OR_ALIAS.search(line):
+                    problems.append(f"{name}:{number} ({how}) uses a YAML anchor, alias or merge key, which this text "
+                                    f"check does not resolve: {line.strip()}")
+        self.report(problems, "write the workflow out in the plain block form this module's helpers read.")
+
+    def test_event_reader_misses_no_event_yaml_reads_when_available(self):
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML not installed; workflow_events() is the only event source")
+        for name, text in self.texts.items():
+            data = yaml.safe_load(text)
+            on = data.get("on", data.get(True))  # YAML 1.1, which PyYAML reads, makes the bare key `on` true
+            events = {on} if isinstance(on, str) else set(on or ())
+            self.assertLessEqual(events, workflow_events(text), name)
+
+    def test_no_reachable_job_reads_a_secret(self):
+        problems = []
+        for name, how in sorted(pull_request_reachable(self.texts).items()):
+            text = self.texts.get(name, "")
+            owners = job_of_line(text)
+            for number, found in secret_references(text):
+                where = f"job {owners[number - 1]}" if owners[number - 1] else "workflow level, so every job"
+                problems.append(f"{name}:{number} ({where}; {how}) reads the secrets context: {found}")
+        self.report(problems, "move a job that needs a secret to a workflow no pull request starts; for the job's own "
+                              "token use github.token, which test_only_the_sarif_upload_jobs_hold_a_write_scope bounds.")
+
+    def test_only_the_sarif_upload_jobs_hold_a_write_scope(self):
+        held, problems = {}, []
+        for name, how in sorted(pull_request_reachable(self.texts).items()):
+            text = self.texts.get(name)
+            if text is None:
+                continue  # test_every_trigger_and_reachable_workflow_is_read reports it
+            owners, own_key, block_keys = job_of_line(text), {}, {}
+            for number, line in enumerate(text.splitlines(), 1):
+                key = re.match(r"( *)(?:- +)?[\"']?permissions[\"']?[ \t]*:(.*)$", line)
+                if not key:
+                    continue
+                section, value = owners[number - 1], key.group(2).strip()
+                where = f"{name}:{number} ({'job ' + section if section else 'workflow level'}; {how})"
+                if "write-all" in value:
+                    problems.append(f"{where} grants write-all")
+                elif value:
+                    problems.append(f"{where} has `permissions: {value}`, a form this check does not read")
+                else:
+                    block_keys[section] = block_keys.get(section, 0) + 1
+                if len(key.group(1)) == (4 if section else 0):
+                    own_key.setdefault(section, number)
+            sections = {None: text.split("\njobs:\n", 1)[0], **jobs(text)}
+            for section, section_text in sections.items():
+                where = f"{name} ({'job ' + section if section else 'workflow level'}; {how})"
+                if len(permission_blocks(compact(section_text))) != block_keys.get(section, 0):
+                    problems.append(f"{where} has a `permissions:` block this check does not read")
+            for scope, access in (item for block in scopes(compact(sections[None])) for item in block.items()):
+                if access.strip("'\"") == "write":
+                    problems.append(f"{name}:{own_key.get(None)} (workflow level; {how}) grants {scope}: write to every "
+                                    "job without its own permissions")
+            for job_id, job_text in jobs(text).items():
+                if job_id in own_key:
+                    line, blocks = own_key[job_id], scopes(compact(job_text))
+                elif None in own_key:
+                    line, blocks = own_key[None], scopes(compact(sections[None])) + scopes(compact(job_text))
+                else:
+                    problems.append(f"{name}:{owners.index(job_id) + 1} (job {job_id}; {how}) sets no permissions and "
+                                    "neither does its workflow, so its token gets the repository default")
+                    continue
+                grants = {}
+                for block in blocks:
+                    for scope, access in block.items():
+                        scope, access = scope.strip("'\""), access.strip("'\"")
+                        if access not in ACCESS_LEVELS:
+                            problems.append(f"{name}:{line} (job {job_id}; {how}) has `{scope}: {access}`, an access "
+                                            "this check does not read")
+                        elif access == "write":
+                            grants[scope] = access
+                if grants:
+                    held[(name, job_id)] = (line, how, grants)
+        for (name, job_id), (line, how, grants) in sorted(held.items()):
+            if PULL_REQUEST_WRITE_ALLOWLIST.get((name, job_id)) != grants:
+                listed = ", ".join(f"{scope}: write" for scope in sorted(grants))
+                problems.append(f"{name}:{line} (job {job_id}; {how}) holds {listed}, which PULL_REQUEST_WRITE_ALLOWLIST "
+                                "does not grant it")
+        for (name, job_id), grants in sorted(PULL_REQUEST_WRITE_ALLOWLIST.items()):
+            if (name, job_id) not in held:
+                problems.append(f"PULL_REQUEST_WRITE_ALLOWLIST grants {name}:{job_id} {grants}, but no job a pull request "
+                                "can start holds a write scope there; remove the stale entry")
+        self.report(problems, "keep the job's permissions read-only, or move the job to a workflow no pull request "
+                              "starts. A new write scope here is a security decision: add it to "
+                              "PULL_REQUEST_WRITE_ALLOWLIST with a comment giving its reason, and record it in "
+                              "docs/decisions/2026-09-22-github-automation-closure.md.")
 
 
 class ActionsAllowListTests(unittest.TestCase):

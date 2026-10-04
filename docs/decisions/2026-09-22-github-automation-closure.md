@@ -1964,3 +1964,46 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   `github_owned_allowed`/`patterns_allowed` (add a `patterns_allowed` entry
   here with a dated reason), or a currently-used GitHub-owned action becomes
   blocked under `selected`.
+
+## Pull-request secrets and write-scope tripwire (2026-10-04)
+
+The OpenHands resolver (#489) pushes agent-written commits to
+same-repository branches, and its pre-push gate keeps them out of
+`.github/**`. A `pull_request` run from a same-repository branch gets the
+repository's secrets and the job's `GITHUB_TOKEN` scopes as written; only a
+fork's pull request has its secrets withheld and its write scopes turned to
+read
+([events, "Workflows in forked repositories"](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request);
+[workflow syntax, "How permissions are calculated for a workflow job"](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions);
+both read 2026-10-04).
+
+- **Pinned.** `tests/test_workflow_hardening.py`'s
+  `PullRequestReachableJobsTests`: no job of a workflow triggered by
+  `pull_request*`, `issue_comment` or `workflow_run` (or of a local reusable
+  workflow such a job calls; none today), whatever its `if:`, reads the
+  `secrets` context, passes `secrets:` or falls back to the repository
+  default; no such workflow grants `write-all` or a workflow-level write; and
+  the jobs holding a write scope are exactly `PULL_REQUEST_WRITE_ALLOWLIST`:
+  `security-scan.yml`'s `osv-sarif-upload` and `zizmor-sarif-upload`, each
+  with only `security-events: write` (sections 3 and 4). A form its text
+  reader cannot parse fails. At `3bdacab` it reads 24 jobs in 11 workflows
+  and passes.
+- **Evidence class.** A locally authored test, run locally. On planted
+  copies of the workflows it failed for each of 14 mutations and passed
+  unmutated. A `${{ secrets.X }}` step and `contents: write` on a
+  pull-request job passed every earlier test in the module and
+  `zizmor --offline --persona regular` at this repository's pin, 1.30.1.
+- **Alternatives.** zizmor's `secrets-inherit` and `excessive-permissions`
+  audits caught `secrets: inherit` and a job left on the repository default
+  in the same runs
+  ([audits at v1.30.1](https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/docs/audits.md)),
+  and OpenSSF Scorecard's Token-Permissions and Dangerous-Workflow checks
+  score least-privilege tokens and privileged triggers
+  ([checks.md at f1ebd76](https://github.com/ossf/scorecard/blob/f1ebd76756593c0454d782b4ba36ebc33ad131b6/docs/checks.md)).
+  These are general rules: none forbids a secret in a `pull_request` job or
+  a write scope outside an allowlist.
+- **Overturn.** A job a pull request starts needs a secret or another write
+  scope: move it to a workflow no pull request starts, or add an allowlist
+  entry with its reason in the constant and here. If the resolver's gate
+  stops excluding `.github/**`, the exposure reopens regardless of this
+  test, since a pull request's own workflow files then run.
