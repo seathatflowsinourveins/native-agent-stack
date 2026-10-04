@@ -48,9 +48,9 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    config (`adoption/new-wsl/templates/`, the 2026-10-03 addendum); the two instruction blocks; and six steps of the tool
    itself (the launcher, the login-shell PATH block, the skills step, the two PATH directories and the remote plugin
    rules). A piece goes to the first entry that matches it. A piece no entry
-   matches, and an entry no piece reaches, fail the check. Today: 399 pieces, 350 wired (207 practice, 143 through a slot),
-   35 not wired (0 through a slot that does not install, 35 by their own entry) and 14 authorization pieces (the five
-   settings, the main checkout's Codex trust grant of the 2026-10-04 addendum, the six tool approval modes of Decision 14
+   matches, and an entry no piece reaches, fail the check. Today: 404 pieces, 354 wired (207 practice, 147 through a slot),
+   35 not wired (0 through a slot that does not install, 35 by their own entry) and 15 authorization pieces (the five
+   settings, the main checkout's Codex trust grant of the 2026-10-04 addendum, the seven tool approval modes of Decision 14
    and semble's two allow rules, which also wait for their slots),
    each listed below; a slot whose install is another owner (an interim install, the 2026-10-03 addendum) counts as one
    that does not install the piece's owner. On 2026-10-04 the counts moved from 385 pieces, 293 wired and 93 through a
@@ -304,8 +304,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
       config and the stack-worker profile), semble and context-mode and semble's two allow rules, because their slots
       install those owners as interim installs; SocratiCode's and headroom's wait, because their slots install another
       owner. Since the 2026-10-04 addendum the option also writes the main checkout's Codex trust grant, and since the
-      changelog-parity record Claude Code's `crossSessionInbound = "accept"`. Fourteen pieces
-      are in the class (`--check` counts `authorization: 14`, and 35 pieces are not wired).
+      changelog-parity record Claude Code's `crossSessionInbound = "accept"`. Fifteen pieces
+      are in the class (`--check` counts `authorization: 15`, and 35 pieces are not wired).
     - **The default.** `--render` and `--apply` neither render nor write the five, and an existing value of those keys in a
       person's files is never touched: the render lacks the keys, so the Claude merge leaves the file's keys as they are,
       and so does the Codex merge.
@@ -853,7 +853,7 @@ unchanged.
   2026-10-04 (~15:10Z): the user changed the advisor to Opus 5.5; the template now carries `advisorModel: "opus"` (see [Advisor model](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model)).
   when the shared template moves. `advisorModel` is `opus` (Opus 5.5) too, by its own override entry: the user's decision of
   2026-10-04 and the value NativeStack carries (`docs/decisions/2026-10-04-new-wsl-changelog-parity.md`).
-- **Counts.** 399 pieces, 350 wired, 35 not wired and 14 authorization pieces (Decisions 2 and 14 above).
+- **Counts.** 404 pieces, 354 wired, 35 not wired and 15 authorization pieces (Decisions 2 and 14 above).
 
 What would overturn it: Codex matching a project's trust by a parent directory or by another key form; a decision that
 the repository's root should ask again (the entry returns to `not_wired`); the user choosing another main model, or the
@@ -920,6 +920,7 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `codex/config/sandbox_mode` | `"danger-full-access"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
 | `codex/config/mcp_servers.context-mode.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `context-supply` installing `context-mode` |
+| `codex/config/mcp_servers.jcodemunch.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-index` installing `jcodemunch` |
 | `codex/config/mcp_servers.semble.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-search` installing `semble` |
 | `codex/config/projects."${PROJECT_ROOT}".trust_level` | `"trusted"` | no | a trusted project's own .codex/config.toml layers load and Codex asks nothing about the folder, so the grant is written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |

@@ -255,7 +255,7 @@ class MapTests(unittest.TestCase):
         code, out, err = run_main("--check")
         self.assertEqual((code, err), (0, ""), out[-400:])
         self.assertIn("check passed", out)
-        self.assertRegex(out, rf"pieces: 3\d\d; wired: \d+; not wired: \d+; authorization: {len(AuthorizationTests.ALL)}\n")
+        self.assertRegex(out, rf"pieces: [34]\d\d; wired: \d+; not wired: \d+; authorization: {len(AuthorizationTests.ALL)}\n")
 
     def test_every_piece_has_one_line_and_every_unwired_one_says_why(self):
         results, *_ = cfg.analyse(ROOT)
@@ -732,8 +732,14 @@ class RenderTests(unittest.TestCase):
         # (the user's directive of 2026-10-04; JCODEMUNCH_SHARE_SAVINGS=0, CONFIGURATION.md at the pinned revision).
         self.assertEqual(servers["jcodemunch"], {"type": "stdio", "command": "${ECO_ROOT}/bin/jcodemunch-mcp", "args": [],
                                                  "env": {"JCODEMUNCH_SHARE_SAVINGS": "0"}})
-        self.assertEqual(config["mcp_servers"]["jcodemunch"], {"command": host["ECO_ROOT"] + "/bin/jcodemunch-mcp",
-                                                               "env": {"JCODEMUNCH_SHARE_SAVINGS": "0"}})
+        # The Codex entry is the one the project template registers per project (startup allowance, the three verbs of the
+        # front door, the savings opt-out); its approval mode is an authorization piece, written only with the option.
+        self.assertEqual(config["mcp_servers"]["jcodemunch"], {
+            "command": host["ECO_ROOT"] + "/bin/jcodemunch-mcp", "startup_timeout_sec": 60,
+            "enabled_tools": ["route", "menu", "order"],
+            "env": {"RTK_TELEMETRY_DISABLED": "1", "PATH": config["mcp_servers"]["context-mode"]["env"]["PATH"],
+                    "JCODEMUNCH_SHARE_SAVINGS": "0"}})
+        self.assertTrue(config["mcp_servers"]["jcodemunch"]["env"]["PATH"].startswith(host["ECO_ROOT"] + "/bin:"))
         self.assertEqual(config["mcp_servers"]["ai-memory"], {"url": f"http://{host['AI_MEMORY_URL']}/mcp"})
         semble = config["mcp_servers"]["semble"]
         self.assertEqual((semble["command"], semble["enabled_tools"]), ("semble", ["search", "find_related"]))
@@ -1830,10 +1836,11 @@ class AuthorizationTests(ApplyCase):
     # The coordinator's decision of 2026-10-04: the main checkout is trusted, and Codex looks a linked worktree's trust
     # up under it (codex-rs/git-utils/src/trust.rs at rust-v0.160.0); every other project still asks.
     TRUST = ('codex/config/projects."${PROJECT_ROOT}".trust_level',)
-    # The tool approval modes of five MCP servers, each tied to its installed owner's slot; wave 3 installs them all.
+    # The tool approval modes of six MCP servers, each tied to its installed owner's slot; wave 3 installs them all.
     APPROVAL = ("codex/config/mcp_servers.ai-memory.default_tools_approval_mode",
                 "codex/config/mcp_servers.semble.default_tools_approval_mode",
                 "codex/config/mcp_servers.context-mode.default_tools_approval_mode",
+                "codex/config/mcp_servers.jcodemunch.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode")
@@ -1842,10 +1849,11 @@ class AuthorizationTests(ApplyCase):
              "claude/settings/permission/allow/mcp__semble__find_related")
     ALL = STANDALONE + TRUST + APPROVAL + ALLOW
     SLOT_OF = dict(zip(APPROVAL + ALLOW, (("memory-owner", "ai-memory"), ("code-search", "semble"),
-                                          ("context-supply", "context-mode"), ("memory-owner", "ai-memory"),
+                                          ("context-supply", "context-mode"), ("code-index", "jcodemunch"),
+                                          ("memory-owner", "ai-memory"),
                                           ("code-search", "SocratiCode"), ("output-compression", "headroom"),
                                           ("code-search", "semble"), ("code-search", "semble"))))
-    WAITING = APPROVAL[4:]                        # negative-control fixtures remove these two installed owners
+    WAITING = APPROVAL[5:]                        # negative-control fixtures remove these two installed owners
     WRITTEN = STANDALONE + TRUST + APPROVAL + ALLOW     # what the option writes today
     OPTION = "--with-authorization-settings"
     DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode, "
@@ -1930,7 +1938,7 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual((codex_on["approval_policy"], codex_on["sandbox_mode"]), ("never", "danger-full-access"))
         self.assertEqual({name: server["default_tools_approval_mode"] for name, server in codex_on["mcp_servers"].items()
                           if "default_tools_approval_mode" in server},
-                         {"ai-memory": "approve", "semble": "approve", "context-mode": "approve"})
+                         {"ai-memory": "approve", "semble": "approve", "context-mode": "approve", "jcodemunch": "approve"})
         # One trust grant, for the host's main checkout (PROJECT_ROOT) and nothing else: no parent directory, and not
         # the publication checkout the shared template also names.
         project_root = json.loads((ROOT / "adoption/hosts/example.json").read_text())["PROJECT_ROOT"]
@@ -1944,6 +1952,7 @@ class AuthorizationTests(ApplyCase):
                 [("approval_policy",), ("sandbox_mode",), ("mcp_servers", "ai-memory", "default_tools_approval_mode"),
                  ("mcp_servers", "semble", "default_tools_approval_mode"),
                  ("mcp_servers", "context-mode", "default_tools_approval_mode"),
+                 ("mcp_servers", "jcodemunch", "default_tools_approval_mode"),
                  ("projects", project_root, "trust_level")]))
             self.assertEqual(set(leaves(off)) - set(leaves(on)), set())
             self.assertEqual({k: v for k, v in leaves(on).items() if k in leaves(off)}, leaves(off))
@@ -1956,6 +1965,7 @@ class AuthorizationTests(ApplyCase):
                     "Claude Code crossSessionInbound")
     CODEX_CONFIG = ("Codex approval_policy, Codex sandbox_mode, Codex mcp_servers.ai-memory.default_tools_approval_mode, "
                     "Codex mcp_servers.context-mode.default_tools_approval_mode, "
+                    "Codex mcp_servers.jcodemunch.default_tools_approval_mode, "
                     "Codex mcp_servers.semble.default_tools_approval_mode, "
                     'Codex projects."${PROJECT_ROOT}".trust_level')
     STACK_WORKER = ("Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode, "

@@ -454,6 +454,15 @@
     },
     {
       "match": [
+        "codex/*/mcp_servers.jcodemunch.default_tools_approval_mode"
+      ],
+      "wiring": "authorization:a tool approval mode of \"approve\" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has",
+      "slot": "code-index",
+      "owner": "jcodemunch",
+      "note": "jcodemunch's tools carry no MCP annotations, so Codex asks before each call, and a never policy refuses it (adoption/templates/project.codex.config.template.toml, which registers the same entry per project: approve auto-approves even under approval_policy = never, codex-rs/codex-mcp/src/mcp/mod.rs L89-L98 at rust-v0.157.1)."
+    },
+    {
+      "match": [
         "claude/mcp/server/jcodemunch",
         "codex/config/mcp_servers.jcodemunch.*"
       ],

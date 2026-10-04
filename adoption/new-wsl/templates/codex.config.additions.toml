@@ -28,11 +28,20 @@ default_tools_approval_mode = "approve"
 # session starts with the tools ready (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md). JCODEMUNCH_SHARE_SAVINGS=0 in
 # the server's env block is the documented opt-out of its anonymous savings counter (CONFIGURATION.md L231, SECURITY.md L311 at the
 # same revision). The code-index install-plan row installs this console script; `jcodemunch-mcp init`, which writes a prompt
-# policy and hooks, is not run here.
+# policy and hooks, is not run here. The entry is the one adoption/templates/project.codex.config.template.toml registers per
+# project, moved to user scope: its tools carry no MCP annotations, so under approval_policy = "never" Codex refuses every call
+# unless the approval mode approves them (codex-rs/codex-mcp/src/mcp/mod.rs L89-L98 at rust-v0.157.1; authorization, as above),
+# and enabled_tools names the three verbs of its front door (jcodemunch-mcp 1.108.319, counter.py FRONT_DOOR). CODE_INDEX_PATH
+# stays unset: upstream's default is ~/.code-index (README.md L225).
 [mcp_servers.jcodemunch]
 command = "${ECO_ROOT}/bin/jcodemunch-mcp"
+startup_timeout_sec = 60
+enabled_tools = ["route", "menu", "order"]
+default_tools_approval_mode = "approve"
 
 [mcp_servers.jcodemunch.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 JCODEMUNCH_SHARE_SAVINGS = "0"
 
 # semble 0.6.1 (MinishLab/semble, a uv tool), the code-search slot's interim install (definitive manifest, amendment 3;

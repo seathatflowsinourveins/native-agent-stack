@@ -34,10 +34,15 @@ a new project and in a new worktree alike.
 - **Savings counter:** upstream's default is an anonymous savings counter (README.md L225). Its documented opt-out is
   `JCODEMUNCH_SHARE_SAVINGS=0` in the server's env block (CONFIGURATION.md L229-233 and SECURITY.md L311 at the same
   revision), which both registrations carry, as the per-project registration did.
+- **The Codex entry** is the one `adoption/templates/project.codex.config.template.toml` registers per project, at user
+  scope: a 60 s start-up allowance, `enabled_tools` naming the three verbs of the front door (`route`, `menu`, `order`),
+  and `default_tools_approval_mode = "approve"`, because the tools carry no MCP annotations and a `never` policy refuses
+  an unapproved call. The approval mode is an authorization piece: written only with `--with-authorization-settings`,
+  and only while the `code-index` slot installs jcodemunch.
 - **Not run:** `jcodemunch-mcp init`, which writes enforcement hooks and a prompt policy into the client.
 - **Unchanged:** the shared Claude and Codex templates and every other host keep the per-project opt-in
-  (`adoption/bootstrap.md`, "jCodeMunch, per project"). The record counts move to 399 pieces, 350 wired, 35 not wired and
-  14 authorization.
+  (`adoption/bootstrap.md`, "jCodeMunch, per project"). The record counts move to 404 pieces, 354 wired, 35 not wired and
+  15 authorization.
 
 ## The cost, measured
 
