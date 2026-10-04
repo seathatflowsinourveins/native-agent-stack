@@ -9527,8 +9527,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "cf1285212173effebbeb22631c2ce7fac21119fd2a4837e5c6364b9e174067cf",
-      "bytes": 65171
+      "sha256": "ba245dcc6aec0c3b6ae532046551634a3eddb32f3b6e864957434f610d0a7b56",
+      "bytes": 65488
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -52427,8 +52427,8 @@
     },
     {
       "path": "tests/test_frozen_macos_variant_no_use.py",
-      "sha256": "a65dd06715de0afc890c75a06b2585f99a6c7c97ad94d6629947dc7cb2cb0d01",
-      "bytes": 34773
+      "sha256": "b3aa81bc327cb35fd71c96b820afd1fa81f5c20fe03604d73f64062bfe11d314",
+      "bytes": 35340
     },
     {
       "path": "tests/test_gap_crosswalk.py",

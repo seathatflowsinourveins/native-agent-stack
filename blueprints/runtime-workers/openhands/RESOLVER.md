@@ -70,9 +70,11 @@ their source identifiers are retained rather than presenting this round as a rep
 failed attempts, refreshed measurements and native results: the two-module suite exited
 1 with installed gitleaks raising `gitleaks_failed`; its cause was not independently
 established. [Evidence part 15](evidence/push-gate-fail-first.txt) also records the
-coordinator-reported host run at `677acc449`: 213 tests, OK (skipped=1), exit 0, with
+coordinator-reported 2026-10-04 host run at `677acc449`: 213 tests, OK (skipped=1), exit 0, with
 `TMPDIR=/tmp/t489` and the installed-gitleaks test passing. The gitleaks version and run
-duration were not supplied. The earlier
+duration were not supplied. This dated host evidence applies only to `677acc449`.
+A passing suite at the PR head is still required. The current head needs its own
+passing run, which the coordinator records before landing. The earlier
 [set comparison](evidence/gate-reads-set-diff-20261004.json) is historical fixture/tree
 evidence, not a proof of the reader's completeness. The decision's overturn condition
 is: "a derivation that passes an adversarial corpus with no losses against b8eb9352b
@@ -113,7 +115,8 @@ refusal. The imported-constant control first reads a test module inside `reads()
 it refuses for `CalledProcessError`, `TimeoutExpired` and `KeyError`. Evaluator
 recursion remains advisory, and the independent parser boundary remains enforced.
 [Evidence part 16](evidence/push-gate-fail-first.txt) retains the failing-first control
-and this round's local results. No reader precision repair is included.
+and this round's local results: the two-module run exited 1 with the installed-gitleaks
+`RuntimeError(gitleaks_failed)` in the builder sandbox. No reader precision repair is included.
 
 ## Superseded design and runbook notes (2026-10-04)
 
