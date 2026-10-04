@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "native_publication_gate_correction",
+  "source": "Maintained repository pre-push registry gate and tests/test_osv_lockfile_coverage.py, source inherited from currentmain46365ea; OSV2.6.0 supported requirements.txt extractor already used for actual candidate scans.",
+  "failed_pre_push": {
+    "head": "325c5e22e796cd59ac3de1b013664805d9f96c7c",
+    "exit_code": 1,
+    "returned_summary": "Ran 3 tests in 0.190s; FAILED (failures=1). Push refused.",
+    "failed_test": "test_every_tracked_lockfile_and_manifest_is_listed",
+    "missing_inputs": [
+      "examples/deepagents-omniroute/requirements.in",
+      "examples/deepagents-omniroute/requirements.lock",
+      "examples/openhands-native-capabilities/cli-constraints.txt",
+      "examples/openhands-native-capabilities/requirements.in",
+      "examples/openhands-native-capabilities/requirements.lock"
+    ]
+  },
+  "repair": {
+    "path": ".github/osv-scanner-lockfiles.json",
+    "scanned": "Both exact resolved locks and CLI patched constraint use native requirements.txt parser.",
+    "covered": "The two requirements.in inputs are covered by their exact resolved locks.",
+    "no_new_ignores": true,
+    "no_workflow_changes": true
+  },
+  "native_verification": {
+    "command": "rtk python3 -m unittest tests.test_osv_lockfile_coverage",
+    "exit_code": 0,
+    "returned_output": "......................................\n----------------------------------------------------------------------\nRan 38 tests in 0.239s\n\nOK"
+  },
+  "limits": [
+    "Local native publication gate evidence; remote required-check results remain a separate observation."
+  ]
+}
