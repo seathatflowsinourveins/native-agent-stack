@@ -51610,8 +51610,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "59dec1e9c568ae42a668d584b07bb343df90bf8c53a159f1e8c85760a01243a6",
-      "bytes": 94985
+      "sha256": "c5ea86bd324e9baf3263ac7f6edd107c736e3fa5c62c6395161d3319b4458998",
+      "bytes": 98120
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -52050,8 +52050,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "f19fdfcf543e4b32012db48c4d37d3c3433604698b83a9f618f954cc10d82bbb",
-      "bytes": 157034
+      "sha256": "ff9bd18c08199728ba70eeb8bc4e107c017fc96cbbac5b64a8d2076cc6de19a2",
+      "bytes": 161018
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -52640,8 +52640,8 @@
     },
     {
       "path": "tests/test_pin_holds.py",
-      "sha256": "bad2ec0c5eabc07c180990cbe48bf6e54ff06335bc6aa3d33d6dfdeade60dce5",
-      "bytes": 12791
+      "sha256": "b7a64c982bd85842ec8b79fa5d40c4295a7967e03c3451916e6051d161f56a10",
+      "bytes": 9565
     },
     {
       "path": "tests/test_pit_availability.py",
