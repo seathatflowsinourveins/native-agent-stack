@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "native_runtime_task_trial_plan",
+  "status": "frozen_before_provider_execution",
+  "frozen_at": "2026-09-30T23:26:00Z",
+  "lane": "foundation",
+  "runtime": {
+    "worker_revision": "2b4a534b7f9ee8724889578d0abf8ba5470d4529",
+    "worker_sha256": "31cf9ede2a8f248d20fa18a8ca8abb51b616620caa4f37730c2025f30e8bb90f",
+    "oracle_sha256": "2a1d3b770d0b828d239575fe0c79694489df420c99dc11535072630198cae171",
+    "deepagents": "0.7.21",
+    "langchain_openai": "1.6.7",
+    "sqlite": "3.1.1",
+    "model": "cx/gpt-6.1-sol-max",
+    "effort": "max",
+    "client_endpoint": "http://127.0.0.1:25371/v1",
+    "underlying_lane": "http://127.0.0.1:20128/v1",
+    "state": "Private owned SQLite file outside model-visible workspace",
+    "skill_root": "/skills",
+    "skill": "research",
+    "skill_revision": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+    "deadline_seconds": 600,
+    "request_timeout_seconds": 120,
+    "max_retries": 0,
+    "max_concurrency": 2,
+    "recursion_limit": 24,
+    "task_call_limit_per_run": 1,
+    "implicit_general_purpose": false,
+    "shell": false,
+    "previous_response_id": false
+  },
+  "frozen_inputs": [
+    {
+      "path": "sources/filesystem.py",
+      "sha256": "eed9c6dc6dd1a4d451689b9eb369ec786b6d38884b7964e0aca65c5aa190961b"
+    },
+    {
+      "path": "sources/local_shell.py",
+      "sha256": "17cd269ca1701df6a96459c4ca5c3959be28896fb6098f7360e45a9254741066"
+    },
+    {
+      "path": "sources/sqlite.py",
+      "sha256": "b577c44d44e72b270d78caee4b7aacc5d2521dbbc1a33d39fb3240e20a830439"
+    },
+    {
+      "path": "sources/sqlite-README.md",
+      "sha256": "c5041ffb8e9b8a73fd2e22170aaa6732a52bbe97381a96f6dda9a40200c80fbc"
+    },
+    {
+      "path": "sources/manifest.json",
+      "sha256": "746ce5eb2595d57c43c5aeec5fb2b630493924e9e129c1e6f46207ff1ccc8fc5"
+    },
+    {
+      "path": "skills/research/SKILL.md",
+      "sha256": "985569f15739c713d6784887c3d186d4ef9ac85bec5ad9c068d25bf0739928e4"
+    },
+    {
+      "path": "inputs/session-marker.txt",
+      "sha256": "57c4b071a6a7baee48be6717d3e0459cdd6cc228782847e0524486413fd16343"
+    },
+    {
+      "path": "initial-prompt.txt",
+      "sha256": "6a25c232ad56c2dbf9ad22295a4c219b3e1a1114a732f2958838da44cdb8b05e"
+    },
+    {
+      "path": "resume-prompt.txt",
+      "sha256": "e46c70533840fae46ca5d2aae136b0e2266b6a7c42d20dfa212316c4131b625d"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "research",
+      "contract": "Load selected skill; read private fixture marker; exactly one explicit source-reviewer native task; produce cited specialist.md and research.json answering root-confinement and SQLite context-closure questions from pinned source; preserve marker in conversation state."
+    },
+    {
+      "id": "continuation",
+      "contract": "After initial process exits and marker input is removed, reconstruct same native graph/SQLite/thread in a fresh process; native get_state contains prior marker before new turn; write remembered exact marker to resume-marker.txt without restating it in prompt or making new read_file/task calls."
+    },
+    {
+      "id": "negative-controls",
+      "contract": "Initial oracle fails with artifacts absent; checkpoint marker-presence oracle fails on fresh different thread; same resume oracle fails on wrong/missing recovered marker; all failures preserved next to passing outcomes."
+    }
+  ],
+  "oracle": "examples/deepagents-omniroute/acceptance_oracle.py; local integration check, not upstream tests or benchmark",
+  "provider_observation": {
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e86cb7e7798b497a43672dc67328a12d2793964/tools/runtime-worker-evidence/gateway_observer.py",
+    "sha256": "d4569ed6efef53015eb1619bf5591f91530476896fd6e18f4c2ba44ec07a6f97",
+    "runtime": "mitmproxy12.2.3 native reverse mode",
+    "fields": "Path/model/effort/tool names/status/selected Responses usage; no content, arguments or credentials retained",
+    "meaning": "Local independent wire metadata; not backend identity or complete provider billing."
+  },
+  "architecture_acceptance": "Astra/Max green after explicit endpoint and native skill-root fixes; offline patched-send guard is not a measured zero-call counter.",
+  "accounting": "Preserve every failed attempt. De-duplicate native graph AIMessage usage by stable message ID; checkpoint replay snapshots are not extra calls. Provider/observer/native counters remain separate; cache and reasoning are subsets. Complete whole-provider usage and savings remain unknown.",
+  "scope": "One local research trial and cross-process continuation, not arbitrary interrupted-tool replay, isolation qualification, comparative winner or global default promotion."
+}
