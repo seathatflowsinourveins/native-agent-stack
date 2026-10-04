@@ -267,6 +267,28 @@ class IssueSelectionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.r.resolver_instruction(selected, task="x", owned_paths=[])
 
+    def test_the_agent_instructions_state_every_category_the_push_gate_refuses(self):
+        # Cross-family review P2 of 2026-10-04: the skill and the generated instruction told the
+        # agent to add or update tests, which the gate refuses on this repository, and omitted the
+        # gate's categories. Both now state each category's phrase and the stop-and-report rule, and
+        # the gate's rules, its agent map and the receipt's rule set stay in step.
+        gate, receipt = self.r.push_gate, self.r._recipe("receipt")
+        selected = self.r.select_issue(issue_fixture(), [], 12, provenance=self.provenance())
+        instruction = self.r.resolver_instruction(selected, task="Implement issue 12 within scope.",
+                                                  owned_paths=["docs/example.md"])
+        skill = (RECIPE / "skills/resolver/SKILL.md").read_text(encoding="utf-8")
+        for phrase in sorted({*gate.AGENT_RULE_PHRASES.values(), gate.STOP_AND_REPORT}):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, " ".join(skill.split()))
+                self.assertIn(phrase, " ".join(instruction.split()))
+        for stale in ("Add or update tests", "write the failing test first"):
+            self.assertNotIn(stale, instruction)
+            self.assertNotIn(stale, skill)
+        rules = {*gate.RULE_PRECEDENCE, "github", "codeowners", "gate_code", "workflow_policy_test",
+                 "pr_text_interpolation", "zizmor_finding", "unresolved_read"}
+        self.assertEqual(set(gate.AGENT_RULE_PHRASES) | gate.GATE_ONLY_RULES, rules)
+        self.assertEqual(set(receipt.PUSH_GATE_RULES), rules)
+
 
 # -- Unit 2 helpers: fixture repositories with local git only (no network).
 

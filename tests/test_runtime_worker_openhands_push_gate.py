@@ -26,7 +26,8 @@ from tests.test_runtime_worker_openhands_resolver import (
 
 ROOT = Path(__file__).resolve().parents[1]
 RESOLVER = "blueprints/runtime-workers/openhands/resolver"
-ENFORCING = (f"{RESOLVER}/push_gate.py", f"{RESOLVER}/patch_policy.py", f"{RESOLVER}/gh_harness.py")
+ENFORCING = (f"{RESOLVER}/push_gate.py", f"{RESOLVER}/patch_policy.py", f"{RESOLVER}/gate_reads.py",
+             f"{RESOLVER}/gh_harness.py")
 # The zizmor version the gate enforces, read from the file and with the pattern the gate uses
 # (push_gate.ZIZMOR_PIN_FILE, push_gate.ZIZMOR_PIN), so a pin bump moves these tests with it and the real-zizmor test
 # keeps running against the newly pinned release instead of skipping.
@@ -250,6 +251,123 @@ FILTER_STEP = """      - name: Detect changed paths
         run: |
 """ + "".join(f"          {line}\n" if line else "\n" for line in FILTER_SCRIPT.splitlines())
 
+# Cross-family review P1 of 2026-10-04: the derivation missed data that CI-run gate code reads, such as
+# blueprints/convergence-practice/contract.schema.json, which scripts/validate_convergence.py reads
+# as `read_json(CONTRACT / "contract.schema.json")` with `CONTRACT = REPO / "blueprints/convergence-practice"`.
+# READ_FORMS holds every read form gate_reads models, for the reader alone. READ_POLICY is that
+# shape in a fixture repository's gate step: a schema under a module constant, here imported from a
+# helper module, and TOML, YAML, f-string and glob reads; the step also runs a shell script that
+# names its data file.
+READ_FORMS = '''import csv
+import json
+import os
+import tomllib
+from pathlib import Path
+
+import yaml
+
+REPO = Path(__file__).resolve().parents[1]
+HERE = Path(__file__).parent
+CONTRACT = REPO / "policy/contract"
+TABLE = (("alpha", ("table", "alpha.json")), ("beta", ("table", "beta.json")))
+
+
+def read_json(path):
+    with open(path, encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def main(argv):
+    schema = read_json(CONTRACT / "contract.schema.json")
+    with open(REPO / "policy" / "rules.toml", "rb") as handle:
+        rules = tomllib.load(handle)
+    workflow = yaml.safe_load((REPO / "policy/ci.yaml").read_text(encoding="utf-8"))
+    rows = list(csv.reader(open(os.path.join(os.path.dirname(__file__), "..", "policy", "rows.csv"))))
+    local = (HERE / "local.json").read_bytes()
+    limits = (REPO / f"policy/limits-{rules['tier']}.json").read_text()
+    checks = [read_json(path) for path in sorted((REPO / "policy" / "checks").glob("*.json"))]
+    sets = [path.read_text() for path in (REPO / "policy" / "sets").iterdir()]
+    for name in ("one.json", "two.json"):
+        (REPO / "policy" / "pair" / name).read_text()
+    for _, (directory, leaf) in TABLE:
+        (REPO / "policy" / directory / leaf).read_text()
+    augmented = REPO / "policy"
+    augmented /= "augmented.json"
+    received = Path(argv[1]) / "policy" / "received.json"
+    subjects = [(REPO / name).read_text() for name in rules["subjects"]]
+    outside = Path("/etc/hostname").read_text()
+    return schema, workflow, rows, local, limits, checks, sets, augmented.read_text(), received, subjects, outside
+
+
+def normalized(rel):
+    rel = os.path.normpath(rel)
+    return (REPO / rel).read_text()
+
+
+def unresolved():
+    globals()["TARGET"] = "policy/target.json"
+    return (REPO / TARGET).read_text()  # noqa: F821
+'''
+
+READ_POLICY = '''import json
+import tomllib
+from pathlib import Path
+
+import yaml
+
+from gate_paths import CONTRACT_DIR
+
+REPO = Path(__file__).resolve().parents[1]
+CONTRACT = REPO / CONTRACT_DIR
+
+
+def read_json(path):
+    with open(path, encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def main():
+    schema = read_json(CONTRACT / "contract.schema.json")
+    with open(REPO / "policy" / "rules.toml", "rb") as handle:
+        rules = tomllib.load(handle)
+    workflow = yaml.safe_load((REPO / "policy/ci.yaml").read_text(encoding="utf-8"))
+    limits = read_json(REPO / f"policy/limits-{rules['tier']}.json")
+    checks = [read_json(path) for path in sorted((REPO / "policy" / "checks").glob("*.json"))]
+    subjects = [(REPO / name).read_text(encoding="utf-8") for name in rules["subjects"]]
+    return schema, workflow, limits, checks, subjects
+'''
+
+READS_FILES = {
+    ".github/workflows/ci.yml": CI_WORKFLOW + """      - name: Gate data
+        run: |
+          python3 scripts/read_policy.py
+          bash scripts/check_shell.sh
+""",
+    "scripts/read_policy.py": READ_POLICY,
+    "scripts/gate_paths.py": 'CONTRACT_DIR = "policy/contract"\n',
+    "scripts/check_shell.sh": "grep -q strict policy/shell.txt\npython3 scripts/inner_check.py\n",
+    # Run by the shell script, not by the step: gate code all the same.
+    "scripts/inner_check.py": ('import json\nfrom pathlib import Path\n\n'
+                               'print(json.loads((Path(__file__).resolve().parents[1] / "policy" / "inner.json")'
+                               '.read_text()))\n'),
+    "policy/inner.json": "{}\n",
+    "policy/contract/contract.schema.json": '{"type": "object", "required": ["id"]}\n',
+    "policy/rules.toml": 'tier = "strict"\nsubjects = ["docs/guide.md"]\n',
+    "policy/ci.yaml": "checks: [one]\n",
+    "policy/limits-strict.json": "{}\n",
+    "policy/checks/one.json": "{}\n",
+    "policy/shell.txt": "strict\n",
+}
+
+# A read the reader cannot resolve: the name is bound through globals(), which it does not model.
+UNRESOLVED_FILES = {
+    ".github/workflows/ci.yml": CI_WORKFLOW + "      - run: python3 scripts/read_unknown.py\n",
+    "scripts/read_unknown.py": ('from pathlib import Path\n\nREPO = Path(__file__).resolve().parents[1]\n'
+                                'globals()["TARGET"] = "policy/target.json"\n'
+                                'print((REPO / TARGET).read_text(encoding="utf-8"))  # noqa: F821\n'),
+    "policy/target.json": "{}\n",
+}
+
 
 class WorkflowReaderTests(unittest.TestCase):
     """push_gate's text-level workflow reader, interpolation scan and unittest discovery."""
@@ -379,6 +497,82 @@ class WorkflowReaderTests(unittest.TestCase):
                                 ("tools/t", "test_e.py"), (".", "test*.py")])
 
 
+class GateReadsTests(unittest.TestCase):
+    """gate_reads and the derivation's data reads (rule ci_read) on in-memory trees, without git."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.g = load_gate(ROOT)
+        cls.gr = cls.g.gate_reads
+
+    def reads(self, source, tracked, path="scripts/check.py"):
+        blobs = {path, *tracked}
+        return self.gr.GateReads(path, source).reads(blobs, self.g.patch_policy.parent_dirs(blobs))
+
+    def derive(self, files):
+        return self.g.derive_ci_protected(self.g.patch_policy.MemoryTree({**GATE_FILES, **files}))
+
+    def test_every_read_form_resolves_to_repository_paths(self):
+        tracked = {"policy/contract/contract.schema.json", "policy/rules.toml", "policy/ci.yaml", "policy/rows.csv",
+                   "policy/limits-strict.json", "policy/checks/one.json", "policy/sets/a.json", "policy/pair/one.json",
+                   "policy/pair/two.json", "policy/table/alpha.json", "policy/table/beta.json", "policy/target.json",
+                   "docs/guide.md"}
+        files, prefixes, globs, unresolved = self.reads(READ_FORMS, tracked)
+        self.assertEqual(files, {
+            "scripts/check.py",  # Path(__file__) itself
+            "policy/contract/contract.schema.json",  # a module constant joined in a function, read by a helper
+            "policy/rules.toml",  # open() and tomllib.load
+            "policy/ci.yaml",  # Path.read_text and yaml.safe_load
+            "policy/rows.csv",  # os.path.join over os.path.dirname(__file__) and "..", then csv.reader
+            "scripts/local.json",  # Path(__file__).parent; untracked, so an agent could add it
+            "policy/pair/one.json", "policy/pair/two.json",  # a loop over a literal tuple
+            "policy/table/alpha.json", "policy/table/beta.json",  # destructured from a constant table
+            "policy/augmented.json",  # `/=`
+            "policy/received.json",  # literals under a received base, read as repository-relative
+            "policy/target.json",  # a path literal
+        })
+        self.assertEqual(prefixes, {"policy/sets"})  # iterdir: the whole directory
+        self.assertEqual(globs, {"policy/limits-*.json", "policy/checks/*.json"})  # the f-string and glob shapes
+        # The file rules["subjects"] selects (docs/guide.md) is the check's subject and stays editable;
+        # policy/rules.toml, which selects it, is protected above. So is a parameter, also after
+        # `rel = os.path.normpath(rel)`. The name bound through globals() cannot be resolved, so the
+        # gate refuses (PushGate.check, gate_input_unresolved).
+        line = READ_FORMS.splitlines().index("    return (REPO / TARGET).read_text()  # noqa: F821") + 1
+        self.assertEqual(unresolved, {f"scripts/check.py:{line}"})
+
+    def test_the_derivation_follows_imported_constants_and_script_text(self):
+        derived = self.derive(READS_FILES)
+        self.assertEqual(derived.unresolved, [])
+        expected = {"policy/contract/contract.schema.json": "ci_read", "policy/rules.toml": "ci_read",
+                    "policy/ci.yaml": "ci_read", "policy/shell.txt": "ci_read", "scripts/read_policy.py": "ci_named",
+                    "scripts/check_shell.sh": "ci_named", "scripts/gate_paths.py": "ci_import",
+                    "scripts/inner_check.py": "ci_read", "policy/inner.json": "ci_read"}
+        for path, rule in expected.items():
+            with self.subTest(path=path):
+                self.assertEqual(derived.files.get(path), rule)
+        self.assertEqual(derived.globs, {"policy/limits-*.json": "ci_read", "policy/checks/*.json": "ci_read"})
+        protected = self.g.Protected([derived], set())
+        for path, rule in (("policy/checks/added.json", "ci_read"), ("policy/limits-lax.json", "ci_read"),
+                           ("docs/guide.md", None), ("src/app.py", None)):
+            with self.subTest(path=path):
+                self.assertEqual(protected.rule(path), rule)
+
+    def test_reads_the_reader_cannot_resolve_are_reported(self):
+        self.assertEqual(self.derive(UNRESOLVED_FILES).unresolved, ["scripts/read_unknown.py:5"])
+        # Without the helper module, the imported constant is unknown, so both reads built on it are
+        # unresolved rather than taken as subjects.
+        lines = READ_POLICY.splitlines()
+        missing = {path: data for path, data in READS_FILES.items() if path != "scripts/gate_paths.py"}
+        self.assertEqual(self.derive(missing).unresolved,
+                         [f"scripts/read_policy.py:{lines.index('CONTRACT = REPO / CONTRACT_DIR') + 1}",
+                          f"scripts/read_policy.py:"
+                          f"{lines.index('    schema = read_json(CONTRACT / \"contract.schema.json\")') + 1}"])
+        # A gate script this interpreter cannot parse is unresolved too, since CI's interpreter may be
+        # newer and run it.
+        broken = {**READS_FILES, "scripts/inner_check.py": "def check(:\n    pass\n"}
+        self.assertEqual(self.derive(broken).unresolved, ["scripts/inner_check.py:0"])
+
+
 class RepositoryWorkflowTests(unittest.TestCase):
     """The gate's reader and derivation on this repository's own workflows."""
 
@@ -430,32 +624,68 @@ class RepositoryWorkflowTests(unittest.TestCase):
                 self.assertEqual(facts.triggers, frozenset(triggers) if isinstance(triggers, (dict, list))
                                  else frozenset([triggers]))
 
+    @classmethod
+    def derived(cls):
+        """This checkout's HEAD tree and its derivation, computed once for the class."""
+        if not hasattr(cls, "_derived"):
+            tree = cls.g.patch_policy.GitTree(ROOT, "HEAD", git=REAL_GIT)
+            cls._derived = (tree, cls.g.derive_ci_protected(tree))
+        return cls._derived
+
     def test_the_derivation_protects_the_ci_gate_files(self):
-        tree = self.g.patch_policy.GitTree(ROOT, "HEAD", git=REAL_GIT)
-        derived = self.g.derive_ci_protected(tree)
+        tree, derived = self.derived()
         protected = self.g.Protected([derived], self.g.policy_tests(tree))
         self.assertEqual(derived.interpolations, [])
         expected = {"scripts/validate.py": "ci_named", ".gitleaks.toml": "ci_named",
                     "tests/test_workflow_hardening.py": "workflow_policy_test",
                     "tests/test_brand_new_module.py": "ci_discovered", ".github/workflows/validate.yml": "github",
                     "CODEOWNERS": "codeowners", f"{RESOLVER}/push_gate.py": "gate_code",
+                    f"{RESOLVER}/gate_reads.py": "gate_code",
                     "blueprints/runtime-workers/openhands/resolver.py": "gate_code",
-                    "docs/decisions/2026-09-28-openhands-resolver-isolation.md": None}
+                    # Cross-family review P1 of 2026-10-04: scripts/validate_convergence.py reads this
+                    # schema as read_json(CONTRACT / "contract.schema.json").
+                    "blueprints/convergence-practice/contract.schema.json": "ci_read",
+                    "blueprints/runtime-workers/openhands/README.md": None}
         for path, rule in expected.items():
             with self.subTest(path=path):
                 self.assertEqual(protected.rule(path), rule)
-        # Over-breadth checks. Test modules are protected but not traced: a test's sys.path entry
-        # (tools/, scripts/) protects no whole directory. Files a step only lists as `case` patterns
-        # (adoption-bootstrap.yml's `changes` step and its PATTERNS and MACOS_PATTERNS globs, main
-        # e0c329ae9) are not traced either, so their sys.path entries (scripts/, tools/adoption/)
-        # protect no whole directory. A gate script's helper directory stays protected.
-        self.assertNotIn("tools", derived.prefixes)
-        self.assertNotIn("scripts", derived.prefixes)
-        self.assertNotIn("tools/adoption", derived.prefixes)
+        # Over-breadth checks. Files a step only lists as `case` patterns (adoption-bootstrap.yml's
+        # `changes` step and its PATTERNS and MACOS_PATTERNS globs, main e0c329ae9) are neither named
+        # nor traced. Since the derivation follows what CI runs to a fixpoint, scripts/ and
+        # tools/adoption/ are protected through a real route: adoption/bootstrap-linux.sh, which that
+        # workflow runs, runs tools/adoption/managed_block.py (named in its text, so ci_read), and
+        # managed_block.py puts both directories on sys.path (ci_import).
+        # scripts/credential_boot_receipt.py stays listed only.
+        self.assertIsNone(derived.files.get("scripts/credential_boot_receipt.py"))
+        self.assertEqual(derived.files.get("adoption/bootstrap-linux.sh"), "ci_named")
+        self.assertEqual(derived.files.get("tools/adoption/managed_block.py"), "ci_read")
+        self.assertEqual(derived.prefixes.get("scripts"), "ci_import")
         self.assertEqual(derived.prefixes.get("tools/sota-convergence"), "ci_import")
         # The schedule-only workflow's script is not reachable from a push or its PR.
         self.assertNotIn(".github/workflows/practice-references-freshness.yml", derived.workflows)
         self.assertIn(".github/workflows/validate.yml", derived.workflows)
+
+    def test_the_gate_reads_stay_resolved_and_bounded_on_this_repository(self):
+        # Cross-family review P1 of 2026-10-04 asked for a bound on the derivation's breadth once it
+        # follows gate reads. The counts before and after are in
+        # blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt part 7. evidence/,
+        # tests/ and .github/ are left out of the ratio: gate scripts enumerate the retained evidence,
+        # unittest discovery covers tests/, and .github/ is refused by name, and the first two grow with
+        # every receipt and test. A main change that makes a read unresolvable would refuse every push.
+        tree, derived = self.derived()
+        self.assertEqual(derived.unresolved, [])
+        self.assertNotIn("", derived.prefixes)
+        self.assertTrue(all(self.g.gate_reads.static_dir(pattern) for pattern in derived.globs), derived.globs)
+        protected = self.g.Protected([derived], self.g.policy_tests(tree))
+        blobs = [path for path, entry in tree.entries().items() if entry[1] == "blob"]
+        working = [path for path in blobs if not path.startswith(("evidence/", "tests/", ".github/"))]
+        covered = [path for path in working if protected.rule(path)]
+        self.assertLessEqual(len(covered), len(working) // 4, f"{len(covered)} of {len(working)}")
+        # The resolver's main working area stays editable, apart from the gate's own code.
+        blueprints = [path for path in working
+                      if path.startswith("blueprints/") and protected.rule(path) != "gate_code"]
+        covered = [path for path in blueprints if protected.rule(path)]
+        self.assertLessEqual(len(covered), len(blueprints) // 50, sorted(covered))
 
 
 class PushGateTests(unittest.TestCase):
@@ -611,11 +841,14 @@ class PushGateTests(unittest.TestCase):
         self.assertEqual(record["reasons"], ["tool_inside_agent_tree"])
 
     def test_a_gate_file_that_differs_from_the_trusted_commit_refuses(self):
-        fixture = GateFixture(self.tmp / f"modified-{secrets.token_hex(3)}")
-        with open(fixture.trusted / ENFORCING[1], "a", encoding="utf-8") as handle:
-            handle.write("# an uncommitted local change\n")
-        record, _ = self.check({"docs/a.md": "b\n"}, fixture=fixture, gate=self.gate(module=load_gate(fixture.trusted)))
-        self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_file_modified"]))
+        for rel in ENFORCING:
+            with self.subTest(path=rel):
+                fixture = GateFixture(self.tmp / f"modified-{secrets.token_hex(3)}")
+                with open(fixture.trusted / rel, "a", encoding="utf-8") as handle:
+                    handle.write("# an uncommitted local change\n")
+                record, _ = self.check({"docs/a.md": "b\n"}, fixture=fixture,
+                                       gate=self.gate(module=load_gate(fixture.trusted)))
+                self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_file_modified"]))
 
     def test_a_trusted_checkout_off_main_refuses(self):
         fixture = GateFixture(self.tmp / f"offmain-{secrets.token_hex(3)}")
@@ -684,6 +917,61 @@ class PushGateTests(unittest.TestCase):
         self.assertIn({"path": "tools/extra/action.yml", "rule": "zizmor_finding", "known": False}, record["paths"])
 
 
+class GateDataReadTests(unittest.TestCase):
+    """PushGate.check where the gate step reads policy data (cross-family review P1 of 2026-10-04)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = Path(tempfile.mkdtemp(prefix="push-gate-reads-")).resolve()
+        cls.fixture = GateFixture(cls.tmp / "reads", READS_FILES)
+        cls.zizmor, _ = fake_zizmor(cls.tmp)
+        cls.gate = load_gate(cls.fixture.trusted).PushGate(git=REAL_GIT, zizmor=cls.zizmor)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp, ignore_errors=True)
+
+    def check(self, edits, *, fixture=None, gate=None):
+        fixture = fixture or self.fixture
+        clone, head = fixture.agent_commit(edits)
+        return (gate or self.gate).check(str(clone), base=fixture.base, head=head)
+
+    def test_data_a_gate_script_reads_is_refused(self):
+        cases = {
+            "policy/contract/contract.schema.json": '{"type": "object"}\n',  # the requirement dropped
+            "policy/rules.toml": 'tier = "lax"\nsubjects = []\n',
+            "policy/ci.yaml": "checks: []\n",
+            "policy/limits-strict.json": '{"max": 0}\n',
+            "policy/limits-lax.json": "{}\n",  # a new file the f-string can select
+            "policy/checks/one.json": '{"skip": true}\n',
+            "policy/checks/added.json": "{}\n",  # a new file the glob reads
+            "policy/shell.txt": "lax\n",  # named by the shell script the step runs
+            "policy/inner.json": '{"skip": true}\n',  # read by a script that script runs
+        }
+        for name, data in cases.items():
+            with self.subTest(path=name):
+                record = self.check({name: data})
+                self.assertEqual((record["status"], record["reasons"]), ("fail", ["protected_path"]), record)
+                self.assertEqual(record["paths"], [{"path": name, "rule": "ci_read", "known": name in READS_FILES}])
+
+    def test_the_files_the_data_selects_and_unrelated_files_stay_editable(self):
+        # docs/guide.md is the subject policy/rules.toml selects: the check reads it to judge it, so it
+        # stays editable while the file that selects it is protected.
+        for name in ("docs/guide.md", "src/app.py"):
+            with self.subTest(path=name):
+                record = self.check({name: "changed\n"})
+                self.assertEqual((record["status"], record["reasons"], record["paths"]), ("pass", [], []), record)
+                self.assertEqual(record["protected"]["globs"], 2)
+
+    def test_a_read_the_reader_cannot_resolve_refuses_every_commit(self):
+        fixture = GateFixture(self.tmp / f"unresolved-{secrets.token_hex(3)}", UNRESOLVED_FILES)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        record = self.check({"docs/guide.md": "changed\n"}, fixture=fixture, gate=gate)
+        self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_input_unresolved"]), record)
+        self.assertEqual(record["unresolved"], ["scripts/read_unknown.py:5"])
+        self.assertEqual(record["paths"], [{"path": "scripts/read_unknown.py", "rule": "unresolved_read", "known": True}])
+
+
 class HarnessPushGateTests(unittest.TestCase):
     """GhHarness.push and run with the trusted gate: refusals happen before any push argv."""
 
@@ -694,6 +982,8 @@ class HarnessPushGateTests(unittest.TestCase):
         cls.tmp = Path(tempfile.mkdtemp(prefix="push-gate-harness-")).resolve()
         cls.fixture = GateFixture(cls.tmp / "shared")
         cls.module = load_gate(cls.fixture.trusted)
+        cls.reads = GateFixture(cls.tmp / "reads", READS_FILES)
+        cls.reads_module = load_gate(cls.reads.trusted)
         cls.zizmor, _ = fake_zizmor(cls.tmp)
         cls.tools = FakeTools(cls.tmp)
 
@@ -726,6 +1016,23 @@ class HarnessPushGateTests(unittest.TestCase):
         [record] = harness.gates
         self.assertEqual((record["status"], record["commit"], record["reasons"]), ("fail", head, ["protected_path"]))
         self.assertEqual(record["paths"], [{"path": ".github/workflows/ci.yml", "rule": "github", "known": True}])
+
+    def test_a_planted_schema_edit_is_refused_before_any_push(self):
+        # Cross-family review P1 of 2026-10-04: the step's gate script reads this schema as
+        # scripts/validate_convergence.py reads contract.schema.json. Before the derivation followed
+        # gate reads, this commit passed the gate and was pushed.
+        clone, head = self.reads.agent_commit({"policy/contract/contract.schema.json": '{"type": "object"}\n'})
+        calls = []
+        harness = self.harness(calls, self.reads_module.PushGate(git=REAL_GIT, zizmor=self.zizmor))
+        with self.assertRaises(self.h.HarnessRefused) as refused:
+            harness.push(str(clone), "openhands/issue-12", base=self.reads.base, head=head)
+        self.assertEqual(refused.exception.reason, "push_gate_refused")
+        self.assertFalse(any("push" in argv for argv in calls), calls)
+        self.assertEqual(harness.writes, [])
+        [record] = harness.gates
+        self.assertEqual((record["status"], record["commit"], record["reasons"]), ("fail", head, ["protected_path"]))
+        self.assertEqual(record["paths"], [{"path": "policy/contract/contract.schema.json", "rule": "ci_read",
+                                            "known": True}])
 
     def test_a_passing_commit_is_pushed_by_its_exact_name(self):
         clone, head = self.fixture.agent_commit({"docs/a.md": "b\n"})

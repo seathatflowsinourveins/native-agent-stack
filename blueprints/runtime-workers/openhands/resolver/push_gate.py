@@ -20,17 +20,22 @@ of a rename count), check() refuses a change to:
   derived from the workflow files by derive_ci_protected: the files, directories and
   modules its `run:` steps name (`ci_named`), the import closure of the gate scripts they
   name (`ci_import`; test modules are protected but not traced), the test modules,
-  start directories and packages unittest discovery reaches (`ci_discovered`), and local
-  actions and reusable workflows (`ci_local_action`).
-It also refuses a `run:` or `script:` text that interpolates untrusted event text
+  start directories and packages unittest discovery reaches (`ci_discovered`), local
+  actions and reusable workflows (`ci_local_action`), and the data those gate scripts
+  read (`ci_read`, gate_reads.py; cross-family review P1 of 2026-10-04): the files they
+  address, the directory or glob a computed path resolves under, and the paths a gate
+  script in another language names.
+It refuses every commit while a gate script's read cannot be resolved (`gate_input_unresolved`,
+rule `unresolved_read`: it fails closed by refusing, since that read could be any file). It
+also refuses a `run:` or `script:` text that interpolates untrusted event text
 (`pr_text_interpolated`), and it runs the zizmor version CI pins on the commit's workflows
 and actions with this module's own flags (no configuration file, no ignore comments); an
 excessive-permissions, dangerous-triggers, cache-poisoning, artipacked or
 template-injection finding refuses (`zizmor_finding`), and an unavailable zizmor fails closed.
 
-Immutable to the agent: this module, its sibling patch_policy.py and the rules above run
-from the checkout this file sits in (TRUSTED_ROOT, from __file__ only, never from an
-argument or the environment). check() refuses when that checkout or a tool lies inside an
+Immutable to the agent: this module, its siblings patch_policy.py and gate_reads.py and the
+rules above run from the checkout this file sits in (TRUSTED_ROOT, from __file__ only, never
+from an argument or the environment). check() refuses when that checkout or a tool lies inside an
 agent tree, when an enforcing file differs from the trusted commit's blob, when the trusted
 commit is not on main's history at the base, or when the base's enforcing files differ
 from the trusted ones (a stale gate). Every check returns one record; the harness journals
@@ -70,7 +75,8 @@ GATE_RELATIVE = f"{RESOLVER_DIR}/push_gate.py"
 TRUSTED_ROOT = GATE_FILE.parents[4]
 # The files that decide what is refused: this module, the derivation it reuses and the
 # harness that calls it. Each must equal the trusted commit's blob and the base's.
-ENFORCING_FILES = (GATE_RELATIVE, f"{RESOLVER_DIR}/patch_policy.py", f"{RESOLVER_DIR}/gh_harness.py")
+ENFORCING_FILES = (GATE_RELATIVE, f"{RESOLVER_DIR}/patch_policy.py", f"{RESOLVER_DIR}/gate_reads.py",
+                   f"{RESOLVER_DIR}/gh_harness.py")
 
 
 def _sibling(name):
@@ -91,6 +97,7 @@ def _sibling(name):
 
 
 patch_policy = _sibling("patch_policy")
+gate_reads = _sibling("gate_reads")
 
 SHA = re.compile(r"[0-9a-f]{40}")
 GIT_ENV = patch_policy.GIT_ENV
@@ -565,7 +572,30 @@ def _without_pattern_lists(code):
 # When several rules derive the same path or prefix, the record names the most specific reason,
 # whatever order the workflows are read in: a local action or unittest discovery runs the file,
 # a step names it, or a gate script imports it.
-RULE_PRECEDENCE = ("ci_local_action", "ci_discovered", "ci_named", "ci_import")
+RULE_PRECEDENCE = ("ci_local_action", "ci_discovered", "ci_named", "ci_import", "ci_read")
+
+# Every rule a refused path can carry, with the phrase the agent's instructions use for it
+# (cross-family review P2 of 2026-10-04). skills/resolver/SKILL.md and
+# resolver.resolver_instruction state each phrase and STOP_AND_REPORT, and a test keeps them, this
+# map and the receipt's rule set in step, so no rule reaches the gate without reaching the
+# instructions. unresolved_read is the gate's own failure (a read it cannot resolve), not a path the
+# agent chose.
+AGENT_RULE_PHRASES = {
+    "github": ".github/",
+    "codeowners": "CODEOWNERS",
+    "gate_code": "blueprints/runtime-workers/openhands/resolver",
+    "workflow_policy_test": "tests/",
+    "ci_discovered": "tests/",
+    "ci_named": "CI runs or reads",
+    "ci_import": "CI runs or reads",
+    "ci_read": "CI runs or reads",
+    "ci_local_action": "CI runs or reads",
+    "pr_text_interpolation": "pull-request or issue text",
+    "zizmor_finding": "workflow or action",
+}
+GATE_ONLY_RULES = frozenset({"unresolved_read"})
+STOP_AND_REPORT = ("including a new or changed test, change nothing: stop and report which file would need to "
+                   "change and why")
 
 
 def _stronger(current, rule):
@@ -575,10 +605,12 @@ def _stronger(current, rule):
 
 
 class CiProtected:
-    """The derived set for one tree: exact files and directory prefixes, each with its rule."""
+    """The derived set for one tree: exact files, directory prefixes and path globs (fnmatch,
+    `*` also matching "/"), each with its rule."""
 
     def __init__(self):
-        self.files, self.prefixes, self.workflows, self.interpolations = {}, {}, [], []
+        self.files, self.prefixes, self.globs, self.workflows, self.interpolations = {}, {}, {}, [], []
+        self.unresolved = []  # "<gate file>:<line>" of reads gate_reads.GateReads could not resolve
 
     def add_file(self, path, rule):
         self.files[path] = _stronger(self.files.get(path), rule)
@@ -586,6 +618,10 @@ class CiProtected:
     def add_prefix(self, path, rule):
         if path:
             self.prefixes[path] = _stronger(self.prefixes.get(path), rule)
+
+    def add_glob(self, pattern, rule):
+        if pattern:
+            self.globs[pattern] = _stronger(self.globs.get(pattern), rule)
 
 
 def derive_ci_protected(tree):
@@ -693,7 +729,112 @@ def derive_ci_protected(tree):
             pending.append(name)
         for name in rule_dirs:
             result.add_prefix(name, "ci_import")
+    _add_gate_reads(result, tree, blobs, dirs, sorted(traced - test_modules), test_modules)
     return result
+
+
+def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
+    """The data CI-run gate code reads (cross-family review P1 of 2026-10-04).
+
+    The gate code starts as the Python files traced so far that are not test modules (the
+    named scripts and their import closure) and the other code files a step names or a gate
+    script imports. gate_reads.GateReads reads a Python file; a `from module import NAME` of a
+    repository module is resolved in that module, as patch_policy.resolve_module finds it
+    (CPython's import order). A code file in another language counts the tracked paths its
+    text names (patch_policy.names_in_text, the run-step rule, without pattern-only lists).
+    A code file that gate code names or reads is followed in turn, to a fixpoint: its reads,
+    its imports (patch_policy.python_references, rule ci_import) or the names in its text.
+    Test modules are protected but not followed: what they read, like what they import, is
+    mostly the code and data under test (decision record, residual risks). The gate fails
+    closed (PushGate.check, gate_input_unresolved) on a read the reader leaves unresolved and
+    on a gate Python file it cannot parse or that nests too deeply for it, since CI's
+    interpreter may run what this one cannot read."""
+    analyzers, active, entries = {}, set(), tree.entries()
+
+    def analyzer(path):
+        """The file's GateReads, or None when it cannot be read (unresolved)."""
+        if path not in analyzers:
+            try:
+                analyzers[path] = gate_reads.GateReads(
+                    path, tree.read(path).decode("utf-8", "surrogateescape"),
+                    imported=lambda module, name, level: imported(path, module, name, level))
+            except (SyntaxError, ValueError, RecursionError):
+                analyzers[path] = None
+        return analyzers[path]
+
+    def imported(path, module, name, level):
+        here = posixpath.dirname(path)
+        if level:
+            base = here.split("/") if here else []
+            if level - 1 > len(base):
+                return (gate_reads.UNKNOWN,)
+            roots = ("/".join(base[:len(base) - (level - 1)]),)
+        else:
+            roots = tuple(dict.fromkeys((here, "")))
+        parts = [part for part in module.split(".") if part]
+        found = sorted(patch_policy.resolve_module(parts, roots, blobs, dirs), key=len) if parts else []
+        target = found[-1] if found else None
+        key = (target, name)
+        if target is None or key in active:
+            return (gate_reads.UNKNOWN,)
+        other = analyzer(target)
+        if other is None:
+            return (gate_reads.UNKNOWN,)
+        active.add(key)
+        try:
+            return other.module_value(name)
+        finally:
+            active.discard(key)
+
+    def is_code(path):
+        return posixpath.splitext(path)[1] in patch_policy.CODE_SUFFIXES or entries[path][0] == "100755"
+
+    queue = [*gate_python, *sorted(path for path, rule in result.files.items()
+                                   if rule in ("ci_named", "ci_import") and not path.endswith(".py"))]
+    done, followed = set(test_modules), set(gate_python)
+    while queue:
+        path = queue.pop(0)
+        if path in done or path not in blobs:
+            continue
+        done.add(path)
+        named = []
+        if path.endswith(".py"):
+            reader = analyzer(path)
+            try:
+                if reader is None:
+                    raise RecursionError  # unparseable here or too deep: unresolved
+                files, prefixes, globs, unresolved = reader.reads(blobs, dirs)
+            except RecursionError:
+                result.unresolved.append(f"{path}:0")
+                continue
+            for name in prefixes:
+                result.add_prefix(name, "ci_read")
+            for pattern in globs:
+                result.add_glob(pattern, "ci_read")
+            result.unresolved.extend(sorted(unresolved))
+            named = sorted(files)
+            if path not in followed:  # reached by a name or a read: its imports run too
+                try:
+                    imports, import_dirs = patch_policy.python_references(path, tree.read(path), blobs, dirs)
+                except (SyntaxError, ValueError, UnicodeDecodeError):
+                    imports, import_dirs = (), ()
+                    result.unresolved.append(f"{path}:0")
+                for name in imports:
+                    result.add_file(name, "ci_import")
+                    queue.append(name)
+                for name in import_dirs:
+                    result.add_prefix(name, "ci_import")
+        elif is_code(path):
+            text = _without_pattern_lists(patch_policy.executable_lines(tree.read(path)))
+            for kind, name in patch_policy.names_in_text(text, blobs, dirs):
+                if kind == "dir":
+                    result.add_prefix(name, "ci_read")
+                else:
+                    named.append(name)
+        for name in named:
+            result.add_file(name, "ci_read")
+            if name in blobs and name not in done and (name.endswith(".py") or is_code(name)):
+                queue.append(name)
 
 
 def policy_tests(tree, cache=None):
@@ -745,7 +886,7 @@ class Protected:
     """The union of the rules over the trusted, base and head trees."""
 
     def __init__(self, derived, tests):
-        self.files, self.prefixes = {}, {}
+        self.files, self.prefixes, self.globs = {}, {}, {}
         for item in derived:
             for path, rule in item.files.items():
                 key = patch_policy.fold(path)
@@ -753,6 +894,9 @@ class Protected:
             for path, rule in item.prefixes.items():
                 key = patch_policy.fold(path)
                 self.prefixes[key] = _stronger(self.prefixes.get(key), rule)
+            for pattern, rule in getattr(item, "globs", {}).items():
+                key = patch_policy.fold(pattern)
+                self.globs[key] = _stronger(self.globs.get(key), rule)
         for path in tests:
             self.files[patch_policy.fold(path)] = "workflow_policy_test"
 
@@ -768,6 +912,9 @@ class Protected:
             prefix = "/".join(parts[:end])
             if prefix in self.prefixes:
                 return self.prefixes[prefix]
+        for pattern, rule in self.globs.items():
+            if fnmatch.fnmatchcase(folded, pattern):  # `*` also matches "/" (Lib/fnmatch.py translate)
+                return rule
         return None
 
 
@@ -844,13 +991,23 @@ class PushGate:
                 protected = Protected(derived, set().union(*(policy_tests(tree, shared) for tree in
                                                               (trusted_tree, base_tree, head_tree))))
                 record["protected"] = {"workflows": len(set().union(*(item.workflows for item in derived))),
-                                       "files": len(protected.files), "prefixes": len(protected.prefixes)}
+                                       "files": len(protected.files), "prefixes": len(protected.prefixes),
+                                       "globs": len(protected.globs)}
                 for path in changed:
                     rule = protected.rule(path)
                     if rule:
                         paths.setdefault(path, rule)
                 if any(rule for rule in paths.values()):
                     reasons.append("protected_path")
+                # A gate read the reader could not resolve (gate_reads: a computed path at the root
+                # whose part is of unknown origin) could be any file, so the gate fails closed by
+                # refusing the commit rather than protecting the whole tree.
+                unresolved = sorted(set().union(*(item.unresolved for item in derived)))
+                if unresolved:
+                    reasons.append("gate_input_unresolved")
+                    record["unresolved"] = unresolved[:MAX_PATHS]
+                    for location in unresolved:
+                        paths.setdefault(location.rsplit(":", 1)[0], "unresolved_read")
                 interpolated = sorted({workflow for item in (derived[0], derived[2])
                                        for workflow, _ in item.interpolations})
                 if interpolated:

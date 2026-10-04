@@ -48,11 +48,31 @@ The host side is `blueprints/runtime-workers/openhands/resolver.py`; see
    - symlinks, submodules and binary files.
 3. Rename or delete a file only when both the old and the new path are owned.
 
+## What the push gate refuses
+
+Before the host pushes, a trusted gate checks your exact change. Even inside the owned
+paths, it refuses, with no push, a change to:
+- `.github/`: workflows, local actions, rulesets and CI requirements;
+- a file named `CODEOWNERS`, anywhere;
+- the resolver's own gate and driver: `blueprints/runtime-workers/openhands/resolver/`
+  and `blueprints/runtime-workers/openhands/resolver.py`;
+- every file CI runs or reads as a check. On this repository that is all of `tests/`,
+  because CI runs the whole suite. It is also every script and data file a workflow step
+  names, and what those scripts import and read, such as a schema or a pin file. Local
+  actions count too;
+- a workflow or action step that uses pull-request or issue text, and a workflow or action
+  that zizmor flags.
+
+If the fix needs any of these, including a new or changed test, change nothing: stop and
+report which file would need to change and why. The owner makes that change.
+
 ## Workflow
 
 1. Read `AGENTS.md` (loaded as the `agents` skill) and the files around the change.
-2. Where the repository has tests for the area, write the failing test first, then
-   the change.
+2. Do not add or change tests: the push gate refuses `tests/` on this repository, so
+   the `tdd` skill's test-first steps do not apply here. Run the existing tests that
+   cover the change instead. If the fix needs a new or changed test, stop and report the
+   test that is needed.
 3. Run `python3 scripts/validate.py` and the relevant
    `python3 -m unittest tests.<module>`, and note each exit code.
 4. Delete scratch files and build output you created.
