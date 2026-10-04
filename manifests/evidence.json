@@ -4507,8 +4507,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "fa66c58c9b716f45da8d7962e07cc29d344db869e6d8539d6ad371b2cdf19048",
-      "bytes": 63971
+      "sha256": "abed4bbede40ac704c5209251905cdab37812e28879ed436b3257382385e7c6b",
+      "bytes": 64672
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -9452,11 +9452,6 @@
       "bytes": 72677
     },
     {
-      "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "2f7d4b93b536590bbfe65ed3e4b11402ec018bb25e819c5462019acbd0dc5bf6",
-      "bytes": 47086
-    },
-    {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
       "sha256": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2",
       "bytes": 286
@@ -9493,8 +9488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/dispatch.py",
-      "sha256": "bece0a67738380f7e5723634893e77d6919ac5edb0214137be5b9f16d3b18662",
-      "bytes": 23280
+      "sha256": "a579f6ce525ddffc05989c05425e485562c982ae9d0c78b92af97424691d8ca2",
+      "bytes": 19469
     },
     {
       "path": "blueprints/runtime-workers/openhands/e2e/check.py",
@@ -9513,8 +9508,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/e2e/task.py",
-      "sha256": "abdcd19cb411099cba8046cedb25a0f8fd9283dd79f9fa54ad1e2f2ca67b22c3",
-      "bytes": 3182
+      "sha256": "832043a6733b112cc9cc79d5a82524849bc357374bb1eb0ba267747cf24fcaa7",
+      "bytes": 2956
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/agent-server-image-grype-20260928.json",
@@ -9555,11 +9550,6 @@
       "path": "blueprints/runtime-workers/openhands/evidence/publication-pass.txt",
       "sha256": "4c6f58444061b23b0b40dc27ffb52e3f55ffdd02e3e4195407ec57992d1e5be2",
       "bytes": 212
-    },
-    {
-      "path": "blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt",
-      "sha256": "a52f56059df777d70212ec43f4494a58ad04ac6530a117ce4e683cca06342ac7",
-      "bytes": 19260
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/receipt-red.txt",
@@ -9872,16 +9862,6 @@
       "bytes": 3568
     },
     {
-      "path": "blueprints/runtime-workers/openhands/evidence/stage2-fail-first.txt",
-      "sha256": "214fabb2476d41f6ba6aeae0937ade9d4438e60de31109fe740b0d890aed1e78",
-      "bytes": 48843
-    },
-    {
-      "path": "blueprints/runtime-workers/openhands/evidence/stage2-repair-fail-first.txt",
-      "sha256": "f553c496389302ddd821387f898b76b47f6f9ed3cdff7f3da9e7cdbcf8e9f875",
-      "bytes": 53282
-    },
-    {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
       "sha256": "6576e0f1b0ea27a22909854a90299ffef78034239d7147629eec595f6f520de0",
       "bytes": 3013
@@ -9898,8 +9878,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/host.py",
-      "sha256": "0bd757852494738de6d336f8c444ffac4625fdad6fe890c93b31621290d8068c",
-      "bytes": 104013
+      "sha256": "c6a609b51403353da7fc16bc131cd2f76904b00f498d9478e30b742e6bc89e4c",
+      "bytes": 84290
     },
     {
       "path": "blueprints/runtime-workers/openhands/install-container.sh",
@@ -9933,8 +9913,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/receipt.py",
-      "sha256": "b8ef5b9fbe7210fafa3ea849eb2edbc0b865c0a2cd660665d33d79ae7a915521",
-      "bytes": 30797
+      "sha256": "f8d04162b554157cf958d72ebc80f9adbc1f07a98a3b39bed4d72a16f0b00cc8",
+      "bytes": 17709
     },
     {
       "path": "blueprints/runtime-workers/openhands/recipe.py",
@@ -9952,31 +9932,6 @@
       "bytes": 75592
     },
     {
-      "path": "blueprints/runtime-workers/openhands/resolver.py",
-      "sha256": "3929d1a5f75d90b54ad92d99ed347aa145307442cf9e55daac41dad34dc05100",
-      "bytes": 98039
-    },
-    {
-      "path": "blueprints/runtime-workers/openhands/resolver/gh_harness.py",
-      "sha256": "feac3c5cd42af57c59e2234265652a7d61bc6d8445f529fffed8b05c8ce36e59",
-      "bytes": 34953
-    },
-    {
-      "path": "blueprints/runtime-workers/openhands/resolver/outgoing_guard.py",
-      "sha256": "a31debb1d20491cd18b640ccd6f29eb2a5c29d6ea429692a9361a80e8ea8174e",
-      "bytes": 12638
-    },
-    {
-      "path": "blueprints/runtime-workers/openhands/resolver/patch_policy.py",
-      "sha256": "fba292f3204475e0cc192bb0e30663675ffebcff309b035395fcee53468122ad",
-      "bytes": 43493
-    },
-    {
-      "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
-      "sha256": "23ad7e9b1bc5e8b8ac3861f6f01f657eae3c8932a524bfef0844c28956395b95",
-      "bytes": 47385
-    },
-    {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
       "sha256": "a14cf4b25484b77c5f5b6d3103877d9eae3dee660b087b1e264710dd93c207a4",
       "bytes": 442
@@ -9987,14 +9942,9 @@
       "bytes": 629
     },
     {
-      "path": "blueprints/runtime-workers/openhands/skills/resolver/SKILL.md",
-      "sha256": "68585db2af6972397d081daa38c09e85856f974a933bf00861b0ebd75cc5f08e",
-      "bytes": 4467
-    },
-    {
       "path": "blueprints/runtime-workers/openhands/worker.py",
-      "sha256": "f3dabc570c925297d53ac040cd022bb2a2ce08a9d95953d4e84235f5437dd7ec",
-      "bytes": 14291
+      "sha256": "ea5d67a538f87feac8a4d0b8a66cfdcbaef44f86a8ee7cb11efc332272bb1f5c",
+      "bytes": 11141
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
@@ -16023,8 +15973,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
-      "sha256": "1d0c5631ee052206b7ccfb28a692e41806d7891ba6c24c9590c634c5f3acf169",
-      "bytes": 46465
+      "sha256": "1a2d28d0a0f998d3945ddbadb2c4ae18dd4e72838a0315a77bfea885483435ab",
+      "bytes": 19915
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
@@ -16318,8 +16268,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "a9d6524f3e32e3531aecbb389999c76566491a227d04c2d2eda031794c733161",
-      "bytes": 159253
+      "sha256": "1bd3bfe10af2a99bec00cb8a1eeebefd6b4c10ce58ed58aec0c63e7fef3d4c23",
+      "bytes": 161066
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -34967,6 +34917,56 @@
       "bytes": 2303
     },
     {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/README.md",
+      "sha256": "1318d326e265b8d794aba873c91700b2f208f627c889cd5fe935ce6befe4d425",
+      "bytes": 22908
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/capacity.json",
+      "sha256": "1eb91f3aa06e3138ff49259964203c3f240630f8d270dbeddcc37512e29415ff",
+      "bytes": 3205
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/coresidency.json",
+      "sha256": "7aec6d2595e9945928c9395b98be84bdcd960a6294efe5a7346527b44cc80984",
+      "bytes": 5809
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/embed-acceptance.json",
+      "sha256": "a5b64858d49ff54c0ecca6e8f581e6248aa6a95b02719fcfb284c4d6a9ecfc9d",
+      "bytes": 1768
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/gate.json",
+      "sha256": "9944f8d614543e0743e4effc97dc8804ed79e32893500058df386053c3851581",
+      "bytes": 15361
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/li26-mac-descriptive.json",
+      "sha256": "586cde01ad338a2f435571e00e2b161ca20d97ffc141b948bb88dab1a8d469fc",
+      "bytes": 4046
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/li26-window-samples.json",
+      "sha256": "d5b1794bc28f8909fbbbd3a0a7495ce9208b586a7e6f8663ab96022481a44a0a",
+      "bytes": 838
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/li26_mac_descriptive.py",
+      "sha256": "935893d8beeee746716869b95d3a1c67ee595336b77e191751273763eb822ead",
+      "bytes": 9460
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/port-record-20261003.md",
+      "sha256": "8812eb21c999ac470f333f9d403f75bda588a4e5ff6409cb1986adb3aa452571",
+      "bytes": 15052
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/swap-event.json",
+      "sha256": "1f8a103c20d063e941523b95baa5820ed3f3a8b835ebf1e1efbd2fee509a00a7",
+      "bytes": 1766
+    },
+    {
       "path": "evidence/artifacts/mac-stage1-client-layer-20260927/README.md",
       "sha256": "df6c3e4ad05911232fb6d4b027774f9d57730c1a5b59fe973ae382bff9e2a5b8",
       "bytes": 63328
@@ -51958,18 +51958,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands.py",
-      "sha256": "53dd326c5591fdd4513b134c061525c41edbf4f5260bf87bf0284837065ece63",
-      "bytes": 220510
-    },
-    {
-      "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "207a0384e2907831ae2a25f35e65deb670b152437edbdf87e2b26bc05c881ba4",
-      "bytes": 48136
-    },
-    {
-      "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "263087ff5f65d357d3516058bfbed827db861ff8a6ccd6a2ee988b7aa85b668a",
-      "bytes": 262365
+      "sha256": "1103b1cd52507997cd6a3c628970d7fe46007fc0ddcf3fb43027f53f05a4b981",
+      "bytes": 220324
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
