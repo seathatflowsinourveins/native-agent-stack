@@ -16409,8 +16409,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "41337b4ec009a2085a08ce776b998a27519a14fa5a6acd7b34188de4d497fd63",
-      "bytes": 183431
+      "sha256": "61039915b9fe31c5931f3cffbd60bdc686fa3433a495ce91dd56501bb67b0ef7",
+      "bytes": 184073
     },
     {
       "path": "docs/stack.md",
@@ -32491,6 +32491,11 @@
       "path": "evidence/artifacts/jev-p1-20261003/freeze-manifest.draft.json",
       "sha256": "db5bd2869276d35d1e07bb3d2b6d1970fdee2f0f6459427d424be2bbc528c92f",
       "bytes": 5824
+    },
+    {
+      "path": "evidence/artifacts/k4-timing-gc-20261003/summary.json",
+      "sha256": "4569f912234abf37f455c7653b2dd468b633bb40b3a8b18e442db02f3a4fe4ff",
+      "bytes": 19674
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
@@ -51734,8 +51739,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "a8def2e5f22eff792f5ddc36779b8db1c1c903e705d93b72bc5665e54167f64d",
-      "bytes": 367709
+      "sha256": "577aa3bc6902431328ace00e58e97eabf7f3306138ca4e9b67c0a72a6c733fd2",
+      "bytes": 368728
     },
     {
       "path": "tests/test_security_identity.py",
