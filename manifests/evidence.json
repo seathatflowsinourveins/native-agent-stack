@@ -16253,6 +16253,11 @@
       "bytes": 84655
     },
     {
+      "path": "docs/decisions/2026-10-03-macos-full-suite-coverage.md",
+      "sha256": "6c1099993e992b8bdfaf1d9d582fb9f2dace0d8b48846072ac44548bb8b928a8",
+      "bytes": 23777
+    },
+    {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
@@ -16454,8 +16459,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "e404039f0ff6e51a62d88d11e00271b435569969b457e51a3b33762cff357927",
-      "bytes": 176430
+      "sha256": "54b636b8623a1c94bc25946e42689471980bc5813c77413e1f902b25a93eceb0",
+      "bytes": 179507
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -32606,6 +32611,16 @@
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/sdk-vs-cli-resume-comparison.json",
       "sha256": "c51d516dd0ff1e3438d2a9371b089e647c621c749a723e488b57190b4034d5c5",
       "bytes": 22807
+    },
+    {
+      "path": "evidence/artifacts/github-ci-measurements-20261003/input.json",
+      "sha256": "d01f9b6398988964dec35bdb567f5b0f72fe5419255818fbf49beea81ebc127c",
+      "bytes": 15399
+    },
+    {
+      "path": "evidence/artifacts/github-ci-measurements-20261003/later-reads-20261003.json",
+      "sha256": "b100809511623c4cc13ef62939f7cf52e3113b40eae63952146657ed47f56ab3",
+      "bytes": 56770
     },
     {
       "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
@@ -50316,6 +50331,11 @@
       "path": "evidence/receipts/github-automation-newpc-20260922.json",
       "sha256": "531713a7a8062ff78d8f541ea92ea57eb665d28c7a1f875f538fe3cd26d38a63",
       "bytes": 5836
+    },
+    {
+      "path": "evidence/receipts/github-ci-measurements-20261003.json",
+      "sha256": "49c572546389a9384423a3b90d6b22384d293b354a73522903d7ff2ab7a6718a",
+      "bytes": 53971
     },
     {
       "path": "evidence/receipts/gitleaks-macos-memory-bound-20260924.json",
