@@ -1082,6 +1082,128 @@ class HostAlertTests(unittest.TestCase):
                              "no systemctl on this host")
 
 
+class SurfaceWatchTests(unittest.TestCase):
+    """The sixth count: scripts/upstream_surface_watch.py's latest.json in the state directory's surface-watch/,
+    read offline, counted only while at most three days old (synthetic reports, not watch output)."""
+
+    KEYS = ["claude:setting:newSetting", "claude:env:CLAUDE_CODE_NEW", "codex:feature:brand_new"]
+
+    def report(self, checkout: Checkout, generated_at: str = "2026-09-29T12:00:00Z", unreviewed=None,
+               raw: str | None = None) -> None:
+        path = checkout.state / "surface-watch" / "latest.json"
+        path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        document = {"schema_version": 1, "generated_at": generated_at, "new": [], "removed": [], "stage_changed": [],
+                    "unreviewed": self.KEYS if unreviewed is None else unreviewed,
+                    "summary_line": "surface watch: 3 unreviewed of 3 new; details: python3 x --dry-run"}
+        path.write_text(raw if raw is not None else json.dumps(document), encoding="utf-8")
+
+    def document(self, checkout: Checkout) -> dict:
+        code, stdout, stderr = checkout.run("--dry-run", "--json")
+        self.assertEqual(code, 0, stderr)
+        return json.loads(stdout)
+
+    def test_no_watch_report_is_a_coverage_note_and_no_count(self):
+        checkout = Checkout(self)
+        document = self.document(checkout)
+        self.assertEqual(list(document["due"]), list(cd.DUE_KEYS))
+        coverage = document["details"][-1]
+        self.assertEqual((coverage["surface_watch"], coverage["surface_watch_reason"]),
+                         ("surface watch not run", "no latest.json"))
+        _, text, _ = checkout.run("--dry-run")
+        self.assertIn("surface watch not run (no latest.json)", text)
+
+    def test_a_fresh_report_adds_the_sixth_count_and_writes_the_notice(self):
+        checkout = Checkout(self)
+        self.report(checkout)
+        code, _, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+        self.assertEqual(document["due"], {"pins_behind": 0, "stale_receipts": 0, "due_layers": 0,
+                                           "reopen_triggers": 0, "host_alerts": 0, "surface_unreviewed": 3})
+        line = document["summary_line"]
+        self.assertTrue(line.startswith("stack currency: 3 unreviewed upstream switches; details: "), line)
+        self.assertTrue(line.endswith(f"; details: {checkout.command()}"), line)
+        self.assertLessEqual(len(line), 160)
+        found = next(item for item in document["details"] if item["kind"] == "surface_unreviewed")
+        self.assertEqual((found["count"], found["keys"], found["generated_at"]), (3, self.KEYS, "2026-09-29T12:00:00Z"))
+        self.assertEqual(document["details"][-1]["surface_watch"], "fresh")
+        _, text, _ = checkout.run("--dry-run")
+        self.assertIn("upstream switches: 3 new without a disposition (watch of 2026-09-29T12:00:00Z)", text)
+        self.assertIn("upstream switches: python3 scripts/upstream_surface_watch.py --dry-run", text)
+
+    def test_the_count_joins_the_others_in_the_line(self):
+        checkout = Checkout(self)
+        checkout.something_due()
+        self.report(checkout)
+        line = self.document(checkout)["summary_line"]
+        self.assertTrue(line.startswith("stack currency: 1 pin behind, 2 stale receipts, 1 layer"), line)
+        self.assertLessEqual(len(line), 160)
+
+    def test_the_report_counts_for_three_days_and_no_longer(self):
+        cases = {"2026-09-27T12:00:00Z": 3, "2026-09-27T11:59:59Z": None, "2026-09-30T12:59:00Z": 3,
+                 "2026-09-30T13:00:01Z": None}
+        for generated_at, expected in cases.items():
+            with self.subTest(generated_at=generated_at):
+                checkout = Checkout(self)
+                self.report(checkout, generated_at)
+                document = self.document(checkout)
+                self.assertEqual(document["due"].get("surface_unreviewed"), expected)
+                coverage = document["details"][-1]
+                if expected is None:
+                    self.assertEqual(coverage["surface_watch"], "surface watch not run")
+                    self.assertIn(generated_at, coverage["surface_watch_reason"])
+
+    def test_an_unreadable_report_is_a_coverage_note_never_an_error(self):
+        cases = {"not JSON": "{not json", "an array": "[]",
+                 "no unreviewed list": json.dumps({"generated_at": NOW, "unreviewed": "x"}),
+                 "keys that are not strings": json.dumps({"generated_at": NOW, "unreviewed": [1]}),
+                 "no time": json.dumps({"generated_at": "yesterday", "unreviewed": []})}
+        for label, raw in cases.items():
+            with self.subTest(report=label):
+                checkout = Checkout(self)
+                self.report(checkout, raw=raw)
+                code, _, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertFalse(checkout.due_file.exists())
+                document = self.document(checkout)
+                self.assertNotIn("surface_unreviewed", document["due"])
+                self.assertEqual(document["details"][-1]["surface_watch"], "surface watch output unreadable")
+
+    def test_a_fresh_report_with_nothing_unreviewed_is_zero_and_clears_the_notice(self):
+        checkout = Checkout(self)
+        self.report(checkout, unreviewed=[])
+        checkout.due_file.write_text('{"earlier": true}\n', encoding="utf-8")
+        code, _, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertFalse(checkout.due_file.exists())
+        self.assertEqual(self.document(checkout)["due"]["surface_unreviewed"], 0)
+
+    def test_the_report_is_read_offline(self):
+        import socket
+
+        def refuse(*args, **kwargs):
+            raise AssertionError("currency_due.py opened a socket")
+
+        checkout = Checkout(self)
+        self.report(checkout)
+        with mock.patch.object(socket, "socket", side_effect=refuse), \
+                mock.patch.object(socket, "create_connection", side_effect=refuse):
+            document = self.document(checkout)
+        self.assertEqual(document["due"]["surface_unreviewed"], 3)
+
+    def test_a_direct_aggregate_without_a_state_directory_checks_nothing(self):
+        document = cd.aggregate(AggregateShapeTests.reports(), NOW_DATETIME, NOW, 30)
+        self.assertNotIn("surface_unreviewed", document["due"])
+        self.assertIsNone(document["details"][-1]["surface_watch"])
+
+    def test_the_line_keeps_its_limit_with_all_six_counts(self):
+        due = {key: 9999 for key in cd.COUNT_KEYS}
+        line = cd.summary_line(due, "python3 ~/code/native-agent-stack-live/scripts/currency_due.py --dry-run")
+        self.assertLessEqual(len(line), 160)
+        self.assertTrue(line.endswith("; details: python3 ~/code/native-agent-stack-live/scripts/currency_due.py "
+                                      "--dry-run"))
+
+
 class ThisCheckoutTests(unittest.TestCase):
     def test_the_real_checks_run_dry_and_write_nothing(self):
         # The five-second budget is measured on the workstation by the acceptance command; this bound only
@@ -1133,6 +1255,32 @@ class UnitTemplateTests(unittest.TestCase):
         self.assertEqual(code, 0, stderr)
         summary = json.loads(checkout.due_file.read_text(encoding="utf-8"))["summary_line"]
         self.assertEqual(shlex.split(summary.split("; details: ", 1)[1])[2:], ["--dry-run", *flags])
+
+    def test_the_service_runs_the_surface_watch_first_and_never_waits_on_its_success(self):
+        # Wants= is weak and After= only orders (systemd.unit(5)); a hard dependency would let a failed watch block
+        # the currency run.
+        self.assertIn("Wants=upstream-surface-watch.service", self.service)
+        self.assertIn("After=upstream-surface-watch.service", self.service)
+        directives = [line for line in self.service if line and not line.startswith("#")]
+        hard = ("Requires=", "Requisite=", "BindsTo=", "PartOf=", "Upholds=")
+        self.assertFalse([line for line in directives if line.startswith(hard)])
+        self.assertLess(directives.index("After=upstream-surface-watch.service"), directives.index("[Service]"))
+
+    def test_the_surface_watch_is_a_guarded_networked_oneshot_that_only_the_currency_service_starts(self):
+        watch = (SYSTEMD_DIR / "upstream-surface-watch.service").read_text(encoding="utf-8").splitlines()
+        for setting in ("Type=oneshot", "UMask=0077", "NoNewPrivileges=true", "Environment=PYTHONDONTWRITEBYTECODE=1",
+                        "ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/upstream_surface_watch.py --network"):
+            self.assertIn(setting, watch)
+        self.assertNotIn("[Install]", watch)
+        directives = [line for line in watch if line and not line.startswith("#")]
+        self.assertTrue(any(line.startswith("TimeoutStartSec=") for line in directives))
+        search_path = next(line for line in directives if line.startswith("Environment=PATH="))
+        self.assertIn("%h/.local/share/codex-ecosystem/bin", search_path)  # gh and codex resolve through PATH
+        self.assertTrue((ROOT / "scripts/upstream_surface_watch.py").is_file())
+        # The watch writes the directory this script reads.
+        from scripts import upstream_surface_watch as usw
+        self.assertEqual(usw.default_state_dir({"HOME": "/h"}), cd.default_state_dir({"HOME": "/h"}) / cd.SURFACE_DIR)
+        self.assertEqual(usw.LATEST_FILE, cd.SURFACE_FILE)
 
     def test_the_timer_runs_daily_catches_up_and_spreads_its_start(self):
         for setting in ("OnCalendar=daily", "Persistent=true", "RandomizedDelaySec=15m",

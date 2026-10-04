@@ -3,7 +3,7 @@
 
 The daily user timer adoption/templates/systemd/stack-currency.timer runs this. It runs this checkout's own
 read-only checks as subprocesses, with the arguments their weekly workflows use, reads the host's own status, and
-aggregates five counts:
+aggregates five counts, and a sixth when the upstream-surface watch ran recently:
 
 - pins_behind: components whose platform pin's version probe did not observe the pinned version
   (scripts/adoption_status.py --pinned-versions --json, the "mismatched" ids of each selected profile, each id
@@ -23,7 +23,13 @@ aggregates five counts:
   (backup) or 8 days (restore check) or never recorded, and a record that cannot be read; from `systemctl --user show`,
   each of the new WSL distribution's stage-2 units (STAGE2_UNITS) and dagu.service that is enabled and failed or inactive
   (a start-limit-hit leaves it failed). A host without a record or a unit has no alert for it, and a host whose user
-  manager cannot be asked says so in the coverage entry; neither is an error of the run.
+  manager cannot be asked says so in the coverage entry; neither is an error of the run;
+- surface_unreviewed: the new upstream switches without a disposition ("unreviewed") that
+  scripts/upstream_surface_watch.py wrote to the state directory's surface-watch/latest.json, read offline (this
+  script never fetches and never runs the watch; the timer's upstream-surface-watch.service runs before it). It is a
+  count only while that file's generated_at is at most SURFACE_MAX_AGE_DAYS (3) days old; a missing or stale file is
+  the coverage note "surface watch not run", an unreadable one "surface watch output unreadable", never a count and
+  never an error (docs/upstream-surface-watch.md).
 
 When any count is nonzero it writes ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json
 atomically (a temporary file in the same directory, fsync, mode 0600, os.replace):
@@ -85,7 +91,17 @@ LABELS = {"pins_behind": ("pin behind", "pins behind"),
           "stale_receipts": ("stale receipt", "stale receipts"),
           "due_layers": ("layer due", "layers due"),
           "reopen_triggers": ("layer with reopen triggers", "layers with reopen triggers"),
-          "host_alerts": ("host alert", "host alerts")}
+          "host_alerts": ("host alert", "host alerts"),
+          "surface_unreviewed": ("unreviewed upstream switch", "unreviewed upstream switches")}
+# The upstream-surface watch's report (scripts/upstream_surface_watch.py, its default state directory under this one).
+# Its count joins the due counts only while the report is fresh, so DUE_KEYS keeps the five counts every run has.
+SURFACE_KEY = "surface_unreviewed"
+COUNT_KEYS = (*DUE_KEYS, SURFACE_KEY)
+SURFACE_DIR = "surface-watch"
+SURFACE_FILE = "latest.json"
+SURFACE_MAX_AGE_DAYS = 3
+SURFACE_FUTURE_SKEW = timedelta(hours=1)  # a generated_at further ahead of the clock than this is not trusted
+SURFACE_SAMPLES = 10  # unreviewed keys kept in the details
 # The host's own alerts (wave-2 lifecycle ruling, change 7): the backup and restore-check status records in the state
 # directory, which keep last_success {snapshot_id, time} apart from last_attempt {result, exit_code, time} so that a
 # failure never overwrites the last success (the same ruling, change 8), and the user manager's view of the new WSL
@@ -269,12 +285,13 @@ def collect(root: Path, now_text: str, network: bool, state: Path | None = None)
             except (OSError, UnicodeError):
                 raise CheckError(f"{Path(SKILLS[0]).name} wrote no report") from None
             skills = parse_report(Path(SKILLS[0]).name, skills_text)
-    host = None
+    host = surface = None
     if state is not None:
         host = {"backup": read_record(state / BACKUP_RECORD), "restore": read_record(state / RESTORE_RECORD),
                 "units": query_units((*STAGE2_UNITS, DAGU_UNIT))}
+        surface = {"record": read_record(state / SURFACE_DIR / SURFACE_FILE)}  # a file read; never a fetch
     return {"receipts": receipts, "layers": layers, "pins": pins, "skills": skills, "sweep_dates": sweep_dates(root),
-            "host": host}
+            "host": host, "surface": surface}
 
 
 def report_options(network: bool, cadence_days: int) -> list[str]:
@@ -326,7 +343,7 @@ def summary_line(due: dict, command: str = DETAILS_COMMAND, complete: bool = Tru
     symbolic XDG form; the document carries the command in its details_command field) that leaves them that room
     takes its place; when none does, the run fails (CheckError) rather than emit a line without a runnable
     command or over SUMMARY_LIMIT."""
-    parts = [f"{due[key]} {LABELS[key][0] if due[key] == 1 else LABELS[key][1]}" for key in DUE_KEYS if due.get(key)]
+    parts = [f"{due[key]} {LABELS[key][0] if due[key] == 1 else LABELS[key][1]}" for key in COUNT_KEYS if due.get(key)]
     if not parts:
         return ("stack currency: nothing due" if complete else
                 "stack currency: nothing known due, skill check incomplete")
@@ -417,6 +434,35 @@ def host_alerts(host, now: datetime) -> tuple[list[dict], dict]:
     else:
         checked = str(units)
     return alerts, {"host_units": checked, "backup_record": backup, "restore_record": restore}
+
+
+def surface_findings(surface, now: datetime) -> tuple[int | None, list[dict], dict]:
+    """(count or None, details, coverage fields) from collect()'s ``surface``: the watch's unreviewed list while its
+    generated_at is at most SURFACE_MAX_AGE_DAYS old. None (a caller that collected no state) checks nothing; a
+    missing, stale or unreadable report is a coverage note, never a count and never an error."""
+    if surface is None:
+        return None, [], {"surface_watch": None}
+    record = surface.get("record")
+    if record is None:
+        return None, [], {"surface_watch": "surface watch not run", "surface_watch_reason": "no latest.json"}
+    if set(record) == {"error"}:
+        return None, [], {"surface_watch": "surface watch output unreadable", "surface_watch_reason": record["error"]}
+    when, unreviewed = record_time(record.get("generated_at")), record.get("unreviewed")
+    if when is None or not isinstance(unreviewed, list) or not all(isinstance(key, str) for key in unreviewed):
+        return None, [], {"surface_watch": "surface watch output unreadable",
+                          "surface_watch_reason": "no generated_at time or no unreviewed list of keys"}
+    age = now - when
+    if age > timedelta(days=SURFACE_MAX_AGE_DAYS) or -age > SURFACE_FUTURE_SKEW:
+        reason = (f"latest.json of {record['generated_at']} is more than {SURFACE_MAX_AGE_DAYS} days old"
+                  if age > timedelta(0) else f"latest.json generated_at {record['generated_at']} is in the future")
+        return None, [], {"surface_watch": "surface watch not run", "surface_watch_reason": reason}
+    details = []
+    if unreviewed:
+        line = record.get("summary_line")
+        details.append({"kind": "surface_unreviewed", "count": len(unreviewed), "keys": unreviewed[:SURFACE_SAMPLES],
+                        "generated_at": record["generated_at"],
+                        "summary_line": line[:200] if isinstance(line, str) else None})
+    return len(unreviewed), details, {"surface_watch": "fresh", "surface_watch_generated_at": record["generated_at"]}
 
 
 def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, root: Path = ROOT,
@@ -518,13 +564,17 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
 
     alerts, host_coverage = host_alerts(reports.get("host"), now)
     details += alerts
+    surface_count, surface_details, surface_coverage = surface_findings(reports.get("surface"), now)
+    details += surface_details
 
     details.append({"kind": "coverage", "pins_unchecked": len(unchecked), "due_layers_total": due_total,
                     "sweep_cadence_days": cadence_days, "network": skills is not None,
                     "skills_complete": skills_complete, "skills_fetch_errors": skills_errors,
-                    "skills_unresolved": skills_unresolved, **host_coverage})
+                    "skills_unresolved": skills_unresolved, **host_coverage, **surface_coverage})
     due = {"pins_behind": pins_behind, "stale_receipts": stale_receipts, "due_layers": due_layers,
            "reopen_triggers": reopen_triggers, "host_alerts": len(alerts)}
+    if surface_count is not None:
+        due[SURFACE_KEY] = surface_count
     command = details_command(root, skills is not None, cadence_days)
     if due_file is None:  # a direct caller: the default state directory, as main() would resolve it
         due_file, from_xdg = default_state_dir() / DUE_FILE, os.path.isabs(os.environ.get("XDG_STATE_HOME") or "")
@@ -604,6 +654,10 @@ def render_text(document: dict) -> str:
         elif kind in ("unit_not_active", "dagu_not_active"):
             lines.append(f"  unit: {item['unit']} is enabled and {item['active_state']} "
                          f"({item['sub_state']}, result {item['result']})")
+        elif kind == "surface_unreviewed":
+            more = "" if item["count"] <= len(item["keys"]) else f" and {item['count'] - len(item['keys'])} more"
+            lines.append(f"  upstream switches: {item['count']} new without a disposition (watch of "
+                         f"{item['generated_at']}): {', '.join(str(key) for key in item['keys'])}{more}")
         elif kind == "coverage":
             network = ("off" if not item["network"] else "on" if item["skills_complete"] else
                        f"on, incomplete ({item['skills_fetch_errors']} error(s), {item['skills_unresolved']} "
@@ -611,9 +665,13 @@ def render_text(document: dict) -> str:
             host = ("" if item.get("host_units") is None else
                     f"; host units {item['host_units']}; backup record {item['backup_record']}; "
                     f"restore-check record {item['restore_record']}")
+            surface = ("" if item.get("surface_watch") is None else
+                       f"; surface watch of {item.get('surface_watch_generated_at')}" if item["surface_watch"] == "fresh"
+                       else f"; {item['surface_watch']} ({item.get('surface_watch_reason')})")
             lines.append(f"coverage: {item['pins_unchecked']} pinned component(s) unchecked on this host; "
                          f"{item['due_layers_total']} layer(s) not yet saturation candidates, due "
-                         f"{item['sweep_cadence_days']} days after their last sweep; network checks {network}{host}")
+                         f"{item['sweep_cadence_days']} days after their last sweep; network checks {network}{host}"
+                         f"{surface}")
     due = document["due"]
     kinds = {item["kind"] for item in document["details"]}
     actions = []
@@ -629,6 +687,9 @@ def render_text(document: dict) -> str:
         actions.append("units: systemctl --user status <unit>, then adoption/lifecycle.md")
     if any(kind.startswith(("backup_", "restore_check_")) for kind in kinds):
         actions.append("backups: dagu history restic-backup and restic-restore-check")
+    if due.get(SURFACE_KEY):
+        actions.append("upstream switches: python3 scripts/upstream_surface_watch.py --dry-run and "
+                       "docs/upstream-surface-watch.md")
     if actions:
         lines.append("next: " + "; ".join(actions))
     return "\n".join(lines)
