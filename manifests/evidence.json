@@ -15873,8 +15873,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "b8e25d6753042c7030f6e72e47a8aeed2328cb6beed9dddb75c1f541e34144cc",
-      "bytes": 158137
+      "sha256": "18992f4241d7e5c4bb902d0f6f359deea13e49274fb06fdfe327b7daf135acb4",
+      "bytes": 153089
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -52488,8 +52488,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "05e2e5a1152a5dfc704bc3dbde52055a872dfc503b67662d584c87747256c726",
-      "bytes": 165365
+      "sha256": "a627a544a77e03aafae747367d881d9358c7ffcf60810838d000861a0decd388",
+      "bytes": 140713
     },
     {
       "path": "tests/test_workflow_security.py",
