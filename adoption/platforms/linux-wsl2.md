@@ -139,13 +139,32 @@ itself evidence the WSL UVA gap closed.
 Lessons from work on the WSL workstation in September 2026; the links give the
 upstream behavior behind each.
 
-- Do not pipe a script to `powershell.exe -Command -`. PowerShell reads
+**Prerequisite: PowerShell 7 installed on the Windows host.** A stock Windows installation does not include it.
+This guidance uses [PowerShell v7.6.6](https://github.com/PowerShell/PowerShell/releases/tag/v7.6.6)
+(2026-09-08; current stable release checked 2026-10-04). Run
+`winget install --id Microsoft.PowerShell --source winget --installer-type wix` in a Windows command shell
+([Microsoft's install instructions](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-powershell-using-winget)).
+WinGet defaults to MSIX since 7.6; `--installer-type wix` selects the MSI installation, whose default directory is
+`C:\Program Files\PowerShell\7`
+([installation options](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-the-msi-package-with-command-line-options)).
+If `/mnt/c/Program Files/PowerShell/7/pwsh.exe` is absent, stop the Windows-side steps and install it first. When WinGet
+is unavailable, [download the stable MSI](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-the-msi-package),
+double-click it and follow the prompts, retaining the default directory; check that executable path before resuming
+([Microsoft's installer steps, lines 84–92](https://github.com/MicrosoftDocs/PowerShell-Docs/blob/a3de8f22552170e70852470d46cd52cd9ca471ec/reference/docs-conceptual/install/install-powershell-on-windows.md#L84-L92)).
+Do not fall back to Windows PowerShell 5.1. NativeStack disables `appendWindowsPath`, so invoke the quoted absolute
+path below even when Windows has the executable on its PATH.
+
+- Do not pipe a script to `pwsh.exe -Command -`. PowerShell reads
   standard input one statement at a time, as if typed at the prompt, and does
   not run a statement that fails to parse
-  ([about_PowerShell_exe](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_exe?view=powershell-5.1)),
+  ([about_pwsh, -Command](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh?view=powershell-7.6#-command---c)),
   so a multi-line block can be dropped without an error. Write a `.ps1` file
   and run it with
-  `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w file.ps1)"`.
+  `'/mnt/c/Program Files/PowerShell/7/pwsh.exe' -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(wslpath -w step.ps1)"`.
+  `-File` takes the script path and must follow the other launcher options;
+  `-NonInteractive` makes prompts fail instead of hanging
+  ([about_pwsh, -File](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh?view=powershell-7.6#-file---f),
+  [about_pwsh, -NonInteractive](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh?view=powershell-7.6#-noninteractive---noni)).
 - Strip `\r` and `\0` from Windows-side output before comparing or parsing it,
   for example with `tr -d '\r\0'`. Windows programs end lines with CRLF, and
   `wsl.exe` writes UTF-16 unless `WSL_UTF8=1` is set
