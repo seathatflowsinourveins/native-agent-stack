@@ -2543,8 +2543,7 @@ class SkillsYamlProvisioningControls(unittest.TestCase):
         start, end = yaml_provisioning_span(lines)
         step = lines[start:end]
         run_index = next(i for i, line in enumerate(step) if line.startswith("        run: |"))
-        suite_end = shell_ci.step_span(lines, next(i for i, line in enumerate(lines)
-                                                   if line.strip() == "run: python3 -m unittest"))[1]
+        suite_end = shell_ci.suite_step_span(lines)[1]
         return {
             "removed step": ("missing", "\n".join(lines[:start] + lines[end:])),
             "step after the suite": ("order", "\n".join(lines[:start] + lines[end:suite_end] + step + lines[suite_end:])),
