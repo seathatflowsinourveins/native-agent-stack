@@ -1,0 +1,233 @@
+{
+ "agent-sdks/codex-sdk-and-codex-exec-app-server": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Plan change in the repository, then one run on the host.\n\n(1) Plan change. Add an app-server smoke to the after_sign_in stage, next to the existing SDK quickstart, in two places:\n- the acceptance of the codex-sdk-and-codex-exec-app-server row in install-plan.json;\n- the accept.sh function of the same name.\n\nCite rust-v0.160.0 codex-rs/cli/src/main.rs#L923 and codex-rs/app-server-test-client/src/lib.rs#L1072 and #L1994 as its source. The smoke:\n\n```sh\ncd \"$tool_root/codex-sdk\"\nout=\"$(codex debug app-server send-message-v2 'Reply with exactly 4. Do not use tools or modify files.' </dev/null)\"\ngrep -q '^< initialize response:' <<<\"$out\"\ngrep -q '^< thread/start response:' <<<\"$out\"\ngrep -q '^< turn/start response:' <<<\"$out\"\ngrep -qx '< turn/completed notification: Completed' <<<\"$out\"\ngrep -qF 'text: \"4\"' <<<\"$out\"\n```\n\nPoints to keep:\n- **No daemon.** The command starts a short-lived stdi",
+  "owner": "Codex SDK and codex exec/app-server",
+  "unit": "clients-1"
+ },
+ "instructions-skills/trail-of-bits-security-skills-trailofbits-skills": {
+  "status": "PARTIAL",
+  "fix_kind": "host",
+  "fix": "This is a host-state fix on NativeStack2604. The plan already prescribes it (install-plan.json:307; manifest.json:875-880; claude.settings.template.json:392; adoption/skills/lifecycle.md:286-302).\n\n1. From a shell outside any Claude session, run:\n   \"$tool_root/skills-1.7.0/bin/skills\" remove semgrep -g -y\n   lifecycle.md:299-301 requires the outside shell: the settings template denies `skills remove` inside a session, so do not route around that rule.\n2. Set skillOverrides.semgrep to \"off\" in ~/.claude/settings.json, matching template line 392, as a single-key merge. Re-running tools/adoption/apply_claude_settings.py would also apply it, but it re-merges the whole template.\n3. Verify:\n   - \"$tool_root/skills-1.7.0/bin/skills\" list -g -a claude-code codex --json lists exactly agentic-actions-auditor, codeql, fp-check, modern-python, property-based-testing, sarif-parsing, supply-chain-ris",
+  "owner": "Trail of Bits security skills (trailofbits/skills)",
+  "unit": "clients-1"
+ },
+ "instructions-skills/engineering-process-skills": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Make the existing cleanup requirement executable in the install plan before the delegated installation: \"$tool_root/skills-1.7.0/bin/skills\" remove domain-modeling setup-matt-pocock-skills grill-me improve-codebase-architecture semgrep -g -y. Set Claude skillOverrides to off for the retired names semgrep, grill-me and improve-codebase-architecture. Retain the manifest's individual source pins when reinstalling selected skills. Extend acceptance to inspect \"$tool_root/skills-1.7.0/bin/skills\" list -g -a claude-code codex --json and reject the five excluded names, alongside the existing selected-skill verification. Apply the cleanup on the host and record fresh native skill activation evidence after it.",
+  "owner": "mattpocock/skills (selected skills, not the bundle)",
+  "unit": "clients-1"
+ },
+ "instructions-skills/skill-authoring": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Add the Python prerequisite and dependency provisioning to the plan: uv pip install --python \"$(mise which python)\" PyYAML==6.0.3. Add acceptance through the session-default interpreter: python -B \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/skill-creator/scripts/quick_validate.py\" \"$HOME/.agents/skills/find-skills\" and python -B \"${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py\" \"$HOME/.agents/skills/find-skills\". Apply the dependency step on this host. Complete fresh-session creation and evaluation in both clients; for Claude, use the pinned creator's paired with-skill/baseline workflow, scripts.aggregate_benchmark and eval-viewer/generate_review.py with --static for headless reporting.",
+  "owner": "skill-creator (embedded in Codex; anthropics/skills for Claude Code)",
+  "unit": "clients-2"
+ },
+ "mcp-surfaces/mcp-inspector": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "This is a repository plan change followed by a run on 2604. Nothing is installed, and the on-demand policy stays.\n\n1) Change the plan checker first. check_plan.py:183-188 forbids commands, acceptance or an accept.sh function on a not-installed row. Let the ON_DEMAND rows (check_plan.py:22) carry a pinned on-demand command and an acceptance function, and update plan README.md:26 and :31 and the accept.sh skip loop (accept.sh:819-822) to match.\n\n2) Edit the mcp-inspector row (install-plan.json:569-592):\n- commands: [\"npx -y @modelcontextprotocol/inspector@2.9.0\"]\n- version_pinned: true\n- needs.node: true (upstream engines node >=22.19.0)\n- acceptance, run through the plan's own route against the installed qmd stdio server and labelled as our integration check:\n  - npx -y @modelcontextprotocol/inspector@2.9.0 --cli <qmd mcp command> --method tools/list (this already passes);\n  - a default w",
+  "owner": "MCP Inspector",
+  "unit": "clients-2"
+ },
+ "cross:gpt6-harnesses/gpt-gateway": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "REPOSITORY PLAN CHANGE (origin/main):\n(a) Revise the gpt-gateway row (evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json:2653-2714) to the ruling's build (wave2-records.json:286,300):\n- base release/v3.8.52 @ 23a11484862b3bb589a55e85b00e4ac53ffeb234;\n- cherry-pick 24bbadbad15eec0d598c908416e4b01be4e37671 and 6c7990058c4ce9677de79452c8cefb10b4bf1b3d (PR 13788), and 0585aba5589d5a1f49243a13a8db249558e7c9e3 (PR 15167);\n- commands as recorded in B5a-omniroute-build.sh:11-19: npm ci; the five named unit tests via node --test; npm run typecheck:core; npm run build:release; OMNIROUTE_ALLOW_CANARY_BUILD=1 npm run check:pack-artifact; npm pack;\n- npm omniroute@3.8.51 stays as the documented rollback (wave2-records.json:284).\nBind a sanitized receipt built from the existing host records instead of rebuilding: B5a-omniroute-build.txt (all gates exit 0, BUILD_SHA 720e881a4) and p2-ga",
+  "owner": "OmniRoute",
+  "unit": "gpt-runtime-1"
+ },
+ "cross:runtime-workers/agent-runtime-worker": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Repository plan change first, then host completion.\n\n1) Amend the agent-runtime-worker row (install-plan.json:2715-2765) so the plan row, the venv and the dispatcher all use one SDK version. My fix departs from the reviewer's here.\n- Better evidenced: merge the phase-1 amendment the receipt names (version, unit, sandbox; wave2-20261004/openhands-sdk-p1/receipt.json:88) at v1.51.0. PyPI lists 1.51.0 as the latest release (uploaded 2026-10-03T07:38Z). The unchanged upstream test suite ran at that version: 10894 passed, and the 13 failures are browser end-to-end tests the host can't run (no browser launch), outside the enabled features (receipt.json:49).\n- Install it the way the receipt did, with lock constraints:\n  checkout_tag https://github.com/OpenHands/software-agent-sdk.git v1.51.0 \"$tool_root/openhands-source\"\n  then, in that checkout: uv export --frozen --no-dev --no-hashes --no-emi",
+  "owner": "OpenHands software-agent-sdk",
+  "unit": "gpt-runtime-1"
+ },
+ "cross:runtime-workers/research-harnesses": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Host repair: apply the current managed instruction blocks with python3 tools/adoption/managed_block.py claude-md --example adoption/new-wsl/claude-user-instructions.md and python3 tools/adoption/managed_block.py codex-md --template adoption/new-wsl/codex-user-instructions.md from the destination checkout. Configure an active DeerFlow models entry using name: gpt-runtime, use: langchain_openai:ChatOpenAI, model: cx/gpt-6.1-sol-max, base_url: http://127.0.0.1:21128/v1 and api_key: local-loopback for the recorded keyless loopback gateway. Retain the upstream bundled DuckDuckGo search tool. Use DEER_FLOW_CONFIG_PATH=\"$tool_root/deer-flow/config.yaml\" and the installed backend interpreter to execute the documented DeerFlowClient().chat(query) API, requiring a nonempty cited research answer. Repository change: add this embedded DeerFlow functional acceptance alongside GPT Researcher in the ins",
+  "owner": "GPT Researcher and DeerFlow, kept as two independent evidence gatherers",
+  "unit": "gpt-runtime-1"
+ },
+ "code-navigation/serena": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Reconcile the plan with the requested development pin: replace its 1.7.0 installation with uv tool install --force -p 3.13 'git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143'. On the host, configure $HOME/code/native-agent-stack/.serena/project.local.yml with language_servers: [python], the upstream-supported override and language identifier, then run serena project index \"$HOME/code/native-agent-stack\". Repeat serena init at the installed pin and require successful find_symbol and find_referencing_symbols calls in fresh Claude Code and Codex sessions. Pin reconciliation and project-operation acceptance belong in the repository plan; the local override and indexing are host state.",
+  "owner": "Serena",
+  "unit": "context-1"
+ },
+ "code-navigation/structural-search": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "This is a repository plan change. No user step is needed. Do not adopt the cargo llvm-cov stage.\n\n1. Edit the post_install program in install-plan.json:770 and make the identical edit in accept.sh:248-252. check_plan.py:234 and :237 require exactly one post_install check per slot, and it must match the plan.\n2. Keep the existing `ast-grep --version` and the search probe inside the same mktemp/trap.\n3. Chain the following with && so any failure fails the check:\n   - `printf 'callback();\\n' > \"$ast_grep_probe/control.ts\"`\n   - `out=\"$(ast-grep -p '$A && $A()' -l ts -r '$A?.()' \"$ast_grep_probe/probe.ts\")\"`. This is the unchanged README:84 form. It must exit 0. Capturing into a variable means no pipe hides ast-grep's exit code.\n   - `printf '%s\\n' \"$out\" | grep -qF 'callback?.()'`. The rewrite output must contain the replacement.\n   - `{ ast-grep -p '$A && $A()' -l ts -r '$A?.()' \"$ast_grep",
+  "owner": "ast-grep",
+  "unit": "context-1"
+ },
+ "semantic-rag/embedding-model": {
+  "status": "PARTIAL",
+  "fix_kind": "host",
+  "fix": "On the host, start the installed runtime using upstream's foreground command: OLLAMA_HOST=127.0.0.1:21434 ollama serve. From another shell, require curl -fsS http://127.0.0.1:21434/api/version to report 0.35.0, then run bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only embedding-model --stage service_health from the repository. Require successful ollama show output with num_ctx 8192 and an /api/embed response containing one 1024-element vector. The plan already documents the server prerequisite and this acceptance stage; the evidenced blocker is host runtime state.",
+  "owner": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
+  "unit": "context-1"
+ },
+ "document-retrieval/tobi-qmd": {
+  "status": "PARTIAL",
+  "fix_kind": "host",
+  "fix": "Host repair: set models.embed in <host path>/.config/qmd/native-agent-stack-catalog.yml to <host path>/.local/share/qmd/models/Qwen3-Embedding-0.6B-Q8_0.gguf. Run qmd --index native-agent-stack-catalog update, then qmd --index native-agent-stack-catalog embed -f and qmd --index native-agent-stack-catalog doctor. For the intended GPU route, use the supported QMD_LLAMA_GPU=cuda setting and verify offloading. Rerun both plan acceptance stages. After the gateway launch prerequisite is resolved, retain successful MCP query and get receipts from fresh headless sessions in both clients. The model requirement is already recorded in the plan.",
+  "owner": "tobi/qmd",
+  "unit": "context-2"
+ },
+ "document-retrieval/mineru": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Plan change (the plan is the record; host application follows).\n\n1) Native wiring through the repo's pinned skill route, not ad-hoc npx. The find-skills manifest entry's gap field records that upstream's `npx skills add` step is replaced by a manifest pin.\n- Add a `mineru` entry to adoption/skills/manifest.json:\n  - url https://github.com/opendatalab/MinerU/tree/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/skills/mineru\n  - ref c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93 (peeled commit of tag mineru-4.0.10-released, git ls-remote 2026-10-04)\n  - path skills/mineru\n  - tree_sha and skill_md_sha256, computed as for find-skills\n  - claude_listing on, codex_enabled true\n- Add to the mineru row: `python3 -B \"$repo_root/tools/adoption/install_skills.py\" --skills-bin \"$tool_root/skills-1.7.0/bin/skills\" --json --only mineru`. It runs `skills add <url> --skill mineru -g -y -a claude-code codex` (instal",
+  "owner": "MinerU",
+  "unit": "context-2"
+ },
+ "token-efficiency/ccusage": {
+  "status": "FAIL",
+  "fix_kind": "plan",
+  "fix": "Replace the plan's no-install/skip row with the named owner and the upstream global installation command pinned as npm install -g ccusage@20.0.26. Add upstream verification commands ccusage --version, ccusage --help and ccusage daily. Verify both documented source reports, ccusage claude daily and ccusage codex daily, against fresh native-client session data, and record actual client invocation of the meter.",
+  "owner": "ccusage 20.0.26",
+  "unit": "context-3"
+ },
+ "token-efficiency/statusline": {
+  "status": "PARTIAL",
+  "fix_kind": "host",
+  "fix": "Reconcile the unit's stale 0.8.0 pin with the approved v0.10.0 plan. Restore the plugin from the plan's tagged jarrodwatts/claude-hud#v0.10.0 marketplace and verify its source commit is 75683c6de1ac07f6bbef00d739001679dba0740c. From that installed plugin directory, run node scripts/setup.mjs inspect --shell posix, then node scripts/setup.mjs install --shell posix, as already prescribed by the plan. Repeat the upstream sample render and existing plan acceptance. Record actual HUD and Codex footer use in fresh interactive sessions; the supplied print-mode session does not prove UI rendering.",
+  "owner": "claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line",
+  "unit": "context-3"
+ },
+ "observation-inference/otel-collector-contrib": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Repository change: supply the service's resolved data directory to acceptance, using NS2604_OBSERVABILITY_DATA=\"${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability\" otelcol-contrib validate --config=\"$config_root/otel.yaml\". Ensure clean installation creates the configured otelcol/queue directory, or uses the upstream file_storage create_directory setting. Update the manifest and slot inventory to the verified 0.162.0 release already selected by the plan. Re-run the unchanged upstream validator and health check with this recorded configuration.",
+  "owner": "OTel Collector Contrib",
+  "unit": "observe-eval-1"
+ },
+ "observation-inference/grafana": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Repository change: in the provisioned token-layer dashboard source, change targets[].interval from \"1h\" to \"1m\" for the six affected Claude panels while retaining their [1h] PromQL lookbacks. Deploy the corrected file through Grafana's documented dashboard provisioning provider and validate the affected panels through POST /api/ds/query. Include an exercised SDK receipt workload in subsequent dashboard acceptance to resolve the three unexercised receipt panels. Use the Alertmanager plugin's documented testDatasource status request for its acceptance. Synchronize the manifest and inventory to 13.2.3, and reconcile the plan's measurement-only exclusion with the requested finalized installation.",
+  "owner": "Grafana",
+  "unit": "observe-eval-1"
+ },
+ "observation-inference/local-model-server": {
+  "status": "PARTIAL",
+  "fix_kind": "host",
+  "fix": "Host state: during the designated GPU-owner window, start the installed server with the upstream foreground command OLLAMA_HOST=127.0.0.1:21434 ollama serve. In another terminal, run OLLAMA_HOST=127.0.0.1:21434 ollama ls, then run the existing acceptance request with pipeline failure propagation: curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Hello world\"}' | jq -e '(.embeddings | length) == 1'. Check OLLAMA_HOST=127.0.0.1:21434 ollama ps immediately afterward to establish GPU allocation, and record successful use by the intended native workflow. The plan already contains the pinned installation, manual startup instruction and embedding acceptance.",
+  "owner": "Ollama",
+  "unit": "observe-eval-1"
+ },
+ "observation-inference/alerting": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Repository plan change in evidence/artifacts/new-wsl-install-plan-20261002, then host apply.\n\n1. config/alertmanager.yaml: replace receiver \"sink\" with the ruling's receiver (added-critics-result.json:175). For example:\n   route: {receiver: user, group_by: [alertname, job]}\n   receivers: [{name: user, webhook_configs: [{url_file: <0600 file>, send_resolved: true}]}]\n   The 0600 file sits outside every worktree (docs/secret-storage.md) and holds https://ntfy.sh/<secret-topic>?template=alertmanager. The Telegram alternative is telegram_configs with bot_token_file and chat_id_file.\n   Provenance: url/url_file and bot_token_file/chat_id_file come from the Alertmanager v0.34.1 docs/configuration.md copy that context-mode indexed on 2026-10-03; it was not re-fetched today.\n\n2. config/prometheus.yaml: add alerting.alertmanagers 127.0.0.1:21093 (the host has it; the plan does not) and rule_files",
+  "owner": "Alertmanager",
+  "unit": "observe-eval-2"
+ },
+ "observation-inference/local-generation-model": {
+  "status": "PARTIAL",
+  "fix_kind": "host",
+  "fix": "Repair host state using the existing plan rather than weakening its checks. During the designated GPU handover/window, start the existing user unit with systemctl --user start ollama.service; it wraps the upstream ollama serve command with OLLAMA_HOST=127.0.0.1:21434. Run bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only local-generation-model to place the pinned GGUF and canonical Modelfiles in the expected layout and execute the documented ollama create commands. Rerun both acceptance stages, requiring IQ3_S, num_ctx 64000 and completed nonempty generation. Capture fresh Claude Code and Codex sessions actually invoking OLLAMA_HOST=127.0.0.1:21434 ollama run swift-iq3s-s2o-64k through their native shell tools. These repairs can use the existing plan without a repository change.",
+  "owner": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
+  "unit": "observe-eval-2"
+ },
+ "observation-inference/session-analytics": {
+  "status": "FAIL",
+  "fix_kind": "plan",
+  "fix": "Add a pinned release installation and acceptance row. Download agentsview_0.43.0_linux_amd64.tar.gz from the v0.43.0 release, verify SHA256 4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9 against upstream SHA256SUMS, extract it, and install the agentsview binary into ~/.local/bin using install -m 0755. The upstream installer fetched at this tag still selects the latest release, so its script tag alone does not pin the installed binary. Configure agents.claude.dirs and agents.codex.dirs for the native session roots; use upstream agentsview daemon start, agentsview sync, agentsview session list and agentsview usage daily. Require newly created headless sessions from both clients to appear in the local archive. Record these steps in the plan.",
+  "owner": "agentsview 0.43.0, local archive",
+  "unit": "observe-eval-2"
+ },
+ "quality-evaluation/inspect-ai": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Repository plan change, then re-run on the host.\n\n1) Install the provider package in the tool's environment. In install-plan.json:1756 and install.sh:449, change the command to:\n`uv tool install --python 3.13 inspect-ai==0.3.273 --with openai==<release the plan selects and records, >=3.1.0 per providers.py:366>`\nThen re-run the slot's install on NativeStack2604. Skip this step if the coordinator's environment check shows openai is already present at 0.3.273.\n\n2) Add a functional acceptance. In accept.sh:514-523 and install-plan.json:1772-1781, keep `inspect --version` as the post_install check. Add an after_sign_in stage that runs the unchanged upstream example through the existing loopback gateway:\n`inspect eval <inspect_ai checkout at tag 0.3.273>/examples/theory_of_mind.py --model openai-api/omniroute/cx/gpt-6.1-sol --model-base-url http://127.0.0.1:21128/v1 --limit 1 --log-dir <retai",
+  "owner": "Inspect AI",
+  "unit": "observe-eval-2"
+ },
+ "quality-evaluation/harbor-containerized-agent-e2e-runner": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Repository plan change, followed by a host run.\n\n1) In the Harbor row (install-plan.json:1785-1822), keep `uv tool install --python 3.13 harbor==0.23.0`. Add a pinned fixture source, because the wheel ships no examples/: `git clone --depth 1 --branch v0.23.0 https://github.com/harbor-framework/harbor \"$tool_root/harbor-v0.23.0\"`, and record the tag's commit SHA in the row.\n\n2) Add a functional acceptance stage to the row and to accept.sh, after the version line and before after_sign_in, since it needs no sign-in:\n`DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock harbor run -p \"$tool_root/harbor-v0.23.0/examples/tasks/hello-user\" -a oracle -e docker -n 1 -o <jobs-dir>`\n- Require the trial result.json (src/harbor/models/trial/paths.py:289-291) to show exception_info null and verifier_result.rewards.reward == 1.0.\n- Repeat with `-a nop` and require reward 0.0 with verification completed (neg",
+  "owner": "Harbor (containerized agent E2E runner)",
+  "unit": "observe-eval-2"
+ },
+ "quality-evaluation/promptfoo": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Add the missing plan row using npm install -g promptfoo@0.123.1 and the documented promptfoo --version check. Adopt the pinned examples/openai-compatible-gateway/promptfooconfig.yaml, configure the intended model routes and apiBaseUrl, and identify the existing gateway credential through apiKeyEnvar without embedding its value. Add promptfoo eval -c <gateway-config> --no-cache as functional acceptance. Register the upstream STDIO server with claude mcp add --scope user --transport stdio promptfoo -- promptfoo mcp --transport stdio and codex mcp add promptfoo -- promptfoo mcp --transport stdio. Require fresh sessions in both clients to call the upstream run_evaluation tool and retain results. Record installation, wiring and acceptance in the repository plan.",
+  "owner": "promptfoo for gateway/LLM A/B; Inspect and Harbor for task evaluation",
+  "unit": "observe-eval-2"
+ },
+ "ci-supply-chain/syft": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Repository change: retain the plan's mise use -g syft@1.54.0 and reconcile manifests/stack.json version/release URL, supply-chain.yml version/checksum/reported version, publish-catalog.yml download/checksum references, and catalog-freshness.yml to 1.54.0; regenerate the unit metadata accordingly. The live upstream checksum for syft_1.54.0_linux_amd64.tar.gz is 54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860. Preserve checksum verification when updating both workflows. After resolving the shared Codex launch-environment gap, repeat syft alpine:latest through fresh native client sessions and record successful command execution.",
+  "owner": "Syft",
+  "unit": "delivery-1"
+ },
+ "git-github-automation/git": {
+  "status": "PARTIAL",
+  "fix_kind": "host",
+  "fix": "Host state only: in ~/code/native-agent-stack, run git config --local user.name '<user-approved name>' and git config --local user.email '<user-approved email>' using the user's chosen commit identity. Verify git var GIT_AUTHOR_IDENT and git var GIT_COMMITTER_IDENT both exit 0, including through the shell tools of fresh Claude Code and Codex sessions.",
+  "owner": "git",
+  "unit": "delivery-2"
+ },
+ "git-github-automation/worktrunk": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Repository change: reconcile the unit and manifest pins with the selected v0.80.0 plan, and add the documented native integration steps wt config plugins claude install and wt config plugins codex install. Add wt config shell install for shell-driven switching and ensure the upstream shell initialization loads in the shell being tested. Retain the selected claude-hud statusline. Verify plugin loading and a disposable worktree lifecycle in fresh clients; Codex must invoke wt switch --create and wt remove directly rather than assuming its plugin supplies isolation.",
+  "owner": "worktrunk",
+  "unit": "delivery-2"
+ },
+ "git-github-automation/difftastic": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Change the install plan in the repository. The mise install of difftastic 0.71.0 stays.\n\n(1) Replace the check. In evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json, replace the difftastic row's \"version only\" post_install acceptance (:2440-2449) with a \"smoke\" check that exercises syntax-aware diffing, and mirror it in accept.sh difftastic() (:655-664).\n- Primary option, following acceptance-evidence-policy.md:35-40: the reviewer's upstream fixtures. Use Wilfred/difftastic@0.71.0 sample_files/simple_1.js and simple_2.js, pinned at the tag by sha256 (copied unchanged, or fetched at the tag), with the assertions from tests/cli.rs. Per the reviewer: `difft --check-only` must print \"Has syntactic changes\" and `difft --exit-code` must exit 1. I have not verified those strings; read the exact assertions from the pinned tests/cli.rs before landing.\n- No-download option, verifi",
+  "owner": "difftastic",
+  "unit": "delivery-2"
+ },
+ "git-github-automation/cross-family-review": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "A repository plan change, then a run on 2604. Nothing needs installing or configuring. The Codex lane owns the GPT half (decision record :141-142).\n\n1) In install-plan.json:2502-2525, give the cross-family-review row an acceptance.after_sign_in check (kind smoke) that covers both directions. Source it to the record's own sources (:367-369) plus the headless doc. In accept.sh, remove the slot from the skip loop (:820), add a function with an after_sign_in branch following the pattern at :79-82, and rewrite the claim at :3.\n\n2) GPT reviewing Claude-authored work: use a pinned commit whose trailers name Claude (for example 8c32a84b) and run:\ncodex exec review --commit <CLAUDE_SHA> -m gpt-6.1-sol -c model_reasoning_effort=\"max\" -c 'sandbox_mode=\"read-only\"' --ephemeral --json -o <dir>/last.txt < /dev/null\nDo not pass a prompt argument: 0.160.0 rejects a prompt together with --commit (record ",
+  "owner": "No additional component: the two clients' native review commands, each family on the other's \u2026",
+  "unit": "delivery-3"
+ },
+ "cross:wsl-distro/base-distribution": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Change the repository plan, then re-run the checks on NativeStack2604. No host state changes for this slot.\n\n(1) Give the row a real acceptance. Replace `acceptance {}` (install-plan.json:2649) with Canonical's own tests at the installed version: ubuntu/wsl-setup tag 0.6.3, pinned to commit 73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8. Remove 'base-distribution' from accept.sh's skip loop (accept.sh:820-822). Run inside the distribution as its default user, from a checkout of that commit (or its raw files):\n- `bash test/basic-assertions.sh \"$WSL_USER\"`\n- `bash test/systemd-assertions.sh`\n\nRecord each script's real exit code. Take the expected user from the recipe's `<WSL_USER>` or from the `[user] default=` line of /etc/wsl.conf. Do not adopt the reviewer's literal `basic-assertions.sh <user>`: it would publish the host account name.\n\n(2) Do not expect exit 0 from systemd-assertions.sh on WSL",
+  "owner": "Ubuntu 26.04.1 LTS (Canonical WSL image), primary",
+  "unit": "host-1"
+ },
+ "isolation/sandbox-runtime-srt": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Repository change, on a branch from origin/main 14048b84:\n\n(1) Update the stale 0.0.77 selectors to the plan's reviewed 0.0.78:\n- manifests/stack.json:865: set version to 0.0.78.\n- adoption/new-wsl-profile.json:744: set pin to 0.0.78.\n- adoption/new-wsl-profile.json:756-757: change the tarball name and URL to sandbox-runtime-0.0.78.tgz.\n- adoption/new-wsl-profile.json:762 and :789: point the registry source to /0.0.78.\n- adoption/new-wsl-profile.json:767: change the install command to `npm install -g @anthropic-ai/sandbox-runtime@0.0.78`.\n- adoption/new-wsl-profile.json:768, :774 and :784-785: change the README source from commit 6fa73136 to the v0.0.78 tag that the plan already cites.\n- adoption/new-wsl-profile.json:788: set the tag to 0.0.78.\nThen regenerate the host-1 unit input (it still says 0.0.77) and run `python3 scripts/validate.py`.\n\n(2) Add a client-session acceptance to the s",
+  "owner": "sandbox-runtime (srt)",
+  "unit": "host-1"
+ },
+ "secrets-credentials/betterleaks": {
+  "status": "PARTIAL",
+  "fix_kind": "plan",
+  "fix": "Repository change: migrate scripts/git-hooks/pre-commit to require betterleaks and execute betterleaks git --pre-commit --staged --redact --no-banner --config \"$root/.gitleaks.toml\" \"$root\", which upstream 1.9.0 supports. Update CI installation to v1.9.0, including its checksum and Sigstore tag/commit pins, and put the scanner under the existing required secret-scan context. Run history and directory scans with finding exit code 1; remove the trial's --exit-code 0 and assertion-failure suppression from the gate. Resolve the existing allowlist fixture differences before promotion. Add hook activation and staged clean/synthetic-positive acceptance to the install plan. Host step after those changes: git -C <host path>/code/native-agent-stack config --local core.hooksPath scripts/git-hooks. Obtain fresh Claude and Codex receipts showing that commits exercise the hook.",
+  "owner": "betterleaks",
+  "unit": "host-1"
+ },
+ "cross:credential-practice/credential-guard": {
+  "status": "PARTIAL",
+  "fix_kind": "host",
+  "fix": "Apply the existing upstream F9 client-configuration step from ~/code/native-agent-stack: python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>', where <host> names this distribution's adoption/hosts/<host>.json. Close native Codex sessions and stop its app-server daemon beforehand, as the installer requires. The codex-config step must merge [shell_environment_policy] inherit = \"none\" and the new-WSL template's explicit non-secret set entries, retaining the existing PATH. Then run python3 scripts/credential_status.py --client-guards --json and require client_guards.codex_shell_environment_inherit_none=true. Supply a fresh headless Codex session demonstrating the environment policy with a dummy canary and successful benign tool use, without printing environment or credential values. The missing configuration is host state; the supported wiring step already exists upstre",
+  "owner": "Command and secret-path guard (K4)",
+  "unit": "host-2"
+ }
+}

@@ -1,0 +1,400 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-e2e-20261004",
+  "kind": "native_model_e2e",
+  "recorded_at_utc": "2026-10-04T20:26:16Z",
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "omniroute"
+  ],
+  "claim": "The historical 2026-10-04 foundation E2E covered 15 units and 80 slots through native executor observations, independent model review and 22 adjudications. Final labels are READY 18, PARTIAL 31, FAIL 2, BY_DESIGN 12 and INTERIM 17, with zero unjudged slots. Readiness is (18 + 12) / 80 = 37.5%, rounded half up to 38%; all 22 executor/reviewer disagreements were adjudicated. This publication independently checks and sanitizes the retained status chains; it does not repeat host or provider execution. Missing prompt, adjudicator model metadata and separate fix-list provenance are explicit.",
+  "limitations": [
+    "Host state is as of 2026-10-04 19:10–20:10Z only; later source merge timestamp 2026-10-04T20:26:16Z does not extend that observation window. No commands were run on any WSL distribution by this publisher.",
+    "Fixes are pending. The 33 PARTIAL/FAIL slots after adjudication are not accepted as ready: 25 repository-plan and 8 host fixes (evidence/artifacts/ns2604-e2e-20261004/fixes.json); six token slots resolve with PR #684.",
+    "This is not an upstream benchmark. Native executor observations, independent model judgments and adjudication are separate from upstream tests, structural checks, independent host replication and measured quality or token improvement.",
+    "The 17 INTERIM slots are held by design. They remain in the denominator and contribute zero to the readiness numerator; the 12 BY_DESIGN slots are intentional dispositions rather than proof that their tools executed.",
+    "Adjudication: Claude Opus 5.5 at effort max (evidence-reviewer), prompt template in evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md; separate adjudication start/end timestamps are not retained.",
+    "Historical source command excerpts and raw conversations remain private. Public reasons are bounded to 60 words, fixes preserve the merge's 900-character bound before sanitization, and citations are limited to four per slot. Hashes establish byte identity, not success or adequacy of every native acceptance claim.",
+    "Reviewer records report the requested gateway model cx/gpt-6.1-sol-max and max effort; no resolved backend model identity is inferred. Independent model review is review of retained evidence, not independent execution on the host.",
+    "The publisher leaves the receipt and new artifact hashes unregistered for the coordinator-owned manifests/evidence.json. Full repository validation is expected to report registry drift until integration; per-file scans and local receipt tests are structural evidence only."
+  ],
+  "data": {
+    "publication_date_utc": "2026-10-04",
+    "publication_base_revision": "5358bb564fc42edb54a1edf7b848bf07d7f0997a",
+    "host_scope": "Historical Linux WSL2 foundation observation; host identity withheld",
+    "observed_window_utc": {
+      "start": "2026-10-04T19:10:00Z",
+      "end": "2026-10-04T20:10:00Z"
+    },
+    "source_scope": "ns2604-e2e-20261004; private directory <host path>",
+    "counts": {
+      "READY": 18,
+      "PARTIAL": 31,
+      "FAIL": 2,
+      "BY_DESIGN": 12,
+      "INTERIM": 17,
+      "UNJUDGED": 0
+    },
+    "slots_total": 80,
+    "units_total": 15,
+    "percent": 38,
+    "formula": "(READY + BY_DESIGN) / all slots in scope; UNJUDGED counts as not ready",
+    "readiness_numerator": 30,
+    "unrounded_percent": 37.5,
+    "rounding": "nearest integer, half up",
+    "disagreement_count": 22,
+    "disagreements_open": 0,
+    "adjudications": 22,
+    "evidence_classes": [
+      {
+        "class": "native_host_observation",
+        "actor": "Claude Sonnet executors",
+        "scope": "Historical native commands, exit codes and excerpts retained in each unit evidence file; no publication-time host execution"
+      },
+      {
+        "class": "independent_model_review",
+        "actor": "GPT Sol reviewers",
+        "scope": "80 independent slot reviews in 15 completed worker result records; evidence review, not native host replication"
+      },
+      {
+        "class": "model_adjudication",
+        "actor": "Claude Opus, as identified in the publication brief",
+        "scope": "22 retained judgments override final status and fix fields; exact model record unavailable"
+      },
+      {
+        "class": "structural_validation",
+        "actor": "bounded publisher",
+        "scope": "Independent original-record join, count and layer recomputation, sanitization and repository receipt checks; no new capability acceptance"
+      }
+    ],
+    "model_records": {
+      "executor": {
+        "model_id": "claude-sonnet-5-5",
+        "source": "observe-eval-1.json:executor.model; context-3.json:executor"
+      },
+      "reviewer": {
+        "requested_model": "cx/gpt-6.1-sol-max",
+        "requested_effort": "max",
+        "source": "review/<unit>/out.jsonl result records",
+        "completed_units": 15,
+        "resolved_backend_model_id": null
+      },
+      "adjudicator": {
+        "reported_family": "Claude Opus",
+        "reported_family_source": "user-provided publication brief",
+        "model_id": null,
+        "exact_model_record_retained": false
+      }
+    },
+    "fix_plan": {
+      "source": "user-provided publication brief; fixes.json absent",
+      "plan_followups": 30,
+      "host_followups": 11,
+      "token_slots_under_issue_684": 6,
+      "open_partial_fail_slots": 33,
+      "merged_fix_kinds_all_slots": {
+        "none": 42,
+        "plan": 30,
+        "host": 8
+      },
+      "merged_fix_kinds_partial_fail": {
+        "plan": 25,
+        "host": 8
+      }
+    },
+    "sanitization": "Host paths become <host path>; local user identities <user>; machine names <machine>; emails <email>. No raw transcripts or session streams are copied. Reviewer streams are used only for selected model-request metadata and source hashes.",
+    "method_source": {
+      "file": "e2e_merge.py",
+      "class": "provided historical local integration procedure",
+      "execution_by_publisher": false
+    },
+    "source_gaps": [
+      "original adjudication prompt",
+      "exact adjudicator run model metadata and timestamps",
+      "fixes.json"
+    ],
+    "private_source_hashes": [
+      {
+        "file": "units.json",
+        "sha256": "9175b36f0e1589a56a33522045852333adca0496432bacc2fd8df57e8138c6a0"
+      },
+      {
+        "file": "executor-status.json",
+        "sha256": "e83044d00a954436a9c51b05ff7f3bc3a0825a25e5152f6131bee0b4e0da20c8"
+      },
+      {
+        "file": "e2e-merged.json",
+        "sha256": "838365089640113b5f495a8eb214fff5798775cbadf3e0f1605c4af05a14d182"
+      },
+      {
+        "file": "adjudication.json",
+        "sha256": "a045daad25f9199c2a473336cc8898575c18f6ad773cd695e235747913e51e69"
+      },
+      {
+        "file": "review-prompt.txt",
+        "sha256": "74ae11e9ad15adc66d6f380e1fd3ff7583a85b4138ccc77ea533c5f572cabd41"
+      },
+      {
+        "file": "e2e_merge.py",
+        "sha256": "9876a892da0a8c816fb497adddc03abcef724d9c533fa2332842c63f8d9f94dc"
+      },
+      {
+        "file": "review-driver.py",
+        "sha256": "6c8610e978b31f8d6a3d11ab89825ea6aa082211f601e19239a8e50e3af798a4"
+      },
+      {
+        "file": "review-driver-v2.py",
+        "sha256": "e62d8450e0d14a739759af3800d0eff1dc901b3dd38b42c88cfd0cfa33e386fd"
+      },
+      {
+        "file": "clients-1.json",
+        "sha256": "d9b71aba94539f6fee5d2f3a3e82cc924846c1709d3846b33de8f7adf2fe6174"
+      },
+      {
+        "file": "clients-2.json",
+        "sha256": "b1e2eb9c394a036a573a80e7c053830814f38d16d79da84ce66f2ab1ffb5bf43"
+      },
+      {
+        "file": "gpt-runtime-1.json",
+        "sha256": "4c4bc65f0dfdd9cbf977b8cf908d6281e940fc2ea5bcf379438b313a32526dc9"
+      },
+      {
+        "file": "context-1.json",
+        "sha256": "ddfbcd1ac1b7cec3b6f43596f7e2734f3962fa7b7cf700dd47cc531558aa3235"
+      },
+      {
+        "file": "context-2.json",
+        "sha256": "c72ea3becbb9b5ff966d1e13dcf2153438767b3d50656f9ce27b13b9a20c1563"
+      },
+      {
+        "file": "context-3.json",
+        "sha256": "bddebb9bd7071a1e1bb26ab7af96f4275605fa3d24a4a6becc636a7a2ed48c31"
+      },
+      {
+        "file": "context-4.json",
+        "sha256": "c8a7662d0927ed848bf8313cbe9a1f5eb855925420bcb319520ad6f90e95d594"
+      },
+      {
+        "file": "context-5.json",
+        "sha256": "7c52ef793a15f202596c567b97b61cc59ebb6f0b904ef718397d04ca2b747ac3"
+      },
+      {
+        "file": "observe-eval-1.json",
+        "sha256": "1ad92df4da0e80b3f87bbc99b008a940bccd234ae5103b930ce4cccaa21135ae"
+      },
+      {
+        "file": "observe-eval-2.json",
+        "sha256": "9a897e83ecff1dd57c9e8ab031252fc8f90dc86c5e37d18065837e55d2230d63"
+      },
+      {
+        "file": "delivery-1.json",
+        "sha256": "5b1846963f3bad1a11bf914493604a6349be7b3a53cd148da8f8f50631531e03"
+      },
+      {
+        "file": "delivery-2.json",
+        "sha256": "ea7fa2759970cada6c056d78eeabf6b7c4998ffa799a716b7d8cda0af3aee217"
+      },
+      {
+        "file": "delivery-3.json",
+        "sha256": "aab30a99f632053d51e9e6e0563f4601acedfd048fb89d7917ac1374fe7ac41e"
+      },
+      {
+        "file": "host-1.json",
+        "sha256": "5ceffb36c772a3e0d4963509f68a1742403cdfd083c65532db939cbc9ddd94fb"
+      },
+      {
+        "file": "host-2.json",
+        "sha256": "24f6ecbc30004b5cf80f57a38f2746ba00395c0e481362698f12cb35a868085e"
+      },
+      {
+        "file": "review-clients-1.json",
+        "sha256": "b1754fe6c17247a260e4641ff0eb6d92191fb55c9ea37be3f6e6d5f8afa27171"
+      },
+      {
+        "file": "review-clients-2.json",
+        "sha256": "a542eacab8a54860f0e421165b8aeb44a6993ef03e83f60ef3dab11d7c4902eb"
+      },
+      {
+        "file": "review-gpt-runtime-1.json",
+        "sha256": "e4b7044c42ee75730ab343a74e3804927b23c77a2fb8df6f7226260046c83b89"
+      },
+      {
+        "file": "review-context-1.json",
+        "sha256": "7e4ebfdb2b58847b92700c0a71b7d0bcf1479c242bfebe118179d2694df8b671"
+      },
+      {
+        "file": "review-context-2.json",
+        "sha256": "28371b817d9cc56775cd73ee9fb190bf72aec977e1b470f16db971dd5fea5e6b"
+      },
+      {
+        "file": "review-context-3.json",
+        "sha256": "8fd514c69e2b85df424a5bab7a0b0bb4216aafcaa1bcb588cb22e156320e21d6"
+      },
+      {
+        "file": "review-context-4.json",
+        "sha256": "ca2ce3a87d4fd0c906957c7cb0fa8ece23e62ef338a90cc8754d8b716b2e04a2"
+      },
+      {
+        "file": "review-context-5.json",
+        "sha256": "65b6d5e1e70b938a2c36fd9328a481fb131e1a80f10c423b840aa0c7b034927c"
+      },
+      {
+        "file": "review-observe-eval-1.json",
+        "sha256": "2fdf24f5b1c379ac6ea4f8c72895249f34d6f052f4c149d376f58cdec35a7bcd"
+      },
+      {
+        "file": "review-observe-eval-2.json",
+        "sha256": "c24988a44196261f3aaa5ccf69273f6eaa52707d1c9294c341cbae5f429f99ee"
+      },
+      {
+        "file": "review-delivery-1.json",
+        "sha256": "7d6643d4bdbf12e958b0d658f7aea26ffd0e36a20601ffc88027b8fdc9c722c0"
+      },
+      {
+        "file": "review-delivery-2.json",
+        "sha256": "960d55b6d77fa52866cb208a4b30db476fb60669d4e59d15f90fdba6734efa8b"
+      },
+      {
+        "file": "review-delivery-3.json",
+        "sha256": "a29a9c5cd37ae53a58c20f2d80df6d9bdef3d1075e77b96d42dfdb6809c74895"
+      },
+      {
+        "file": "review-host-1.json",
+        "sha256": "85270025ebf6e22a5ba212d7f1d8dff85adec2c25102aa6dc0dca5784c4996ab"
+      },
+      {
+        "file": "review-host-2.json",
+        "sha256": "c9166a63c581ab34b3fa5486fcb0e87a9c50190ea6c7a883c283876a930dfeff"
+      },
+      {
+        "file": "review/clients-1/out.jsonl",
+        "sha256": "cb31d3a09e3f72a6bba482c231850b7238404ba0ea2ac2bc340c1382c81f71a0"
+      },
+      {
+        "file": "review/clients-2/out.jsonl",
+        "sha256": "d4cca262f39325aedf0e66cb6d3bf5901d411bc9924bd94655070113cb84155f"
+      },
+      {
+        "file": "review/gpt-runtime-1/out.jsonl",
+        "sha256": "52223f3932542a6215f6129a5a9b5f720b4523461d4f5e25c7ef81be271dc4a4"
+      },
+      {
+        "file": "review/context-1/out.jsonl",
+        "sha256": "789665a12940a742de4c00d3bb1e069f131853cc38a9020c798d9410ebafb9e9"
+      },
+      {
+        "file": "review/context-2/out.jsonl",
+        "sha256": "e9208d76c86d8161d7151d2a5ee380d60d71794dece714b91e5f8fdd40acea2f"
+      },
+      {
+        "file": "review/context-3/out.jsonl",
+        "sha256": "b2fce2ec0233fa86ac99024a4537c889cf2c2c3194483776e99d2b362c8d4389"
+      },
+      {
+        "file": "review/context-4/out.jsonl",
+        "sha256": "e3c3e6198f1a171e6f220c8483ccc52f8ed27a9774e4baeff28a837bfea37d71"
+      },
+      {
+        "file": "review/context-5/out.jsonl",
+        "sha256": "bf61dddcddd7bd5b51bacbc664f2f38d225f9dbb9308795f73cbd6706826b910"
+      },
+      {
+        "file": "review/observe-eval-1/out.jsonl",
+        "sha256": "6c9698b6a6b19f946b2f00fa46a55c1d87ddfd866328c297c05fbeba3aedc5ab"
+      },
+      {
+        "file": "review/observe-eval-2/out.jsonl",
+        "sha256": "8c93f88d2b9c21d5e1eb62d149f6b0bc54aaa9d59f8f1dd97adfec86ab54b1a0"
+      },
+      {
+        "file": "review/delivery-1/out.jsonl",
+        "sha256": "c4bd6bdfb970d82cc03fb285f1b63a22486fde2445bb5e271fc1735ddfd92483"
+      },
+      {
+        "file": "review/delivery-2/out.jsonl",
+        "sha256": "e702181dcc6d0ace3f07f69b112dae45372540393409db0180dcdb4cfba740f3"
+      },
+      {
+        "file": "review/delivery-3/out.jsonl",
+        "sha256": "35b7cf53e03767e6e8f3ea3a3388cb6f9a6259ab0718ba679f23c46dcbf8be0b"
+      },
+      {
+        "file": "review/host-1/out.jsonl",
+        "sha256": "b6f701a502ad98506387e7e4e0e1c0ac63f16782b4206d408841b845f2386d1f"
+      },
+      {
+        "file": "review/host-2/out.jsonl",
+        "sha256": "7aef93ee1d1bca19542416a3df4417af9fb73d3e46ff32da6b61b8b337bc92f9"
+      }
+    ],
+    "public_artifacts": [
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/slots.json",
+        "sha256": "1148fa248a1e016d32c34f686291a2fb887f61cdfaec812ab86be0de08a0e137",
+        "bytes": 122503
+      },
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/method.md",
+        "sha256": "34fc8cfaad2bd1cb88e6c2c88640f4d6cbe234de75fdd28963172cfab1269d5a",
+        "bytes": 8128
+      },
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/summary.json",
+        "sha256": "a42e6fc0d2b7674c177b539ff4ddce528061016cc7e6df0a3e9c54499129df31",
+        "bytes": 4520
+      },
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/review-prompt.txt",
+        "sha256": "ff67cab96aa705619bfc29583bec1c115faeb2e85cc776e836c256f484f7e511",
+        "bytes": 2061
+      },
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md",
+        "sha256": "0cb56515e2d5c4431cf3120654ac0652dd9dd11896b7055103c1c3293024b3ec",
+        "bytes": 715
+      },
+      {
+        "path": "docs/decisions/2026-10-04-ns2604-verified-e2e.md",
+        "sha256": "a4a1a56180b2f9c22b3bc6ec0cbb14cf835dcaa383eb8cde17731bc0307893d3",
+        "bytes": 5679
+      }
+    ],
+    "publication_checks": {
+      "original_status_chains_compared": 80,
+      "private_content_hits": 0,
+      "receipt_tests": {
+        "cmd": "python3 -m unittest tests.test_validate tests.test_evidence_manifest tests.test_host_receipts tests.test_receipt_staleness tests.test_token_e2e_receipt_checks",
+        "exit": 0,
+        "counts": "291 tests passed, 0 skipped"
+      },
+      "private_content_scan": {
+        "cmd": "python3 scripts/validate.py --scan-file <each deliverable>",
+        "scanned_files": 8,
+        "exit": 0,
+        "hits": 0
+      },
+      "repository_validation": {
+        "cmd": "python3 scripts/validate.py",
+        "exit": 1,
+        "errors": 6,
+        "scope": "new evidence files are not hash-listed; coordinator-owned registry untouched"
+      },
+      "git_diff_check": {
+        "cmd": "git diff --check",
+        "exit": 0
+      },
+      "untracked_whitespace_checks": {
+        "cmd": "git diff --no-index --check <empty file> <each deliverable>",
+        "files": 8,
+        "native_difference_exits": 8,
+        "whitespace_diagnostics": 0,
+        "correction": "The initial wrapper misclassified exit 1 as failure. Official Git documentation says no-index enables difference exit codes; zero diagnostic output is retained separately.",
+        "verification_source": "https://git-scm.com/docs/git-diff"
+      },
+      "original_source_hashes_rechecked": 53
+    },
+    "completeness_critic": "Covered all 15 units, 80 status chains, independent reviews, 22 adjudications, all layers, failures, exclusions and holds. Missing original adjudication prompt, exact adjudicator metadata and separate fix list are explicit; no fresh native replication or upstream benchmark is claimed.",
+    "north_star_action": "Preserve recoverable native foundation status and follow-ups supporting complex engineering, US-equities research and historical simulation."
+  }
+}

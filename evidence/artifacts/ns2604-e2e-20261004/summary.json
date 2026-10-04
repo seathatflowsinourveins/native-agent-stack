@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "observed_window_utc": {
+    "start": "2026-10-04T19:10:00Z",
+    "end": "2026-10-04T20:10:00Z"
+  },
+  "merged_at_utc": "2026-10-04T20:26:16Z",
+  "units_total": 15,
+  "slots_total": 80,
+  "judged": 80,
+  "counts": {
+    "READY": 18,
+    "PARTIAL": 31,
+    "FAIL": 2,
+    "BY_DESIGN": 12,
+    "INTERIM": 17,
+    "UNJUDGED": 0
+  },
+  "ready_slots": 30,
+  "percent": 38,
+  "unrounded_percent": 37.5,
+  "formula": "(READY + BY_DESIGN) / all slots in scope; UNJUDGED counts as not ready",
+  "rounding": "nearest integer, half up",
+  "per_layer": {
+    "native-clients": {
+      "READY": 2,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "agent-sdks": {
+      "READY": 1,
+      "PARTIAL": 1,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "instructions-skills": {
+      "READY": 1,
+      "PARTIAL": 3,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 1,
+      "UNJUDGED": 0
+    },
+    "mcp-surfaces": {
+      "READY": 1,
+      "PARTIAL": 1,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "workers": {
+      "READY": 0,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 1,
+      "UNJUDGED": 0
+    },
+    "cross:gpt6-harnesses": {
+      "READY": 0,
+      "PARTIAL": 1,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "cross:runtime-workers": {
+      "READY": 0,
+      "PARTIAL": 2,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "code-navigation": {
+      "READY": 0,
+      "PARTIAL": 2,
+      "FAIL": 0,
+      "BY_DESIGN": 1,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "semantic-rag": {
+      "READY": 0,
+      "PARTIAL": 1,
+      "FAIL": 0,
+      "BY_DESIGN": 1,
+      "INTERIM": 1,
+      "UNJUDGED": 0
+    },
+    "document-retrieval": {
+      "READY": 0,
+      "PARTIAL": 2,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "web-research": {
+      "READY": 0,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "BY_DESIGN": 2,
+      "INTERIM": 1,
+      "UNJUDGED": 0
+    },
+    "durable-memory": {
+      "READY": 0,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 1,
+      "UNJUDGED": 0
+    },
+    "token-efficiency": {
+      "READY": 0,
+      "PARTIAL": 1,
+      "FAIL": 1,
+      "BY_DESIGN": 0,
+      "INTERIM": 11,
+      "UNJUDGED": 0
+    },
+    "observation-inference": {
+      "READY": 2,
+      "PARTIAL": 5,
+      "FAIL": 1,
+      "BY_DESIGN": 1,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "quality-evaluation": {
+      "READY": 0,
+      "PARTIAL": 3,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "ci-supply-chain": {
+      "READY": 4,
+      "PARTIAL": 1,
+      "FAIL": 0,
+      "BY_DESIGN": 1,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "git-github-automation": {
+      "READY": 1,
+      "PARTIAL": 4,
+      "FAIL": 0,
+      "BY_DESIGN": 2,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "scheduling-supervision": {
+      "READY": 1,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "hosting-services": {
+      "READY": 2,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "BY_DESIGN": 1,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "cross:wsl-distro": {
+      "READY": 0,
+      "PARTIAL": 1,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "isolation": {
+      "READY": 0,
+      "PARTIAL": 1,
+      "FAIL": 0,
+      "BY_DESIGN": 1,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "secrets-credentials": {
+      "READY": 0,
+      "PARTIAL": 1,
+      "FAIL": 0,
+      "BY_DESIGN": 1,
+      "INTERIM": 1,
+      "UNJUDGED": 0
+    },
+    "cross:credential-practice": {
+      "READY": 0,
+      "PARTIAL": 1,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "recovery-portability": {
+      "READY": 2,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "BY_DESIGN": 1,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    },
+    "cross:convergence-practice": {
+      "READY": 1,
+      "PARTIAL": 0,
+      "FAIL": 0,
+      "BY_DESIGN": 0,
+      "INTERIM": 0,
+      "UNJUDGED": 0
+    }
+  },
+  "disagreement_count": 22,
+  "disagreements_open": 0,
+  "adjudications": 22,
+  "open_fix_slots": 33,
+  "fix_kind_counts": {
+    "none": 42,
+    "plan": 30,
+    "host": 8
+  }
+}
