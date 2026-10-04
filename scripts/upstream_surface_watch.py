@@ -249,6 +249,13 @@ class SourceUnavailable(WatchError):
         super().__init__(f"source unavailable: {name} ({detail})")
 
 
+# What json can raise on a document it cannot convert: JSONDecodeError and UnicodeError are ValueErrors, an integer
+# literal past the interpreter's string-conversion limit (sys.get_int_max_str_digits(), 4300 by default) raises a bare
+# ValueError, and nesting past the recursion limit a RecursionError (scripts/currency_due.py read_record() catches the
+# first two kinds the same way).
+JSON_FAILURES = (ValueError, RecursionError)
+
+
 # --------------------------------------------------------------------------- small helpers
 
 
@@ -416,7 +423,7 @@ class Fetcher:
         try:
             meta = json.loads((self.directory / f"{source}.json").read_text(encoding="utf-8"))
             body = (self.directory / f"{source}.body").read_bytes()
-        except (OSError, UnicodeError, json.JSONDecodeError):
+        except (OSError, *JSON_FAILURES):
             return None
         if not isinstance(meta, dict) or meta.get("sha256") != sha256_hex(body):
             return None
@@ -727,7 +734,7 @@ def parse_hook_events(text: str) -> list[str]:
 def load_json(body: bytes, name: str):
     try:
         return json.loads(body)
-    except (UnicodeError, json.JSONDecodeError):
+    except JSON_FAILURES:
         raise AnchorMissing(name, "not JSON") from None
 
 
@@ -1069,7 +1076,7 @@ def parse_release_list(body: bytes) -> list[dict] | None:
     try:
         answer = json.loads(body)
         nodes = answer["data"]["repository"]["releases"]["nodes"]
-    except (UnicodeError, json.JSONDecodeError, KeyError, TypeError):
+    except (*JSON_FAILURES, KeyError, TypeError):
         return None
     if not isinstance(nodes, list):
         return None
@@ -1090,7 +1097,7 @@ def read_json_file(path: Path, label: str):
         return json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         raise InputError(f"{label} not found: {path}") from None
-    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+    except (OSError, *JSON_FAILURES) as error:
         raise InputError(f"{label} unreadable: {path} ({type(error).__name__})") from None
 
 
@@ -1482,6 +1489,15 @@ def build_baseline(observed: dict, fetcher: Fetcher, now_text: str, channel: str
     missing = [kind for kind in KINDS if kind not in names]
     if missing:
         raise InputError(f"--write-baseline needs every kind observed; not observed: {', '.join(missing)}")
+    # A baseline made from a cached artifact would grandfather every switch added since that fetch, and the next run
+    # would report nothing new: every source it records must have come from the network in this run (cross-checks are
+    # report-only and not recorded).
+    not_fresh = {source: str(record.get("origin"))[:120] for source, record in sorted(fetcher.records.items())
+                 if not record.get("cross_check") and record.get("origin") != "network"}
+    if not_fresh:
+        raise SourceUnavailable(", ".join(not_fresh), "--write-baseline needs every source fetched from the network in "
+                                "this run, not read from the cache: " + "; ".join(
+                                    f"{source}: {origin}" for source, origin in not_fresh.items()))
     sources = {}
     for source, record in sorted(fetcher.records.items()):
         if record.get("origin") in ("skipped", "unavailable") or source.startswith("xc-"):
@@ -1623,16 +1639,43 @@ def run(args) -> tuple[dict, str]:
     action = "dry run: wrote nothing"
     if not args.dry_run:
         try:
-            if args.write_baseline:
-                write_atomic(baseline_path, (json.dumps(baseline, indent=1) + "\n").encode("utf-8"), mode=0o644,
-                             directory_mode=0o755)
+            earlier = read_if_present(latest_path)
             make_private_dirs(state)
             fetcher.commit()
             write_atomic(latest_path, (json.dumps(document, indent=1) + "\n").encode("utf-8"))
         except OSError as error:
             raise InputError(f"write failed: {type(error).__name__}: {error}") from None
+        if args.write_baseline:
+            # Last, so that no failed write leaves a baseline that this run's report and cache do not match. The report
+            # just written was built against the new baseline and says "nothing new": beside the old baseline it would
+            # hide every switch that baseline was meant to report, so a failure here puts the earlier report back.
+            try:
+                write_atomic(baseline_path, (json.dumps(baseline, indent=1) + "\n").encode("utf-8"), mode=0o644,
+                             directory_mode=0o755)
+            except OSError as error:
+                raise InputError(f"write failed: {type(error).__name__}: {error}; the baseline was not replaced and "
+                                 f"{restore_report(latest_path, earlier)}") from None
         action = f"wrote {latest_path}" + (f" and {baseline_path}" if args.write_baseline else "")
     return document, action
+
+
+def read_if_present(path: Path) -> bytes | None:
+    try:
+        return path.read_bytes()
+    except FileNotFoundError:
+        return None
+
+
+def restore_report(path: Path, earlier: bytes | None) -> str:
+    """Put back the report that a failed --write-baseline run replaced (none: remove this run's), and say so."""
+    try:
+        if earlier is None:
+            path.unlink(missing_ok=True)
+            return "the report of this run was removed"
+        write_atomic(path, earlier)
+        return "the earlier report was restored"
+    except OSError as error:
+        return f"the earlier report could not be restored ({type(error).__name__}: {error})"
 
 
 def render_text(document: dict, action: str) -> str:
@@ -1739,7 +1782,8 @@ def build_parser() -> argparse.ArgumentParser:
     output.add_argument("--json", action="store_true", help="print the latest.json document")
     output.add_argument("--summary", action="store_true", help="print only the one-line summary")
     parser.add_argument("--write-baseline", action="store_true",
-                        help="write the baseline from this run (refuses to replace one without --force)")
+                        help="write the baseline from this run's network fetches (needs --network; refuses to replace one "
+                             "without --force)")
     parser.add_argument("--force", action="store_true", help="let --write-baseline replace an existing baseline")
     parser.add_argument("--check-dispositions", action="store_true",
                         help="validate the dispositions catalog (schema, key uniqueness) and exit; no fetch")
@@ -1787,6 +1831,8 @@ def main(argv: list[str] | None = None) -> int:
         return check_dispositions(args)
     if args.write_baseline and args.dry_run:
         parser.error("--write-baseline writes the baseline; it cannot be combined with --dry-run")
+    if args.write_baseline and not args.network:
+        parser.error("--write-baseline builds the baseline from this run's fetches, never from the cache; add --network")
     if args.force and not args.write_baseline:
         parser.error("--force only applies to --write-baseline")
     try:

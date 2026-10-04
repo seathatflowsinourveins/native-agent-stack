@@ -881,25 +881,30 @@ class CachedArtifactTests(unittest.TestCase):
                     self.assertEqual(code, 0, stderr)
                     baseline_before = watch.baseline.read_bytes()
                     latest_before = watch.latest.read_bytes()
-                    cache = watch.state / usw.CACHE_DIR
                     body = json.dumps(schema).encode()
-                    (cache / "codex-config-schema.body").write_bytes(body)
-                    meta_path = cache / "codex-config-schema.json"
-                    meta = json.loads(meta_path.read_text())
-                    meta.update(sha256=sha256(body), bytes=len(body))
-                    meta_path.write_text(json.dumps(meta))
-                    release_path = cache / "github-codex-latest-release.body"
-                    release = json.loads(release_path.read_bytes())
-                    release["assets"][-1]["digest"] = "sha256:" + sha256(body)
-                    release_body = json.dumps(release).encode()
-                    release_path.write_bytes(release_body)
-                    release_meta_path = cache / "github-codex-latest-release.json"
-                    release_meta = json.loads(release_meta_path.read_text())
-                    release_meta.update(sha256=sha256(release_body), bytes=len(release_body))
-                    release_meta_path.write_text(json.dumps(release_meta))
                     if mode == "write-baseline":
+                        # A baseline is made from this run's fetches only (never the cache), so the corrupt schema
+                        # arrives over the synthetic network instead of through the cache.
+                        upstream.schema_override = body
                         watch.baseline.unlink()
-                    code, _, stderr = watch.run(*(["--write-baseline"] if mode == "write-baseline" else []))
+                        code, _, stderr = watch.run("--network", "--write-baseline", upstream=upstream)
+                    else:
+                        cache = watch.state / usw.CACHE_DIR
+                        (cache / "codex-config-schema.body").write_bytes(body)
+                        meta_path = cache / "codex-config-schema.json"
+                        meta = json.loads(meta_path.read_text())
+                        meta.update(sha256=sha256(body), bytes=len(body))
+                        meta_path.write_text(json.dumps(meta))
+                        release_path = cache / "github-codex-latest-release.body"
+                        release = json.loads(release_path.read_bytes())
+                        release["assets"][-1]["digest"] = "sha256:" + sha256(body)
+                        release_body = json.dumps(release).encode()
+                        release_path.write_bytes(release_body)
+                        release_meta_path = cache / "github-codex-latest-release.json"
+                        release_meta = json.loads(release_meta_path.read_text())
+                        release_meta.update(sha256=sha256(release_body), bytes=len(release_body))
+                        release_meta_path.write_text(json.dumps(release_meta))
+                        code, _, stderr = watch.run()
                     self.assertEqual(code, 3, stderr)
                     self.assertIn("anchor missing: config-schema.json:$ref", stderr)
                     self.assertNotIn("below 80%", stderr)
@@ -1297,6 +1302,163 @@ class WriteTests(unittest.TestCase):
         code, _, stderr = watch.run("--network", upstream=upstream)
         self.assertEqual(code, 1, stderr)
         self.assertIn("duplicate key claude:setting:x", stderr)
+
+
+def failing_write(target: Path):
+    """write_atomic that raises for ``target`` alone: a full or unwritable filesystem at one path."""
+    real = usw.write_atomic
+
+    def write(path, data, *arguments, **keywords):
+        if Path(path) == target:
+            raise OSError(f"simulated failure writing {target.name}")
+        return real(path, data, *arguments, **keywords)
+
+    return mock.patch.object(usw, "write_atomic", side_effect=write)
+
+
+class BaselineWriteTests(unittest.TestCase):
+    """--write-baseline replaces the committed baseline only from data this run fetched from the network, and only after
+    the cache and latest.json writes succeeded (the review threads on run(), 2026-10-04)."""
+
+    def changed_upstream(self):
+        """A seeded watch and an upstream that gained a setting, so a --force run would change the baseline."""
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        upstream.settings_extra = ["laterSetting"]
+        return watch, upstream, watch.baseline.read_bytes(), watch.latest.read_bytes()
+
+    def test_the_baseline_is_not_written_from_the_cache(self):
+        watch, upstream, baseline, latest = self.changed_upstream()
+        code, _, stderr = watch.run("--write-baseline", "--force", upstream=upstream)
+        self.assertEqual(code, 2, stderr)
+        self.assertIn("--network", stderr)
+        self.assertEqual(watch.baseline.read_bytes(), baseline)
+        self.assertEqual(watch.latest.read_bytes(), latest)
+
+    def test_a_source_that_fell_back_to_the_cache_does_not_make_a_baseline(self):
+        watch, upstream, baseline, latest = self.changed_upstream()
+        upstream.broken.add(usw.CODEX_LATEST_PATH)
+        code, _, stderr = watch.run("--network", "--write-baseline", "--force", upstream=upstream)
+        self.assertEqual(code, 4, stderr)
+        self.assertIn("source unavailable: github-codex-latest-release", stderr)
+        self.assertIn("cache", stderr)
+        self.assertEqual(watch.baseline.read_bytes(), baseline)
+        self.assertEqual(watch.latest.read_bytes(), latest)
+
+    def test_a_run_that_fetched_every_source_still_makes_the_baseline(self):
+        # Control: the refusals above are not a blanket refusal of --force.
+        watch, upstream, _, _ = self.changed_upstream()
+        code, _, stderr = watch.run("--network", "--write-baseline", "--force", upstream=upstream)
+        self.assertEqual(code, 0, stderr)
+        self.assertIn("laterSetting", json.loads(watch.baseline.read_text(encoding="utf-8"))["kinds"]["claude:setting"])
+
+    def test_a_failed_cache_write_keeps_the_baseline(self):
+        watch, upstream, baseline, latest = self.changed_upstream()
+        with mock.patch.object(usw.Fetcher, "commit", side_effect=OSError("simulated full disk")):
+            code, _, stderr = watch.run("--network", "--write-baseline", "--force", upstream=upstream)
+        self.assertEqual(code, 1, stderr)
+        self.assertIn("simulated full disk", stderr)
+        self.assertEqual(watch.baseline.read_bytes(), baseline)
+        self.assertEqual(watch.latest.read_bytes(), latest)
+
+    def test_a_failed_report_write_keeps_the_baseline(self):
+        watch, upstream, baseline, latest = self.changed_upstream()
+        with failing_write(watch.latest):
+            code, _, stderr = watch.run("--network", "--write-baseline", "--force", upstream=upstream)
+        self.assertEqual(code, 1, stderr)
+        self.assertIn("simulated failure writing latest.json", stderr)
+        self.assertEqual(watch.baseline.read_bytes(), baseline)
+        self.assertEqual(watch.latest.read_bytes(), latest)
+
+    def test_a_failed_baseline_write_puts_the_earlier_report_back(self):
+        # The report of a --write-baseline run is built against the new baseline and says "nothing new"; left beside the
+        # old baseline it would hide every switch the old baseline was meant to report.
+        watch, upstream, baseline, latest = self.changed_upstream()
+        with failing_write(watch.baseline):
+            code, _, stderr = watch.run("--network", "--write-baseline", "--force", upstream=upstream)
+        self.assertEqual(code, 1, stderr)
+        self.assertIn("simulated failure writing", stderr)
+        self.assertIn("the earlier report was restored", stderr)
+        self.assertEqual(watch.baseline.read_bytes(), baseline)
+        self.assertEqual(watch.latest.read_bytes(), latest)
+
+    def test_a_failed_first_baseline_write_leaves_no_report(self):
+        watch, upstream = Watch(self), Upstream()
+        with failing_write(watch.baseline):
+            code, _, stderr = watch.run("--network", "--write-baseline", upstream=upstream)
+        self.assertEqual(code, 1, stderr)
+        self.assertFalse(watch.baseline.exists())
+        self.assertFalse(watch.latest.exists())
+
+    def test_a_report_that_cannot_be_put_back_is_said_so(self):
+        watch, upstream, baseline, _ = self.changed_upstream()
+        real, written = usw.write_atomic, []
+
+        def write(path, data, *arguments, **keywords):
+            written.append(Path(path))
+            if Path(path) == watch.baseline or written.count(watch.latest) > 1:
+                raise OSError(f"simulated failure writing {Path(path).name}")
+            return real(path, data, *arguments, **keywords)
+
+        with mock.patch.object(usw, "write_atomic", side_effect=write):
+            code, _, stderr = watch.run("--network", "--write-baseline", "--force", upstream=upstream)
+        self.assertEqual(code, 1, stderr)
+        self.assertIn("could not be restored", stderr)
+        self.assertEqual(watch.baseline.read_bytes(), baseline)
+
+
+@contextlib.contextmanager
+def default_int_string_limit():
+    previous = sys.get_int_max_str_digits()
+    sys.set_int_max_str_digits(4300)
+    try:
+        yield
+    finally:
+        sys.set_int_max_str_digits(previous)
+
+
+UNCONVERTIBLE = {
+    "an integer past the string-conversion limit": '{"rows": [], "n": 1' + "0" * 5000 + "}",
+    "nesting past the recursion limit": "[" * 100000 + "]" * 100000,
+}
+
+
+class JsonConversionTests(unittest.TestCase):
+    """A document that json cannot convert is an invalid input with a bounded diagnostic, never a traceback: an integer
+    past the string-conversion limit raises a bare ValueError (not a JSONDecodeError), deep nesting a RecursionError."""
+
+    def test_an_unconvertible_catalog_or_baseline_exits_1(self):
+        for label, text in UNCONVERTIBLE.items():
+            with self.subTest(document=label), default_int_string_limit():
+                watch = Watch(self)
+                watch.dispositions.write_text(text, encoding="utf-8")
+                code, _, stderr = watch.run("--check-dispositions")
+                self.assertEqual(code, 1, stderr)
+                self.assertIn("dispositions unreadable", stderr)
+                watch = Watch(self)
+                watch.baseline.parent.mkdir(parents=True, exist_ok=True)
+                watch.baseline.write_text(text, encoding="utf-8")
+                code, _, stderr = watch.run("--network", upstream=Upstream())
+                self.assertEqual(code, 1, stderr)
+                self.assertIn("baseline unreadable", stderr)
+
+    def test_an_unconvertible_cache_record_is_no_cache(self):
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        meta_path = watch.state / usw.CACHE_DIR / "claude-mods-overview-page.json"
+        for label, text in UNCONVERTIBLE.items():
+            with self.subTest(document=label), default_int_string_limit():
+                meta_path.write_text(text, encoding="utf-8")
+                code, _, stderr = watch.run("--dry-run")
+                self.assertEqual(code, 4, stderr)
+                self.assertIn("source unavailable: claude-mods-overview-page", stderr)
+
+    def test_an_unconvertible_upstream_body_is_not_json_or_no_release_list(self):
+        for label, text in UNCONVERTIBLE.items():
+            with self.subTest(document=label), default_int_string_limit():
+                with self.assertRaisesRegex(usw.AnchorMissing, "not JSON"):
+                    usw.load_json(text.encode("utf-8"), "npm-dist-tags:x")
+                self.assertIsNone(usw.parse_release_list(text.encode("utf-8")))
 
 
 class SummaryTests(unittest.TestCase):
