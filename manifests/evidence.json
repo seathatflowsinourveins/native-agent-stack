@@ -4404,7 +4404,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "846ca24fe134313c184ca10a7e2e63b0ecc106f5c57758772bd33f3749fb78cb",
+      "sha256": "f6e47f4e72f582870eef6fb22116160cfbfcad64923bad816a07308602fd4021",
       "bytes": 950
     },
     {
@@ -15925,8 +15925,8 @@
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
-      "sha256": "253382a1ce3393cd072a425471b800f134d0fae467457356650f2d1529ba0e18",
-      "bytes": 28327
+      "sha256": "2976b2d2f245ecb3129ff14e7758b7131e779fee04b71e7828099f2ecb89935c",
+      "bytes": 33407
     },
     {
       "path": "docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md",
@@ -16375,8 +16375,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5ad517b788493c2f5831607a350df4d723a10f89872dbf1c68370a47ec14e3c3",
-      "bytes": 174863
+      "sha256": "2cdbf2b0b2ddccc6914ef3a1654e6f244c9c823f2d47d1cfce40454da6535aae",
+      "bytes": 175758
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -51665,8 +51665,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "9a12a0a0d036b3c6c84cbb52ec4149c47265f091c87da30168bb73c3dc757f5d",
-      "bytes": 295767
+      "sha256": "fd516d8b78de7e3a9da4917c8d126fc71d7ab216a014bb28fb8bd189d6b0fb7b",
+      "bytes": 296975
     },
     {
       "path": "scripts/host_receipts.py",
@@ -51797,6 +51797,26 @@
       "path": "tests/fixtures/codex-worker-lane/rtk-worker-items.json",
       "sha256": "2c6f2d95823f34fa5c061e549577aaaebfaad8e3b89192efee5d490b128421da",
       "bytes": 495
+    },
+    {
+      "path": "tests/fixtures/guard_685/README.md",
+      "sha256": "8da7b72ab0497df025dab2bce5534ae6b2c92276233477ed710352362de35ca6",
+      "bytes": 1032
+    },
+    {
+      "path": "tests/fixtures/guard_685/a7888d31/secret_path_guard.py",
+      "sha256": "ac4e4ac67b27bd0a3406665d21f9899e45dba8f7b75d34ddfe1e945acfcd4933",
+      "bytes": 292086
+    },
+    {
+      "path": "tests/fixtures/guard_685/f77a35eb2/secret_path_guard.py",
+      "sha256": "7b1ec8fa5c6127060c81e23b80e5fe9f7dfec9af045960e928e38763bbb95790",
+      "bytes": 276717
+    },
+    {
+      "path": "tests/fixtures/guard_685/monotonicity.json",
+      "sha256": "896a72ead08b7aea38d142c817e9eaa97624b2d2ce0653d5255a537abe31f694",
+      "bytes": 767
     },
     {
       "path": "tests/fixtures/host-receipts/home-path-in-excerpt.json",
@@ -52740,8 +52760,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "b21fd38cf2571b5de939f7566293e1dcfd90e138d2695d84ee57a8deb6e62d53",
-      "bytes": 386003
+      "sha256": "36edfe372be11f424e36576c1533111514662958063f429aec7a7284cc81b958",
+      "bytes": 391697
     },
     {
       "path": "tests/test_security_identity.py",
