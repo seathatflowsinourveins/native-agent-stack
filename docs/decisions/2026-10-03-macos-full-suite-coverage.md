@@ -6,6 +6,14 @@ pre-registered fallback, not adopted; O1 and O3 are rejected; R1 to R6 are propo
 changes no workflow, test, ruleset, required check or repository setting; each change it names lands in its own
 reviewed pull request.
 
+**Superseded in part, 2026-10-04.** Merged #677 (`docs/decisions/2026-10-03-macos-ci-scope.md`, `e0c329ae9`) replaced
+this record's macOS coverage policy: it stops running the full macOS suite on every pull request. #677 names this
+record's Decision and Alternatives sections as superseded. The disposition in the paragraph above ("O4 proceeds; O2 is a
+pre-registered fallback"), the Preregistered checks and the Overturn conditions depend on that decision, so they are
+historical requirements of the original decision as well. The current macOS coverage policy is #677's. The Measured
+findings, the receipt and its measurements stand, as #677 states. R1 to R6 under Reductions were proposals on
+2026-10-03; later records give their status.
+
 ## Measured findings
 
 Measured on 2026-10-03 with read-only `gh` REST GET calls over the runs created 2026-09-25 to 2026-10-02 UTC (8,782
@@ -57,6 +65,8 @@ the first three successful runs per event at measurement time.
 
 ## Decision
 
+*Historical: superseded by #677 on 2026-10-04 (see the note under the title).*
+
 - **O4, keep the full suite on macOS for every pull request and shorten both required test jobs: proceed.** On 30 of
   1,025 pull-request head SHAs in 8 days the macOS leg failed while the Linux leg passed, so coverage stays as it is.
   Time-to-green is bounded by the slower of two serial suites, so the lever is to run both suites faster with the same
@@ -68,6 +78,8 @@ the first three successful runs per event at measurement time.
 - **R1 to R6** go to their owners as proposals (see Reductions); this record makes none of those changes.
 
 ## Alternatives
+
+*Historical: superseded by #677 on 2026-10-04 (see the note under the title).*
 
 - **O1, gate the whole `validate-macos` job by changed paths** (a `paths` filter, `needs:` on the `changes` job or a
   job-level `if:`). Rejected:
@@ -132,6 +144,8 @@ check would reach any of them is unknown.
 
 ## Preregistered checks
 
+*Historical: superseded by #677 on 2026-10-04 (see the note under the title).*
+
 O2 can be adopted only through this rule, fixed now, before any evidence for it is read; adoption would be its own
 decision record.
 
@@ -166,6 +180,8 @@ decision record.
   or Python updates; filename-case collisions on APFS; and how pull requests change once they are not gated.
 
 ## Overturn
+
+*Historical: superseded by #677 on 2026-10-04 (see the note under the title).*
 
 Revisit this record when any of these happens:
 - O2's rule passes in the dry-run phase (adopt it in a new record), or the owner sets a time budget that the speed-up

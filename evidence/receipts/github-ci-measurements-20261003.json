@@ -37,7 +37,7 @@
       "path": "evidence/artifacts/github-ci-measurements-20261003/later-reads-20261003.json",
       "sha256": "b100809511623c4cc13ef62939f7cf52e3113b40eae63952146657ed47f56ab3",
       "bytes": 56770,
-      "what": "218 read-only GET calls on 2026-10-03 from 09:42 to 09:57 UTC, after the measurement: each call's exact argument vector, times, exit code and payload sha256, and the fields derived from the payloads. The payloads are withheld because they carry commit author names and email addresses."
+      "what": "218 read-only GET calls on 2026-10-03 from 09:42 to 09:57 UTC, after the measurement: each call's exact argument vector, times, exit code and payload sha256, and the fields derived from the payloads. The payloads are withheld because they carry commit author names and email addresses. The six cache calls ran as two batches of three chained commands, so their started_utc and ended_utc are the enclosing batch's start and end times, not per-command times (the artifact's note)."
     },
     "changes_from_input": [
       "head_sha (12 characters) added to each itemized failing-test entry on 2026-10-03, while the runs still resolved.",
