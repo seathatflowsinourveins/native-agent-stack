@@ -9500,8 +9500,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "8a08d735a8f343ab32b88f6a4ccca87dffa0fcf81eb50b83b5dc6628cf512752",
-      "bytes": 52230
+      "sha256": "9c4ed33b4d78fd4e2d46ffc2b2dc84edb078b11d9125a600ddcca5a776e08cb9",
+      "bytes": 56474
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -9579,6 +9579,11 @@
       "bytes": 8151
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/gate-reads-set-diff-20261004.json",
+      "sha256": "ad92ad3c433ef92078c303d3a8b3f483fa1e7f420fddeef36b7e2bd5c3ea2253",
+      "bytes": 52184
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/phase1-commands.json",
       "sha256": "cbd76e3a31da13c27566b24f6c6c083b351d2cfe7e1b140a868419ff4334ec6f",
       "bytes": 34970
@@ -9605,8 +9610,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt",
-      "sha256": "c97af6dbf391b497c7aef9fd677928a003f007d5030e0888aa3f5a385c35ad33",
-      "bytes": 157643
+      "sha256": "b710a162d491e07f70dd111411425f0e21a629e2bbd8a758c12af2351d050890",
+      "bytes": 378281
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/receipt-red.txt",
@@ -9960,8 +9965,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
-      "sha256": "ea3b4022c5d48dcf478495b41aca16880c405abc7699dd7ab4d07a5676dbb9cc",
-      "bytes": 13729
+      "sha256": "a49d7e9044da763036c037d1cf251ac4d52a64ec75c2b3167cccb9e93bbce240",
+      "bytes": 23029
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -10015,8 +10020,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/receipt.py",
-      "sha256": "8cefa7e4d41f6b526911bc87235298f143743d56895f222d91add19fc07910be",
-      "bytes": 31889
+      "sha256": "8aa7fdddd3209de8e6e53575ad8ac8613a904f31caaa0561fc47898495b0a045",
+      "bytes": 32216
     },
     {
       "path": "blueprints/runtime-workers/openhands/recipe.py",
@@ -10040,8 +10045,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gate_reads.py",
-      "sha256": "643fbf9a70c764be410917d7d0099630c55a45dedd6494b96aceb3bf397b02ba",
-      "bytes": 53388
+      "sha256": "b4ecb2ee1a68e0fea924075f04a17a7a74673be7c42d401416187cd184e3acac",
+      "bytes": 60722
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gh_harness.py",
@@ -10060,8 +10065,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
-      "sha256": "6e4b7580cf0f931badfa6751a858ab6b4c032be4e504c92889e4114f1a7d3f0f",
-      "bytes": 59498
+      "sha256": "edecb30c4c21980bf7bb95251f3e35054d83a6bb955aa8c8efbfbfbffbe26596",
+      "bytes": 59501
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -16110,8 +16115,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
-      "sha256": "311438bfd21d4f0fef252341c06547f3a6e3d26f3a331b53e395cbc1888c21dc",
-      "bytes": 69735
+      "sha256": "9ad89edbd44b765d83ef048382cd68e2ef90298262437f8dde0eb4d974ce607b",
+      "bytes": 72483
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
@@ -52770,8 +52775,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "0964deed40cbec52c97c0ca37dcd9c7049599c346635a645b4f2ff1b4092c15c",
-      "bytes": 83146
+      "sha256": "05831abaa04411932d4c7f14bb95afe874446c3c807106f2836d7c4fa1d14ce5",
+      "bytes": 100208
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
