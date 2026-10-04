@@ -1,0 +1,70 @@
+...F.FFF....
+======================================================================
+FAIL: test_every_pinned_file_is_scanned_with_its_pinned_lines (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_every_pinned_file_is_scanned_with_its_pinned_lines)
+Not vacuous: each pinned file, this module included, is read by the scan and holds each pinned line.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 480, in test_every_pinned_file_is_scanned_with_its_pinned_lines
+    self.fail("\n".join(missing) + "\n" + STALE_PIN)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: frozen_inputs.sources: the variant lock (sha256 e18dc9bbb90c041c65d7d610d6c8ba920247f6a774f1e770337cb084ada10cb2)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: frozen_inputs.inputs: the variant manifest (sha256 3a6d91b040d5bb3cce275eeeb08484a60fcffff3f4809f0f945bb58a5afeed07)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 0-14, artifacts: the run summary (sha256 58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 2, 3 and 14, artifacts: the variant manifest (sha256 3a6d91b040d5bb3cce275eeeb08484a60fcffff3f4809f0f945bb58a5afeed07)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 2, 3 and 14, artifacts: the variant manifest (sha256 3a6d91b040d5bb3cce275eeeb08484a60fcffff3f4809f0f945bb58a5afeed07)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 2, 3 and 14, artifacts: the variant manifest (sha256 3a6d91b040d5bb3cce275eeeb08484a60fcffff3f4809f0f945bb58a5afeed07)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 2, 3 and 14, artifacts: the variant lock (sha256 e18dc9bbb90c041c65d7d610d6c8ba920247f6a774f1e770337cb084ada10cb2)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 2, 3 and 14, artifacts: the variant lock (sha256 e18dc9bbb90c041c65d7d610d6c8ba920247f6a774f1e770337cb084ada10cb2)
+blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json: observations 2, 3 and 14, artifacts: the variant lock (sha256 e18dc9bbb90c041c65d7d610d6c8ba920247f6a774f1e770337cb084ada10cb2)
+blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-after-noconfig.json: OSV's JSON source path of the frozen lock (sha256 6bb997ea6522f0ee3b0465bb074557ef270a657874536028b254da3b8dcfeea1)
+blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-main.json: OSV's JSON source path of the frozen lock (sha256 6bb997ea6522f0ee3b0465bb074557ef270a657874536028b254da3b8dcfeea1)
+A pinned line was not found where PINNED_LINES expects it (above): the scope rules no longer read that file, or the line changed or was removed. Restore the scope, or re-pin after review; if the variant and its frozen OSV exception were removed together (the closure record's exit path), remove this module with them.
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='blueprints/x/experiment.json')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 443, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(path, "100644", b"{}"))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='blueprints/x/launch.json')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 443, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(path, "100644", b"{}"))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='blueprints/x/socraticode-mcp.json')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 443, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(path, "100644", b"{}"))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.399s
+
+FAILED (failures=4)

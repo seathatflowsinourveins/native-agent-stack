@@ -15754,8 +15754,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "e5cea48794b9181a0fe008105201bc2d8297d6574e5759cff060cb1b335047b2",
-      "bytes": 147418
+      "sha256": "523961e7b8b594172953d38e8b44c2d212770c6d2b5cacc62d904ccc551c64f0",
+      "bytes": 150927
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -16154,8 +16154,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5e87cc6552a77bc0a32df9c9abd03d354463b9308468ce1246e03c4355148723",
-      "bytes": 143786
+      "sha256": "3ec6b6592eb4deaeffef6780f47f30512c2d012c1215324b22c97c37af3200b7",
+      "bytes": 146676
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -18211,6 +18211,361 @@
       "path": "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
       "sha256": "0c0216ddb2a4bf29c42eea18126602b4f4fdef6e6bb957759fd1bc31e18c3653",
       "bytes": 3338
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/controls/round3-module.py.txt",
+      "sha256": "3058872c039726e7057addb1e54ea32cd5f24b1f8cbdd449a23befc10ee77bd2",
+      "bytes": 22523
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/controls/round4-module.py.txt",
+      "sha256": "415d90caf23b81f0d0b4c2a3e3f23316db51f4058cbebed81ef0bf71a0d02242",
+      "bytes": 28119
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/controls/round5-module.py.txt",
+      "sha256": "6006cede80c9df94028fc377dfc4efbbb8c3e283ec99bbf1ad25cd4040ddd054",
+      "bytes": 33302
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-L1.log",
+      "sha256": "ef5bc28e8130a48f61d9e5a33c7271bf155d96b2b6b53e4e01362981867f5e55",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-L2.log",
+      "sha256": "f665bef636d3db73066d3eba27ea02ef80bb47215c40057e6e813bf6566b6f64",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-L3.log",
+      "sha256": "0c132351f0a8b69e7f4edc6bd075900cd0ccb957ffb62b5a30eef689eec7be2a",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-L4.log",
+      "sha256": "c6667ee896d41a6e7d45f378c0c966d45abaa7cd5f5edfff495a3568d56a89e0",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-L5.log",
+      "sha256": "7eec4afd1b3f663682283b158c0b2280a58273c9ab52122b7c3597fca17ada42",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M0.log",
+      "sha256": "4e8fb884883a10e9991af9237f5dbf8010faed686726783af1b4dee219074c7d",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M1a.log",
+      "sha256": "682974e9e14c286939410709b4aaeb34499ff264bba021624ae42fdd31a320d2",
+      "bytes": 1542
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M1b.log",
+      "sha256": "c7170589e717954b1cfeb7787e8ce52e36c4326da190a5e7d91f2e467e76d7c3",
+      "bytes": 1548
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M2.log",
+      "sha256": "df46623ed2ca7134bc91121d078f380b2a5c3c8975e596639743b0a31baa97ec",
+      "bytes": 1682
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M3.log",
+      "sha256": "5b67ae383b614e089e177fcb95d31c8580a2418ba1869917f7620eaf07b8c233",
+      "bytes": 3396
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M4.log",
+      "sha256": "cf019a85ac8dd6c64360dabbe0cd1e57e85646c58a626c92c856bd63457db30a",
+      "bytes": 3071
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M5.log",
+      "sha256": "32666d424d6af73eeb6814af609e159abecc8006cf94f2d050c0dd1d6561b1c1",
+      "bytes": 1532
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M6.log",
+      "sha256": "8c6178829471760501690dfbb9846a9ba8a5a23a640a8389e618ab735c6f54af",
+      "bytes": 1507
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M7.log",
+      "sha256": "c0b987fbda2480e3d431c513fe9572b3c5d40a9ec0274e52aca65bc54498ff54",
+      "bytes": 1513
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M8.log",
+      "sha256": "749478f35426e48db790709cb4b47515ac0ed8d191ba63999e7817a9c48f3553",
+      "bytes": 1607
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-M9.log",
+      "sha256": "f3576c7c1b55a91ca809b10d8409bcb0c1461a9961e53e03224d08671100696b",
+      "bytes": 1547
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-N1.log",
+      "sha256": "c08ec3224729ccbd6516fddf2b1639b74bca1e34c4875c158d44fb13b53ecbc4",
+      "bytes": 1520
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-N2.log",
+      "sha256": "07b33a17c4e97737fdd21d4d4431aab806e35d1deec65b15b8e266f1026a0b0e",
+      "bytes": 1538
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-N3.log",
+      "sha256": "9554c52e0098021ab187ef1c725a64d837f946cd62adfcae03930c97e67fca0e",
+      "bytes": 1435
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-N4.log",
+      "sha256": "0dd9d5414a395844f93905bfc9ce4031cb46b72f3905b490e5681da0be93865b",
+      "bytes": 3316
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-N5.log",
+      "sha256": "399e8f4931ddf1175cd744eb9bba7699b596fd9ec14376622a0e5da15229e2e2",
+      "bytes": 1642
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-N6.log",
+      "sha256": "9149af3282d45ac64db05cc08fda425e7494ce5b926f1cc32b2f91e7a12c5211",
+      "bytes": 1800
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-N7.log",
+      "sha256": "87494a6780379bd4efa7684be155a25069487a30bce5bd8c60efdcc5abfd5f22",
+      "bytes": 1551
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-N8.log",
+      "sha256": "72a2cc7fd53044a4321ed32edbd1e33efeba2eb8237c15e949a70b9e3d032ba4",
+      "bytes": 1568
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-N9.log",
+      "sha256": "2d1696f75bcedac557babd1e5c943b7f15f495613387adafe4ae51d7d0a1dab7",
+      "bytes": 1589
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-P1.log",
+      "sha256": "ef5bc28e8130a48f61d9e5a33c7271bf155d96b2b6b53e4e01362981867f5e55",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-P2.log",
+      "sha256": "8dbb91c7cfae3913e3026958e6e173946686884023ddad2a78b6d390ec43c3b5",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-P3.log",
+      "sha256": "0c132351f0a8b69e7f4edc6bd075900cd0ccb957ffb62b5a30eef689eec7be2a",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-P4.log",
+      "sha256": "4e8fb884883a10e9991af9237f5dbf8010faed686726783af1b4dee219074c7d",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X1.log",
+      "sha256": "ea49debf10ff99cbe8b37a10b096c8b602e3a2d9df34208814e167b620fc3b63",
+      "bytes": 1500
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X10.log",
+      "sha256": "5ccb497eb27b429b2fadd772111a2a957563fd13d3aa0cf0e9e52e0e800813b5",
+      "bytes": 3104
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X11.log",
+      "sha256": "117957563907aa174517acdc9afec63dae943c3b1e40fa83e78acd7104d5c901",
+      "bytes": 2448
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X12.log",
+      "sha256": "9454985a6216b32246c3e52e9413139adced2d11063aa920673387ec52e15c0b",
+      "bytes": 2885
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X13.log",
+      "sha256": "5d810803c21a9c7c6984da5c34339f52d3527b32964de4c2052215337a886b1a",
+      "bytes": 1589
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X14.log",
+      "sha256": "90631f7b50eee47e0198618a14d1a8196d9f60a0fcfdd1187684cb979561f0f2",
+      "bytes": 43064
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X15.log",
+      "sha256": "ddfeb60824afaf111689ca0fe3227aceac2c34033cc852992b11605fd03f9882",
+      "bytes": 16810
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X16.log",
+      "sha256": "3dbffb801e33d39a12c1e154ab2a7dab421af4af3af162172063cf375c7f19ce",
+      "bytes": 15594
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X2.log",
+      "sha256": "8c154371015008e484c390dd91eec12e2ae0df01d9b864cb58ea6c6c6c7d673f",
+      "bytes": 1572
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X3.log",
+      "sha256": "329334d7b5efbeb07dc006ac327ba1cc9812a92f34c32036f108c722b1e77d7e",
+      "bytes": 1567
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X4.log",
+      "sha256": "d4178f36292e86e6bc818fd0ea361787c279daa22e10eff6820d9ef980989281",
+      "bytes": 1581
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X5.log",
+      "sha256": "f5cd434a47bb32126c34dea3a77cc59c9d612696f34176ade07f5ff7edfc23f9",
+      "bytes": 1531
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X6.log",
+      "sha256": "cd508d123b2676ab4d5ec52a6dc9ab95911c794c5a91b0de2e8d168371095f23",
+      "bytes": 2803
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X7.log",
+      "sha256": "b99cb31951837d10980fe01da4a79e41949096988922c4e5ac399d8f3c6496fc",
+      "bytes": 2433
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X8.log",
+      "sha256": "550c97c8303dbb199ab4fe008d118a9a4e703306fa6b746ac50d6b81925def45",
+      "bytes": 9427
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results-X9.log",
+      "sha256": "6b71369c46704a19f8378d034b35f532345ebad694022832baaef087edfb77e2",
+      "bytes": 8848
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/results.json",
+      "sha256": "cabf4c842e4c67098cae5814cc8c3936f57f85283b9d4f0cab57b4e0a1ff7e97",
+      "bytes": 32116
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/final/stdout.txt",
+      "sha256": "77a55cd4e79357fbcdcd2f5931eacaee1566fd96d1db9f7c6f28056f8324da20",
+      "bytes": 17218
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+      "sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+      "bytes": 25390
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round3-module/results-M0.log",
+      "sha256": "1bc955d33430ba6a2466488ee44d50059a1e0b14ecc1d2dadbdf8db322f04475",
+      "bytes": 105
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round3-module/results-N1.log",
+      "sha256": "1bc955d33430ba6a2466488ee44d50059a1e0b14ecc1d2dadbdf8db322f04475",
+      "bytes": 105
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round3-module/results-N2.log",
+      "sha256": "b68fe83b1b81a7482a69e058ba1d5b1f8ef77e7fdad5d12d1f126da101311044",
+      "bytes": 105
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round3-module/results-N3.log",
+      "sha256": "e9b721e556240831427758513c993d936496ddd1887fe41dd843fd4026cb2792",
+      "bytes": 105
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round3-module/results.json",
+      "sha256": "3a33c3519e8dc00952bb597dc86147aa016098e2b589a9f97b399537de2039f2",
+      "bytes": 1943
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round3-module/stdout.txt",
+      "sha256": "ee79004b83edf07465013981ddcb396e28fc0a98bc216f839f2b8c436e7b42ad",
+      "bytes": 619
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round4-module/results-M0.log",
+      "sha256": "e32b6940062b3569b56e8760a7116a3aa88a2b682830b4160316b323e2224635",
+      "bytes": 107
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round4-module/results-N4.log",
+      "sha256": "8e6d2f412cb056b26f270eaba69a10205a87c1c9a7a8ad1ac4c7dbaf2537f013",
+      "bytes": 107
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round4-module/results-N5.log",
+      "sha256": "dc27874dc1280261ee15a452d1872d7e44019c76998ca6efb89754d1fd09a62a",
+      "bytes": 107
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round4-module/results-N6.log",
+      "sha256": "2e738e51d33ae6a4dab7356f0dd8f52b1cb7c6e3fb705027063c65e20c42bd85",
+      "bytes": 107
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round4-module/results-N7.log",
+      "sha256": "b3abc27558ffe3b1eabf300ccd9ce37e776b72b81a3f5250d724acf89e945974",
+      "bytes": 107
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round4-module/results-N8.log",
+      "sha256": "3f2dff532f775c42800860884e2ce31aa8381293e89b1d0d34121933f6e4ac47",
+      "bytes": 107
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round4-module/results-X13.log",
+      "sha256": "47e12b259fbf56a9e34f1ad54869898c535cc63385ed9364dc07e8f67de297e5",
+      "bytes": 107
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round4-module/results.json",
+      "sha256": "f1d51be2d60c0d0cb5179d917167b21332d47d6a83d9df2cd89a2f52e32e0c41",
+      "bytes": 3474
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round4-module/stdout.txt",
+      "sha256": "ee138ea5029c3b7cd52e325ecfe97cf4aee40b583fd97994fc25480176445034",
+      "bytes": 1084
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round5-module/results-M0.log",
+      "sha256": "a2867a7a1a0f664b9e94ea07454ab48e4507c20a681ab79727c98edd41e9abbe",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round5-module/results-N9.log",
+      "sha256": "ff6ea8c51aefb3ef389e434a21a791d6b607abb131514adb09ae54b0b77a5deb",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round5-module/results.json",
+      "sha256": "f8e3294ad2ede150b6dc836b4b78bef395533578b9d8bf34ca1193fe007af846",
+      "bytes": 991
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/round5-module/stdout.txt",
+      "sha256": "aa55340c73d051cc3f9e4c13e513f3df508f5c2375d4212ca9c503b7f3a4324e",
+      "bytes": 311
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/runs.json",
+      "sha256": "fcbeafe71e752346e9138c6f62dbeb748430879706ecc8ea6ea8b21efd3c4e26",
+      "bytes": 12131
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
@@ -48821,6 +49176,11 @@
       "path": "evidence/receipts/dashboard-render-e2e-20260921.json",
       "sha256": "15e85ee331ee29c5cff07bb0e73ef48dfb0df93be1d3a845b93728213e5a93a5",
       "bytes": 2641
+    },
+    {
+      "path": "evidence/receipts/dependabot-alert-16-dismissal-20261003.json",
+      "sha256": "2f15e81a487425afd3a95207da30ba9755e2ae4d3cb12ebc3f8b8ae8eee2e0f5",
+      "bytes": 41544
     },
     {
       "path": "evidence/receipts/desktop-cli-workflows.json",
