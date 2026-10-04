@@ -581,7 +581,7 @@ class StateCases(unittest.TestCase):
         self.assertEqual(self.state.snapshot(), before)
 
     def test_insufficient_cash_respects_fee_economics(self):
-        """Observed final9000 fee reduces cash1000; buy2000 refused without new journal writes."""
+        """Final9000 fee leaves cash900; buy2000 stays refused while the valid200 mark is retained."""
         self.order(qty=1)
         self.fill(quantity=1)
         self.fee(amount="9000.00")
@@ -589,7 +589,13 @@ class StateCases(unittest.TestCase):
         before = self.state.snapshot()
         with self.assertRaisesRegex(self.module.Refused, "insufficient_cash"):
             self.order("cash", price="200.00")
-        self.assertEqual(self.state.snapshot(), before)
+        after = self.state.snapshot()
+        for field in ["orders", "executions", "commissions", "positions", "cash_cents", "fees_cents",
+                      "gross_loss_cents", "gross_loss_exact_cents", "halt", "ready", "alerts", "budget",
+                      "observation_conflicts", "peak_equity_cents"]:
+            self.assertEqual(after[field], before[field], field)
+        self.assertEqual(after["position_marks"], {"SYNTH.TEST": "200.00"})
+        self.assertEqual(after["event_count"], before["event_count"]+1)
         self.assertEqual(len(self.transport.calls), 1)
 
     def test_loss_and_drawdown_caps_persist_across_restart_and_new_intent(self):
@@ -847,15 +853,76 @@ class StateCases(unittest.TestCase):
             self.order("sell_again", qty=2, side="SELL")
         self.assertEqual(self.state.snapshot(), before)
 
+    def test_refused_buy_peak_observation_still_enforces_later_drawdown(self):
+        """Refused buy at mark300 still establishes equity11000; mark279 then halts on 105 USD drawdown."""
+        self.order(qty=5)
+        self.fill(quantity=5)
+        self.fee(amount="0")
+        with self.assertRaisesRegex(self.module.Refused, "^aggregate_exposure_cap_exceeded$"):
+            self.order("refused", qty=10, quote_price="300.00")
+        self.assertFalse(self.action("observe_risk", {"SYNTH.TEST": "279.00"}))
+        snap = self.state.snapshot()
+        self.assertEqual(snap["halt"], "drawdown_cap_exceeded")
+        self.assertEqual(snap["peak_equity_cents"], 1100000)
+        self.assertEqual(snap["position_marks"], {"SYNTH.TEST": "279.00"})
+        self.economics(5, 950000, 0, 5)
+        self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"])
+        self.restart()
+        self.assertEqual(self.state.snapshot()["peak_equity_cents"], 1100000)
+        with self.assertRaisesRegex(self.module.Refused, "^halted:drawdown_cap_exceeded$"):
+            self.order("after_halt", qty=1)
+
+    def test_stale_terminal_status_events_preserve_terminal_states(self):
+        """Cancelled after filled and rejected after cancelled retain the terminal ledger and latch contradiction."""
+        for index, (terminal, stale, cumulative) in enumerate([
+            ("filled", "cancelled", 3), ("cancelled", "rejected", 0),
+        ]):
+            with self.subTest(terminal=terminal, stale=stale):
+                self.close_state()
+                self.db_path = Path(self.tmp.name)/("terminal-status-"+str(index)+".sqlite")
+                self.broker = FakeBroker()
+                self.transport = Transport(self)
+                self.state = self.open_state()
+                self.order(qty=3)
+                if terminal == "filled":
+                    self.fill(quantity=3)
+                    self.fee(amount="0")
+                else:
+                    self.action("cancel", "buy", self.transport)
+                    self.assertTrue(self.action("status", "buy", "cancelled", 0))
+                before = self.state.snapshot()
+                self.assertTrue(before["ready"])
+                self.assertFalse(self.action("status", "buy", stale, cumulative))
+                after = self.state.snapshot()
+                for field in ["orders", "executions", "commissions", "positions", "cash_cents",
+                              "fees_cents", "gross_loss_cents", "gross_loss_exact_cents", "halt"]:
+                    self.assertEqual(after[field], before[field], field)
+                self.assertEqual(after["orders"][0]["status"], terminal)
+                self.assertEqual(after["alerts"][-1], "terminal_order_status_changed")
+                with self.assertRaisesRegex(self.module.Refused, "^reconciliation_required$"):
+                    self.order("new", qty=1)
+                self.restart()
+                self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+                self.assertEqual(self.state.snapshot()["alerts"][-1], "contradiction_requires_adjudication")
+                self.assertEqual([c["kind"] for c in self.transport.calls],
+                                 ["submit"] if terminal == "filled" else ["submit", "cancel"])
+
     def test_fresh_quote_marks_held_exposure_before_admission(self):
-        """Fresh quote300 marks held5=1500; proposed buy1000 exceeds2000 and is refused unchanged."""
+        """Fresh quote300 retains mark and equity peak11000; refused buy leaves order and cash economics unchanged."""
         self.order(qty=5)
         self.fill(quantity=5)
         self.fee(amount="0")
         before = self.state.snapshot()
         with self.assertRaisesRegex(self.module.Refused, "exposure"):
             self.order("new", qty=10, quote_price="300.00")
-        self.assertEqual(self.state.snapshot(), before)
+        after = self.state.snapshot()
+        for field in ["orders", "executions", "commissions", "positions", "cash_cents", "fees_cents",
+                      "gross_loss_cents", "gross_loss_exact_cents", "halt", "ready", "alerts", "budget",
+                      "observation_conflicts"]:
+            self.assertEqual(after[field], before[field], field)
+        self.assertEqual(after["position_marks"], {"SYNTH.TEST": "300.00"})
+        self.assertEqual(after["peak_equity_cents"], 1100000)
+        self.assertEqual(after["event_count"], before["event_count"]+1)
         self.assertEqual(len(self.transport.calls), 1)
 
     def test_numeric_exposure_halt_cancels_owned_remaining_order(self):
@@ -1356,6 +1423,70 @@ runpy.run_path(target,run_name='__main__')
         self.assertEqual(artifact["cases"][0]["actual"], "skipped")
 
 
+    def test_acceptance_cli_rejects_required_expected_failure(self):
+        """A required case's expected assertion failure exits1 and is retained as expected_failure, never passed."""
+        evidence = RUN_EVIDENCE_DIR or Path(self.tmp.name)/"expected-failure-evidence"
+        attempt = RUN_ATTEMPT+"-required-expected-failure"
+        code = """import runpy,sys,unittest
+target,evidence,attempt=sys.argv[1:]
+def required_expected_failure(self,cls):
+ name='test_duplicate_intent_has_one_durable_transport_attempt'
+ original=getattr(cls,name)
+ def required_failure(case):
+  original(case)
+  case.fail('required_case_expected_failure_fault_fixture')
+ required_failure.__doc__='Required-case expected-failure fault fixture'
+ setattr(cls,name,unittest.expectedFailure(required_failure))
+ return unittest.TestSuite([cls(name)])
+unittest.TestLoader.loadTestsFromTestCase=required_expected_failure
+sys.argv=[target,'--evidence-dir',evidence,'--attempt',attempt]
+runpy.run_path(target,run_name='__main__')
+"""
+        result = subprocess.run([sys.executable, "-c", code, str(Path(__file__)), str(evidence), attempt],
+                                capture_output=True, text=True)
+        artifact = json.loads((evidence/(attempt+".json")).read_text())
+        returned_output = re.sub(r"(?m)^(Ran \d+ tests? in )\d+\.\d+s$", r"\1<elapsed>s",
+                                 (result.stdout+result.stderr).replace(str(evidence), "<private-evidence>").replace(str(ROOT), "<checkout>"))
+        self.record["sequence"].append({"operation": "required_expected_failure_cli_probe", "expected_exit": 1,
+                                        "actual_exit": result.returncode, "artifact": artifact,
+                                        "returned_output": returned_output})
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(artifact["cases"][0]["actual"], "expected_failure")
+        self.assertNotEqual(artifact["acceptance_status"], "passed")
+        self.assertEqual((artifact["tests"], artifact["skips"], artifact["expected_failures"],
+                          artifact["unexpected_successes"], artifact["exit_code"]), (1, 0, 1, 0, 1))
+        self.assertIn("required_case_expected_failure_fault_fixture", artifact["cases"][0]["failure"])
+
+    def test_acceptance_cli_rejects_required_unexpected_success(self):
+        """A required case's unexpected success exits1 and is retained as unexpected_success, never passed."""
+        evidence = RUN_EVIDENCE_DIR or Path(self.tmp.name)/"unexpected-success-evidence"
+        attempt = RUN_ATTEMPT+"-required-unexpected-success"
+        code = """import runpy,sys,unittest
+target,evidence,attempt=sys.argv[1:]
+def required_unexpected_success(self,cls):
+ name='test_duplicate_intent_has_one_durable_transport_attempt'
+ setattr(cls,name,unittest.expectedFailure(getattr(cls,name)))
+ return unittest.TestSuite([cls(name)])
+unittest.TestLoader.loadTestsFromTestCase=required_unexpected_success
+sys.argv=[target,'--evidence-dir',evidence,'--attempt',attempt]
+runpy.run_path(target,run_name='__main__')
+"""
+        result = subprocess.run([sys.executable, "-c", code, str(Path(__file__)), str(evidence), attempt],
+                                capture_output=True, text=True)
+        artifact = json.loads((evidence/(attempt+".json")).read_text())
+        returned_output = re.sub(r"(?m)^(Ran \d+ tests? in )\d+\.\d+s$", r"\1<elapsed>s",
+                                 (result.stdout+result.stderr).replace(str(evidence), "<private-evidence>").replace(str(ROOT), "<checkout>"))
+        self.record["sequence"].append({"operation": "required_unexpected_success_cli_probe", "expected_exit": 1,
+                                        "actual_exit": result.returncode, "artifact": artifact,
+                                        "returned_output": returned_output})
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(artifact["cases"][0]["actual"], "unexpected_success")
+        self.assertNotEqual(artifact["acceptance_status"], "passed")
+        self.assertEqual((artifact["tests"], artifact["skips"], artifact["expected_failures"],
+                          artifact["unexpected_successes"], artifact["exit_code"]), (1, 0, 0, 1, 1))
+        self.assertEqual(artifact["cases"][0]["failure"], "required_case_unexpected_success")
+
+
 class EvidenceResult(unittest.TextTestResult):
     def startTest(self, test):
         self.current_case = test
@@ -1388,6 +1519,16 @@ class EvidenceResult(unittest.TextTestResult):
     def addError(self, test, err):
         super().addError(test, err)
         self.failed(test, self.diagnostic(err))
+
+    def addExpectedFailure(self, test, err):
+        super().addExpectedFailure(test, err)
+        self.failed(test, self.diagnostic(err))
+        self.case_record(test)["actual"] = "expected_failure"
+
+    def addUnexpectedSuccess(self, test):
+        super().addUnexpectedSuccess(test)
+        self.failed(test, "required_case_unexpected_success")
+        self.case_record(test)["actual"] = "unexpected_success"
 
     def addSubTest(self, test, subtest, err):
         super().addSubTest(test, subtest, err)
@@ -1424,7 +1565,8 @@ if __name__ == "__main__":
     RUN_EVIDENCE_DIR, RUN_ATTEMPT = args.evidence_dir, args.attempt
     result = unittest.TextTestRunner(verbosity=2, resultclass=EvidenceResult).run(
         unittest.defaultTestLoader.loadTestsFromTestCase(StateCases))
-    acceptance_exit = 0 if result.wasSuccessful() and not result.skipped else 1
+    acceptance_exit = 0 if (result.wasSuccessful() and not result.skipped
+                            and not result.expectedFailures and not result.unexpectedSuccesses) else 1
     if args.evidence_dir:
         args.evidence_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
         target = args.evidence_dir / (args.attempt+".json")
@@ -1433,6 +1575,8 @@ if __name__ == "__main__":
         artifact = {"scope": "offline_synthetic_integration", "attempt": args.attempt,
                     "broker_network_calls": 0, "tests": result.testsRun,
                     "failures": len(result.failures), "errors": len(result.errors),
+                    "expected_failures": len(result.expectedFailures),
+                    "unexpected_successes": len(result.unexpectedSuccesses),
                     "skips": len(result.skipped), "exit_code": acceptance_exit,
                     "acceptance_status": "blocked_required_skips" if result.skipped else ("passed" if acceptance_exit == 0 else "failed"),
                     "source_hashes": {p.name: hashlib.sha256(p.read_bytes()).hexdigest()

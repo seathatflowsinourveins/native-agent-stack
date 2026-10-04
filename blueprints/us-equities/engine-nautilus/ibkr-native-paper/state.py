@@ -338,17 +338,23 @@ class PaperState:
         if not self.limits.session_open_ns <= now < self.limits.session_close_ns:
             raise Refused("session_closed")
         symbol = payload["symbol"]
-        reason, _ = self._numeric_guard_values({symbol: fresh_mark})
-        if reason and self._get("halt") is None:
-            # A valid fresh quote exposing an existing numeric breach is itself
-            # an observation: persist the halt and disposition before transport.
+        position = self.db.execute("SELECT * FROM positions WHERE symbol=?", (symbol,)).fetchone()
+        reason, peak = self._numeric_guard_values({symbol: fresh_mark})
+        new_halt = reason is not None and self._get("halt") is None
+        mark_changed = position is not None and decimal(position["mark"]) != fresh_mark
+        if mark_changed or peak > self._get("peak_equity_cents") or new_halt:
+            # A validated quote is an observation independently of admission.
+            # Commit its mark and high-water state before any order refusal.
             with self._tx():
                 self.db.execute("UPDATE positions SET mark=? WHERE symbol=?", (str(fresh_mark), symbol))
-                self._risk_latch()
-                self._event("admission_numeric_halt", {"symbol": symbol, "mark": str(fresh_mark), "reason": reason})
+                self._set("peak_equity_cents", peak)
+                if new_halt:
+                    self._halt(reason)
+                self._event("admission_risk_observation", {"symbol": symbol, "mark": str(fresh_mark),
+                                                           "peak_equity_cents": peak, "reason": reason})
+        if new_halt:
             self._cancel_halted(transport)
             raise Refused("halted:"+self._get("halt"))
-        position = self.db.execute("SELECT * FROM positions WHERE symbol=?", (symbol,)).fetchone()
         quantity = position["quantity"] if position else 0
         rows = self.db.execute("SELECT * FROM orders WHERE status NOT IN ('filled','cancelled','rejected')").fetchall()
         reserved_buy = sum(o["reserved_cents"] for o in rows)
@@ -609,6 +615,9 @@ class PaperState:
             qty = json.loads(order["payload"])["quantity"]
             if type(cumulative_filled) is not int or not 0 <= cumulative_filled <= qty or status not in ["accepted", "cancel_pending", "cancelled", "filled", "rejected"]:
                 return self._block("unknown_order_status", contradiction=True)
+            terminal = {"filled", "cancelled", "rejected"}
+            if order["status"] in terminal and status in terminal and status != order["status"]:
+                return self._block("terminal_order_status_changed", contradiction=True)
             if cumulative_filled > order["filled"]:
                 return self._block("status_missing_executions")
             if status == "filled" and order["filled"] != qty:
@@ -809,6 +818,8 @@ class PaperState:
             commissions = [{"exec_id": r["exec_id"], **json.loads(r["payload"]), "posted_cents": r["cents"]} for r in self.db.execute("SELECT * FROM commissions ORDER BY exec_id")]
             return {"orders": orders, "executions": executions, "commissions": commissions,
                     "positions": {p["symbol"]: p["quantity"] for p in self.db.execute("SELECT * FROM positions ORDER BY symbol")},
+                    "position_marks": {p["symbol"]: p["mark"] for p in self.db.execute("SELECT * FROM positions ORDER BY symbol")},
+                    "peak_equity_cents": self._get("peak_equity_cents"),
                     "cash_cents": self._get("cash_cents"), "fees_cents": self._get("fees_cents"),
                     "gross_loss_cents": self._get("gross_loss_cents"), "halt": self._get("halt"),
                     "gross_loss_exact_cents": self._get("gross_loss_exact_cents"),

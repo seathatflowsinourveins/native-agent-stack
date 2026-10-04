@@ -127,6 +127,28 @@ permanent or unresolved reason before and after restart; disabling the
 contradiction latch makes the three permanent cases fail. This revision's plan
 digest is frozen before the round's final acceptance execution.
 
+Review-thread repair — 2026-10-04, round `643-p4`: a validated fresh admission
+quote now persists a changed held-position mark and the equity high-water state
+before cash, position or aggregate-exposure admission can refuse the proposed
+order. The observation consumes no request budget and creates no order or cash
+posting. Holding five shares bought at `100.00`, a `300.00` quote establishes
+equity `11000.00` even when the buy is refused; a subsequent `279.00` mark then
+latches the `105.00` drawdown breach. Snapshots retain marks and peak equity for
+observation. Changed terminal status events preserve the prior terminal order
+and latch `terminal_order_status_changed` with a permanent contradiction.
+
+Acceptance requires no failures, errors, skips, expected failures or unexpected
+successes. The supported `unittest.TestResult` counters and
+`TextTestResult.addExpectedFailure`/`addUnexpectedSuccess` callbacks were read
+from installed CPython `3.13.15` source. Expected failures and unexpected
+successes retain distinct non-passing case outcomes and their native counts;
+required-case CLI fault controls exit nonzero. Every new regression first
+failed against a scratch copy of head `a92f220f` with its state and acceptance
+runner unchanged, then passed after repair. The earlier whole-journal no-op
+expectations for refused buys were corrected to require retained valid marks
+while preserving every order, cash, fee, reservation and refusal assertion.
+This plan digest is frozen before the round's final acceptance execution.
+
 Source: `nautechsystems/nautilus_trader` Python `2.0.0rc5`, revision
 `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`, execution `parse.rs` 55–73,
 85–147 and `core_updates.rs` 240–280. Installed `model/__init__.pyi` has SHA256
