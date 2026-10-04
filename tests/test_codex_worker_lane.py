@@ -9,7 +9,7 @@ Evidence classes (docs/acceptance-evidence-policy.md):
   `expectedVersion`, a null value deleting a key) and answers `mcp get`, `mcp list` and `debug prompt-input`;
 - the prove verdict tests read event fixtures cut from real `codex exec --json` runs of codex-cli 0.157.1
   (tests/fixtures/codex-worker-lane/, paths masked; see that directory's items for what each run was);
-- CodexIntegrationTests runs the real codex app-server of the pinned version (lane.CODEX_VERSION, 0.159.3) against a
+- CodexIntegrationTests runs the real codex app-server of the pinned version (lane.CODEX_VERSION, 0.160.0) against a
   scratch Codex home, only when NAS_CODEX_INTEGRATION=1 and that codex is on PATH (local integration evidence;
   skipped in CI).
 """
@@ -136,7 +136,7 @@ def doctor_output(mode, has_roles, home):
         checks["config.load"] = {"id": "config.load", "category": "config", "status": status, "summary": summary,
                                  "details": details, "remediation": None, "durationMs": 3}
     return json.dumps({"schemaVersion": 1, "generatedAt": "2026-09-29T00:00:00Z", "overallStatus": "fail",
-                       "codexVersion": "0.159.3", "checks": checks}) + "\n"
+                       "codexVersion": "0.160.0", "checks": checks}) + "\n"
 '''
 _DOCTOR_NAMESPACE: dict = {}
 exec("import json\n" + DOCTOR, _DOCTOR_NAMESPACE)
@@ -148,7 +148,7 @@ ROLES_SOURCE_DIR = ROOT / "adoption" / "agents" / "codex"
 ROLE_NAMES = ("stack-researcher.toml", "stack-verifier.toml")
 
 FAKE_CODEX = r'''#!{python}
-"""Fake codex 0.159.3 for tests/test_codex_worker_lane.py (see its docstring)."""
+"""Fake codex 0.160.0 for tests/test_codex_worker_lane.py (see its docstring)."""
 import hashlib, json, os, re, sys, tomllib
 from pathlib import Path
 
@@ -186,7 +186,7 @@ def segments(path):
     return out + [cur]
 
 if argv == ["--version"]:
-    print("codex-cli 0.159.3"); sys.exit(0)
+    print("codex-cli 0.160.0"); sys.exit(0)
 if argv[:1] == ["app-server"]:
     race = os.environ.get("FAKE_CODEX_RACE")
     for line in sys.stdin:
@@ -606,7 +606,7 @@ class FakeHost:
 
 
 class ApplyFlowTests(unittest.TestCase):
-    """Synthetic: the fake codex above stands in for codex-cli 0.159.3."""
+    """Synthetic: the fake codex above stands in for codex-cli 0.160.0."""
 
     def setUp(self):
         self.host = FakeHost(self)
@@ -2125,7 +2125,7 @@ class SandboxProbeControlTests(unittest.TestCase):
 
 
 @unittest.skipUnless(os.environ.get("NAS_CODEX_INTEGRATION") == "1" and shutil.which("codex"),
-                     "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.159.3 on PATH to run the real app-server")
+                     "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server")
 class CodexIntegrationTests(unittest.TestCase):
     """Local integration with the real codex: its app-server writes a scratch Codex home and rollback restores it
     byte for byte; a project config outranks the profile but not the pinned flags; the gateway profile loads under
