@@ -535,7 +535,7 @@ free branch name.
     its push URL (`push`, `:704-709`), opens the PR with `--head <branch>`
     (`:257-259`, allowlist entry `:448`), and checks this repository's identity and
     branch rules (`:627-628`, `:684-689`). Before any run, option 2 needs a fork
-    remote and push-URL check, `--head <owner>:<branch>`, the rules lookup and a
+    remote and push-URL check, `--head <holder>:<branch>`, the rules lookup and a
     `non_fast_forward` ruleset on the fork, and its own review. A fork does not stop
     the PR body publishing the final message; only a change to `build_pr_body` does.
 - A7's environment listing reads `Config.Env`, the environment Docker starts the server

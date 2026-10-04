@@ -230,7 +230,7 @@ The owner decides between two options:
    needs no code change for this option.
 2. **Push agent branches to an owner fork**, so that PR runs get no secret and a read-only token
    whatever a workflow declares. This is the review's proposal. GitHub states the token and secret
-   limits in [Events that trigger workflows](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows),
+   limits in [Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows),
    "Workflows in forked repositories" (read 2026-10-03): "With the exception of `GITHUB_TOKEN`,
    secrets are not passed to the runner when a workflow is triggered from a forked repository. The
    `GITHUB_TOKEN` has read-only permissions in pull requests from forked repositories." That
