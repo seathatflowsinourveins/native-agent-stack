@@ -134,14 +134,9 @@ order. The observation consumes no request budget and creates no order or cash
 posting. Holding five shares bought at `100.00`, a `300.00` quote establishes
 equity `11000.00` even when the buy is refused; a subsequent `279.00` mark then
 latches the `105.00` drawdown breach. Snapshots retain marks and peak equity for
-observation. A `cancelled` → `filled` report is allowed: missing executions
-block recoverably with `status_missing_executions` until the late execution
-books, then an agreeing complete reconciliation clears the block. A stale
-`cancelled` report on a `filled` order with cumulative fills below the booked
-fills changes no order field and records `stale_order_status`. Every changed
-terminal pair involving `rejected`, and `cancelled` on a `filled` order with
-cumulative fills equal to the order quantity, preserves the prior terminal
-order and latches `terminal_order_status_changed` as a permanent contradiction.
+observation. Changed terminal status events preserve the prior terminal order
+and latch `terminal_order_status_changed` with a permanent contradiction.
+(superseded in 643-p5)
 
 Acceptance requires no failures, errors, skips, expected failures or unexpected
 successes. The supported `unittest.TestResult` counters and
@@ -154,14 +149,25 @@ runner unchanged, then passed after repair. The earlier whole-journal no-op
 expectations for refused buys were corrected to require retained valid marks
 while preserving every order, cash, fee, reservation and refusal assertion.
 
-Delta repair — 2026-10-04, round `643-p5`: final commission postings must fit
-SQLite's signed int64 range before the guarded INSERT. Fees or rebates outside
-that range latch `invalid_commission` as a permanent contradiction, preserving
-pending fees and every booked economic field. Native order and permanent IDs
-must be positive int64 values; venue IDs have at most 19 decimal digits and
-must fit the same range. Oversize venue IDs latch `unknown_venue_order_id`;
-oversize native IDs latch `invalid_native_id`, both permanently, before binding
-or booking. The installed CPython `3.13.15` and SQLite `3.53.1` first reproduced
+Delta repair — 2026-10-04, round `643-p5`: a `cancelled` → `filled` report reaches
+the recoverable `status_missing_executions` path until the late execution books,
+then an agreeing complete reconciliation clears the block. A stale `cancelled`
+report on a `filled` order with cumulative fills below the booked fills records
+`stale_order_status` and changes no order field. Every changed terminal pair
+involving `rejected`, and `cancelled` on a `filled` order with cumulative fills
+equal to the order quantity, retains the permanent `terminal_order_status_changed`
+contradiction.
+
+Final commission postings must fit SQLite's signed int64 range before the
+guarded INSERT. Fees or rebates outside that range latch `invalid_commission`
+as a permanent contradiction, preserving pending fees and every booked economic
+field. For identity validation, p5 adds only the int64 upper bound on native
+order/permanent IDs and parsed venue IDs, and the 19-digit bound on venue ID
+strings. Positivity of native order and permanent IDs was already enforced
+before p5, including the existing zero-ID refusal test. Oversize venue IDs latch
+`unknown_venue_order_id`; oversize native IDs latch `invalid_native_id`, both
+permanently, before binding or booking. The installed CPython `3.13.15` and
+SQLite `3.53.1` first reproduced
 `ValueError` from a 4301-digit `int()` input and `OverflowError` from a SQLite
 bind of `2**63`; these are local runtime observations.
 
@@ -173,7 +179,14 @@ failed against a scratch copy of head `b27c2a69` with its implementation,
 existing probes and acceptance runner unchanged. These are local synthetic
 integration checks using the installed `unittest`, `sqlite3` and `hashlib`
 interfaces; they do not establish native broker acceptance.
-This plan digest is frozen before the round's final acceptance execution.
+The p5 plan digest was frozen before that round's final acceptance execution.
+
+Provenance repair — 2026-10-04, round `643-p6`: the dated p4 record above states
+its original terminal policy and marks it superseded; p5 receives credit for
+the recoverable late-fill and stale-cancellation behavior and the added identity
+upper bounds. The test binding computes `plan_sha256` from these final FREEZE
+bytes; this digest is frozen before the round's fresh final acceptance with
+`--attempt p6`.
 
 Source: `nautechsystems/nautilus_trader` Python `2.0.0rc5`, revision
 `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`, execution `parse.rs` 55–73,

@@ -13146,8 +13146,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-native-paper/offline-FREEZE.md",
-      "sha256": "8bba6198ed58283de1822893c14f9600215807160b7b0c0de57cb633ffe94e63",
-      "bytes": 13545
+      "sha256": "d7c4078f909a3b1f900525c8a41835841fbba33a63a9d8434a3affaf360aac74",
+      "bytes": 14205
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-native-paper/state.py",
