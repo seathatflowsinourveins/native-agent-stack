@@ -70,9 +70,12 @@ SHELLCHECK = shutil.which("shellcheck")
 # variable of its own. evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt retains
 # that source read. Never ~/.config/rtk/config.toml, the Linux path.
 MAC_RTK_CONFIG = "Library/Application Support/rtk/config.toml"
+# v0.51.0: src/core/config.rs:510-513 calls user_dirs::config();
+# src/core/user_dirs.rs:47-63 still uses dirs::config_dir(), and Cargo.lock pins dirs 5.0.1.
+# Source: rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026.
 # The rtk versions whose macOS config path was read from source. A re-pin must re-read
 # get_config_path and the dirs crate its Cargo.lock pins before adding its version here.
-RTK_CONFIG_PATH_REVIEWED_VERSIONS = {"0.50.0"}
+RTK_CONFIG_PATH_REVIEWED_VERSIONS = {"0.50.0", "0.51.0"}
 # The temporary HOME the rtk reminder tests use: not "home", so a retained test output never
 # shows a "/home/<name>/" path, which scripts/validate.py reads as a personal home path.
 FAKE_HOME = "fake-home"
@@ -257,8 +260,9 @@ class PinsSchemaTests(unittest.TestCase):
     # (docs/decisions/2026-09-25-workstation-sota-refresh.md). Each entry names both versions
     # exactly, so a move on either side fails here until this table is reviewed again.
     MAC_PIN_LAGS_LINUX = {
+        # Linux selects 0.14.2; the Mac keeps its qualified 0.13.13 until its own qualification.
+        "mcporter": ("0.13.13", "0.14.2", "evidence/receipts/mcporter-0142-qualification-20261004.json"),
         "ai-memory": ("2.3.2", "2.4.1", "evidence/receipts/ai-memory-241-qualification-20260925.json"),
-        "mcporter": ("0.13.13", "0.14.1", "evidence/receipts/mcporter-0141-qualification-20260925.json"),
         # Linux selects 0.160.0 on 2026-10-03; the Mac keeps 0.155.1 until its own
         # qualification.
         "codex": ("0.155.1", "0.160.0", "evidence/receipts/runtime-sdk-20261003.json"),
@@ -333,6 +337,7 @@ class TokenEfficiencyPinPortabilityTests(unittest.TestCase):
     PORTED_FUNCTIONS = ("fetch", "verify_sha256", "install_uv_tool", "install_uv_tool_from_git")
     # Pins that moved after the 2026-09-26 digest check: (version, receipt that re-checked its digests).
     MOVED_AFTER_DIGEST_CHECK = {
+        "rtk": ("0.51.0", "evidence/receipts/rtk-051-qualification-20261004.json"),
         "ccusage": ("20.0.26", "evidence/receipts/ccusage-20026-qualification-20260927.json"),
     }
 
