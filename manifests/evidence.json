@@ -49709,13 +49709,13 @@
     },
     {
       "path": "observability/README.md",
-      "sha256": "c4fd4a7d69704bd51edf9e1eff5e14c96a5eb9938fdd55f18aaa99ec47b30d94",
-      "bytes": 15457
+      "sha256": "7c7795560a7ef6541c91dfb8b0bf4e693f5dcdf9cfc75f262d8e4832057177e3",
+      "bytes": 15625
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "cc394e24445dc7d194aaa7d2593d8b02dc5db2f89ee3c3bed3c7f26b934b7262",
-      "bytes": 25028
+      "sha256": "28d512ce7b62b9c87d6fc3ec1e4c2f4d1b616de498f48ddad02b062096c65212",
+      "bytes": 25778
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -49759,13 +49759,13 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-alertmanager.yml.example",
-      "sha256": "693ecb28036e88fac500419009db4a88617377124c8ebe31e2764c7f1006bda7",
-      "bytes": 418
+      "sha256": "c2df17901a0807bbe1a75a27751f888ffbdfaa30fc238f5bc563d57349c1533e",
+      "bytes": 1587
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
-      "sha256": "2acdccb25dbf82764da4024d7409a5b2bb6f7ea322b01940a6c400bd39cb29f2",
-      "bytes": 39356
+      "sha256": "313396f59fe56025d7ceb0bb4a76695327bb2fd583976085735c7424629bab8b",
+      "bytes": 47996
     },
     {
       "path": "observability/backends/templates/ecosystem-grafana-dashboards.yml.example",
@@ -49799,8 +49799,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "25583ba47d5919759f569cc130c31374707dcfb992ed7faf692e620f4ada4947",
-      "bytes": 12864
+      "sha256": "2f0284939d4ad0c90dfc4d4f6e677d8c2b880a3d73c950b219a60b88b6cd88f4",
+      "bytes": 16292
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
@@ -49809,8 +49809,8 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "6e476fbf535971627466ec7b39b99b1952d938464ab894c231d59e7c0e2f0f55",
-      "bytes": 41579
+      "sha256": "df33394028df2a687f7e39beefe0aa02978a0d6a0b97fd9d8a14f12e6075d3d6",
+      "bytes": 44636
     },
     {
       "path": "observability/collector/claude-settings.json.example",
@@ -49819,8 +49819,8 @@
     },
     {
       "path": "observability/collector/codex-identity-launcher.sh.example",
-      "sha256": "2942baca412b3cfed51e8e6d036bd6a3023dc8917fe295e9b74fc61b5f7d161a",
-      "bytes": 4066
+      "sha256": "58a4254926d8b27ea16571d17a09a77869614f13a624997fedbf02a1c1c78929",
+      "bytes": 6167
     },
     {
       "path": "observability/collector/codex.toml.example",
@@ -49829,8 +49829,8 @@
     },
     {
       "path": "observability/collector/collector.yaml",
-      "sha256": "3394aa992c06ed4d60d588c70112eb345695fdf8e7d3d7c13a277bf9b8666612",
-      "bytes": 24911
+      "sha256": "a6312ca3150dc8ef95e408adb6b4522bea0dc3e20d8351e394f7824b95d37de2",
+      "bytes": 26125
     },
     {
       "path": "observability/collector/ecosystem-otelcol.service.example",
@@ -50974,8 +50974,8 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "944fb543cbb1ba5025a4d1df2a4ffd84a3323f3f67b591bb83a8bdd796fc1a0e",
-      "bytes": 16142
+      "sha256": "256a60345e905991852d0500343202436f452623a8e3e5231232533d4969f12c",
+      "bytes": 31542
     },
     {
       "path": "tests/test_observability_run_correlation.py",
@@ -50984,13 +50984,13 @@
     },
     {
       "path": "tests/test_observability_tool_names.py",
-      "sha256": "a6c2324600d817f1fdff5975f713fbd65d08735cc0410001211ff7ae98c07526",
-      "bytes": 24367
+      "sha256": "01643e542017a248c166302b90f7218e42c83eceb3e4084b1a99a4bb73617a89",
+      "bytes": 25617
     },
     {
       "path": "tests/test_observability_writer_identity.py",
-      "sha256": "ef64ba46907134593f0c05ea9376820f1524ccffc465396746c5a329920a91f4",
-      "bytes": 30907
+      "sha256": "2f58b64cbd4f1af2b23ed869147278e2f84ad3357fef11a13c6496154fb1f15b",
+      "bytes": 37789
     },
     {
       "path": "tests/test_observability_writer_identity_host.py",
