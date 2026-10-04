@@ -1,0 +1,56 @@
+{
+  "at_c2_end": {
+    "local": "11:06:29",
+    "swap_mb": 4977.12
+  },
+  "below_6gb_by": "10:38:18",
+  "co_resident_at_spike": {
+    "apple_container": "one 2 GiB VM (the Hindsight trial Postgres), running since 10:15 local",
+    "li26_c2_server_rss_mib": 16879,
+    "minute_samples_around_first_rise": {
+      "after": {
+        "free": "34%",
+        "local": "10:37:56",
+        "ollama": [
+          {
+            "ctx": 4096,
+            "name": "qwen3-embedding:4b",
+            "size_gib": 4.07
+          },
+          {
+            "ctx": 65536,
+            "name": "qwen3.5-9b-64k:latest",
+            "size_gib": 8.48
+          }
+        ],
+        "swap_used": "7647.81M"
+      },
+      "before": {
+        "free": "37%",
+        "local": "10:36:56",
+        "ollama": [],
+        "swap_used": "16.81M"
+      }
+    },
+    "omniroute_build": {
+      "build_release_output_written_local": "10:38:22",
+      "note": "upstream `npm run build:release` (a Next.js production build) ran between these two times, from file birth times",
+      "npm_ci_finished_local": "10:34:40"
+    }
+  },
+  "date": "2026-09-27",
+  "first_rise": {
+    "local": "10:37:06",
+    "swap_mb": 4731.31
+  },
+  "host_id": "mac-coordinator-64gb-20260925",
+  "kind": "mac_swap_event",
+  "li26_c2_effect": "none on quality: 0 errors, predictions identical to C0 on all 360 filings",
+  "memory_kills_in_c2_window": 0,
+  "peak": {
+    "local": "10:37:38",
+    "swap_mb": 13933.56
+  },
+  "reading": "the model set alone did not swap (16.81 MB through two full li26 runs and the first 16 minutes of C2); swap grew only while a large Node production build overlapped the full model set, then drained slowly and did not grow during the worst-case co-residency probe",
+  "swap_before_mb": 16.81
+}

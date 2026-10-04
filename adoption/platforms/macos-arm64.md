@@ -113,6 +113,9 @@ plans for is the labelled projection `macos-arm64-64gb-projected` in
 unified memory as the generation budget, `full` semantic-RAG tier, both drawn
 from one shared pool); for this page's embedding choice it follows the 48 GB
 rules. None of these sizes has a real qualification run yet.
+Corrected 2026-10-03 (port of #410): `mac-coordinator-64gb-20260925` ran a descriptive
+co-residency probe on 2026-09-27 that was not accepted as a qualification
+([port record](../../evidence/artifacts/mac-model-hosting-20260927/port-record-20261003.md)).
 
 ## Prerequisites
 
@@ -359,7 +362,7 @@ At `v2026.09.26` macOS has no rtk pin, and that script prints no reminder.
 `socraticode` is installed with `--ignore-scripts` (the pin's own
 `ignore_scripts: true` field, read by the script's `install_npm`), the same
 convention [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions)
-documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux from 2026-09-26, 0.159.2 from 2026-09-30; the macOS pin stays 0.155.1) and in its `claude-code` entry (2.1.284, as on macOS). Since 2026-09-30 the shared Codex template defaults to `gpt-6.1-sol`, which entered Codex's bundled model catalog in `rust-v0.159.1` and is absent from the Linux 0.155.1 build's catalog (`codex debug models --bundled`, offline): macOS needs its own 0.159.x qualification before the template default applies there, and until then `tools/adoption/render_config.py --platform macos-arm64` renders the template's `CODEX_MODEL` placeholder as `gpt-6-astra` from this 0.155.1 pin. It changed after `v2026.09.25.2`,
+documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux from 2026-09-26, 0.159.2 from 2026-09-30, 0.159.3 from 2026-10-01 and the repository 0.160.0 pair from 2026-10-03; the macOS pin stays 0.155.1) and in its `claude-code` entry (2.1.284, as on macOS). Since 2026-09-30 the shared Codex template defaults to `gpt-6.1-sol`, which entered Codex's bundled model catalog in `rust-v0.159.1` and is absent from the Linux 0.155.1 build's catalog (`codex debug models --bundled`, offline): macOS needs its own qualification of a version carrying the new model before the template default applies there, and until then `tools/adoption/render_config.py --platform macos-arm64` renders the template's `CODEX_MODEL` placeholder as `gpt-6-astra` from this 0.155.1 pin. It changed after `v2026.09.25.2`,
 adding the identical entry there too (same version,
 url, sha256 and `--ignore-scripts`), completing the token-efficiency profile's Linux pin
 coverage alongside new `repomix`, `toon`, `headroom`, `ccusage` and `serena`
@@ -749,8 +752,14 @@ currently loaded from that same destination path, rename into place,
 confirmed loaded from its own destination path, or not loaded at all with a
 file present to clean up). On the hosted runner (run `35875188590`, "What a
 hosted run proves" above) `launchd-agents.sh` bootstrapped and booted out the
-`qdrant` and `llama-embed` agents; `ai-memory` has not run, and none of the
-three has run on a Mac workstation.
+`qdrant` and `llama-embed` agents.
+Corrected 2026-10-03 (port of #410): as of 2026-09-27 the `ai-memory` template
+had not run on that hosted runner. On 2026-09-27 `llama-embed` ran on the
+coordinator Mac and `embed_acceptance.py` returned pass without a discriminating
+control, so this is an observation. As of that date, the `qdrant` and `ai-memory`
+templates had not run on a Mac workstation; the pre-existing `local.agent-ecosystem.*`
+agents served those roles
+([port record](../../evidence/artifacts/mac-model-hosting-20260927/port-record-20261003.md)).
 
 **Credential boot receipt (added after `v2026.09.26.2`; documented, not
 run).** On Linux/WSL2 the `credential-boot-receipt.service` oneshot runs
@@ -865,7 +874,18 @@ there; what a Mac's crash reporter keeps of a crashed command's environment
 has not been checked. Key acceptance on a Mac is
 the runner, guard and status test suites on the macOS CI job, then a new Mac
 host receipt that separates the steps run from those not run. WSL receipts
-do not certify the Mac.
+do not certify the Mac. Added after `v2026.09.26.2`: on a pull request that
+macOS CI job (`adoption-bootstrap.yml`'s `validate-macos`) runs in full when the pull
+request changes a listed macOS-relevant path, runs only the changed top-level
+test modules when nothing else relevant changed (a scoped result, not a
+full-suite pass), and is skipped otherwise (untested, not passed); push,
+schedule and dispatch runs are always full
+([docs/decisions/2026-10-03-macos-ci-scope.md](../../docs/decisions/2026-10-03-macos-ci-scope.md)).
+The runner, guard and status suites (`tests/test_credential_run.py`,
+`tests/test_secret_path_guard.py`, `tests/test_effort_default_guard.py`,
+`tests/test_adoption_status.py` and `tests/test_credential_status.py`) are on
+that list, as is the code they test, so a change to them always runs the job in
+full.
 
 ## Qdrant collections
 

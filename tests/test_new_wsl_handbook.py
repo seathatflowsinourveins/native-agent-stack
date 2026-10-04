@@ -984,15 +984,16 @@ class NewWslHandbookTests(unittest.TestCase):
                 rows[cells[0]] = cells
         return rows
 
-    def test_inventory_holds_all_89_manifest_rows_the_ten_added_and_the_five_consensus_ones(self):
+    def test_inventory_holds_all_90_manifest_rows_the_ten_added_and_the_six_consensus_ones(self):
+        # The sixth consensus row, statusline, comes from the layer consensus's wave-2 batch (2026-10-03).
         data, markdown = self.generated()
         manifest = self.read(DEFAULTS_SOURCE)
-        self.assertEqual(len(manifest["slots"]), 89)
+        self.assertEqual(len(manifest["slots"]), 90)
         self.assertEqual(sum(row["row_kind"] == "added" for row in manifest["slots"]), 10)
-        self.assertEqual(sum(row["row_kind"] == "consensus" for row in manifest["slots"]), 5)
+        self.assertEqual(sum(row["row_kind"] == "consensus" for row in manifest["slots"]), 6)
         rows = {slot["record"]["slot_id"]: (layer["layer_id"], slot)
                 for layer in data["layers"] for slot in layer.get("default_slots", [])}
-        self.assertEqual(len(rows), 89)
+        self.assertEqual(len(rows), 90)
         lines = self.slot_lines(markdown)
         self.assertEqual(set(lines), set(rows))
         for row in manifest["slots"]:
@@ -1012,10 +1013,14 @@ class NewWslHandbookTests(unittest.TestCase):
         # Counts come from the rows and agree with the manifest's own.
         inventory = data["default_decisions"]["inventory"]
         self.assertEqual({key: inventory[key] for key in manifest["counts"]}, manifest["counts"])
-        self.assertEqual(inventory["installed"] + inventory["not_installed"], 89)
-        self.assertIn("The manifest holds 89 slots in 37 layers.", markdown)
+        self.assertEqual(inventory["installed"] + inventory["not_installed"], 90)
+        self.assertIn("The manifest holds 90 slots in 37 layers.", markdown)
         self.assertIn("added 10", markdown)
-        self.assertIn("consensus 5", markdown)
+        self.assertIn("consensus 6", markdown)
+        # The interim installs of amendment 3 are counted apart from the decided installs, as the producer counts them.
+        self.assertEqual(inventory["interim"], sum(1 for row in manifest["slots"] if row.get("interim")))
+        self.assertIn(f"{inventory['interim']} of the slots that install nothing by their decided default carry an "
+                      "interim install", markdown)
 
     def test_consensus_rows_and_amendments_come_from_the_manifest_and_its_consensus_record(self):
         """A consensus row is shown as the manifest gives it; an amendment is listed under its layer and changes no cell."""
@@ -1023,8 +1028,10 @@ class NewWslHandbookTests(unittest.TestCase):
         manifest = self.read(DEFAULTS_SOURCE)
         consensus = self.read(manifest["sources"]["consensus"]["path"])
         lines = self.slot_lines(markdown)
-        added = {row["slot_id"]: row for row in consensus["add_rows"]}
+        wave2 = consensus.get("wave2") or {}
+        added = {row["slot_id"]: row for row in consensus["add_rows"] + wave2.get("add_rows", [])}
         self.assertEqual({row["slot_id"] for row in manifest["slots"] if row["row_kind"] == "consensus"}, set(added))
+        self.assertIn("statusline", added)          # the wave-2 batch's row (2026-10-03)
         for slot_id, row in added.items():
             with self.subTest(slot=slot_id):
                 cells = lines[slot_id]
@@ -1034,7 +1041,7 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertIn(f"{row['catalog']} / {row['layer_id']} / consensus", cells[9])
                 self.assertFalse(row["definitive"])
         amendments = [(row["slot_id"], item) for row in manifest["slots"] for item in row.get("amendments", [])]
-        self.assertEqual(len(amendments), len(consensus["amend_rows"]))
+        self.assertEqual(len(amendments), len(consensus["amend_rows"]) + len(wave2.get("amend_rows", [])))
         self.assertEqual(data["default_decisions"]["inventory"]["amendments"], len(amendments))
         self.assertIn(f"Rows of kind consensus: {len(added)}; amendments: {len(amendments)}.", markdown)
         for slot_id, item in amendments:
@@ -1103,7 +1110,14 @@ class NewWslHandbookTests(unittest.TestCase):
                 reason = record["resolution"]["reason"]
                 self.assertFalse(slot["installed"])
                 self.assertEqual(slot["not_installed_reason"], reason)
-                self.assertEqual(lines[record["slot_id"]][4], "not installed: " + reason)
+                interim = record.get("interim")
+                # A waiting row that carries an interim install (amendment 3) shows it beside its decided default's reason.
+                expected = ("not installed: " + reason if not interim else
+                            f"interim install ({interim['date_utc']}, amendment 3): [{interim['default']}]"
+                            f"({interim['repository']}); its decided default is not installed: {reason}")
+                self.assertEqual(lines[record["slot_id"]][4], expected)
+        self.assertEqual(sorted(slot["record"]["slot_id"] for slot in waiting if slot["record"].get("interim")),
+                         ["code-search", "memory-owner"])
         messaging = next(slot for slot in rows if slot["record"]["slot_id"] == "agent-messaging")
         self.assertEqual(messaging["state"], "split")
         self.assertTrue(lines["agent-messaging"][4].startswith("not installed: native facilities do not cover"))

@@ -286,32 +286,43 @@ stage_dir=""
 # stage_dir, which this same cleanup() already removes wholesale below).
 pending_migration_prefix=""
 pending_migration_dest=""
+unpublished_prefix=""
+unpublished_dest=""
 cleanup() {
-  # Round 3e (Codex Medium #6, applied defensively here too): never itself
-  # fatal under the script's own `set -e` -- an ordinary failure in one
-  # cleanup step (the stage_dir removal below, say) must never abort this
-  # function before the lock release after it also runs. Every command from
-  # here on is checked explicitly rather than relied on to abort the whole
-  # function via errexit.
   set +e
   # An interrupted version report leaves its probe and watchdog running in
   # their own process groups (run_version_probe, below); stop both.
   # Reaped under a silenced stderr, so bash prints no job notice for them.
   local group
   for group in "${version_probe_pid:-}" "${version_watchdog_pid:-}"; do
-    if [[ -n "$group" ]]; then { kill -KILL -- "-$group" && wait "$group"; } 2>/dev/null; fi
+    if [[ -n "$group" ]]; then { kill -KILL -- "-$group" && wait "$group"; } 2>/dev/null || true; fi
   done
-  if [[ -n "$pending_migration_prefix" && -e "$pending_migration_prefix" && -n "$pending_migration_dest" ]]; then
-    if [[ ! -e "$pending_migration_dest" ]]; then
+  if [[ -n "${pending_migration_prefix:-}" && -e "$pending_migration_prefix" && -n "${pending_migration_dest:-}" ]]; then
+    if [[ ! -e "$pending_migration_dest" && ! -L "$pending_migration_dest" ]]; then
       mv -- "$pending_migration_prefix" "$pending_migration_dest" 2>/dev/null && pending_migration_prefix=""
     fi
     if [[ -n "$pending_migration_prefix" ]]; then
-      printf 'WARNING: an unexpected exit left a previous install moved aside at %s; its usual location %s was not restored automatically. Restore it manually with: mv -- %q %q\n' \
-        "$pending_migration_prefix" "$pending_migration_dest" "$pending_migration_prefix" "$pending_migration_dest" >&2
+      if [[ -e "$pending_migration_dest" || -L "$pending_migration_dest" ]]; then
+        printf 'WARNING: a previous install remains at %s; remove it with: rm -rf -- %q\n' \
+          "$pending_migration_prefix" "$pending_migration_prefix" >&2
+      else
+        printf 'WARNING: a previous install remains at %s; Restore it manually with: mv -- %q %q\n' \
+          "$pending_migration_prefix" "$pending_migration_prefix" "$pending_migration_dest" >&2
+      fi
     fi
   fi
+  # A signal immediately after os.replace can precede the state clear below.
+  # Never delete a prefix already reached through its publication symlink.
+  if [[ -n "${unpublished_prefix:-}" && "$unpublished_prefix" == "$ecosystem_root/tools/"* \
+        && -d "$unpublished_prefix" && ! -L "$unpublished_prefix" \
+        && "$(dirname -- "$(canonical_path "$unpublished_prefix")")" == "$(canonical_path "$ecosystem_root/tools")" \
+        && "$(canonical_path "${unpublished_dest:-/}")" != "$(canonical_path "$unpublished_prefix")" ]]; then
+    rm -rf -- "$unpublished_prefix" 2>/dev/null \
+      || printf 'WARNING: an unpublished install remains at %s; remove it with: rm -rf -- %q\n' \
+        "$unpublished_prefix" "$unpublished_prefix" >&2
+  fi
   if [[ -n "${stage_dir:-}" && "$stage_dir" == "$ecosystem_root"/staging.* && -d "$stage_dir" ]]; then
-    rm -rf -- "$stage_dir" 2>/dev/null || true
+    rm -rf -- "$stage_dir"
   fi
   if [[ "${lock_held:-0}" == 1 && -d "$lock_dir" ]]; then
     rmdir "$lock_dir" 2>/dev/null || true
@@ -445,11 +456,15 @@ print(os.path.realpath(sys.argv[1]))' "$target" 2>/dev/null)" && [[ -n "$via_pyt
 # escalated -- pruning is disk hygiene, never a correctness requirement,
 # since bin_dir's symlinks only ever depend on final_prefix, not on this.
 prune_old_version() {
-  local id="$1" version="$2" target="$3"
+  local id="$1" version="$2" target="$3" published_prefix="${4:-}"
   [[ -n "$target" ]] || return 0
   local canonical_tools canonical_target
   canonical_tools="$(canonical_path "$ecosystem_root/tools")"
   canonical_target="$(canonical_path "$target")"
+  if [[ -n "$published_prefix" && "$canonical_target" == "$(canonical_path "$published_prefix")" ]]; then
+    printf 'Note: leaving newly published %s in place (not pruned for safety).\n' "$target" >&2
+    return 0
+  fi
   if [[ ! -d "$canonical_target" ]]; then
     printf 'Note: leaving %s in place (not a directory after resolving symlinks; not pruned for safety).\n' \
       "$target" >&2
@@ -794,15 +809,7 @@ install_npm() {
   command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
-  # final_prefix is deliberately NEVER canonicalized (round 3d fix): once a
-  # platform_dependency install has run once, it is a SYMLINK (see below),
-  # and canonical_path would resolve straight through it to whatever
-  # versioned directory it currently targets -- silently defeating the
-  # entire point of it being a stable, never-resolved name. ecosystem_root
-  # is already canonical by the time the top-level script reaches here (see
-  # its own canonicalization above); the one path that still genuinely
-  # needs canonical_path for install_platform_dependency's sake is the
-  # versioned prefix itself, canonicalized separately below.
+  # Keep the stable publication name unresolved; only the fresh tree is canonicalized.
   local final_prefix="$ecosystem_root/tools/$id-$version"
   local package
   package="$(npm_package_name "$url")"
@@ -810,90 +817,49 @@ install_npm() {
   if [[ "$(jq -r --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")" != "" ]]; then
     has_platform_dependency=1
   fi
+  # Linux provides the independent SHA-256/SHA-512 pre-install gate. The macOS
+  # reference retains its platform installer; this optional hook keeps the
+  # publication implementation shared without changing the macOS pin contract.
+  if [[ "$has_platform_dependency" == 1 ]] && declare -F fetch_platform_dependency >/dev/null; then
+    fetch_platform_dependency "$id"
+  fi
 
   local prefix="$final_prefix"
   if [[ "$has_platform_dependency" == 1 ]]; then
-    # Round 3d (Codex): rounds 3b/3c's rename-aside-then-move-in swap was
-    # only ever RECOVERABLE, not atomic, and the recovery itself had two
-    # more bugs -- an unchecked rollback `mv` that could itself fail
-    # silently, and no coverage at all for a signal landing between the
-    # rename and reporting success. This replaces it with the Homebrew
-    # Cellar/opt pattern: final_prefix becomes a SYMLINK to a versioned,
-    # never-reused directory (tools/<id>-<version>-<stamp>), installed here
-    # BEFORE it is ever live. bin_dir's own symlinks point into
-    # final_prefix/bin/* (unchanged below) and so transparently follow
-    # final_prefix through this extra indirection -- they never need to be
-    # re-created when a later install flips final_prefix to a new target.
-    # Flipping final_prefix is then a SINGLE rename(2) of one symlink over
-    # another (via python3's os.replace, guaranteed available -- see
-    # canonical_path's own comment -- and, unlike `ln -sfn`, a genuine
-    # single-syscall rename rather than an unlink-then-symlink pair), so at
-    # every instant final_prefix resolves to the complete old tree or the
-    # complete new one, never neither.
+    # The existing Homebrew Cellar/opt pattern publishes one complete tree
+    # through os.replace. Never merge into a stale directory at the new name.
     local stamp
     stamp="$(date -u +%Y%m%d%H%M%S)-$$"
     prefix="$final_prefix-$stamp"
+    mkdir "$prefix"
+    unpublished_prefix="$prefix"
+    unpublished_dest="$final_prefix"
+  else
+    mkdir -p "$prefix"
   fi
-  mkdir -p "$prefix"
   prefix="$(canonical_path "$prefix")"
 
   local npm_install_args=(--global --no-audit --no-fund --prefix "$prefix")
   if [[ "$ignore_scripts" == "true" || "$has_platform_dependency" == 1 ]]; then
-    # A platform_dependency needs the wrapper's own lifecycle scripts
-    # deferred until install_platform_dependency has replaced whatever npm
-    # auto-fetched with the verified copy; see that function's comment.
     npm_install_args+=(--ignore-scripts)
   fi
   npm install "${npm_install_args[@]}" "$archive" >/dev/null
   if [[ "$has_platform_dependency" == 1 ]]; then
     install_platform_dependency "$id" "$prefix" "$ignore_scripts"
 
-    # --- Atomic-flip recovery step table (round 3e) -------------------------
-    # INT, TERM and HUP are explicitly trapped (script-wide, "exit N" only;
-    # see the top-level trap block) so bash always defers a caught signal
-    # until whatever foreign command (mv, ln, python3, rm) is currently
-    # running actually finishes -- every "On a signal here" cell below is
-    # therefore identical to "On failure here": a signal can only ever be
-    # acted on at a step boundary, never mid-step.
-    # Step                                    | On failure or a signal here
-    # 1. mkdir versioned dir, npm install,    | final_prefix untouched; the new versioned directory is an orphan
-    #    install_platform_dependency (above)  | (never referenced), safe to ignore or prune
-    # 2. one-time migration: mv a REAL        | pending_migration_prefix set; final_prefix now absent, previous
-    #    final_prefix aside (only when it     | install moved aside but not yet restored -- top-level cleanup()
-    #    predates this design and is not      | (trap, script-wide) moves it back onto pending_migration_dest if
-    #    already a symlink)                   | that destination is still free; reports the exact manual `mv`
-    #                                         | otherwise
-    # 3. readlink final_prefix (only when     | read-only; nothing mutated. The value read here is UNVERIFIED
-    #    already a symlink) -> previous_ver-  | (an external or "../" target, or one this run does not own) and
-    #    ioned                                | is never trusted directly -- see step 6
-    # 4. ln -s new versioned dir -> tmp_link  | tmp_link absent or partial; final_prefix untouched. Harmless:
-    #    (a NEW symlink under stage_dir)      | tmp_link lives under stage_dir, removed wholesale by cleanup()
-    # 5. os.replace(tmp_link, final_prefix)   | rename(2) either completes or does not begin; a failed call never
-    #    -- THE atomic step                   | touches final_prefix at all. On failure, tmp_link is removed and
-    #                                         | any pending migration is left for cleanup() to restore
-    # 6. prune_old_version(previous_versioned | best-effort ONLY, never fails the install: deletes previous_
-    #    or migration_prefix) -- only after   | versioned ONLY when its canonical form is a direct child of the
-    #    step 5 already succeeded             | canonical tools/ directory with a name matching <id>-<version>-*
-    #                                         | (rejects an external target, a relative "../" target, a wrong-
-    #                                         | name target, and a symlink loop, which canonical_path resolves
-    #                                         | without hanging and which then simply fails these checks); a
-    #                                         | rejected or failed deletion is logged and left in place, never
-    #                                         | escalated. migration_prefix (this run's own, already known-safe)
-    #                                         | skips the ownership check but is equally best-effort
-    # -------------------------------------------------------------------------
     local migration_prefix=""
     if [[ -e "$final_prefix" && ! -L "$final_prefix" ]]; then
       migration_prefix="${final_prefix}.migrating.$$"
-      # Set BEFORE the mv, not after: a signal landing exactly between the
-      # mv completing and the next script line would otherwise reach
-      # cleanup() with pending_migration_prefix still empty, unable to find
-      # what it should restore even though the mv itself already succeeded.
-      # Harmless the other way around (signalled before the mv even starts):
-      # cleanup() only acts once pending_migration_prefix actually exists on
-      # disk.
       pending_migration_prefix="$migration_prefix"
       pending_migration_dest="$final_prefix"
-      mv -- "$final_prefix" "$migration_prefix"
+      # GNU mv -T prevents an existing destination from turning a rename
+      # into a directory merge. BSD mv does not provide this option.
+      if [[ "$(uname -s)" == Linux ]]; then
+        mv -T -- "$final_prefix" "$migration_prefix"
+      else
+        [[ ! -e "$migration_prefix" && ! -L "$migration_prefix" ]] || { printf 'Migration destination already exists: %s\n' "$migration_prefix" >&2; exit 1; }
+        mv -- "$final_prefix" "$migration_prefix"
+      fi
     fi
 
     local previous_versioned=""
@@ -908,21 +874,19 @@ install_npm() {
     local tmp_link="$stage_dir/${id}-${version}-link.$$"
     rm -f -- "$tmp_link"
     ln -s -- "$prefix" "$tmp_link"
-    if python3 -c '
+    if python3 -I -c '
 import os, sys
 os.replace(sys.argv[1], sys.argv[2])
 ' "$tmp_link" "$final_prefix"; then
+      # Clear recovery state before best-effort pruning. A leftover after a
+      # successful publication is for deletion, never for restoration.
+      pending_migration_prefix="" pending_migration_dest="" unpublished_prefix="" unpublished_dest=""
       if [[ -n "$migration_prefix" ]]; then
-        # This run's own, already known-safe (we created it above); still
-        # best-effort, never fatal, matching prune_old_version's own
-        # contract.
         rm -rf -- "$migration_prefix" 2>/dev/null \
-          || printf 'Note: failed to prune the migrated-aside %s; left in place (not fatal).\n' "$migration_prefix" >&2
-        pending_migration_prefix=""
-        pending_migration_dest=""
+          || printf 'Note: a migrated-aside install remains at %s; remove it with: rm -rf -- %q\n' "$migration_prefix" "$migration_prefix" >&2
       fi
       if [[ -n "$previous_versioned" ]]; then
-        prune_old_version "$id" "$version" "$previous_versioned"
+        prune_old_version "$id" "$version" "$previous_versioned" "$prefix"
       fi
     else
       rm -f -- "$tmp_link"

@@ -1,0 +1,9 @@
+....................<PYTHON_INSTALL>/lib/python3.13/subprocess.py:1140: ResourceWarning: subprocess 133 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.............ssssssssss...............................................................................................................ssssssssssssss..........................s..........................................ssssssss...........................sss.........s.........................sssss......................
+----------------------------------------------------------------------
+Ran 337 tests in 89.567s
+
+OK (skipped=42)
+Installed dashboard and two units; service activation remains explicit.

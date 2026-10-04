@@ -174,10 +174,12 @@ class NewWslProfileCliTests(unittest.TestCase):
     def test_accepted_cli_and_sdk_pins_do_not_assert_sdk_provisioning(self):
         data = self.load()
         rows = {row["name"]: row for row in data["entries"]}
-        self.assertEqual(rows["Codex"]["pin"], "0.159.3")
-        self.assertEqual(data["boundary"]["accepted_python_sdk_pin"], "0.159.3")
+        self.assertEqual(rows["Codex"]["pin"], "0.160.0")
+        self.assertEqual(data["boundary"]["accepted_codex_cli_pin"], "0.160.0")
+        self.assertEqual(data["boundary"]["accepted_python_sdk_pin"], "0.160.0")
+        self.assertEqual(rows["Codex Python SDK"]["pin"], "0.160.0")
+        self.assertEqual(rows["Codex TypeScript SDK"]["pin"], "0.159.3")
         for name in ("Codex TypeScript SDK", "Codex Python SDK"):
-            self.assertEqual(rows[name]["pin"], "0.159.3")
             self.assertEqual(rows[name]["provisioning_status"], "unprovisioned_source_review")
             self.assertFalse(rows[name]["default_install"])
 

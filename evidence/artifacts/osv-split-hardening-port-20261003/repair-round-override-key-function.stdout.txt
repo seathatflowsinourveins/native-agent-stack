@@ -1,0 +1,6 @@
+2026-10-04T00:47:27Z head 48bbe5c5f double-alias override_problems: [] ignore_entry_problems: []
+2026-10-04T00:47:27Z head 48bbe5c5f regex+Ecosystem override_problems: [] ignore_entry_problems: []
+2026-10-04T00:47:27Z repair double-alias override_problems: ["'lib': unknown key 'Ecosystem'", "'lib': unknown key 'Name'"]
+2026-10-04T00:47:27Z repair regex+Ecosystem override_problems: ["'nex[t]': unknown key 'Ecosystem'"]
+2026-10-04T00:47:27Z printed lines equal the receipt's inline before/after record at 4d7f4dd0e: True
+exit 0

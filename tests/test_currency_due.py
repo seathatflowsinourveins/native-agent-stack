@@ -191,6 +191,9 @@ class Checkout:
         self.set(PINNED, pinned_report())
         self.set(SATURATION, saturation_report([("foundation/workers", False, "sweep-a")]))
         self.write_ledger(ledger(("sweep-a", "2026-09-29", "completed")))
+        # The user manager's answer that run() hands the script instead of this host's: {unit: properties}, or a string
+        # saying why it could not be asked. No unit by default.
+        self.units = {}
 
     def set(self, relative: str, report=None, *, stdout: str | None = None, code: int = 0,
             output_file: str | None = None) -> None:
@@ -225,9 +228,15 @@ class Checkout:
 
     def run(self, *extra: str) -> tuple[int, str, str]:
         stdout, stderr = io.StringIO(), io.StringIO()
-        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr), \
+                mock.patch.object(cd, "query_units", lambda units, systemctl="systemctl": self.units):
             code = cd.main(["--root", str(self.root), "--state-dir", str(self.state), "--now", NOW, *extra])
         return code, stdout.getvalue(), stderr.getvalue()
+
+    def write_record(self, name: str, record) -> None:
+        """A status record in the state directory, as the backup and restore-check DAGs write it."""
+        self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
+        (self.state / name).write_text(record if isinstance(record, str) else json.dumps(record), encoding="utf-8")
 
     @property
     def due_file(self) -> Path:
@@ -259,7 +268,7 @@ class DueFileTests(unittest.TestCase):
                                           "details"])
         self.assertEqual(document["generated_at"], NOW)
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 2, "due_layers": 0,
-                                           "reopen_triggers": 1})
+                                           "reopen_triggers": 1, "host_alerts": 0})
         # The counts give way to the command when TMPDIR makes the checkout's path long (SummaryLineTests covers
         # the shortening), so the exact text is checked around the command.
         self.assertTrue(document["summary_line"].startswith("stack currency: 1 pin behind, 2 stale receipts, 1 layer"),
@@ -494,7 +503,7 @@ class AggregateShapeTests(unittest.TestCase):
         # The unmodified reports: codex's pin, a drifted skill, an invalid skill pin and the skills CLI make four.
         document = cd.aggregate(self.reports(), NOW_DATETIME, NOW, 30)
         self.assertEqual(document["due"], {"pins_behind": 4, "stale_receipts": 1, "due_layers": 1,
-                                           "reopen_triggers": 1})
+                                           "reopen_triggers": 1, "host_alerts": 0})
         exercised = 0
         for name in ("receipts", "pins", "layers", "skills"):
             for path in json_paths(self.reports()[name]):
@@ -620,7 +629,7 @@ class IncompleteSkillCheckTests(unittest.TestCase):
         self.assertEqual(code, 0, stderr)
         document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 2, "due_layers": 0,
-                                           "reopen_triggers": 1})
+                                           "reopen_triggers": 1, "host_alerts": 0})
         coverage = document["details"][-1]
         self.assertEqual((coverage["skills_complete"], coverage["skills_fetch_errors"], coverage["skills_unresolved"]),
                          (False, 1, 1))
@@ -719,7 +728,7 @@ class DetailsCommandTests(unittest.TestCase):
         checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("skill-drift",))))
         document = self.notice(checkout, "--network")
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 0, "due_layers": 0,
-                                           "reopen_triggers": 0})
+                                           "reopen_triggers": 0, "host_alerts": 0})
         self.assertEqual(document["summary_line"], f"stack currency: 1 pin behind; details: {checkout.command('--network')}")
         again = self.reproduced(checkout, document)
         self.assertEqual((again["due"], again["summary_line"]), (document["due"], document["summary_line"]))
@@ -909,6 +918,9 @@ class SummaryLineTests(unittest.TestCase):
     def test_the_line_names_only_nonzero_counts_and_the_command(self):
         line = cd.summary_line({"pins_behind": 2, "stale_receipts": 1, "due_layers": 3, "reopen_triggers": 0})
         self.assertEqual(line, f"stack currency: 2 pins behind, 1 stale receipt, 3 layers due; details: {COMMAND}")
+        line = cd.summary_line({"pins_behind": 0, "stale_receipts": 0, "due_layers": 0, "reopen_triggers": 0,
+                                "host_alerts": 1})
+        self.assertEqual(line, f"stack currency: 1 host alert; details: {COMMAND}")
         self.assertEqual(cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 0)), "stack currency: nothing due")
 
     def test_the_line_stays_within_160_characters_and_keeps_the_command(self):
@@ -941,6 +953,133 @@ class StateDirectoryTests(unittest.TestCase):
         for environ, expected in cases:
             with self.subTest(environ=environ):
                 self.assertEqual(cd.default_state_dir(environ), expected)
+
+
+class HostAlertTests(unittest.TestCase):
+    """The host's own alerts (wave-2 lifecycle ruling, changes 7 and 8) from synthetic status records and unit states;
+    the clock is NOW, 2026-09-30T12:00:00Z."""
+
+    @staticmethod
+    def record(success: str | None = "2026-09-30T05:00:00Z", result: str = "ok", exit_code: int = 0,
+               attempt: str = "2026-09-30T05:00:00Z") -> dict:
+        record = {"last_attempt": {"result": result, "exit_code": exit_code, "time": attempt}}
+        if success is not None:
+            record["last_success"] = {"snapshot_id": "a1b2c3d4", "time": success}
+        return record
+
+    @staticmethod
+    def unit(state: str = "active", enabled: str = "enabled", sub: str = "running", result: str = "success") -> dict:
+        return {"UnitFileState": enabled, "ActiveState": state, "SubState": sub, "Result": result}
+
+    def document(self, checkout: Checkout) -> dict:
+        code, stdout, stderr = checkout.run("--dry-run", "--json")
+        self.assertEqual(code, 0, stderr)
+        return json.loads(stdout)
+
+    def alerts(self, checkout: Checkout) -> list:
+        return [item for item in self.document(checkout)["details"]
+                if item["kind"].startswith(("backup_", "restore_check_", "unit_", "dagu_"))]
+
+    def test_no_record_and_no_enabled_unit_is_no_alert(self):
+        document = self.document(Checkout(self))
+        self.assertEqual(document["due"]["host_alerts"], 0)
+        coverage = document["details"][-1]
+        self.assertEqual((coverage["host_units"], coverage["backup_record"], coverage["restore_record"]),
+                         ("checked", "absent", "absent"))
+
+    def test_a_fresh_backup_and_restore_check_are_no_alert(self):
+        checkout = Checkout(self)
+        checkout.write_record(cd.BACKUP_RECORD, self.record("2026-09-29T13:00:00Z"))          # 47 h before NOW
+        checkout.write_record(cd.RESTORE_RECORD, self.record("2026-09-23T13:00:00Z"))         # 7 days before NOW
+        self.assertEqual(self.alerts(checkout), [])
+
+    def test_a_failed_or_partial_backup_is_an_alert_beside_the_last_success_it_keeps(self):
+        for result, exit_code in (("failed", 1), ("partial", 3), ("ok", 3)):
+            with self.subTest(result=result, exit_code=exit_code):
+                checkout = Checkout(self)
+                checkout.write_record(cd.BACKUP_RECORD, self.record(result=result, exit_code=exit_code))
+                self.assertEqual(self.alerts(checkout), [{"kind": "backup_failed", "result": result,
+                                                          "exit_code": exit_code, "time": "2026-09-30T05:00:00Z"}])
+
+    def test_a_backup_older_than_48_hours_or_never_successful_is_overdue(self):
+        for success, expected in (("2026-09-28T11:00:00Z", 49), (None, None)):
+            with self.subTest(success=success):
+                checkout = Checkout(self)
+                checkout.write_record(cd.BACKUP_RECORD, self.record(success))
+                self.assertEqual(self.alerts(checkout), [{"kind": "backup_overdue", "last_success": success,
+                                                          "age_hours": expected, "max_age_hours": 48}])
+
+    def test_a_restore_check_older_than_8_days_or_failed_is_an_alert(self):
+        checkout = Checkout(self)
+        checkout.write_record(cd.RESTORE_RECORD, self.record("2026-09-21T11:00:00Z", result="failed", exit_code=1))
+        self.assertEqual([item["kind"] for item in self.alerts(checkout)],
+                         ["restore_check_failed", "restore_check_overdue"])
+
+    def test_an_unreadable_record_is_an_alert_and_not_an_error_of_the_run(self):
+        for text, error in (("{not json", "not JSON"), ("[]", "not a JSON object")):
+            with self.subTest(text=text):
+                checkout = Checkout(self)
+                checkout.write_record(cd.BACKUP_RECORD, text)
+                self.assertEqual(self.alerts(checkout), [{"kind": "backup_record_unreadable", "error": error}])
+        checkout = Checkout(self)
+        checkout.write_record(cd.BACKUP_RECORD, {"last_success": {"snapshot_id": "a", "time": "2026-09-30T05:00:00Z"}})
+        self.assertEqual(self.alerts(checkout), [{"kind": "backup_record_unreadable", "error": "no last_attempt object"}])
+
+    def test_an_enabled_unit_that_failed_or_hit_its_start_limit_and_an_inactive_dagu_are_alerts(self):
+        checkout = Checkout(self)
+        checkout.units = {"omniroute.service": self.unit("failed", sub="failed", result="start-limit-hit"),
+                          "ollama.service": self.unit("inactive", enabled="disabled", sub="dead"),
+                          "ai-memory.service": self.unit(),
+                          "ecosystem-otelcol.service": self.unit("activating", sub="auto-restart", result="exit-code"),
+                          "dagu.service": self.unit("inactive", sub="dead")}
+        self.assertEqual(self.alerts(checkout), [
+            {"kind": "unit_not_active", "unit": "omniroute.service", "active_state": "failed", "sub_state": "failed",
+             "result": "start-limit-hit"},
+            {"kind": "dagu_not_active", "unit": "dagu.service", "active_state": "inactive", "sub_state": "dead",
+             "result": "success"}])
+        # A unit this host does not enable (Ollama before the GPU handover) and one that is restarting are no alert.
+
+    def test_a_user_manager_that_cannot_be_asked_is_coverage_not_an_alert(self):
+        checkout = Checkout(self)
+        checkout.units = "no systemctl on this host"
+        document = self.document(checkout)
+        self.assertEqual(document["due"]["host_alerts"], 0)
+        self.assertEqual(document["details"][-1]["host_units"], "no systemctl on this host")
+
+    def test_host_alerts_write_the_notice_and_the_details_name_them(self):
+        checkout = Checkout(self)
+        checkout.write_record(cd.BACKUP_RECORD, self.record(result="failed", exit_code=1))
+        checkout.units = {"dagu.service": self.unit("failed", sub="failed", result="exit-code")}
+        code, _, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+        self.assertEqual(document["due"]["host_alerts"], 2)
+        self.assertTrue(document["summary_line"].startswith("stack currency: 2 host alerts; details: "),
+                        document["summary_line"])
+        text = cd.render_text(document)
+        self.assertIn("  backup: the last attempt ended failed (exit code 1) at 2026-09-30T05:00:00Z", text)
+        self.assertIn("  unit: dagu.service is enabled and failed (failed, result exit-code)", text)
+        self.assertIn("units: systemctl --user status <unit>", text)
+        self.assertIn("backups: dagu history restic-backup", text)
+
+    def test_query_units_reads_the_blocks_of_systemctl_show_and_names_why_it_could_not_ask(self):
+        with tempfile.TemporaryDirectory(dir=short_temp_base()) as temporary:
+            showing = Path(temporary) / "systemctl"
+            showing.write_text("#!/bin/sh\nprintf 'Id=omniroute.service\\nUnitFileState=enabled\\nActiveState=failed\\n"
+                               "SubState=failed\\nResult=start-limit-hit\\n\\nId=dagu.service\\nUnitFileState=enabled\\n"
+                               "ActiveState=active\\nSubState=running\\nResult=success\\n'\n", encoding="utf-8")
+            showing.chmod(0o755)
+            states = cd.query_units(("omniroute.service", "dagu.service"), str(showing))
+            self.assertEqual(states["omniroute.service"]["Result"], "start-limit-hit")
+            self.assertEqual(states["dagu.service"]["ActiveState"], "active")
+            refusing = Path(temporary) / "refusing"
+            refusing.write_text("#!/bin/sh\necho 'Failed to connect to bus: No medium found' >&2\nexit 1\n",
+                                encoding="utf-8")
+            refusing.chmod(0o755)
+            self.assertEqual(cd.query_units(("dagu.service",), str(refusing)),
+                             "systemctl --user show exited 1: Failed to connect to bus: No medium found")
+            self.assertEqual(cd.query_units(("dagu.service",), str(Path(temporary) / "absent")),
+                             "no systemctl on this host")
 
 
 class ThisCheckoutTests(unittest.TestCase):

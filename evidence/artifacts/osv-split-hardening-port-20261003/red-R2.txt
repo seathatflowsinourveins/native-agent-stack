@@ -1,0 +1,41 @@
+test_each_primary_and_sarif_status_is_retained (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained) ... ok
+test_pr_collects_three_primary_statuses_without_sarif (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_pr_collects_three_primary_statuses_without_sarif) ... ok
+test_preflight_failure_is_returned_before_scan (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_preflight_failure_is_returned_before_scan) ... ok
+test_three_invocations_keep_every_input_and_parser_separate (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate) ... FAIL
+test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan) ... 
+  test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan) (mutation='unknown-config') ... FAIL
+
+======================================================================
+FAIL: test_three_invocations_keep_every_input_and_parser_separate (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scan-root>/tests/test_osv_lockfile_coverage.py", line 722, in test_three_invocations_keep_every_input_and_parser_separate
+    self.assertEqual([arg for arg in argv if arg.startswith('--lockfile=')], expected)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['--l[222 chars].txt:blueprints/us-equities/sim-crosscheck-hft[4221 chars]ock'] != ['--l[222 chars].txt:.github/requirements-ci.txt', '--lockfile[4280 chars]ock']
+
+First differing element 3:
+'--lo[19 chars].txt:blueprints/us-equities/sim-crosscheck-hft[22 chars]lock'
+'--lo[19 chars].txt:.github/requirements-ci.txt'
+
+Second list contains 1 additional elements.
+First extra element 50:
+'--lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock'
+
+Diff is 4711 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan) (mutation='unknown-config')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scan-root>/tests/test_osv_lockfile_coverage.py", line 759, in test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan
+    self.assertEqual(result.returncode, 1, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 1 : 
+
+----------------------------------------------------------------------
+Ran 5 tests in 2.300s
+
+FAILED (failures=2)
+
+exit_code=1

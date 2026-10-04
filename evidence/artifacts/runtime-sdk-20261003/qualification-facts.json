@@ -1,0 +1,117 @@
+{
+  "checked_at": "2026-10-03",
+  "by": "Claude session <SESSION> (coordinator-run commands)",
+  "upstream": {
+    "tag": "rust-v0.160.0",
+    "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "published_at": "2026-10-01T20:19:13Z"
+  },
+  "npm_wrapper": {
+    "package": "@openai/codex@0.160.0",
+    "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0.tgz",
+    "dist_integrity": "sha512-kEtVGzjRAYAMOwJxN39bGcna7LT3IDQgq64NNJ/dDTfu4OzZaocJcyNb5/gGJ/IVF/Vj7oK7E2m3nmTan7lpjg==",
+    "computed_integrity_matches": true,
+    "sha256": "373517768e912eeb5054024ae9215e2c90a1420957b66fe134ef745a00948d4a",
+    "bytes": 4902
+  },
+  "native_binary": {
+    "via": "npm install --global --prefix <private prefix> ./codex-0.160.0.tgz (platform package @openai/codex@0.160.0-linux-x64)",
+    "version": "codex-cli 0.160.0",
+    "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+    "exec_help_diff_vs_0_159_3_lines": 0
+  },
+  "sdk_pair": {
+    "openai-codex": "0.160.0",
+    "openai-codex-cli-bin": "0.160.0",
+    "python": "3.13.15",
+    "uv": "0.12.17",
+    "compile_command": "uv pip compile blueprints/us-equities/workers/requirements.txt --constraints adoption/sdk/accepted-constraints.txt --python <CPython 3.13.15> --python-version 3.13.15 --python-platform x86_64-unknown-linux-gnu --generate-hashes --no-build --no-sources --default-index https://pypi.org/simple --no-header --output-file adoption/sdk/requirements-linux-x86_64-py313.lock --quiet (both inputs with the two codex lines at 0.160.0)",
+    "lock_file": "<PRIVATE_RUN_DIR>/requirements-linux-x86_64-py313.lock",
+    "lock_sha256": "4af67ebfa7ee46f833c2f03531870a642967b7d2c40e6e5cbb51096a066c6960",
+    "distribution_count": 36,
+    "artifact_hash_count": 867,
+    "lock_diff_vs_main": "only openai-codex and openai-codex-cli-bin change (0.159.3 -> 0.160.0) with their hashes",
+    "strict_hash_sync_exit": 0,
+    "pip_check": "All installed packages are compatible",
+    "bundled_cli_version": "codex-cli 0.160.0",
+    "bundled_cli_sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+    "bundled_cli_matches_npm_platform_binary": true,
+    "lock_file_repo_root": "<PRIVATE_RUN_DIR>/requirements-linux-x86_64-py313.repo-root.lock",
+    "lock_sha256_repo_root_compile": "3a17fa09d3c598e30ed8a6e833eb061ca84cad8a3af99fd975a4024c4031cddc",
+    "repo_root_compile_note": "recompiled 2026-10-03 from the worktree root with the adoption/sdk/README.md command (uv 0.12.17) so the '# via' comments are repository-relative as on main; the first compile ran in a private directory and its comments named bare file names; strict-hash sync and pip check re-run on the new bytes in a fresh venv (exit 0), bundled CLI sha256 unchanged"
+  },
+  "canaries": {
+    "sdk_native_account": {
+      "marker_exact_match": true,
+      "final_response": "SDK_01600_NATIVE_CANARY_OK",
+      "item_types": [
+        "ThreadItem"
+      ],
+      "usage": {
+        "last": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 7168,
+          "input_tokens": 21418,
+          "output_tokens": 12,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 21430
+        },
+        "model_context_window": 258400,
+        "total": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 7168,
+          "input_tokens": 21418,
+          "output_tokens": 12,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 21430
+        }
+      },
+      "seconds": 5.8,
+      "provider": "openai (native sign-in, default CODEX_HOME)",
+      "model": "gpt-6.1-sol",
+      "effort": "low",
+      "marker": "SDK_01600_NATIVE_CANARY_OK"
+    },
+    "sdk_gateway": {
+      "marker_exact_match": true,
+      "final_response": "SDK_01600_GATEWAY_CANARY_OK",
+      "usage": {
+        "last": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 15137,
+          "output_tokens": 36,
+          "reasoning_output_tokens": 21,
+          "total_tokens": 15173
+        },
+        "model_context_window": 258400,
+        "total": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 15137,
+          "output_tokens": 36,
+          "reasoning_output_tokens": 21,
+          "total_tokens": 15173
+        }
+      },
+      "seconds": 3.9,
+      "provider": "omniroute 127.0.0.1:20128 (private CODEX_HOME)",
+      "model": "cx/gpt-6.1-sol",
+      "effort": "max",
+      "marker": "SDK_01600_GATEWAY_CANARY_OK"
+    },
+    "cli_exec_gateway": {
+      "exit": 0,
+      "last_message": "CLI_01600_GATEWAY_CANARY_OK",
+      "model": "cx/gpt-6.1-sol",
+      "effort": "max",
+      "private_codex_home": true
+    }
+  },
+  "state_db_note": "git diff rust-v0.159.3 rust-v0.160.0 -- codex-rs/state shows no new SQL migration files (runtime, reclamation and tests only)",
+  "limits": [
+    "backend model and effort not read from the gateway call log",
+    "the shared host launcher, daemon and production prefix still run 0.159.3; the host switch is a separate coordinated step",
+    "moves inside the 7-day cooldown recorded in docs/decisions/2026-09-25-workstation-sota-refresh.md, as 0.159.2 and 0.159.3 did (docs/decisions/2026-09-27-model-currency.md); <HOST> already runs 0.160.0"
+  ]
+}
