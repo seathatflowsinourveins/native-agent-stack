@@ -821,6 +821,9 @@ class PinningTests(unittest.TestCase):
 
 SHELL_BREAK = {"|", "||", "&&", ";", ">", ">>", "2>&1", "&>", "2>", "<"}
 QUIET_FLAGS = {"-v", "-q", "-b", "-f", "-c", "--verbose", "--quiet", "--buffer", "--failfast", "--catch", "--locals"}
+# Report options that take a value and select no test: `--durations N`, also spelled `--durations=N` (Python 3.12+,
+# https://docs.python.org/3/library/unittest.html#cmdoption-unittest-durations).
+VALUE_FLAGS = {"--durations"}
 
 
 def unittest_invocations(job_text):
@@ -838,8 +841,16 @@ def unittest_invocations(job_text):
 
 def runs_whole_suite(args):
     """True for the whole project suite: no module or pattern arguments, or ``discover``
-    without ``-p`` over the default or ``tests`` start directory."""
-    rest = [a for a in args if a not in QUIET_FLAGS]
+    without ``-p`` over the default or ``tests`` start directory. Report options select no
+    test, so QUIET_FLAGS and ``--durations N`` are left out before deciding."""
+    rest, value_next = [], False
+    for arg in args:
+        if value_next:
+            value_next = False
+        elif arg in VALUE_FLAGS:
+            value_next = True
+        elif arg not in QUIET_FLAGS and arg.partition("=")[0] not in VALUE_FLAGS:
+            rest.append(arg)
     if not rest:
         return True
     if rest[0] != "discover" or any(a in ("-p", "--pattern") for a in rest):
@@ -871,16 +882,140 @@ class WholeSuiteJobsCheckOutFullHistory(unittest.TestCase):
                             self.assertRegex(step, r"(?m)^\s+fetch-depth:\s*0\s*(#.*)?$")
         self.assertIn("catalog-freshness.yml:freshness", suite_jobs)
         self.assertIn("validate.yml:validate", suite_jobs)
+        self.assertIn("adoption-bootstrap.yml:validate-macos", suite_jobs)
 
     def test_whole_suite_classification(self):
         cases = {(): True, ("-v",): True, ("discover",): True, ("discover", "-s", "tests"): True,
                  ("tests.test_x", "-v"): False, ("discover", "-s", "tools/token-report", "-p", "t.py", "-q"): False,
-                 ("discover", "-s", "tools/token-report"): False, ("discover", "-p", "test_a*.py"): False}
+                 ("discover", "-s", "tools/token-report"): False, ("discover", "-p", "test_a*.py"): False,
+                 ("--durations", "50"): True, ("-v", "--durations", "50"): True, ("--durations=50",): True,
+                 ("--durations", "50", "tests.test_x"): False, ("discover", "-s", "tests", "--durations", "50"): True,
+                 ("discover", "--durations", "50", "-p", "test_a*.py"): False}
         for args, whole in cases.items():
             with self.subTest(args=args):
                 self.assertIs(runs_whole_suite(list(args)), whole)
         self.assertEqual(unittest_invocations("run: python3 -m unittest 2>&1 | tee log\n"), [[]])
         self.assertEqual(unittest_invocations("run: python3 -m unittest -v >full.log 2>&1\n"), [["-v"]])
+        wrapped = 'timeout --signal=ABRT --kill-after=60s 55m \\\n  python3 -m unittest -v --durations 50 2>&1 | tee "$log"\n'
+        self.assertEqual(unittest_invocations(wrapped), [["-v", "--durations", "50"]])
+
+
+class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
+    """The step that runs the whole suite in each job lists the 50 slowest tests and runs with faulthandler on. On the
+    Linux jobs GNU timeout sends SIGABRT five minutes before the job's limit, so a hang prints every thread's Python
+    traceback before the job is killed, and SIGKILL follows 60 s later. validate-macos is not wrapped: the macos-15
+    image lists no GNU coreutils (actions/runner-images@6d942e630479cd99a93dadfc766af11242bfa402,
+    images/macos/macos-15-arm64-Readme.md and images/macos/toolsets/toolset-15.json). validate keeps the verbose log of
+    its run as an artifact, uploaded even when the suite fails."""
+
+    SUITE_STEPS = {
+        "adoption-bootstrap.yml:validate-macos": "Run the full test suite (gating on macOS)",
+        "catalog-freshness.yml:freshness": "Run project test suite",
+        "validate.yml:validate": "Test validation failure modes",
+    }
+    UNWRAPPED = {"adoption-bootstrap.yml:validate-macos"}
+    VALIDATE = "validate.yml:validate"
+    UPLOAD_STEP = "Upload the verbose test suite log"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.jobs = {f"{path.name}:{job_id}": job_text for path in sorted(WORKFLOWS.glob("*.yml"))
+                    for job_id, job_text in jobs(path.read_text(encoding="utf-8")).items()}
+
+    def suite_step(self, key):
+        return uncommented(step_block(self.jobs[key], self.SUITE_STEPS[key]))
+
+    def suite_invocation(self, key):
+        found = [args for args in unittest_invocations(self.suite_step(key)) if runs_whole_suite(args)]
+        self.assertEqual(len(found), 1, f"{key}: the named step runs the whole suite once")
+        return found[0]
+
+    def test_every_whole_suite_job_names_its_suite_step(self):
+        found = {key for key, job_text in self.jobs.items()
+                 if any(runs_whole_suite(args) for args in unittest_invocations(job_text))}
+        self.assertEqual(found, set(self.SUITE_STEPS))
+
+    def test_each_suite_lists_its_50_slowest_tests_with_faulthandler_on(self):
+        for key in sorted(self.SUITE_STEPS):
+            with self.subTest(key):
+                args = self.suite_invocation(key)
+                self.assertIn("--durations", args)
+                self.assertEqual(args[args.index("--durations") + 1], "50")
+                self.assertRegex(self.suite_step(key), r"(?m)^          PYTHONFAULTHANDLER: '1'$")
+
+    def test_linux_suites_abort_five_minutes_before_the_job_limit(self):
+        for key in sorted(set(self.SUITE_STEPS) - self.UNWRAPPED):
+            with self.subTest(key):
+                limit = int(re.search(r"(?m)^    timeout-minutes: (\d+)$", self.jobs[key]).group(1))
+                script = re.sub(r"[ \t]*\\\n\s*", " ", self.suite_step(key))
+                self.assertIn(f"timeout --signal=ABRT --kill-after=60s {limit - 5}m python3 -m unittest ", script)
+                self.assertIn("set -o pipefail", script, "tee would otherwise hide the exit status of timeout and unittest")
+
+    def test_the_macos_suite_has_no_gnu_timeout_wrapper(self):
+        for key in sorted(self.UNWRAPPED):
+            with self.subTest(key):
+                self.assertNotRegex(self.suite_step(key), r"\btimeout --")
+
+    def test_validate_uploads_its_verbose_log_even_when_the_suite_fails(self):
+        self.assertIn("-v", self.suite_invocation(self.VALIDATE))
+        log = re.search(r'\| tee "\$RUNNER_TEMP/([^"]+)"', self.suite_step(self.VALIDATE)).group(1)
+        job = self.jobs[self.VALIDATE]
+        upload = step_block(job, self.UPLOAD_STEP)
+        self.assertEqual(block_if(upload), "always()")
+        self.assertIn("uses: actions/upload-artifact@", upload)
+        self.assertIn("path: ${{ runner.temp }}/" + log + "\n", upload)
+        self.assertLess(job.index(self.SUITE_STEPS[self.VALIDATE]), job.index(self.UPLOAD_STEP))
+
+
+@unittest.skipUnless(sys.platform.startswith("linux") and shutil.which("bash") and shutil.which("timeout"),
+                     "the Linux suite steps run under bash with GNU coreutils timeout, as on ubuntu-24.04")
+class ValidateSuiteStepTracesAHang(unittest.TestCase):
+    """validate.yml's suite script run as the runner runs a step without `shell:` (`bash -e` over the script file), in
+    a scratch checkout whose one test hangs, with the step's limit cut from minutes to 3 s. With the step's
+    PYTHONFAULTHANDLER the log that the artifact uploads holds the hung test's traceback and the step fails with
+    timeout's status 124; the control without the variable fails the same way and holds no traceback."""
+
+    HANG = "import time\nimport unittest\n\n\nclass T(unittest.TestCase):\n    def test_hangs(self):\n        time.sleep(600)\n"
+
+    def run_step(self, faulthandler):
+        job = jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))["validate"]
+        step = step_block(job, WholeSuiteHeadroomAndDiagnostics.SUITE_STEPS["validate.yml:validate"])
+        self.assertIn("PYTHONFAULTHANDLER: '1'", step)
+        script, cut = re.subn(r"--kill-after=60s \d+m ", "--kill-after=5s 3s ", run_block(step))
+        self.assertEqual(cut, 1, "the step has one limit to cut")
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch, ignore_errors=True)
+        (scratch / "tests").mkdir()
+        (scratch / "tests/__init__.py").write_text("", encoding="utf-8")
+        (scratch / "tests/test_hang.py").write_text(self.HANG, encoding="utf-8")
+        tools = scratch / "bin"
+        tools.mkdir()
+        (tools / "python3").write_text(f'#!/bin/sh\nexec {shlex.quote(sys.executable)} "$@"\n', encoding="utf-8")
+        (tools / "python3").chmod(0o755)
+        (scratch / "step.sh").write_text(script, encoding="utf-8")
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith(("GITHUB_", "PYTHON"))}
+        environment.update(PATH=f"{tools}{os.pathsep}{os.environ.get('PATH', '')}", PYTHONDONTWRITEBYTECODE="1",
+                           RUNNER_TEMP=str(scratch / "runner-temp"))
+        if faulthandler:
+            environment["PYTHONFAULTHANDLER"] = "1"
+        proc = subprocess.run(["bash", "-e", str(scratch / "step.sh")], cwd=scratch, env=environment,
+                              capture_output=True, text=True, timeout=120)
+        log = re.search(r'\| tee "\$RUNNER_TEMP/([^"]+)"', script).group(1)
+        path = scratch / "runner-temp" / log
+        return proc.returncode, path.read_text(encoding="utf-8") if path.exists() else None
+
+    def test_a_hang_prints_the_hung_test_traceback_and_fails_the_step(self):
+        code, log = self.run_step(faulthandler=True)
+        self.assertEqual(code, 124, log)
+        self.assertIn("Fatal Python error: Aborted", log)
+        self.assertRegex(log, r'File "[^"]*test_hang\.py", line 7 in test_hangs')
+
+    def test_control_without_faulthandler_the_hang_leaves_no_traceback(self):
+        code, log = self.run_step(faulthandler=False)
+        self.assertEqual(code, 124, log)
+        self.assertIn("test_hangs (tests.test_hang.T", log, "the hung test started, so its traceback could have printed")
+        self.assertNotIn("Fatal Python error", log)
 
 
 
