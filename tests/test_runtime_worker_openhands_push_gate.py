@@ -11,6 +11,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import shutil
 import subprocess
@@ -26,7 +27,11 @@ from tests.test_runtime_worker_openhands_resolver import (
 ROOT = Path(__file__).resolve().parents[1]
 RESOLVER = "blueprints/runtime-workers/openhands/resolver"
 ENFORCING = (f"{RESOLVER}/push_gate.py", f"{RESOLVER}/patch_policy.py", f"{RESOLVER}/gh_harness.py")
-PIN = "1.30.1"
+# The zizmor version the gate enforces, read from the file and with the pattern the gate uses
+# (push_gate.ZIZMOR_PIN_FILE, push_gate.ZIZMOR_PIN), so a pin bump moves these tests with it and the real-zizmor test
+# keeps running against the newly pinned release instead of skipping.
+PIN = re.search(r"^zizmor==(?P<version>[0-9]+\.[0-9]+\.[0-9]+)\b",
+                (ROOT / ".github/requirements-ci.txt").read_text(encoding="utf-8"), re.M)["version"]
 CHECKOUT_SHA = "08c6903cd8c0fde910a37f88322edcfb5dd907a8"
 
 CI_WORKFLOW = f"""name: ci

@@ -51,7 +51,8 @@ python3 blueprints/runtime-workers/openhands/resolver.py --help
 python3 blueprints/runtime-workers/openhands/resolver.py run --help
 ```
 
-The gate module's real-zizmor test runs only when `zizmor` on `PATH` is the pinned 1.30.1, and
+The gate module's real-zizmor test runs only when `zizmor` on `PATH` is the version pinned in
+`.github/requirements-ci.txt` (1.30.1 today; the tests read the pin from that file, as the gate does), and
 its PyYAML cross-check of the workflow reader only when PyYAML is importable (this host's
 `/usr/bin/python3` has it). Both skip with their reason otherwise.
 

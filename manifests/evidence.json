@@ -9354,8 +9354,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "b0c796a50d26856a1f0c409e593b9a6c32dbf1ac76687fa8028bcd3563b882a6",
-      "bytes": 46725
+      "sha256": "9496a27b589031eaf031ca950718eb7e52969d5e0e903d6ce63b4b301f01e56f",
+      "bytes": 46831
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -51029,8 +51029,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "f304f8c141a8a3146faa75a41ceb6ea2fd57b55b51f439dd59eb3396bf235cbe",
-      "bytes": 41354
+      "sha256": "f9fd2fad4efb626f7e0879739f3e77a55b0242c7f85fee75c948fd1f822da35a",
+      "bytes": 41799
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
