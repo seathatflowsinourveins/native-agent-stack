@@ -71,24 +71,72 @@ but its native version probe exited 1 with `UtilBindVsockAnyPort: socket failed 
 in this bounded environment. Host PowerShell 7.6.6 remains supplied context;
 the release metadata and upstream sources above were independently read.
 
-The two changed regression cases passed (2 tests, exit 0), and the final
-recipe/document-consistency run passed (139 tests, 1 skip, exit 0). The required combined suite
-ran 342 tests with 6 failures and 9 skips (exit 1): the existing ledger-path
-guard rejects temporary fixture paths inside any Git worktree. The requested
-sibling temporary directory is outside this job's writable roots, so the
-temporary files were confined to the owned worktree instead. The classifier
-was verified without changing its implementation or that guard.
+The coordinator's completed-head validation report for `91ec598e1` is
+**LANDABLE** for repository integration.
+The handbook and its receipt output digests were regenerated under the
+[2026-10-01 generator contract](2026-10-01-new-wsl-handbook-generator.md).
+The recipe, skill-usage, docs-consistency and handbook tests pass.
+`python3 scripts/validate.py` passes (exit 0), and
+`python3 scripts/build_ecosystem.py --check` passes (exit 0).
+These results supersede the earlier attempts below; the native Windows probe
+retains the limitation stated above. This repair independently reran both
+validation commands against the unchanged incoming head, each with exit 0.
 
-The related modules ran 324 tests with 2 failures (exit 1). The unchanged
-Windows Terminal notification test finds `auth_storage_failure` in the native
-Codex schema without a decision in its existing map. The handbook check
-detects the changed recipe's source hash. Regenerating the handbook would
-also require changing its binding dated receipt under
-`evidence/artifacts/new-wsl-handbook-20261001/`; this job preserves dated
-evidence, so those files remain unchanged and that failure remains explicit.
+**Superseded attempt — combined suite:** the two changed regression cases
+passed (2 tests, exit 0), and the recipe/document-consistency run passed
+(139 tests, 1 skip, exit 0). The combined suite ran 342 tests with 6 failures
+and 9 skips (exit 1): the ledger-path guard rejected temporary fixture paths
+inside a Git worktree. The requested sibling temporary directory was outside
+that attempt's writable roots, so its temporary files were confined to the
+owned worktree. The classifier was verified without changing its implementation
+or that guard.
 
-Publication validation initially rejected personal workspace paths in two
-captured test logs. Redacted those paths and retained the sanitized output;
-the repeat `python3 scripts/validate.py` passed (exit 0).
-`python3 scripts/build_ecosystem.py --check` and `git diff --check` also passed
-(exit 0). These checks do not close the failed suite conditions above.
+**Superseded attempt — related modules:** 324 tests ran with 2 failures
+(exit 1). The Windows Terminal notification test found `auth_storage_failure`
+in the native Codex schema without a decision in its map, and the handbook
+check detected the changed recipe's source hash. At that attempt, handbook
+regeneration and the accompanying receipt digest update were deferred.
+The completed head regenerated both under the existing generator contract.
+
+**Superseded attempt — publication validation:** validation initially rejected
+personal workspace paths in two captured test logs. Those paths were redacted
+and the sanitized output retained; the repeat `python3 scripts/validate.py`
+passed (exit 0). The ecosystem and diff checks also passed (exit 0).
+
+The bounded review repair of 2026-10-04 independently recomputed the supplied
+head's recipe SHA-256 as
+`5c7995822a80f8ca5e006c24de67497f0f3d7a5809b02f74dfc852028597633d`
+and test SHA-256 as
+`a05c758abd049d8d5f50459b39b223ad0d96bd5960b2dccc50bfc1ab7d09e8f3`.
+The convergence check reproduced exactly the two stale frozen-input pins
+(exit 1). Following the recipe record's re-freezes in `ad7d645ba`,
+`b8dd81ddc`, `3a8dc31a6`, `99d5b122c` and `ee4ece2e8`, the repair updates
+`frozen_inputs.base_revision` to `91ec598e170db3257a72322a21b6f920ad5b6094`
+and recomputes every affected pin from the final file bytes. The recipe now
+labels the quote convention's PowerShell 5.1 origin as historical, and the
+checklist includes the PowerShell 7 MSI executable prerequisite. Microsoft's
+pinned installation source above was re-read for that prerequisite. The
+supported handbook generator's `--write` command refreshed its outputs, and
+their receipt digests were updated again for these recipe edits.
+
+The repair's local rerun uses `TMPDIR=.bounded-job-029/tmp` throughout.
+The explicit repaired convergence record passes (exit 0), the handbook check
+passes (exit 0), and `git diff --check` passes (exit 0). The required
+`--all-recorded --root . --json` check exits 1 at record discovery because the
+coordinator's evidence registry still contains the prior JSON file hashes;
+the registry is reserved for the coordinator's final commit. The combined
+recipe, handbook, docs-consistency and skill-usage suite ran 414 tests with
+6 failures and 9 skips (exit 1). All six failures are in the skill-usage
+call-ledger cases: their temporary fixtures inherit this job's Git worktree,
+while the ledger requires a path outside every Git worktree. Those environment
+failures remain explicit and need a coordinator rerun with eligible fixture
+paths. They are separate from the completed-head validation report above.
+
+Repair completeness critic: the quote annotation and prerequisite tick also
+affect the recipe and checklist hashes, so both join the unchanged test's
+new pin in the convergence record. The generated handbook and its receipt
+digests remain bound to those final inputs. The next Windows recipe lifecycle
+sweep must retain the packaging and interop checks identified above. Native
+Windows installation and host acceptance retain their separate evidence scope.
+The coordinator re-registers the repaired files in `manifests/evidence.json`
+last.

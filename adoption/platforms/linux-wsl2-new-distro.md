@@ -176,10 +176,11 @@ wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --
 wsl.exe -d '<Name>' --exec bash -lc 'node --version'
 ```
 
-The first probe prints `<WSL_USER>,directory` and `<WSL_USER>,socket`. No command that a PowerShell block hands to
-`wsl.exe` carries a double quote inside its single-quoted argument: Windows PowerShell 5.1 does not escape it for a
-native program, and the argument breaks apart (run 3, 2026-10-02: the earlier `stat -c "%U %F"` form returned
-`stat: missing operand`, and a quoted `for` loop returned `unexpected EOF`).
+The first probe prints `<WSL_USER>,directory` and `<WSL_USER>,socket`. The recipe retains the convention that no
+command a PowerShell block hands to `wsl.exe` carries a double quote inside its single-quoted argument. Its origin
+is historical: Windows PowerShell 5.1 broke those arguments in run 3 (2026-10-02), where the earlier
+`stat -c "%U %F"` form returned `stat: missing operand`, and a quoted `for` loop returned `unexpected EOF`.
+The maintained Windows-side blocks now run in PowerShell 7.
 
 Record these per-arm observations in `comparison_arms` alongside each rehearsal's schema, ownership, storage and idle
 observations. The inspected 26.04.1 system interpreter is Python 3.14.4-1ubuntu0.1 (its `python3` metapackage is
