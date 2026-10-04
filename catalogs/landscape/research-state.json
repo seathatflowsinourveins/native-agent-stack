@@ -387,7 +387,7 @@
       "catalog": "foundation",
       "layer_id": "agent-sdks",
       "status": "on_requirement_change",
-      "next_action": "Qualify a concrete application need (durable multi-host state, explicit graph checkpoints, a remote/container worker or programmatic Claude session control) before promoting a deferred SDK alternative; the SDK table in docs/foundation-closure-20260921.md (lines 78-84) has not been revisited by any lane since 2026-09-21.",
+      "next_action": "Qualify a concrete application need (durable multi-host state, explicit graph checkpoints, a remote/container worker or programmatic session control) before promoting a deferred SDK alternative. The 2026-09-21 SDK table in docs/foundation-closure-20260921.md has its header at line 80 and candidate rows at lines 82-86, with no OpenAI Agents SDK row. The 2026-10-03 source revisit corrects the citation and adds OpenAI Agents SDK as unqualified in the current catalogs; it supplies no new execution and preserves the codex_tool adoption hold and newly preregistered comparison path in docs/decisions/2026-10-03-foundation-catalog-drift.md.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/foundation-closure-20260921.md",

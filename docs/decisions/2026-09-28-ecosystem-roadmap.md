@@ -343,3 +343,19 @@ Decision rights stay as recorded:
 - **The route is settled by the user's direction, unmeasured.** The landscape sweep and cross-family research and review use OmniRoute; the native Codex defaults remain as recorded.
 - **Item 5 needs no confirmation.** The user already directed the route (`2026-09-27-omniroute-account-pool.md:304-305`). Who confirms the criterion is read two ways: the 2026-09-29 update records it as an owner decision under the delegation (line 311), while the status line (line 3), item 5 itself (line 252) and `2026-09-28-delegated-decisions.md:5-8` support keeping it user-only, as #488's draft noted ([PREREGISTRATION.md L9–13](https://github.com/seathatflowsinourveins/native-agent-stack/blob/caea04f28d7dcd5d428155cf1a24b28423cba1ce/blueprints/gate-b-gpt6-route/PREREGISTRATION.md#L9)). The route is user-directed under either reading, and the user can take this back.
 - See [the route settlement](2026-10-03-sweep-gpt6-route-settlement.md) for the sources, preserved design, independent M5 prerequisites and overturn conditions.
+
+### 2026-10-03, later, main `9b0b8d6d`
+
+- **#445 is retired.** The Park item "re-derived on the rebuilt gateway" is replaced by the
+  [dated R02 retirement record](2026-10-03-retire-gateway-ab-r02.md). F-WK-3's R02 freeze-release and admissible-value
+  items above (`:187-188`) were not carried by the 2026-09-30 rebuild record
+  (`2026-09-30-omniroute-rebuild.md:3-8,30-32,43-55`, which names neither R02 nor #445). The freeze ended in fact no
+  later than 2026-09-29 00:42Z, when 20128 was running `5fc47d970` at `81c9b6da` instead of the frozen `dd6e9607e`
+  (`2026-09-30-omniroute-rebuild.md:30-32`). The apply-after-R02 order was broken in fact no later than the 2026-09-30
+  rebuild, which records the affinity patch `045aa81f3` on 20128 (`2026-09-30-omniroute-rebuild.md:54-55`). PR #425's
+  records, on main since 2026-09-28T22:57:18Z, already label `045aa81f3` as 20128's build
+  (`2026-09-28-openhands-resolver-isolation.md:281`). That label comes from a source read, not an observed version
+  read, and read as the running build it conflicts with the rebuild record
+  (`2026-09-30-omniroute-rebuild.md:30-31,135-136`). The sources do not settle whether either break came earlier, and
+  this update neither asserts nor rules out an earlier date. No explicit user release is on record, and this update
+  releases nothing. Evidence class: `source_review` of the retained records.
