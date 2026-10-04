@@ -28,23 +28,18 @@ left the shared template unchanged.
    default map `HOOKS` is the three guards). An unknown name is refused as before.
 3. **A re-apply retires the carrier hooks a host already has.** `apply_claude_settings.py` combines hooks per event and never
    dropped a base hook, so changing the template alone would leave NativeStack's live SubagentStart entry running. A merge
-   now removes the hook objects that run `token-lanes-subagent-start.py` or `token-lanes-session-start.py` from a
-   `.claude/hooks/` directory, unless the template passed carries the same command or `--keep-held-out-hooks` is given. "Run"
-   is decided by one anchored pattern over the whole command string (`CARRIER_COMMAND`), not by parsing shell: the command is
-   variable assignments, an optional python interpreter (bare or an absolute path) with the options that leave the script
-   operand in place (`-B -E -I -O -S -b -d -q -s -u`, `-X` and `-W` with a value, `--`; never `-c` or `-m`), the carrier file as
-   the script operand or as the executable (unquoted with `$HOME`, `${HOME}`, `~` or an absolute path, double-quoted with
-   `$HOME` or an absolute path, single-quoted with an absolute path), its arguments (plain words, or quoted words that hold no
-   expansion), `2>/dev/null`, and a trailing `|| true`, and nothing else. A hook that merely mentions the path
-   (`sha256sum <path>`, an argument of another script, an `echo`), wraps the carrier (`bash -c`, `exec`, `nohup`, `timeout`,
-   `env`), chains another command, or substitutes a command into an argument or a redirection is the host's own and is kept,
-   even when it also runs a carrier. Two cross-family reads found a defect in each of the three earlier matchers (any shell word
-   naming the file; the first word that is not an option; shlex tokens, which glue `;(` and `&&(`); the pattern replaces them
-   and is tested against the second read's 25 command shapes, whose expectations came from executing them in a shell, and
-   against a timing bound (see the addendum at the end). A group
-   or event left empty is dropped, every other hook keeps its value and order, and a second merge changes nothing. On a copy
-   of NativeStack's live settings of 2026-10-04 the merge removes exactly one hook, the SubagentStart carrier, and with
-   `--keep-held-out-hooks` it stays.
+   now removes the hook objects whose command is a carrier command this repository shipped, unless the template passed carries
+   the same command or `--keep-held-out-hooks` is given. The test is an exact allowlist, not a recognised grammar:
+   `SHIPPED_CARRIER_COMMANDS` holds the four strings the history shows (git log -S over the template and the opt-in entries file,
+   each with where it first appeared): `python3 "${HOME}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true`, the same
+   for `token-lanes-session-start.py`, and both with `$HOME`. A hook is retired when its command equals one of them, or one of them as
+   `install_claude_profile.py` renders it for the host (the placeholder replaced by the home directory that the settings file belongs
+   to), byte for byte after trimming outer whitespace; nothing is parsed or expanded. Everything else is the host's own and is
+   kept: a carrier path mentioned as an argument, a wrapper, a chained command, an option, a substitution, a hand-edited carrier
+   command (the fail-closed residual: it keeps running until its owner edits it). A group or event left empty is dropped, every
+   other hook keeps its value and order, and a second merge changes nothing. On a copy of NativeStack's live settings of 2026-10-04
+   the merge removes exactly one hook, the SubagentStart carrier, and with `--keep-held-out-hooks` it stays. Three cross-family
+   reads found a defect in each earlier matcher (the addendum at the end), which is why none recognises a grammar any more.
 4. **Opting in is one documented step** (`adoption/hooks/claude/README.md`): install the files with `--hook`, then
    `apply_claude_settings.py --template adoption/hooks/claude/held-out-hook-entries.json`, and apply the default template with
    `--keep-held-out-hooks` from then on.
@@ -105,25 +100,26 @@ left the shared template unchanged.
 - The command center's A/B at the operating point measuring a carrier arm with a net saving: the two hook entries move back into
   the template from `held-out-hook-entries.json`, and the applier's retirement list shrinks to the file that is not restored.
 
-## Addendum (2026-10-04, evening): the cross-family reads of this change and the extra round
+## Addendum (2026-10-04, evening): the cross-family reads of this change and the extra rounds
 
-Two cross-family reads of this change found a defect in the retirement matcher: the first found one P2, the second two more. The
-bounded loop allows one review and one repair round; the second repair is an extra round, taken because each finding was a way
-for a re-apply to delete a hook that the host wrote for itself, which the change promises never to do.
+Three cross-family reads of this change found a defect in the retirement matcher: one P2, then two, then three. The bounded loop
+allows one review and one repair round; the second and third repairs are extra rounds, taken because each finding was a way for a
+re-apply to delete a hook that the host wrote for itself, which the change promises never to do.
 
 | Read (head) | Finding | Matcher before the fix | Fix |
 | --- | --- | --- | --- |
-| first, `91118a302` | a hook that merely mentions a carrier path is deleted (`sha256sum <path>` reproduced against the committed template) | any shell word that names the file | the file must be the executable or the python script operand |
-| second, `998420e9f`, P2 | python option values are not the script operand: `python3 -c '... # <path>'` and `python3 -X <path> -c ...` deleted, `python3 -X utf8 <path>` and `python3 -W ignore <path>` kept | the first word that is not an option | python's own option grammar, then the pattern below |
-| second, `998420e9f`, P2 | compound commands and substitutions: `python3 <path>;(printf host)`, `&&(`, `$(...)` and `> >(tee ...)` deleted although they run host commands | shlex tokens (it glues `;(` and `&&(`) | one anchored pattern over the whole command, no shell parsing |
+| first, `91118a302`, P2 | a hook that merely mentions a carrier path is deleted (`sha256sum <path>` reproduced against the committed template) | any shell word that names the file | the file must be the executable or the python script operand |
+| second, `998420e9f`, 2 x P2 | python option values are not the script operand (`-c '... # <path>'`, `-X <path> -c ...` deleted; `-X utf8 <path>` kept); `;(`, `&&(` and substitutions slip past shlex's tokens | the first non-option word, then shlex tokens | one anchored pattern over the whole command |
+| third, `e2b355cdf`, 3 x P2 | options after `--` still select a host script; an unquoted `-X` or `-W` value is globbed by the shell; an unquoted `$HOME` word-splits the script operand | the anchored pattern, a recognised grammar | the exact allowlist |
 
-The pattern (`CARRIER_COMMAND` in `tools/adoption/apply_claude_settings.py`, decision 3 above) fails closed: a command that is not
-exactly a carrier invocation is the host's, and a carrier it also runs keeps running until the host removes that hook. The second
-read's 25 command shapes are `HeldOutHookTests.ADVERSARIAL`, each with the expectation that executing the shape in a shell
-established: the shapes that run only a carrier are retired (quoted and unquoted paths, an absolute interpreter, variable
-assignments, `-X utf8`, `-W ignore`, a redirection before the script, a quoted `";"` argument, `2>/dev/null || true`) and the shapes
-that wrap it, chain or substitute are kept. Nineteen syntax tails and a timing bound guard the closure (the worst of nine
-pathological inputs of up to 240,000 characters took 36 ms), and the merge against a copy of this host's live settings still
-removes exactly one hook. Residual: a host hook that wraps the carrier (`bash -c`, `exec`, `nohup`, `timeout`, `env`) or chains it
-with other commands is left in place, so a carrier can keep running on such a host until its owner edits that hook by hand; the
-applier does not report such hooks, and an operator who wants a list can search the live settings for the two file names.
+Every grammar fix opened the next edge (shell and Python syntax, expansion, splitting), so the third repair recognises no grammar:
+`SHIPPED_CARRIER_COMMANDS` is the finite set the history shows, a hook is retired only when its command equals a member as shipped
+or as rendered for the host, and nothing else is. Tests (`HeldOutHookTests`): the four strings and where each first appeared, and the
+allowlist equal to them; every shipped string retired as shipped and as rendered; the shipped template and opt-in files carry only
+allowlisted commands (a new shipped shape fails there until it is added, with its source); outer whitespace trimmed and nothing
+else; a mutation test (every single-character deletion, insertion and replacement of the six strings, 6,884 variants, none
+retired); the second read's 25 shapes and the third read's 30, all kept (the pattern matcher retired 26 of the 55); another host's
+home does not retire; applying to a temporary home retires the carrier rendered for that home. The merge against a copy of this
+host's live settings still removes exactly one hook. Residual: a host that hand-edited a carrier command keeps it, and a carrier
+that a host hook wraps or chains keeps running there until its owner edits that hook; the applier does not report such hooks, and
+an operator who wants a list can search the live settings for the two file names.

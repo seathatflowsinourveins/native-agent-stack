@@ -7,7 +7,6 @@ import json
 import os
 import stat
 import sys
-import time
 import unittest
 from pathlib import Path
 
@@ -214,13 +213,38 @@ class MergeSettingsTests(unittest.TestCase):
 
 class HeldOutHookTests(unittest.TestCase):
     """The token-lane carriers are held out of the clean default: applying the template removes the hook objects an
-    earlier template installed for them, and nothing else (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md)."""
+    earlier template installed for them, and nothing else (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md).
+    A hook is retired only when its command is a string this repository shipped, as shipped or rendered for the host's home."""
 
+    HOME = "/home/example"
     SUB = 'python3 "/home/example/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true'
     SESSION = 'python3 "/home/example/.claude/hooks/token-lanes-session-start.py" 2>/dev/null || true'
+    CARRIER = "/home/example/.claude/hooks/token-lanes-session-start.py"
+
+    # Every carrier command the repository has shipped (git log -S over the template and the opt-in entries file, 2026-10-04),
+    # as shipped, with where it first appeared: the fixture that the allowlist in apply_claude_settings.py must equal.
+    HISTORY = (
+        ('python3 "${HOME}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true',
+         "adoption/templates/claude.settings.template.json, 0c33b37a9 (main, #378; first written as abaa8425d)"),
+        ('python3 "${HOME}/.claude/hooks/token-lanes-session-start.py" 2>/dev/null || true',
+         "adoption/templates/claude.settings.template.json, 2da4aaa77 (PR 684, branch c5/token-layer-2604-wide)"),
+        ('python3 "$HOME/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true',
+         "adoption/hooks/claude/held-out-hook-entries.json (PR 699)"),
+        ('python3 "$HOME/.claude/hooks/token-lanes-session-start.py" 2>/dev/null || true',
+         "adoption/hooks/claude/held-out-hook-entries.json (PR 699)"),
+    )
+
+    def history_commands(self):
+        """The shipped strings, and each as the installer renders it for HOME (tests/test_install_claude_profile.py: the
+        template's ${HOME} replaced by the home directory)."""
+        shipped = [command for command, _ in self.HISTORY]
+        return shipped + [command.replace("${HOME}", self.HOME).replace("$HOME", self.HOME) for command in shipped]
 
     def template(self):
         return json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))
+
+    def merge(self, base, template, keep_held_out=False):
+        return acs.merge_settings(base, template, keep_held_out, home=self.HOME)
 
     def test_the_template_runs_no_held_out_file(self):
         text = (ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8")
@@ -236,34 +260,88 @@ class HeldOutHookTests(unittest.TestCase):
                              {"matcher": "startup|resume|clear|compact|fork",
                               "hooks": [{"type": "command", "command": self.SESSION, "timeout": 5}]}],
         }}
-        merged = acs.merge_settings(base, self.template())
+        merged = self.merge(base, self.template())
         self.assertNotIn("token-lanes", json.dumps(merged["hooks"]))
         self.assertEqual(merged["hostOnlyKey"], "retained")
         # the hosts' own entries keep their values and order; only the carrier groups are gone
         self.assertEqual(merged["hooks"]["SubagentStart"][0], base["hooks"]["SubagentStart"][0])
         self.assertEqual(merged["hooks"]["SessionStart"][0], base["hooks"]["SessionStart"][0])
-        self.assertEqual(acs.merge_settings(merged, self.template()), merged)
+        self.assertEqual(self.merge(merged, self.template()), merged)
 
     def test_a_mixed_entry_loses_only_the_carrier_hook(self):
         host = {"type": "command", "command": "true", "timeout": 7}
         carrier = {"type": "command", "command": self.SUB, "timeout": 5}
         base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": [host, carrier]}]}}
-        merged = acs.merge_settings(base, {"hooks": {"Stop": [{"matcher": "", "hooks": [host]}]}})
+        merged = self.merge(base, {"hooks": {"Stop": [{"matcher": "", "hooks": [host]}]}})
         self.assertEqual(merged["hooks"]["SubagentStart"], [{"matcher": "", "hooks": [host]}])
 
     def test_an_event_that_held_only_a_carrier_is_dropped(self):
         base = {"hooks": {"SessionStart": [{"matcher": "startup", "hooks": [{"type": "command", "command": self.SESSION}]}]}}
-        merged = acs.merge_settings(base, {"hooks": {"Stop": [{"matcher": "", "hooks": [{"type": "command", "command": "x"}]}]}})
+        merged = self.merge(base, {"hooks": {"Stop": [{"matcher": "", "hooks": [{"type": "command", "command": "x"}]}]}})
         self.assertEqual(sorted(merged["hooks"]), ["Stop"])
 
     def test_a_template_that_carries_the_command_keeps_it_once(self):
         # An adopter's own template opts the carrier back in: the live entry stays and is not duplicated.
         entry = {"matcher": "", "hooks": [{"type": "command", "command": self.SUB, "timeout": 5}]}
-        merged = acs.merge_settings({"hooks": {"SubagentStart": [entry]}}, {"hooks": {"SubagentStart": [entry]}})
+        merged = self.merge({"hooks": {"SubagentStart": [entry]}}, {"hooks": {"SubagentStart": [entry]}})
         self.assertEqual(merged["hooks"]["SubagentStart"], [entry])
 
+    def test_the_allowlist_is_exactly_the_strings_the_repository_shipped(self):
+        self.assertEqual(sorted(acs.carrier_commands(self.HOME)), sorted(set(self.history_commands())))
+        self.assertEqual([command for command, _ in acs.SHIPPED_CARRIER_COMMANDS], [command for command, _ in self.HISTORY])
+
+    def test_every_shipped_command_is_retired_as_shipped_and_as_rendered(self):
+        for command in self.history_commands():
+            with self.subTest(command=command):
+                hook = {"type": "command", "command": command}
+                self.assertTrue(acs.runs_held_out_hook(hook, self.HOME))
+                base = {"hooks": {"SessionStart": [{"matcher": "startup", "hooks": [hook]}]}}
+                self.assertEqual(self.merge(base, {"hooks": {}}).get("hooks", {}), {})
+
+    def test_the_shipped_files_carry_only_allowlisted_commands(self):
+        # A new shipped shape fails here until it is added to SHIPPED_CARRIER_COMMANDS with its source.
+        for relative in ("adoption/templates/claude.settings.template.json", "adoption/hooks/claude/held-out-hook-entries.json"):
+            data = json.loads((ROOT / relative).read_text(encoding="utf-8"))
+            for groups in data.get("hooks", {}).values():
+                for group in groups:
+                    for hook in group.get("hooks", []):
+                        if any(name in hook.get("command", "") for name in acs.HELD_OUT_HOOK_FILES):
+                            with self.subTest(file=relative, command=hook["command"]):
+                                self.assertTrue(acs.runs_held_out_hook(hook, self.HOME))
+
+    def test_the_opt_in_entries_are_retired_by_a_default_apply_and_kept_with_the_flag(self):
+        entries = json.loads((ROOT / "adoption/hooks/claude/held-out-hook-entries.json").read_text(encoding="utf-8"))
+        self.assertEqual(sum(len(group["hooks"]) for groups in entries["hooks"].values() for group in groups), 2)
+        self.assertEqual(self.merge({"hooks": entries["hooks"]}, {"hooks": {}}).get("hooks", {}), {})
+        kept = self.merge({"hooks": entries["hooks"]}, {"hooks": {}}, keep_held_out=True)
+        self.assertEqual(kept["hooks"], entries["hooks"])
+
+    def test_outer_whitespace_is_trimmed_and_nothing_else_is(self):
+        for command in self.history_commands():
+            self.assertTrue(acs.runs_held_out_hook({"command": f" \t{command}\r\n"}, self.HOME))
+            for tail in (" ;", "\nx", " #", "\\", "  "[:1] + "|| true"):
+                self.assertFalse(acs.runs_held_out_hook({"command": command + tail}, self.HOME), tail)
+
+    def test_no_single_edit_of_a_shipped_command_is_retired(self):
+        # The allowlist matches whole strings: deleting, inserting or replacing any one character of any of the six strings
+        # yields a command that is not retired (unless the edit only adds outer whitespace).
+        allowed = set(self.history_commands())
+        checked = 0
+        for command in sorted(allowed):
+            for index in range(len(command) + 1):
+                candidates = [command[:index] + extra + command[index:] for extra in (" ", ";", "x", "\n", "'", '"', "$", "&", "|", "(")]
+                if index < len(command):
+                    candidates.append(command[:index] + command[index + 1:])
+                    candidates += [command[:index] + extra + command[index + 1:] for extra in ("x", " ", ";")]
+                for candidate in candidates:
+                    if candidate.strip() in allowed:
+                        continue
+                    checked += 1
+                    self.assertFalse(acs.runs_held_out_hook({"command": candidate}, self.HOME), candidate)
+        self.assertGreater(checked, 5000)
+
     # Commands that name a carrier path without running it, or run it among other things: retiring them would delete a
-    # host's own hook (the cross-family read of 2026-10-04 reproduced the first against the committed template).
+    # host's own hook (the cross-family reads of 2026-10-04 reproduced these against the committed template).
     MENTIONS = (
         "sha256sum /home/example/.claude/hooks/token-lanes-session-start.py",
         "cat ~/.claude/hooks/token-lanes-subagent-start.py",
@@ -276,108 +354,64 @@ class HeldOutHookTests(unittest.TestCase):
         'python3 "/home/example/.claude/hooks/token-lanes-session-start.py"\nrm -f /home/example/x',
     )
 
-    # The shapes that run a carrier: the interpreter and the script operand, or the file as the executable, optionally
-    # with options, arguments, redirections, an environment assignment and the trailing `|| true` of the shipped entries.
-    RUNS = (
-        'python3 "/home/example/.claude/hooks/token-lanes-session-start.py" 2>/dev/null || true',
-        'python3 "$HOME/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true',
-        'python3 "${HOME}/.claude/hooks/token-lanes-session-start.py" 2>/dev/null || true',
-        'python3 "/home/example/.claude/hooks/token-lanes-session-start.py"',
-        "python /home/example/.claude/hooks/token-lanes-session-start.py --quiet",
-        "python3.12 -u ~/.claude/hooks/token-lanes-subagent-start.py",
-        'FOO=1 python3 "$HOME/.claude/hooks/token-lanes-session-start.py"',
-        '"/home/example/.claude/hooks/token-lanes-session-start.py" 2>/dev/null',
+    # The second cross-family read's 25 command shapes (job-052) and the third read's 30 (job-054): {c} is the carrier path. Under
+    # the allowlist none of them is a shipped string, so every one is kept, the ones that run the carrier as well as the ones that
+    # run host code: a hand-edited carrier command stays the host's (the fail-closed residual).
+    SECOND_READ = (
+        ("adjacent_subshell", "python3 {c};(printf host)"), ("adjacent_and_subshell", "python3 {c} &&(printf host)"),
+        ("argument_substitution", 'python3 {c} "$(printf host > /home/example/marker)"'),
+        ("redirection_substitution", 'python3 {c} > "$(printf host > /home/example/marker)"'),
+        ("process_substitution", "python3 {c} > >(tee /home/example/log)"),
+        ("inline_python_path_comment", "python3 -c 'print(\"host\") # {c}'"),
+        ("xoption_data_argument", "python3 -X {c} -c 'print(\"host\")'"), ("xoption_before_script", "python3 -X utf8 {c}"),
+        ("warning_option_before_script", "python3 -W ignore {c}"), ("redirection_before_script", "python3 2>/dev/null {c}"),
+        ("quoted_control_argument", 'python3 {c} ";" echo host'), ("double_quoted_path", 'python3 "{c}"'),
+        ("single_quoted_path", "python3 '{c}'"), ("absolute_interpreter", "/usr/bin/python3 {c}"),
+        ("assignment", 'FOO=1 BAR="two words" python3 {c}'), ("trailing_redirection", "python3 {c} 2>/dev/null || true"),
+        ("bash_c", "bash -c 'python3 {c}'"), ("sh_script", "sh {c}"), ("exec_wrapper", "exec python3 {c}"),
+        ("nohup_wrapper", "nohup python3 {c}"), ("timeout_wrapper", "timeout 5 python3 {c}"),
+        ("env_wrapper", "env FOO=1 python3 {c}"), ("redirection_data", "cat < {c}"),
+        ("multiline", "python3 {c}\nprintf host"), ("ordinary_compound", "python3 {c}; printf host"),
+    )
+    THIRD_READ = (
+        ("end_options_flag", "python3 -- -u {c}"), ("end_options_xvalue", "python3 -- -X dev {c}"),
+        ("end_options_repeated", "python3 -- -- {c}"), ("end_options_after_isolation", "python3 -I -- -u {c}"),
+        ("end_options_redirection_tail", "python3 -- -u 2>/dev/null {c} || true"),
+        ("interpreter_spaces", "'/home/example/interpreter with spaces/python3' {c}"),
+        ("isolated_dev_options", "python3 -I -E -X dev {c}"), ("unicode_interpreter", "pythоn3 {c}"),
+        ("unicode_script", "python3 /home/example/.claude/hooks/token-lanes-sessiоn-start.py"),
+        ("unicode_separator", "python3\xa0{c}"), ("trailing_semicolon", "python3 {c};"), ("compact_or_true", "python3 {c} ||true"),
+        ("crlf", "python3 {c}\r\n"), ("crlf_then_host", "python3 {c}\r\nprintf host"),
+        ("end_options_valid", "python3 -I -E -X dev -- {c}"), ("redirect_after_end_options", "python3 -- 2>/dev/null {c}"),
+        ("attached_options", "python3 -Wignore -Xutf8 {c}"), ("tab_separator", "python3\t{c}"),
+        ("double_spaces", "python3  {c}"), ("quoted_substitution_literal", "python3 {c} '$(printf host)'"),
+        ("extra_control", "python3 {c} || true && printf host"), ("joined_quotes", "python3 {c} 'one''two'"),
+        ("quoted_option_value", "python3 -X 'dev' {c}"),
+        ("unquoted_home", "python3 $HOME/.claude/hooks/token-lanes-session-start.py"),
+        ("unquoted_braced_home", "python3 ${HOME}/.claude/hooks/token-lanes-session-start.py"),
+        ("quoted_home_control", 'python3 "$HOME/.claude/hooks/token-lanes-session-start.py"'),
+        ("quoted_braced_home_control", 'python3 "${HOME}/.claude/hooks/token-lanes-session-start.py"'),
+        ("tilde_control", "python3 ~/.claude/hooks/token-lanes-session-start.py"),
+        ("glob_X", "python3 -X dev* {c}"), ("glob_W", "python3 -W ignore:* {c}"),
     )
 
-    # The second cross-family read's 25 command shapes (job-052, 2026-10-04), each with whether the hook runs a carrier and
-    # nothing else the host cares about: {c} is the carrier path. The expectations come from executing the shapes in a shell
-    # (the read's harness), so they are about what the command does, not about how the matcher is written.
-    ADVERSARIAL = (
-        ("adjacent_subshell", "python3 {c};(printf host)", False),
-        ("adjacent_and_subshell", "python3 {c} &&(printf host)", False),
-        ("argument_substitution", 'python3 {c} "$(printf host > /home/example/marker)"', False),
-        ("redirection_substitution", 'python3 {c} > "$(printf host > /home/example/marker)"', False),
-        ("process_substitution", "python3 {c} > >(tee /home/example/log)", False),
-        ("inline_python_path_comment", "python3 -c 'print(\"host\") # {c}'", False),
-        ("xoption_data_argument", "python3 -X {c} -c 'print(\"host\")'", False),
-        ("xoption_before_script", "python3 -X utf8 {c}", True),
-        ("warning_option_before_script", "python3 -W ignore {c}", True),
-        ("redirection_before_script", "python3 2>/dev/null {c}", True),
-        ("quoted_control_argument", 'python3 {c} ";" echo host', True),
-        ("double_quoted_path", 'python3 "{c}"', True),
-        ("single_quoted_path", "python3 '{c}'", True),
-        ("absolute_interpreter", "/usr/bin/python3 {c}", True),
-        ("assignment", 'FOO=1 BAR="two words" python3 {c}', True),
-        ("trailing_redirection", "python3 {c} 2>/dev/null || true", True),
-        ("bash_c", "bash -c 'python3 {c}'", False),
-        ("sh_script", "sh {c}", False),
-        ("exec_wrapper", "exec python3 {c}", False),
-        ("nohup_wrapper", "nohup python3 {c}", False),
-        ("timeout_wrapper", "timeout 5 python3 {c}", False),
-        ("env_wrapper", "env FOO=1 python3 {c}", False),
-        ("redirection_data", "cat < {c}", False),
-        ("multiline", "python3 {c}\nprintf host", False),
-        ("ordinary_compound", "python3 {c}; printf host", False),
-    )
-
-    def test_the_second_reads_adversarial_shapes_are_retired_or_kept_as_the_shell_runs_them(self):
-        carrier = "/home/example/.claude/hooks/token-lanes-session-start.py"
-        for label, template, retire in self.ADVERSARIAL:
-            with self.subTest(shape=label):
-                hook = {"type": "command", "command": template.format(c=carrier)}
-                self.assertEqual(acs.runs_held_out_hook(hook), retire)
-                base = {"hooks": {"SessionStart": [{"matcher": "startup", "hooks": [hook]}]}}
-                merged = acs.merge_settings(base, {"hooks": {}})
-                if retire:
-                    self.assertEqual(merged.get("hooks", {}), {})
-                else:
-                    self.assertEqual(merged["hooks"]["SessionStart"], base["hooks"]["SessionStart"])
-
-    def test_the_matcher_reads_no_shell_syntax_it_cannot_match_whole(self):
-        # Fail closed: a command is retired only when the whole string is a carrier invocation. Syntax a shell would act on
-        # (a control operator, a substitution, a backslash, a comment, a wrong separator) anywhere makes it the host's.
-        carrier = "/home/example/.claude/hooks/token-lanes-session-start.py"
-        for tail in ("; printf host", "&& printf host", "| tee x", "& printf host", " # note", " \\ ", "\n", " $(printf host)",
-                     " `printf host`", " $((1))", " <(printf host)", " 2>&1", ">/dev/null", " 2> /dev/null", "  2>/dev/null",
-                     " || false", " || true ", " || true;", " |  | true"):
-            with self.subTest(tail=tail):
-                self.assertFalse(acs.runs_held_out_hook({"command": f"python3 {carrier}{tail}"}))
-
-    def test_the_matcher_fails_fast_on_long_commands(self):
-        # One anchored pattern over closed character classes: no input makes it backtrack badly (the worst of these took
-        # about 40 ms where it was written); a generous bound still catches a regression to exponential time.
-        carrier = "/home/example/.claude/hooks/token-lanes-session-start.py"
-        started = time.perf_counter()
-        for command in (f"python3 {carrier} " + "a " * 20000 + "$", "A=1 " * 20000 + f"python3 {carrier} ;",
-                        "python3 " + "-u " * 20000 + f"{carrier} ;", "python3 " + "2>/dev/null " * 10000 + f"{carrier} ;",
-                        "python3 " + "/a" * 20000 + "/.claude/hooks/token-lanes-session-start.py ;",
-                        'python3 "' + "/a b" * 10000 + '/.claude/hooks/x.py"', f"python3 {carrier}" + " ||" * 10000):
-            self.assertFalse(acs.runs_held_out_hook({"command": command}))
-        self.assertLess(time.perf_counter() - started, 5.0)
+    def kept(self, command):
+        hook = {"type": "command", "command": command}
+        self.assertFalse(acs.runs_held_out_hook(hook, self.HOME), command)
+        base = {"hooks": {"SessionStart": [{"matcher": "startup", "hooks": [hook]}]}}
+        self.assertEqual(self.merge(base, {"hooks": {}})["hooks"]["SessionStart"], base["hooks"]["SessionStart"])
 
     def test_a_hook_that_merely_mentions_a_carrier_path_is_kept(self):
         for command in self.MENTIONS:
             with self.subTest(command=command):
-                hook = {"type": "command", "command": command}
-                self.assertFalse(acs.runs_held_out_hook(hook))
-                base = {"hooks": {"SessionStart": [{"matcher": "startup", "hooks": [hook]}]}}
-                merged = acs.merge_settings(base, {"hooks": {}})
-                self.assertEqual(merged["hooks"]["SessionStart"], base["hooks"]["SessionStart"])
+                self.kept(command)
 
-    def test_every_shape_that_runs_a_carrier_is_retired(self):
-        # Control: the stricter matcher still retires the commands the templates and live hosts carry.
-        for command in self.RUNS:
-            with self.subTest(command=command):
-                hook = {"type": "command", "command": command}
-                self.assertTrue(acs.runs_held_out_hook(hook))
-                base = {"hooks": {"SessionStart": [{"matcher": "startup", "hooks": [hook]}]}}
-                self.assertEqual(acs.merge_settings(base, {"hooks": {}}).get("hooks", {}), {})
-
-    def test_the_hook_entries_of_the_opt_in_file_are_carrier_invocations(self):
-        entries = json.loads((ROOT / "adoption/hooks/claude/held-out-hook-entries.json").read_text(encoding="utf-8"))
-        hooks = [hook for groups in entries["hooks"].values() for group in groups for hook in group["hooks"]]
-        self.assertEqual(len(hooks), 2)
-        self.assertTrue(all(acs.runs_held_out_hook(hook) for hook in hooks))
+    def test_the_second_and_third_reads_shapes_are_all_kept(self):
+        self.assertEqual(len(self.SECOND_READ), 25)
+        self.assertEqual(len(self.THIRD_READ), 30)
+        for label, template in self.SECOND_READ + self.THIRD_READ:
+            with self.subTest(shape=label):
+                self.kept(template.format(c=self.CARRIER) if "{c}" in template else template)
 
     def test_only_a_hook_file_under_a_claude_hooks_directory_is_retired(self):
         own = [{"type": "command", "command": "python3 /home/example/bin/token-lanes-subagent-start.py"},
@@ -385,19 +419,48 @@ class HeldOutHookTests(unittest.TestCase):
                {"type": "command", "command": "echo token-lanes-subagent-start.py"},
                {"type": "command", "command": "python3 'unterminated"}]
         base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": own}]}}
-        merged = acs.merge_settings(base, {"hooks": {}})
+        merged = self.merge(base, {"hooks": {}})
         self.assertEqual(merged["hooks"]["SubagentStart"], [{"matcher": "", "hooks": own}])
-        self.assertFalse(any(acs.runs_held_out_hook(hook) for hook in own))
-        self.assertTrue(acs.runs_held_out_hook({"command": self.SUB}))
+        self.assertFalse(any(acs.runs_held_out_hook(hook, self.HOME) for hook in own))
+        self.assertTrue(acs.runs_held_out_hook({"command": self.SUB}, self.HOME))
+
+    def test_another_hosts_home_does_not_retire_a_hook(self):
+        # The rendered form is the host's own: a command with another home directory is not a string this host was given.
+        other = self.SUB.replace(self.HOME, "/Users/example")
+        self.assertFalse(acs.runs_held_out_hook({"command": other}, self.HOME))
+        self.assertTrue(acs.runs_held_out_hook({"command": other}, "/Users/example"))
+
+    def test_a_settings_file_names_its_own_home(self):
+        self.assertEqual(acs.host_home(Path("/home/example/.claude/settings.json")), "/home/example")
+        self.assertIsNone(acs.host_home(Path("/home/example/settings.json")))
+        self.assertIsNone(acs.host_home(Path("/tmp/x/.claude/other.json")))
+
+    def test_applying_to_a_home_retires_the_carrier_rendered_for_that_home(self):
+        import contextlib
+        import io
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as scratch:
+            home = Path(scratch).resolve()
+            target = home / ".claude" / "settings.json"
+            target.parent.mkdir()
+            carrier = f'python3 "{home}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true'
+            target.write_text(json.dumps({"hooks": {"SubagentStart": [{"matcher": "", "hooks": [
+                {"type": "command", "command": "memory-hook"}, {"type": "command", "command": carrier}]}]}}), encoding="utf-8")
+            with contextlib.redirect_stderr(io.StringIO()):
+                acs.apply(ROOT / "adoption/templates/claude.settings.template.json", target, dry_run=False)
+            text = target.read_text(encoding="utf-8")
+            self.assertNotIn("token-lanes", text)
+            self.assertIn("memory-hook", text)
 
     def test_a_template_without_hooks_leaves_the_live_hooks_alone(self):
         base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": [{"type": "command", "command": self.SUB}]}]}}
-        self.assertEqual(acs.merge_settings(base, {"theme": "dark"})["hooks"], base["hooks"])
+        self.assertEqual(self.merge(base, {"theme": "dark"})["hooks"], base["hooks"])
 
     def test_malformed_hook_values_pass_through(self):
         base = {"hooks": {"Stop": [{"matcher": "", "hooks": 5}, "not-a-group"], "Other": "text"}}
-        self.assertEqual(acs.retire_held_out_hooks(base["hooks"], {}), base["hooks"])
-        self.assertEqual(acs.retire_held_out_hooks("text", {}), "text")
+        self.assertEqual(acs.retire_held_out_hooks(base["hooks"], {}, self.HOME), base["hooks"])
+        self.assertEqual(acs.retire_held_out_hooks("text", {}, self.HOME), "text")
 
 
 class ApplyIOTests(unittest.TestCase):

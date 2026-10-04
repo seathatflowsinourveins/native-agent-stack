@@ -10,8 +10,9 @@ missing template entry next to its template neighbours, so a deny rule stays
 ahead of a `!` carve-out), combines hooks
 per event de-duplicated by command, writes atomically, and preserves the
 original file's mode bits. The one thing a merge removes from the live hooks is a hook
-object that runs a held-out token-lane carrier file (HELD_OUT_HOOK_FILES; see runs_held_out_hook: a hook that only
-mentions the path is the host's own and stays), so a host
+object whose command is, byte for byte, a held-out token-lane carrier command this repository shipped
+(SHIPPED_CARRIER_COMMANDS, as shipped or rendered for the host's home; any other hook, even one that runs a carrier, is the
+host's own and stays), so a host
 that applied an older template ends up clean; a template that itself carries the
 command keeps it, and --keep-held-out-hooks keeps the ones a host opted into (see
 adoption/hooks/claude/README.md). Supports --dry-run (prints the would-be result and exits
@@ -24,7 +25,6 @@ import argparse
 import copy
 import json
 import os
-import re
 import shlex
 import shutil
 import stat
@@ -72,45 +72,41 @@ def command_key(cmd: str) -> str:
         return cmd
 
 
-# A carrier invocation as one anchored pattern over the whole command string. It reads no shell: every part is a closed
-# character class, so a control operator, a substitution, a backslash, a comment, a newline or a wrapper command anywhere in
-# the string leaves it unmatched and the hook the host's own (fail closed). Matched by CARRIER_COMMAND.fullmatch().
-_WORD = r"[A-Za-z0-9_./:=@%+,-]+"  # an unquoted word: no shell syntax can occur in it
-_DQ_WORD = r'"[^"$`\\]*"'  # double quotes holding no expansion and no escape
-_SQ_WORD = r"'[^']*'"  # single quotes hold anything, literally
-_ANY_WORD = rf"(?:{_WORD}|{_DQ_WORD}|{_SQ_WORD})"
-_REDIRECT = r"2>/dev/null"  # the one redirection the shipped entries carry
-_ASSIGNMENT = rf"[A-Za-z_][A-Za-z0-9_]*=(?:{_WORD}|{_DQ_WORD}|{_SQ_WORD})?"
-_INTERPRETER = r"(?:/(?:[A-Za-z0-9_.-]+/)*)?python(?:3(?:\.[0-9]+)?)?"
-# CPython's own options that leave the script operand where it is: flags that change no semantics, -X and -W with a value,
-# and `--`. Absent on purpose: -c and -m (no script runs), -i, -x, -V and -h.
-_PYTHON_OPTION = r"(?:-[BEIOSbdqsu]+|-[XW] ?[A-Za-z0-9_][A-Za-z0-9_=.:*,-]*|--)"
-_FILES = "|".join(re.escape(name) for name in HELD_OUT_HOOK_FILES)
-_ABSOLUTE = r"(?:/[A-Za-z0-9_@+.-]+)+"
-_ABSOLUTE_QUOTED = r"(?:/[A-Za-z0-9_@+. -]+)+"
-_HOOK_FILE = rf"/\.claude/hooks/(?:{_FILES})"
-_SCRIPT = (rf"(?:(?:\$HOME|\$\{{HOME\}}|~|{_ABSOLUTE}){_HOOK_FILE}"  # unquoted: $HOME, ${HOME}, ~ and an absolute path
-           rf"|\"(?:\$HOME|\$\{{HOME\}}|{_ABSOLUTE_QUOTED}){_HOOK_FILE}\""  # double quotes expand $HOME but not ~
-           rf"|'{_ABSOLUTE_QUOTED}{_HOOK_FILE}')")  # single quotes expand nothing
-CARRIER_COMMAND = re.compile(
-    rf"(?:{_ASSIGNMENT} )*"  # variable assignments before the command
-    rf"(?:{_INTERPRETER} (?:(?:{_PYTHON_OPTION}|{_REDIRECT}) )*)?"  # a python interpreter and its options, or none
-    rf"{_SCRIPT}"  # the carrier: the script operand, or the executable itself
-    rf"(?: (?:{_ANY_WORD}|{_REDIRECT}))*"  # its arguments, and the redirection
-    r"(?: \|\| true)?")  # the tail of the shipped entries
+# The carrier commands this repository has shipped, as shipped, with where each first appeared (git log -S over the two files that
+# carry hook commands, oldest first). A hook is retired only when its command is one of these strings, or one of them as
+# install_claude_profile.py renders it for the host (its ${HOME} replaced by the host's home directory; tests/test_install_claude_profile.py),
+# byte for byte after trimming outer whitespace. Nothing is parsed or expanded, so nothing a host wrote for itself, a wrapper, a
+# chained command, an option, a substitution or a hand-edited carrier command, can be mistaken for a carrier: it stays. Four
+# rounds of cross-family reads found a defect in every matcher that recognised a grammar; the allowlist is finite and is the only
+# thing to review. A new shipped shape is added here, with its source, in the commit that ships it.
+SHIPPED_CARRIER_COMMANDS = (
+    ('python3 "${HOME}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true',
+     "adoption/templates/claude.settings.template.json, 0c33b37a9 (main, #378; first written as abaa8425d)"),
+    ('python3 "${HOME}/.claude/hooks/token-lanes-session-start.py" 2>/dev/null || true',
+     "adoption/templates/claude.settings.template.json, 2da4aaa77 (PR 684, branch c5/token-layer-2604-wide)"),
+    ('python3 "$HOME/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true',
+     "adoption/hooks/claude/held-out-hook-entries.json, the commit that added it (PR 699)"),
+    ('python3 "$HOME/.claude/hooks/token-lanes-session-start.py" 2>/dev/null || true',
+     "adoption/hooks/claude/held-out-hook-entries.json, the commit that added it (PR 699)"),
+)
 
 
-def runs_held_out_hook(entry: dict) -> bool:
-    """True when a hooks-array entry runs one of HELD_OUT_HOOK_FILES from a `.claude/hooks/` directory and does nothing
-    else: the whole command is a carrier invocation (CARRIER_COMMAND). A command that merely mentions the path
-    (`sha256sum <path>`, an argument of another script, an `echo`), wraps the carrier (`bash -c`, `exec`, `nohup`, `timeout`,
-    `env`), chains another command after or before it, or substitutes a command into an argument or a redirection is the
-    host's own and is kept, so retiring never deletes a hook that does more than run a carrier."""
+def carrier_commands(home: str) -> frozenset:
+    """The strings that retire a hook on the host whose home directory is ``home``: each shipped command as shipped, and as the
+    installer renders it for that host."""
+    shipped = [command for command, _ in SHIPPED_CARRIER_COMMANDS]
+    rendered = [command.replace("${HOME}", home).replace("$HOME", home) for command in shipped]
+    return frozenset(shipped + rendered)
+
+
+def runs_held_out_hook(entry: dict, home: str | None = None) -> bool:
+    """True when a hooks-array entry's command is exactly a carrier command this repository shipped (SHIPPED_CARRIER_COMMANDS,
+    as shipped or rendered for ``home``, the current user's home by default), outer whitespace aside."""
     cmd = hook_command(entry)
-    return cmd is not None and CARRIER_COMMAND.fullmatch(cmd) is not None
+    return cmd is not None and cmd.strip() in carrier_commands(home if home is not None else str(Path.home()))
 
 
-def retire_held_out_hooks(base_hooks, incoming_hooks):
+def retire_held_out_hooks(base_hooks, incoming_hooks, home: str | None = None):
     """`base_hooks` without the hook objects that run a held-out carrier file, unless the incoming template runs the
     same command. A group left with no hook is dropped, and so is an event left with no group; every other group,
     hook object and key keeps its value and order."""
@@ -135,7 +131,7 @@ def retire_held_out_hooks(base_hooks, incoming_hooks):
                 kept_groups.append(copy.deepcopy(group))
                 continue
             kept = [hook for hook in group["hooks"]
-                    if not (runs_held_out_hook(hook) and command_key(hook_command(hook)) not in wanted)]
+                    if not (runs_held_out_hook(hook, home) and command_key(hook_command(hook)) not in wanted)]
             if len(kept) == len(group["hooks"]):
                 kept_groups.append(copy.deepcopy(group))
             elif kept:
@@ -270,12 +266,13 @@ def deep_merge_dict(base: dict, incoming: dict) -> dict:
     return merged
 
 
-def merge_settings(base: dict, template: dict, keep_held_out: bool = False) -> dict:
+def merge_settings(base: dict, template: dict, keep_held_out: bool = False, home: str | None = None) -> dict:
     """Merge `template` (the rendered adoption template) into `base` (the
     live settings), returning a new dict. Rules:
       - `hooks`: combined per event, de-duplicated by command (merge_hooks), after the hook objects that
         run a held-out carrier file are removed from the live hooks (retire_held_out_hooks) unless
-        keep_held_out is true
+        keep_held_out is true (``home``: the home directory the host's carrier commands were rendered with, the
+        current user's by default)
       - nested objects (modelSettings, env, permissions, statusLine,
         enabledPlugins, ...): deep-merged, so host-only keys such as extra
         permission rules, plugins or per-model levels are kept
@@ -291,7 +288,7 @@ def merge_settings(base: dict, template: dict, keep_held_out: bool = False) -> d
     hooks = template.get("hooks")
     merged = deep_merge_dict(base, {k: v for k, v in template.items() if k != "hooks"})
     if hooks is not None:
-        live = base.get("hooks") if keep_held_out else retire_held_out_hooks(base.get("hooks"), hooks)
+        live = base.get("hooks") if keep_held_out else retire_held_out_hooks(base.get("hooks"), hooks, home)
         merged["hooks"] = merge_hooks(live, hooks)
     return merged
 
@@ -342,6 +339,13 @@ def atomic_write(target: Path, text: str, mode: int) -> None:
         raise
 
 
+def host_home(target_path: Path) -> str | None:
+    """The home directory a settings file belongs to: the parent of its `.claude` directory, else the current user's."""
+    if target_path.name == "settings.json" and target_path.parent.name == ".claude":
+        return str(target_path.parent.parent)
+    return None
+
+
 def apply(template_path: Path, target_path: Path, dry_run: bool, keep_held_out: bool = False) -> dict:
     if not template_path.is_file():
         raise ApplyError(f"template not found: {template_path}")
@@ -358,7 +362,7 @@ def apply(template_path: Path, target_path: Path, dry_run: bool, keep_held_out: 
         base = {}
         original_mode = 0o600
 
-    merged = merge_settings(base, template, keep_held_out)
+    merged = merge_settings(base, template, keep_held_out, host_home(target_path))
     rendered = json.dumps(merged, indent=2, ensure_ascii=False) + "\n"
 
     if dry_run:
