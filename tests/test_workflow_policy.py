@@ -480,12 +480,12 @@ def top_level_conjuncts(expression):
     return [" ".join(part.split()) for part in parts]
 
 
-def expression_end(value):
-    """The index just past the `}}` that closes the `${{` opening `value`, or None when none does: the scan of
+def expression_end(value, start=0):
+    """The index just past the `}}` that closes the `${{` at `value[start:]`, or None when none does: the scan of
     TemplateReader.ParseScalar, where every `'` opens or closes a string literal (a doubled `''` reads as two) and only
     a `}}` outside a literal closes the expression."""
     quoted = False
-    for k in range(3, len(value)):
+    for k in range(start + 3, len(value)):
         if value[k] == "'":
             quoted = not quoted
         elif not quoted and value[k] == "}" and value[k - 1] == "}":
@@ -564,16 +564,45 @@ def cache_writes(step):
     return None
 
 
+def expressions(text):
+    """The inside of each `${{ ... }}` in a string, delimited as TemplateReader.ParseScalar delimits them: the next
+    `${{` whatever the quotes around it, closed by expression_end(), so `format('a}}b{0}', toJSON(secrets))` is one
+    expression. One that never closes runs to the end of the string: GitHub rejects it, and the rest is still read."""
+    found, start = [], text.find("${{")
+    while start >= 0:
+        end = expression_end(text, start)
+        if end is None:
+            found.append(text[start + 3:])
+            break
+        found.append(text[start + 3:end - 2])
+        start = text.find("${{", end)
+    return found
+
+
+# Index access to one secret by a string literal, which names the secret that property access names (Contexts
+# reference, "Available contexts": index syntax `github['sha']`, property dereference syntax `github.sha`). An
+# expression's string literal takes single quotes, with `''` for a quote; double quotes "will throw an error"
+# (Expressions, "Literals"), and such a key is read the same way, so the token's exception does not depend on quoting.
+SECRET_INDEX = re.compile(r"""secrets\s*\[\s*(?:'((?:[^']|'')*)'|"([^"]*)")\s*\]""", re.IGNORECASE)
+
+
 def secret_references(text):
-    """Every secrets reference in one string other than secrets.GITHUB_TOKEN: `secrets.NAME` anywhere, `secrets:
-    inherit`, and the bare context inside an expression (`toJSON(secrets)`, `secrets['NAME']`). GitHub does not
-    allow the secrets context in an `if:` condition."""
+    """Every secrets reference in one string other than the job's own token: `secrets.NAME` anywhere, `secrets:
+    inherit`, and inside each expression (expressions()) `secrets['NAME']` and the whole context: `toJSON(secrets)`,
+    or an index that is not one string literal, such as `secrets[format(...)]`. GITHUB_TOKEN by property or by index is
+    the token, compared without case as the property form always was. GitHub does not allow the secrets context in an
+    `if:` condition."""
     found = [match.group(0) for match in re.finditer(r"\bsecrets\.([A-Za-z_][A-Za-z0-9_-]*)", text, re.IGNORECASE)
              if match.group(1).upper() != "GITHUB_TOKEN"]
     found += [match.group(0) for match in re.finditer(r"\bsecrets[ \t]*:[ \t]*inherit\b", text, re.IGNORECASE)]
-    for expression in re.finditer(r"\$\{\{(.*?)\}\}", text, re.DOTALL):
-        found += [f"${{{{{expression.group(1)}}}}}" for _ in re.finditer(r"\bsecrets\b(?!\.[A-Za-z_])",
-                                                                         expression.group(1), re.IGNORECASE)]
+    for expression in expressions(text):
+        for match in re.finditer(r"\bsecrets\b(?!\.[A-Za-z_])", expression, re.IGNORECASE):
+            index = SECRET_INDEX.match(expression, match.start())
+            if index is None:
+                found.append(f"${{{{{expression}}}}}")
+            elif (index.group(2) if index.group(1) is None else index.group(1).replace("''", "'")).upper() \
+                    != "GITHUB_TOKEN":
+                found.append(index.group(0))
     return found
 
 
@@ -861,6 +890,21 @@ def planted_files(name, text, extension=".yml"):
     return dict(text) if isinstance(text, dict) else {f"{name}{extension}": text}
 
 
+def on_event(event):
+    """BASE with `event` as its only trigger."""
+    return mutate(BASE, PULL_REQUEST_AND_PUSH, f"  {event}:\n")
+
+
+def step_env(value):
+    """BASE's test step reading `value` through its env, for mutate(..., 'run: echo "$GITHUB_SHA"', step_env(...))."""
+    return f'run: echo "$TOKEN"\n        env:\n          TOKEN: {value}'
+
+
+# The cross-family review of #686 (P1): a `}}` inside a string literal does not close an expression, and format()
+# reads a doubled brace as one (Expressions, `format`), so the whole context after one is still a reference.
+WHOLE_CONTEXT_AFTER_A_QUOTED_MARKER = "\"${{ format('a}}b{0}', toJSON(secrets)) }}\""
+
+
 # (name, rule the planted file breaks, its text). Each fails with exactly that rule and nothing else.
 PLANTED = [
     ("missing-permissions", "workflow-permissions-missing", mutate(BASE, "permissions: {}\n", "")),
@@ -945,6 +989,24 @@ PLANTED = [
      mutate(mutate(BASE, PULL_REQUEST_AND_PUSH, "  pull_request_review_comment:\n    types: [created]\n"),
             'run: echo "$GITHUB_SHA"', 'run: echo "$TOKEN"\n        env:\n'
                                         '          TOKEN: "${{ \\u0073ecrets.NPM_TOKEN }}"')),
+    # The cross-family review of #686 (P1): the reviewer's form for each event, an indexed secret after a quoted `}}`
+    # in a reusable workflow's secrets mapping, a computed index (the whole context), and the same scan on pull_request.
+    ("issue-comment-whole-context-after-a-quoted-marker", "comment-event-secret",
+     mutate(on_event("issue_comment"), 'run: echo "$GITHUB_SHA"', step_env(WHOLE_CONTEXT_AFTER_A_QUOTED_MARKER))),
+    ("review-whole-context-after-a-quoted-marker", "comment-event-secret",
+     mutate(on_event("pull_request_review"), 'run: echo "$GITHUB_SHA"',
+            step_env(WHOLE_CONTEXT_AFTER_A_QUOTED_MARKER))),
+    ("review-comment-whole-context-after-a-quoted-marker", "comment-event-secret",
+     mutate(on_event("pull_request_review_comment"), 'run: echo "$GITHUB_SHA"',
+            step_env(WHOLE_CONTEXT_AFTER_A_QUOTED_MARKER))),
+    ("comment-call-passing-an-indexed-secret-after-a-quoted-marker", "comment-event-secret",
+     on_event("issue_comment") + CALL_JOB.format(uses="./.github/workflows/called.yml")
+     + "    secrets:\n      token: ${{ format('a}}b{0}', secrets['NPM_TOKEN']) }}\n"),
+    ("comment-secret-by-a-computed-index", "comment-event-secret",
+     mutate(on_event("issue_comment"), 'run: echo "$GITHUB_SHA"',
+            step_env("${{ secrets[format('{0}_TOKEN', 'GITHUB')] }}"))),
+    ("pull-request-whole-context-after-a-quoted-marker", "pull-request-secret",
+     mutate(BASE, 'run: echo "$GITHUB_SHA"', step_env(WHOLE_CONTEXT_AFTER_A_QUOTED_MARKER))),
     ("checkout-without-with", "checkout-persist-credentials",
      mutate(BASE, "        with:\n          persist-credentials: false\n", "")),
     ("checkout-persisting", "checkout-persist-credentials",
@@ -1034,6 +1096,11 @@ ACCEPTED = [
      mutate(mutate(BASE, PULL_REQUEST_AND_PUSH, "  issue_comment:\n    types: [created]\n"),
             'run: echo "$GITHUB_SHA"',
             'run: echo "$TOKEN"\n        env:\n          TOKEN: ${{ secrets.GITHUB_TOKEN }}')),
+    # The cross-family review of #686 (P2): index access names the token as property access does, whatever the quotes.
+    ("comment-workflow-with-the-job-token-by-index",
+     mutate(on_event("issue_comment"), 'run: echo "$GITHUB_SHA"', step_env("${{ secrets['GITHUB_TOKEN'] }}"))),
+    ("comment-workflow-with-the-job-token-by-a-double-quoted-index",
+     mutate(on_event("issue_comment"), 'run: echo "$GITHUB_SHA"', step_env('${{ secrets["GITHUB_TOKEN"] }}'))),
 ]
 
 
@@ -1281,6 +1348,25 @@ class PlantedViolationTests(unittest.TestCase):
         self.assertEqual(secret_references("# ${{ secrets.NPM_TOKEN }}\n"), ["secrets.NPM_TOKEN"])
         self.assertEqual(secret_references("x: ${{ secrets.GITHUB_TOKEN }}\n"), [])
         self.assertEqual(len(secret_references("x: ${{ secrets['NPM_TOKEN'] }}\n")), 1)
+
+    def test_secret_references_delimit_expressions_as_parse_scalar_does(self):
+        # The cross-family review of #686. P1: a `}}` inside a string literal does not end an expression, so what
+        # follows it is read. P2: index access to GITHUB_TOKEN by a string literal is the token, as property access
+        # is; the whole context and an index that is not one literal stay references, whatever they compute.
+        for text in ("x: ${{ secrets.GITHUB_TOKEN }}", "x: ${{ secrets['GITHUB_TOKEN'] }}",
+                     'x: ${{ secrets["GITHUB_TOKEN"] }}', "x: ${{ secrets [ 'github_token' ] }}",
+                     "x: ${{ format('a}}b{0}', secrets['GITHUB_TOKEN']) }}"):
+            with self.subTest(allowed=text):
+                self.assertEqual(secret_references(text), [])
+        for text in ("x: ${{ format('a}}b{0}', toJSON(secrets)) }}",
+                     "x: ${{ format('a}}b{0}', secrets['NPM_TOKEN']) }}",
+                     "x: ${{ secrets }}", "x: ${{ toJSON(secrets) }}", "x: ${{ secrets.* }}",
+                     "x: ${{ secrets[format('{0}_TOKEN', 'GITHUB')] }}", "x: ${{ secrets['GITHUB_TOKEN '] }}",
+                     "x: ${{ secrets['GITHUB_TOKEN'] && secrets['NPM_TOKEN'] }}",
+                     "x: ${{ format('{0}', toJSON(secrets) "):
+            with self.subTest(refused=text):
+                self.assertEqual(len(secret_references(text)), 1, secret_references(text))
+        self.assertEqual(expressions("a ${{ format('}}', 'x') }} b ${{ c }}"), [" format('}}', 'x') ", " c "])
 
     def test_a_yaml_extension_is_checked_too(self):
         found = self.check_planted("missing-permissions", PLANTED[0][2], extension=".yaml")

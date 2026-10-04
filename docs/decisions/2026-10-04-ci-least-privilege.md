@@ -267,9 +267,10 @@ workflow", and an environment's required reviewers can release its secrets to th
 workflow's file is never read here, so neither can be checked in it; zizmor's `unpinned-uses` only asks for a SHA pin,
 which the planted remote call has. An `issue_comment` run uses the default branch's workflow, and a review run from a
 same-repository branch gets the repository's secrets (a fork's run gets none); both run on text that outside users
-write. `GITHUB_TOKEN` stays allowed in all three, as in `pull-request-secret`: it is also `github.token`, and its scopes
-are what `pull-request-write-scope` and the reviewed write inventory bound. On `6af8e55b` no workflow declares an
-environment, calls a reusable workflow from a job, or has a comment or review trigger, so all three rules pass.
+write. `GITHUB_TOKEN` stays allowed in those workflows, by property or by index, as in `pull-request-secret`: it is
+also `github.token`, and its scopes are what `pull-request-write-scope` and the reviewed write inventory bound. On
+`6af8e55b` no workflow declares an environment, calls a reusable workflow from a job, or has a comment or review
+trigger, so all three rules pass.
 
 **Repair round 2: the coordinator's P2 residuals on #681** (from the cross-family review of `de0b0043`).
 
@@ -287,12 +288,37 @@ quoted in a bare value, starts a segment, and the expression's text outside stri
 New planted controls: a leading and a trailing space at job and at cache-step level, and the block scalar. New accepted
 variants: a quoted `}}` in a job guard and in a cache-step guard.
 
-**Controls.** 53 planted entries (14 new: 4, 2 and 3 for the new rules, 5 for repair round 2), 13 accepted variants
-(7 new), and a reachability test that checks the caller is named and that a call is followed through a `$/` hop to a
-callee without `workflow_call`. In a scratch copy, breaking each new rule's predicate fails exactly that rule's planted
-controls (plus the reachability test for the environment rule); restoring #681's helper fails the 5 new planted
-controls, the 2 new accepted variants and 7 unit cases; disabling call-following fails only the reachability test,
-because the `workflow_call` step still reaches the planted callee. PyYAML 6.0.3 agrees with the loader on all 84 texts.
+**Cross-family review of #686 at `aeb5ba25`** (one repair round). The secrets scan that `pull-request-secret`,
+`comment-event-secret` and `test_pull_request_jobs_hold_no_secret_and_no_write` share delimited expressions with the
+regex `\$\{\{(.*?)\}\}`, which stops at the first `}}` even inside a string literal.
+
+1. **P1.** `TOKEN: "${{ format('a}}b{0}', toJSON(secrets)) }}"` in a step's `env`, and
+   `${{ format('a}}b{0}', secrets['NPM_TOKEN']) }}` in a reusable workflow's `secrets` mapping, gave no violation for
+   any of the three comment and review events, nor `pull-request-secret` on `pull_request` (reproduced). Both are
+   valid: `format()` reads a doubled brace as one brace (Expressions, `format`), and `ParseScalar` does not close an
+   expression inside a literal. `secret_references()` now reads each expression as `expressions()` delimits it, with
+   `expression_end()`, the scan repair round 2 introduced; an expression that never closes is read to the end.
+2. **P2.** `secrets['GITHUB_TOKEN']` was a violation while `secrets.GITHUB_TOKEN` passed, although index and property
+   syntax access the same value (Contexts reference, "Available contexts"). Index access by one string literal now
+   names the secret it indexes (`SECRET_INDEX`; a `''` escape is unescaped, and a double-quoted key, which GitHub's
+   parser rejects, is read the same way), so the token passes in both forms. The whole context and an index that is
+   not one literal, such as `secrets[format('{0}_TOKEN', 'GITHUB')]`, stay violations whatever they compute.
+
+New planted controls: the reviewer's `env` form under `issue_comment`, `pull_request_review` and
+`pull_request_review_comment`; the indexed secret after a quoted `}}` in a called workflow's `secrets` mapping; the
+computed index; and the `env` form under `pull_request` for `pull-request-secret`. New accepted variants: the token by
+single-quoted and by double-quoted index. A unit test covers both access forms, both kinds of whole-context access and
+an unclosed expression.
+
+**Controls.** 59 planted entries (20 new: 4, 2 and 8 for the new rules, 5 for repair round 2, 1 for
+`pull-request-secret`), 15 accepted variants (9 new), and a reachability test that checks the caller is named and that
+a call is followed through a `$/` hop to a callee without `workflow_call`. In a scratch copy, breaking each new rule's
+predicate fails exactly that rule's planted controls (plus the reachability test for the environment rule); restoring
+#681's helper fails the 5 repair-round-2 planted controls, the 2 accepted variants that go with them and 7 unit cases;
+disabling call-following fails only the reachability test, because the `workflow_call` step still reaches the planted
+callee. Restoring the old expression regex fails the 5 quoted-marker controls and 3 unit cases, and reading every index
+as the whole context fails the 2 index-form variants and 5 unit cases. PyYAML 6.0.3 agrees with the loader on all 92
+texts.
 
 **Dependabot wording.** `2026-09-22-github-automation-closure.md` said fork and Dependabot pull requests get a
 read-only token. A Dependabot run's token is read-only by default (it can be raised): GitHub documents raising it with
@@ -353,6 +379,10 @@ new rule yet.
   `secrets-inherit`, `unpinned-uses`, `self-repository`, `secrets-outside-env` (<https://docs.zizmor.sh/audits/>).
 - actions/runner `src/Sdk/DTObjectTemplating/ObjectTemplating/TemplateReader.cs` (`ParseScalar`) at
   `d7bc179baf11a02110b46cfbbc4040f74ac3f60a`.
+- GitHub, Contexts reference, "Available contexts" (index and property dereference syntax):
+  <https://docs.github.com/en/actions/reference/workflows-and-actions/contexts>; Evaluate expressions in workflows and
+  actions, "Literals" (single-quoted strings only) and `format` (doubled braces):
+  <https://docs.github.com/en/actions/reference/workflows-and-actions/expressions> (both read 2026-10-04 at 14:15Z).
 
 ## Alternatives considered
 
