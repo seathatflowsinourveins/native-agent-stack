@@ -507,8 +507,11 @@ class WorkflowTests(unittest.TestCase):
     def test_triggers_permissions_and_token_follow_catalog_freshness(self):
         self.assertRegex(self.text, r"(?m)^on:\n  schedule:\n(?:    #.*\n)*    - cron: '[0-9]+ [0-9]+ \* \* [0-6]'\n"
                                     r"  workflow_dispatch:\n")
-        self.assertEqual(re.findall(r"(?m)^[ \t]*permissions:.*$", self.text), ["permissions:"])
-        self.assertIn("\npermissions:\n  contents: read\n\njobs:\n", self.text)
+        # As in catalog-freshness.yml since 2026-10-04 (docs/decisions/2026-10-04-ci-least-privilege.md): the
+        # workflow grants no scope and its one job grants `contents: read`.
+        self.assertEqual(re.findall(r"(?m)^[ \t]*permissions:.*$", self.text), ["permissions: {}", "    permissions:"])
+        self.assertIn("\npermissions: {}\n", self.text)
+        self.assertIn("\n    permissions:\n      contents: read\n    steps:\n", self.text)
         self.assertEqual(self.text.count("GH_TOKEN: ${{ github.token }}"), 1)
         self.assertEqual(self.text.count("persist-credentials: false"), 1)
         self.assertIn('>> "$GITHUB_STEP_SUMMARY"', self.text)

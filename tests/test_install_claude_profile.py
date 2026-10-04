@@ -1,4 +1,4 @@
-"""Unit tests for tools/adoption/install_claude_profile.py's guard/agents
+"""Unit tests for tools/adoption/install_claude_profile.py's guard/agents/workflows
 steps (sha256-checked, idempotent) and the MCP registration matcher used to
 decide whether an existing `claude mcp get` entry already matches the
 template (so registration is skipped rather than repeated). The `claude`
@@ -206,6 +206,286 @@ class GuardInstallTests(unittest.TestCase):
             self.assertFalse((home / ".claude" / "hooks" / "effort-default-guard.py").exists())
 
 
+class WorkflowInstallTests(unittest.TestCase):
+    """Local integration checks for native saved-script files, without model calls."""
+
+    NAMES = ("readiness-audit.js", "review-changes.js", "layer-verdict-lane.js")
+
+    def cli(self, home, *args):
+        return subprocess.run(
+            [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"),
+             "--home", str(home), *args],
+            cwd=ROOT, capture_output=True, text=True, timeout=30,
+        )
+
+    def install(self, home):
+        with mock.patch("sys.stdout", new_callable=io.StringIO):
+            return icp.install_workflows(home, dry_run=False)
+
+    def test_cli_clean_install_readback_and_idempotence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            planned = self.cli(home, "--only", "workflows", "--dry-run")
+            self.assertEqual(planned.returncode, 0, planned.stderr)
+            self.assertFalse((home / ".claude").exists())
+            for name in self.NAMES:
+                self.assertIn(f"would install {home / '.claude/workflows' / name}", planned.stdout)
+            installed = self.cli(home, "--only", "workflows")
+            self.assertEqual(installed.returncode, 0, installed.stderr)
+            dest_dir = home / ".claude/workflows"
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, set(self.NAMES))
+            before = {}
+            for name in self.NAMES:
+                dest = dest_dir / name
+                self.assertEqual(dest.read_bytes(), (icp.WORKFLOWS_SRC_DIR / name).read_bytes())
+                before[name] = (dest.stat().st_ino, dest.stat().st_mtime_ns)
+            repeated = self.cli(home, "--only", "workflows")
+            self.assertEqual(repeated.returncode, 0, repeated.stderr)
+            self.assertEqual(repeated.stdout.count("already matches; skipped"), 3)
+            for name in self.NAMES:
+                dest = dest_dir / name
+                self.assertEqual((dest.stat().st_ino, dest.stat().st_mtime_ns), before[name])
+
+    def test_explicit_profile_selection_installs_saved_workflows(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(icp, "install_guards") as guards, \
+             mock.patch.object(icp, "install_agents") as agents, \
+             mock.patch.object(icp, "install_mcp_servers") as mcp, \
+             mock.patch("sys.stdout", new_callable=io.StringIO):
+            home = Path(tmp)
+            self.assertEqual(icp.main(["--home", tmp, "--only", "workflows"]), 0)
+            self.assertEqual({p.name for p in (home / ".claude/workflows").iterdir()}, set(self.NAMES))
+            guards.assert_not_called()
+            agents.assert_not_called()
+            mcp.assert_not_called()
+
+    def test_default_profile_never_reads_or_creates_workflows(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(icp, "install_guards") as guards, \
+             mock.patch.object(icp, "install_agents") as agents, \
+             mock.patch.object(icp, "install_mcp_servers") as mcp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+
+            def forbid_workflow_access(method):
+                def checked(path, *args, **kwargs):
+                    if path.is_relative_to(dest_dir) or path.is_relative_to(icp.WORKFLOWS_SRC_DIR):
+                        raise AssertionError(f"default run accessed workflows: {path}")
+                    return method(path, *args, **kwargs)
+                return checked
+
+            with mock.patch.object(Path, "open", forbid_workflow_access(Path.open)), \
+                 mock.patch.object(Path, "stat", forbid_workflow_access(Path.stat)), \
+                 mock.patch.object(Path, "iterdir", forbid_workflow_access(Path.iterdir)), \
+                 mock.patch.object(Path, "mkdir", forbid_workflow_access(Path.mkdir)):
+                self.assertEqual(icp.main(["--home", tmp]), 0)
+            self.assertFalse(dest_dir.exists())
+            guards.assert_called_once_with(home, False, None)
+            agents.assert_called_once_with(home, False, None)
+            mcp.assert_called_once()
+
+    def test_source_corruption_or_missing_manifest_entry_refuses_before_writes(self):
+        for failure in ("corruption", "missing-entry"):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as tmp:
+                scratch = Path(tmp)
+                sources = scratch / "sources"
+                sources.mkdir()
+                for name in self.NAMES:
+                    shutil.copy2(icp.WORKFLOWS_SRC_DIR / name, sources / name)
+                sums = sources / "SHA256SUMS"
+                sums.write_bytes(icp.WORKFLOWS_SHA256SUMS.read_bytes())
+                if failure == "corruption":
+                    with (sources / self.NAMES[-1]).open("ab") as stream:
+                        stream.write(b"\n// unreviewed mutation\n")
+                else:
+                    sums.write_text("\n".join(line for line in sums.read_text().splitlines()
+                                              if not line.endswith(self.NAMES[-1])) + "\n")
+                home = scratch / "home"
+                home.mkdir()
+                with mock.patch.object(icp, "WORKFLOWS_SRC_DIR", sources), \
+                     mock.patch.object(icp, "WORKFLOWS_SHA256SUMS", sums):
+                    with self.assertRaises(icp.InstallError):
+                        self.install(home)
+                self.assertFalse((home / ".claude").exists())
+
+    def test_conflicting_last_target_refuses_every_write_including_dry_run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+            dest_dir.mkdir(parents=True)
+            conflict = dest_dir / self.NAMES[-1]
+            conflict.write_bytes(b"personalized workflow\n")
+            custom = dest_dir / "custom.js"
+            custom.write_bytes(b"custom workflow\n")
+            for extra in ((), ("--dry-run",)):
+                result = self.cli(home, "--only", "workflows", *extra)
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("differs; left unchanged", result.stderr)
+                self.assertEqual(conflict.read_bytes(), b"personalized workflow\n")
+                self.assertEqual(custom.read_bytes(), b"custom workflow\n")
+                self.assertEqual({p.name for p in dest_dir.iterdir()}, {conflict.name, custom.name})
+
+    def test_matching_or_dangling_target_symlink_is_refused(self):
+        for target_exists in (True, False):
+            with self.subTest(target_exists=target_exists), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                dest_dir = home / ".claude/workflows"
+                dest_dir.mkdir(parents=True)
+                target = home / "outside.js"
+                if target_exists:
+                    target.write_bytes((icp.WORKFLOWS_SRC_DIR / self.NAMES[-1]).read_bytes())
+                dest = dest_dir / self.NAMES[-1]
+                dest.symlink_to(target)
+                result = self.cli(home, "--only", "workflows")
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("refusing target symlink", result.stderr)
+                self.assertTrue(dest.is_symlink())
+                self.assertEqual({p.name for p in dest_dir.iterdir()}, {dest.name})
+                self.assertEqual(target.exists(), target_exists)
+                if target_exists:
+                    self.assertEqual(target.read_bytes(), (icp.WORKFLOWS_SRC_DIR / dest.name).read_bytes())
+
+    def test_nonfile_target_is_preserved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest = home / ".claude/workflows" / self.NAMES[-1]
+            dest.mkdir(parents=True)
+            result = self.cli(home, "--only", "workflows")
+            self.assertEqual(result.returncode, 1, result.stdout)
+            self.assertTrue(dest.is_dir())
+            self.assertEqual({p.name for p in dest.parent.iterdir()}, {dest.name})
+
+    def test_personal_dotfiles_directory_symlink_is_supported(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dotfiles = home / "dotfiles-claude"
+            dotfiles.mkdir()
+            (home / ".claude").symlink_to(dotfiles, target_is_directory=True)
+            result = self.cli(home, "--only", "workflows")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue((home / ".claude").is_symlink())
+            for name in self.NAMES:
+                self.assertEqual((dotfiles / "workflows" / name).read_bytes(),
+                                 (icp.WORKFLOWS_SRC_DIR / name).read_bytes())
+
+    def test_write_failure_cleans_new_files_and_empty_directories_then_recovers(self):
+        original_open = Path.open
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+
+            def fail_open(path, mode="r", *args, **kwargs):
+                if path.name == self.NAMES[-1] and mode == "xb":
+                    raise OSError("injected write failure")
+                return original_open(path, mode, *args, **kwargs)
+
+            with mock.patch.object(Path, "open", fail_open):
+                with self.assertRaisesRegex(icp.InstallError, "new files rolled back"):
+                    self.install(home)
+            self.assertFalse((home / ".claude").exists())
+            self.assertEqual(self.install(home), dict.fromkeys(self.NAMES, "installed"))
+
+    def test_readback_failure_rolls_back_new_files_and_preserves_reused_and_custom(self):
+        original_read = Path.read_bytes
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+            dest_dir.mkdir(parents=True)
+            reused = dest_dir / self.NAMES[0]
+            reused.write_bytes((icp.WORKFLOWS_SRC_DIR / reused.name).read_bytes())
+            reused_identity = (reused.stat().st_ino, reused.stat().st_mtime_ns)
+            custom = dest_dir / "custom.js"
+            custom.write_bytes(b"custom workflow\n")
+
+            def fail_readback(path):
+                if path.parent == dest_dir and path.name == self.NAMES[-1]:
+                    return b"injected readback mismatch"
+                return original_read(path)
+
+            with mock.patch.object(Path, "read_bytes", fail_readback):
+                with self.assertRaisesRegex(icp.InstallError, "installed readback differs"):
+                    self.install(home)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {reused.name, custom.name})
+            self.assertEqual((reused.stat().st_ino, reused.stat().st_mtime_ns), reused_identity)
+            self.assertEqual(custom.read_bytes(), b"custom workflow\n")
+            result = self.install(home)
+            self.assertEqual(result, {self.NAMES[0]: "skipped", self.NAMES[1]: "installed", self.NAMES[2]: "installed"})
+
+    def test_target_created_after_preflight_is_preserved_and_earlier_write_rolled_back(self):
+        original_open = Path.open
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+
+            def competing_open(path, mode="r", *args, **kwargs):
+                if path.parent == dest_dir and path.name == self.NAMES[1] and mode == "xb":
+                    with original_open(path, "wb") as stream:
+                        stream.write(b"another writer's workflow\n")
+                return original_open(path, mode, *args, **kwargs)
+
+            with mock.patch.object(Path, "open", competing_open):
+                with self.assertRaises(icp.InstallError):
+                    self.install(home)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {self.NAMES[1]})
+            self.assertEqual((dest_dir / self.NAMES[1]).read_bytes(), b"another writer's workflow\n")
+
+    def test_scoped_remove_dry_run_then_preserves_edited_and_custom_entries(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            self.install(home)
+            dest_dir = home / ".claude/workflows"
+            custom = dest_dir / "custom.js"
+            custom.write_bytes(b"custom workflow\n")
+            planned = self.cli(home, "--only", "workflows", "--remove-workflows", "--dry-run")
+            self.assertEqual(planned.returncode, 0, planned.stderr)
+            self.assertEqual(planned.stdout.count("would remove"), 3)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {*self.NAMES, custom.name})
+            edited = dest_dir / self.NAMES[-1]
+            edited.write_bytes(b"personalized workflow\n")
+            removed = self.cli(home, "--only", "workflows", "--remove-workflows")
+            self.assertEqual(removed.returncode, 1, removed.stdout)
+            self.assertIn("differs; left unchanged", removed.stderr)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {edited.name, custom.name})
+            self.assertEqual(edited.read_bytes(), b"personalized workflow\n")
+            self.assertEqual(custom.read_bytes(), b"custom workflow\n")
+
+    def test_scoped_remove_preserves_target_symlinks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            self.install(home)
+            dest_dir = home / ".claude/workflows"
+            target = home / "outside.js"
+            dest = dest_dir / self.NAMES[-1]
+            dest.rename(target)
+            dest.symlink_to(target)
+            removed = self.cli(home, "--only", "workflows", "--remove-workflows")
+            self.assertEqual(removed.returncode, 1, removed.stdout)
+            self.assertIn("is a symlink; left unchanged", removed.stderr)
+            self.assertTrue(dest.is_symlink())
+            self.assertEqual(target.read_bytes(), (icp.WORKFLOWS_SRC_DIR / dest.name).read_bytes())
+
+    def test_complete_scoped_remove_is_idempotent_and_reinstall_recovers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            self.install(home)
+            for attempt in range(2):
+                removed = self.cli(home, "--only", "workflows", "--remove-workflows")
+                self.assertEqual(removed.returncode, 0, removed.stderr)
+                self.assertEqual(list((home / ".claude/workflows").iterdir()), [])
+                self.assertEqual(removed.stdout.count("removed" if attempt == 0 else "already absent"), 3)
+            self.assertEqual(self.install(home), dict.fromkeys(self.NAMES, "installed"))
+
+    def test_remove_rejects_mixed_mutation_options_before_writes(self):
+        for options in (("--remove-workflows",),
+                        ("--only", "workflows", "--only", "guard", "--remove-workflows"),
+                        ("--only", "workflows", "--replace-mcp", "--remove-workflows")):
+            with self.subTest(options=options), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                result = self.cli(home, *options)
+                self.assertEqual(result.returncode, 2, result.stdout)
+                self.assertIn("requires exactly --only workflows", result.stderr)
+                self.assertFalse((home / ".claude").exists())
+
+
 class SecretGuardProfileTests(unittest.TestCase):
     """The secret-path guard and its deny rules ship in the user profile for every new host."""
 
@@ -313,9 +593,10 @@ class SecretGuardProfileTests(unittest.TestCase):
         merged = acs.merge_settings(base, template)
         self.assertEqual(merged["permissions"]["deny"][0], "Bash(rm -rf /)")
         self.assertIn("Read(~/.config/native-agent-stack/**)", merged["permissions"]["deny"])
-        commands = [h["command"] for h in merged["hooks"]["PreToolUse"][0]["hooks"]]
+        commands = [h["command"] for group in merged["hooks"]["PreToolUse"]
+                    if group.get("matcher") == "Bash" for h in group["hooks"]]
         self.assertEqual(commands.count("rtk hook claude"), 1)
-        self.assertTrue(any("secret_path_guard.py" in c for c in commands))
+        self.assertEqual(sum("secret_path_guard.py" in c for c in commands), 1)
 
 
 class ProfileTemplateSettingsTests(unittest.TestCase):
