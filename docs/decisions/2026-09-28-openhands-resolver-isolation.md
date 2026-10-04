@@ -346,6 +346,60 @@ refuses, with no push, a change to:
   (`patch_policy.python_references`). Test modules are protected themselves, but their imports,
   the code they test, are not.
 
+**Gate data (cross-family review P1, repaired 2026-10-04).** The GPT-6.1 Sol full read of
+`40f12ba5` found that the derivation missed the data gate scripts read:
+`scripts/validate_convergence.py` reads `blueprints/convergence-practice/contract.schema.json` as
+`read_json(CONTRACT / "contract.schema.json")`, and that schema was editable. The derivation now
+adds the data the gate scripts read (rule `ci_read`, `resolver/gate_reads.py`). It evaluates every
+expression of each gate Python file to the repository locations it spells:
+- string literals; module, class and `self.X` constants; f-strings and `+`;
+- `Path(__file__)` chains (`.parent`, `.parents[k]`, `/`, `Path(a, b)`, `os.path.join`,
+  `joinpath`, `with_name`, `os.path.dirname`), `x /= y`, and the elements of literal tuples,
+  lists and dicts, destructured or not;
+- a `from module import NAME` of a repository module, resolved in that module.
+
+So a read is caught where its path is built, whatever then reads the bytes: `open`,
+`Path.read_text` or `read_bytes`, `json.load`, `tomllib.load`, `csv.reader`, a YAML loader or a
+helper. The reader's scopes follow Python's: a comprehension has its own scope, its first
+iterable is evaluated outside it (Language Reference 6.2.4), and an assignment expression inside it
+binds in the containing scope (PEP 572). Within a scope a name takes the union of its
+assignments, which can only add protection. The reads become protection as follows:
+- an exact location protects that file, tracked or not, since an agent could add it;
+- a path built dynamically (a glob, an f-string, a join over a directory or a value not fixed in
+  the code) protects the directory it resolves under, or its glob shape where the computed parts
+  sit inside a template or a glob pattern. An f-string `docs/{id}.md` protects `docs/*.md`, whose
+  `*` matches across directories, as `fnmatch` does;
+- a path the code receives (an argument, the environment, file content or another call's result)
+  selects the subjects a check judges, such as the documents a link check reads. Those stay
+  editable, while the file that selects them is protected wherever the code spells it;
+- a gate script in another language protects the paths its text names, by the same rule as a
+  `run:` step;
+- a code file that gate code runs or reads is gate code too, followed to a fixpoint: its reads,
+  its imports or the names in its text. `adoption/bootstrap-linux.sh`, which
+  `adoption-bootstrap.yml` runs, runs `tools/adoption/*.py`; `managed_block.py` puts `scripts/`
+  and `tools/adoption/` on `sys.path`, so both are protected (`ci_import`);
+- a read the reader cannot resolve (a computed path at the root with a part of unknown origin,
+  such as a name bound through `globals()`) fails closed by refusing: every commit is refused
+  (`gate_input_unresolved`, rule `unresolved_read`), and the record names the script and line.
+  So does a gate Python file that the gate's interpreter cannot parse or that nests too deeply for
+  the reader, since CI's interpreter may run what the gate's cannot read.
+
+Refusing was chosen over protecting conservatively, because protecting the directory such a read
+resolves under means protecting the whole tree. A refusal blocks every commit just as surely, and
+it says which read to fix. On the merged tree no read is unresolved, and a repository test keeps
+it so.
+
+Test modules stay protected but unfollowed, as for their imports: what a test reads is mostly the
+code and data it tests. Following their reads as well was measured and not adopted. It would
+protect 9,083 of the merged tree's 10,455 files, and leave 83 reads in 13 test modules
+unresolved, so every push would be refused.
+
+The resolver skill and the generated instruction name every category the gate refuses. They
+tell the agent to stop and report, without editing, when a fix would need such a change,
+including a new or changed test, since `tests/**` is protected on this repository. A test keeps
+both in step with the gate's rule list (`push_gate.AGENT_RULE_PHRASES`) and the receipt's (P2 of
+the same read).
+
 It also refuses a `run:` or `script:` step that interpolates untrusted event text: an expression
 reading a `github.event` value whose name ends in body, default_branch, email, head_ref, label,
 message, name, page_name, ref or title, or `github.head_ref` (GitHub's [script
@@ -364,15 +418,17 @@ of reviewed main, never from the agent's tree or branch. At run time the gate:
 - takes its root only from its own file's location, never from an argument or the environment;
 - refuses when that checkout, its files or a tool path lie inside an agent tree (the attempt's
   result directory, which holds the agent's workspace and the host clone);
-- requires the gate's three files (`push_gate.py`, `patch_policy.py`, `gh_harness.py`) to equal the
-  trusted commit's blobs, and the trusted commit to be on main's history at the attempt's base;
-- requires the same three files at the base to equal the trusted ones, so a stale gate refuses;
+- requires the gate's four files (`push_gate.py`, `patch_policy.py`, `gate_reads.py`,
+  `gh_harness.py`) to equal the trusted commit's blobs, and the trusted commit to be on main's
+  history at the attempt's base;
+- requires the same four files at the base to equal the trusted ones, so a stale gate refuses;
 - records the trusted commit.
 
 `plan_run` checks the location and the files before any container, and its printed dry-run plan
 says only that the check passed; the push repeats every check against the clone. When several
 rules derive the same path, the record names the most specific one (local action, then unittest
-discovery, then a step's name, then an import), whatever order the workflows are read in. Each
+discovery, then a step's name, then an import, then a gate read), whatever order the workflows are
+read in. Each
 check leaves one record per commit: pass or fail, its reason codes, the
 paths that triggered it with their rules, the trusted commit, and zizmor's version and failing
 audits. The record goes into `GhHarness.gates`, beside the write journal, and into the attempt's
@@ -433,6 +489,32 @@ The tripwire stays a regression check there; it does not stand in for the gate.
   Paths that appear only inside echoed text still count as names (the `changes` step's summary
   names `docs/decisions/2026-10-03-macos-ci-scope.md`). That over-protects in the safe direction.
   Narrowing the list is a reviewed change to the gate on main.
+- Following gate reads made the list much broader. On the merged tree `db287ea72` (10,455 tracked
+  files) the gate protected 440 files (4.2%) before the change and protects 7,493 (71.7%) after.
+  Leaving out `evidence/`, `tests/` and `.github/`, it was 121 of 3,436 (3.5%) and is 631 (18.4%).
+  The derived set went from 304 files and 5 prefixes to 545 files, 18 prefixes and 10 globs, with
+  no unresolved read. One read accounts for most of it: `tools/sota-convergence/gap_wave_ledger.py`
+  joins `root / "evidence/artifacts" / wave` with `wave` from its arguments, so all 6,358 files
+  under `evidence/artifacts` are protected. The same script's `root / f"docs/{doc['id']}.md"`
+  protects `docs/*.md` (192 files), so a resolver task on most documents is now refused at the
+  gate. `blueprints/` outside the gate code stays editable (14 of 2,602 protected). Two narrowings
+  are left for a later reviewed change, each with its own failing-first controls. One would trace
+  argument values to the literal arguments of the step that runs the script; validate.yml passes
+  `--wave gap-wave2-20260923 --wave gap-wave3-20260923`, so two wave directories and one ledger
+  page would remain. The other would recognise files a check only compares with its own output.
+  Until then the breadth is the price of failing closed, and a repository test bounds it
+  (18.4% of the tree outside `evidence/`, `tests/` and `.github/` against a ceiling of 25%; 14
+  `blueprints/` files against 52). Deriving three trees now takes about 3.3 s each on this host,
+  and a gate check with zizmor about 11 to 12 s, up from 2.2 s.
+- What the reader treats as a subject stays editable. Where the data selecting a policy file is
+  itself received rather than spelled in the code (a path taken from a file the script finds by
+  enumeration, for example), that policy file is not protected. The reader also does not model
+  every form: a name bound through `globals()`, `exec`, or a path assembled inside a function and
+  returned to the caller through a parameter is either unresolved, so every commit is refused, or
+  treated as received. The unit tests pin each modelled form and the fail-closed cases.
+- Data a test module reads outside `tests/` is not protected unless another rule protects it
+  (everything under `tests/` is, through discovery). A test whose expected values live in such a
+  file can be weakened through that file, as the code under test can be changed.
 
 **Evidence** (local integration and synthetic checks, not upstream acceptance or a live run):
 - `tests/test_runtime_worker_openhands_push_gate.py` has fixture repositories, local git, a
@@ -443,15 +525,46 @@ The tripwire stays a regression check there; it does not stand in for the gate.
 - [evidence/push-gate-fail-first.txt](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt)
   keeps the tests' failing run at the base, 23 planted defects in the gate code, each failing its
   test, and a local rehearsal on this repository's own trees with the real zizmor. Its part 6
-  covers the round after main's `e0c329ae9` and CodeQL alert 90.
+  covers the round after main's `e0c329ae9` and CodeQL alert 90. Its part 7 covers the gate-data
+  repair: the new tests failing against `21b24dede`'s gate, with the planted schema commit pushed,
+  19 more planted defects (42 of 42 detected), the breadth before and after, and a rehearsal on the
+  merged tree.
+- The gate-data tests: every modelled read form on one script, in the unit tests (a module-constant
+  schema, TOML, YAML, CSV, f-string, glob, `iterdir`, a literal-tuple loop, destructuring, `/=`, a
+  received base, a received subject and a `globals()` name). A fixture whose gate step reads a
+  schema through an imported constant: each of its data files, a new file under the glob, the
+  shell script's data file and the data of a script that shell script runs are refused, and the
+  subject and unrelated files pass. A read the reader cannot resolve, and a gate script it cannot
+  parse, refuse every commit. The repository test checks that `contract.schema.json` is `ci_read`,
+  that no read is unresolved, and the breadth bound.
+
+**Proposed, not adopted (2026-10-04): the owned paths as an allowlist in the gate as well.** The
+task's owned paths already act as an allowlist, applied before the gate. `patch_policy.validate_patch`
+refuses any change outside them before the host commits, so the derivation only decides within the
+owned paths. A miss like P1's mattered only to a task that owns the schema's directory. Two
+additions would make the pair independent of each other, without replacing the derivation, which
+still protects CI inputs inside owned paths:
+- the gate re-checks, on the exact commit, that every changed path is owned, with the owned paths
+  passed from the trusted plan. That would catch a `patch_policy` defect, or a commit that differs
+  from the validated patch, which the current gate would let through wherever the derivation has
+  no rule;
+- `plan_run` refuses, before any container, owned paths that the derivation protects. With 71% of
+  the tree now protected, such a task would otherwise end in a refused push, and this saves the
+  run.
+
+Adopt the first when the plan's owned paths can reach `PushGate.check` through the harness without
+passing through anything the agent can influence. Adopt the second once the derivation's cost is
+acceptable at plan time: about 3.3 s per tree on this host. Neither replaces the derivation,
+because within the owned paths it is the only rule that knows what CI reads.
 
 **Overturn.** If the pre-push gate cannot be kept immutable to the agent, switch to option 2
 (fork isolation). That happens when the agent can reach the trusted checkout, the gate's files or
 the push credential, when a gate check is bypassed, or when the gate cannot run before every push.
 Before switching, verify that the fork's policy withholds secrets and write tokens from its PR
 runs; a fork still needs safe caches, artifacts and privileged downstream consumers. Reopen the
-list of protected files if a workflow change adds a path the derivation does not read. Reopen the
-zizmor flags if CI's pinned version or flags change.
+list of protected files if a workflow change adds a path the derivation does not read, or if a gate
+script reads data through a form `gate_reads.py` does not model (the repository test fails on main
+when a read becomes unresolved). Reopen the zizmor flags if CI's pinned version or flags change.
 
 **First live run.** The narrowing above covers resolver mode's CI execution only on these terms.
 The first live run waits until three things hold: this gate has landed on main, its negative
@@ -637,6 +750,24 @@ its versioned primary sources. Do not weaken or skip the validator's refusal ass
   - `python/ql/src/Security/CWE-312/CleartextLogging.ql` and `.qhelp`.
 
   The flow itself comes from the alert's analysis SARIF (read with `gh api`).
+- Cross-family review of `40f12ba5` (GPT-6.1 Sol, max), 2026-10-04: findings P1 (gate data) and P2
+  (the agent's instructions), relayed by the command center. The Python behaviour the gate-data
+  reader models, from docs.python.org/3.13 (read 2026-10-04, HTTP 200):
+  [pathlib](https://docs.python.org/3.13/library/pathlib.html) ("If a segment is an absolute
+  path, all previous segments are ignored (like os.path.join())"; `Path.rglob` "like calling
+  Path.glob() with "**/" added in front of the pattern"),
+  [os.path.join](https://docs.python.org/3.13/library/os.path.html#os.path.join),
+  [fnmatch](https://docs.python.org/3.13/library/fnmatch.html) ("the filename separator ('/' on
+  Unix) is not special to this module"), [tomllib.load](https://docs.python.org/3.13/library/tomllib.html)
+  ("a readable and binary file object"), [csv.reader](https://docs.python.org/3.13/library/csv.html)
+  ("an iterable of strings ... most commonly a file-like object"), the [Language Reference
+  6.2.4](https://docs.python.org/3.13/reference/expressions.html#displays-for-lists-sets-and-dictionaries)
+  (a comprehension's implicitly nested scope, its leftmost iterable evaluated in the enclosing
+  scope), [PEP 572](https://peps.python.org/pep-0572/) (an assignment expression in a
+  comprehension binds in the containing scope), and [ast](https://docs.python.org/3.13/library/ast.html).
+  Each path rule was also checked on the installed CPython 3.13.15 (`PurePosixPath("a") / "/b"`
+  and `os.path.join("a", "/b")` give `/b`; `fnmatchcase("docs/decisions/x.md", "docs/*.md")` is
+  true).
 - Repository, for the gate: `.github/requirements-ci.txt` (the zizmor pin) and
   `.github/workflows/validate.yml` (CI's zizmor flags and the whole-suite `python3 -m unittest`
   run). The gate also reuses `blueprints/runtime-workers/openhands/resolver/patch_policy.py`

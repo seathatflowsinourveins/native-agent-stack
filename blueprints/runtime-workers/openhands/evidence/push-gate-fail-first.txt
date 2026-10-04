@@ -259,3 +259,126 @@ tools/adoption/managed_block.py edit (listed only in MACOS_PATTERNS): pass
 scripts/validate.py edit (run by the workflows): fail protected_path [ci_named]
 new test module (tests/test_resolver_added.py): fail protected_path [ci_discovered]
 .github/workflows/adoption-bootstrap.yml edit: fail protected_path [github]
+
+
+7. Cross-family review P1 and P2: gate data and the agent's instructions, 2026-10-04 (merge
+   db287ea72 of main 3bdacabd5, fix 86688e1e1)
+
+The GPT-6.1 Sol full read of 40f12ba51 returned two findings:
+- P1: the derivation missed data that CI-run gate code reads. scripts/validate_convergence.py
+  reads blueprints/convergence-practice/contract.schema.json as
+  read_json(CONTRACT / "contract.schema.json"), and a commit changing that schema passed the gate;
+- P2: skills/resolver/SKILL.md and resolver.resolver_instruction omitted the gate's categories
+  and still asked the agent to add or update tests, while tests/** is protected.
+
+Failing first, 2026-10-04T05:49:25Z to 05:49:51Z. Method: the working tree copied into <scratch>
+and committed there, with push_gate.py, receipt.py, resolver.py and skills/resolver/SKILL.md
+restored from 21b24dede, the round-2 head. gate_reads.py stays in the copy; that push_gate.py
+never loads it.
+$ python3 -m unittest tests.test_runtime_worker_openhands_push_gate \
+    tests.test_runtime_worker_openhands_resolver.IssueSelectionTests.test_the_agent_instructions_state_every_category_the_push_gate_refuses
+exit 1; Ran 42 tests; FAILED (failures=14, errors=5, skipped=1):
+- the planted schema commit was pushed: test_a_planted_schema_edit_is_refused_before_any_push
+  failed with "HarnessRefused not raised";
+- each of the fixture's nine data edits passed the gate, with status pass and no reason: the
+  schema, rules.toml, ci.yaml, limits-strict.json, a new limits-lax.json, checks/one.json, a new
+  checks/added.json, shell.txt (named by the shell script the step runs) and inner.json (read by
+  the Python script that shell script runs);
+- the read the reader cannot resolve passed, where it must refuse every commit;
+- a local edit of gate_reads.py in the trusted checkout passed; it was no enforcing file;
+- on this repository, contract.schema.json and tools/adoption/managed_block.py had no rule
+  (None != 'ci_read');
+- five errors from the interfaces the fix adds: no gate_reads module, no CiProtected.unresolved,
+  no "globs" count in the record (twice), no AGENT_RULE_PHRASES.
+With only the two instruction sources restored:
+$ python3 -m unittest ...IssueSelectionTests.test_the_agent_instructions_state_every_category_the_push_gate_refuses
+exit 1; Ran 1 test; FAILED (failures=9). Across the skill and the instruction, none of the
+gate's category phrases was there (.github/, CODEOWNERS, the gate's own directory, what CI runs
+or reads, tests/, pull-request or issue text, a workflow or action), nor the stop-and-report
+sentence, and the instruction still said "Add or update tests".
+
+Planted defects on the fixed tree, 2026-10-04T05:46:08Z to 05:49:06Z, with the runner and method
+of part 2: the unmutated copy passes (exit 0). M1 to M23 are as in part 6, each exit 1 again;
+M13 now fails four subtests, one per enforcing file. The new ones:
+M24 exact gate reads are not protected: exit 1, failures=6; test_every_read_form_resolves_to_repository_paths,
+    test_data_a_gate_script_reads_is_refused, test_a_planted_schema_edit_is_refused_before_any_push,
+    test_the_derivation_protects_the_ci_gate_files
+M25 computed reads under a directory are not protected: exit 1, failures=5;
+    test_every_read_form_resolves_to_repository_paths, test_data_a_gate_script_reads_is_refused
+M26 unresolved reads are not reported: exit 1, failures=2; test_reads_the_reader_cannot_resolve_are_reported,
+    test_a_read_the_reader_cannot_resolve_refuses_every_commit
+M27 imported constants are taken as received data: exit 1, failures=3;
+    test_the_derivation_follows_imported_constants_and_script_text, test_data_a_gate_script_reads_is_refused,
+    test_a_planted_schema_edit_is_refused_before_any_push
+M28 `x op= y` binds an unknown value again: exit 1, failures=1; test_every_read_form_resolves_to_repository_paths
+M29 destructured elements are taken as received data: exit 1, failures=1; the same test
+M30 the gate ignores unresolved reads: exit 1, failures=1; test_a_read_the_reader_cannot_resolve_refuses_every_commit
+M31 literals under a received base are ignored: exit 1, failures=1; test_every_read_form_resolves_to_repository_paths
+M32 gate_reads.py is not an enforcing file: exit 1, failures=1;
+    test_a_gate_file_that_differs_from_the_trusted_commit_refuses
+M33 the text of gate scripts in other languages is not followed: exit 1, failures=5;
+    test_the_derivation_follows_imported_constants_and_script_text, test_data_a_gate_script_reads_is_refused
+M34 comprehension targets share the enclosing scope: exit 1, failures=1;
+    test_every_read_form_resolves_to_repository_paths
+M35 the skill drops the stop-and-report rule: exit 1, failures=1;
+    test_the_agent_instructions_state_every_category_the_push_gate_refuses
+M36 the instruction asks for tests again: exit 1, failures=1; the same test
+M37 the receipt drops ci_read: exit 1, failures=1; the same test
+M38 a name defined through itself reads as unknown: exit 1, failures=2;
+    test_every_read_form_resolves_to_repository_paths,
+    test_the_gate_reads_stay_resolved_and_bounded_on_this_repository
+M39 the instructions' rule map drops ci_read: exit 1, failures=1;
+    test_the_agent_instructions_state_every_category_the_push_gate_refuses
+M40 a read of subjects at the root protects the whole tree: exit 1, failures=3;
+    test_the_gate_reads_stay_resolved_and_bounded_on_this_repository,
+    test_the_files_the_data_selects_and_unrelated_files_stay_editable
+M41 code that gate code runs is not followed: exit 1, failures=2;
+    test_the_derivation_follows_imported_constants_and_script_text, test_data_a_gate_script_reads_is_refused
+M42 a gate script the reader cannot parse reads nothing: exit 1, failures=1;
+    test_reads_the_reader_cannot_resolve_are_reported
+Detected 42 of 42. An earlier run of the same list, before the stop-and-report phrase was made
+specific, missed M35: the skill's workflow step still said "stop and report" for tests. The test
+now looks for the whole sentence that covers every category.
+
+The gate tests under /usr/bin/python3 3.12.3 with PyYAML 6.0.1:
+$ /usr/bin/python3 -m unittest tests.test_runtime_worker_openhands_push_gate
+exit 0; Ran 44 tests; OK. The PyYAML cross-check ran; under CPython 3.13.15 it is the one skip.
+
+Breadth on the merged tree db287ea72 (10,455 tracked files), the derivation of 21b24dede's gate
+against this one, 2026-10-04:
+                                              before (21b24dede)   after (86688e1e1)
+derived files                                 304                  545
+derived prefixes                              5                    18
+derived globs                                 0                    10
+unresolved reads                              -                    0
+tracked files protected                       440 (4.2%)           7,493 (71.7%)
+  of 3,436 outside evidence/, tests/, .github/ 121 (3.5%)          631 (18.4%)
+  of 2,602 in blueprints/ outside gate code   5                    14
+seconds to derive one tree                    0.75                 3.3
+The largest entries after: evidence/artifacts, 6,358 files
+(tools/sota-convergence/gap_wave_ledger.py: root / "evidence/artifacts" / wave, wave from its
+arguments); tests, 282 (unittest discovery); docs/*.md, 192 (the same script's
+root / f"docs/{doc['id']}.md"); evidence/hosts, 182 (scripts/host_receipts.py); tools, 140, and
+examples, 93 (named in adoption/bootstrap-*.sh and examples/claude-native/workflows/test-envelope.mjs);
+evidence/artifacts/layer-verdicts-*, 122; scripts, 38 (ci_import: adoption/bootstrap-linux.sh runs
+tools/adoption/managed_block.py, which puts scripts/ on sys.path). Following the 246 test modules'
+reads as well, the alternative not adopted, would protect 9,083 files (86.9%), 2,204 of the
+3,436, and leave 83 reads in 13 modules unresolved.
+
+Local rehearsal on the merged tree, 2026-10-04T05:50:33Z to 05:53:02Z. Method of part 4: the gate
+loaded from 86688e1e1 with real zizmor 1.30.1, one planted commit per clone, the clone removed
+after each check. Each record had 14 reachable workflows, 545 protected files, 18 prefixes and 10
+globs; the new-test case had 546 files. Every record named the trusted commit, and each check took
+11.1 to 12.3 seconds.
+benign blueprint edit (blueprints/runtime-workers/openhands/README.md): pass; zizmor 0 findings
+blueprints/convergence-practice/contract.schema.json edit (P1's example): fail protected_path [ci_read]
+adoption/pins-linux-x86_64.json edit: fail protected_path [ci_read]
+catalogs/foundation/manifest.json edit: fail protected_path [ci_read]
+docs/token-practice.md edit: fail protected_path [ci_read] (the docs/*.md glob)
+evidence/artifacts/mac-model-hosting-20260927/gate.json edit: fail protected_path [ci_read]
+tools/adoption/managed_block.py edit: fail protected_path [ci_read]. Part 6's rehearsal passed this
+  edit, since the workflow step only lists the file as a case pattern. But
+  adoption/bootstrap-linux.sh, which the workflow runs, runs it, and the derivation now follows that.
+new test module (tests/test_resolver_added.py): fail protected_path [ci_discovered]
+scripts/validate.py edit: fail protected_path [ci_named]
+.github/workflows/adoption-bootstrap.yml edit: fail protected_path [github]

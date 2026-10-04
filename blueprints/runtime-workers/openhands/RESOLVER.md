@@ -30,12 +30,13 @@ local composition of cited mechanisms.
 | `resolver/patch_policy.py` | Fail-closed patch parser and validator; derives the host-executed set at the base commit; extracts what a patch adds |
 | `resolver/gh_harness.py` | Allowlisted gh and git operations, the child environment, preflight, the base and repository reads, the gated push of an exact commit, and the journals of GitHub writes and gate records |
 | `resolver/push_gate.py` | The trusted pre-push gate: protected paths derived from the workflows, untrusted-text interpolation, the pinned zizmor, and the trusted-copy checks ([decision](#the-decision-record-amendment-is-decided)) |
+| `resolver/gate_reads.py` | The gate's reader of the data CI-run gate scripts read: each expression evaluated to the repository paths it spells, then files, directory prefixes, globs and unresolved reads |
 | `resolver/outgoing_guard.py` | Checks every text before it reaches GitHub, including what the pushed patch adds; approves body files by hash |
 | `host.py` | Resolver mode of `run`: resolver preflight, early gates, the pinned clone, `AGENTS.md`, the resolver skill set |
 | `dispatch.py` | `finish_result`'s resolver branch: the export, then the driver |
 | `worker.py` | `--request --resolver`: the resolver agent, with no MCP server and no hook |
 | `receipt.py` | The receipt's `resolver` section |
-| `skills/resolver/SKILL.md` | The agent-side skill that states the same bounds |
+| `skills/resolver/SKILL.md` | The agent-side skill that states the same bounds, and what the push gate refuses |
 | `tests/test_runtime_worker_openhands_resolver.py` | Our integration checks and fixtures |
 | `tests/test_runtime_worker_openhands_push_gate.py` | The pre-push gate's checks and negative controls, on fixture repositories and on this repository's workflows |
 
@@ -73,8 +74,11 @@ cited CI facts and the Docker template, and the text of both helper scripts.
 for the pre-push gate of 2026-10-04. It keeps the gate tests' failing run at the base,
 23 planted defects in the gate, harness and driver code, each failing its test, the
 PyYAML cross-check of the workflow reader, and a local rehearsal of the gate on this
-repository's own trees with the real zizmor 1.30.1. The rehearsal ran no resolver, no
-container and no GitHub call.
+repository's own trees with the real zizmor 1.30.1. Its part 7 does the same for the
+repair round after the cross-family read: the gate-data tests failing against the
+earlier gate, which pushed a planted schema commit, 42 planted defects, and the
+derivation's breadth before and after. The rehearsals ran no resolver, no container and
+no GitHub call.
 
 ## Issue selection
 
@@ -429,9 +433,9 @@ never presents them as evidence that the change is correct. The review also name
 possible route to a job's `contents: read` token, by writing to `$GITHUB_PATH` before
 the step that sets `GH_TOKEN`. That route was not verified in this round. Since the
 amendment's decision, the trusted pre-push gate refuses any commit that changes what
-CI runs as a check: workflows, local actions, CODEOWNERS, the workflow-policy tests and
-every file a reachable `run:` step names, imports or discovers. Code under test still
-runs, so the results stay model-controlled.
+CI runs or reads as a check: workflows, local actions, CODEOWNERS, the workflow-policy
+tests and every file a reachable `run:` step names, imports, discovers or reads as data.
+Code under test still runs, so the results stay model-controlled.
 
 **The PR body publishes model text.** Besides the validated patch, the body carries
 up to 6000 characters of the agent's final message, fenced and guarded, and the SOTA
@@ -462,6 +466,13 @@ command center adopted that refinement. The gate:
   list is derived from the workflow files by a deterministic reader. Paths a step only
   lists as `case` patterns, such as the `changes` step's `PATTERNS` globs, do not count;
   any other use of such a list does;
+- refuses any change to the data those gate scripts read (`ci_read`, from the
+  cross-family read of 2026-10-04, which found
+  `blueprints/convergence-practice/contract.schema.json` unprotected). `resolver/gate_reads.py`
+  evaluates each gate script's expressions to the paths they spell. An exact path is a
+  protected file; a computed one protects the directory or glob it resolves under; a gate
+  script in another language protects the paths its text names. A read it cannot
+  resolve refuses every commit (`gate_input_unresolved`);
 - refuses a step that interpolates untrusted event text;
 - runs the zizmor version CI pins, with the gate's own flags. Its excessive-permissions,
   dangerous-triggers, cache-poisoning, artipacked and template-injection findings refuse,
@@ -589,7 +600,11 @@ free branch name.
     accepted.
   - The gate's protected list is broad by design. All of `tests/**` is protected,
     because validate.yml runs the whole suite, and so is every file a reachable step
-    names. A task whose owned paths need those files fails at the gate with no push.
+    names or a gate script reads. On the merged tree that is 7,493 of 10,455 tracked
+    files, including all of `evidence/artifacts` and `docs/*.md`, against 440 before the
+    gate followed reads ([record](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md),
+    residual risks). A task whose owned paths need those files fails at the gate with no
+    push, and the agent's instructions tell it to stop and report such a change.
   - The pinned zizmor 1.30.1 predates the `issue_comment` check that its audit
     documentation dates to 1.31.0. No workflow here uses `issue_comment`.
   - Option 2, pushing agent branches to an owner fork, stays the overturn target. It
