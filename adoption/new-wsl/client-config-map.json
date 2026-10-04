@@ -81,6 +81,20 @@
     },
     {
       "match": [
+        "claude/settings/plugin/cc-plugin-you-should-know@builtin"
+      ],
+      "wiring": "practice",
+      "source": "https://code.claude.com/docs/en/plugins/mods/overview (read 2026-10-04): the built-in mod cc-plugin-you-should-know runs a side agent that watches long tasks and shows notes above the prompt; it is disabled by default and an enabledPlugins entry turns it on (Claude Code 2.1.287 changelog: 'Added You should know'). The owner asked on 2026-10-04 for the latest changelog features on both hosts; the side agent costs tokens, which are counted apart from the token-efficiency measurements. NativeStack carries the entry in its own user settings; the piece is in adoption/new-wsl/templates/claude.settings.additions.json, which only this tool reads."
+    },
+    {
+      "match": [
+        "claude/settings/hook/ConfigChange/*"
+      ],
+      "wiring": "practice",
+      "source": "https://code.claude.com/docs/en/hooks-guide ('Audit configuration changes', read 2026-10-04): a logging-only ConfigChange hook that appends the change's source and file to ~/claude-config-audit.log and ends with `|| true`; NativeStack runs the same literal command (the 2026-09-28 community-sweep decision recorded it, and its template half never landed). The piece is in adoption/new-wsl/templates/claude.settings.additions.json."
+    },
+    {
+      "match": [
         "claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude"
       ],
       "wiring": "slot:command-output",

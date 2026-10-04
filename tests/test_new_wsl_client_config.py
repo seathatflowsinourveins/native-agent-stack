@@ -675,7 +675,8 @@ class RenderTests(unittest.TestCase):
         self.assertNotIn("skipDangerousModePermissionPrompt", settings)
         # The wave-2 rows: context-mode's plugin (an interim install) and claude-hud 0.10.0 (the statusline row), whose
         # status line is the command its setup.mjs writes; the codex plugin for Claude Code stays out.
-        self.assertEqual(settings["enabledPlugins"], {"context-mode@context-mode": True, "claude-hud@claude-hud": True})
+        self.assertEqual(settings["enabledPlugins"], {"context-mode@context-mode": True, "claude-hud@claude-hud": True,
+                                                      "cc-plugin-you-should-know@builtin": True})
         self.assertEqual(sorted(settings["extraKnownMarketplaces"]), ["claude-hud", "context-mode"])
         self.assertEqual(settings["extraKnownMarketplaces"]["claude-hud"]["source"]["ref"], "v0.10.0")
         self.assertEqual(settings["statusLine"], {
@@ -685,10 +686,13 @@ class RenderTests(unittest.TestCase):
         events = {event: [h["command"] for g in groups for h in g["hooks"]] for event, groups in settings["hooks"].items()}
         commands = [command for v in events.values() for command in v]
         # Each hook runs a file the repository copies, ai-memory (an interim install) at the link the plan's
-        # memory-owner row makes, or rtk (the owner's directive of 2026-10-04); context-mode writes its own cache-heal hook.
+        # memory-owner row makes, rtk (the owner's directive of 2026-10-04), or the logging-only ConfigChange audit command
+        # that NativeStack runs; context-mode writes its own cache-heal hook.
         ai_memory = "/home/example/.local/bin/ai-memory "
+        audit = "jq -c '{timestamp: now | todate, source: .source, file: .file_path}' >> ~/claude-config-audit.log || true"
+        self.assertEqual(events["ConfigChange"], [audit])
         self.assertEqual(sum(".claude/hooks/" in command for command in commands), 4)
-        self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) or command == "rtk hook claude"
+        self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) or command in ("rtk hook claude", audit)
                             for command in commands), commands)
         self.assertTrue(any(command.startswith(ai_memory) for command in events["SessionStart"]), events)
         self.assertEqual([command for command in commands if "cache-heal" in command], [])
@@ -1499,7 +1503,7 @@ class ApplyTests(ApplyCase):
                          ["ai-memory", "codebase-memory", "headroom", "qmd", "semble", "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
-        self.assertEqual(sorted(settings["hooks"]), ["Notification", "PostToolUse", "PreCompact", "PreToolUse",
+        self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",
                                                      "SessionEnd", "SessionStart", "Stop", "SubagentStart",
                                                      "SubagentStop"])
         self.assertEqual(settings["env"]["PATH"].split(":")[:3],
