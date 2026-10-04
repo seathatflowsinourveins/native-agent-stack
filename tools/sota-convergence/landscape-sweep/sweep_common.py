@@ -130,17 +130,18 @@ def deviation_rounds(deviations: list, layer_ids) -> tuple[dict, list]:
 
 
 def private_findings(value, patterns, pointer: str = "") -> list[tuple[str, str]]:
-    """(JSON pointer, kind) for every string, dict keys included, that matches a private-content pattern. The
-    matched text is never returned, so a report cannot leak it."""
+    """(Locator, kind) for private strings and keys. Matching keys and their descendants use the key's
+    document-order index instead of its text, so a report cannot expose that text through a pointer."""
     found = []
     if isinstance(value, str):
         found.extend((pointer or "/", description) for description, pattern in patterns if pattern.search(value))
     elif isinstance(value, dict):
-        for key, item in value.items():
-            child = f"{pointer}/{pointer_token(key)}"
-            if isinstance(key, str):
-                found.extend((child, f"{description} (in a key)") for description, pattern in patterns
-                             if pattern.search(key))
+        for index, (key, item) in enumerate(value.items()):
+            kinds = [description for description, pattern in patterns if pattern.search(key)] \
+                if isinstance(key, str) else []
+            token = f"<key-{index}>" if kinds else pointer_token(key)
+            child = f"{pointer}/{token}"
+            found.extend((child, f"{description} (in a key)") for description in kinds)
             found.extend(private_findings(item, patterns, child))
     elif isinstance(value, list):
         for index, item in enumerate(value):
@@ -161,7 +162,7 @@ def host_replacements(work: Path | None = None, repo_root: Path | None = REPO_RO
 
 
 class RedactionKeyCollision(ValueError):
-    """Distinct keys would merge; path names the parent, never the colliding keys."""
+    """Distinct keys would merge; path contains only dictionary-key and list indices, never key text."""
 
     def __init__(self, path):
         self.path = path
@@ -176,11 +177,11 @@ def rewrite_strings(value, fix, path=()):
         return [rewrite_strings(item, fix, (*path, index)) for index, item in enumerate(value)]
     if isinstance(value, dict):
         result = {}
-        for key, item in value.items():
+        for index, (key, item) in enumerate(value.items()):
             rewritten_key = fix(key) if isinstance(key, str) else key
             if rewritten_key in result:
                 raise RedactionKeyCollision(path)
-            result[rewritten_key] = rewrite_strings(item, fix, (*path, rewritten_key))
+            result[rewritten_key] = rewrite_strings(item, fix, (*path, f"<key-{index}>"))
         return result
     return value
 

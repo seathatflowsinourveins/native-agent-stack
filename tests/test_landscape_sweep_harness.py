@@ -3930,12 +3930,15 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(returns["workflow_run"], "wf_fixture-1")
         lanes = json.loads((work / "out/lanes.json").read_text())
         self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], "run note")
+        previous = {path.name: path.read_bytes() for path in (work / "out").iterdir()}
         identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
         res["first"][0]["claude_discover"]["notes"] = f"session {identifier}"
         done = self.cli(work, res)
         self.assertEqual(done.returncode, 3)
         self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: local session identifier", done.stderr)
         self.assertNotIn(identifier, done.stderr + done.stdout)
+        self.assertEqual(done.stdout, "")
+        self.assertEqual({path.name: path.read_bytes() for path in (work / "out").iterdir()}, previous)
 
     def test_cli_redacts_dash_encoded_project_directory_in_notes(self):
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
@@ -4070,6 +4073,116 @@ class ConvertTests(unittest.TestCase):
 
     def test_cli_redacts_anchored_macos_profile_in_strings_keys_and_summary(self):
         self.assert_anchored_profile_redaction("-".join(("", "Users", "fixtureuser")))
+
+    def assert_profile_context_redaction(self, encoded_home, prefix=""):
+        work = temp_dir(self)
+        encoded = prefix + encoded_home
+        contexts = ("{}", "read {}", "https://example.test/{}/notes", "https://example.test/?project={}",
+                    "https://example.test/list#{}", "cache=/data/{}/", "/srv/{}/notes.md#L4")
+        strings = [context.format(encoded) for context in contexts]
+        expected = [context.format(prefix + "<project-dir>") for context in contexts]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        done = self.cli(work, res, run_id=" | ".join(strings))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+        for name in ("returns", "lanes", "layers", "survivors"):
+            self.assertNotIn(encoded_home, (work / f"out/{name}.json").read_text())
+        self.assertNotIn(encoded_home, done.stdout)
+
+    def test_cli_redacts_bare_macos_case_variants_in_all_contexts(self):
+        for users in ("users", "USERS", "uSeRs"):
+            for suffix in ("", "-code-project"):
+                with self.subTest(users=users, suffix=suffix):
+                    self.assert_profile_context_redaction("-".join(("", users, "fixtureuser")) + suffix)
+
+    def test_cli_redacts_anchored_macos_case_variants_in_all_contexts(self):
+        for users in ("users", "USERS", "uSeRs"):
+            for prefix in ("projects/", "claude-1000/"):
+                for suffix in ("", "-code-project"):
+                    with self.subTest(users=users, prefix=prefix, suffix=suffix):
+                        self.assert_profile_context_redaction("-".join(("", users, "fixtureuser")) + suffix, prefix)
+
+    def test_cli_redacts_dots_only_profile_names(self):
+        roots = (("", "home"), ("", "Users"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        for parts in roots:
+            for name in (".", "..", "..."):
+                with self.subTest(parts=parts, name=name):
+                    self.assert_profile_context_redaction("-".join((*parts, name)))
+
+    def test_cli_preserves_example_profiles_before_non_tail_punctuation(self):
+        roots = (("", "home"), ("", "uSeRs"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        controls = [prefix + "-".join((*parts, "example")) + tail
+                    for parts in roots for prefix in ("", "projects/", "claude-1000/")
+                    for tail in (",", ";", ":", ">", "}", "&", "?", "#", "=", "|")]
+        work = temp_dir(self)
+        res = healthy_result()
+        notes = [{"value": text, text: "retained control"} for text in controls]
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res, run_id=" | ".join(controls))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(controls))
+
+    def test_cli_redacts_complete_local_name_fragments(self):
+        work = temp_dir(self)
+        home = Path("/") / "home" / "fixturelocal"
+        encoded = "-".join(("", "home", "fixturelocal"))
+        contexts = ("{}/", "projects/{}/", "https://example.test/?project={}", "cache=/data/{}/")
+        strings = [context.format(encoded + suffix) for suffix in (".smith", "_smith", "9smith", ".smith-code")
+                   for context in contexts]
+        expected = [context.format("<project-dir>") for _ in range(4) for context in contexts]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        run_file = write_json(work / "run.json", {"runId": " | ".join(strings), "status": "completed", "result": res})
+        scope = write_json(work / "scope.json", scope_for())
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(convert.Path, "home", return_value=home), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                 "--out", str(work / "out")])
+        self.assertEqual(code, 0, stderr.getvalue())
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], " | ".join(expected))
+        self.assertNotIn("smith", stdout.getvalue() + (work / "out/returns.json").read_text())
+
+    def test_redactor_output_passes_actual_encoded_home_publication_rule(self):
+        patterns = [(kind, pattern) for kind, pattern in sweep_common.private_content(ROOT)
+                    if kind == "encoded home path"]
+        self.assertEqual(len(patterns), 1,
+                         "#697 at 0d2a38b2 must be on the base: scripts/validate.py has no unique encoded home path rule")
+        roots = ["-".join(("", "home"))]
+        roots.extend("-".join(("", users)) for users in ("Users", "users", "USERS", "uSeRs"))
+        roots.extend("-".join(("", "mnt", drive, users)) for drive, users in
+                     (("c", "Users"), ("C", "users"), ("D", "USERS"), ("d", "uSeRs")))
+        roots.extend("-".join((drive, "", users)) for drive, users in
+                     (("D", "Users"), ("d", "users"), ("C", "USERS"), ("c", "uSeRs")))
+        roots.extend(drive + "---" + users for drive, users in (("E", "Users"), ("e", "uSeRs")))
+        names = ("fixtureuser", "fixture.user", "fixture_user", "fixture9", "fixture-user",
+                 "fixture.user-code-project", "fixture_user-code-project", "fixturelocal", "fixturelocal.smith",
+                 "fixturelocal_smith", ".", "..", "...", "example", "ExAmPlE", "example.person", "exampleuser", "<user>")
+        tails = ("", "/", "\\", '"', "'", " ", "\t", "\n", "`", ")", "]", ",", ";", ":", ".",
+                 ">", "}", "&", "?", "#", "=")
+        contexts = ("{}", "read {} continued", "projects/{}", "claude-1000/{}", "~/.claude/projects/{}",
+                    "/tmp/claude-1000/{}", "https://example.test/{}", "https://example.test/?project={}",
+                    "https://example.test/list#{}", "//example.test/{}", "cache=/data/{}", "/srv/{}/notes.md#L4",
+                    "docs/readme.md#{}", "docs/search?q=dir/{}", "?project={}", "assignment={}", ".{}",
+                    "word{}", "-{}", "{}. Next.")
+        strings = [context.format(root + "-" + name + tail) for root in roots for name in names
+                   for tail in tails for context in contexts]
+        self.assertGreater(sum(bool(patterns[0][1].search(text)) for text in strings), 0)
+        document = [{"value": text, text: "retained note"} for text in strings]
+        home = Path("/") / "home" / "fixturelocal"
+        with mock.patch.object(convert.Path, "home", return_value=home):
+            redacted = convert.redact_project_dirs(document, work=None, repo_root=None)
+        findings = sweep_common.private_findings(redacted, patterns)
+        self.assertFalse(findings, f"{len(findings)} encoded-home residues; first safe locator: {findings[:1]}")
 
     def test_cli_redacts_anchored_wsl_profile_in_strings_keys_and_summary(self):
         for drive, users in (("c", "Users"), ("D", "uSeRs")):
@@ -4320,10 +4433,10 @@ class ConvertTests(unittest.TestCase):
                     self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
                     self.assertNotIn(encoded, done.stdout)
 
-    def assert_cli_key_collision(self, work, res, pointer, private_keys):
+    def assert_cli_key_collision(self, work, res, locator_pattern, private_keys):
         done = self.cli(work, res)
         self.assertEqual(done.returncode, 3, done.stderr)
-        self.assertIn("returns.json#" + pointer + ": redaction key collision", done.stderr)
+        self.assertRegex(done.stderr, r"returns\.json#" + locator_pattern + r": redaction key collision")
         self.assertEqual(done.stdout, "")
         self.assertFalse((work / "out").exists(), "collision must be detected before writing artifacts")
         for key in private_keys:
@@ -4335,7 +4448,7 @@ class ConvertTests(unittest.TestCase):
         res = healthy_result()
         res["first"][0]["claude_discover"]["notes"] = {
             "details": [{encoded[0]: "first note", encoded[1]: "second note"}]}
-        self.assert_cli_key_collision(work, res, "/raw/alpha/first/claude_discover/notes/details/0", encoded)
+        self.assert_cli_key_collision(work, res, r"/(?:<key-\d+>/){6}0", encoded)
 
     def test_cli_fails_closed_on_host_sanitize_key_collision(self):
         work = temp_dir(self)
@@ -4343,24 +4456,41 @@ class ConvertTests(unittest.TestCase):
         res = healthy_result()
         res["first"][0]["claude_discover"]["notes"] = {
             "details": [{private_key: "first note", "<work-dir>/one": "second note"}]}
-        self.assert_cli_key_collision(work, res, "/raw/alpha/first/claude_discover/notes/details/0", [private_key])
+        self.assert_cli_key_collision(work, res, r"/(?:<key-\d+>/){6}0", [private_key])
 
-    def test_cli_wires_selected_validator_patterns_to_publication_check(self):
+    def test_cli_key_collision_reports_only_indices(self):
         work = temp_dir(self)
-        marker = "fixture-publication-marker"
-        validator_root = work / "publication-root"
-        scripts = validator_root / "scripts"
-        scripts.mkdir(parents=True)
-        (scripts / "validate.py").write_text(
-            "import re\nPRIVATE_CONTENT = [('fixture publication policy', re.compile(" +
-            repr(re.escape(marker)) + "))]\n")
+        parent = "-".join(("0123abcd", "4567", "89ab", "cdef", "0123456789ab"))
+        encoded = ["-".join(("", root, "fixtureuser")) for root in ("home", "Users")]
         res = healthy_result()
-        res["first"][0]["claude_discover"]["notes"] = marker
-        done = self.cli(work, res, "--repo-root", validator_root, run_id=marker)
+        res["first"][0]["claude_discover"]["notes"] = {parent: {encoded[0]: "first", encoded[1]: "second"}}
+        self.assert_cli_key_collision(work, res, r"(?:/<key-\d+>){6}", [parent, *encoded])
+
+    def test_cli_refuses_private_residue_before_publishing(self):
+        work = temp_dir(self)
+        identifier = "-".join(("0123abcd", "4567", "89ab", "cdef", "0123456789ab"))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = identifier
+        done = self.cli(work, res, run_id=identifier)
         self.assertEqual(done.returncode, 3, done.stderr)
-        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: fixture publication policy", done.stderr)
-        self.assertIn("printed summary#/run/runId: fixture publication policy", done.stderr)
-        self.assertNotIn(marker, done.stderr)
+        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: local session identifier", done.stderr)
+        self.assertIn("printed summary#/run/runId: local session identifier", done.stderr)
+        self.assertNotIn(identifier, done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertFalse((work / "out").exists())
+
+    def test_cli_refuses_private_keys_without_printing_text(self):
+        work = temp_dir(self)
+        identifier = "-".join(("0123abcd", "4567", "89ab", "cdef", "0123456789ab"))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {"details": [{identifier: {"value": identifier}}]}
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes/details/0/<key-0>: "
+                      "local session identifier (in a key)", done.stderr)
+        self.assertNotIn(identifier, done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertFalse((work / "out").exists())
 
     def test_cli_redacts_unanchored_wsl_checkout_with_linux_home(self):
         work = temp_dir(self)

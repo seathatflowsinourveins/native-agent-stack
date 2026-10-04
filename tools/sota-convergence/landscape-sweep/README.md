@@ -694,16 +694,19 @@ realpaths, replacing every character outside ASCII letters and digits with `-`, 
 [sweep_common.host_replacements](sweep_common.py). It replaces each whole segment, bare or with a
 project-directory suffix, with `<project-dir>` even without a directory prefix. Local and generic rules run
 over the whole text, including URLs, queries, fragments and assignments. Privacy takes priority over retaining
-an encoded user-profile slug in a source URL. Generic roots
-are `-home-`, `-Users-`, `-mnt-<drive>-Users-` and `<drive>--Users-` (also multiple separators after the drive).
-The generic rule adopts the coordinating [#697](https://github.com/seathatflowsinourveins/native-agent-stack/pull/697)
-candidate's `encoded home path` boundary, username class, tail and case-sensitive exemption, as locally read
-at `4865239e75312d781ffcdc073a7366be668b45ef`, `scripts/validate.py`. It uses `(?<![\w-])`, a username from
+an encoded user-profile slug in a source URL. Both this converter and
+[#697](https://github.com/seathatflowsinourveins/native-agent-stack/pull/697) at `0d2a38b2`,
+`scripts/validate.py`'s `encoded home path` rule, cover `-home-` case-sensitively and `-Users-`,
+`-mnt-<drive>-Users-` and `<drive>--Users-` case-insensitively. Coverage includes bare text, `projects/` and
+`claude-<uid>/` anchors, URL paths, queries and fragments, assignments, and JSON keys and values.
+The generic redactor uses that revision's `(?<![\w-])` boundary, a username from
 `[A-Za-z0-9_.]+`, and a dash or `/`, backslash, double or single quote, whitespace, backtick, `)`, `]` or end
 terminator. A dash starts a longer project suffix, which is included in the replacement without an anchor.
 Only lowercase `example` followed by that tail is exempt; `ExAmPlE`, `example.person` and `exampleuser` redact.
-The converter retains its additional case-insensitive Windows/WSL root matching and multiple Windows
-separators; this is wider root coverage than the reviewed candidate rule.
+Dots-only names are removed too. The converter is deliberately stricter for Windows encodings with more
+than two separators after the drive letter, and for known local home, checkout and work-directory encodings
+outside the generic roots or exemption. Local name continuations with letters, digits, `_` and `.` are
+consumed as part of the same segment, so a `.smith` fragment cannot survive a replaced local prefix.
 WSL checkouts under a Windows profile are covered even when the native home is a Linux path; encoded Windows
 segments can begin with the drive letter. Native `projects/` and `claude-<uid>/` anchors still receive
 redaction too. Redaction covers deeper strings and nested JSON fields and keys and preserves sentence-ending
@@ -713,16 +716,21 @@ The implementation follows the recursive string/key traversal of
 [sweep_common.sanitize](sweep_common.py) at the same `8c32a84b2` source baseline; it uses Python's standard-library
 regular expressions and the existing angle-bracket placeholder style. Both the host-path and encoded-path
 stages reject distinct keys that would redact to the same text: exit 3 with a `redaction key collision`
-finding at the parent JSON pointer, before any converted artifacts or summary are written.
+finding before any converted artifacts or summary are written. Collision locators contain only dictionary-key
+and list indices. Private-content findings replace every matching key with its document-order index, including
+when that key is an ancestor of a matching value; neither diagnostic prints matching key text.
 Fixtures cover notes, nested strings,
 bare local and anchored homes, all four profile forms, WSL checkouts, work directories, dict keys, the printed
 summary, publication-rule username and boundary cases, bare-home terminators, case-sensitive example-user
-exemptions, prose, sentence endings, URL redaction, path line fragments, assignments and key collisions.
+exemptions, prose, sentence endings, URL redaction, path line fragments, assignments, all macOS root case
+variants, dots-only names, non-tail punctuation, complete local names and key collisions.
 The converter's private-content check uses the selected checkout's own `PRIVATE_CONTENT` patterns, returning
-exit 3 for any retained match (including UUIDs). Until the encoded-home rule lands in `scripts/validate.py`,
-the publication check detects no dash-encoded path, so this redaction is the only line of defence for that
-form, and the fixture checks only the wiring. That fixture supplies a synthetic pattern and verifies its
-findings for artifacts and the printed summary. This repair does not edit either validator checkout.
+exit 3 for any retained match (including UUIDs), before creating or updating `--out` or printing the summary.
+The policy regression loads the actual `encoded home path` rule from `scripts/validate.py` by name and checks
+redacted values and keys over the fixture matrix. It fails when that rule is absent, without a skip or a
+synthetic marker. #697 lands before this change; before that landing the original checkout's publication
+scan has no encoded-home pattern, and pre-landing verification uses a throwaway copy with #697 at `0d2a38b2`
+overlaid as its validator. This repair does not edit the original checkout's validator.
 
 Read these fields of `convert.py`'s summary before appending:
 
