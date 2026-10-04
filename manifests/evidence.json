@@ -51519,8 +51519,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "97e8c945026711f1ef4ce8fd115d3ef83becb5a402ac2d0c8d19876d9129c023",
-      "bytes": 186012
+      "sha256": "20c70c09d8b293c23caccb1086f5a379f2f9c823f37555d17bfb202038f9a4b2",
+      "bytes": 188578
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -51684,8 +51684,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "fc304fcd5fca49dcc17330e09621700ba2e2b8a18e631b2d7a96cef59d4d00e5",
-      "bytes": 12503
+      "sha256": "2d41e61a25e03789f51c0dfe1a5849f15c5f7cd84812ec554d78a1ef5df8188f",
+      "bytes": 13526
     },
     {
       "path": "tools/sota-convergence/practice_references.py",
