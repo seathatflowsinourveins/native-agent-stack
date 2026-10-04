@@ -1,0 +1,22 @@
+{
+ "schema_version": 1,
+ "generated_utc": "2026-10-04T10:42:49Z",
+ "baseline_versions": {
+  "claude_code": "2.1.289",
+  "codex": "rust-v0.160.0"
+ },
+ "description": "Decisions on the user-switchable upstream switches that scripts/upstream_surface_watch.py observes (catalogs/foundation/upstream-surface-baseline.json). A new name whose key has no row here is unreviewed: the watch lists it in latest.json and scripts/currency_due.py counts it as surface_unreviewed. Validate with python3 scripts/upstream_surface_watch.py --check-dispositions; field rules: docs/upstream-surface-watch.md.",
+ "rules": {
+  "key": "surface:kind:name, for example claude:setting:autoUpdatesChannel. Any kind is allowed, because the judged ledger spans more kinds than the watch observes; each key appears once.",
+  "enabled": "Decided and applied: the carrier (file or profile) sets the value at the scope.",
+  "adopt-pending": "Decided but not yet applied: the carrier names where the value will be set.",
+  "declined": "Decided against: the reason says why and overturn names the comparison that would change it.",
+  "default-on": "The upstream default already gives the wanted behavior, so nothing is set; carrier may be null.",
+  "not-applicable": "Does not apply to this stack's hosts or workflows, such as another platform or a removed feature.",
+  "defer-user": "Needs the user's own decision (sign-in, spending, policy); the resolver does not apply it.",
+  "baseline-unreviewed": "Grandfathered at the baseline version without a judgment; like every row, it is excluded from the unreviewed count, and overturn may be null.",
+  "unreviewed": "A name absent from the baseline whose key has no row here. Only these are counted; a baseline name without a row is grandfathered by the baseline itself.",
+  "fields": "Every row has all ten fields: key; one of the seven values above; reason (one line, at most 160 characters); source (an https URL or path:line, repo@pin:path:line included); carrier (required for enabled and adopt-pending, otherwise a string or null); value (any JSON, null allowed); scope (a short string or null); overturn (required except for baseline-unreviewed); reviewed_utc (YYYY-MM-DDTHH:MM:SSZ); version (the upstream version the review read)."
+ },
+ "rows": []
+}
