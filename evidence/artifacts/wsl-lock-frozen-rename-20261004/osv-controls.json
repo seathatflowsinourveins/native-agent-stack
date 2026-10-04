@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "record": "wsl-lock-frozen-rename-20261004 OSV-Scanner discovery controls",
+  "run_utc": {
+    "first": "2026-10-04T08:12:44Z",
+    "last": "2026-10-04T08:13:02Z"
+  },
+  "scanner": {
+    "version_output": "osv-scanner version: 2.6.0 / osv-scalibr version: 0.5.2 / commit: e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6 / built at: 2026-09-14T01:44:58Z",
+    "asset": "https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64",
+    "sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "sha256_source": ".github/workflows/security-scan.yml OSV_SCANNER_SHA256 (sha256sum --check: OK before use)"
+  },
+  "inputs": {
+    "lock_sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
+    "every_copy_sha256_checked": true,
+    "partition_file_lists_equal_except_the_lock_name": true,
+    "config": ".github/osv-scanner.toml at f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5 (ordinary config; no entry for GHSA-vfj7-8cjw-p6xm)"
+  },
+  "sanitization": "The scratch directory, written with and without its leading slash, is replaced by <scratch>; the binary location by <osv-bin>. Nothing else is changed, so the result table keeps its original column widths only where no path was replaced.",
+  "controls": [
+    {
+      "id": "npm-name",
+      "input": "package-lock.json alone (the archived bytes under the npm name)",
+      "command": "nice -n 19 <osv-bin>/osv-scanner scan source --config .github/osv-scanner.toml --no-resolve -r <scratch>/npm-name",
+      "exit_code": 1,
+      "stdout": "Scanning dir <scratch>/npm-name\nStarting filesystem walk for root: /\nScanned <scratch>/npm-name/package-lock.json file and found 170 packages\nEnd status: 1 dirs visited, 2 inodes visited, 1 Extract calls, 5.232267ms elapsed, 5.232327ms wall time\n.github/osv-scanner.toml has unused ignores:\n - GHSA-8mgp-746c-j5xp\n - GHSA-h35f-9h28-mq5c\n - GHSA-hj66-6f7g-4r5v\n - GHSA-xpv3-w29h-x7cv\n\nTotal 1 package affected by 1 known vulnerability (0 Critical, 1 High, 0 Medium, 0 Low, 0 Unknown) from 1 ecosystem.\n0 vulnerabilities can be fixed.\n\n+-------------------------------------+------+-----------+---------+---------+---------------+-----------------------------------------------------------------+\n| OSV URL                             | CVSS | ECOSYSTEM | PACKAGE | VERSION | FIXED VERSION | SOURCE                                                          |\n+-------------------------------------+------+-----------+---------+---------+---------------+-----------------------------------------------------------------+\n| https://osv.dev/GHSA-vfj7-8cjw-p6xm | 8.7  | npm       | braces  | 3.0.3   | --            | <scratch>/npm-name/package-lock.json |\n+-------------------------------------+------+-----------+---------+---------+---------------+-----------------------------------------------------------------+\n",
+      "stderr": ""
+    },
+    {
+      "id": "frozen-name",
+      "input": "package-lock.json.frozen alone (the same bytes under the archive name)",
+      "command": "nice -n 19 <osv-bin>/osv-scanner scan source --config .github/osv-scanner.toml --no-resolve -r <scratch>/frozen-name",
+      "exit_code": 128,
+      "stdout": "Scanning dir <scratch>/frozen-name\nStarting filesystem walk for root: /\nEnd status: 1 dirs visited, 2 inodes visited, 0 Extract calls, 83.162µs elapsed, 83.252µs wall time\n",
+      "stderr": "No package sources found, --help for usage information.\n"
+    },
+    {
+      "id": "partition-before",
+      "input": "the whole partition as at the base commit (lock as package-lock.json)",
+      "command": "nice -n 19 <osv-bin>/osv-scanner scan source --config .github/osv-scanner.toml --no-resolve -r <scratch>/partition-before",
+      "exit_code": 1,
+      "stdout": "Scanning dir <scratch>/partition-before\nStarting filesystem walk for root: /\nScanned <scratch>/partition-before/package-lock.json file and found 170 packages\nEnd status: 6 dirs visited, 31 inodes visited, 1 Extract calls, 5.735231ms elapsed, 5.735301ms wall time\n.github/osv-scanner.toml has unused ignores:\n - GHSA-8mgp-746c-j5xp\n - GHSA-h35f-9h28-mq5c\n - GHSA-hj66-6f7g-4r5v\n - GHSA-xpv3-w29h-x7cv\n\nTotal 1 package affected by 1 known vulnerability (0 Critical, 1 High, 0 Medium, 0 Low, 0 Unknown) from 1 ecosystem.\n0 vulnerabilities can be fixed.\n\n+-------------------------------------+------+-----------+---------+---------+---------------+-------------------------------------------------------------------------+\n| OSV URL                             | CVSS | ECOSYSTEM | PACKAGE | VERSION | FIXED VERSION | SOURCE                                                                  |\n+-------------------------------------+------+-----------+---------+---------+---------------+-------------------------------------------------------------------------+\n| https://osv.dev/GHSA-vfj7-8cjw-p6xm | 8.7  | npm       | braces  | 3.0.3   | --            | <scratch>/partition-before/package-lock.json |\n+-------------------------------------+------+-----------+---------+---------+---------------+-------------------------------------------------------------------------+\n",
+      "stderr": ""
+    },
+    {
+      "id": "partition-after",
+      "input": "the whole partition after the rename (lock as package-lock.json.frozen)",
+      "command": "nice -n 19 <osv-bin>/osv-scanner scan source --config .github/osv-scanner.toml --no-resolve -r <scratch>/partition-after",
+      "exit_code": 128,
+      "stdout": "Scanning dir <scratch>/partition-after\nStarting filesystem walk for root: /\nEnd status: 6 dirs visited, 31 inodes visited, 0 Extract calls, 328.121µs elapsed, 328.221µs wall time\n",
+      "stderr": "No package sources found, --help for usage information.\n"
+    }
+  ]
+}

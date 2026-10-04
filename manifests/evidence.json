@@ -4109,8 +4109,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "fcc206e377a1dea01e31e34c43f3276600f89b0e6951c02891bc46e2a49910be",
-      "bytes": 2355
+      "sha256": "40d7f3bcf927a13088a126f70c71da3dba2e6181f52de2c451ab9f31193b8554",
+      "bytes": 2529
     },
     {
       "path": ".github/main-ruleset.json",
@@ -4123,14 +4123,9 @@
       "bytes": 2547
     },
     {
-      "path": ".github/osv-scanner-frozen-wsl-retrieval.toml",
-      "sha256": "8931d59b82ce8326ea0028adef428a1262f3e16800d1b744341960513a139887",
-      "bytes": 2330
-    },
-    {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "1f93426a7ab9d1270542e98b606f244abe07ec2b9da90144441072e1dd308bdd",
-      "bytes": 11925
+      "sha256": "2be9f85160b9f3f6ac9f4fb11cc3ebb25c960aea20a72a6ffe6e32d7b3b30eef",
+      "bytes": 12367
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4234,8 +4229,8 @@
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "66c78251c6281ebbced0e5fd70496f2e075538b792359ec434592e3145969b4c",
-      "bytes": 14900
+      "sha256": "f1fcc7f05ecd9eab1b59f6d84d2e0274981da7046914c1a0d26c9189ea876ac6",
+      "bytes": 13178
     },
     {
       "path": ".github/workflows/sota-sources-gate.yml",
@@ -4499,13 +4494,13 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "1e08ba8e879b0c52fd5c53341ea60bb27ca70ebc64cb9af655d9ba5ae0a21cb0",
-      "bytes": 214941
+      "sha256": "381645d1470125614137eef39a3b802e0a91ec480f6453a45051fbe99c743f21",
+      "bytes": 215375
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "62fcb6658e588bece47042f4809f98fb93bbd14db5a12800596c9355c47fabef",
-      "bytes": 19269
+      "sha256": "83ecd0b5c2fedd3b30e025497968893475db41a67662500413e1dee22da29151",
+      "bytes": 19586
     },
     {
       "path": "adoption/paired/README.md",
@@ -6880,18 +6875,18 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/README.md",
-      "sha256": "0c521bfbee47c91382f20b8cdf1bfcb7377d16cc981354f3da9690ba8435a4dd",
-      "bytes": 8389
+      "sha256": "f5e18dac4a9759f2879687f6c4b58dbf904a3393a453d7a9ad91c0bfb5c3b451",
+      "bytes": 10743
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
-      "sha256": "da2c4d58d7012febb1ce70d49111ecdbf22f46867fe84c098e01c75c7af0eabd",
-      "bytes": 14819
+      "sha256": "05fae80832470371bde09b145d7aeeb125cd4c44accee82052aa499ad5f79207",
+      "bytes": 18068
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/experiment.json",
-      "sha256": "fb67f4143ffdb3593caba0f725a1a264cb13cb05bba23ec9bd2ecb0d5a4db669",
-      "bytes": 14342
+      "sha256": "e0994e2ac14c785135f7f3c5f0d588076c59f437afbb4b2cd18b7e4e302ce64e",
+      "bytes": 14349
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/install-inventory.json",
@@ -6909,7 +6904,7 @@
       "bytes": 2300
     },
     {
-      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json.frozen",
       "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
       "bytes": 82463
     },
@@ -15925,8 +15920,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "e698c1eacf823d847b0da199ae452f505b36e9ac9d97d7caac5265c7e939021a",
-      "bytes": 153425
+      "sha256": "e7a04ffd9489c038674637c89e799d8bcc14265d3b6dbdf76148ef9327b305c4",
+      "bytes": 155413
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -15945,8 +15940,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-longmemeval-frozen-npm-lock.md",
-      "sha256": "898fd5fa76d5406e3561ecaf2a752e75a9483adc255d080be5e594a4b1b10e3e",
-      "bytes": 15009
+      "sha256": "c08298744b969b067b1dc7c0545a748ba6f1a870b1274b16f9491326128bd5fc",
+      "bytes": 19415
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
@@ -16235,8 +16230,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "11ca64cb13a2b67351cb7c1656e6556e6ded8a379821764cf49a169ff2f5ccc4",
-      "bytes": 34809
+      "sha256": "4efed6abf346d5ae4a9742ba8a527625d5d95f252f58611c2de9e98dc486e174",
+      "bytes": 37516
     },
     {
       "path": "docs/direct-results.md",
@@ -16500,12 +16495,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "dbe33bcdccdcc2ff2ae21abf2c8cb831e29e2a4add866bb565341eeb275c4f14",
-      "bytes": 560927
+      "sha256": "3e699173f1dc25672eb0d95f05e169386a610646db4e3a82e9e67f39814dd41a",
+      "bytes": 561055
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "790307290b9b980cd2549e2449d2df559e27f71c04808adff11a9919cc2fcf9c",
+      "sha256": "c540e0af3f9fccd04da00e7ddc73693b7184079455e1327ed961d096ae81f34b",
       "bytes": 323968
     },
     {
@@ -38420,7 +38415,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "82a7cd57951f4d9d5eabeb8037c5847ad77e572c25311804d077c7095b3db750",
+      "sha256": "80f899426a2b9b9d0a758e5e58227cbe09027852d0aa9bd42e8a8769c565d0ad",
       "bytes": 4174
     },
     {
@@ -48564,6 +48559,21 @@
       "bytes": 12602
     },
     {
+      "path": "evidence/artifacts/wsl-lock-frozen-rename-20261004/guard-mutants.json",
+      "sha256": "40c7f933b28bfa2a20b3eac1d292501a53139cf8e79061c7180da124242d8eb3",
+      "bytes": 3672
+    },
+    {
+      "path": "evidence/artifacts/wsl-lock-frozen-rename-20261004/osv-controls.json",
+      "sha256": "f602d64c05934fd610bfbb0247f519b5cd69e098616a1cad44cbefed90fc493a",
+      "bytes": 5810
+    },
+    {
+      "path": "evidence/artifacts/wsl-lock-frozen-rename-20261004/run-mutants.py.txt",
+      "sha256": "eaa37ac567326a6e7b91fa44d28d43c0ddc61f73e9a03f7ca4c729bb8cace57f",
+      "bytes": 3329
+    },
+    {
       "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/candidate-archive-expired-invalid-attempt1.toml",
       "bytes": 804,
       "sha256": "2ac5bf924d35b1b986ca8da16edbb98d0870de7e8f2ce93506edeb4447227461"
@@ -50729,6 +50739,11 @@
       "bytes": 936
     },
     {
+      "path": "evidence/receipts/wsl-lock-frozen-rename-20261004.json",
+      "sha256": "d21147f20604461b717efec55ad917f1f11fa01ebd9c328b26c1c95e42b91d8c",
+      "bytes": 13431
+    },
+    {
       "path": "evidence/receipts/wsl-memory-maintenance-20260920.json",
       "sha256": "11443ae6cef72ef8388a817c8e7546d5f2c40e4333f1faeb4dc99167ab7194f1",
       "bytes": 891
@@ -52065,8 +52080,8 @@
     },
     {
       "path": "tests/test_bootstrap_full_profile.py",
-      "sha256": "1cf578726c84b65e6cbd1bb7aa45e7827ccc1d2ae137844f2d3194151449ef77",
-      "bytes": 42008
+      "sha256": "cbda23c7560619672bdd99a92a9c59b91d119b804c33245dc26ed30af61023a7",
+      "bytes": 43022
     },
     {
       "path": "tests/test_bootstrap_integrity_drivers.py",
@@ -52265,8 +52280,8 @@
     },
     {
       "path": "tests/test_frozen_macos_variant_no_use.py",
-      "sha256": "19a16eaec459481bab7bf957992e63435b7740167cc0ad91750f112e545b5f78",
-      "bytes": 34370
+      "sha256": "a65dd06715de0afc890c75a06b2585f99a6c7c97ad94d6629947dc7cb2cb0d01",
+      "bytes": 34773
     },
     {
       "path": "tests/test_gap_crosswalk.py",
@@ -52535,8 +52550,8 @@
     },
     {
       "path": "tests/test_new_wsl_profile.py",
-      "sha256": "b7689a2d17c412ab7251890082c89a50563ed5599f9e663c7d1e291b586c2801",
-      "bytes": 17209
+      "sha256": "5cb42181a6d18d490b0e3a12eb5f10b2002a5b35e00005a7264f2debec063a81",
+      "bytes": 17372
     },
     {
       "path": "tests/test_observability.py",
@@ -52600,8 +52615,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "86f372452299daf1be59452c3e0c13691a1c00058154d17a8a594a914c19dbe6",
-      "bytes": 75774
+      "sha256": "cb4d002908f17185127d1d98caaec8ef47b4fd23adefe9c28ee4b3050e53d3a3",
+      "bytes": 75839
     },
     {
       "path": "tests/test_path_safety.py",
@@ -52855,13 +52870,13 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "88ae801f83099773a0fb03460a2f40aac9a4fb09430f15da2059a1580d98b8cc",
-      "bytes": 141543
+      "sha256": "2084a4f33e80ee646dbfbfb28568404cddf114fa7e749a674c4d194a09de3297",
+      "bytes": 141483
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "b3435eb91e7ba380dbd2bdaba874cc6adbdec65fa6a4fb32a9492e3256e74947",
-      "bytes": 76951
+      "sha256": "646cec9f8e45b6f8666a7c6495744e6c7cb0d7dff3efc145370dad724accf418",
+      "bytes": 82767
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -52895,8 +52910,8 @@
     },
     {
       "path": "tests/test_wsl_retrieval.py",
-      "sha256": "b4e1abcc70ed75d302ca3ecabfba23bda9f53ab4a460a1d0fc16fd47453ea7fa",
-      "bytes": 18897
+      "sha256": "72a79a26ffccc2582c536af34f25f7c18c0bdedc99040f671d86476df0d9fe91",
+      "bytes": 26358
     },
     {
       "path": "tests/test_zizmor_negative_control.py",
