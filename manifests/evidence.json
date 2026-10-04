@@ -4187,8 +4187,8 @@
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "b07ace2d27deebb1aa1f07fbdfdc2ed6ea531d8579122e81e6abb1633725edff",
-      "bytes": 14571
+      "sha256": "a71ad8f600b6ceb327ae4245de038ced38c4c1762e92a675e0cd0053df497f35",
+      "bytes": 14773
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -9687,6 +9687,21 @@
       "bytes": 5376
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-1.events.txt",
+      "sha256": "ed2a572adacb52eab031348e11a147f93b492a277c224a68202dcaf2738c2ede",
+      "bytes": 1539
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-2.events.txt",
+      "sha256": "d0355e50e9e96baa2bbada4f23a5805dc29b5bb17b0f9601f4f4d5bbb9e3db24",
+      "bytes": 1788
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-7.md",
+      "sha256": "327c0de8c449151d630b4aa696637efc3c03977bae22dbca28bbd17a2317fef4",
+      "bytes": 4851
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review.sh.txt",
       "sha256": "f298f861bf7c304234dca3deff44d60fc5ed613fcea2ebe7f3c5884287f6fc75",
       "bytes": 981
@@ -9725,6 +9740,16 @@
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-6-attempt-2.txt",
       "sha256": "2602a3e8e72bcbc183859d527f50c3d5db0738e2a3057ef1d55b0af057830e32",
       "bytes": 4094
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-7.txt",
+      "sha256": "ed5c4eb4747c12447951fe1d6673bf52613c179daf1f40c93db75ecb148702ac",
+      "bytes": 4515
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.event-excerpt.py.txt",
+      "sha256": "6a387138ee642e256e9914ee5b2d0bcc08bef35a6f8211e41d5f8db66fed3784",
+      "bytes": 1319
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.install-check.sh.txt",
@@ -9810,6 +9835,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.txt",
       "sha256": "67862738e093b35d7b80ddf24bf7ffd244e5b184196de498d6a797adaa24ba51",
       "bytes": 25849
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-osv-split-hardening.osv-split-controls.py.txt",
+      "sha256": "3933fa846e89e755a2ccbc6722654cdcd2d64f58cf4ab702c6ac69e2ca8e0f18",
+      "bytes": 8296
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
@@ -15843,8 +15873,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "523961e7b8b594172953d38e8b44c2d212770c6d2b5cacc62d904ccc551c64f0",
-      "bytes": 150927
+      "sha256": "18992f4241d7e5c4bb902d0f6f359deea13e49274fb06fdfe327b7daf135acb4",
+      "bytes": 153089
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -16095,6 +16125,11 @@
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
+    },
+    {
+      "path": "docs/decisions/2026-10-03-osv-split-hardening-port.md",
+      "sha256": "3a5a7491e8a1034b3fb6ecbe6d482d03eb261920c957a99992751604246a8e0f",
+      "bytes": 4475
     },
     {
       "path": "docs/decisions/2026-10-03-retire-gateway-ab-r02.md",
@@ -40612,6 +40647,326 @@
       "bytes": 12542
     },
     {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/acceptance-runs.json",
+      "sha256": "932b155b20a059f3c5b7d350470e0e09ac97584a5398bb74360c38e27f8fff95",
+      "bytes": 13809
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/actionlint.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/actionlint.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/builder-attempts.json",
+      "sha256": "9cf900f28efd7c1e8185f9e335a62643492fd711f8dcf9debdb941334db5e83e",
+      "bytes": 1940
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/component-matrix.stdout.txt",
+      "sha256": "4cd2e50526b588cf998c7136436856094ee43628f56bf7db7f397105a40df225",
+      "bytes": 61
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/convergence-repair-1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/convergence-repair-1.stdout.txt",
+      "sha256": "2e2cb59d7e86bd664480e5a763a93b1b8ec6faa809e75511fff22873cb951b42",
+      "bytes": 512
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/eleven-mutants.stderr.txt",
+      "sha256": "d1eb84fac17926d15eb4a352fa7296a61931e26749909b129050431e79f7ad6f",
+      "bytes": 254
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/eleven-mutants.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/mutants-final.stderr.txt",
+      "sha256": "cb04dc61e25864f517eb5fd97734db638da2e2d3c00c1122e762e56d31fa7311",
+      "bytes": 254
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/mutants-final.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-controls/relock-2026-09-30-urllib3.split-osv-scanner-frozen-macos.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-controls/relock-2026-09-30-urllib3.split-osv-scanner.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-four-controls.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-four-controls.stdout.txt",
+      "sha256": "a80bd4344323e4c43e1be1286f273fea6e55c0aa087864a0aff88da050f98b9d",
+      "bytes": 2745
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-step-summary.json",
+      "sha256": "0800c2c0fc6618f4c362840d8a92d24892ec621503a29430680e2d4fd4444180",
+      "bytes": 1166
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-step.sh.txt",
+      "sha256": "4863ee1116f0fe26c1a15aea284121e063ae7704b6f7b0be97fb5db5ddc4eace",
+      "bytes": 4756
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-step.stderr.txt",
+      "sha256": "2bc0b5232f057e28cde26f0940933ed4c9f7141c37df31f3e84a589f6fbc681b",
+      "bytes": 18392
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/native-step.stdout.txt",
+      "sha256": "6d1cb39ab08eebfb1ab1d2fade781e499c2e2e02f674a4aed9e120c008c8f335",
+      "bytes": 18444
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/new-host-grand-list.stdout.txt",
+      "sha256": "f161f06c41a6dffe6e66c88c61f6e8de9ac981c52fc179231fb0df66ccb30b5a",
+      "bytes": 51
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-macos.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner-frozen-wsl-retrieval.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/osv-scanner.sarif",
+      "sha256": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.stderr.txt",
+      "sha256": "0bf26b36afe0d989095718667c1043c17d53ac06182ee87baf6588b700aa6ca0",
+      "bytes": 282
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.stdout.txt",
+      "sha256": "854566d9eb4b9bcce521ab2734128971bdcb931bb1cec854725e6ab3b8e7d7c7",
+      "bytes": 4389
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-baseline.toml",
+      "sha256": "05f72772704ae8ccecf1088651f819636cb35362d19931019f64d023249a8a65",
+      "bytes": 121
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.stderr.txt",
+      "sha256": "c64e191ca356523553f6e212cb67b3e6250f148ee7c8b94b1f491f8d3f1b0f11",
+      "bytes": 336
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.stdout.txt",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-case-alias.toml",
+      "sha256": "0f0d9a8150ddf977783f5dd6f2738812fac8271fdbcd6103a777c7455ac7f252",
+      "bytes": 148
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-pnpm-input.yaml.txt",
+      "sha256": "2953a34b57cae2670d4dfca47019df189dd5beec47ed8ba74d9ef4d2ba4025e0",
+      "bytes": 67
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/p2-2-summary.json",
+      "sha256": "30694bf41f9e73391e39a6cf9cd96e03ec82beec6371f58f729572cf5482d045",
+      "bytes": 471
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/primary-sources.json",
+      "sha256": "8c80ac4c005d5e48a06a0b0a9f54889d8e2e7d2d81bc3ecdff0a3244d6fb139f",
+      "bytes": 11941
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.py.txt",
+      "sha256": "023b555522e1291b8e978326eaac31b31834b26fce74e7606ba1f31478888933",
+      "bytes": 6335
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.stdout.txt",
+      "sha256": "6c14c74d306c2a672fad9a94767ba9c10d7f453163c58802611a1b5d485daad6",
+      "bytes": 2895
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R1.txt",
+      "sha256": "f7ec26a21667f324a924557e8060a61e3ed0f566c40a2aa6d6a6e73c3bc46f53",
+      "bytes": 9327
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R2.txt",
+      "sha256": "b48e506ef200045fecbb9c8c9e6976b936fa9aba9eb0c8592b7b3d53a725b211",
+      "bytes": 3355
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R3.txt",
+      "sha256": "df553c63c13c39e037d17acaca41c10fb7aac24c931c2085dd04b6fb30dbff0d",
+      "bytes": 2807
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-key.txt",
+      "sha256": "df335c5f75ca13b5530ff03cf53f8ab869ef9d309244e99c88dc03b9a88df4ae",
+      "bytes": 457
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-override.txt",
+      "sha256": "081521e8e93134af19effbb2a3151978cd152d7235edf845f5188bb7dd8f8c1e",
+      "bytes": 469
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-controls.py.txt",
+      "sha256": "6a240fe60d67040037d0178098ea9b3a2b17c78200b0ec9190a9066e3e83fd09",
+      "bytes": 4955
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-runs.json",
+      "sha256": "722afe4026b7b576ddf28bf2b3430a6edce251aeff1ca4e56ee64e5862699b86",
+      "bytes": 3386
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/registry-base-reconciliation.json",
+      "sha256": "4b95da057479835e433da0ccefae0cb6a85d5709eb849259a0cd7732df7fc32c",
+      "bytes": 611
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.py.txt",
+      "sha256": "06eab390d148c50eb7a8833474d5ef1e9da0da89477b7823fbdcbd16c3547f4f",
+      "bytes": 4087
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.stdout.txt",
+      "sha256": "7e42d7dd71f3a3351a3b56db793aa7696cadae9c6d8a8b9b57c6772dfc630055",
+      "bytes": 4226
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.py.txt",
+      "sha256": "b1449383dcfc2f5799d9bc1a5f144a1bd063f08dc6b776dac5f22d0af0135c7f",
+      "bytes": 2558
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.stdout.txt",
+      "sha256": "e71767e753c536e0e7cc4eab58723cef0e59844be9a2fc9dee992f44397df19a",
+      "bytes": 530
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stderr.txt",
+      "sha256": "824676798b6e82d6695738d40180680c6b160b905334435aaf55ffed745af77d",
+      "bytes": 28944
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stderr.txt",
+      "sha256": "0b782c5d0b46f72714633a087253c1d5d997982751e08246e5797901fafdc34c",
+      "bytes": 28944
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/unittest.stderr.txt",
+      "sha256": "cffc00eb7ff370c8c0663d873d2b13543dbda6b9b02903836d6323a948026550",
+      "bytes": 28944
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/unittest.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate-convergence.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate-convergence.stdout.txt",
+      "sha256": "fe82d4684fbf64b6b9f3871505f3ca5fc7f9128d5fe6e8bec80c78aa4d37ed44",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate-repair-1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate-repair-1.stdout.txt",
+      "sha256": "52eb04115e661d26eb766811d400c4a17f1cd4ec8d3a2c161fdabc43a090b9cc",
+      "bytes": 161
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/validate.stdout.txt",
+      "sha256": "9e5a654f1e9184a0fd9d60809e1cd8999dcccb22771e50a7dd92a4c7b35586f4",
+      "bytes": 356
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline-repository.stderr.txt",
+      "sha256": "cfe14c3e69b41f395c8fba4c5ccdc8ceb717637612d1a72b718d46d3104db154",
+      "bytes": 1756
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline-repository.stdout.txt",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stderr.txt",
+      "sha256": "a8d483dad2ee7a40cbe333bc3c62eb7a02f0b9fec7debbee5062891a5273012a",
+      "bytes": 106
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stdout.txt",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
       "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
       "bytes": 80969
@@ -49807,6 +50162,11 @@
       "bytes": 30986
     },
     {
+      "path": "evidence/receipts/osv-split-hardening-port-20261003.json",
+      "sha256": "840e5d47577f12651e34cd165e6013f421c2989797649b36d7af8f1bc3828bda",
+      "bytes": 113894
+    },
+    {
       "path": "evidence/receipts/osv-urllib3-next-20260930.json",
       "sha256": "9056d2721e24a73a9bac11568902b33a86c57b52f0b28ab9c5c417194d1b5ffb",
       "bytes": 24256
@@ -51492,6 +51852,11 @@
       "bytes": 211565
     },
     {
+      "path": "tests/test_frozen_macos_variant_no_use.py",
+      "sha256": "19a16eaec459481bab7bf957992e63435b7740167cc0ad91750f112e545b5f78",
+      "bytes": 34370
+    },
+    {
       "path": "tests/test_gap_crosswalk.py",
       "sha256": "af5b008bbe49ad5493aac73568405442ff05d5d921b9655e2ff2caa0e8801876",
       "bytes": 5678
@@ -51823,8 +52188,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "c5869af9dc29f5b5abe469f3588559734051c8f87d75c23183d90d299aa4d21a",
-      "bytes": 65718
+      "sha256": "86f372452299daf1be59452c3e0c13691a1c00058154d17a8a594a914c19dbe6",
+      "bytes": 75774
     },
     {
       "path": "tests/test_path_safety.py",
@@ -52073,8 +52438,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "72ef5cefa9352c55d41ece3770050209c273b8675c3459cd531136653e20810e",
-      "bytes": 140273
+      "sha256": "a627a544a77e03aafae747367d881d9358c7ffcf60810838d000861a0decd388",
+      "bytes": 140713
     },
     {
       "path": "tests/test_workflow_security.py",
