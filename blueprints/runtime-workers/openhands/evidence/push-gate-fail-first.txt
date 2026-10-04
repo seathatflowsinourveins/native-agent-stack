@@ -271,13 +271,14 @@ The GPT-6.1 Sol full read of 40f12ba51 returned two findings:
 - P2: skills/resolver/SKILL.md and resolver.resolver_instruction omitted the gate's categories
   and still asked the agent to add or update tests, while tests/** is protected.
 
-Failing first, 2026-10-04T05:49:25Z to 05:49:51Z, on the fix's content over the first merge
-(db287ea72). Method: the working tree copied into <scratch> and committed there, with
-push_gate.py, receipt.py, resolver.py and skills/resolver/SKILL.md restored from 21b24dede, the
-round-2 head. gate_reads.py stays in the copy; that push_gate.py never loads it.
+Failing first, 2026-10-04T06:06:20Z to 06:06:46Z, on the final tree (the fix over the merge
+4a03dd796, with the final tests). Method: the working tree copied into
+<scratch> and committed there, with push_gate.py, receipt.py, resolver.py and
+skills/resolver/SKILL.md restored from 21b24dede, the round-2 head. gate_reads.py stays in the
+copy; that push_gate.py never loads it.
 $ python3 -m unittest tests.test_runtime_worker_openhands_push_gate \
     tests.test_runtime_worker_openhands_resolver.IssueSelectionTests.test_the_agent_instructions_state_every_category_the_push_gate_refuses
-exit 1; Ran 42 tests; FAILED (failures=14, errors=5, skipped=1):
+exit 1; Ran 43 tests; FAILED (failures=14, errors=5, skipped=1):
 - the planted schema commit was pushed: test_a_planted_schema_edit_is_refused_before_any_push
   failed with "HarnessRefused not raised";
 - each of the fixture's nine data edits passed the gate, with status pass and no reason: the
@@ -286,10 +287,12 @@ exit 1; Ran 42 tests; FAILED (failures=14, errors=5, skipped=1):
   the Python script that shell script runs);
 - the read the reader cannot resolve passed, where it must refuse every commit;
 - a local edit of gate_reads.py in the trusted checkout passed; it was no enforcing file;
-- on this repository, contract.schema.json and tools/adoption/managed_block.py had no rule
-  (None != 'ci_read');
+- the receipt dropped both ci_read and unresolved_read paths;
+- on this repository, contract.schema.json had no rule (None != 'ci_read');
 - five errors from the interfaces the fix adds: no gate_reads module, no CiProtected.unresolved,
   no "globs" count in the record (twice), no AGENT_RULE_PHRASES.
+A first run at 05:49:25Z, on the fix's content over the first merge db287ea72 and before the
+receipt test was added, failed the same way (42 tests, failures=14, errors=5).
 With only the two instruction sources restored:
 $ python3 -m unittest ...IssueSelectionTests.test_the_agent_instructions_state_every_category_the_push_gate_refuses
 exit 1; Ran 1 test; FAILED (failures=9). Across the skill and the instruction, none of the
@@ -297,8 +300,8 @@ gate's category phrases was there (.github/, CODEOWNERS, the gate's own director
 or reads, tests/, pull-request or issue text, a workflow or action), nor the stop-and-report
 sentence, and the instruction still said "Add or update tests".
 
-Planted defects on the fixed tree (the fix's content over db287ea72), 2026-10-04T05:46:08Z to
-05:49:06Z, with the runner and method of part 2: the unmutated copy passes (exit 0). M1 to M23 are as in part 6, each exit 1 again;
+Planted defects on the final tree, 2026-10-04T06:03:34Z to 06:06:20Z, with the runner and method
+of part 2: the unmutated copy passes (exit 0). M1 to M23 are as in part 6, each exit 1 again;
 M13 now fails four subtests, one per enforcing file. The new ones:
 M24 exact gate reads are not protected: exit 1, failures=6; test_every_read_form_resolves_to_repository_paths,
     test_data_a_gate_script_reads_is_refused, test_a_planted_schema_edit_is_refused_before_any_push,
@@ -323,7 +326,7 @@ M34 comprehension targets share the enclosing scope: exit 1, failures=1;
 M35 the skill drops the stop-and-report rule: exit 1, failures=1;
     test_the_agent_instructions_state_every_category_the_push_gate_refuses
 M36 the instruction asks for tests again: exit 1, failures=1; the same test
-M37 the receipt drops ci_read: exit 1, failures=1; the same test
+M37 the receipt drops ci_read: exit 1, failures=2; the same test, test_gate_read_refusals_reach_the_receipt
 M38 a name defined through itself reads as unknown: exit 1, failures=2;
     test_every_read_form_resolves_to_repository_paths,
     test_the_gate_reads_stay_resolved_and_bounded_on_this_repository
@@ -336,13 +339,14 @@ M41 code that gate code runs is not followed: exit 1, failures=2;
     test_the_derivation_follows_imported_constants_and_script_text, test_data_a_gate_script_reads_is_refused
 M42 a gate script the reader cannot parse reads nothing: exit 1, failures=1;
     test_reads_the_reader_cannot_resolve_are_reported
-Detected 42 of 42. An earlier run of the same list, before the stop-and-report phrase was made
-specific, missed M35: the skill's workflow step still said "stop and report" for tests. The test
-now looks for the whole sentence that covers every category.
+Detected 42 of 42. The same list also detected 42 of 42 at 05:46:08Z to 05:49:06Z, on the fix's
+content over db287ea72. An earlier run, before the stop-and-report phrase was made specific,
+missed M35: the skill's workflow step still said "stop and report" for tests. The test now looks
+for the whole sentence that covers every category.
 
 The gate tests under /usr/bin/python3 3.12.3 with PyYAML 6.0.1:
 $ /usr/bin/python3 -m unittest tests.test_runtime_worker_openhands_push_gate
-exit 0; Ran 44 tests; OK. The PyYAML cross-check ran; under CPython 3.13.15 it is the one skip.
+exit 0; Ran 45 tests; OK. The PyYAML cross-check ran; under CPython 3.13.15 it is the one skip.
 
 Breadth on the final merged tree 4a03dd796 (10,528 tracked files), the derivation of 21b24dede's
 gate against this one, 2026-10-04 (on the first merge, db287ea72, the figures were within 66 files

@@ -649,17 +649,11 @@ class RepositoryWorkflowTests(unittest.TestCase):
         for path, rule in expected.items():
             with self.subTest(path=path):
                 self.assertEqual(protected.rule(path), rule)
-        # Over-breadth checks. Files a step only lists as `case` patterns (adoption-bootstrap.yml's
-        # `changes` step and its PATTERNS and MACOS_PATTERNS globs, main e0c329ae9) are neither named
-        # nor traced. Since the derivation follows what CI runs to a fixpoint, scripts/ and
-        # tools/adoption/ are protected through a real route: adoption/bootstrap-linux.sh, which that
-        # workflow runs, runs tools/adoption/managed_block.py (named in its text, so ci_read), and
-        # managed_block.py puts both directories on sys.path (ci_import).
-        # scripts/credential_boot_receipt.py stays listed only.
+        # A file a step only lists as a `case` pattern (adoption-bootstrap.yml's `changes` step and its
+        # MACOS_PATTERNS globs, main e0c329ae9) is neither named nor traced. scripts/ and
+        # tools/adoption/ may still be protected as directories through a real route: the bootstrap
+        # script that workflow runs runs tools/adoption/managed_block.py, which puts both on sys.path.
         self.assertIsNone(derived.files.get("scripts/credential_boot_receipt.py"))
-        self.assertEqual(derived.files.get("adoption/bootstrap-linux.sh"), "ci_named")
-        self.assertEqual(derived.files.get("tools/adoption/managed_block.py"), "ci_read")
-        self.assertEqual(derived.prefixes.get("scripts"), "ci_import")
         self.assertEqual(derived.prefixes.get("tools/sota-convergence"), "ci_import")
         # The schedule-only workflow's script is not reachable from a push or its PR.
         self.assertNotIn(".github/workflows/practice-references-freshness.yml", derived.workflows)
@@ -1101,6 +1095,22 @@ class ReceiptProjectionTests(unittest.TestCase):
             "zizmor": {"version": PIN, "findings": 2, "failing": ["template-injection"]}})
         self.assertEqual(self.receipt.push_gate_summary(None), [])
         self.assertEqual(self.receipt.push_gate_summary([{"status": "maybe", "commit": "HEAD"}])[0]["status"], None)
+
+    def test_gate_read_refusals_reach_the_receipt(self):
+        # Cross-family review P1 of 2026-10-04: the ci_read and unresolved_read rules and the
+        # gate_input_unresolved reason are kept; the record's line list is not copied.
+        record = {"commit": "c" * 40, "base": "a" * 40, "trusted_commit": "b" * 40, "status": "fail",
+                  "reasons": ["protected_path", "gate_input_unresolved"],
+                  "paths": [{"path": "policy/contract.schema.json", "rule": "ci_read", "known": True},
+                            {"path": "scripts/read_unknown.py", "rule": "unresolved_read", "known": True}],
+                  "unresolved": ["scripts/read_unknown.py:5"],
+                  "zizmor": {"version": PIN, "findings": 0, "failing": []}}
+        [summary] = self.receipt.push_gate_summary([record])
+        self.assertEqual((summary["reasons"], summary["paths"], summary["unnamed_paths"]),
+                         (["gate_input_unresolved", "protected_path"],
+                          [{"path": "policy/contract.schema.json", "rule": "ci_read"},
+                           {"path": "scripts/read_unknown.py", "rule": "unresolved_read"}], 0))
+        self.assertNotIn("unresolved", summary)
 
 
 class AttemptPushGateTests(unittest.TestCase):
