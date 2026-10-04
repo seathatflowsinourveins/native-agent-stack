@@ -5954,8 +5954,8 @@
     },
     {
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/README.md",
-      "sha256": "83f400f86db59d34f1d783e837978d4930e478f997f28367a490a4f13a749b30",
-      "bytes": 17394
+      "sha256": "9db0823f48a6007881fbf7848d126cb8a6814f1649461d80b644cee73388f328",
+      "bytes": 15796
     },
     {
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
@@ -15949,8 +15949,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "80474ecd31df167df851c649d24faf2d17cd6ca71e870f58dd8f99a95d7c54a4",
-      "bytes": 35977
+      "sha256": "0c262a772632c090bee7a257d2227c224b2cdf8b55fe52fca4e8a203000eeb90",
+      "bytes": 34588
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -16071,11 +16071,6 @@
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
-    },
-    {
-      "path": "docs/decisions/2026-10-03-retire-gateway-ab-r02.md",
-      "sha256": "d8b119ccf00931c0d3ab837a2dcbc9c583a0dfa987a79056cd0176eaacf34356",
-      "bytes": 27952
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
