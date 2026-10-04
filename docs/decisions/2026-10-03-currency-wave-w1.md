@@ -2,6 +2,8 @@
 
 ## Decision and north-star action
 
+Amended 2026-10-04: after merging main 14048b84 this PR integrates seven W1 moves; claude-hud, RTK and mcporter follow main's #693; see [Merge with main 14048b84, 2026-10-04](#merge-with-main-14048b84-2026-10-04).
+
 Integrate eight qualified foundation release pins from the W1 build contract;
 hold mcporter at 0.14.1 after R642b review.
 This maintains the native tooling used to build complex projects and conduct the
@@ -487,7 +489,8 @@ W1 `4367dd46addc8fa424a754ee84b0167cfa8365b1`, main
 `59f8a1e36e1f2870d9de18a16c42f1e72cdae1c6`. The mcp-inspector,
 opentelemetry-collector-contrib and playwright-cli rows already match W1
 exactly: each has four checks in W1 and three in main and the base. Their
-fourth `commits/<sha>` checks originated in W1, rather than in the merge.
+fourth `commits/<tag>` checks resolve release tags to commits and originated
+in W1, rather than in the merge.
 Main did not change those rows. Retain those exact W1 rows and add their
 three checks to main's counters, producing 277 and 260. No new API calls
 were made for this repair.
@@ -498,7 +501,8 @@ summary counter of 254. This repair carries that dated one-entry discrepancy
 forward while adding the measured W1 delta; it does not relabel the historical
 summary as a newly reconciled count of every array entry.
 
-Completeness critic: inspect all 55 PR paths differing from main for the same
+Completeness critic: inspect the 55 pre-repair paths, plus
+`docs/harness-defaults.md` added by this repair, for the same
 current-tense pin contradiction, while recognizing dated decisions and
 qualification artifacts as history. The operational mcporter paragraph and
 HUD row were the remaining matching statements. Compare all seven retained
@@ -507,3 +511,37 @@ from its supported default inputs, verify its receipt hashes, run the named
 acceptance checks, and report the names and reasons of any skipped tests.
 The general lesson is to compare native check entries before trusting unchanged
 summary fields, and to review current guide wording alongside selection rows.
+
+
+## Merge with main 38ac9aca, 2026-10-04
+
+The landing merge incorporates main
+`38ac9aca114ad9ef4a15d8620d947eb5c2f518c3` into PR head
+`7969c61479566bc5ee3a0c4ea7d4549c94e67544`. The anti-pattern table keeps
+W1's two rows first and main's ten newly inserted rows immediately after,
+with every row intact. The handbook uses the merged sources and the supported
+default generator inputs; its receipt preserves historical validation scope
+while following the generated output hashes. The nine W1 receipt registrations
+are restored alongside all of main's registrations. This maintains the native
+foundation tooling for the north-star research action named above.
+
+The October 4 amendment under the decision headline points readers from the
+original eight-move/hold decision to the seven retained W1 moves and main's
+#693 selections. The bootstrap HUD upgrade block cites the observed
+2026-10-04 host remove/add/install path and that receipt's limitations, while
+keeping W1's marketplace-update/plugin-update path explicitly unverified.
+
+Correction verification: read the fourth check's `endpoint` in the original
+W1 snapshot at `4367dd46addc8fa424a754ee84b0167cfa8365b1`. The three endpoints
+use release tags (`2.9.0`, `v0.162.0` and `v0.1.22`), so the review repair now
+names `commits/<tag>` and describes the tag-to-commit lookup. The preceding
+repair inspected 55 pre-repair paths and added `docs/harness-defaults.md`,
+producing 56 paths against `14048b84` at `7969c614`; its completeness wording
+now states both parts of that scope.
+
+Completeness critic: retain both sets of exact anti-pattern rows, preserve
+all main evidence registrations and all nine W1 receipt records, check the
+seven W1 moves and main's component selections, regenerate stale projections
+from merged sources, and run the named acceptance checks with skipped tests
+reported by name and reason. Historical host observations and the unverified
+W1 update path retain their original qualification limits.

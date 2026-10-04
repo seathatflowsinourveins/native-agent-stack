@@ -628,6 +628,11 @@ GitHub-hosted macOS runner; see
    2.1.288 command help with both `HOME` and `CLAUDE_CONFIG_DIR` in temporary
    directories; it did not execute a marketplace or plugin update. A safe
    offline reproduction of the GitHub-tag transition remains unverified.
+   Main's [2026-10-04 host receipt and limitations](../evidence/receipts/claude-hud-0100-qualification-20261004.json)
+   record the observed path after a tagged marketplace add failed on the old
+   source entry: the host ran `claude plugin marketplace remove claude-hud`,
+   repeated the tagged add and ran `claude plugin install claude-hud@claude-hud --scope user --json`
+   successfully; W1's marketplace-update/plugin-update path above remains unverified.
 
    Then compare the `gitCommitSha` that landed with the reviewed revisions in
    those rows (the check reads `$CLAUDE_CONFIG_DIR` when it is set, as Claude
