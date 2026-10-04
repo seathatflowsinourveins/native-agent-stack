@@ -1454,12 +1454,16 @@ class PortableTopRuleTests(unittest.TestCase):
     operator's user-level file, so it took the rules only that file held, six standing clauses, the Sol-primary Codex
     routing and skill matching, then the coordinator scoping and pinned-launch rule of the Gate A owner's review
     (docs/decisions/2026-09-30-rule-text-every-layer.md); the 5% rule applies from that baseline.
+    Re-baselined on 2026-10-03 to 1,962 words (1,808 before): phase 0.3 of the wave-2 synthesis asks for instruction lines
+    in both client blocks, which no existing text held (context-mode's working directory, semble's lane, the GPT
+    Researcher entry and Claude Code to Codex messaging; the 2026-10-03 addendum of
+    docs/decisions/2026-10-02-new-wsl-client-configuration.md); the 5% rule applies from that baseline.
     docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
     `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
     its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 1750  # Python str.split() count after the Gate A owner's review of PR #557 (1,703 before it; 1,696 before the conditional skill-discovery wording; 1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
+    BASELINE_WORDS = 1962  # Python str.split() count after the wave-2 instruction lines of 2026-10-03 (1,808 before them; 1,750 after the Gate A owner's review of PR #557, 1,703 before it; 1,696 before the conditional skill-discovery wording; 1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (

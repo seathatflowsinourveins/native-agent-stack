@@ -1,0 +1,45 @@
+{
+ "clone_head": "b6ffec8645f1c2a0ead45dc36b02dda9511cee00",
+ "results": [
+  {
+   "id": "M0",
+   "origin": "baseline",
+   "mutant": "unmutated tree",
+   "expected": "pass",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": true,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.401s",
+    "OK"
+   ]
+  },
+  {
+   "id": "N9",
+   "origin": "round 6",
+   "mutant": "new .CLAUDE/skills/frozen-app/SKILL.md (upper-cased client directory) whose instructions run pnpm install in the variant",
+   "expected": "fail",
+   "observed": "pass",
+   "exit_code": 0,
+   "as_expected": false,
+   "failing_tests": [],
+   "errors": 0,
+   "reopen_message": false,
+   "stale_pin_message": false,
+   "git_message": false,
+   "recheck_message": false,
+   "skipped": false,
+   "summary": [
+    "Ran 10 tests in 0.391s",
+    "OK"
+   ]
+  }
+ ]
+}

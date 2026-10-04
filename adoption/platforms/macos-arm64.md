@@ -874,7 +874,18 @@ there; what a Mac's crash reporter keeps of a crashed command's environment
 has not been checked. Key acceptance on a Mac is
 the runner, guard and status test suites on the macOS CI job, then a new Mac
 host receipt that separates the steps run from those not run. WSL receipts
-do not certify the Mac.
+do not certify the Mac. Added after `v2026.09.26.2`: on a pull request that
+macOS CI job (`adoption-bootstrap.yml`'s `validate-macos`) runs in full when the pull
+request changes a listed macOS-relevant path, runs only the changed top-level
+test modules when nothing else relevant changed (a scoped result, not a
+full-suite pass), and is skipped otherwise (untested, not passed); push,
+schedule and dispatch runs are always full
+([docs/decisions/2026-10-03-macos-ci-scope.md](../../docs/decisions/2026-10-03-macos-ci-scope.md)).
+The runner, guard and status suites (`tests/test_credential_run.py`,
+`tests/test_secret_path_guard.py`, `tests/test_effort_default_guard.py`,
+`tests/test_adoption_status.py` and `tests/test_credential_status.py`) are on
+that list, as is the code they test, so a change to them always runs the job in
+full.
 
 ## Qdrant collections
 

@@ -13,7 +13,7 @@ function gates on one workstation, recorded in the first and confirmatory receip
 | `foundation-definitive.compact.json` | The foundation's 21 layers and 4 cross rows: per slot the default, its label, alternatives, the Claude deciders' deciding facts, both critics' findings and corrections, the overturn checks and each family's status |
 | `trading/trading-definitive.compact.json` | The 12 us-equities layers, in the same shape. The trading lane's work, with its builder, its one-owner map and both rounds' preregistrations |
 | `settlements.json` | The model-server settlement's default, basis, scope, receipt paths and hashes, verbatim limits and overturn condition; read by `assemble_manifest.py` |
-| `../new-wsl-layer-consensus-20261002/consensus.json` | The layer-consensus record of 2026-10-02, in its own folder: five rows to add and six amendments by a direct consensus of the two model families. `assemble_manifest.py` reads it in its last step, hashes the notes it names and changes no field that the rounds decided |
+| `../new-wsl-layer-consensus-20261002/consensus.json` | The layer-consensus record of 2026-10-02, in its own folder: five rows to add and six amendments by a direct consensus of the two model families, and its wave-2 batch of 2026-10-03 (amendment 3: interim installs; one added row; two amendments). `assemble_manifest.py` reads it in its last step, hashes the records it names and changes no field that the rounds decided |
 | `criteria.txt` | The seven criteria of the first round, unchanged |
 | `decide-prompt.txt`, `decide-critic-prompt.txt` | The decision round's prompts, with the rules frozen before the round |
 | `decide-workflow.js` | The Claude family's workflow script (run `wf_c0e29ea4-90f`), with both output schemas inline |
@@ -40,6 +40,13 @@ A row is `definitive` only when both deciders of both families named the default
 
 An `amendments` list on a row holds later decisions by direct consensus. It stands beside the row's fields and changes
 none of them.
+
+An `interim` object on a row is an interim install under amendment 3 of the decision rule (the layer-consensus record's
+wave-2 batch, 2026-10-03): what the destination installs in the row's place until the named measurement decides, with
+its pin, its authority (the owner's dated decision or a direct consensus with both acknowledgements), both families'
+reviews and its hashed records. The assembler writes it only on a row whose decided default installs nothing and leaves
+every field the rounds decided as it was; the manifest states the exception beside the no-install rule
+(`no_install_rule_exception`) and counts the interims (`counts.interim`).
 
 ## A known leak in one packet
 

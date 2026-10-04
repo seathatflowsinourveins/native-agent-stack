@@ -1,0 +1,206 @@
+..F..FFFFFFFFFFFFFFFFFF....
+======================================================================
+FAIL: test_tracked_paths_are_compared_in_any_ascii_letter_case (tests.test_frozen_macos_variant_no_use.ArtifactDirectoryTests.test_tracked_paths_are_compared_in_any_ascii_letter_case)
+A differently cased path is inside the directory and a second copy of a file counts; a sibling is outside.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 406, in test_tracked_paths_are_compared_in_any_ascii_letter_case
+    self.assertEqual(artifact_relative_paths(names), ["rebuild.sh", "run-summary.json", "variant/package.json"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['run-summary.json', 'variant/THUMBS.DB'] != ['rebuild.sh', 'run-summary.json', 'variant/package.json']
+
+First differing element 0:
+'run-summary.json'
+'rebuild.sh'
+
+Second list contains 1 additional elements.
+First extra element 2:
+'variant/package.json'
+
+- ['run-summary.json', 'variant/THUMBS.DB']
++ ['rebuild.sh', 'run-summary.json', 'variant/package.json']
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='.CLAUDE/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='.Codex/prompts/x.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='.AGENTS/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='evidence/artifacts/x/.CLAUDE/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='evidence/artifacts/x/.Codex/prompts/x.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='evidence/artifacts/x/.AGENTS/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='catalogs/x/.CLAUDE/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='catalogs/x/.Codex/prompts/x.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='catalogs/x/.AGENTS/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='blueprints/x/.CLAUDE/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='blueprints/x/.Codex/prompts/x.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='blueprints/x/.AGENTS/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='docs/x/.CLAUDE/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='docs/x/.Codex/prompts/x.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='docs/x/.AGENTS/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='manifests/.CLAUDE/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='manifests/.Codex/prompts/x.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes) (path='manifests/.AGENTS/skills/x/SKILL.md')
+Outside the excluded classes every file is scanned, blueprints/**/*.json included; inside them only the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 428, in test_the_listed_configuration_kinds_are_scanned_inside_the_record_classes
+    self.assertTrue(in_scope(directory + name, "100644", b""))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.376s
+
+FAILED (failures=19)
