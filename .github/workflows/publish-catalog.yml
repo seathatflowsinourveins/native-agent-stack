@@ -6,8 +6,15 @@ on:
     tags:
       - 'v*'
 
-permissions:
-  contents: read
+# No token scope and no cache access by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+# cache-mode: none keeps the attested archive from restoring any cached state.
+permissions: {}
+cache-mode: none
+
+# One run per ref at a time, never cancelled: a started publish and release must finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   publish:

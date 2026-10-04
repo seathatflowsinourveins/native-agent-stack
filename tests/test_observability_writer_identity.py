@@ -38,6 +38,8 @@ OTELCOL_VERSION = next(component["version"] for component in
                        if component["id"] == "opentelemetry-collector-contrib")
 OTELCOL = Path(os.environ.get("OTELCOL_TEST_BIN", str(_TOOLS /
                f"otelcol-{OTELCOL_VERSION}/otelcol-contrib")))
+# main before the launcher read ECOSYSTEM_LANE (the negative control's launcher; CI checks out full history).
+PRE_LANE_COMMIT = "1f5a791b02a230aced670c88bab3d3d0ebcf401a"
 
 try:
     import yaml
@@ -171,6 +173,7 @@ class LauncherTests(unittest.TestCase):
         fake = root / "real-codex"
         fake.write_text('#!/usr/bin/env bash\nprintf "%s|%s\\n" "${OTEL_RESOURCE_ATTRIBUTES:-}" "$*"\nexit 7\n')
         fake.chmod(0o755)
+        self.fake = fake
         self.launcher = root / "codex"
         self.launcher.write_text(LAUNCHER.read_text().replace("@CODEX_BIN@", str(fake)))
         self.launcher.chmod(0o755)
@@ -178,13 +181,19 @@ class LauncherTests(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def run_launcher(self, attributes=None, *args, shell=None):
-        env = {k: v for k, v in os.environ.items() if k != "OTEL_RESOURCE_ATTRIBUTES"}
+    def run_launcher(self, attributes=None, *args, shell=None, lane=None, env=None):
+        """Returns the attributes and argv the real codex received; stderr is kept in self.stderr. A lane caller's own
+        ECOSYSTEM_LANE never reaches these runs: lane sets it, and env adds other variables."""
+        environment = {k: v for k, v in os.environ.items() if k not in ("OTEL_RESOURCE_ATTRIBUTES", "ECOSYSTEM_LANE")}
+        environment.update(env or {})
         if attributes is not None:
-            env["OTEL_RESOURCE_ATTRIBUTES"] = attributes
+            environment["OTEL_RESOURCE_ATTRIBUTES"] = attributes
+        if lane is not None:
+            environment["ECOSYSTEM_LANE"] = lane
         command = [shell, str(self.launcher)] if shell else [str(self.launcher)]
-        result = subprocess.run([*command, *args], env=env, capture_output=True, text=True)
+        result = subprocess.run([*command, *args], env=environment, capture_output=True, text=True)
         self.assertEqual(result.returncode, 7, result.stderr)
+        self.stderr = result.stderr
         attrs, argv = result.stdout.rstrip("\n").split("|", 1)
         return attrs, argv
 
@@ -217,12 +226,15 @@ class LauncherTests(unittest.TestCase):
                          "print(json.dumps({'env': dict(os.environ), 'argv': sys.argv[1:]}))\n")
         child.chmod(0o755)
         self.launcher.write_text(LAUNCHER.read_text().replace("@CODEX_BIN@", str(child)))
-        names = ("id", "inherited", "kept", "rest", "entry", "key", "value")
+        names = ("id", "inherited", "kept", "rest", "entry", "key", "value", "lane", "listed_lane")
         env = {name: f"sentinel {name}\n'unchanged'" for name in names}
         # Even a caller using the private prefix must not receive the launcher's scratch values.
         env.update({f"__codex_identity_{name}": f"private sentinel {name}" for name in names})
         env["PATH"] = os.environ.get("PATH", "/usr/bin:/bin")
         env["OTEL_RESOURCE_ATTRIBUTES"] = "service.instance.id=parent,a=b\n"
+        # A malformed lane adds no attribute, so the inherited trailing newline still ends the value, and the variable
+        # itself reaches codex unchanged.
+        env["ECOSYSTEM_LANE"] = "Not A Lane\n"
         argv = ["", "two words", "'single' and \"double\"", "line one\nline two", "trailing\n"]
         for shell in ("bash", "sh"):
             with self.subTest(shell=shell):
@@ -247,6 +259,71 @@ class LauncherTests(unittest.TestCase):
         # macOS runs bin/codex with bash 3.2; dash accepts no bash-4 feature either.
         attrs, _ = self.run_launcher("service.instance.id=chosen,a=b", shell="dash")
         self.assertRegex(attrs, r"^service\.instance\.id=chosen/[0-9a-f-]{36},a=b$")
+        attrs, _ = self.run_launcher("service.instance.id=chosen", shell="dash", lane="root")
+        self.assertRegex(attrs, r"^service\.instance\.id=chosen/[0-9a-f-]{36},ecosystem\.lane=root$")
+        for lane in ("Root", "root,service.instance.id=evil", "a" * 33):
+            with self.subTest(lane=lane):
+                attrs, _ = self.run_launcher(shell="dash", lane=lane)
+                self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36}$")
+                self.assertIn("ECOSYSTEM_LANE ignored", self.stderr)
+
+    def test_a_lane_variable_adds_the_lane_attribute(self):
+        attrs, _ = self.run_launcher(lane="root")
+        self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36},ecosystem\.lane=root$")
+        self.assertEqual(self.stderr, "")
+        # Inherited entries come first and an inherited identity stays the prefix.
+        attrs, _ = self.run_launcher("ecosystem.client.scope=worker,service.instance.id=parent", lane="trading")
+        self.assertRegex(attrs, r"^service\.instance\.id=parent/[0-9a-f-]{36},ecosystem\.client\.scope=worker,"
+                                r"ecosystem\.lane=trading$")
+        # The Collector's pattern, ^[a-z][a-z0-9_-]{0,31}$: up to 32 characters, digits, '_' and '-' after the first.
+        for lane in ("a" * 32, "w2_lane-b"):
+            with self.subTest(lane=lane):
+                attrs, _ = self.run_launcher(lane=lane)
+                self.assertRegex(attrs, rf"^service\.instance\.id=[0-9a-f-]{{36}},ecosystem\.lane={lane}$")
+        # An empty value names no lane, without a warning; scratch values a caller exports change nothing.
+        attrs, _ = self.run_launcher(lane="", env={"__codex_identity_lane": "evil", "__codex_identity_listed_lane": "1"})
+        self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36}$")
+        self.assertEqual(self.stderr, "")
+        attrs, _ = self.run_launcher(lane="root", env={"__codex_identity_listed_lane": "1"})
+        self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36},ecosystem\.lane=root$")
+
+    def test_a_malformed_lane_is_dropped_with_a_warning_and_codex_still_starts(self):
+        # The comma case would otherwise add a second service.instance.id, which the SDK's last-duplicate rule keeps.
+        for lane in ("Root", "1root", "-root", "_root", "root lane", "a" * 33, "root,service.instance.id=evil",
+                     "root=x", "root\n", "rööt"):
+            with self.subTest(lane=lane):
+                attrs, _ = self.run_launcher(lane=lane)
+                self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36}$")
+                self.assertIn("ECOSYSTEM_LANE ignored", self.stderr)
+                self.assertNotIn(lane.strip(), self.stderr)
+
+    def test_an_explicit_lane_entry_wins(self):
+        attrs, _ = self.run_launcher("ecosystem.lane=trading", lane="root")
+        self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36},ecosystem\.lane=trading$")
+        self.assertEqual(self.stderr, "")
+        # The SDK trims keys (env.rs L45-58 at v0.31.0), so a spaced key is the same attribute; it is kept unchanged.
+        attrs, _ = self.run_launcher(" ecosystem.lane = trading ,a=b", lane="root")
+        self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36}, ecosystem\.lane = trading ,a=b$")
+        # The explicit entry wins even when the variable is malformed: it is not read, so no warning.
+        attrs, _ = self.run_launcher("ecosystem.lane=trading", lane="Not A Lane")
+        self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36},ecosystem\.lane=trading$")
+        self.assertEqual(self.stderr, "")
+        # An entry without '=' is no attribute for the SDK, so the variable still names the lane.
+        attrs, _ = self.run_launcher("ecosystem.lane", lane="root")
+        self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36},ecosystem\.lane,ecosystem\.lane=root$")
+
+    def test_negative_control_the_launcher_before_lane_support_ignores_the_variable(self):
+        try:
+            old = subprocess.run(["git", "-C", str(ROOT), "show", f"{PRE_LANE_COMMIT}:{LAUNCHER.relative_to(ROOT)}"],
+                                 capture_output=True, text=True)
+        except OSError:
+            self.skipTest("git is not available")
+        if old.returncode != 0:
+            self.skipTest(f"{PRE_LANE_COMMIT} is not in this clone's history")
+        self.assertNotIn("ECOSYSTEM_LANE", old.stdout)
+        self.launcher.write_text(old.stdout.replace("@CODEX_BIN@", str(self.fake)))
+        attrs, _ = self.run_launcher(lane="root")
+        self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36}$")
 
 
 @unittest.skipUnless(PROMTOOL.exists() and HAVE_YAML, "promtool not installed at the documented path, or no PyYAML")
@@ -421,6 +498,25 @@ class NativeCollectorTests(unittest.TestCase):
         # The host apply reads this series back after a Collector restart to confirm the new pipeline runs.
         self.assertTrue(any(line.startswith("otelcol_processor_incoming_items{") and 'processor="groupbyattrs/session"'
                             in line for line in telemetry.splitlines()), telemetry)
+
+    def test_lane_name_becomes_a_label_and_a_malformed_one_is_dropped(self):
+        # A lane's launch exports OTEL_RESOURCE_ATTRIBUTES=ecosystem.lane=<lane> (codex-identity-launcher.sh.example).
+        start = time.time_ns() - 5_000_000_000
+        now = time.time_ns()
+        for instance, lane in (("codex-proc-1", "trading"), ("codex-proc-2", "Trading Lane"), ("codex-proc-3", None)):
+            resource = {"service.name": "codex_exec", "service.version": "0.160.0", "service.instance.id": instance}
+            if lane is not None:
+                resource["ecosystem.lane"] = lane
+            self.post(resource, "codex_otel", [{"name": "codex.turn.token_usage", "histogram": {
+                "aggregationTemporality": 1,
+                "dataPoints": [codex_histogram({"token_type": "input"}, 1000.0, start, now)]}}])
+        time.sleep(2)
+        exported = {labels["instance"]: labels for labels, _ in samples(
+            self.scrape(self.exporter), "ecosystem_codex_turn_token_usage_sum")}
+        self.assertEqual({instance: labels.get("ecosystem_lane") for instance, labels in exported.items()},
+                         {"codex-proc-1": "trading", "codex-proc-2": None, "codex-proc-3": None})
+        # Only the lane becomes a label; the other kept resource attributes stay off the series.
+        self.assertNotIn("service_version", exported["codex-proc-1"])
 
     @unittest.skipUnless(PROMETHEUS.exists(), "the pinned Prometheus is not installed at the documented path")
     def test_prometheus_scrape_drops_codex_buckets_and_counts_a_new_series_from_zero(self):

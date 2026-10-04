@@ -20,6 +20,7 @@ import tomllib
 STAGES = ("post_install", "service_health", "after_sign_in")
 RUNTIME_PINS = {"node", "python", "uv"}  # install.sh installs these unconditionally, before any mise tool
 ON_DEMAND = {"mcp-inspector", "base-distribution"}  # the manifest says installs; the plan installs nothing for them (README.md)
+GATE = "interim_acknowledged"  # install.sh's gate of the interim installs (amendment 3 of the manifest's decision rule)
 FUNCTION = re.compile(r"^([A-Za-z0-9_.-]+) ?\(\) ?\{(.*)$")
 PORT_IN_CONFIG = (re.compile(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}:(\d{4,5})\b|\[[0-9a-f:]*\]:(\d{4,5})\b|(?<![\w.]):(\d{4,5})\b"),
                   re.compile(r"(?i)\b\w*port\w*\s*[=:]\s*[\"']?(\d{4,5})\b"))
@@ -130,7 +131,9 @@ def main():
     excluded = [r for r in rows if not r["installed"] and not r.get("measurement_only")]
     by_slot = {r["slot"]: r for r in rows}
 
-    # one row per foundation row of the manifest, with its layer, default and repository
+    # one row per foundation row of the manifest, with its layer, default and repository. A manifest row with an interim
+    # (amendment 3 of the decision rule) is installed as its interim: the plan row names the interim's owner and repository,
+    # and the row's decided default, which installs nothing, stays as the rounds recorded it.
     for slot in manifest:
         if slot not in by_slot:
             bad("manifest", f"manifest row {slot} has no row in install-plan.json")
@@ -141,12 +144,18 @@ def main():
             continue
         if r["layer"] != m["layer_id"]:
             bad("manifest", f"row {r['slot']}: layer {r['layer']!r} differs from the manifest's {m['layer_id']!r}")
-        if not r.get("measurement_only") and (r["owner"], r["repository"]) != (m["default"], m["repository"]):
-            bad("manifest", f"row {r['slot']}: owner/repository differ from the manifest's default/repository")
+        interim = m.get("interim")
+        default, repository = (interim["default"], interim["repository"]) if interim else (m["default"], m["repository"])
+        if not r.get("measurement_only") and (r["owner"], r["repository"]) != (default, repository):
+            bad("manifest", f"row {r['slot']}: owner/repository differ from the manifest's "
+                            + ("interim's default/repository" if interim else "default/repository"))
         state, outcome = m.get("state") or "open", (m.get("resolution") or {}).get("outcome")
         if r["installed"] and r.get("measurement_only"):
             bad("rows", f"row {r['slot']} is both installed and measurement_only")
-        if r["installed"]:
+        if interim:
+            if not r["installed"]:
+                bad("manifest", f"row {r['slot']}: the manifest records an interim install, and the plan does not install it")
+        elif r["installed"]:
             if m["installs_nothing_extra"]:
                 bad("manifest", f"selected row {r['slot']}: the manifest says it installs nothing extra")
             if outcome == "not_installed":
@@ -177,6 +186,19 @@ def main():
             bad("acceptance", f"selected row {slot} has no post-install acceptance")
         if not active and (r["commands"] or r["acceptance"]):
             bad("rows", f"row {slot} is not installed but keeps commands or acceptance")
+
+    # an interim install waits for the acknowledgements of its rule amendment (the wave-2 batch of the layer consensus):
+    # its install function calls the gate before anything else, and the gate reads the owed acknowledgements
+    gated = [r for r in rows if (manifest.get(r["slot"]) or {}).get("interim")]
+    if gated and "acknowledgements_owed" not in install_funcs.get(GATE, ""):
+        bad("interim", f"install.sh has no {GATE} function that reads the wave-2 batch's acknowledgements_owed, the gate "
+                       "every interim install calls first")
+    for r in gated:
+        body = [line.strip() for line in install_funcs.get(r["slot"], "").splitlines()
+                if line.strip() and not line.strip().startswith("#")]
+        if body[:1] != [f'{GATE} {r["slot"]} || return "$?"']:
+            bad("interim", f"row {r['slot']}: its install function in install.sh does not call `{GATE} {r['slot']}` "
+                           "before anything else, so an interim install would run while an acknowledgement is owed")
 
     # commands and acceptance in the scripts are the ones in the JSON; every command has a source URL
     for r in rows:
@@ -230,6 +252,18 @@ def main():
     loop = re.search(r"^for slot in ([^;]*); do\n  if \[\[ -z \"\$only\" \|\| \"\$only\" == \"\$slot\" \]\]; then skipped", accept_text, re.M)
     if not loop or [s.strip("'") for s in loop.group(1).split()] != [r["slot"] for r in excluded]:
         bad("dispatch", "accept.sh: the skipped-slot loop is not the rows that are neither installed nor measurement-only")
+    # An installed row that install.sh runs only when named (the default run skips it) has its checks gated the same way.
+    named_only = [r for r in selected
+                  if re.search(r"^if named '" + re.escape(r["slot"]) + r"'; then run_slot '" + re.escape(r["slot"]) + r"';", install_text, re.M)]
+    for r in named_only:
+        slot = r["slot"]
+        if f'if [[ "$only" == {slot} ]]; then {slot}; elif [[ -z "$only" ]]; then skipped {slot}; fi' not in accept_text:
+            bad("dispatch", f"accept.sh checks row {slot} in the default run, but install.sh installs it only when named")
+    # ... and the converse: accept.sh skips no installed row in the default run that install.sh installs by default.
+    for r in selected:
+        slot = r["slot"]
+        if r not in named_only and f'if [[ "$only" == {slot} ]]; then {slot}; elif [[ -z "$only" ]]; then skipped {slot}; fi' in accept_text:
+            bad("dispatch", f"accept.sh skips row {slot} in the default run, but install.sh installs it by default")
 
     # --list prints exactly the rows of install-plan.json
     proc = subprocess.run(["bash", str(plan_dir / "install.sh"), "--list"], capture_output=True, text=True, cwd=plan_dir, timeout=120)
@@ -286,7 +320,8 @@ def main():
         print("\n".join(problems))
         print(f"FAILED: {len(problems)} problem(s)")
         return 1
-    print(f"OK: {len(rows)} rows: {len(selected)} installed by default, {len(measured)} measurement-only, {len(excluded)} not installed; "
+    print(f"OK: {len(rows)} rows: {len(selected)} installed ({len(selected) - len(named_only)} by the default run, {len(named_only)} only when named), "
+          f"{len(measured)} measurement-only, {len(excluded)} not installed; "
           f"{sum(len(r['commands']) for r in rows)} commands and {sum(len(r['acceptance']) for r in rows)} acceptance entries agree with the scripts")
     return 0
 

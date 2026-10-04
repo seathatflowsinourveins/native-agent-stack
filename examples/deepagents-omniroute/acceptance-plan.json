@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "native_runtime_capability_acceptance_plan",
+  "lane": "foundation",
+  "frozen_at": "2026-09-30T22:51:00Z",
+  "base_revision": "29458b4342422c979ad3b9bc62532ea6f05073c1",
+  "scope": "Role-specific DeepAgents research worker using supported native graph, task-selected skills, specialist delegation and persisted checkpoint continuation. Candidate trial, not default promotion.",
+  "sources": [
+    {
+      "repository": "langchain-ai/deepagents",
+      "version": "0.7.21",
+      "revision": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+      "files": [
+        "libs/deepagents/deepagents/graph.py",
+        "libs/deepagents/Makefile",
+        "README.md"
+      ],
+      "installation": "Native uv requirements resolution; exact supported create_deep_agent composition, no orchestration loop."
+    },
+    {
+      "repository": "langchain-ai/langchain",
+      "package": "langchain-openai",
+      "version": "1.6.7",
+      "source": "https://docs.langchain.com/oss/python/integrations/chat/openai",
+      "purpose": "Native ChatOpenAI explicit child base_url, Responses and max reasoning; resolved integration dependencies differ from upstream DeepAgents lock."
+    },
+    {
+      "repository": "langchain-ai/langgraph",
+      "package": "langgraph-checkpoint-sqlite",
+      "version": "3.1.1",
+      "source": "https://github.com/langchain-ai/langgraph/tree/main/libs/checkpoint-sqlite",
+      "purpose": "Native SQLite checkpointer; exact source pin will be bound before execution."
+    },
+    {
+      "repository": "langchain-ai/langchain-mcp-adapters",
+      "version": "0.3.2",
+      "source": "https://github.com/langchain-ai/langchain-mcp-adapters",
+      "purpose": "Supported native MCP tools only when the bounded task needs them."
+    }
+  ],
+  "roles": {
+    "coordinator": "Retained native Claude/Codex accounts; one integrating coordinator",
+    "worker": {
+      "model": "cx/gpt-6.1-sol-max",
+      "effort": "max"
+    },
+    "judge": {
+      "model": "cx/gpt-6-astra-max",
+      "effort": "max",
+      "trigger": "Independent consequential judgment if selected; simple task correctness decided by unchanged executable oracle"
+    },
+    "candidate_role": "Persisted multi-step research with task-selected skill and specialist context"
+  },
+  "baseline": {
+    "retained": "Qualified Codex SDK0.159.2/Dagu workflow; no new comparison rerun",
+    "deepagents": "Installed package absence must be captured before install",
+    "upstream_dependency_context": "DeepAgents source uv.lock uses langchain-openai1.1.14; current1.6.7 integration must be labelled separately."
+  },
+  "acceptance": [
+    {
+      "id": "installation",
+      "required": "Exact native package metadata and uv pip check, hashed resolved requirements; dependency scan."
+    },
+    {
+      "id": "upstream-tests",
+      "required": "Unchanged selected skills/subagent/graph upstream tests, exact file selection/hashes, actual returned results/skips. No mocked output promoted to provider acceptance."
+    },
+    {
+      "id": "native-config",
+      "required": "Explicit child OmniRoute20128 Responses/Sol-Max; selected skill directory and tools; bounded native delegation/middleware only if source supports it; private SQLite state."
+    },
+    {
+      "id": "model-trial",
+      "required": "Only after source/config readiness, freeze task and exact deterministic oracle; one bounded initial worker run and persisted continuation from a separate process. Real skill/tool/specialist invocation independently observed, cancellation/cleanup retained."
+    },
+    {
+      "id": "negative-control",
+      "required": "Same task oracle fails for absent/wrong output or missing capability; distinguish fixture control from upstream tests."
+    }
+  ],
+  "task_trial": {
+    "status": "not started; exact fixture and oracle will be frozen before any provider call",
+    "owned_workspace": true,
+    "deadline_seconds": 600,
+    "recursion_limit": 24,
+    "maximum_concurrent_workers": 2,
+    "skill_policy": "Load one source-pinned relevant skill progressively; native automatic compaction/cache preserved",
+    "provider_usage": "Native whole-run usage when returned; unknown fields remain null. Parent/child and provider/observer counters not added twice."
+  },
+  "ownership": {
+    "implementation": "examples/deepagents-omniroute/ only in separate worker worktree; root owns source matrix/receipts/plan",
+    "shared": "No O1 sandbox recipe, gateway, shared skill catalog, active untracked landscape or global clients/settings modification."
+  },
+  "rollback": "Remove only this owned private candidate environment, SQLite state and task fixtures; retain public source/tests and sanitized failures."
+}

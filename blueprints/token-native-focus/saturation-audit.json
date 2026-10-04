@@ -1726,8 +1726,8 @@
             "kind": "native_cli_e2e"
           },
           {
-            "id": "claude-hud-0100-qualification-20261003",
-            "path": "evidence/receipts/claude-hud-0100-qualification-20261003.json",
+            "id": "claude-hud-0100-qualification-20261004",
+            "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -1742,7 +1742,7 @@
       "integration_mode": "Configured optional statusline rendered in the retained foundation-closure native Claude terminal observations.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Retained foundation-closure observations record the configured HUD rendering model, project, context and usage fields before and after a native review. Earlier synthetic and effort-overlay attempts remain historical evidence. The landscape reconciliation performed no new native run. Historical lifecycle observations remain bound to 0.8.0. W1 0.10.0 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
+        "scope": "Retained foundation-closure observations record the configured HUD rendering model, project, context and usage fields before and after a native review. Earlier synthetic and effort-overlay attempts remain historical evidence. The landscape reconciliation performed no new native run.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -1751,7 +1751,7 @@
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback. W1 pin qualification does not recertify this historical stage at 0.10.0.",
+          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
           "evidence_refs": [
             "evidence/receipts/component-history.json",
             "evidence/receipts/token-practice-coverage-20260920.json",
@@ -1761,7 +1761,7 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Native PTY screen observations and installed-plugin audit qualify visible claude-hud 0.8.0 rendering in Claude 2.1.278. Every statistic, billing reconciliation, Windows dropdown interaction and a new host remain unqualified. No execution was repeated for this catalog reconciliation. W1 pin qualification does not recertify this historical stage at 0.10.0.",
+          "scope": "Native PTY screen observations and installed-plugin audit qualify visible claude-hud 0.8.0 rendering in Claude 2.1.278. Every statistic, billing reconciliation, Windows dropdown interaction and a new host remain unqualified. No execution was repeated for this catalog reconciliation.",
           "evidence_refs": [
             "evidence/receipts/native-claude-hud-interactive-20260920.json",
             "evidence/artifacts/full-stack-convergence-20260921/hud-observation.json",
@@ -1771,22 +1771,22 @@
         },
         "persistence": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.10.0.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
           "evidence_refs": []
         },
         "restart": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.10.0.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
           "evidence_refs": []
         },
         "cleanup": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.10.0.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
           "evidence_refs": []
         },
         "recovery": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.10.0.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
           "evidence_refs": []
         }
       },
@@ -1918,7 +1918,7 @@
     {
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.159.3",
+      "version": "0.160.0",
       "profile": "core",
       "role": "Native subscription coding client",
       "installation_assessment": "native installation/operation recorded in scoped public receipt",
@@ -2114,6 +2114,11 @@
             "id": "codex-01593-hindsight-native-memory-20261001",
             "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "runtime-sdk-20261003",
+            "path": "evidence/receipts/runtime-sdk-20261003.json",
+            "kind": "compatibility_attempt"
           }
         ],
         "retained_operation_ids": [],
@@ -4995,8 +5000,8 @@
     },
     {
       "component_id": "mcporter",
-      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
-      "version": "0.14.1",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.2",
+      "version": "0.14.2",
       "profile": "core",
       "role": "Native CLI bridge with persistent MCP daemon connection",
       "installation_assessment": "runtime present at retained native operation date",
@@ -5046,6 +5051,11 @@
             "id": "mcporter-0141-qualification-20260925",
             "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "mcporter-0142-qualification-20261004",
+            "path": "evidence/receipts/mcporter-0142-qualification-20261004.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5067,7 +5077,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -7398,8 +7408,8 @@
     },
     {
       "component_id": "rtk",
-      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-      "version": "0.50.0",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+      "version": "0.51.0",
       "profile": "core",
       "role": "Compact supported command outputs, retain failure/raw recovery",
       "installation_assessment": "runtime present at retained native operation date",
@@ -7499,6 +7509,11 @@
             "id": "rtk-050-qualification-20260925",
             "path": "evidence/receipts/rtk-050-qualification-20260925.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "rtk-051-qualification-20261004",
+            "path": "evidence/receipts/rtk-051-qualification-20261004.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7528,7 +7543,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",

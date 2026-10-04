@@ -3,9 +3,19 @@
  "kind": "new-wsl-definitive-manifest",
  "date_utc": "2026-10-01",
  "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, agreed by both model families, and is not a merit acceptance",
- "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name. A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides.",
+ "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name. A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides. Amendment 3 (wave 2, 2026-10-03): a row whose decided default installs nothing may carry an interim install, recorded in the row's interim field beside the fields the rounds decided, which stay as they were. The interim names what it installs and at which pin, the measurement or comparison that replaces or removes it, the authority that installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision, as the record that relays it states it, or a direct consensus with both families' acknowledgements on record. On the owner's decision an interim may sit on a definitive row whose default installs nothing: the definitive verdict stays recorded beside it, and the named measurement reports to the owner instead of removing the interim by itself. An interim is never definitive and is neither a blind result nor a measurement; no other installed row may own its job; its label starts with 'interim install', names its authority and says what decides it. The install plan installs it as the row's owner, and the client configuration wires what it installs while the row carries it.",
  "decision_rule_before_amendment_2": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
  "no_install_rule": "an option that installs nothing extra is the default unless measured evidence shows a challenger's gain on the requirement's own metric with an interval that excludes zero",
+ "no_install_rule_exception": "Amendment 3 makes one exception to the no-install rule: an interim install puts something extra on the destination before measured evidence shows a gain, on documented fit and the authority it names, and only until its named measurement decides; the row's decided default, which installs nothing, stays recorded beside it.",
+ "consensus_wave2": {
+  "date_utc": "2026-10-03",
+  "meaning": "the wave-2 batch of 2026-10-03: one row added and two amendments recorded by direct consensus of both model families, and three interim installs under amendment 3 on the owner's decisions of that day; selection records only: no comparison named here has run, and this record changes nothing on any host",
+  "acknowledgements": [],
+  "acknowledgements_owed": [
+   "claude",
+   "gpt"
+  ]
+ },
  "not_claimed": "no candidate is installed or measured by these rounds; a default decided on documented fit says so; a definitive default is the slot's install decision, not a merit acceptance: the full-field re-vote, the measured comparison and new-host acceptance stay separate",
  "sources": {
   "foundation": {
@@ -19,7 +29,7 @@
   },
   "settlements": {
    "file": "settlements.json",
-   "sha256": "2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24"
+   "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3"
   },
   "convergence": {
    "file": "convergence.json",
@@ -35,17 +45,17 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "e47e7a98053a7a83a5eecdf9da2b42cbeb68e635c71fcd4feda443fa26e37e83"
+   "sha256": "e6897728fd866a4d17583109f0d48bcd578c59b237e7186e31ec8ff09e83abf4"
   }
  },
  "counts": {
   "layers": 37,
-  "slots": 89,
+  "slots": 90,
   "definitive": 31,
   "by_row_kind": {
    "first_round": 53,
    "added": 10,
-   "consensus": 5,
+   "consensus": 6,
    "judged": 11,
    "pinned": 6,
    "project_practice": 2,
@@ -53,12 +63,13 @@
   },
   "by_state": {
    "definitive": 31,
-   "resolved": 22,
-   "measurement": 4,
-   "split": 7,
+   "resolved": 23,
+   "measurement": 6,
+   "split": 5,
    "open": 25
   },
-  "installed": 56
+  "installed": 59,
+  "interim": 3
  },
  "pinned_requirements": {
   "us-equities": [
@@ -1095,6 +1106,52 @@
    "resolution": {
     "outcome": "kept",
     "reason": "waits for or was settled by a measurement: outside the combination rule"
+   },
+   "interim": {
+    "date_utc": "2026-10-03",
+    "default": "semble 0.6.1",
+    "repository": "https://github.com/MinishLab/semble",
+    "pin": "tag v0.6.1 = commit 24497845460960db1839c8485319df189a889225; PyPI semble-0.6.1-py3-none-any.whl sha256 fea96cf60d93555966d57f26604b8ef935bf3f876757568cec9fe655dd651256; model minishlab/potion-code-16M-v2 at revision e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b, loaded from a local snapshot",
+    "label": "interim install on the owner's decision (amendment 3); not a blind result and not a measurement; the frozen code-search confirmatory decides, and its result replaces or removes it",
+    "decided_by": "the frozen code-search confirmatory (its section 6): semble selected, it becomes final once its pins equal the executable annex's; SocratiCode or ColGREP selected, that one replaces it; no selection, semble is removed and the slot returns to empty",
+    "authority": {
+     "kind": "owner_decision",
+     "date_utc": "2026-10-03",
+     "decision": "install semble now: decision 2 of the wave-2 synthesis lifts the code-search hold",
+     "relayed_by": "wave2-records.json owner_decisions[0]"
+    },
+    "reviews": {
+     "claude": "the wave-2 ruling for the code-search layer: nothing in the slot until amendment 3 exists, then semble 0.6.1 as the interim engine, MCP only, with the model pinned and one cache per client",
+     "gpt": "the GPT family's check agreed with conditions (gpt-6-astra). The whole-wave read (https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965501630), before the owner's decision, recommended keeping the search hold with the clients' built-in search"
+    },
+    "records": [
+     {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
+      "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+     }
+    ],
+    "configuration": {
+     "transport": "stdio MCP server 'semble', CPU only, no port and no GPU",
+     "model": "SEMBLE_MODEL_NAME = $HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c (the local snapshot at the pinned revision)",
+     "caches": "SEMBLE_CACHE_LOCATION = $HOME/.cache/semble-claude for Claude Code and $HOME/.cache/semble-codex for Codex, absolute",
+     "codex_tools": "enabled_tools = [\"search\", \"find_related\"]; default_tools_approval_mode = \"approve\", written only with --with-authorization-settings, because semble's tools carry no annotations and Codex 0.160.0 asks before each such call",
+     "claude_allow_rules": "mcp__semble__search and mcp__semble__find_related, exact names, written only with --with-authorization-settings"
+    },
+    "open_acceptance_gates": [
+     "each client's cache holds <sha256>/index/metadata.json whose model_path is the local snapshot",
+     "Codex lists both tools, and a codex exec --json search completes without 'requires approval'",
+     "a fresh Claude Code session's mcp__semble__search shows no prompt",
+     "an edit is returned after waiting longer than three times the first build's duration",
+     "no new listener and no GPU process"
+    ],
+    "sources": [
+     "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.code-search: the dossier default, the GPT check and its conditions, the ruling's changes 1-7 and 9)",
+     "https://github.com/MinishLab/semble/releases/tag/v0.6.1",
+     "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/src/semble/mcp.py",
+     "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md",
+     "https://huggingface.co/minishlab/potion-code-16M-v2/tree/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b",
+     "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/mcp_tool_call.rs"
+    ]
    }
   },
   {
@@ -1102,15 +1159,24 @@
    "layer_id": "semantic-rag",
    "slot_id": "embedding-model",
    "row_kind": "added",
-   "default": "Not installed until the deciding measurement returns",
-   "repository": "",
-   "installs_nothing_extra": true,
+   "default": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
+   "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+   "installs_nothing_extra": false,
    "definitive": false,
-   "label": "split: decided by the named measurement, nothing installed until it returns",
-   "state": "split",
+   "label": "settled by the preregistered measurement: nDCG@10 0.49827 on CQADupstackUnixRetrieval against 0.41394 for EmbeddingGemma (difference 0.084331, 95% interval 0.067738 to 0.100656), with the generation model resident; Nemotron-3-Embed-1B tied (difference 0.003124, interval -0.012194 to 0.018141) and needs a second model server, and WeMM-Embedding-2B ran out of GPU memory; measured on one workstation; not a merit acceptance",
+   "state": "measurement",
    "measurement": {
-    "returned": false,
-    "receipts": []
+    "returned": true,
+    "receipts": [
+     {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+      "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
+     },
+     {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
+      "sha256": "6f5dfbf83c5116e38b42d38ddd5fdbb1a27cf23b5ef7e8ac12d4071c9173a541"
+     }
+    ]
    },
    "coincides_with_lane_record": null,
    "claude": "not judged in the first round",
@@ -1380,6 +1446,52 @@
    "resolution": {
     "outcome": "kept",
     "reason": "waits for or was settled by a measurement: outside the combination rule"
+   },
+   "interim": {
+    "date_utc": "2026-10-03",
+    "default": "ai-memory 2.5.2",
+    "repository": "https://github.com/akitaonrails/ai-memory",
+    "pin": "tag v2.5.2 (tag object af8c6820bbbcca0b8d3604d7b2d59c0e0263ea85) = commit 7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83; release asset ai-memory-linux-x86_64.tar.gz sha256 acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8",
+    "label": "interim install on the owner's decision (amendment 3), with a fresh store; not a blind result and not a measurement; the memory head-to-head decides, and its result replaces or removes it",
+    "decided_by": "the memory head-to-head at its frozen revision (D3r2 or later), binding once its hash is posted and the Codex lane has read it; it checks that each arm actually uses its vectors, and its best eligible system takes the slot with no protected incumbent",
+    "authority": {
+     "kind": "owner_decision",
+     "date_utc": "2026-10-03",
+     "decision": "install ai-memory with a fresh store now: decision 2 of the wave-2 synthesis lifts the memory hold",
+     "relayed_by": "wave2-records.json owner_decisions[0]"
+    },
+    "reviews": {
+     "claude": "the wave-2 ruling for the memory layer: ai-memory 2.5.2 as the one memory owner of both clients, zero-LLM with its in-process embedder set explicitly, installed only after the owner lifts the hold (its change 1), which the owner's decision of 2026-10-03 does",
+     "gpt": "the GPT family's check agreed with conditions (gpt-6-astra): a provisional operational choice, not the established best retriever; its first condition kept the measurement-first hold unless the owner explicitly supersedes it, which the owner's decision does. The whole-wave read (https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965501630), before that decision, recommended keeping the memory hold"
+    },
+    "records": [
+     {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
+      "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+     }
+    ],
+    "configuration": {
+     "listen": "127.0.0.1:29374, the port the host template and the client templates carry (synthesis X5); the ruling's 21374 is not used",
+     "embedding_provider": "local: all-MiniLM-L6-v2, 384 dimensions, in process, set explicitly, so a failed model fetch is a visible start failure",
+     "llm": "none (zero-LLM)",
+     "service": "the upstream systemd user unit packaging/systemd/ai-memory-user.service at the pin, under linger",
+     "store": "fresh: no seed from another host, whose open handoffs a seed would carry",
+     "backup": "staged by the Restic backup job (synthesis X6): no ai-memory timer and no copy under /mnt/c",
+     "codex_tool_approval": "default_tools_approval_mode = \"approve\", written by the client configuration only with --with-authorization-settings (memory change 13)"
+    },
+    "open_acceptance_gates": [
+     "the user unit is active, /healthz on 127.0.0.1:29374 returns 200, and ai-memory status reports 2.5.2 with the local embedder",
+     "claude mcp list shows it connected at :29374/mcp, codex mcp list lists it, and the hooks admit capture",
+     "a canary typed in an ordinary session of one client is returned by memory_query in a fresh session of the other, in both directions, without memory_write_page",
+     "a handoff survives an unrelated session started in between; restart, spool drain and cold boot pass",
+     "across every hook source of both clients, only ai-memory fills the memory slot"
+    ],
+    "sources": [
+     "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.memory: the dossier default, the GPT check and its conditions, the ruling's changes 1, 3-5 and 12-15; synthesis_extracts X5)",
+     "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
+     "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md",
+     "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/local-embeddings.md"
+    ]
    }
   },
   {
@@ -1441,6 +1553,94 @@
    "resolution": {
     "outcome": "kept",
     "reason": "decided by both families in the decision round on a measured comparison: no context-supply layer"
+   },
+   "interim": {
+    "date_utc": "2026-10-03",
+    "default": "context-mode 1.0.169",
+    "repository": "https://github.com/mksglu/context-mode",
+    "pin": "Claude Code plugin context-mode@context-mode at commit 6f0cc6841c687e754059f36714a11233fda1a02b, or a descendant whose compare against it lists only stats.json; Codex plugin hooks and skills at --ref 6f0cc684 with the plugin's own MCP server off; the Codex session server from the npm tarball context-mode@1.0.169, sha256 09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
+    "label": "interim install on the owner's pin (amendment 3), beside the definitive no-install default; not a measured selection and not a blind result, with no saving or superiority claim; a preregistered end-to-end comparison decides and reports to the owner",
+    "decided_by": "a preregistered multi-agent end-to-end comparison against the clients' native output limits (none is on file yet): if the paired ratio interval of raw tool-output tokens entering context per agent does not lie wholly below 1, or the one-sided 95% lower bound of the task-success difference is below -0.10, the recommendation reverts to the native base and the result goes to the owner; the pin is never removed automatically",
+    "authority": {
+     "kind": "owner_decision",
+     "date_utc": "2026-10-03",
+     "decision": "use context-mode in both clients of the destination (the owner's pin that the wave-2 ruling for the context layer adopts)",
+     "verbatim": "please always use the sota gpt powered sota sdks, runtime for the research, context mode etc, we are evolve beyond simple action of web search",
+     "relayed_by": "wave2-records.json owner_decisions[1]"
+    },
+    "reviews": {
+     "claude": "the wave-2 ruling for the context layer adopts the owner's pin as the slot's interim, status interim_until_measurement, and keeps the decision round's verdict and the Harbor result as the reason the slot waits on a measurement",
+     "gpt": "the GPT family's check disagreed (gpt-6-astra): its alternative is no additional context-supply layer, with context-mode kept as the user-mandated exception until the client acceptance tests and a comparison support promotion. The whole-wave read (https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965501630): preserve the explicit user pin; bind the actual plugin, npm, source and hook identities and fresh-session behaviour"
+    },
+    "records": [
+     {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
+      "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+     }
+    ],
+    "configuration": {
+     "claude": "the plugin from the marketplace at the reviewed revision, with the compare gate (only stats.json changed) before every update",
+     "codex_plugin": "marketplace add --ref 6f0cc6841c687e754059f36714a11233fda1a02b, then plugin add; its own MCP server stays off",
+     "codex_server": "one session-bound MCP server running start.mjs from the verified npm tarball, installed with npm install --global --prefix ${ECO_ROOT}/tools/context-mode-1.0.169",
+     "codex_hooks": "the six plugin hooks trusted by their hashes, read back through codex app-server hooks/list and rendered by the client configuration; never --dangerously-bypass-hook-trust"
+    },
+    "open_acceptance_gates": [
+     "the Claude plugin shows 1.0.169, its compare against 6f0cc684 lists only stats.json, /mcp shows it connected and ctx-doctor passes",
+     "stream-json shows ctx_* tool_use counts in a parent and a subagent, and one ctx_search recall",
+     "on Codex only the user-config context-mode server is enabled; hooks/list shows the six hooks trusted without the bypass flag",
+     "an mcp_tool_call to ctx_execute completes; two concurrent sessions and one older than six minutes each get their own directory",
+     "one compaction completes in each client with no repeated PreCompact or SessionStart cycle"
+    ],
+    "sources": [
+     "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.token-context: the dossier default, the GPT check and its alternative, the ruling's changes 1-3, 6-10 and 17; owner_decisions[1])",
+     "https://github.com/mksglu/context-mode/commit/6f0cc6841c687e754059f36714a11233fda1a02b",
+     "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/start.mjs",
+     "https://www.npmjs.com/package/context-mode/v/1.0.169"
+    ]
+   }
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "token-efficiency",
+   "slot_id": "statusline",
+   "row_kind": "consensus",
+   "default": "claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line",
+   "repository": "https://github.com/jarrodwatts/claude-hud",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "both families by direct consensus on primary sources (wave 2, 2026-10-03; both pull-request acknowledgements owed); not a blind round, not a measurement",
+   "state": "resolved",
+   "measurement": null,
+   "coincides_with_lane_record": null,
+   "claude": "proposed and ruled on 2026-10-03 from sources read at their pins (wave 2)",
+   "gpt": "agreed with conditions on 2026-10-03 after its own primary-source check (gpt-6-astra); the whole-wave read keeps the row conditional on the destination's readback",
+   "job": "the interactive status line of the two clients (context and plan usage at a glance)",
+   "resolution": {
+    "outcome": "added_by_consensus",
+    "by": "direct consensus of both model families",
+    "batch": "wave2",
+    "reason": "Claude Code's status line is a bare command with no content of its own, so one tool owns it. claude-hud 0.10.0 was the one candidate read at its latest tag that installs as a pinnable plugin, makes no network call, reads no credential file and takes plan usage from the documented stdin rate_limits; its cost, daily-cost, weekly-cost and identity segments are off by default and stay off. Codex needs no tool: its native footer shows the six items once they are set. The usage meter stays none by design.",
+    "pin": "tag v0.10.0 = commit 75683c6de1ac07f6bbef00d739001679dba0740c, installed from marketplace jarrodwatts/claude-hud#v0.10.0 at user scope; the launcher runs the highest claude-hud version in any marketplace cache, so the pin also needs marketplace auto-update off and no other cached version",
+    "codex_footer": "[tui] status_line = [\"model-with-reasoning\", \"project-name\", \"git-branch\", \"context-used\", \"five-hour-limit\", \"weekly-limit\"]",
+    "kept_off": "showCost, showDailyCost, showWeeklyCost, showAuth and showAuthUser false; externalUsageWritePath empty; CLAUDE_HUD_ALLOW_EXTRA_CMD never set",
+    "wiring": "the upstream helper scripts/setup.mjs writes statusLine (inspect, then install, with --shell posix) and refreshInterval 5 is kept; the client configuration renders the same command, so a re-render keeps statusLine and refreshInterval",
+    "layer": "token-efficiency, beside the usage meter whose context and plan-usage readings the status line shows; it adds a display, not a second meter",
+    "runner_up": "claude-powerline 1.32.1: its default 'today' cost segment is a second cost meter, and it fetches an unpinned pricing file",
+    "overturn": "replace claude-hud only if the destination's live proof fails (no Context or Usage line after the first reply with a subscriber sign-in), a pin move adds a network call or a credential read, or the project goes unmaintained while claude-powerline, with 'today' off and no pricing fetch, passes the same constraint",
+    "open_acceptance_gates": [
+     "claude-hud is 0.10.0, enabled, from marketplace ref v0.10.0, the only cached version, with marketplace auto-update off",
+     "statusLine in the Claude settings runs the helper's launcher with an executable runtime path and refreshInterval 5",
+     "after one reply the HUD shows the Context and Usage lines; an API-key or gateway session shows no Usage line",
+     "the Codex footer shows the six items, and /status and /usage daily work"
+    ],
+    "sources": [
+     "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.analytics-statusline: the dossier default, the GPT check, the ruling's changes 1, 3-9 and 15)",
+     "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+     "https://github.com/jarrodwatts/claude-hud/blob/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/setup.mjs",
+     "https://github.com/jarrodwatts/claude-hud/blob/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/statusline.mjs#L29-L39",
+     "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/tui/src/bottom_pane/status_line_setup.rs#L54-L76",
+     "https://code.claude.com/docs/en/statusline"
+    ]
    }
   },
   {
@@ -1707,15 +1907,24 @@
    "layer_id": "observation-inference",
    "slot_id": "local-generation-model",
    "row_kind": "added",
-   "default": "Not installed until the deciding measurement returns",
-   "repository": "",
-   "installs_nothing_extra": true,
+   "default": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
+   "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
+   "installs_nothing_extra": false,
    "definitive": false,
-   "label": "split: decided by the named measurement, nothing installed until it returns",
-   "state": "split",
+   "label": "settled by the preregistered measurement: first-pass valid tool calls 200 of 200 against 175 of 200 for gpt-oss:20b (difference 0.125, 95% interval 0.065 to 0.19) on 100 BFCL cases through the server's chat and responses surfaces, both arms entirely on the GPU at 64,000 tokens with the embedder resident; Bonsai and Swift on PrismML's llama.cpp failed the function gate and qwen3.8:27b did not fit on the GPU; measured on one workstation; not a merit acceptance",
+   "state": "measurement",
    "measurement": {
-    "returned": false,
-    "receipts": []
+    "returned": true,
+    "receipts": [
+     {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+      "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
+     },
+     {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
+      "sha256": "55ac6ff05f4437dffb2623117c71fb8d6f786d71e63a44b46973b145b1d29577"
+     }
+    ]
    },
    "coincides_with_lane_record": null,
    "claude": "not judged in the first round",
@@ -2255,7 +2464,20 @@
      "https://github.com/gethasp/hasp/blob/624b3b38ac4f7a267e6925c545768c95945d781a/LICENSE",
      "https://github.com/gethasp/hasp/blob/624b3b38ac4f7a267e6925c545768c95945d781a/README.md#L44"
     ]
-   }
+   },
+   "amendments": [
+    {
+     "date_utc": "2026-10-03",
+     "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements owed)",
+     "decision": "keep the measurement; gate each arm on eligibility before it is scored; HASP 1.0.44 is ineligible on Linux as documented; systemd-creds --user becomes the deciding storage comparison",
+     "text": "The row's state stays measurement and it still installs nothing extra. Before any arm is scored it passes an eligibility gate: resuming after a restart needs no interactive input and no stored or exported unlock secret; no unlock secret sits in an environment or client configuration an agent can see; the delivery path has no approval prompt. At v1.0.44 HASP's documented Linux keyring default and launch path predict that it fails the gate, so the practice stays; its arm reopens only when a release adds a Linux unlock that needs no stored or exported password. systemd-creds --user, scoped to the storage part alone (the runner reading a --user ciphertext against the 0600 file, the other six parts of the practice kept), is the deciding storage comparison. Its gain is limited to passive reads as the distribution's default user and to partial copies that leave out the host's credential secret; there is none against a same-user agent or a process that can start the distribution as root.",
+     "sources": [
+      "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.custody: the ruling's change 15, with changes 1-3 as the synthesis carries them)",
+      "https://github.com/gethasp/hasp/blob/v1.0.44/apps/server/internal/store/keyring_default.go#L1-L7",
+      "https://github.com/gethasp/hasp/blob/v1.0.44/apps/server/internal/app/agentops/launch.go#L85"
+     ]
+    }
+   ]
   },
   {
    "catalog": "foundation",
@@ -2757,6 +2979,16 @@
      ],
      "sources": [
       "https://github.com/hashgraph-online/hol-guard/blob/85090ce61ed5bb5457104b5a73cb2bbc9443fda0/docs/guard/harness-support.md#L9"
+     ]
+    },
+    {
+     "date_utc": "2026-10-03",
+     "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements owed)",
+     "decision": "cover the destination gateway's ports 21128 and 21129 with the guard's gateway rule before that gateway holds accounts",
+     "text": "The guard's gateway rule recognised 20128 and 20129 only. The destination's own OmniRoute listens on 21128 (with its live socket on 21129), so the rule takes both ports before any account is signed in there: a management route on 21128 is held to the same frozen matrix as on 20128, and every management route on 21129 is refused. The guard's documented scope stays Claude Code's Bash tool: a context-mode ctx_execute call and a Codex shell are not covered, which belongs to the enforcement comparison already held on this row.",
+     "sources": [
+      "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.custody: the ruling's change 11; synthesis_extracts X16)",
+      "scripts/hooks/secret_path_guard.py (K4_GW_HEAD, K4_GW_FIND, K4_GW_ROWS)"
      ]
     }
    ]

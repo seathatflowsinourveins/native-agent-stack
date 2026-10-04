@@ -1,0 +1,6 @@
+{
+  "command": "python3 scripts/validate.py",
+  "exit_code": 1,
+  "returned_output": "Publication validation failed:\nreceipt runtime-sdk-20261003: payload claim differs from manifest\nreceipt runtime-sdk-20261003: payload limitations differs from manifest\n",
+  "correction": "Synchronize the existing runtime-sdk-20261003 receipt registration claim and limitations with its updated payload, then re-register final file hashes through host_receipts.register_file and rerun publication validation."
+}

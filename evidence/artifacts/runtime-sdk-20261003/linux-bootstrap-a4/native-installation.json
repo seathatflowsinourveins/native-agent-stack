@@ -1,0 +1,35 @@
+{
+  "evidence_class": "Native installation operation; separate from provider/model and SDK lifecycle acceptance",
+  "command": "rtk env ECO_INSTALL_ROOT=<A4_BOOTSTRAP_ROOT>/prefix npm_config_cache=<A4_BOOTSTRAP_ROOT>/npm-cache npm_config_userconfig=<A4_BOOTSTRAP_ROOT>/empty-npmrc npm_config_globalconfig=<A4_BOOTSTRAP_ROOT>/empty-global-npmrc CODEX_HOME=<A4_BOOTSTRAP_ROOT>/codex-home bash <A4_BOOTSTRAP_ROOT>/source/adoption/bootstrap-linux.sh --profile codex-only-a4 --skip-system-packages > <BUILD_ROOT>/A4-bootstrap.log 2>&1",
+  "exit_code": 0,
+  "launch_observed_at_utc": "2026-10-03 05:02:41 UTC",
+  "completion_observed_at_utc": "2026-10-03 05:04:20 UTC",
+  "time_scope": "Coordinator observation bracket; exact process start/end were not instrumented.",
+  "source_manifest_scope": "Codex-only fixture profile plus the unmodified script's mandatory node/uv/gh prerequisites",
+  "state_isolation": "Fresh ECO_INSTALL_ROOT, empty npm user/global configuration, fresh npm cache and dedicated CODEX_HOME. No shared installation, shell profile or host launcher changed.",
+  "native_operation": "bash bootstrap-linux.sh --profile codex-only-a4 --skip-system-packages",
+  "source_sha256": {
+    "bootstrap-linux.sh": "487d25bff2a412883e4875f98be230c89ea37bf9737d71dd558da20d8e94f2ad",
+    "pins-linux-x86_64.json": "f9b362b7caec258e13fc06d42894ea8a7a8f9dcc5dd6405a130ff41c7627604d",
+    "manifest.json": "a86e2e88f51995a17e2628cd0912faf7c0f7a14f00a7790238429f5bf481a9f0"
+  },
+  "installed_binary": {
+    "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+    "path": "<A4_BOOTSTRAP_ROOT>/prefix/tools/codex-0.160.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/bin/codex",
+    "executable": true
+  },
+  "version_check": {
+    "argv": [
+      "<A4_BOOTSTRAP_ROOT>/prefix/bin/codex",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "codex-cli 0.160.0\n",
+    "stderr": ""
+  },
+  "observed_summary": "summary: 4 verified, 0 failed",
+  "outputs": [
+    "bootstrap.log",
+    "installed-versions.txt"
+  ]
+}

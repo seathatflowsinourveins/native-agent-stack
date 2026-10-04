@@ -17,13 +17,18 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: read
+# No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
 
 jobs:
   freshness:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    # Raised from 30 to 60 on 2026-10-04: the job took 1687 of its 1800 s in run 37104350733 (its test suite step
+    # 1502 s) and 1623 s in run 37116574776, and the suite grows with most merged changes. The limit stays a hang guard;
+    # the suite step below aborts five minutes before it.
+    timeout-minutes: 60
+    permissions:
+      contents: read
     outputs:
       drift: ${{ steps.diff.outputs.drift }}
       upstream_errors: ${{ steps.diff.outputs.upstream_errors }}
@@ -148,9 +153,17 @@ jobs:
           python3 scripts/validate_convergence.py
           --all-recorded --root . --json
       - name: Run project test suite
+        # --durations 50 lists the 50 slowest tests at the end of the run (Python 3.12+; this job sets up 3.13). GNU
+        # timeout sends SIGABRT at 55 minutes, five under the job's limit, and SIGKILL 60 s later; with
+        # PYTHONFAULTHANDLER faulthandler first prints every thread's Python traceback, so a hang names the test it
+        # stopped in. A timeout fails the step with status 124. The steps before this one took 127 to 178 s in the eight
+        # completed runs 35934519434 to 37116574776.
+        env:
+          PYTHONFAULTHANDLER: '1'
         run: |
           set -o pipefail
-          python3 -m unittest 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
+          timeout --signal=ABRT --kill-after=60s 55m \
+            python3 -m unittest --durations 50 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
       - name: Report the test suite's skipped-test count
         if: ${{ !cancelled() }}
         run: |

@@ -133,7 +133,9 @@ class GateIdentityTests(unittest.TestCase):
         self.assertEqual(re.findall(r"(?m)^on:.*$", text), ["on:"])
         self.assertEqual(re.findall(r"(?m)^  [a-z_]+:", text.split("\non:\n", 1)[1].split("\n\n", 1)[0]),
                          ["  workflow_call:"])
-        self.assertIn("\npermissions:\n  contents: read\n\n", text)
+        # No token scope and no cache access (docs/decisions/2026-10-04-ci-least-privilege.md); the job adds none.
+        self.assertIn("\npermissions: {}\ncache-mode: none\n\n", text)
+        self.assertNotRegex(text, r"(?m)^    permissions:")
         self.assertNotRegex(text, r"(?m)^[ \t]*[\w-]+:[ \t]*write(?:-all)?[ \t]*(?:#.*)?$")
         self.assertEqual(list(jobs(text)), [JOB_ID])
 

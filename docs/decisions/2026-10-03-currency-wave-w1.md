@@ -399,3 +399,59 @@ and affected CI pin together, preserving the failed receipt and observations.
 Inspector rollback after an OAuth-store migration may need a fresh sign-in;
 this wave exercised stdio only. Host rollback, service swaps and sealed verdict
 refreshes remain separately owned operations.
+
+## Merge with main 14048b84, 2026-10-04
+
+Main reached claude-hud 0.10.0 through #693 first, so this PR no longer moves
+claude-hud. Its current stack, snapshot, token-efficiency and saturation rows and
+installation recipe follow main's
+[2026-10-04 qualification receipt](../../evidence/receipts/claude-hud-0100-qualification-20261004.json).
+W1's [2026-10-03 HUD receipt](../../evidence/receipts/claude-hud-0100-qualification-20261003.json)
+remains dated history, outside the component's current `evidence_ids`.
+
+RTK follows main at 0.51.0 and mcporter follows main at 0.14.2. W1 retains its
+seven unique moves and their original 2026-10-03 receipts: jcodemunch-mcp
+1.108.327, mcp-inspector 2.9.0, openresearch 0.2.15,
+opentelemetry-collector-contrib 0.162.0, playwright-cli 0.1.22 (Playwright
+1.64.0-alpha-1790635538000), syft 1.54.0 and worktrunk 0.80.0.
+This merge maintains the foundation tools used to build complex projects and
+support the north-star US-equities research and historical simulation.
+
+W1's 2026-10-03 mcporter 0.14.2 hold reason remains recorded history: an
+inconsistent resolved tree (bundled core 2.2.0 beside resolved server 2.3.0;
+`npm ls --all` returned `ELSPROBLEMS`) and no persistent daemon/`serve`
+qualification. The [compatibility-attempt receipt](../../evidence/receipts/mcporter-0142-qualification-20261003.json)
+remains unchanged and outside mcporter's current `evidence_ids`. Whether #693's
+2026-10-04 receipt addresses that hold belongs to that receipt's owner. This
+merge follows main's selection without judging that qualification. Its
+[mcporter receipt](../../evidence/receipts/mcporter-0142-qualification-20261004.json)
+states these limitations verbatim:
+
+- "No macOS execution and no upstream test suite run. The npm tarball hash is artifact evidence and does not pin the transitive dependency tree or rolldown platform binding."
+- "Configured-server list/call failures are retained. The stale daemon was not recovered and keep-alive transport acceptance is not claimed; dist/daemon/client.js was recorded byte-identical across 0.14.1 and 0.14.2."
+- "npm audit signatures --global failed with EAUDITGLOBAL (exit 1); only the later scratch-project audit succeeded. The ad-hoc MCP statistics are self-reports, not provider counts or savings."
+- "The Mac keeps its separately qualified MCPorter 0.13.13 pin until a Mac qualifies 0.14.2. The platform-independent tarball artifact check is not Mac execution or Mac qualification."
+
+The source comparison uses this worktree's merge-index stages 1, 2 and 3,
+with PR head `4367dd46addc8fa424a754ee84b0167cfa8365b1` and main
+`14048b840425c2569e0df60a6596e94e601da15b`. Component rows follow the policy
+above; other changes retain both branches' nonconflicting edits. Summary
+counters use main plus W1's delta from stage 1: `api_commands` is 274 + 0 =
+274, and `selected_component_api_commands` is 257 + 0 = 257.
+
+Generated projections use the merged repository's supported generators and
+documented default inputs. Correction to the receipt-generation assumption:
+`build_new_wsl_handbook.py --help`, its `OUTPUTS` tuple and `main()` publish
+only the Markdown and JSON handbook. The adjacent receipt's generator/profile
+hashes, output hashes and inventory are refreshed from those generated outputs,
+following `tests/test_new_wsl_handbook.py`'s committed-output receipt assertions;
+its historical validation results retain their original scope.
+
+Completeness critic: compare all three main-moved rows against stage 3 across
+all four component sources, retain all seven W1 rows and receipt bytes from
+stage 2, union the writer-identity test's dynamic collector selection with
+main's lane assertions, regenerate dependent projections, and preserve main's
+manifest registrations before registering every file differing from main.
+No new upstream adoption or landscape judgment is made in this bounded offline
+merge; the dated mcporter hold and main receipt limitations remain inputs to
+their owners' next qualification sweep.

@@ -55,7 +55,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 
 | Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.159.3 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 12 / 14 |
+| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.160.0 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 12 / 14 |
 | CI and supply chain | retain | `zizmor` | 1.30.1 | native_proven | host_verified | untested | — | 9 / 14 |
 |  |  | `syft` | 1.52.0 | native_proven | host_verified | untested | — |  |
 |  |  | `candidate:actions-attest` | unpinned | native_proven | accepted | untested | — |  |
@@ -75,10 +75,10 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `candidate:openai-skills` | unpinned | local_integration | conditional | untested | — |  |
 | Isolation | retain | `worktrunk` | 0.79.0 | native_proven | host_verified | host_verified | — | 16 / 19 |
 |  |  | `sandbox-runtime` | 0.0.77 | native_proven | host_verified | untested | — |  |
-| MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | host_verified, bootstrap 0.14.1 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation, token-efficiency | 12 / 14 |
+| MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | host_verified, bootstrap 0.14.2 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation, token-efficiency | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 | native_proven | host_verified | untested | — |  |
 | Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.284 | untested, bootstrap 2.1.284 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 9 / 14 |
-|  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.159.3 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
+|  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.160.0 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
 | Observation and optional inference | keep_but_compare | `opentelemetry-collector-contrib` | 0.161.0 | synthetic | host_verified | untested | observability | 8 / 11 |
 |  |  | `prometheus` | 3.14.0 | synthetic | host_verified | untested | observability |  |
 |  |  | `loki` | 3.7.8 | synthetic | host_verified | untested | observability |  |
@@ -92,7 +92,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Semantic code retrieval | keep_but_compare | `socraticode` | 1.14.0 | native_proven | host_verified, bootstrap 1.15.0 | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency | 10 / 12 |
 |  |  | `qdrant` | 1.19.1 | native_proven | host_verified | untested, bootstrap 1.19.1 | semantic-rag, recovery, macos-arm64-foundation |  |
 |  |  | `vllm` | 0.25.0 (behind v0.30.0) | native_proven | host_verified | untested | semantic-rag |  |
-| Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | host_verified, bootstrap 0.50.0 | host_verified, bootstrap 0.50.0 | foundation-cpu, token-efficiency | 4 / 6 |
+| Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | host_verified, bootstrap 0.51.0 | host_verified, bootstrap 0.51.0 | foundation-cpu, token-efficiency | 4 / 6 |
 |  |  | `headroom` | 0.37.0 (behind v0.38.0) | synthetic | host_verified, bootstrap 0.37.0 | untested, bootstrap 0.37.0 | token-efficiency |  |
 |  |  | `ccusage` | 20.0.24 | synthetic | host_verified, bootstrap 20.0.26 | untested, bootstrap 20.0.26 | token-efficiency |  |
 | Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional, bootstrap 0.1.8 | untested | — | 7 / 9 |

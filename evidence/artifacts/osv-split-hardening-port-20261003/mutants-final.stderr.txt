@@ -1,0 +1,6 @@
+test_the_step_catches_a_mutant_of_itself (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_the_step_catches_a_mutant_of_itself) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 6.716s
+
+OK

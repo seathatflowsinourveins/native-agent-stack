@@ -12,27 +12,27 @@ counter capture uses the Python standard library and installed upstream tools.
 ## Install the selected upstream tools once
 
 The [native recipes](../../recipes/README.md) contain the pinned release and
-checksum procedure for RTK 0.50.0, plus the official upstream source links.
+checksum procedure for RTK 0.51.0, plus the official upstream source links.
 Keep a working existing installation; installation is not a step in each refresh.
 For a new Linux x86_64 installation, the upstream commands are:
 
 ```sh
 REPORT_TOOLS="${XDG_DATA_HOME:-$HOME/.local/share}/native-token-report"
-mkdir -p "$REPORT_TOOLS/rtk-0.50.0"
-gh release download v0.50.0 --repo rtk-ai/rtk \
+mkdir -p "$REPORT_TOOLS/rtk-0.51.0"
+gh release download v0.51.0 --repo rtk-ai/rtk \
   --pattern rtk-x86_64-unknown-linux-musl.tar.gz \
-  --pattern checksums.txt --dir "$REPORT_TOOLS/rtk-0.50.0"
+  --pattern checksums.txt --dir "$REPORT_TOOLS/rtk-0.51.0"
 (
   set -eu
-  cd "$REPORT_TOOLS/rtk-0.50.0"
+  cd "$REPORT_TOOLS/rtk-0.51.0"
   sha256sum --check --ignore-missing checksums.txt
   tar -xf rtk-x86_64-unknown-linux-musl.tar.gz
 )
 uv venv "$REPORT_TOOLS/headroom-0.37.0"
 uv pip install --python "$REPORT_TOOLS/headroom-0.37.0/bin/python" headroom-ai==0.37.0
 uv tool install jcodemunch-mcp==1.108.327
-npm install --prefix "$REPORT_TOOLS/mcporter-0.14.1" mcporter@0.14.1
-export PATH="$REPORT_TOOLS/rtk-0.50.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/mcporter-0.14.1/node_modules/.bin:$HOME/.local/bin:$PATH"
+npm install --prefix "$REPORT_TOOLS/mcporter-0.14.2" mcporter@0.14.2
+export PATH="$REPORT_TOOLS/rtk-0.51.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/mcporter-0.14.2/node_modules/.bin:$HOME/.local/bin:$PATH"
 ```
 
 The checksum command must report the selected archive as `OK`. Other operating
@@ -97,7 +97,7 @@ and refresh" above) first.
 
 Before installing, give that configuration's `"rtk"`, `"headroom"` and, if
 set, `"toon"` keys absolute installed paths (for example by passing
-`--rtk "$REPORT_TOOLS/rtk-0.50.0/rtk" --headroom "$REPORT_TOOLS/headroom-0.37.0/bin/headroom"`
+`--rtk "$REPORT_TOOLS/rtk-0.51.0/rtk" --headroom "$REPORT_TOOLS/headroom-0.37.0/bin/headroom"`
 at `init-config` time, or by editing an existing config.json directly).
 `initialize_config` stores those fields verbatim, unlike `jcodemunch`/
 `mcporter`, which it resolves once with `shutil.which()` at init time, so a

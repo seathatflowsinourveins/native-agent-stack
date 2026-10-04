@@ -22,8 +22,9 @@ on:
     - cron: '29 7 * * 1'
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope and no cache access by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
+cache-mode: none
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
@@ -33,6 +34,8 @@ jobs:
   sbom-vuln:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    permissions:
+      contents: read
     defaults:
       run:
         shell: bash

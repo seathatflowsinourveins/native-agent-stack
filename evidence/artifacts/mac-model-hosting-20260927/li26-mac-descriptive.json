@@ -1,0 +1,120 @@
+{
+  "host_id": "mac-coordinator-64gb-20260925",
+  "kind": "li26_mac_metal_descriptive",
+  "model": "unsloth/Qwen3.8-27B-GGUF@4ca720788d1e01f1bff70c033e0d0028fd02e502 Qwen3.8-27B-UD-Q4_K_M.gguf",
+  "pairs": [
+    {
+      "arm": "C2@b11146",
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "control": "C0@b11146",
+      "criteria_descriptive": {
+        "faster_median_decode": true,
+        "json_valid_rate": true,
+        "noninferior_micro_f1": true,
+        "run_clean": true
+      },
+      "decode_speedup": 1.515,
+      "delta_micro_f1": 0.0,
+      "identical_predictions": 360,
+      "isolates": "MTP drafting on the same build and flags",
+      "n": 360
+    },
+    {
+      "arm": "C0@b11146",
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "control": "C0@b11057",
+      "criteria_descriptive": {
+        "faster_median_decode": true,
+        "json_valid_rate": true,
+        "noninferior_micro_f1": true,
+        "run_clean": true
+      },
+      "decode_speedup": 1.004,
+      "delta_micro_f1": 0.0,
+      "identical_predictions": 360,
+      "isolates": "runtime build b11057 -> b11146 with the same model and flags",
+      "n": 360
+    }
+  ],
+  "parity": false,
+  "plan_sha256": "b90db46f20624895089cee5bbce27b0c8df2f3c783b1873cea5920a0f8e18b95",
+  "profile_note": "metrics.json's profile field repeats the plan's declaration; argv is what ran here",
+  "prompt_sha256": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58",
+  "runs": {
+    "C0@b11057": {
+      "argv": "llama-server --model Qwen3.8-27B-UD-Q4_K_M.gguf --alias li26-c0 --ctx-size 8192 --parallel 1 --gpu-layers 99 --fit off --threads 6 --threads-batch 6 --batch-size 512 --ubatch-size 128 --cache-ram 0 --no-webui --offline",
+      "build_info": "b11057-59657a613",
+      "errors": 0,
+      "events": [],
+      "exact_match_rate": 0.975,
+      "json_valid_rate": 1.0,
+      "macro_codes": 12,
+      "macro_f1": 0.9867,
+      "median_decode_tokens_per_second": 15.73,
+      "median_ttft_ms": 5609,
+      "memory_kills": 0,
+      "micro_f1": 0.9909,
+      "n": 360,
+      "not_attempted": 0,
+      "runtime": "b11057 (59657a613), the macOS pin",
+      "server_peak_rss_mib": 16300,
+      "status": "completed",
+      "window_local": [
+        "2026-09-27 08:49:28",
+        "2026-09-27 09:36:07"
+      ]
+    },
+    "C0@b11146": {
+      "argv": "llama-server --model Qwen3.8-27B-UD-Q4_K_M.gguf --alias li26-c0 --ctx-size 8192 --parallel 1 --gpu-layers 99 --fit off --threads 6 --threads-batch 6 --batch-size 512 --ubatch-size 128 --cache-ram 0 --no-webui --offline",
+      "build_info": "b11146-7fe450e19",
+      "errors": 0,
+      "events": [],
+      "exact_match_rate": 0.975,
+      "json_valid_rate": 1.0,
+      "macro_codes": 12,
+      "macro_f1": 0.9867,
+      "median_decode_tokens_per_second": 15.8,
+      "median_ttft_ms": 5485,
+      "memory_kills": 0,
+      "micro_f1": 0.9909,
+      "n": 360,
+      "not_attempted": 0,
+      "runtime": "b11146 (7fe450e19), the plan's runtime",
+      "server_peak_rss_mib": 16530,
+      "status": "completed",
+      "window_local": [
+        "2026-09-27 09:36:20",
+        "2026-09-27 10:21:01"
+      ]
+    },
+    "C2@b11146": {
+      "argv": "llama-server --model Qwen3.8-27B-UD-Q4_K_M.gguf --alias li26-c2 --ctx-size 8192 --parallel 1 --gpu-layers 99 --fit off --threads 6 --threads-batch 6 --batch-size 512 --ubatch-size 128 --cache-ram 0 --no-webui --offline --spec-type draft-mtp --spec-draft-n-max 3",
+      "build_info": "b11146-7fe450e19",
+      "errors": 0,
+      "events": [],
+      "exact_match_rate": 0.975,
+      "json_valid_rate": 1.0,
+      "macro_codes": 12,
+      "macro_f1": 0.9867,
+      "median_decode_tokens_per_second": 23.94,
+      "median_ttft_ms": 5802,
+      "memory_kills": 0,
+      "micro_f1": 0.9909,
+      "n": 360,
+      "not_attempted": 0,
+      "runtime": "b11146 (7fe450e19), the plan's runtime",
+      "server_peak_rss_mib": 17606,
+      "status": "completed",
+      "window_local": [
+        "2026-09-27 10:21:01",
+        "2026-09-27 11:06:32"
+      ]
+    }
+  }
+}
