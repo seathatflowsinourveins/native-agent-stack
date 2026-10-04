@@ -10124,8 +10124,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a0229ad6acc3b1d81857d606bbac02db43a25a8f774540fe826a5f132a2380f7",
-      "bytes": 484781
+      "sha256": "9eece716982d44ddc5ff844003680c9b04f45fbe7b21d35f18188ee6a70de15c",
+      "bytes": 484284
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15474,8 +15474,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "107c6176702bdc95c586762cf9521c1d91b79bbd4ce6ad9e92c3c08afe063f84",
-      "bytes": 255589
+      "sha256": "975b5a515271c24b1a158594568a76f1b6d65db6eb920f561db77e056e20b8b1",
+      "bytes": 253392
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -16253,11 +16253,6 @@
       "bytes": 84655
     },
     {
-      "path": "docs/decisions/2026-10-03-omniroute-3851-pin.md",
-      "sha256": "dc22610e9a76a64c67a2ce4a13126d2efa74b974d666d7f6036662ac282f187a",
-      "bytes": 23724
-    },
-    {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
@@ -16409,8 +16404,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "c5211cd4fdf9824db1638fba1290dfb012a448a7f0fb06289d36ddd24239eec9",
-      "bytes": 41611
+      "sha256": "d86649c5c4f7fe5686d588586588ad20f6b84f95b0b109cca510f82c5d0b40c4",
+      "bytes": 39778
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -16529,8 +16524,8 @@
     },
     {
       "path": "docs/native-dashboards.md",
-      "sha256": "7873026e9de4f06c651de7edc5c4fdc05cc61b7eb34267160d263864e8c98ae9",
-      "bytes": 17782
+      "sha256": "3e1a49e3a6e7d90fd6985d85c4e56c32c5d232e4d6d073f471338b7e753592bc",
+      "bytes": 17709
     },
     {
       "path": "docs/native-foundation-resolution-20260921.md",
@@ -16689,7 +16684,7 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "0cf61d527319aa065dcf74da19b78214c527005cd2a5f4bf73b5b7c0dcfceda6",
+      "sha256": "c701409aa29644941e107e1102c1f0cc765509553f93c93872f27bf661cdde94",
       "bytes": 591301
     },
     {
@@ -51389,8 +51384,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "07a9ba1f192497808897040543ae605a1da686c7743b23df58503e927f453520",
-      "bytes": 102293
+      "sha256": "bcbc611c905081a00ca6762d8fad0e478841b0e101a9adc4ce4d09450710c943",
+      "bytes": 101523
     },
     {
       "path": "observability/README.md",
@@ -51674,13 +51669,13 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "ad750498ace3022cdaab34bc6cafb42300379d9a9e0f9e76f00414916c9d8a96",
-      "bytes": 128978
+      "sha256": "5ce6c88fac8855b5c8138f6fa553073580f990ea3dd853a17b760a41e60ca9fa",
+      "bytes": 128045
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
-      "sha256": "5165e75affc97436910612b9056ef464dc3ca1d2f0585c17625f0ce3f371f83c",
-      "bytes": 8294
+      "sha256": "beabed12521161b15c8e44ce8dccff02a78e863b844c706d99391fe38a847201",
+      "bytes": 8125
     },
     {
       "path": "recipes/claude-codex-foreground-review.md",
@@ -53614,7 +53609,7 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "20c8f4f0b757860b0d9960809dcee36e0c4425489550df31b7c0a940798615b2",
+      "sha256": "17e56072c6b5568af421dd67b7dfb4db51906d11511e950448f611d58ba73808",
       "bytes": 25833
     },
     {
