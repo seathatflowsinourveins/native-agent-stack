@@ -2,8 +2,9 @@
 
 A fake `codex` (and a fake `gh`) early on PATH stands in for the real CLI, and a stubbed Hugging Face Hub fetch
 for source_reviews.py; sweep.js runs under node with stubbed agent(), parallel() and pipeline() (skipped without
-node); convert.py's evidence is appended to a synthetic saturation ledger checkout with scripts/saturation_ledger.py
-itself. Optional: BASH32_BINARY (a real bash 3.2, as on macOS) and shellcheck.
+node); the native changed-key recovery test requires node and fails clearly without it. convert.py's evidence is
+appended to a synthetic saturation ledger checkout with scripts/saturation_ledger.py itself. Optional:
+BASH32_BINARY (a real bash 3.2, as on macOS) and shellcheck.
 """
 
 from __future__ import annotations
@@ -3910,8 +3911,8 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
                                                        "ref": "@RETURNS@#/failures/alpha"}])
 
-    def cli(self, work, res, *extra, codex_files=True):
-        run_file = write_json(work / "run.json", {"runId": "wf_fixture-1", "status": "completed", "result": res})
+    def cli(self, work, res, *extra, codex_files=True, run_id="wf_fixture-1"):
+        run_file = write_json(work / "run.json", {"runId": run_id, "status": "completed", "result": res})
         write_json(work / "scope.json", scope_for())
         if codex_files:
             write_codex_files(work, res)
@@ -3938,7 +3939,7 @@ class ConvertTests(unittest.TestCase):
 
     def test_cli_redacts_dash_encoded_project_directory_in_notes(self):
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
-        for prefix in ("~/.claude/projects/", ""):
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
             with self.subTest(prefix=prefix):
                 work = temp_dir(self)
                 res = healthy_result()
@@ -3951,7 +3952,7 @@ class ConvertTests(unittest.TestCase):
 
     def test_cli_redacts_dash_encoded_project_directory_deeper_in_strings(self):
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
-        for prefix in ("~/.claude/projects/", ""):
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
             with self.subTest(prefix=prefix):
                 work = temp_dir(self)
                 res = healthy_result()
@@ -3967,6 +3968,80 @@ class ConvertTests(unittest.TestCase):
                 self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], expected)
                 for name in ("returns", "lanes", "layers", "survivors"):
                     self.assertNotIn(encoded, (work / f"out/{name}.json").read_text())
+
+    def test_cli_redacts_bare_and_suffixed_local_encoded_home(self):
+        # Mock the native home lookup, never the real HOME environment or a real user name.
+        for home in (Path("/") / "home" / "fixture.user", Path("/") / "Users" / "fixture.user"):
+            with self.subTest(home=home):
+                encoded = "-".join(("", home.parts[1], "fixture", "user"))
+                work = temp_dir(self)
+                res = healthy_result()
+                notes = {"bare": encoded, "path": encoded + "/session-fixture/notes",
+                         "project": encoded + "-code-project", "sentence": "read " + encoded + ". Next."}
+                res["first"][0]["claude_discover"]["notes"] = notes
+                run_file = write_json(work / "run.json", {"runId": encoded, "status": "completed", "result": res})
+                scope = write_json(work / "scope.json", scope_for())
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with mock.patch.object(convert.Path, "home", return_value=home), \
+                        contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                         "--out", str(work / "out")])
+                self.assertEqual(code, 0, stderr.getvalue())
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"bare": "<project-dir>", "path": "<project-dir>/session-fixture/notes",
+                                  "project": "<project-dir>", "sentence": "read <project-dir>. Next."})
+                self.assertNotIn(encoded, stdout.getvalue())
+
+    def test_cli_redacts_bare_encoded_home_after_native_directory_anchors(self):
+        encoded = "-".join(("", "home", "fixtureuser"))
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = prefix + encoded + "/session-fixture"
+                done = self.cli(work, res)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 prefix + "<project-dir>/session-fixture")
+
+    def test_cli_preserves_home_substring_in_prose(self):
+        notes = "see the " + "-".join(("", "home", "assistant", "core")) + " repo and /docs/" + \
+            "-".join(("", "home", "page", "setup"))
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+
+    def test_cli_encoded_home_redaction_preserves_sentence_ending(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = "read projects/" + encoded + ". Next sentence."
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         "read projects/<project-dir>. Next sentence.")
+
+    def test_cli_redacts_encoded_dict_key_and_printed_summary(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        path = "projects/" + encoded
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {"details": [{path: "retained note"}]}
+        # runId reaches the printed summary; notes alone would make the stdout assertion vacuous.
+        done = self.cli(work, res, run_id=path)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"details": [{"projects/<project-dir>": "retained note"}]})
+        self.assertNotIn(encoded, done.stdout)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], "projects/<project-dir>")
 
     def test_cli_preserves_home_substrings_inside_ordinary_words(self):
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
@@ -4044,7 +4119,8 @@ class UsageRecordTests(unittest.TestCase):
         retry = next(c for c in usage["children"] if c["label"] == "critic")
         self.assertEqual(usage["status"], "complete")
         self.assertEqual([(c["agent_id"], c["superseded_by"], c["reason"]) for c in usage["superseded_attempts"]],
-                         [("killed", retry["agent_id"], "re-run under a changed call key after a usage-limit pause")])
+                         [("killed", retry["agent_id"], "no result entry; a later complete attempt with the same label "
+                           "returned; call keys not compared")])
         self.assertEqual(usage["by_resolved_model"], {"claude-opus-5-5": {"children": 2, "output_tokens": 17}})
         self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 1)
         self.assertIn("1", usage["reason"])
@@ -4088,6 +4164,82 @@ class UsageRecordTests(unittest.TestCase):
         self.assertEqual(len([c for c in usage["children"] if not c["complete"]]), 2)
         self.assertEqual(usage.get("superseded_attempts", []), [])
 
+    def test_result_bearing_or_unclassified_incomplete_child_is_not_linked(self):
+        for issue in ("null result", "empty result", "wait-notice result", "missing meta.json", None):
+            with self.subTest(issue=issue):
+                raw = paused_child_usage("critic")
+                if issue is None:
+                    raw["children"][0].pop("issues")
+                else:
+                    raw["children"][0]["issues"] = [issue]
+                done, document = self.measure_paused(raw)
+                self.assertEqual(done.returncode, 1)
+                self.assertEqual(document["child_usage"]["status"], "incomplete")
+                self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+                self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 0)
+
+    def test_multiple_complete_children_with_the_same_label_prevent_linking(self):
+        for earlier in (False, True):
+            with self.subTest(earlier=earlier):
+                raw = paused_child_usage("critic")
+                retry = next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])
+                other = dict(retry, agent_id="other-complete")
+                raw["children"].insert(0 if earlier else len(raw["children"]), other)
+                done, document = self.measure_paused(raw)
+                self.assertEqual(done.returncode, 1)
+                self.assertEqual(document["child_usage"]["status"], "incomplete")
+                self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+
+    def test_partial_link_keeps_the_other_child_incomplete(self):
+        raw = paused_child_usage("critic")
+        orphan = dict(raw["children"][0], label="refute-facts:missing", agent_id="lost")
+        raw["children"].insert(1, orphan)
+        raw["effort_mismatches"].append({"child": orphan["label"], "efforts": []})
+        done, document = self.measure_paused(raw)
+        usage = document["child_usage"]
+        self.assertEqual(done.returncode, 1)
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual([c["agent_id"] for c in usage["children"] if not c["complete"]], ["lost"])
+        self.assertEqual([c["agent_id"] for c in usage["superseded_attempts"]], ["killed"])
+        self.assertEqual(usage["effort_mismatches"], [{"child": orphan["label"], "efforts": []}])
+        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 1)
+
+    def test_post_processing_retains_source_reason_and_covered_attempt_provenance(self):
+        raw = paused_child_usage("critic")
+        retry = next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])
+        same_key_target = next(c for c in raw["children"] if c["label"] == "discover:alpha")
+        raw["superseded_attempts"] = [dict(same_key_target, agent_id="same-key-killed", complete=False,
+                                           efforts=[], superseded_by=same_key_target["agent_id"])]
+        raw["effort_mismatches"].append({"child": "discover:alpha", "efforts": [],
+                                         "superseded_by": same_key_target["agent_id"]})
+        raw["reason"] += "; 1 earlier attempt re-run under the same call key"
+        raw["children"][0]["resolved_models"] = [*raw["children"][0]["resolved_models"], "other-model"]
+        raw["multi_model_children"] = ["critic"]
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        processing = document["measurement"]["post_processing"]
+        self.assertEqual(processing["source_status"], raw["status"])
+        self.assertEqual(processing["source_reason"], raw["reason"])
+        self.assertEqual(processing["linked_agent_ids"], ["killed"])
+        self.assertEqual(processing["covered_agent_ids"], ["same-key-killed", "killed"])
+        self.assertEqual(processing["covered_effort_mismatches"],
+                         [{"child": "critic", "efforts": [], "superseded_by": retry["agent_id"]},
+                          {"child": "discover:alpha", "efforts": [], "superseded_by": same_key_target["agent_id"]}])
+        self.assertEqual(processing["effort_mismatches_covered"], 2)
+        self.assertEqual(document["child_usage"]["multi_model_children"], [])
+
+    def test_summary_distinguishes_raw_and_wrapper_exit_codes(self):
+        for orphan in (False, True):
+            with self.subTest(orphan=orphan):
+                raw = paused_child_usage("critic")
+                if orphan:
+                    raw["children"].insert(1, dict(raw["children"][0], label="orphan", agent_id="lost"))
+                done, document = self.measure_paused(raw)
+                summary = json.loads(done.stdout)
+                self.assertEqual(summary["raw_exit_code"], document["measurement"]["exit_code"])
+                self.assertEqual(summary["exit_code"], done.returncode)
+                self.assertEqual(done.returncode, 1 if orphan else 0)
+
     def test_unsuperseded_nonmax_attempt_stays_an_effort_deviation(self):
         raw = paused_child_usage("critic")
         raw["children"].pop(0)
@@ -4121,8 +4273,8 @@ class UsageRecordTests(unittest.TestCase):
         self.assertEqual(usage["status"], "incomplete")
         self.assertEqual(usage["superseded_attempts"][0]["usage_issues"], raw["children"][0]["usage_issues"])
 
-    @unittest.skipUnless(NODE, "node not installed")
     def test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once(self):
+        self.assertTrue(NODE, "node is required for the native child-usage.mjs changed-key recovery fixture")
         transcripts = temp_dir(self) / "subagents" / "workflows" / "wf_changed-keys"
         transcripts.mkdir(parents=True)
         followup = "refute-facts:scheduling-supervision:followup"
@@ -4154,6 +4306,11 @@ class UsageRecordTests(unittest.TestCase):
                          [("c0", "c2"), ("f0", "f1"), ("c1", "c2")])
         self.assertEqual([c["agent_id"] for c in usage["children"]], ["c2", "f1"])
         self.assertEqual(usage["by_resolved_model"]["claude-opus-5-5"]["output_tokens"], 17)
+
+    def test_native_changed_keys_reports_missing_node_as_a_failure(self):
+        with mock.patch(__name__ + ".NODE", None):
+            with self.assertRaisesRegex(AssertionError, "node is required for the native child-usage.mjs"):
+                self.test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once()
 
     def test_record_sanitizes_the_transcript_dir_and_hashes_the_raw_output(self):
         work = temp_dir(self)
@@ -4416,6 +4573,41 @@ class LedgerIntegrationTests(unittest.TestCase):
         usage = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
         self.assertEqual(make_result.check_usage(usage, "fixture", {"failures": {}}, ("alpha", "beta"))["status"],
                          "complete")
+
+    def assert_make_result_rejects_uncovered_retry(self, condition):
+        for listed in (False, True):
+            with self.subTest(listed=listed):
+                raw = paused_child_usage("critic")
+                killed = raw["children"].pop(0)
+                retry = next(c for c in raw["children"] if c["label"] == "critic")
+                raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+                if condition == "missing":
+                    raw["children"].remove(retry)
+                elif condition == "another label":
+                    retry["label"] = "discover:alpha"
+                elif condition == "incomplete":
+                    retry["complete"] = False
+                else:
+                    retry["efforts"] = ["xhigh"]
+                raw["effort_mismatches"] = ([{"child": "critic", "efforts": [],
+                                             "superseded_by": retry["agent_id"]}] if listed else [])
+                # Isolate coverage from the status gate, including a stale 'complete' input.
+                raw["status"] = "complete"
+                usage = {"measurement": {"exit_code": 1}, "child_usage": raw}
+                with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
+                    make_result.check_usage(usage, "fixture", {"failures": {}}, ("alpha", "beta"))
+
+    def test_make_result_rejects_superseded_attempt_with_missing_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("missing")
+
+    def test_make_result_rejects_superseded_attempt_with_another_label_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("another label")
+
+    def test_make_result_rejects_superseded_attempt_with_incomplete_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("incomplete")
+
+    def test_make_result_rejects_superseded_attempt_with_xhigh_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("xhigh")
 
     def test_superseded_critic_rerun_keeps_completed_layers_clean(self):
         usage = usage_record.record(json.dumps(paused_child_usage("critic")).encode("utf-8"), 1, "cmd", ROOT)

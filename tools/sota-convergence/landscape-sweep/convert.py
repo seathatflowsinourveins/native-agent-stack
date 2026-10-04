@@ -39,9 +39,10 @@ Models and effort: each Claude vote names the resolved model and the effort its 
 (child-usage.mjs output; a call the runtime re-ran is measured by the attempt that returned, and the client-written
 <synthetic> rows name no model); without it, the requested alias and effort null (not measured). The GPT-6 vote
 names the model and effort its job reported.
-Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. Dash-encoded home project-directory
-segments become <project-dir>, including inside nested strings and without a ~/.claude/projects/ prefix.
-Ordinary words containing the same substring remain unchanged. Any string still matching
+Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. The dash-encoded local home from
+Path.home() (non-alphanumerics become '-') and its project-directory suffix become <project-dir>, including bare
+home segments. Other hosts' -home- forms need a projects/ or claude-<uid>/ path anchor. Redaction traverses nested
+strings and dict keys and preserves sentence-ending periods. Ordinary words and unanchored prose stay unchanged. Any string still matching
 scripts/validate.py PRIVATE_CONTENT is listed by pointer and kind (never its text), and the exit code is 3.
 Integrity: with --work-dir, every GPT-6 output is compared with the file Codex wrote (gpt6/<job>/last.json). Exit 4
 when the workflow used an output that differs from that file (mismatch), that Codex never wrote (no_file) or that
@@ -84,7 +85,9 @@ SYNTHETIC_MODEL = "<synthetic>"  # child-usage.mjs: the model of client-written 
 COPY_FAILURES = ("mismatch", "no_file", "file_unparseable", "file_only")
 VOTE_ROLES = (("facts", "facts"), ("fit_claude", "Claude fit"), ("fit_gpt6", "GPT-6 fit"))
 SKILLS_CATALOG = "skills"  # build_inputs.SKILLS: the catalog of a skills-* layer, whose proposals are skill refs
-ENCODED_PROJECT_DIR = re.compile(r"(?<![\w.-])-home-[\w.]+-[\w.-]*")
+# Generic homes need a native directory anchor; local encoded homes are derived at the redaction call site.
+# Ending on a word character or dash preserves any sentence-ending periods.
+ENCODED_PROJECT_DIR = re.compile(r"(?<![\w.-])(?P<prefix>projects/|claude-\d+/)-home-[\w.-]*[\w-](?![\w-])")
 
 
 def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
@@ -680,15 +683,32 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
 
 
 def redact_project_dirs(value):
-    """Redact dash-encoded home path segments; traverse strings and keys as sweep_common.sanitize does."""
-    if isinstance(value, str):
-        return ENCODED_PROJECT_DIR.sub("<project-dir>", value)
-    if isinstance(value, list):
-        return [redact_project_dirs(item) for item in value]
-    if isinstance(value, dict):
-        return {(redact_project_dirs(key) if isinstance(key, str) else key): redact_project_dirs(item)
-                for key, item in value.items()}
-    return value
+    """Redact local encoded homes and native directory-anchored homes in strings and keys.
+
+    Use the same home and realpath forms as host_replacements; a bare encoded home is also private. Generic
+    forms require projects/ or claude-<uid>/ so prose such as an unrelated home-assistant repo is preserved.
+    """
+    home = str(Path.home())
+    encoded_homes = sorted({re.sub(r"[^a-zA-Z0-9]", "-", form) for form in (home, os.path.realpath(home))
+                            if form and form != "/"}, key=lambda form: -len(form))
+    local = (re.compile(r"(?<![\w.-])(?:" + "|".join(re.escape(form) for form in encoded_homes)
+                        + r")(?:-(?:[\w.-]*[\w-])?)?(?![\w-])") if encoded_homes else None)
+
+    def fix(text):
+        if local:
+            text = local.sub("<project-dir>", text)
+        return ENCODED_PROJECT_DIR.sub(lambda match: match["prefix"] + "<project-dir>", text)
+
+    def walk(item):
+        if isinstance(item, str):
+            return fix(item)
+        if isinstance(item, list):
+            return [walk(part) for part in item]
+        if isinstance(item, dict):
+            return {(fix(key) if isinstance(key, str) else key): walk(part) for key, part in item.items()}
+        return item
+
+    return walk(value)
 
 
 def main(argv=None) -> int:
