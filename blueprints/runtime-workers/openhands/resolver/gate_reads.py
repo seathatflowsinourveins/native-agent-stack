@@ -73,7 +73,7 @@ file-like object"), so each is reached through a handle opened on a path the cod
 fnmatch ("the filename separator ('/' on Unix) is not special to this module"), so a shape's
 `*` also matches across directories, as Protected.rule's fnmatch.fnmatchcase applies it; the
 Language Reference 6.2.4 and PEP 572 for the scopes above; ast for the node types. For
-executed(), read 2026-10-05: subprocess (run, call, check_call, check_output, Popen,
+executed(), read 2026-10-04: subprocess (run, call, check_call, check_output, Popen,
 getoutput, getstatusoutput), os "Process Management" (system, popen, startfile, posix_spawn,
 the exec* and spawn* families), asyncio subprocesses, pty.spawn, runpy (run_path,
 run_module), importlib.util.spec_from_file_location and importlib.machinery.SourceFileLoader,

@@ -637,7 +637,7 @@ class GateReadsTests(unittest.TestCase):
                 self.assertEqual(protected.rule(path), rule)
 
     def test_only_code_a_gate_script_runs_is_followed(self):
-        # Merge round of 2026-10-05: main's #679 made tools/adoption/install_claude_profile.py read
+        # Merge round of 2026-10-04: main's #679 made tools/adoption/install_claude_profile.py read
         # three examples/claude-native/workflows/*.js files to hash and copy them. Following every
         # code file gate code reads took the names in their text, so all of blueprints/ became
         # protected. A code file is followed only when a call that executes code receives it.

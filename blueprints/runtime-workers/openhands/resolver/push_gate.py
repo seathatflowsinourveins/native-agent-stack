@@ -748,7 +748,7 @@ def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
     code runs it: a code file in another language runs, or hands on, every code file its text
     names; a Python file runs what reaches a call that executes code
     (gate_reads.GateReads.executed). A code file that Python gate code only reads, such as a
-    workflow script it hashes and copies, is data: protected, not followed (2026-10-05, after
+    workflow script it hashes and copies, is data: protected, not followed (2026-10-04, after
     main's #679 made tools/adoption/install_claude_profile.py read
     examples/claude-native/workflows/*.js). Test modules are protected but not followed: what
     they read, like what they import, is mostly the code and data under test (decision

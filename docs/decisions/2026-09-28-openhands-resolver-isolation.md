@@ -385,7 +385,7 @@ assignments, which can only add protection. The reads become protection as follo
   module that passes a parameter on to one; or a function imported from outside the standard
   library (`sys.stdlib_module_names`), whose body the reader does not read;
 - a code file that gate code only reads, such as a workflow script it hashes and copies, is data:
-  protected as a file, but what its text names is not followed. The merge round of 2026-10-05
+  protected as a file, but what its text names is not followed. The merge round of 2026-10-04
   added this line. Main's #679 made `tools/adoption/install_claude_profile.py`, which the
   bootstrap runs, read the three `examples/claude-native/workflows/*.js` files to install them,
   and their text names `blueprints` and `fixtures`. Following every code file that gate code
@@ -802,8 +802,8 @@ its versioned primary sources. Do not weaken or skip the validator's refusal ass
   Each path rule was also checked on the installed CPython 3.13.15 (`PurePosixPath("a") / "/b"`
   and `os.path.join("a", "/b")` give `/b`; `fnmatchcase("docs/decisions/x.md", "docs/*.md")` is
   true).
-- Merge round of 2026-10-05, the calls `GateReads.executed` treats as running code, from
-  docs.python.org/3.13 (read 2026-10-05, HTTP 200): [subprocess](https://docs.python.org/3.13/library/subprocess.html)
+- Merge round of 2026-10-04, the calls `GateReads.executed` treats as running code, from
+  docs.python.org/3.13 (read 2026-10-04, HTTP 200): [subprocess](https://docs.python.org/3.13/library/subprocess.html)
   (`run`, `call`, `check_call`, `check_output`, `Popen`, `getoutput`, `getstatusoutput`),
   [os](https://docs.python.org/3.13/library/os.html) "Process Management" (`system`, `popen`,
   `posix_spawn`, the `exec*` and `spawn*` families), [asyncio
