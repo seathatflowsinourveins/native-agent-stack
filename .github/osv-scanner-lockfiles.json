@@ -14,6 +14,18 @@
       "parser": "uv.lock"
     },
     {
+      "path": "examples/deepagents-omniroute/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "examples/openhands-native-capabilities/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "examples/openhands-native-capabilities/cli-constraints.txt",
+      "parser": "requirements.txt"
+    },
+    {
       "path": ".github/requirements-ci.txt",
       "parser": "requirements.txt"
     },
@@ -185,9 +197,25 @@
     {
       "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
       "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/requirements-scoring.in",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/requirements-scoring.lock",
+      "parser": "requirements.txt"
     }
   ],
   "covered_by_lockfile": [
+    {
+      "path": "examples/deepagents-omniroute/requirements.in",
+      "lockfile": "examples/deepagents-omniroute/requirements.lock"
+    },
+    {
+      "path": "examples/openhands-native-capabilities/requirements.in",
+      "lockfile": "examples/openhands-native-capabilities/requirements.lock"
+    },
     {
       "path": "blueprints/convergence-practice/application-delivery/package.json",
       "lockfile": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml"

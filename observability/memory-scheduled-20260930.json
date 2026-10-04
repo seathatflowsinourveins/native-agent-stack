@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-09-30",
+  "automation_id": "maintain-native-foundation-and-trading-catalogs",
+  "trigger": {
+    "kind": "native_task_heartbeat",
+    "timestamp_utc": "2026-09-30T13:01:51.154Z",
+    "dispatch_internal_id": null
+  },
+  "operation": "Bounded scheduled native memory/RAG observation; inspect newly failed consolidation without retrying provider calls.",
+  "outcome": "New failed consolidation generation; retrieval/services continue working. No recovery claimed.",
+  "evidence_class": "native_proven",
+  "evidence_scope": "Actual scoped MCP/CLI/store observations and independent service/monitor readback. This receipt is not a new upstream test, model-quality evaluation, savings measurement or restart test.",
+  "scoped_report": {
+    "command": "ai-memory auto-improve-report --workspace agent-lab --project agent-lab --json",
+    "exit_code": 0,
+    "generated_at": "2026-09-30T13:02:49.624945389Z",
+    "returned_summary": "83 run(s), 19 terminal learning proposal(s), 100.0% approved in the last 30 day(s).",
+    "unchanged_since": "2026-09-29 excluding generated_at and since_created_at",
+    "interpretation": "Historical learning telemetry; it does not report the separate consolidation queue's success."
+  },
+  "setup_decision": {
+    "tool": "memory_read_page",
+    "scope": {
+      "workspace": "agent-lab",
+      "project": "agent-lab"
+    },
+    "path": "decisions/native-memory-learning-maintenance.md",
+    "body_unchanged_since": "2026-09-29",
+    "hourly_learning_scheduler_enabled": false
+  },
+  "consolidation": {
+    "store_query": {
+      "mode": "SQLite read-only",
+      "scope": {
+        "workspace": "agent-lab",
+        "project": "agent-lab"
+      },
+      "selection": "sessions joined to projects/workspaces and session_consolidation_jobs; ended_at IS NOT NULL; order session ended_at DESC, started_at DESC, job generation DESC; limit 1"
+    },
+    "returned_sql": {
+      "id": "<local-id-3>",
+      "started_at": 1789880685547137,
+      "ended_at": 1790758194547407,
+      "ended_observation_count": 17318,
+      "generation": 17318,
+      "state": "failed",
+      "job_started_at": 1790758685151785,
+      "completed_at": 1790758690432658,
+      "attempts": 5,
+      "last_error": "provider error 429: {\"error\":{\"type\":\"usage_limit_reached\",\"message\":\"The usage limit has been reached\",\"plan_type\":\"prolite\",\"resets_at\":1791097147,\"eligible_promo\":null,\"limit_window_minutes\":10080,\"resets_in_seconds\":338457}}",
+      "next_attempt_at": 1790758680588544
+    },
+    "end_utc": "2026-09-30T08:49:54.547407Z",
+    "last_attempt_started_utc": "2026-09-30T08:58:05.151785Z",
+    "last_attempt_completed_utc": "2026-09-30T08:58:10.432658Z",
+    "provider_reported_reset_utc": "2026-10-04T06:59:07Z",
+    "reset_meaning": "Timestamp returned in the retained failure; not a fresh account quota check or guarantee of recovery.",
+    "native_readback": {
+      "tool": "memory_read_session_observations",
+      "arguments": {
+        "workspace": "agent-lab",
+        "project": "agent-lab",
+        "session_id": "<latest-ended-session>",
+        "kinds": [
+          "session-end"
+        ],
+        "limit": 1,
+        "body_max_chars": 200,
+        "order": "desc"
+      },
+      "returned": {
+        "session": {
+          "agent_kind": "codex",
+          "started_at": "2026-09-20T05:04:45.547137Z",
+          "ended_at": "2026-09-30T08:49:54.547407Z",
+          "observation_count": 17352
+        },
+        "total": 7,
+        "observations": [
+          {
+            "kind": "session-end",
+            "created_at": "2026-09-30T08:49:54.172111Z",
+            "body": ""
+          }
+        ]
+      }
+    },
+    "count_scope": "ended_observation_count/generation=17318 is the ended snapshot. MCP readback counts 17352 currently stored observations; these are distinct counters.",
+    "default_session_selection": "Omitted session_id still returned the newer-starting September 26 completed Claude session. Explicit selection verified the latest-ended Codex session.",
+    "recovery": {
+      "status": "not_attempted",
+      "model_calls": 0,
+      "account_changes": 0,
+      "database_mutations": 0,
+      "synthetic_session_end_events": 0,
+      "reason": "Provider usage limit remains unresolved; inspect supported recovery after quota returns, preserving the original failed generation.",
+      "upstream_source": {
+        "repository": "https://github.com/akitaonrails/ai-memory",
+        "pin": "353841d91618d20b110b208de284a74d0b960379",
+        "files": ["crates/ai-memory-store/src/session_consolidation.rs:10-11,116-125,217-259", "crates/ai-memory-cli/src/commands/serve.rs:722-725,804-818", "crates/ai-memory-mcp/src/server.rs:2730-2752,2813-2825"],
+        "findings": "Five attempts with waits 30/60/120/240 seconds; failed rows are not claimed again. Direct MCP memory_consolidate supports an exact session_id but does not reset or complete the background queue row.",
+        "nested_retries": "At this source pin, crates/ai-memory-consolidate/src/consolidator.rs:67-106 permits up to three structured calls per queue attempt and crates/ai-memory-llm/src/error.rs:73-75 classifies provider 429 as transient. Five queue attempts do not establish five actual HTTP calls; actual live request count is unmeasured.",
+        "upstream_tests_inspected_not_run": ["queue_is_idempotent_per_observation_generation", "failed_claim_retries_and_graceful_release_does_not_spend_attempt", "expired_final_attempt_replays_without_spending_an_extra_attempt", "session_consolidation_worker_consumes_and_completes_durable_job"],
+        "installed_patch_equivalence": null,
+        "scope": "Source review at available clean upstream pin only; equivalence to the installed custom build remains unknown."
+      },
+      "supported_interface": {
+        "tool": "memory_consolidate",
+        "arguments": {"session_id": "<exact-retained-session-id>", "dry_run": false, "multi_page": false},
+        "invoked": false,
+        "prerequisite": "Fresh native provider readiness after quota recovery; preserve failure history and verify actual returned/store/page outcomes independently."
+      }
+    }
+  },
+  "retrieval": {
+    "socraticode": {
+      "query": "collect native Linux and Desktop usage separately",
+      "limit": 1,
+      "returned_file": "tools/ecosystem/linux-usage-report.test.cjs",
+      "lines": [
+        76,
+        83
+      ],
+      "score": 0.8333,
+      "source_sha256": "da5975a3bb9a3b0af972af387dd28497c590881ed08d868411efd1a6a9e16b54",
+      "excerpt_matches_original": true,
+      "points": 1974,
+      "collection": "green",
+      "watcher": "active (auto-updating on changes)"
+    },
+    "qmd": {
+      "source": "docs/tasks/2026-09-25-quality-optimization.md",
+      "sha256": "1eace1655ce74cb960b7e0091e45245cdcde954c3e8076ce3b9b7421e1038661",
+      "unchanged": true,
+      "reused_search_get_date": "2026-09-27",
+      "files": 183,
+      "vectors": 0,
+      "mode": "BM25 intentional"
+    }
+  },
+  "independent_monitor": {
+    "interval_utc": [
+      "2026-09-30T13:01:33Z",
+      "2026-09-30T13:03:30Z"
+    ],
+    "services": {
+      "ai-memory": "active/running/enabled; success",
+      "qdrant-agent-lab": "active/running/enabled; success",
+      "nemotron-embed-agent-lab": "active/running/enabled; success"
+    },
+    "timers": "Existing native-data and progress timers active/waiting; idle oneshots successful.",
+    "inventory": {
+      "rows": 78,
+      "marker_rows": 1,
+      "unknown": 0,
+      "stale": 5,
+      "generation": "2026-09-30T13:01:33.077Z",
+      "emission": "2026-09-30T13:01:33.630Z",
+      "http_status": 204,
+      "pages": 214,
+      "versions": 654,
+      "sessions": 314,
+      "observations": 455448,
+      "embedding_status": "ok",
+      "missing_latest_embeddings": 0,
+      "unresolved_embedding_failures": 0,
+      "llm_status": "unavailable",
+      "previous_llm_status": "ok",
+      "causal_attribution": null,
+      "snapshot_sha256": "818ba1faa7ae32e1514bf603618ff86bfda4bab2283d823797b9ea7a2fb95e51",
+      "loki_payload_sha256": "ae6620afb0f2bd73d6d26a42a233947974a196868ecdce4708e9b821f7f0fb3a"
+    },
+    "prometheus": {
+      "up": 9,
+      "total": 9,
+      "observed_at": "2026-09-30T13:03:30Z",
+      "firing_alerts": [
+        "EcosystemOmniRouteHealthUnexpected",
+        "EcosystemFreeLLMAPIHealthUnexpected"
+      ],
+      "consolidation_specific_firing_alert": false,
+      "swap_used_bytes": 542031872,
+      "swap_alert": false
+    },
+    "progress": {
+      "rows": 100,
+      "emission": "2026-09-30T12:58:13.546Z",
+      "source_timestamp": "2026-09-25 at 22:46 UTC (minute precision)",
+      "digest_sha256": "1b790eb41c5c2d4cb662fa4860413b9ac05303932aa2f33a5956a5d42b9cd209",
+      "checkpoint_sha256": "f73f1f175ee31b2fbdcce4b23294c97093dcf7645433b9309a763f66b6c266dd"
+    },
+    "interpretation": "Fresh publication, green services, embedding status, historical task checkpoints and consolidation completion are separate evidence. No current consolidation/provider-specific firing alert was observed."
+  },
+  "retained_attempts": [
+    {
+      "operation": "Read-only latest-ended SQL export",
+      "failure": "TypeError: Object of type bytes is not JSON serializable",
+      "recovery": "Converted the blob UUID using uuid.UUID(bytes=...) before serialization, then sanitized it. SQL data were not mutated."
+    },
+    {
+      "operation": "Inspect previously recorded source pin 62e73148fa4712540dab82d7fadf2ebf09a42cec",
+      "outcome": "Object absent from located checkout; GitHub exact-ref contents requests returned HTTP 404 (No commit found for ref).",
+      "recovery": "Used available clean upstream pin 353841d91618d20b110b208de284a74d0b960379 for bounded source review; installed-patch equivalence remains unknown."
+    }
+  ],
+  "private_returned_results": {
+    "sha256": "043d3e03521800c21e1bc08fe1ee21ffe8988d33077ddb165471e3a0168b0a94",
+    "scope": "Sanitized full native responses retained privately; public receipt contains bounded result selections."
+  },
+  "unknowns": {
+    "session_tokens_saved": null,
+    "lifetime_tokens_saved": null,
+    "provider_usage": null,
+    "app_restart_persistence": null,
+    "service_restart_persistence": null,
+    "physical_pc_reboot_persistence": null
+  },
+  "unchanged_runtime": "No installation, restart, model/account/permission change, manual learning, new monitor or broker action. Existing pins and scoped state retained.",
+  "decision": {
+    "status": "retain_installed_selection",
+    "alternative": "Retrying or changing provider immediately was not selected because the actual failure is a quota refusal, not evidence that another memory implementation performs better.",
+    "overturn": "Native quota readiness and a supported recovery command followed by actual successful consolidation, independent stored/MCP readback and preserved failed-generation evidence."
+  }
+}
