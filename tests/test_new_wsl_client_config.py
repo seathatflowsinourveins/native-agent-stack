@@ -598,7 +598,12 @@ class RenderTests(unittest.TestCase):
 
     def test_settings_keep_the_practice_pieces_and_drop_the_old_profile_pieces(self):
         settings = json.loads(self.files["settings.json"])
-        self.assertEqual(settings["model"], "opus[1m]")
+        # The user's choice of 2026-10-04, Opus 5.5, pinned by its full model name (the map's model entry overrides the
+        # shared template's opus[1m], which other hosts keep); the advisor stays the template's.
+        self.assertEqual(settings["model"], "claude-opus-5-5")
+        self.assertEqual(settings["advisorModel"], "fable")
+        self.assertEqual(json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text())["model"],
+                         "opus[1m]")
         self.assertEqual(settings["effortLevel"], "xhigh")
         self.assertNotIn("defaultMode", settings["permissions"])        # an authorization setting: not by default
         self.assertNotIn("allow", settings["permissions"])              # an allow rule is one too
@@ -1708,10 +1713,14 @@ def leaves(node, prefix=()):
 
 class AuthorizationTests(ApplyCase):
     """The settings that grant a permission or suppress a confirmation are written only on request: the four that stand
-    alone, and the tool approval modes and allow rules tied to the slot that wires their server."""
+    alone, the main checkout's Codex trust grant, and the tool approval modes and allow rules tied to the slot that wires
+    their server."""
 
     FOUR = ("claude/settings/setting/permissions.defaultMode", "claude/settings/setting/skipDangerousModePermissionPrompt",
             "codex/config/approval_policy", "codex/config/sandbox_mode")
+    # The coordinator's decision of 2026-10-04: the main checkout is trusted, and Codex looks a linked worktree's trust
+    # up under it (codex-rs/git-utils/src/trust.rs at rust-v0.160.0); every other project still asks.
+    TRUST = ('codex/config/projects."${PROJECT_ROOT}".trust_level',)
     # The tool approval modes of five MCP servers, each tied to the slot that wires its server. context-mode, ai-memory and
     # semble are the interim installs of their slots (amendment 3); SocratiCode and headroom wait, since their slots
     # install another owner.
@@ -1724,18 +1733,19 @@ class AuthorizationTests(ApplyCase):
     # semble's exact-name allow rules for Claude Code (wave-2 code-search ruling, change 3).
     ALLOW = ("claude/settings/permission/allow/mcp__semble__search",
              "claude/settings/permission/allow/mcp__semble__find_related")
-    ALL = FOUR + APPROVAL + ALLOW
+    ALL = FOUR + TRUST + APPROVAL + ALLOW
     SLOT_OF = dict(zip(APPROVAL + ALLOW, (("memory-owner", "ai-memory"), ("code-search", "semble"),
                                           ("context-supply", "context-mode"), ("memory-owner", "ai-memory"),
                                           ("code-search", "SocratiCode"), ("context-supply", "headroom"),
                                           ("code-search", "semble"), ("code-search", "semble"))))
     WAITING = APPROVAL[4:]                        # SocratiCode's and headroom's: their slots install another owner
-    WRITTEN = FOUR + APPROVAL[:4] + ALLOW         # what the option writes today
+    WRITTEN = FOUR + TRUST + APPROVAL[:4] + ALLOW  # what the option writes today
     OPTION = "--with-authorization-settings"
     DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode and "
-                    "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, and the tool approval modes "
-                    "and allow rules of the wired MCP servers are not written, and a value of theirs that a file has is not "
-                    "touched; --with-authorization-settings adds the ones a file lacks)")
+                    "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, the trust_level of the wired "
+                    "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
+                    "and a value of theirs that a file has is not touched; --with-authorization-settings adds the ones a "
+                    "file lacks)")
 
     def render(self, *extra: str):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1768,8 +1778,8 @@ class AuthorizationTests(ApplyCase):
             self.assertIn("not written unless --with-authorization-settings is given", by_key[key].reason)
             self.assertEqual(by_key[key].entry.wiring.partition(":")[0], "authorization")
             self.assertTrue(by_key[key].entry.wiring.partition(":")[2].strip(), "a reason")
-            # The four settings stand alone; a tool approval mode or an allow rule is tied to the slot that wires its
-            # server as well.
+            # The four settings and the trust grant stand alone; a tool approval mode or an allow rule is tied to the slot
+            # that wires its server as well.
             self.assertEqual((by_key[key].entry.slot, by_key[key].entry.owner), self.SLOT_OF.get(key, ("", "")), key)
         deny = [v for v in results if "/permission/deny/" in v.piece.key and v.entry.wiring == "practice"]
         self.assertGreater(len(deny), 100)
@@ -1791,6 +1801,7 @@ class AuthorizationTests(ApplyCase):
         self.assertNotIn("skipDangerousModePermissionPrompt", settings)
         self.assertNotIn("approval_policy", codex)
         self.assertNotIn("sandbox_mode", codex)
+        self.assertNotIn("projects", codex)
         self.assertEqual([name for name, server in codex["mcp_servers"].items() if "default_tools_approval_mode" in server],
                          [])
         settings_on, codex_on = self.render(self.OPTION)
@@ -1801,6 +1812,10 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual({name: server["default_tools_approval_mode"] for name, server in codex_on["mcp_servers"].items()
                           if "default_tools_approval_mode" in server},
                          {"ai-memory": "approve", "semble": "approve", "context-mode": "approve"})
+        # One trust grant, for the host's main checkout (PROJECT_ROOT) and nothing else: no parent directory, and not
+        # the publication checkout the shared template also names.
+        project_root = json.loads((ROOT / "adoption/hosts/example.json").read_text())["PROJECT_ROOT"]
+        self.assertEqual(codex_on["projects"], {project_root: {"trust_level": "trusted"}})
         # The two renders differ in those keys and in nothing else; the deny list is in both.
         for off, on in ((settings, settings_on), (codex, codex_on)):
             self.assertEqual(sorted(set(leaves(on)) - set(leaves(off))), sorted(
@@ -1808,7 +1823,8 @@ class AuthorizationTests(ApplyCase):
                 if on is settings_on else
                 [("approval_policy",), ("sandbox_mode",), ("mcp_servers", "ai-memory", "default_tools_approval_mode"),
                  ("mcp_servers", "semble", "default_tools_approval_mode"),
-                 ("mcp_servers", "context-mode", "default_tools_approval_mode")]))
+                 ("mcp_servers", "context-mode", "default_tools_approval_mode"),
+                 ("projects", project_root, "trust_level")]))
             self.assertEqual(set(leaves(off)) - set(leaves(on)), set())
             self.assertEqual({k: v for k, v in leaves(on).items() if k in leaves(off)}, leaves(off))
         self.assertEqual(settings["permissions"]["deny"], settings_on["permissions"]["deny"])
@@ -1819,8 +1835,10 @@ class AuthorizationTests(ApplyCase):
     ADDED_CLAUDE = f"added: Claude Code permissions.defaultMode, {ALLOW_LABELS}, Claude Code skipDangerousModePermissionPrompt"
     CODEX_CONFIG = ("Codex approval_policy, Codex sandbox_mode, Codex mcp_servers.ai-memory.default_tools_approval_mode, "
                     "Codex mcp_servers.context-mode.default_tools_approval_mode, "
-                    "Codex mcp_servers.semble.default_tools_approval_mode")
+                    "Codex mcp_servers.semble.default_tools_approval_mode, "
+                    'Codex projects."${PROJECT_ROOT}".trust_level')
     STACK_WORKER = "Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode"
+    TRUST_LABEL = 'Codex projects."${PROJECT_ROOT}".trust_level'
 
     def test_a_fresh_apply_writes_none_by_default_and_all_of_them_with_the_option(self):
         self.seed()
@@ -1858,6 +1876,39 @@ class AuthorizationTests(ApplyCase):
                                f"{self.STACK_WORKER}; already the same: {self.ADDED_CLAUDE[len('added: '):]}, "
                                f"{self.CODEX_CONFIG})")
 
+    def test_a_new_codex_home_with_the_option_keeps_the_trust_grant_and_a_second_run_finds_it_the_same(self):
+        # codex_home.py --keep-project-trust: the grant the render holds survives the creation of config.toml, so the
+        # line's "added" is true; the merge of the second run looks the grant up under the path the render filled in
+        # for ${PROJECT_ROOT}, finds it and adds nothing.
+        self.seed()
+        self.assertFalse((self.home / ".codex/config.toml").exists())
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        text = (self.home / ".codex/config.toml").read_text()
+        self.assertTrue(text.startswith("# Written by tools/adoption/codex_home.py --keep-hook-trust "
+                                        "--keep-project-trust from the user config"), text[:200])
+        main_checkout = str(self.home / "code/agent-lab")   # the example host's PROJECT_ROOT, moved under --home
+        self.assertEqual(tomllib.loads(text)["projects"], {main_checkout: {"trust_level": "trusted"}})
+        trust = self.TRUST_LABEL
+        self.assertIn(trust, self.authorization_line(out).split("added: ", 1)[1].split("; ", 1)[0].split(", "))
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        line = self.authorization_line(out)
+        self.assertNotIn("added: ", line)
+        self.assertIn(trust, line.split("already the same: ", 1)[1].split("; ", 1)[0].split(", "))
+        self.assertEqual(tomllib.loads((self.home / ".codex/config.toml").read_text())["projects"],
+                         {main_checkout: {"trust_level": "trusted"}})
+
+    def test_a_trust_answer_the_file_already_has_is_kept_and_named(self):
+        # The person said no to the folder once: the merge keeps the file's answer, and the line says so.
+        main_checkout = str(self.home / "code/agent-lab")
+        self.seed(codex_text=f'[projects."{main_checkout}"]\ntrust_level = "untrusted"\n')
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        config = tomllib.loads((self.home / ".codex/config.toml").read_text())
+        self.assertEqual(config["projects"], {main_checkout: {"trust_level": "untrusted"}})
+        self.assertIn(self.TRUST_LABEL, self.authorization_line(out).split("kept your value: ", 1)[1])
+
     def test_the_destinations_files_gain_them_only_with_the_option(self):
         self.seed(DESTINATION_CLAUDE, DESTINATION_CODEX)
         for extra, present in (((), False), ((self.OPTION,), True)):
@@ -1871,6 +1922,7 @@ class AuthorizationTests(ApplyCase):
                 self.assertEqual("skipDangerousModePermissionPrompt" in settings, present)
                 self.assertEqual("approval_policy" in config, present)
                 self.assertEqual("sandbox_mode" in config, present)
+                self.assertEqual("projects" in config, present)
                 for server in ("ai-memory", "semble", "context-mode"):
                     self.assertEqual("default_tools_approval_mode" in config["mcp_servers"][server], present, server)
                 self.assertEqual(settings["theme"], "auto")                       # the destination's own keys stay
@@ -2109,6 +2161,10 @@ class AuthorizationTests(ApplyCase):
                 ("claude/settings/permission/allow/Bash(ls)", None, True),
                 ("claude/settings/permission/deny/Bash(rm *)", None, False),
                 ("codex/config/approval_policy", "never", True),
+                ('codex/config/projects."/srv/repo".trust_level', "trusted", True),
+                ('codex/config/projects."/srv/repo".trust_level', "untrusted", True),     # a saved answer, either way
+                ('codex/stack-worker/projects."/srv/repo".trust_level', "trusted", True),
+                ('codex/config/projects."/srv/repo".other', "x", False),
                 ("codex/config/model", "gpt-6.1-sol", False)):
             self.assertEqual(cfg.is_authorization_piece(key, value), expected, (key, value))
         # Without the value only the key decides.
@@ -2246,7 +2302,8 @@ class AuthorizationTests(ApplyCase):
         self.assertIn('codex/config/sandbox_mode = "danger-full-access"', block)
         listed = [line for line in block.splitlines() if line.startswith("  claude/") or line.startswith("  codex/")]
         self.assertEqual(len(listed), len(self.ALL))
-        # A tool approval mode or an allow rule says which slot it also waits for; the four settings say nothing of the kind.
+        # A tool approval mode or an allow rule says which slot it also waits for; the four settings and the trust grant
+        # say nothing of the kind.
         for key in self.APPROVAL:
             slot, owner = self.SLOT_OF[key]
             self.assertIn(f'  {key} = "approve"  (and only while slot {slot} installs {owner})', block)
@@ -2270,13 +2327,15 @@ class AuthorizationTests(ApplyCase):
             rows_of_key = [row for row in tables[1].splitlines() if key in row]
             self.assertEqual(len(rows_of_key), 1, key)
             slot_cell = rows_of_key[0].rstrip("|").rsplit("|", 1)[1].strip()
-            self.assertEqual(slot_cell, "-" if key in self.FOUR else "slot `%s` installing `%s`" % self.SLOT_OF[key], key)
+            self.assertEqual(slot_cell, "-" if key in self.FOUR + self.TRUST else
+                             "slot `%s` installing `%s`" % self.SLOT_OF[key], key)
 
     def test_the_help_text_names_the_option_what_it_writes_and_who_it_is_for(self):
         helped = " ".join(cfg.build_parser().format_help().split())
         self.assertIn("--with-authorization-settings", helped)
         for phrase in ("grant a permission or suppress a confirmation", "permissions.defaultMode",
                        "skipDangerousModePermissionPrompt", "approval_policy", "sandbox_mode",
+                       "the trust_level of the host's main checkout in Codex",
                        "neither rendered nor written and a value a file already has is never touched",
                        "a differing one is kept and printed beside the render's",
                        "only on a host whose owner asked for the repository's permission practice"):
