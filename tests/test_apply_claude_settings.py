@@ -238,7 +238,9 @@ class HeldOutHookTests(unittest.TestCase):
         """The shipped strings, and each as the installer renders it for HOME (tests/test_install_claude_profile.py: the
         template's ${HOME} replaced by the home directory)."""
         shipped = [command for command, _ in self.HISTORY]
-        return shipped + [command.replace("${HOME}", self.HOME).replace("$HOME", self.HOME) for command in shipped]
+        import string
+
+        return shipped + [string.Template(command).substitute(HOME=self.HOME) for command in shipped]
 
     def template(self):
         return json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))
@@ -316,15 +318,18 @@ class HeldOutHookTests(unittest.TestCase):
         kept = self.merge({"hooks": entries["hooks"]}, {"hooks": {}}, keep_held_out=True)
         self.assertEqual(kept["hooks"], entries["hooks"])
 
-    def test_outer_whitespace_is_trimmed_and_nothing_else_is(self):
+    def test_no_whitespace_around_a_shipped_command_is_tolerated(self):
+        # The command must equal a shipped string exactly. str.strip() would also remove a no-break space, a next-line character
+        # and a carriage return, which /bin/sh treats as part of a word: `\xa0python3 ...` runs a program named so.
         for command in self.history_commands():
-            self.assertTrue(acs.runs_held_out_hook({"command": f" \t{command}\r\n"}, self.HOME))
-            for tail in (" ;", "\nx", " #", "\\", "  "[:1] + "|| true"):
-                self.assertFalse(acs.runs_held_out_hook({"command": command + tail}, self.HOME), tail)
+            for padded in (" " + command, command + " ", "\t" + command, command + "\n", "\xa0" + command, "\x85" + command,
+                           command + "\r", "\r" + command, command + "\xa0"):
+                with self.subTest(padded=repr(padded[:12] + "..." + padded[-4:])):
+                    self.kept(padded)
 
     def test_no_single_edit_of_a_shipped_command_is_retired(self):
         # The allowlist matches whole strings: deleting, inserting or replacing any one character of any of the six strings
-        # yields a command that is not retired (unless the edit only adds outer whitespace).
+        # yields a command that is not retired (an insertion of ten characters and a replacement by three, at every position).
         allowed = set(self.history_commands())
         checked = 0
         for command in sorted(allowed):
@@ -334,7 +339,7 @@ class HeldOutHookTests(unittest.TestCase):
                     candidates.append(command[:index] + command[index + 1:])
                     candidates += [command[:index] + extra + command[index + 1:] for extra in ("x", " ", ";")]
                 for candidate in candidates:
-                    if candidate.strip() in allowed:
+                    if candidate in allowed:
                         continue
                     checked += 1
                     self.assertFalse(acs.runs_held_out_hook({"command": candidate}, self.HOME), candidate)
@@ -434,24 +439,103 @@ class HeldOutHookTests(unittest.TestCase):
         self.assertEqual(acs.host_home(Path("/home/example/.claude/settings.json")), "/home/example")
         self.assertIsNone(acs.host_home(Path("/home/example/settings.json")))
         self.assertIsNone(acs.host_home(Path("/tmp/x/.claude/other.json")))
+        self.assertIsNone(acs.host_home(Path("/tmp/x/settings.json")))
 
-    def test_applying_to_a_home_retires_the_carrier_rendered_for_that_home(self):
+    def carrier_for(self, home):
+        return f'python3 "{home}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true'
+
+    def settings_with(self, path, command):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"hooks": {"SubagentStart": [{"matcher": "", "hooks": [
+            {"type": "command", "command": "memory-hook"}, {"type": "command", "command": command}]}]}}), encoding="utf-8")
+
+    def applied(self, target):
         import contextlib
         import io
+
+        with contextlib.redirect_stderr(io.StringIO()):
+            acs.apply(ROOT / "adoption/templates/claude.settings.template.json", target, dry_run=False)
+        return target.read_text(encoding="utf-8")
+
+    def test_applying_to_a_home_retires_the_carrier_rendered_for_that_home(self):
         import tempfile
 
         with tempfile.TemporaryDirectory() as scratch:
             home = Path(scratch).resolve()
             target = home / ".claude" / "settings.json"
-            target.parent.mkdir()
-            carrier = f'python3 "{home}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true'
-            target.write_text(json.dumps({"hooks": {"SubagentStart": [{"matcher": "", "hooks": [
-                {"type": "command", "command": "memory-hook"}, {"type": "command", "command": carrier}]}]}}), encoding="utf-8")
-            with contextlib.redirect_stderr(io.StringIO()):
-                acs.apply(ROOT / "adoption/templates/claude.settings.template.json", target, dry_run=False)
-            text = target.read_text(encoding="utf-8")
+            self.settings_with(target, self.carrier_for(home))
+            text = self.applied(target)
             self.assertNotIn("token-lanes", text)
             self.assertIn("memory-hook", text)
+
+    def test_a_relative_target_names_the_home_it_is_in(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as scratch:
+            home = Path(scratch).resolve()
+            self.settings_with(home / ".claude" / "settings.json", self.carrier_for(home))
+            before = Path.cwd()
+            os.chdir(home)
+            try:
+                self.assertEqual(acs.host_home(Path(".claude/settings.json")), str(home))
+                text = self.applied(Path(".claude/settings.json"))
+            finally:
+                os.chdir(before)
+            self.assertNotIn("token-lanes", text)
+
+    def test_an_alias_of_a_home_names_the_real_one(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as scratch:
+            real = Path(scratch).resolve() / "real"
+            alias = Path(scratch).resolve() / "alias"
+            real.mkdir()
+            alias.symlink_to(real, target_is_directory=True)
+            self.settings_with(real / ".claude" / "settings.json", self.carrier_for(real))
+            self.assertEqual(acs.host_home(alias / ".claude" / "settings.json"), str(real))
+            text = self.applied(alias / ".claude" / "settings.json")
+            self.assertNotIn("token-lanes", text)
+
+    def test_a_target_that_is_not_a_homes_claude_settings_retires_nothing(self):
+        # No fallback to the operator's own home: a file outside <home>/.claude/settings.json that holds the command this user's
+        # installer would have rendered keeps it, because whose file it is cannot be told.
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as scratch:
+            target = Path(scratch).resolve() / "elsewhere" / "settings.json"
+            self.settings_with(target, self.carrier_for(Path.home()))
+            text = self.applied(target)
+            self.assertIn("token-lanes-subagent-start.py", text)
+            self.assertIn("memory-hook", text)
+
+    def test_a_home_with_a_trailing_slash_renders_the_same_commands(self):
+        self.assertEqual(acs.carrier_commands(self.HOME + "/"), acs.carrier_commands(self.HOME))
+        self.assertTrue(acs.runs_held_out_hook({"command": self.SUB}, self.HOME + "/"))
+        self.assertFalse(acs.runs_held_out_hook({"command": self.SUB.replace(self.HOME, self.HOME + "/")}, self.HOME + "/"))
+
+    def test_a_home_that_contains_a_placeholder_is_substituted_once(self):
+        # render_config.py substitutes in one pass; sequential replaces would add an alias that it never writes.
+        import string
+
+        home = "/fixture/cash$HOME"
+        expected = {command for command, _ in acs.SHIPPED_CARRIER_COMMANDS}
+        expected |= {string.Template(command).substitute(HOME=home) for command, _ in acs.SHIPPED_CARRIER_COMMANDS}
+        self.assertEqual(set(acs.carrier_commands(home)), expected)
+        doubled = 'python3 "/fixture/cash/fixture/cash$HOME/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true'
+        self.assertNotIn(doubled, acs.carrier_commands(home))
+        self.assertFalse(acs.runs_held_out_hook({"command": doubled}, home))
+
+    def test_without_a_known_home_nothing_is_retired(self):
+        self.assertEqual(acs.carrier_commands(None), frozenset())
+        self.assertEqual(acs.carrier_commands("relative/path"), frozenset())
+        self.assertEqual(acs.carrier_commands(""), frozenset())
+        hook = {"type": "command", "command": self.SUB}
+        self.assertFalse(acs.runs_held_out_hook(hook))
+        base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": [hook]}]}}
+        merged = acs.merge_settings(base, self.template())
+        self.assertIn(hook, [kept for group in merged["hooks"]["SubagentStart"] for kept in group["hooks"]])
+        self.assertFalse(acs.runs_held_out_hook({"command": 'python3 "${HOME}/.claude/hooks/token-lanes-subagent-start.py" '
+                                                           '2>/dev/null || true'}))
 
     def test_a_template_without_hooks_leaves_the_live_hooks_alone(self):
         base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": [{"type": "command", "command": self.SUB}]}]}}

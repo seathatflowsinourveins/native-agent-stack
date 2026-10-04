@@ -28,6 +28,7 @@ import os
 import shlex
 import shutil
 import stat
+import string
 import sys
 import tempfile
 import time
@@ -74,11 +75,13 @@ def command_key(cmd: str) -> str:
 
 # The carrier commands this repository has shipped, as shipped, with where each first appeared (git log -S over the two files that
 # carry hook commands, oldest first). A hook is retired only when its command is one of these strings, or one of them as
-# install_claude_profile.py renders it for the host (its ${HOME} replaced by the host's home directory; tests/test_install_claude_profile.py),
-# byte for byte after trimming outer whitespace. Nothing is parsed or expanded, so nothing a host wrote for itself, a wrapper, a
-# chained command, an option, a substitution or a hand-edited carrier command, can be mistaken for a carrier: it stays. Four
-# rounds of cross-family reads found a defect in every matcher that recognised a grammar; the allowlist is finite and is the only
-# thing to review. A new shipped shape is added here, with its source, in the commit that ships it.
+# render_config.py renders the settings template for the host (one string.Template substitution of its home directory for HOME;
+# tests/test_install_claude_profile.py shows the rendered form), and the command equals it exactly: no trimming, because the shell
+# treats a no-break space, a next-line character or a carriage return around a command as part of a word. Nothing is parsed or
+# expanded, so nothing a host wrote for itself, a wrapper, a chained command, an option, a substitution or a hand-edited carrier
+# command, can be mistaken for a carrier: it stays. Three rounds of cross-family reads found a defect in each matcher that
+# recognised a grammar; the allowlist is finite and is the only thing to review. A new shipped shape is added here, with its source,
+# in the commit that ships it.
 SHIPPED_CARRIER_COMMANDS = (
     ('python3 "${HOME}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true',
      "adoption/templates/claude.settings.template.json, 0c33b37a9 (main, #378; first written as abaa8425d)"),
@@ -91,19 +94,24 @@ SHIPPED_CARRIER_COMMANDS = (
 )
 
 
-def carrier_commands(home: str) -> frozenset:
-    """The strings that retire a hook on the host whose home directory is ``home``: each shipped command as shipped, and as the
-    installer renders it for that host."""
+def carrier_commands(home: str | None) -> frozenset:
+    """The strings that retire a hook on the host whose home directory is ``home`` (an absolute path; a trailing slash is
+    dropped): each shipped command as shipped, and as the renderer writes it for that host. A host whose home is not known (None,
+    or not absolute) has none: retirement then removes nothing."""
+    if not home or not os.path.isabs(home):
+        return frozenset()
+    home = os.path.normpath(home)
     shipped = [command for command, _ in SHIPPED_CARRIER_COMMANDS]
-    rendered = [command.replace("${HOME}", home).replace("$HOME", home) for command in shipped]
+    # One pass, as render_config.py substitutes: a home that itself contains "$HOME" is not expanded a second time.
+    rendered = [string.Template(command).substitute(HOME=home) for command in shipped]
     return frozenset(shipped + rendered)
 
 
 def runs_held_out_hook(entry: dict, home: str | None = None) -> bool:
-    """True when a hooks-array entry's command is exactly a carrier command this repository shipped (SHIPPED_CARRIER_COMMANDS,
-    as shipped or rendered for ``home``, the current user's home by default), outer whitespace aside."""
+    """True when a hooks-array entry's command is exactly a carrier command this repository shipped (SHIPPED_CARRIER_COMMANDS, as
+    shipped or rendered for ``home``): string equality, no trimming. Without a known ``home`` nothing is retired."""
     cmd = hook_command(entry)
-    return cmd is not None and cmd.strip() in carrier_commands(home if home is not None else str(Path.home()))
+    return cmd is not None and cmd in carrier_commands(home)
 
 
 def retire_held_out_hooks(base_hooks, incoming_hooks, home: str | None = None):
@@ -271,8 +279,8 @@ def merge_settings(base: dict, template: dict, keep_held_out: bool = False, home
     live settings), returning a new dict. Rules:
       - `hooks`: combined per event, de-duplicated by command (merge_hooks), after the hook objects that
         run a held-out carrier file are removed from the live hooks (retire_held_out_hooks) unless
-        keep_held_out is true (``home``: the home directory the host's carrier commands were rendered with, the
-        current user's by default)
+        keep_held_out is true (``home``: the home directory the host's carrier commands were rendered with; without
+        one nothing is retired)
       - nested objects (modelSettings, env, permissions, statusLine,
         enabledPlugins, ...): deep-merged, so host-only keys such as extra
         permission rules, plugins or per-model levels are kept
@@ -340,9 +348,15 @@ def atomic_write(target: Path, text: str, mode: int) -> None:
 
 
 def host_home(target_path: Path) -> str | None:
-    """The home directory a settings file belongs to: the parent of its `.claude` directory, else the current user's."""
-    if target_path.name == "settings.json" and target_path.parent.name == ".claude":
-        return str(target_path.parent.parent)
+    """The home directory a settings file belongs to: its resolved path (relative paths made absolute, symlinks followed, so an
+    alias of a home names the real one) must be <home>/.claude/settings.json. Any other path has no home that this tool can
+    name, and retirement then removes nothing: it never borrows the operator's own home for a file that is not theirs."""
+    try:
+        resolved = target_path.resolve()
+    except (OSError, RuntimeError):
+        return None
+    if resolved.name == "settings.json" and resolved.parent.name == ".claude":
+        return str(resolved.parent.parent)
     return None
 
 

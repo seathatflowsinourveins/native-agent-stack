@@ -22,10 +22,12 @@ repository, byte-pinned in `SHA256SUMS`:
 - the SessionStart hook `token-lanes-session-start.py` and its block `token-lanes-block.main.md`.
 
 The template registers neither hook, `install_claude_profile.py` copies none of these files unless `--hook NAME` names
-it, and `apply_claude_settings.py` removes a live hook entry whose command equals, byte for byte, one of the carrier commands this
-repository shipped (`SHIPPED_CARRIER_COMMANDS`, as shipped or with `${HOME}` replaced by the host's home directory, as
-`install_claude_profile.py` renders it); any other hook, including one that wraps, chains or edits a carrier command, is the
-host's and is kept, so a host that applied an older template ends up clean unless it edited the entry itself.
+it, and `apply_claude_settings.py` removes a live hook entry whose command equals, exactly (no trimming), one of the carrier
+commands this repository shipped (`SHIPPED_CARRIER_COMMANDS`, as shipped or with the placeholder replaced by the host's home
+directory, as `render_config.py` renders it). The home is the one the settings file belongs to: its resolved path must be
+`<home>/.claude/settings.json`, and for any other path nothing is removed. Any other hook, including one that wraps, chains or
+edits a carrier command, is the host's and is kept, so a host that applied an older template ends up clean unless it edited the
+entry itself.
 
 ### Opt in on one host
 
