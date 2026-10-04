@@ -4539,8 +4539,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "f9b362b7caec258e13fc06d42894ea8a7a8f9dcc5dd6405a130ff41c7627604d",
-      "bytes": 34163
+      "sha256": "62ec522f64fc9fa782d11b44eb429b408bd7deadb122eff98f92336e9223f583",
+      "bytes": 36668
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -4624,8 +4624,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "550e733dd7c47ea1dd3662c12bf6a56cff44d62578e24ac8f23bbb6851c046a6",
-      "bytes": 16325
+      "sha256": "4a30d0449f0b1fc041647121f4a05d1df209c53eb1f2fd51999843f953a47145",
+      "bytes": 17078
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -16237,6 +16237,11 @@
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
       "sha256": "fbb0b96d881cce318dd73f22d570cf5f903e685905e211211409b17e78fb8088",
       "bytes": 24976
+    },
+    {
+      "path": "docs/decisions/2026-10-04-codex-dated-holds.md",
+      "sha256": "77cd924e5e347929fe38f7f19d4ff25d179da65981c17fca03743d6f14208e68",
+      "bytes": 7862
     },
     {
       "path": "docs/direct-results.md",
@@ -51250,8 +51255,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "5dce41e9a72a965566c24b6c47ae0d887f47f8655763c6c55eb01437efcffad0",
-      "bytes": 100811
+      "sha256": "44fb32b1dc75858d673f87656f4a039520e6e351de8ab3e6ccb5058dc8c343ee",
+      "bytes": 101157
     },
     {
       "path": "observability/README.md",
@@ -51580,8 +51585,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "5017a00d36990b5e576fa17a5761e2ea2c6d879ea72252bb068baf7542b0447d",
-      "bytes": 89443
+      "sha256": "59dec1e9c568ae42a668d584b07bb343df90bf8c53a159f1e8c85760a01243a6",
+      "bytes": 94985
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -52020,8 +52025,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "e0db3aff5a7fcde5c25f2dd06f0a2bcb70fbd2339ac6eab2554a8b897ca31cc0",
-      "bytes": 146852
+      "sha256": "f19fdfcf543e4b32012db48c4d37d3c3433604698b83a9f618f954cc10d82bbb",
+      "bytes": 157034
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -52165,8 +52170,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "b044dbd842570b38de679381208cc193ecf2b1a8d5f22a4139aa6eb9786f0644",
-      "bytes": 155728
+      "sha256": "a8ff33fbbc72a88dd1fdb00aed37464ddff7b02c417304e6938b8b5ce763035c",
+      "bytes": 159042
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -52609,6 +52614,11 @@
       "bytes": 7047
     },
     {
+      "path": "tests/test_pin_holds.py",
+      "sha256": "bad2ec0c5eabc07c180990cbe48bf6e54ff06335bc6aa3d33d6dfdeade60dce5",
+      "bytes": 12791
+    },
+    {
       "path": "tests/test_pit_availability.py",
       "sha256": "4f9cb899edcd84950a71014d4efe588a4d9d70e5ee74f91ecf0c3a40f860c40b",
       "bytes": 20615
@@ -52910,8 +52920,8 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "a5a1d210bded93924796d18c8775fdcf76f31a3b7dd17c0c8a888f547d2194a9",
-      "bytes": 81028
+      "sha256": "3ff8cbb04050a3066fa0372f389d9aaff681ed955bb9cf49a43722fe4225b319",
+      "bytes": 82100
     },
     {
       "path": "tools/adoption/codex_roles.py",
