@@ -4618,13 +4618,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "7fdb79e02c0a2a670bc59e6ad86d4fe43132b93fb003763c1ce4e983505e23f4",
-      "bytes": 87091
+      "sha256": "ff94e93390875a4c6d2baa352fa7075e66acc7a966b33f1ef62338fb9988b7f3",
+      "bytes": 91531
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "95f59e4cc13c2b03237cb6c973b2f8203275eccd1b0eb023c24a6a307db42504",
-      "bytes": 26347
+      "sha256": "317a997ce3e794298d985f035af05285e27bc3690fd9e09be068991a82fe2056",
+      "bytes": 29535
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -4738,8 +4738,8 @@
     },
     {
       "path": "adoption/templates/wsl/first-boot-checklist.md",
-      "sha256": "d3f1a57e53d85cfb6ee02c147564be714c24f85a2d9b6917fa773784be3033b4",
-      "bytes": 14288
+      "sha256": "1a06df0e6d50b07b439317a61a450e450127052589f63254e769d99166e3603b",
+      "bytes": 15192
     },
     {
       "path": "adoption/templates/wsl/stage1-receipt.example.json",
@@ -6824,7 +6824,7 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
-      "sha256": "b95375a7a84315db69c141517980bcf6b1d2de7bdc381de8b96d0ef819ebe48e",
+      "sha256": "23b6648763d838b789cd947670d27f34bdc04a4d35914902f4979a574c20f1b6",
       "bytes": 23065
     },
     {
@@ -16323,6 +16323,11 @@
       "bytes": 15230
     },
     {
+      "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
+      "sha256": "635fb536fb82377c4f1dd8d1acefe73d4fa6cc9298ce578164c372142ac36a8a",
+      "bytes": 16799
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -16584,12 +16589,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "3e699173f1dc25672eb0d95f05e169386a610646db4e3a82e9e67f39814dd41a",
+      "sha256": "54eeb8ea606b3f4f123320dc2f2f7f07c356d969a538c3d935de17b771fa5420",
       "bytes": 561055
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "c540e0af3f9fccd04da00e7ddc73693b7184079455e1327ed961d096ae81f34b",
+      "sha256": "aa04b30d16fc14acac62d0af23e670ad254feb7e59ea85dfe233d361a992f59a",
       "bytes": 323968
     },
     {
@@ -38509,7 +38514,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "80f899426a2b9b9d0a758e5e58227cbe09027852d0aa9bd42e8a8769c565d0ad",
+      "sha256": "09120036b32a73586a8d064c32749f2607819a18cfc298cd7961fd99aa6c573d",
       "bytes": 4174
     },
     {
@@ -52914,8 +52919,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "29840312b7f1e4d65420a8f115952fc6becf5ddae28897ccaa9ca837068bfc76",
-      "bytes": 249439
+      "sha256": "994cc7796bf7995137a1cb117f96705e38fcf10fb9b43d970eca0292b93bc85f",
+      "bytes": 249557
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -53049,8 +53054,8 @@
     },
     {
       "path": "tests/test_wsl_new_distro_recipe.py",
-      "sha256": "20cbc7e07820a85700749d350a25779047fdb5de97ea9b0243c41d3f965d82ee",
-      "bytes": 219736
+      "sha256": "a05c758abd049d8d5f50459b39b223ad0d96bd5960b2dccc50bfc1ab7d09e8f3",
+      "bytes": 220273
     },
     {
       "path": "tests/test_wsl_restore.py",
