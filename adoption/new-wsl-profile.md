@@ -5,6 +5,8 @@ reconciled with accepted main `85543efe5abcddb7b7cddb14e8774e83b6758616`; its Co
 recommendations and isolated comparison arms. It establishes no merit winner,
 provider/model/GPU result or replacement-host acceptance.
 
+The RTK and mcporter source rows follow [PR #693](https://github.com/seathatflowsinourveins/native-agent-stack/pull/693), main `14048b840425c2569e0df60a6596e94e601da15b`: **RTK 0.51.0** and **mcporter 0.14.2**. The RTK archive SHA-256 is checked against the [release checksums](https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt); the mcporter tarball is rehashed and checked against [npm integrity](https://registry.npmjs.org/mcporter/0.14.2). This source refresh establishes no new host acceptance.
+
 The native manifest profile is `new-wsl-clean-foundation`. Its component list is
 only Codex and Claude Code; the existing bootstrap adds its pinned Node, uv and
 gh prerequisites. CPython 3.13.15 is supplied through uv without replacing the

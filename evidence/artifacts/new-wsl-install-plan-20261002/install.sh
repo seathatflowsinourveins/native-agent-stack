@@ -383,15 +383,15 @@ ccusage() {
 }
 
 command-output() {
-  # RTK 0.50.0 | release-binary | planned
+  # RTK 0.51.0 | release-binary | planned
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04 (the owner's decision, amendment 4), after every recorded run of this plan.
-  # Planned. Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L113 (the Linux release asset); https://github.com/rtk-ai/rtk/releases/tag/v0.50.0 (its sha256: the release's checksums.txt line, adoption/pins-linux-x86_64.json)
-  run_command 'fetch_verified https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89 "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/rtk-0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz"' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L113 (the Linux release asset); https://github.com/rtk-ai/rtk/releases/tag/v0.51.0 (its sha256: the release's checksums.txt line, adoption/pins-linux-x86_64.json)
+  run_command 'fetch_verified https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/rtk-0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz"' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/recipes/README.md#L59 (extract into the empty versioned prefix); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/bootstrap-linux.sh#L414 (the link into the ecosystem root's bin, where the client templates run ${ECO_ROOT}/bin)
-  run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; mkdir -p "$e/tools/rtk-0.50.0" "$e/bin"; tar -xf "$e/downloads/rtk-0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz" -C "$e/tools/rtk-0.50.0"; [[ -x "$e/tools/rtk-0.50.0/rtk" ]]; ln -sfn "$e/tools/rtk-0.50.0/rtk" "$e/bin/rtk"' || return "$?"
-  # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.50.0/src/core/config.rs (Linux config path); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/recipes/README.md#L163 (the exact five exclusions); copy_config above (preserve existing files).
+  run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; mkdir -p "$e/tools/rtk-0.51.0" "$e/bin"; tar -xf "$e/downloads/rtk-0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz" -C "$e/tools/rtk-0.51.0"; [[ -x "$e/tools/rtk-0.51.0/rtk" ]]; ln -sfn "$e/tools/rtk-0.51.0/rtk" "$e/bin/rtk"' || return "$?"
+  # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs (Linux config path); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/recipes/README.md#L163 (the exact five exclusions); copy_config above (preserve existing files).
   run_command 'rtk_config_dir="$HOME/.config/rtk"; if [[ "${XDG_CONFIG_HOME:-}" == /* ]]; then rtk_config_dir="$XDG_CONFIG_HOME/rtk"; fi; mkdir -p -- "$rtk_config_dir"; if [[ ! -e "$rtk_config_dir/config.toml" ]]; then install -m 0600 -- "$plan_dir/config/rtk-config.toml" "$rtk_config_dir/config.toml"; elif ! cmp -s -- "$plan_dir/config/rtk-config.toml" "$rtk_config_dir/config.toml"; then printf "Existing RTK config.toml differs; retained. Review hook exclusions before client configuration.\n" >&2; fi' || return "$?"
-  # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L2940-L2952 (hook check output and exit status); https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1540-L1569 (exclude_commands). Verify before the client hook can be wired.
+  # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.51.0/src/main.rs#L3072-L3100 (hook check output and exit status); https://github.com/rtk-ai/rtk/blob/v0.51.0/src/discover/registry.rs#L1553-L1582 (exclude_commands). Verify before the client hook can be wired.
   run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; for command in "git show HEAD:README.md | tail -20" "diff a b" "jq . x.json" "git branch -a"; do rc=0; decision=$(RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" hook check "$command" 2>&1) || rc=$?; [[ "$rc" -eq 1 && "$decision" == "No rewrite for: $command" ]]; done; decision=$(RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" hook check "git status" 2>&1); [[ "$decision" == "rtk git status" ]]' || return "$?"
 }
 
@@ -405,7 +405,7 @@ output-compression() {
 code-index() {
   # jcodemunch-mcp 1.108.319 | uv-tool | planned
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04 (the owner's decision, amendment 4), after every recorded run of this plan.
-  # Planned. Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91 (uv tool install jcodemunch-mcp); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/recipes/README.md#L521 (the pin, --python 3.13 and the ecosystem root)
+  # Planned. Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91 (uv tool install jcodemunch-mcp); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L523 (the pin, --python 3.13 and the ecosystem root)
   run_command 'UV_TOOL_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools" UV_TOOL_BIN_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin" uv tool install --python 3.13 jcodemunch-mcp==1.108.319' || return "$?"
 }
 
@@ -714,7 +714,7 @@ research-harnesses() {
 
 credential-guard() {
   # Command and secret-path guard (K4) | repository-recipe | planned
-  printf '%s\n' 'UNRUN. Follow adoption/bootstrap.md step 4a guard hooks and settings. No new install command. Recipe source is this checkout commit; selected release metadata retained. No isolated upstream smoke/version command for the combined practice. Recipe/source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap.md#L400'
+  printf '%s\n' 'UNRUN. Follow adoption/bootstrap.md step 4a guard hooks and settings. No new install command. Recipe source is this checkout commit; selected release metadata retained. No isolated upstream smoke/version command for the combined practice. Recipe/source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/bootstrap.md#L412'
 }
 
 convergence-validators() {
@@ -752,7 +752,7 @@ if $list; then
   printf '%s\n' 'ccusage | ccusage 20.0.26 | none | planned'
   printf '%s\n' 'context-supply | context-mode 1.0.169 | none | planned'
   printf '%s\n' 'statusline | claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line | none | planned'
-  printf '%s\n' 'command-output | RTK 0.50.0 | release-binary | planned'
+  printf '%s\n' 'command-output | RTK 0.51.0 | release-binary | planned'
   printf '%s\n' 'output-compression | Headroom 0.37.0 (headroom-ai[mcp], MCP server only) | uv-tool | planned'
   printf '%s\n' 'code-index | jcodemunch-mcp 1.108.319 | uv-tool | planned'
   printf '%s\n' 'code-graph | codebase-memory-mcp 0.11.0 | release-binary | planned'

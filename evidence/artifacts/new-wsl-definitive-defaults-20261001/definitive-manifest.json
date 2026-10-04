@@ -56,7 +56,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "4c388fa43259c86a588f69fe8b8ade80ec0cd018713ad8eca6ddb4afb3d107b4"
+   "sha256": "9a453a1d6a6f9ac685c403b41a9b611f9849050c4dee3bf36428631d6289aef2"
   }
  },
  "counts": {
@@ -1789,7 +1789,7 @@
    "layer_id": "token-efficiency",
    "slot_id": "command-output",
    "row_kind": "owner_decision",
-   "default": "RTK 0.50.0",
+   "default": "RTK 0.51.0",
    "repository": "https://github.com/rtk-ai/rtk",
    "installs_nothing_extra": false,
    "definitive": false,
@@ -1805,24 +1805,26 @@
     "by": "the owner's decision of 2026-10-04",
     "batch": "wave3",
     "reason": "the owner's order installs the token-efficiency repositories by default; RTK is the first core row of docs/token-efficiency-stack.json (compact supported command outputs, keep failure and raw recovery). Claude Code's Bash hook rewrites supported commands; Codex calls rtk explicitly at this pin",
-    "pin": "tag v0.50.0; release asset rtk-x86_64-unknown-linux-musl.tar.gz, sha256 bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89 (adoption/pins-linux-x86_64.json; the release's checksums.txt and the GitHub asset digest read 2026-10-04 state the same digest)",
-    "install": "the install plan's command-output function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/rtk-0.50.0 and linked into ${ECO_ROOT}/bin",
+    "pin": "tag v0.51.0; release asset rtk-x86_64-unknown-linux-musl.tar.gz, sha256 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 (adoption/pins-linux-x86_64.json; the release's checksums.txt and the GitHub asset digest read 2026-10-04 state the same digest)",
+    "install": "the install plan's command-output function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/rtk-0.51.0 and linked into ${ECO_ROOT}/bin",
     "usage_rules": [
-     "the pin stays 0.50.0: v0.51.0 (2026-10-02) lists a breaking CLI change (callers that relied on implicit shell expansion in positional arguments must pass the script explicitly), so a move is its own qualification",
-     "never run rtk init --global --codex at 0.50.0 (docs/token-session-handbook.md:373); Codex uses explicit rtk commands",
+     "the pin follows main 14048b840 after PR #693: v0.51.0 requires --shell for executable positional scripts that need shell expansion; the plan uses direct git/proxy arguments and hook-check inspection strings",
+     "retain explicit rtk commands for Codex; this plan never runs rtk init --global --codex (docs/token-session-handbook.md:373)",
      "RTK_TELEMETRY_DISABLED=1 in both clients; rtk proxy returns the raw output when a condensed result is unusable"
     ],
     "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without RTK against the full stack and the lean base), or the fresh-session invocation census, reports that RTK adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
     "open_acceptance_gates": [
-     "${ECO_ROOT}/bin/rtk reports 0.50.0, and rtk git log -3 and rtk proxy git log -3 both return in a checkout",
+     "${ECO_ROOT}/bin/rtk reports 0.51.0, and rtk git log -3 and rtk proxy git log -3 both return in a checkout",
      "a Claude Code Bash call to a supported command is rewritten by the hook, and rtk gain --format json reads back the session's counters"
     ],
     "sources": [
      "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
      "docs/token-efficiency-stack.json (rows[component_id=rtk].upstream_commands)",
      "recipes/README.md (Official release archives; the rtk row)",
-     "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-     "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0"
+     "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+     "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt",
+     "https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs#L119-L123",
+     "docs/decisions/2026-10-04-token-full-stack-owner-default.md (Refresh onto main after PR #693)"
     ]
    }
   },

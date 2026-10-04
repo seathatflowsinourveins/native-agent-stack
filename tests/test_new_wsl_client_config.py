@@ -386,7 +386,7 @@ class MapTests(unittest.TestCase):
         hook = "claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude"
         verdicts = {v.piece.key: v for v in cfg.analyse(ROOT)[0]}
         self.assertTrue(verdicts[hook].wired)
-        self.assertIn("slot command-output installs RTK 0.50.0", verdicts[hook].reason)
+        self.assertIn("slot command-output installs RTK 0.51.0", verdicts[hook].reason)
         with tempfile.TemporaryDirectory() as tmp:     # a directive adds an owner beside a different installed default
             root = make_catalog(Path(tmp))
 

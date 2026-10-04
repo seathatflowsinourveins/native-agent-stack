@@ -1183,8 +1183,8 @@
           "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/ccusage\" --version)\" == \"ccusage 20.0.26\" ]]",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/pins-linux-x86_64.json#L282",
-            "line": 282
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/pins-linux-x86_64.json#L309",
+            "line": 309
           }
         }
       },
@@ -1287,14 +1287,14 @@
     {
       "layer": "token-efficiency",
       "slot": "command-output",
-      "owner": "RTK 0.50.0",
+      "owner": "RTK 0.51.0",
       "repository": "https://github.com/rtk-ai/rtk",
-      "release": "v0.50.0",
+      "release": "v0.51.0",
       "installed": true,
       "route": "release-binary",
       "commands": [
-        "fetch_verified https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/rtk-0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz\"",
-        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; mkdir -p \"$e/tools/rtk-0.50.0\" \"$e/bin\"; tar -xf \"$e/downloads/rtk-0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz\" -C \"$e/tools/rtk-0.50.0\"; [[ -x \"$e/tools/rtk-0.50.0/rtk\" ]]; ln -sfn \"$e/tools/rtk-0.50.0/rtk\" \"$e/bin/rtk\"",
+        "fetch_verified https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/rtk-0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; mkdir -p \"$e/tools/rtk-0.51.0\" \"$e/bin\"; tar -xf \"$e/downloads/rtk-0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz\" -C \"$e/tools/rtk-0.51.0\"; [[ -x \"$e/tools/rtk-0.51.0/rtk\" ]]; ln -sfn \"$e/tools/rtk-0.51.0/rtk\" \"$e/bin/rtk\"",
         "rtk_config_dir=\"$HOME/.config/rtk\"; if [[ \"${XDG_CONFIG_HOME:-}\" == /* ]]; then rtk_config_dir=\"$XDG_CONFIG_HOME/rtk\"; fi; mkdir -p -- \"$rtk_config_dir\"; if [[ ! -e \"$rtk_config_dir/config.toml\" ]]; then install -m 0600 -- \"$plan_dir/config/rtk-config.toml\" \"$rtk_config_dir/config.toml\"; elif ! cmp -s -- \"$plan_dir/config/rtk-config.toml\" \"$rtk_config_dir/config.toml\"; then printf \"Existing RTK config.toml differs; retained. Review hook exclusions before client configuration.\\n\" >&2; fi",
         "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; for command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do rc=0; decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?; [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]; done; decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1); [[ \"$decision\" == \"rtk git status\" ]]"
       ],
@@ -1308,26 +1308,26 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L113",
+        "url": "https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L113",
         "line": 113
       },
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n[[ \"$(\"$e/bin/rtk\" --version)\" == \"rtk 0.50.0\" ]]\ncd \"$repo_root\"\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" git log -n 3\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" proxy git log -n 3\ne=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\nfor command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do\n  rc=0\n  decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?\n  [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]\ndone\ndecision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1)\n[[ \"$decision\" == \"rtk git status\" ]]",
+          "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n[[ \"$(\"$e/bin/rtk\" --version)\" == \"rtk 0.51.0\" ]]\ncd \"$repo_root\"\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" git log -n 3\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" proxy git log -n 3\ne=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\nfor command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do\n  rc=0\n  decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?\n  [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]\ndone\ndecision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1)\n[[ \"$decision\" == \"rtk git status\" ]]",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L121",
+            "url": "https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L121",
             "line": 121
           }
         }
       },
       "config_paths": [
-        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/rtk-0.50.0",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/rtk-0.51.0",
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/rtk",
         "$XDG_CONFIG_HOME/rtk/config.toml (absolute XDG_CONFIG_HOME only; otherwise $HOME/.config/rtk/config.toml)"
       ],
-      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The release archive goes through the plan's checksum-verified download (fetch_verified) instead of gh release download, so the plan needs no GitHub sign-in; the digest is the one adoption/pins-linux-x86_64.json records (the release's checksums.txt line and the GitHub asset digest), and the archive holds only the rtk executable (listed 2026-10-04). The pin stays 0.50.0: v0.51.0 (2026-10-02) lists a breaking CLI change. The command-output slot installs the binary and the recipe's exact five-entry [hooks] exclude_commands table at RTK's Linux config path ($XDG_CONFIG_HOME/rtk/config.toml only when XDG_CONFIG_HOME is absolute; otherwise $HOME/.config/rtk/config.toml), mode 0600, preserving existing files and warning on a difference. Native hook checks verify the four exclusions and a git status positive control before client configuration can wire the hook. The Claude Code hook and RTK_TELEMETRY_DISABLED=1 remain the client configuration's; rtk init --global --codex is never run at 0.50.0 (Codex calls rtk explicitly)."
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The release archive goes through the plan's checksum-verified download (fetch_verified) instead of gh release download, so the plan needs no GitHub sign-in; the digest is the one adoption/pins-linux-x86_64.json records (the release's checksums.txt line and the GitHub asset digest), and the archive holds only the rtk executable (listed 2026-10-04). The pin follows main 14048b840 after PR #693: v0.51.0 requires --shell for executable positional scripts that need shell expansion; the plan uses direct arguments and hook-check inspection strings. The Linux archive was fetched again and rehashed against the v0.51.0 publisher checksums.txt on 2026-10-04. The command-output slot installs the binary and the recipe's exact five-entry [hooks] exclude_commands table at RTK's Linux config path ($XDG_CONFIG_HOME/rtk/config.toml only when XDG_CONFIG_HOME is absolute; otherwise $HOME/.config/rtk/config.toml), mode 0600, preserving existing files and warning on a difference. Native hook checks verify the four exclusions and a git status positive control before client configuration can wire the hook. The Claude Code hook and RTK_TELEMETRY_DISABLED=1 remain the client configuration's; rtk init --global --codex is never run by this plan (Codex calls rtk explicitly)."
     },
     {
       "layer": "token-efficiency",
@@ -1526,8 +1526,8 @@
           "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n[[ \"$(\"$e/bin/toon\" --version)\" == 4.1.1 ]]\nprobe=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$probe\"' EXIT\nprintf '%s\\n' '[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]' > \"$probe/records.json\"\n\"$e/bin/toon\" \"$probe/records.json\" -o \"$probe/records.toon\"\n\"$e/bin/toon\" \"$probe/records.toon\" --decode --strict -o \"$probe/recovered.json\"\njq -e --slurpfile a \"$probe/records.json\" --slurpfile b \"$probe/recovered.json\" -n '$a == $b' >/dev/null",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/pins-linux-x86_64.json#L267",
-            "line": 267
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/pins-linux-x86_64.json#L294",
+            "line": 294
           }
         }
       },
@@ -3314,8 +3314,8 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap.md#L400",
-        "line": 400
+        "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/bootstrap.md#L412",
+        "line": 412
       },
       "service": null,
       "acceptance": {
@@ -3323,8 +3323,8 @@
           "command": null,
           "kind": "unavailable",
           "source": {
-            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap.md#L400",
-            "line": 400
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/bootstrap.md#L412",
+            "line": 412
           },
           "reason": "Repository adoption practice; no standalone host self-test or version command was found in the cited recipe."
         }

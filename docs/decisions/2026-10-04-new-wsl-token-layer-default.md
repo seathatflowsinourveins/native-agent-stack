@@ -114,8 +114,8 @@ Apply from current `main`, never from an older checkout on the destination:
 
 ## Counts
 
-`--check` now counts: 386 pieces, 315 wired (211 practice, 104 through a slot), 59 not wired (30 through a slot that
-does not install, 29 by their own entry) and 12 authorization pieces. The 2026-10-02 record's counts sentence and its
+`--check` now counts: 404 pieces, 354 wired (207 practice, 147 through a slot), 35 not wired (0 through a slot that
+does not install, 35 by their own entry) and 15 authorization pieces. The 2026-10-02 record's counts sentence and its
 `--check --markdown` tables are recounted in the same change. The branch `c5/new-wsl-codex-0160` edits the same
 sentence, so whichever of the two lands second recounts it.
 

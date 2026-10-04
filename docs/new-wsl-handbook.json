@@ -178,7 +178,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "4c388fa43259c86a588f69fe8b8ade80ec0cd018713ad8eca6ddb4afb3d107b4"
+          "sha256": "9a453a1d6a6f9ac685c403b41a9b611f9849050c4dee3bf36428631d6289aef2"
         },
         "convergence": {
           "file": "convergence.json",
@@ -2316,7 +2316,7 @@
             "catalog": "foundation",
             "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
             "coincides_with_lane_record": null,
-            "default": "RTK 0.50.0",
+            "default": "RTK 0.51.0",
             "definitive": false,
             "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
             "installs_nothing_extra": false,
@@ -2328,25 +2328,27 @@
             "resolution": {
               "batch": "wave3",
               "by": "the owner's decision of 2026-10-04",
-              "install": "the install plan's command-output function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/rtk-0.50.0 and linked into ${ECO_ROOT}/bin",
+              "install": "the install plan's command-output function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/rtk-0.51.0 and linked into ${ECO_ROOT}/bin",
               "open_acceptance_gates": [
-                "${ECO_ROOT}/bin/rtk reports 0.50.0, and rtk git log -3 and rtk proxy git log -3 both return in a checkout",
+                "${ECO_ROOT}/bin/rtk reports 0.51.0, and rtk git log -3 and rtk proxy git log -3 both return in a checkout",
                 "a Claude Code Bash call to a supported command is rewritten by the hook, and rtk gain --format json reads back the session's counters"
               ],
               "outcome": "added_by_owner_decision",
               "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without RTK against the full stack and the lean base), or the fresh-session invocation census, reports that RTK adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
-              "pin": "tag v0.50.0; release asset rtk-x86_64-unknown-linux-musl.tar.gz, sha256 bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89 (adoption/pins-linux-x86_64.json; the release's checksums.txt and the GitHub asset digest read 2026-10-04 state the same digest)",
+              "pin": "tag v0.51.0; release asset rtk-x86_64-unknown-linux-musl.tar.gz, sha256 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 (adoption/pins-linux-x86_64.json; the release's checksums.txt and the GitHub asset digest read 2026-10-04 state the same digest)",
               "reason": "the owner's order installs the token-efficiency repositories by default; RTK is the first core row of docs/token-efficiency-stack.json (compact supported command outputs, keep failure and raw recovery). Claude Code's Bash hook rewrites supported commands; Codex calls rtk explicitly at this pin",
               "sources": [
                 "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
                 "docs/token-efficiency-stack.json (rows[component_id=rtk].upstream_commands)",
                 "recipes/README.md (Official release archives; the rtk row)",
-                "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-                "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0"
+                "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+                "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt",
+                "https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs#L119-L123",
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md (Refresh onto main after PR #693)"
               ],
               "usage_rules": [
-                "the pin stays 0.50.0: v0.51.0 (2026-10-02) lists a breaking CLI change (callers that relied on implicit shell expansion in positional arguments must pass the script explicitly), so a move is its own qualification",
-                "never run rtk init --global --codex at 0.50.0 (docs/token-session-handbook.md:373); Codex uses explicit rtk commands",
+                "the pin follows main 14048b840 after PR #693: v0.51.0 requires --shell for executable positional scripts that need shell expansion; the plan uses direct git/proxy arguments and hook-check inspection strings",
+                "retain explicit rtk commands for Codex; this plan never runs rtk init --global --codex (docs/token-session-handbook.md:373)",
                 "RTK_TELEMETRY_DISABLED=1 in both clients; rtk proxy returns the raw output when a condensed result is unusable"
               ]
             },
@@ -7475,7 +7477,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "2e08dad68097c0ddf64f1e0b79637d755e9a6b468fe7a83ecd74fa2892d723f0"
+      "sha256": "48a1db80f4cbbeecc975d275d4ed92e71d8f1cc06a5e918259c9aab3e52c1ab2"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -7483,7 +7485,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "b905accb2b2893a038149acf4e2bdb3454c132c9eadfdc858ae0db173082f2c3"
+      "sha256": "35306c969c85d2cd3234d0dae17fcdc31673e729f1c7d2cfe625d5fcd7fd4813"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7595,7 +7597,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "b538e85fafaca27fbb57ac0845025defac708bf2b5ccd6aa09cf97468dbdf084"
+      "sha256": "52eecda21c4824cfae1c39dc334afcb7a4d2e54cf24e1af3e496ae3a1f00d29b"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7619,7 +7621,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "4c388fa43259c86a588f69fe8b8ade80ec0cd018713ad8eca6ddb4afb3d107b4"
+      "sha256": "9a453a1d6a6f9ac685c403b41a9b611f9849050c4dee3bf36428631d6289aef2"
     }
   ],
   "stage_order": [
@@ -8058,7 +8060,7 @@
       "acceptance": {
         "command": "pnpm test",
         "evidence_class": "upstream_test_command_not_executed",
-        "source": "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md"
+        "source": "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md"
       },
       "aliases": [
         "mcporter"
@@ -8067,8 +8069,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://registry.npmjs.org/mcporter/0.14.1",
-        "value": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2"
+        "source": "https://registry.npmjs.org/mcporter/0.14.2",
+        "value": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b"
       },
       "documented_install": [
         {
@@ -8081,20 +8083,25 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/mcp-surfaces.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
-        "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md"
+        "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md",
+        "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md",
+        "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md"
       ],
       "install": {
-        "command": "npm install -g mcporter@0.14.1",
+        "command": "npm install -g mcporter@0.14.2",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "prerequisites": [
+          "Node 24 or newer; ps on the daemon launch PATH."
+        ],
         "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md"
+        "source": "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md"
       },
       "name": "mcporter",
       "owner_layer_id": "mcp-surfaces",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "npm:mcporter",
-      "pin": "0.14.1",
+      "pin": "0.14.2",
       "position": 1,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/openclaw/mcporter",
@@ -9326,8 +9333,8 @@
         "prerequisites": [
           "A git checkout."
         ],
-        "scope": "Upstream's one-line commit example in a checkout; rtk proxy git log -n 10 returns the raw output when a condensed result is unusable (README line 309).",
-        "source": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md#L193"
+        "scope": "Upstream's one-line commit example in a checkout; rtk proxy git log -n 10 returns the raw output when a condensed result is unusable (README line 313).",
+        "source": "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L193"
       },
       "aliases": [
         "rtk-ai/rtk",
@@ -9337,8 +9344,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://api.github.com/repos/rtk-ai/rtk/releases/tags/v0.50.0",
-        "value": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89"
+        "source": "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt",
+        "value": "5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5"
       },
       "documented_install": [
         {
@@ -9356,22 +9363,24 @@
         "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-        "docs/token-efficiency-stack.json"
+        "docs/token-efficiency-stack.json",
+        "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md",
+        "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt"
       ],
       "install": {
-        "command": "gh release download v0.50.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-0.50.0\" && (cd \"$STACK_HOME/downloads/rtk-0.50.0\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")",
+        "command": "gh release download v0.51.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-0.51.0\" && (cd \"$STACK_HOME/downloads/rtk-0.51.0\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")",
         "execution_status": "UNRUN",
-        "pinning_source": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md#L113",
+        "pinning_source": "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L113",
         "prerequisites": [
           "tar and sha256sum."
         ],
-        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. This replaces the UNRUN cargo build of the tagged source: the release binary is the asset the recorded sha256 identifies. The Claude Code hook and its exclude_commands are the client configuration's; rtk init --global --codex is never run at 0.50.0.",
-        "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/recipes/README.md#L41"
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. This replaces the UNRUN cargo build of the tagged source: the release binary is the asset the recorded sha256 identifies. The Claude Code hook and its exclude_commands are the client configuration's; rtk init --global --codex is never run at 0.51.0.",
+        "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L41"
       },
       "name": "RTK",
       "owner_layer_id": "token-efficiency",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "0.50.0",
+      "pin": "0.51.0",
       "position": 14,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/rtk-ai/rtk",

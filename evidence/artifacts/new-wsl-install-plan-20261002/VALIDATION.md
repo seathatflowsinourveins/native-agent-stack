@@ -367,3 +367,52 @@ The container cannot establish these conditions; check them on the real distribu
 Unresolved evidence limits: the suppressed original mise/chezmoi/Codex diagnostic rows cannot be recovered from these logs. Five workflow/adoption rows have no source-backed host executable check, so their explicit unavailable entries are skipped. Neither a skip, source review, configuration validation nor a version proves provider/GPU/service acceptance. All revised target-distribution commands remain unrun; no upstream failure was waived.
 
 Historical: executed checks for the round 1 revision (the first plan, 53 rows; the current plan has 69 rows: the checks of its 64-row revision are in the first two sections above, and those of the five rows added from the layer consensus, which have not run anywhere, are in the third): the requested Python JSON load, `bash -n` on both scripts and `bash install.sh --list` all returned 0. The list retained all 53 rows. TOML parsing, stage/schema/source agreement, all 156 slot/stage combinations, default/all-owner stages, unavailable/excluded skips, nonzero failure propagation and invalid arguments passed local fixtures. Additional Bash fixtures caught the original caller-directory and doctor-only false-pass patterns and verified the repairs. All 16 passing acceptance objects, original model/research examples, original HTTP endpoints and all seven exclusions were compared with the original plan and retained. The entire plan folder passed a personal-path/user-name scan; `git diff --check` passed. The fixtures ran no native owner programs, stack services or models. Independent Astra/Max source review confirmed the two review fixes and reported no remaining follow-up findings.
+
+## PR #684 refresh after PR #693 (2026-10-04)
+
+Source and repository checks only, against main
+`14048b840425c2569e0df60a6596e94e601da15b`. The active RTK rows now select
+0.51.0. A fresh Linux archive has SHA-256
+`5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5`, matching the
+[v0.51.0 publisher checksums](https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt)
+and release asset digest. The mcporter profile now selects 0.14.2; its fresh npm
+archive has SHA-256
+`f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b`, and its SHA-512
+and SHA-1 match the registry metadata. The claude-hud row already selected 0.10.0;
+the upstream tag resolves to `75683c6de1ac07f6bbef00d739001679dba0740c` and its
+plugin manifest states 0.10.0. No installation or acceptance function ran on a
+WSL distribution. The earlier RTK 0.50.0 observations above retain their dates.
+
+The persisted RTK TOML already matches the recipe byte for byte: one `[hooks]`
+table with five `exclude_commands` patterns, including the global-option forms
+of git show and git branch. The existing integration test checks that file and
+the plan's preservation of existing configuration. The release's positional
+shell change does not require a rewrite of the direct git/proxy and hook-check
+calls. The source ranges in the comments follow v0.51.0.
+
+The first full requested test run returned 1: 780 tests, five failures, five
+skips. The corrections were a stale RTK version assertion, removal of two
+unnecessary comments so the persisted TOML remains the exact upstream recipe
+projection, the current dropped-unit list in the client record, the profile
+input digest in the handbook receipt, and the architecture citation format.
+The latter was first changed to archived URLs in `pin_source`; the existing
+public generator requires local repository locators there
+(`scripts/build_ecosystem.py`, `architecture_pin_source`). Those locators now
+resolve the component fields on main, while the original sources for the dated
+pins remain explicit in `edition.scope`. No generator contract was changed.
+
+The subsequent full requested suite passed: 780 tests, five skips, exit 0.
+`new_wsl_client_config.py --check` passed with 404 pieces: 354 wired (207
+practice, 147 through a slot), 35 not wired and 15 authorization pieces.
+`check_plan.py` passed: 80 rows, 56 installed, 3 measurement-only, 21 not
+installed; 118 commands and 78 acceptance entries agree with the scripts.
+The handbook check and `git diff --check` passed. Receipt input and output
+digests were replaced in place without reformatting it.
+
+`validate.py` returned 1 with only registered SHA-256/byte-count drift. The
+protected `manifests/evidence.json` remains the coordinator's. The same drift
+blocks `validate_convergence.py --all-recorded` during record discovery; every
+one of its 30 declared records passes the validator's supported positional
+record mode, exit 0. Re-run the discovery mode after the coordinator refreshes
+the registry. The known RTK grep file-list exactness control is still a separate
+repair; `scripts/native_token_ci.py` was not edited.

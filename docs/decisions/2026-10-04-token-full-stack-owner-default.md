@@ -242,3 +242,47 @@ integration checks, not upstream acceptance.
 
 - For a row: its removal check reports a result, or the owner withdraws the row. A result removes nothing by itself.
 - For the batch: the owner withdraws this decision, or asks for the lean base again.
+
+## Refresh onto main after PR #693 (2026-10-04)
+
+PR #684 follows main `14048b840425c2569e0df60a6596e94e601da15b` for RTK **0.51.0**
+and mcporter **0.14.2**. The statusline row already uses claude-hud **0.10.0**.
+This refresh serves the clean foundation for the US-equities research and historical
+simulation north star. It changes source contracts and their generated projections;
+the destination's installation and session acceptance remain unrun.
+
+The RTK Linux asset was downloaded again and its SHA-256,
+`5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5`, matches the
+v0.51.0 publisher's [checksums.txt](https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt)
+and release asset digest. The [release](https://github.com/rtk-ai/rtk/releases/tag/v0.51.0)
+is at `e001f773f80b22b7dc4c7a79521b30e35aaef026`. Its breaking CLI change requires
+`--shell` for executable positional scripts that need shell expansion. The plan's
+git, proxy and hook-check calls use direct arguments. Keep one `[hooks]` table with
+the five `exclude_commands` entries that
+[main's bootstrap paragraph](https://github.com/seathatflowsinourveins/native-agent-stack/blob/14048b840425c2569e0df60a6596e94e601da15b/adoption/bootstrap.md#L551)
+requires; the persisted configuration already had those entries. Upstream declares
+the field in [config.rs](https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs#L119-L123).
+
+The mcporter profile's 0.14.1 recommendation moves to 0.14.2, matching the install
+plan and main. A fresh [registry tarball](https://registry.npmjs.org/mcporter/-/mcporter-0.14.2.tgz)
+has SHA-256 `f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b`;
+its SHA-512 and SHA-1 match the [registry metadata](https://registry.npmjs.org/mcporter/0.14.2).
+The supported install and test commands remain `npm install -g mcporter@0.14.2`
+and `pnpm test`, from [README at the pinned source](https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md#L28).
+The [release](https://github.com/openclaw/mcporter/releases/tag/v0.14.2) requires
+Node 24 or newer. The [claude-hud release](https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0)
+and source `75683c6de1ac07f6bbef00d739001679dba0740c` agree with the existing
+statusline row; no older claude-hud profile entry exists.
+
+Retaining RTK 0.50.0 or mcporter 0.14.1 would leave the current contracts behind
+the accepted repository pins. A future qualified main pin or a destination failure
+of the native acceptance would reopen this refresh. The older architecture edition
+and artifact observations keep their dated versions; an edition citation whose
+pin has changed now names its original commit explicitly. Other moved citations
+are checked against the exact main above and updated at their sources.
+
+Completeness review covered the wave amendment, install and acceptance scripts,
+persisted RTK configuration, profile, client blocks, handbook, and citations into
+all 42 files changed by PR #693. The known RTK 0.51.0 grep file-list exactness
+control remains a separate repair in `scripts/native_token_ci.py`. Registry hashes
+remain the integrating coordinator's responsibility.

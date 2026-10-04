@@ -344,7 +344,7 @@ code-search() {
       # Kind: smoke; Source: https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/src/semble/cli.py#L269 (--version); https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/README.md#L114 (search, path, --format)
       # The probe search after the version line is this project's integration check, not upstream acceptance.
       # The last line reads SocratiCode's installed version from its package.json, never by running it: every invocation starts its MCP server.
-      # Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/pins-linux-x86_64.json#L334 (the socraticode pin's version_probe, npm-metadata)
+      # Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/pins-linux-x86_64.json#L361 (the socraticode pin's version_probe, npm-metadata)
       check code-search smoke 'semble --version
 probe="$(mktemp -d)"
 trap '\''rm -rf -- "$probe"'\'' EXIT
@@ -397,22 +397,22 @@ ccusage() {
   # UNRUN on every distribution: changed by the wave-3 batch of 2026-10-04, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/pins-linux-x86_64.json#L282 (ccusage --version prints ccusage 20.0.26)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/pins-linux-x86_64.json#L309 (ccusage --version prints ccusage 20.0.26)
       check ccusage smoke '[[ "$("${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/ccusage" --version)" == "ccusage 20.0.26" ]]'
       ;;
     *) skipped ccusage ;;
   esac
 }
 command-output() {
-  # RTK 0.50.0 (owner row, amendment 4); https://github.com/rtk-ai/rtk
+  # RTK 0.51.0 (owner row, amendment 4); https://github.com/rtk-ai/rtk
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L121 (--version); https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L193 (rtk git log); https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L309 (rtk proxy, the raw passthrough); https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L524 (RTK_TELEMETRY_DISABLED)
-      # The version line is exact as the archive's binary printed it on 2026-10-04; the two log lines run in this checkout.
-      # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L2940-L2952 (excluded commands exit 1 with No rewrite; the positive control exits 0 with its rewrite).
+      # Kind: smoke; Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L121 (--version); https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L193 (rtk git log); https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L313 (rtk proxy, the raw passthrough); https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L551 (RTK_TELEMETRY_DISABLED)
+      # Planned exact 0.51.0 version; the archive digest was verified separately; the two log lines run in this checkout.
+      # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.51.0/src/main.rs#L3072-L3100 (excluded commands exit 1 with No rewrite; the positive control exits 0 with its rewrite).
       check command-output smoke 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"
-[[ "$("$e/bin/rtk" --version)" == "rtk 0.50.0" ]]
+[[ "$("$e/bin/rtk" --version)" == "rtk 0.51.0" ]]
 cd "$repo_root"
 RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" git log -n 3
 RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" proxy git log -n 3
@@ -444,7 +444,7 @@ code-index() {
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L113 (jcodemunch-mcp --version); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/recipes/README.md#L523 (its output at the pin)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L113 (jcodemunch-mcp --version); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L525 (its output at the pin)
       check code-index smoke '[[ "$("${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp" --version)" == "jcodemunch-mcp 1.108.319" ]]'
       ;;
     *) skipped code-index ;;
@@ -487,7 +487,7 @@ structured-data() {
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/pins-linux-x86_64.json#L267 (toon --version prints only the version); https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L63 (-o); https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L65 (--decode)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/pins-linux-x86_64.json#L294 (toon --version prints only the version); https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L63 (-o); https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L65 (--decode)
       # The round trip of a uniform two-record array after the version line is this project's integration check, not upstream acceptance.
       check structured-data smoke 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"
 [[ "$("$e/bin/toon" --version)" == 4.1.1 ]]
@@ -937,7 +937,7 @@ credential-guard() {
   # Command and secret-path guard (K4); https://github.com/seathatflowsinourveins/native-agent-stack
   case "$stage" in
     post_install)
-      # Kind: unavailable; Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap.md#L400
+      # Kind: unavailable; Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/bootstrap.md#L412
       # Unavailable: Repository adoption practice; no standalone host self-test or version command was found in the cited recipe.
       skipped credential-guard
       ;;
