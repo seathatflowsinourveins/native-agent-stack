@@ -1407,6 +1407,41 @@ class BaselineWriteTests(unittest.TestCase):
         self.assertEqual(watch.baseline.read_bytes(), baseline)
 
 
+class LifecycleUnitTests(unittest.TestCase):
+    """adoption/lifecycle.md is the canonical installation block (the review thread on stack-currency.service, P1): it
+    renders every unit that a unit it installs Wants= or Requires= and that has its own template, and verifies each."""
+
+    TEMPLATES = ROOT / "adoption/templates/systemd"
+
+    def block(self) -> str:
+        text = (ROOT / "adoption/lifecycle.md").read_text(encoding="utf-8")
+        found = [block for block in re.findall(r"```sh\n(.*?)```", text, re.S)
+                 if "stack-currency.timer" in block and "systemctl --user enable" in block]
+        self.assertEqual(len(found), 1)
+        return found[0]
+
+    def rendered(self, block: str) -> set[str]:
+        return set(re.findall(r"^(?:sed \S+ |cp )adoption/templates/systemd/([\w.@-]+)", block, re.M))
+
+    def test_the_block_renders_every_unit_the_installed_units_pull_in(self):
+        rendered = self.rendered(self.block())
+        self.assertIn("stack-currency.service", rendered)
+        wanted = set()
+        for unit in sorted(rendered):
+            text = (self.TEMPLATES / unit).read_text(encoding="utf-8")
+            for line in re.findall(r"^(?:Wants|Requires|BindsTo)=(.+)$", text, re.M):
+                wanted.update(line.split())
+        needed = {unit for unit in wanted if (self.TEMPLATES / unit).is_file()}
+        self.assertIn("upstream-surface-watch.service", needed)  # the premise: this dependency exists
+        self.assertEqual(needed - rendered, set(), "the block never renders a unit that an installed unit wants")
+
+    def test_the_block_verifies_every_unit_it_renders(self):
+        block = self.block()
+        verify = re.search(r"^systemd-analyze --user verify (.*)$", block, re.M)
+        self.assertIsNotNone(verify)
+        self.assertEqual(set(re.findall(r"~/\.config/systemd/user/([\w.@-]+)", verify.group(1))), self.rendered(block))
+
+
 @contextlib.contextmanager
 def default_int_string_limit():
     previous = sys.get_int_max_str_digits()
