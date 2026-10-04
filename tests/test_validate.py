@@ -527,6 +527,22 @@ class EncodedHomePathTests(unittest.TestCase):
                     with self.subTest(drive=drive, name=name, suffix=suffix):
                         self.assertIsNotNone(pattern.search("~/.claude/projects/" + slug + suffix))
 
+    def test_users_branches_ignore_case_and_home_stays_case_sensitive(self):
+        # Review thread on #697: Windows (and default macOS) path components are case-insensitive.
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        # Slugs are joined at run time so this file never carries a literal that the rule flags.
+        for parts in (("C", "", "USERS", "carol", "repo"), ("c", "", "users", "carol", "repo"),
+                      ("C", "", "uSeRs", "carol/"), ("", "users", "bob", "src"), ("", "USERS", "bob/"),
+                      ("", "mnt", "c", "USERS", "carol", "repo"), ("", "mnt", "C", "users", "carol/")):
+            slug = "-".join(parts)
+            with self.subTest(parts=parts):
+                self.assertIsNotNone(pattern.search("~/.claude/projects/" + slug))
+        for parts in (("", "HOME", "alice", "x"), ("", "Home", "alice/"), ("C", "", "USERS", "example", "repo"),
+                      ("", "users", "example/")):
+            slug = "-".join(parts)
+            with self.subTest(parts=parts):
+                self.assertIsNone(pattern.search("~/.claude/projects/" + slug))
+
     def test_bare_home_and_wsl_placeholders_and_invalid_forms_do_not_match(self):
         pattern = dict(PRIVATE_CONTENT)["encoded home path"]
         roots = (("", "home"), ("", "Users"), ("C", "", "Users"), ("", "mnt", "c", "Users"))
