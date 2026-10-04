@@ -2836,7 +2836,7 @@ BASELINE_STOP_PARTS = (
 )
 BASELINE_STOP_RE = re.compile(r"^- The workstation's baseline passes.*?(?=^- |^```|\Z)", re.M | re.S)
 LINUX_ENTRIES = (
-    '/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -ExecutionPolicy Bypass '
+    "'/mnt/c/Program Files/PowerShell/7/pwsh.exe' -NoProfile -NonInteractive -ExecutionPolicy Bypass "
     '-File "$(wslpath -w step.ps1)"',
     "/mnt/c/Windows/System32/wsl.exe -d <Name>",
     "/mnt/c/Windows/System32/wsl.exe -d <Name> -- bash -s < steps.sh",
@@ -2969,10 +2969,10 @@ def linux_entry_errors(recipe: str) -> list[str]:
     errors = [f"the Linux entry lacks its full Windows path: {command}" for command in LINUX_ENTRIES
               if "`" + command + "`" not in recipe]
     inline = re.findall(r"`([^`\n]*)`", recipe)
-    if any(command.startswith("powershell.exe -NoProfile") or (command.startswith("wsl.exe -d <Name>") and
+    if any(command.startswith(("powershell.exe -NoProfile", "pwsh.exe -NoProfile")) or (command.startswith("wsl.exe -d <Name>") and
             ("bash -s" in command or "-u root" in command)) for command in inline):
         errors.append("a Linux entry starts a Windows program by a bare name")
-    if any(shell == "sh" and re.match(r"(?:wsl|powershell)\.exe\b", command)
+    if any(shell == "sh" and re.match(r"(?:wsl|powershell|pwsh)\.exe\b", command)
            for shell, command in fenced_commands(recipe)):
         errors.append("an sh block starts a Windows program by a bare name")
     return errors
@@ -3133,6 +3133,12 @@ class Run2RepairTests(FollowUpCase):
                 self.assertIn("`" + command + "`", recipe)
                 old = recipe.replace("`" + command + "`", "`" + command.rsplit("/", 1)[-1] + "`", 1)
                 self.assertTrue(linux_entry_errors(old))
+        for program in ("powershell.exe", "pwsh.exe"):
+            for launcher, error in (
+                    (f"`{program} -NoProfile -File step.ps1`", "a Linux entry starts a Windows program by a bare name"),
+                    (f"```sh\n{program} -NoProfile -File step.ps1\n```", "an sh block starts a Windows program by a bare name")):
+                with self.subTest(program=program, launcher=launcher):
+                    self.assertIn(error, linux_entry_errors(recipe + "\n" + launcher + "\n"))
 
     def test_f10_quotes_each_path_without_word_splitting(self):
         recipe, record, _, receipt = self.inputs()
