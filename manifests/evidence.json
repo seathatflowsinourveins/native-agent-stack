@@ -4033,6 +4033,25 @@
         "With a server-wide context of 64,000 the embedder loaded at its full context and took 5.78 GB (Part A, A1b); the measured system sets the context per model (qwen3-embedding-8k, 8,192 tokens), never server-wide."
       ],
       "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json"
+    },
+    {
+      "id": "native-runtime-role-resolution-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "omniroute",
+        "claude-code"
+      ],
+      "claim": "One host installed separately versioned OpenHands CLI1.16.0/SDK1.50.1 and DeepAgents0.7.21 candidates through native supported interfaces. CLI108 and final SDK184 unchanged upstream tests passed; DeepAgents361 passed with1 expected failure in its separate upstream-lock environment. Actual OmniRoute Sol-Max requests passed one OpenHands native LLM exact-output round-trip and bounded DeepAgents selected-skill/single-specialist research, saved-context repair and fresh-process SQLite continuation. All results are scoped, not a universal framework winner or global default promotion.",
+      "limitations": [
+        "CLI SDK1.21 Jinja cache hard-codes real user home; strict cache isolation remains held.",
+        "Final SDK native configuration/tests exercise skills/plugins/MCP/condenser interfaces; production MCP, full Conversation/condenser/provider execution and optional extensions are not qualified by them.",
+        "Original DeepAgents24-step attempt failed; one changed32-step saved-context repair passed. No arbitrary interrupted-tool replay, OS confinement or comparative winner is qualified.",
+        "Complete provider billing/backend identity and whole-task token savings remain unknown; cached/reasoning counters are subsets.",
+        "Native Claude Opus/Max peer timed out180s exit124 without a verdict; later peer turns reached account usage limits. Completed earlier reviews are preserved; no new acknowledgement/approval is claimed.",
+        "Original full output stays private with exact hashes; public excerpts replace private paths and omit raw conversations, marker values, credentials and flow identifiers.",
+        "Exact executed sources are archived. Initial whitespace/comment cleanup had identical ASTs; the current worker subsequently adopts native secret-aware serialization after CodeQL, verified by native fixture and fresh saved-state checks. No new provider run is claimed."
+      ],
+      "path": "evidence/receipts/native-runtime-role-resolution-20260930.json"
     }
   ],
   "files": [
@@ -52682,6 +52701,7 @@
     "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
     "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
     "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
-    "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json"
+    "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json",
+    "evidence/artifacts/native-runtime-role-resolution-20260930/experiment.json"
   ]
 }
