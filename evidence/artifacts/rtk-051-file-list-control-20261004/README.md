@@ -3,7 +3,7 @@
 These small sanitized artifacts retain the original terminal evidence used by
 [the decision note](../../../docs/decisions/2026-10-04-rtk-file-list-control.md).
 Job 035's outputs were copied from its surviving temporary storage. Job 042
-repairs PR #698 from the pre-rebase review head `45a7218c0` (its registry commit was replaced by `5e6afa4f0` on rebase); it leaves the registry to the coordinator.
+repairs PR #698 from the pre-rebase review head `45a7218c0` (rebased away; this PR's head supersedes it); it leaves the registry to the coordinator.
 The upstream reference is [rtk-ai/rtk v0.51.0](https://github.com/rtk-ai/rtk/tree/v0.51.0),
 tag commit `e001f773f80b22b7dc4c7a79521b30e35aaef026`, particularly `feac25d`
 and `3223a80`. No credentials or native conversations were read or copied.

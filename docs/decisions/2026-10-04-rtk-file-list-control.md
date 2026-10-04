@@ -50,7 +50,7 @@ The tag resolves to `e001f773f80b22b7dc4c7a79521b30e35aaef026`.
 At `5a4add33a` (pre-rebase `421e4ee87`, the same patch) on 2026-10-04, the renamed
 `rtk-exactness-controls-diff-unchanged-and-grep-fold-lossless` kept both diff
 predicates unchanged and compared sorted reconstructed paths with native paths.
-The PR #698 follow-up at the pre-rebase review head `45a7218c0` (its registry commit was replaced by `5e6afa4f0` on rebase) now compares the complete sequences
+The PR #698 follow-up at the pre-rebase review head `45a7218c0` (rebased away; this PR's head supersedes it) now compares the complete sequences
 in order. Both plain-list predicates require successful grep exits, three
 distinct native paths and the correct header/tail count. The proxy check
 continues to require identical output and exits for every case.
@@ -138,7 +138,7 @@ the reruns. Provider usage is unmeasured.
 At repair commit `5a4add33a` (pre-rebase `421e4ee87`, the same patch), `python3 scripts/validate.py` returned exit 1 with
 registry drift only: hashes and byte counts for the changed receipt, script and
 test module, plus the receipt's appended limitations mirror. After the registry
-commit the pre-rebase review head `45a7218c0` (its registry commit was replaced by `5e6afa4f0` on rebase), the unchanged baseline rerun in job 042 returned exit 0:
+commit the pre-rebase review head `45a7218c0` (rebased away; this PR's head supersedes it), the unchanged baseline rerun in job 042 returned exit 0:
 69 components, 9,897 hashed files, four profiles and 199 receipts. Its first
 attempt included unignored job-local upstream downloads and failed publication
 path checks; ignoring those private scratch files resolved that failure before
@@ -181,7 +181,7 @@ native fixture passes ten checks; its original stdout/argv/hashes are retained
 beside the terminal streams. Final `python3 scripts/validate.py` returns exit 1
 with registry drift only (changed hashes/byte counts, the appended limitations
 mirror and new artifact registrations); `git diff --check` returns exit 0.
-These working-tree results are separate from the passing pre-rebase `45a7218c0` baseline; after the rebase onto `38ac9aca1` and the registry commit `5e6afa4f0`, `python3 scripts/validate.py` passes (exit 0).
+These working-tree results are separate from the passing pre-rebase `45a7218c0` baseline; after the rebase onto `38ac9aca1` and this PR's registry commit, `python3 scripts/validate.py` passes (exit 0).
 
 ## Residual and completeness critic
 
