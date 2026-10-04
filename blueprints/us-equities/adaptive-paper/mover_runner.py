@@ -20,7 +20,7 @@ import asyncio
 from collections import Counter
 from dataclasses import asdict, replace
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import hashlib
 import json
 import math
@@ -754,8 +754,20 @@ def command_paper(args):
                 before = ledger.accounting()
                 # As runner.main: book legitimate fees, then compare cash with the
                 # lineage's original baseline before consuming a new trial identity.
-                baseline = (Decimal(previous["baseline_cash"]) if previous is not None else
-                            Decimal(checkpoint["account"]["cash"]) - before.cash_delta_usd)
+                if previous is not None:
+                    stored_baseline = previous.get("baseline_cash")
+                    if stored_baseline is None:
+                        raise SafetyError("next_trial_baseline_missing")
+                    if type(stored_baseline) not in (str, int, float):
+                        raise SafetyError("next_trial_baseline_invalid")
+                    try:
+                        baseline = Decimal(stored_baseline)
+                    except (InvalidOperation, TypeError, ValueError):
+                        raise SafetyError("next_trial_baseline_invalid") from None
+                    if not baseline.is_finite():
+                        raise SafetyError("next_trial_baseline_invalid")
+                else:
+                    baseline = Decimal(checkpoint["account"]["cash"]) - before.cash_delta_usd
                 inter_trial = (None if previous is None else Decimal(checkpoint["account"]["cash"])
                                - (baseline + before.cash_delta_usd))
                 if inter_trial is not None and abs(inter_trial) > Decimal("0.01"):

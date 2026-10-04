@@ -4,7 +4,7 @@ Uses the maintained native unittest fixtures and installed SDK; the account and
 HTTP observations are independent fake broker values, never native acceptance.
 """
 import asyncio
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from decimal import Decimal
 import hashlib
 import json
@@ -24,10 +24,12 @@ except ImportError:
     import test_adaptive_paper_mover_native as native
     import test_adaptive_paper_transport as http_fixture
 
-if native.NATIVE:
-    import mover_runner
-    import safety
-    import transport
+# These modules defer SDK/native imports until port construction. Import them
+# before setUpModule so the existing hermetic fixture also isolates Python-only
+# admission checks from the host's STOP and account-lock paths.
+import mover_runner
+import safety
+import transport
 
 
 def setUpModule():
@@ -51,9 +53,79 @@ def observation(case, **fields):
 
 def ledger_state(path):
     # Read-only observation must not initialize or change the ledger.
-    with sqlite3.connect(f"file:{path}?mode=ro", uri=True) as db:
+    with closing(sqlite3.connect(f"file:{path}?mode=ro", uri=True)) as db:
         return {table: db.execute(f"SELECT * FROM {table} ORDER BY 1").fetchall()
                 for table in ("meta", "requests", "intents", "fees")}
+
+
+class NextTrialBaselineValidation(unittest.TestCase):
+    """Admission before port construction uses only the Python command and ledger."""
+
+    def refuses(self, baseline_fields, reason):
+        wiring = native.MoverPaperCommandWiring()
+        wiring.setUp()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scan_path = root / "scan.json"
+            scan_path.write_bytes(native.scan_raw([native.row("AAA", 1, "10.00")]))
+            state = root / "state" / wiring.FINGERPRINT / "mover"
+            ledger_path = state / "ledger.sqlite3"
+            _, limits, _ = mover_runner.load_mover_config(native.CONFIG)
+            ledger = safety.Ledger(ledger_path, limits)
+            try:
+                ledger.begin_next_trial(time.time() - 30, "legacy")
+            finally:
+                ledger.close()
+            metadata_path = state / "trial.json"
+            metadata_path.write_text(json.dumps({"trial_id": "legacy", "phase": "finished",
+                                                 "started_at": time.time() - 30, **baseline_fields}))
+            metadata_before = metadata_path.read_bytes()
+            before = ledger_state(ledger_path)
+            real_load_scan = mover_runner.load_scan
+
+            def checkpoint(key, secret, *, before_request, **kwargs):
+                for _ in range(3):
+                    before_request("read")
+                return {"account": wiring.observation([])["account"], "fees": []}
+
+            output = root / "refusal.json"
+            with patch.object(mover_runner, "credentials", return_value=("key", "secret")), \
+                 patch.object(transport, "preflight",
+                              side_effect=lambda key, secret, symbols, **kw: wiring.observation(symbols)), \
+                 patch.object(transport, "fee_checkpoint", side_effect=checkpoint) as checkpoint_read, \
+                 patch.object(transport, "AlpacaPaperTransport",
+                              side_effect=AssertionError("refused admission must not build a port")) as port, \
+                 patch.object(mover_runner, "load_scan",
+                              side_effect=lambda raw, settings, *, now:
+                              real_load_scan(raw, settings, now=native.SCAN_TIME + 20)), \
+                 patch("builtins.print"):
+                code = mover_runner.main(["paper", "--env-file", str(root / "unused.env"),
+                                          "--config", str(native.CONFIG), "--scan", str(scan_path),
+                                          "--trial", "next", "--state-root", str(root / "state"),
+                                          "--output", str(output)])
+            receipt = json.loads(output.read_text())
+            self.assertEqual((code, receipt["status"], receipt["stage"], receipt["reason"]),
+                             (2, "not_started", "trial_start", reason))
+            checkpoint_read.assert_called_once()
+            port.assert_not_called()
+            self.assertEqual(metadata_path.read_bytes(), metadata_before)
+            after = ledger_state(ledger_path)
+            for table in ("meta", "intents", "fees"):
+                self.assertEqual(after[table], before[table])
+            with closing(sqlite3.connect(f"file:{ledger_path}?mode=ro", uri=True)) as db:
+                self.assertEqual(db.execute("SELECT trial_id FROM trials ORDER BY trial_id").fetchall(),
+                                 [("legacy",)])
+
+    def test_missing_baseline_refuses_without_consuming_trial_or_building_port(self):
+        self.refuses({}, "next_trial_baseline_missing")
+
+    def test_null_baseline_refuses_without_consuming_trial_or_building_port(self):
+        self.refuses({"baseline_cash": None}, "next_trial_baseline_missing")
+
+    def test_malformed_baseline_refuses_without_consuming_trial_or_building_port(self):
+        for value in ("not-a-decimal", "", "NaN", "sNaN", "Infinity", "-Infinity", {}, [], True):
+            with self.subTest(baseline=value):
+                self.refuses({"baseline_cash": value}, "next_trial_baseline_invalid")
 
 
 @unittest.skipUnless(native.NATIVE, "requires pinned combined native runtime")
