@@ -43851,6 +43851,11 @@
       "bytes": 29878
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-native-effort-inputs-local-20261003.json",
+      "sha256": "c03203c82bb4262ba5e12c2f518f8f836c1e5893f874b0d33b06078d507dec9c",
+      "bytes": 8392
+    },
+    {
       "path": "evidence/artifacts/runtime-sdk-20260930/README.md",
       "sha256": "70059a0b57eb1aae9bb62c04ffbbc60e4119381e777eba5290ad12c23f66f3bd",
       "bytes": 1585
@@ -51107,8 +51112,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "082bb1714e51f99114b5dbb3858833d25f43b62229be62c90fba331e8aceeb75",
-      "bytes": 16427
+      "sha256": "d678527b01bbd0276a5c37fa9803a25b24cc8972ccaff594d734f248965b31ce",
+      "bytes": 19366
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
@@ -51147,8 +51152,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py",
-      "sha256": "14018bd65c39f18683ce83833abe23c9238419c7c1fde99f5521ae752dbd1c43",
-      "bytes": 38441
+      "sha256": "43bbc7eba07ce964ef622505e2a0438be69e3a151c1acbf520f28b1ad8a82503",
+      "bytes": 42591
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
@@ -51157,8 +51162,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01",
-      "bytes": 25542
+      "sha256": "d6d9cae14f06a1bdf36de6b4825ff7a6d17d8b0c5f08345e2dc8c6b3a44e0e56",
+      "bytes": 25805
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py.lock",
