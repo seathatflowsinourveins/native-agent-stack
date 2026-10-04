@@ -1131,14 +1131,15 @@ class SurfaceWatchTests(unittest.TestCase):
                 "cross_check": cross_check}
 
     def report(self, checkout: Checkout, generated_at: str = "2026-09-29T12:00:00Z", unreviewed=None,
-               raw: str | None = None, sources=None, run_at: str | None = None) -> None:
+               raw: str | None = None, sources=None, run_at: str | None = None, kinds_not_observed=None) -> None:
         path = checkout.state / "surface-watch" / "latest.json"
         path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
         if sources is None:
             sources = [self.source("claude-env-vars-page", "network", generated_at)]
         document = {"schema_version": 1, "generated_at": generated_at, "run_at": run_at or generated_at, "new": [],
                     "removed": [], "stage_changed": [], "unreviewed": self.KEYS if unreviewed is None else unreviewed,
-                    "coverage": {"mode": "network", "from_cache": [], "sources": sources},
+                    "coverage": {"mode": "network", "from_cache": [], "sources": sources,
+                                 "kinds_not_observed": {} if kinds_not_observed is None else kinds_not_observed},
                     "summary_line": "surface watch: 3 unreviewed of 3 new; details: python3 x --dry-run"}
         path.write_text(raw if raw is not None else json.dumps(document), encoding="utf-8")
 
@@ -1146,6 +1147,144 @@ class SurfaceWatchTests(unittest.TestCase):
         code, stdout, stderr = checkout.run("--dry-run", "--json")
         self.assertEqual(code, 0, stderr)
         return json.loads(stdout)
+
+    def earlier_surface_notice(self, checkout: Checkout) -> bytes:
+        self.report(checkout, unreviewed=["codex:feature:brand_new"])
+        code, _, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        before = checkout.due_file.read_bytes()
+        document = json.loads(before)
+        self.assertEqual(document["due"]["surface_unreviewed"], 1)
+        finding = next(item for item in document["details"] if item["kind"] == "surface_unreviewed")
+        self.assertEqual(finding["keys"], ["codex:feature:brand_new"])
+        return before
+
+    def assert_surface_gap_keeps_notice(self, checkout: Checkout, before: bytes,
+                                      state: str = "surface watch incomplete") -> dict:
+        code, stdout, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertTrue(checkout.due_file.exists(), stdout)
+        self.assertEqual(checkout.due_file.read_bytes(), before)
+        self.assertIn(f"(kept {checkout.due_file})", stdout)
+        self.assertNotIn("nothing due", stdout)
+        self.assertLessEqual(len(stdout.split(" (kept ", 1)[0]), 160)
+        document = self.document(checkout)
+        self.assertEqual(document["details"][-1]["surface_watch"], state)
+        self.assertTrue(cd.incomplete(document))
+        self.assertNotIn("surface_unreviewed", document["due"])
+        self.assertNotIn("nothing due", document["summary_line"])
+        _, text, _ = checkout.run("--dry-run")
+        self.assertIn(state, text)
+        self.assertIn("surface watch: journalctl --user -u upstream-surface-watch.service", text)
+        return document
+
+    def test_coverage_unobserved_kinds_keep_previous_findings(self):
+        checkout = Checkout(self)
+        before = self.earlier_surface_notice(checkout)
+        self.report(checkout, unreviewed=[], kinds_not_observed={"codex:feature": "binary not found"})
+        document = self.assert_surface_gap_keeps_notice(checkout, before)
+        self.assertIn("codex:feature", document["details"][-1]["surface_watch_reason"])
+        self.assertIn("surface watch incomplete", document["summary_line"])
+
+    def test_coverage_unavailable_or_skipped_sources_keep_previous_findings(self):
+        for origin in ("unavailable", "skipped"):
+            for required in (True, False):
+                with self.subTest(origin=origin, required=required):
+                    checkout = Checkout(self)
+                    before = self.earlier_surface_notice(checkout)
+                    source = self.source("codex-features-list", origin, NOW)
+                    source["required"] = required
+                    self.report(checkout, unreviewed=[], sources=[source])
+                    document = self.assert_surface_gap_keeps_notice(checkout, before)
+                    reason = document["details"][-1]["surface_watch_reason"]
+                    self.assertIn("codex-features-list", reason)
+                    self.assertIn(origin, reason)
+
+    def test_coverage_complete_report_clears_previous_findings(self):
+        checkout = Checkout(self)
+        self.earlier_surface_notice(checkout)
+        self.report(checkout, unreviewed=[], kinds_not_observed={})
+        code, stdout, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertFalse(checkout.due_file.exists())
+        self.assertTrue(stdout.startswith("stack currency: nothing due (removed "), stdout)
+        document = self.document(checkout)
+        self.assertEqual(document["details"][-1]["surface_watch"], "fresh")
+        self.assertEqual(document["due"]["surface_unreviewed"], 0)
+        self.assertFalse(cd.incomplete(document))
+
+    def test_coverage_unavailable_or_skipped_cross_checks_still_clear_previous_findings(self):
+        for origin in ("unavailable", "skipped"):
+            with self.subTest(origin=origin):
+                checkout = Checkout(self)
+                self.earlier_surface_notice(checkout)
+                self.report(checkout, unreviewed=[], sources=[
+                    self.source("claude-env-vars-page", "network", NOW),
+                    self.source("xc-chenrui-lifecycle", origin, NOW, cross_check=True)])
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertFalse(checkout.due_file.exists())
+                self.assertTrue(stdout.startswith("stack currency: nothing due (removed "), stdout)
+                document = self.document(checkout)
+                self.assertEqual(document["details"][-1]["surface_watch"], "fresh")
+                self.assertEqual(document["due"]["surface_unreviewed"], 0)
+                self.assertFalse(cd.incomplete(document))
+
+    def test_coverage_malformed_unobserved_kinds_are_unreadable(self):
+        for value in (None, [], "codex:feature", False, 1, {"codex:feature": None},
+                      {"codex:feature": []}, {"codex:feature": 1}):
+            with self.subTest(kinds_not_observed=value):
+                checkout = Checkout(self)
+                before = self.earlier_surface_notice(checkout)
+                self.report(checkout, raw=json.dumps({"generated_at": NOW, "unreviewed": [], "coverage": {
+                    "sources": [self.source("claude-env-vars-page", "network", NOW)],
+                    "kinds_not_observed": value}}))
+                self.assert_surface_gap_keeps_notice(checkout, before, "surface watch output unreadable")
+
+    def test_coverage_malformed_sources_are_unreadable(self):
+        for sources in (None, {}, "source", 1, [None], [[]], ["source"], [{}], [{"origin": None}],
+                        [{"origin": []}], [{"origin": 1}]):
+            with self.subTest(sources=sources):
+                checkout = Checkout(self)
+                before = self.earlier_surface_notice(checkout)
+                self.report(checkout, raw=json.dumps({"generated_at": NOW, "unreviewed": [], "coverage": {
+                    "sources": sources, "kinds_not_observed": {}}}))
+                self.assert_surface_gap_keeps_notice(checkout, before, "surface watch output unreadable")
+
+    def test_coverage_gaps_without_previous_findings_write_no_notice(self):
+        for label, options in (("kind", {"kinds_not_observed": {"codex:feature": "binary not found"}}),
+                               ("source", {"sources": [self.source("codex-features-list", "unavailable", NOW)]})):
+            with self.subTest(gap=label):
+                checkout = Checkout(self)
+                self.report(checkout, unreviewed=[], **options)
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertFalse(checkout.due_file.exists())
+                self.assertIn("surface watch incomplete", stdout)
+                self.assertIn("(no due-file)", stdout)
+                self.assertNotIn("nothing due", stdout)
+
+    def test_coverage_gaps_beside_other_counts_write_them_and_name_the_gap(self):
+        for label, options in (("kind", {"kinds_not_observed": {"codex:feature": "binary not found"}}),
+                               ("source", {"sources": [self.source("codex-features-list", "skipped", NOW)]})):
+            with self.subTest(gap=label):
+                checkout = Checkout(self)
+                checkout.something_due()
+                self.report(checkout, unreviewed=[], **options)
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertIn("surface watch incomplete", stdout)
+                document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+                self.assertEqual(document["due"]["pins_behind"], 1)
+                self.assertNotIn("surface_unreviewed", document["due"])
+                self.assertEqual(document["details"][-1]["surface_watch"], "surface watch incomplete")
+                self.assertTrue(cd.incomplete(document))
+
+    def test_coverage_partial_report_does_not_count_remaining_findings(self):
+        checkout = Checkout(self)
+        before = self.earlier_surface_notice(checkout)
+        self.report(checkout, kinds_not_observed={"codex:feature": "probe failed"})
+        self.assert_surface_gap_keeps_notice(checkout, before)
 
     def test_no_watch_report_is_a_coverage_note_and_no_count(self):
         checkout = Checkout(self)

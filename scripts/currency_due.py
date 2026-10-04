@@ -29,11 +29,13 @@ aggregates five counts, and a sixth when the upstream-surface watch ran recently
   script never fetches and never runs the watch; the timer's upstream-surface-watch.service runs before it). It is a
   count only while the report's data is at most SURFACE_MAX_AGE_DAYS (3) days old: its generated_at and the
   fetched_utc of every source it took from the cache (coverage.sources; a failed --network fetch falls back to the
-  cache), and no report time is more than an hour ahead of the clock. With no watch state directory, a missing file is
+  cache), no report time is more than an hour ahead of the clock, and its coverage has no unobserved kinds or
+  unavailable or skipped sources other than report-only cross-checks. With no watch state directory, a missing file is
   the coverage note "surface watch not run" (the watch unit may not be installed on the host). A missing report in an
   existing watch state directory is stale. A file that exists but is stale or future-dated
-  ("surface watch stale") or unreadable ("surface watch output unreadable") is a check that could not answer, as an
-  incomplete skill check is (below). None of these is a count or an error (docs/upstream-surface-watch.md).
+  ("surface watch stale"), unreadable ("surface watch output unreadable") or only partly observed
+  ("surface watch incomplete") is a check that could not answer, as an incomplete skill check is (below). None of
+  these is a count or an error (docs/upstream-surface-watch.md).
 
 When any count is nonzero it writes ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json
 atomically (a temporary file in the same directory, fsync, mode 0600, os.replace):
@@ -46,10 +48,10 @@ and otherwise removes that file, unless the run could not see everything it was 
 (--network) that answered incompletely, meaning an error in its report, a skill left unfetched or in a state this
 script does not know, or a skills CLI release that was not fetched, is unknown, and unknown is not "nothing due"
 (the check's own report says "Incomplete fetches remain unknown"); so is a surface-watch report that exists but is
-stale, future-dated or unreadable. Such a run writes the file when the counts it did reach are nonzero, with the gap
-in the coverage entry of the details, and otherwise leaves the state directory as it was: no removal and no new
+stale, future-dated, unreadable or only partly observed. Such a run writes the file when the counts it did reach are
+nonzero, with the gap in the coverage entry of the details, and otherwise leaves the state directory as it was: no removal and no new
 file, exit 0. Its line then says "nothing known due" and names the gap ("skill check incomplete", "surface watch
-stale", "surface watch unreadable"); a surface gap adds the details command when it fits.
+stale", "surface watch unreadable", "surface watch incomplete"); a surface gap adds the details command when it fits.
 
 The command that ends summary_line is "python3 <checkout>/scripts/currency_due.py --dry-run", the inspected checkout's
 own copy of this script by its absolute path, written as ~/... under the home directory (so the command works from any
@@ -108,16 +110,18 @@ SURFACE_DIR = "surface-watch"
 SURFACE_FILE = "latest.json"
 SURFACE_MAX_AGE_DAYS = 3
 SURFACE_FUTURE_SKEW = timedelta(hours=1)  # a report time further ahead of the clock than this is not trusted
-SURFACE_SAMPLES = 10  # unreviewed keys kept in the details
+SURFACE_SAMPLES = 10  # unreviewed keys or coverage gaps kept in the details
 # The report's states in the coverage entry. No watch state directory is only a coverage note: the watch unit may not
-# be installed on this host. A report that cannot answer (missing after observation, stale, future-dated or unreadable)
-# is an incomplete check, as an
+# be installed on this host. A report that cannot answer (missing after observation, stale, future-dated, unreadable
+# or only partly observed) is an incomplete check, as an
 # incomplete skill check is: it keeps an earlier due-file and is never "nothing due"; SURFACE_GAPS is its line phrase.
 SURFACE_NOT_RUN = "surface watch not run"
 SURFACE_STALE = "surface watch stale"
 SURFACE_UNREADABLE = "surface watch output unreadable"
+SURFACE_PARTIAL = "surface watch incomplete"
 SURFACE_FRESH = "fresh"
-SURFACE_GAPS = {SURFACE_STALE: "surface watch stale", SURFACE_UNREADABLE: "surface watch unreadable"}
+SURFACE_GAPS = {SURFACE_STALE: "surface watch stale", SURFACE_UNREADABLE: "surface watch unreadable",
+               SURFACE_PARTIAL: "surface watch incomplete"}
 RECORD_MAX_BYTES = 8 * 1024 * 1024  # a status record or watch report larger than this is unreadable, never read whole
 # The host's own alerts (wave-2 lifecycle ruling, change 7): the backup and restore-check status records in the state
 # directory, which keep last_success {snapshot_id, time} apart from last_attempt {result, exit_code, time} so that a
@@ -502,11 +506,12 @@ def surface_data_time(record: dict, generated: datetime) -> tuple[datetime | Non
 
 def surface_findings(surface, now: datetime) -> tuple[int | None, list[dict], dict]:
     """(count or None, details, coverage fields) from collect()'s ``surface``: the watch's unreviewed list while the
-    oldest data in its report (surface_data_time()) is at most SURFACE_MAX_AGE_DAYS old. None (a caller that collected
+    oldest data in its report (surface_data_time()) is at most SURFACE_MAX_AGE_DAYS old and its kinds and sources were
+    observed (apart from report-only cross-checks). None (a caller that collected
     no state) checks nothing; a missing report without a watch state directory is the coverage note SURFACE_NOT_RUN;
     a report lost after observation is SURFACE_STALE, and a stale, future-dated or
-    unreadable one is SURFACE_STALE or SURFACE_UNREADABLE, an incomplete check (incomplete()). None of them is a
-    count or an error of the run."""
+    unreadable one is SURFACE_STALE or SURFACE_UNREADABLE; unobserved kinds or unavailable/skipped non-cross-check
+    sources make it SURFACE_PARTIAL. Each is an incomplete check (incomplete()), never a count or an error of the run."""
     if surface is None:
         return None, [], {"surface_watch": None}
     record = surface.get("record")
@@ -526,6 +531,12 @@ def surface_findings(surface, now: datetime) -> tuple[int | None, list[dict], di
     data_time, problem = surface_data_time(record, when)
     if data_time is None:
         return None, [], {"surface_watch": SURFACE_UNREADABLE, "surface_watch_reason": problem}
+    coverage = record["coverage"]  # surface_data_time validated the sources list and each entry's origin
+    not_observed = coverage.get("kinds_not_observed", {})
+    if not isinstance(not_observed, dict) or not all(isinstance(kind, str) and isinstance(reason, str)
+                                                    for kind, reason in not_observed.items()):
+        return None, [], {"surface_watch": SURFACE_UNREADABLE,
+                          "surface_watch_reason": "no coverage.kinds_not_observed mapping of kinds to reasons"}
     as_of = utc_of(data_time)
     if max(when, ran) - now > SURFACE_FUTURE_SKEW:
         return None, [], {"surface_watch": SURFACE_STALE, "surface_watch_reason":
@@ -534,6 +545,11 @@ def surface_findings(surface, now: datetime) -> tuple[int | None, list[dict], di
         held = "" if data_time == when else f" (a source came from the cache; generated_at {record['generated_at']})"
         return None, [], {"surface_watch": SURFACE_STALE, "surface_watch_reason":
                           f"latest.json data of {as_of} is more than {SURFACE_MAX_AGE_DAYS} days old{held}"}
+    gaps = [f"kind {kind[:80]} not observed: {reason[:200]}" for kind, reason in not_observed.items()]
+    gaps += [f"source {str(item.get('source'))[:80]} {item['origin']}" for item in coverage["sources"]
+             if item.get("cross_check") is not True and item["origin"] in ("unavailable", "skipped")]
+    if gaps:
+        return None, [], {"surface_watch": SURFACE_PARTIAL, "surface_watch_reason": "; ".join(gaps[:SURFACE_SAMPLES])}
     details = []
     if unreviewed:
         line = record.get("summary_line")
