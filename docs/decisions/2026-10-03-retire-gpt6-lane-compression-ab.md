@@ -241,6 +241,19 @@ historical verification locators, not instructions to inspect host state.
     **Verification:** Read installed chatCore.ts L1916-1919 and L2157-2164; source hash matches pinned upstream.
     **Citation:** https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2157-L2164
 
+**In the canonical log.** Entries 1-8 and 10 are now rows dated 2026-09-27 at
+the end of the [anti-pattern log][log], in its five columns, with host paths
+left out and this section as their source. Entry 9 adds no row. Main's row
+"Assuming a temporary directory is outside every Git repository" (2026-09-27)
+records the same mistake, the same 11 export-guard errors and the same rule
+(`TMPDIR` outside every repository, and keep the guard's refusal), so it stays
+unchanged. One observation in entry 9 is not in that row: in the draft's
+sandbox the alternate location also had a read-only `.git` sentinel, so that
+row's `/var/tmp` is an example, not a guarantee. The draft's two coordinator
+corrections under Review and repair already have 2026-09-27 rows on main:
+"Using a two-slash model slug on a chained gateway" and "Reading a null
+call_logs effort column as "effort not sent"".
+
 ### 2026-09-28 20129 apply record: historical and superseded
 
 The [2026-09-28T03:51:17Z apply comment][apply] records W1 at
@@ -343,8 +356,12 @@ git show 73fc873e1da52ac68a731d33e482a7ae0444f6b2:tests/test_gpt6_lane_compressi
 At the source-review base, `git grep -n -w '#431'` finds thirteen lines in
 ten files. This change updates only one of them, the control-default sentence
 in [blueprints/runtime-workers/openhands/README.md L148-151][openhands].
-The engines-on arm and its implementation remain available; a new
-preregistration on the current gateway build is required to select it.
+The engines-on arm and its implementation remain available. Making it the
+default needs a completed qualifying comparison under a new preregistration on
+the current gateway build. That is a policy, not a code gate:
+`environment_selection()` in the recipe still accepts an explicit `engines-on`
+selection and routes it to 20129. The anti-pattern log rows this change adds
+also name #431 and link this record.
 
 The other twelve stay unchanged as dated, frozen or convergence-bound records:
 
@@ -395,6 +412,46 @@ meeting the frozen quality and exact-value gates. Main's [L276-295][decision-a]
 remains the acceptance condition for decision (a); an obsolete or unrun draft
 cannot supply it.
 
+## Completeness critic
+
+AGENTS.md asks a coordinator to end every substantive research or adoption
+unit with a completeness critic. This one was added at review, from this
+record's own evidence, with no new source read. The unit checked the custody
+surfaces (the #431 head and comment count, #608, the scoped coordination search
+and LANES-BOARD), main's dated records at the source-review base, the pinned
+draft files with recomputed blob, SHA-256 and byte identities, the retained-ref
+evidence with GitHub's documentation, the eight required check contexts and
+every `#431` reference on main at the source-review base.
+
+- **Missed modality.** Nothing live was read. The bindings table's right-hand
+  column is documented state, the management API was not re-read, no installed
+  client version was observed, no model ran and no usage was measured. A new
+  preregistration starts from live read-backs of the then-current gateway build
+  and clients.
+- **Missed sources.** The draft's 2026-09-27 upstream reads (Harbor, promptfoo,
+  the Codex SDK and CLI, inspect_swe) were not re-verified. OmniRoute after the
+  rebuild's `2f42a9ac1` was not read for a change in how Codex
+  content-part-array tool outputs are compressed, which is this record's first
+  reopen trigger.
+- **Missed candidate classes.** Every proposed cell is a gateway configuration.
+  Main's reported cache-read shares of about 0.9 on the three-arm jobs put
+  native prompt caching beside compression as a candidate class; the draft
+  holds cache behaviour as a condition (its `two-hop` gate names
+  `prompt_cache_key` and the arms' cache rate), not as a treatment. Its runner
+  survey was source reading only (Harbor's last-segment model argument,
+  promptfoo's intact `config.model`, inspect_swe's own bridge), and its ceiling
+  leaves prose verdicts, research narrative and evidence-writing outside the
+  output-style question.
+- **Where the findings go.** The `token-efficiency` layer's next landscape sweep
+  takes the OmniRoute content-part-array check, main's two untested boundaries
+  (string-shaped shell outputs and very long sessions with large tool outputs)
+  and caching as a candidate class beside compression. The `quality-evaluation`
+  layer's next sweep takes runner qualification for a one-slash canonical model
+  and a merged native profile, re-read at current upstream. The eleven sealing
+  gates above remain the checklist for any such comparison. These are
+  requirements for a future comparison, not grounds for a run here.
+
+[log]: ../harness-defaults.md#anti-pattern-log
 [notice]: https://github.com/seathatflowsinourveins/native-agent-stack/pull/431#issuecomment-5967134814
 [notice608]: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5967137495
 [custody]: https://github.com/seathatflowsinourveins/native-agent-stack/pull/431#issuecomment-5878290260
