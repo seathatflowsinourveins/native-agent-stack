@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Deterministic host driver for the OpenHands PR resolver.
 
+2026-10-04: the public driver is disabled until the owned-path allowlist gate lands.
+The stages below describe dormant code, retained for the later enablement PR.
+
 Stage 1 built the driver's core and a CLI that exercises it with fakes. Stage 2
 wires it into host.run and dispatch: `run` performs one attempt end to end
 (RESOLVER.md "Stage 2"), and `run --dry-run` stops after the read-only steps.
@@ -345,12 +348,13 @@ def resolver_instruction(selected, *, task, owned_paths, new_boundary=new_bounda
         "other path outside the owned set unchanged; a patch that touches one is discarded.\n"
         "- Even inside the owned paths, the host's push gate refuses a change to: .github/; a file "
         "named CODEOWNERS anywhere; the resolver's gate and driver (blueprints/runtime-workers/openhands/"
-        "resolver/ and resolver.py); every file CI runs or reads as a check, which on this repository "
-        "is all of tests/ plus the scripts and data workflow steps name and what those scripts "
-        "import and read, such as a schema or a pin file, and local actions; and a workflow or "
+        "resolver/ and resolver.py); all of tests/ and the files workflow steps name or import, "
+        "including local actions; and a workflow or "
         "action step that uses pull-request or issue text, or a workflow or action that zizmor "
         "flags. If the fix needs such a change, including a new or changed test, change nothing: "
         "stop and report which file would need to change and why.\n"
+        "- Static read inventories are monitoring only; they authorize no path and refuse no change. "
+        "The resolver entry point stays disabled until the owned-path allowlist gate lands.\n"
         "- There is no network: only the model endpoint is reachable. Do not fetch the issue, "
         "install packages, push or open a pull request; the host does that from your patch.\n\n"
         "Workflow:\n"
@@ -1833,7 +1837,17 @@ def build_parser():
     return parser
 
 
+DISABLED_MESSAGE = ("resolver disabled until the owned-path allowlist gate lands "
+                    "(docs/decisions/2026-09-28-openhands-resolver-isolation.md)")
+
+
 def main(argv=None, *, session_key=None, **injected):
+    """Public entry point is disabled before parsing, network, push or model calls."""
+    print(DISABLED_MESSAGE, file=sys.stderr)
+    return 3
+
+
+def _dormant_main(argv=None, *, session_key=None, **injected):
     """Entry point. `session_key` lets a caller (a test) pass a fake-mode key in memory;
     `injected` (runner, clock, sleep, now, gate) replaces the run command's gh runner, clocks and
     pre-push gate in tests. The command line has no way to replace the gate."""

@@ -1,94 +1,23 @@
-"""The data CI-run gate code reads, for the trusted pre-push gate (resolver/push_gate.py).
+"""Monitoring-only inventory of paths named by CI-run Python (2026-10-04).
 
-Cross-family review P1 of 2026-10-04: a gate judges a change with its code and with the data
-its code addresses, such as the JSON schema that scripts/validate_convergence.py reads
-(`CONTRACT / "contract.schema.json"`, with `CONTRACT = REPO / "blueprints/convergence-practice"`
-and `REPO = Path(__file__).resolve().parents[1]`). GateReads evaluates every expression of a
-CI-run Python file to the repository locations it spells. A code-addressed read is caught
-where its path is built, wherever the bytes are later read:
-- builtin open(), io.open and Path.open; Path.read_text and Path.read_bytes (CPython
-  Lib/pathlib);
-- json.load, tomllib.load and csv.reader, which read from a handle opened on that path;
-- a helper such as `read_json(path)`, whose argument is built at the call site.
+The static evaluator's files, prefixes, globs, computed execution/unresolved locations
+and unclassified entries are advisory. They provide no protection, refuse no commit and
+make no completeness claim. The resolver entry point is disabled pending a separate
+owned-path allowlist gate. Known gaps and superseded enforcement claims are recorded in
+RESOLVER.md and docs/decisions/2026-09-28-openhands-resolver-isolation.md.
 
-So no read sink needs to be modelled, and no helper's parameter needs to be traced.
+The existing bounded evaluator is retained unchanged: literals and imported containers,
+Path chains, runtime templates, scoped bindings and executing-call discovery. Value.tail,
+residual, legacy_prefix and exec_computed preserve its historical representation only.
+reads() inventories files/prefixes/globs and diagnostics; executed() suggests execution
+paths and computed diagnostics. Neither method enforces a policy. Unparseable scripts
+are handled separately by push_gate, which retains that explicit fail-closed category.
 
-What the code spells:
-- a string literal;
-- a module, class or `self.X` constant;
-- an f-string, `+`, `%` or `str.format` over those;
-- a `Path(__file__)` chain: `.parent`, `.parents[k]`, `/`, Path(a, b, ...), os.path.join,
-  joinpath, with_name, with_suffix, with_stem, os.path.dirname;
-- an element of a literal tuple, list, set or dict constant, including a destructured
-  `for a, (b, *c) in CONSTANT`, dict.items()/values()/keys() and imported module containers;
-- `from module import NAME` of a repository module.
-
-A path the code receives from outside its text is the subject the gate checks: a parameter,
-`self.X` not set from a constant, argparse, os.environ, sys.argv, file content, subprocess
-output, or the result of any other call, received as the whole path. Where the data that
-selects it is a file, the code spells that file's location, so that file is protected.
-That subject rule does not apply to a computed path with a fixed directory: its fixed parts
-form a glob, with `*` for each runtime segment. An environment value or an unfollowed call
-used as a computed base is opaque; joining a tail to it is recorded as unclassified. The
-gate reports that residual without refusing the commit; it must be classified before the
-resolver's first live run (cross-family read 489b, repair exception of 2026-10-04).
-
-Each expression evaluates to a bounded set of alternatives (Value):
-- ("loc", path, exact): a repository location, "" for the root. exact False means somewhere
-  under `path`; `shape` is then the glob (fnmatch, `*` also matching "/") of the whole
-  location, when the computed parts sit inside a template or an enumeration pattern.
-- ("str", text, exact): text; exact False means `text` is only its static prefix.
-- ("seq",) and ("map",): a literal container (its AST node); ("data",): received;
-  ("unknown",): not determined here; ("outside",): outside the repository.
-
-`tail` keeps b8eb9352b's origin values (data, enum, literal, unknown), including data for an
-opaque f-string piece and literal when more than 32 location alternatives collapse.
-`residual` separately marks an opaque whole value, an ambiguous computed read, or a known
-path construction whose base is not repo-anchored. `assumed` marks a literal tail under a
-received base: that legacy location is retained alongside the residual marker, so later
-joins still protect it. `legacy_prefix` retains pre-round directory protection where a new
-glob is more precise; `exec_computed` preserves computed-execution refusal after a filename
-transformation resolves an exact read.
-
-reads() turns the values into protection:
-- an exact location is a file;
-- a computed location under a non-root directory is its shape, else the directory;
-- at the root, a shape with a fixed directory is protected. A received or enumerated whole
-  path selects subjects. The pre-round unknown, unassumed location remains unresolved and
-  fails closed. Newly unclassifiable computed reads are retained in `unclassified`.
-
-executed() tells running from reading, so the derivation follows only code CI runs (a code
-file that gate code hashes or copies is data). A file runs when its location, or text read
-from it, is inside the arguments of a call that executes code: a call EXECUTING names, whatever
-its receiver; a call of a function or method of this module that passes a parameter on to such
-a call (by name, to a fixpoint); or a call of a function imported from outside the standard
-library, whose body is not read here. An executing call whose argument is a computed location
-may run any file under it. The pre-round computed-execution refusals remain fail-closed,
-including opaque pieces in anchored templates, collapsed alternatives and exact-base
-with_suffix/with_stem. A residual marker does not change those decisions or add a refusal.
-
-Names follow Python's scopes: module, class, function, lambda and comprehension, with a
-comprehension's first iterable evaluated in the enclosing scope (Python Language Reference
-6.2.4) and an assignment expression in a comprehension binding in the containing scope
-(PEP 572). Within a scope the analysis is flow-insensitive: a name takes the union of all its
-bindings there, including `x op= y` as `x op y`, which can only add alternatives, so only add
-protection. A name defined through itself (`rel = normpath(rel)`) takes its other bindings'
-values (the least fixpoint); a name with no binding at all is unknown.
-
-Sources for the modelled behaviour, docs.python.org/3.13, read 2026-10-04: pathlib PurePath
-("If a segment is an absolute path, all previous segments are ignored (like os.path.join())"),
-Path.rglob ("like calling Path.glob() with "**/" added in front of the pattern") and
-Path.iterdir; tomllib.load ("a readable and binary file object"), json.load (a
-.read()-supporting file object) and csv.reader ("an iterable of strings ... most commonly a
-file-like object"), so each is reached through a handle opened on a path the code builds;
-fnmatch ("the filename separator ('/' on Unix) is not special to this module"), so a shape's
-`*` also matches across directories, as Protected.rule's fnmatch.fnmatchcase applies it; the
-Language Reference 6.2.4 and PEP 572 for the scopes above; ast for the node types. For
-executed(), read 2026-10-04: subprocess (run, call, check_call, check_output, Popen,
-getoutput, getstatusoutput), os "Process Management" (system, popen, startfile, posix_spawn,
-the exec* and spawn* families), asyncio subprocesses, pty.spawn, runpy (run_path,
-run_module), importlib.util.spec_from_file_location and importlib.machinery.SourceFileLoader,
-the builtins exec and compile, and sys.stdlib_module_names ("New in version 3.10").
+Reference implementations and semantics already used by this reader: CPython 3.13
+pathlib, fnmatch, ast, unittest and the language reference (comprehensions and PEP 572);
+the repository's existing patch_policy import resolver. No new derivation round repairs
+arbitrary Python or claims an adversarial corpus pass. The five final-review P1s and
+Opus r2 P2s remain recorded monitoring limitations.
 """
 from __future__ import annotations
 
@@ -247,7 +176,7 @@ def join1(left, right):
             result = UNKNOWN if "unknown" in (left.kind, right.kind) else DATA
             return result._replace(residual="path" if left.residual == "path" else "computed") if opaque else result
         if opaque:
-            # Retain b8eb9352b's assumed literal alternative so subsequent joins extend it.
+            # Retain b8eb9352b's assumed literal alternative in the monitoring representation.
             # The separate marker reports that the actual base has not been repo-anchored.
             assumed = join1(loc("", True, None, True), right)
             return (DATA._replace(residual="path"), assumed)
@@ -820,7 +749,7 @@ class GateReads:
                     returns = [item.value for item in ast.walk(payload) if isinstance(item, ast.Return) and item.value]
                     return _dedupe([value for item in returns for value in self.value(item)]) if returns else (DATA,)
         # Any other call computes its result at run time: received. A helper given a code-spelled
-        # location and a literal may join them; that join is a candidate, kept where it is tracked.
+        # location and a literal may join them; that join is an inventory candidate where tracked.
         candidates = [OPAQUE]
         locations = [item for alternatives in arguments for item in alternatives if item.kind == "loc" and item.exact]
         literals = [item for alternatives in arguments for item in alternatives if item.kind == "str" and item.exact]
@@ -973,7 +902,7 @@ class GateReads:
                             computed.add(f"{self.path}:{getattr(node, 'lineno', 0)}")
         return paths, computed
 
-    # -- Protection
+    # -- Monitoring
 
     def _note_unclassified(self, node, value):
         location = f"{self.path}:{getattr(node, 'lineno', 0)}"
@@ -987,12 +916,12 @@ class GateReads:
         - An exact location is a file read, whether or not the tree has it yet (an agent
           could add it). A tracked directory is not, by itself. An assumed location (a literal
           under a received base) counts where it is plausible (see `plausible`).
-        - A computed location under a non-root directory protects its shape, else that
+        - A computed location under a non-root directory reports its shape, else that
           directory as a prefix.
-        - At the root, a shape with a fixed directory is protected. Otherwise a
+        - At the root, a shape with a fixed directory is reported. Otherwise a
           whole received or enumerated part selects subjects. The root's unknown, unassumed
-          location remains unresolved as at 7c1d24cc5. New unclassifiable computed reads are
-          recorded in self.unclassified with their existing shapes, without a refusal.
+          location remains an advisory diagnostic as at 7c1d24cc5. New unclassifiable computed reads are
+          recorded in self.unclassified with their existing shapes, without enforcement.
         - An exact string counts where it is plausible and has no whitespace. A computed
           relative string with a fixed directory uses the same glob representation as Path.
         """
@@ -1003,8 +932,8 @@ class GateReads:
         parents = {child: node for node in ast.walk(self.module) for child in ast.iter_child_nodes(node)}
 
         def containing_path(node):
-            """Suppress new globs for partial templates; retain pre-round prefix protection.
-            Filename transformations intentionally narrow their receiver's read protection."""
+            """Suppress new globs for partial templates; retain the historical prefix inventory.
+            Filename transformations intentionally narrow their receiver's read inventory."""
             embedded, narrowed = False, False
             while node in parents:
                 node = parents[node]

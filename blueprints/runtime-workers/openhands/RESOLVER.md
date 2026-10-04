@@ -1,5 +1,79 @@
 # OpenHands PR resolver: deterministic host driver
 
+## Monitoring-only decision and disabled driver (2026-10-04)
+
+PR #489 ends with the static read derivation as **monitoring only**. Its files,
+directory prefixes, globs, computed-execution and unresolved diagnostics, followed
+execution/import paths, and unclassified entries are advisory. They protect no path,
+refuse no commit, and make no claim of completeness. No further derivation repair round
+follows. A separate, later PR will implement the real gate: a default-deny owned-path
+allowlist, permitting a resolver commit to touch only its task's declared paths.
+
+The public `resolver.py` entry point exits with status 3 before argument parsing, any
+network request, git push or model call. Its stderr message is:
+
+```
+resolver disabled until the owned-path allowlist gate lands (docs/decisions/2026-09-28-openhands-resolver-isolation.md)
+```
+
+The existing command handlers remain dormant and are exercised only by local fixture
+tests. The historical live runbook below does not enable the driver. Enablement requires
+the owned-path allowlist gate in the later PR, including its independent acceptance.
+
+`PushGate.check` prints `advisory_gate_reads` on stderr on every run and records it under
+the same clearly named field in the receipt. It includes `mode: "monitoring_only"`, sorted
+`files`, `prefixes`, `globs`, `unresolved` and `unclassified` lists, each list's own count,
+and available `unclassified_shapes`. The receipt retains the record's counts and adds
+an omitted counter per list when filtering removes entries. Shapes use only path/glob
+characters without whitespace. Counts are `null` when derivation never ran.
+
+Refusals outside the read derivation remain: `.github/`, CODEOWNERS anywhere, the trusted
+gate and driver files, the test tree, files/directories named by workflow run steps and
+their existing workflow import/discovery closure, local actions and reusable workflows,
+PR- or issue-text interpolation, trusted-checkout and pinned zizmor checks, and
+unparseable workflows or gate scripts. Advisory results never add `protected_path` or
+`gate_input_unresolved`; the latter now retains only the gate-script parser boundary.
+
+The refreshed [monitoring baseline](evidence/unclassified-gate-reads-20261004.json) names
+the measured tree `3636e7182b220be945818a367e4daefa643bfc26`. It has 321 unclassified
+locations in 29 scripts. The baseline test compares counts per script and shapes per
+script, so line-only edits do not invalidate it. On that tree:
+
+| Inventory or explicit-category measurement | Count | Bound |
+| --- | --- | --- |
+| Advisory exact files / prefixes / globs | 291 / 27 / 145 | No completeness claim |
+| Advisory unresolved diagnostics | 0 | Advisory only |
+| Advisory unclassified locations / scripts | 321 / 29 | No cap |
+| Enforced gate-script parse failures | 0 | Fail closed |
+| Tracked files in explicit refusal categories | 443 / 10599 | Historical breadth comparison only |
+| Explicit categories outside `evidence/`, `tests/`, `.github/` | 121 / 3450 | At most 862 (25%) |
+| Explicit `blueprints/` categories outside gate code | 4 / 2610 | At most 52 |
+
+The final independent reviews leave these known limitations of the monitoring reader;
+their source identifiers are retained rather than presenting this round as a repair:
+
+- **489d P1-1:** literal dicts with unresolved `**build_mapping()` expansions silently drop the remainder in `items()`/`keys()` iteration.
+- **489d P1-2:** the baseline was stale after merging main despite unchanged 321/29 totals; this round refreshes it and compares scripts/shapes independently of line shifts.
+- **Opus r2 P1 #1:** opaque join markers multiply alternatives and collapse moderate literal sets, losing paths/following and adding spurious root paths.
+- **Opus r2 P1 #2:** imported containers may mutate or contain nonliteral elements, and foreign AST names/`__file__` use importer scope, allowing additions and reads to disappear.
+- **Opus r2 P1 #3:** `with_name` on a computed base can lose path alternatives and computed-execution diagnostics after narrowing to an exact filename.
+- **Opus r2 P2 #1:** embedded-expression suppression can discard inner locations in `%` templates and later concatenation pieces.
+- **Opus r2 P2 #2:** computed residuals are reported only at three read sinks, leaving helper, shutil and returned-path forms silent.
+
+[Evidence part 14](evidence/push-gate-fail-first.txt) retains the review sources, actual
+failed attempts, refreshed measurements and native acceptance results. The earlier
+[set comparison](evidence/gate-reads-set-diff-20261004.json) is historical fixture/tree
+evidence, not a proof of the reader's completeness. The decision's overturn condition
+is: "a derivation that passes an adversarial corpus with no losses against b8eb9352b
+could be reconsidered as a second layer, never as the only gate".
+
+## Superseded design and runbook notes (2026-10-04)
+
+All design, enforcement and live-run claims below are retained historical notes. The
+monitoring-only decision above supersedes the earlier derived-read protections,
+computed-read/execution refusals, and classify-every-residual enablement precondition.
+The driver remains disabled until the later owned-path allowlist gate lands.
+
 The resolver turns one owner-authored issue into a draft pull request. A contained
 OpenHands agent writes a patch; this driver does everything that touches GitHub.
 The design is the resolver plan of 2026-09-28: section 2 (the loop) and section 3

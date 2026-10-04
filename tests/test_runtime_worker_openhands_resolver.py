@@ -284,7 +284,7 @@ class IssueSelectionTests(unittest.TestCase):
         for stale in ("Add or update tests", "write the failing test first"):
             self.assertNotIn(stale, instruction)
             self.assertNotIn(stale, skill)
-        rules = {*gate.RULE_PRECEDENCE, "github", "codeowners", "gate_code", "workflow_policy_test",
+        rules = {*(rule for rule in gate.RULE_PRECEDENCE if rule != "ci_read"), "github", "codeowners", "gate_code", "workflow_policy_test",
                  "pr_text_interpolation", "zizmor_finding", "unresolved_read"}
         self.assertEqual(set(gate.AGENT_RULE_PHRASES) | gate.GATE_ONLY_RULES, rules)
         self.assertEqual(set(receipt.PUSH_GATE_RULES), rules)
@@ -2339,7 +2339,7 @@ class PullRequestLoopTests(unittest.TestCase):
 
 
 class CommandLineTests(unittest.TestCase):
-    """Unit 7: `resolver.py plan|validate-patch|open-pr|review|run` over fakes and local git only."""
+    """Dormant command handlers over fakes/local git; the public driver always refuses."""
 
     @classmethod
     def setUpClass(cls):
@@ -2359,8 +2359,20 @@ class CommandLineTests(unittest.TestCase):
         import io
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            code = self.r.main(list(argv), **kwargs)
+            code = self.r._dormant_main(list(argv), **kwargs)
         return code, out.getvalue()
+
+    def test_public_driver_refuses_before_parsing_or_any_external_call(self):
+        import contextlib
+        import io
+        expected = ('resolver disabled until the owned-path allowlist gate lands '
+                    '(docs/decisions/2026-09-28-openhands-resolver-isolation.md)')
+        output = io.StringIO()
+        with mock.patch.object(self.r, "build_parser", side_effect=AssertionError("parser reached")), \
+                contextlib.redirect_stderr(output):
+            code = self.r.main(["run"], runner=mock.Mock(side_effect=AssertionError("external call reached")))
+        self.assertNotEqual(code, 0)
+        self.assertEqual(output.getvalue().strip(), expected)
 
     def test_plan_prints_the_selection_summary_and_writes_the_instruction(self):
         issue = self.write_json("issue.json", issue_fixture())
@@ -2465,26 +2477,15 @@ class CommandLineTests(unittest.TestCase):
         self.assertNotIn(key, printed)
         self.assertEqual((self.tmp / "leaky.jsonl").read_text(encoding="utf-8"), "")
 
-    def test_run_takes_the_stage_2_options_and_refuses_without_them(self):
-        # Stage 2 replaced the stage-1 NotImplementedError with the wired run command.
-        script = subprocess.run([sys.executable, str(RECIPE / "resolver.py"), "run", "--issue", "12"],
-                                capture_output=True, text=True, timeout=60, env=hermetic_git_environment())
-        self.assertEqual(script.returncode, 2)
-        self.assertIn("the following arguments are required", script.stderr)
-        self.assertNotIn("NotImplementedError", script.stderr)
-        listed = subprocess.run([sys.executable, str(RECIPE / "resolver.py"), "--help"], capture_output=True,
-                                text=True, timeout=60, env=hermetic_git_environment())
-        self.assertEqual(listed.returncode, 0)
-        for command in ("plan", "validate-patch", "open-pr", "review", "run"):
-            self.assertIn(command, listed.stdout)
-        options = subprocess.run([sys.executable, str(RECIPE / "resolver.py"), "run", "--help"], capture_output=True,
-                                 text=True, timeout=60, env=hermetic_git_environment())
-        self.assertEqual(options.returncode, 0)
-        for option in ("--issue", "--owned-path", "--task", "--task-file", "--lane", "--arm", "--port", "--prefix",
-                       "--state", "--gh", "--git", "--gitleaks", "--zizmor", "--reviewer-command", "--dry-run"):
-            self.assertIn(option, options.stdout)
-        self.assertNotIn("--run-id", options.stdout)
-        self.assertNotIn("--gate", options.stdout)  # the trusted gate cannot be replaced from the command line
+    def test_public_cli_is_disabled_even_for_help_or_incomplete_arguments(self):
+        for argv in (("run", "--issue", "12"), ("--help",), ("run", "--help")):
+            with self.subTest(argv=argv):
+                run = subprocess.run([sys.executable, str(RECIPE / "resolver.py"), *argv],
+                                     capture_output=True, text=True, timeout=60,
+                                     env=hermetic_git_environment())
+                self.assertEqual(run.returncode, 3)
+                self.assertEqual(run.stderr.strip(), self.r.DISABLED_MESSAGE)
+                self.assertEqual(run.stdout, "")
 
 
 class ResolverSkillTests(unittest.TestCase):
@@ -3865,7 +3866,7 @@ class ResolverRunTests(unittest.TestCase):
 
     def run_cli(self, github, *, edits=None, message=FINAL_MESSAGE, gates=None, dry_run=False, plant=False,
                 api_answers=None, dispatch_time=None, g4=True):
-        """resolver.main(["run", ...]) with Docker, the agent-server, gh and network git replaced.
+        """resolver._dormant_main(["run", ...]) with Docker, the agent-server, gh and network git replaced.
 
         `api_answers` maps (method, path) to an answer or an exception to raise; `dispatch_time`
         replaces dispatch.py's `time` module (its deadline clock); `g4` records gate G4 for
@@ -3948,7 +3949,7 @@ class ResolverRunTests(unittest.TestCase):
                 mocks["time"] = enter(mock.patch.object(dispatch, "time", dispatch_time))
             enter(contextlib.redirect_stdout(out))
             extra = ["--dry-run"] if dry_run else ["--reviewer-command", self.reviewer]
-            code = self.r.main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep, gate=self.gate)
+            code = self.r._dormant_main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep, gate=self.gate)
         return code, json.loads(out.getvalue()), mocks
 
     def receipt(self, printed):

@@ -48,6 +48,12 @@ The host side is `blueprints/runtime-workers/openhands/resolver.py`; see
    - symlinks, submodules and binary files.
 3. Rename or delete a file only when both the old and the new path are owned.
 
+## Monitoring-only decision, 2026-10-04
+
+The resolver entry point is disabled until the owned-path allowlist gate lands. Static
+read inventories are advisory only and authorize no task path or push. The later gate
+will default-deny changes outside the task's declared owned paths.
+
 ## What the push gate refuses
 
 Before the host pushes, a trusted gate checks your exact change. Even inside the owned
@@ -56,10 +62,8 @@ paths, it refuses, with no push, a change to:
 - a file named `CODEOWNERS`, anywhere;
 - the resolver's own gate and driver: `blueprints/runtime-workers/openhands/resolver/`
   and `blueprints/runtime-workers/openhands/resolver.py`;
-- every file CI runs or reads as a check. On this repository that is all of `tests/`,
-  because CI runs the whole suite. It is also every script and data file a workflow step
-  names, and what those scripts import and read, such as a schema or a pin file. Local
-  actions count too;
+- all of `tests/`, because CI runs the whole suite, plus the files workflow steps name
+  or import, local actions and reusable workflows;
 - a workflow or action step that uses pull-request or issue text, and a workflow or action
   that zizmor flags.
 

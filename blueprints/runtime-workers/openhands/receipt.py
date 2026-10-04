@@ -242,13 +242,39 @@ def _matching(value, pattern):
 # The trusted pre-push gate's records (resolver/push_gate.py, journaled by GhHarness.gates).
 # The rules a path can break, and zizmor's audit names (docs.zizmor.sh/audits).
 PUSH_GATE_RULES = frozenset({"github", "codeowners", "gate_code", "workflow_policy_test", "ci_named", "ci_import",
-                             "ci_read", "ci_discovered", "ci_local_action", "pr_text_interpolation", "zizmor_finding",
+                             "ci_discovered", "ci_local_action", "pr_text_interpolation", "zizmor_finding",
                              "unresolved_read"})
 AUDIT_NAME = re.compile(r"[a-z][a-z0-9-]{0,63}")
 SEMVER = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
 REPOSITORY_PATH = re.compile(r"[A-Za-z0-9._@+-][A-Za-z0-9._@+/-]{0,254}")
 UNCLASSIFIED_LOCATION = re.compile(r"[A-Za-z0-9._@+-][A-Za-z0-9._@+/-]{0,254}:[0-9]+")
 UNCLASSIFIED_SHAPE = re.compile(r"[A-Za-z0-9._@+/*?\[\]!-]{1,4096}")
+
+
+def advisory_gate_reads_summary(source):
+    """Sanitized monitoring inventory; counts are the record's own, never enforcement."""
+    source = source if isinstance(source, dict) else {}
+    result = {"mode": "monitoring_only"}
+    for field, pattern in (("files", REPOSITORY_PATH), ("prefixes", REPOSITORY_PATH),
+                           ("globs", UNCLASSIFIED_SHAPE), ("unresolved", UNCLASSIFIED_LOCATION),
+                           ("unclassified", UNCLASSIFIED_LOCATION)):
+        entries = source.get(field) if isinstance(source.get(field), list) else []
+        values = sorted({value for value in entries if _matching(value, pattern)
+                         and ".." not in value.rsplit(":", 1)[0].split("/")})
+        count = source.get(field + "_count")
+        if type(count) is not int or count < 0:
+            count = None
+        result[field] = values
+        result[field + "_count"] = count
+        result[field + "_omitted"] = max(len(entries), count or 0) - len(values)
+    shapes = source.get("unclassified_shapes")
+    result["unclassified_shapes"] = {}
+    for location in result["unclassified"]:
+        if isinstance(shapes, dict) and isinstance(shapes.get(location), list):
+            values = sorted({shape for shape in shapes[location] if _matching(shape, UNCLASSIFIED_SHAPE)})
+            if values:
+                result["unclassified_shapes"][location] = values
+    return result
 
 
 def push_gate_summary(records):
@@ -264,18 +290,6 @@ def push_gate_summary(records):
                  if isinstance(entry, dict) and entry.get("known") is True and entry.get("rule") in PUSH_GATE_RULES
                  and _matching(entry.get("path"), REPOSITORY_PATH) and ".." not in entry["path"].split("/")]
         zizmor = record.get("zizmor") if isinstance(record.get("zizmor"), dict) else {}
-        source_unclassified = record.get("unclassified") if isinstance(record.get("unclassified"), list) else []
-        unclassified = sorted({location for location in source_unclassified
-                               if _matching(location, UNCLASSIFIED_LOCATION)
-                               and ".." not in location.rsplit(":", 1)[0].split("/")})
-        source_shapes = record.get("unclassified_shapes")
-        shapes = {location: sorted({shape for shape in source_shapes[location]
-                                   if _matching(shape, UNCLASSIFIED_SHAPE)})
-                  for location in unclassified if isinstance(source_shapes, dict)
-                  and isinstance(source_shapes.get(location), list)}
-        unclassified_count = record.get("unclassified_count")
-        if type(unclassified_count) is not int or unclassified_count < 0:
-            unclassified_count = None
         omitted = record.get("paths_omitted")
         summary.append({
             "status": record.get("status") if record.get("status") in ("pass", "fail") else None,
@@ -285,10 +299,7 @@ def push_gate_summary(records):
             "reasons": sorted({reason for reason in record.get("reasons") or [] if _matching(reason, REASON_CODE)})
             if isinstance(record.get("reasons"), list) else [],
             "paths": named,
-            "unclassified": unclassified,
-            "unclassified_count": unclassified_count,
-            "unclassified_omitted": max(len(source_unclassified), unclassified_count or 0) - len(unclassified),
-            "unclassified_shapes": {location: values for location, values in shapes.items() if values},
+            "advisory_gate_reads": advisory_gate_reads_summary(record.get("advisory_gate_reads")),
             "unnamed_paths": len(entries) - len(named) + (omitted if type(omitted) is int and omitted > 0 else 0),
             "zizmor": {"version": _matching(zizmor.get("version"), SEMVER),
                        "findings": zizmor.get("findings") if type(zizmor.get("findings")) is int else None,
