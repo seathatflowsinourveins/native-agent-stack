@@ -66,7 +66,15 @@ minimal bootstrap extracts the pinned official Node archive directly, so its
 upstream mise reproduction example adds no default mise dependency.
 
 Comparison positions are display/dependency order. Every arm has
-`default_install: false` and `default_precedence: null`. The Ubuntu 26.04.1 and
+`default_install: false` and `default_precedence: null`. On 2026-10-04 the owner's
+decision ([record](../docs/decisions/2026-10-04-token-full-stack-owner-default.md),
+amendment 4 of the definitive manifest's rule) made the token-efficiency tools default
+installs: RTK and Headroom are no longer comparison arms, ccusage gained its install and
+acceptance, and context-mode, jcodemunch-mcp, codebase-memory-mcp, Repomix, TOON,
+MarkItDown, Context Hub, otel-tui and agentsview have rows. They install through the
+[install plan](../evidence/artifacts/new-wsl-install-plan-20261002/README.md)'s slot rows,
+not by iterating over entries; SocratiCode stays an arm of the split code-search slot,
+which the plan's interim installs beside semble. The Ubuntu 26.04.1 and
 24.04.5 images are symmetric provisional arms. Canonical publishes a separate
 checksum for each; the dual-image recipe owner supplies their install/acceptance
 steps. The engine comparison precedes container-boundary qualification, and
@@ -211,9 +219,9 @@ have no default-install precedence.
 | ai-memory | 2.5.2 | [upstream mise example](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1622), [GitHub backend version syntax](https://mise.jdx.dev/dev-tools/backends/github.html) |
 | Hindsight | 0.10.2 | [reviewed install source](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/README.md) |
 | agentmemory | 0.9.29 | [reviewed install source](https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md) |
-| RTK | 0.50.0 | [upstream Git install](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md#L106), [Cargo tag/lock syntax](https://doc.rust-lang.org/cargo/commands/cargo-install.html) |
+| RTK | 0.50.0 | [release asset](https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md#L113) through the [archive procedure](../recipes/README.md#official-release-archives) (until 2026-10-04: the [upstream Git install](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md#L106) with [Cargo tag/lock syntax](https://doc.rust-lang.org/cargo/commands/cargo-install.html)) |
 | sqz | 1.9.0 | [reviewed install source](https://github.com/ojuschugh1/sqz/blob/726e77bd7e9d6ae7529e2750da69d86e622ca699/README.md) |
-| Headroom | 0.37.0 | [reviewed install source](https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md) |
+| Headroom | 0.37.0 | [reviewed install source](https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md); since 2026-10-04 the [uv tool form](https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md#L92) with the `[mcp]` extra, not `[all]` |
 | Phoenix | 20.18.0 | [reviewed install source](https://github.com/Arize-ai/phoenix/blob/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md) |
 | Dagu | 2.16.6 | [reviewed install source](https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md) |
 | mise | 2026.9.18 | [tagged installation guide](https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md), [version normalization in the selected installer source](https://github.com/jdx/mise/blob/v2026.9.18/packaging/standalone/install.envsubst#L300) |

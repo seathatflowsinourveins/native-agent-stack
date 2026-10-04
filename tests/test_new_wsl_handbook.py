@@ -984,16 +984,18 @@ class NewWslHandbookTests(unittest.TestCase):
                 rows[cells[0]] = cells
         return rows
 
-    def test_inventory_holds_all_90_manifest_rows_the_ten_added_and_the_six_consensus_ones(self):
-        # The sixth consensus row, statusline, comes from the layer consensus's wave-2 batch (2026-10-03).
+    def test_inventory_holds_all_100_manifest_rows_the_ten_added_the_six_consensus_and_the_ten_owner_ones(self):
+        # The sixth consensus row, statusline, comes from the layer consensus's wave-2 batch (2026-10-03), and the ten owner
+        # rows from its wave-3 batch (2026-10-04, amendment 4).
         data, markdown = self.generated()
         manifest = self.read(DEFAULTS_SOURCE)
-        self.assertEqual(len(manifest["slots"]), 90)
+        self.assertEqual(len(manifest["slots"]), 100)
         self.assertEqual(sum(row["row_kind"] == "added" for row in manifest["slots"]), 10)
         self.assertEqual(sum(row["row_kind"] == "consensus" for row in manifest["slots"]), 6)
+        self.assertEqual(sum(row["row_kind"] == "owner_decision" for row in manifest["slots"]), 10)
         rows = {slot["record"]["slot_id"]: (layer["layer_id"], slot)
                 for layer in data["layers"] for slot in layer.get("default_slots", [])}
-        self.assertEqual(len(rows), 90)
+        self.assertEqual(len(rows), 100)
         lines = self.slot_lines(markdown)
         self.assertEqual(set(lines), set(rows))
         for row in manifest["slots"]:
@@ -1013,10 +1015,11 @@ class NewWslHandbookTests(unittest.TestCase):
         # Counts come from the rows and agree with the manifest's own.
         inventory = data["default_decisions"]["inventory"]
         self.assertEqual({key: inventory[key] for key in manifest["counts"]}, manifest["counts"])
-        self.assertEqual(inventory["installed"] + inventory["not_installed"], 90)
-        self.assertIn("The manifest holds 90 slots in 37 layers.", markdown)
+        self.assertEqual(inventory["installed"] + inventory["not_installed"], 100)
+        self.assertIn("The manifest holds 100 slots in 37 layers.", markdown)
         self.assertIn("added 10", markdown)
         self.assertIn("consensus 6", markdown)
+        self.assertIn("owner_decision 10", markdown)
         # The interim installs of amendment 3 are counted apart from the decided installs, as the producer counts them.
         self.assertEqual(inventory["interim"], sum(1 for row in manifest["slots"] if row.get("interim")))
         self.assertIn(f"{inventory['interim']} of the slots that install nothing by their decided default carry an "
@@ -1093,6 +1096,79 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 1, result.stdout)
                 self.assertIn(message, result.stderr)
 
+    def test_owner_rows_and_owner_defaults_come_from_the_owner_batch_and_list_what_they_replace(self):
+        """Amendment 4 (wave 3, 2026-10-04): a row the owner added is shown as the batch gives it, an owner default with the
+        owner's outcome, and what each owner decision replaced is listed under its layer's table."""
+        data, markdown = self.generated()
+        manifest = self.read(DEFAULTS_SOURCE)
+        consensus = self.read(manifest["sources"]["consensus"]["path"])
+        lines = self.slot_lines(markdown)
+        added = {row["slot_id"]: row for row in consensus["wave3"]["add_rows"]}
+        self.assertEqual({row["slot_id"] for row in manifest["slots"] if row["row_kind"] == "owner_decision"}, set(added))
+        self.assertEqual(len(added), 10)
+        for slot_id, row in added.items():
+            with self.subTest(owner_row=slot_id):
+                cells = lines[slot_id]
+                self.assertEqual((cells[1], cells[4], cells[6], cells[7]),
+                                 (row["state"], "installed", "added_by_owner_decision", row["label"]))
+                self.assertIn(f"{row['catalog']} / {row['layer_id']} / owner_decision", cells[9])
+        overturned = [row for row in manifest["slots"] if row.get("overturned")]
+        self.assertEqual(sorted(row["slot_id"] for row in overturned),
+                         ["ccusage", "code-search", "context-supply", "session-analytics"])
+        for row in overturned:
+            item = row["overturned"]["amendment"]
+            with self.subTest(owner_amendment=row["slot_id"]):
+                self.assertIn(f"- Owner decision on `{row['slot_id']}` ({item['date_utc']}; {item['by']}): {item['decision']}.",
+                              markdown)
+                if row["overturned"].get("fields"):
+                    self.assertEqual(lines[row["slot_id"]][6], "owner_default")
+                    self.assertEqual(lines[row["slot_id"]][4], "installed")
+        inventory = data["default_decisions"]["inventory"]
+        self.assertEqual(inventory["owner_amendments"], len(overturned))
+        self.assertIn(f"Rows of kind owner_decision: {len(added)}; owner amendments: {len(overturned)}.", markdown)
+
+    def test_an_owner_row_or_owner_default_must_match_the_owner_batch(self):
+        """Negative controls: a row of the owner batch relabelled, a decided row that calls itself an owner row, an owner row
+        with an outcome of the rounds or definitive, and an owner default without the outcome it replaced are refused."""
+        self.real_tree()
+        original = self.read(DEFAULTS_SOURCE)
+
+        def slot(manifest, slot_id):
+            return next(row for row in manifest["slots"] if row["slot_id"] == slot_id)
+
+        def relabel_owner_row(manifest):
+            slot(manifest, "command-output")["row_kind"] = "consensus"
+
+        def claim_owner_row(manifest):
+            slot(manifest, "codex")["row_kind"] = "owner_decision"
+
+        def round_outcome(manifest):
+            slot(manifest, "command-output")["resolution"]["outcome"] = "final"
+
+        def definitive(manifest):
+            slot(manifest, "command-output").update(definitive=True, state="definitive")
+
+        def lost_replaced_outcome(manifest):
+            slot(manifest, "ccusage")["overturned"]["fields"]["resolution"]["outcome"] = "unknown"
+
+        def bare_owner_amendment(manifest):
+            del slot(manifest, "ccusage")["overturned"]["amendment"]["decision"]
+
+        for mutate, message in (
+                (relabel_owner_row, "consensus row differs from the layer-consensus record: command-output"),
+                (claim_owner_row, "consensus row differs from the layer-consensus record: codex"),
+                (round_outcome, "owner row is never definitive and carries the owner's outcome: command-output"),
+                (definitive, "owner row is never definitive and carries the owner's outcome: command-output"),
+                (lost_replaced_outcome, "owner default needs the owner's outcome and the rounds' outcome it replaced: ccusage"),
+                (bare_owner_amendment, "owner amendment needs its date, its author and its decision: ccusage")):
+            with self.subTest(mutation=mutate.__name__):
+                manifest = deepcopy(original)
+                mutate(manifest)
+                self.write(DEFAULTS_SOURCE, manifest)
+                result = self.public_cli()
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn(message, result.stderr)
+
     def test_a_split_row_is_shown_as_not_installed_with_the_manifests_reason(self):
         """A measurement row whose measurement returned installs its settled default, as the manifest counts it."""
         data, markdown = self.generated()
@@ -1111,10 +1187,15 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertFalse(slot["installed"])
                 self.assertEqual(slot["not_installed_reason"], reason)
                 interim = record.get("interim")
-                # A waiting row that carries an interim install (amendment 3) shows it beside its decided default's reason.
+                # A waiting row that carries an interim install (amendment 3) shows it beside its decided default's reason;
+                # an interim of several repositories (amendment 4 widened code-search's) names them all, not as one link.
+                if interim:
+                    repositories = [part.strip() for part in interim["repository"].split(";")]
+                    named = (f"[{interim['default']}]({repositories[0]})" if len(repositories) == 1
+                             else f"{interim['default']} ({', '.join(repositories)})")
                 expected = ("not installed: " + reason if not interim else
-                            f"interim install ({interim['date_utc']}, amendment 3): [{interim['default']}]"
-                            f"({interim['repository']}); its decided default is not installed: {reason}")
+                            f"interim install ({interim['date_utc']}, amendment 3): {named}"
+                            f"; its decided default is not installed: {reason}")
                 self.assertEqual(lines[record["slot_id"]][4], expected)
         self.assertEqual(sorted(slot["record"]["slot_id"] for slot in waiting if slot["record"].get("interim")),
                          ["code-search", "memory-owner"])
