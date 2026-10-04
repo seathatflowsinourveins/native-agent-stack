@@ -1483,8 +1483,10 @@ class OpenHandsIsolationTests(unittest.TestCase):
         calls, run = self.docker_run_fake(host)
         with patch.object(host.subprocess, "run", side_effect=run):
             self.assertTrue(host.teardown_attempt(self.state, self.run_id, self.arm))
+        # The server's environment names are read (names only) before its removal: plan acceptance A7.
         self.assertEqual([argv[len(host.DOCKER):] for argv in calls], [
             ["logs", self.stem + "-proxy"], ["rm", "-f", self.stem + "-proxy"],
+            ["inspect", "--format", host.ENV_NAMES_FORMAT, self.stem + "-server"],
             ["logs", self.stem + "-server"], ["rm", "-f", self.stem + "-server"],
             ["network", "rm", self.stem + "-int"], ["network", "ls", "--format", "{{.Name}}"],
             ["network", "rm", self.stem + "-gw"], ["network", "ls", "--format", "{{.Name}}"]])
