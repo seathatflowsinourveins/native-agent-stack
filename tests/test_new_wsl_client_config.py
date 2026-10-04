@@ -192,6 +192,9 @@ def make_catalog(tmp: Path) -> Path:
              *cfg.TEMPLATE_ADDITIONS.values(), *cfg.BLOCK_TEXT_REL.values(), *cfg.GENERATED_BLOCKS.values(), f"{cfg.PLAN_REL}/install-plan.json",
              f"{cfg.PLAN_REL}/config/otel.yaml", f"{cfg.PLAN_REL}/config/omniroute.env.example",
              cfg.SKILLS_MANIFEST_REL]
+    # The dated records that the map's `directive` fields name: --check requires each to be a file of the checkout.
+    files += sorted({entry["directive"] for entry in json.loads((ROOT / cfg.MAP_REL).read_text(encoding="utf-8"))["entries"]
+                     if "directive" in entry})
     for rel in files:
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / rel, root / rel)
@@ -373,10 +376,40 @@ class MapTests(unittest.TestCase):
                 entry = next(e for e in data["entries"] if e["match"] ==
                              ["claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude"])
                 entry["wiring"] = "practice"
+                entry.pop("directive", None)    # a directive belongs to a slot entry only
             edit_json(root / cfg.MAP_REL, change)
             errors = cfg.analyse(root)[3]
         self.assertIn("claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude: a practice piece runs `rtk`, which "
                       "is not in the repository", errors)
+
+    def test_a_directive_adds_its_owner_while_the_slot_installs_and_needs_its_record(self):
+        hook = "claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude"
+        verdicts = {v.piece.key: v for v in cfg.analyse(ROOT)[0]}
+        self.assertTrue(verdicts[hook].wired)
+        self.assertIn("owner's directive (docs/decisions/", verdicts[hook].reason)
+        with tempfile.TemporaryDirectory() as tmp:     # the record the directive names is gone
+            root = make_catalog(Path(tmp))
+            record = next(e["directive"] for e in json.loads((root / cfg.MAP_REL).read_text())["entries"] if "directive" in e)
+            (root / record).unlink()
+            errors = cfg.analyse(root)[3]
+        self.assertTrue([e for e in errors if "its directive record" in e and record in e], errors)
+        with tempfile.TemporaryDirectory() as tmp:     # the slot comes to install nothing: the owner unwires with it
+            root = make_catalog(Path(tmp))
+
+            def no_layer(data):
+                for row in data["slots"]:
+                    if row.get("catalog") == "foundation" and row["slot_id"] == "context-supply":
+                        row.pop("interim", None)
+                        row["installs_nothing_extra"] = True
+            edit_json(root / cfg.MANIFEST_REL, no_layer)
+            verdicts = {v.piece.key: v for v in cfg.analyse(root)[0]}
+        self.assertFalse(verdicts[hook].wired)
+        with tempfile.TemporaryDirectory() as tmp:     # a directive on an entry that is not a slot entry is refused
+            root = make_catalog(Path(tmp))
+            edit_json(root / cfg.MAP_REL, lambda d: next(e for e in d["entries"] if e["match"] == [hook]).update(
+                wiring="practice"))
+            with self.assertRaises(cfg.ConfigError):
+                cfg.load_map(root)
 
     def test_a_practice_hook_may_run_only_files_that_the_repository_copies(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -619,18 +652,24 @@ class RenderTests(unittest.TestCase):
                        "'/home/example/.claude/plugins/claude-hud/statusline.mjs'"})
         events = {event: [h["command"] for g in groups for h in g["hooks"]] for event, groups in settings["hooks"].items()}
         commands = [command for v in events.values() for command in v]
-        # Each hook runs a file the repository copies, or ai-memory (an interim install) at the link the plan's
-        # memory-owner row makes; context-mode writes its own cache-heal hook.
+        # Each hook runs a file the repository copies, ai-memory (an interim install) at the link the plan's
+        # memory-owner row makes, or rtk (the owner's directive of 2026-10-04); context-mode writes its own cache-heal hook.
         ai_memory = "/home/example/.local/bin/ai-memory "
-        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 3)
-        self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) for command in commands),
-                        commands)
+        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 5)
+        self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) or command == "rtk hook claude"
+                            for command in commands), commands)
         self.assertTrue(any(command.startswith(ai_memory) for command in events["SessionStart"]), events)
         self.assertEqual([command for command in commands if "cache-heal" in command], [])
-        self.assertFalse([e for e in settings["permissions"]["deny"] if e.startswith(("Bash(rtk", "Agent(codex"))])
+        self.assertFalse([e for e in settings["permissions"]["deny"] if e.startswith("Agent(codex")])
+        self.assertEqual(len([e for e in settings["permissions"]["deny"] if e.startswith("Bash(rtk git push")]), 6)
         self.assertIn("Bash(git push --force *)", settings["permissions"]["deny"])
         self.assertEqual(settings["env"]["MCP_AUTO_OPEN_ENABLED"], "false")
-        self.assertNotIn("RTK_TELEMETRY_DISABLED", settings["env"])
+        # rtk and agent teams: the owner's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-token-layer-default.md).
+        self.assertEqual(settings["env"]["RTK_TELEMETRY_DISABLED"], "1")
+        self.assertEqual(settings["env"]["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"], "1")
+        self.assertEqual(events["PreToolUse"][0], "rtk hook claude")
+        self.assertTrue([c for c in events["SubagentStart"] if "token-lanes-subagent-start.py" in c], events)
+        self.assertTrue([c for c in events["SessionStart"] if "currency-due-notice.py" in c], events)
 
     def test_the_overlay_keeps_its_bell_and_the_notification_channel(self):
         overlay = json.loads(self.files["settings.linux-wsl2.overlay.json"])
@@ -689,8 +728,8 @@ class RenderTests(unittest.TestCase):
                                                         "context-used", "five-hour-limit", "weekly-limit"])
         policy = config["shell_environment_policy"]
         self.assertEqual(policy["inherit"], "none")
-        self.assertEqual(sorted(policy["set"]), ["DOCKER_HOST", "HOME", "LANG", "MCP_AUTO_OPEN_ENABLED", "PATH", "TERM",
-                                                 "TMPDIR", "XDG_RUNTIME_DIR"])
+        self.assertEqual(sorted(policy["set"]), ["DOCKER_HOST", "HOME", "LANG", "MCP_AUTO_OPEN_ENABLED", "PATH",
+                                                 "RTK_TELEMETRY_DISABLED", "TERM", "TMPDIR", "XDG_RUNTIME_DIR"])
         self.assertEqual(policy["set"]["HOME"], "/home/example")
         # The user's systemd runtime directory, for systemctl --user and the messaging courier, and the rootless Docker
         # socket in it (wave-2 custody ruling, change 7; synthesis X12): the id of the user the tool runs as.
@@ -720,10 +759,11 @@ class RenderTests(unittest.TestCase):
 
     def test_no_text_names_a_tool_that_the_manifest_does_not_install(self):
         names = unwired_names_independently()
-        self.assertTrue({"rtk", "socraticode", "headroom", "codebase-memory", "jcodemunch", "openai-codex"} <= {
+        self.assertTrue({"socraticode", "headroom", "codebase-memory", "jcodemunch", "openai-codex"} <= {
             n.lower() for n in names}, names)
-        # The interim installs and the statusline row are wired, so their names are no longer scanned for.
-        self.assertEqual({"ai-memory", "context-mode", "claude-hud", "semble"} & {n.lower() for n in names}, set())
+        # The interim installs, the statusline row and rtk (the owner's directive of 2026-10-04) are wired, so their
+        # names are no longer scanned for.
+        self.assertEqual({"ai-memory", "context-mode", "claude-hud", "semble", "rtk"} & {n.lower() for n in names}, set())
         with tempfile.TemporaryDirectory() as tmp:    # the render with the authorization settings is scanned too
             self.assertEqual(run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp, "--with-authorization-settings")[0], 0)
             with_option = {path.name: path.read_text(encoding="utf-8") for path in Path(tmp).iterdir()}
@@ -741,7 +781,7 @@ class RenderTests(unittest.TestCase):
         old = render_config.render_all(values)
         names = unwired_names_independently()
         found = {n for text in old.values() for n in names if name_hits(text, [n])}
-        self.assertTrue({"rtk", "socraticode", "headroom", "codebase-memory", "jcodemunch"} <= {
+        self.assertTrue({"socraticode", "headroom", "codebase-memory", "jcodemunch"} <= {
             n.lower() for n in found}, found)
 
     def test_the_ports_are_the_install_plans(self):
@@ -819,7 +859,8 @@ class RenderTests(unittest.TestCase):
                 for group in groups:
                     for hook in group["hooks"]:
                         referenced.update(re.findall(r"\.claude/hooks/([A-Za-z0-9_.-]+)", hook["command"]))
-        self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py"})
+        self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py", "currency-due-notice.py",
+                                      "token-lanes-subagent-start.py"})
         for name in referenced:
             source = icp.HOOKS[name]
             self.assertTrue(source.is_file(), name)
@@ -1000,13 +1041,13 @@ class InstructionBlockTests(unittest.TestCase):
 
     def test_no_tool_that_is_not_wired_is_named_in_either_block(self):
         names = unwired_names_independently()
-        self.assertTrue({"rtk", "socraticode", "headroom", "codebase-memory", "jcodemunch", "promptfoo"} <= {
+        self.assertTrue({"socraticode", "headroom", "codebase-memory", "jcodemunch", "promptfoo"} <= {
             n.lower() for n in names}, names)
         for piece in self.PIECES:
             self.assertTrue(name_hits("\n".join(source_lines(piece)), names), f"the sources name some: {piece}")
             self.assertEqual(name_hits(generated_text(piece), names), [], piece)
         # Control: the same scan finds a name that is added back, whole or in a different case.
-        self.assertIn("rtk", name_hits(generated_text(cfg.CODEX_MD_PIECE) + "Use rtk.\n", names))
+        self.assertIn("headroom", name_hits(generated_text(cfg.CODEX_MD_PIECE) + "Use headroom.\n", names))
         self.assertIn("headroom", name_hits(generated_text(cfg.CLAUDE_MD_PIECE) + "Ask HEADROOM.\n", names))
 
     def test_the_kept_and_the_dropped_text_together_are_the_whole_source(self):
@@ -1034,7 +1075,7 @@ class InstructionBlockTests(unittest.TestCase):
                     dependents.append(unit.text)
                     continue
                 self.assertTrue(name_hits(unit.text, names), (piece, unit.line, unit.text))
-        self.assertGreaterEqual(total, 20)
+        self.assertGreaterEqual(total, 3)     # since the token layer is wired (2026-10-04), three units go
         # ai-memory is wired (the memory-owner row's interim install), so the sentence that depends on its sentence stays;
         # test_the_two_blocks_lose_the_sentence_that_only_made_sense_with_the_ai_memory_one_and_list_it runs that case.
         self.assertEqual(dependents, [])
@@ -1233,7 +1274,7 @@ class CarrierTests(unittest.TestCase):
     A filtered copy would break the repository's own rules for them, so the map leaves them out: they require the RTK
     block (wave-2 context ruling, change 14)."""
 
-    def test_the_carriers_are_not_wired_and_a_filtered_copy_fails_the_three_rules_that_pin_them(self):
+    def test_the_carriers_are_not_wired_and_only_the_researcher_names_a_tool_that_is_not_wired(self):
         results, manifest, *_ = cfg.analyse(ROOT)
         verdicts = {v.piece.key: v for v in results}
         names = cfg.unwired_names(results, manifest)
@@ -1249,15 +1290,18 @@ class CarrierTests(unittest.TestCase):
             self.assertEqual(codex_roles.structural_problems(role, role, data), [])
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), sums[role_file])
             hits = {n.lower() for n in name_hits(data["developer_instructions"], names)}
-            self.assertIn("rtk", hits)
-            self.assertNotIn("context-mode", hits)      # an interim install now, so its working-directory bullet stays
-            # Filtered the way the two blocks are, it loses the exact-command-shapes bullet and the RTK block that the
-            # rules require.
+            # context-mode is an interim install and rtk is wired by the owner's directive of 2026-10-04, so the
+            # working-directory bullet and the RTK block stay; only the researcher's jCodeMunch sentence names a tool
+            # that is not wired.
+            self.assertEqual(hits, {"jcodemunch"} if role == "stack-researcher" else set(), role_file)
+            # Filtered the way the two blocks are, a carrier keeps the three rules; a dropped sentence changes the bytes
+            # its pinned hash covers.
             text, dropped = cfg.filter_block(data["developer_instructions"], names)
-            self.assertGreaterEqual(len(dropped), 20, role_file)
+            self.assertEqual(bool(dropped), bool(hits), role_file)
             self.assertEqual(name_hits(text, names), [], role_file)
+            self.assertEqual(text != data["developer_instructions"], bool(dropped), role_file)
             problems = codex_roles.structural_problems(role, role, dict(data, developer_instructions=text))
-            self.assertEqual(sorted(problems), ["exact_shapes", "f4_block"], role_file)
+            self.assertEqual(problems, [], role_file)
 
 
 def installing_independently(row: dict) -> bool:
@@ -1285,7 +1329,9 @@ def map_unwired_names_independently() -> set:
     for entry in json.loads(MAP.read_text())["entries"]:
         wiring = entry["wiring"]
         if wiring.startswith("not_wired") or (wiring.startswith("slot:")
-                                              and not slot_wires_independently(entry, rows[wiring[5:]])):
+                                              and not slot_wires_independently(entry, rows[wiring[5:]])
+                                              and not (entry.get("directive")
+                                                       and installing_independently(rows[wiring[5:]]))):
             names.update(entry.get("names", []))
     return names
 
@@ -1386,7 +1432,8 @@ class ApplyTests(ApplyCase):
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
         hooks = sorted(p.name for p in (self.home / ".claude/hooks").iterdir())
-        self.assertEqual(hooks, ["effort-default-guard.py", "secret_path_guard.py"])
+        self.assertEqual(hooks, sorted(["currency-due-notice.py", "effort-default-guard.py", "secret_path_guard.py",
+                                        *(name for name in icp.HOOKS if name.startswith("token-lanes"))]))
         for name in hooks:
             self.assertEqual(hashlib.sha256((self.home / ".claude/hooks" / name).read_bytes()).hexdigest(),
                              icp.expected_sha256(icp.HOOKS[name]))
@@ -2394,25 +2441,25 @@ class RenderedScanTests(unittest.TestCase):
     def test_a_name_in_a_rendered_file_fails_the_check_and_the_message_says_which_render(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["env"].update(SCAN_PROBE="use rtk here"))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["env"].update(SCAN_PROBE="use headroom here"))
             edit_json(root / cfg.MAP_REL, lambda d: d["entries"].insert(0, {
                 "match": ["claude/settings/env/SCAN_PROBE"], "wiring": "practice"}))
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
-        self.assertIn("the render for the example host without --with-authorization-settings: settings.json names rtk, "
+        self.assertIn("the render for the example host without --with-authorization-settings: settings.json names headroom, "
                       "which is not wired", err)
-        self.assertIn("the render for the example host with --with-authorization-settings: settings.json names rtk", err)
+        self.assertIn("the render for the example host with --with-authorization-settings: settings.json names headroom", err)
 
     def test_a_name_that_only_an_authorization_setting_carries_is_found_in_the_render_with_the_option_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["permissions"].update(defaultMode="rtk-default"))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["permissions"].update(defaultMode="headroom-default"))
             errors = cfg.rendered_name_errors(root)
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
         self.assertEqual(errors, ["the render for the example host with --with-authorization-settings: settings.json "
-                                  "names rtk, which is not wired"])
-        self.assertIn("with --with-authorization-settings: settings.json names rtk", err)
+                                  "names headroom, which is not wired"])
+        self.assertIn("with --with-authorization-settings: settings.json names headroom", err)
 
     def test_a_name_in_an_instruction_block_or_the_codex_config_is_found_too(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -3423,7 +3470,7 @@ class RecordTests(unittest.TestCase):
         manifest = cfg.load_manifest(ROOT)
         listed = cfg.dropped_markdown(ROOT, cfg.generate_blocks(ROOT, cfg.unwired_names(results, manifest))).rstrip("\n")
         self.assertIn(listed, text, "regenerate the record's dropped list with `--check --markdown`")
-        self.assertGreater(listed.count("\nline "), 20)
+        self.assertGreaterEqual(listed.count("\nline "), 3)    # three units go since the token layer is wired
         # Control: a table whose row differs from the tool's is not in the record.
         self.assertNotIn(tables.replace("| `slot:context-supply` |", "| `slot:other` |", 1), text)
         piece_rows = tables.split("\n\n")[0].splitlines()[2:]

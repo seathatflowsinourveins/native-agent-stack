@@ -13,7 +13,9 @@ adoption/new-wsl/client-config-map.json names every piece of the client template
 marketplace, status line, group of variables, permission rule, MCP server, Codex key, copied hook or agent file,
 instruction block and step of this tool) and gives it one wiring: `slot:<manifest slot>` (wired while that slot
 installs and its default is the owner the entry names; a row's interim install, amendment 3 of the manifest's decision rule,
-counts as what the slot installs while the row carries it), `practice`, `not_wired:<reason>`, or `authorization:<reason>` (a
+counts as what the slot installs while the row carries it, and a slot entry's `directive`, the dated record of the owner's
+directive, adds the entry's owner while that slot installs anything), `practice`, `not_wired:<reason>`, or
+`authorization:<reason>` (a
 setting that grants a permission or suppresses a confirmation: written only with --with-authorization-settings and,
 when the entry also names a `slot` and its `owner`, only while that slot installs the owner). The map is a closed world:
 a piece it does not name is an error. The tool does not read the old bootstrap profile
@@ -440,6 +442,9 @@ def load_map(root: Path) -> list:
                               "installs its tool, and comes with the `owner` the entry names")
         if "keep_existing" in raw and raw["keep_existing"] is not True:
             raise ConfigError(f"map entry {index} ({match[0]}): keep_existing is true or absent")
+        if "directive" in raw and not (kind == "slot" and isinstance(raw["directive"], str) and raw["directive"].strip()):
+            raise ConfigError(f"map entry {index} ({match[0]}): `directive` names the dated record of the owner's "
+                              "directive that adds a slot entry's owner to what that slot installs")
         entries.append(Entry(index, tuple(match), raw["wiring"], raw))
     return entries
 
@@ -615,6 +620,11 @@ def slot_verdict(piece: Piece, entry: Entry, slot: str, manifest: dict, plan: di
         return False, why_not_installed(slot, row)
     default = installed_default(row)
     interim = " (interim install)" if row.get("interim") else ""
+    if entry.owner.casefold() not in default.casefold() and entry.raw.get("directive"):
+        # The owner's dated directive adds the owner beside what the slot installs, and only while the slot installs
+        # something: the piece unwires with the slot when its measurement decides that the slot installs nothing.
+        return True, (f"slot {slot} installs {default}{interim}, and the owner's directive "
+                      f"({entry.raw['directive']}) adds {entry.owner} while the slot installs")
     if entry.owner.casefold() not in default.casefold():
         warnings.append(f"{piece.key}: slot {slot} installs {default!r}{interim}; the map wires {entry.owner!r}")
         return False, f"slot {slot} installs {default!r}{interim}, not {entry.owner!r}"
@@ -1325,6 +1335,9 @@ def consistency_errors(root: Path, results: list, entries: list) -> list:
     dead = {name for entry in entries for name in entry.names if not codex_roles.name_hits(pool, [name], True)}
     errors += [f"the map lists the name {name!r}, and no template, instruction or agent text holds it"
                for name in sorted(dead)]
+    errors += [f"map entry {entry.index} ({entry.match[0]}): its directive record {entry.raw['directive']} is not a "
+               "file of the repository" for entry in entries
+               if entry.raw.get("directive") and not (root / entry.raw["directive"]).is_file()]
     for item in load_dependents(root):
         found = 0
         for piece in BLOCK_TEXT_REL:
