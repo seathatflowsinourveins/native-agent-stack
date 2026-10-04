@@ -454,6 +454,18 @@
     },
     {
       "match": [
+        "claude/mcp/server/jcodemunch",
+        "codex/config/mcp_servers.jcodemunch.*"
+      ],
+      "wiring": "slot:code-index",
+      "owner": "jcodemunch",
+      "names": [
+        "jcodemunch"
+      ],
+      "source": "jgravelle/jcodemunch-mcp 1.108.319, revision 8f7b34abe16fb459e0bf1c04747d584216dfe32e: README.md L119-122 documents the user-scope registration (`claude mcp add -s user jcodemunch jcodemunch-mcp` after `uv tool install jcodemunch-mcp`), and CONFIGURATION.md L231 and SECURITY.md L311 document JCODEMUNCH_SHARE_SAVINGS=0 in the server's env block as the opt-out of the anonymous savings counter. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (\"we need to set up all the sota repos, mcp tools, harness rules, upstream cc native hooks and beyond, resolute them cleanly for future session to make sure their seamless pick up\"); docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md overturns the per-project rule of 2026-09-25 for this distribution. The install plan's code-index row installs the console script; jcodemunch-mcp init, which writes a prompt policy and hooks, is not run."
+    },
+    {
+      "match": [
         "claude/profile/hook-file/effort-default-guard.py",
         "claude/profile/hook-file/secret_path_guard.py"
       ],

@@ -48,7 +48,7 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    config (`adoption/new-wsl/templates/`, the 2026-10-03 addendum); the two instruction blocks; and six steps of the tool
    itself (the launcher, the login-shell PATH block, the skills step, the two PATH directories and the remote plugin
    rules). A piece goes to the first entry that matches it. A piece no entry
-   matches, and an entry no piece reaches, fail the check. Today: 396 pieces, 347 wired (207 practice, 140 through a slot),
+   matches, and an entry no piece reaches, fail the check. Today: 399 pieces, 350 wired (207 practice, 143 through a slot),
    35 not wired (0 through a slot that does not install, 35 by their own entry) and 14 authorization pieces (the five
    settings, the main checkout's Codex trust grant of the 2026-10-04 addendum, the six tool approval modes of Decision 14
    and semble's two allow rules, which also wait for their slots),
@@ -853,7 +853,7 @@ unchanged.
   2026-10-04 (~15:10Z): the user changed the advisor to Opus 5.5; the template now carries `advisorModel: "opus"` (see [Advisor model](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model)).
   when the shared template moves. `advisorModel` is `opus` (Opus 5.5) too, by its own override entry: the user's decision of
   2026-10-04 and the value NativeStack carries (`docs/decisions/2026-10-04-new-wsl-changelog-parity.md`).
-- **Counts.** 396 pieces, 347 wired, 35 not wired and 14 authorization pieces (Decisions 2 and 14 above).
+- **Counts.** 399 pieces, 350 wired, 35 not wired and 14 authorization pieces (Decisions 2 and 14 above).
 
 What would overturn it: Codex matching a project's trust by a parent directory or by another key form; a decision that
 the repository's root should ask again (the entry returns to `not_wired`); the user choosing another main model, or the
@@ -928,10 +928,6 @@ settings and the project agents' gaps) and the list of dropped units after them;
 
 | Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |
 | --- | --- | --- |
-| `evidence-reviewer.md` | `jcodemunch` | - |
-| `isolated-builder.md` | `jcodemunch` | - |
-| `security-reviewer.md` | `jcodemunch` | - |
-| `stack-researcher.md` | `jcodemunch` | - |
 
 `examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (1 unit(s) left out; 57 of 58 lines stay):
 

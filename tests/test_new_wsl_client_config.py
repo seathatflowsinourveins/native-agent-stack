@@ -484,7 +484,7 @@ class AgentGapTests(unittest.TestCase):
         gaps = cfg.agent_gaps(ROOT, results, plan)
         # Wave 3 wires the token servers; context-mode's plugin tools and skill retain their native names.
         wired_servers = {"serena", "qmd", "ai-memory", "semble", "socraticode", "headroom", "codebase-memory",
-                         "plugin_context-mode_context-mode"}
+                         "jcodemunch", "plugin_context-mode_context-mode"}
         for path in sorted((ROOT / cfg.CLAUDE_AGENTS_REL).glob("*.md")):
             text = path.read_text()
             head = re.match(r"---\n(.*?)\n---\n", text, re.S).group(1)
@@ -496,15 +496,9 @@ class AgentGapTests(unittest.TestCase):
             gap = gaps.get(path.name, {"mcp_tools": [], "skills": []})
             self.assertEqual({tool.split("__")[1] for tool in gap["mcp_tools"]}, expected_servers, path.name)
             self.assertEqual(gap["skills"], expected_skills, path.name)
-        # jCodeMunch is available only after the project's own registration, never from the user profile.
-        project_tools = ["mcp__jcodemunch__route", "mcp__jcodemunch__order"]
-        self.assertEqual(gaps, {
-            "evidence-reviewer.md": {"mcp_tools": project_tools, "skills": []},
-            "isolated-builder.md": {"mcp_tools": project_tools, "skills": []},
-            "security-reviewer.md": {"mcp_tools": project_tools, "skills": []},
-            "stack-researcher.md": {"mcp_tools": ["mcp__jcodemunch__route", "mcp__jcodemunch__menu",
-                                                 "mcp__jcodemunch__order"], "skills": []},
-        })
+        # The owner-selected token stack supplies every server and skill the project agents name; jCodeMunch is registered
+        # at user scope (the user's directive of 2026-10-04, docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md).
+        self.assertEqual(gaps, {})
         # The skills rows run install_skills.py over adoption/skills/manifest.json (wave-2 skills ruling, change 7): the
         # selected rows, without the retired, pruned and held ones.
         selected = {skill["name"] for skill in json.loads((ROOT / cfg.SKILLS_MANIFEST_REL).read_text())["skills"]
@@ -533,9 +527,7 @@ class AgentGapTests(unittest.TestCase):
             edit_json(root / cfg.MANIFEST_REL, install)
             after = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
         self.assertIn("socraticode", json.dumps(before["evidence-reviewer.md"]))
-        self.assertNotIn("socraticode", json.dumps(after["evidence-reviewer.md"]))
-        self.assertEqual(after["evidence-reviewer.md"], {
-            "mcp_tools": ["mcp__jcodemunch__route", "mcp__jcodemunch__order"], "skills": []})
+        self.assertNotIn("evidence-reviewer.md", after)    # jCodeMunch is wired too, so no gap remains
 
 
 class ManifestRuleTests(unittest.TestCase):
@@ -616,10 +608,8 @@ class ManifestRuleTests(unittest.TestCase):
         self.assertEqual({s for s in slots if cfg.installs(rows[s])},
                          {"serena", "tobi-qmd", "otel-collector-contrib", "gpt-gateway", "claude-code", "mise",
                           "mcp-inspector", "context-supply", "memory-owner", "code-search", "statusline",
-                          "container-engine", "command-output", "output-compression", "code-graph",
+                          "container-engine", "command-output", "output-compression", "code-index", "code-graph",
                           "api-docs"})
-        self.assertNotIn("code-index", slots)  # its console script installs, but neither user profile registers it
-        self.assertTrue(cfg.installs(rows["code-index"]))
         self.assertEqual({s for s in slots if rows[s].get("interim")}, {"memory-owner", "code-search"})
 
 
@@ -718,7 +708,7 @@ class RenderTests(unittest.TestCase):
         servers = json.loads(self.files["mcp-servers.json"])["mcpServers"]
         # The owner-selected token stack joins Serena, QMD and the interim memory/search installs.
         self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd",
-                                         "semble"])
+                                         "jcodemunch", "semble"])
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
@@ -734,12 +724,16 @@ class RenderTests(unittest.TestCase):
         config = tomllib.loads(self.files["codex.config.toml"])
         # semble comes from the new distribution's additions, merged after the shared template's servers.
         self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory",
-                                                      "qmd", "context-mode", "semble"])
+                                                      "qmd", "context-mode", "jcodemunch", "semble"])
         pinned_search = host["ECO_ROOT"] + "/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
         self.assertEqual(servers["socraticode"]["args"], [pinned_search.replace(host["ECO_ROOT"], "${ECO_ROOT}")])
         self.assertEqual(config["mcp_servers"]["socraticode"]["args"], [pinned_search])
-        self.assertNotIn("jcodemunch", servers)
-        self.assertNotIn("jcodemunch", config["mcp_servers"])
+        # jCodeMunch at user scope, with the documented opt-out of its anonymous savings counter in the server's env block
+        # (the user's directive of 2026-10-04; JCODEMUNCH_SHARE_SAVINGS=0, CONFIGURATION.md at the pinned revision).
+        self.assertEqual(servers["jcodemunch"], {"type": "stdio", "command": "${ECO_ROOT}/bin/jcodemunch-mcp", "args": [],
+                                                 "env": {"JCODEMUNCH_SHARE_SAVINGS": "0"}})
+        self.assertEqual(config["mcp_servers"]["jcodemunch"], {"command": host["ECO_ROOT"] + "/bin/jcodemunch-mcp",
+                                                               "env": {"JCODEMUNCH_SHARE_SAVINGS": "0"}})
         self.assertEqual(config["mcp_servers"]["ai-memory"], {"url": f"http://{host['AI_MEMORY_URL']}/mcp"})
         semble = config["mcp_servers"]["semble"]
         self.assertEqual((semble["command"], semble["enabled_tools"]), ("semble", ["search", "find_related"]))
@@ -1505,7 +1499,7 @@ class ApplyTests(ApplyCase):
                              icp.expected_sha256(icp.HOOKS[name]))
         self.assertEqual(len(list((self.home / ".claude/agents").iterdir())), 11)
         self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())),
-                         ["ai-memory", "codebase-memory", "headroom", "qmd", "semble", "serena", "socraticode"])
+                         ["ai-memory", "codebase-memory", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",

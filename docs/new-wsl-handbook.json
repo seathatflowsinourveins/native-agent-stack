@@ -7475,7 +7475,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "0e7d09444a7f97d75086ff6eef2f258a20fe8e85a5553c33f5d55afdd9de7098"
+      "sha256": "2e08dad68097c0ddf64f1e0b79637d755e9a6b468fe7a83ecd74fa2892d723f0"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -11728,7 +11728,7 @@
         "prerequisites": [
           "uv with CPython 3.13."
         ],
-        "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered per project, never at user scope; jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
+        "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
         "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91"
       },
       "name": "jcodemunch-mcp",
