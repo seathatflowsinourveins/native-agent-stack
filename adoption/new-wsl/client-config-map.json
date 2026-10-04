@@ -14,13 +14,13 @@
         "claude/settings/env/RTK_TELEMETRY_DISABLED",
         "codex/*/shell_environment_policy.set.RTK_TELEMETRY_DISABLED"
       ],
-      "wiring": "slot:context-supply",
+      "wiring": "slot:command-output",
       "owner": "rtk",
       "names": [
         "RTK_TELEMETRY_DISABLED",
         "rtk"
       ],
-      "note": "rtk filters command output between the tools and the model, the job of the context-supply slot. The owner's directive of 2026-10-04 adds it beside the slot's interim install. A copy of the variable inside an MCP server's table follows that server's own entry, so an unwired server never gets a table of its own.",
+      "note": "RTK 0.50.0 owns command-output under the owner's full-stack decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md). A copy of the variable inside an MCP server's table follows that server's own entry, so an unwired server never gets a table of its own.",
       "directive": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md"
     },
     {
@@ -83,7 +83,7 @@
       "match": [
         "claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude"
       ],
-      "wiring": "slot:context-supply",
+      "wiring": "slot:command-output",
       "owner": "rtk",
       "names": [
         "rtk"
@@ -238,7 +238,7 @@
       "match": [
         "claude/settings/permission/deny/Bash(rtk *"
       ],
-      "wiring": "slot:context-supply",
+      "wiring": "slot:command-output",
       "owner": "rtk",
       "names": [
         "rtk"
@@ -384,7 +384,12 @@
       "names": [
         "socraticode"
       ],
-      "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement; semble is its interim install."
+      "override": {
+        "args": [
+          "${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
+        ]
+      },
+      "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement; the owner's full-stack decision of 2026-10-04 makes both its interim install."
     },
     {
       "match": [
@@ -401,7 +406,7 @@
       "match": [
         "claude/mcp/server/headroom"
       ],
-      "wiring": "slot:context-supply",
+      "wiring": "slot:output-compression",
       "owner": "headroom",
       "names": [
         "headroom"
@@ -412,11 +417,24 @@
         "claude/mcp/server/codebase-memory",
         "codex/*/mcp_servers.codebase-memory.*"
       ],
-      "wiring": "not_wired:no slot of the manifest names a code-graph or symbol-index tool such as codebase-memory or jCodeMunch (the code-navigation slot's owner is Serena)",
+      "wiring": "slot:code-graph",
+      "owner": "codebase-memory",
       "names": [
-        "codebase-memory",
+        "codebase-memory"
+      ],
+      "source": "DeusData/codebase-memory-mcp v0.11.0, installed by the code-graph row of evidence/artifacts/new-wsl-install-plan-20261002/install.sh. docs/decisions/2026-09-25-codex-mcp-scope.md requires explicit index_repository and auto_index=false; this entry registers only the MCP server and never invokes indexing."
+    },
+    {
+      "match": [
+        "claude/mcp/server/jcodemunch",
+        "codex/config/mcp_servers.jcodemunch.*"
+      ],
+      "wiring": "slot:code-index",
+      "owner": "jcodemunch",
+      "names": [
         "jcodemunch"
-      ]
+      ],
+      "source": "jgravelle/jcodemunch-mcp 1.108.319, revision 8f7b34abe16fb459e0bf1c04747d584216dfe32e README.md: user-scope `claude mcp add -s user jcodemunch` and Codex [mcp_servers.jcodemunch]. The install plan's code-index row installs the jcodemunch-mcp console script into ${ECO_ROOT}/bin. The 2604 additions register that executable only; jcodemunch-mcp init is never invoked."
     },
     {
       "match": [
@@ -547,7 +565,7 @@
         "codex/*/mcp_servers.headroom.default_tools_approval_mode"
       ],
       "wiring": "authorization:a tool approval mode of \"approve\" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has",
-      "slot": "context-supply",
+      "slot": "output-compression",
       "owner": "headroom"
     },
     {
@@ -579,6 +597,17 @@
     },
     {
       "match": [
+        "codex/config/mcp_servers.socraticode.args"
+      ],
+      "wiring": "slot:code-search",
+      "owner": "SocratiCode",
+      "override": [
+        "${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
+      ],
+      "source": "The install plan's code-search row installs socraticode 1.15.0 into this versioned prefix and creates no bin/socraticode link; docs/decisions/2026-09-25-codex-mcp-scope.md requires the pinned dist/index.js path."
+    },
+    {
+      "match": [
         "codex/*/mcp_servers.socraticode.*"
       ],
       "wiring": "slot:code-search",
@@ -591,7 +620,7 @@
       "match": [
         "codex/*/mcp_servers.headroom.*"
       ],
-      "wiring": "slot:context-supply",
+      "wiring": "slot:output-compression",
       "owner": "headroom",
       "names": [
         "headroom"
@@ -673,7 +702,8 @@
       "match": [
         "codex/stack-worker/shell_environment_policy.set.CHUB_*"
       ],
-      "wiring": "not_wired:the two variables opt a tool out of telemetry (Context Hub, chub), which the manifest does not install",
+      "wiring": "slot:api-docs",
+      "owner": "Context Hub",
       "names": [
         "chub",
         "CHUB_TELEMETRY",

@@ -16,6 +16,12 @@
 [mcp_servers.ai-memory]
 default_tools_approval_mode = "approve"
 
+# jgravelle/jcodemunch-mcp 1.108.319, README.md at 8f7b34abe16fb459e0bf1c04747d584216dfe32e:
+# the native MCP registration only. The code-index install-plan row installs this console script;
+# jcodemunch-mcp init is a separate prompt-policy and hook decision and is never run here.
+[mcp_servers.jcodemunch]
+command = "${ECO_ROOT}/bin/jcodemunch-mcp"
+
 # semble 0.6.1 (MinishLab/semble, a uv tool), the code-search slot's interim install (definitive manifest, amendment 3;
 # wave-2 code-search ruling, changes 2-5). Stdio, CPU only, no port. Its two tools carry no MCP annotations, so Codex
 # 0.160.0 asks before each call unless the approval mode approves them (authorization, as above); enabled_tools names

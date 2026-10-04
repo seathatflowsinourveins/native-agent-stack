@@ -48,8 +48,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    config (`adoption/new-wsl/templates/`, the 2026-10-03 addendum); the two instruction blocks; and six steps of the tool
    itself (the launcher, the login-shell PATH block, the skills step, the two PATH directories and the remote plugin
    rules). A piece goes to the first entry that matches it. A piece no entry
-   matches, and an entry no piece reaches, fail the check. Today: 389 pieces, 318 wired (214 practice, 104 through a slot),
-   58 not wired (30 through a slot that does not install, 28 by their own entry) and 13 authorization pieces (the four
+   matches, and an entry no piece reaches, fail the check. Today: 391 pieces, 355 wired (214 practice, 141 through a slot),
+   23 not wired (0 through a slot that does not install, 23 by their own entry) and 13 authorization pieces (the four
    settings, the main checkout's Codex trust grant of the 2026-10-04 addendum, the six tool approval modes of Decision 14
    and semble's two allow rules, which also wait for their slots),
    each listed below; a slot whose install is another owner (an interim install, the 2026-10-03 addendum) counts as one
@@ -303,7 +303,7 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
       config and the stack-worker profile), semble and context-mode and semble's two allow rules, because their slots
       install those owners as interim installs; SocratiCode's and headroom's wait, because their slots install another
       owner. Since the 2026-10-04 addendum the option also writes the main checkout's Codex trust grant. Thirteen pieces
-      are in the class (`--check` counts `authorization: 13`, and 58 pieces are not wired).
+      are in the class (`--check` counts `authorization: 13`, and 23 pieces are not wired).
     - **The default.** `--render` and `--apply` neither render nor write the four, and an existing value of those keys in a
       person's files is never touched: the render lacks the keys, so the Claude merge leaves the file's keys as they are,
       and so does the Codex merge.
@@ -849,7 +849,7 @@ unchanged.
   without a suffix). Claude Code resolves the same model as before; what changes is that the new distribution keeps it
   when the shared template moves. `advisorModel` stays the template's `fable`.
   2026-10-04 (~15:10Z): the user changed the advisor to Opus 5.5; the template now carries `advisorModel: "opus"` (see [Advisor model](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model)).
-- **Counts.** 389 pieces, 318 wired, 58 not wired and 13 authorization pieces (Decisions 2 and 14 above).
+- **Counts.** 391 pieces, 355 wired, 23 not wired and 13 authorization pieces (Decisions 2 and 14 above).
 
 What would overturn it: Codex matching a project's trust by a parent directory or by another key form; a decision that
 the repository's root should ask again (the entry returns to `not_wired`); the user choosing another main model, or the
@@ -873,36 +873,7 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `claude/settings/hook/SessionStart/matcher=-/"${HOME}/.claude/hooks/context-mode-cache-heal.mjs"` | `not_wired` | context-mode writes this SessionStart hook into settings.json itself and deploys the file it runs, ~/.claude/hooks/context-mode-cache-heal.mjs (start.mjs L166-183 at mksglu/context-mode@6f0cc684; evidence/artifacts/context-mode-codex-binding-20260926/README.md L207-217), and its self-heal runs on every start from either client and on npm postinstall (start.mjs L227-427 and L237-239, scripts/heal-installed-plugins.mjs L202-205); the repository does not copy that file, and a second writer of the entry would compete with the plugin's own (wave-2 synthesis X11; context ruling, change 8) |
 | `claude/settings/plugin/codex@openai-codex` | `not_wired` | the manifest has no slot whose repository is openai/codex-plugin-cc (the nearest rows, codex and codex-sdk-and-codex-exec-app-server, are openai/codex), so no installed owner supplies the plugin |
 | `claude/settings/marketplace/openai-codex` | `not_wired` | the manifest has no slot whose repository is openai/codex-plugin-cc (the nearest rows, codex and codex-sdk-and-codex-exec-app-server, are openai/codex), so no installed owner supplies the plugin |
-| `claude/mcp/server/socraticode` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `claude/mcp/server/headroom` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
-| `claude/mcp/server/codebase-memory` | `not_wired` | no slot of the manifest names a code-graph or symbol-index tool such as codebase-memory or jCodeMunch (the code-navigation slot's owner is Serena) |
 | `codex/config/check_for_update_on_startup` | `not_wired` | the template sets it false because the client is pinned and updated by the stack, and the install plan installs Codex with its self-updating native installer, so Codex keeps its own update check |
-| `codex/config/mcp_servers.socraticode.command` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.args` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.startup_timeout_sec` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.RTK_TELEMETRY_DISABLED` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.PATH` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.QDRANT_MODE` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.QDRANT_URL` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.EMBEDDING_PROVIDER` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.LMSTUDIO_URL` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.EMBEDDING_MODEL` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.EMBEDDING_DIMENSIONS` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.EMBEDDING_CONTEXT_LENGTH` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.EMBEDDING_QUERY_PREFIX` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.EMBEDDING_DOCUMENT_PREFIX` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.EMBEDDING_DOCUMENT_INCLUDE_PATH` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.RESPECT_GITIGNORE` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.INCLUDE_DOT_FILES` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.SOCRATICODE_WATCHER` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.socraticode.env.SEARCH_DEFAULT_LIMIT` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/config/mcp_servers.headroom.command` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
-| `codex/config/mcp_servers.headroom.args` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
-| `codex/config/mcp_servers.headroom.env.HEADROOM_OFFLINE` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
-| `codex/config/mcp_servers.headroom.env.HF_HUB_OFFLINE` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
-| `codex/config/mcp_servers.headroom.env.TRANSFORMERS_OFFLINE` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
-| `codex/config/mcp_servers.headroom.env.DO_NOT_TRACK` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
-| `codex/config/mcp_servers.codebase-memory.command` | `not_wired` | no slot of the manifest names a code-graph or symbol-index tool such as codebase-memory or jCodeMunch (the code-navigation slot's owner is Serena) |
 | `codex/config/projects."${HOME}/code/native-agent-stack-publication".trust_level` | `not_wired` | trust grants belong to one host; adoption/bootstrap.md step 4 and tools/adoption/codex_home.py leave them out, and Codex asks on this host |
 | `codex/config/tui.model_availability_nux.gpt-6-astra` | `not_wired` | a counter of how often Codex showed a model notice on the source host, which is client state and not configuration |
 | `codex/config/tui.model_availability_nux."gpt-6.1-sol"` | `not_wired` | a counter of how often Codex showed a model notice on the source host, which is client state and not configuration |
@@ -914,12 +885,6 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `codex/config/hooks.state."${HOME}/.codex/hooks.json:session_end:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
 | `codex/config/hooks.state."${HOME}/.codex/hooks.json:user_prompt_submit:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
 | `codex/config/hooks.state."${HOME}/.codex/hooks.json:stop:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
-| `codex/stack-worker/shell_environment_policy.set.CHUB_TELEMETRY` | `not_wired` | the two variables opt a tool out of telemetry (Context Hub, chub), which the manifest does not install |
-| `codex/stack-worker/shell_environment_policy.set.CHUB_FEEDBACK` | `not_wired` | the two variables opt a tool out of telemetry (Context Hub, chub), which the manifest does not install |
-| `codex/stack-worker/mcp_servers.codebase-memory.startup_timeout_sec` | `not_wired` | no slot of the manifest names a code-graph or symbol-index tool such as codebase-memory or jCodeMunch (the code-navigation slot's owner is Serena) |
-| `codex/stack-worker/mcp_servers.socraticode.enabled_tools` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/stack-worker/mcp_servers.socraticode.env.SOCRATICODE_WATCHER` | `slot:code-search` | slot code-search installs 'semble 0.6.1' (interim install), not 'SocratiCode' |
-| `codex/stack-worker/mcp_servers.headroom.enabled_tools` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
 | `codex/hooks/setting/description` | `not_wired` | ~/.codex/hooks.json is written by ai-memory 2.5.2's own install-hooks (the hooks.state entry below), so this tool would be a second writer of that file, and the template's handler has no reviewed trust hash; the Claude Code notice is wired |
 | `codex/hooks/hook/SessionStart/matcher=startup/python3 "$HOME/.claude/hooks/currency-due-notice.py" 2>/dev/null \|\| true` | `not_wired` | ~/.codex/hooks.json is written by ai-memory 2.5.2's own install-hooks (the hooks.state entry below), so this tool would be a second writer of that file, and the template's handler has no reviewed trust hash; the Claude Code notice is wired |
 | `codex/role/stack-researcher.toml` | `not_wired` | the carriers are byte-pinned in adoption/agents/codex/SHA256SUMS and ruled by tools/adoption/codex_roles.py (cwd_rule, exact_shapes, f4_block); stack-researcher.toml names jCodeMunch, which this distribution does not install, so a copy without that sentence keeps the three rules but not its pinned hash; stack-verifier.toml names no tool that is not wired, and the 2026-10-04 token-layer record leaves both roles to its follow-up, the carriers filtered to the installed lanes |
@@ -943,14 +908,10 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `codex/config/projects."${PROJECT_ROOT}".trust_level` | `"trusted"` | no | a trusted project's own .codex/config.toml layers load and Codex asks nothing about the folder, so the grant is written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
 | `codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-search` installing `SocratiCode` |
-| `codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `context-supply` installing `headroom` |
+| `codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `output-compression` installing `headroom` |
 
 | Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |
 | --- | --- | --- |
-| `evidence-reviewer.md` | `jcodemunch`, `socraticode` | - |
-| `isolated-builder.md` | `jcodemunch`, `socraticode` | - |
-| `security-reviewer.md` | `jcodemunch`, `socraticode` | - |
-| `stack-researcher.md` | `jcodemunch` | - |
 
 `examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (1 unit(s) left out; 57 of 58 lines stay):
 
@@ -960,14 +921,11 @@ line 17, bullet; names Promptfoo
 
 ```
 
-`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (2 unit(s) left out; 64 of 66 lines stay):
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (1 unit(s) left out; 65 of 66 lines stay):
 
 ```text
 line 11, sentence; names Promptfoo
 A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
-
-line 17, sentence; names codebase-memory, headroom, socraticode
-Token lanes, one lane per artifact, verifying original source before editing or judging retrieved or compressed text: `serena` for exact symbols and references, `socraticode` or, where it is connected, `semble` for conceptual code search, `codebase-memory` for the code graph, `qmd` for scoped Markdown search, `ai-memory` for prior decisions (evidence, never authority), `context-mode` (`ctx_execute`) for large command output, `headroom` to compress a large selected text, with retrieval for recovery.
 
 ```
 

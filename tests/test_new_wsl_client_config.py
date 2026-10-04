@@ -386,7 +386,7 @@ class MapTests(unittest.TestCase):
         hook = "claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude"
         verdicts = {v.piece.key: v for v in cfg.analyse(ROOT)[0]}
         self.assertTrue(verdicts[hook].wired)
-        self.assertIn("owner's directive (docs/decisions/", verdicts[hook].reason)
+        self.assertIn("slot command-output installs RTK 0.50.0", verdicts[hook].reason)
         with tempfile.TemporaryDirectory() as tmp:     # the record the directive names is gone
             root = make_catalog(Path(tmp))
             record = next(e["directive"] for e in json.loads((root / cfg.MAP_REL).read_text())["entries"] if "directive" in e)
@@ -398,7 +398,7 @@ class MapTests(unittest.TestCase):
 
             def no_layer(data):
                 for row in data["slots"]:
-                    if row.get("catalog") == "foundation" and row["slot_id"] == "context-supply":
+                    if row.get("catalog") == "foundation" and row["slot_id"] == "command-output":
                         row.pop("interim", None)
                         row["installs_nothing_extra"] = True
             edit_json(root / cfg.MANIFEST_REL, no_layer)
@@ -460,9 +460,9 @@ class AgentGapTests(unittest.TestCase):
         results, _, plan, errors, warnings = cfg.analyse(ROOT)
         self.assertEqual(errors, [])
         gaps = cfg.agent_gaps(ROOT, results, plan)
-        # Serena and QMD, ai-memory and semble (interim installs), and context-mode's plugin, whose tools Claude Code
-        # names mcp__plugin_context-mode_context-mode__* and whose skill is context-mode:context-mode.
-        wired_servers = {"serena", "qmd", "ai-memory", "semble", "plugin_context-mode_context-mode"}
+        # Wave 3 wires the token servers; context-mode's plugin tools and skill retain their native names.
+        wired_servers = {"serena", "qmd", "ai-memory", "semble", "socraticode", "headroom", "codebase-memory",
+                         "jcodemunch", "plugin_context-mode_context-mode"}
         for path in sorted((ROOT / cfg.CLAUDE_AGENTS_REL).glob("*.md")):
             text = path.read_text()
             head = re.match(r"---\n(.*?)\n---\n", text, re.S).group(1)
@@ -474,11 +474,8 @@ class AgentGapTests(unittest.TestCase):
             gap = gaps.get(path.name, {"mcp_tools": [], "skills": []})
             self.assertEqual({tool.split("__")[1] for tool in gap["mcp_tools"]}, expected_servers, path.name)
             self.assertEqual(gap["skills"], expected_skills, path.name)
-        # The wave-2 context ruling (change 14): stack-verifier's gap empties, the other four keep jCodeMunch (and three of
-        # them SocratiCode), and isolated-builder has its context-mode:context-mode skill.
-        self.assertEqual(sorted(gaps), ["evidence-reviewer.md", "isolated-builder.md", "security-reviewer.md",
-                                        "stack-researcher.md"])
-        self.assertEqual(gaps["isolated-builder.md"]["skills"], [])
+        # The owner-selected token stack supplies every server and skill the project agents name.
+        self.assertEqual(gaps, {})
         # The skills rows run install_skills.py over adoption/skills/manifest.json (wave-2 skills ruling, change 7): the
         # selected rows, without the retired, pruned and held ones.
         selected = {skill["name"] for skill in json.loads((ROOT / cfg.SKILLS_MANIFEST_REL).read_text())["skills"]
@@ -498,12 +495,16 @@ class AgentGapTests(unittest.TestCase):
                 row = next(r for r in data["slots"] if r["slot_id"] == "code-search" and r["catalog"] == "foundation")
                 row.update(installs_nothing_extra=False, state="definitive", default="SocratiCode")
                 row["resolution"] = {"outcome": "final"}
-                row.pop("interim", None)       # a decided default replaces the interim install (semble)
+                row.pop("interim", None)       # a decided default replaces the interim install
+            # Keep the absent-server control now that the committed interim installs SocratiCode too.
+            edit_json(root / cfg.MANIFEST_REL, lambda data: next(
+                r for r in data["slots"] if r["slot_id"] == "code-search" and r["catalog"] == "foundation")[
+                    "interim"].update(default="semble 0.6.1"))
             before = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
             edit_json(root / cfg.MANIFEST_REL, install)
             after = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
         self.assertIn("socraticode", json.dumps(before["evidence-reviewer.md"]))
-        self.assertNotIn("socraticode", json.dumps(after["evidence-reviewer.md"]))
+        self.assertNotIn("evidence-reviewer.md", after)    # jCodeMunch is wired too, so no gap remains
 
 
 class ManifestRuleTests(unittest.TestCase):
@@ -515,10 +516,8 @@ class ManifestRuleTests(unittest.TestCase):
         planned = {slot for slot, row in plan.items() if row["installed"]}
         self.assertEqual(installing - planned, {"mcp-inspector", "base-distribution"})
         self.assertEqual(planned - installing, set())
-        # 39 rows of the 64-row plan (36, and the interim installs of memory-owner, code-search and context-supply, amendment
-        # 3), the two local-model rows settled by their preregistered measurement (local-generation-model, embedding-model),
-        # the two rows of the layer consensus that install (skill-discovery, skill-authoring) and its wave-2 statusline row.
-        self.assertEqual(len(planned), 44)
+        # The 44 previously installed rows plus wave 3's ten new rows, ccusage and session-analytics.
+        self.assertEqual(len(planned), 56)
 
     def test_a_split_slot_that_is_changed_to_installing_wires_its_piece_and_back(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -536,11 +535,11 @@ class ManifestRuleTests(unittest.TestCase):
                 files = cfg.render(root, plan[0], plan[2], cfg.host_values(EXAMPLE_HOST, plan[2], None, []))
                 return json.loads(files["mcp-servers.json"])["mcpServers"], files["codex.config.toml"]
 
-            # The split slot carries semble as its interim install (amendment 3), so SocratiCode's pieces stay out.
+            # Wave 3's split-slot interim installs both semble and SocratiCode.
             before = wired()
-            self.assertEqual([before[k] for k in keys], [False, False])
-            self.assertNotIn("socraticode", servers()[0])
-            self.assertNotIn("socraticode", servers()[1])
+            self.assertEqual([before[k] for k in keys], [True, True])
+            self.assertIn("socraticode", servers()[0])
+            self.assertIn("socraticode", servers()[1])
             manifest = root / cfg.MANIFEST_REL
             original = manifest.read_text()
 
@@ -556,8 +555,8 @@ class ManifestRuleTests(unittest.TestCase):
             self.assertIn("[mcp_servers.socraticode]", servers()[1])
             manifest.write_text(original, encoding="utf-8")
             restored = wired()
-            self.assertEqual([restored[k] for k in keys], [False, False])
-            self.assertNotIn("socraticode", servers()[0])
+            self.assertEqual([restored[k] for k in keys], [True, True])
+            self.assertIn("socraticode", servers()[0])
             # The slot installs a different owner: the piece for SocratiCode stays out, and the check says so.
             edit_json(manifest, lambda data: install(data, default="semble"))
             other = wired()
@@ -582,13 +581,13 @@ class ManifestRuleTests(unittest.TestCase):
         self.assertTrue(slots <= set(rows), slots - set(rows))
         not_installing = {s for s in slots if not cfg.installs(rows[s])}
         self.assertEqual(not_installing, set())
-        # context-supply, memory-owner and code-search install through their interims (amendment 3); statusline is the
-        # layer consensus's wave-2 row; container-engine wires the Codex shells' DOCKER_HOST (wave-2 custody ruling, 7).
+        # Wave 3 gives context-supply its owner default and adds five slots with client configuration pieces.
         self.assertEqual({s for s in slots if cfg.installs(rows[s])},
                          {"serena", "tobi-qmd", "otel-collector-contrib", "gpt-gateway", "claude-code", "mise",
                           "mcp-inspector", "context-supply", "memory-owner", "code-search", "statusline",
-                          "container-engine"})
-        self.assertEqual({s for s in slots if rows[s].get("interim")}, {"context-supply", "memory-owner", "code-search"})
+                          "container-engine", "command-output", "output-compression", "code-index", "code-graph",
+                          "api-docs"})
+        self.assertEqual({s for s in slots if rows[s].get("interim")}, {"memory-owner", "code-search"})
 
 
 class RenderTests(unittest.TestCase):
@@ -677,8 +676,9 @@ class RenderTests(unittest.TestCase):
 
     def test_the_wired_servers_are_registered_and_serena_and_qmd_by_the_command_their_readmes_give(self):
         servers = json.loads(self.files["mcp-servers.json"])["mcpServers"]
-        # Serena and QMD (decided defaults); ai-memory and semble (interim installs, amendment 3 of the manifest).
-        self.assertEqual(list(servers), ["ai-memory", "serena", "qmd", "semble"])
+        # The owner-selected token stack joins Serena, QMD and the interim memory/search installs.
+        self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd",
+                                         "jcodemunch", "semble"])
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
@@ -693,7 +693,13 @@ class RenderTests(unittest.TestCase):
             "SEMBLE_CACHE_LOCATION": "${HOME}/.cache/semble-claude"})
         config = tomllib.loads(self.files["codex.config.toml"])
         # semble comes from the new distribution's additions, merged after the shared template's servers.
-        self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "qmd", "context-mode", "semble"])
+        self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory",
+                                                      "qmd", "context-mode", "jcodemunch", "semble"])
+        pinned_search = host["ECO_ROOT"] + "/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
+        self.assertEqual(servers["socraticode"]["args"], [pinned_search.replace(host["ECO_ROOT"], "${ECO_ROOT}")])
+        self.assertEqual(config["mcp_servers"]["socraticode"]["args"], [pinned_search])
+        self.assertEqual(servers["jcodemunch"], {"type": "stdio", "command": "${ECO_ROOT}/bin/jcodemunch-mcp", "args": []})
+        self.assertEqual(config["mcp_servers"]["jcodemunch"], {"command": host["ECO_ROOT"] + "/bin/jcodemunch-mcp"})
         self.assertEqual(config["mcp_servers"]["ai-memory"], {"url": f"http://{host['AI_MEMORY_URL']}/mcp"})
         semble = config["mcp_servers"]["semble"]
         self.assertEqual((semble["command"], semble["enabled_tools"]), ("semble", ["search", "find_related"]))
@@ -749,21 +755,27 @@ class RenderTests(unittest.TestCase):
 
     def test_the_stack_worker_profile_keeps_the_wired_servers_and_the_settings_that_need_no_tool(self):
         profile = tomllib.loads(self.files["codex.stack-worker.config.toml"])
-        self.assertEqual(set(profile), {"model", "model_reasoning_effort", "web_search", "mcp_servers"})
-        # Serena, and the ai-memory and context-mode tables of the interim installs; without the option no approval mode.
+        self.assertEqual(set(profile), {"model", "model_reasoning_effort", "web_search", "mcp_servers",
+                                        "shell_environment_policy"})
+        self.assertEqual(profile["shell_environment_policy"], {"set": {"CHUB_TELEMETRY": "0", "CHUB_FEEDBACK": "0"}})
+        # All installed servers' worker policies remain; without the option no approval mode.
         self.assertEqual(profile["mcp_servers"], {
             "serena": {"startup_timeout_sec": 60, "required": True},
+            "codebase-memory": {"startup_timeout_sec": 60},
             "ai-memory": {"enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status",
                                             "memory_briefing"]},
+            "socraticode": {"enabled_tools": ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"],
+                             "env": {"SOCRATICODE_WATCHER": "manual"}},
+            "headroom": {"enabled_tools": ["headroom_compress", "headroom_retrieve", "headroom_stats"]},
             "context-mode": {"disabled_tools": ["ctx_upgrade", "ctx_purge"]}})
 
     def test_no_text_names_a_tool_that_the_manifest_does_not_install(self):
         names = unwired_names_independently()
-        self.assertTrue({"socraticode", "headroom", "codebase-memory", "jcodemunch", "openai-codex"} <= {
+        self.assertTrue({"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "hcom", "openai-codex"} <= {
             n.lower() for n in names}, names)
-        # The interim installs, the statusline row and rtk (the owner's directive of 2026-10-04) are wired, so their
-        # names are no longer scanned for.
-        self.assertEqual({"ai-memory", "context-mode", "claude-hud", "semble", "rtk"} & {n.lower() for n in names}, set())
+        # The owner defaults and interim installs are wired, so their names are no longer scanned for.
+        self.assertEqual({"ai-memory", "context-mode", "claude-hud", "semble", "rtk", "socraticode", "headroom",
+                          "codebase-memory", "jcodemunch", "chub"} & {n.lower() for n in names}, set())
         with tempfile.TemporaryDirectory() as tmp:    # the render with the authorization settings is scanned too
             self.assertEqual(run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp, "--with-authorization-settings")[0], 0)
             with_option = {path.name: path.read_text(encoding="utf-8") for path in Path(tmp).iterdir()}
@@ -781,7 +793,7 @@ class RenderTests(unittest.TestCase):
         old = render_config.render_all(values)
         names = unwired_names_independently()
         found = {n for text in old.values() for n in names if name_hits(text, [n])}
-        self.assertTrue({"socraticode", "headroom", "codebase-memory", "jcodemunch"} <= {
+        self.assertTrue({"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "openai-codex"} <= {
             n.lower() for n in found}, found)
 
     def test_the_ports_are_the_install_plans(self):
@@ -1041,14 +1053,14 @@ class InstructionBlockTests(unittest.TestCase):
 
     def test_no_tool_that_is_not_wired_is_named_in_either_block(self):
         names = unwired_names_independently()
-        self.assertTrue({"socraticode", "headroom", "codebase-memory", "jcodemunch", "promptfoo"} <= {
+        self.assertTrue({"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "openai-codex", "promptfoo"} <= {
             n.lower() for n in names}, names)
         for piece in self.PIECES:
             self.assertTrue(name_hits("\n".join(source_lines(piece)), names), f"the sources name some: {piece}")
             self.assertEqual(name_hits(generated_text(piece), names), [], piece)
         # Control: the same scan finds a name that is added back, whole or in a different case.
-        self.assertIn("headroom", name_hits(generated_text(cfg.CODEX_MD_PIECE) + "Use headroom.\n", names))
-        self.assertIn("headroom", name_hits(generated_text(cfg.CLAUDE_MD_PIECE) + "Ask HEADROOM.\n", names))
+        self.assertIn("Promptfoo", name_hits(generated_text(cfg.CODEX_MD_PIECE) + "Use promptfoo.\n", names))
+        self.assertIn("Promptfoo", name_hits(generated_text(cfg.CLAUDE_MD_PIECE) + "Ask PROMPTFOO.\n", names))
 
     def test_the_kept_and_the_dropped_text_together_are_the_whole_source(self):
         results, manifest, *_ = cfg.analyse(ROOT)
@@ -1075,7 +1087,7 @@ class InstructionBlockTests(unittest.TestCase):
                     dependents.append(unit.text)
                     continue
                 self.assertTrue(name_hits(unit.text, names), (piece, unit.line, unit.text))
-        self.assertGreaterEqual(total, 3)     # since the token layer is wired (2026-10-04), three units go
+        self.assertEqual(total, 2)           # the installed token lanes now stay; only the two Promptfoo units go
         # ai-memory is wired (the memory-owner row's interim install), so the sentence that depends on its sentence stays;
         # test_the_two_blocks_lose_the_sentence_that_only_made_sense_with_the_ai_memory_one_and_list_it runs that case.
         self.assertEqual(dependents, [])
@@ -1290,10 +1302,8 @@ class CarrierTests(unittest.TestCase):
             self.assertEqual(codex_roles.structural_problems(role, role, data), [])
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), sums[role_file])
             hits = {n.lower() for n in name_hits(data["developer_instructions"], names)}
-            # context-mode is an interim install and rtk is wired by the owner's directive of 2026-10-04, so the
-            # working-directory bullet and the RTK block stay; only the researcher's jCodeMunch sentence names a tool
-            # that is not wired.
-            self.assertEqual(hits, {"jcodemunch"} if role == "stack-researcher" else set(), role_file)
+            # The owner defaults now include jCodeMunch; both carriers name only wired tools.
+            self.assertEqual(hits, set(), role_file)
             # Filtered the way the two blocks are, a carrier keeps the three rules; a dropped sentence changes the bytes
             # its pinned hash covers.
             text, dropped = cfg.filter_block(data["developer_instructions"], names)
@@ -1439,7 +1449,7 @@ class ApplyTests(ApplyCase):
                              icp.expected_sha256(icp.HOOKS[name]))
         self.assertEqual(len(list((self.home / ".claude/agents").iterdir())), 11)
         self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())),
-                         ["ai-memory", "qmd", "semble", "serena"])
+                         ["ai-memory", "codebase-memory", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["Notification", "PostToolUse", "PreCompact", "PreToolUse",
@@ -1768,9 +1778,7 @@ class AuthorizationTests(ApplyCase):
     # The coordinator's decision of 2026-10-04: the main checkout is trusted, and Codex looks a linked worktree's trust
     # up under it (codex-rs/git-utils/src/trust.rs at rust-v0.160.0); every other project still asks.
     TRUST = ('codex/config/projects."${PROJECT_ROOT}".trust_level',)
-    # The tool approval modes of five MCP servers, each tied to the slot that wires its server. context-mode, ai-memory and
-    # semble are the interim installs of their slots (amendment 3); SocratiCode and headroom wait, since their slots
-    # install another owner.
+    # The tool approval modes of five MCP servers, each tied to its installed owner's slot; wave 3 installs them all.
     APPROVAL = ("codex/config/mcp_servers.ai-memory.default_tools_approval_mode",
                 "codex/config/mcp_servers.semble.default_tools_approval_mode",
                 "codex/config/mcp_servers.context-mode.default_tools_approval_mode",
@@ -1783,10 +1791,10 @@ class AuthorizationTests(ApplyCase):
     ALL = FOUR + TRUST + APPROVAL + ALLOW
     SLOT_OF = dict(zip(APPROVAL + ALLOW, (("memory-owner", "ai-memory"), ("code-search", "semble"),
                                           ("context-supply", "context-mode"), ("memory-owner", "ai-memory"),
-                                          ("code-search", "SocratiCode"), ("context-supply", "headroom"),
+                                          ("code-search", "SocratiCode"), ("output-compression", "headroom"),
                                           ("code-search", "semble"), ("code-search", "semble"))))
-    WAITING = APPROVAL[4:]                        # SocratiCode's and headroom's: their slots install another owner
-    WRITTEN = FOUR + TRUST + APPROVAL[:4] + ALLOW  # what the option writes today
+    WAITING = APPROVAL[4:]                        # negative-control fixtures remove these two installed owners
+    WRITTEN = FOUR + TRUST + APPROVAL + ALLOW     # what the option writes today
     OPTION = "--with-authorization-settings"
     DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode and "
                     "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, the trust_level of the wired "
@@ -1833,7 +1841,17 @@ class AuthorizationTests(ApplyCase):
         self.assertTrue(all(v.wired for v in deny))
         with_option, *_ = cfg.analyse(ROOT, authorization=True)
         self.assertEqual({v.piece.key for v in with_option if v.authorization and v.wired}, set(self.WRITTEN))
-        for verdict in with_option:       # a tool approval mode waits while its slot installs another owner
+        with tempfile.TemporaryDirectory() as tmp:   # preserve the absent-owner control after wave 3 installs both
+            root = make_catalog(Path(tmp))
+            def without_owners(data):
+                for row in data["slots"]:
+                    if row.get("catalog") == "foundation" and row["slot_id"] in ("code-search", "output-compression"):
+                        row.pop("interim", None)
+                        row.update(default="semble", installs_nothing_extra=False, state="definitive")
+                        row["resolution"] = {"outcome": "final"}
+            edit_json(root / cfg.MANIFEST_REL, without_owners)
+            absent_owners, *_ = cfg.analyse(root, authorization=True)
+        for verdict in absent_owners:       # a tool approval mode waits while its slot installs another owner
             if verdict.piece.key in self.WAITING:
                 self.assertFalse(verdict.wired, verdict.piece.key)
                 self.assertIn(f"not written although {self.OPTION} was given: slot {self.SLOT_OF[verdict.piece.key][0]} "
@@ -1884,7 +1902,9 @@ class AuthorizationTests(ApplyCase):
                     "Codex mcp_servers.context-mode.default_tools_approval_mode, "
                     "Codex mcp_servers.semble.default_tools_approval_mode, "
                     'Codex projects."${PROJECT_ROOT}".trust_level')
-    STACK_WORKER = "Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode"
+    STACK_WORKER = ("Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode, "
+                    "Codex stack-worker profile mcp_servers.socraticode.default_tools_approval_mode, "
+                    "Codex stack-worker profile mcp_servers.headroom.default_tools_approval_mode")
     TRUST_LABEL = 'Codex projects."${PROJECT_ROOT}".trust_level'
 
     def test_a_fresh_apply_writes_none_by_default_and_all_of_them_with_the_option(self):
@@ -2417,7 +2437,7 @@ class AcknowledgementGateTests(ApplyCase):
         with mock.patch.object(cfg, "owed_acknowledgements", return_value=["claude", "gpt"]):
             code, out, err = self.apply()
             self.assertEqual(code, 1, out + err)
-            self.assertIn("apply refused: the render wires the interim installs of code-search, context-supply, "
+            self.assertIn("apply refused: the render wires the interim installs of code-search, "
                           "memory-owner (amendment 3 of the manifest's decision rule), and the acknowledgement of the "
                           "wave-2 batch is still owed by claude, gpt", err)
             self.assertNotIn("summary:", out)                  # no step ran
@@ -2426,7 +2446,7 @@ class AcknowledgementGateTests(ApplyCase):
             code, out, err = self.apply(dry=True)
             self.assertEqual(code, 0, out + err)
             self.assertIn("note: a real run refuses now: the render wires the interim installs of code-search, "
-                          "context-supply, memory-owner", out)
+                          "memory-owner", out)
         self.assertEqual(tree(self.home), before)
 
 
@@ -2441,36 +2461,36 @@ class RenderedScanTests(unittest.TestCase):
     def test_a_name_in_a_rendered_file_fails_the_check_and_the_message_says_which_render(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["env"].update(SCAN_PROBE="use headroom here"))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["env"].update(SCAN_PROBE="use promptfoo here"))
             edit_json(root / cfg.MAP_REL, lambda d: d["entries"].insert(0, {
                 "match": ["claude/settings/env/SCAN_PROBE"], "wiring": "practice"}))
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
-        self.assertIn("the render for the example host without --with-authorization-settings: settings.json names headroom, "
+        self.assertIn("the render for the example host without --with-authorization-settings: settings.json names Promptfoo, "
                       "which is not wired", err)
-        self.assertIn("the render for the example host with --with-authorization-settings: settings.json names headroom", err)
+        self.assertIn("the render for the example host with --with-authorization-settings: settings.json names Promptfoo", err)
 
     def test_a_name_that_only_an_authorization_setting_carries_is_found_in_the_render_with_the_option_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["permissions"].update(defaultMode="headroom-default"))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["permissions"].update(defaultMode="promptfoo-default"))
             errors = cfg.rendered_name_errors(root)
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
         self.assertEqual(errors, ["the render for the example host with --with-authorization-settings: settings.json "
-                                  "names headroom, which is not wired"])
-        self.assertIn("with --with-authorization-settings: settings.json names headroom", err)
+                                  "names Promptfoo, which is not wired"])
+        self.assertIn("with --with-authorization-settings: settings.json names Promptfoo", err)
 
     def test_a_name_in_an_instruction_block_or_the_codex_config_is_found_too(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
             path = root / cfg.TEMPLATES["codex/config"]
-            path.write_text(path.read_text().replace('web_search = "live"', 'web_search = "live"\nprobe_note = "headroom"'),
+            path.write_text(path.read_text().replace('web_search = "live"', 'web_search = "live"\nprobe_note = "promptfoo"'),
                             encoding="utf-8")
             edit_json(root / cfg.MAP_REL, lambda d: d["entries"].insert(0, {
                 "match": ["codex/config/probe_note"], "wiring": "practice"}))
             errors = cfg.rendered_name_errors(root)
-        self.assertTrue(any("codex.config.toml names headroom" in error for error in errors), errors)
+        self.assertTrue(any("codex.config.toml names Promptfoo" in error for error in errors), errors)
 
     def test_a_render_that_fails_is_reported_and_not_taken_for_a_clean_scan(self):
         with mock.patch.object(cfg, "render", side_effect=cfg.ConfigError("boom")):
@@ -3470,9 +3490,9 @@ class RecordTests(unittest.TestCase):
         manifest = cfg.load_manifest(ROOT)
         listed = cfg.dropped_markdown(ROOT, cfg.generate_blocks(ROOT, cfg.unwired_names(results, manifest))).rstrip("\n")
         self.assertIn(listed, text, "regenerate the record's dropped list with `--check --markdown`")
-        self.assertGreaterEqual(listed.count("\nline "), 3)    # three units go since the token layer is wired
+        self.assertEqual(listed.count("\nline "), 2)          # only the two Promptfoo units go after wave 3
         # Control: a table whose row differs from the tool's is not in the record.
-        self.assertNotIn(tables.replace("| `slot:context-supply` |", "| `slot:other` |", 1), text)
+        self.assertNotIn(tables.replace("| `not_wired` |", "| `slot:other` |", 1), text)
         piece_rows = tables.split("\n\n")[0].splitlines()[2:]
         self.assertEqual(len(piece_rows), sum(1 for v in results if not v.wired and not v.authorization))
         # The authorization settings are a table of their own, and none of them is among the pieces that are not wired.
