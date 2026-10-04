@@ -9,8 +9,9 @@ It parses every workflow with a strict YAML-subset loader that needs no third-pa
 all carry PyYAML). Any construct outside the subset (anchor, alias, tag, flow mapping other than `{}`, duplicate key,
 tab indentation, document marker, multi-line flow scalar) is reported as an `unparseable` violation instead of being
 guessed at, and the loader is cross-checked against PyYAML wherever PyYAML is importable. The rules in RULES then run
-on the parsed workflows; each rule has a planted workflow, written to a temporary directory, that fails with exactly
-that rule named. zizmor runs with --no-config --no-ignores, so no file in a commit can suppress its findings; the zizmor
+on the parsed workflows, so the secrets rule reads values as GitHub does, after YAML decoding (the raw text stays a
+second net); each rule has planted workflows, written to a temporary directory, that fail with exactly that rule
+named. zizmor runs with --no-config --no-ignores, so no file in a commit can suppress its findings; the zizmor
 classes keep that so and add a pedantic-persona pass over the five audits the consensus names.
 """
 
@@ -37,7 +38,7 @@ RULES = {
     "dangerous-trigger": "a pull_request_target or workflow_run trigger",
     "pull-request-secret": "a secret other than GITHUB_TOKEN in a workflow that runs on pull_request",
     "checkout-persist-credentials": "actions/checkout without persist-credentials: false",
-    "runner-label": "a self-hosted, unlisted or dynamic runs-on",
+    "runner-label": "a runs-on that is not one literal label from GitHub's documented hosted-runner list",
     "job-timeout": "a job without an integer timeout-minutes",
     "pull-request-cache-write": "a cache write, or a write-capable cache-mode, in a job that runs on pull_request",
     "pull-request-cache-mode": "a job that runs on pull_request without cache-mode none or read",
@@ -50,8 +51,20 @@ PULL_REQUEST_EVENTS = {"pull_request", "workflow_call"}
 DANGEROUS_EVENTS = {"pull_request_target", "workflow_run"}
 # The one condition accepted as keeping a job or step off pull_request runs: a top-level `&&` conjunct of its `if:`.
 EXCLUDES_PULL_REQUEST = "github.event_name != 'pull_request'"
-# GitHub-hosted runner labels (https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
-RUNNER_LABEL = re.compile(r"(?:ubuntu|macos|windows)-[0-9a-z][0-9a-z.-]*")
+# An exact allowlist, not a pattern: the standard GitHub-hosted runner labels in the ubuntu, windows and macos
+# families, as GitHub's "GitHub-hosted runners" reference lists them
+# (https://docs.github.com/en/actions/reference/runners/github-hosted-runners, "Standard GitHub-hosted runners for
+# public repositories"; source github/docs data/reusables/actions/supported-github-runners.md and
+# single-cpu-table-row.md at 2bd66de8cea336061c9ea060c9b37385136e6ab3, last changed 2026-09-17 by eb8f32b5dd88, read
+# 2026-10-04). Left out: `xcode-27` (public preview, outside the three families) and larger runners, whose Linux and
+# Windows labels are names an organization chooses. A self-hosted runner never matches a label here only by shape;
+# adopting a new hosted label is a reviewed change to this set.
+HOSTED_RUNNER_LABELS = frozenset({
+    "ubuntu-slim", "ubuntu-latest", "ubuntu-26.04", "ubuntu-24.04", "ubuntu-22.04",
+    "ubuntu-26.04-arm", "ubuntu-24.04-arm", "ubuntu-22.04-arm",
+    "windows-latest", "windows-2025", "windows-2025-vs2026", "windows-2022", "windows-11-arm", "windows-11-vs2026-arm",
+    "macos-latest", "macos-26", "macos-15", "macos-14", "macos-26-intel", "macos-15-intel",
+})
 ATTEST_ACTIONS = {"actions/attest", "actions/attest-build-provenance", "actions/attest-sbom"}
 # actions/checkout reads the input with core.getBooleanInput: YAML 1.2 core-schema spellings only.
 FALSE = {"false", "False", "FALSE"}
@@ -410,13 +423,19 @@ def top_level_conjuncts(expression):
 
 
 def excludes_pull_request(condition):
-    """True only when an `if:` provably keeps its job or step off pull_request runs."""
+    """True only when an `if:` provably keeps its job or step off pull_request runs. The value must be one whole
+    `${{ ... }}` expression or a bare expression. actions/runner splits a value that mixes literal text with `${{ }}`
+    into segments and evaluates it as a `format()` string (TemplateReader.ParseScalar,
+    src/Sdk/DTObjectTemplating/ObjectTemplating/TemplateReader.cs at d7bc179baf11), and a non-empty string is truthy,
+    so a mixed value such as `${{ !cancelled() }} && github.event_name != 'pull_request'` excludes nothing."""
     if not isinstance(condition, str):
         return False
     expression = condition.strip()
     if expression.startswith("${{") and expression.endswith("}}"):
-        expression = expression[3:-2].strip()
-    conjuncts = top_level_conjuncts(expression)
+        expression = expression[3:-2]
+    if "${{" in expression or "}}" in expression:
+        return False
+    conjuncts = top_level_conjuncts(expression.strip())
     return conjuncts is not None and EXCLUDES_PULL_REQUEST in conjuncts
 
 
@@ -457,15 +476,51 @@ def cache_writes(step):
 
 
 def secret_references(text):
-    """Every secrets reference other than secrets.GITHUB_TOKEN: `secrets.NAME` anywhere in the raw text, comments
-    included (fail closed), `secrets: inherit`, and the bare context inside an expression (`toJSON(secrets)`,
-    `secrets['NAME']`). GitHub does not allow the secrets context in an `if:` condition."""
+    """Every secrets reference in one string other than secrets.GITHUB_TOKEN: `secrets.NAME` anywhere, `secrets:
+    inherit`, and the bare context inside an expression (`toJSON(secrets)`, `secrets['NAME']`). GitHub does not
+    allow the secrets context in an `if:` condition."""
     found = [match.group(0) for match in re.finditer(r"\bsecrets\.([A-Za-z_][A-Za-z0-9_-]*)", text, re.IGNORECASE)
              if match.group(1).upper() != "GITHUB_TOKEN"]
     found += [match.group(0) for match in re.finditer(r"\bsecrets[ \t]*:[ \t]*inherit\b", text, re.IGNORECASE)]
     for expression in re.finditer(r"\$\{\{(.*?)\}\}", text, re.DOTALL):
         found += [f"${{{{{expression.group(1)}}}}}" for _ in re.finditer(r"\bsecrets\b(?!\.[A-Za-z_])",
                                                                          expression.group(1), re.IGNORECASE)]
+    return found
+
+
+def decoded_strings(node):
+    """Every mapping key, mapping value and sequence item of the parsed document, after YAML decoding: escapes in
+    double-quoted scalars resolved and block scalars folded, which is what GitHub evaluates."""
+    if isinstance(node, dict):
+        for key, value in node.items():
+            yield key
+            yield from decoded_strings(value)
+    elif isinstance(node, list):
+        for item in node:
+            yield from decoded_strings(item)
+    elif isinstance(node, str):
+        yield node
+
+
+def inherited_secrets(node):
+    """Every `secrets: inherit` pair, matched on decoded keys and values (so `"\\u0073ecrets": inherit` counts)."""
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key.lower() == "secrets" and isinstance(value, str) and value.strip().lower() == "inherit":
+                yield "secrets: inherit"
+            yield from inherited_secrets(value)
+    elif isinstance(node, list):
+        for item in node:
+            yield from inherited_secrets(item)
+
+
+def workflow_secret_references(document, text):
+    """The pull-request-secret rule's input: references in the decoded values first, since `"\\u0073ecrets.X"`
+    decodes to `secrets.X` and hides from any raw-text search; then the raw text as a second net that also covers
+    comments (fail closed)."""
+    found = [reference for value in decoded_strings(document) for reference in secret_references(value)]
+    found += list(inherited_secrets(document))
+    found += [reference for reference in secret_references(text) if reference not in found]
     return found
 
 
@@ -503,7 +558,7 @@ def raw_violations(name, text):
     if "concurrency" not in document and events != ["workflow_call"]:
         add("workflow-concurrency", "", "no top-level concurrency")
     if pull_request:
-        for reference in secret_references(text):
+        for reference in workflow_secret_references(document, text):
             add("pull-request-secret", "", reference)
     workflow_cache_mode = document.get("cache-mode")
     for job_id, job in document["jobs"].items():
@@ -524,7 +579,7 @@ def raw_violations(name, text):
             add("id-token-write", job_id, "id-token: write without an attestation step off pull_request")
         if "uses" not in job:
             runner = job.get("runs-on")
-            if not isinstance(runner, str) or "${{" in runner or not RUNNER_LABEL.fullmatch(runner):
+            if not isinstance(runner, str) or runner not in HOSTED_RUNNER_LABELS:
                 add("runner-label", job_id, repr(runner))
             timeout = job.get("timeout-minutes")
             if not (isinstance(timeout, str) and timeout.isdigit() and 1 <= int(timeout) <= 360):
@@ -674,6 +729,10 @@ PLANTED = [
     ("upload-guard-with-or", "pull-request-write-scope",
      mutate(BASE + EXTRA_JOB, "if: ${{ !cancelled() && github.event_name != 'pull_request' }}",
             "if: ${{ always() || github.event_name != 'pull_request' }}")),
+    # Repair round 1 (job-005, P2): a value mixing literal text with ${{ }} is a format() string, truthy on a PR.
+    ("upload-guard-mixed-literal-and-expression", "pull-request-write-scope",
+     mutate(BASE + EXTRA_JOB, "if: ${{ !cancelled() && github.event_name != 'pull_request' }}",
+            "if: ${{ !cancelled() }} && github.event_name != 'pull_request'")),
     ("id-token-without-attestation", "id-token-write",
      mutate(ATTEST_WORKFLOW, "      - name: Attest\n        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 "
                              "# v4.2.2\n        with:\n          subject-path: dist/archive.tar.gz\n", "")),
@@ -685,6 +744,24 @@ PLANTED = [
      mutate(BASE, 'run: echo "$GITHUB_SHA"', 'run: echo "$TOKEN"\n        env:\n          TOKEN: ${{ secrets.NPM_TOKEN }}')),
     ("whole-secrets-context", "pull-request-secret",
      mutate(BASE, 'run: echo "$GITHUB_SHA"', 'run: echo "$ALL"\n        env:\n          ALL: ${{ toJSON(secrets) }}')),
+    # Repair round 1 (job-005, P1): references that only YAML decoding reveals, and block scalars.
+    ("secret-behind-a-u-escape", "pull-request-secret",
+     mutate(BASE, 'run: echo "$GITHUB_SHA"', 'run: echo "$TOKEN"\n        env:\n'
+                                              '          TOKEN: "${{ \\u0073ecrets.NPM_TOKEN }}"')),
+    ("secret-behind-an-x-escape", "pull-request-secret",
+     mutate(BASE, 'run: echo "$GITHUB_SHA"', 'run: echo "$TOKEN"\n        env:\n'
+                                              '          TOKEN: "${{ \\x73ecrets.NPM_TOKEN }}"')),
+    ("secret-in-a-folded-block-scalar", "pull-request-secret",
+     mutate(BASE, 'run: echo "$GITHUB_SHA"', 'run: echo "$TOKEN"\n        env:\n'
+                                              '          TOKEN: >-\n            ${{\n            secrets.NPM_TOKEN }}')),
+    ("secret-in-a-literal-block-scalar", "pull-request-secret",
+     mutate(BASE, 'run: echo "$GITHUB_SHA"', 'run: |\n          echo "${{ secrets.NPM_TOKEN }}"')),
+    ("secrets-inherit-under-a-quoted-key", "pull-request-secret",
+     BASE + '\n  called:\n    uses: ./.github/workflows/called.yml\n    permissions:\n      contents: read\n'
+            '    "secrets": inherit\n'),
+    ("secrets-inherit-under-an-escaped-key", "pull-request-secret",
+     BASE + '\n  called:\n    uses: ./.github/workflows/called.yml\n    permissions:\n      contents: read\n'
+            '    "\\u0073ecrets": inherit\n'),
     ("checkout-without-with", "checkout-persist-credentials",
      mutate(BASE, "        with:\n          persist-credentials: false\n", "")),
     ("checkout-persisting", "checkout-persist-credentials",
@@ -692,6 +769,8 @@ PLANTED = [
     ("self-hosted", "runner-label", mutate(BASE, "runs-on: ubuntu-24.04", "runs-on: self-hosted")),
     ("runner-list", "runner-label", mutate(BASE, "runs-on: ubuntu-24.04", "runs-on: [self-hosted, linux]")),
     ("dynamic-runner", "runner-label", mutate(BASE, "runs-on: ubuntu-24.04", "runs-on: ${{ github.event.inputs.runner }}")),
+    # Repair round 1 (job-005, P2): shaped like a hosted label, but not on GitHub's list.
+    ("hosted-style-unlisted-label", "runner-label", mutate(BASE, "runs-on: ubuntu-24.04", "runs-on: ubuntu-owned-private")),
     ("no-timeout", "job-timeout", mutate(BASE, "    timeout-minutes: 5\n", "")),
     ("expression-timeout", "job-timeout", mutate(BASE, "timeout-minutes: 5", "timeout-minutes: ${{ inputs.minutes }}")),
     ("combined-cache-action", "pull-request-cache-write",
@@ -700,6 +779,11 @@ PLANTED = [
     ("unguarded-save", "pull-request-cache-write",
      mutate(BASE, "      - name: Test\n", CACHE_STEPS.replace(
          "        if: github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true'\n", "")
+            + "      - name: Test\n")),
+    ("save-guard-mixed-literal-and-expression", "pull-request-cache-write",
+     mutate(BASE, "      - name: Test\n", CACHE_STEPS.replace(
+         "if: github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true'",
+         "if: ${{ steps.restore.outputs.cache-hit != 'true' }} && github.event_name != 'pull_request'")
             + "      - name: Test\n")),
     ("setup-go-default-cache", "pull-request-cache-write",
      mutate(BASE, "      - name: Test\n", "      - name: Go\n        uses: actions/setup-go@"
@@ -902,6 +986,42 @@ class PlantedViolationTests(unittest.TestCase):
         text = mutate(ATTEST_WORKFLOW, "permissions: {}\n", "permissions:\n  id-token: write\n")
         self.assertEqual({violation.rule for violation in self.check_planted("workflow-id-token", text)},
                          {"workflow-permissions-not-empty", "id-token-write"})
+
+    def test_only_a_whole_or_bare_expression_can_exclude_pull_requests(self):
+        # Repair round 1 (job-005, P2): actions/runner evaluates a mixed literal/expression value as a format() string.
+        accepted = ("github.event_name != 'pull_request'",
+                    "${{ github.event_name != 'pull_request' }}",
+                    "${{ !cancelled() && github.event_name != 'pull_request' }}",
+                    "github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true'")
+        refused = ("${{ !cancelled() }} && github.event_name != 'pull_request'",
+                   "github.event_name != 'pull_request' && ${{ !cancelled() }}",
+                   "${{ !cancelled() }} && ${{ github.event_name != 'pull_request' }}",
+                   "${{ always() || github.event_name != 'pull_request' }}",
+                   "github.event_name!='pull_request'", None, "")
+        for condition in accepted:
+            with self.subTest(accepted=condition):
+                self.assertTrue(excludes_pull_request(condition))
+        for condition in refused:
+            with self.subTest(refused=condition):
+                self.assertFalse(excludes_pull_request(condition))
+
+    def test_an_escaped_reference_hides_from_the_raw_scan_but_not_from_the_rule(self):
+        # Repair round 1 (job-005, P1): the rule reads decoded values; the raw scan stays as a second net.
+        for name in ("secret-behind-a-u-escape", "secret-behind-an-x-escape", "secrets-inherit-under-a-quoted-key",
+                     "secrets-inherit-under-an-escaped-key"):
+            text = next(text for planted, _, text in PLANTED if planted == name)
+            with self.subTest(planted=name):
+                self.assertEqual(secret_references(text), [], "the raw text alone shows no reference")
+                self.assertTrue(workflow_secret_references(load_workflow(text), text))
+
+    def test_the_runner_allowlist_is_exact(self):
+        # Repair round 1 (job-005, P2): a set of documented labels, not a prefix pattern.
+        self.assertIn("ubuntu-24.04", HOSTED_RUNNER_LABELS)
+        self.assertIn("macos-15", HOSTED_RUNNER_LABELS)
+        for label in ("ubuntu-owned-private", "ubuntu-24.04-gpu", "macos-15-large", "windows-latest-8-cores",
+                      "self-hosted", "Ubuntu-24.04", " ubuntu-24.04"):
+            with self.subTest(label=label):
+                self.assertNotIn(label, HOSTED_RUNNER_LABELS)
 
     def test_a_secret_named_in_prose_is_not_a_reference_but_one_in_a_comment_is(self):
         self.assertEqual(secret_references("# no secrets. The job reads secrets, tokens and keys.\n"), [])

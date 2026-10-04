@@ -78,8 +78,8 @@ accessing a cache"). No cache holds a secret.
 ### 4. Runners, timeouts, concurrency
 
 Every job already ran on a literal `ubuntu-24.04` or `macos-15` label with a `timeout-minutes`; the tripwire now
-requires an `ubuntu-*`, `macos-*` or `windows-*` label written as one literal string and an integer timeout from 1 to
-360. Six workflows gained a top-level concurrency group: `native-foundation-e2e.yml` and `native-token-e2e.yml` use
+requires one literal label from an exact allowlist of GitHub's documented standard hosted-runner labels in the ubuntu,
+windows and macos families (20 labels; repair round 1) and an integer timeout from 1 to 360. Six workflows gained a top-level concurrency group: `native-foundation-e2e.yml` and `native-token-e2e.yml` use
 the repository's pull-request pattern (cancel superseded pull request runs, never push or schedule runs), and
 `native-service-reboot.yml`, `practice-references-freshness.yml`, `runtime-worker-skills-freshness.yml` and
 `publish-catalog.yml` queue one run at a time and never cancel (per ref for `publish-catalog.yml`, so a started
@@ -133,7 +133,7 @@ no third-party package (CI's interpreters do not all carry PyYAML). A construct 
 violation, never a guess: anchors, aliases, tags, flow mappings other than `{}`, duplicate keys, tabs, document markers
 and multi-line flow scalars. PyYAML 6.0.3 accepts five of the six planted constructs; GitHub's own parser may as well,
 so failing closed matters. Where PyYAML is importable the loader is cross-checked against it. Locally both agree on all
-21 workflows and on 30 planted and accepted variants. The rules:
+21 workflows and on all 39 parseable planted and accepted variants. The rules:
 
 | Rule | Fails on |
 | --- | --- |
@@ -142,19 +142,20 @@ so failing closed matters. Where PyYAML is importable the loader is cross-checke
 | `pull-request-write-scope` | a job that runs on `pull_request` (or `workflow_call`) holding a write scope or `id-token: write` |
 | `id-token-write` | `id-token: write` outside a job that attests provenance off pull requests |
 | `dangerous-trigger` | `pull_request_target` or `workflow_run` |
-| `pull-request-secret` | a secret other than `GITHUB_TOKEN`, `secrets: inherit` or the whole `secrets` context in a pull request workflow |
+| `pull-request-secret` | a secret other than `GITHUB_TOKEN`, `secrets: inherit` or the whole `secrets` context in a pull request workflow, found in the decoded values (YAML escapes resolved, block scalars folded) with the raw text, comments included, as a second net |
 | `checkout-persist-credentials` | `actions/checkout` without `persist-credentials: false` |
-| `runner-label` | a self-hosted, unlisted, list-form or expression `runs-on` |
+| `runner-label` | a `runs-on` that is not one literal label from the exact allowlist of GitHub's documented hosted-runner labels |
 | `job-timeout` | a missing or non-integer `timeout-minutes` |
 | `pull-request-cache-write` | a cache write or a write-capable `cache-mode` in a pull request job |
 | `pull-request-cache-mode` | a pull request job without `cache-mode` `none` or `read` |
 | `workflow-concurrency` | no top-level concurrency (reusable workflows excepted) |
 | `unparseable` | anything outside the strict subset |
 
-A job counts as off pull requests only when a top-level `&&` operand of its `if:` is exactly
-`github.event_name != 'pull_request'`. Each rule has a planted workflow, 30 in all, written to a temporary directory,
-which must fail with exactly that rule and nothing else. Six accepted variants must pass, one for each guard the rules
-allow. Exemptions are keyed by file (and job) name. A test fails once an exemption no longer suppresses anything, and
+A job counts as off pull requests only when its `if:` is one whole `${{ ... }}` expression or a bare expression, and a
+top-level `&&` operand of it is exactly `github.event_name != 'pull_request'`. A value that mixes literal text with
+`${{ }}` never counts: actions/runner evaluates it as a `format()` string, which is truthy. Each rule has at least one
+planted workflow, 39 in all, written to a temporary directory, which must fail with exactly that rule and nothing else.
+Six accepted variants must pass, one for each guard the rules allow. Exemptions are keyed by file (and job) name. A test fails once an exemption no longer suppresses anything, and
 the same bytes under another file name fail. The write grants, and the one job that pushes, are pinned as reviewed
 inventories.
 
@@ -208,13 +209,35 @@ Job 004's residual risks, and what this change does about them:
    rejects it; the PR body reaches only `actions/github-script` as data. The release job rebuilds nothing from pull
    request artifacts (tag push only).
 5. **Runner policy.** GitHub-hosted labels only, no dynamic `runs-on`, timeouts on every job, concurrency where it
-   fits. The label check is a name check: a self-hosted runner registered with a label shaped like a hosted one would
-   pass. The repository registers no self-hosted runner; the repository settings are the control there.
+   fits. The label check is an exact allowlist of documented hosted labels, so a hosted-style name such as
+   `ubuntu-owned-private` fails. It still checks names only, and cannot prove where a job runs if a self-hosted runner
+   were registered under one of those exact labels. The repository registers no self-hosted runner; the repository
+   settings are the control there.
 
 Also not covered here: the two hash-bound workflows keep a workflow-level `contents: read` and no concurrency until
 their bindings are refreshed (section 5); `bootstrap-macos` keeps GitHub's trigger cache default (section 3); no hosted
 run of the changed workflows exists yet. Their first pull request runs, `action-compatibility.yml` included (its path
 filter covers itself), are the first evidence that `{}` jobs and `cache-mode` behave as documented on this repository.
+
+## Repair round 1 (2026-10-04)
+
+The cross-family review of `deea517e` (job-005, GPT-6.1 Sol at max) returned REJECT, with one P1 and two P2 findings in
+`tests/test_workflow_policy.py`. All three are fixed, each with planted controls that must fail with the rule named:
+
+1. **P1: the secrets rule read only the raw text.** A reference written with YAML escapes, such as
+   `TOKEN: "${{ secrets.NPM_TOKEN }}"`, decodes to `${{ secrets.NPM_TOKEN }}`, which GitHub evaluates. The raw
+   scan saw nothing, and all 24 policy tests passed with that fixture in `token-report.yml`. The rule now reads every
+   decoded key, value and sequence item the loader returns (`decoded_strings`, `inherited_secrets`) and keeps the raw
+   scan, which also covers comments, as a second net. New controls cover a `\u` escape, a `\x` escape, a folded block
+   scalar, a literal block scalar, and `secrets: inherit` under a quoted and under an escaped key.
+2. **P2: the runner check was a prefix pattern.** `runs-on: ubuntu-owned-private` passed. It is now an exact allowlist
+   of the 20 standard hosted labels GitHub documents in the three families (section 4). New control:
+   `ubuntu-owned-private`.
+3. **P2: `excludes_pull_request` accepted a mixed value.** `${{ !cancelled() }} && github.event_name != 'pull_request'`
+   counted as excluding pull requests. But actions/runner's `TemplateReader.ParseScalar` turns a value with literal
+   text and an expression into a `format()` string, which is truthy. Now only a whole `${{ ... }}` expression or a bare
+   expression can exclude pull requests. New controls: the reviewer's job-level case, and the same shape on a cache
+   save step.
 
 ## Alternatives considered
 
@@ -269,6 +292,12 @@ unittest modules that parse workflows, run with the system Python (no PyYAML) an
   `2bd66de8cea336061c9ea060c9b37385136e6ab3`, where `cache-mode` was documented on 2026-09-10 (`be60fe442256`).
 - GitHub, Events that trigger workflows:
   <https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows>.
+- GitHub, GitHub-hosted runners ("Standard GitHub-hosted runners for public repositories", the runner allowlist):
+  <https://docs.github.com/en/actions/reference/runners/github-hosted-runners>; source github/docs
+  `data/reusables/actions/supported-github-runners.md` and `single-cpu-table-row.md` at `2bd66de8`, last changed
+  2026-09-17 (`eb8f32b5dd88`), read 2026-10-04.
+- actions/runner `src/Sdk/DTObjectTemplating/ObjectTemplating/TemplateReader.cs` (`ParseScalar`: literal and
+  expression segments become a `format()` expression) at `d7bc179baf11a02110b46cfbbc4040f74ac3f60a`.
 - OpenSSF Scorecard checks, Token-Permissions and Dangerous-Workflow:
   <https://github.com/ossf/scorecard/blob/main/docs/checks.md> (read at `f1ebd76756593c0454d782b4ba36ebc33ad131b6`).
 - zizmor audits (excessive-permissions, dangerous-triggers, cache-poisoning, artipacked, template-injection,
