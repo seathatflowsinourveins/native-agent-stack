@@ -1,0 +1,31 @@
+2026-10-03T20:58:15Z base-workflow (463a57b98) upload guards: expected caught, observed caught; ran 1, failures 1, errors 0
+   test_failure_path_semantics_keep_findings_uploadable (tests.test_workflow_hardening.SecurityScanTests.test_failure_path_semantics_keep_findings_uploadable) ... FAIL
+   FAIL: test_failure_path_semantics_keep_findings_uploadable (tests.test_workflow_hardening.SecurityScanTests.test_failure_path_semantics_keep_findings_uploadable)
+   AssertionError: unexpectedly None : Upload the frozen-artifact OSV-Scanner SARIF to code scanning must run after an earlier upload fails
+2026-10-03T20:58:15Z head workflow upload guards: expected survives, observed survives; ran 1, failures 0, errors 0
+   test_failure_path_semantics_keep_findings_uploadable (tests.test_workflow_hardening.SecurityScanTests.test_failure_path_semantics_keep_findings_uploadable) ... ok
+2026-10-03T20:58:15Z R4-key on head: expected caught, observed caught; ran 2, failures 2, errors 0
+   test_every_ignore_has_id_reason_and_a_near_expiry (tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_every_ignore_has_id_reason_and_a_near_expiry) ... FAIL
+   test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory) ... FAIL
+   FAIL: test_every_ignore_has_id_reason_and_a_near_expiry (tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_every_ignore_has_id_reason_and_a_near_expiry)
+   AssertionError: Lists differ: ["GHSA-8mgp-746c-j5xp: unknown key 'ID'"] != []
+   FAIL: test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory)
+   AssertionError: Lists differ: ["GHSA-8mgp-746c-j5xp: unknown key 'ID'"] != []
+2026-10-03T20:58:15Z Ecosystem alias -> FrozenScanTests: expected caught, observed caught; ran 1, failures 1, errors 0
+   test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory) ... FAIL
+   FAIL: test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory)
+   AssertionError: Lists differ: ["'nex[t]': unknown key 'Ecosystem'"] != []
+2026-10-03T20:58:15Z Ecosystem alias -> IgnorePolicyTests: expected caught, observed caught; ran 1, failures 1, errors 0
+   test_no_other_suppression_mechanism_bypasses_the_policy (tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_no_other_suppression_mechanism_bypasses_the_policy) ... FAIL
+   FAIL: test_no_other_suppression_mechanism_bypasses_the_policy (tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_no_other_suppression_mechanism_bypasses_the_policy)
+   AssertionError: Lists differ: ["'nex[t]': unknown key 'Ecosystem'"] != []
+2026-10-03T20:58:15Z Name+Ecosystem alias -> FrozenScanTests: expected caught, observed caught; ran 1, failures 1, errors 0
+   test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory) ... FAIL
+   FAIL: test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory)
+   AssertionError: Lists differ: ["'lib': unknown key 'Ecosystem'", "'lib': unknown key 'Name'"] != []
+2026-10-03T20:58:15Z Name+Ecosystem alias -> IgnorePolicyTests: expected caught, observed caught; ran 1, failures 1, errors 0
+   test_no_other_suppression_mechanism_bypasses_the_policy (tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_no_other_suppression_mechanism_bypasses_the_policy) ... FAIL
+   FAIL: test_no_other_suppression_mechanism_bypasses_the_policy (tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_no_other_suppression_mechanism_bypasses_the_policy)
+   AssertionError: Lists differ: ["'lib': unknown key 'Ecosystem'", "'lib': unknown key 'Name'"] != []
+2026-10-03T20:58:15Z all observations match expectations: True
+exit 0

@@ -1,0 +1,5 @@
+Starting filesystem walk for root: /
+Scanned <case-alias-root>/pnpm-lock.yaml file and found 1 package
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 284.979µs elapsed, 285.059µs wall time
+GHSA-vcvr-r3jv-pc5j has been filtered out because: synthetic native case-alias reproduction
+Filtered 1 vulnerability from output
