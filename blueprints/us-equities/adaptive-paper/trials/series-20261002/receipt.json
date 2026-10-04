@@ -9,10 +9,10 @@
   "endpoint": "https://paper-api.alpaca.markets",
   "paper_only": true,
   "evidence_classes": [
-    "retained_native_paper_execution",
-    "local_integration_acceptance_review",
-    "independent_process_and_state_observation",
-    "fresh_native_read_only_observation"
+    "upstream_example_or_native_operation",
+    "local_integration_check",
+    "independent_observation",
+    "structural_validation"
   ],
   "sources": {
     "engine_revision": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
@@ -49,7 +49,8 @@
     "limits_changed": false,
     "gross_loss_cap_usd_account2": "480",
     "drawdown_cap_usd_account2": "475",
-    "permanent_halt_retained": true
+    "permanent_halt_retained": true,
+    "permanent_halt_scope": "original Account 2 ledger and lineage"
   },
   "original_trials": [
     {
@@ -422,7 +423,7 @@
     "trigger_behavior": "not_exercised"
   },
   "account2_fresh_read_only_observation": {
-    "evidence_class": "fresh_native_paper_account_observation",
+    "evidence_class": "local_integration_check",
     "trial": false,
     "broker": "alpaca",
     "account_slot": 2,
@@ -453,11 +454,12 @@
     "frozen_lifetime_gross_loss_cap_usd": "480",
     "halt_cleared": false,
     "new_root_created": false,
+    "halt_and_root_claim_scope": "Original Account 2 ledger and lineage; this reconciliation did not inspect a successor lineage.",
     "engine_recover_run": false,
     "orders_submitted_by_observation": 0,
     "limitations": [
       "Read-only SDK snapshot, not a new engine recovery trial",
-      "Permanent numeric halt remains",
+      "Permanent numeric halt remains in the original Account 2 ledger and lineage",
       "Source CLI did not print an exact timestamp"
     ],
     "sanitization": "Only account_ref removed from original native stdout; all other native field values preserved.",
@@ -466,7 +468,7 @@
     "new_model_trial": false
   },
   "independent_original_account2_ledger_observation": {
-    "evidence_class": "independent_read_only_state_observation",
+    "evidence_class": "independent_observation",
     "read_at_utc": "2026-10-03T03:36:18.774750+00:00",
     "sqlite_connection_mode": "ro",
     "source_label": "original-account2-ledger.sqlite3",
@@ -528,6 +530,7 @@
     "command_sanitization": "Private lock, existing credential pointer and output path replaced with placeholders; no credential values read or retained by this receipt.",
     "existing_stored_credentials_reused": true,
     "credential_rotation_or_remapping": false,
+    "credential_statement_scope": "This HTTP 401 recheck only; excludes the later user credential store and HTTP 200 follow-up.",
     "authentication_failure_cause": "undetermined",
     "disposition": "admission_failed_HTTP_401",
     "orders_submitted": 0
@@ -588,13 +591,16 @@
     "Trial 2 retains four average-invariant observations; their count alone does not establish a defect. The no-halt frozen acceptance failure is independently decisive.",
     "Known effects retained by the October 2 freeze: issue 215 part 2, trial C run-loop stall, and issue 543; this review does not requalify them.",
     "Fresh account 2 operation is a read-only SDK snapshot, not an engine recovery run or a new trading/model trial; exact native snapshot timestamp was not printed.",
-    "Permanent numeric halt and original root remain. Account 1 authentication remains unsuccessful with undetermined cause; no strategy qualification is established.",
+    "The original Account 2 ledger and lineage retain their permanent numeric halt and root. Account 1 authentication was unsuccessful at the initial recheck with undetermined cause; the later readmission is recorded in the follow-up, without strategy qualification.",
     "No unchanged official upstream test suite was run by this evidence task. Repository validation covers structural consistency only.",
     "Broker paper fills are simulated and do not establish exchange execution quality, live slippage, queue position or live trading performance.",
     "Historical and fresh provider/model usage are unmeasured; no provider usage or new model execution is inferred from these artifacts."
   ],
   "follow_up_2026_10_03_account1_readmission_and_monday_scheduling": {
-    "evidence_class": "local_integration_receipt_with_retained_native_operation_output",
+    "evidence_class": "local_integration_check",
+    "retained_native_operation_output": true,
+    "recorded_at_utc": "2026-10-04T20:28:55.340410363Z",
+    "recorded_at_scope": "Follow-up clarification recorded during this bounded repair; not a broker, SDK snapshot or timer-operation timestamp.",
     "observation_date_utc": "2026-10-03",
     "historical_receipt_fields_and_source_bindings_preserved": true,
     "private_followup_sources_sha256": {
@@ -605,6 +611,9 @@
       "rate-limit/paper-20261003T040505Z.json": "1aaad24dc7abf5cc6fc279718835d2404979756420da39f652245585513e6bfe",
       "SERIES-INDEX-20261005.md": "34d206820c0032ca7cb0c3fd8488c552a2c16c36ffbf4f13b327908c52b535a1"
     },
+    "preceded_by_user_credential_store_via_secure_terminal": true,
+    "credential_store_session_stamp_utc": "2026-10-03T04:05:05Z",
+    "credential_store_session_stamp_provenance": "Session-launch stamp disclosed by the retained probe filename; not an exact credential-store completion time. The secure terminal stores credentials before running the probe.",
     "later_native_probe_original_json": {
       "account": "paper",
       "host": "paper-api.alpaca.markets",
@@ -629,6 +638,7 @@
       "correction": "One newly frozen corrected invocation; no source edit or process retry after broker access."
     },
     "corrected_native_read_only_snapshot": {
+      "evidence_class": "local_integration_check",
       "snapshot_process_exit": 0,
       "native_snapshot_timestamp": null,
       "probe_timestamp_not_snapshot_timestamp": true,
@@ -703,12 +713,21 @@
       "rth_timer_activation_observed": true,
       "native_enable_exit": 0,
       "native_show_exit": 0,
+      "native_enable_argv_sanitized": null,
+      "native_show_argv_sanitized": null,
+      "native_enable_show_observed_at_utc": null,
+      "retained_follow_up_observation_date_utc": "2026-10-03",
+      "native_enable_show_metadata_provenance": "The retained follow-up date does not timestamp the original timer commands. Exact original argv and operation observation time were not supplied with this repair; the retained exit codes and returned fields are unchanged.",
       "original_native_rth_timer_observation": {
         "UnitFileState": "enabled",
         "ActiveState": "active",
         "NextElapseUSecRealtime": "Mon 2026-10-05 10:00:05 EDT"
       },
       "original_account2_numeric_halt_preserved": true,
+      "permanent_halt_scope": "original Account 2 ledger and lineage",
+      "recovery_gate_and_successor_lineage_provenance": "Retained SERIES-INDEX-20261005.md only; neither performed nor verified by this reconciliation.",
+      "successor_root_existence": "not_verified_here",
+      "successor_authorization_freeze_and_caps": "out_of_scope",
       "monday_orders_not_yet_observed": true,
       "monday_execution_acceptance": "not_established"
     },
@@ -717,7 +736,7 @@
       "The later probe supplies its own exact timestamp; the SDK snapshot supplies only an observation date.",
       "Four logical calls and sixteen default-retry HTTP attempts describe frozen scope and bounds, not measured actual request counts or provider usage.",
       "The first import failure and correction freeze are retained. No snapshot-helper source change is claimed.",
-      "The assembled receipt and returned native output are local integration evidence, not unchanged official upstream test acceptance.",
+      "The assembled receipt and both helper snapshots are Local integration checks retaining native operation output, not unchanged official upstream test acceptance.",
       "Readmission establishes observed paper identity, flatness and SIP admission. No paper or strategy qualification is promoted, and no Monday order outcome is recorded."
     ]
   }
