@@ -4364,8 +4364,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "9a5285127577d70421b8bf1e3c75b16b8d7d1e83849371e3ddc8ab0ac3b62076",
-      "bytes": 63613
+      "sha256": "939e23df38be742d3882c2214c9d995460875380fb69e09d272f2168b32c78d0",
+      "bytes": 63848
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -16159,6 +16159,11 @@
       "bytes": 4475
     },
     {
+      "path": "docs/decisions/2026-10-03-pr561-token-lifecycle-retirement.md",
+      "sha256": "17ef165b5f4837e5f303f64581d878bfde12bb600423833e58450268c07a53a8",
+      "bytes": 61167
+    },
+    {
       "path": "docs/decisions/2026-10-03-retire-gateway-ab-r02.md",
       "sha256": "d8b119ccf00931c0d3ab837a2dcbc9c583a0dfa987a79056cd0176eaacf34356",
       "bytes": 27952
@@ -16330,8 +16335,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "9533e79322f3f5fa154c436d6e17ce6a6c3da0e30703124c51ba4cf0aad2c8bb",
-      "bytes": 162276
+      "sha256": "13a7db94d4a2f86c0fe2d439e43be44a4c34b46bf36742a5617d75307e41c1ef",
+      "bytes": 173460
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -47634,6 +47639,26 @@
       "bytes": 24371
     },
     {
+      "path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/README.md",
+      "sha256": "698eefb4f62b886e96e2e7d28aae97e0c577bce787b49dcfd193b497814fc3e7",
+      "bytes": 2121
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/acceptance-observation.json",
+      "sha256": "dd4e8a6fee7828d3b322d9f4317133755444cd3d5d97d0034b69029360ce5980",
+      "bytes": 2589
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/claude-code.stdout.txt",
+      "sha256": "db4153306755c709c7213768e54a342cbc7d84857ed4379a0bb2836f174263fe",
+      "bytes": 26822
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/codex.stdout.txt",
+      "sha256": "d8843d03ad5f0066ef626fb9bcc2b96db1e46ac0737725d5d40572937e0572ad",
+      "bytes": 30548
+    },
+    {
       "path": "evidence/artifacts/token-stack-cards-20260927/README.md",
       "sha256": "7c04fec29e4fbbf5be5fcce0d65469bf6b3f873af41e3a840edbba32b086b1f6",
       "bytes": 13531
@@ -51595,8 +51620,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "df9d794668e8942a053cc3c76f2cb5e063c55671f286abdb14788b3dde04737b",
-      "bytes": 114715
+      "sha256": "a04bed6a106b51e2740ec5d4a49e328fbac2ed8a432ca8378d5d1339c9d9f4c6",
+      "bytes": 115098
     },
     {
       "path": "scripts/new_wsl_profile.py",
@@ -51995,8 +52020,8 @@
     },
     {
       "path": "tests/test_apply_claude_settings.py",
-      "sha256": "4e18b1a1bb457d3bb159e5886638e484ac6b581b6f10a0a41ca4b3bcbb5e046f",
-      "bytes": 16418
+      "sha256": "1bd3e90b095c326edf6327202bcbeeab7ed6ccc6c5789dc794062024baf6d64f",
+      "bytes": 18302
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
@@ -52290,8 +52315,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "ca72ad1ad78e20d9524dface39eb91a0f6d49ac9fcd465623303a3463ed7d138",
-      "bytes": 99427
+      "sha256": "a12319ac847bff624b1124246e28be3d58d27bf64e002fe3aa17646bfb9a3ef1",
+      "bytes": 114886
     },
     {
       "path": "tests/test_install_skills.py",
@@ -52440,8 +52465,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "d233c0148973fca20352b6df2e93e75fde68b65fee3ee11b9ba282aff8f604e0",
-      "bytes": 104999
+      "sha256": "e69ae65b5ab65b093805df7c20b2d3e01d4f28c8bfa2a3ccaa0d9db132fd443e",
+      "bytes": 108145
     },
     {
       "path": "tests/test_native_worker_fixture.py",
@@ -52835,8 +52860,8 @@
     },
     {
       "path": "tools/adoption/apply_claude_settings.py",
-      "sha256": "aa69bcb6adaa1cea6b6961ff3bc3366621f36ef9443047ac64fe2d232640a07a",
-      "bytes": 11810
+      "sha256": "9f9597c3aca440437e64b87ca67c82d9eab14655165d8d57cdcc05a19741ff75",
+      "bytes": 13231
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
@@ -52855,8 +52880,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "0c4b58276bbb962ee09c49cd19dc844e90f7f5155b8187e0bef2471b7aa60568",
-      "bytes": 16946
+      "sha256": "99e3a9410f0c8494a57a27a0653db72af36d7f2e6a658e63fd127578e01b95bd",
+      "bytes": 23961
     },
     {
       "path": "tools/adoption/install_skills.py",
