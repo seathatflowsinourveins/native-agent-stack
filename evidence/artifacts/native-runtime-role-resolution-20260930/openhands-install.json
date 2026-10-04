@@ -1,0 +1,947 @@
+{
+  "schema_version": 1,
+  "kind": "native_install_original_evidence",
+  "scope": "Original OpenHands native returned output excerpts with private paths replaced by labels; full originals retained privately with exact hashes. No model execution in this artifact.",
+  "sources": {
+    "cli": {
+      "repository": "OpenHands/OpenHands-CLI",
+      "tag": "1.16.0",
+      "commit": "2963442dacc7cea44e39b7c4e73724295c853465"
+    },
+    "sdk": {
+      "repository": "OpenHands/software-agent-sdk",
+      "tag": "v1.50.1",
+      "commit": "1e1390acc8788346ba4804c34323284009bf3f5e"
+    },
+    "osv": {
+      "repository": "google/osv-scanner",
+      "version": "2.6.0",
+      "sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108"
+    }
+  },
+  "metadata": {
+    "cli": {
+      "python": "3.12.3",
+      "packages": {
+        "openhands": "1.16.0",
+        "openhands-sdk": "1.21.0",
+        "openhands-tools": "1.21.0",
+        "openhands-workspace": "1.11.1",
+        "openhands-agent-server": "1.9.1",
+        "litellm": "1.93.2",
+        "pytest": "9.1.1",
+        "pytest-asyncio": "1.4.0"
+      }
+    },
+    "sdk": {
+      "python": "3.13.15",
+      "packages": {
+        "openhands-sdk": "1.50.1",
+        "openhands-tools": "1.50.1",
+        "litellm": "1.93.2",
+        "pytest": "9.1.1",
+        "pytest-asyncio": "1.4.0"
+      }
+    }
+  },
+  "pip_checks": {
+    "cli": 0,
+    "sdk": 0
+  },
+  "tests": {
+    "cli": {
+      "testcases": 108,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "junit": "<owned-private-state>/openhands/cli-upstream-tests.xml",
+      "command": "<owned-private-state>/openhands/logs/cli-upstream-tests.command.json",
+      "native_private_cache_scope": false,
+      "acceptance": "installed/native tests passed; strict SDK Jinja cache isolation unqualified"
+    },
+    "sdk": {
+      "testcases": 184,
+      "passed": 184,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "junit": "<owned-private-state>/openhands/sdk-upstream-tests-private-final.xml",
+      "command": "<owned-private-state>/openhands/logs/sdk-upstream-tests-private-final.command.json",
+      "native_private_cache_scope": true,
+      "acceptance": "passed unchanged184 native upstream cases in supported private OH environment; no-provider scope"
+    },
+    "sdk_original_scope_failure": {
+      "testcases": 184,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "junit": "<owned-private-state>/openhands/sdk-upstream-tests.xml",
+      "command": "<owned-private-state>/openhands/logs/sdk-upstream-tests.command.json",
+      "scope_accepted": false,
+      "native_private_cache_scope": false
+    },
+    "sdk_private_naming_failure": {
+      "testcases": 184,
+      "passed": 182,
+      "failures": 2,
+      "failure_details": [
+        {
+          "classname": "tests.sdk.skills.test_installed_skills",
+          "name": "test_get_installed_skills_dir_returns_default_path",
+          "message": "AssertionError: assert '.openhands' in '<owned-private-state>/openhands/sdk-state/skills/installed'\n +  where '<owned-private-state>/openhands/sdk-state/skills/installed' = str(PosixPath('<owned-private-state>/openhands/sdk-state/skills/installed'))"
+        },
+        {
+          "classname": "tests.sdk.plugin.test_installed_plugins",
+          "name": "test_get_installed_plugins_dir_returns_default_path",
+          "message": "AssertionError: assert '.openhands' in '<owned-private-state>/openhands/sdk-state/plugins/installed'\n +  where '<owned-private-state>/openhands/sdk-state/plugins/installed' = str(PosixPath('<owned-private-state>/openhands/sdk-state/plugins/installed'))"
+        }
+      ],
+      "errors": 0,
+      "skips": 0,
+      "junit": "<owned-private-state>/openhands/sdk-upstream-tests-private.xml",
+      "command": "<owned-private-state>/openhands/logs/sdk-upstream-tests-private.command.json",
+      "native_private_cache_scope": true,
+      "acceptance": "retained failed attempt; original assertions require .openhands substring; superseded by source-reviewed final private .openhands run",
+      "scope_accepted": false
+    }
+  },
+  "scans": {
+    "cli": {
+      "scanned_packages": 209,
+      "vulnerabilities": 0,
+      "exit_code": 0,
+      "native_json": "<owned-private-state>/openhands/cli-osv.json",
+      "initial_failed_command": "<owned-private-state>/openhands/logs/cli-osv-scan.command.json",
+      "repaired_command": "<owned-private-state>/openhands/logs/cli-osv-scan-repair.command.json",
+      "advisory_ignores": []
+    },
+    "sdk": {
+      "scanned_packages": 187,
+      "vulnerabilities": 0,
+      "exit_code": 0,
+      "native_json": "<owned-private-state>/openhands/sdk-osv.json",
+      "initial_failed_command": "<owned-private-state>/openhands/logs/sdk-osv-scan.command.json",
+      "repaired_command": "<owned-private-state>/openhands/logs/sdk-osv-scan-repair.command.json",
+      "advisory_ignores": []
+    }
+  },
+  "native_configuration": {
+    "command": "<owned-private-state>/openhands/logs/sdk-native-config-private-final.command.json",
+    "native_metadata": "<owned-private-state>/openhands/logs/sdk-native-config-private-final.stdout",
+    "exit_code": 0,
+    "conversation_started": false,
+    "plugin_installed": false,
+    "mcp_started": false
+  },
+  "scope_acceptance": {
+    "sdk_install": true,
+    "sdk_native_upstream_tests": true,
+    "sdk_native_user_cache_private": true,
+    "cli_install": true,
+    "cli_native_upstream_tests": true,
+    "cli_native_user_cache_private": false,
+    "cli_strict_isolation": "held",
+    "provider_trial": "not_started",
+    "O1_changes": false
+  },
+  "native_setup_receipt_sha256": "636f1275988f79384db5205190a1095cd2690e489202b214e7f63c132154d912",
+  "original_source_hashes": [
+    {
+      "source": "cli",
+      "file": "tests/stores/test_env_llm_overrides.py",
+      "sha256": "0d87089132ab5389cb6c9a4564ec6fe4525ab5b98f3426ba6240fe80f381b814",
+      "actual_sha256": "0d87089132ab5389cb6c9a4564ec6fe4525ab5b98f3426ba6240fe80f381b814"
+    },
+    {
+      "source": "cli",
+      "file": "tests/settings/test_skills_loading.py",
+      "sha256": "e8846631374c47e604355ac2f85131145f291296ee93cd682d2919384713b64d",
+      "actual_sha256": "e8846631374c47e604355ac2f85131145f291296ee93cd682d2919384713b64d"
+    },
+    {
+      "source": "cli",
+      "file": "tests/tui/test_headless_mode.py",
+      "sha256": "f1b8b29e447b74d2fcb093fe85366011dea6bec3ee02701ab4f20bfd958b7ac6",
+      "actual_sha256": "f1b8b29e447b74d2fcb093fe85366011dea6bec3ee02701ab4f20bfd958b7ac6"
+    },
+    {
+      "source": "cli",
+      "file": "tests/mcp/test_mcp_utils.py",
+      "sha256": "77d996aeb6a9afc84261dad8b066ecbd49efec4c48b004ef1f1b92e3a2dec096",
+      "actual_sha256": "77d996aeb6a9afc84261dad8b066ecbd49efec4c48b004ef1f1b92e3a2dec096"
+    },
+    {
+      "source": "cli",
+      "file": "uv.lock",
+      "sha256": "17305d45f178dfac639d8f51b4f08d2edc32656b850ff4e0b3104d0f64169486",
+      "actual_sha256": "17305d45f178dfac639d8f51b4f08d2edc32656b850ff4e0b3104d0f64169486"
+    },
+    {
+      "source": "cli",
+      "file": "pyproject.toml",
+      "sha256": "a54ce9365feeaf8ae8694917891d827ed529e32c8334e90765209bdf9b36b78b",
+      "actual_sha256": "a54ce9365feeaf8ae8694917891d827ed529e32c8334e90765209bdf9b36b78b"
+    },
+    {
+      "source": "sdk",
+      "file": "tests/sdk/llm/test_responses_parsing_and_kwargs.py",
+      "sha256": "940e7eae189a114be43152e58cfcd5a8a06de8de1ca913af78652383cd1d244f",
+      "actual_sha256": "940e7eae189a114be43152e58cfcd5a8a06de8de1ca913af78652383cd1d244f"
+    },
+    {
+      "source": "sdk",
+      "file": "tests/sdk/llm/test_llm_timeout.py",
+      "sha256": "5b2832c32e7fff23085497b27931a86363e51cf0349fe461e2cc42a012d225ae",
+      "actual_sha256": "5b2832c32e7fff23085497b27931a86363e51cf0349fe461e2cc42a012d225ae"
+    },
+    {
+      "source": "sdk",
+      "file": "tests/sdk/llm/test_prompt_caching_cross_conversation.py",
+      "sha256": "38dbd6226388d91a3187dafec8894089a6b8aaaacd5188d90db13350aa128651",
+      "actual_sha256": "38dbd6226388d91a3187dafec8894089a6b8aaaacd5188d90db13350aa128651"
+    },
+    {
+      "source": "sdk",
+      "file": "tests/sdk/skills/test_agentskills_fields.py",
+      "sha256": "856c8329fdad2fbac8f1266108e0714057eb71be7c154f219e535c1b2460e7e0",
+      "actual_sha256": "856c8329fdad2fbac8f1266108e0714057eb71be7c154f219e535c1b2460e7e0"
+    },
+    {
+      "source": "sdk",
+      "file": "tests/sdk/skills/test_installed_skills.py",
+      "sha256": "70b0cbae50631d5183d33219fd72e6ca43db39628463c1a2e9130448bb7bd5cf",
+      "actual_sha256": "70b0cbae50631d5183d33219fd72e6ca43db39628463c1a2e9130448bb7bd5cf"
+    },
+    {
+      "source": "sdk",
+      "file": "tests/sdk/skills/test_load_project_skills.py",
+      "sha256": "a6a39391c244a403655b75829fd8f26daa7d3f45612f2490e5b6d5bd4bb8e1b7",
+      "actual_sha256": "a6a39391c244a403655b75829fd8f26daa7d3f45612f2490e5b6d5bd4bb8e1b7"
+    },
+    {
+      "source": "sdk",
+      "file": "tests/sdk/plugin/test_installed_plugins.py",
+      "sha256": "980da7497a25be025896bfeb4b2d9034112e101e66bca1881b7f6e4115d29609",
+      "actual_sha256": "980da7497a25be025896bfeb4b2d9034112e101e66bca1881b7f6e4115d29609"
+    },
+    {
+      "source": "sdk",
+      "file": "tests/sdk/mcp/test_create_mcp_tool.py",
+      "sha256": "b42e2b10e769cc1bc391a0f942ab419be853eed6ea8ab4d23f363b7fa2d5e235",
+      "actual_sha256": "b42e2b10e769cc1bc391a0f942ab419be853eed6ea8ab4d23f363b7fa2d5e235"
+    },
+    {
+      "source": "sdk",
+      "file": "tests/sdk/mcp/test_mcp_config_secrets.py",
+      "sha256": "6bccd4ba4f11b73f102680659bb9d9f5af2f761052065fa1fc8d509f5334a9ef",
+      "actual_sha256": "6bccd4ba4f11b73f102680659bb9d9f5af2f761052065fa1fc8d509f5334a9ef"
+    },
+    {
+      "source": "sdk",
+      "file": "tests/sdk/context/condenser/test_llm_summarizing_condenser.py",
+      "sha256": "4f81dc34bcd4f9710816781f7d1b06cc9a6d0b479511ad7d1e11442ab704c054",
+      "actual_sha256": "4f81dc34bcd4f9710816781f7d1b06cc9a6d0b479511ad7d1e11442ab704c054"
+    },
+    {
+      "source": "sdk",
+      "file": "uv.lock",
+      "sha256": "e2c49fee72a61005789eed7b78e363e901b385b979bf3327e098d27a7d96aecb",
+      "actual_sha256": "e2c49fee72a61005789eed7b78e363e901b385b979bf3327e098d27a7d96aecb"
+    },
+    {
+      "source": "sdk",
+      "file": "pyproject.toml",
+      "sha256": "7fd52ea2cbde781d18b7556710fbd75055b033461ed7f1d1eecefe22b9a94fba",
+      "actual_sha256": "7fd52ea2cbde781d18b7556710fbd75055b033461ed7f1d1eecefe22b9a94fba"
+    }
+  ],
+  "command_records": [
+    {
+      "label": "cli-installed-metadata",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/cli-tools/openhands/bin/python",
+        "-c",
+        "import sys,importlib.metadata as m,json; print(json.dumps({\"python\":sys.version.split()[0],\"packages\":{p:m.version(p) for p in [\"openhands\",\"openhands-sdk\",\"openhands-tools\",\"openhands-workspace\",\"openhands-agent-server\",\"litellm\",\"pytest\",\"pytest-asyncio\"]}},indent=2))"
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T22:58:36.797192+00:00",
+      "finished_at": "2026-09-30T22:58:36.957378+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/cli-installed-metadata.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/cli-installed-metadata.stderr",
+      "stdout_sha256": "4a68965d4178f11f0151d3aac3e7218e1809d413c8b63404c7f0598e9370a969",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [
+        "  \"packages\": {",
+        "    \"openhands\": \"1.16.0\",",
+        "    \"openhands-sdk\": \"1.21.0\",",
+        "    \"openhands-tools\": \"1.21.0\",",
+        "    \"openhands-workspace\": \"1.11.1\",",
+        "    \"openhands-agent-server\": \"1.9.1\","
+      ],
+      "stdout_bytes": 291,
+      "stderr_returned_excerpt": [],
+      "stderr_bytes": 0
+    },
+    {
+      "label": "sdk-installed-metadata",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/sdk-venv/bin/python",
+        "-c",
+        "import sys,importlib.metadata as m,json;print(json.dumps({\"python\":sys.version.split()[0],\"packages\":{p:m.version(p) for p in [\"openhands-sdk\",\"openhands-tools\",\"litellm\",\"pytest\",\"pytest-asyncio\"]}},indent=2))"
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T22:59:35.666494+00:00",
+      "finished_at": "2026-09-30T22:59:35.817099+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-installed-metadata.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-installed-metadata.stderr",
+      "stdout_sha256": "1e41638fa1123c5dce95d9571afdc00e8cbcad510d0c153963cb56a20de301ce",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [
+        "  \"packages\": {",
+        "    \"openhands-sdk\": \"1.50.1\",",
+        "    \"openhands-tools\": \"1.50.1\","
+      ],
+      "stdout_bytes": 189,
+      "stderr_returned_excerpt": [],
+      "stderr_bytes": 0
+    },
+    {
+      "label": "cli-version",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/cli-bin/openhands",
+        "--version"
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T22:58:15.298887+00:00",
+      "finished_at": "2026-09-30T22:58:27.360161+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/cli-version.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/cli-version.stderr",
+      "stdout_sha256": "3dbe1bb57cd164ab7dea353f0f57692f239c74078005c3bba9687c1b1f59d272",
+      "stderr_sha256": "d8ec4ba607d4673d0e3da12561b94a50295fbe79326c3d62a7c28ff69826f926",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [
+        "OpenHands CLI 1.16.0"
+      ],
+      "stdout_bytes": 21,
+      "stderr_returned_excerpt": [
+        "<owned-private-state>/openhands/cli-tools/openhands/lib/python3.12/site-packages/openhands/sdk/llm/auth/openai.py:25: AuthlibDeprecationWarning: authlib.jose module is deprecated, please use joserfc instead.",
+        "It will be compatible before version 2.0.0.",
+        "|  OpenHands SDK v1.21.0                                               |",
+        "|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |",
+        "|  Get help: openhands.dev/joinslack                                   |",
+        "|  Scale up: openhands.dev/product/sdk                                 |"
+      ],
+      "stderr_bytes": 1014
+    },
+    {
+      "label": "cli-help",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/cli-bin/openhands",
+        "--help"
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T22:58:27.360753+00:00",
+      "finished_at": "2026-09-30T22:58:36.796635+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/cli-help.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/cli-help.stderr",
+      "stdout_sha256": "fca5d07d2b3dee38339457ef267e818f70a78e86270b4678939cef6b305daa4d",
+      "stderr_sha256": "d8ec4ba607d4673d0e3da12561b94a50295fbe79326c3d62a7c28ff69826f926",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [
+        "                openhands serve --gpu               # Launch with GPU support",
+        "                openhands web                       # Launch CLI as web app",
+        "                openhands web --port 8080           # Launch web app on custom port",
+        "                openhands acp                       # Agent-Client Protocol",
+        "                openhands login                     # Authenticate with OpenHands Cloud",
+        "                openhands logout                    # Log out from OpenHands Cloud"
+      ],
+      "stdout_bytes": 4220,
+      "stderr_returned_excerpt": [
+        "<owned-private-state>/openhands/cli-tools/openhands/lib/python3.12/site-packages/openhands/sdk/llm/auth/openai.py:25: AuthlibDeprecationWarning: authlib.jose module is deprecated, please use joserfc instead.",
+        "It will be compatible before version 2.0.0.",
+        "|  OpenHands SDK v1.21.0                                               |",
+        "|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |",
+        "|  Get help: openhands.dev/joinslack                                   |",
+        "|  Scale up: openhands.dev/product/sdk                                 |"
+      ],
+      "stderr_bytes": 1014
+    },
+    {
+      "label": "cli-pip-check",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<owned-private-state>/openhands/cli-tools/openhands/bin/python",
+        "--no-config"
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T22:58:36.958592+00:00",
+      "finished_at": "2026-09-30T22:58:37.066466+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/cli-pip-check.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/cli-pip-check.stderr",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "7ea75fa313650db6d613cd46b3816aa87ce16f83f5fa527f7e20e91333a6d815",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [],
+      "stdout_bytes": 0,
+      "stderr_returned_excerpt": [
+        "Checked 209 packages in 45ms",
+        "All installed packages are compatible"
+      ],
+      "stderr_bytes": 67
+    },
+    {
+      "label": "sdk-pip-check",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<owned-private-state>/openhands/sdk-venv/bin/python",
+        "--no-config"
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T22:59:35.817701+00:00",
+      "finished_at": "2026-09-30T22:59:35.879572+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-pip-check.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-pip-check.stderr",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "cc1f6044951244791464b88d023c6b148970fbeaf10ae48f26fbeec70d4b0564",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [],
+      "stdout_bytes": 0,
+      "stderr_returned_excerpt": [
+        "Using Python 3.13.15 environment at: <owned-private-state>/openhands/sdk-venv",
+        "Checked 187 packages in 5ms",
+        "All installed packages are compatible"
+      ],
+      "stderr_bytes": 205
+    },
+    {
+      "label": "cli-upstream-tests",
+      "argv": [
+        "rtk",
+        "proxy",
+        "uv",
+        "run",
+        "--no-sync",
+        "--python",
+        "<owned-private-state>/openhands/cli-tools/openhands/bin/python",
+        "python",
+        "-m",
+        "pytest",
+        "tests/stores/test_env_llm_overrides.py",
+        "tests/settings/test_skills_loading.py",
+        "tests/tui/test_headless_mode.py",
+        "tests/mcp/test_mcp_utils.py",
+        "--junitxml=<owned-private-state>/openhands/cli-upstream-tests.xml"
+      ],
+      "cwd": "<owned-private-state>/openhands/sources/cli",
+      "started_at": "2026-09-30T22:59:36.086712+00:00",
+      "finished_at": "2026-09-30T22:59:56.176700+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/cli-upstream-tests.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/cli-upstream-tests.stderr",
+      "stdout_sha256": "9aa0dcea3104d83f4f447232374f4e9c83166fb22c23fab3fa5dd248030bc1b0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [
+        "rootdir: <owned-private-state>/openhands/sources/cli",
+        "../../cli-tools/openhands/lib/python3.12/site-packages/openhands/sdk/llm/auth/openai.py:25",
+        "  <owned-private-state>/openhands/cli-tools/openhands/lib/python3.12/site-packages/openhands/sdk/llm/auth/openai.py:25: AuthlibDeprecationWarning: authlib.jose module is deprecated, please use joserfc instead.",
+        "  It will be compatible before version 2.0.0.",
+        "- generated xml file: <owned-private-state>/openhands/cli-upstream-tests.xml -",
+        "======================== 108 passed, 1 warning in 9.63s ========================"
+      ],
+      "stdout_bytes": 13366,
+      "stderr_returned_excerpt": [],
+      "stderr_bytes": 0
+    },
+    {
+      "label": "sdk-upstream-tests",
+      "argv": [
+        "rtk",
+        "proxy",
+        "uv",
+        "run",
+        "--no-sync",
+        "--python",
+        "<owned-private-state>/openhands/sdk-venv/bin/python",
+        "python",
+        "-m",
+        "pytest",
+        "tests/sdk/llm/test_responses_parsing_and_kwargs.py",
+        "tests/sdk/llm/test_llm_timeout.py",
+        "tests/sdk/llm/test_prompt_caching_cross_conversation.py",
+        "tests/sdk/skills/test_agentskills_fields.py",
+        "tests/sdk/skills/test_installed_skills.py",
+        "tests/sdk/skills/test_load_project_skills.py",
+        "tests/sdk/plugin/test_installed_plugins.py",
+        "tests/sdk/mcp/test_create_mcp_tool.py",
+        "tests/sdk/mcp/test_mcp_config_secrets.py",
+        "tests/sdk/context/condenser/test_llm_summarizing_condenser.py",
+        "--junitxml=<owned-private-state>/openhands/sdk-upstream-tests.xml"
+      ],
+      "cwd": "<owned-private-state>/openhands/sources/sdk",
+      "started_at": "2026-09-30T22:59:56.735141+00:00",
+      "finished_at": "2026-09-30T23:00:23.471383+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-upstream-tests.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-upstream-tests.stderr",
+      "stdout_sha256": "e49da30297fc064731b345db6e9a1ac6c4dec16edc2cfa1bf281cfa56a688fe9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [
+        "tests/sdk/skills/test_load_project_skills.py::test_load_project_skills_merges_agents_and_openhands PASSED [ 43%]",
+        "  <owned-private-state>/openhands/sources/sdk/tests/sdk/plugin/test_installed_plugins.py:203: PytestUnknownMarkWarning: Unknown pytest.mark.network - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html",
+        "  <owned-private-state>/openhands/sources/sdk/tests/sdk/plugin/test_installed_plugins.py:229: PytestUnknownMarkWarning: Unknown pytest.mark.network - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html",
+        "  <owned-private-state>/openhands/sources/sdk/tests/sdk/plugin/test_installed_plugins.py:250: PytestUnknownMarkWarning: Unknown pytest.mark.network - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html",
+        "- generated xml file: <owned-private-state>/openhands/sdk-upstream-tests.xml -",
+        "======================= 184 passed, 3 warnings in 17.56s ======================="
+      ],
+      "stdout_bytes": 23154,
+      "stderr_returned_excerpt": [],
+      "stderr_bytes": 0
+    },
+    {
+      "label": "sdk-upstream-tests-private",
+      "argv": [
+        "rtk",
+        "proxy",
+        "uv",
+        "run",
+        "--no-sync",
+        "--python",
+        "<owned-private-state>/openhands/sdk-venv/bin/python",
+        "python",
+        "-m",
+        "pytest",
+        "tests/sdk/llm/test_responses_parsing_and_kwargs.py",
+        "tests/sdk/llm/test_llm_timeout.py",
+        "tests/sdk/llm/test_prompt_caching_cross_conversation.py",
+        "tests/sdk/skills/test_agentskills_fields.py",
+        "tests/sdk/skills/test_installed_skills.py",
+        "tests/sdk/skills/test_load_project_skills.py",
+        "tests/sdk/plugin/test_installed_plugins.py",
+        "tests/sdk/mcp/test_create_mcp_tool.py",
+        "tests/sdk/mcp/test_mcp_config_secrets.py",
+        "tests/sdk/context/condenser/test_llm_summarizing_condenser.py",
+        "--basetemp=<owned-private-state>/openhands/pytest-sdk-private",
+        "--junitxml=<owned-private-state>/openhands/sdk-upstream-tests-private.xml"
+      ],
+      "cwd": "<owned-private-state>/openhands/sources/sdk",
+      "started_at": "2026-09-30T23:20:27.359845+00:00",
+      "finished_at": "2026-09-30T23:20:49.220522+00:00",
+      "exit_code": 1,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-upstream-tests-private.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-upstream-tests-private.stderr",
+      "stdout_sha256": "a9f445638b5ba8171099c335176947c81865bb1701bbc89ca4126b77bc77df93",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_usage": "unknown",
+      "native_environment": {
+        "UV_TOOL_DIR": "<owned-private-state>/openhands/cli-tools",
+        "UV_TOOL_BIN_DIR": "<owned-private-state>/openhands/cli-bin",
+        "UV_PROJECT_ENVIRONMENT": "<owned-private-state>/openhands/sdk-venv",
+        "OPENHANDS_PERSISTENCE_DIR": "<owned-private-state>/openhands/cli-state",
+        "OPENHANDS_CONVERSATIONS_DIR": "<owned-private-state>/openhands/cli-conversations",
+        "OPENHANDS_WORK_DIR": "<owned-private-state>/openhands/workspace",
+        "OH_PERSISTENCE_DIR": "<owned-private-state>/openhands/sdk-state",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "stdout_returned_excerpt": [
+        "E    +  where '<owned-private-state>/openhands/sdk-state/plugins/installed' = str(PosixPath('<owned-private-state>/openhands/sdk-state/plugins/installed'))",
+        "  <owned-private-state>/openhands/sources/sdk/tests/sdk/plugin/test_installed_plugins.py:203: PytestUnknownMarkWarning: Unknown pytest.mark.network - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html",
+        "  <owned-private-state>/openhands/sources/sdk/tests/sdk/plugin/test_installed_plugins.py:229: PytestUnknownMarkWarning: Unknown pytest.mark.network - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html",
+        "  <owned-private-state>/openhands/sources/sdk/tests/sdk/plugin/test_installed_plugins.py:250: PytestUnknownMarkWarning: Unknown pytest.mark.network - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html",
+        "- generated xml file: <owned-private-state>/openhands/sdk-upstream-tests-private.xml -",
+        "================== 2 failed, 182 passed, 3 warnings in 13.92s =================="
+      ],
+      "stdout_bytes": 24851,
+      "stderr_returned_excerpt": [],
+      "stderr_bytes": 0
+    },
+    {
+      "label": "sdk-upstream-tests-private-final",
+      "argv": [
+        "rtk",
+        "proxy",
+        "uv",
+        "run",
+        "--no-sync",
+        "--python",
+        "<owned-private-state>/openhands/sdk-venv/bin/python",
+        "python",
+        "-m",
+        "pytest",
+        "tests/sdk/llm/test_responses_parsing_and_kwargs.py",
+        "tests/sdk/llm/test_llm_timeout.py",
+        "tests/sdk/llm/test_prompt_caching_cross_conversation.py",
+        "tests/sdk/skills/test_agentskills_fields.py",
+        "tests/sdk/skills/test_installed_skills.py",
+        "tests/sdk/skills/test_load_project_skills.py",
+        "tests/sdk/plugin/test_installed_plugins.py",
+        "tests/sdk/mcp/test_create_mcp_tool.py",
+        "tests/sdk/mcp/test_mcp_config_secrets.py",
+        "tests/sdk/context/condenser/test_llm_summarizing_condenser.py",
+        "--basetemp=<owned-private-state>/openhands/pytest-sdk-private-final",
+        "--junitxml=<owned-private-state>/openhands/sdk-upstream-tests-private-final.xml"
+      ],
+      "cwd": "<owned-private-state>/openhands/sources/sdk",
+      "started_at": "2026-09-30T23:28:12.643270+00:00",
+      "finished_at": "2026-09-30T23:28:34.448488+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-upstream-tests-private-final.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-upstream-tests-private-final.stderr",
+      "stdout_sha256": "e93e1617189512e901bd5d9c91f4ac6440f825241676b6b5247774b98ca217b4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_usage": "unknown",
+      "native_environment": {
+        "UV_TOOL_DIR": "<owned-private-state>/openhands/cli-tools",
+        "UV_TOOL_BIN_DIR": "<owned-private-state>/openhands/cli-bin",
+        "UV_PROJECT_ENVIRONMENT": "<owned-private-state>/openhands/sdk-venv",
+        "OPENHANDS_PERSISTENCE_DIR": "<owned-private-state>/openhands/cli-state",
+        "OPENHANDS_CONVERSATIONS_DIR": "<owned-private-state>/openhands/cli-conversations",
+        "OPENHANDS_WORK_DIR": "<owned-private-state>/openhands/workspace",
+        "OH_PERSISTENCE_DIR": "<owned-private-state>/openhands/sdk-state/.openhands",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "stdout_returned_excerpt": [
+        "tests/sdk/skills/test_load_project_skills.py::test_load_project_skills_merges_agents_and_openhands PASSED [ 43%]",
+        "  <owned-private-state>/openhands/sources/sdk/tests/sdk/plugin/test_installed_plugins.py:203: PytestUnknownMarkWarning: Unknown pytest.mark.network - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html",
+        "  <owned-private-state>/openhands/sources/sdk/tests/sdk/plugin/test_installed_plugins.py:229: PytestUnknownMarkWarning: Unknown pytest.mark.network - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html",
+        "  <owned-private-state>/openhands/sources/sdk/tests/sdk/plugin/test_installed_plugins.py:250: PytestUnknownMarkWarning: Unknown pytest.mark.network - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html",
+        "- generated xml file: <owned-private-state>/openhands/sdk-upstream-tests-private-final.xml -",
+        "======================= 184 passed, 3 warnings in 13.78s ======================="
+      ],
+      "stdout_bytes": 23168,
+      "stderr_returned_excerpt": [],
+      "stderr_bytes": 0
+    },
+    {
+      "label": "sdk-cache-scope-negative",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/sdk-venv/bin/python",
+        "-c",
+        "from openhands.sdk.plugin.fetch import DEFAULT_CACHE_DIR; import pathlib,json; p=pathlib.Path(DEFAULT_CACHE_DIR); print(json.dumps({\"cache_dir\":str(p),\"private_scope\":p.is_relative_to(pathlib.Path('<owned-private-state>/openhands'))})); assert p.is_relative_to(pathlib.Path('<owned-private-state>/openhands')), \"native SDK cache escapes assigned private namespace\""
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T23:18:19.561898+00:00",
+      "finished_at": "2026-09-30T23:18:26.116382+00:00",
+      "exit_code": 1,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-cache-scope-negative.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-cache-scope-negative.stderr",
+      "stdout_sha256": "4e9c1ebbfc722c4aa57bc1dad4561a57d9e5bbc14c8da3db6dadfd07138a074e",
+      "stderr_sha256": "6f262f36e26bc4fac89a50f82e259fadd93d3f166352e6e1dcfbc0b8e00a12f6",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [
+        "{\"cache_dir\": \"<native-user-home>/.openhands/cache/plugins\", \"private_scope\": false}"
+      ],
+      "stdout_bytes": 78,
+      "stderr_returned_excerpt": [
+        "|  OpenHands SDK v1.50.1                                               |",
+        "|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |",
+        "|  Get help: openhands.dev/joinslack                                   |",
+        "|  Scale up: openhands.dev/product/sdk                                 |",
+        "    from openhands.sdk.plugin.fetch import DEFAULT_CACHE_DIR; import pathlib,json; p=pathlib.Path(DEFAULT_CACHE_DIR); print(json.dumps({\"cache_dir\":str(p),\"private_scope\":p.is_relative_to(pathlib.Path('<owned-private-state>/openhands'))})); assert p.is_relative_to(pathlib.Path('<owned-private-state>/openhands')), \"native SDK cache escapes assigned private namespace\""
+      ],
+      "stderr_bytes": 1727
+    },
+    {
+      "label": "sdk-cache-scope-positive",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/sdk-venv/bin/python",
+        "-c",
+        "from openhands.sdk.plugin.fetch import DEFAULT_CACHE_DIR; import pathlib,json; p=pathlib.Path(DEFAULT_CACHE_DIR); print(json.dumps({\"cache_dir\":str(p),\"private_scope\":p.is_relative_to(pathlib.Path('<owned-private-state>/openhands'))})); assert p.is_relative_to(pathlib.Path('<owned-private-state>/openhands')), \"native SDK cache escapes assigned private namespace\""
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T23:18:26.117132+00:00",
+      "finished_at": "2026-09-30T23:18:32.897411+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-cache-scope-positive.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-cache-scope-positive.stderr",
+      "stdout_sha256": "66b4641a4802cbd04dd9725cefb1fe095e0a0a6497c9b18587eb58fb18fa68af",
+      "stderr_sha256": "f1c99bd0ac85977af480b715a1e5ed825ce4a057c19797827bcedf7f4d08b226",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [
+        "{\"cache_dir\": \"<owned-private-state>/openhands/sdk-state/cache/plugins\", \"private_scope\": true}"
+      ],
+      "stdout_bytes": 157,
+      "stderr_returned_excerpt": [
+        "|  OpenHands SDK v1.50.1                                               |",
+        "|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |",
+        "|  Get help: openhands.dev/joinslack                                   |",
+        "|  Scale up: openhands.dev/product/sdk                                 |"
+      ],
+      "stderr_bytes": 658
+    },
+    {
+      "label": "sdk-cache-scope-final",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/sdk-venv/bin/python",
+        "-c",
+        "from openhands.sdk.plugin.fetch import DEFAULT_CACHE_DIR; import pathlib,json; p=pathlib.Path(DEFAULT_CACHE_DIR); print(json.dumps({\"cache_dir\":str(p),\"private_scope\":p.is_relative_to(pathlib.Path('<owned-private-state>/openhands'))})); assert p.is_relative_to(pathlib.Path('<owned-private-state>/openhands')), \"native SDK cache escapes assigned private namespace\""
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T23:28:06.208654+00:00",
+      "finished_at": "2026-09-30T23:28:12.641529+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-cache-scope-final.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-cache-scope-final.stderr",
+      "stdout_sha256": "3fd91147913852cc475136e9412d67502266ecf9e569a4d79f5bf69b89715333",
+      "stderr_sha256": "f1c99bd0ac85977af480b715a1e5ed825ce4a057c19797827bcedf7f4d08b226",
+      "provider_usage": "unknown",
+      "native_environment": {
+        "UV_TOOL_DIR": "<owned-private-state>/openhands/cli-tools",
+        "UV_TOOL_BIN_DIR": "<owned-private-state>/openhands/cli-bin",
+        "UV_PROJECT_ENVIRONMENT": null,
+        "OPENHANDS_PERSISTENCE_DIR": "<owned-private-state>/openhands/cli-state",
+        "OPENHANDS_CONVERSATIONS_DIR": "<owned-private-state>/openhands/cli-conversations",
+        "OPENHANDS_WORK_DIR": "<owned-private-state>/openhands/workspace",
+        "OH_PERSISTENCE_DIR": "<owned-private-state>/openhands/sdk-state/.openhands",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "stdout_returned_excerpt": [
+        "{\"cache_dir\": \"<owned-private-state>/openhands/sdk-state/.openhands/cache/plugins\", \"private_scope\": true}"
+      ],
+      "stdout_bytes": 168,
+      "stderr_returned_excerpt": [
+        "|  OpenHands SDK v1.50.1                                               |",
+        "|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |",
+        "|  Get help: openhands.dev/joinslack                                   |",
+        "|  Scale up: openhands.dev/product/sdk                                 |"
+      ],
+      "stderr_bytes": 658
+    },
+    {
+      "label": "cli-sdk-cache-scope",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/cli-tools/openhands/bin/python",
+        "-c",
+        "from openhands.sdk.context.prompts.prompt import _get_env; import pathlib,json; p=pathlib.Path(_get_env('<owned-private-state>/openhands/cli-tools/openhands/lib/python3.12/site-packages/openhands/sdk/context/prompts/templates').bytecode_cache.directory); print(json.dumps({\"cache_dir\":str(p),\"private_scope\":p.is_relative_to(pathlib.Path('<owned-private-state>/openhands'))})); assert p.is_relative_to(pathlib.Path('<owned-private-state>/openhands')), \"CLI pinned SDK cache escapes assigned private namespace\""
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T23:18:32.898002+00:00",
+      "finished_at": "2026-09-30T23:18:40.631866+00:00",
+      "exit_code": 1,
+      "stdout": "<owned-private-state>/openhands/logs/cli-sdk-cache-scope.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/cli-sdk-cache-scope.stderr",
+      "stdout_sha256": "8e24bbb699afad3d2de8c83ce2f8ecca2c5bce437c3cf96b9cdc5da6726d9abb",
+      "stderr_sha256": "bbd9122fe86b0ad5a576bcb7e26cb2ee93c12bd257ab435fce5272e6f065b208",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [
+        "{\"cache_dir\": \"<native-user-home>/.openhands/cache/jinja\", \"private_scope\": false}"
+      ],
+      "stdout_bytes": 76,
+      "stderr_returned_excerpt": [
+        "<owned-private-state>/openhands/cli-tools/openhands/lib/python3.12/site-packages/openhands/sdk/llm/auth/openai.py:25: AuthlibDeprecationWarning: authlib.jose module is deprecated, please use joserfc instead.",
+        "It will be compatible before version 2.0.0.",
+        "|  OpenHands SDK v1.21.0                                               |",
+        "|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |",
+        "|  Get help: openhands.dev/joinslack                                   |",
+        "|  Scale up: openhands.dev/product/sdk                                 |"
+      ],
+      "stderr_bytes": 1160
+    },
+    {
+      "label": "sdk-native-config-private-final",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/sdk-venv/bin/python",
+        "<owned-private-state>/openhands-worker/examples/openhands-native-capabilities/native-config.py",
+        "--model",
+        "cx/gpt-6.1-sol-max",
+        "--canonical-model",
+        "openai/gpt-6.1",
+        "--base-url",
+        "http://127.0.0.1:20128/v1",
+        "--workspace",
+        "<owned-private-state>/openhands/workspace",
+        "--persistence-dir",
+        "<owned-private-state>/openhands/sdk-conversations",
+        "--skills-dir",
+        "<owned-private-state>/openhands/sources/sdk/examples/05_skills_and_plugins/01_loading_agentskills/example_skills",
+        "--mcp-config",
+        "{\"fetch\":{\"command\":\"uvx\",\"args\":[\"--with\",\"mcp==1.29.0\",\"mcp-server-fetch==2026.7.10\"]}}",
+        "--plugin-source",
+        "<owned-private-state>/openhands/sources/sdk/examples/05_skills_and_plugins/02_loading_plugins/example_plugins/code-quality"
+      ],
+      "cwd": "<owned-private-state>/openhands-worker",
+      "started_at": "2026-09-30T23:28:34.449267+00:00",
+      "finished_at": "2026-09-30T23:28:41.198875+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-native-config-private-final.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-native-config-private-final.stderr",
+      "stdout_sha256": "4b63b13af290f0d00ed0270e0c8372ad37474c7efb7372e51e22f234ac69f01c",
+      "stderr_sha256": "f1c99bd0ac85977af480b715a1e5ed825ce4a057c19797827bcedf7f4d08b226",
+      "provider_usage": "unknown",
+      "native_environment": {
+        "UV_TOOL_DIR": "<owned-private-state>/openhands/cli-tools",
+        "UV_TOOL_BIN_DIR": "<owned-private-state>/openhands/cli-bin",
+        "UV_PROJECT_ENVIRONMENT": null,
+        "OPENHANDS_PERSISTENCE_DIR": "<owned-private-state>/openhands/cli-state",
+        "OPENHANDS_CONVERSATIONS_DIR": "<owned-private-state>/openhands/cli-conversations",
+        "OPENHANDS_WORK_DIR": "<owned-private-state>/openhands/workspace",
+        "OH_PERSISTENCE_DIR": "<owned-private-state>/openhands/sdk-state/.openhands",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "stdout_returned_excerpt": [
+        "      \"source\": \"<owned-private-state>/openhands/sources/sdk/examples/05_skills_and_plugins/02_loading_plugins/example_plugins/code-quality\",",
+        "  \"native_user_persistence_dir\": \"<owned-private-state>/openhands/sdk-state/.openhands\""
+      ],
+      "stdout_bytes": 1289,
+      "stderr_returned_excerpt": [
+        "|  OpenHands SDK v1.50.1                                               |",
+        "|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |",
+        "|  Get help: openhands.dev/joinslack                                   |",
+        "|  Scale up: openhands.dev/product/sdk                                 |"
+      ],
+      "stderr_bytes": 658
+    },
+    {
+      "label": "cli-osv-scan",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/osv-scanner",
+        "scan",
+        "source",
+        "--no-resolve",
+        "--lockfile=pip:<owned-private-state>/openhands/cli-resolved-requirements.txt",
+        "--format=json",
+        "--output-file=<owned-private-state>/openhands/cli-osv.json"
+      ],
+      "cwd": "<owned-private-state>/openhands",
+      "started_at": "2026-09-30T23:00:23.626102+00:00",
+      "finished_at": "2026-09-30T23:00:23.764120+00:00",
+      "exit_code": 127,
+      "stdout": "<owned-private-state>/openhands/logs/cli-osv-scan.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/cli-osv-scan.stderr",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d41653cd73a27b63486382c6d318cbdb5a61e417d499a54c049d4709d28cdc37",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [],
+      "stdout_bytes": 0,
+      "stderr_returned_excerpt": [
+        "could not determine extractor, requested pip"
+      ],
+      "stderr_bytes": 45
+    },
+    {
+      "label": "sdk-osv-scan",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/osv-scanner",
+        "scan",
+        "source",
+        "--no-resolve",
+        "--lockfile=pip:<owned-private-state>/openhands-worker/examples/openhands-native-capabilities/requirements.lock",
+        "--format=json",
+        "--output-file=<owned-private-state>/openhands/sdk-osv.json"
+      ],
+      "cwd": "<owned-private-state>/openhands",
+      "started_at": "2026-09-30T23:00:23.764720+00:00",
+      "finished_at": "2026-09-30T23:00:23.905663+00:00",
+      "exit_code": 127,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-osv-scan.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-osv-scan.stderr",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d41653cd73a27b63486382c6d318cbdb5a61e417d499a54c049d4709d28cdc37",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [],
+      "stdout_bytes": 0,
+      "stderr_returned_excerpt": [
+        "could not determine extractor, requested pip"
+      ],
+      "stderr_bytes": 45
+    },
+    {
+      "label": "cli-osv-scan-repair",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/osv-scanner",
+        "scan",
+        "source",
+        "--no-resolve",
+        "--lockfile=requirements.txt:<owned-private-state>/openhands/cli-resolved-requirements.txt",
+        "--format=json",
+        "--output-file=<owned-private-state>/openhands/cli-osv.json"
+      ],
+      "cwd": "<owned-private-state>/openhands",
+      "started_at": "2026-09-30T23:02:00.019351+00:00",
+      "finished_at": "2026-09-30T23:02:00.570472+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/cli-osv-scan-repair.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/cli-osv-scan-repair.stderr",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "55780a74b323b6124b28ad86cf1c72293a1431ad1f9ca9092b95cc0b6e5190ad",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [],
+      "stdout_bytes": 0,
+      "stderr_returned_excerpt": [
+        "Scanned <owned-private-state>/openhands/cli-resolved-requirements.txt file and found 209 packages"
+      ],
+      "stderr_bytes": 300
+    },
+    {
+      "label": "sdk-osv-scan-repair",
+      "argv": [
+        "rtk",
+        "<owned-private-state>/openhands/osv-scanner",
+        "scan",
+        "source",
+        "--no-resolve",
+        "--lockfile=requirements.txt:<owned-private-state>/openhands-worker/examples/openhands-native-capabilities/requirements.lock",
+        "--format=json",
+        "--output-file=<owned-private-state>/openhands/sdk-osv.json"
+      ],
+      "cwd": "<owned-private-state>/openhands",
+      "started_at": "2026-09-30T23:02:00.571039+00:00",
+      "finished_at": "2026-09-30T23:02:01.126711+00:00",
+      "exit_code": 0,
+      "stdout": "<owned-private-state>/openhands/logs/sdk-osv-scan-repair.stdout",
+      "stderr": "<owned-private-state>/openhands/logs/sdk-osv-scan-repair.stderr",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "5b952c7b366d3eac60b4e6570698d364a876620cfabf6d20000f6bef1b80b657",
+      "provider_usage": "unknown",
+      "stdout_returned_excerpt": [],
+      "stdout_bytes": 0,
+      "stderr_returned_excerpt": [
+        "Scanned <owned-private-state>/openhands-worker/examples/openhands-native-capabilities/requirements.lock file and found 187 packages"
+      ],
+      "stderr_bytes": 336
+    }
+  ],
+  "limitations": [
+    "Three upstream plugin tests fetch public GitHub; this is no-provider native acceptance rather than fully offline execution.",
+    "LiteLLM1.93.2 is an explicit declared-range-compatible dependency override; original upstream locks remain unchanged and are not the accepted installed environment.",
+    "First SDK184-pass attempt failed private cache scope; public user cache may have been updated. No shared-cache cleanup was performed.",
+    "Second SDK private attempt passed182 and failed2 original .openhands-substring checks. It remains preserved separately; final private .openhands attempt passed all184.",
+    "CLI pinned SDK1.21 hard-codes the Jinja cache under the real user home. Native CLI install and108 tests passed, but strict cache isolation is unqualified and CLI candidate remains held.",
+    "Configuration construction and original mocked/native tests do not establish provider execution, a production MCP handshake or a persisted running conversation."
+  ],
+  "independent_review": {
+    "family": "Astra/Max stack-verifier",
+    "status": "confirmed named native no-provider claims",
+    "fresh_checks": "Metadata,pip-check,cache-scope,frozen environments,source blobs,OSV binary version; existing tests and OSV scans were not rerun.",
+    "provider_execution": "unverified by this setup review"
+  }
+}
