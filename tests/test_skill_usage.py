@@ -2523,8 +2523,9 @@ class CodexCommandNormalization(unittest.TestCase):
                                                                "shell": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"}, ok),
                          sourced_command("item_s3", ["C:\\Windows\\System32\\cmd.exe", "/c", "qmd search x"], "unified_exec_startup"),
                          sourced_command("item_s4", ["powershell.exe", "-NoProfile", "-Command", "qmd search x"], "agent"),
+                         sourced_command("item_s6", ["pwsh.exe", "-NoProfile", "-Command", "qmd search x"], "agent"),
                          *shell_function_call("call_priv_s5", {"cmd": "qmd search x", "shell": "/usr/bin/sh"}, ok))
-        self.assertEqual(got.get("codex_commands"), {"non_posix_shell": 3, "unknown_shell": 1, "user_shell": 0,
+        self.assertEqual(got.get("codex_commands"), {"non_posix_shell": 4, "unknown_shell": 1, "user_shell": 0,
                                                      "exec_interactions": 0})
         self.assertEqual({lane: row["calls"] for lane, row in got["cli_lanes"]["lanes"].items()}, {"qmd": 1})
         self.assertEqual(got["m4"]["status"], "incomplete")
