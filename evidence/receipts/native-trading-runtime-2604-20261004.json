@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "id": "native-trading-runtime-2604-20261004",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "alpaca-py",
+    "duckdb",
+    "edgartools",
+    "exchange-calendars",
+    "nautilus-trader",
+    "pandas",
+    "skfolio"
+  ],
+  "claim": "NativeStack2604 installed the delivered locked CPython 3.12.3 research runtime and recorded 25/25 offline acceptance PASS on 2026-10-04, including the unchanged NautilusTrader 2.0.0rc5 synthetic quickstart; both earlier unsuccessful attempts are retained.",
+  "limitations": [
+    "Historical native execution on NativeStack2604 on 2026-10-04; packaging does not rerun installation or acceptance and does not qualify another host.",
+    "No paper or broker execution, provider-data acquisition, model inference, live trading, container start or gateway sign-in occurred in this runtime run.",
+    "The unchanged Nautilus example uses synthetic EUR/USD bars. Bundled SP500 data and the three-row schema example do not qualify point-in-time US-equity data, strategies or economic performance.",
+    "The 25-row acceptance script is a local integration harness, not an unchanged upstream test suite. Imported software, hash checks and transcribed examples do not constitute whole-component qualification.",
+    "Only outer install/accept logs, timestamp files and the result summary were staged. Per-check output logs, engine reports, original outer coordinator argv and separate script durations were not staged; no independent post-run observation or discriminating controls for local checks are supplied.",
+    "CPython 3.12.3 versus 3.13 and complete canonical matrix ratification remain open.",
+    "The EdgarTools 5.59.1 filing-fix overturn comparison remains open; delivered EdgarTools stays at catalog 5.58.0.",
+    "The supplied handoff reports a second Claude r2 preparation review PASS, but its verdict artifact is absent; preparation review is separate from independent review of this run.",
+    "Images were pulled by immutable OCI index digest and inspected only. Source-to-image reproducibility, LEAN oracle parity and rc5 broker risk/recovery remain open."
+  ],
+  "recorded_at": "2026-10-04T21:23:33Z",
+  "execution_kind": "historical_host_local_offline_research_runtime",
+  "host": {
+    "distribution": "NativeStack2604",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine_established": false
+  },
+  "source_job": "job-031",
+  "preparation_source_revision": "d323b53437e025be3d054b9b5e4d292fe396c75e",
+  "packaging_base_revision": "38ac9aca114ad9ef4a15d8620d947eb5c2f518c3",
+  "observation": {
+    "started_at_utc": "2026-10-04T21:17:20Z",
+    "ended_at_utc": "2026-10-04T21:23:33Z",
+    "combined_batch_duration_s": 373.0,
+    "separate_script_durations_s": null,
+    "timing_scope": "Outer successful install-plus-accept batch; never counted once per script.",
+    "runner_summary_as_supplied": "mise exec uv@0.12.17 -- bash {install,accept}-trading-2604.sh",
+    "working_directory": "original staged delivery directory (portable relative script names); exact outer cwd not supplied",
+    "native_install_exit": 0,
+    "native_accept_exit": 0,
+    "pass": 25,
+    "total": 25,
+    "confirmation": "Each named row and both outer exits were parsed directly from the retained native outer log and compared with result-summary.json. This confirms transcription, not independent observation of the underlying engine results."
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "uv": "0.12.17",
+    "requirements": [
+      "alpaca-py==0.44.0",
+      "arch==8.0.0",
+      "duckdb==1.5.5",
+      "dvc==3.67.1",
+      "edgartools==5.58.0",
+      "exchange-calendars==4.13.2",
+      "fincore==0.5.1",
+      "mlflow[mcp]==3.16.1",
+      "nautilus-trader==2.0.0rc5",
+      "numpy==2.5.3",
+      "pandas==3.0.6",
+      "pandera[pandas]==0.33.1",
+      "purgedcv==0.1.10",
+      "skfolio==1.2.9"
+    ],
+    "lock_entries": 242,
+    "lock_entry_scope": "Includes the project entry; not an installed-distribution count.",
+    "exclude_newer": "2026-10-06T04:00:00Z",
+    "project_sha256": "581bbb38a265068791c1a8c92435f9859876fd613d3c2c87d618a223376b01e0",
+    "lock_sha256": "c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086"
+  },
+  "source_integrity": {
+    "nautilus_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "quickstart_sha256": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53",
+    "quickstart_source": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/quickstart.py",
+    "adapter_commit": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+    "adapter_sha256": "fbf530884c2ad3b9e0c2b1f989eda399531647cc1db3c56dc9bcac10174fea47",
+    "scope": "Expected source hashes in the executed acceptance script; both integrity rows PASS in the outer log. Original installed source files were not staged."
+  },
+  "checks": [
+    {
+      "name": "offline_isolation",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "python",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_nautilus-trader",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_numpy",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_pandas",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_alpaca-py",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_edgartools",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_exchange-calendars",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_dvc",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_duckdb",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_pandera",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_skfolio",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_fincore",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_mlflow",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_arch",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "import_purgedcv",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "ibkr_adapter",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "alpaca_adapter_source",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "alpaca_adapter_import",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "nautilus_quickstart_sha256",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "local_import_version_source_or_isolation_probe",
+      "input_kind": "installed_native_software_or_staged_public_source"
+    },
+    {
+      "name": "nautilus_quickstart",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "native_proven",
+      "check_kind": "unchanged_upstream_example",
+      "input_kind": "synthetic_generated_EURUSD_bars"
+    },
+    {
+      "name": "duckdb_query",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "transcribed_upstream_example_with_local_assertions",
+      "input_kind": "synthetic_in_memory_view"
+    },
+    {
+      "name": "pandera_example",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "transcribed_upstream_example_with_local_assertions",
+      "input_kind": "synthetic_three_row_dataframe"
+    },
+    {
+      "name": "skfolio_example",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "transcribed_upstream_example_with_local_assertions",
+      "input_kind": "wheel_bundled_SP500_fixture"
+    },
+    {
+      "name": "arch_example",
+      "result": "pass",
+      "exit": 0,
+      "execution_scope": "historical_host_local_native_execution",
+      "evidence_class": "local_integration",
+      "check_kind": "transcribed_upstream_example_with_local_assertions",
+      "input_kind": "wheel_bundled_SP500_fixture"
+    }
+  ],
+  "preserved_unsuccessful_attempts": [
+    {
+      "log": "evidence/artifacts/trading-runtime-2604-20261004/run.log",
+      "time_file": "evidence/artifacts/trading-runtime-2604-20261004/started.txt",
+      "install_exit": 69,
+      "accept_exit": 1,
+      "blocked_checks": 25,
+      "check_exit": 69,
+      "condition": "uv 0.12.17 version prerequisite unsatisfied",
+      "correction": "uv 0.12.17 pin satisfied via mise exec (host default uv is 0.12.22)"
+    },
+    {
+      "log": "evidence/artifacts/trading-runtime-2604-20261004/run-2.log",
+      "time_file": "evidence/artifacts/trading-runtime-2604-20261004/started-2.txt",
+      "install_exit": 2,
+      "accept_exit": 1,
+      "blocked_checks": 25,
+      "check_exit": 69,
+      "condition": "--managed-python conflicts with UV_PYTHON_PREFERENCE=only-managed",
+      "correction": "removed --managed-python from `uv python find` (conflicts with UV_PYTHON_PREFERENCE=only-managed)"
+    }
+  ],
+  "fixes_before_pass": [
+    "uv 0.12.17 pin satisfied via mise exec (host default uv is 0.12.22)",
+    "removed --managed-python from `uv python find` (conflicts with UV_PYTHON_PREFERENCE=only-managed)"
+  ],
+  "review_history": [
+    {
+      "round": "r1",
+      "source": "verdict-claude-r1.json in the supplied staging bundle",
+      "verdict": "FINDINGS",
+      "findings": {
+        "P1": 2,
+        "P2": 1,
+        "residuals_P3": 15
+      },
+      "scope": "Preparation source review; staged repaired scripts incorporate the checkout, Docker endpoint and native-coreutils corrections."
+    },
+    {
+      "round": "r2",
+      "source": "user-provided job-031 handoff",
+      "verdict": "PASS",
+      "artifact_supplied": false,
+      "scope": "Reported second Claude read of prepared r2; not a post-run independent receipt review."
+    }
+  ],
+  "sanitization": {
+    "run-3.log": "Five personal home-path occurrences replaced with ~; all other output and line order retained.",
+    "other_logs": "No personal home-path substitutions needed.",
+    "summary_and_timestamp_files": "Copied unchanged; no personal paths or credentials found.",
+    "source_review": "Raw review conversation and private job-state locators excluded.",
+    "hash_scope": "Only published sanitized output is hashed."
+  },
+  "artifacts": [
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/result-summary.json",
+      "sha256": "622621ea1c9b824ad899245575e74b9c7e28ab30617eabf1316827774111ae06",
+      "bytes": 1158,
+      "hash_scope": "published_sanitized_bytes"
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/run-2.log",
+      "sha256": "85cb870a45bc86f6a4685c06a4510afac5fa545d531ccd47303784eaa262d872",
+      "bytes": 1199,
+      "hash_scope": "published_sanitized_bytes"
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/run-3.log",
+      "sha256": "679d454a0651a103c22d518424cca7bbc20c4f4bd5748cc9d0785d70f6149463",
+      "bytes": 13729,
+      "hash_scope": "published_sanitized_bytes"
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/run.log",
+      "sha256": "81df4b2eebf1036d02c9b19423189627b4e0e09946b54aee6a4719343faa4689",
+      "bytes": 938,
+      "hash_scope": "published_sanitized_bytes"
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/started-2.txt",
+      "sha256": "fc149c435f76eabf171ad6fb679aab5df3a996ea610b3b168b0d696435cc1890",
+      "bytes": 42,
+      "hash_scope": "published_sanitized_bytes"
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/started-3.txt",
+      "sha256": "b6471d4a6265495c3d89f42d8e4221f4581a0cdf6b527de8ffd7f4cb2b2f6d13",
+      "bytes": 42,
+      "hash_scope": "published_sanitized_bytes"
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/started.txt",
+      "sha256": "db1b9758dba57af083667b00816862aeb1700d8be39fba8236065987214629f1",
+      "bytes": 42,
+      "hash_scope": "published_sanitized_bytes"
+    }
+  ],
+  "recipe": "blueprints/us-equities/runtime-2604/README.md",
+  "decision": "docs/decisions/2026-10-04-trading-2604-preparation.md",
+  "packaging_changes": {
+    "installer": "Provenance comment points to repository README and receipt; executable statements unchanged.",
+    "acceptance": "A named synthetic sandbox_home replaces literal spellings in mount/HOME/cache arguments to avoid the publication scanner false positive. Its expanded argv remains unchanged; this is not a rerun of the published script.",
+    "runtime_project": "pyproject.toml and uv.lock are byte-identical to staged copies."
+  }
+}

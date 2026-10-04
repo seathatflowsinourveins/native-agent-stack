@@ -4148,6 +4148,32 @@
         "The host note reports a five-second refresh effect, but these retained records do not include a new interactive terminal observation. Plugin details reported approximately zero always-on tokens; this is a native projection, not measured provider counts."
       ],
       "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json"
+    },
+    {
+      "id": "native-trading-runtime-2604-20261004",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "alpaca-py",
+        "duckdb",
+        "edgartools",
+        "exchange-calendars",
+        "nautilus-trader",
+        "pandas",
+        "skfolio"
+      ],
+      "claim": "NativeStack2604 installed the delivered locked CPython 3.12.3 research runtime and recorded 25/25 offline acceptance PASS on 2026-10-04, including the unchanged NautilusTrader 2.0.0rc5 synthetic quickstart; both earlier unsuccessful attempts are retained.",
+      "limitations": [
+        "Historical native execution on NativeStack2604 on 2026-10-04; packaging does not rerun installation or acceptance and does not qualify another host.",
+        "No paper or broker execution, provider-data acquisition, model inference, live trading, container start or gateway sign-in occurred in this runtime run.",
+        "The unchanged Nautilus example uses synthetic EUR/USD bars. Bundled SP500 data and the three-row schema example do not qualify point-in-time US-equity data, strategies or economic performance.",
+        "The 25-row acceptance script is a local integration harness, not an unchanged upstream test suite. Imported software, hash checks and transcribed examples do not constitute whole-component qualification.",
+        "Only outer install/accept logs, timestamp files and the result summary were staged. Per-check output logs, engine reports, original outer coordinator argv and separate script durations were not staged; no independent post-run observation or discriminating controls for local checks are supplied.",
+        "CPython 3.12.3 versus 3.13 and complete canonical matrix ratification remain open.",
+        "The EdgarTools 5.59.1 filing-fix overturn comparison remains open; delivered EdgarTools stays at catalog 5.58.0.",
+        "The supplied handoff reports a second Claude r2 preparation review PASS, but its verdict artifact is absent; preparation review is separate from independent review of this run.",
+        "Images were pulled by immutable OCI index digest and inspected only. Source-to-image reproducibility, LEAN oracle parity and rc5 broker risk/recovery remain open."
+      ],
+      "path": "evidence/receipts/native-trading-runtime-2604-20261004.json"
     }
   ],
   "files": [
@@ -14973,6 +14999,31 @@
       "bytes": 273
     },
     {
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "sha256": "072dc125b9e799101e304096d90d01392398d23bd198e7b5b7a80a0544b50d84",
+      "bytes": 12596
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
+      "sha256": "e64356b3d9362f80c42fecce8369fbb6142302a76a6bcbbcaa04306dae81d947",
+      "bytes": 13203
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
+      "sha256": "9107bc2e290171ef37bcb4f90c97a9923afa025c902266abc2c484b7f7bc8b4e",
+      "bytes": 18071
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml",
+      "sha256": "581bbb38a265068791c1a8c92435f9859876fd613d3c2c87d618a223376b01e0",
+      "bytes": 515
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+      "sha256": "c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086",
+      "bytes": 353069
+    },
+    {
       "path": "blueprints/us-equities/security-identity/README.md",
       "sha256": "a919229e8e563563777c53ae26a189449069a363f4fcb60d15681e19da5c57d5",
       "bytes": 14391
@@ -15409,7 +15460,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "a3d4df9eb0f9cea278deb99a6370eb7f17e46c87e63b2092a649e9831d147519",
+      "sha256": "c761d3e6ec61a3c2d822d36f0afc7d49c6cb0da0269245e1c06516818b23aa00",
       "bytes": 314853
     },
     {
@@ -15804,8 +15855,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "6cdc57719ada786b46fe8c27d6d36ce162ffe66304b4e21d9e4e5131f6fa153d",
-      "bytes": 22531
+      "sha256": "70eec2aebaf9f5db9b637c50012bbdd65dc3bda7d148e21392d51a2a7b12d9b4",
+      "bytes": 23668
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -15944,7 +15995,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "f09a0e803184d4e31e48c534ae6d717774516bc2f42d1f7195fa4bee434eb0cb",
+      "sha256": "a1af27458583cabaebfe3d0299b239fdf23f42740165f02f9323d33f0647d26f",
       "bytes": 32903
     },
     {
@@ -16341,6 +16392,11 @@
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
       "sha256": "635fb536fb82377c4f1dd8d1acefe73d4fa6cc9298ce578164c372142ac36a8a",
       "bytes": 16799
+    },
+    {
+      "path": "docs/decisions/2026-10-04-trading-2604-preparation.md",
+      "sha256": "1a9905229c28ea63f6c773272cc4786eec655f5c49ba787c58ea205a627ee36a",
+      "bytes": 11910
     },
     {
       "path": "docs/direct-results.md",
@@ -48583,6 +48639,41 @@
       "bytes": 30252
     },
     {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/result-summary.json",
+      "sha256": "622621ea1c9b824ad899245575e74b9c7e28ab30617eabf1316827774111ae06",
+      "bytes": 1158
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/run-2.log",
+      "sha256": "85cb870a45bc86f6a4685c06a4510afac5fa545d531ccd47303784eaa262d872",
+      "bytes": 1199
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/run-3.log",
+      "sha256": "679d454a0651a103c22d518424cca7bbc20c4f4bd5748cc9d0785d70f6149463",
+      "bytes": 13729
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/run.log",
+      "sha256": "81df4b2eebf1036d02c9b19423189627b4e0e09946b54aee6a4719343faa4689",
+      "bytes": 938
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/started-2.txt",
+      "sha256": "fc149c435f76eabf171ad6fb679aab5df3a996ea610b3b168b0d696435cc1890",
+      "bytes": 42
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/started-3.txt",
+      "sha256": "b6471d4a6265495c3d89f42d8e4221f4581a0cdf6b527de8ffd7f4cb2b2f6d13",
+      "bytes": 42
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/started.txt",
+      "sha256": "db1b9758dba57af083667b00816862aeb1700d8be39fba8236065987214629f1",
+      "bytes": 42
+    },
+    {
       "path": "evidence/artifacts/u11-part1-source-repair-20261001/integration-main-20261002.json",
       "sha256": "6382ce9bc43e18e5797b0e0c7df0f2b76f2485ca6a908e3b7aba13ec1c1eb638",
       "bytes": 2740
@@ -49426,6 +49517,11 @@
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--worktrunk--use--20260924.json",
       "sha256": "d524f6df375ae5eaa4f64ef333264626beb5f936bffae1268cd1993981080199",
       "bytes": 10269
+    },
+    {
+      "path": "evidence/hosts/native-stack-2604-20261004/native-stack-2604-20261004--nautilustrader--use--20261004.json",
+      "sha256": "97aa0f8b4c3a3e6a69da2eed7a199daa9689cfde724ada35e0c95abdec074f1c",
+      "bytes": 4526
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--affaan-m%2FECC--install--20260926-2.json",
@@ -50776,6 +50872,11 @@
       "path": "evidence/receipts/native-token-stack-final-20260920.json",
       "sha256": "4223674dbaaeecc2bfefcc477a36610cc3e3b1a14716f93fe4572a5252bb2fc8",
       "bytes": 115131
+    },
+    {
+      "path": "evidence/receipts/native-trading-runtime-2604-20261004.json",
+      "sha256": "9289cc21b8f30c7be728d9261719e3709439b85b874af5551d60489166a65d43",
+      "bytes": 17934
     },
     {
       "path": "evidence/receipts/native-ultracode-20260921.json",

@@ -1,0 +1,30 @@
+install | BLOCKED | uv-version
+Requires uv 0.12.17 from the foundation lane.
+install-exit=69
+offline_isolation | BLOCKED | 69
+python | BLOCKED | 69
+BLOCKED: acceptance prerequisites unavailable
+import_nautilus-trader | BLOCKED | 69
+import_numpy | BLOCKED | 69
+import_pandas | BLOCKED | 69
+import_alpaca-py | BLOCKED | 69
+import_edgartools | BLOCKED | 69
+import_exchange-calendars | BLOCKED | 69
+import_dvc | BLOCKED | 69
+import_duckdb | BLOCKED | 69
+import_pandera | BLOCKED | 69
+import_skfolio | BLOCKED | 69
+import_fincore | BLOCKED | 69
+import_mlflow | BLOCKED | 69
+import_arch | BLOCKED | 69
+import_purgedcv | BLOCKED | 69
+ibkr_adapter | BLOCKED | 69
+alpaca_adapter_source | BLOCKED | 69
+alpaca_adapter_import | BLOCKED | 69
+nautilus_quickstart_sha256 | BLOCKED | 69
+nautilus_quickstart | BLOCKED | 69
+duckdb_query | BLOCKED | 69
+pandera_example | BLOCKED | 69
+skfolio_example | BLOCKED | 69
+arch_example | BLOCKED | 69
+accept-exit=1
