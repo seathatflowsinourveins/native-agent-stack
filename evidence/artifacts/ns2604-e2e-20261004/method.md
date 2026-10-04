@@ -134,9 +134,9 @@ Untracked files were also checked with git diff --no-index --check against the
 empty file. An initial wrapper treated exit 1 as failure; that classification was
 corrected after reading the [official Git diff manual](https://git-scm.com/docs/git-diff):
 no-index enables difference exit codes. All eight native checks returned exit 1
-for new content with zero whitespace diagnostics. The coordinator registered all
-eight published files, and full repository validation passed at revision
-92d182e7e. This bounded repair leaves manifests/evidence.json with the
-coordinator; validation of the repaired working tree returned exit 1 with 16
+for new content with zero whitespace diagnostics. The coordinator registers all
+eight published files in the PR's final registry-only commit, and full
+repository validation passes at that head. Before that synchronization, the
+bounded repair round's validation of its working tree returned exit 1 with 16
 expected registry-drift errors: changed hashes/byte counts and mirrored
-claim/limitations pending synchronization.
+claim/limitations.

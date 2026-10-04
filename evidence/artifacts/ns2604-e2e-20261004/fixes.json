@@ -9,7 +9,7 @@
  "instructions-skills/trail-of-bits-security-skills-trailofbits-skills": {
   "status": "PARTIAL",
   "fix_kind": "host",
-  "fix": "This is a host-state fix on NativeStack2604. The plan already prescribes it (install-plan.json:307; manifest.json:875-880; claude.settings.template.json:392; adoption/skills/lifecycle.md:286-302).\n\n1. From a shell outside any Claude session, run:\n   \"$tool_root/skills-1.7.0/bin/skills\" remove semgrep -g -y\n   lifecycle.md:299-301 requires the outside shell: the settings template denies `skills remove` inside a session, so do not route around that rule.\n2. Set skillOverrides.semgrep to \"off\" in ~/.claude/settings.json, matching template line 392, as a single-key merge. Re-running tools/adoption/apply_claude_settings.py would also apply it, but it re-merges the whole template.\n3. Verify:\n   - \"$tool_root/skills-1.7.0/bin/skills\" list -g -a claude-code codex --json lists exactly agentic-actions-auditor, codeql, fp-check, modern-python, property-based-testing, sarif-parsing, supply-chain-ris",
+  "fix": "This is a host-state fix on NativeStack2604. The plan already prescribes it (install-plan.json:307; manifest.json:875-880; claude.settings.template.json:392; adoption/skills/lifecycle.md:286-302).\n\n1. From a shell outside any Claude session, run:\n   \"$tool_root/skills-1.7.0/bin/skills\" remove semgrep -g -y\n   lifecycle.md:299-301 requires the outside shell: the settings template denies `skills remove` inside a session, so do not route around that rule.\n2. Set skillOverrides.semgrep to \"off\" in <host path>, matching template line 392, as a single-key merge. Re-running tools/adoption/apply_claude_settings.py would also apply it, but it re-merges the whole template.\n3. Verify:\n   - \"$tool_root/skills-1.7.0/bin/skills\" list -g -a claude-code codex --json lists exactly agentic-actions-auditor, codeql, fp-check, modern-python, property-based-testing, sarif-parsing, supply-chain-ris",
   "owner": "Trail of Bits security skills (trailofbits/skills)",
   "unit": "clients-1"
  },
@@ -142,7 +142,7 @@
  "observation-inference/session-analytics": {
   "status": "FAIL",
   "fix_kind": "plan",
-  "fix": "Add a pinned release installation and acceptance row. Download agentsview_0.43.0_linux_amd64.tar.gz from the v0.43.0 release, verify SHA256 4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9 against upstream SHA256SUMS, extract it, and install the agentsview binary into ~/.local/bin using install -m 0755. The upstream installer fetched at this tag still selects the latest release, so its script tag alone does not pin the installed binary. Configure agents.claude.dirs and agents.codex.dirs for the native session roots; use upstream agentsview daemon start, agentsview sync, agentsview session list and agentsview usage daily. Require newly created headless sessions from both clients to appear in the local archive. Record these steps in the plan.",
+  "fix": "Add a pinned release installation and acceptance row. Download agentsview_0.43.0_linux_amd64.tar.gz from the v0.43.0 release, verify SHA256 4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9 against upstream SHA256SUMS, extract it, and install the agentsview binary into <host path> using install -m 0755. The upstream installer fetched at this tag still selects the latest release, so its script tag alone does not pin the installed binary. Configure agents.claude.dirs and agents.codex.dirs for the native session roots; use upstream agentsview daemon start, agentsview sync, agentsview session list and agentsview usage daily. Require newly created headless sessions from both clients to appear in the local archive. Record these steps in the plan.",
   "owner": "agentsview 0.43.0, local archive",
   "unit": "observe-eval-2"
  },
@@ -177,7 +177,7 @@
  "git-github-automation/git": {
   "status": "PARTIAL",
   "fix_kind": "host",
-  "fix": "Host state only: in ~/code/native-agent-stack, run git config --local user.name '<user-approved name>' and git config --local user.email '<user-approved email>' using the user's chosen commit identity. Verify git var GIT_AUTHOR_IDENT and git var GIT_COMMITTER_IDENT both exit 0, including through the shell tools of fresh Claude Code and Codex sessions.",
+  "fix": "Host state only: in <host path>, run git config --local user.name '<user-approved name>' and git config --local user.email '<user-approved email>' using the user's chosen commit identity. Verify git var GIT_AUTHOR_IDENT and git var GIT_COMMITTER_IDENT both exit 0, including through the shell tools of fresh Claude Code and Codex sessions.",
   "owner": "git",
   "unit": "delivery-2"
  },
@@ -226,7 +226,7 @@
  "cross:credential-practice/credential-guard": {
   "status": "PARTIAL",
   "fix_kind": "host",
-  "fix": "Apply the existing upstream F9 client-configuration step from ~/code/native-agent-stack: python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>', where <host> names this distribution's adoption/hosts/<host>.json. Close native Codex sessions and stop its app-server daemon beforehand, as the installer requires. The codex-config step must merge [shell_environment_policy] inherit = \"none\" and the new-WSL template's explicit non-secret set entries, retaining the existing PATH. Then run python3 scripts/credential_status.py --client-guards --json and require client_guards.codex_shell_environment_inherit_none=true. Supply a fresh headless Codex session demonstrating the environment policy with a dummy canary and successful benign tool use, without printing environment or credential values. The missing configuration is host state; the supported wiring step already exists upstre",
+  "fix": "Apply the existing upstream F9 client-configuration step from <host path>: python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>', where <host> names this distribution's adoption/hosts/<host>.json. Close native Codex sessions and stop its app-server daemon beforehand, as the installer requires. The codex-config step must merge [shell_environment_policy] inherit = \"none\" and the new-WSL template's explicit non-secret set entries, retaining the existing PATH. Then run python3 scripts/credential_status.py --client-guards --json and require client_guards.codex_shell_environment_inherit_none=true. Supply a fresh headless Codex session demonstrating the environment policy with a dummy canary and successful benign tool use, without printing environment or credential values. The missing configuration is host state; the supported wiring step already exists upstre",
   "owner": "Command and secret-path guard (K4)",
   "unit": "host-2"
  }

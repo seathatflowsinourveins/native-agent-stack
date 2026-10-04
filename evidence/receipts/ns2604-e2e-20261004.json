@@ -17,7 +17,7 @@
     "Adjudication: claude-opus-5-5 at effort max (evidence-reviewer), prompt template as run in evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md. Run wf_8bf450a9-d1e (17 agents) started 2026-10-04T20:06:45Z and completed 2026-10-04T20:20:30Z; run wf_cdbf70a0-02c (5 agents) started 2026-10-04T20:08:29Z and completed 2026-10-04T20:19:31Z.",
     "Historical source command excerpts and raw conversations remain private. Public reasons are bounded to 60 words, fixes preserve the merge's 900-character bound before sanitization, and citations are limited to four per slot. Hashes establish byte identity, not success or adequacy of every native acceptance claim.",
     "Reviewer records report the requested gateway model cx/gpt-6.1-sol-max and max effort; no resolved backend model identity is inferred. Independent model review is review of retained evidence, not independent execution on the host.",
-    "The coordinator registered all eight published files in manifests/evidence.json, and full repository validation passed at revision 92d182e7e. This bounded repair leaves that registry coordinator-owned; validation of the repaired working tree reports only hashes and mirrored claim/limitations pending synchronization. Per-file scans and local receipt tests are structural evidence only."
+    "The coordinator registers all eight published files in manifests/evidence.json in the PR's final registry-only commit, and full repository validation passes at that head. Per-file scans and local receipt tests are structural evidence only."
   ],
   "data": {
     "publication_date_utc": "2026-10-04",
@@ -375,6 +375,14 @@
       {
         "file": "wf_cdbf70a0-02c",
         "sha256": "fb2211c01eb58218da6020d13ce61dcaea5a2a5c9d524a65263d17081de8d4c0"
+      },
+      {
+        "file": "context-2.probe-H.txt",
+        "sha256": "1d84241b30066b684f643c6aa7a1581546a9f33cd6bf1666f599b5257331d4f9"
+      },
+      {
+        "file": "context-2.claude-stream.jsonl",
+        "sha256": "bb0e4c7d3349d6944266276c3b584167f14fa09237dcab4336956edbf1731d40"
       }
     ],
     "public_artifacts": [
@@ -385,8 +393,8 @@
       },
       {
         "path": "evidence/artifacts/ns2604-e2e-20261004/method.md",
-        "sha256": "45c7800fd1e23e4c65d165a8ffa18027802aec1b7f2a519cd971303b556f6979",
-        "bytes": 9442
+        "sha256": "c166003013dcd1dd7f786977da74013e4987896958c2bba2344b5abbea049f5f",
+        "bytes": 9421
       },
       {
         "path": "evidence/artifacts/ns2604-e2e-20261004/summary.json",
@@ -405,13 +413,13 @@
       },
       {
         "path": "docs/decisions/2026-10-04-ns2604-verified-e2e.md",
-        "sha256": "77ed46ff3a0a1d7d99b866124a08a636ef0aafee6c62a0675aeb6166a1d7cc74",
-        "bytes": 6665
+        "sha256": "5c4f4c17c4e101a13f3167fc82973c1de4b2a3ab7b7d68741f9504dfecad8a93",
+        "bytes": 6659
       },
       {
         "path": "evidence/artifacts/ns2604-e2e-20261004/fixes.json",
-        "sha256": "c4a6eba1030f27ec771be3f04c123d5b35ac1605340e1034d38e1ac2cff7858f",
-        "bytes": 31546
+        "sha256": "9c27909616706d6a5dfc1fd2abb1c7f921e9b7b675d2ea4beea5d73bc894e861",
+        "bytes": 31505
       }
     ],
     "publication_checks": {
@@ -430,10 +438,10 @@
       },
       "repository_validation": {
         "cmd": "python3 scripts/validate.py",
-        "revision": "92d182e7e",
+        "revision": "the PR head carrying the final registry-only commit",
         "exit": 0,
         "errors": 0,
-        "scope": "Coordinator registration of all eight published files is complete; baseline validation passed before this bounded repair. Repaired hashes and mirrored fields require coordinator synchronization."
+        "scope": "All eight published files registered, with hashes and mirrored fields synchronized in the final registry-only commit."
       },
       "git_diff_check": {
         "cmd": "git diff --check",
@@ -447,7 +455,7 @@
         "correction": "The initial wrapper misclassified exit 1 as failure. Official Git documentation says no-index enables difference exit codes; zero diagnostic output is retained separately.",
         "verification_source": "https://git-scm.com/docs/git-diff"
       },
-      "original_source_hashes_rechecked": 56,
+      "original_source_hashes_rechecked": 58,
       "repair_round": {
         "receipt_tests": {
           "cmd": "TMPDIR=.bounded-job-044/tmp rtk python3 -m unittest tests.test_validate tests.test_evidence_manifest tests.test_host_receipts tests.test_receipt_staleness",
@@ -475,7 +483,7 @@
           "cmd": "python3 scripts/validate.py",
           "exit": 1,
           "errors": 16,
-          "scope": "All eight published files are registered. Only changed artifact hashes/byte counts and mirrored claim/limitations differ from the coordinator-owned registry after this repair; baseline validation at 92d182e7e passed."
+          "scope": "The repair round's working tree before the coordinator's registry synchronization: only changed artifact hashes/byte counts and mirrored claim/limitations differed. The final registry-only commit synchronizes them, and validate.py passes there."
         },
         "git_diff_check": {
           "cmd": "git diff --check",
