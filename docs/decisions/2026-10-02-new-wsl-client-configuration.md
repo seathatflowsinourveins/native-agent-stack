@@ -855,6 +855,13 @@ What would overturn it: Codex matching a project's trust by a parent directory o
 the repository's root should ask again (the entry returns to `not_wired`); the user choosing another main model, or the
 floating `opus` alias, for the new distribution.
 
+## Addendum 2026-10-04: the token layer
+
+[The 2026-10-04 record](2026-10-04-new-wsl-token-layer-default.md) applies the owner's directive of that day. It supersedes this record's
+not-wired rulings for rtk (through the map's new `directive` field), the SubagentStart token-lane carrier and the Claude Code
+currency notice, and it adds agent teams. Where the text above says that those pieces stay unwired, the 2026-10-04 record
+governs. Decision 2's counts sentence and the tables below are recounted.
+
 ## Pieces that are not wired
 
 `python3 -B tools/adoption/new_wsl_client_config.py --check --markdown` prints these three tables (the pieces that are not wired, the authorization
