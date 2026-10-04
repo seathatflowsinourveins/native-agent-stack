@@ -48,8 +48,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    config (`adoption/new-wsl/templates/`, the 2026-10-03 addendum); the two instruction blocks; and six steps of the tool
    itself (the launcher, the login-shell PATH block, the skills step, the two PATH directories and the remote plugin
    rules). A piece goes to the first entry that matches it. A piece no entry
-   matches, and an entry no piece reaches, fail the check. Today: 390 pieces, 343 wired (203 practice, 140 through a slot),
-   34 not wired (0 through a slot that does not install, 34 by their own entry) and 13 authorization pieces (the four
+   matches, and an entry no piece reaches, fail the check. Today: 391 pieces, 343 wired (203 practice, 140 through a slot),
+   35 not wired (0 through a slot that does not install, 35 by their own entry) and 13 authorization pieces (the four
    settings, the main checkout's Codex trust grant of the 2026-10-04 addendum, the six tool approval modes of Decision 14
    and semble's two allow rules, which also wait for their slots),
    each listed below; a slot whose install is another owner (an interim install, the 2026-10-03 addendum) counts as one
@@ -303,7 +303,7 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
       config and the stack-worker profile), semble and context-mode and semble's two allow rules, because their slots
       install those owners as interim installs; SocratiCode's and headroom's wait, because their slots install another
       owner. Since the 2026-10-04 addendum the option also writes the main checkout's Codex trust grant. Thirteen pieces
-      are in the class (`--check` counts `authorization: 13`, and 34 pieces are not wired).
+      are in the class (`--check` counts `authorization: 13`, and 35 pieces are not wired).
     - **The default.** `--render` and `--apply` neither render nor write the four, and an existing value of those keys in a
       person's files is never touched: the render lacks the keys, so the Claude merge leaves the file's keys as they are,
       and so does the Codex merge.
@@ -849,7 +849,7 @@ unchanged.
   without a suffix). Claude Code resolves the same model as before; what changes is that the new distribution keeps it
   when the shared template moves. `advisorModel` stays the template's `fable`.
   2026-10-04 (~15:10Z): the user changed the advisor to Opus 5.5; the template now carries `advisorModel: "opus"` (see [Advisor model](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model)).
-- **Counts.** 390 pieces, 343 wired, 34 not wired and 13 authorization pieces (Decisions 2 and 14 above).
+- **Counts.** 391 pieces, 343 wired, 35 not wired and 13 authorization pieces (Decisions 2 and 14 above).
 
 What would overturn it: Codex matching a project's trust by a parent directory or by another key form; a decision that
 the repository's root should ask again (the entry returns to `not_wired`); the user choosing another main model, or the
