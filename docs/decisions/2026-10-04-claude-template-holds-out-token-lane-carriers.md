@@ -29,7 +29,12 @@ left the shared template unchanged.
 3. **A re-apply retires the carrier hooks a host already has.** `apply_claude_settings.py` combines hooks per event and never
    dropped a base hook, so changing the template alone would leave NativeStack's live SubagentStart entry running. A merge
    now removes the hook objects that run `token-lanes-subagent-start.py` or `token-lanes-session-start.py` from a
-   `.claude/hooks/` directory, unless the template passed carries the same command or `--keep-held-out-hooks` is given; a group
+   `.claude/hooks/` directory, unless the template passed carries the same command or `--keep-held-out-hooks` is given. "Run"
+   means the file is the executable or the script operand of a python interpreter (the first word that is not an option) and
+   nothing else runs but a trailing `|| true`, the shape of the shipped entries; a hook that merely mentions the path
+   (`sha256sum <path>`, an argument of another script, an `echo`) or runs something else beside the carrier is the host's own and
+   is kept (a cross-family read found that the first matcher, any shell word naming the file, deleted such a hook; the
+   replacement is tested against nine commands that mention a path and eight that run one). A group
    or event left empty is dropped, every other hook keeps its value and order, and a second merge changes nothing. On a copy
    of NativeStack's live settings of 2026-10-04 the merge removes exactly one hook, the SubagentStart carrier, and with
    `--keep-held-out-hooks` it stays.
@@ -63,9 +68,15 @@ left the shared template unchanged.
    apply the host already uses, `apply_claude_settings.py` with the rendered template: the SubagentStart carrier entry goes.
    The seven carrier files already in `~/.claude/hooks/` stay and do nothing; delete them if wanted.
 2. `python3 tools/adoption/codex_config_prune.py` (read the dry run), then `--apply` in a quiet window.
-3. Register jcodemunch for Codex, which NativeStack lacks, through `apply_codex_lane.py` or `codex mcp add jcodemunch` with the
-   template's entry. NativeStack's Claude Code registration already exists and is not changed; its three extra local switches
-   (context providers, git blame, AI summaries off) stay as they are.
+3. Register jcodemunch for Codex, which NativeStack lacks. `apply_codex_lane.py` does not do it (its `owned_edits` says
+   registering servers is not that lane's job); two steps do, and a scratch Codex home on 2026-10-04 (codex-cli 0.159.3) showed
+   them complete the template's entry: `codex mcp add jcodemunch --env RTK_TELEMETRY_DISABLED=1 --env JCODEMUNCH_SHARE_SAVINGS=0
+   --env PATH=<the template's PATH> -- <ECO_ROOT>/bin/jcodemunch-mcp` writes the command and the environment, then the
+   template's three other keys (`startup_timeout_sec = 60`, `enabled_tools = ["route", "menu", "order"]`,
+   `default_tools_approval_mode = "approve"`) go in through Codex's config writer (`config/batchWrite`, the path
+   `codex_config_prune.py` uses) or by editing `[mcp_servers.jcodemunch]` while no codex process runs; `codex mcp get jcodemunch`
+   then lists all of them. NativeStack's Claude Code registration already exists and is not changed; its three extra local
+   switches (context providers, git blame, AI summaries off) stay as they are.
 4. A fresh session on NativeStack: confirm no `token-lanes` hook fires (hook counts of the session record) and that
    `claude mcp get jcodemunch` and `codex mcp get jcodemunch` are connected.
 

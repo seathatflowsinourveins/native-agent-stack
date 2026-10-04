@@ -44,8 +44,9 @@ a new project and in a new worktree alike.
   (`docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md`, decision 6) moves the same entries into
   `adoption/mcp/claude-user.json` and the Codex user template, because the repository's tests make the two user-scope sets mirror
   each other, so every host that installs the profile from the shared templates now gets the server; the per-project forms of
-  `adoption/bootstrap.md` remain for a project that wants its own registration. The record counts move to 404 pieces, 354 wired, 35 not wired and
-  15 authorization.
+  `adoption/bootstrap.md` remain for a project that wants its own registration. The record counts moved to 404 pieces, 354 wired, 35 not wired and
+  15 authorization, and the carrier entries that the same decision removes from the map bring them to 393 pieces, 354 wired,
+  24 not wired and 15 authorization (the builder's `--check` at that head).
 
 ## The cost, measured
 

@@ -261,6 +261,57 @@ class HeldOutHookTests(unittest.TestCase):
         merged = acs.merge_settings({"hooks": {"SubagentStart": [entry]}}, {"hooks": {"SubagentStart": [entry]}})
         self.assertEqual(merged["hooks"]["SubagentStart"], [entry])
 
+    # Commands that name a carrier path without running it, or run it among other things: retiring them would delete a
+    # host's own hook (the cross-family read of 2026-10-04 reproduced the first against the committed template).
+    MENTIONS = (
+        "sha256sum /home/example/.claude/hooks/token-lanes-session-start.py",
+        "cat ~/.claude/hooks/token-lanes-subagent-start.py",
+        "python3 /home/example/bin/audit.py /home/example/.claude/hooks/token-lanes-session-start.py",
+        'python3 -c "print(1)" /home/example/.claude/hooks/token-lanes-session-start.py',
+        'echo "/home/example/.claude/hooks/token-lanes-session-start.py"',
+        "test -f /home/example/.claude/hooks/token-lanes-session-start.py && echo present",
+        'true && python3 "/home/example/.claude/hooks/token-lanes-session-start.py"',
+        'python3 "/home/example/.claude/hooks/token-lanes-session-start.py"; rm -f /home/example/x',
+        'python3 "/home/example/.claude/hooks/token-lanes-session-start.py"\nrm -f /home/example/x',
+    )
+
+    # The shapes that run a carrier: the interpreter and the script operand, or the file as the executable, optionally
+    # with options, arguments, redirections, an environment assignment and the trailing `|| true` of the shipped entries.
+    RUNS = (
+        'python3 "/home/example/.claude/hooks/token-lanes-session-start.py" 2>/dev/null || true',
+        'python3 "$HOME/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true',
+        'python3 "${HOME}/.claude/hooks/token-lanes-session-start.py" 2>/dev/null || true',
+        'python3 "/home/example/.claude/hooks/token-lanes-session-start.py"',
+        "python /home/example/.claude/hooks/token-lanes-session-start.py --quiet",
+        "python3.12 -u ~/.claude/hooks/token-lanes-subagent-start.py",
+        'FOO=1 python3 "$HOME/.claude/hooks/token-lanes-session-start.py"',
+        '"/home/example/.claude/hooks/token-lanes-session-start.py" 2>/dev/null',
+    )
+
+    def test_a_hook_that_merely_mentions_a_carrier_path_is_kept(self):
+        for command in self.MENTIONS:
+            with self.subTest(command=command):
+                hook = {"type": "command", "command": command}
+                self.assertFalse(acs.runs_held_out_hook(hook))
+                base = {"hooks": {"SessionStart": [{"matcher": "startup", "hooks": [hook]}]}}
+                merged = acs.merge_settings(base, {"hooks": {}})
+                self.assertEqual(merged["hooks"]["SessionStart"], base["hooks"]["SessionStart"])
+
+    def test_every_shape_that_runs_a_carrier_is_retired(self):
+        # Control: the stricter matcher still retires the commands the templates and live hosts carry.
+        for command in self.RUNS:
+            with self.subTest(command=command):
+                hook = {"type": "command", "command": command}
+                self.assertTrue(acs.runs_held_out_hook(hook))
+                base = {"hooks": {"SessionStart": [{"matcher": "startup", "hooks": [hook]}]}}
+                self.assertEqual(acs.merge_settings(base, {"hooks": {}}).get("hooks", {}), {})
+
+    def test_the_hook_entries_of_the_opt_in_file_are_carrier_invocations(self):
+        entries = json.loads((ROOT / "adoption/hooks/claude/held-out-hook-entries.json").read_text(encoding="utf-8"))
+        hooks = [hook for groups in entries["hooks"].values() for group in groups for hook in group["hooks"]]
+        self.assertEqual(len(hooks), 2)
+        self.assertTrue(all(acs.runs_held_out_hook(hook) for hook in hooks))
+
     def test_only_a_hook_file_under_a_claude_hooks_directory_is_retired(self):
         own = [{"type": "command", "command": "python3 /home/example/bin/token-lanes-subagent-start.py"},
                {"type": "command", "command": 'python3 "/home/example/.claude/hooks/my-token-lanes-subagent-start.py"'},

@@ -10,7 +10,8 @@ missing template entry next to its template neighbours, so a deny rule stays
 ahead of a `!` carve-out), combines hooks
 per event de-duplicated by command, writes atomically, and preserves the
 original file's mode bits. The one thing a merge removes from the live hooks is a hook
-object that runs a held-out token-lane carrier file (HELD_OUT_HOOK_FILES), so a host
+object that runs a held-out token-lane carrier file (HELD_OUT_HOOK_FILES; see runs_held_out_hook: a hook that only
+mentions the path is the host's own and stays), so a host
 that applied an older template ends up clean; a template that itself carries the
 command keeps it, and --keep-held-out-hooks keeps the ones a host opted into (see
 adoption/hooks/claude/README.md). Supports --dry-run (prints the would-be result and exits
@@ -23,6 +24,7 @@ import argparse
 import copy
 import json
 import os
+import re
 import shlex
 import shutil
 import stat
@@ -70,16 +72,49 @@ def command_key(cmd: str) -> str:
         return cmd
 
 
+HOOK_INTERPRETER = re.compile(r"python(?:3(?:\.\d+)?)?")  # what the carrier entries run under
+SHELL_CONTROL = frozenset({";", ";;", "&", "&&", "|", "||", "|&"})  # shlex(punctuation_chars=True) tokens that end a command
+ENV_ASSIGNMENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=")
+
+
 def runs_held_out_hook(entry: dict) -> bool:
-    """True when a hooks-array entry runs one of HELD_OUT_HOOK_FILES from a `.claude/hooks/` directory."""
+    """True when a hooks-array entry runs one of HELD_OUT_HOOK_FILES from a `.claude/hooks/` directory: the file is the
+    executable, or the script operand of a python interpreter (the first word that is not an option), whatever options,
+    arguments and redirections follow, and nothing else runs but a trailing `|| true`, the shape of the shipped entries.
+    A command that merely mentions the path (`sha256sum <path>`, an argument of another script, an `echo`) does not run
+    it, and neither does a compound or multi-line command that runs something else as well, so retiring never deletes a
+    host's own hook; such an entry is left alone, and a carrier it also runs stays the host's to remove."""
     cmd = hook_command(entry)
-    if cmd is None:
+    if cmd is None or "\n" in cmd:
         return False
     try:
-        words = shlex.split(cmd)
+        lexer = shlex.shlex(cmd, posix=True, punctuation_chars=True)
+        lexer.whitespace_split = True
+        lexer.commenters = ""
+        tokens = list(lexer)
     except ValueError:
         return False
-    return any("/.claude/hooks/" in word and word.rsplit("/", 1)[-1] in HELD_OUT_HOOK_FILES for word in words)
+    commands, current = [], []
+    for token in tokens:
+        if token in SHELL_CONTROL:
+            commands.append(current)
+            current = []
+        else:
+            current.append(token)
+    commands.append(current)
+    first, rest = commands[0], commands[1:]
+    if any(words not in ([], ["true"], [":"]) for words in rest):
+        return False
+    words = list(first)
+    while words and ENV_ASSIGNMENT.match(words[0]):
+        words.pop(0)
+    if not words:
+        return False
+    if HOOK_INTERPRETER.fullmatch(words[0].rsplit("/", 1)[-1]):
+        operand = next((word for word in words[1:] if not word.startswith("-")), None)
+    else:
+        operand = words[0]
+    return operand is not None and "/.claude/hooks/" in operand and operand.rsplit("/", 1)[-1] in HELD_OUT_HOOK_FILES
 
 
 def retire_held_out_hooks(base_hooks, incoming_hooks):
