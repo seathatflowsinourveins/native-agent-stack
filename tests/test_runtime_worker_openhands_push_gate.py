@@ -92,7 +92,8 @@ GATE_FILES = {
     "scripts/commented_only.py": "print('comment')\n",
     "policy/gate.toml": "strict = true\n",
     "tests/__init__.py": "",
-    "tests/test_policy.py": "WORKFLOWS = '.github/workflows'\n",
+    # A test module imports the code it tests; that code is not a gate (src/app.py stays editable).
+    "tests/test_policy.py": "import src.app\n\nWORKFLOWS = '.github/workflows'\n",
     "tests/helpers.py": "",
     "docs/a.md": "a\n",
     "docs/guide.md": "guide\n",
@@ -358,6 +359,11 @@ class RepositoryWorkflowTests(unittest.TestCase):
         for path, rule in expected.items():
             with self.subTest(path=path):
                 self.assertEqual(protected.rule(path), rule)
+        # Test modules are protected but not traced: a test's sys.path entry (tools/, scripts/)
+        # protects no whole directory; a gate script's helper directory stays protected.
+        self.assertNotIn("tools", derived.prefixes)
+        self.assertNotIn("scripts", derived.prefixes)
+        self.assertEqual(derived.prefixes.get("tools/sota-convergence"), "ci_import")
         # The schedule-only workflow's script is not reachable from a push or its PR.
         self.assertNotIn(".github/workflows/practice-references-freshness.yml", derived.workflows)
         self.assertIn(".github/workflows/validate.yml", derived.workflows)

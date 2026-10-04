@@ -18,8 +18,9 @@ of a rename count), check() refuses a change to:
   (`workflow_policy_test`);
 - every file a workflow the push or its draft PR can start executes or reads as a gate,
   derived from the workflow files by derive_ci_protected: the files, directories and
-  modules its `run:` steps name (`ci_named`), the import closure of the Python files they
-  name (`ci_import`), the packages unittest discovery enters (`ci_discovered`), and local
+  modules its `run:` steps name (`ci_named`), the import closure of the gate scripts they
+  name (`ci_import`; test modules are protected but not traced), the test modules,
+  start directories and packages unittest discovery reaches (`ci_discovered`), and local
   actions and reusable workflows (`ci_local_action`).
 It also refuses a `run:` or `script:` text that interpolates untrusted event text
 (`pr_text_interpolated`), and it runs the zizmor version CI pins on the commit's workflows
@@ -429,6 +430,21 @@ def _unittest_runs(text):
     return runs
 
 
+def _unittest_modules(text):
+    """The dotted test names (`tests.test_x` or `tests.test_x.Case`) unittest invocations name."""
+    names = []
+    for found in UNITTEST.finditer(text.replace("\\\n", " ")):
+        args = []
+        for token in found.group(1).split():
+            if token in SHELL_BREAK or token.startswith((">", "2>", "|", ";", "&", ")")):
+                break
+            args.append(_unquote(token))
+        if args[:1] == ["discover"] or any(arg == "discover" for arg in args if not arg.startswith("-")):
+            continue
+        names += [arg for arg in args if not arg.startswith("-") and patch_policy._DOTTED.fullmatch(arg)]
+    return names
+
+
 def discovered(blobs, start, pattern):
     """unittest discovery from `start` with `pattern`, over a tree's blob names.
 
@@ -493,8 +509,9 @@ def derive_ci_protected(tree):
     actions they use. For each `run:` or `script:` text, without its whole-line comments
     (patch_policy.executable_lines): the names patch_policy.names_in_text finds from the
     repository root, from each working directory and from each `cd` target; unittest
-    discovery; and the import closure (patch_policy.python_references) of each Python
-    file named. Raises WorkflowSyntaxError when a reachable file cannot be read.
+    discovery (its start directory and the packages it enters); and the import closure
+    (patch_policy.python_references) of each Python file named that is not a test module.
+    Raises WorkflowSyntaxError when a reachable file cannot be read.
     """
     entries = tree.entries()
     blobs = {path for path, entry in entries.items() if entry[1] == "blob"}
@@ -508,7 +525,7 @@ def derive_ci_protected(tree):
         if facts.triggers is None or facts.triggers - UNREACHABLE_TRIGGERS:
             queue.append((path, facts))
     seen = {path for path, _ in queue}
-    named_python = set()
+    named_python, test_modules = set(), set()
     while queue:
         path, facts = queue.pop(0)
         result.workflows.append(path)
@@ -539,14 +556,20 @@ def derive_ci_protected(tree):
                         result.add_file(full, "ci_named")
                         if full.endswith(".py"):
                             named_python.add(full)
+            for name in _unittest_modules(code):
+                test_modules |= patch_policy.resolve_module(name.split("."), ("",), blobs, dirs)
             for start, pattern in _unittest_runs(code):
                 for root in dict.fromkeys(roots):
                     joined = posixpath.normpath(posixpath.join(root, start)) if root else start
                     files, packages = discovered(blobs, joined, pattern)
+                    test_modules |= files
                     for module in files:
                         result.add_file(module, "ci_discovered")
                     for package in packages:
                         result.add_prefix(package, "ci_discovered")
+                    start_dir = _relative(joined)
+                    if start_dir and start_dir in dirs:
+                        result.add_prefix(start_dir, "ci_discovered")
         for use in facts.local_uses:
             relative = _relative(use)
             if not relative:
@@ -563,7 +586,10 @@ def derive_ci_protected(tree):
                 if action in blobs and action not in seen:
                     seen.add(action)
                     queue.append((action, scan_workflow(tree.read(action).decode("utf-8", "replace"))))
-    pending, traced = sorted(named_python), set()
+    # Gate scripts' imports judge the change; a test module's imports are the code it tests,
+    # which CI runs whatever is protected (the record's accepted residual), so test modules
+    # are protected themselves but not traced.
+    pending, traced = sorted(named_python - test_modules), set(test_modules)
     while pending:
         path = pending.pop()
         if path in traced or path not in blobs:
