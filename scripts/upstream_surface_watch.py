@@ -1053,8 +1053,12 @@ def cross_check_claude(fetcher: Fetcher, names: dict) -> dict:
     environment = catalogs["environment.catalog.json"]
     setting_names = {fact["path"].split(".")[0] for fact in settings.get("facts", [])
                      if isinstance(fact, dict) and isinstance(fact.get("path"), str)}
-    env_names = {item["name"] for group in ("configurableVariables", "supplements", "providedToHooks")
-                 for item in environment.get(group, []) if isinstance(item, dict) and isinstance(item.get("name"), str)}
+    # configurableVariables is a list of names; supplements and providedToHooks are {name, scope, source} objects
+    # (environment.catalog.json of v2.1.289, read 2026-10-04).
+    env_names = {item if isinstance(item, str) else item.get("name")
+                 for group in ("configurableVariables", "supplements", "providedToHooks")
+                 for item in environment.get(group, [])
+                 if isinstance(item, str) or (isinstance(item, dict) and isinstance(item.get("name"), str))}
     result = {"status": "compared", "repository": "https://github.com/amitray007/claude-code-schema",
               "tag": release.get("tag_name"), "claude_code_version": settings.get("claudeCodeVersion")}
     if "claude:setting" in names:

@@ -782,8 +782,10 @@ class CrossCheckTests(unittest.TestCase):
         watch.seed(self, upstream)
         settings = json.dumps({"claudeCodeVersion": "2.1.288", "facts": [
             {"path": "fillerSetting00"}, {"path": "policyHelper.path"}, {"path": "trackerOnly"}]}).encode()
-        environment = json.dumps({"configurableVariables": [{"name": "CLAUDECODE"}, {"name": "TRACKER_ONLY_VAR"}],
-                                  "supplements": [], "providedToHooks": []}).encode()
+        # configurableVariables holds plain names, the other groups {name, ...} objects (the tracker's v2.1.289 shape).
+        environment = json.dumps({"configurableVariables": ["CLAUDECODE", "TRACKER_ONLY_VAR"],
+                                  "supplements": [{"name": "TRACKER_SUPPLEMENT", "scope": "configurable-standard"}],
+                                  "providedToHooks": []}).encode()
         lifecycle = json.dumps({"codex_cli_version": "codex-cli 0.160.0", "cli_features": [
             {"key": "feature_00", "stage": "stable", "enabled": False}, {"key": "tracker_feature", "stage": "stable"}]})
         release = {"tag_name": "v2.1.288", "assets": [
@@ -806,7 +808,8 @@ class CrossCheckTests(unittest.TestCase):
         crossed = watch.document("--network", "--cross-check", upstream=upstream)["cross_check"]
         self.assertEqual(crossed["claude"]["status"], "compared")
         self.assertEqual(crossed["claude"]["claude:setting"]["only_theirs"], ["trackerOnly"])
-        self.assertEqual(crossed["claude"]["claude:env"]["only_theirs"], ["TRACKER_ONLY_VAR"])
+        self.assertEqual(crossed["claude"]["claude:env"]["only_theirs"], ["TRACKER_ONLY_VAR", "TRACKER_SUPPLEMENT"])
+        self.assertEqual(crossed["claude"]["claude:env"]["common"], 1)
         self.assertEqual(crossed["codex"]["codex:feature"]["only_theirs"], ["tracker_feature"])
         self.assertEqual(crossed["codex"]["codex:feature"]["stage_differs"], ["feature_00"])
 
