@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "native_execution_source_bindings",
+  "meaning": "Original executed sources remain byte-identical in archives. Initial publication cleanup only changed comments/blank lines. A subsequent native secret-aware worker serializer is a substantive post-trial fix, source/offline/checkpoint tested without a new provider run.",
+  "files": [
+    {
+      "path": "examples/deepagents-omniroute/worker.py",
+      "archive": "evidence/artifacts/native-runtime-role-resolution-20260930/executed-source/worker.py.txt",
+      "executed_sha256": "66ae2bba78773b52abdd4a312965579d7c2a1b888f54c3e7f1e9776a957ff0ec",
+      "published_sha256": "cc6ebc1878b4b10f295e59a18cde7afc152a6dd7bd4faf6e7f5eb64ef2ede8cd",
+      "ast_equal": false,
+      "publication_whitespace_cleanup_sha256": "5691d455518c4e8f3d45fa8a04ad14e2f77d71d1a08cd39c63f1050bfccfe66f",
+      "post_trial_change": "Native langchain_core.load.dumps replaces generic model_dump JSON export; see secret-aware-serialization.json."
+    },
+    {
+      "path": "examples/deepagents-omniroute/acceptance_oracle.py",
+      "archive": "evidence/artifacts/native-runtime-role-resolution-20260930/executed-source/acceptance_oracle.py.txt",
+      "executed_sha256": "2a1d3b770d0b828d239575fe0c79694489df420c99dc11535072630198cae171",
+      "published_sha256": "76299b821509f494a7a8ee76df65981e8c47c0618127795974d77c11e249aaa2",
+      "ast_equal": true
+    },
+    {
+      "path": "examples/openhands-native-capabilities/native-llm-trial.py",
+      "archive": "evidence/artifacts/native-runtime-role-resolution-20260930/executed-source/native-llm-trial.py.txt",
+      "executed_sha256": "0f119e83a5367e12e1729d0376e71cc250b776b7c56afcab8d97a785435fca9b",
+      "published_sha256": "a96927350554a829bade31efe60ca2442943929f25384e7c517fb0d924b1e1b7",
+      "ast_equal": true
+    }
+  ]
+}
