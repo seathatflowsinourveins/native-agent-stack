@@ -12,8 +12,9 @@ on:
       - .github/workflows/hardware-profile-smoke.yml
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope and no cache access by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
+cache-mode: none
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
@@ -23,6 +24,8 @@ jobs:
   linux-profile:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -55,6 +58,8 @@ jobs:
   macos-profile:
     runs-on: macos-15
     timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

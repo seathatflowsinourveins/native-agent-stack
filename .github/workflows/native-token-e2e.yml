@@ -24,13 +24,20 @@ on:
     - cron: '11 7 * * 1'
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope and no cache access by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
+cache-mode: none
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   native-token-tools:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1

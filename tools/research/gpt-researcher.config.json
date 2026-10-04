@@ -1,0 +1,35 @@
+{
+ "FAST_LLM": "openai:cx/gpt-6.1-sol-high",
+ "SMART_LLM": "openai:cx/gpt-6.1-sol-max",
+ "STRATEGIC_LLM": "openai:cx/gpt-6.1-sol-max",
+ "LLM_KWARGS": {
+  "base_url": "http://127.0.0.1:21128/v1",
+  "temperature": null,
+  "streaming": true,
+  "max_retries": 1,
+  "max_tokens": 12000,
+  "timeout": 600,
+  "default_headers": {
+   "x-omniroute-session": "set-per-run-by-gpt_researcher.sh"
+  }
+ },
+ "RETRIEVER": "duckduckgo",
+ "CONTEXT_FILTER": "keyword",
+ "FAST_TOKEN_LIMIT": 6000,
+ "SMART_TOKEN_LIMIT": 12000,
+ "STRATEGIC_TOKEN_LIMIT": 8000,
+ "SUMMARY_TOKEN_LIMIT": 700,
+ "BROWSE_CHUNK_MAX_LENGTH": 4096,
+ "MAX_SEARCH_RESULTS_PER_QUERY": 5,
+ "MAX_ITERATIONS": 3,
+ "MAX_SUBTOPICS": 3,
+ "MAX_SCRAPER_WORKERS": 4,
+ "SCRAPER_RATE_LIMIT_DELAY": 0.5,
+ "SCRAPER": "bs",
+ "CURATE_SOURCES": false,
+ "TOTAL_WORDS": 1500,
+ "REPORT_SOURCE": "web",
+ "IMAGE_GENERATION_ENABLED": false,
+ "MCP_SERVERS": [],
+ "VERBOSE": true
+}

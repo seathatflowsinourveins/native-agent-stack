@@ -1,8 +1,9 @@
 {
   "schema_version": 2,
   "generated_at_utc": "2026-10-02T02:41:24Z",
+  "revised_at_utc": "2026-10-03T18:26:54Z",
   "base": "Ubuntu 26.04.1 WSL 2",
-  "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json). On the destination distribution they are unrun",
+  "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable, after their measurement settled them in the manifest: they are created through the running model server, which the plan does not start, so the default run skips them and --only installs each; as plan rows their install and acceptance commands have not run anywhere (the measurement created and ran the same models in a throwaway distribution). Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply as interim installs under amendment 3 of the manifest's decision rule, and the added statusline row), and research-harnesses, tobi-qmd and gpt-gateway are revised; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination.",
   "owners": [
     {
       "layer": "native-clients",
@@ -271,7 +272,8 @@
       "installed": true,
       "route": "none",
       "commands": [
-        "DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add 'mattpocock/skills#v1.2.3' -g -a claude-code codex -s tdd diagnosing-bugs codebase-design domain-modeling writing-for-agents setup-matt-pocock-skills -y"
+        "npm install --global --prefix \"$tool_root/skills-1.7.0\" skills@1.7.0",
+        "python3 -B \"$repo_root/tools/adoption/install_skills.py\" --skills-bin \"$tool_root/skills-1.7.0/bin/skills\" --json"
       ],
       "needs": {
         "sudo": false,
@@ -283,26 +285,26 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/mattpocock/skills/v1.2.3/README.md#L52",
-        "line": 52
+        "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L44",
+        "line": 44
       },
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "declare -A want=([tdd]=423f3cc2bccf3b0ed426fb35eeb4b38d9188a343 [diagnosing-bugs]=463c81def888fefa77b894837d301d9ed70e0994 [codebase-design]=20b7cd1dd1fe5b0bd37ba72649f3a29375574b5b [domain-modeling]=959e63161ff78b4b1cd553b2c0e09e0c68418e5f [writing-for-agents]=bd9c9c4762db0a9a094fd419316ebd4b0444d06e [setup-matt-pocock-skills]=abf20c04a4aa8a37ff20aa7286f28857150f8b8d)\nlock=\"${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}\"\nlock=\"${lock:-$HOME/.agents/.skill-lock.json}\"\nlisting=\"$(npx --yes skills@1.7.0 list -g -a claude-code codex --json)\"\nfor skill in tdd diagnosing-bugs codebase-design domain-modeling writing-for-agents setup-matt-pocock-skills; do\n  for agent in 'Claude Code' Codex; do\n    jq -e --arg skill \"$skill\" --arg agent \"$agent\" 'any(.[]; .name == $skill and (.agents | index($agent) != null))' <<<\"$listing\" >/dev/null\n  done\n  jq -e --arg skill \"$skill\" --arg hash \"${want[$skill]}\" '.skills[$skill].skillFolderHash == $hash' \"$lock\" >/dev/null\ndone",
+          "command": "python3 -B \"$repo_root/tools/adoption/install_skills.py\" --skills-bin \"$tool_root/skills-1.7.0/bin/skills\" --check-only --json",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L164",
-            "line": 164
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/fd111e59a7480c7910907e5cdc9a32a9e42ec42e/tools/adoption/install_skills.py#L554",
+            "line": 554
           }
         }
       },
       "config_paths": [
+        "$tool_root/skills-1.7.0",
         "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills",
-        "${CODEX_HOME:-$HOME/.codex}/skills",
         "$HOME/.agents/skills"
       ],
-      "notes": "Planned. Classification gap: the permitted enum has no skills-CLI route. Per skill, for both agents, never the bundle: the README's Claude plugin installs the whole set and the README says to pick one route (README.md:27). The five skills carry the critic's subjects (test-first loop, bug diagnosis, module and domain design, writing agent documents); setup-matt-pocock-skills is included because the README asks that it be one of the selected skills (README.md:55) and describes it as run once per repository before the other engineering skills (README.md:198); it is user-invoked (disable-model-invocation) and running it per repository is not part of this plan. The installer is pinned to skills 1.7.0 (npm gitHead 7407f389, tag v1.7.0). It parses owner/repo#ref (src/source-parser.ts:284-314, unit test src/source-parser.test.ts:129) and clones --depth 1 --branch <ref> (src/git.ts:295-302), so the tag v1.2.3 (commit 6acc160e4e0cd062dbbbd7a1b26ae92855edf07e) is what the installer is asked to clone. Superseded assumption from before the first run: that the lock entry would record ref v1.2.3 (src/skill-lock.ts:20-21 declares that optional field) and that the acceptance would check that ref; the end of this note says what the clean run returned and what the acceptance checks instead. Agent names claude-code (src/agents.ts:155) and codex (src/agents.ts:224); -g, -a, -s and -y are the installer's documented non-interactive form (README.md:110-111). Telemetry is off through DISABLE_TELEMETRY=1 (README.md:540, :554; src/telemetry.ts:86-88). The pin through #ref is read from source and the installer's unit test, not from its README, and is first exercised by the target-distribution run. The installer needs node (mise) but not the clients: an explicit -a does not require the agent to be installed (src/add.ts:1602-1612). The lock returned by the clean run had no ref; the installer supports it as an optional field, and why it was absent is unresolved. The acceptance compares each skill's recorded skillFolderHash with the git tree hash of its folder at tag v1.2.3 (GitHub tree API, read 2026-10-02); it does not hash the installed directories.",
+      "notes": "Revised by the wave-2 skills ruling of 2026-10-03, change 7 (evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.skills): the row delegates to tools/adoption/install_skills.py against the reduced, pinned adoption/skills/manifest.json, so install.sh reproduces the destination's skill set instead of installing mattpocock v1.2.3 with the two skills the manifest excludes (domain-modeling, setup-matt-pocock-skills). The skills CLI 1.7.0 is installed in its own prefix (the manifest's cli.install), and the installer adds each manifest skill from its pinned tree URL for both agents, with telemetry off, verifies its SKILL.md sha256 and the lock's tree hash, and rolls back a mismatch; it skips a held skill (agent-browser, held for the browser-tool measurement) and installs skill-creator as a copy for Claude Code only. This row's default, the selected mattpocock skills (tdd, diagnosing-bugs, codebase-design, writing-for-agents at d81f3a18), is part of that one call, and so are the manifest's other shared skills, which no definitive row names; skill-discovery and skill-authoring run the same installer for their one skill each, which is then already in place. grill-me, improve-codebase-architecture and semgrep were retired on 2026-10-03. The acceptance is the installer's read-only check of every selected skill (--check-only): canonical SKILL.md bytes and lock tree hash, or the Claude Code copy for skill-creator; listings and Codex rules are the client configuration's. A host that already holds the v1.2.3 bytes or the excluded skills removes them first (skills ruling, change 8; adoption/skills/lifecycle.md, Retire and remove). UNRUN on every distribution: revised from the wave-2 records of 2026-10-03, after every recorded run of this plan.",
       "supporting_sources": [
         {
           "url": "https://raw.githubusercontent.com/mattpocock/skills/v1.2.3/README.md#L55",
@@ -353,6 +355,178 @@
           "line": 113
         }
       ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "skill-discovery",
+      "owner": "find-skills (vercel-labs/skills)",
+      "repository": "https://github.com/vercel-labs/skills",
+      "release": "v1.7.0",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "npm install --global --prefix \"$tool_root/skills-1.7.0\" skills@1.7.0",
+        "python3 -B \"$repo_root/tools/adoption/install_skills.py\" --skills-bin \"$tool_root/skills-1.7.0/bin/skills\" --json --only find-skills"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L44",
+        "line": 44
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "want=76a98a285cb0434f3d39e1a873823556330e398b\nlock=\"${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}\"\nlock=\"${lock:-$HOME/.agents/.skill-lock.json}\"\nlisting=\"$(npx --yes skills@1.7.0 list -g -a claude-code codex --json)\"\nfor agent in 'Claude Code' Codex; do\n  jq -e --arg agent \"$agent\" 'any(.[]; .name == \"find-skills\" and (.agents | index($agent) != null))' <<<\"$listing\" >/dev/null\ndone\njq -e --arg hash \"$want\" '.skills[\"find-skills\"].skillFolderHash == $hash' \"$lock\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164",
+            "line": 164
+          }
+        }
+      },
+      "config_paths": [
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills",
+        "${CODEX_HOME:-$HOME/.codex}/skills",
+        "$HOME/.agents/skills"
+      ],
+      "notes": "Planned; the install and acceptance commands of this row have not run anywhere, on any distribution. Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md), after the clean run that VALIDATION.md records; that run does not cover this row. Classification gap: the permitted enum has no skills-CLI route. Only the find-skills folder is installed, for both agents, and no other skill of the repository: -s names the one skill (README.md:89), and -g, -a and -y are the installer's documented non-interactive form (README.md:111). The ref is the record's commit 7407f3893ad4dceab546ac002c3ef806e4000c73, which the record gives as release v1.7.0. A full commit after # is not a branch or tag: the installer first tries clone --depth 1 --branch <ref> and, when that fails with a missing-ref error and the ref is a 40-character commit, fetches that commit and checks out FETCH_HEAD (src/git.ts:295-322 at the installer's commit, with isCommitSha at :30 and cloneAtSha at :65). That path is read from source and has not been exercised by this plan. Telemetry is off through DISABLE_TELEMETRY=1 (README.md:540). The acceptance follows the engineering-process-skills row: the installer's own listing must show find-skills for Claude Code and for Codex, and the skillFolderHash that the installer records in its lock file must equal 76a98a285cb0434f3d39e1a873823556330e398b, the git tree hash of skills/find-skills at that commit (GitHub tree API, read 2026-10-02; the SKILL.md blob there is a41bdd074bb587afd861332cf2f473f3154de4d7, as the record says). It does not hash the installed directories and says nothing about a client loading or invoking the skill: the record's open gates (listing, hash and read-back on the destination, and a useful invocation in each client) stay open. Revised by the wave-2 skills ruling of 2026-10-03, change 7 (evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.skills): the install delegates to tools/adoption/install_skills.py --only find-skills, which adds the manifest's pinned tree for both agents and verifies it; the acceptance is unchanged. UNRUN on every distribution: revised from the wave-2 records of 2026-10-03, after every recorded run of this plan.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89",
+          "line": 89
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540",
+          "line": 540
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L302",
+          "line": 302
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315",
+          "line": 315
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L65",
+          "line": 65
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills/SKILL.md#L2",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "skill-authoring",
+      "owner": "skill-creator (embedded in Codex; anthropics/skills for Claude Code)",
+      "repository": "https://github.com/anthropics/skills",
+      "release": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "npm install --global --prefix \"$tool_root/skills-1.7.0\" skills@1.7.0",
+        "python3 -B \"$repo_root/tools/adoption/install_skills.py\" --skills-bin \"$tool_root/skills-1.7.0/bin/skills\" --json --only skill-creator"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L44",
+        "line": 44
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "want=3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6\nlock=\"${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}\"\nlock=\"${lock:-$HOME/.agents/.skill-lock.json}\"\nlisting=\"$(npx --yes skills@1.7.0 list -g --json)\"\njq -e '[.[] | select(.name == \"skill-creator\") | .agents] == [[\"Claude Code\"]]' <<<\"$listing\" >/dev/null\njq -e --arg hash \"$want\" '.skills[\"skill-creator\"].skillFolderHash == $hash' \"$lock\" >/dev/null\nshared_copy=\"$HOME/.agents/skills/skill-creator\"\ncodex_copy=\"${CODEX_HOME:-$HOME/.codex}/skills/skill-creator\"\n[[ ! -e \"$shared_copy\" && ! -L \"$shared_copy\" && ! -e \"$codex_copy\" && ! -L \"$codex_copy\" ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164",
+            "line": 164
+          }
+        }
+      },
+      "config_paths": [
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills"
+      ],
+      "notes": "Planned; the install and acceptance commands of this row have not run anywhere, on any distribution. Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md), after the clean run that VALIDATION.md records; that run does not cover this row. Classification gap: the permitted enum has no skills-CLI route. For Claude Code only: -a names claude-code alone, and --copy writes the folder into the Claude Code skills directory instead of a shared canonical copy with symlinks (README.md:91, :141-142). Nothing is installed for Codex and no same-name copy is placed for it. Codex carries its own skill-creator, embedded at the selected tag (the record cites codex-rs/skills/src/lib.rs at a956835d020762cb2b570053af06f643a11c0ecc). The installer's shared directory, $HOME/.agents/skills, is the one it uses for Codex's global skills (read in the bundled dist/cli.mjs of the skills 1.7.0 package: getAgentBaseDir and installSkillForAgent), and its README gives ~/.codex/skills/ as Codex's global path (README.md:298; the bundled code reads it as ${CODEX_HOME:-$HOME/.codex}/skills). A copy in either directory would be a same-name copy placed for Codex, which the record rules out, so the acceptance also fails when skill-creator exists in either of them, a dangling symbolic link included. Codex keeps its embedded skills under skills/.system, which the check leaves alone. Only the skill-creator folder is installed, and no other skill of the repository (README.md:89). The record names no release of this repository, so the ref is the record's commit 8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4. A full commit after # is not a branch or tag: the installer first tries clone --depth 1 --branch <ref> and, when that fails with a missing-ref error and the ref is a 40-character commit, fetches that commit and checks out FETCH_HEAD (src/git.ts:295-322 at the installer's commit, with isCommitSha at :30 and cloneAtSha at :65). That path is read from source and has not been exercised by this plan. Telemetry is off through DISABLE_TELEMETRY=1 (README.md:540). The acceptance follows the engineering-process-skills row for one agent: the installer's listing, run without an agent filter so that it reports every agent the installer detects, must name Claude Code as the only agent of skill-creator, and the skillFolderHash in its lock file must equal 3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6, the git tree hash of skills/skill-creator at that commit (GitHub tree API, read 2026-10-02; the SKILL.md blob there is 65b3a402dbd09b8e83f9d637c6b553875189085c, as the record says). It does not hash the installed directory, does not check that the embedded Codex skill is available on the destination and says nothing about a client loading or invoking the skill: those are the record's open gates. Revised by the wave-2 skills ruling of 2026-10-03, change 7 (evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.skills): the install delegates to tools/adoption/install_skills.py --only skill-creator; the manifest entry's agents [\"claude-code\"] and copy true make the installer run the add with --copy -a claude-code, the form this row used, and read the copy back from Claude Code's folder. The acceptance is unchanged. UNRUN on every distribution: revised from the wave-2 records of 2026-10-03, after every recorded run of this plan.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89",
+          "line": 89
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L91",
+          "line": 91
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L141",
+          "line": 141
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540",
+          "line": 540
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L302",
+          "line": 302
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315",
+          "line": 315
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L65",
+          "line": 65
+        },
+        {
+          "url": "https://raw.githubusercontent.com/anthropics/skills/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md#L2",
+          "line": 2
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L298",
+          "line": 298
+        }
+      ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "research-skill",
+      "owner": "Not installed until its activation gate returns (GPT Researcher's own skill with its MCP server)",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing is installed and this plan carries no install command for it until its activation gate returns. The gate, as the record gives it: An activation gate, not a comparison: a resolved and pinned environment for the MCP server, a native protocol handshake over STDIO, discovery of its five tools, a useful research result returned in each client, and a bounded lifecycle (start, stop, removal). The candidate is the GPT Researcher skill (assafelovic/gpt-researcher at 0957c301ed06c2a5857b834358c7227c739041d4, skills/gpt-researcher/SKILL.md) with its dependency gptr-mcp (assafelovic/gptr-mcp at 63884773685b1f12c7f0d9e283b3d71a5b9b5fda); neither is installed, pinned into this plan or run."
     },
     {
       "layer": "mcp-surfaces",
@@ -622,50 +796,93 @@
     {
       "layer": "semantic-rag",
       "slot": "code-search",
-      "owner": "Not installed until the deciding measurement returns (the families split between semble and SocratiCode)",
-      "repository": "",
-      "release": null,
-      "installed": false,
-      "route": "none",
-      "commands": [],
+      "owner": "semble 0.6.1",
+      "repository": "https://github.com/MinishLab/semble",
+      "release": "v0.6.1",
+      "installed": true,
+      "route": "uv-tool",
+      "commands": [
+        "uv tool install -p 3.13 'semble[mcp]==0.6.1'",
+        "\"$(uv tool dir)/semble/bin/python\" -c \"from huggingface_hub import snapshot_download; print(snapshot_download('minishlab/potion-code-16M-v2', revision='e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b', local_dir='$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c'))\""
+      ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
         "gpu": false,
         "node": false,
-        "python": false
+        "python": true
       },
-      "version_pinned": false,
-      "install_source": null,
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/README.md#L41",
+        "line": 41
+      },
       "service": null,
-      "acceptance": {},
-      "config_paths": [],
-      "notes": "waits for or was settled by a measurement: outside the combination rule"
+      "acceptance": {
+        "post_install": {
+          "command": "semble --version\nprobe=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$probe\"' EXIT\nprintf '%s\\n' 'def parse_invoice_total(lines):' '    return sum(float(line.split(\",\")[2]) for line in lines)' > \"$probe/invoice_probe.py\"\nSEMBLE_MODEL_NAME=\"$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c\" SEMBLE_CACHE_LOCATION=\"$probe/cache\" semble search \"sum the invoice totals\" \"$probe\" --format text | grep -q invoice_probe.py",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/src/semble/cli.py#L269",
+            "line": 269
+          }
+        }
+      },
+      "config_paths": [
+        "$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c",
+        "$HOME/.cache/semble-claude",
+        "$HOME/.cache/semble-codex"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Interim install under amendment 3 of the manifest's decision rule, on the owner's decision of 2026-10-03 (decision 2 lifts the code-search hold); the frozen code-search confirmatory decides and replaces or removes it. Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). The uv tool with the mcp extra at the exact version (README.md:41; docs/installation.md:44 pins semble[mcp]==X.Y.Z; requires-python >=3.10, classifiers up to 3.13, pyproject.toml:12-25). semble loads its model by Hub name with no revision and keys cache validity on that name, so the second command pins minishlab/potion-code-16M-v2 at e9d2a44c into a local snapshot, which SEMBLE_MODEL_NAME names (README.md:285; code-search ruling, change 4); record the resolved dependencies after the install with uv pip freeze --python \"$(uv tool dir)/semble/bin/python\". Each client gets its own absolute SEMBLE_CACHE_LOCATION (code-search ruling, change 5), and the client configuration renders both MCP entries, Codex's enabled_tools and its approval mode, and Claude Code's two exact-name allow rules (the last two only with --with-authorization-settings); never run semble install or mcp add for those entries (synthesis X11). Stdio MCP, CPU only, no port. The acceptance's first line is upstream's documented check (cli.py:269, README.md:114); the probe search after it, on a temporary file with the pinned local model and a scratch cache, is this project's integration check, not upstream acceptance (code-search ruling, change 6). Rollback, with literal targets: the ruling's change 9."
     },
     {
       "layer": "semantic-rag",
       "slot": "embedding-model",
-      "owner": "Not installed until the deciding measurement returns",
-      "repository": "",
-      "release": null,
-      "installed": false,
-      "route": "none",
-      "commands": [],
+      "owner": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
+      "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+      "release": "qwen3-embedding:0.6b, library manifest sha256 ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d",
+      "installed": true,
+      "route": "model-server",
+      "commands": [
+        "OLLAMA_HOST=127.0.0.1:21434 ollama pull qwen3-embedding:0.6b",
+        "curl -fsS http://127.0.0.1:21434/api/tags | jq -e '.models[] | select(.name == \"qwen3-embedding:0.6b\") | .digest == \"ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d\"' >/dev/null",
+        "OLLAMA_HOST=127.0.0.1:21434 ollama create qwen3-embedding-8k -f \"$plan_dir/models/qwen3-embedding-8k.Modelfile\""
+      ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
-        "gpu": false,
+        "gpu": true,
         "node": false,
         "python": false
       },
-      "version_pinned": false,
-      "install_source": null,
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L85",
+        "line": 85
+      },
       "service": null,
-      "acceptance": {},
+      "acceptance": {
+        "post_install": {
+          "command": "printf '%s  %s\\n' ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding/0.6b\" | sha256sum --check --status && grep -F sha256:06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding-8k/latest\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/manifest/paths.go#L29",
+            "line": 29
+          }
+        },
+        "service_health": {
+          "command": "out=\"$(OLLAMA_HOST=127.0.0.1:21434 ollama show qwen3-embedding-8k)\" && grep -E '^ +num_ctx +8192 *$' <<<\"$out\" >/dev/null && curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Why is the sky blue?\"}' | jq -e '(.embeddings | length) == 1 and (.embeddings[0] | length) == 1024' >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659",
+            "line": 1659
+          }
+        }
+      },
       "config_paths": [],
-      "notes": "one blind GPT order selected nothing and the other three models that each add a second server; the critic's choice was not among the judged candidates"
+      "notes": "Planned. Settled by the local-model measurement of 2026-10-02 and 2026-10-03 (evidence/artifacts/new-wsl-local-models-20261002; docs/decisions/2026-10-03-new-wsl-local-models.md). The measured system: the Ollama library model qwen3-embedding:0.6b (Q8_0), pinned by its manifest digest (registry.ollama.ai served that digest on 2026-10-03), and a derived model qwen3-embedding-8k that carries num_ctx 8192 as its own parameter (models/qwen3-embedding-8k.Modelfile, byte-identical to the measured one). No server-wide context is set: with OLLAMA_CONTEXT_LENGTH=64000 the embedder took 5.78 GB. ollama pull checks every layer it downloads against the manifest's digest (server/images.go:1082); the second command stops the row unless the server reports the pinned manifest digest (server/model_list.go:64). The model is created through the running model server, which the plan does not start: the default run skips this row, and bash install.sh --only embedding-model installs it once the server answers on 127.0.0.1:21434 and reports version 0.35.0, the measured one, through GET /api/version (docs/api.md:1824); otherwise install.sh stops the row before the pull. The post-install check reads files only (the library manifest's sha256 and the derived model's model layer, in the server's store under ${OLLAMA_MODELS:-$HOME/.ollama/models}, envconfig/config.go:112). The service check shows num_ctx 8192 and makes one embedding call of 1,024 dimensions (the model card, Qwen/Qwen3-Embedding-0.6B at 97b0c614 README.md:36). The derived model's digest that the measurement recorded (e3c32ffa36019b43b729c6da039b463bd28890b14135e76013bb0c1255766d83) is for comparison, not a check. No reranker is installed (reranker-model). Not run on any distribution as a plan row."
     },
     {
       "layer": "semantic-rag",
@@ -706,7 +923,7 @@
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
-        "gpu": false,
+        "gpu": true,
         "node": true,
         "python": false
       },
@@ -724,10 +941,22 @@
             "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L671",
             "line": 671
           }
+        },
+        "after_sign_in": {
+          "command": "f=\"$HOME/.local/share/qmd/models/Qwen3-Embedding-0.6B-Q8_0.gguf\"\nprintf '%s  %s\\n' 06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 \"$f\" | sha256sum --check --status\ngrep -qxF \"  embed: $f\" \"$HOME/.config/qmd/native-agent-stack-catalog.yml\"\nqmd --index native-agent-stack-catalog status\nqmd --index native-agent-stack-catalog doctor",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L1021",
+            "line": 1021
+          }
         }
       },
-      "config_paths": [],
-      "notes": "Planned. Upstream first global npm route; Node >=22; status verifies grammars."
+      "config_paths": [
+        "$HOME/.config/qmd/native-agent-stack-catalog.yml",
+        "$HOME/.cache/qmd/",
+        "$HOME/.local/share/qmd/models/Qwen3-Embedding-0.6B-Q8_0.gguf"
+      ],
+      "notes": "Planned. Upstream first global npm route; Node >=22; status verifies grammars. Wave-2 retrieval ruling, change 16: needs.gpu reads true, because QMD runs node-llama-cpp with GPU auto: it uses the GPU when there is one and tries a CPU load only when GPU initialization fails, while a failure to create its first embedding context throws (src/llm.ts at facd35e, read by both families); concurrent fit beside the model server is the fit gate's, not this row's. config_paths name the index configuration, the cache and the interim embedder (Qwen3-Embedding-0.6B-Q8_0, sha256 06507c7b..., models.embed by absolute path). The after_sign_in check needs that embedder provisioned and the index embedded (embed -f in the GPU window, synthesis phase 3), as Ollama's check needs its model route; it is the live proof's host part (file hash, the configuration's embed line, status and doctor), and the client parts (each client's MCP query and get) stay with the live proof. UNRUN."
     },
     {
       "layer": "document-retrieval",
@@ -864,26 +1093,61 @@
     {
       "layer": "durable-memory",
       "slot": "memory-owner",
-      "owner": "Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory)",
-      "repository": "",
-      "release": null,
-      "installed": false,
-      "route": "none",
-      "commands": [],
+      "owner": "ai-memory 2.5.2",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "release": "v2.5.2",
+      "installed": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified https://github.com/akitaonrails/ai-memory/releases/download/v2.5.2/ai-memory-linux-x86_64.tar.gz acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8 \"$HOME/.local/opt/ai-memory-2.5.2/ai-memory-linux-x86_64.tar.gz\"",
+        "tar -xzf \"$HOME/.local/opt/ai-memory-2.5.2/ai-memory-linux-x86_64.tar.gz\" -C \"$HOME/.local/opt/ai-memory-2.5.2\" && ln -sfn \"$HOME/.local/opt/ai-memory-2.5.2/ai-memory\" \"$HOME/.local/bin/ai-memory\"",
+        "if [[ ! -e \"$HOME/.config/ai-memory/config.toml\" ]]; then mkdir -p \"$HOME/.config/ai-memory\" \"$HOME/.local/share/ai-memory\" && ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" init; fi",
+        "f=\"$HOME/.config/ai-memory/config.toml\"; if grep -qx 'bind = \"127.0.0.1:49374\"' \"$f\"; then sed -i 's|^bind = \"127.0.0.1:49374\"$|bind = \"127.0.0.1:29374\"\\nembedding_provider = \"local\"|' \"$f\"; fi; grep -qx 'bind = \"127.0.0.1:29374\"' \"$f\"; grep -qx 'embedding_provider = \"local\"' \"$f\"",
+        "mkdir -p \"$HOME/.config/systemd/user\" && sed 's|^ExecStart=/usr/bin/ai-memory |ExecStart=%h/.local/bin/ai-memory |' \"$HOME/.local/opt/ai-memory-2.5.2/packaging/systemd/ai-memory-user.service\" > \"$HOME/.config/systemd/user/ai-memory.service\" && systemctl --user daemon-reload && systemctl --user enable --now ai-memory.service",
+        "AI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory install-hooks --agent codex --apply"
+      ],
       "needs": {
         "sudo": false,
-        "systemd_user_unit": false,
+        "systemd_user_unit": true,
         "docker": false,
         "gpu": false,
         "node": false,
         "python": false
       },
-      "version_pinned": false,
-      "install_source": null,
-      "service": null,
-      "acceptance": {},
-      "config_paths": [],
-      "notes": "waits for or was settled by a measurement: outside the combination rule"
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1634",
+        "line": 1634
+      },
+      "service": {
+        "form": "upstream systemd user unit packaging/systemd/ai-memory-user.service of the release archive, ExecStart moved to the user prefix",
+        "port": 29374,
+        "port_setting": "bind = \"127.0.0.1:29374\" in ~/.config/ai-memory/config.toml (crates/ai-memory-cli/templates/config.default.toml L10 at 7580b74d; the wave-2 synthesis X5: the port the host template and the client templates carry)"
+      },
+      "acceptance": {
+        "post_install": {
+          "command": "ai-memory --version\njq -e '[(\"SessionStart\", \"UserPromptSubmit\", \"PreToolUse\", \"PostToolUse\", \"PreCompact\", \"Stop\", \"SessionEnd\") as $event | any(.hooks[$event][]?.hooks[]?; (.command // \"\") | contains(\"ai-memory\"))] | all' \"${CODEX_HOME:-$HOME/.codex}/hooks.json\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/render_shared.rs#L907",
+            "line": 907
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:29374/healthz\nAI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory status --json",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/serve.rs#L2712",
+            "line": 2712
+          }
+        }
+      },
+      "config_paths": [
+        "$HOME/.config/ai-memory/config.toml",
+        "$HOME/.config/systemd/user/ai-memory.service",
+        "$HOME/.local/share/ai-memory"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Interim install under amendment 3 of the manifest's decision rule, on the owner's decision of 2026-10-03 (decision 2 lifts the memory hold), with a fresh store; the memory head-to-head decides and replaces or removes it. Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). Route: the release archive and its sha256 (docs/install.md:1634-1636 names the archive and its .sha256 sidecar; the sha256 is the wave-2 memory dossier's, equal to the sidecar on 2026-10-03), extracted in a user prefix with the binary linked into ~/.local/bin, so the archive's sibling hooks/ stay next to it (the dossier's step 1). init writes the upstream config and data layout (docs/install.md:254-261). The config's bind moves from upstream's 127.0.0.1:49374 to 127.0.0.1:29374, the port the host template and the client templates already carry (wave-2 synthesis X5; the memory ruling's 21374 is not used), and embedding_provider = \"local\" makes the in-process all-MiniLM-L6-v2 embedder explicit, so a failed model fetch is a visible start failure (memory ruling, changes 4 and 5); no LLM provider is set (zero-LLM). The unit is upstream's user unit with ExecStart moved to the user prefix; it is enabled and started as upstream documents (docs/install.md:277-283). Linger is the recipe's F2, not this row. Wait for 'embedder enabled' in journalctl --user -u ai-memory.service before the service check. AI_MEMORY_SERVER_URL is needed only by manual CLI commands (memory change 14). Client wiring: the client configuration (tools/adoption/new_wsl_client_config.py) renders both clients' MCP entries, Claude Code's hooks and Codex's tool approval, so never run install-mcp, or install-hooks for Claude Code (synthesis X11). Codex's seven hooks are the one exception X11 allows: the client configuration writes no ~/.codex/hooks.json, so the last command, ai-memory's own installer, writes them once (it merges its seven events into $CODEX_HOME/hooks.json or ~/.codex/hooks.json with a backup and touches no config.toml: crates/ai-memory-cli/src/commands/install_hooks.rs:2071-2093, 2152-2181 and 2211-2229, and render_shared.rs:907-915; with AI_MEMORY_SERVER_URL set it takes the bare server origin, docs/install.md:118-121 and 593-595), after which new_wsl_client_config.py --check must pass; it is recorded in docs/decisions/2026-10-02-new-wsl-client-configuration.md. Their trust follows synthesis X10: read each hook's currentHash back through `codex app-server` hooks/list (no repository tool reads it yet; scripts/adoption_status.py --client-wiring counts the trusted ai-memory hooks the way Codex 0.155.1 to 0.157.1 computes trust), record the reviewed hashes in the client configuration, whose apply then renders the seven [hooks.state] entries; the one-time /hooks review is the fallback until then, and --dangerously-bypass-hook-trust is never used (memory ruling, change 12). The post-install acceptance's hooks.json line is this project's integration check, not upstream acceptance. Backups are staged by the Restic job (synthesis X6). Live proof: the interim's open acceptance gates in the definitive manifest."
     },
     {
       "layer": "token-efficiency",
@@ -912,26 +1176,92 @@
     {
       "layer": "token-efficiency",
       "slot": "context-supply",
-      "owner": "No context-supply layer: the usage meter only",
-      "repository": "",
-      "release": null,
-      "installed": false,
+      "owner": "context-mode 1.0.169",
+      "repository": "https://github.com/mksglu/context-mode",
+      "release": "6f0cc6841c687e754059f36714a11233fda1a02b ; npm 1.0.169",
+      "installed": true,
       "route": "none",
-      "commands": [],
+      "commands": [
+        "claude plugin marketplace add mksglu/context-mode --scope user",
+        "claude plugin install context-mode@context-mode --scope user",
+        "codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json",
+        "codex plugin add context-mode@context-mode --json",
+        "p=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169\"; d=\"$(mktemp -d)\"; (cd \"$d\" && npm pack context-mode@1.0.169 >/dev/null && printf '%s  %s\\n' 09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c context-mode-1.0.169.tgz | sha256sum --check --status && npm install --global --prefix \"$p\" ./context-mode-1.0.169.tgz); rc=$?; rm -rf -- \"$d\"; exit \"$rc\""
+      ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
         "gpu": false,
-        "node": false,
+        "node": true,
         "python": false
       },
-      "version_pinned": false,
-      "install_source": null,
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L72",
+        "line": 72
+      },
       "service": null,
-      "acceptance": {},
-      "config_paths": [],
-      "notes": "decided by both families in the decision round on a measured comparison: no context-supply layer"
+      "acceptance": {
+        "post_install": {
+          "command": "want=6f0cc6841c687e754059f36714a11233fda1a02b\nsha=\"$(jq -r '[.plugins[\"context-mode@context-mode\"][] | select(.scope == \"user\") | .gitCommitSha][0]' \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/installed_plugins.json\")\"\n[[ \"$sha\" == \"$want\" ]] || [[ \"$(curl -fsSL \"https://api.github.com/repos/mksglu/context-mode/compare/$want...$sha\" | jq -r '[.files[].filename] | unique | join(\",\")')\" == stats.json ]]\ncodex plugin list --json | jq -e 'any(.installed[]; .pluginId == \"context-mode@context-mode\" and .enabled)' >/dev/null\n[[ \"$(jq -r .version \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169/lib/node_modules/context-mode/package.json\")\" == 1.0.169 ]]\nconfig_dir=\"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"\njq -e '(.extraKnownMarketplaces[\"context-mode\"].autoUpdate // false) == false' \"$config_dir/settings.json\" >/dev/null\njq -e '(.[\"context-mode\"].autoUpdate // false) == false' \"$config_dir/plugins/known_marketplaces.json\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L78",
+            "line": 78
+          }
+        }
+      },
+      "config_paths": [
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/installed_plugins.json",
+        "${CODEX_HOME:-$HOME/.codex}/config.toml",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Interim install under amendment 3 of the manifest's decision rule, on the owner's pin (the wave-2 brief quotes the owner: 'context mode'), beside the slot's definitive no-install default; a preregistered end-to-end comparison decides and reports to the owner, and the pin is never removed automatically. Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). Classification gap: the permitted enum has no plugin-marketplace or local-npm route. Claude Code: the plugin from its marketplace (README.md:72-73); a marketplace source takes no commit, so this installs the default branch head and the acceptance gates it: the installed gitCommitSha is the reviewed 6f0cc684, or a descendant whose compare lists only stats.json (context ruling, change 17; recipes/README.md 'Native context mode and hooks'). The compare uses GitHub's public API without a sign-in. The route stays the default-branch head behind that gate, not the context ruling's preferred sha-pinned hand-authored marketplace (change 17; recipes/README.md:143): the client configuration renders this marketplace by its GitHub source (the extraKnownMarketplaces.context-mode piece of claude.settings.template.json that the map wires), so a hand-authored local marketplace would be a second registration of context-mode that it does not render (synthesis X11, one writer); that registration has not been run anywhere, and the change keeps the gate until it is run and its gitCommitSha read back. Between installs nothing moves the plugin: Claude Code updates plugins only from a marketplace with auto-update on, which for a third-party marketplace is off unless autoUpdate is set on its extraKnownMarketplaces entry or its known_marketplaces.json entry (https://code.claude.com/docs/en/plugins/loading, 'Which marketplaces and plugins auto-update', read 2026-10-03); the acceptance's last lines check that neither sets it (this project's integration check). Codex: the plugin's hooks and skills at --ref 6f0cc684 (README.md:593; codex-rs/cli/src/marketplace_cmd.rs:70-72 and plugin_cmd.rs:61 at a956835d), with the plugin's own MCP server off, and one session-bound MCP server from the verified npm tarball (sha256 09c41e4c..., the repository's pin in adoption/pins-linux-x86_64.json) installed under ${ECO_ROOT}/tools/context-mode-1.0.169, the path the Codex template's entry runs (context ruling, change 7, option a; ECO_ROOT is the host template's). start.mjs can re-execute under Bun, run npm installs of its own dependencies and write the Claude configuration (context ruling, changes 6 and 8): record command -v bun and npm ls for each install surface after the first session. The six Codex hook trust entries, the server entry and the plugin settings are the client configuration's; never pass --dangerously-bypass-hook-trust. Live proof: the interim's open acceptance gates in the definitive manifest."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "statusline",
+      "owner": "claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line",
+      "repository": "https://github.com/jarrodwatts/claude-hud",
+      "release": "v0.10.0",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "claude plugin marketplace add jarrodwatts/claude-hud#v0.10.0 --scope user",
+        "claude plugin install claude-hud@claude-hud --scope user",
+        "c=\"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"; set -- \"$c\"/plugins/cache/*/claude-hud/0.10.0; [[ $# == 1 && -f \"$1/scripts/setup.mjs\" ]] || { printf \"claude-hud 0.10.0 is not in exactly one marketplace cache under %s\\n\" \"$c\" >&2; exit 1; }; rt=\"$(command -v bun 2>/dev/null || command -v node 2>/dev/null)\" || { printf \"no node or bun for the claude-hud helper\\n\" >&2; exit 1; }; \"$rt\" \"$1/scripts/setup.mjs\" inspect --shell posix; \"$rt\" \"$1/scripts/setup.mjs\" install --shell posix",
+        "s=\"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json\"; t=\"$(readlink -f -- \"$s\")\"; if jq -e \".statusLine.refreshInterval == null\" \"$t\" >/dev/null; then n=\"$(mktemp \"$t.XXXXXX\")\"; jq \".statusLine.refreshInterval = 5\" \"$t\" > \"$n\" && chmod --reference=\"$t\" -- \"$n\" && mv -f -- \"$n\" \"$t\" || { rm -f -- \"$n\"; exit 1; }; fi"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/README.md#L29",
+        "line": 29
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "config_dir=\"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"\njq -e '[.plugins[\"claude-hud@claude-hud\"][] | select(.scope == \"user\") | .version] == [\"0.10.0\"]' \"$config_dir/plugins/installed_plugins.json\" >/dev/null\nversions=\"$(ls -d \"$config_dir\"/plugins/cache/*/claude-hud/*/ | wc -l)\"\ncmp -s \"$config_dir/plugins/claude-hud/statusline.mjs\" \"$(ls -d \"$config_dir\"/plugins/cache/*/claude-hud/0.10.0)/scripts/statusline.mjs\"\njq -e '.statusLine.type == \"command\" and (.statusLine.refreshInterval | type == \"number\" and . >= 1 and . == floor)' \"$config_dir/settings.json\" >/dev/null\nconfigured=\"$(jq -r '.statusLine.command' \"$config_dir/settings.json\")\"\nlines=\"$(echo '{\"model\":{\"display_name\":\"Opus\"},\"context_window\":{\"used_percentage\":12,\"context_window_size\":200000}}' | bash -c \"$configured\" | wc -l)\"\n[[ \"$versions\" -eq 1 && \"$lines\" -ge 2 && \"$configured\" == *\"$config_dir/plugins/claude-hud/statusline.mjs\"* ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/commands/setup.md#L72",
+            "line": 72
+          }
+        }
+      },
+      "config_paths": [
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/cache",
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/claude-hud"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Added by the wave-2 batch of the layer consensus (2026-10-03; both pull-request acknowledgements owed). Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). Classification gap: the permitted enum has no plugin-marketplace route. The marketplace at the v0.10.0 tag (commit 75683c6d) and the plugin at user scope (README.md:29-30; usage ruling, change 2). The launcher runs the highest claude-hud version in any marketplace cache (scripts/statusline.mjs:29-39), so the pin also needs marketplace auto-update off, the documented default for a third-party marketplace, and no other cached version, which the acceptance checks. Then upstream's helper runs without prompts (usage ruling, change 3): scripts/setup.mjs inspect, then install, with --shell posix, under the runtime commands/setup.md:24 finds (mise's Node here). install copies the launcher to <config dir>/plugins/claude-hud/statusline.mjs and writes statusLine as the quoted runtime, then that launcher (scripts/setup.mjs:19-32 and 69-101), before the client configuration's apply, which keeps a statusLine the file has (keep_existing). setup.mjs keeps earlier statusLine keys only when they were claude-hud's (L94), so refreshInterval 5 is added when absent (change 4). Run the helper again after every mise Node move (change 5). The acceptance runs the configured command through bash with upstream's sample input (commands/setup.md:10 and 69-77), and checks that refreshInterval is a positive integer and that the copied launcher is 0.10.0's; it no longer runs the cached launcher directly, which passed while the configured command's launcher was missing (review of 2026-10-03). The interval check takes any integer of at least 1, the settings schema's type and minimum (SchemaStore claude-code-settings.json at de76181a, L2454), not only 5: install keeps an earlier claude-hud value (L94), and the check had rejected such an installed configuration (review of 2026-10-03 at 99a2e3c6). Kept off: showCost, showDailyCost, showWeeklyCost, showAuth and showAuthUser; CLAUDE_HUD_ALLOW_EXTRA_CMD is never set. Codex needs no install: its footer's six items are a key of its configuration, which the client configuration renders."
     },
     {
       "layer": "observation-inference",
@@ -985,7 +1315,7 @@
       "config_paths": [
         "$config_root/otel.yaml"
       ],
-      "notes": "Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
+      "notes": "Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate. Synthesis X1 (wave 2): on the destination this service runs under the observability ruling's ecosystem-* user unit (its step 7, with its changes 4-6), the only unit set; the lifecycle dossier's otelcol-contrib, prometheus and alertmanager unit texts are dropped (they bind the same ports, and that Prometheus unit lacks --web.enable-otlp-receiver).",
       "release_asset": {
         "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz",
         "sha256": "fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3"
@@ -1044,7 +1374,7 @@
       "config_paths": [
         "$config_root/prometheus.yaml"
       ],
-      "notes": "Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
+      "notes": "Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate. Synthesis X1 (wave 2): on the destination this service runs under the observability ruling's ecosystem-* user unit (its step 7, with its changes 4-6), the only unit set; the lifecycle dossier's otelcol-contrib, prometheus and alertmanager unit texts are dropped (they bind the same ports, and that Prometheus unit lacks --web.enable-otlp-receiver).",
       "release_asset": {
         "url": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
         "sha256": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0"
@@ -1242,18 +1572,18 @@
           }
         },
         "after_sign_in": {
-          "command": "OLLAMA_HOST=127.0.0.1:21434 ollama run embeddinggemma \"Hello world\"",
+          "command": "curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Hello world\"}' | jq -e '(.embeddings | length) == 1' >/dev/null",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/v0.35.0/docs/cli.mdx#L73",
-            "line": 73
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659",
+            "line": 1659
           }
         }
       },
       "config_paths": [
         "$config_root/ollama.env.example"
       ],
-      "notes": "Planned. First Linux installer installs under /usr and needs privileges; prefer registered user-level mise route. Upstream unit is system-wide (docs/linux.mdx:57-89), so do not invent user unit. Foreground start: OLLAMA_HOST=127.0.0.1:21434 ollama serve. Not automatically started. Smoke downloads/runs upstream example model; GPU inference remains unrun. Version mode exits without starting the daemon, warning when it is absent. List checks the running local server. The original model smoke is retained after a model route is provisioned; its inference behavior remains unverified.",
+      "notes": "Planned. First Linux installer installs under /usr and needs privileges; prefer registered user-level mise route. Upstream unit is system-wide (docs/linux.mdx:57-89), so do not invent user unit. Foreground start: OLLAMA_HOST=127.0.0.1:21434 ollama serve. Not automatically started. Version mode exits without starting the daemon, warning when it is absent. List checks the running local server. The after_sign_in smoke is one /api/embed call to qwen3-embedding-8k, the settled embedder, once the embedding-model row has created it (until that model's manifest is in the store, accept.sh prints skipped for this stage, which is not a pass); the endpoint answers 404 for a missing model, through GetModel's not-found error, and its handler pulls nothing (server/routes.go:981-984 and 3226-3227 at cc4069396f). It replaced upstream's example `ollama run embeddinggemma` on 2026-10-03, which would pull EmbeddingGemma, a model no row selected. GPU inference on the destination remains unrun.",
       "mise_tool": "ollama"
     },
     {
@@ -1308,7 +1638,7 @@
       "config_paths": [
         "$config_root/alertmanager.yaml"
       ],
-      "notes": "Planned. Documented release-binary route plus the sha256 from the release's own sha256sums.txt (the README describes the precompiled binaries in prose only; it quotes no tar command). Download/checksum/user-prefix operations and the tar form are script transport glue taken from the Prometheus row, not a claimed verbatim upstream installer. amtool is not installed to PATH: it runs from the extracted directory, as promtool does. The minimal configuration has one receiver with no integration, so nothing is ever sent (a receiver is a name plus optional integration lists, docs/configuration.md:821-829; upstream's own fixture config/testdata/conf.nil-match_re-route.yml uses one); the root route must name a receiver (README.md:59-62). Port 21093 is in the plan's 21xxx band beside Prometheus's 21090, and no other row or config file uses it; --cluster.listen-address= leaves no HA listener. No upstream systemd user unit is documented; installed binary and configuration only, foreground service start remains separate.",
+      "notes": "Planned. Documented release-binary route plus the sha256 from the release's own sha256sums.txt (the README describes the precompiled binaries in prose only; it quotes no tar command). Download/checksum/user-prefix operations and the tar form are script transport glue taken from the Prometheus row, not a claimed verbatim upstream installer. amtool is not installed to PATH: it runs from the extracted directory, as promtool does. The minimal configuration has one receiver with no integration, so nothing is ever sent (a receiver is a name plus optional integration lists, docs/configuration.md:821-829; upstream's own fixture config/testdata/conf.nil-match_re-route.yml uses one); the root route must name a receiver (README.md:59-62). Port 21093 is in the plan's 21xxx band beside Prometheus's 21090, and no other row or config file uses it; --cluster.listen-address= leaves no HA listener. No upstream systemd user unit is documented; installed binary and configuration only, foreground service start remains separate. Synthesis X1 (wave 2): on the destination this service runs under the observability ruling's ecosystem-* user unit (its step 7, with its changes 4-6), the only unit set; the lifecycle dossier's otelcol-contrib, prometheus and alertmanager unit texts are dropped (they bind the same ports, and that Prometheus unit lacks --web.enable-otlp-receiver).",
       "supporting_sources": [
         {
           "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/docs/configuration.md#L821",
@@ -1344,26 +1674,51 @@
     {
       "layer": "observation-inference",
       "slot": "local-generation-model",
-      "owner": "Not installed until the deciding measurement returns",
-      "repository": "",
-      "release": null,
-      "installed": false,
-      "route": "none",
-      "commands": [],
+      "owner": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
+      "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
+      "release": "d74895bbe5db4bec1e0024e7cc87d59c02d7631a",
+      "installed": true,
+      "route": "model-server",
+      "commands": [
+        "fetch_verified 'https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF/resolve/d74895bbe5db4bec1e0024e7cc87d59c02d7631a/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf' '1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786' \"$tool_root/ollama-models/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf\"",
+        "install -m 0644 -t \"$tool_root/ollama-models\" \"$plan_dir/models/swift-iq3s-s2o.Modelfile\" \"$plan_dir/models/swift-iq3s-s2o-64k.Modelfile\"",
+        "OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o -f \"$tool_root/ollama-models/swift-iq3s-s2o.Modelfile\"",
+        "OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o-64k -f \"$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile\""
+      ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
-        "gpu": false,
+        "gpu": true,
         "node": false,
         "python": false
       },
-      "version_pinned": false,
-      "install_source": null,
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/modelfile.mdx#L120",
+        "line": 120
+      },
       "service": null,
-      "acceptance": {},
+      "acceptance": {
+        "post_install": {
+          "command": "printf '%s  %s\\n' f6522bf4934aaa4f60231a042a8dfb781a7f5b3b1abc5053757f37169772ea9e \"$tool_root/ollama-models/swift-iq3s-s2o.Modelfile\" 6d15fee40e089b73961262647352c3443a03fa643122a92ca7a0b59376793d8e \"$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile\" | sha256sum --check --status && grep -F sha256:1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786 \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/swift-iq3s-s2o-64k/latest\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/create.go#L905",
+            "line": 905
+          }
+        },
+        "service_health": {
+          "command": "out=\"$(OLLAMA_HOST=127.0.0.1:21434 ollama show swift-iq3s-s2o-64k)\" && grep -E '^ +num_ctx +64000 *$' <<<\"$out\" >/dev/null && grep -E '^ +quantization +IQ3_S *$' <<<\"$out\" >/dev/null && curl -fsS http://127.0.0.1:21434/api/generate -d '{\"model\":\"swift-iq3s-s2o-64k\",\"prompt\":\"Reply with the word ready.\",\"stream\":false,\"think\":false,\"options\":{\"num_predict\":32}}' | jq -e '.done == true and (.response | length > 0)' >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L48",
+            "line": 48
+          }
+        }
+      },
       "config_paths": [],
-      "notes": "the two blind GPT orders and the Claude critic chose different models, and the fit of the critic's choice is inferred, not measured"
+      "notes": "Planned. Settled by the local-model measurement of 2026-10-02 (evidence/artifacts/new-wsl-local-models-20261002; docs/decisions/2026-10-03-new-wsl-local-models.md). The measured system: the IQ3_S file of the pinned Hugging Face revision (11,771,546,912 bytes; the publisher's repository is not gated), imported into Ollama 0.35.0 with the library qwen3.8:27b model's Modelfile lines (models/swift-iq3s-s2o.Modelfile: the measured file, sha256 8911245e..., with its FROM line, an absolute path in the throwaway distribution, written relative to the Modelfile as docs/modelfile.mdx:126 allows), and a derived model that carries the context of 64,000 as its own parameter (models/swift-iq3s-s2o-64k.Modelfile, byte-identical to the measured one). No server-wide context is set. fetch_verified and the placement of the two Modelfiles beside the file are plan glue; ollama create (cmd/cmd.go:2422) copies the file into the server's model store, written by the client when a loopback server shares its store and uploaded otherwise (cmd/cmd.go:385 and :523), and the server keeps it as the model layer under its own sha256 (server/create.go:905), so the row needs about 23.5 GB of disk while the downloaded file is kept. The models are created through the running model server, which the plan does not start: the default run skips this row, and bash install.sh --only local-generation-model installs it once the server answers on 127.0.0.1:21434 and reports version 0.35.0, the measured one, through GET /api/version (docs/api.md:1824); otherwise install.sh stops the row before the download. The post-install check reads files only: the placed Modelfiles are the repository's, and the created model's manifest names the pinned file as a layer. The service check shows num_ctx 64000 and quantization IQ3_S and runs one short generation with thinking off, which is not the measured effort (medium). The manifest digests that the measurement recorded (swift-iq3s-s2o eaedf746b10251265e653fae1052c98f3edc7b196f089f1508d8d0fa8820f68c, swift-iq3s-s2o-64k 8b39735c4f973d2192171c5b800a2bbb25cf053a59e5d7d2edcaa9830198cb11) are for comparison, not a check. One RTX 4090 serves the workstation's model services and this server: the measured co-residency (the generation model 14.81 GiB and the embedder 2.66 GiB, each entirely on the GPU) held with no other WSL process holding GPU memory, so which distribution's server holds the card is for the lifecycle design to decide; nothing here decides it. Not run on any distribution as a plan row."
     },
     {
       "layer": "observation-inference",
@@ -1918,6 +2273,30 @@
       "notes": "no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for"
     },
     {
+      "layer": "secrets-credentials",
+      "slot": "credential-custody",
+      "owner": "Not installed until the deciding measurement returns (the repository's runner and guard stay the practice)",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing is installed until the deciding measurement returns, and the repository's practice stays in use. The measurement, as the record gives it: HASP against the repository's runner and guard on the existing synthetic leak-path fixtures: output and trace checks, audit records, client boundaries, restart and removal. A claim that an agent can never read a value needs direct controls and a stated isolation scope. Native client sign-ins stay native: no import or copy of an authentication store, no real secret, no operating-system grant and no provider call is part of the comparison. HASP 1.0.43 (gethasp/hasp at 624b3b38ac4f7a267e6925c545768c95945d781a) is the challenger arm; it is not installed, and this plan carries no install command for an arm."
+    },
+    {
       "layer": "git-github-automation",
       "slot": "git",
       "owner": "git",
@@ -2121,6 +2500,30 @@
       "notes": "git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes)"
     },
     {
+      "layer": "git-github-automation",
+      "slot": "cross-family-review",
+      "owner": "No additional component: the two clients' native review commands, each family on the other's work",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing additional is installed: the capability is the two clients' native review commands, which the claude-code and codex rows install. The record's open gate is the qualification of the Codex 0.160 review command on the destination, owned by the Codex lane. PR-Agent 0.47.0 is a comparison only for an identified gap and is not installed."
+    },
+    {
       "layer": "recovery-portability",
       "slot": "mise",
       "owner": "mise",
@@ -2274,7 +2677,7 @@
       "service": {
         "form": "upstream detached daemon; service form: not documented upstream for systemd user",
         "port": 21128,
-        "port_setting": "OMNIROUTE_SERVER_HOST=127.0.0.1 API_HOST=127.0.0.1 PORT=21128 LIVE_WS_HOST=127.0.0.1 LIVE_WS_PORT=21129 (docs/reference/ENVIRONMENT.md:158-190)"
+        "port_setting": "OMNIROUTE_SERVER_HOST=127.0.0.1 API_HOST=127.0.0.1 PORT=21128 LIVE_WS_HOST=127.0.0.1 LIVE_WS_PORT=21129 EMBED_WS_PROXY_PORT=21131 (docs/reference/ENVIRONMENT.md:158-190; EMBED_WS_PROXY_PORT per the wave-2 gateway ruling, change 12)"
       },
       "acceptance": {
         "post_install": {
@@ -2297,7 +2700,7 @@
       "config_paths": [
         "$config_root/omniroute.env.example"
       ],
-      "notes": "Planned. First persistent npm route. After provider configuration, run with all loopback env settings: omniroute serve --port 21128 --no-open --daemon (bin/cli/commands/serve.mjs:56-62). No user unit documented. HOSTNAME does not set server bind. Provider configuration remains native; no credential values in plan; daemon not automatically started. The installed doctor rejects --json despite the documentation example. JSON is global --output json. --no-liveness is the upstream local diagnostic mode; full liveness and machine-token HTTP checks remain in service_health. Doctor only warns for unreachable endpoints, so service-health first requires upstream /readyz HTTP success, then retains the full doctor. /readyz aliases the lifecycle 200/503 healthz route.",
+      "notes": "Planned. First persistent npm route. After provider configuration, run with all loopback env settings: omniroute serve --port 21128 --no-open --daemon (bin/cli/commands/serve.mjs:56-62). No user unit documented. HOSTNAME does not set server bind. Provider configuration remains native; no credential values in plan; daemon not automatically started. The installed doctor rejects --json despite the documentation example. JSON is global --output json. --no-liveness is the upstream local diagnostic mode; full liveness and machine-token HTTP checks remain in service_health. Doctor only warns for unreachable endpoints, so service-health first requires upstream /readyz HTTP success, then retains the full doctor. /readyz aliases the lifecycle 200/503 healthz route. Wave-2 gateway ruling, change 12: config/omniroute.env.example gains EMBED_WS_PROXY_PORT=21131 (the embed-service WebSocket proxy, whose upstream default 20131 is the workstation gateway's), and all its lines are plain NAME=value lines, because systemd's EnvironmentFile= drops export lines; on the destination the ports stay in the unit's Environment= lines or as plain lines in server.env, whose values override them. Synthesis X3: the destination's unit is the gateway ruling's step-6 unit rendered from adoption/templates/systemd/omniroute.service; the lifecycle dossier's omniroute.service text is dropped. The gateway ruling's route for the destination is an owned-prefix canary build (release/v3.8.52 @23a11484 plus pull requests 13788 and 15167) with its own gates; npm 3.8.51 here is its rollback only before accounts exist. That route change is not in this revision.",
       "supporting_sources": [
         {
           "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/c1e30b7676975feb298b49eff6ff58923c04b89e/bin/cli/program.mjs#L18",
@@ -2374,12 +2777,12 @@
         "(cd \"$tool_root/gpt-researcher\" && uv pip install --python .venv/bin/python -r requirements.txt)",
         "checkout_tag https://github.com/bytedance/deer-flow.git v2.1.0 \"$tool_root/deer-flow\"",
         "(cd \"$tool_root/deer-flow\" && if [[ ! -e config.yaml && ! -e .env && ! -e frontend/.env ]]; then make config; elif [[ ! -e config.yaml || ! -e .env || ! -e frontend/.env ]]; then printf \"Partial DeerFlow config; repair from upstream recipe.\\n\" >&2; exit 1; fi)",
-        "(cd \"$tool_root/deer-flow\" && make docker-init)"
+        "(cd \"$tool_root/deer-flow/backend\" && uv sync --locked)"
       ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
-        "docker": true,
+        "docker": false,
         "gpu": false,
         "node": false,
         "python": true
@@ -2389,60 +2792,47 @@
         "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/v3.7.0/README.md#L99",
         "line": 99
       },
-      "service": {
-        "form": "upstream Compose restart: unless-stopped; configure model before make up",
-        "port": 2026,
-        "port_setting": "PORT=2026; BIND_HOST=127.0.0.1 (docker/docker-compose.yaml:45-67)"
-      },
+      "service": null,
       "acceptance": {
         "post_install": {
-          "command": "cd \"$tool_root/gpt-researcher\"\n.venv/bin/python -c 'import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open(\"pyproject.toml\", \"rb\"))[\"project\"][\"version\"])'\ncd \"$tool_root/deer-flow/docker\"\nDEER_FLOW_ROOT=\"$tool_root/deer-flow\" docker compose -p deer-flow-dev -f docker-compose-dev.yaml config --quiet",
+          "command": "cd \"$tool_root/gpt-researcher\"\n.venv/bin/python -c 'import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open(\"pyproject.toml\", \"rb\"))[\"project\"][\"version\"])'\nbash \"$repo_root/tools/research/gpt_researcher.sh\" --preflight-only\n\"$tool_root/deer-flow/backend/.venv/bin/python\" -c 'from deerflow.client import DeerFlowClient'",
           "kind": "smoke",
           "source": {
             "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/pyproject.toml#L23",
             "line": 23
           }
         },
-        "service_health": {
-          "command": "curl -fsS http://127.0.0.1:2026/health/ready",
-          "kind": "health",
-          "source": {
-            "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/docker/docker-compose.yaml#L152",
-            "line": 152
-          }
-        },
         "after_sign_in": {
-          "command": "cd \"$tool_root/gpt-researcher\"\n.venv/bin/python - <<'PY'\nfrom gpt_researcher import GPTResearcher\nimport asyncio\n\nasync def get_report(query: str, report_type: str):\n    researcher = GPTResearcher(query, report_type)\n    research_result = await researcher.conduct_research()\n    report = await researcher.write_report()\n    research_context = researcher.get_research_context()\n    research_costs = researcher.get_costs()\n    research_images = researcher.get_research_images()\n    research_sources = researcher.get_research_sources()\n    return report, research_context, research_costs, research_images, research_sources\n\nif __name__ == \"__main__\":\n    query = \"what team may win the NBA finals?\"\n    report_type = \"research_report\"\n    report, context, costs, images, sources = asyncio.run(get_report(query, report_type))\n    print(\"Report:\")\n    print(report)\n    print(\"\\nResearch Costs:\")\n    print(costs)\n    print(\"\\nNumber of Research Images:\")\n    print(len(images))\n    print(\"\\nNumber of Research Sources:\")\n    print(len(sources))\nPY",
+          "command": "out=\"$(bash \"$repo_root/tools/research/gpt_researcher.sh\" \"Ubuntu 26.04 WSL news this month\")\"\ngrep -q \"^Report written to 'outputs/\" <<<\"$out\"\nrun=\"$(sed -n 's/^run directory: //p' <<<\"$out\")\"\nrefs=\"$(awk '/^#+ *References/{f=1} f' \"$run\"/outputs/*.md | grep -oE 'https?://[^) >]+' | sort -u | wc -l)\"\n[[ \"$refs\" -ge 5 ]]",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/v3.7.0/docs/docs/gpt-researcher/gptr/pip-package.md#L32",
-            "line": 32
+            "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/cli.py#L336",
+            "line": 336
           }
         }
       },
       "config_paths": [
         "$tool_root/gpt-researcher/.venv",
         "$tool_root/deer-flow/config.yaml",
-        "$tool_root/deer-flow/.env",
-        "$tool_root/deer-flow/frontend/.env"
+        "$tool_root/deer-flow/backend/.venv"
       ],
-      "notes": "One row for the manifest's research-harnesses slot; the two independent evidence gatherers keep their own commands, in order: GPT Researcher (source checkout plus isolated venv) then DeerFlow (Compose). install.sh attempts both and fails when either fails; the post-install check runs the GPT Researcher version check and then the DeerFlow Compose configuration check in one shell, so a failure in the first stops the second; service-health is DeerFlow's, and the model-using example after sign-in is GPT Researcher's. GPT Researcher: Planned. Classification gap: source checkout plus isolated Python venv has no permitted route label. Release v3.7.0 declares package 0.16.0; installing gpt-researcher==3.7.0 would invent a version. Install tagged requirements and import source from checkout. OpenAI-compatible names: OPENAI_BASE_URL, OPENAI_API_KEY; search TAVILY_API_KEY (README:107-124). Example performs full model/search research. No server enabled for library use. Post-install imports the checkout and reports its declared source version; requirements-only installation does not install gpt-researcher distribution metadata. Full research remains after provider/search configuration. DeerFlow: Planned. Skip interactive make setup; Install.md documents make config/make docker-init. Guard existing complete config because make config otherwise exits 1. Upstream make up runs service; model must first be configured via models[].base_url and OPENAI_API_KEY. No general base-URL env name documented in reviewed sources; IMAGE_GENERATION_BASE_URL is image-only. Host make doctor is inapplicable to the selected Compose install because it requires host pnpm/nginx/backend environment. Use shipped Compose readiness probe /health/ready; container Python remains upstream-managed. Host make is a preparation prerequisite. No secrets/config values filled. make docker-init prepares the development Compose workflow and can tolerate a sandbox image pull failure; this does not establish installed images. Post-install validates the actual dev Compose configuration using its DEER_FLOW_ROOT parameter. The existing production readiness probe remains for the explicitly documented make up production start.",
+      "notes": "One row for the manifest's research-harnesses slot; the two independent evidence gatherers keep their own commands, in order: GPT Researcher (source checkout plus isolated venv) then DeerFlow (source checkout plus its backend's locked uv environment). install.sh attempts both and fails when either fails. Revised by the wave-2 research ruling (2026-10-03; Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2).): DeerFlow runs as the embedded DeerFlowClient, with no HTTP service, port, Compose, nginx, apt or sudo (changes 9 and 10; README.md:1639-1686, the backend's uv sync --locked is Makefile:96), so make docker-init, the 2026 service and its /health/ready check are gone and needs.docker is false; make config still generates config.yaml, which embedded runs read through DEER_FLOW_CONFIG_PATH (app_config.py:398-401 fails closed without it). The HTTP service comes back only if claude-to-deerflow passes the research-skill gate, and only in a loopback-only form. GPT Researcher: Classification gap: source checkout plus isolated Python venv has no permitted route label. Release v3.7.0 declares package 0.16.0; installing gpt-researcher==3.7.0 would invent a version. Install tagged requirements and import source from checkout. Runs go only through tools/research/gpt_researcher.sh (synthesis X18; research changes 2-5): a keyless configuration (tools/research/gpt-researcher.config.json, the measured session-80 values without the key: duckduckgo retriever, keyword context filter, fast cx/gpt-6.1-sol-high, smart and strategic cx/gpt-6.1-sol-max, LLM_KWARGS.max_tokens 12000), its base_url and a per-run x-omniroute-session header written into each run's copy, an env -i scrub with the placeholder key local-loopback inline (the runner cannot rename the gateway entry's OMNIROUTE_API_KEY, and OPENAI_API_KEY is on the inventory's must_not_be_set list), a fail-closed preflight in upstream's own Config with no network call, and --report_type research_report only (detailed_report reaches embeddings). No TAVILY_API_KEY: the duckduckgo retriever needs none (custody ruling, change 12). The post-install check imports both gatherers and runs the preflight; the check after sign-in is one short current-month research run through the destination gateway (127.0.0.1:21128): the success line and at least five distinct http(s) references in the report's reference list (research change 6); the gateway call log's status-200 rows and zero /v1/embeddings rows are read on the gateway's side. Not set by this row: DeerFlow's model entry (cx/gpt-6.1-sol-max through http://127.0.0.1:21128/v1) and OPENAI_API_KEY=local-loopback in its .env, which are the destination's configuration (research step 5). One embedded DeerFlow run that returns a cited answer, with nothing listening on 2026, 8001 or 3000, is the live proof, owed. UNRUN in this form on every distribution.",
       "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/README.md#L1658",
+          "line": 1658
+        },
+        {
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Makefile#L96",
+          "line": 96
+        },
         {
           "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Install.md#L38",
           "line": 38
         },
         {
-          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/345f08be00c8a9495079b732a39b46aa9af1584e/scripts/docker.sh#L18",
-          "line": 18
-        },
-        {
-          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/345f08be00c8a9495079b732a39b46aa9af1584e/Install.md#L44",
-          "line": 44
-        },
-        {
-          "url": "https://raw.githubusercontent.com/docker/compose/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/docs/reference/compose_config.md#L27",
-          "line": 27
+          "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/config/config.py#L158",
+          "line": 158
         }
       ]
     },

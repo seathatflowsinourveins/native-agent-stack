@@ -1,0 +1,94 @@
+{
+  "evidence_class": "local_native_integration_observation",
+  "provider_calls": 0,
+  "independent_driver_exit": 0,
+  "green_fixture_driver_exit": 0,
+  "contexts": {
+    "claude-code": {
+      "native_exit_code": 0,
+      "file_bytes": 26822,
+      "file_sha256": "db4153306755c709c7213768e54a342cbc7d84857ed4379a0bb2836f174263fe",
+      "responses": [
+        {
+          "id": 1,
+          "bytes": 465,
+          "sha256": "5277f280d5eeb79d76c620b8676144aab4d33b83dd1d89c7c222a853c676e494"
+        },
+        {
+          "id": 2,
+          "bytes": 26357,
+          "sha256": "d2e22bcef4d45e867ca580dae8f50ad5738d31f4b348531ea1a88844994b5083"
+        }
+      ],
+      "tools": 23
+    },
+    "codex": {
+      "native_exit_code": 0,
+      "file_bytes": 30548,
+      "file_sha256": "d8843d03ad5f0066ef626fb9bcc2b96db1e46ac0737725d5d40572937e0572ad",
+      "responses": [
+        {
+          "id": 1,
+          "bytes": 465,
+          "sha256": "5277f280d5eeb79d76c620b8676144aab4d33b83dd1d89c7c222a853c676e494"
+        },
+        {
+          "id": 2,
+          "bytes": 30083,
+          "sha256": "2fe0460cd748ae5df612496585404a47f282ad90747a94d3c17a1149ee0f194f"
+        }
+      ],
+      "tools": 23
+    }
+  },
+  "negative_controls": {
+    "claude": {
+      "driver_exit_code": 1,
+      "native_exit_codes": [
+        0,
+        0
+      ],
+      "failed_check": [
+        "serena-tools-list-byte-parity-with-the-pinned-install"
+      ],
+      "diffs": [
+        {
+          "path": "/result/tools/0/inputSchema/properties/needle/type",
+          "before": "string",
+          "after": "integer"
+        }
+      ],
+      "untouched_context_exact": true,
+      "tools_list_bytes": 26358,
+      "tools_list_sha256": "cff4ae8b51555ac6b0875046467cd7304f08b20cbb8db2ec603855419e32a5c7",
+      "cleanup": {
+        "owned_temporary_directory_absent": true,
+        "retained_output_exists": true
+      }
+    },
+    "codex": {
+      "driver_exit_code": 1,
+      "native_exit_codes": [
+        0,
+        0
+      ],
+      "failed_check": [
+        "serena-tools-list-byte-parity-with-the-pinned-install"
+      ],
+      "diffs": [
+        {
+          "path": "/result/tools/4/inputSchema/properties/substring_pattern/type",
+          "before": "string",
+          "after": "integer"
+        }
+      ],
+      "untouched_context_exact": true,
+      "tools_list_bytes": 30084,
+      "tools_list_sha256": "c99dfc464045cbeaf88f9761c471fa9a4bfbcd7c4ea2998c3ca74e7bc0eafb3c",
+      "cleanup": {
+        "owned_temporary_directory_absent": true,
+        "retained_output_exists": true
+      }
+    }
+  }
+}

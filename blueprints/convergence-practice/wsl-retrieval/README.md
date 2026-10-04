@@ -1,4 +1,20 @@
-# Incomplete historical WSL retrieval reference
+# Retired historical WSL retrieval reference
+
+This directory is retired for installation and source/QMD replay. [run.py](run.py)
+fails both old modes before launching a subprocess or creating an output directory.
+The dependency-free [package.json](package.json) is a retirement guard; the original
+manifest and recording aid are preserved as text artifacts. Since 2026-10-04 the
+retained lock is stored byte-identical as [package-lock.json.frozen](package-lock.json.frozen),
+a name no dependency scanner reads ([below](#lock-renamed-out-of-scanner-discovery-2026-10-04)).
+Neither the retirement nor the rename patches the dependency, and no scanner
+exception remains for it.
+
+The separate current QMD recipe is in [recipes/README.md](../../../recipes/README.md#component-catalog-install-and-check),
+with current native fixture guidance in [docs/native-token-ci.md](../../../docs/native-token-ci.md).
+Active QMD's [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+advisory remains unresolved; this historical retirement does not qualify or change
+that setup. [retirement-assessment.json](retirement-assessment.json) records the
+current source disposition separately from the original receipts.
 
 The retained September 20, 2026 receipts are an **incomplete historical fixture
 reference**. They do not establish native E2E or adoption acceptance. Per-command
@@ -21,7 +37,7 @@ The source fixture contains the frozen planner from repository revision
 `6f74bc503ccecaaf6ccebd53677b23aedab50921`. Its selected ripgrep **15.2.0** and
 ast-grep **0.45.3** results contain exact file lines, byte spans and source text.
 The QMD **2.8.3** fixture reports Node **24.21.0**, better-sqlite3 **13.0.3** and
-sqlite-vec **0.1.9**, with the retained [package lock](package-lock.json). It covers
+sqlite-vec **0.1.9**, with the retained [package lock](package-lock.json.frozen). It covers
 five positive and two negative queries, Unicode, a one-line `get`, process reopen,
 update and deletion in a three-document primary collection plus one decoy.
 The final recorded database has integrity `ok`, three active documents and zero
@@ -44,6 +60,17 @@ original SHA-256 `4cbcceac02158629ca78262aaa826c995c21bbe45fa83481f7c139f16a6c52
 The successful QMD receipt originally mapped `run.py` directly; the offline audit
 now resolves that historical name to the archived bytes. Neither receipt was
 rewritten to pretend it recorded today's file or missing invocation metadata.
+
+[package-original.json.txt](package-original.json.txt) preserves the original
+174-byte manifest with SHA-256
+`7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8`.
+Every historical `package.json` binding resolves to that archive without rewriting
+the receipts' frozen-input names or declared runner mappings.
+[run-recording-aid.py.txt](run-recording-aid.py.txt) preserves the later 16,427-byte
+recording aid with SHA-256
+`be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12`.
+It was a future recording aid, and is not attributed to the original execution.
+All original receipts, source review and earlier runner archives remain unchanged.
 
 The [install receipt](install-receipt.json) still records the actual historical
 `npm ci --ignore-scripts --omit=optional` action. Its contents and digest are
@@ -78,35 +105,63 @@ omitted inputs and same-count replacement checks as well as incorrect spans,
 source bodies, URI scope, stale updates, erased failures and unsupported claims.
 A zero audit exit means retained facts are consistent; its result explicitly
 reports `native_acceptance_established: false`. It cannot repair missing evidence.
+The companion `current_retirement_assessment` checks the exact new archives,
+retained lock, retirement manifest and current entrypoint hashes. Regressions reject
+changed recording-aid or manifest archives, restored dependencies/scripts and a
+missing runtime guard. Both old modes must stop before output or subprocess work.
+It also requires the lock to exist only as `package-lock.json.frozen` at its digest,
+tracked in Git, and no `package-lock.json`, `npm-shrinkwrap.json`, `yarn.lock`,
+`pnpm-lock.yaml`, `bun.lock` or `deno.lock` anywhere in this directory, in any letter
+case, on disk or in the Git index; it fails closed when Git cannot list the files.
+Scenario regressions on scratch Git repositories and code mutants of the guard
+(`LockDiscoveryGuardTests`) show each of those requirements is enforced.
+These are local integration and artifact checks; they do not establish native npm
+guard acceptance or a scanner exception.
 
-## Future command capture and supported installation
+## Supported entrypoint retirement
 
-[run.py](run.py) is a future recording aid. It now retains each attempted command's
-sanitized argument vector and working directory before launch, preserves argument
-boundaries, and records failed launches and timeouts. Private path roots become
-scope markers such as `<RUN>` and `<NODE>`; original historical facts receive no
-fabricated fields. Mocked regressions exercise this recording without invoking
-native retrieval. Both previously executed runner versions remain archived.
+The retained private manifest has no dependencies or lifecycle/replay scripts. Its
+`devEngines.runtime` names `retired-wsl-retrieval` with `onFail: error`. In the reviewed
+[npm 11.19.0 supported behavior](https://github.com/npm/cli/blob/v11.19.0/lib/base-cmd.js#L201),
+that runtime name is rejected before ordinary `install` and `ci`, including
+`--ignore-scripts`. The [tagged manifest documentation](https://github.com/npm/cli/blob/v11.19.0/docs/lib/content/configuring-npm/package-json.md#L1117)
+describes the check. Independent native controls belong to the separate retirement
+acceptance record; the offline audit checks the guard's artifacts only.
 
-For a separately authorized fresh QMD trial, follow the maintained
-[QMD native recipe](../../../recipes/README.md#component-catalog-install-and-check) and
-[native token fixture guidance](../../../docs/native-token-ci.md). The supported
-installation control is:
+Removing a manifest alone would leave [npm Arborist's root-lock fallback](https://github.com/npm/cli/blob/v11.19.0/workspaces/arborist/lib/arborist/load-virtual.js#L50).
+The guard protects supported npm entry points. It is not an installation sandbox:
+explicit `--force`, other package managers and restored historical files are
+outside its claim. The text archives are evidence for offline review; this
+directory provides no supported replay or installation route.
 
-```sh
-NODE_LLAMA_CPP_SKIP_DOWNLOAD=true npm install --global \
-  --prefix "$NEW_OWNED_QMD_PREFIX" @tobilu/qmd@2.8.3
-```
+Recovered historical invocation evidence could reopen the incomplete acceptance
+assessment. A current QMD trial belongs to the separate maintained recipe and
+current status, with supported installation and complete command capture. Whole-task
+provider, parent/child/retry/cache usage remains unknown; no savings claim is made.
 
-Required npm dependency lifecycle scripts remain enabled. Do not reuse the
-historical blanket `--ignore-scripts` command as a fresh-host recipe. The retained
-lock and optional-backend assertions describe the historical prefix; they do not
-prove compatibility of a newly installed prefix. Use the maintained native fixture
-for current supported installation acceptance, retaining its actual install and
-runtime commands and outputs. This review performs no install or native rerun.
+## Lock renamed out of scanner discovery (2026-10-04)
 
-Acceptance requires recovered verifiable historical invocation evidence or a
-separately authorized reachable-host trial with supported installation and complete
-command capture. Preserve native accounts, model/effort settings, caching and
-compaction. No automatic history capture is introduced. Whole-task provider,
-parent/child/retry/cache usage remains unknown; no savings claim is made.
+The retained lock moved from `package-lock.json` to `package-lock.json.frozen` with
+`git mv`. Its bytes are unchanged: 82,463 bytes, SHA-256
+`5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb`.
+
+GitHub's dependency graph, Scorecard's OSV-Scanner run and OSV-Scanner itself find
+lockfiles by file name. Under its npm name this lock raised Dependabot alert 17
+(braces 3.0.3, GHSA-vfj7-8cjw-p6xm, high, no patched release) and the Scorecard
+code-scanning alert 19 that carries the same advisory. It also needed a dedicated
+OSV-Scanner grant, due to expire on 2026-10-17. No scanner reads the `.frozen` name,
+so that grant and its scan group are deleted. "Fixed" means the lock was removed
+from discovery, not that braces was patched: the archived bytes still pin braces
+3.0.3. Active QMD's own exposure to the advisory is unchanged and unresolved.
+
+The receipts, the install inventory and the 2026-10-03 retirement assessment still
+name the lock `package-lock.json`. The audit resolves that name to the archive, as it
+resolves `package.json` to `package-original.json.txt`, and no receipt was rewritten.
+The convergence record changes only the lock's path, with the same SHA-256, and the
+evaluation digests of `audit.py` and `tests/test_wsl_retrieval.py`. This directory
+still offers no supported way to restore or install the lock.
+
+Decision: the 2026-10-04 addendum to
+[2026-09-25-longmemeval-frozen-npm-lock.md](../../../docs/decisions/2026-09-25-longmemeval-frozen-npm-lock.md).
+OSV-Scanner controls and the guard's mutants:
+[wsl-lock-frozen-rename-20261004.json](../../../evidence/receipts/wsl-lock-frozen-rename-20261004.json).

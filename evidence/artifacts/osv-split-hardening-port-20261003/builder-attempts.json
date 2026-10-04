@@ -1,0 +1,32 @@
+{
+  "written_utc": "2026-10-03T19:55:26Z",
+  "attempts": [
+    {
+      "command": "rtk python3 - (copy selected pinned evidence through git show, then assert helper SHA256 equals historical verifier SHA256)",
+      "exit_code": 1,
+      "outcome": "Five excerpt copies succeeded. The helper hash assertion failed before writing the new helper; source bytes had not changed.",
+      "observed_utc": null,
+      "usage": null,
+      "timing": "Original command had no date stamp; unknown remains unknown.",
+      "correction": "The cited verifier file SHA256 is distinct from the split-controls helper. Native git show and rtk proxy git show independently return 8296 bytes and SHA256 3933fa846e89e755a2ccbc6722654cdcd2d64f58cf4ab702c6ac69e2ca8e0f18."
+    },
+    {
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 /tmp/pr555-acceptance.py case-alias",
+      "exit_code": 1,
+      "outcome": "ModuleNotFoundError: No module named 'tests'; OSV not invoked.",
+      "observed_utc": null,
+      "usage": null,
+      "timing": "Original command had no date stamp; unknown remains unknown.",
+      "correction": "Add the repository root to the observation wrapper import path; the subsequent native baseline/alias outputs are retained separately."
+    },
+    {
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 - (importlib.util.spec_from_file_location of scripts/host_receipts.py, then register_file)",
+      "exit_code": 1,
+      "outcome": "Relative import had no package context, then ModuleNotFoundError: No module named 'validate'; register_file was not invoked.",
+      "observed_utc": null,
+      "usage": null,
+      "timing": "Original command had no date stamp; unknown remains unknown.",
+      "correction": "Use the supported package import from scripts.host_receipts import register_file; 51 changed/new paths were then registered successfully before rerunning the required generators."
+    }
+  ]
+}

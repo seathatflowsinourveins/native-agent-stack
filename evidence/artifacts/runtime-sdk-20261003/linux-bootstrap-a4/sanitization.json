@@ -1,0 +1,11 @@
+{
+  "fields_replaced": [
+    "worktree path",
+    "A4 build/root paths",
+    "host toolchain and Python paths",
+    "temporary fixture directories",
+    "user home prefixes"
+  ],
+  "originals": "Retained privately in the assigned A4 build outputs; no credentials or account files read or copied.",
+  "remaining_scope": "Fixture process IDs and source line numbers are not model/thread/request identifiers."
+}

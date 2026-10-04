@@ -1,0 +1,18 @@
+....................<PYTHON_INSTALL>/lib/python3.13/subprocess.py:1140: ResourceWarning: subprocess 133 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.............ssssssssss...............................................................................................................ssssssssssssss..........................s................F.........................ssssssss...........................sss.........s.........................sssss......................
+======================================================================
+FAIL: test_a_failed_migration_rollback_keeps_the_previous_copy_and_reports_the_manual_command (tests.test_adoption_bootstrap_macos.PlatformDependencyInstallTests.test_a_failed_migration_rollback_keeps_the_previous_copy_and_reports_the_manual_command)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_adoption_bootstrap_macos.py", line 3042, in test_a_failed_migration_rollback_keeps_the_previous_copy_and_reports_the_manual_command
+    self.assertIn("Restore it manually with: mv --", second.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Restore it manually with: mv --' not found in 'python3: injected os.replace failure for testing\nFailed to flip <FIXTURE_ROOT>/eco/tools/codexlike-1.0.0 to the newly installed codexlike 1.0.0 (fail closed).\n'
+
+----------------------------------------------------------------------
+Ran 337 tests in 85.846s
+
+FAILED (failures=1, skipped=42)
+Installed dashboard and two units; service activation remains explicit.

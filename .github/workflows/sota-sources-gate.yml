@@ -12,8 +12,10 @@ name: SOTA sources gate
 on:
   workflow_call:
 
-permissions:
-  contents: read
+# No token scope and no cache access (docs/decisions/2026-10-04-ci-least-privilege.md): the job reads only the caller's
+# pull_request payload. No concurrency group here: in a called workflow ${{ github.workflow }} is the caller's name.
+permissions: {}
+cache-mode: none
 
 jobs:
   sota-sources:

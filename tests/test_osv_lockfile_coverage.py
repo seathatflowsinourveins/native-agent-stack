@@ -8,8 +8,8 @@ days away, and when a repo-wide ignore would hide a pin that IGNORE_ALLOWED_LOCK
 for that lock and advisory at the lock's reviewed sha256. That guard follows includes and fails
 closed on a version or line it cannot parse strictly; an allowed lock must be self-contained, and
 an ignore counts as active only before its ignoreUntil date. A dated exception for one frozen artifact lives in a config of its own
-that only that lock's scan uses (FROZEN_LOCKS): the inventory split and that config's scope are checked here, and the scanner itself
-keeps the exception from reaching any other lock.
+that only that lock's scan uses (FROZEN_LOCKS). The workflow and these policy checks enforce the split and scope;
+OSV applies an explicit config to every invocation input and does not enforce that path boundary itself.
 """
 
 from datetime import date, datetime, timedelta, timezone
@@ -20,8 +20,11 @@ import os
 import re
 import subprocess
 import tempfile
+import textwrap
 import tomllib
 import unittest
+import sys
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 INVENTORY = ROOT / ".github/osv-scanner-lockfiles.json"
@@ -42,12 +45,20 @@ TRACKED = re.compile(
 # File names OSV-Scanner infers without a parser prefix, and the parsers this inventory uses.
 # package-lock.json is listed in the pinned v2.6.0 supported-lockfiles documentation.
 INFERRED = {"requirements.txt", "uv.lock", "package-lock.json", "pnpm-lock.yaml", "packages.lock.json"}
-PARSERS = {"requirements.txt", "packages.lock.json"}
+# OSV-Scanner v2.6.0 lockfile.go maps "uv.lock" to the native UV extractor;
+# an explicit parser also supports the native uv PEP 723 script-lock basename.
+PARSERS = {"requirements.txt", "packages.lock.json", "uv.lock"}
+# A dependency_free entry is a package.json with nothing to scan: no key naming dependencies (dependencies,
+# devDependencies, peerDependenciesMeta and the rest) or the fields below, in any letter case, and none of these
+# lockfile names beside it. They are the JavaScript lockfiles that GitHub's dependency graph (npm, Yarn, pnpm and
+# Deno rows) or OSV-Scanner v2.6.0 (docs/supported_languages_and_lockfiles.md) reads by name, and npm's shrinkwrap.
+DEPENDENCY_STEERING_FIELDS = {"workspaces", "overrides", "resolutions"}
+JS_LOCK_NAMES = {"package-lock.json", "npm-shrinkwrap.json", "yarn.lock", "pnpm-lock.yaml", "bun.lock", "deno.lock"}
 
 
-# osv-scanner 2.6.0 matches [[IgnoredVulns]] by id in every lockfile it scans (ShouldIgnore checks only the id and
-# ignoreUntil, and security-scan.yml passes one --config for the whole inventory). An ignore added for one lock is
-# therefore repo-wide. IGNORE_SCOPES names the package versions each such ignore affects. IGNORE_ALLOWED_LOCKS names the
+# osv-scanner 2.6.0 matches [[IgnoredVulns]] by id in every input of that invocation (ShouldIgnore checks the id and
+# ignoreUntil). An ignore in CONFIG therefore reaches the whole ordinary group; dedicated archive groups have separate
+# configs. IGNORE_SCOPES names the package versions each ordinary ignore affects. IGNORE_ALLOWED_LOCKS names the
 # only locks allowed to pin them: per inventory lockfile, the advisories whose non-reachability was reviewed for it, the
 # sha256 of the lock content that review covered and the repository path of its evidence. A changed lock needs a new
 # review before its new digest is recorded here, and an allowed lock must be self-contained: its digest covers only its
@@ -163,7 +174,7 @@ def python_pins(path, parser=None):
     includes, each read once (a shared or cyclic include is not read again). package is None for a line the guard
     cannot parse strictly, an include that names no file among them; version then holds the line. Nothing for the npm
     and NuGet lock formats, which cannot pin a PyPI package."""
-    if path.name == "uv.lock":
+    if parser == "uv.lock" or path.name == "uv.lock":
         data = tomllib.loads(path.read_text(encoding="utf-8"))
         return [(path, canonical(p["name"]), p.get("version")) if "name" in p else (path, None, str(p))
                 for p in data.get("package", [])]
@@ -278,10 +289,21 @@ def scan_partition(entries, configs=None):
     return ordinary, frozen, stray
 
 
+IGNORE_ENTRY_KEYS = {"id", "ignoreUntil", "reason"}
+
+
 def ignore_entry_problems(config):
-    """Why an [[IgnoredVulns]] entry of a parsed config breaks the ignore policy (a missing id or reason, a missing or distant ignoreUntil)."""
+    """Reject invalid grants and keys not spelled exactly as policy reads them.
+
+    OSV-Scanner v2.6.0's BurntSushi/toml v1.6.0 decoder matches struct fields
+    case-insensitively, so distinct id/ID keys can target the same native field.
+    """
     problems, latest = [], date.today() + timedelta(days=90)
+    for key in sorted(set(config) - {"IgnoredVulns", "PackageOverrides"}):
+        problems.append(f"{key}: not a table this policy knows")
     for entry in config.get("IgnoredVulns", []):
+        for key in sorted(set(entry) - IGNORE_ENTRY_KEYS):
+            problems.append(f"{entry.get('id')}: unknown key {key!r}")
         if not entry.get("id"):
             problems.append(f"{entry}: no id")
         if not str(entry.get("reason", "")).strip():
@@ -294,6 +316,38 @@ def ignore_entry_problems(config):
             until = until.date()
         if until > latest:
             problems.append(f"{entry.get('id')}: ignoreUntil more than 90 days away")
+        if until <= date.today():
+            problems.append(f"{entry.get('id')}: ignoreUntil has expired")
+    return problems
+
+
+# The toml tags of PackageOverrideEntry and its nested tables at OSV-Scanner v2.6.0
+# (internal/config/config.go:38-49 and :83-89).
+PACKAGE_OVERRIDE_KEYS = {"name", "version", "ecosystem", "group", "nameIsRegex", "ignore",
+                         "vulnerability", "license", "effectiveUntil", "reason"}
+PACKAGE_OVERRIDE_TABLE_KEYS = {"vulnerability": {"ignore"}, "license": {"override", "ignore"}}
+
+
+def override_problems(config):
+    """Reject ordinary overrides that can suppress an npm package by name or regex.
+
+    OSV applies an override without an ecosystem to every ecosystem. Reject npm
+    in any case as project policy; native ecosystem matching is case-sensitive.
+    The decoder matches keys case-blind, so a key not spelled exactly as a toml
+    tag (Ecosystem beside ecosystem) can set the field this policy reads.
+    """
+    problems = []
+    for entry in config.get("PackageOverrides", []):
+        for key in sorted(set(entry) - PACKAGE_OVERRIDE_KEYS):
+            problems.append(f"{entry.get('name')!r}: unknown key {key!r}")
+        for table, keys in PACKAGE_OVERRIDE_TABLE_KEYS.items():
+            nested = entry.get(table)
+            if isinstance(nested, dict):
+                for key in sorted(set(nested) - keys):
+                    problems.append(f"{entry.get('name')!r}: unknown key {table}.{key}")
+        ecosystem = str(entry.get("ecosystem", "")).strip().lower()
+        if not ecosystem or ecosystem == "npm":
+            problems.append(f"{entry.get('name')!r}: a package override needs an ecosystem other than npm")
     return problems
 
 
@@ -333,6 +387,9 @@ class LockfileInventoryTests(unittest.TestCase):
     def excluded(self):
         return [entry["path"] for entry in self.inventory.get("excluded", [])]
 
+    def dependency_free(self):
+        return [entry["path"] for entry in self.inventory.get("dependency_free", [])]
+
     def test_every_tracked_lockfile_and_manifest_is_listed(self):
         try:
             files = tracked_files()
@@ -340,7 +397,8 @@ class LockfileInventoryTests(unittest.TestCase):
             self.skipTest("not a Git checkout; the listed paths are still checked below")
         expected = sorted(path for path in files if TRACKED.search(path))
         self.assertGreater(len(expected), 0)
-        missing = sorted(set(expected) - set(self.listed()) - set(self.covered()) - set(self.excluded()))
+        missing = sorted(set(expected) - set(self.listed()) - set(self.covered()) - set(self.excluded())
+                         - set(self.dependency_free()))
         self.assertEqual(missing, [], "add these to .github/osv-scanner-lockfiles.json")
         # An exclusion only covers a tracked file this inventory would otherwise require.
         for path in self.excluded():
@@ -357,10 +415,26 @@ class LockfileInventoryTests(unittest.TestCase):
             self.assertTrue(evidence and (ROOT / evidence).is_file(), f"{path}: exclusion needs an existing evidence path")
 
     def test_entries_are_unique_existing_files(self):
-        paths = self.listed() + self.covered() + self.excluded()
+        paths = self.listed() + self.covered() + self.excluded() + self.dependency_free()
         self.assertEqual(len(paths), len(set(paths)), "duplicate inventory entry")
         for path in paths:
             self.assertTrue((ROOT / path).is_file(), f"{path} is listed but missing")
+
+    def test_dependency_free_manifests_have_nothing_to_scan(self):
+        for entry in self.inventory.get("dependency_free", []):
+            path = entry.get("path", "")
+            with self.subTest(path=path):
+                self.assertEqual(path.rsplit("/", 1)[-1], "package.json", f"{path}: only a package.json can be dependency-free")
+                self.assertTrue(str(entry.get("reason", "")).strip(), f"{path}: a dependency-free entry needs a reason")
+                evidence = entry.get("evidence", "")
+                self.assertTrue(evidence and (ROOT / evidence).is_file(), f"{path}: needs an existing evidence path")
+                manifest = json.loads((ROOT / path).read_text(encoding="utf-8"))
+                self.assertIsInstance(manifest, dict, path)
+                declared = sorted(key for key in manifest
+                                  if "dependencies" in key.lower() or key.lower() in DEPENDENCY_STEERING_FIELDS)
+                self.assertEqual(declared, [], f"{path} declares dependencies: list it as covered_by_lockfile with its scanned lock")
+                beside = sorted(child.name for child in (ROOT / path).parent.iterdir() if child.name.lower() in JS_LOCK_NAMES)
+                self.assertEqual(beside, [], f"{path} has a lockfile beside it: scan that lock and cover the manifest with it")
 
     def test_parsers_are_explicit_where_osv_cannot_infer_them(self):
         for entry in self.inventory["lockfiles"]:
@@ -505,10 +579,14 @@ class IgnorePolicyTests(unittest.TestCase):
         self.assertEqual(scratch_findings({"uv.lock": lock}, scanned="uv.lock", parser=None),
                          [("uv.lock", "nltk", "3.10.3", "GHSA-8mgp-746c-j5xp"),
                           ("uv.lock", "setuptools", "80.10.2", "GHSA-h35f-9h28-mq5c")])
+        self.assertEqual(scratch_findings({"worker.py.lock": lock}, scanned="worker.py.lock", parser="uv.lock"),
+                         [("worker.py.lock", "nltk", "3.10.3", "GHSA-8mgp-746c-j5xp"),
+                          ("worker.py.lock", "setuptools", "80.10.2", "GHSA-h35f-9h28-mq5c")])
 
     def test_no_other_suppression_mechanism_bypasses_the_policy(self):
         config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
         self.assertLessEqual(set(config), {"IgnoredVulns", "PackageOverrides"})
+        self.assertEqual(override_problems(config), [])
         latest = date.today() + timedelta(days=90)
         for entry in config.get("PackageOverrides", []):
             # An override can silently ignore a whole package; it needs the same reason and expiry.
@@ -521,8 +599,7 @@ class IgnorePolicyTests(unittest.TestCase):
 
 
 class FrozenScanTests(unittest.TestCase):
-    """A dated exception for a frozen artifact is scoped by the scanner, not by a reader of the lock: its config is used only by the scan of the
-    inventory entries that name it (docs/decisions/2026-09-22-github-automation-closure.md, "urllib3 and PyJWT relock and a frozen macOS lock")."""
+    """The workflow and policy preflight bind each explicit OSV config to its reviewed artifact; OSV itself applies it to all inputs."""
 
     inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
     ordinary_config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
@@ -546,10 +623,34 @@ class FrozenScanTests(unittest.TestCase):
             self.assertIn(path, [entry["path"] for entry in self.inventory["lockfiles"]], "a frozen lock is a lockfile entry, not a manifest")
 
     def test_the_ordinary_config_has_no_exception_for_a_frozen_advisory(self):
+        self.assertEqual(ignore_entry_problems(self.ordinary_config), [])
         ids = {entry["id"] for entry in self.ordinary_config.get("IgnoredVulns", [])}
         frozen_ids = {advisory for lock in FROZEN_LOCKS.values() for advisory in lock["advisories"]}
         self.assertEqual(ids & frozen_ids, set(), "the exception belongs in the frozen config, which only the frozen scan uses")
-        self.assertEqual({override.get("name") for override in self.ordinary_config.get("PackageOverrides", [])} & {"next"}, set())
+        self.assertEqual({override.get("name") for override in self.ordinary_config.get("PackageOverrides", [])} & {"next", "braces"}, set())
+        self.assertEqual(override_problems(self.ordinary_config), [])
+
+    def test_a_config_with_a_key_the_scanner_reads_case_blind_is_a_problem(self):
+        good = {"IgnoredVulns": [{"id": "GHSA-x", "reason": "r", "ignoreUntil": date.today() + timedelta(days=30)}]}
+        self.assertEqual(ignore_entry_problems(good), [])
+        for label, config in (("an upper-case ID beside id", {"IgnoredVulns": [{**good["IgnoredVulns"][0], "ID": "GHSA-y"}]}),
+                              ("a case-varied reason key", {"IgnoredVulns": [{**good["IgnoredVulns"][0], "Reason": "r"}]}),
+                              ("a case-varied top-level table", {**good, "ignoredvulns": good["IgnoredVulns"]})):
+            with self.subTest(label=label):
+                self.assertNotEqual(ignore_entry_problems(config), [], label)
+
+    def test_a_package_override_that_could_match_next_or_braces_is_a_problem(self):
+        self.assertEqual(override_problems({"PackageOverrides": [{"name": "lib", "ecosystem": "PyPI", "ignore": True}]}), [])
+        for override in ({"name": "next", "ecosystem": "npm", "ignore": True},
+                         {"name": "nex[t]", "nameIsRegex": True, "ecosystem": "npm", "ignore": True},
+                         {"name": "brac[e]s", "nameIsRegex": True, "ecosystem": "npm", "ignore": True},
+                         {"name": "nex[t]", "nameIsRegex": True, "ignore": True},
+                         {"name": ".*", "nameIsRegex": True, "ecosystem": "NPM"},
+                         {"name": "nex[t]", "nameIsRegex": True, "ecosystem": "PyPI", "Ecosystem": "npm", "ignore": True},
+                         {"name": "lib", "Name": "next", "ecosystem": "PyPI", "Ecosystem": "npm", "ignore": True},
+                         {"name": "lib", "ecosystem": "PyPI", "vulnerability": {"Ignore": True}}):
+            with self.subTest(override=override):
+                self.assertNotEqual(override_problems({"PackageOverrides": [override]}), [], override)
 
     def test_each_frozen_config_holds_exactly_the_advisories_of_its_locks(self):
         for config_path in sorted({lock["config"] for lock in FROZEN_LOCKS.values()}):
@@ -558,9 +659,11 @@ class FrozenScanTests(unittest.TestCase):
             expected = sorted(advisory for lock in FROZEN_LOCKS.values() if lock["config"] == config_path for advisory in lock["advisories"])
             self.assertEqual(sorted(entry["id"] for entry in config["IgnoredVulns"]), expected)
             self.assertEqual(ignore_entry_problems(config), [])
+            self.assertEqual(active_ignores(config), set(expected), 'an archive exception must still be active (UTC)')
 
     def test_each_frozen_lock_matches_its_reviewed_digest_and_names_evidence(self):
         for path, lock in FROZEN_LOCKS.items():
+            self.assertTrue((ROOT / path).is_file(), path)
             self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(), lock["sha256"],
                              f"{path} changed after its review: re-review whether it reaches the advisories of its config, then record the new sha256")
             self.assertTrue((ROOT / lock["evidence"]).is_file(), lock["evidence"])
@@ -570,11 +673,16 @@ class FrozenScanTests(unittest.TestCase):
         configs = {lock["config"] for lock in FROZEN_LOCKS.values()}
         self.assertEqual(re.findall(r"(?m)^\s+frozen_config=(\S+)$", text), sorted(configs))
         for needle in ('select(has("config") | not)', 'select(.config == $config)', "--config .github/osv-scanner.toml", '--config "$frozen_config"',
-                       '$(( ${#lockfiles[@]} + ${#frozen[@]} ))', 'jq \'.lockfiles | length\' "$inventory"', "osv-scanner-frozen-macos.sarif"):
+                       '$(( ${#lockfiles[@]} + ${#frozen[@]} ))',
+                       'jq \'.lockfiles | length\' "$inventory"', "osv-scanner-frozen-macos.sarif"):
             self.assertIn(needle, text, needle)
         # the frozen scan never gets the ordinary lock list, and the ordinary scan never gets the frozen one
-        self.assertIn('"${frozen[@]}")', text)
+        self.assertEqual(text.count('"${frozen[@]}")'), 1)
         self.assertEqual(text.count('"${lockfiles[@]}")'), 1)
+        # The retired WSL group went on 2026-10-04, when its lock was renamed out of discovery; only the
+        # preflight's retirement tests still name that partition.
+        rest = [line for line in text.splitlines() if "tests.test_wsl_retrieval.RetiredRunnerTests" not in line]
+        self.assertEqual([line for line in rest if "wsl" in line.lower()], [])
 
     def test_the_partition_check_catches_a_mutant_inventory(self):
         entries = [{"path": "a"}, {"path": "b", "config": FROZEN_CONFIG}, {"path": "c", "config": ".github/other.toml"}, {"path": "d", "parser": "requirements.txt"}]
@@ -583,6 +691,375 @@ class FrozenScanTests(unittest.TestCase):
         self.assertEqual({config: [entry["path"] for entry in group] for config, group in frozen.items()}, {FROZEN_CONFIG: ["b"]})
         self.assertEqual([entry["path"] for entry in stray], ["c"])
         self.assertEqual(len(ordinary) + sum(len(group) for group in frozen.values()) + len(stray), len(entries))
+
+    def test_expired_ignore_fails_the_policy_before_a_scan(self):
+        for until in [date(2000, 1, 1), date.today()]:
+            with self.subTest(until=until):
+                config = {'IgnoredVulns': [{'id': 'GHSA-vfj7-8cjw-p6xm', 'reason': 'dated retirement evidence',
+                                           'ignoreUntil': until}]}
+                self.assertTrue(any('expired' in message for message in ignore_entry_problems(config)))
+
+
+class SyntheticWorkflowInvocationTests(unittest.TestCase):
+    """Execute the workflow shell with recording doubles; check routing/status behavior, never native scanner acceptance."""
+
+    configs = ['.github/osv-scanner.toml', FROZEN_CONFIG]
+
+    def run_step(self, inventory=None, primary=(0, 0), sarif=(0, 0), write_sarif=True, preflight=0, script=None):
+        if script is None:
+            workflow = WORKFLOW.read_text(encoding='utf-8')
+            step = workflow.split('      - name: Scan every listed lockfile and manifest', 1)[1]
+            script = textwrap.dedent(step.split('        run: |\n', 1)[1].split('      - name:', 1)[0])
+        inventory = inventory or json.loads(INVENTORY.read_text(encoding='utf-8'))
+        with tempfile.TemporaryDirectory() as directory:
+            scratch = Path(directory)
+            (scratch / '.github').mkdir()
+            (scratch / '.github/osv-scanner-lockfiles.json').write_text(json.dumps(inventory), encoding='utf-8')
+            binaries = scratch / 'bin'
+            binaries.mkdir()
+            tool_directory = scratch / 'runner/osv-scanner'
+            tool_directory.mkdir(parents=True)
+            double = '#!' + sys.executable + '\n' + textwrap.dedent('''\
+                import json, os, sys
+                from pathlib import Path
+                argv = sys.argv[1:]
+                preflight = Path(sys.argv[0]).name == 'python3'
+                fact = {'kind': 'preflight' if preflight else 'scanner', 'argv': argv}
+                with open(os.environ['OSV_WORKFLOW_LOG'], 'a', encoding='utf-8') as output:
+                    output.write(json.dumps(fact) + '\\n')
+                if preflight:
+                    raise SystemExit(int(os.environ['OSV_WORKFLOW_PREFLIGHT']))
+                configs = [argv[index + 1] if arg == '--config' else arg.split('=', 1)[1]
+                           for index, arg in enumerate(argv) if arg == '--config' or arg.startswith('--config=')]
+                if len(configs) != 1:
+                    raise SystemExit(2)
+                config = configs[0]
+                format_run = '--format' in argv
+                if format_run:
+                    Path(argv[argv.index('--output-file') + 1]).write_text('synthetic workflow fixture; not native SARIF\\n')
+                status = json.loads(os.environ['OSV_WORKFLOW_STATUSES'])[config]['sarif' if format_run else 'primary']
+                raise SystemExit(status)
+                ''')
+            for path in [binaries / 'python3', tool_directory / 'osv-scanner']:
+                path.write_text(double, encoding='utf-8')
+                path.chmod(0o700)
+            environment = dict(os.environ, PATH=str(binaries) + os.pathsep + os.environ['PATH'],
+                               RUNNER_TEMP=str(scratch / 'runner'), WRITE_SARIF=str(write_sarif).lower(),
+                               OSV_WORKFLOW_LOG=str(scratch / 'calls.jsonl'), OSV_WORKFLOW_PREFLIGHT=str(preflight),
+                               OSV_WORKFLOW_STATUSES=json.dumps({config: {'primary': p, 'sarif': s}
+                                   for config, p, s in zip(self.configs, primary, sarif)}))
+            result = subprocess.run(['bash', '-c', script], cwd=scratch, env=environment,
+                                    text=True, capture_output=True, check=False)
+            log = scratch / 'calls.jsonl'
+            calls = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
+            artifacts = sorted(path.name for path in tool_directory.glob('*.sarif'))
+        return result, calls, artifacts
+
+    def test_two_invocations_keep_every_input_and_parser_separate(self):
+        result, calls, artifacts = self.run_step()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        preflight = [call for call in calls if call['kind'] == 'preflight']
+        self.assertEqual(len(preflight), 1)
+        self.assertIn('tests.test_osv_lockfile_coverage.LockfileInventoryTests', preflight[0]['argv'])
+        self.assertIn('tests.test_osv_lockfile_coverage.FrozenScanTests', preflight[0]['argv'])
+        self.assertIn('tests.test_wsl_retrieval.RetiredRunnerTests', preflight[0]['argv'])
+        scanners = [call['argv'] for call in calls if call['kind'] == 'scanner']
+        self.assertEqual(len(scanners), 4)
+        for argv in scanners:
+            self.assertEqual(sum(arg == '--config' or arg.startswith('--config=') for arg in argv), 1, argv)
+        inventory = json.loads(INVENTORY.read_text(encoding='utf-8'))
+        for config in self.configs:
+            group = [argv for argv in scanners
+                     if [argv[index + 1] if arg == '--config' else arg.split('=', 1)[1]
+                         for index, arg in enumerate(argv) if arg == '--config' or arg.startswith('--config=')] == [config]]
+            self.assertEqual(len(group), 2, config)
+            expected = ['--lockfile=' + entry.get('parser', '') + ':' + entry['path']
+                        for entry in inventory['lockfiles']
+                        if entry.get('config', '.github/osv-scanner.toml') == config]
+            self.assertGreater(len(expected), 0)
+            for argv in group:
+                self.assertEqual(argv[:2], ['scan', 'source'])
+                self.assertIn('--no-resolve', argv)
+                self.assertEqual([arg for arg in argv if arg.startswith('--lockfile=')], expected)
+        self.assertEqual(artifacts, ['osv-scanner-frozen-macos.sarif', 'osv-scanner.sarif'])
+
+    def test_each_primary_and_sarif_status_is_retained(self):
+        cases = [((1, 0), (0, 0), 1), ((0, 1), (0, 0), 1),
+                 ((2, 0), (0, 0), 2), ((0, 0), (1, 0), 1),
+                 ((0, 0), (0, 1), 1), ((0, 0), (0, 7), 7),
+                 ((0, 7), (2, 0), 7), ((0, 127), (0, 0), 127)]
+        for primary, sarif, expected in cases:
+            with self.subTest(primary=primary, sarif=sarif):
+                result, calls, artifacts = self.run_step(primary=primary, sarif=sarif)
+                self.assertEqual(result.returncode, expected, result.stderr)
+                self.assertEqual(len([call for call in calls if call['kind'] == 'scanner']), 4)
+                self.assertEqual(len(artifacts), 2)
+
+    def test_pr_collects_both_primary_statuses_without_sarif(self):
+        result, calls, artifacts = self.run_step(primary=(0, 1), write_sarif=False)
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertEqual(len([call for call in calls if call['kind'] == 'scanner']), 2)
+        self.assertEqual(artifacts, [])
+
+    def test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan(self):
+        for mutation in ['unknown-config', 'duplicate', 'missing-archive', 'wrong-archive-lock']:
+            with self.subTest(mutation=mutation):
+                inventory = json.loads(INVENTORY.read_text(encoding='utf-8'))
+                entries = inventory['lockfiles']
+                if mutation == 'unknown-config':
+                    entries[0]['config'] = '.github/unknown.toml'
+                elif mutation == 'duplicate':
+                    entries.append(dict(entries[0]))
+                elif mutation == 'missing-archive':
+                    inventory['lockfiles'] = [entry for entry in entries if entry.get('config') != FROZEN_CONFIG]
+                else:
+                    archive = next(entry for entry in entries if entry.get('config') == FROZEN_CONFIG)
+                    archive['path'] = 'other-active-project/pnpm-lock.yaml'
+                result, calls, artifacts = self.run_step(inventory=inventory)
+                self.assertEqual(result.returncode, 1, result.stderr)
+                self.assertEqual([call for call in calls if call['kind'] == 'scanner'], [])
+                self.assertEqual(artifacts, [])
+
+    def test_preflight_failure_is_returned_before_scan(self):
+        for status in [1, 7, 127]:
+            with self.subTest(status=status):
+                result, calls, artifacts = self.run_step(preflight=status)
+                self.assertEqual(result.returncode, status, result.stderr)
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0]['kind'], 'preflight')
+                self.assertEqual(artifacts, [])
+
+    def test_the_step_catches_a_mutant_of_itself(self):
+        # Extend main's recording doubles; this method is outside the real preflight.
+        workflow = WORKFLOW.read_text(encoding='utf-8')
+        step = workflow.split('      - name: Scan every listed lockfile and manifest', 1)[1]
+        script = textwrap.dedent(step.split('        run: |\n', 1)[1].split('      - name:', 1)[0])
+        routing = 'test_two_invocations_keep_every_input_and_parser_separate'
+        statuses = 'test_each_primary_and_sarif_status_is_retained'
+        assignment = textwrap.dedent('''\
+            jq -e --arg mac_config "$frozen_config" '
+              .lockfiles as $entries | ($entries | map(.path)) as $paths |
+              (($paths | length) == ($paths | unique | length)) and
+              ([$entries[] | select(.config == $mac_config) | .path] ==
+                ["evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"])
+            ' "$inventory" > /dev/null || exit 1
+            ''')
+        count_guard = '-eq "$(jq \'.lockfiles | length\' "$inventory")"'
+        mutants = [
+            ('R1 duplicated config', routing, [
+                ('"${scan[@]}"\nstatus=$?\n', 'scan+=(--config "$frozen_config")\n"${scan[@]}"\nstatus=$?\n')]),
+            ('R1 duplicated inline config', routing, [
+                ('"${scan[@]}"\nstatus=$?\n', 'scan+=(--config="$frozen_config")\n"${scan[@]}"\nstatus=$?\n')]),
+            ('R2 omitted ordinary input and weakened count', routing, [
+                ('| select(has("config") | not) |', '| select(has("config") | not) | select(.path != ".github/requirements-ci.txt") |'),
+                (count_guard, count_guard.replace('-eq', '-le'))]),
+            ('macOS scan uses ordinary config', routing, [
+                ('scan_frozen=("$RUNNER_TEMP/osv-scanner/osv-scanner" scan source --config "$frozen_config"',
+                 'scan_frozen=("$RUNNER_TEMP/osv-scanner/osv-scanner" scan source --config .github/osv-scanner.toml')]),
+            ('primary status dropped', statuses, [
+                ('statuses=("$status" "$frozen_status")', 'statuses=("$status")')]),
+            ('R3 SARIF statuses dropped', statuses, [
+                ('statuses+=("$sarif_status" "$frozen_sarif_status")\n', '')]),
+            ('scanner error no longer wins', statuses, [
+                ('if [ "$code" -gt "$status" ]; then', 'if [ "$code" -eq 1 ]; then')]),
+            ('preflight failure ignored', 'test_preflight_failure_is_returned_before_scan', [
+                ('tests.test_wsl_retrieval.RetiredRunnerTests || exit "$?"', 'tests.test_wsl_retrieval.RetiredRunnerTests')]),
+            ('SARIF written on pull_request', 'test_pr_collects_both_primary_statuses_without_sarif', [
+                ('if [ "$WRITE_SARIF" = true ]; then', 'if true; then')]),
+            ('jq assignment and uniqueness guard removed', 'test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan', [
+                (assignment, '')]),
+            ('ordinary scan resolves unpinned inputs', routing, [
+                ('--no-resolve "${lockfiles[@]}")', '"${lockfiles[@]}")')]),
+        ]
+        for name, check, replacements in mutants:
+            with self.subTest(mutation=name, check=check):
+                mutated = script
+                for old, new in replacements:
+                    self.assertIn(old, script, name)
+                    self.assertEqual(mutated.count(old), 1, name)
+                    mutated = mutated.replace(old, new, 1)
+                case = type(self)(check)
+                result = unittest.TestResult()
+                with patch.object(case, 'run_step', side_effect=lambda *args, **kwargs: self.run_step(*args, script=mutated, **kwargs)):
+                    case.run(result)
+                self.assertEqual(result.errors, [], result.errors)
+                self.assertTrue(result.failures, f'{name} survived {check}')
+
+
+class FrozenPolicyMutationTests(unittest.TestCase):
+    """Mutate candidate policy inputs and exercise the actual guards the workflow invokes.
+
+    Scratch evidence is explicitly synthetic; these controls prove policy rejection,
+    never archive eligibility or native scanner acceptance.
+    """
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.scratch = Path(temporary.name)
+        for path, grant in FROZEN_LOCKS.items():
+            for name in (path, grant['config']):
+                target = self.scratch / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes((ROOT / name).read_bytes())
+            evidence = self.scratch / grant['evidence']
+            evidence.parent.mkdir(parents=True, exist_ok=True)
+            evidence.write_text('{"synthetic_policy_fixture": true}\n', encoding='utf-8')
+        # The frozen macOS archive is the one config-bound lock since the WSL group's removal (2026-10-04).
+        self.lock, grant = next(iter(FROZEN_LOCKS.items()))
+        self.config = self.scratch / grant['config']
+        self.receipt = self.scratch / grant['evidence']
+
+    def check(self, method, **attributes):
+        case = FrozenScanTests(method)
+        for key, value in attributes.items():
+            setattr(case, key, value)
+        result = unittest.TestResult()
+        with patch(__name__ + '.ROOT', self.scratch):
+            case.run(result)
+        return result
+
+    def assert_rejected(self, method, **attributes):
+        result = self.check(method, **attributes)
+        self.assertTrue(result.failures, 'the actual preflight guard accepted the changed input')
+        self.assertEqual(result.errors, [], result.errors)
+
+    def test_changed_lock_bytes_and_missing_evidence_are_rejected(self):
+        method = 'test_each_frozen_lock_matches_its_reviewed_digest_and_names_evidence'
+        self.assertTrue(self.check(method).wasSuccessful())
+        lock = self.scratch / self.lock
+        original = lock.read_bytes()
+        lock.write_bytes(original + b'\n')
+        self.assert_rejected(method)
+        lock.write_bytes(original)
+        self.receipt.unlink()
+        self.assert_rejected(method)
+
+    def test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs(self):
+        original = FrozenScanTests.ordinary_config
+        overrides = {
+            'package-override': {'name': 'braces', 'ignore': True},
+            'next-regex': {'name': 'nex[t]', 'nameIsRegex': True, 'ecosystem': 'npm', 'ignore': True},
+            'npm-case-regex': {'name': '.*', 'nameIsRegex': True, 'ecosystem': 'NPM', 'ignore': True},
+            'ecosystem-less-regex': {'name': 'brac[e]s', 'nameIsRegex': True, 'ignore': True},
+            'case-aliased-ecosystem': {'name': 'nex[t]', 'nameIsRegex': True, 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True},
+            'case-aliased-name-and-ecosystem': {'name': 'lib', 'Name': 'next', 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True},
+        }
+        for mutation in ('advisory', *overrides):
+            with self.subTest(mutation=mutation):
+                config = {key: list(value) for key, value in original.items()}
+                if mutation == 'advisory':
+                    # Well formed, so the frozen-id check is the only one that can reject it.
+                    config.setdefault('IgnoredVulns', []).append({
+                        'id': FROZEN_LOCKS[self.lock]['advisories'][0], 'reason': 'synthetic leaked exception',
+                        'ignoreUntil': date.today() + timedelta(days=30)})
+                    self.assertEqual(ignore_entry_problems(config), [])
+                else:
+                    config.setdefault('PackageOverrides', []).append(overrides[mutation])
+                self.assert_rejected('test_the_ordinary_config_has_no_exception_for_a_frozen_advisory',
+                                     ordinary_config=config)
+
+    def test_an_unbound_advisory_cannot_leak_into_the_macos_config(self):
+        # GHSA-vfj7-8cjw-p6xm belonged to the retired WSL group (removed 2026-10-04); no frozen lock carries it now.
+        until = date.today() + timedelta(days=30)
+        with self.config.open('a', encoding='utf-8') as output:
+            output.write(f'\n[[IgnoredVulns]]\nid = "GHSA-vfj7-8cjw-p6xm"\n'
+                         f'ignoreUntil = {until.isoformat()}\nreason = "synthetic leaked exception"\n')
+        self.assert_rejected('test_each_frozen_config_holds_exactly_the_advisories_of_its_locks')
+
+    def test_expired_config_is_rejected_by_the_actual_preflight_guard(self):
+        text = self.config.read_text(encoding='utf-8')
+        expired = re.sub(r'(?m)^ignoreUntil = \S+$', 'ignoreUntil = 2000-01-01', text)
+        self.assertNotEqual(expired, text, 'the frozen config has no ignoreUntil line to expire')
+        self.config.write_text(expired, encoding='utf-8')
+        self.assert_rejected('test_each_frozen_config_holds_exactly_the_advisories_of_its_locks')
+
+    def test_ordinary_inventory_omission_is_rejected_by_the_actual_preflight_guard(self):
+        inventory = json.loads(INVENTORY.read_text(encoding='utf-8'))
+        inventory['lockfiles'].remove(next(entry for entry in inventory['lockfiles'] if 'config' not in entry))
+        case = LockfileInventoryTests('test_every_tracked_lockfile_and_manifest_is_listed')
+        case.inventory = inventory
+        result = unittest.TestResult()
+        case.run(result)
+        self.assertTrue(result.failures, 'preflight accepted an omitted tracked active input')
+        self.assertEqual(result.errors, [], result.errors)
+
+
+class DependencyFreeMutationTests(unittest.TestCase):
+    """Mutate a scratch copy of each dependency_free manifest and its entry, and run the actual inventory test on it.
+
+    Synthetic policy controls: they prove the check rejects a manifest with something to scan, not that GitHub's
+    dependency graph or OSV-Scanner reports nothing for the real one (the rename's receipt holds those controls).
+    """
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.scratch = Path(temporary.name)
+        self.inventory = json.loads(INVENTORY.read_text(encoding='utf-8'))
+        self.assertTrue(self.inventory['dependency_free'], 'no dependency_free entry to mutate')
+        self.entry = self.inventory['dependency_free'][0]
+        for name in (self.entry['path'], self.entry['evidence']):
+            target = self.scratch / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((ROOT / name).read_bytes())
+        self.manifest = self.scratch / self.entry['path']
+
+    def check(self, inventory=None):
+        case = LockfileInventoryTests('test_dependency_free_manifests_have_nothing_to_scan')
+        case.inventory = inventory or self.inventory
+        result = unittest.TestResult()
+        with patch(__name__ + '.ROOT', self.scratch):
+            case.run(result)
+        return result
+
+    def assert_rejected(self, label, inventory=None):
+        result = self.check(inventory)
+        self.assertTrue(result.failures, f'{label} was accepted')
+        self.assertEqual(result.errors, [], result.errors)
+
+    def test_unchanged_copy_passes(self):
+        result = self.check()
+        self.assertTrue(result.wasSuccessful(), result.failures + result.errors)
+
+    def test_a_manifest_with_something_to_scan_is_rejected(self):
+        original = self.manifest.read_text(encoding='utf-8')
+        mutations = {
+            'restored dependency': {'dependencies': {'@tobilu/qmd': '2.8.3'}},
+            'case-varied devDependencies': {'DevDependencies': {'braces': '3.0.3'}},
+            'peer dependency metadata': {'peerDependenciesMeta': {'braces': {'optional': True}}},
+            'workspaces': {'workspaces': ['packages/*']},
+            'overrides': {'overrides': {'braces': '3.0.3'}},
+            'resolutions': {'resolutions': {'braces': '3.0.3'}},
+        }
+        for label, fields in mutations.items():
+            with self.subTest(mutation=label):
+                self.manifest.write_text(json.dumps({**json.loads(original), **fields}), encoding='utf-8')
+                self.assert_rejected(label)
+        self.manifest.write_text(original, encoding='utf-8')
+
+    def test_a_lockfile_beside_the_manifest_is_rejected(self):
+        for name in sorted(JS_LOCK_NAMES) + ['Package-Lock.json']:
+            with self.subTest(beside=name):
+                lock = self.manifest.parent / name
+                lock.write_text('{}\n', encoding='utf-8')
+                try:
+                    self.assert_rejected(name)
+                finally:
+                    lock.unlink()
+
+    def test_an_unreasoned_unevidenced_or_non_package_json_entry_is_rejected(self):
+        for label in ('empty reason', 'missing evidence', 'not a package.json'):
+            with self.subTest(mutation=label):
+                inventory = json.loads(json.dumps(self.inventory))
+                entry = inventory['dependency_free'][0]
+                if label == 'empty reason':
+                    entry['reason'] = ' '
+                elif label == 'missing evidence':
+                    entry['evidence'] = 'evidence/receipts/no-such-receipt.json'
+                else:
+                    entry['path'] = entry['path'].rsplit('/', 1)[0] + '/requirements.txt'
+                self.assert_rejected(label, inventory)
 
 
 class AllowedLockTests(unittest.TestCase):

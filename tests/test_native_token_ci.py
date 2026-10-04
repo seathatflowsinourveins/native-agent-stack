@@ -1312,10 +1312,54 @@ class NativeTokenCIContracts(unittest.TestCase):
                         with self.assertRaisesRegex(AssertionError, f"^{failing}$"):
                             ci.context_mode_fixture(run)
 
+    def test_serena_verified_native_preimages_require_exact_tool_schemas(self):
+        # Exact independently observed native responses from the immutable upstream pin.
+        # This replay exercises our parity gate; it is not a new server run or upstream test.
+        evidence = SCRIPT.parents[1] / "evidence/artifacts/token-profile-completion-20260930/serena-no-project"
+        transcripts = {context: (evidence / f"{context}.stdout.txt").read_bytes().splitlines(keepends=True)
+                       for context in ("claude-code", "codex")}
+        frozen_hashes = {"claude-code": "d2e22bcef4d45e867ca580dae8f50ad5738d31f4b348531ea1a88844994b5083",
+                         "codex": "2fe0460cd748ae5df612496585404a47f282ad90747a94d3c17a1149ee0f194f"}
+        for context, lines in transcripts.items():
+            self.assertEqual(len(lines), 2)
+            self.assertEqual(hashlib.sha256(lines[0]).hexdigest(), ci.SERENA_INITIALIZE_SHA256)
+            self.assertEqual(hashlib.sha256(lines[1]).hexdigest(), frozen_hashes[context])
+        for target in (None, "claude-code", "codex"):
+            with self.subTest(changed_schema=target), tempfile.TemporaryDirectory() as directory:
+                run = self._new_run(Path(directory))
+                run.tools["serena"] = "/stub/serena"
+                answers = deepcopy(transcripts)
+                if target is not None:
+                    response = json.loads(answers[target][1])
+                    tools = response["result"]["tools"]
+                    self.assertEqual(tools[0]["inputSchema"]["properties"]["needle"]["type"], "string")
+                    tools[0]["inputSchema"]["properties"]["needle"]["type"] = "integer"
+                    answers[target][1] = (json.dumps(response, separators=(",", ":"), ensure_ascii=False) + "\n").encode()
+                    self.assertEqual(ci.serena_tool_names(answers[target][1]), ci.serena_tool_names(transcripts[target][1]))
+                    self.assertNotEqual(hashlib.sha256(answers[target][1]).hexdigest(), frozen_hashes[target])
+
+                def server(_run, _label, argv, _requests, **kwargs):
+                    context = argv[argv.index("--context") + 1]
+                    home = Path(kwargs["env"]["SERENA_HOME"])
+                    home.mkdir(parents=True, exist_ok=True)
+                    (home / "serena_config.yml").write_text("web_dashboard: false\n")
+                    return answers[context]
+
+                with patch.object(ci, "mcp_stdio_session", side_effect=server):
+                    if target is None:
+                        ci.serena_fixture(run)
+                        self.assertTrue(all(check["passed"] for check in run.report["checks"]))
+                        self.assertEqual(len(run.report["checks"]), 4)
+                    else:
+                        with self.assertRaisesRegex(AssertionError, "^serena-tools-list-byte-parity-with-the-pinned-install$"):
+                            ci.serena_fixture(run)
+                        self.assertEqual(run.report["checks"][-1],
+                                         {"label": "serena-tools-list-byte-parity-with-the-pinned-install", "passed": False})
+
     def test_serena_fixture_requires_exact_response_bytes_context_tools_and_scoped_state(self):
         # serena_fixture and its frozen response/context comments at c6fbd1c5932df2494ffa0020af5a9fbe80b82143.
-        # The checkout retains hashes, not their preimages. Synthetic transcripts use test-scoped
-        # expected hashes, with the real digest/parser/checks; they are not pinned-server evidence.
+        # This synthetic test uses test-scoped hashes with the real digest/parser/checks; it is
+        # not pinned-server evidence. The retained native preimages are covered separately above.
         labels = (
             "serena-initialize-byte-parity-with-the-pinned-install",
             "serena-tools-list-byte-parity-with-the-pinned-install",
@@ -1378,7 +1422,7 @@ class NativeTokenCIContracts(unittest.TestCase):
                     context = argv[argv.index("--context") + 1]
                     self.assertEqual(label, f"serena-{context}-initialize-and-tools-list")
                     self.assertEqual(argv, ["/stub/serena", "start-mcp-server", "--context", context,
-                                            "--project-from-cwd", "--enable-web-dashboard", "false",
+                                            "--enable-web-dashboard", "false",
                                             "--open-web-dashboard", "false"])
                     self.assertEqual(requests, [("tools/list", {})])
                     home = Path(kwargs["env"]["SERENA_HOME"])

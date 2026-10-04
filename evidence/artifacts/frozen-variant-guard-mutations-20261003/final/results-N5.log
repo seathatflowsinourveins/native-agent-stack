@@ -1,0 +1,22 @@
+.F........
+======================================================================
+FAIL: test_the_artifact_directory_holds_nothing_beyond_its_three_files_on_disk (tests.test_frozen_macos_variant_no_use.ArtifactDirectoryTests.test_the_artifact_directory_holds_nothing_beyond_its_three_files_on_disk)
+OS metadata files aside; a directory is not a file, a symbolic link is. A missing file or an absent directory
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 387, in test_the_artifact_directory_holds_nothing_beyond_its_three_files_on_disk
+    self.assertEqual(extra, [], f"{ARTIFACT} holds {extra} besides {ARTIFACT_FILES}: {REOPEN}.")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['rebuild.sh'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'rebuild.sh'
+
+- ['rebuild.sh']
++ [] : evidence/artifacts/macos-application-20260924 holds ['rebuild.sh'] besides ['run-summary.json', 'variant/package.json', 'variant/pnpm-lock.yaml']: reopen Dependabot alert 16 and remove the frozen OSV exception (its config .github/osv-scanner-frozen-macos.toml, its inventory key in .github/osv-scanner-lockfiles.json and its FROZEN_LOCKS row in tests/test_osv_lockfile_coverage.py) before installing, building or serving from the lock (docs/decisions/2026-09-22-github-automation-closure.md, 'Dependabot alert 16').
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.396s
+
+FAILED (failures=1)

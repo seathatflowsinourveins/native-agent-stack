@@ -1,0 +1,702 @@
+{
+  "schema_version": 1,
+  "kind": "native_model_and_recovery_original_evidence",
+  "commands": [
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py",
+        "--phase",
+        "initial",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--events",
+        "<owned-private-state>/deepagents/logs/27-worker-inspect-offline.stdout",
+        "--expected-marker",
+        "<owned-private-state>/deepagents/expected-marker.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:29:25.881Z",
+      "finished_at": "2026-09-30T23:29:26.057Z",
+      "exit_code": 2,
+      "signal": null,
+      "id": "live-01-missing-initial-oracle",
+      "stdout_sha256": "fedd66926b489ae450d95244f120db7d1b2b9ad12f7811e2ff2d5ff154fbf495",
+      "stdout_bytes": 73,
+      "native_oracle_output": {
+        "phase": "initial",
+        "passed": false,
+        "error_type": "FileNotFoundError"
+      },
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "600s",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/worker.py",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--checkpoint",
+        "<owned-private-state>/deepagents/trial-checkpoint.sqlite",
+        "--thread-id",
+        "foundation-native-research-20260930",
+        "--skill",
+        "/skills",
+        "--api-key-env",
+        "OMNIROUTE_WORKER_API_KEY",
+        "--base-url",
+        "http://127.0.0.1:25371/v1",
+        "--prompt-file",
+        "<owned-private-state>/deepagents/initial-prompt.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:29:47.467057+00:00",
+      "finished_at": "2026-09-30T23:35:12.370191+00:00",
+      "exit_code": 1,
+      "id": "live-02-initial-worker",
+      "stderr_sha256": "a078141cbab8ae8a17d49236c45d37c7556fa493cc4beabfe4fa8218fa3bae6e",
+      "stderr_bytes": 1142,
+      "returned_error_excerpt": [
+        "langgraph.errors.GraphRecursionError: Recursion limit of 24 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key."
+      ],
+      "jsonl_sha256": "7d8d339e48ea7a38542299c77df70609dc0009323aa768da44e94ec090b30747",
+      "jsonl_bytes": 270726
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py",
+        "--phase",
+        "initial",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--events",
+        "<owned-private-state>/deepagents/logs/live-02-initial-worker.jsonl",
+        "--expected-marker",
+        "<owned-private-state>/deepagents/expected-marker.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:37:26.478Z",
+      "finished_at": "2026-09-30T23:37:26.543Z",
+      "exit_code": 2,
+      "signal": null,
+      "id": "live-03-initial-oracle",
+      "stdout_sha256": "a4b4d1cc2abeaa601b6253d4544772d2730fcbe907f0816dd432cca8358a3623",
+      "stdout_bytes": 403,
+      "native_oracle_output": {
+        "phase": "initial",
+        "checks": {
+          "filesystem_os_isolation": true,
+          "checkpoint_context_closes_connection": true,
+          "source_pins": true,
+          "specialist_artifact_and_citations": true,
+          "exactly_one_native_task": true,
+          "task_returned": true,
+          "actual_selected_skill_read": true,
+          "marker_in_native_checkpoint": false,
+          "filesystem_quote": true,
+          "sqlite_quote": false,
+          "quotes_support_claims": true
+        },
+        "passed": false
+      },
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "600s",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/worker.py",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--checkpoint",
+        "<owned-private-state>/deepagents/trial-checkpoint.sqlite",
+        "--thread-id",
+        "foundation-native-research-20260930",
+        "--skill",
+        "/skills",
+        "--api-key-env",
+        "OMNIROUTE_WORKER_API_KEY",
+        "--base-url",
+        "http://127.0.0.1:25371/v1",
+        "--inspect"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:37:26.545Z",
+      "finished_at": "2026-09-30T23:37:28.761Z",
+      "exit_code": 0,
+      "signal": null,
+      "id": "live-04-failed-state-inspect",
+      "stdout_sha256": "e293fa8d5a62e3c72d723b061cc8110a0c620673781170b6135fc1ebef6ff303",
+      "stdout_bytes": 60961,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "600s",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/worker.py",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--checkpoint",
+        "<owned-private-state>/deepagents/trial-checkpoint.sqlite",
+        "--thread-id",
+        "foundation-native-research-20260930",
+        "--skill",
+        "/skills",
+        "--api-key-env",
+        "OMNIROUTE_WORKER_API_KEY",
+        "--base-url",
+        "http://127.0.0.1:25371/v1",
+        "--prompt-file",
+        "<owned-private-state>/deepagents/repair-prompt.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:49:49.140531+00:00",
+      "worker_sha256": "66ae2bba78773b52abdd4a312965579d7c2a1b888f54c3e7f1e9776a957ff0ec",
+      "finished_at": "2026-09-30T23:50:20.021912+00:00",
+      "exit_code": 0,
+      "id": "repair-14-worker",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "jsonl_sha256": "b88b2b7cc1391fa25377096ecd93c0773dcc8e57eb0c5c5a4e4b0d0d0f2d9269",
+      "jsonl_bytes": 141457
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "cat",
+        "<owned-private-state>/deepagents/logs/live-02-initial-worker.jsonl",
+        "<owned-private-state>/deepagents/logs/repair-14-worker.jsonl"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:51:09.381Z",
+      "finished_at": "2026-09-30T23:51:09.414Z",
+      "exit_code": 0,
+      "source_hashes": [
+        "7d8d339e48ea7a38542299c77df70609dc0009323aa768da44e94ec090b30747",
+        "b88b2b7cc1391fa25377096ecd93c0773dcc8e57eb0c5c5a4e4b0d0d0f2d9269"
+      ],
+      "id": "repair-15-concat"
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py",
+        "--phase",
+        "initial",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--events",
+        "<owned-private-state>/deepagents/logs/repair-15-combined-native-events.jsonl",
+        "--expected-marker",
+        "<owned-private-state>/deepagents/expected-marker.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:51:09.416Z",
+      "finished_at": "2026-09-30T23:51:09.476Z",
+      "exit_code": 0,
+      "signal": null,
+      "id": "repair-16-combined-initial-oracle",
+      "stdout_sha256": "0a4c90567d876268c2e0fc46bd50124dc31ce99c369b5c2e09f0e0e6d5a89917",
+      "stdout_bytes": 400,
+      "native_oracle_output": {
+        "phase": "initial",
+        "checks": {
+          "filesystem_os_isolation": true,
+          "checkpoint_context_closes_connection": true,
+          "source_pins": true,
+          "specialist_artifact_and_citations": true,
+          "exactly_one_native_task": true,
+          "task_returned": true,
+          "actual_selected_skill_read": true,
+          "marker_in_native_checkpoint": true,
+          "filesystem_quote": true,
+          "sqlite_quote": true,
+          "quotes_support_claims": true
+        },
+        "passed": true
+      },
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "600s",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/worker.py",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--checkpoint",
+        "<owned-private-state>/deepagents/trial-checkpoint.sqlite",
+        "--thread-id",
+        "foundation-empty-control-20260930",
+        "--skill",
+        "/skills",
+        "--api-key-env",
+        "OMNIROUTE_WORKER_API_KEY",
+        "--base-url",
+        "http://127.0.0.1:25371/v1",
+        "--inspect"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:51:09.478Z",
+      "finished_at": "2026-09-30T23:51:11.874Z",
+      "exit_code": 0,
+      "signal": null,
+      "id": "live-08-empty-thread-inspect",
+      "stdout_sha256": "b378e35f8783555d9fcad7b34ac0fe5f8d45e5ce250ded0a52782589430b0d27",
+      "stdout_bytes": 69,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py",
+        "--phase",
+        "empty-thread",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--events",
+        "<owned-private-state>/deepagents/logs/live-08-empty-thread-inspect.stdout",
+        "--expected-marker",
+        "<owned-private-state>/deepagents/expected-marker.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:51:11.874Z",
+      "finished_at": "2026-09-30T23:51:11.932Z",
+      "exit_code": 2,
+      "signal": null,
+      "id": "live-09-empty-thread-oracle",
+      "stdout_sha256": "e285029306ec517e60d4da7c3540d81cfb1ea46e7eeaa7639524023c603a17f3",
+      "stdout_bytes": 92,
+      "native_oracle_output": {
+        "phase": "empty-thread",
+        "checks": {
+          "checkpoint_contains_marker": false
+        },
+        "passed": false
+      },
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "rm",
+        "<owned-private-state>/deepagents/trial-workspace/inputs/session-marker.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:52:18.724Z",
+      "finished_at": "2026-09-30T23:52:18.825Z",
+      "exit_code": 0,
+      "id": "live-10-marker-removal"
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "600s",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/worker.py",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--checkpoint",
+        "<owned-private-state>/deepagents/trial-checkpoint.sqlite",
+        "--thread-id",
+        "foundation-native-research-20260930",
+        "--skill",
+        "/skills",
+        "--api-key-env",
+        "OMNIROUTE_WORKER_API_KEY",
+        "--base-url",
+        "http://127.0.0.1:25371/v1",
+        "--inspect"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:52:18.826Z",
+      "finished_at": "2026-09-30T23:52:20.985Z",
+      "exit_code": 0,
+      "signal": null,
+      "id": "live-11-same-thread-before-continuation",
+      "stdout_sha256": "6c166e5ba8f5a5d2063be4cca9d7ea81fd935cb362e2e5cbd2bd1bf72d612d51",
+      "stdout_bytes": 70640,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "600s",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/worker.py",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--checkpoint",
+        "<owned-private-state>/deepagents/trial-checkpoint.sqlite",
+        "--thread-id",
+        "foundation-native-research-20260930",
+        "--skill",
+        "/skills",
+        "--api-key-env",
+        "OMNIROUTE_WORKER_API_KEY",
+        "--base-url",
+        "http://127.0.0.1:25371/v1",
+        "--prompt-file",
+        "<owned-private-state>/deepagents/resume-prompt.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:52:58.331741+00:00",
+      "worker_sha256": "66ae2bba78773b52abdd4a312965579d7c2a1b888f54c3e7f1e9776a957ff0ec",
+      "finished_at": "2026-09-30T23:53:11.922997+00:00",
+      "exit_code": 0,
+      "id": "live-12-continuation-worker",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "jsonl_sha256": "53802f47735741269ca27e57ed82203452e3694aa98ee29346afe5ec8fb42c40",
+      "jsonl_bytes": 151254
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py",
+        "--phase",
+        "resume",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--events",
+        "<owned-private-state>/deepagents/logs/live-12-continuation-worker.jsonl",
+        "--expected-marker",
+        "<owned-private-state>/deepagents/expected-marker.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:54:26.999Z",
+      "finished_at": "2026-09-30T23:54:27.074Z",
+      "exit_code": 0,
+      "signal": null,
+      "id": "live-13-continuation-oracle",
+      "stdout_sha256": "bc421024e8087c3212119144fdcd7eea4abf707dc617df37cc06f8ca9daff0b4",
+      "stdout_bytes": 156,
+      "native_oracle_output": {
+        "phase": "resume",
+        "checks": {
+          "restored_before_new_turn": true,
+          "marker_recovered": true,
+          "new_events_avoid_reread_and_delegation": true
+        },
+        "passed": true
+      },
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py",
+        "--phase",
+        "resume",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--events",
+        "<owned-private-state>/deepagents/logs/live-12-continuation-worker.jsonl",
+        "--expected-marker",
+        "<owned-private-state>/deepagents/expected-marker.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:55:23.665Z",
+      "finished_at": "2026-09-30T23:55:23.719Z",
+      "exit_code": 2,
+      "signal": null,
+      "id": "live-15-missing-resume-control",
+      "stdout_sha256": "1b34d52c480b9d0a62df479ac68e4ce0017949b3b2067898d83d87a49b850943",
+      "stdout_bytes": 72,
+      "native_oracle_output": {
+        "phase": "resume",
+        "passed": false,
+        "error_type": "FileNotFoundError"
+      },
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<owned-private-state>/deepagents/integration-venv/bin/python",
+        "<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py",
+        "--phase",
+        "resume",
+        "--workspace",
+        "<owned-private-state>/deepagents/trial-workspace",
+        "--events",
+        "<owned-private-state>/deepagents/logs/live-12-continuation-worker.jsonl",
+        "--expected-marker",
+        "<owned-private-state>/deepagents/expected-marker.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:55:23.986Z",
+      "finished_at": "2026-09-30T23:55:24.039Z",
+      "exit_code": 2,
+      "signal": null,
+      "id": "live-16-wrong-resume-control",
+      "stdout_sha256": "101b45861361fcd5661cc82810c3379c5a2de4ceff78155305124e767d4f9ede",
+      "stdout_bytes": 158,
+      "native_oracle_output": {
+        "phase": "resume",
+        "checks": {
+          "restored_before_new_turn": true,
+          "marker_recovered": false,
+          "new_events_avoid_reread_and_delegation": true
+        },
+        "passed": false
+      },
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "cp",
+        "<owned-private-state>/deepagents/artifact-history/continuation-original/resume-marker.txt",
+        "<owned-private-state>/deepagents/trial-workspace/artifacts/resume-marker.txt"
+      ],
+      "cwd": "<owned-private-state>/checkout",
+      "started_at": "2026-09-30T23:55:24.169Z",
+      "finished_at": "2026-09-30T23:55:24.242Z",
+      "exit_code": 0,
+      "sha256": "a5f2ce9d4252bf6715b23087a96bcd7d45e0d304bad7fcb498b5704e27d2cfdf",
+      "id": "live-17-native-artifact-restored"
+    }
+  ],
+  "actual_returned_findings": {
+    "filesystem_os_isolation": false,
+    "checkpoint_context_closes_connection": true,
+    "source_pins": {
+      "deepagents": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+      "sqlite": "b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4"
+    },
+    "filesystem_quote": {
+      "characters": 38,
+      "sha256": "3da22670f7ea94054e47f6725fc882616af5d86037a057e8362540b3f2e052da"
+    },
+    "sqlite_quote": {
+      "characters": 13,
+      "sha256": "fcd488d5085fd9b2830ae6af54bf0d38483b36580117e64bab85c10523677554"
+    }
+  },
+  "quote_diagnosis": {
+    "quote_type": "string",
+    "quote_length": 262,
+    "exact_source_substring": true,
+    "quote_within_length_bounds": false,
+    "contains_literal_closing_prefix": true,
+    "source_contains_closing_prefix": true,
+    "quote_sha256": "eb99ed35c2ecf6a377b37414bff5b664b04ea1cf945d474b7e3a75d6d2b5a379",
+    "whitespace_normalized_substring": true
+  },
+  "usage": [
+    {
+      "scope": "Native graph_update AIMessage usage only, stable-ID dedup; checkpoint snapshots excluded",
+      "attempt": "live-02-initial-worker",
+      "exit_code": 1,
+      "distinct_ai_messages": 22,
+      "main_ai_messages": 8,
+      "nested_ai_messages": 14,
+      "usage_reported_count": 22,
+      "duplicates_ignored": 0,
+      "missing_message_ids": 0,
+      "totals": {
+        "input_tokens": 300536,
+        "output_tokens": 7422,
+        "total_tokens": 307958
+      },
+      "subset_details": {
+        "input_token_details": {
+          "cache_creation": 0,
+          "cache_read": 254592
+        },
+        "output_token_details": {
+          "reasoning": 4130
+        }
+      },
+      "tool_name_counts": {
+        "ls": 9,
+        "read_file": 33,
+        "task": 1,
+        "grep": 6,
+        "write_file": 2
+      },
+      "complete_provider_usage": null,
+      "complete_provider_billing": null,
+      "observer_usage": "Separate root-owned wire scope; never summed with native counts",
+      "previous_attempt_replayed_ids_excluded_from_totals": true
+    },
+    {
+      "scope": "Native graph_update AIMessage usage only, stable-ID dedup; checkpoint snapshots excluded",
+      "attempt": "repair-14-worker",
+      "exit_code": 0,
+      "distinct_ai_messages": 3,
+      "main_ai_messages": 3,
+      "nested_ai_messages": 0,
+      "usage_reported_count": 3,
+      "duplicates_ignored": 0,
+      "missing_message_ids": 0,
+      "totals": {
+        "input_tokens": 33483,
+        "output_tokens": 556,
+        "total_tokens": 34039
+      },
+      "subset_details": {
+        "input_token_details": {
+          "cache_creation": 0,
+          "cache_read": 13696
+        },
+        "output_token_details": {
+          "reasoning": 337
+        }
+      },
+      "tool_name_counts": {
+        "read_file": 1,
+        "edit_file": 1
+      },
+      "complete_provider_usage": null,
+      "complete_provider_billing": null,
+      "observer_usage": "Separate root-owned wire scope; never summed with native counts",
+      "previous_attempt_replayed_ids_excluded_from_totals": true
+    },
+    {
+      "scope": "Native graph_update AIMessage usage only, stable-ID dedup; checkpoint snapshots excluded",
+      "attempt": "live-12-continuation-worker",
+      "exit_code": 0,
+      "distinct_ai_messages": 2,
+      "main_ai_messages": 2,
+      "nested_ai_messages": 0,
+      "usage_reported_count": 2,
+      "duplicates_ignored": 0,
+      "missing_message_ids": 0,
+      "totals": {
+        "input_tokens": 23330,
+        "output_tokens": 170,
+        "total_tokens": 23500
+      },
+      "subset_details": {
+        "input_token_details": {
+          "cache_creation": 0,
+          "cache_read": 22656
+        },
+        "output_token_details": {
+          "reasoning": 98
+        }
+      },
+      "tool_name_counts": {
+        "write_file": 1
+      },
+      "complete_provider_usage": null,
+      "complete_provider_billing": null,
+      "observer_usage": "Separate root-owned wire scope; never summed with native counts",
+      "previous_attempt_replayed_ids_excluded_from_totals": true
+    }
+  ],
+  "wire_observation": {
+    "source_sha256": "d4569ed6efef53015eb1619bf5591f91530476896fd6e18f4c2ba44ec07a6f97",
+    "original_private_snapshot_sha256": "d5cb683a19963b2190cc71dac44acf7d6104dc980f1cc59bf104a472e5dd0f6f",
+    "events": 81,
+    "requests": 27,
+    "response_status_counts": {
+      "200": 27
+    },
+    "models": {
+      "cx/gpt-6.1-sol-max": 27
+    },
+    "efforts": {
+      "max": 27
+    },
+    "paths": {
+      "/v1/responses": 27
+    },
+    "tool_sets": [
+      [
+        "ls",
+        "read_file",
+        "write_file",
+        "edit_file",
+        "delete",
+        "glob",
+        "grep"
+      ],
+      [
+        "ls",
+        "read_file",
+        "write_file",
+        "edit_file",
+        "delete",
+        "glob",
+        "grep",
+        "task"
+      ]
+    ],
+    "usage_capture": "Non-SSE native Responses bodies provide no response.completed event to this stream observer; wire usage is unknown, not zero. Native AI usage remains separate.",
+    "billing_or_backend_identity": null
+  },
+  "scope": "Actual bounded DeepAgents research with one named synchronous specialist, saved-context repair and fresh-process continuation. Synthetic source/marker fixtures and authored oracle are local integration evidence.",
+  "public_source_bindings": {
+    "initial_worker_revision": "37cb7cc7b225c39ab5ac53bba8ec8a661ad7f940",
+    "repaired_worker_revision": "d626e03d51d4cc3e9e290ada8b87224b7a234a1d",
+    "initial_worker_sha256": "31cf9ede2a8f248d20fa18a8ca8abb51b616620caa4f37730c2025f30e8bb90f",
+    "repair_worker_sha256": "66ae2bba78773b52abdd4a312965579d7c2a1b888f54c3e7f1e9776a957ff0ec",
+    "oracle_sha256": "2a1d3b770d0b828d239575fe0c79694489df420c99dc11535072630198cae171"
+  },
+  "preserved_failure": "Initial run exit1 at24 steps with no completed checkpoint_after; unchanged oracle exit2 because final checkpoint and quote-length conditions failed. Repair changes native cap to32 and prompt, retaining original state/events/failure usage. Combined events are exact cat bytes; original run remains failed.",
+  "continuation": "Marker input removed before fresh same-thread inspect. Saved native state contains marker before new prompt; continuation produces remembered marker without read_file or task in new events. Missing and wrong artifacts fail same oracle; original native bytes are restored.",
+  "limits": [
+    "Complete provider billing/backend identity unknown.",
+    "No whole-task token savings comparison.",
+    "No OS confinement or arbitrary interrupted-tool replay qualification.",
+    "Skill background delegation excluded; native synchronous specialist used."
+  ]
+}

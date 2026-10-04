@@ -1,0 +1,84 @@
+# Dated Mac runtime and memory-candidate follow-up
+
+Decision date: 2026-10-01. Foundation source reconciliation only. This follows the bounded-decision routing and minimal source-owner handoff, while preserving their earlier 2.5.0 compaction observations and all historical September 25 receipts/verdicts.
+
+## Latest reported runtime
+
+The [sealed 09:17 UTC Mac checkpoint](https://github.com/seathatflowsinourveins/native-agent-stack/issues/384#issuecomment-5928477895) reports official ai-memory **2.5.2** cutover after a private preflight and quiescent rollback snapshot: health 200, native SDK 2.5.2 / 23 tools, scoped default/wha read acceptance, 247 Markdown files and schema 70 retained. Models/providers/native hook definitions reportedly stayed unchanged during cutover. The later bounded hook audit reports seven Codex/nine Claude compiled native commands, 20 trusted Codex definitions retained, and native hook sources byte-identical across 2.5.1/2.5.2. Briefing is explicit marker opt-in and absent for wha; no marker or hook setting was changed by this source task. This cloud task did not read the private deployment receipt or reproduce that native execution; the sealed public mirror links its private receipts without transferring their acceptance to this cloud task. Rollback retains matching official 2.5.1 and its quiescent schema-70 corpus.
+
+Independent official [v2.5.2 release metadata](https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2), checked October 1, verifies publication `2026-10-01T07:40:18Z`, annotated tag `af8c6820bbbcca0b8d3604d7b2d59c0e0263ea85`, peeled source `7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83`. The ARM archive API digest matches `160881fab2be3d2e9cf64f656da517c961c1e14ff4987d75a70ee1c71e17e9ef` (15,112,158 bytes); the installed binary digest `cf4d063a64ff5f95140e14cbb59de997f8af92975df29d43173eb1efbd7c2e69` remains owner-reported. Release metadata is not a fresh extraction or binary execution. Ollama 0.34.4 remains production; its 0.35 strict parity gate is unchanged and Hindsight stays isolated.
+
+The owner separately reports a scoped native Astra/ultra explicit read → real compaction → fresh resume → read proof with per-process hooks disabled. That narrow result does not close broader G03 or erase the original tool-free compaction failure. The sealed G09 report records private official 2.5.2 capture/dry-run/semantic consolidation success; one reviewer returned an empty summary with no proposals. Approval and page recovery remain untested. Its strict=false, embedding=none, approval=true, scheduler-off fixture differs from production; usage is unknown. Owned processes exited 0 and their ports closed.
+
+### Earlier 2.5.1 checkpoint (retained)
+
+The [Mac owner’s 07:32:31Z handoff](https://github.com/seathatflowsinourveins/native-agent-stack/issues/384#issuecomment-5926863898) reported the earlier runtime checkpoint, now superseded above: official ai-memory 2.5.1, with Ollama 0.34.4, measured model digests unchanged, and Hindsight 0.10.2 isolated. The owner reports private preflight plus production cutover/postflight, schema 70 and 244 Markdown files retained, native SDK 2.5.1 / 23 tools, successful health/scoped status/read, rollback corpus and official 2.5.0 retained, unchanged settings/providers/hook trust, and all 162 installed hook script members byte-identical to 2.5.0. Those are owner-reported native results; this cloud task did not read private artifacts, run the service or reproduce them.
+
+Independent primary-source review verifies the [official stable v2.5.1 release](https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.1), published `2026-10-01T06:04:28Z`, annotated tag `2d5038d09a32d5976a3a175f16d176ea6242d531`, peeled source `695805eb881fd25f6bea67a9d0ff05b9adeaab44`. The release API's SHA-256 for `ai-memory-macos-aarch64.tar.gz` (15,087,472 bytes) matches `4740c1d8963a2a8837620ec3266a47a745996dc16d1106853e3daea32f4db1bc`. The installed binary digest `3faadd170e506d894bbee477bb15694fc64706b0cedfc00c633f3318b984be3a` remains owner-reported. API digest agreement is metadata verification, not a fresh archive extraction/binary execution.
+
+The [pinned changelog](https://github.com/akitaonrails/ai-memory/blob/695805eb881fd25f6bea67a9d0ff05b9adeaab44/CHANGELOG.md#L10) records capture-path security and launcher/lease corrections. Unchanged installed script members do not mean all native/generated upstream hook code stayed unchanged.
+
+The WSL-qualified ai-memory 2.4.1 stack pin is a different scope and remains unchanged. No Mac result becomes universal new-host, WSL, provider or GPU acceptance. The sealed WSL 2.5.2 companion passed 24 offline checks with 25 archive entries (SHA256 ad38863c4a86560c82b77819744d359cc894ba9cbfe1a3f3c07385aba9089091); it is unexecuted and does not change the separately qualified stack pin. Matching binary/schema/corpus remains required. The earlier lifecycle's 20 passes / two failures, 20-second rerank mismatch, invalid synthesis JSON and stale pure-compaction recall remain open; subsequent parsed-JSON diagnostic calls do not erase them.
+
+## Candidate source coverage
+
+| Candidate | Primary source and exact pin | Review boundary |
+| --- | --- | --- |
+| Qwen/Qwen3.8-27B | [QwenLM README](https://github.com/QwenLM/Qwen3.8/blob/2ea10dc725823bf7c3e21ce8557cbe15245132ae/README.md#L48), `2ea10dc725823bf7c3e21ce8557cbe15245132ae`; August 14 announcement follows Qwen3.6's April release | Already covered for generation. Memory-role fidelity, structured output and the same 20-second latency budget remain unmeasured. |
+| BAAI/AREX-2 | [Publisher README](https://github.com/VectorSpaceLab/AREX-2/blob/2b4fc81acf5699b66a7daba7d4ffb6570c096326/assets/site/index.html#L195), `2b4fc81acf5699b66a7daba7d4ffb6570c096326`; Qwen3.8-27B-based reflection/coding/research model | September 29 verifies repository appearance, not weight-release timing. Apache-2.0 on evaluation code does not establish weight licensing. Weight revision/gating remains unknown. |
+| jinaai/jina-reranker-v3.5-mlx | [Author's publisher-namespace download](https://github.com/hanxiao/jina-reranker-v3.5-in-page-search/blob/721a8f5ceb1cef52eccdd85d9bcf67153e5e6043/README.md#L119) and [official Jina listwise contract](https://github.com/jina-ai/jina-on-prem/blob/5128127ddd80aec11dc18c73f9e5e4b648d0b9fe/server/families/reranking.py#L129) | Fresh HF revision/date/conversion details were not verified. The [existing CC-BY-NC-4.0 rejection](../../catalogs/foundation/memory-stack-20260925.json#L1512) remains; an MLX format does not reopen selection or establish ai-memory chat-rerank compatibility. |
+
+Fresh HF API/card access returned proxy 403. Existing historical HF pins are retained as historical evidence, not described as newly checked. These are source-reviewed candidates, not measured production replacements. No weights, service, provider, model, effort or custom adapter were adopted by this source task.
+
+## Native integration blocker and next gate
+
+The owner reports the actual official `jev_rerank_shim_choice.py` at ai-memory `a8757a05` sends up to 30 candidates in one System One Choice question; official Ollama 0.35 accepts 2–26 options. The unmodified adapter therefore does not establish generic native fit. The referenced rubric shim was absent from that inspected pinned tree. The later owner handoff found a historical rubric shim, but its 87,072 raw HTTP bytes exceeded Ollama's 64 KiB gate; finding the older file does not establish full-domain native fit. Zero chat-usage fields are placeholders and cannot establish token savings. These are reported source/native compatibility observations, not execution reproduced in this cloud task.
+
+Reproduce the preregistered C3/C4 control on official 2.5.2: historical .570 recall on local 19b6429 is not a score for either new official patch. Preserve same-task latency/structured-output and representative lifecycle gates, plus blind cross-family convergence before replacement. Vela/VelaNext is retired; preregister a surviving host before any confirmatory run. Do not execute the frozen unsafe benchmark. WSL native execution/sign-in remains pending its own destination session. Whole-task usage and net savings remain unknown.
+
+## Source/producer integration
+
+The sealed owner report retains 21 open gaps and readiness false. Its report UI passed 31 checks and 21 evidence hashes, while historical report hashes stayed unchanged; report QA is not runtime/model acceptance. QMD reported three passes and one primary-document top-three miss, with exact-source fallback retained. Whole-task usage and net savings remain unknown.
+
+The canonical NAS owner records this dated delta without rewriting historical experiments or broad runtime pins. The separate `agent-ecosystem` producer owns maintained source selections, host records and generated lookup data. Its minimal synchronization must preserve personal RTK/operator bytes, per-file receipt provenance and historical evidence. Mac global settings/services/histories remain with the sole Mac owner. Source review, generated-file consistency, installed synchronization and native consumption are separate acceptance levels.
+
+## Status on 2026-10-03
+
+The October 1 next gate, reproducing C3/C4 on official 2.5.2 and preregistering
+a surviving host, is no longer queued work for this Mac record. The Mac memory
+decision unit closed on October 2, retaining official ai-memory 2.5.2 as the
+single shared-memory owner and queuing no candidate experiment, holdout or
+canary
+([closed qualification verdict](../../blueprints/memory-stack/native-qualification/VERDICT.md),
+[closure record](https://github.com/seathatflowsinourveins/native-agent-stack/blob/4ced2923063db6a6dcafa9f25af5ee05a4153c75/blueprints/memory-stack/native-qualification/closure.json#L4-L8),
+[Mac Claude resolution](2026-10-02-mac-claude-resolution.md#acceptance-boundaries)).
+A replacement requires a new, explicitly scoped decision unit
+([replacement boundary](../../blueprints/memory-stack/native-qualification/VERDICT.md#known-limits-are-final-dispositions-not-running-tests)).
+
+The two-host architecture records the Mac owner's 2.5.2 runtime beside the
+older main component lock at 2.4.1, whose pin update stays open
+([two-host architecture](2026-10-02-two-host-north-star-architecture.md#current-sources-accepted-pins-and-upgrade-decisions),
+[2026-10-03 amendment](2026-10-02-two-host-north-star-architecture.md#amendment-2026-10-03-wsl-scope)).
+On the new-WSL destination, ai-memory 2.5.2 is only the source profile's pinned,
+unprovisioned head-to-head comparison arm
+([source profile](../../adoption/new-wsl-profile.md),
+[definitive defaults](2026-10-01-new-wsl-definitive-defaults.md)).
+That destination's memory owner waits for its own head-to-head and acceptance,
+and nothing in this Mac record transfers selection or acceptance to it
+([profile entry](https://github.com/seathatflowsinourveins/native-agent-stack/blob/4ced2923063db6a6dcafa9f25af5ee05a4153c75/adoption/new-wsl-profile.json#L2407-L2455),
+[memory-owner slot](2026-10-01-new-wsl-definitive-defaults.md#the-six-slots-of-the-foundations-decision-round),
+[durable-memory layer](https://github.com/seathatflowsinourveins/native-agent-stack/blob/4ced2923063db6a6dcafa9f25af5ee05a4153c75/catalogs/foundation/new-wsl-architecture-20261001.json#L576-L604)).
+
+The original lifecycle failures, 20-second rerank mismatch, invalid synthesis
+JSON and stale pure-compaction recall remain preserved
+([October 1 runtime evidence](2026-10-01-mac-runtime-memory-candidates.md#latest-reported-runtime)).
+Readiness remains false, and whole-task usage and net savings remain unknown
+([October 1 source/producer evidence](2026-10-01-mac-runtime-memory-candidates.md#sourceproducer-integration),
+[closed qualification limits](../../blueprints/memory-stack/native-qualification/VERDICT.md#known-limits-are-final-dispositions-not-running-tests)).
+
+A read-only October 3 re-check returned the recorded 2.5.2/2.5.1 tags, 2.5.2
+publication timestamp and ARM archive size/digest, latest release `v2.5.2`, and
+owner-comment timestamps `2026-10-01T09:18:54Z` and `2026-10-01T07:32:31Z`; this
+is source review
+([2.5.2 checkpoint](2026-10-01-mac-runtime-memory-candidates.md#latest-reported-runtime),
+[2.5.1 checkpoint](2026-10-01-mac-runtime-memory-candidates.md#earlier-251-checkpoint-retained)).

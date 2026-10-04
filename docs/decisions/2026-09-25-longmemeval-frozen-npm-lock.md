@@ -225,3 +225,79 @@ the exposure.
 
 Unchanged from the decision above, plus: a later run relocks any of these six files (the new lock
 gets its plain name and the normal scan, or its own dated entry here with evidence).
+
+## Addendum (2026-10-04): the retired WSL retrieval lock
+
+**Added in:** the pull request that renames the retired WSL retrieval lock, PR-1 of the
+2026-10-04 GitHub-automation audit, assigned by the coordinating session. Merging that pull
+request adopts this addendum.
+
+**Scope added:** one file, `blueprints/convergence-practice/wsl-retrieval/package-lock.json.frozen`
+(82,463 bytes, sha256 `5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb`). The
+partition's dependency-free `package.json` keeps its name. The decision above and the 2026-09-27
+addendum keep their own scope.
+
+### Context
+
+The partition was retired on 2026-10-03 (the closure record's "Retired historical WSL retrieval
+partition"): nothing installs or replays it, but its lock kept its npm name. Under that name:
+
+- GitHub's dependency graph raised Dependabot alert 17: braces ≤ 3.0.3, GHSA-vfj7-8cjw-p6xm
+  (CVE-2026-93687), high, transitive, no patched release.
+- Scorecard's OSV-Scanner run carried the same advisory as code-scanning alert 19.
+- The required `osv-scanner` check needed a dedicated grant,
+  `.github/osv-scanner-frozen-wsl-retrieval.toml`, which expires on 2026-10-17, and a scan group
+  of its own.
+
+On 2026-10-03 the coordinating session decided to rename both frozen npm locks to `.frozen` and
+stop scanning them in a follow-up pull request (the closure record's alert-16 note). This addendum
+carries that out for the WSL lock. The macOS variant follows separately.
+
+### Evidence
+
+- OSV-Scanner 2.6.0, the release asset verified against the workflow's pinned sha256, ran
+  `scan source --config .github/osv-scanner.toml --no-resolve -r` over scratch copies on
+  2026-10-04:
+  - The lock alone as `package-lock.json` exits 1: 170 packages, and GHSA-vfj7-8cjw-p6xm on braces
+    3.0.3 with no fixed version.
+  - The same bytes as `package-lock.json.frozen` exit 128 with "No package sources found".
+  - The whole partition before the rename exits 1. After the rename (the same files with the lock
+    renamed) it exits 128 with 0 extract calls, so the dependency-free `package.json` is not a
+    package source either.
+- GitHub's dependency graph recognizes npm, pnpm, Yarn and Deno manifests by fixed names
+  (`package-lock.json`, `package.json`, `pnpm-lock.yaml`, `yarn.lock`, `deno.lock`; read
+  2026-10-04). Scorecard v5.5.0, which the pinned scorecard-action v2.4.4 builds on, runs a
+  recursive OSV-Scanner directory scan (`clients/osv.go`, lines 78-93). Neither reads `.frozen`
+  names. That follows from their documentation and source; it was not observed on a live pull
+  request.
+- The bytes stay pinned. `manifests/evidence.json`, the convergence record and `audit.py` bind the
+  sha256, and Git records the rename at 100% similarity (blob `d37ec744`).
+- `audit_retirement` requires the lock to exist only as `.frozen` at its digest, and no npm, Yarn,
+  pnpm, Bun or Deno lockfile name in the partition, on disk or in Git. Its scenarios catch eight
+  code mutants of the guard.
+- Receipt: `evidence/receipts/wsl-lock-frozen-rename-20261004.json`.
+
+### Decision
+
+Store the WSL lock as `package-lock.json.frozen`, and delete its dedicated OSV config, inventory
+entry and scan group. The dependency-free `package.json` moves to the inventory's new
+`dependency_free` class.
+
+No receipt is rewritten. The receipts keep the name `package-lock.json`, which `audit.py` resolves
+to the archive. In the convergence record (`experiment.json`) the lock's cited path changes and its
+sha256 stays the same, because the bytes are identical. The evaluation digests of `audit.py` and
+`tests/test_wsl_retrieval.py` move too: the record binds them and this change edits both files, as
+#622 did when it last changed them. That is the one change to the record beyond the cited path.
+
+### What the rename does not do
+
+It does not patch braces: the archived bytes still pin braces 3.0.3. When GitHub reports alerts 17
+and 19 as fixed, "fixed" means removed from discovery. Active QMD 2.8.3 still resolves braces 3.0.3
+without a tracked lock; its reachability review is a separate item. Restoring the lock under any of
+those lockfile names in the partition fails the audit.
+
+### Overturn
+
+Unchanged from the decision above, plus: if alert 17 stays open after the merge, stop and bring
+option (a), a dismissal that needs the user's explicit authorization naming alert 17, to the user.
+Alert 19 is never dismissed.

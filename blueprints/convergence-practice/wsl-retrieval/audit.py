@@ -2,10 +2,25 @@
 import ast
 import hashlib
 import json
+import os
+import subprocess
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parent
+
+# The receipts and the 2026-10-03 retirement assessment name the retained lock package-lock.json. Since
+# 2026-10-04 its unchanged bytes are stored as LOCK_ARCHIVE, a name no dependency scanner reads, and each of
+# those historical bindings resolves to the archive without rewriting a receipt.
+LOCK_NAME = 'package-lock.json'
+LOCK_ARCHIVE = 'package-lock.json.frozen'
+LOCK_BYTES = 82463
+LOCK_SHA256 = '5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb'
+# Lockfile names that scanners find by name alone: npm's two (package-lock.json, npm-shrinkwrap.json), Yarn's
+# and pnpm's, plus bun.lock (OSV-Scanner v2.6.0's supported lockfiles) and deno.lock (GitHub's dependency
+# graph). None may exist anywhere in this partition, on disk or in the Git index, in any letter case.
+DISCOVERED_LOCK_NAMES = frozenset({'package-lock.json', 'npm-shrinkwrap.json', 'yarn.lock', 'pnpm-lock.yaml',
+                                   'bun.lock', 'deno.lock'})
 
 # Fixed acceptance names from the preserved runner versions, never from a receipt.
 REQUIRED_FROZEN_INPUTS = {
@@ -60,8 +75,8 @@ def audit(source, qmd, failed, inventory, root=ROOT):
             (failed, {'run.py': 'run-initial.py.txt'}, 'run-initial.py.txt'),
             (qmd, {}, 'run-qmd-attempt-2.py.txt')]:
         require(receipt['frozen_file_mapping'] == declared_mapping, 'wrong executed runner provenance')
-        # The original QMD receipt had no remapping. Its run.py bytes are now archived.
-        mapping = {'run.py': runner}
+        # Resolve archived bytes without fabricating original receipt mapping fields.
+        mapping = {'run.py': runner, 'package.json': 'package-original.json.txt', LOCK_NAME: LOCK_ARCHIVE}
         require(set(receipt['frozen_inputs']) == REQUIRED_FROZEN_INPUTS, 'required frozen input names changed')
         for name, digest in receipt['frozen_inputs'].items():
             require(hashlib.sha256((root/mapping.get(name, name)).read_bytes()).hexdigest() == digest,
@@ -151,7 +166,7 @@ def audit(source, qmd, failed, inventory, root=ROOT):
             and inventory['installed_optional_llama_backends'] == [], 'model/backend artifact appeared')
     require(inventory['installed_qmd'] == '2.8.3' and inventory['installed_better_sqlite3'] == '13.0.3'
             and inventory['installed_sqlite_vec_linux_x64'] == '0.1.9' and inventory['all_registry_payloads_have_integrity'] is True, 'locked native dependency scope changed')
-    require(inventory['lock_sha256'] == hashlib.sha256((root/'package-lock.json').read_bytes()).hexdigest(), 'dependency lock changed')
+    require(inventory['lock_sha256'] == hashlib.sha256((root/LOCK_ARCHIVE).read_bytes()).hexdigest(), 'dependency lock changed')
     require(failed['passed'] is False and failed['native_commands'] == 5 and len(failed['facts']) == 5
             and failed['checks']['qmd-positive-0_paths'] is False
             and failed['failure'] == {'type': 'AssertionError', 'message': 'qmd-positive-0_paths'}, 'initial native failure erased or relabeled')
@@ -163,7 +178,86 @@ def audit(source, qmd, failed, inventory, root=ROOT):
             'whole_task_provider_usage': None, 'semantic_rag_or_client_integration': False}
 
 
+def discovered_lock_names(names):
+    """The relative paths among names whose last component is a lockfile name that scanners find by name."""
+    return sorted(name for name in names if Path(name).name.lower() in DISCOVERED_LOCK_NAMES)
+
+
+def tracked_names(root):
+    """The paths the Git index tracks under root, relative to it. Fails closed when Git cannot list them."""
+    # Inherited Git routing or index variables must not select another checkout or index (scripts/validate.py).
+    environment = {key: value for key, value in os.environ.items() if not key.startswith('GIT_')}
+    try:
+        listing = subprocess.run(['git', '--no-optional-locks', '-C', str(root), 'ls-files', '-z'],
+                                 env=environment, capture_output=True, check=False)
+    except OSError:
+        listing = None
+    require(listing is not None and listing.returncode == 0, 'cannot list the files Git tracks in the partition')
+    return {os.fsdecode(item) for item in listing.stdout.split(b'\0') if item}
+
+
+def audit_retirement(root=ROOT):
+    """Check current retirement artifacts without qualifying historical execution."""
+    assessment = json.loads((root/'retirement-assessment.json').read_text())
+    archives = {
+        'package-original.json.txt': (174, '7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8'),
+        'run-recording-aid.py.txt': (16427, 'be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12'),
+    }
+    require(set(assessment['archived_artifacts']) == set(archives), 'retirement archive names changed')
+    for name, (size, digest) in archives.items():
+        data = (root/name).read_bytes()
+        require(len(data) == size and hashlib.sha256(data).hexdigest() == digest,
+                'changed retirement artifact: '+name)
+        require(assessment['archived_artifacts'][name]['bytes'] == size
+                and assessment['archived_artifacts'][name]['sha256'] == digest,
+                'retirement archive identity changed: '+name)
+    # The assessment records the lock under its original name; the bytes now live under LOCK_ARCHIVE.
+    require(assessment['retained_lock']['path'] == LOCK_NAME
+            and assessment['retained_lock']['bytes'] == LOCK_BYTES
+            and assessment['retained_lock']['sha256'] == LOCK_SHA256, 'retired lock identity changed')
+    archive = (root/LOCK_ARCHIVE).read_bytes() if (root/LOCK_ARCHIVE).is_file() else b''
+    require(len(archive) == LOCK_BYTES, 'retired lock missing or resized: '+LOCK_ARCHIVE)
+    require(hashlib.sha256(archive).hexdigest() == LOCK_SHA256, 'retired lock changed: '+LOCK_ARCHIVE)
+    manifest = json.loads((root/'package.json').read_text())
+    require(manifest.get('private') is True, 'retirement manifest must remain private')
+    require(not any(manifest.get(name) for name in ['dependencies', 'devDependencies',
+            'optionalDependencies', 'peerDependencies', 'bundledDependencies', 'bundleDependencies']),
+            'retirement manifest restores dependencies')
+    require(not manifest.get('scripts'), 'retirement manifest restores lifecycle or replay scripts')
+    require(manifest.get('devEngines', {}).get('runtime')
+            == {'name': 'retired-wsl-retrieval', 'onFail': 'error'},
+            'retirement manifest runtime guard changed')
+    require(set(assessment['current_entrypoints']) == {'run.py', 'package.json'},
+            'retirement entrypoint set changed')
+    for name, identity in assessment['current_entrypoints'].items():
+        require(hashlib.sha256((root/name).read_bytes()).hexdigest() == identity['sha256'],
+                'changed retirement entrypoint: '+name)
+    require(assessment['historical_native_acceptance_established'] is False
+            and assessment['native_npm_guard_acceptance_established'] is False,
+            'offline retirement assessment cannot establish native acceptance')
+    require(assessment['active_qmd_advisory']
+            == {'id': 'GHSA-vfj7-8cjw-p6xm', 'status': 'unresolved'},
+            'active QMD advisory disposition changed')
+    # The lock stays out of name-based discovery only while no scanner-read lock name exists here, on disk
+    # (any depth, any letter case, a symlink included) or in the Git index that the default branch is built from.
+    on_disk = [os.path.relpath(os.path.join(folder, name), root)
+               for folder, folders, files in os.walk(root) for name in folders + files]
+    restored = discovered_lock_names(on_disk)
+    require(not restored, 'retired lock restored under a scanner-read name on disk: '+', '.join(restored))
+    tracked = tracked_names(root)
+    require(LOCK_ARCHIVE in tracked, 'retired lock archive is not tracked in Git: '+LOCK_ARCHIVE)
+    restored = discovered_lock_names(tracked)
+    require(not restored, 'retired lock tracked under a scanner-read name in Git: '+', '.join(restored))
+    return {'artifacts_consistent': True, 'status': 'retired_historical_source',
+            'retained_lock': {'archive': LOCK_ARCHIVE, 'sha256': LOCK_SHA256, 'scanner_discovered': False,
+                              'dependency_patched': False},
+            'native_npm_guard_acceptance_established': False,
+            'active_qmd_advisory_status': 'unresolved'}
+
+
 if __name__ == '__main__':
     load = lambda name: json.loads((ROOT/name).read_text())
-    print(json.dumps(audit(load('source-receipt.json'), load('qmd-receipt.json'),
-                           load('qmd-attempt-1.json'), load('install-inventory.json')), indent=2))
+    result = audit(load('source-receipt.json'), load('qmd-receipt.json'),
+                   load('qmd-attempt-1.json'), load('install-inventory.json'))
+    result['current_retirement_assessment'] = audit_retirement()
+    print(json.dumps(result, indent=2))

@@ -18,7 +18,8 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    `trading-catalog.json`, `trading-by-layer.json` (consolidated onto the
    12-layer taxonomy copied live from
    `catalogs/sota-convergence/manifest-20260922.json#/taxonomy`),
-   `trading-pins.json`, `star-candidates.json` and `models.json` into `--out`.
+   `trading-pins.json`, `runtime-pins.json`, `star-candidates.json` and
+   `models.json` into `--out`.
    `trading-pins.json` holds the trading upstreams that a blueprint or runtime
    record pins but that no selected (`default`/`conditional`) us-equities card
    carries: hftbacktest, nautilus-ibapi and rust-ibapi. Each is declared in
@@ -26,6 +27,31 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    is read from that record, not copied. A pointer that no longer resolves, a
    non-taxonomy layer or an id that collides with a card id raises instead of
    dropping the component.
+   `runtime-pins.json` holds the GPT runtime workers, SDKs and agents.
+   `RUNTIME_PIN_SOURCES` reads each pin from the record that installs it: the
+   new-WSL install plan's row by slot, the runtime-worker recipe's
+   `blueprints/runtime-workers/openhands/pins.json`, and the native SDK
+   constraints in `adoption/sdk/accepted-constraints.txt`.
+   `RUNTIME_WATCH_SOURCES` adds watch-only upstreams that a file on main names
+   but no install or runtime record on main pins, such as pi (a catalog card
+   may record an evaluated version). A malformed declaration raises, a
+   `pin_pointer`, `repository_pointer` or row `array` that is not an
+   [RFC 6901](https://www.rfc-editor.org/rfc/rfc6901) JSON pointer included
+   (`tag` for `/tag`, or a `~` other than `~0` and `~1`). A
+   record that moved or changed shape does not, so the daily report keeps its
+   other tables: that entry is written with `"pin": null` and an `"error"`
+   naming only the declared path, its pointer, slot or requirement and a short
+   reason, and the printed summary lists it under `runtime_unresolved`.
+   A pin or watch source may also declare
+   `"tags": {"prefix": ..., "pattern": ...}` for an upstream whose GitHub
+   releases are absent or belong to other packages: a literal tag prefix (empty
+   for every tag; otherwise letters, digits, `.`, `-`, `_`, `=` and `+`, never
+   `..`) and a Python regex that starts with `^`, ends with `$` and has exactly
+   one capture group, the dotted numeric version. `new-wsl:inspect-ai` declares
+   every tag with `^(\d+\.\d+\.\d+)$`, `watch:codex-action` the `v` tags with
+   `^v(\d+\.\d+(?:\.\d+)?)$`, and `watch:deepagents` the `deepagents==` tags
+   with `^deepagents==(\d+\.\d+\.\d+)$`. A malformed declaration raises; each
+   entry carries its `tags` or `null`.
 
    ```sh
    python3 tools/sota-convergence/extract_layers.py --repo-root . --out /path/to/work-dir
@@ -34,14 +60,35 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
 2. **`github_freshness.py`** -- a real network step (authenticated `gh api`
    calls; `gh auth status` must already pass). Reads the repository URLs out
    of the working files above (`foundation-layers.json`, `trading-catalog.json`,
-   `trading-pins.json` when present, and `star-candidates.json`) and writes `github-freshness.json` with
+   `trading-pins.json` and `runtime-pins.json` when present, and `star-candidates.json`) and writes `github-freshness.json` with
    stars, `pushed_at`, latest release/tag, head commit, license, archived and
    rename status per repository, plus every alias URL seen for that
    repository's normalized GitHub slug (`"aliases"` -- a `/releases/tag/vX`
    or `/tree/...` catalog URL and the canonical form both resolve to the same
    record; `build_manifest.py` looks records up by slug, not by exact URL).
-   Resumable: a repository already present in `--out` *without* an `"error"`
-   or `"partial_errors"` field is skipped unless `--refresh`. A repository
+   For each tag prefix that a `runtime-pins.json` entry declares, one more
+   `gh api --paginate repos/{slug}/git/matching-refs/tags/{prefix}` call
+   ([List matching references](https://docs.github.com/en/rest/git/refs#list-matching-references))
+   lists the tags whose names start with it, and the record carries
+   `"matching_tags": {prefix: [names]}`, without `refs/tags/` and in the API's
+   name order. At most 5,000 names are kept per prefix, the first in that
+   order (a cut list may miss the highest version), and a record with a cut
+   list carries `"matching_tags_truncated": true`, once per record, not per
+   prefix, so `build_manifest.py` compares none of the rows that declare a
+   prefix of that repository (step 4). A repository without a
+   declared prefix makes no such call, whichever working file names it. A
+   prefix that matches no tag returns an empty list, so any failure of that
+   call leaves the prefix without a list and is kept under the record's
+   `"matching_tags_errors"` (`{prefix: short reason}`), counted in the
+   document's top-level `matching_tags_errors`. It is never a
+   `"partial_errors"` entry, so the repository's drift and trading rows stay
+   reliable and the propose job is not held; only the runtime row that
+   declares the prefix says `tag_pattern_unfetched`. A record with
+   `"matching_tags_errors"`, or without a list for every prefix declared now,
+   stays pending, and the next run fetches that whole repository again.
+   Resumable: a repository already present in `--out` *without* an `"error"`,
+   `"partial_errors"` or `"matching_tags_errors"` field, and with a list for
+   every declared prefix, is skipped unless `--refresh`. A repository
    whose record carries `"error"` (the primary `repos/{slug}` call itself
    timed out or failed) stays pending and is retried on the next run. A
    repository whose primary call succeeded but a releases/tags/commit
@@ -49,7 +96,24 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    releases" (a timeout, 429, or 5xx) keeps that failure in
    `"partial_errors"`, is counted in the document's top-level
    `partial_errors`, and is also retried on the next run -- it is not
-   silently treated as done just because the primary call succeeded. One
+   silently treated as done just because the primary call succeeded.
+   The top-level `errors` and `partial_errors` count only the repositories
+   that a working file other than `runtime-pins.json` names (and any record
+   retained from an earlier run that no working file names now), the
+   inventory and the counts from before that file existed: they hold
+   `catalog-freshness.yml`'s `propose` job through
+   `scripts/freshness_propose.py`'s `upstream-errors.txt` and
+   `upstream-partial-errors.txt`, and `scripts/saturation_ledger.py` reads
+   them as the freshness input's completeness. A repository that only
+   `runtime-pins.json` names (by normalized slug, so another file's alias or
+   other letter case makes it shared; five on 2026-10-03:
+   `harbor-framework/harbor`, `openai/codex-action`,
+   `openai/openai-agents-js`, `openai/openai-python` and
+   `openhands/software-agent-sdk`) is fetched, resumed and recorded the same
+   way, but its failures count in `runtime_only_errors` and
+   `runtime_only_partial_errors`, which nothing in the drift or propose path
+   reads, and `runtime_only_repositories` lists those slugs, so the runtime
+   table of `drift.md` can name the rows whose fetch failed. One
    `gh` call raising (a timeout, missing binary, etc.) never aborts the batch
    -- `gh_api` catches it and records `{"error": "..."}` for that repository
    only -- and progress is checkpointed to `--out` every 25 fetched
@@ -108,6 +172,50 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    days before `--checked-at`. `pushed_at` stands in only when the commit date
    is unknown. `dormant` is `null`, never `false`, when the run has no data
    for the repository. The manifest's key layout and rows are unchanged.
+   `--runtime-freshness-out PATH` writes the report-only
+   `runtime-freshness.json` (schema `runtime-freshness/1`) the same way, with
+   one row per `runtime-pins.json` entry (`--runtime-pins`, default
+   `<work-dir>/runtime-pins.json`; without that file the sidecar has no rows).
+   A resolved pin uses the manifest's pin-vs-upstream rule. A watch-only row,
+   or a row whose source did not resolve, is `not_compared` with reason
+   `watch_only` or `source_unresolved`. A row whose entry declares `tags`
+   takes its upstream latest from the record's `matching_tags` list for that
+   prefix before the pin is compared: of the names that fully match the
+   pattern, the one whose capture is the highest integer tuple (never the
+   last by name: the API's order puts 0.3.99 after 0.3.276) becomes
+   `upstream.latest`, with `latest_source: "matching_tag"` and
+   `matching_tag_count`. The pattern and the capture match ASCII digits only
+   (`re.ASCII`). Such a row has `released_at` and `prerelease` null, because
+   they describe the repository's latest GitHub release, which in a monorepo
+   can be another package's, and no `latest_flag`; every other upstream field
+   stays `compute_upstream`'s, and dormancy still reads the repository's
+   activity. With no match (a pattern that is missing or does not compile
+   counts as none), or no list (never fetched, or the call failed), the row
+   keeps every `compute_upstream` field with `latest_source`
+   `tag_pattern_unmatched` or `tag_pattern_unfetched`. When the record carries
+   `matching_tags_truncated`, a higher version may be among the names cut, so
+   `latest_source` is `tag_pattern_truncated` in place of `matching_tag` or
+   `tag_pattern_unmatched`: the latest is still the tag selected from the
+   names kept (or `compute_upstream`'s when none matched), and a pinned row is
+   `not_compared` with reason `tag_list_truncated`; a watch-only or unresolved
+   row keeps its own reason.
+   `drift.md` marks a matching-tag latest `(tag)` (never a latest from a cut
+   list) and lists those three kinds of row in one line after the runtime
+   table, each with its `latest_source`. One more line names the rows on a
+   runtime-only repository whose fetch failed (step 2); like every row with no
+   reliable upstream data they are blanked and listed as unfetched, but their
+   failures do not hold the `propose` job. A watch-only row carries its upstream
+   and dormancy; an unresolved row does only when it has a repository, and one
+   without has an empty `upstream` and the `not_fetched` dormancy. The same
+   upstreams' `manifests/stack.json` pins and selected (`default`/`conditional`)
+   trading card pins stay in the manifest and `trading-freshness.json` (the
+   drift and trading tables of `drift.md`); an `alternative` card's pin is
+   compared in no table. The manifest and `trading-freshness.json` are
+   byte-identical with or without this flag. If the runtime rows trip the leak
+   gate (a third-party tag, say), only this sidecar is withheld: it keeps its
+   schema and keys with no entries, every count 0 and
+   `"gate_error": "leak_gate_tripped"`, the step still exits 0, and `drift.md`
+   says the runtime table was withheld.
 
    ```sh
    python3 tools/sota-convergence/build_manifest.py \
@@ -1443,8 +1551,12 @@ What remains and how it is handled:
   commands that do any of the following:
   - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
     (Python's `Path.cwd()/ref`) starts no path, and neither does a URL's `//` authority (`https://host`,
-    `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://` and `https:///` do. A URL reaches nothing from a
-    blind child without the network or a CLI it cannot resolve. Measured
+    `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://`, `local://`, any scheme containing `unix`
+    (`http+unix://%2F...`) and `https:///` do. A URL reaches nothing from a blind child without the network or a
+    CLI it cannot resolve. Measured 2026-09-24 (codex-cli 0.155.1, `--sandbox read-only`), a blind child could
+    create an AF_UNIX socket, but its `connect()` to a probe-owned socket failed with
+    `PermissionError: [Errno 1] Operation not permitted`, while the caller's own connection was accepted.
+    This dated measurement has not been repeated on the current Codex pin. Measured
     2026-09-24 (codex-cli 0.155.1, `--sandbox read-only`), its Python connection to a local listener the caller
     had just reached, and to 127.0.0.1:6333 (Qdrant's port), failed with `PermissionError: [Errno 1] Operation
     not permitted`, and the listener accepted nothing. The root rule skips a quoted `'/'` joined with `+` between
@@ -1479,7 +1591,17 @@ What remains and how it is handled:
     passwd and reads the real `~/.zshenv`, so a Homebrew PATH set there counts too. The refusal is correct, since a
     child's `zsh -c` would get the same PATH, but zsh, fish, ksh and tcsh are untested here. Install the CLIs
     elsewhere (`~/.local/bin`) to run blind lanes there. A shell-script codex launcher (pnpm's cmd-shim, which runs
-    node by name) is refused up front, and a failed child's last stderr lines go to the console, not the record.
+    node by name) with an absolute shell shebang is refused up front as before. An env-style shell launcher,
+    including `#!/usr/bin/env -S bash -e`, is measured with `--version` using `blind_child_argv`, the blind
+    child's environment and PATH, fresh scratch HOME/CODEX_HOME, no stdin and a five-second timeout.
+    Only exits 126 and 127 refuse it, naming the launcher and its last stderr line; a timeout, launch error or
+    another nonzero exit is reported to the console and does not refuse it. One shared shebang helper keeps
+    the check and child argv consistent. The telemetry identity launcher from
+    `observability/collector/codex-identity-launcher.sh.example`, rendered with an absolute target, is accepted;
+    asdf's env-bash shim running `asdf` by name is refused when that command cannot resolve on the blind PATH.
+    The helper retains the existing env/interpreter and standalone `env -S` subset; it does not implement
+    GNU env's full option, quoting or expansion grammar. A failed child's last stderr lines go to the console,
+    not the record.
     A probe that fails is named in the refusal (`PathUnmeasured`), and non-UTF-8 profile output is read leniently
     (R2-4). The unit suites pin the measured PATH, so they do not depend on the host's (R2-3).
 
@@ -1494,6 +1616,19 @@ What remains and how it is handled:
   lower bound: it reads only the command text. Known gaps include a path a program computes (a
   `python3 -c` that joins path parts, a glob, a variable set in an earlier command) and anything a command
   reads indirectly (a script's own reads, a config file it loads, a symlink under the repository).
+  **PR #216 port, 2026-10-03.** These are the lows from the independent review of #206 at `891ab70f`.
+  The broad quoted-`'://'` and regex-anchor exemptions from `3f456ec286` are dropped: the full
+  `blind_audit` regression cases keep constructed reads such as `'://'[1:]+'etc/passwd'` and
+  `'/etc/passwd$)'[:-2]` flagged. Two exact wave-20260924 shapes remain a disclosed residual:
+  `print(ref, 'EXTERNAL' if '://' in ref else ref)` and
+  `rg --files tests | rg '(test_adaptive_paper_(recovery|safety)\\.py$|/runner.py$)'`.
+  In the wave-20260924 re-record these shapes voided 2 of 32 Codex layers, and both passed on rerun with
+  the same code. No broader literal exemption is adopted without a deterministic check that preserves
+  every must-flag case at both audit call sites. The old hold has lapsed: only wave 20260922 is registered
+  in `layer-verdict-waves.json` and sealed in `evidence/artifacts/layer-verdicts-20260922`; #372 moved
+  `lane-prompt.md` from `9b8a8364` to `d3ef2cc0`, and #505 moved `codex_lane.py` from
+  `a4bd8f47` to `5662227f`. Main's existing provenance entries stay unchanged; this port registers
+  its final bytes rather than #216's unlanded hashes.
 - **Claude family (lane and adjudication):** its agents run Read, Glob and Grep only, and those have no path
   limit, so `transcript_audit.py` audits what they opened in the workflow run's transcripts, which Claude Code
   keeps at `~/.claude/projects/<export slug>/<session>/subagents/workflows/<run id>/agent-*.jsonl` (`transcript_audit.py
