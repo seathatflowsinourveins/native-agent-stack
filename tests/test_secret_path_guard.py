@@ -3293,21 +3293,24 @@ K4_CASES = {
 
 # Frozen policy rows, independent of the production allowlist. Every allowed
 # host/port has method/path/query neighbors. These are synthetic policy tests.
+# 21128 (the new WSL distribution's gateway, 2026-10-03, wave-2 custody ruling
+# change 11) takes 20128's rows; 21129 (its live-dashboard WebSocket) none.
 K4_GATEWAY_ROWS = [
-    ('GET', '/api/health', (20128, 20129), None, False),
-    ('GET', '/api/settings/compression', (20128, 20129), None, False),
-    ('GET', '/api/context/combos', (20128, 20129), None, False),
-    ('GET', '/api/model-capability-overrides', (20128, 20129), None, False),
-    ('GET', '/api/resilience', (20128, 20129), None, False),
-    ('GET', '/api/settings/feature-flags', (20128, 20129), None, False),
-    ('GET', '/api/cache', (20128, 20129), None, False),
-    ('GET', '/api/analytics/compression', (20128, 20129), 'since=all', False),
-    ('GET', '/api/usage/call-logs', (20128, 20129), 'limit=5&offset=0', False),
-    ('GET', '/api/usage/call-logs/fixture-1', (20128, 20129), None, False),
-    ('GET', '/api/usage/provider-limits', (20128,), None, True),
-    ('POST', '/api/usage/provider-limits', (20128,), None, True),
+    ('GET', '/api/health', (20128, 20129, 21128), None, False),
+    ('GET', '/api/settings/compression', (20128, 20129, 21128), None, False),
+    ('GET', '/api/context/combos', (20128, 20129, 21128), None, False),
+    ('GET', '/api/model-capability-overrides', (20128, 20129, 21128), None, False),
+    ('GET', '/api/resilience', (20128, 20129, 21128), None, False),
+    ('GET', '/api/settings/feature-flags', (20128, 20129, 21128), None, False),
+    ('GET', '/api/cache', (20128, 20129, 21128), None, False),
+    ('GET', '/api/analytics/compression', (20128, 20129, 21128), 'since=all', False),
+    ('GET', '/api/usage/call-logs', (20128, 20129, 21128), 'limit=5&offset=0', False),
+    ('GET', '/api/usage/call-logs/fixture-1', (20128, 20129, 21128), None, False),
+    ('GET', '/api/usage/provider-limits', (20128, 21128), None, True),
+    ('POST', '/api/usage/provider-limits', (20128, 21128), None, True),
     ('POST', '/api/compression/preview', (20129,), None, False),
 ]
+K4_GATEWAY_PORTS = {20128, 20129, 21128, 21129}
 for method, path, ports, query, body_free in K4_GATEWAY_ROWS:
     for host in ('127.0.0.1', 'localhost', '[::1]', '10.0.2.2', 'host.docker.internal'):
         for port in ports:
@@ -3326,7 +3329,7 @@ for method, path, ports, query, body_free in K4_GATEWAY_ROWS:
                 K4_CASES['gateway_matrix'].append((f'curl -X {method} {shlex.quote(target + "?" + query)}', None))
             if body_free:
                 K4_CASES['gateway_matrix'].append((safe + " -d ''", 'gateway_credential_route'))
-        for port in {20128, 20129} - set(ports):
+        for port in K4_GATEWAY_PORTS - set(ports):
             K4_CASES['gateway_matrix'].append((f'curl -X {method} http://{host}:{port}{path}', 'gateway_credential_route'))
 for suffix in ('?limit=', '?limit=123456', '?limit=-1', '?limit=+1', '?limit=1&limit=2',
                '?limit=5&', '?x=1', '?offset=1&&limit=2', '?', '/a_b', '/' + 'a' * 65, '/a/b'):
@@ -3623,6 +3626,21 @@ k4_extend("gateway_effective_requests", [
     ("python3 - <<'PY'\nimport requests\nrequests.post('http://127.0.0.1:20128/api/settings', json={})\nPY", "gateway_credential_route"),
     ("python3 - <<'PY'\nurl = 'http://127.0.0.1:20128/api/health'\nPY", "gateway_credential_route"),
     ("node - <<'JS'\nfetch('http://127.0.0.1:20129/api/compression/preview', {method: 'POST', body: '{}'})\nJS", None),
+    # The new WSL distribution's gateway (21128) and its WebSocket port (21129): the route that returns decrypted pooled
+    # tokens (/api/providers/client, wave-2 gateway ruling change 7) refuses on every form, interpreter code included,
+    # whose only anchor is the 2112 port; /v1 is not a management route.
+    ("curl -s http://127.0.0.1:21128/api/providers/client", "gateway_credential_route"),
+    ("curl -s http://127.0.0.1:21128/api/health", None),
+    ("curl -X POST http://127.0.0.1:21128/api/usage/provider-limits", None),
+    ("curl -X POST http://127.0.0.1:21128/api/compression/preview -d '{}'", "gateway_credential_route"),
+    ("curl -s http://127.0.0.1:21129/api/health", "gateway_credential_route"),
+    ("curl -s http://localhost:21128/v1/models", None),
+    ("wget -qO- http://127.0.0.1:21128/api/providers/client", "gateway_credential_route"),
+    ("xh :21128/api/providers/client", "gateway_credential_route"),
+    ("http POST :21128/api/usage/provider-limits", None),
+    ("node -p \"fetch('http://127.0.0.1:21128/api/providers/client')\"", "gateway_credential_route"),
+    ("python3 - <<'PY'\nurl = 'http://127.0.0.1:21128/api/providers/client'\nPY", "gateway_credential_route"),
+    ("python3 - <<'PY'\nimport requests\nrequests.get('http://127.0.0.1:21128/api/health')\nPY", None),
 ])
 k4_extend("manager_environment", [
     ("systemctl --user import-environment GH_TOKEN", "secret_variable_reference"),
