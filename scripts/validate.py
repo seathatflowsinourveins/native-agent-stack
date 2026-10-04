@@ -28,10 +28,11 @@ PRIVATE_CONTENT = (
     ("local companion task handle", re.compile(r"task-[a-z0-9]{8}-[a-z0-9]{6}", re.I)),
     ("personal home path", re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)")),
     ("Windows user path", re.compile(r"(?:[A-Za-z]:[/\\]+|/mnt/[A-Za-z]/)Users[/\\]+(?!example(?:[/\\]|\b))[A-Za-z0-9_.-]+", re.I)),
-    # Claude project and scratchpad directories encode path separators as dashes.
+    # Claude project and scratchpad directories encode path separators as dashes,
+    # including bare homes and Windows profiles reached through WSL mounts.
     ("encoded home path", re.compile(
-        r"(?<![\w-])(?:-(?:home|Users)-|[A-Za-z]--Users-)"
-        r"(?!example-)[A-Za-z0-9_.]+-")),
+        r"(?<![\w-])(?:-(?:home|Users)-|[A-Za-z]--Users-|-mnt-[A-Za-z]-Users-)"
+        r"(?!example(?:-|[/\\\"'\s`)\]]|$))[A-Za-z0-9_.]+(?:-|(?=[/\\\"'\s`)\]]|$))")),
     ("Hugging Face token", re.compile(r"\bhf_[A-Za-z0-9]{20,}\b")),
     ("GitHub token", re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})\b")),
     ("Tavily token", re.compile(r"\btvly-(?:(?:prod|dev)-)?[A-Za-z0-9_-]{24,}\b")),

@@ -171,6 +171,10 @@ class PublicationValidationTests(unittest.TestCase):
             "/tmp/claude-1000/" + "-".join(("", "home", "alice", "code", "proj")) + "/<id>/scratchpad/",
             "~/.claude/projects/" + "-".join(("", "Users", "bob", "src", "app")) + "/",
             "-".join(("C", "", "Users", "carol", "repo")),
+            "/tmp/claude-1000/" + "-".join(("", "home", "alice")) + "/<id>/",
+            "~/.claude/projects/" + "-".join(("", "Users", "bob")) + "/",
+            '"' + "-".join(("C", "", "Users", "carol")) + '"',
+            "~/.claude/projects/" + "-".join(("", "mnt", "c", "Users", "carol", "repo")) + "/",
         )
         for index, content in enumerate(paths):
             with self.subTest(form=index):
@@ -505,6 +509,51 @@ class PublicationValidationTests(unittest.TestCase):
 
 
 class EncodedHomePathTests(unittest.TestCase):
+    def test_bare_homes_and_name_characters_match(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        for parts in (("", "home"), ("", "Users"), ("C", "", "Users")):
+            for name in ("alice", "john.doe", "john-doe", "user99", "j_doe", "example.person"):
+                slug = "-".join((*parts, name))
+                for suffix in ("/", "\\", '"', "'", " ", "\t", "\n", "`", ")", "]", ""):
+                    with self.subTest(root=parts, name=name, suffix=suffix):
+                        self.assertIsNotNone(pattern.search(slug + suffix))
+
+    def test_wsl_profiles_and_name_characters_match(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        for drive in ("c", "C", "d", "Z"):
+            for name in ("alice", "john.doe", "john-doe", "user99", "j_doe", "example.person"):
+                slug = "-".join(("", "mnt", drive, "Users", name))
+                for suffix in ("-repo/", "/", "\\", '"', " ", "]", ""):
+                    with self.subTest(drive=drive, name=name, suffix=suffix):
+                        self.assertIsNotNone(pattern.search("~/.claude/projects/" + slug + suffix))
+
+    def test_bare_home_and_wsl_placeholders_and_invalid_forms_do_not_match(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        roots = (("", "home"), ("", "Users"), ("C", "", "Users"), ("", "mnt", "c", "Users"))
+        for parts in roots:
+            for name in ("<user>", "example", ""):
+                slug = "-".join((*parts, name))
+                for suffix in ("-repo/", "/", "\\", '"', "'", " ", "\t", "\n", "`", ")", "]", ""):
+                    with self.subTest(root=parts, name=name, suffix=suffix):
+                        self.assertIsNone(pattern.search(slug + suffix))
+            for name in ("alice", "john.doe", "user99", "j_doe"):
+                slug = "-".join((*parts, name))
+                for suffix in (":", "=", "@", ">", "(", "{", ",", ";"):
+                    with self.subTest(root=parts, name=name, invalid_suffix=suffix):
+                        self.assertIsNone(pattern.search(slug + suffix))
+        for drive in ("", "cd", "1", "_"):
+            with self.subTest(invalid_drive=drive):
+                self.assertIsNone(pattern.search("-".join(("", "mnt", drive, "Users", "alice", "repo"))))
+
+    def test_example_prefix_names_keep_existing_matches(self):
+        # Only the complete example placeholder is exempt; punctuation in a
+        # real name must not make an existing match disappear.
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        for parts in (("", "home"), ("", "Users"), ("C", "", "Users")):
+            for name in ("example.person", "example99", "example_user", "examples"):
+                with self.subTest(root=parts, name=name):
+                    self.assertIsNotNone(pattern.search("-".join((*parts, name, "repo"))))
+
     def test_posix_and_windows_forms_match(self):
         pattern = dict(PRIVATE_CONTENT)["encoded home path"]
         paths = (
@@ -532,6 +581,11 @@ class EncodedHomePathTests(unittest.TestCase):
             "-".join(("", "home", "alice", "code")),
             "-".join(("", "Users", "bob", "src")),
             "-".join(("C", "", "Users", "carol", "repo")),
+            "-".join(("", "home", "alice")),
+            "-".join(("", "Users", "bob")),
+            "-".join(("C", "", "Users", "carol")),
+            "-".join(("", "mnt", "c", "Users", "carol", "repo")),
+            "-".join(("", "mnt", "c", "Users", "carol")),
         )
         for index, content in enumerate(paths):
             for prefix in ("a", "Z", "0", "_", "-", "é", "９"):

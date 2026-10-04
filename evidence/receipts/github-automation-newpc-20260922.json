@@ -4,7 +4,7 @@
   "kind": "native_cli_e2e",
   "recorded_at_utc": "2026-09-22T00:00:00Z",
   "component_ids": ["codex", "claude-code"],
-  "claim": "The new-machine handbook (adoption/bootstrap.md, adoption/platforms/*.md), the three native client config templates and tools/adoption/render_config.py were built and locally verified on this Linux/WSL2 host: render_config.py --check reproduced this host's live ~/.claude/settings.json, ~/.codex/config.toml and agent-lab/.codex/config.toml byte-for-byte from the templates plus this host's own gitignored adoption/hosts/wsl-seath.json values, and the new unit tests plus every existing repository validator pass against the three new catalogs/foundation/decisions.json rows. Hosted GitHub Actions execution for the new-pc-bootstrap-ci decision is explicitly pending, not claimed here.",
+  "claim": "The new-machine handbook (adoption/bootstrap.md, adoption/platforms/*.md), the three native client config templates and tools/adoption/render_config.py were built and locally verified on this Linux/WSL2 host: render_config.py --check reproduced this host's live ~/.claude/settings.json, ~/.codex/config.toml and agent-lab/.codex/config.toml byte-for-byte from the templates plus this host's own gitignored adoption/hosts/wsl-<user>.json values, and the new unit tests plus every existing repository validator pass against the three new catalogs/foundation/decisions.json rows. Hosted GitHub Actions execution for the new-pc-bootstrap-ci decision is explicitly pending, not claimed here.",
   "limitations": [
     "Byte-identical --check is native evidence for this one host's three live files only; a different host still needs its own adoption/hosts/<host>.json and its own --check run.",
     "adoption/platforms/macos-arm64.md is drafted, not accepted: no command on that page has run on macOS.",
@@ -15,10 +15,10 @@
   ],
   "data": {
     "render_check": {
-      "command": "python3 tools/adoption/render_config.py --host wsl-seath --check --live-codex-project <agent-lab checkout>/.codex/config.toml",
+      "command": "python3 tools/adoption/render_config.py --host wsl-<user> --check --live-codex-project <agent-lab checkout>/.codex/config.toml",
       "exit_code": 0,
       "result": "settings.json, codex.config.toml and project.codex.config.toml all reported byte-identical to their live files",
-      "host_value_file": "adoption/hosts/wsl-seath.json (gitignored; not published; matches adoption/hosts/example.json's key set with this host's real values)"
+      "host_value_file": "adoption/hosts/wsl-<user>.json (gitignored; not published; matches adoption/hosts/example.json's key set with this host's real values)"
     },
     "diff_outcome": "byte_identical",
     "diff_outcome_note": "No JSON-formatting-only fallback was needed; the rendered and live bytes matched exactly for all three files.",

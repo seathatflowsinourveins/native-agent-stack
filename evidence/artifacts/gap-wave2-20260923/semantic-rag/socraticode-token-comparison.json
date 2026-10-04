@@ -97,7 +97,7 @@
     "Model defaulted to the account's aliased Opus model rather than a pinned model id; --effort low was passed explicitly per the unit's constraint, but model choice itself was not controlled beyond that.",
     "ccusage's account-wide aggregation could not isolate these 6 calls from concurrent activity on the shared account, so per-call `usage` JSON (a different, session-scoped evidence source) was used instead; this is noted as a deviation from the suggested ccusage-based approach, with the reason recorded.",
     "Did not test whether forcing tool use (e.g. via a system-prompt instruction to always use codebase_search) would change the picture; this receipt characterizes default model behavior only.",
-    "Publication redaction 2026-10-04: the six runs/*.stdout copies replace only the username in encoded home paths with <user>; raw_artifacts hashes name the redacted publication bytes. Recorded results and usage are unchanged; no execution was repeated."
+    "Publication redaction 2026-10-04: the six runs/*.stdout copies replace only the username in encoded home paths with <user>; those six raw_artifacts sha256 values name the redacted publication bytes. Scope correction 2026-10-04: run_arm.sh retains its historical file-as-run sha256 and its separate published_sha256, verified against the published helper. Recorded results and usage are unchanged; no execution was repeated."
   ],
   "raw_artifacts": [
     {
