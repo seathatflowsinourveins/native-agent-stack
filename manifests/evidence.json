@@ -9114,8 +9114,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/README.md",
-      "sha256": "6be47a55ac64a27af537f2c62b0b2c1db63b2b230a64a87397793b21963c3860",
-      "bytes": 24370
+      "sha256": "0bf3b7616957aa090b6c67552b82847604e976fa21b3c37af5d2b89ac676d92c",
+      "bytes": 24591
     },
     {
       "path": "blueprints/native-skill-practice/p1/l_nli_provider.py",
@@ -9134,8 +9134,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/p1_freeze.py",
-      "sha256": "d3c956d53e425c4181b56096e0beada211977e17fe18c35df9aa1761d7abd620",
-      "bytes": 17241
+      "sha256": "6e2e2e70387b655e7992f95b3dde0cd7bef3345c30e13e9f7376a78750e79ed6",
+      "bytes": 20783
     },
     {
       "path": "blueprints/native-skill-practice/p1/p1_scoring.py",
@@ -32074,7 +32074,7 @@
     },
     {
       "path": "evidence/artifacts/jev-p1-20261003/freeze-manifest.draft.json",
-      "sha256": "3ef7651e04956a342e141ddeddc4cf96678ed35d3c0ebb59db1c7c2b560e854a",
+      "sha256": "c764914b991b68e06309843e7f5bea488932e6d9d610a8bb79bdebd4db47bd6d",
       "bytes": 5824
     },
     {
@@ -50749,8 +50749,8 @@
     },
     {
       "path": "tests/test_jev_p1_casepack.py",
-      "sha256": "3d3ed14ef8c48bba3c92102a88e7d95525a046085aaf1216111cb5f436bc705d",
-      "bytes": 57254
+      "sha256": "96ef791ef1707977e9b8a2c2507f0e22cedf190a23240794d416a1544a5ac1ec",
+      "bytes": 67450
     },
     {
       "path": "tests/test_jev_p1_scoring.py",
