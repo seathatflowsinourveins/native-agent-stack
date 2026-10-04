@@ -205,7 +205,7 @@ hold:
 The narrowing takes effect only when this record merges, and the owner may reject it. The
 SWE-bench mode reads no issue text and needs no narrowing.
 
-### Resolver-mode amendment (proposed 2026-09-28, pending the owner's decision)
+### Resolver-mode amendment (proposed 2026-09-28; decided 2026-10-04: option 1 with trusted pre-push enforcement)
 
 Independent review of the resolver's stage 2 found that resolver mode does not meet conditions 2
 and 3 as written (`blueprints/runtime-workers/openhands/RESOLVER.md`, "The push runs the model's
@@ -224,10 +224,13 @@ and none uses a secret other than `GITHUB_TOKEN`. No workflow uses `pull_request
 `workflow_run`, and the only jobs with a write scope among the 11 skip `pull_request`. Check
 results on `openhands/*` are model-controlled and are not evidence.
 
-The owner decides between two options:
+The owner was asked to decide between two options. Option 1 was chosen on 2026-10-04 with the
+refinement in "Decision" below; option 2 stays recorded as the alternative and the overturn
+target.
 1. **Accept CI execution** for resolver mode within those bounds, re-checked whenever a workflow
-   changes, and accept the final message as a second, guarded output. The resolver as built
-   needs no code change for this option.
+   changes, and accept the final message as a second, guarded output. As proposed, the resolver
+   as built needed no code change for this option; as decided, it adds the trusted pre-push gate
+   below.
 2. **Push agent branches to an owner fork**, so that PR runs get no secret and a read-only token
    whatever a workflow declares. This is the review's proposal. GitHub states the token and secret
    limits in [Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows),
@@ -245,23 +248,23 @@ The owner decides between two options:
      owner creates or a second account. Which one it is changes the push identity, the fork's
      ruleset and the `--head <holder>:<branch>` value.
    - **A harness change.** The resolver as built pushes to and opens PRs only in this repository.
-     `blueprints/runtime-workers/openhands/resolver/gh_harness.py:44` fixes `REPO`. `op_push`
-     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:241-254`) pushes only to
-     `origin`, and `push` (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:704-709`)
+     `blueprints/runtime-workers/openhands/resolver/gh_harness.py:47` fixes `REPO`. `op_push`
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:244-259`) pushes only to
+     `origin`, and `push` (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:733-762`)
      refuses unless the origin push URL equals `ORIGIN_URL`. `op_pr_create`
-     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:257-259`) and its allowlist
-     entry (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:448`) pass
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:262-264`) and its allowlist
+     entry (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:453`) pass
      `--head <branch>` in this repository. `check_repository`
-     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:627-628`) requires `full_name`
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:632-633`) requires `full_name`
      to equal `REPO`, and `branch_rules`
-     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:684-689`) reads this
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:713-718`) reads this
      repository's rules. The ruleset section above binds only this repository's `openhands/*`
-     refs.
+     refs. (Line numbers as of the 2026-10-04 gate change.)
    - **Before a first run**, option 2 therefore needs a separately reviewed change: a fork remote
      and push-URL check, `gh pr create --head <holder>:<branch>`, the branch-rules lookup and a
      `non_fast_forward` ruleset on the fork, and its own independent review.
    - **Condition 3.** A fork does not change what the PR body publishes. `build_pr_body`
-     (`blueprints/runtime-workers/openhands/resolver.py:547-550`, `:590-592`) includes the final
+     (`blueprints/runtime-workers/openhands/resolver.py:548-551`, `:591-593`) includes the final
      message wherever the branch lives. Under option 2 the owner either accepts the final message
      as a second, guarded output, as in option 1, or has it dropped from the PR body, which is a
      further change to `build_pr_body`.
@@ -269,9 +272,162 @@ The owner decides between two options:
 Neither option blocks CI egress. With a fork, main's `pull_request` workflows still run the pushed
 code on the same GitHub-hosted runners, whose egress is audited, not blocked. Either option can
 add an egress block to the PR jobs that run repository code; that is a workflow change outside the
-resolver PR. Until the owner accepts one option, and for option 2 until its harness change
-has passed its own review and landed, this narrowing does not cover resolver mode's CI execution, and the
-resolver's first live run waits.
+resolver PR.
+
+#### Decision (2026-10-04): option 1, with enforcement before execution in trusted harness code
+
+**Delegation.** The owner delegated the choice to converged practice, in their words: "max quality
+sota convergenced resolution automation workflow at highest quality".
+
+**Proposal, cross-family vote and refinement.** The command center (Claude session
+`wsl-architecture-design`) proposed option 1 with a tripwire: an automated test plus zizmor,
+both inside PR CI. Its convergence sources were GitHub's Actions hardening guidance (`pull_request`
+rather than `pull_request_target`, a least-privilege `GITHUB_TOKEN`), the OpenSSF Scorecard
+Token-Permissions and Dangerous-Workflow checks, and zizmor. A GPT-family consensus job (bounded job
+004, GPT-6.1 Sol at max, read-only) voted **disagree** on sufficiency, while accepting option 1's
+architecture with trusted enforcement before execution. Its reasons, each checked against the
+source named:
+- A check inside PR CI cannot protect against the commit under test. "Any user with write access
+  to your repository has read access to all secrets configured in your repository" ([Secure use
+  reference](https://docs.github.com/en/actions/reference/security/secure-use)), and a
+  same-repository PR gets no fork boundary: secrets are withheld, and the token is read-only, only
+  "when a workflow is triggered from a forked repository" ([Events that trigger
+  workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows),
+  "Workflows in forked repositories"). The push itself already starts `push` workflows: "This
+  includes workflows that are not merged into the default branch" (same page, `push`). So an agent
+  commit that could change a workflow or a checker would run before any CI check judged it. The
+  job labels this timing an inference from the documented trust model; this record adopts it.
+- An explicit `permissions` block sets every scope it omits to none ("If you specify the access
+  for any of these permissions, all of those that are not specified are set to none", [Workflow
+  syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)), but
+  a job-level block can widen it, and a same-repository PR gets no fork downgrade.
+- Scorecard awards its highest Token-Permissions score to read-only top-level permissions with
+  write scopes declared at the run level, and Dangerous-Workflow detects named patterns (untrusted
+  checkout under `pull_request_target`/`workflow_run`, script injection) ([OpenSSF Scorecard
+  checks](https://github.com/ossf/scorecard/blob/main/docs/checks.md)); zizmor's audits detect
+  specified patterns ([zizmor audits](https://docs.zizmor.sh/audits/)). Their documented scope is
+  workflow hygiene, not containment of arbitrary test code.
+
+The command center adopted the refinement. The verdict, with its residual risks and sources, is
+kept outside the repository with the coordinator's bounded-job records; this record restates each
+point it relies on with its own source.
+
+**Chosen.** Option 1: CI executes the agent's commit within the bounds above, and the final
+message stays a second, guarded output (a fenced PR-body section of at most 6,000 characters, as
+built). Enforcement moves before execution, into trusted harness code: the resolver pushes only a
+commit that the trusted pre-push gate (`blueprints/runtime-workers/openhands/resolver/push_gate.py`)
+has passed.
+
+**The gate.** `GhHarness.push` runs `PushGate.check` on the exact agent commit before any push, and
+pushes that commit by name (`<sha>:refs/heads/<branch>`). `GhHarness.run` refuses any push of a
+commit the gate did not pass in that harness, and any push without a gate. The gate diffs the
+commit against its base (`git diff-tree`, renames off, so both names of a rename count) and
+refuses, with no push, a change to:
+- `.github/**`, which holds the workflows, local actions, rulesets, the zizmor pin and the
+  CODEOWNERS file there;
+- a file named `CODEOWNERS` in any location;
+- the resolver's gate and harness code (`resolver/**` and `resolver.py`);
+- the workflow-policy tests: `tests/**.py` files whose text names `.github`;
+- every repository file that a workflow the push or its draft PR can start executes or reads as
+  a gate. The list is derived from the workflow files, not written by hand. A workflow is
+  reachable unless all its triggers are `schedule`, `workflow_dispatch` or
+  `repository_dispatch`; local reusable workflows and local actions it uses are followed. For
+  each `run:` or `script:` text, without its comment lines, the derivation takes the files,
+  directories and dotted modules it names (the patch validator's reviewed tokenizer,
+  `patch_policy.names_in_text`), resolved from the repository root, each `working-directory` and
+  each `cd` target. It adds the test modules, start directories and packages that unittest
+  discovery reaches (Python's documented rules: the default pattern `test*.py`, and since 3.11
+  only subdirectories with `__init__.py`), and the import closure of the gate scripts named
+  (`patch_policy.python_references`). Test modules are protected themselves, but their imports,
+  the code they test, are not.
+
+It also refuses a `run:` or `script:` step that interpolates untrusted event text: an expression
+reading a `github.event` value whose name ends in body, default_branch, email, head_ref, label,
+message, name, page_name, ref or title, or `github.head_ref` (GitHub's [script
+injections](https://docs.github.com/en/actions/concepts/security/script-injections) list). Finally
+it runs the zizmor version that `.github/requirements-ci.txt` pins for CI (1.30.1) on the commit's
+workflows and actions, read from the commit's own blobs. It uses the gate's own flags:
+`--no-config --no-ignores --persona regular --strict-collection` as in CI, plus `--offline`, because
+no token reaches the gate and all five audits below work offline. An excessive-permissions,
+dangerous-triggers, cache-poisoning, artipacked or template-injection finding refuses. A missing
+zizmor, another version, a tool failure or unreadable output fails closed, as does a workflow
+that the gate's text-level reader cannot read with certainty (flow collections, aliases or tags
+around the keys it reads).
+
+**Trusted-copy invariant.** The gate's code and its rules execute from the coordinator's checkout
+of reviewed main, never from the agent's tree or branch. At run time the gate:
+- takes its root only from its own file's location, never from an argument or the environment;
+- refuses when that checkout, its files or a tool path lie inside an agent tree (the attempt's
+  result directory, which holds the agent's workspace and the host clone);
+- requires the gate's three files (`push_gate.py`, `patch_policy.py`, `gh_harness.py`) to equal the
+  trusted commit's blobs, and the trusted commit to be on main's history at the attempt's base;
+- requires the same three files at the base to equal the trusted ones, so a stale gate refuses;
+- records the trusted commit.
+
+`plan_run` checks the location and the files before any container; the push repeats every check
+against the clone. Each check leaves one record per commit: pass or fail, its reason codes, the
+paths that triggered it with their rules, the trusted commit, and zizmor's version and failing
+audits. The record goes into `GhHarness.gates`, beside the write journal, and into the attempt's
+`resolver-outcome.json`. The receipt keeps codes, hashes and counts, and names a path only when
+the base already has it.
+
+**What this change leaves to a separate defence-in-depth PR.** Workflow hardening belongs to a
+separate PR, not this one:
+- `permissions: {}` defaults with job-level grants;
+- `persist-credentials: false` on every checkout;
+- cache policy (`cache-mode`) for jobs that run repository code;
+- runner-label and timeout policy;
+- protected zizmor configuration;
+- a strict tripwire regression test on main.
+
+The tripwire stays a regression check there; it does not stand in for the gate.
+
+**Residual risks** (job 004's list, with GitHub's documentation where it states the behaviour):
+- Test code that CI runs has network access. It can read the checkout and whatever credentials
+  the job holds, and use the network; a `contents: read` token limits writes, not
+  confidentiality. The gate protects the checks, not the code under test. Hardening (credentials
+  not persisted, minimal tokens) narrows this; a credential-free sandbox with egress limits would
+  close it, and until then it is accepted.
+- PR runs can restore caches from the base and default branches, while caches they create are
+  scoped to `refs/pull/.../merge` ([Dependency caching
+  reference](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching),
+  "Restrictions for accessing a cache"). Keep credentials out of caches, and keep privileged
+  consumers from restoring untrusted state.
+- Artifacts, logs and the fenced PR body stay attacker-controlled data for any downstream
+  consumer. No workflow here uses `workflow_run` or `pull_request_target` (Secure use reference,
+  "Mitigating the risks of untrusted code checkout"). The gate refuses a step that interpolates
+  untrusted event text, and a test asserts that no workflow of this repository does.
+- GitHub-hosted runners are ephemeral (Secure use reference, "Hardening for self-hosted
+  runners"); resource use and external network effects remain.
+- The protected list is broad by design. Every `tests/**` file and every file a reachable `run:`
+  step names, such as `scripts/validate.py`, `.gitleaks.toml` and `manifests/evidence.json`, is
+  refused. A resolver task whose owned paths need those files fails at the gate, with no push.
+  Narrowing the list is a reviewed change to the gate on main.
+
+**Evidence** (local integration and synthetic checks, not upstream acceptance or a live run):
+- `tests/test_runtime_worker_openhands_push_gate.py` has fixture repositories, local git, a
+  stand-in zizmor and, when installed at the pin, the real zizmor 1.30.1. Its negative controls:
+  a planted workflow edit is refused before any push argv; so are a CODEOWNERS edit, a
+  gate-script edit and a local-action edit; a benign commit passes; the gate refuses to run from
+  inside the agent tree; an unavailable zizmor fails closed.
+- [evidence/push-gate-fail-first.txt](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt)
+  keeps the tests' failing run at the base, 17 planted defects in the gate code, each failing its
+  test, and a local rehearsal on this repository's own trees with the real zizmor.
+
+**Overturn.** If the pre-push gate cannot be kept immutable to the agent, switch to option 2
+(fork isolation). That happens when the agent can reach the trusted checkout, the gate's files or
+the push credential, when a gate check is bypassed, or when the gate cannot run before every push.
+Before switching, verify that the fork's policy withholds secrets and write tokens from its PR
+runs; a fork still needs safe caches, artifacts and privileged downstream consumers. Reopen the
+list of protected files if a workflow change adds a path the derivation does not read. Reopen the
+zizmor flags if CI's pinned version or flags change.
+
+**First live run.** The narrowing above covers resolver mode's CI execution only on these terms.
+The first live run waits until three things hold: this gate has landed on main, its negative
+controls pass on that main, and the stage gates are recorded (G2, P3 and G5 in
+`stage-gates.json`, and G4's reviewer argv). Run from a checkout of that main
+([RESOLVER.md](../../blueprints/runtime-workers/openhands/RESOLVER.md#live-runbook-first-attempt),
+precondition).
 
 ## GitHub harness (follow-up PR)
 
@@ -415,5 +571,34 @@ its versioned primary sources. Do not weaken or skip the validator's refusal ass
 - docs.github.com events-that-trigger-workflows ("Workflows in forked repositories") and
   pull-requests/reference/forks ("Which repositories can be forked?"), read 2026-10-03 for the
   resolver-mode amendment's option 2.
+- The amendment's decision of 2026-10-04, each page fetched that day (HTTP 200) and quoted above.
+  These are the six sources of the GPT-family job 004, which also cover the command center's
+  proposal (GitHub hardening, Scorecard, zizmor):
+  - [GitHub Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use):
+    write access and secrets, untrusted checkout under `pull_request_target`/`workflow_run`, and
+    hosted runners;
+  - [Workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax):
+    `permissions`, `cache-mode`, `steps[*].run`, `working-directory` and local `uses: ./`;
+  - [Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows):
+    `push` and `pull_request`, and the fork limits;
+  - [Dependency caching reference](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching):
+    cache restrictions and merge-ref scope;
+  - [OpenSSF Scorecard checks](https://github.com/ossf/scorecard/blob/main/docs/checks.md):
+    Token-Permissions and Dangerous-Workflow;
+  - [zizmor audits](https://docs.zizmor.sh/audits/): artipacked, cache-poisoning,
+    dangerous-triggers, excessive-permissions and template-injection, each marked as working
+    offline.
+
+  The gate's own mechanisms add three more: [GitHub Script
+  injections](https://docs.github.com/en/actions/concepts/security/script-injections) (the
+  untrusted-context endings), [Python unittest, "Test
+  Discovery"](https://docs.python.org/3/library/unittest.html#test-discovery) with the installed
+  CPython 3.13.15 `Lib/unittest/loader.py` `_find_test_path`, and the installed zizmor 1.30.1
+  `--help` (`--offline`, `--no-config`, `--no-ignores`, `--collect`, `--no-exit-codes`).
+- Repository, for the gate: `.github/requirements-ci.txt` (the zizmor pin) and
+  `.github/workflows/validate.yml` (CI's zizmor flags and the whole-suite `python3 -m unittest`
+  run). The gate also reuses `blueprints/runtime-workers/openhands/resolver/patch_policy.py`
+  (`names_in_text`, `executable_lines`, `python_references`, `GitTree`) and
+  `tests/test_workflow_hardening.py` (the text-level workflow reading and `runs_whole_suite`).
 - Repository: `docs/decisions/2026-09-25-host-request-lane.md:176-178`,
   `docs/github-automation.md:479-481,493-494`, `.github/tag-ruleset.json` (the JSON shape).

@@ -28,7 +28,8 @@ local composition of cited mechanisms.
 | --- | --- |
 | `resolver.py` | Issue selection, the delimited instruction, branch naming, SOTA sources, PR body, review loop, the stage-2 driver (`ResolverAttempt`, `run`) and CLI |
 | `resolver/patch_policy.py` | Fail-closed patch parser and validator; derives the host-executed set at the base commit; extracts what a patch adds |
-| `resolver/gh_harness.py` | Allowlisted gh and git operations, the child environment, preflight, the base and repository reads, push, and the journal of GitHub writes |
+| `resolver/gh_harness.py` | Allowlisted gh and git operations, the child environment, preflight, the base and repository reads, the gated push of an exact commit, and the journals of GitHub writes and gate records |
+| `resolver/push_gate.py` | The trusted pre-push gate: protected paths derived from the workflows, untrusted-text interpolation, the pinned zizmor, and the trusted-copy checks ([decision](#the-decision-record-amendment-is-decided)) |
 | `resolver/outgoing_guard.py` | Checks every text before it reaches GitHub, including what the pushed patch adds; approves body files by hash |
 | `host.py` | Resolver mode of `run`: resolver preflight, early gates, the pinned clone, `AGENTS.md`, the resolver skill set |
 | `dispatch.py` | `finish_result`'s resolver branch: the export, then the driver |
@@ -36,6 +37,7 @@ local composition of cited mechanisms.
 | `receipt.py` | The receipt's `resolver` section |
 | `skills/resolver/SKILL.md` | The agent-side skill that states the same bounds |
 | `tests/test_runtime_worker_openhands_resolver.py` | Our integration checks and fixtures |
+| `tests/test_runtime_worker_openhands_push_gate.py` | The pre-push gate's checks and negative controls, on fixture repositories and on this repository's workflows |
 
 `resolver/` has no `__init__.py`. `resolver.py` loads each module by file path under
 a unique name, so `import resolver` still finds the driver.
@@ -44,9 +46,14 @@ a unique name, so `import resolver` still finds the driver.
 
 ```
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands_resolver tests.test_runtime_worker_openhands
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands_push_gate
 python3 blueprints/runtime-workers/openhands/resolver.py --help
 python3 blueprints/runtime-workers/openhands/resolver.py run --help
 ```
+
+The gate module's real-zizmor test runs only when `zizmor` on `PATH` is the pinned 1.30.1, and
+its PyYAML cross-check of the workflow reader only when PyYAML is importable (this host's
+`/usr/bin/python3` has it). Both skip with their reason otherwise.
 
 The tests create their private directories under `TMPDIR`. They are local
 integration checks with synthetic fixtures, local git and fake gh, git, gitleaks,
@@ -61,6 +68,12 @@ the same for the repair round after the independent reviews. It holds one failin
 per review item, the documentation check for the text-only items F2 and D3, and nine
 mutations, each of which fails its test. It also keeps the observations behind the
 cited CI facts and the Docker template, and the text of both helper scripts.
+[evidence/push-gate-fail-first.txt](evidence/push-gate-fail-first.txt) does the same
+for the pre-push gate of 2026-10-04. It keeps the gate tests' failing run at the base,
+seventeen planted defects in the gate and harness code, each failing its test, the
+PyYAML cross-check of the workflow reader, and a local rehearsal of the gate on this
+repository's own trees with the real zizmor 1.30.1. The rehearsal ran no resolver, no
+container and no GitHub call.
 
 ## Issue selection
 
@@ -173,8 +186,11 @@ Known limits:
   branch protection. So the harness allows no protection read, and it refuses rules,
   ruleset and protection writes.
 - **Push:** `git remote get-url --push --all origin` must list only this
-  repository. The push resets every inherited credential helper with empty values,
-  then uses gh's own helper for github.com only (gitcredentials(7); gh
+  repository. Then the trusted pre-push gate (`resolver/push_gate.py`) must pass the
+  exact commit, and the push names that commit (`<sha>:refs/heads/<branch>`, never
+  `HEAD`). `run` refuses a push of any commit the gate did not pass in that harness, and
+  any push without a gate. The push resets every inherited credential helper with empty
+  values, then uses gh's own helper for github.com only (gitcredentials(7); gh
   `helper_config.go:36-56`). A local-git test shows the reset and its negative
   control.
 - **pr create:** source review of gh `create.go:283-287`, `833-866` and `1085-1096`
@@ -357,14 +373,19 @@ stay out through `.git/info/exclude`. The driver then:
 7. requires the commit's diff to equal the validated patch byte for byte. A hunk
    that `git apply` placed at an offset refuses here (`commit_patch_mismatch`);
 8. runs `next_branch` again, and reads the rules again if the name changed;
-9. pushes through `GhHarness.push`, then `create_pull_request` opens the draft with
-   one lane label. The driver records the PR number at once, and
+9. runs the trusted pre-push gate on the exact commit (`GhHarness.push`, then
+   `PushGate.check`). A refusal stops at stage `push` with reason `push_gate_refused`,
+   and nothing is pushed. A pass pushes the commit by name; then `create_pull_request`
+   opens the draft with one lane label. The driver records the PR number at once, and
    `confirm_pull_request` reads the PR back.
 
 Each GitHub write (push, `pr_create`, `review`, `pr_comment`) is journaled with its
 operation name and the exit status of gh or git (`GhHarness.writes`). That is the
 response status the driver observes: gh exits non-zero when GitHub answers with an
-error. The HTTP status code itself is not recorded.
+error. The HTTP status code itself is not recorded. Each gate check is journaled per
+commit (`GhHarness.gates`): pass or fail, its reason codes, the paths that triggered a
+failure with their rules, the trusted commit, and zizmor's version and failing audits.
+The attempt's `resolver-outcome.json` keeps these records as `push_gate`.
 
 **Nothing the model wrote runs on the host.** The host runs no test, hook, script or
 build from the workspace or the patch. It uses only git plumbing on host-owned
@@ -405,26 +426,53 @@ So the check results on `openhands/*` are model-controlled: the model can make a
 required check report what it wants. The residuals comment says so, and the driver
 never presents them as evidence that the change is correct. The review also named a
 possible route to a job's `contents: read` token, by writing to `$GITHUB_PATH` before
-the step that sets `GH_TOKEN`. That route was not verified in this round.
+the step that sets `GH_TOKEN`. That route was not verified in this round. Since the
+amendment's decision, the trusted pre-push gate refuses any commit that changes what
+CI runs as a check: workflows, local actions, CODEOWNERS, the workflow-policy tests and
+every file a reachable `run:` step names, imports or discovers. Code under test still
+runs, so the results stay model-controlled.
 
 **The PR body publishes model text.** Besides the validated patch, the body carries
 up to 6000 characters of the agent's final message, fenced and guarded, and the SOTA
 lines that resolve in the base tree.
 
-**The decision record needs a resolver-mode amendment.** Its scoped narrowing lets
-owner issue text reach a model with tools only when "their patch is graded with no
-network" (condition 2) and "a validated patch is the only output" (condition 3).
-Resolver mode meets neither as written: CI runs the patch with network, and the PR
-body publishes the final message. The record's
-[resolver-mode amendment](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md#resolver-mode-amendment-proposed-2026-09-28-pending-the-owners-decision)
-is proposed and waits for the owner's decision between two options: accept CI
-execution within the bounds above, which needs no code change, or push agent
-branches to an owner fork. The fork first needs a separately reviewed change to this
-driver's GitHub harness, which pushes to and opens PRs only in this repository (see
-Residuals). Neither option blocks CI egress, and under either the PR body publishes
-the final message unless `build_pr_body` drops it. Until the owner accepts one, and
-for the fork until that harness change has passed its own review and landed, the first live
-run waits (the live runbook's precondition).
+#### The decision record amendment is decided
+
+The record's scoped narrowing lets owner issue text reach a model with tools only when
+"their patch is graded with no network" (condition 2) and "a validated patch is the only
+output" (condition 3). Resolver mode meets neither as written: CI runs the patch with
+network, and the PR body publishes the final message. The record's
+[resolver-mode amendment](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md#resolver-mode-amendment-proposed-2026-09-28-decided-2026-10-04-option-1-with-trusted-pre-push-enforcement)
+was decided on 2026-10-04. The owner delegated the choice to converged practice. The
+choice is option 1 with trusted pre-push enforcement:
+- CI executes the agent's commit within the bounds above.
+- The final message stays a fenced, guarded PR-body output of at most 6,000 characters,
+  as built.
+- A check inside PR CI does not suffice. Enforcement runs before execution, in trusted
+  harness code: `GhHarness.push` pushes only a commit that `resolver/push_gate.py` has
+  passed.
+
+The command center proposed option 1 with an in-CI tripwire. A GPT-family consensus job
+showed that a check inside PR CI cannot protect against the commit under test, and the
+command center adopted that refinement. The gate:
+- refuses any change to `.github/**`, a `CODEOWNERS` file anywhere, the resolver's own
+  gate and harness code, the workflow-policy tests, and every file a reachable workflow's
+  `run:` steps name, import (for gate scripts), discover or use as a local action. That
+  list is derived from the workflow files by a deterministic reader;
+- refuses a step that interpolates untrusted event text;
+- runs the zizmor version CI pins, with the gate's own flags. Its excessive-permissions,
+  dangerous-triggers, cache-poisoning, artipacked and template-injection findings refuse,
+  and a missing zizmor fails closed;
+- runs only from the reviewed main checkout it sits in, never from inside an agent tree,
+  and records that checkout's commit.
+
+Option 2, an owner fork, stays recorded as the alternative and the overturn target. It
+would still need the separately reviewed harness change in Residuals. Workflow
+hardening (`permissions: {}` defaults, `persist-credentials: false`, cache, runner and
+timeout policy, a protected zizmor configuration and a strict tripwire test) is a
+separate defence-in-depth PR. The first live run waits until this gate has landed, its
+negative controls pass on that main, and the stage gates are recorded (the live
+runbook's precondition).
 
 ### 4. The review loop, after `host.run` returns
 
@@ -452,6 +500,10 @@ That section is built from host-written files only, and each field has a fixed s
 - the branch, PR number and head;
 - the SOTA source counts;
 - each GitHub write's operation and exit status;
+- each pre-push gate record (`push_gate`). It keeps the status, the commit, the base, the
+  trusted commit, the reason codes, zizmor's version and failing audits, and the
+  triggering paths. A path is named only when the base already has it; a path the
+  model chose is only counted;
 - the gates' receipt hashes (stage-gates.json and the P0-P2 probe receipt) and the
   G4-qualified reviewer argv's hash;
 - the containment evidence of plan acceptance A7 (`containment`), as names and
@@ -503,7 +555,8 @@ free branch name.
   committed pin cannot name the commit that adds the skill.
 - The decision record's narrowing conditions 2 and 3 do not hold for resolver mode as
   written. The pushed commit runs in CI with network, and the PR body publishes the
-  final message. The record's amendment is proposed, not accepted.
+  final message. The record's amendment, decided 2026-10-04, accepts both under option 1
+  with the trusted pre-push gate.
 - The brief cites "#425 README Integration note 5" for the rule that execution
   outside the agent container uses network mode `none`. The committed README, the
   merged PR's description and the decision record contain no such numbered note.
@@ -525,19 +578,26 @@ free branch name.
   result.
 - `run` holds the gh login's full scopes for the whole attempt. That is plan section
   3's residual.
-- The owner's decision on the record's resolver-mode amendment is open. The review
-  proposed two mitigations of different kinds:
-  - An egress block in the PR jobs that run repository code. That is a workflow
-    change outside this PR, and either option can add it.
-  - Pushing agent branches to an owner fork (option 2). That changes this PR's own
-    harness, which targets only this repository: `resolver/gh_harness.py` fixes
-    `REPO` (`:44`), pushes only to `origin` (`op_push`, `:241-254`) after checking
-    its push URL (`push`, `:704-709`), opens the PR with `--head <branch>`
-    (`:257-259`, allowlist entry `:448`), and checks this repository's identity and
-    branch rules (`:627-628`, `:684-689`). Before any run, option 2 needs a fork
-    remote and push-URL check, `--head <holder>:<branch>`, the rules lookup and a
-    `non_fast_forward` ruleset on the fork, and its own review. A fork does not stop
-    the PR body publishing the final message; only a change to `build_pr_body` does.
+- The record's resolver-mode amendment is decided (option 1 with the trusted pre-push
+  gate). What it leaves open:
+  - An egress block in the PR jobs that run repository code, and the rest of the
+    workflow hardening, belong to a separate defence-in-depth PR. Until then, code under
+    test runs with network and whatever credentials a job holds, and that residual is
+    accepted.
+  - The gate's protected list is broad by design. All of `tests/**` is protected,
+    because validate.yml runs the whole suite, and so is every file a reachable step
+    names. A task whose owned paths need those files fails at the gate with no push.
+  - The pinned zizmor 1.30.1 predates the `issue_comment` check that its audit
+    documentation dates to 1.31.0. No workflow here uses `issue_comment`.
+  - Option 2, pushing agent branches to an owner fork, stays the overturn target. It
+    changes this PR's own harness, which targets only this repository:
+    `resolver/gh_harness.py` fixes `REPO` (`:44`), pushes only to `origin` (`op_push`)
+    after checking its push URL (`push`), opens the PR with `--head <branch>`
+    (`op_pr_create` and its allowlist entry), and checks this repository's identity and
+    branch rules (`check_repository`, `branch_rules`). Before any run, option 2 needs a
+    fork remote and push-URL check, `--head <holder>:<branch>`, the rules lookup and a
+    `non_fast_forward` ruleset on the fork, and its own review. A fork does not stop the
+    PR body publishing the final message; only a change to `build_pr_body` does.
 - A7's environment listing reads `Config.Env`, the environment Docker starts the server
   with. A variable that the model's terminal exports later is not in it. The listing
   has not run against the live image. The proxy log is split from the probe's traffic
@@ -546,16 +606,21 @@ free branch name.
 
 ### Live runbook (first attempt)
 
-These are the coordinator's commands, in order. Run them from a checkout of the
-branch to be exercised, with `RECIPE` set to its
-`blueprints/runtime-workers/openhands` directory. Every variable holds a path or a
-name, never a credential.
+These are the coordinator's commands, in order. Run them from a clean checkout of
+main that contains the merged pre-push gate, with `RECIPE` set to its
+`blueprints/runtime-workers/openhands` directory. The gate refuses to run from a
+checkout off main's history, from one whose gate files differ from main's at the
+attempt's base, and from inside an attempt's result directory. Every variable holds a
+path or a name, never a credential.
 
 ```sh
-# Precondition: the owner has accepted one option of the decision record's resolver-mode amendment
-# (docs/decisions/2026-09-28-openhands-resolver-isolation.md). Until then, stop here. Option 2 (an owner
-# fork) also needs its separately reviewed harness change first, because this driver pushes and opens
-# PRs only in this repository (Residuals). Until that change has passed its own review and landed, stop here too.
+# Precondition (decision record amendment, decided 2026-10-04: option 1 with trusted pre-push enforcement,
+# docs/decisions/2026-09-28-openhands-resolver-isolation.md). Stop here until all three hold:
+#   (a) the trusted pre-push gate (resolver/push_gate.py) has landed on main and this checkout is that main;
+#   (b) its negative controls pass on that main: tests.test_runtime_worker_openhands_push_gate, with the
+#       pinned zizmor on PATH so its real-zizmor test runs rather than skips;
+#   (c) the stage gates are recorded (steps 2-6 below: G2, P3, G5 and G4 in stage-gates.json).
+# Option 2 (an owner fork) is only the overturn target; it would need its own reviewed harness change (Residuals).
 export PATH="$HOME/.local/share/codex-ecosystem/tools/docker-rootless-29.8.1/bin:$HOME/.local/share/codex-ecosystem/tools/skills-1.7.0/bin:$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:$HOME/.local/share/codex-ecosystem/bin:$PATH"
 RECIPE="$PWD/blueprints/runtime-workers/openhands"
 PREFIX="$HOME/.local/share/codex-ecosystem/tools/openhands-1.49.6"
@@ -564,8 +629,13 @@ export OPENHANDS_HOST_FILE=<private 0600 host file from config/host.example.json
 export OPENHANDS_STACK_ROOT="$PWD"
 IMAGE=$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["image"]["ref"])' "$RECIPE/pins.json")
 PROXY=$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["gateway_proxy"]["ref"])' "$RECIPE/pins.json")
-# 0. The driver checkout's HEAD must be a commit on GitHub (the resolver skill pin): main, or the pushed PR branch.
-gh api "repos/seathatflowsinourveins/native-agent-stack/commits/$(git rev-parse HEAD)" --jq .sha
+# 0. The driver checkout's HEAD must be a commit on main's history on GitHub (the resolver skill pin and the gate's
+#    trusted copy), with no local change to the gate's files; then the gate's negative controls on this checkout,
+#    and the zizmor version CI pins (.github/requirements-ci.txt).
+gh api "repos/seathatflowsinourveins/native-agent-stack/compare/$(git rev-parse HEAD)...main" --jq '.status, .behind_by'
+git diff --quiet HEAD -- blueprints/runtime-workers/openhands/resolver/ && echo "gate files unmodified"
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands_push_gate
+ZIZMOR=$(command -v zizmor); "$ZIZMOR" --version; grep -E '^zizmor==' .github/requirements-ci.txt
 # 1. Install: SDK venv, both pinned images pulled by digest and checked, grader. install runs the SWE-bench
 #    preflight, so the host file is the full template.
 PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/host.py" install --prefix "$PREFIX" --state "$STATE"
@@ -601,9 +671,12 @@ REVIEWER="$HOME/.local/bin/claude -p --safe-mode --tools '' --strict-mcp-config 
 python3 -c 'import hashlib, shlex, sys; print(hashlib.sha256(b"".join(a.encode() + b"\0" for a in shlex.split(sys.argv[1]))).hexdigest())' "$REVIEWER"
 # 7. Dry run: every read-only step; prints the plan (base, branch, rules, gates, skill pin, the installer's
 #    dry-run status per skill, instruction hash). It needs skills and node on PATH, as the real run does.
-PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/resolver.py" run --issue <N> --owned-path <path> --task "<task>" --lane lane:foundation --arm control --dry-run
-# 8. The real run (a background task: the checks wait alone is bounded at 60 minutes).
-PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/resolver.py" run --issue <N> --owned-path <path> --task "<task>" --lane lane:foundation --arm control --reviewer-command "$REVIEWER"
+#    The plan also records the gate's trusted commit (push_gate_trusted_commit); a refusal there names the gate check.
+PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/resolver.py" run --issue <N> --owned-path <path> --task "<task>" --lane lane:foundation --arm control --zizmor "$ZIZMOR" --dry-run
+# 8. The real run (a background task: the checks wait alone is bounded at 60 minutes). Before its push, the trusted
+#    gate checks the exact commit; a refusal stops at stage push with push_gate_refused, and resolver-outcome.json
+#    keeps the gate record (the paths that triggered it, the trusted commit, zizmor's result).
+PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/resolver.py" run --issue <N> --owned-path <path> --task "<task>" --lane lane:foundation --arm control --zizmor "$ZIZMOR" --reviewer-command "$REVIEWER"
 # 9. A7 triage, private: the receipt's resolver.containment has env_names.forbidden (must be empty) and the proxy
 #    log's counts. List the agent-side request lines that are no allowlisted route, triage each, and never publish
 #    them: the model chose them.

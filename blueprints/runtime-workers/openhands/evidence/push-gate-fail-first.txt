@@ -1,0 +1,184 @@
+OpenHands resolver: the trusted pre-push gate's failing-first runs, planted defects, reader cross-check
+and local rehearsal (decision record amendment of 2026-10-04, option 1 with trusted pre-push
+enforcement; docs/decisions/2026-09-28-openhands-resolver-isolation.md).
+
+Evidence classes (docs/acceptance-evidence-policy.md): local integration checks and synthetic
+fixtures. None of this is upstream acceptance, a live resolver run, a container, a model call or a
+GitHub write. The rehearsal in part 4 runs only the gate, on local clones.
+
+Host tools: CPython 3.13.15 runs the tests; /usr/bin/python3 3.12.3 with PyYAML 6.0.1 runs only
+the reader cross-check of part 3; git 2.43.0; zizmor 1.30.1, the version that
+.github/requirements-ci.txt pins for CI. Every run used TMPDIR=/var/tmp/489-gate,
+PYTHONDONTWRITEBYTECODE=1 and nice -n 19. Paths below are repository-relative or <scratch>.
+
+
+1. Failing first at the base, 2026-10-04T03:44:48Z
+
+Base: 456f8fee6e6825aaff574bc65eaa70e9da9655e8, this PR's head before the change. Method: a
+`git archive` of the base, extracted into <scratch> and committed there in a throwaway repository,
+so that the tests that read HEAD run. Thirteen force-added, gitignored .jsonl files are absent
+from that commit; no test here reads them. The new tests/test_runtime_worker_openhands_push_gate.py
+and the updated tests/test_runtime_worker_openhands_resolver.py were then copied in.
+
+$ python3 -m unittest tests.test_runtime_worker_openhands_push_gate
+exit 1; Ran 3 tests; FAILED (errors=7)
+Causes: resolver/push_gate.py does not exist (6 FileNotFoundError, loading the module);
+receipt.py has no push_gate_summary (1 AttributeError).
+  ERROR: AttemptPushGateTests.test_a_benign_attempt_pushes_the_gated_commit_and_records_the_pass
+  ERROR: AttemptPushGateTests.test_an_owned_codeowners_change_is_refused_before_the_push
+  ERROR: HarnessPushGateTests (setUpClass)
+  ERROR: PushGateTests (setUpClass)
+  ERROR: ReceiptProjectionTests.test_only_known_repository_paths_and_codes_reach_the_receipt
+  ERROR: RepositoryWorkflowTests (setUpClass)
+  ERROR: WorkflowReaderTests (setUpClass)
+
+$ python3 -m unittest tests.test_runtime_worker_openhands_resolver
+exit 1; Ran 128 tests; FAILED (failures=1, errors=56)
+Each of the 57 traceback blocks ends in the missing gate API:
+- 21: TypeError, ResolverAttempt.__init__() takes no `gate`;
+- 18: SystemExit 2, `run` rejects `--zizmor`;
+- 12: TypeError, GhHarness.__init__() takes no `push_gate`;
+- 5: TypeError, op_push() takes no commit;
+- 1: AssertionError, `run --help` lists no `--zizmor`.
+  ERROR: GhHarnessTests.test_a_gate_record_that_is_not_a_pass_for_the_exact_commit_refuses_the_push [case='fail']
+  ERROR: GhHarnessTests.test_a_gate_record_that_is_not_a_pass_for_the_exact_commit_refuses_the_push [case='another commit']
+  ERROR: GhHarnessTests.test_a_gate_record_that_is_not_a_pass_for_the_exact_commit_refuses_the_push [case='pass with reasons']
+  ERROR: GhHarnessTests.test_a_gate_record_that_is_not_a_pass_for_the_exact_commit_refuses_the_push [case='not a record']
+  ERROR: GhHarnessTests.test_arguments_outside_the_templates_are_refused
+  ERROR: GhHarnessTests.test_denied_operations_are_refused_before_any_subprocess
+  ERROR: GhHarnessTests.test_gh_runs_only_from_an_empty_private_directory
+  ERROR: GhHarnessTests.test_main_rules_are_the_one_new_rules_read_and_protection_stays_refused
+  ERROR: GhHarnessTests.test_operation_builders_emit_the_fixed_templates
+  ERROR: GhHarnessTests.test_preflight_accepts_the_stored_owner_login_and_records_only_classes
+  ERROR: GhHarnessTests.test_preflight_refuses_each_failed_condition_without_echoing_values
+  ERROR: GhHarnessTests.test_push_checks_the_origin_push_url_then_gates_and_pushes_one_refspec
+  ERROR: GhHarnessTests.test_push_helper_chain_resets_inherited_helpers_and_serves_only_github
+  ERROR: GhHarnessTests.test_the_provenance_query_is_the_one_read_only_graphql_template
+  ERROR: GhHarnessTests.test_write_operations_need_an_approving_outgoing_guard
+  ERROR: ResolverAttemptTests.test_a_commit_that_differs_from_the_validated_patch_is_never_pushed
+  ERROR: ResolverAttemptTests.test_a_failed_push_stops_before_the_pull_request
+  ERROR: ResolverAttemptTests.test_a_head_that_moves_as_the_pr_opens_keeps_the_pr_number_and_stops
+  ERROR: ResolverAttemptTests.test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create [reason='pr_view_failed']
+  ERROR: ResolverAttemptTests.test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create [reason='pr_not_draft']
+  ERROR: ResolverAttemptTests.test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create [reason='pr_create_unparseable']
+  ERROR: ResolverAttemptTests.test_an_accepted_patch_becomes_one_ext_commit_with_hooks_off_then_a_draft_pr
+  ERROR: ResolverAttemptTests.test_an_interrupt_inside_the_driver_is_recorded_with_its_writes
+  ERROR: ResolverAttemptTests.test_model_text_that_fails_the_guard_is_refused_before_any_write [reason='session_key']
+  ERROR: ResolverAttemptTests.test_model_text_that_fails_the_guard_is_refused_before_any_write [reason='no_sota_sources']
+  ERROR: ResolverAttemptTests.test_model_text_that_fails_the_guard_is_refused_before_any_write [reason='closing_keyword']
+  ERROR: ResolverAttemptTests.test_model_text_that_fails_the_guard_is_refused_before_any_write [reason='mention']
+  ERROR: ResolverAttemptTests.test_refused_and_empty_patches_write_nothing
+  ERROR: ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write [case='session key']
+  ERROR: ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write [case='host path']
+  ERROR: ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write [case='user name']
+  ERROR: ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write [case='gitleaks finding']
+  ERROR: ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write [case='token shape']
+  ERROR: ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write [case='user name as a new path']
+  ERROR: ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write [case='added line shaped like a header']
+  ERROR: ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write
+  ERROR: ResolverRunTests.test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt [stage='deadline']
+  ERROR: ResolverRunTests.test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt [stage='wait']
+  ERROR: ResolverRunTests.test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt [stage='result']
+  ERROR: ResolverRunTests.test_a_review_loop_that_raises_still_records_the_stop
+  ERROR: ResolverRunTests.test_a_second_attempt_the_same_utc_day_refuses_and_leaves_the_first_receipt_alone
+  ERROR: ResolverRunTests.test_dry_run_performs_every_read_only_step_and_stops_before_any_container_or_write
+  ERROR: ResolverRunTests.test_end_to_end_a_failed_read_back_as_the_pr_opens_records_the_pr_and_exits_5
+  ERROR: ResolverRunTests.test_end_to_end_fake_run_opens_one_draft_pr_reviews_it_once_and_stops
+  ERROR: ResolverRunTests.test_end_to_end_gate_refusal_starts_no_container
+  ERROR: ResolverRunTests.test_end_to_end_head_move_stops_before_the_review
+  ERROR: ResolverRunTests.test_end_to_end_refused_patch_makes_no_github_write
+  ERROR: ResolverRunTests.test_issue_refusal_exits_4_before_any_attempt
+  ERROR: ResolverRunTests.test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify
+  ERROR: Stage2HarnessTests.test_every_github_write_is_journaled_with_its_exit_status
+  ERROR: Stage2HarnessTests.test_harness_reads_base_repository_and_branch_rules_through_its_runner
+  FAIL: CommandLineTests.test_run_takes_the_stage_2_options_and_refuses_without_them
+
+After the change, the same three modules on the working tree that became commits
+00905292de90 and 48831bc65bf5 (2026-10-04T03:51Z):
+$ python3 -m unittest tests.test_runtime_worker_openhands_resolver tests.test_runtime_worker_openhands tests.test_runtime_worker_openhands_push_gate
+exit 0; Ran 280 tests; OK (skipped=1). The skip is the PyYAML cross-check, which this
+interpreter cannot run (part 3). The real-zizmor test ran, because zizmor 1.30.1 is on PATH.
+
+
+2. Planted defects, 2026-10-04T03:50:23Z to 03:51:29Z
+
+Method: the working tree's files, copied into <scratch> and committed in a throwaway repository.
+One textual mutation of the code under test per copy; then only the named tests run. The
+unmutated copy passes the union of those tests (exit 0, OK). Every mutation must fail its tests.
+
+M1  drop the .github rule (push_gate.static_rule): exit 1, failures=3;
+    test_protected_changes_are_refused_with_their_rule, test_a_planted_workflow_commit_is_refused_before_any_push
+M2  drop the CODEOWNERS rule: exit 1, failures=4;
+    test_protected_changes_are_refused_with_their_rule, test_an_owned_codeowners_change_is_refused_before_the_push
+M3  GhHarness.push skips PushGate.check and assumes a pass: exit 1, failures=1;
+    test_a_planted_workflow_commit_is_refused_before_any_push
+M4  GhHarness.run pushes a commit the gate did not pass: exit 1, failures=1;
+    test_the_harness_never_pushes_a_commit_the_gate_did_not_pass
+M5  a missing zizmor passes: exit 1, failures=4; test_an_unavailable_or_wrong_zizmor_fails_closed
+M6  no agent-tree location check in the gate: exit 1, failures=1;
+    test_the_gate_refuses_to_run_from_inside_the_agent_tree
+M7  the harness runs a gate class loaded from inside the agent tree: exit 1, failures=1;
+    test_the_harness_refuses_a_gate_loaded_from_the_agent_tree
+M8  no import closure of the gate scripts: exit 1, failures=1; test_protected_changes_are_refused_with_their_rule
+M9  no unittest discovery: exit 1, failures=2; test_protected_changes_are_refused_with_their_rule
+M10 no local-action rule: exit 1, failures=1; test_protected_changes_are_refused_with_their_rule
+M11 zizmor findings ignored: exit 1, failures=5; test_zizmor_findings_fail_the_gate_only_for_the_five_audits
+M12 untrusted event-text interpolation ignored: exit 1, failures=1;
+    test_untrusted_interpolation_in_a_reachable_workflow_refuses_every_commit
+M13 no blob check of the enforcing files against the trusted commit: exit 1, failures=1;
+    test_a_gate_file_that_differs_from_the_trusted_commit_refuses
+M14 no check that the trusted commit is on main at the base: exit 1, failures=1;
+    test_a_trusted_checkout_off_main_refuses
+M15 no check that the base's enforcing files equal the trusted ones: exit 1, failures=1;
+    test_a_stale_trusted_gate_refuses_when_main_changed_the_gate
+M16 shell comment lines read as names: exit 1, failures=1; test_paths_no_reachable_workflow_executes_pass
+M17 test modules import-traced too: exit 1, failures=2;
+    test_paths_no_reachable_workflow_executes_pass, test_the_derivation_protects_the_ci_gate_files
+Detected 17 of 17.
+
+An earlier run of the same runner, before M17 existed and before 48831bc65bf5 narrowed the
+import tracing, detected 16 of 16. It is superseded by the run above, whose M8 anchor follows
+the narrowed line.
+
+
+3. The workflow reader against PyYAML, 2026-10-04
+
+$ /usr/bin/python3 -m unittest tests.test_runtime_worker_openhands_push_gate.RepositoryWorkflowTests
+exit 0; Ran 3 tests; OK. test_the_reader_matches_pyyaml_on_every_workflow compares, for all 21
+.github/workflows files, every `run`, `script` and `working-directory` value, the local `uses`
+values and the triggers with PyYAML 6.0.1's safe_load. Before the reader's repair, a scratch
+version of that comparison found 11 mismatching files. Seven were refused as unreadable, because
+a key with an empty value was taken for a flow collection (`""[:1] in "{["` is true in Python).
+Four kept the line breaks of `>` folded scalars. The committed reader matches on all 21 files.
+
+
+4. Local rehearsal of the gate on this repository's own trees, 2026-10-04T03:52:28Z to 03:53:19Z
+
+Method: the gate module loaded from this worktree at 48831bc65bf5 (its trusted root), with real
+zizmor 1.30.1. Each case cloned this head with --no-hardlinks, made one planted commit on top, and
+called PushGate.check(clone, base=<this head>, head=<planted commit>). So the base plays main
+after the merge, and the trusted commit equals the base. No resolver, container or GitHub call ran.
+Every record named the trusted commit, and every check took 1.9 to 2.2 seconds. Each record had
+14 reachable workflows, 299 protected files and 5 protected prefixes; the new-test case had 300
+files, its new module included.
+benign docs edit (docs/token-practice.md): pass; zizmor 0 findings
+workflow edit (.github/workflows/validate.yml): fail protected_path [github]
+.github/CODEOWNERS edit: fail protected_path [github]
+root CODEOWNERS added: fail protected_path [codeowners]
+gate script edit (scripts/validate.py): fail protected_path [ci_named]
+gate script helper edit (tools/sota-convergence/gap_crosswalk.py): fail protected_path [ci_named]
+policy test edit (tests/test_workflow_hardening.py): fail protected_path [workflow_policy_test]
+new test module (tests/test_resolver_added.py): fail protected_path [ci_discovered]
+gitleaks policy edit (.gitleaks.toml): fail protected_path [ci_named]
+resolver gate edit (resolver/push_gate.py): fail protected_path [gate_code]
+planted composite action with `${{ github.event.pull_request.title }}` in run (tools/planted/action.yml):
+  fail zizmor_finding [template-injection], zizmor 1 finding
+
+
+5. Probes behind the design, 2026-10-04 (zizmor 1.30.1, flags as in push_gate.ZIZMOR_FLAGS)
+
+A planted composite action outside .github with a template injection gave one finding,
+template-injection (High, High, Regular). It exited 0 with --no-exit-codes and 14 without.
+The repository's .github at the base, extracted from git, gave 0 findings and exit 0. A
+workflow with broken YAML under --strict-collection exited 1 with "fatal: no audit was
+performed", so the gate fails closed on it (zizmor_failed).
