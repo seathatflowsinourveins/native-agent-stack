@@ -4118,8 +4118,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "bcfcb91c7a1bc0ec16eb1223776ff91c8e4311dc2be6a55312ddbf387bc0bc1f",
-      "bytes": 39478
+      "sha256": "dd54caae28434981f9174a695eb5a8ea9f2ad0f3bfe74a063f9238b84e6073bd",
+      "bytes": 55326
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -4188,8 +4188,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "082958cae2045166c365574748138cc61095259e8a19e4237472e38c177887fc",
-      "bytes": 4033
+      "sha256": "2aa11761dcc9be49746a85d2052598cd1970eae8d11025311a0d09ee67ca2e93",
+      "bytes": 4276
     },
     {
       "path": ".gitleaks.toml",
@@ -4488,8 +4488,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "76d66f3cd8df2c86a5c1e523d7bd590bb01c2fc85ac321d418e0413f042ed237",
-      "bytes": 63161
+      "sha256": "fa66c58c9b716f45da8d7962e07cc29d344db869e6d8539d6ad371b2cdf19048",
+      "bytes": 63971
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -15754,8 +15754,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "82695fb0f06eb10ab874ecc1f592b0f8baf4c793547c3b4d52719a5c4c91867f",
-      "bytes": 147084
+      "sha256": "e5cea48794b9181a0fe008105201bc2d8297d6574e5759cff060cb1b335047b2",
+      "bytes": 147418
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -15993,6 +15993,11 @@
       "bytes": 23761
     },
     {
+      "path": "docs/decisions/2026-10-03-macos-ci-scope.md",
+      "sha256": "5af6945bef16c92dcd730b4da9e8b3bf9db34a2207eb4b17c0c3c4ce5133c0be",
+      "bytes": 84655
+    },
+    {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
@@ -16139,8 +16144,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "6b6f18fc90f4252837cb7af82c8d25e97fdaeecfb8003931650bda272258a77a",
-      "bytes": 97961
+      "sha256": "038c4302b3b2bc930fa79d0a52712b40833262d314b7a865140bf8865f09394a",
+      "bytes": 98744
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -34443,6 +34448,131 @@
       "bytes": 32972
     },
     {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/README.md",
+      "sha256": "c5253b45ed54d1011e34015282ed512d1a7c4fa4b712de14792b376d76164220",
+      "bytes": 11928
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/c5wide.txt",
+      "sha256": "9c1b2f766d93e667e088a733d4a3af77b0640a4f293cc53e22d1836cb0b51d7b",
+      "bytes": 1334
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/closure.json",
+      "sha256": "d23ae588ff9678b2e7c0e56f8512b767c1dc0ba34edb5ac13ce350c55cf515e9",
+      "bytes": 4138
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/d1_rows.json",
+      "sha256": "c3d603434af74222e334038a76cf55f9b0ec61037870c14b5166ac2a042b39f1",
+      "bytes": 3778
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/fail_mods.json",
+      "sha256": "f4e6988b8f72e5a31c2c8f409cc21f0b72e687a8dbcf9c066658a0ba3f4f515b",
+      "bytes": 6537
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/files_of.json",
+      "sha256": "e9d76e8c384f66cebfdef8cf095f5cc8e2cb06b7d01b5e18de7c67d943855df4",
+      "bytes": 2926603
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/job_111226811878.json",
+      "sha256": "84b03a7993261f4013feee0a832582d6a60a398a4e864d5b85719b36721fdd2d",
+      "bytes": 3282
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/lists_r2.json",
+      "sha256": "8186d26d047243fc0689091382bf45b8f5f6290a1ef94e2f8efaa869794cb589",
+      "bytes": 23921
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/mac_tests_strict.json",
+      "sha256": "289da3dfb339b85c77961be457f9574152407407848f2d1b5618a54d2c7a52ad",
+      "bytes": 4199
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/macos-ci-evidence.json",
+      "sha256": "2560d0d2e516785fea82941fc6fa2a5d3cfbc59af8f6c78214a88bca02da9e87",
+      "bytes": 31213
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/macos_ci_evidence.py",
+      "sha256": "d49cfea091c31588ec6e0d9fea16515081132df6a3513bd1d7a73d228e1e84bf",
+      "bytes": 4499
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/macos_ci_summary.py",
+      "sha256": "b93c3213e8a32fa1bd719a809265e4316fbb3604ded1f72b9bf1bf1be121946c",
+      "bytes": 1862
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/main_6112.json",
+      "sha256": "23d8c3ac63a4328b685e44c02a0965ab45783f6fb546a732e5248daceb10face",
+      "bytes": 542167
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/modcount.json",
+      "sha256": "b0f1fc1f7568f1969a54bca8a5542be868b07f4fdb9ed8b38370216462edc8db",
+      "bytes": 8747
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/pr_map.json",
+      "sha256": "8d499b66c8582c8172ea1ceb36c65f2964e68db9c8309e7f2f42f759a166e492",
+      "bytes": 349949
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/prs_graphql.jsonl",
+      "sha256": "2de818fa7ff5a828ff90057baded7449786461c25ecc5ad75d8e9582eba92bc9",
+      "bytes": 422744
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/replay-exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/replay-output.txt",
+      "sha256": "6f93c05ad9251552c31914ec8c51212fea8d716e5faba14865f6a9ac044a619f",
+      "bytes": 4924
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/replay.py",
+      "sha256": "3ffb9ab2c8a329971f72c5fa31b0938c824939e94835eac731667551360656d4",
+      "bytes": 13574
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/replay_final.json",
+      "sha256": "db740c8e9736f42d88ea06892a0d7c69b346df10830e717b60dd61ea5920675c",
+      "bytes": 1249
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/replay_r2.json",
+      "sha256": "7bc87e20402e96fd3624b63bc9dfc3b1cd08668cef0222c23471a6c7f23cf21c",
+      "bytes": 711
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/run_pr.json",
+      "sha256": "68f723d33fc74752605b531f111614495b1ee78dddac23eb868ddb4f20c058af",
+      "bytes": 2651
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/runs30.json",
+      "sha256": "ef128445d1b8ac84db1cb9acdc80fc4296ddf8912f25d569ce92f2374638f3f2",
+      "bytes": 6798
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/runs_graphql.json",
+      "sha256": "be20e3aecd835ea8b26565f87d0061280909d002a6a3682feccf3f18daae0c39",
+      "bytes": 2161325
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/sim_r2.json",
+      "sha256": "84eaa304af37193799659f847cc2f24cd0aa70572f01e116ae5efd2555deceb9",
+      "bytes": 783
+    },
+    {
       "path": "evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json",
       "sha256": "c07177bccb5cc2eabaab8910616cce33f2b49fd76f048411a47d3e83fd7c164a",
       "bytes": 20209
@@ -50439,8 +50569,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "8dd9d881d0ae3472eddf91c9be6da13a5ee891983fe70367dce22d798ae3cfb7",
-      "bytes": 228097
+      "sha256": "b4469dcd218a0b691a77b1d69cc0302febe5cdac6398a03ebd5cad59670862d7",
+      "bytes": 228732
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -51279,8 +51409,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "44392072d04e137e45c8d92f99b9f7ce650e75c39446731b016e3150a4c9424d",
-      "bytes": 87539
+      "sha256": "72ef5cefa9352c55d41ece3770050209c273b8675c3459cd531136653e20810e",
+      "bytes": 140273
     },
     {
       "path": "tests/test_workflow_security.py",
