@@ -134,3 +134,38 @@ Overturn this record when:
 - Anthropic ships an official settings schema or a listing command (it replaces S2/S3);
 - amitray007 publishes every version over a sustained window (it becomes the env-var source);
 - OpenAI ships a machine-readable feature or env registry per release.
+
+## Addendum (2026-10-04): the second repair round, after the full read of PR 695
+
+An independent full read at `b4cd191c` (287 tests passing, the negative controls included) found three P2 defects; each is
+closed here.
+
+1. **A report with an unobserved kind counted as fresh** (`scripts/currency_due.py`). `surface_findings()` checked only
+   timestamps, so a watch that lost a source (the Codex binary removed, or its probe failing after the cache was deleted) wrote
+   a report with `coverage.kinds_not_observed` set, exited 0, and the currency run cleared an existing due-file and printed
+   "nothing due". An unobserved kind, or a non-cross-check source with origin `unavailable` or `skipped`, is now
+   `surface watch incomplete` (`SURFACE_PARTIAL`): an incomplete check that keeps the earlier due-file and is never "nothing
+   due"; a malformed `coverage` is unreadable. Nine regression tests fail on the earlier code ("stack currency: nothing due")
+   and pass now; the controls (a complete report still clears, an unavailable cross-check does not matter) stay.
+2. **The persistent catch-up could start the networked watch during a paper session**
+   (`adoption/templates/systemd/upstream-surface-watch.service`). The service now has an `ExecCondition=` that defers the run on
+   weekdays from 09:00 to 16:30 America/New_York (`upstream_surface_watch.py --paper-window-check`); the guide's "Daily run"
+   section gives the reasons and the systemd.service(5) semantics. The window is the US regular session with a margin; the
+   repository has no machine-readable paper-window marker, so this is the one the lane's own market hours define.
+3. **A decision inferred from an unrelated field of the same spelling** (`catalogs/foundation/upstream-surface-dispositions.json`).
+   `history.max_bytes` was "declined" on a citation about the result-carrier metric of a workflow tool, and the generated
+   sentence "off on both hosts although the upstream default is on" had been written for every row the ledger classed
+   covered-declined without reading any default: the released features list and schema contradict it for eight Codex features
+   and for `History.max_bytes` (default null). The sentence is gone (121 rows touched), `history.max_bytes`,
+   `tools.web_search`, its two sub-keys and twelve more rows whose citation named another client's or tool's field are
+   `baseline-unreviewed` or keep `enabled` with the upstream registry as source, the stale locators of `otelHeadersHelper` and
+   `otel.metrics_exporter` are fixed, `plugin_hooks` is `not-applicable` (`Stage::Removed`, rust-v0.160.0
+   `codex-rs/features/src/lib.rs` L1474-L1479), and the command center's four parity decisions of the same day are recorded
+   (`service_tier`, `analytics_plan_history`, `crossSessionInbound`, `advisorModel`). `DispositionCitationTests` now checks the
+   committed catalog against the cited files (the key named in the cited lines, not only in a comment, its parent near a
+   dotted key, its own client near a one-word key) and refuses the unread-default sentence; run against the earlier catalog
+   it fails 127 times.
+
+Residual: whether a cited record is a decision, as opposed to a mention of the key, is still the judged ledger's call; the
+checks above catch a citation that does not name the key for the right client, not a record that names it and decides nothing.
+No deployed unit or scheduled catch-up has been exercised (the templates stay uninstalled).

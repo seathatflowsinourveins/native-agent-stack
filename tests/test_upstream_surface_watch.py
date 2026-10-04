@@ -1598,5 +1598,183 @@ class TestCommittedCatalogs(unittest.TestCase):
             self.assertRegex(entry["fetched_utc"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
 
+# ----------------------------------------------------------------------------------------------- the paper window
+
+
+class PaperWindowTests(unittest.TestCase):
+    """upstream-surface-watch.service defers the networked run inside the paper window (PR 695 review, P2: the persistent
+    catch-up of stack-currency.timer can start it within 15 minutes of WSL starting, during a paper session). Synthetic
+    instants and the unit text: local integration checks, not upstream tests."""
+
+    UNIT = ROOT / "adoption/templates/systemd/upstream-surface-watch.service"
+
+    @staticmethod
+    def at(text: str) -> datetime:
+        return datetime.strptime(text, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+
+    def check(self, *args: str):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = usw.main(["--paper-window-check", *args])
+        return code, out.getvalue(), err.getvalue()
+
+    def test_the_window_is_weekdays_0900_to_1630_new_york_in_summer_and_winter_time(self):
+        cases = (
+            # Monday 2026-10-05, EDT (UTC-4): the window is 13:00Z to 20:30Z, the end exclusive.
+            ("2026-10-05T12:59:59Z", False), ("2026-10-05T13:00:00Z", True),
+            ("2026-10-05T20:29:59Z", True), ("2026-10-05T20:30:00Z", False),
+            # Monday 2026-12-07, EST (UTC-5): 14:00Z to 21:30Z.
+            ("2026-12-07T13:59:59Z", False), ("2026-12-07T14:00:00Z", True),
+            ("2026-12-07T21:29:59Z", True), ("2026-12-07T21:30:00Z", False),
+            # The week-end inside the clock hours, and a Friday.
+            ("2026-10-10T15:00:00Z", False), ("2026-10-11T15:00:00Z", False), ("2026-10-09T15:00:00Z", True),
+            # The UTC date changes inside the window's local day: Monday 18:00 EDT is Tuesday 22:00Z.
+            ("2026-10-06T22:00:00Z", False), ("2026-10-06T02:00:00Z", False),
+        )
+        for text, expected in cases:
+            with self.subTest(at=text):
+                self.assertIs(usw.paper_window_active(self.at(text)), expected)
+
+    def test_the_check_exits_one_inside_zero_outside_and_two_on_a_bad_clock(self):
+        code, out, err = self.check("--now", "2026-10-05T14:00:00Z")
+        self.assertEqual((code, out), (1, ""))
+        self.assertIn("inside the paper window", err)
+        self.assertIn("deferred", err)
+        self.assertEqual(self.check("--now", "2026-10-05T12:00:00Z"), (0, "", ""))
+        code, out, err = self.check("--now", "yesterday")
+        self.assertEqual((code, out), (2, ""))
+        self.assertIn("--now must look like", err)
+        # No mode of the watch runs beside it.
+        for other in ("--network", "--write-baseline", "--cross-check", "--check-dispositions"):
+            with self.subTest(other=other), contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as raised:
+                    usw.main(["--paper-window-check", other])
+                self.assertEqual(raised.exception.code, 2)
+
+    def test_the_check_reads_no_state_and_makes_no_request(self):
+        with mock.patch.object(usw, "run", side_effect=AssertionError("the check must not run the watch")), \
+                mock.patch.object(usw.urllib.request, "urlopen", side_effect=AssertionError("no request")):
+            self.assertEqual(self.check("--now", "2026-10-05T14:00:00Z")[0], 1)
+            self.assertEqual(self.check("--now", "2026-10-10T14:00:00Z")[0], 0)
+
+    def test_a_host_without_a_tz_database_runs_the_watch_instead_of_never_running_it(self):
+        with mock.patch.object(usw, "paper_window_active", side_effect=usw.ZoneInfoNotFoundError("America/New_York")):
+            code, out, err = self.check("--now", "2026-10-05T14:00:00Z")
+        self.assertEqual((code, out), (0, ""))
+        self.assertIn("not deferring", err)
+
+    def test_the_unit_runs_the_check_as_its_exec_condition_before_the_networked_run(self):
+        lines = [line.strip() for line in self.UNIT.read_text(encoding="utf-8").splitlines()
+                 if line.strip() and not line.lstrip().startswith("#")]
+        conditions = [line for line in lines if line.startswith("ExecCondition=")]
+        starts = [line for line in lines if line.startswith("ExecStart=")]
+        self.assertEqual(conditions, ["ExecCondition=/usr/bin/python3 @REPOSITORY@/scripts/upstream_surface_watch.py "
+                                      "--paper-window-check"])
+        self.assertEqual(starts, ["ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/upstream_surface_watch.py --network"])
+        self.assertLess(lines.index(conditions[0]), lines.index(starts[0]))
+        # The header says why, and that systemd skips (not fails) the unit on the condition's exit status 1.
+        text = self.UNIT.read_text(encoding="utf-8")
+        for phrase in ("Persistent=true", "ExecCondition=", "09:00 to 16:30 America/New_York", "not marked as failed"):
+            self.assertIn(phrase, text)
+
+    @unittest.skipUnless(shutil.which("systemd-analyze"), "systemd-analyze is not installed on this host")
+    def test_systemd_analyze_accepts_the_unit(self):
+        with tempfile.TemporaryDirectory(dir=short_temp_base()) as tmp:
+            unit = Path(tmp) / "upstream-surface-watch.service"
+            unit.write_text(self.UNIT.read_text(encoding="utf-8").replace("@REPOSITORY@", str(ROOT)), encoding="utf-8")
+            result = subprocess.run(["systemd-analyze", "verify", str(unit)], capture_output=True, text=True,
+                                    timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+
+# ----------------------------------------------------------------------------------------------- the citations
+
+
+class DispositionCitationTests(unittest.TestCase):
+    """A repository citation of a disposition must name the key, for the same client, in the cited lines (PR 695 review,
+    P2: a decision inferred from an unrelated field of the same spelling, and a default read from no source). Objective
+    checks of the committed catalog against the cited files: local integration checks, not upstream tests."""
+
+    CITATION = re.compile(r"^([\w./@-]+):(\d+)(?:-(\d+))?$")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.rows = json.loads((ROOT / usw.DISPOSITIONS_PATH).read_text(encoding="utf-8"))["rows"]
+        cls.cited = []
+        for row in cls.rows:
+            match = cls.CITATION.match(row["source"])
+            if match:
+                path, first, last = match.group(1), int(match.group(2)), int(match.group(3) or match.group(2))
+                lines = (ROOT / path).read_text(encoding="utf-8", errors="replace").splitlines()
+                cls.cited.append((row, path, first, last, lines))
+
+    @staticmethod
+    def has_token(text: str, token: str) -> bool:
+        return re.search(r"(?<![A-Za-z0-9_])" + re.escape(token) + r"(?![A-Za-z0-9_])", text) is not None
+
+    @staticmethod
+    def names(key: str) -> tuple[str, str]:
+        """(the key's own name, its last dotted part) of surface:kind:name; a trailing .* is dropped."""
+        name = key.split(":", 2)[2].rstrip("*").rstrip(".")
+        return name, name.rsplit(".", 1)[-1]
+
+    def test_the_catalog_has_repository_citations_to_check(self):
+        self.assertGreater(len(self.cited), 100)
+
+    def test_no_row_states_an_upstream_default_that_no_source_gave(self):
+        # The generated sentence "off on both hosts although the upstream default is on" was written for every row the
+        # ledger classed covered-declined; the released Codex features list and schema contradict it (eight features and
+        # History.max_bytes), and no Claude Code default was read either.
+        for row in self.rows:
+            with self.subTest(key=row["key"]):
+                self.assertNotIn("upstream default is on", row["reason"])
+
+    def test_every_cited_line_names_the_key(self):
+        for row, path, first, last, lines in self.cited:
+            with self.subTest(key=row["key"], source=row["source"]):
+                self.assertLessEqual(last, len(lines), "the cited line is beyond the file")
+                name, leaf = self.names(row["key"])
+                hits = [line for line in lines[first - 1:last] if self.has_token(line, leaf) or self.has_token(line, name)]
+                self.assertTrue(hits, f"{path}:{first} does not name {name}: {lines[first - 1].strip()[:90]}")
+                if path.endswith((".toml", ".py", ".sh", ".yaml", ".yml")):
+                    code = [line for line in hits if not line.lstrip().startswith(("#", "//"))]
+                    self.assertTrue(code, f"{path}:{first} names {name} only in a comment")
+
+    def test_a_dotted_key_has_its_parent_near_the_citation(self):
+        for row, path, first, last, lines in self.cited:
+            name, leaf = self.names(row["key"])
+            parts = name.split(".")
+            if len(parts) < 2:
+                continue
+            with self.subTest(key=row["key"], source=row["source"]):
+                parent = parts[-2]
+                near = lines[max(0, first - 4):last + 3]
+                tables = [line for line in lines[:first] if line.lstrip().startswith("[") and self.has_token(line, parent)]
+                self.assertTrue(any(self.has_token(line, parent) for line in near) or tables
+                                or self.has_token(" ".join(lines[first - 1:last]), name),
+                                f"{path}:{first} names {leaf} but not its parent {parent}")
+
+    def test_a_one_word_key_has_its_client_within_twelve_lines_of_the_citation(self):
+        # `language`, `theme`, `permissions`, `skills`, `projects`, `hooks` and the like are spelled the same in Claude Code,
+        # in Codex and in our own tools; the cited lines must be about the client the key belongs to.
+        for row, path, first, last, lines in self.cited:
+            _, leaf = self.names(row["key"])
+            if not re.fullmatch(r"[a-z]{3,12}", leaf):
+                continue
+            with self.subTest(key=row["key"], source=row["source"]):
+                client = "codex" if row["key"].startswith("codex:") else "claude"
+                window = (" ".join(lines[max(0, first - 13):last + 12]) + " " + path).lower()
+                self.assertIn(client, window, f"{path}:{first} is not about {client}")
+
+    def test_a_row_the_review_demoted_is_not_a_decision_again(self):
+        by_key = {row["key"]: row for row in self.rows}
+        for key in ("codex:config:history.max_bytes", "codex:config:tools.web_search", "claude:setting:language",
+                    "codex:config:profile", "codex:config:notify"):
+            with self.subTest(key=key):
+                self.assertEqual(by_key[key]["disposition"], "baseline-unreviewed")
+        self.assertEqual(by_key["codex:feature:plugin_hooks"]["disposition"], "not-applicable")
+        self.assertIn("default null", by_key["codex:config:history.max_bytes"]["reason"])
+
+
 if __name__ == "__main__":
     unittest.main()

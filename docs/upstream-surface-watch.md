@@ -126,13 +126,17 @@ counts. Applying the decision itself (a settings template, a Codex profile) is t
 script's. `scripts/currency_due.py` reads the same file offline and adds `surface_unreviewed` to the session notice
 while the report's data is at most three days old (its `generated_at`, and the fetch time of every source it took
 from the cache, which it re-reads from `coverage.sources`; report-only cross-checks do not count) and neither
-`generated_at` nor `run_at` is more than one hour ahead of its clock. A missing `latest.json` without a watch state
+`generated_at` nor `run_at` is more than one hour ahead of its clock, and only when `coverage.kinds_not_observed` is
+empty and no non-cross-check source in `coverage.sources` has origin `unavailable` or `skipped`. Unobserved kinds or
+unavailable or skipped required or probed sources make the check `surface watch incomplete`; report-only sources
+with `cross_check: true` do not make it incomplete. Malformed kinds or sources coverage is
+`surface watch output unreadable`. A missing `latest.json` without a watch state
 directory is only the coverage note `surface watch not run` (the unit may not be installed on that host). An existing
 watch state directory means observed before: a missing report is `surface watch stale`; an unreadable or non-regular
 report is `surface watch output unreadable`. File-access errors, Unicode errors and JSON parsing `ValueError`s,
-including integer conversion limits, are unreadable records. These and an older or future-dated report are checks
-that could not answer, handled
-as an incomplete skill check is. The earlier due-file stays, and with nothing else due the line says
+including integer conversion limits, are unreadable records. These, incomplete coverage and an older or future-dated
+report are checks that could not answer, handled as an incomplete skill check is. The earlier due-file stays, and
+with nothing else due the line says
 `stack currency: nothing known due, surface watch stale; details: <command>` instead of "nothing due".
 
 ## Dispositions
@@ -170,6 +174,17 @@ sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/system
 systemd-analyze --user verify ~/.config/systemd/user/upstream-surface-watch.service ~/.config/systemd/user/stack-currency.service ~/.config/systemd/user/stack-currency.timer
 systemctl --user daemon-reload
 ```
+
+The paper window. `stack-currency.timer` is `Persistent=true` with `RandomizedDelaySec=15m`, so after a day the host was
+down the catch-up can start the networked watch within 15 minutes of WSL starting, which can be during a paper session.
+`upstream-surface-watch.service` therefore runs `upstream_surface_watch.py --paper-window-check` as its `ExecCondition=`
+before the run. The check reads no state and makes no request; it exits 1 on a weekday from 09:00 to 16:30
+America/New_York (the US regular session, 09:30 to 16:00, with a 30-minute margin each side; a holiday inside it is
+deferred too) and 0 otherwise, and 2 on a bad `--now`. `systemd.service(5)` says that an `ExecCondition=` exit status of
+1 to 254 skips the remaining commands and the unit "is not marked as failed", so the watch is deferred to the next daily
+run, and `stack-currency.service`, which only `Wants=` it, still runs and counts the last report (at most three days old; an
+older one is `surface watch stale`). A host without a time-zone database runs the watch rather than never running it, with a
+note on stderr. `--now YYYY-MM-DDTHH:MM:SSZ` evaluates the check at another instant.
 
 ## Overturn conditions
 
