@@ -46,7 +46,8 @@ TRAP_SETTINGS = ["$schema", "quoted-key", "double-quoted", "recordOfArrays", "ma
                  "policyHelper", "afterNested", "literal", "onEvent", "frozen", "readonly", "conditional", "resolve"]
 HOOKS = ["PreToolUse", "PostToolUse", "Notification", "UserPromptSubmit", "SessionStart", "SessionEnd", "Stop",
          "SubagentStart", "SubagentStop", "PreCompact", "PostCompact", "ConfigChange"]
-MODS = ["cc-plugin-agents-md", "cc-plugin-diff", "cc-plugin-you-should-know"]
+MODS = ["cc-plugin-agents-md", "cc-plugin-diff", "cc-plugin-you-should-know", "cc-plugin-alpha", "cc-plugin-beta",
+        "cc-plugin-gamma"]  # six, as the real overview page lists
 ENV_NAMES = [f"CLAUDE_CODE_SYNTHETIC_{index:03d}" for index in range(110)]
 FEATURES = {f"feature_{index:02d}": (("under development", "stable", "removed")[index % 3], index % 3 == 1)
             for index in range(40)}
@@ -184,6 +185,34 @@ def codex_schema(extra_top=(), features=None) -> dict:
     }
     return {"$schema": "http://json-schema.org/draft-07/schema#", "title": "ConfigToml", "type": "object",
             "properties": properties, "definitions": definitions}
+
+
+def real_shaped_schema() -> dict:
+    """codex_schema() reshaped like the real config-schema.json of rust-v0.160.0, where most paths sit behind a $ref
+    inside an anyOf (schemars' Option<T>): read without its definitions the real one gives 266 of its 1,341 paths, and
+    without allOf/anyOf/oneOf 553. Here 20 sections of 40 keys each sit behind such a reference."""
+    schema = codex_schema()
+    for index in range(20):
+        schema["definitions"][f"Section{index:02d}"] = {"type": "object", "properties": {
+            f"key_{key:02d}": {"type": "string"} for key in range(40)}}
+        schema["properties"][f"section_{index:02d}"] = {"anyOf": [{"$ref": f"#/definitions/Section{index:02d}"},
+                                                                  {"type": "null"}]}
+    schema["properties"]["bulk"]["properties"].update({f"entry_{index:03d}": {"type": "integer"}
+                                                       for index in range(150, 250)})
+    return schema
+
+
+def without_combinators(node):
+    if isinstance(node, dict):
+        return {key: without_combinators(value) for key, value in node.items()
+                if key not in ("allOf", "anyOf", "oneOf")}
+    return [without_combinators(item) for item in node] if isinstance(node, list) else node
+
+
+def env_table_page(names) -> str:
+    """env-vars.md shaped like the real page: its title and one table row per variable."""
+    return "\n".join(["# Environment variables", "", "| Variable | Purpose |", "| :- | :- |",
+                      *(f"| `{name}` | a synthetic variable |" for name in names), ""])
 
 
 STRUCTURED_PATHS = {"features", "tui", "tui.theme", "tui.notifications", "tui.notifications.enabled", "mcp_servers",
@@ -514,6 +543,74 @@ class AnchorTests(unittest.TestCase):
         with self.assertRaises(usw.AnchorMissing) as raised:
             usw.parse_settings_keys(sdk_dts(interface=PLAIN_INTERFACE.replace("@FILLER@", "    one?: string;")))
         self.assertIn("count 1 outside 50..2000", str(raised.exception))
+
+
+class FloorTests(unittest.TestCase):
+    """M1: the reviewer's degraded artifacts, real-shaped, against the deployed bounds (BOUNDS and FLOOR_PERCENT as
+    shipped, never lifted). Each degraded count still passes its absolute bound, so only the 80%-of-baseline floor
+    catches it; the run exits 3, names the kind and writes nothing."""
+
+    def degraded_run(self, prepare, degrade, message: str, absolute):
+        watch, upstream = Watch(self), Upstream()
+        prepare(upstream)
+        watch.seed(self, upstream)
+        before = watch.latest.read_bytes()
+        degrade(upstream)
+        self.assertGreaterEqual(absolute(upstream), 200 if "codex" in message else 100)  # the absolute bound passes
+        code, _, stderr = watch.run("--network", upstream=upstream)
+        self.assertEqual(code, 3, stderr)
+        self.assertIn(message, stderr)
+        self.assertIn("or a real removal of more than 20% at once", stderr)
+        self.assertEqual(watch.latest.read_bytes(), before)
+
+    def test_a_schema_read_without_its_definitions_fails_the_floor(self):
+        schema = real_shaped_schema()
+        self.degraded_run(
+            lambda u: setattr(u, "schema_override", json.dumps(schema).encode()),
+            lambda u: setattr(u, "schema_override", json.dumps(dict(schema, definitions={})).encode()),
+            "anchor missing: codex:config below 80% of baseline (count ",
+            lambda u: len(usw.flatten_codex_schema(u.schema_override)))
+
+    def test_a_schema_read_without_its_combinators_fails_the_floor(self):
+        schema = real_shaped_schema()
+        self.degraded_run(
+            lambda u: setattr(u, "schema_override", json.dumps(schema).encode()),
+            lambda u: setattr(u, "schema_override", json.dumps(without_combinators(schema)).encode()),
+            "anchor missing: codex:config below 80% of baseline",
+            lambda u: len(usw.flatten_codex_schema(u.schema_override)))
+
+    def test_an_env_page_cut_at_half_its_table_fails_the_floor(self):
+        names = [f"CLAUDE_CODE_TABLE_{index:03d}" for index in range(400)]
+        self.degraded_run(
+            lambda u: setattr(u, "env_override", env_table_page(names)),
+            lambda u: setattr(u, "env_override", env_table_page(names[:200])),
+            "anchor missing: claude:env below 80% of baseline (count 200, baseline 400",
+            lambda u: len(usw.parse_env_names(u.env_override)))
+
+    def test_a_removal_under_the_floor_is_reported_and_counted(self):
+        # One mod of six gone (17%) passes the floor: removed is in the line, in coverage.counts and in latest.json.
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        upstream.mods = [name for name in MODS if name != "cc-plugin-beta"]
+        document = watch.document("--network", upstream=upstream)
+        self.assertTrue(document["summary_line"].startswith("surface watch: nothing new, 1 removed"),
+                        document["summary_line"])
+        self.assertEqual(document["coverage"]["counts"]["claude:mod"],
+                         {"observed": 5, "baseline": 6, "new": 0, "removed": 1})
+        self.assertEqual([item["key"] for item in document["removed"]], ["claude:mod:cc-plugin-beta"])
+
+    def test_a_reviewed_rebaseline_is_not_blocked_by_the_floor(self):
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        upstream.mods = MODS[:3]  # half the mods removed upstream, a real change
+        code, _, stderr = watch.run("--network", upstream=upstream)
+        self.assertEqual(code, 3, stderr)
+        self.assertIn("anchor missing: claude:mod below 80% of baseline (count 3, baseline 6", stderr)
+        code, _, stderr = watch.run("--network", "--write-baseline", "--force", upstream=upstream)
+        self.assertEqual(code, 0, stderr)
+        self.assertEqual(json.loads(watch.baseline.read_text(encoding="utf-8"))["kinds"]["claude:mod"],
+                         sorted(MODS[:3]))
+        self.assertEqual(watch.run("--network", upstream=upstream)[0], 0)
 
 
 # ----------------------------------------------------------------------------------------------- run tests

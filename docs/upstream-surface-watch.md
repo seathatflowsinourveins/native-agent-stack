@@ -71,7 +71,7 @@ The parsing rules:
 | 0 | the run finished, with or without new names |
 | 1 | the baseline or dispositions catalog is invalid (or missing), `--check-dispositions` found errors, or a write failed |
 | 2 | usage error, including a state directory inside the checkout and a summary that cannot fit 160 characters |
-| 3 | `anchor missing: <name>`: an anchor was not found, or a count was outside its bound |
+| 3 | `anchor missing: <name>`: an anchor was not found, or a count was outside its bound; or `anchor missing: <kind> below 80% of baseline`: an observed kind holds fewer than 80% of its baseline names, which an artifact read in part gives (the real `config-schema.json` without its definitions gives 266 of 1,341 paths, both inside the absolute bound) and so does a real removal of more than 20% at once, which needs a reviewed `--network --write-baseline --force` (that mode skips this check) |
 | 4 | `source unavailable: <name> (...)`: the source could not be fetched and has no usable cache |
 
 ## latest.json and the resolver

@@ -39,7 +39,9 @@ Sources (each URL re-read 2026-10-04):
       command.
 
 Each source has an anchor: a parse that finds no anchor, or a count outside BOUNDS, stops the run with exit 3 and
-"anchor missing: <name>", so a format change cannot pass as an empty surface. The diff against the baseline gives
+"anchor missing: <name>", so a format change cannot pass as an empty surface; so does a kind below FLOOR_PERCENT (80)
+% of its baseline count ("anchor missing: <kind> below 80% of baseline"), which catches an artifact read in part, and
+a real removal of more than 20% at once, which needs a reviewed re-baseline. The diff against the baseline gives
 new, removed and stage_changed (codex:feature); unreviewed is the keys "surface:kind:name" of the new names that have
 no row in the dispositions catalog. A kind whose source this run did not observe (no codex binary, an uncached probe)
 is left out of the diff and named in coverage. --cross-check adds report-only comparisons with two third-party
@@ -125,6 +127,12 @@ BOUNDS = {
     "claude:changelog/versions": (1, 100000),
 }
 ALLOWED_UNMATCHED_FEATURE_LINES = 3
+# The second, relative guard (check_floors()): an observed kind with fewer than FLOOR_PERCENT % of the names the
+# committed baseline holds for it stops the run with exit 3. The absolute BOUNDS pass a heavily under-read artifact
+# (the real config-schema.json read without its definitions gives 266 of 1,341 paths, without allOf/anyOf/oneOf 553;
+# env-vars.md cut at half its table 218 of 407 names), and a real removal of more than 20% at once is treated the same
+# way: it needs a reviewed re-baseline (--network --write-baseline --force), which skips this guard.
+FLOOR_PERCENT = 80
 
 CLAUDE_PACKAGE = "@anthropic-ai/claude-code"
 CODEX_PACKAGE = "@openai/codex"
@@ -1047,6 +1055,25 @@ def observe(fetcher: Fetcher, channel: str, codex_binary: str | None) -> dict:
             "codex_tags": codex_tags, "watched": watched, "codex_binary": binary_version}
 
 
+def floor_failure(label: str, observed: int, held: int) -> AnchorMissing | None:
+    if observed * 100 >= held * FLOOR_PERCENT:
+        return None
+    return AnchorMissing(f"{label} below {FLOOR_PERCENT}% of baseline",
+                         f"count {observed}, baseline {held}: a parser or format failure, or a real removal of more "
+                         f"than {100 - FLOOR_PERCENT}% at once; review it, then re-baseline with --network "
+                         f"--write-baseline --force")
+
+
+def check_floors(names: dict, baseline: dict) -> None:
+    """AnchorMissing (exit 3) for the first observed kind whose count is below FLOOR_PERCENT % of its baseline count;
+    an unobserved kind is not checked. BOUNDS stay the absolute guard inside each parser."""
+    for kind in KINDS:
+        if kind in names:
+            failure = floor_failure(kind, len(names[kind]), len(baseline["kinds"].get(kind, [])))
+            if failure is not None:
+                raise failure
+
+
 def diff_surface(names: dict, features: dict | None, baseline: dict) -> tuple[list, list, list]:
     """new, removed and stage_changed of the observed kinds against the baseline (an unobserved kind is skipped)."""
     new, removed, stage_changed = [], [], []
@@ -1281,6 +1308,8 @@ def run(args) -> tuple[dict, str]:
 
     fetcher = Fetcher(state, args.network, now_text)
     observed = observe(fetcher, args.claude_channel, codex_binary)
+    if baseline is not None:
+        check_floors(observed["names"], baseline)
     changelog_body = fetcher.obtain("claude-changelog", CHANGELOG_URL, http_fetch(CHANGELOG_URL))
     if args.write_baseline:
         baseline = build_baseline(observed, fetcher, now_text, args.claude_channel)
@@ -1327,7 +1356,10 @@ def run(args) -> tuple[dict, str]:
         "kinds_observed": [kind for kind in KINDS if kind in observed["names"]],
         "kinds_not_observed": not_observed,
         "counts": {kind: {"observed": len(observed["names"][kind]) if kind in observed["names"] else None,
-                          "baseline": len(baseline["kinds"].get(kind, []))} for kind in KINDS},
+                          "baseline": len(baseline["kinds"].get(kind, [])),
+                          "new": sum(1 for item in new if item["key"].startswith(kind + ":")),
+                          "removed": sum(1 for item in removed if item["key"].startswith(kind + ":"))}
+                   for kind in KINDS},
         "dispositions_rows": len(dispositions["rows"]),
         "notes": notes,
     }
@@ -1372,10 +1404,9 @@ def render_text(document: dict, action: str) -> str:
     lines = [document["summary_line"]]
     coverage = document["coverage"]
     for kind, count in coverage["counts"].items():
-        added = sum(1 for item in document["new"] if item["key"].startswith(kind + ":"))
-        gone = sum(1 for item in document["removed"] if item["key"].startswith(kind + ":"))
         observed = "not observed" if count["observed"] is None else str(count["observed"])
-        lines.append(f"  {kind}: {observed} (baseline {count['baseline']}), {added} new, {gone} removed")
+        lines.append(f"  {kind}: {observed} (baseline {count['baseline']}), {count['new']} new, "
+                     f"{count['removed']} removed")
     unreviewed = set(document["unreviewed"])
     for item in document["new"][:40]:
         lines.append(f"  new: {item['key']}" + (" (unreviewed)" if item["key"] in unreviewed else ""))
