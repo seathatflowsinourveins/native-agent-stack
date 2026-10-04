@@ -15,7 +15,6 @@ from datetime import date, timedelta
 import copy
 import json
 from pathlib import Path
-import re
 import unittest
 
 from scripts import adoption_status
@@ -23,42 +22,8 @@ from scripts import adoption_status
 ROOT = Path(__file__).resolve().parents[1]
 PINS_FILES = sorted((ROOT / "adoption").glob("pins-*.json"))
 RECORD = "docs/decisions/2026-10-04-codex-dated-holds.md"
-REQUIRED_KEYS = ("version", "until", "reason", "url", "sha256")
-HOLD_KEYS = {*REQUIRED_KEYS, "checksum_ref", "platform_dependency"}
+REQUIRED_KEYS = adoption_status.HOLD_REQUIRED_KEYS
 HORIZON_DAYS = 90  # as an OSV-Scanner ignoreUntil (.github/osv-scanner.toml)
-SHA256 = re.compile(r"[0-9a-f]{64}\Z")
-INTEGRITY = re.compile(r"sha512-[A-Za-z0-9+/]{86}==\Z")
-
-
-def platform_dependency_problems(name: str, hold: dict, entry: dict) -> list[str]:
-    """A hold of an entry that installs a platform package carries that package for the held version, in the shape
-    of the entry's own platform_dependency (adoption/bootstrap-linux.sh reads those keys)."""
-    pinned, held = entry.get("platform_dependency"), hold.get("platform_dependency")
-    if pinned is None and held is None:
-        return []
-    if not isinstance(pinned, dict) or not isinstance(held, dict):
-        return [f"{name}: platform_dependency must be present on both the entry and the hold, or on neither"]
-    problems = []
-    if set(held) != set(pinned):
-        problems.append(f"{name}: platform_dependency keys {sorted(held)} differ from the entry's {sorted(pinned)}")
-    for key in ("name", "resolved_package"):
-        if held.get(key) != pinned.get(key):
-            problems.append(f"{name}: platform_dependency {key} differs from the entry's")
-    if not str(held.get("version", "")).startswith(f"{hold.get('version')}-"):
-        problems.append(f"{name}: platform_dependency version is not the held version's platform package")
-    if not str(held.get("url", "")).startswith("https://"):
-        problems.append(f"{name}: platform_dependency url is not https")
-    if SHA256.fullmatch(str(held.get("sha256", ""))) is None:
-        problems.append(f"{name}: platform_dependency sha256 is not 64 lowercase hex digits")
-    if "integrity" in pinned and INTEGRITY.fullmatch(str(held.get("integrity", ""))) is None:
-        problems.append(f"{name}: platform_dependency integrity is not an npm sha512 value")
-    check, pinned_check = held.get("installed_binary_check"), pinned.get("installed_binary_check")
-    if isinstance(pinned_check, dict):
-        if not isinstance(check, dict) or set(check) != set(pinned_check) or check.get("path") != pinned_check.get("path"):
-            problems.append(f"{name}: installed_binary_check differs in shape or path from the entry's")
-        elif SHA256.fullmatch(str(check.get("sha256", ""))) is None:
-            problems.append(f"{name}: installed_binary_check sha256 is not 64 lowercase hex digits")
-    return problems
 
 
 def hold_problems(pins: dict, today: date) -> list[str]:
@@ -77,29 +42,16 @@ def hold_problems(pins: dict, today: date) -> list[str]:
                             f"({RECORD})")
         usable = adoption_status.pin_holds(entry)
         for hold in holds:
+            problems += adoption_status.hold_schema_problems(entry, hold)
             if not isinstance(hold, dict):
-                problems.append(f"{label}: a hold that is not an object")
                 continue
             name = f"{label} hold {hold.get('version')!r}"
-            for key in sorted(set(hold) - HOLD_KEYS):
-                problems.append(f"{name}: unknown key {key!r}")
-            for key in REQUIRED_KEYS:
-                if not isinstance(hold.get(key), str) or not hold[key].strip():
-                    problems.append(f"{name}: no {key}")
-            if hold.get("version") == entry.get("version"):
-                problems.append(f"{name}: holds the pinned version itself")
-            if not str(hold.get("url", "")).startswith("https://"):
-                problems.append(f"{name}: url is not https")
-            if SHA256.fullmatch(str(hold.get("sha256", ""))) is None:
-                problems.append(f"{name}: sha256 is not 64 lowercase hex digits")
-            problems += platform_dependency_problems(name, hold, entry)
             until = hold.get("until")
             try:
                 until_date = date.fromisoformat(until) if adoption_status.HOLD_DATE.fullmatch(str(until)) else None
             except ValueError:
                 until_date = None
             if until_date is None:
-                problems.append(f"{name}: until must be a YYYY-MM-DD date")
                 continue
             if until_date <= today:
                 problems.append(f"{name}: until {until} has passed; renew the hold with a new date and reason, or "

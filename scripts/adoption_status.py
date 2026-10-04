@@ -100,6 +100,10 @@ SUPPORTED_VERSION_PROBE_METHODS = ("exec",)
 # before that date and mismatched from it on, the way an OSV-Scanner ignoreUntil stops applying on its date
 # (.github/osv-scanner.toml); the date compared is today's UTC date.
 HOLD_DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}\Z")
+HOLD_REQUIRED_KEYS = ("version", "until", "reason", "url", "sha256")
+HOLD_KEYS = {*HOLD_REQUIRED_KEYS, "checksum_ref", "platform_dependency"}
+HOLD_SHA256 = re.compile(r"[0-9a-f]{64}\Z")
+HOLD_INTEGRITY = re.compile(r"sha512-[A-Za-z0-9+/]{86}==\Z")
 # --pinned-versions replaces NO_PINNED_VERSION with this statement.
 PINNED_VERSION_LIMITATIONS = [
     "--pinned-versions execs a selected profile's component_ids that have an \"exec\" version_probe in this "
@@ -1207,25 +1211,66 @@ def utc_today() -> datetime.date:
     return datetime.datetime.now(datetime.timezone.utc).date()
 
 
+def hold_schema_problems(entry: dict, hold: object) -> list[str]:
+    """Structural hold validation shared by runtime filtering and tests/test_pin_holds.py. Install metadata follows
+    that test's schema at 84245a3e: wrapper URL/digest and, when the pin has one, its platform package's shape and
+    binary check. Expiry is separate so a structurally valid expired hold still reports its date and reason."""
+    label = entry.get("id")
+    if not isinstance(hold, dict):
+        return [f"{label}: a hold that is not an object"]
+    name = f"{label} hold {hold.get('version')!r}"
+    problems = []
+    for key in sorted(set(hold) - HOLD_KEYS):
+        problems.append(f"{name}: unknown key {key!r}")
+    for key in HOLD_REQUIRED_KEYS:
+        if not isinstance(hold.get(key), str) or not hold[key].strip():
+            problems.append(f"{name}: no {key}")
+    if hold.get("version") == entry.get("version"):
+        problems.append(f"{name}: holds the pinned version itself")
+    if not str(hold.get("url", "")).startswith("https://"):
+        problems.append(f"{name}: url is not https")
+    if HOLD_SHA256.fullmatch(str(hold.get("sha256", ""))) is None:
+        problems.append(f"{name}: sha256 is not 64 lowercase hex digits")
+    until = hold.get("until")
+    try:
+        until_date = datetime.date.fromisoformat(until) if isinstance(until, str) and HOLD_DATE.fullmatch(until) else None
+    except ValueError:
+        until_date = None
+    if until_date is None:
+        problems.append(f"{name}: until must be a YYYY-MM-DD date")
+
+    pinned, held = entry.get("platform_dependency"), hold.get("platform_dependency")
+    if pinned is None and held is None:
+        return problems
+    if not isinstance(pinned, dict) or not isinstance(held, dict):
+        return [*problems, f"{name}: platform_dependency must be present on both the entry and the hold, or on neither"]
+    if set(held) != set(pinned):
+        problems.append(f"{name}: platform_dependency keys {sorted(held)} differ from the entry's {sorted(pinned)}")
+    for key in ("name", "resolved_package"):
+        if held.get(key) != pinned.get(key):
+            problems.append(f"{name}: platform_dependency {key} differs from the entry's")
+    if not str(held.get("version", "")).startswith(f"{hold.get('version')}-"):
+        problems.append(f"{name}: platform_dependency version is not the held version's platform package")
+    if not str(held.get("url", "")).startswith("https://"):
+        problems.append(f"{name}: platform_dependency url is not https")
+    if HOLD_SHA256.fullmatch(str(held.get("sha256", ""))) is None:
+        problems.append(f"{name}: platform_dependency sha256 is not 64 lowercase hex digits")
+    if "integrity" in pinned and HOLD_INTEGRITY.fullmatch(str(held.get("integrity", ""))) is None:
+        problems.append(f"{name}: platform_dependency integrity is not an npm sha512 value")
+    check, pinned_check = held.get("installed_binary_check"), pinned.get("installed_binary_check")
+    if isinstance(pinned_check, dict):
+        if not isinstance(check, dict) or set(check) != set(pinned_check) or check.get("path") != pinned_check.get("path"):
+            problems.append(f"{name}: installed_binary_check differs in shape or path from the entry's")
+        elif HOLD_SHA256.fullmatch(str(check.get("sha256", ""))) is None:
+            problems.append(f"{name}: installed_binary_check sha256 is not 64 lowercase hex digits")
+    return problems
+
+
 def pin_holds(entry: dict) -> list[dict]:
-    """The usable holds[] items of one pins entry: objects whose version and reason are non-empty strings and whose
-    until is a real YYYY-MM-DD date. Any other item is skipped, so a malformed hold never turns drift into a hold;
-    tests/test_pin_holds.py keeps the checked-in holds complete and unexpired."""
+    """The structurally complete holds[] items of one pins entry. Malformed install metadata cannot turn drift
+    into a hold; tests/test_pin_holds.py uses the same schema and also enforces checked-in freshness and cardinality."""
     holds = entry.get("holds")
-    usable = []
-    for hold in holds if isinstance(holds, list) else []:
-        if not isinstance(hold, dict):
-            continue
-        version, until, reason = hold.get("version"), hold.get("until"), hold.get("reason")
-        if not (isinstance(version, str) and version.strip() and isinstance(reason, str) and reason.strip()
-                and isinstance(until, str) and HOLD_DATE.fullmatch(until)):
-            continue
-        try:
-            datetime.date.fromisoformat(until)
-        except ValueError:
-            continue
-        usable.append(hold)
-    return usable
+    return [hold for hold in holds if not hold_schema_problems(entry, hold)] if isinstance(holds, list) else []
 
 
 def matching_hold(entry: dict, output: str) -> dict | None:

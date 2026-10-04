@@ -1301,8 +1301,20 @@ class DatedHoldTests(unittest.TestCase):
     and mismatched, with the expiry stated, on and after it (an OSV-Scanner ignoreUntil's rule); any other version is
     drift as before, and a malformed hold or a failing probe never turns drift into a hold."""
 
+    PLATFORM_DEPENDENCY = {
+        "name": "codex-linux-x64", "resolved_package": "@openai/codex", "version": "0.160.0-linux-x64",
+        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0-linux-x64.tgz",
+        "sha256": "1" * 64, "integrity": "sha512-" + "A" * 86 + "==", "checksum_ref": "synthetic fixture",
+        "installed_binary_check": {"path": "vendor/bin/codex", "sha256": "2" * 64},
+    }
     HOLD = {"version": "0.159.3", "until": "2026-11-04", "reason": "X18: synthetic reason",
-            "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz", "sha256": "0" * 64}
+            "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz", "sha256": "0" * 64,
+            "platform_dependency": {
+                **PLATFORM_DEPENDENCY, "version": "0.159.3-linux-x64",
+                "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3-linux-x64.tgz",
+                "sha256": "3" * 64, "integrity": "sha512-" + "B" * 86 + "==",
+                "installed_binary_check": {"path": "vendor/bin/codex", "sha256": "4" * 64},
+            }}
     BEFORE, ON, AFTER = date(2026, 11, 3), date(2026, 11, 4), date(2026, 11, 5)
     HELD_LINE = "    codex: 0.159.3 held until 2026-11-04 (X18: synthetic reason)\n"
     EXPIRED_LINE = "    codex: 0.159.3 hold expired 2026-11-04 (X18: synthetic reason); reported as drift\n"
@@ -1339,7 +1351,7 @@ class DatedHoldTests(unittest.TestCase):
 
     def write_pin(self, holds) -> None:
         self.pins.write_text(json.dumps({"schema_version": 1, "platform": "linux-x86_64", "tools": [
-            {"id": "codex", "version": "0.160.0", "holds": holds,
+            {"id": "codex", "version": "0.160.0", "holds": holds, "platform_dependency": self.PLATFORM_DEPENDENCY,
              "version_probe": {"method": "exec", "command": "codex", "args": ["--version"]}}]}), encoding="utf-8")
 
     def codex_prints(self, version: str, status: int = 0) -> None:
@@ -1431,6 +1443,51 @@ class DatedHoldTests(unittest.TestCase):
                         {**self.HOLD, "until": "2026-11-20", "reason": "second"}])
         item = self.report(self.BEFORE)["profiles"][0]["pinned_versions"][0]
         self.assertEqual((item["hold_version"], item["hold_until"], item["hold_reason"]), ("0.159.3", "2026-11-20", "second"))
+
+    def assert_hold_reports_drift(self, hold):
+        self.write_pin([hold])
+        with patch("scripts.adoption_status.run_version_probe", return_value=(0, "codex-cli 0.159.3\n")) as probe:
+            result = self.report(self.BEFORE)
+        probe.assert_called_once()
+        self.assertEqual(result["profiles"][0]["pinned_versions"], [
+            {"id": "codex", "pinned_version": "0.160.0", "checked": True, "matches_pin": False}])
+        self.assertEqual(result["profiles"][0]["pinned_versions_summary"],
+                         {"matched": [], "mismatched": ["codex"], "unchecked": []})
+        self.assertIs(result["pinned_versions_match"], False)
+
+    def test_a_hold_without_url_reports_drift(self):
+        self.assert_hold_reports_drift({key: value for key, value in self.HOLD.items() if key != "url"})
+
+    def test_a_hold_without_sha256_reports_drift(self):
+        self.assert_hold_reports_drift({key: value for key, value in self.HOLD.items() if key != "sha256"})
+
+    def test_a_hold_without_required_platform_dependency_reports_drift(self):
+        self.assert_hold_reports_drift({key: value for key, value in self.HOLD.items() if key != "platform_dependency"})
+
+    def test_a_hold_with_other_invalid_install_metadata_reports_drift(self):
+        mutations = {
+            "unknown field": lambda hold: hold.update(hosts=["a host"]),
+            "HTTP wrapper URL": lambda hold: hold.update(url="http://registry.npmjs.org/codex.tgz"),
+            "short wrapper digest": lambda hold: hold.update(sha256="0" * 63),
+            "uppercase wrapper digest": lambda hold: hold.update(sha256="A" * 64),
+            "non-string wrapper digest": lambda hold: hold.update(sha256=int("1" * 64)),
+            "null platform payload": lambda hold: hold.update(platform_dependency=None),
+            "platform shape": lambda hold: hold["platform_dependency"].pop("checksum_ref"),
+            "platform package": lambda hold: hold["platform_dependency"].update(name="other-linux-x64"),
+            "resolved package": lambda hold: hold["platform_dependency"].update(resolved_package="other"),
+            "platform version": lambda hold: hold["platform_dependency"].update(version="0.160.0-linux-x64"),
+            "HTTP platform URL": lambda hold: hold["platform_dependency"].update(url="http://registry.npmjs.org/codex.tgz"),
+            "platform digest": lambda hold: hold["platform_dependency"].update(sha256="3"),
+            "platform integrity": lambda hold: hold["platform_dependency"].update(integrity="sha256-x"),
+            "binary path": lambda hold: hold["platform_dependency"]["installed_binary_check"].update(path="bin/codex"),
+            "binary digest": lambda hold: hold["platform_dependency"]["installed_binary_check"].update(sha256="4"),
+            "binary shape": lambda hold: hold["platform_dependency"]["installed_binary_check"].pop("sha256"),
+        }
+        for label, mutate in mutations.items():
+            with self.subTest(mutation=label):
+                hold = json.loads(json.dumps(self.HOLD))
+                mutate(hold)
+                self.assert_hold_reports_drift(hold)
 
     def test_the_default_date_is_today_in_utc(self):
         with patch("scripts.adoption_status.utc_today", return_value=self.BEFORE):
