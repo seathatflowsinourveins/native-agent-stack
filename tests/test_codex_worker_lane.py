@@ -56,7 +56,8 @@ TOP_RULE_SHA256 = "3201144dccd9d134110a2459a1e795d55e8cb747a9592e779e4c4778d8b8b
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
-# A minimal TOML writer for the fake (tables, strings, numbers, booleans, string arrays): enough for these fixtures.
+# A minimal TOML writer for the fake (tables, arrays of tables, strings, numbers, booleans, string arrays): enough for
+# these fixtures, including the user template's [[skills.config]].
 EMITTER = r'''
 def key(k):
     return k if re.fullmatch(r"[A-Za-z0-9_-]+", k) else json.dumps(k)
@@ -72,17 +73,24 @@ def scalar(v):
     return json.dumps(v)
 
 
+def tables(v):
+    return isinstance(v, list) and bool(v) and all(isinstance(x, dict) for x in v)
+
+
 def emit(tree):
     lines = []
 
-    def table(path, t):
+    def table(path, t, header="[{}]"):
         if path:
-            lines.append("[" + ".".join(key(p) for p in path) + "]")
-        lines.extend(f"{key(k)} = {scalar(v)}" for k, v in t.items() if not isinstance(v, dict))
+            lines.append(header.format(".".join(key(p) for p in path)))
+        lines.extend(f"{key(k)} = {scalar(v)}" for k, v in t.items() if not isinstance(v, dict) and not tables(v))
         lines.append("")
         for k, v in t.items():
             if isinstance(v, dict):
                 table(path + [k], v)
+            elif tables(v):
+                for item in v:
+                    table(path + [k], item, "[[{}]]")
     table([], tree)
     return "\n".join(lines).strip("\n") + "\n"
 '''
@@ -519,6 +527,20 @@ class TemplateTests(unittest.TestCase):
             self.assertFalse(set(table["enabled_tools"]) & excluded, name)
         self.assertLessEqual({"ctx_upgrade", "ctx_purge"}, set(profile["mcp_servers"]["context-mode"]["disabled_tools"]))
         self.assertNotIn("default_tools_approval_mode", profile["mcp_servers"]["context-mode"])
+
+    def test_the_fixture_toml_writer_round_trips_the_rendered_user_template(self):
+        # The native tests re-emit the rendered user template through emit_toml (the strict-config test registers a
+        # working fixture Serena that way), and the template's [[skills.config]] is an array of tables.
+        fixture = {"HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
+                   "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
+                   "OTEL_ENDPOINT": "127.0.0.1:1", "AI_MEMORY_URL": "127.0.0.1:1", "QDRANT_URL": "127.0.0.1:1",
+                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0", "CODEX_MODEL": "gpt-6.1-sol"}
+        rendered = string.Template((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
+        data = tomllib.loads(rendered.substitute(fixture))
+        nested = {"a": {"b": [{"x": 1, "c": {"y": "z"}}, {"x": 2}], "d": [], "e": ["s"]}}
+        for label, tree in (("rendered user template", data), ("nested arrays of tables", nested)):
+            with self.subTest(case=label):
+                self.assertEqual(tomllib.loads(emit_toml(tree)), tree)
 
     def test_worker_startup_timeouts_layer_over_user_servers(self):
         # openai/codex rust-v0.160.0: config/src/mcp_types.rs:248-256 and
