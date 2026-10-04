@@ -4560,8 +4560,8 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "6ac2477a7257bffef2250aef3c54814efdc5a48fcbaf45f3e0a5f0f6fabc6103",
-      "bytes": 18253
+      "sha256": "64c3afb8f27ef65b18ac713ef47c31e9588eea05d60734d6045314d90a3d51f4",
+      "bytes": 18976
     },
     {
       "path": "adoption/manifest.json",
@@ -4729,9 +4729,19 @@
       "bytes": 7463
     },
     {
+      "path": "adoption/templates/systemd/stack-currency.service",
+      "sha256": "4d42e82fecc6ab262091c4205844e17424dc87e208588f64593e7c95f78e35a0",
+      "bytes": 3959
+    },
+    {
       "path": "adoption/templates/systemd/token-report-refresh.service",
       "sha256": "580f7e0d4e538d6013342dc943922ab3988b7567be34fe14b01faa97d2733cae",
       "bytes": 9260
+    },
+    {
+      "path": "adoption/templates/systemd/upstream-surface-watch.service",
+      "sha256": "08ba821c2e893e82764341ec05eb9b7a82ea93c4fe0aebb7a929347cda2e0325",
+      "bytes": 4278
     },
     {
       "path": "adoption/templates/wsl/cloud-init.user-data.template",
@@ -15251,8 +15261,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "b18a39bd5069a86701d53ce42a5a028900139523eda1aa4a09d828bd304c2afb",
-      "bytes": 3056
+      "sha256": "b849394c1855754c7dbcc1106e5b21c196a4dd2113d1f3862c9a07107c1b9715",
+      "bytes": 3355
     },
     {
       "path": "catalogs/convergence-practice/architecture-wave/README.md",
@@ -15388,6 +15398,16 @@
       "path": "catalogs/foundation/surfaces.json",
       "sha256": "be845c04926aa9bd1d7824911839090d8e636e6016d9a641bb683ad1c951aef1",
       "bytes": 20383
+    },
+    {
+      "path": "catalogs/foundation/upstream-surface-baseline.json",
+      "sha256": "8d4d28f94c10dae40e405bb5f7392f75dadaeae2656eaaf995cb39f0f23c24a5",
+      "bytes": 75469
+    },
+    {
+      "path": "catalogs/foundation/upstream-surface-dispositions.json",
+      "sha256": "4cee757c3786a53732cfc52549db6a72729a66c22318366bda4916adacb03dca",
+      "bytes": 153291
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -16350,6 +16370,11 @@
       "bytes": 15171
     },
     {
+      "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
+      "sha256": "1389de18bbaf5c41d8f22093a9642d982230a851f954183b7c8254e0b5890bce",
+      "bytes": 18701
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -16743,6 +16768,11 @@
       "path": "docs/upstream-maintenance-pilot.md",
       "sha256": "4b3410eed8701056b412c65938aac3a453e4d72a2fb70ee59313170433c970de",
       "bytes": 7856
+    },
+    {
+      "path": "docs/upstream-surface-watch.md",
+      "sha256": "1638b5cb7f7d05404a9ea897b5efff66d8187f782b02cf44412d44de6f2aec68",
+      "bytes": 18921
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
@@ -44060,6 +44090,11 @@
       "bytes": 29878
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-native-effort-inputs-local-20261003.json",
+      "sha256": "c03203c82bb4262ba5e12c2f518f8f836c1e5893f874b0d33b06078d507dec9c",
+      "bytes": 8392
+    },
+    {
       "path": "evidence/artifacts/runtime-sdk-20260930/README.md",
       "sha256": "70059a0b57eb1aae9bb62c04ffbbc60e4119381e777eba5290ad12c23f66f3bd",
       "bytes": 1585
@@ -51481,8 +51516,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "082bb1714e51f99114b5dbb3858833d25f43b62229be62c90fba331e8aceeb75",
-      "bytes": 16427
+      "sha256": "edcd00175931191ae19336c00405291eef92ca97a4a791295ebc9cd1aeaff434",
+      "bytes": 20410
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
@@ -51521,8 +51556,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py",
-      "sha256": "14018bd65c39f18683ce83833abe23c9238419c7c1fde99f5521ae752dbd1c43",
-      "bytes": 38441
+      "sha256": "d05bcc7a4451a2649becb0c32e31c3e6a0b909c9c02602ea68e2cc8bc59f2ddf",
+      "bytes": 46248
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
@@ -51531,8 +51566,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01",
-      "bytes": 25542
+      "sha256": "e1f06bf5c161ecf66a2172cee27c288b7a03a16c75a6f155099f381a532ac3ea",
+      "bytes": 26572
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py.lock",
@@ -52060,6 +52095,11 @@
       "bytes": 34277
     },
     {
+      "path": "scripts/currency_due.py",
+      "sha256": "4b2e9ecd31ebe0801d7ae44f958a173b372819a0b1984838277502a13ebfb9fe",
+      "bytes": 54767
+    },
+    {
       "path": "scripts/env_freshness.py",
       "sha256": "93646b8896d9efa89536b0c1be350de1cb2ce63ce73a463d30d13c79f0e548db",
       "bytes": 7138
@@ -52153,6 +52193,11 @@
       "path": "scripts/trading_gates.py",
       "sha256": "9781ed54be63cef127a9bb2e99f9e0b24d0aea09b048cde5402f8a151bcde70f",
       "bytes": 34570
+    },
+    {
+      "path": "scripts/upstream_surface_watch.py",
+      "sha256": "96c124949cfb3368ae11628772531bff65da13732d5634469040fb247902812c",
+      "bytes": 105411
     },
     {
       "path": "scripts/validate.py",
@@ -52688,6 +52733,11 @@
       "path": "tests/test_credential_tools.py",
       "sha256": "93aee1682d47a0ac54d1d39ef4d566ac141bbc12434ab9983d99b942156ccc99",
       "bytes": 34946
+    },
+    {
+      "path": "tests/test_currency_due.py",
+      "sha256": "ce3f688cebe5a66b89b7a2770ceb018f0b9b7a144fc5e26fa6a167b1c8626d92",
+      "bytes": 103359
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -53313,6 +53363,11 @@
       "path": "tests/test_tvly_keyring.py",
       "sha256": "4879ed6cccb7be2f9dd7db5cfcd087e1884428cdcb97b16f7d17aef827ec5763",
       "bytes": 12126
+    },
+    {
+      "path": "tests/test_upstream_surface_watch.py",
+      "sha256": "e60c417abd190f598a9ba1f248a1ea94ced9d1b2e13b265fd494266a9d427bca",
+      "bytes": 121324
     },
     {
       "path": "tests/test_validate.py",
