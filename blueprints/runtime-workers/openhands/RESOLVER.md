@@ -494,14 +494,40 @@ command center adopted that refinement. The gate:
 - runs only from the reviewed main checkout it sits in, never from inside an agent tree,
   and records that checkout's commit.
 
+**Superseded wording, 2026-10-04:** "A read it cannot resolve, or a run of a computed path,
+refuses every commit." The earlier unresolved-read and computed-execution classes still
+refuse; newly unclassifiable reads are visible without adding a refusal class. The first
+option-(ii) implementation regressed opaque execution tails and assumed literal protection;
+the GPT/Opus review repair restores both to `b8eb9352b` behavior. The residual now travels
+separately from the legacy tail: an opaque piece contributes `data` to a template, and a
+collapse past 32 alternatives keeps `literal`. Opaque or unknown bases also retain the old
+assumed literal alternative, so `/`, multi-part Path and join chains still protect it.
+
+Fixed templates use their complete glob, with a leading `./` normalized. Intermediate
+templates add no broader new glob; pre-existing directory prefixes remain protected.
+Imported join aliases and `'/'.join` over a literal sequence use the same derivation.
+Opaque runtime-only templates, unknown runtime divisions and opaque enumeration bases
+are visible as unclassified reads; compositions made only of whole argv subjects remain
+editable subjects. This does not establish a general Python execution model: the GPT
+review's concatenated literal argv containers (`[sys.executable] + ["scripts/inner.py"]`,
+and the tuple equivalent) remain a coverage limitation deferred to resolver enablement.
+
+**Intended filename narrowing, recorded 2026-10-04:** `with_suffix` and `with_stem` on an
+exact base protect the resulting exact file, in place of the earlier `dir/stem*` glob.
+A sibling such as `policy/check_extra.py` stays editable beside a `check.py` base whose
+suffix becomes `.json`; the selected `policy/check.json` stays protected. Runtime filename
+transforms keep the completed glob. The prior computed-execution refusals for these
+transformations remain enforced. The sibling, transformed-file and execution controls
+are retained in [evidence part 12](evidence/push-gate-fail-first.txt).
+
 The bounded repair for cross-family read 489b is a recorded exception to the one-repair-round
 rule (2026-10-04). The coordinator selected option (ii): land with the residual visible.
 The initial fail-closed result remains in [evidence part 10](evidence/push-gate-fail-first.txt);
 part 11 records the revised behavior. On the unchanged `b8eb9352` tracked tree the working
 derivation has no legacy unresolved read and reports 222 unclassified locations in 22
-scripts. The sorted list, base commit and available shapes are retained in
-[the dated baseline](evidence/unclassified-gate-reads-20261004.json). The repository test
-prints that list and count without capping them, and passes the unchanged breadth bounds:
+scripts. That historical list remains in evidence part 11; the
+[dated baseline](evidence/unclassified-gate-reads-20261004.json) is refreshed for the merged
+`90a8c3f33` tree after the GPT/Opus review repair. The historical breadth was:
 
 | Measure on the unchanged tracked tree | Before this round | Option (ii) | Bound |
 | --- | ---: | ---: | ---: |
@@ -511,6 +537,30 @@ prints that list and count without capping them, and passes the unchanged breadt
 | Derived files / prefixes / globs | 552 / 18 / 10 | 552 / 12 / 140 | — |
 | Legacy unresolved locations | 0 | 0 | 0 |
 | Unclassified locations | Not recorded | 222 in 22 scripts | No cap |
+
+The [set comparison](evidence/gate-reads-set-diff-20261004.json) loads `b8eb9352b`'s reader
+from local git and applies both readers to the same merged tree. All old files, prefixes
+and globs are retained, with no lost tracked protection. The current snapshot is:
+
+| Measure on `90a8c3f33` | `b8eb9352b` reader | Review repair plus micro-fix | Bound |
+| --- | ---: | ---: | ---: |
+| Protected tracked files | 7,624 / 10,596 | 7,631 / 10,596 | — |
+| Outside `evidence/`, `tests/`, `.github/` | 637 / 3,448 (18.5%) | 644 / 3,448 (18.7%) | 25% (862 files) |
+| Blueprints outside gate code | — | 15 / 2,609 | 52 files |
+| Derived files / prefixes / globs | 335 / 18 / 10 | 335 / 30 / 145 | — |
+| Legacy unresolved locations | 1 | 0 | 0 for an operable gate |
+| Unclassified locations | Not recorded | 321 in 29 scripts | No cap |
+
+Before the micro-fix, both readers reported `tests/test_new_host_grand_list.py:115` as
+legacy unresolved. Main commit `89cf253c0` introduced its iteration over `g.LEDGERS.items()`.
+The coordinator authorized one exception on 2026-10-04 to resolve imported literal
+containers through the existing constant resolver, including `from package import module
+as g`. Dict `items()` with tuple unpacking, `values()`, `keys()`, and plain list/tuple
+iteration now select their literal paths. A runtime-built or unresolved imported mapping
+retains its earlier unresolved result. The new reader has zero unresolved reads, with the
+same 321-location baseline and unchanged breadth; [evidence part 13](evidence/push-gate-fail-first.txt)
+records the controls and acceptance. No refusal class changes. No further repair round
+follows this exception; new findings remain residuals for a follow-up PR.
 
 **Blocking precondition before the resolver's first live run:** every unclassified gate read
 must be classified, starting with [the baseline](evidence/unclassified-gate-reads-20261004.json)
@@ -557,8 +607,13 @@ That section is built from host-written files only, and each field has a fixed s
   trusted commit, the reason codes, zizmor's version and failing audits, and the
   triggering paths. A path is named only when the base already has it; a path the
   model chose is only counted. It also retains the full sorted `unclassified` list,
-  `unclassified_count` and available `unclassified_shapes`, including an empty list and
-  count of zero. These match the JSON printed to stderr on every gate run;
+  the record's own `unclassified_count` and available `unclassified_shapes`. The count is
+  `null` when derivation never ran, distinguishing it from a derived empty list with zero
+  entries. `unclassified_omitted` counts entries not retained after location filtering,
+  including any difference from the record's count. Shapes allow only path/glob characters
+  without whitespace; message text is dropped. The gate prints its full raw list, count
+  and shapes to stderr on every run, while the receipt reports the preserved count and
+  any filtered locations through the omitted counter;
 - the gates' receipt hashes (stage-gates.json and the P0-P2 probe receipt) and the
   G4-qualified reviewer argv's hash;
 - the containment evidence of plan acceptance A7 (`containment`), as names and
@@ -681,7 +736,8 @@ path or a name, never a credential.
 #   (c) the stage gates are recorded (steps 2-6 below: G2, P3, G5 and G4 in stage-gates.json).
 #   (d) every unclassified gate read is classified, including evidence/unclassified-gate-reads-20261004.json
 #       and later reports: anchor on CWD, __file__ or a repo-root constant; a provably external base is a host
-#       read; the rest is unresolved. The 222-location baseline is a blocking precondition, not a waiver.
+#       read; the rest is unresolved. The refreshed 321-location baseline is a blocking precondition, not a waiver.
+#       The 2026-10-04 literal-container micro-fix resolves tests/test_new_host_grand_list.py:115.
 # Option 2 (an owner fork) is only the overturn target; it would need its own reviewed harness change (Residuals).
 export PATH="$HOME/.local/share/codex-ecosystem/tools/docker-rootless-29.8.1/bin:$HOME/.local/share/codex-ecosystem/tools/skills-1.7.0/bin:$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:$HOME/.local/share/codex-ecosystem/bin:$PATH"
 RECIPE="$PWD/blueprints/runtime-workers/openhands"

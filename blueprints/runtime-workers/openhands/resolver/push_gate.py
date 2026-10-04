@@ -1015,7 +1015,7 @@ class PushGate:
         """One record for the exact commit `head` of `clone` against `base`. Never raises."""
         record = {"commit": head, "base": base, "status": "fail", "reasons": [], "paths": [],
                   "trusted_commit": None, "protected": None,
-                  "unclassified": [], "unclassified_count": 0, "unclassified_shapes": {},
+                  "unclassified": [], "unclassified_count": None, "unclassified_shapes": {},
                   "zizmor": {"version": None, "findings": None, "failing": []}}
         reasons, paths = [], {}
         try:

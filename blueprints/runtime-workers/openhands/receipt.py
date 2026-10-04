@@ -248,7 +248,7 @@ AUDIT_NAME = re.compile(r"[a-z][a-z0-9-]{0,63}")
 SEMVER = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
 REPOSITORY_PATH = re.compile(r"[A-Za-z0-9._@+-][A-Za-z0-9._@+/-]{0,254}")
 UNCLASSIFIED_LOCATION = re.compile(r"[A-Za-z0-9._@+-][A-Za-z0-9._@+/-]{0,254}:[0-9]+")
-UNCLASSIFIED_SHAPE = re.compile(r"[^\x00-\x1f\x7f]{1,4096}")
+UNCLASSIFIED_SHAPE = re.compile(r"[A-Za-z0-9._@+/*?\[\]!-]{1,4096}")
 
 
 def push_gate_summary(records):
@@ -264,15 +264,18 @@ def push_gate_summary(records):
                  if isinstance(entry, dict) and entry.get("known") is True and entry.get("rule") in PUSH_GATE_RULES
                  and _matching(entry.get("path"), REPOSITORY_PATH) and ".." not in entry["path"].split("/")]
         zizmor = record.get("zizmor") if isinstance(record.get("zizmor"), dict) else {}
-        unclassified = sorted({location for location in record.get("unclassified", [])
+        source_unclassified = record.get("unclassified") if isinstance(record.get("unclassified"), list) else []
+        unclassified = sorted({location for location in source_unclassified
                                if _matching(location, UNCLASSIFIED_LOCATION)
-                               and ".." not in location.rsplit(":", 1)[0].split("/")}) \
-            if isinstance(record.get("unclassified"), list) else []
+                               and ".." not in location.rsplit(":", 1)[0].split("/")})
         source_shapes = record.get("unclassified_shapes")
         shapes = {location: sorted({shape for shape in source_shapes[location]
                                    if _matching(shape, UNCLASSIFIED_SHAPE)})
                   for location in unclassified if isinstance(source_shapes, dict)
                   and isinstance(source_shapes.get(location), list)}
+        unclassified_count = record.get("unclassified_count")
+        if type(unclassified_count) is not int or unclassified_count < 0:
+            unclassified_count = None
         omitted = record.get("paths_omitted")
         summary.append({
             "status": record.get("status") if record.get("status") in ("pass", "fail") else None,
@@ -283,7 +286,8 @@ def push_gate_summary(records):
             if isinstance(record.get("reasons"), list) else [],
             "paths": named,
             "unclassified": unclassified,
-            "unclassified_count": len(unclassified),
+            "unclassified_count": unclassified_count,
+            "unclassified_omitted": max(len(source_unclassified), unclassified_count or 0) - len(unclassified),
             "unclassified_shapes": {location: values for location, values in shapes.items() if values},
             "unnamed_paths": len(entries) - len(named) + (omitted if type(omitted) is int and omitted > 0 else 0),
             "zizmor": {"version": _matching(zizmor.get("version"), SEMVER),

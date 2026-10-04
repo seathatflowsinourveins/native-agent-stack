@@ -611,12 +611,75 @@ class GateReadsTests(unittest.TestCase):
             "policy/strict.json": "{}\n",
         })
 
+    def test_iterating_imported_literal_constants_protects_each_path(self):
+        # Main 89cf253c0: from scripts import new_host_grand_list as g; g.LEDGERS.items().
+        constants = ('LEDGERS = {"one": "policy/one.json", "two": "policy/two.json"}\n'
+                     'KEY_PATHS = {"policy/one.json": 1, "policy/two.json": 2}\n'
+                     'PATHS = ["policy/one.json", "policy/two.json"]\n'
+                     'TUPLE_PATHS = ("policy/one.json", "policy/two.json")\n')
+        forms = (
+            'for key, rel in g.LEDGERS.items():\n    (ROOT / rel).read_text()\n',
+            'data = {key: (ROOT / rel).read_text() for key, rel in g.LEDGERS.items()}\n',
+            'for rel in g.LEDGERS.values():\n    (ROOT / rel).read_text()\n',
+            'for rel in g.KEY_PATHS.keys():\n    (ROOT / rel).read_text()\n',
+            'for rel in g.PATHS:\n    (ROOT / rel).read_text()\n',
+            'for rel in g.TUPLE_PATHS:\n    (ROOT / rel).read_text()\n',
+        )
+        constants_reader = self.gr.GateReads("scripts/gate_constants.py", constants)
+
+        def imported(module, name, level):
+            return constants_reader.module_value(name) if module == "scripts.gate_constants" and not level \
+                else (self.gr.UNKNOWN,)
+
+        for form in forms:
+            with self.subTest(form=form):
+                source = ('from pathlib import Path\nfrom scripts import gate_constants as g\n'
+                          'ROOT = Path(__file__).resolve().parents[1]\n' + form)
+                derived = self.derive({
+                    ".github/workflows/ci.yml": CI_WORKFLOW + "      - run: python3 scripts/check.py\n",
+                    "scripts/check.py": source,
+                    "scripts/gate_constants.py": constants,
+                    "policy/one.json": "{}\n",
+                    "policy/two.json": "{}\n",
+                    "policy/other.json": "{}\n",
+                })
+                self.assertEqual(derived.unresolved, [])
+                self.assertEqual(derived.unclassified, [])
+                self.assertEqual(derived.globs, {})
+                protected = self.g.Protected([derived], set())
+                for path in ("policy/one.json", "policy/two.json"):
+                    self.assertEqual(protected.rule(path), "ci_read")
+                self.assertIsNone(protected.rule("policy/other.json"))
+                # Observe the caller alone as well: the helper's literal strings must not mask
+                # a dropped read in the loop or comprehension.
+                blobs = {"scripts/check.py", "policy/one.json", "policy/two.json", "policy/other.json"}
+                reader = self.gr.GateReads("scripts/check.py", source, imported=imported)
+                self.assertEqual(reader.reads(blobs, self.g.patch_policy.parent_dirs(blobs)),
+                                 ({"scripts/check.py", "policy/one.json", "policy/two.json"}, set(), set(), set()))
+
+    def test_iterating_an_unresolved_mapping_keeps_the_read_visible(self):
+        for package in ("absent_package", "scripts"):
+            with self.subTest(package=package):
+                source = ('from pathlib import Path\nfrom ' + package + ' import gate_constants as g\n'
+                          'ROOT = Path(__file__).resolve().parents[1]\n'
+                          'for key, rel in g.LEDGERS.items():\n    (ROOT / rel).read_text()\n')
+                derived = self.derive({
+                    ".github/workflows/ci.yml": CI_WORKFLOW + "      - run: python3 scripts/check.py\n",
+                    "scripts/check.py": source,
+                    "scripts/gate_constants.py": 'LEDGERS = build_mapping()\n',
+                    "policy/strict.json": "{}\n",
+                })
+                self.assertEqual(derived.unresolved, ["scripts/check.py:5"])
+                self.assertEqual(derived.globs, {})
+                self.assertIsNone(self.g.Protected([derived], set()).rule("policy/strict.json"))
+
     def test_computed_relative_fstring_read_protects_fixed_glob(self):
         # Cross-family read 489b: the push workflow runs this script, so its policy input is gate data.
         derived = self.derive_read('import sys\nopen(f"policy/{sys.argv[1]}.json").read()\n')
         self.assertEqual(derived.unresolved, [])
         self.assertEqual(derived.globs, {"policy/*.json": "ci_read"})
         self.assertEqual(self.g.Protected([derived], set()).rule("policy/added.json"), "ci_read")
+        self.assertIsNone(self.g.Protected([derived], set()).rule("policy/added.toml"))
 
     def test_computed_path_division_read_protects_fixed_glob(self):
         derived = self.derive_read('import sys\nfrom pathlib import Path\nname = sys.argv[1]\n'
@@ -624,12 +687,14 @@ class GateReadsTests(unittest.TestCase):
         self.assertEqual(derived.unresolved, [])
         self.assertEqual(derived.globs, {"policy/*.json": "ci_read"})
         self.assertEqual(self.g.Protected([derived], set()).rule("policy/added.json"), "ci_read")
+        self.assertIsNone(self.g.Protected([derived], set()).rule("policy/added.toml"))
 
     def test_computed_os_path_join_read_protects_fixed_glob(self):
         derived = self.derive_read('import os\nimport sys\nopen(os.path.join("policy", sys.argv[1])).read()\n')
         self.assertEqual(derived.unresolved, [])
         self.assertEqual(derived.globs, {"policy/*": "ci_read"})
         self.assertEqual(self.g.Protected([derived], set()).rule("policy/added.toml"), "ci_read")
+        self.assertIsNone(self.g.Protected([derived], set()).rule("other/added.toml"))
 
     def test_environment_base_read_is_unclassified_at_script_line(self):
         derived = self.derive_read('import os\nopen(os.path.join(os.environ["POLICY_ROOT"], "rules.json")).read()\n')
@@ -640,27 +705,140 @@ class GateReadsTests(unittest.TestCase):
         derived = self.derive_read('import sys\nopen(sys.argv[1]).read()\n')
         self.assertEqual(derived.unresolved, [])
         self.assertEqual(derived.globs, {})
+        self.assertEqual(derived.unclassified, [])
         self.assertIsNone(self.g.Protected([derived], set()).rule("policy/strict.json"))
 
     def test_fixed_directory_constructions_keep_each_runtime_segment_in_the_glob(self):
         forms = {
-            'open("policy/" + name + ".json").read()': "policy/*.json",
-            'open("policy/%s.json" % name).read()': "policy/*.json",
-            'open("policy/{}.json".format(name)).read()': "policy/*.json",
-            'Path("policy", name).read_text()': "policy/*",
-            'Path("policy").joinpath(name).read_text()': "policy/*",
-            '(Path("policy") / name).with_suffix(".json").read_text()': "policy/*.json",
-            '(Path("policy") / name).with_stem("rules").read_text()': "policy/rules*",
-            'Path("policy/old.json").with_name(f"{name}.json").read_text()': "policy/*.json",
-            'open(f"policy/{name}/rules-{name}.json").read()': "policy/*/rules-*.json",
-            'open(f"{Path(\'policy\') / name}.json").read()': "policy/*.json",
+            'open("policy/" + name + ".json").read()': ("policy/*.json", "policy/new.json", "policy/new.toml"),
+            'open("policy/%s.json" % name).read()': ("policy/*.json", "policy/new.json", "policy/new.toml"),
+            'open("policy/{}.json".format(name)).read()': ("policy/*.json", "policy/new.json", "policy/new.toml"),
+            'Path("policy", name).read_text()': ("policy/*", "policy/new.json", "other/new.json"),
+            'Path("policy").joinpath(name).read_text()': ("policy/*", "policy/new.json", "other/new.json"),
+            '(Path("policy") / name).with_suffix(".json").read_text()':
+                ("policy/*.json", "policy/new.json", "policy/new.toml"),
+            '(Path("policy") / name).with_stem("rules").read_text()':
+                ("policy/rules*", "policy/rules.json", "policy/other.json"),
+            'Path("policy/old.json").with_name(f"{name}.json").read_text()':
+                ("policy/*.json", "policy/new.json", "policy/new.toml"),
+            'open(f"policy/{name}/rules-{name}.json").read()':
+                ("policy/*/rules-*.json", "policy/set/rules-new.json", "policy/set/other.json"),
+            # b8eb9352b also protects policy/ as a prefix for the embedded Path / name.
+            'open(f"{Path(\'policy\') / name}.json").read()':
+                ("policy/*.json", "policy/new.json", "other/new.json"),
         }
-        for expression, glob in forms.items():
+        for expression, (glob, matching, nonmatching) in forms.items():
             with self.subTest(expression=expression):
                 derived = self.derive_read('import sys\nfrom pathlib import Path\nname = sys.argv[1]\n'
                                            + expression + '\n')
                 self.assertEqual(derived.unresolved, [])
-                self.assertIn(glob, derived.globs)
+                self.assertEqual(derived.globs, {glob: "ci_read"})
+                protected = self.g.Protected([derived], set())
+                self.assertEqual(protected.rule(matching), "ci_read")
+                self.assertIsNone(protected.rule(nonmatching))
+
+    def test_runtime_only_computed_reads_are_visible_and_argv_compositions_stay_subjects(self):
+        forms = ('f"{get_base()}{sys.argv[1]}"', 'get_base() + sys.argv[1]',
+                 'Path(environ["R"]) / sys.argv[1]')
+        for expression in forms:
+            for read in (f'open({expression}).read()', f'Path({expression}).read_text()'):
+                with self.subTest(read=read):
+                    derived = self.derive_read('import sys\nfrom pathlib import Path\nfrom os import environ\n'
+                                               + read + '\n')
+                    self.assertEqual(derived.unresolved, [])
+                    self.assertEqual(derived.unclassified, ["scripts/check.py:4"])
+                    self.assertEqual(derived.globs, {})
+        for expression in ('sys.argv[1]', 'f"{sys.argv[1]}{sys.argv[2]}"', 'sys.argv[1] + sys.argv[2]'):
+            for read in (f'open({expression}).read()', f'Path({expression}).read_text()'):
+                with self.subTest(subject=read):
+                    derived = self.derive_read('import sys\nfrom pathlib import Path\n' + read + '\n')
+                    self.assertEqual((derived.unresolved, derived.unclassified, derived.globs), ([], [], {}))
+
+    def test_opaque_enumerations_are_unclassified(self):
+        for expression in ('Path(os.environ["R"]).glob("*.json")',
+                           'Path(os.environ["R"]).rglob("*.json")',
+                           'Path(os.environ["R"]).iterdir()', 'os.listdir(os.environ["R"])'):
+            with self.subTest(expression=expression):
+                derived = self.derive_read('import os\nfrom pathlib import Path\n' + expression + '\n')
+                self.assertEqual(derived.unresolved, [])
+                self.assertEqual(derived.unclassified, ["scripts/check.py:3"])
+
+    def test_named_opaque_path_constructions_stay_visible_without_a_read_sink(self):
+        # The path-building expressions must remain visible when a helper reads them later.
+        derived = self.derive_read('import os\nfrom pathlib import Path\n'
+                                   'target = Path(os.environ["ROOT"]) / "policy" / "received.json"\n'
+                                   'read_policy(target)\n')
+        self.assertEqual(derived.files.get("policy/received.json"), "ci_read")
+        self.assertEqual(derived.unresolved, [])
+        self.assertIn("scripts/check.py:3", derived.unclassified)
+        derived = self.derive_read('import os, sys\nfrom pathlib import Path\n'
+                                   'root = Path(os.environ["ROOT"]) / "policy"\n'
+                                   'target = root / sys.argv[1]\nread_policy(target)\n')
+        self.assertIn("scripts/check.py:4", derived.unclassified)
+        derived = self.derive_read('ratio = get_seconds() / 60\n')
+        self.assertEqual((derived.unresolved, derived.unclassified), ([], []))
+
+    def test_join_aliases_and_leading_dot_protect_normalized_fixed_globs(self):
+        forms = {
+            'open(join("./policy", sys.argv[1])).read()': "policy/*",
+            'open(osp.join("./policy", sys.argv[1])).read()': "policy/*",
+            'open("/".join(["./policy", sys.argv[1]])).read()': "policy/*",
+            'open(f"./policy/{sys.argv[1]}.json").read()': "policy/*.json",
+            '(Path("./policy") / f"{sys.argv[1]}.json").read_text()': "policy/*.json",
+        }
+        for expression, glob in forms.items():
+            with self.subTest(expression=expression):
+                derived = self.derive_read('import sys\nfrom pathlib import Path\nfrom os.path import join\n'
+                                           'import os.path as osp\n' + expression + '\n')
+                self.assertEqual(derived.globs, {glob: "ci_read"})
+                self.assertEqual(derived.unresolved, [])
+                self.assertEqual(derived.unclassified, [])
+                protected = self.g.Protected([derived], set())
+                self.assertEqual(protected.rule("policy/added.json"), "ci_read")
+                self.assertIsNone(protected.rule("other/added.json"))
+        derived = self.derive_read('import sys\nopen(f"../policy/{sys.argv[1]}.json").read()\n')
+        self.assertEqual(derived.globs, {})
+        self.assertEqual(derived.unresolved, [])
+        self.assertEqual(derived.unclassified, ["scripts/check.py:2"])
+
+    def test_received_literal_protection_survives_opaque_and_unknown_bases(self):
+        for base in ('os.environ["ROOT"]', 'os.getenv("ROOT")', 'Path.cwd()', 'get_base()', 'UNKNOWN_BASE'):
+            for expression in (f'(Path({base}) / "policy" / "received.json").read_text()',
+                               f'Path({base}, "policy", "received.json").read_text()',
+                               f'open(os.path.join({base}, "policy", "received.json")).read()'):
+                with self.subTest(expression=expression):
+                    derived = self.derive_read('import os\nfrom pathlib import Path\n' + expression + '\n')
+                    self.assertEqual(derived.files.get("policy/received.json"), "ci_read")
+                    self.assertEqual(derived.unresolved, [])
+                    self.assertEqual(derived.unclassified, ["scripts/check.py:3"])
+
+    def test_collapsed_execution_keeps_the_legacy_literal_tail(self):
+        source = ('import os, sys, subprocess\nfrom pathlib import Path\nROOT = Path(__file__).resolve().parents[1]\n'
+                  + ''.join(f'target = f"{{ROOT}}/scripts/check{i}-{{os.environ[\"CHECK\"]}}.py"\n'
+                            for i in range(33))
+                  + 'subprocess.run([sys.executable, target])\n')
+        reader = self.gr.GateReads("scripts/check.py", source)
+        self.assertEqual(reader.module_value("target")[0].tail, "literal")
+        self.assertEqual(self.derive_read(source).unresolved, ["scripts/check.py:37"])
+
+    def test_embedded_unknown_root_reads_keep_all_legacy_locations(self):
+        source = ('from pathlib import Path\nROOT = Path(__file__).resolve().parents[1]\n'
+                  'def read():\n    return Path(\n        ROOT / TARGET\n    ).read_text()\n')
+        self.assertEqual(self.derive_read(source).unresolved, ["scripts/check.py:4", "scripts/check.py:5"])
+
+    def test_with_suffix_and_stem_narrow_exact_reads_but_keep_execution_refusals(self):
+        for method, argument, result in (("with_suffix", ".json", "policy/check.json"),
+                                          ("with_stem", "rules", "policy/rules.py")):
+            with self.subTest(method=method):
+                derived = self.derive_read('from pathlib import Path\n'
+                                           f'Path("policy/check.py").{method}("{argument}").read_text()\n')
+                self.assertEqual(derived.globs, {})
+                protected = self.g.Protected([derived], set())
+                self.assertEqual(protected.rule(result), "ci_read")
+                self.assertIsNone(protected.rule("policy/check_extra.py"))
+                executed = self.derive_read('import subprocess\nfrom pathlib import Path\n'
+                                            f'subprocess.run([Path(__file__).{method}("{argument}")])\n')
+                self.assertEqual(executed.unresolved, ["scripts/check.py:3"])
 
     def test_opaque_bases_joined_with_a_fixed_tail_are_unclassified(self):
         for expression in ('(Path(os.environ["POLICY_ROOT"]) / "rules.json").read_text()',
@@ -870,7 +1048,9 @@ class RepositoryWorkflowTests(unittest.TestCase):
         self.assertEqual(derived.interpolations, [])
         expected = {"scripts/validate.py": "ci_named", ".gitleaks.toml": "ci_named",
                     "tests/test_workflow_hardening.py": "workflow_policy_test",
-                    "tests/test_brand_new_module.py": "ci_discovered", ".github/workflows/validate.yml": "github",
+                    # The merged workflow set names tests/: both b8eb9352b and the new reader
+                    # give the stronger ci_named rule in place of ci_discovered on this tree.
+                    "tests/test_brand_new_module.py": "ci_named", ".github/workflows/validate.yml": "github",
                     "CODEOWNERS": "codeowners", f"{RESOLVER}/push_gate.py": "gate_code",
                     f"{RESOLVER}/gate_reads.py": "gate_code",
                     "blueprints/runtime-workers/openhands/resolver.py": "gate_code",
@@ -905,9 +1085,12 @@ class RepositoryWorkflowTests(unittest.TestCase):
         # every receipt and test. Legacy unresolved reads refuse every push; the new unclassified
         # residual is reported without a cap and must be classified before the first live run.
         tree, derived = self.derived()
-        self.assertEqual(derived.unresolved, [])
         print(json.dumps({"unclassified_count": len(derived.unclassified), "unclassified": derived.unclassified,
                           "unclassified_shapes": derived.unclassified_shapes}, sort_keys=True))
+        baseline = json.loads((ROOT / "blueprints/runtime-workers/openhands/evidence/"
+                               "unclassified-gate-reads-20261004.json").read_text())
+        self.assertEqual(derived.unclassified, baseline["unclassified"])
+        self.assertEqual(len(derived.unclassified), baseline["count"])
         self.assertNotIn("", derived.prefixes)
         self.assertTrue(all(self.g.gate_reads.static_dir(pattern) for pattern in derived.globs), derived.globs)
         protected = self.g.Protected([derived], self.g.policy_tests(tree))
@@ -920,6 +1103,7 @@ class RepositoryWorkflowTests(unittest.TestCase):
                       if path.startswith("blueprints/") and protected.rule(path) != "gate_code"]
         covered = [path for path in blueprints if protected.rule(path)]
         self.assertLessEqual(len(covered), len(blueprints) // 50, sorted(covered))
+        self.assertEqual(derived.unresolved, [])
 
 
 class PushGateTests(unittest.TestCase):
@@ -1221,6 +1405,52 @@ class GateDataReadTests(unittest.TestCase):
         self.assertEqual(record["unclassified"], ["scripts/check.py:2"])
         self.assertEqual(record["unclassified_count"], 1)
 
+    def test_opaque_computed_execution_keeps_the_pre_round_refusal(self):
+        for piece in ('os.environ["CHECK"]', 'get_check()'):
+            for path in (f'f"{{ROOT}}/scripts/{{{piece}}}.py"', f'ROOT + "/scripts/" + {piece} + ".py"'):
+                with self.subTest(path=path):
+                    files = {
+                        ".github/workflows/ci.yml": CI_WORKFLOW + "      - run: python3 scripts/check.py\n",
+                        "scripts/check.py": ('import os, sys, subprocess\nfrom pathlib import Path\n'
+                                             'ROOT = Path(__file__).resolve().parents[1]\n'
+                                             f'subprocess.run([sys.executable, {path}])\n'),
+                    }
+                    fixture = GateFixture(self.tmp / f"execute-{secrets.token_hex(3)}", files)
+                    gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+                    record = self.check({"docs/guide.md": "changed\n"}, fixture=fixture, gate=gate)
+                    self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_input_unresolved"]))
+                    self.assertEqual(record["unresolved"], ["scripts/check.py:4"])
+
+    def test_received_literal_edits_are_refused_under_opaque_bases(self):
+        for base in ('os.environ["ROOT"]', 'os.getenv("ROOT")', 'Path.cwd()', 'get_base()'):
+            for path in (f'Path({base}) / "policy" / "received.json"',
+                         f'Path({base}, "policy", "received.json")',
+                         f'os.path.join({base}, "policy", "received.json")'):
+                with self.subTest(path=path):
+                    files = {
+                        ".github/workflows/ci.yml": CI_WORKFLOW + "      - run: python3 scripts/check.py\n",
+                        "scripts/check.py": ('import os\nfrom pathlib import Path\n' + f'open({path}).read()\n'),
+                        "policy/received.json": "{}\n",
+                    }
+                    fixture = GateFixture(self.tmp / f"received-{secrets.token_hex(3)}", files)
+                    gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+                    record = self.check({"policy/received.json": "changed\n"}, fixture=fixture, gate=gate)
+                    self.assertEqual((record["status"], record["reasons"]), ("fail", ["protected_path"]))
+                    self.assertEqual(record["paths"], [{"path": "policy/received.json", "rule": "ci_read", "known": True}])
+                    self.assertEqual(record["unclassified"], ["scripts/check.py:3"])
+
+    def test_count_is_unknown_when_derivation_never_ran(self):
+        output = io.StringIO()
+        with contextlib.redirect_stderr(output):
+            record = self.gate.check("relative", base="a" * 40, head="b" * 40)
+        self.assertEqual(record["reasons"], ["invalid_arguments"])
+        self.assertIsNone(record["unclassified_count"])
+        self.assertEqual(json.loads(output.getvalue()),
+                         {"unclassified": [], "unclassified_count": None, "unclassified_shapes": {}})
+        [summary] = load_resolver()._recipe("receipt").push_gate_summary([record])
+        self.assertIsNone(summary["unclassified_count"])
+        self.assertEqual(summary["unclassified_omitted"], 0)
+
     def test_gate_prints_and_receipt_records_unclassified_reads(self):
         files = {
             ".github/workflows/ci.yml": CI_WORKFLOW + "      - run: python3 scripts/check.py\n",
@@ -1377,10 +1607,22 @@ class ReceiptProjectionTests(unittest.TestCase):
             "status": "fail", "commit": "c" * 40, "base": "a" * 40, "trusted_commit": "b" * 40,
             "reasons": ["protected_path", "zizmor_finding"],
             "paths": [{"path": "CODEOWNERS", "rule": "codeowners"}], "unnamed_paths": 6,
-            "unclassified": [], "unclassified_count": 0, "unclassified_shapes": {},
+            "unclassified": [], "unclassified_count": None, "unclassified_shapes": {}, "unclassified_omitted": 0,
             "zizmor": {"version": PIN, "findings": 2, "failing": ["template-injection"]}})
         self.assertEqual(self.receipt.push_gate_summary(None), [])
         self.assertEqual(self.receipt.push_gate_summary([{"status": "maybe", "commit": "HEAD"}])[0]["status"], None)
+
+    def test_unclassified_count_and_omissions_survive_receipt_filtering(self):
+        record = {"unclassified_count": 7,
+                  "unclassified": ["scripts/check.py:2", "scripts/other.py:3", "../outside.py:4", "bad name.py:5"],
+                  "unclassified_shapes": {"scripts/check.py:2": ["policy/*.json", "*.json arbitrary message", "*.json\n"],
+                                          "scripts/other.py:3": ["policy/[ab]*.json", "policy/*.json;message"]}}
+        [summary] = self.receipt.push_gate_summary([record])
+        self.assertEqual(summary["unclassified_count"], 7)
+        self.assertEqual(summary["unclassified_omitted"], 5)
+        self.assertEqual(summary["unclassified"], ["scripts/check.py:2", "scripts/other.py:3"])
+        self.assertEqual(summary["unclassified_shapes"],
+                         {"scripts/check.py:2": ["policy/*.json"], "scripts/other.py:3": ["policy/[ab]*.json"]})
 
     def test_gate_read_refusals_reach_the_receipt(self):
         # Cross-family review P1 of 2026-10-04: the ci_read and unresolved_read rules and the
