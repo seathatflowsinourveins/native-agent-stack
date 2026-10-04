@@ -326,10 +326,13 @@ Ubuntu 26.04 was not run here. The coordinator's measurement there (uutils
 **Action served.** Protect credential output in the foundation's agent shell
 hook, which supports the research and runtime work. This repair starts at
 `385e3f6584d2524c8407d44a7a9ae0ddd1316cd1` and resolves the three P1 findings
-and the one P2 finding from that revision's review.
+and the reported P2 controls from that revision's review. A second authorized
+round starts at `a7888d3107d5d5cec1868ca08b67522a026dda83` (round-one content
+`f33afee2`, pin and registry `a7888d31`) and corrects the independent Opus
+review's uutils findings, including an incorrect harmless-command allowance.
 
 **Sources selected with search-first.** GNU coreutils `v9.12`
-(`c0f8514d9891`), uutils coreutils `0.8.0` and `0.12.0`, and glibc
+(`c0f8514d9891`), uutils coreutils `0.8.0`, `0.10.0` and `0.12.0`, and glibc
 `glibc-2.42`, read on 2026-10-04. The installed GNU env reports `9.4`;
 that version observation is separate from the pinned source review. GNU's
 `v9.12` NEWS identifies its September 14 stable release. No dependency or
@@ -343,16 +346,29 @@ fit this repair; the agreed seam is `check()` in the existing unittest module.
   [glibc execvpe.c](https://github.com/bminor/glibc/blob/glibc-2.42/posix/execvpe.c#L81-L89)
   confirms direct execution when the path contains a slash.
 - [GNU env.c](https://github.com/coreutils/coreutils/blob/v9.12/src/env.c#L603-L811),
-  [uutils env.rs](https://github.com/uutils/coreutils/blob/0.8.0/src/uu/env/src/env.rs#L507-L597)
-  and [its 0.12.0 split iterator](https://github.com/uutils/coreutils/blob/0.12.0/src/uu/env/src/split_iterator.rs)
-  specify splitting and insertion before trailing argv. The guard expands
-  separate, attached, clustered and abbreviated split options, quotes,
-  ASCII whitespace, comments and env escapes. It keeps option termination
-  and assignment state when locating the effective command. Both readings
-  check that argv. Harmless literal commands such as `env -vS "ls -l"`
-  and `env --split "ls -l"` pass. Invalid split strings and inherited
-  variable expansion are refused as `env_split_unclassified`; the guard
-  does not inspect inherited values.
+  [uutils 0.8.0 env.rs](https://github.com/uutils/coreutils/blob/0.8.0/src/uu/env/src/env.rs#L558-L644),
+  [0.10.0 env.rs](https://github.com/uutils/coreutils/blob/0.10.0/src/uu/env/src/env.rs#L575-L709)
+  and [0.12.0 env.rs](https://github.com/uutils/coreutils/blob/0.12.0/src/uu/env/src/env.rs#L611-L749)
+  define different option grammars. GNU getopt stops before assignment
+  operands, accepts abbreviated long options and short clusters, and
+  restarts option parsing after inserting split words before trailing argv.
+  Uutils preprocesses the original argv before clap, continues after words
+  containing `=`, and expands only literal `--split-string`, `-S`, `-vS`
+  and `-vvS` prefixes. The target's 0.10.0 and reviewed 0.12.0 also consume
+  separate payloads for those literal options. Clap accepts other inferred
+  split spellings but discards their payload without expansion; no remaining
+  program means an environment dump. Generated split options are likewise
+  consumed by clap rather than recursively pre-expanded.
+  The guard's current reading expands GNU argv; its prior reading provides
+  the independent uutils backstop. Either refusal wins. Their literal string
+  splitter handles quotes, ASCII whitespace, comments and env escapes from
+  GNU env.c and [uutils split_iterator.rs](https://github.com/uutils/coreutils/blob/0.12.0/src/uu/env/src/split_iterator.rs).
+  P2 acceptance: `env -vS "ls -l"` passes; `env --split "ls -l"` is refused
+  because uutils dumps the environment. Invalid split strings and inherited
+  variable expansion are refused as `env_split_unclassified`; the guard does
+  not inspect inherited values. The prior raw env no-command backstop also
+  remains to preserve main's refusals, including conservative refusals of
+  supported split syntax without a separate command operand.
 - [GNU coreutils.c](https://github.com/coreutils/coreutils/blob/v9.12/src/coreutils.c#L145-L176)
   specifies `--coreutils-prog=NAME` and `--coreutils-prog-shebang=NAME`.
   The guard reads the selected utility and its arguments, discarding the
@@ -386,8 +402,52 @@ refused launcher command or credential file was executed or read.
   original main baseline `f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5`.
   Corpus SHA256: `5d8be2ac060d9435654e6a89e281021c0787be3c60ef4a3bf409d757fd39f2a4`.
   Against the intermediate starting head, the same corpus has 30 new
-  refusals and two allowances: exactly the two reported P2 false refusals.
-  This is a new scoped replay, not reproduction of the historical count.
+  refusals and two allowances, then classified as P2 false refusals.
+  That round-one classification was incorrect for `env --split "ls -l"`;
+  round two restores its refusal. This is a scoped replay, not reproduction
+  of the historical count.
+
+**Round-two returned evidence.** The GNU and uutils source readings are
+distinct from execution on the target distribution; no new uutils host
+acceptance is claimed.
+
+- The final two env review methods fail against the exact `a7888d31` guard
+  with **95 failing subtests, 0 errors**, and pass with this repair. The
+  initial narrower rows produced 80 failing subtests; the counts are
+  separate snapshots. The assignment cases cover `-S`, `-vS` and
+  `--split-string=`, attached and separate payloads, nested env and wrapper
+  calls, a file reader and a tracer. The two invalid `--split` allow
+  controls are now refusal rows; `env -vS "ls -l"` remains allowed.
+- The P2-4 row now includes a harmless trailing `EXAMPLE_OTHER`. At
+  `385e3f65`, the old row is refused while the extended row passes; the
+  repaired guard refuses the extended row as `environment_dump`.
+- The first expanded replay exposed six round-one allowances that main
+  had refused. Restoring the prior raw no-command backstop fixes them;
+  harmless controls retain trailing operands where that backstop applies.
+  The failed replay artifacts remain separate from the final result.
+- The regenerated native unittest replay uses **3,028** fixture/document
+  commands frozen at `a7888d31` and the actual inputs to all four current
+  `test_review_685_*` methods: **3,257 distinct commands**. Against
+  `f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5`, it returns **232 newly
+  refused, 0 loosened**; against `a7888d31`, **95 newly refused,
+  0 loosened**. Both comparisons have **0 reason changes, 0 errors**.
+  Corpus SHA256:
+  `8b075817aff195ca28e7d1fcc723517737b3732d5e83d4a7c8618762cf2fc028`.
+- With `CI=true` and the requested `TMPDIR`, the full guard suite returns
+  **89 tests, 3 skips, 0 failures**. CI skips the installed-hook comparison;
+  two other skips are the existing mutation-driver adapter controls. The
+  requested temporary directory is absent and outside this worker's
+  writable roots, so Python uses its `/tmp` fallback. The host hook and
+  temporary-directory configuration are not changed.
+
+**Completeness check.** This round covers GNU abbreviated/clustered split
+options, uutils literal prefixes, assignment continuation, original versus
+generated argv, nested launchers and controls with trailing operands. It
+retains the independent raw env fallback and the round-one timeout and GNU
+dispatch protections. The original historical replay corpus and live target
+host execution remain unavailable evidence; the scoped replay and pinned
+source review do not substitute for them. The two proven testing/parser
+mistakes are recorded in the [anti-pattern log](../harness-defaults.md#anti-pattern-log).
 - The temporary repair artifacts retain the returned red/green logs and
   `replay.py` / `replay.json`. `python3 scripts/validate.py` is required
   after the final scoped evidence hash registration. It checks structural

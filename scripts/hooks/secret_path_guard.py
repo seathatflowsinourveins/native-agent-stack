@@ -1225,9 +1225,9 @@ def split_env_string(text: str) -> list[str]:
 
 
 def env_split_argv(words: list[str], at: int = 0) -> list[str] | None:
-    """One env -S expansion, or None when its option prefix has no split string. GNU env.c parse_split_string resets getopt,
-    inserts split arguments before the trailing argv, and retains effects of earlier options. uutils env.rs expands clustered -vS
-    too. Discarding already consumed options here keeps their values from being mistaken for commands; raw segments still check files.
+    """One GNU env -S expansion, or None when its option prefix has no split string. GNU env.c parse_split_string resets getopt,
+    inserts split arguments before the trailing argv, and retains effects of earlier options. Discarding already consumed options here
+    keeps their values from being mistaken for commands; raw segments still check files. uutils_env_argv supplies the independent reading.
     Generated argv and repeated splitting spend the existing work budget."""
     if program_of(words[at:at + 1]) != "env":
         return None
@@ -1272,12 +1272,67 @@ def env_split_argv(words: list[str], at: int = 0) -> list[str] | None:
     return None
 
 
-def env_command_start(words: list[str], at: int = 0, moved: list[str] | None = None) -> int | None:
+def uutils_env_argv(words: list[str]) -> list[str] | None:
+    """The argv after uutils 0.10.0/0.12.0 env.rs process_all_string_arguments, or None without a split option. Unlike GNU getopt,
+    preprocessing continues past words containing '=' and expands only the literal --split-string/-S/-vS/-vvS prefixes. Other split
+    spellings remain for clap: infer_long_args accepts abbreviations and ordinary clusters but discards their value without expansion.
+    Process the original argv once: generated words go directly to clap, where even a literal split option's value is discarded.
+    The prior reading checks this argv with splitting disabled, retaining the uutils dump backstop alongside the current GNU reading."""
+    if program_of(words) != "env":
+        return None
+    result = [words[0]]
+    moved: list[str] = []
+    index = 1
+    expecting_arg = False
+    split_seen = False
+    while index < len(words):
+        index = skip_redirections(words, index, moved)
+        if index >= len(words):
+            break
+        word = words[index]
+        spend("reads", 1)
+        if not expecting_arg and (word == "--" or not (word.startswith("-") or "=" in word)):
+            result.extend(words[index:])
+            break
+        index += 1
+        expecting_arg = False
+        prefix = next((prefix for prefix in ("--split-string", "-S", "-vS", "-vvS") if word.startswith(prefix)), None)
+        if prefix is not None:
+            split_seen = True
+            payload = word[len(prefix):]
+            if word == prefix:
+                index = skip_redirections(words, index, moved)
+                if index >= len(words):
+                    raise EnvSplitUnclassified()
+                payload = words[index]
+                index += 1
+            elif prefix == "--split-string" and payload.startswith("="):
+                payload = payload[1:]
+            result.extend(split_env_string(payload))
+        else:
+            if word.startswith("--"):
+                option = word.partition("=")[0]
+                names = [option] if option in ENV_LONG_OPTIONS else [name for name in ENV_LONG_OPTIONS if name.startswith(option)]
+                split_seen |= names == ["--split-string"]
+                expecting_arg = word[2:] in {"argv0", "chdir", "file", "unset"}
+            elif word.startswith("-"):
+                first = next((letter for letter in word[1:] if letter in ENV_VALUE_LETTERS), None)
+                split_seen |= first == "S"
+                expecting_arg = word[-1:] in {"a", "C", "f", "u"}
+            result.append(word)
+    if not split_seen:
+        return None
+    spend("words", len(result) + len(moved) + 1)
+    return result + moved
+
+
+def env_command_start(words: list[str], at: int = 0, moved: list[str] | None = None, *, split_strings: bool = True) -> int | None:
     """Index of the command `env [options] [NAME=value ...] command` runs, where env is words[at], or None for a dump. An option takes the
     next word for its value as GNU or uutils env reads it (env_option_takes_value). A redirection among its words is no option and no value
     (skip_redirections); an input redirection skipped goes to `moved`. With a split string the returned index belongs to its effective argv,
-    which env_split_argv builds; launcher_chain stops before that transformation instead of applying its index to the original list."""
-    while (expanded := env_split_argv(words, at)) is not None:
+    which env_split_argv builds; launcher_chain stops before that transformation instead of applying its index to the original list.
+    split_strings=False locates the program after uutils preprocessing; clap consumes any remaining split option without expanding it."""
+    while split_strings and (expanded := env_split_argv(words, at)) is not None:
         words, at = expanded, 0  # callers that need original indices stop before a split-string env (launcher_chain)
     index = at + 1
     options = True
@@ -1294,7 +1349,7 @@ def env_command_start(words: list[str], at: int = 0, moved: list[str] | None = N
         elif options and word.startswith("-"):
             index += 1
         elif re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word):
-            options = False  # GNU getopt's '+' stops before assignments; uutils also treats the following executable literally
+            options = False  # GNU getopt stops before assignments; uutils clap sees assignments after its separate preprocessing pass
             index += 1
         else:
             return index
@@ -2081,8 +2136,9 @@ def segment_reason(words: list[str]) -> str | None:
 # script (`systemd-run --description kernel_keyring.py exec n X -- keyctl print 1`), a redirection operator that the old walk took for the
 # value of `sudo -u`, a path-qualified wrapper whose option value was the script, the value after a clustered ps option. check() therefore
 # reads a command the old way as well when the reading above allows it, and refuses what either refuses: no command that guard refused
-# passes, except the explicit env split-string false-refusal correction of 2026-10-04, by construction instead of finding each walk that
-# differs. Split-string argv is shared by both readings; ordinary env options keep the prior table. The functions below read that guard's tables
+# passes, except the env split-string corrections of 2026-10-04, by construction instead of finding each walk that differs. The current
+# reading expands GNU split strings; this backstop separately reads uutils preprocessing and clap's discarded split values. Ordinary env
+# options keep the prior table. The functions below read that guard's tables
 # (every table they use is unchanged since, and SECRET_NAMES only grew); they differ from it only where no verdict changes: they spend
 # from the work budget, `find -exec` is walked by index, the mentions of an injected variable use the linear test of
 # mentions_injected_variable, identical started commands are read once, and a text's words come from lex(), whose legacy reading is that
@@ -2150,9 +2206,9 @@ def prior_strip_prefix(words: list[str]) -> list[str]:
 
 
 def prior_env_command_start(words: list[str]) -> int | None:
-    """Index of the command `env [options] [NAME=value ...] command` runs as c26800f3 read it, or None for a dump."""
-    while (expanded := env_split_argv(words)) is not None:
-        words = expanded
+    """Index of env's command as c26800f3 read it, or None for a dump; split strings instead use the independent uutils reading.
+    Keep its raw no-command refusal too, so split expansion cannot loosen a historical refusal. When preprocessing changes argv,
+    the returned index belongs to that argv, which prior_expand also uses."""
     index = 1
     while index < len(words):
         word = words[index]
@@ -2161,7 +2217,8 @@ def prior_env_command_start(words: list[str]) -> int | None:
         elif word.startswith("-") or re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word):
             index += 1
         else:
-            return index
+            expanded = uutils_env_argv(words)
+            return env_command_start(expanded, split_strings=False) if expanded is not None else index
     return None
 
 
@@ -2195,10 +2252,18 @@ def prior_expand(command: str, depth: int = 0) -> list[list[str]]:
             spend("words", len(words) + 1)
             result.append(words)
             program = program_of(words)
+            if program in MULTICALL_LAUNCHERS:
+                dispatched = coreutils_command(words)
+                if dispatched is not None:
+                    words = prior_strip_prefix(dispatched)
+                    continue
             if program == "env":
-                expanded = env_split_argv(words)
+                expanded = uutils_env_argv(words)
                 if expanded is not None:
-                    words = prior_strip_prefix(expanded)
+                    start = env_command_start(expanded, split_strings=False)
+                    if start is None:
+                        break  # the original env segment is refused as a dump by prior_env_command_start
+                    words = prior_strip_prefix(expanded[start:])
                     continue
                 start = prior_env_command_start(words)
                 if start is None:
@@ -2378,8 +2443,8 @@ def read_command(command: str, top: bool = True) -> str | None:
     the reading of c26800f3, with dc33b48a's names, stores and segment identity (_baseline True). A command B refuses keeps B's reason. Only
     a command B allows gets the K4 tightenings (k4_tightenings), each of which can only refuse.
 
-    The launcher repair of 2026-10-04 also corrects false refusals for harmless literal env split-string commands. Split argv, including
-    trailing arguments, is checked by both readings instead of treating the option's payload as an absent command or an executable name.
+    The launcher repair of 2026-10-04 reads GNU split-string argv in the current reading and uutils preprocessing in the prior reading.
+    A harmless literal command passes only when both allow it; an inferred uutils split option can discard its value and dump the environment.
 
     The contract-v2 loosening (L1, section 7.1) is form F: a top-level Python or Node program on stdin through exactly one quoted
     here-document that ends the command (k4_form_f). For F, the two word readings read the command with the body emptied (amendment A5:

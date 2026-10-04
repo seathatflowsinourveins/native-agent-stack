@@ -2127,22 +2127,71 @@ class SecretPathGuardTests(unittest.TestCase):
             r"env -S 'printenv\_EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
             "env -S '\"printenv\" EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
             "env -vS'-- -/printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
-            "env --split 'EXAMPLE_OTHER=1 -/printenv EXAMPLE_TOKEN'": "environment_dump",
+            "env --split 'EXAMPLE_OTHER=1 -/printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            # Keep the pre-existing raw env no-command backstop: required replay must loosen no main-baseline refusal.
+            'env --split-string "ls -l"': "environment_dump",
+            'env -S "ls -l"': "environment_dump",
+            "env -vS'ls -l'": "environment_dump",
+            "env -S 'ls -l;printenv EXAMPLE_TOKEN'": "environment_dump",
+            "env -S 'ls -l' -S 'printenv EXAMPLE_TOKEN'": "environment_dump",
         }
         for command, reason in blocked.items():
             for prefix in ("", "rtk proxy ", "timeout 5 -- "):
                 with self.subTest(command=command, prefix=prefix):
                     self.assertEqual(guard.check(prefix + command), reason)
-        for option in ("-vS", "--split", "--split-string", "-S", "-ivS"):
+        for option in ("-vS", "-vvS", "--split-string", "-S"):
             for tail in ("", " EXAMPLE_OTHER"):
+                if not tail and option in {"--split-string", "-S"}:
+                    continue  # refused by the historical raw no-command backstop above
                 command = f'env {option} "ls -l"{tail}'
                 with self.subTest(command=command):
                     self.assertIsNone(guard.check(command))
-        for command in ("env -vS'ls -l'", "env --split='ls -l' EXAMPLE_OTHER",
-                        "env --split '-- ls -l'", "env --split 'EXAMPLE_OTHER=1 ls -l'",
-                        "env -S 'ls -l;printenv EXAMPLE_TOKEN'"):
+        for command in ("env -vS'ls -l' EXAMPLE_OTHER", "env --split='ls -l' EXAMPLE_OTHER",
+                        'env --split "ls -l" EXAMPLE_OTHER', 'env -ivS "ls -l" EXAMPLE_OTHER',
+                        "env -S 'ls -l;printenv EXAMPLE_TOKEN' EXAMPLE_OTHER"):
             with self.subTest(command=command):
                 self.assertIsNone(guard.check(command))
+
+    def test_review_685_uutils_split_preprocessing(self):
+        # uutils 0.10.0 env.rs process_all_string_arguments (also reviewed at 0.8.0/0.12.0):
+        # only literal --split-string/-S/-vS/-vvS prefixes expand; inferred options discard their payload.
+        # Preprocessing continues after assignment operands, before clap locates the program.
+        blocked = {
+            'env --split "ls -l"': "environment_dump",
+            "env --split 'EXAMPLE_OTHER=1 ls -l'": "environment_dump",
+            "env --split '-- ls -l'": "environment_dump",
+            "env --split='ls -l'": "environment_dump",
+            'env --spl "ls -l"': "environment_dump",
+            'env -ivS "ls -l"': "environment_dump",
+            "env EXAMPLE_OTHER=1 -S 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 -vS 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 --split-string='printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 --split-string 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 -S'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 -vvS'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -S 'env EXAMPLE_OTHER=1 -vS \"printenv EXAMPLE_TOKEN\" EXAMPLE_OTHER' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 -S 'cat' .env": "dotenv_read",
+            "env EXAMPLE_OTHER=1 -S 'gdb' -p 1": "process_trace",
+            "env -S '--split \"ls -l\"'": "environment_dump",
+        }
+        for command, reason in blocked.items():
+            for prefix in ("", "rtk proxy ", "timeout 5 -- ", "env ", "coreutils --coreutils-prog=env "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertEqual(guard.check(prefix + command), reason)
+        allowed = (
+            'env -vS "ls -l"',
+            "env EXAMPLE_OTHER=1 -S 'ls -l' EXAMPLE_OTHER",
+            "env EXAMPLE_OTHER=1 -vS 'ls -l' EXAMPLE_OTHER",
+            "env EXAMPLE_OTHER=1 --split-string='ls -l' EXAMPLE_OTHER",
+            "env --split 'EXAMPLE_OTHER=1 ls -l' EXAMPLE_OTHER",
+            "env -- ls -S 'printenv EXAMPLE_TOKEN'",
+            "env ls -S 'printenv EXAMPLE_TOKEN'",
+            "env -S 'ls -l' -S 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER",
+        )
+        for command in allowed:
+            for prefix in ("", "rtk proxy ", "timeout 5 -- "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertIsNone(guard.check(prefix + command))
 
     def test_review_685_gnu_single_binary_dispatch(self):
         # GNU v9.12 src/coreutils.c main: --coreutils-prog=NAME and --coreutils-prog-shebang=NAME.
