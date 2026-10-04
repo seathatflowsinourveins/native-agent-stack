@@ -47,10 +47,10 @@ The tag resolves to `e001f773f80b22b7dc4c7a79521b30e35aaef026`.
 
 ## Local integration result
 
-At `421e4ee87` on 2026-10-04, the renamed
+At `5a4add33a` (pre-rebase `421e4ee87`, the same patch) on 2026-10-04, the renamed
 `rtk-exactness-controls-diff-unchanged-and-grep-fold-lossless` kept both diff
 predicates unchanged and compared sorted reconstructed paths with native paths.
-The PR #698 follow-up at base `45a7218c0` now compares the complete sequences
+The PR #698 follow-up at the pre-rebase review head `45a7218c0` (its registry commit was replaced by `5e6afa4f0` on rebase) now compares the complete sequences
 in order. Both plain-list predicates require successful grep exits, three
 distinct native paths and the correct header/tail count. The proxy check
 continues to require identical output and exits for every case.
@@ -99,7 +99,7 @@ Paths become scope markers; raw conversations and account state are absent.
 | Guard test before its fixture/check addition | One unittest, one failure, exit 1: the required guard check is absent | Synthetic local contract check |
 | Injected CR in a folded tail before preserving LF records | One unittest, one failure, exit 1: `splitlines()` incorrectly hid the corrupted tail; the inverse now splits only LF | Synthetic local contract check |
 | Fold and guard repair | Three focused tests pass, exit 0; malformed headers, missing/extra/duplicate/changed paths, absent folds, CR loss, exit corruption and proxy corruption are rejected | Local contract checks |
-| Repaired native exactness fixture at `421e4ee87` | Nine checks pass across 11 cases / 33 arms / 73 commands, exit 0 | Local integration of installed upstream CLI |
+| Repaired native exactness fixture at `5a4add33a` (pre-rebase `421e4ee87`, the same patch) | Nine checks pass across 11 cases / 33 arms / 73 commands, exit 0 | Local integration of installed upstream CLI |
 | Native distinctness term deleted in job 042 | Two unittests, one failure, exit 1; LF count control passes | Synthetic local contract check |
 | LF record-count term deleted in job 042 | Two unittests, two failing count variants, exit 1; distinctness control passes | Synthetic local contract check |
 | Same paths reordered under the former sorted comparison | One unittest, one failure, exit 1 | Synthetic local contract check |
@@ -135,10 +135,10 @@ unignored generated temporary artifacts; those artifacts are now ignored.
 All failed outputs remain in the bounded job's temporary storage alongside
 the reruns. Provider usage is unmeasured.
 
-At repair commit `421e4ee87`, `python3 scripts/validate.py` returned exit 1 with
+At repair commit `5a4add33a` (pre-rebase `421e4ee87`, the same patch), `python3 scripts/validate.py` returned exit 1 with
 registry drift only: hashes and byte counts for the changed receipt, script and
 test module, plus the receipt's appended limitations mirror. After the registry
-commit `45a7218c0`, the unchanged baseline rerun in job 042 returned exit 0:
+commit the pre-rebase review head `45a7218c0` (its registry commit was replaced by `5e6afa4f0` on rebase), the unchanged baseline rerun in job 042 returned exit 0:
 69 components, 9,897 hashed files, four profiles and 199 receipts. Its first
 attempt included unignored job-local upstream downloads and failed publication
 path checks; ignoring those private scratch files resolved that failure before
@@ -181,7 +181,7 @@ native fixture passes ten checks; its original stdout/argv/hashes are retained
 beside the terminal streams. Final `python3 scripts/validate.py` returns exit 1
 with registry drift only (changed hashes/byte counts, the appended limitations
 mirror and new artifact registrations); `git diff --check` returns exit 0.
-These working-tree results are separate from the passing `45a7218c0` baseline.
+These working-tree results are separate from the passing pre-rebase `45a7218c0` baseline; after the rebase onto `38ac9aca1` and the registry commit `5e6afa4f0`, `python3 scripts/validate.py` passes (exit 0).
 
 ## Residual and completeness critic
 

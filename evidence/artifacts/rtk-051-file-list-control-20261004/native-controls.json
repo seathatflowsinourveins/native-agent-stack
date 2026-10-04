@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "evidence_class": "local_integration",
-  "base_head": "45a7218c0",
+  "base_head": "45a7218c0 (pre-rebase review head; content pinned by source_files sha256)",
   "captured_at": "2026-10-04T20:35:12.845215+00:00",
   "scope": "Selected original sanitized Run.command records; omitted other exactness commands. Not an upstream suite or model run.",
   "original_receipt_sha256": "34f18f36e4a3b88bba08bc3368549e683bd124e8c99c4dd7a339d18f394ffa1a",

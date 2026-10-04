@@ -3,7 +3,7 @@
 These small sanitized artifacts retain the original terminal evidence used by
 [the decision note](../../../docs/decisions/2026-10-04-rtk-file-list-control.md).
 Job 035's outputs were copied from its surviving temporary storage. Job 042
-repairs PR #698 from `45a7218c0`; it leaves the registry to the coordinator.
+repairs PR #698 from the pre-rebase review head `45a7218c0` (its registry commit was replaced by `5e6afa4f0` on rebase); it leaves the registry to the coordinator.
 The upstream reference is [rtk-ai/rtk v0.51.0](https://github.com/rtk-ai/rtk/tree/v0.51.0),
 tag commit `e001f773f80b22b7dc4c7a79521b30e35aaef026`, particularly `feac25d`
 and `3223a80`. No credentials or native conversations were read or copied.
@@ -58,7 +58,7 @@ The two isolated deletion runs invoke Python's unchanged unittest runner with
   executes the installed CLI. Ten checks pass over 12 cases / 36 arms /
   76 fixture commands, plus a version command (exit 0); owned state is cleaned.
 - `job-042-validate-base-after-ignore.txt`: validation of the unchanged
-  `45a7218c0` baseline passes after the registry commit (exit 0).
+  pre-rebase `45a7218c0` baseline passes after the registry commit (exit 0).
 
 [native-controls.json](native-controls.json) copies the original `Run.command`
 records for the version, both-file diff and all three grep cases, plus the
@@ -83,7 +83,7 @@ code and privacy guards were not patched for acceptance.
 `job-042-acceptance-unittest-final.txt` is the complete sanitized terminal
 stream for the final requested five-module invocation: 966 tests, 35 skips,
 no failures, exit 0. It runs Python's unittest runner against a byte-identical
-native Git copy from `45a7218c0` with the working-tree implementation/test
+native Git copy from the pre-rebase review head `45a7218c0` with the working-tree implementation/test
 changes, a canonicalized workspace job TMPDIR, the original nonzero UID/GID
 and a private util-linux user/mount namespace. The shared ancestor Git marker stays
 untouched. `job-042-validate-final.txt` retains the final validator's exit-1
