@@ -127,9 +127,11 @@ TOP_RULE_MARKER = "native-agent-stack:top-rule"
 EXCEPTIONS_MARKER = "native-agent-stack:rtk-exceptions"
 # adoption/pins-linux-x86_64.json "codex" (tests/test_codex_worker_lane.py keeps the two equal). The writer's
 # behaviour below was read and probed at 0.157.1; at 0.159.2 the source it cites is unchanged (compared at the two tag
-# commits on 2026-09-30) and CodexIntegrationTests ran again against the real binary.
-CODEX_VERSION = "0.159.3"
-REQUIRED_FAILURE = "required MCP servers failed to initialize: "
+# commits on 2026-09-30) and CodexIntegrationTests ran again against the real binary. Those checks vouch for the
+# writer at 0.157.1 and 0.159.2. The selected 0.160.0 SDK/CLI pair has its separate qualification; --apply requires
+# that exact Linux pin and refuses on a host still running 0.159.3 until the coordinated switch.
+CODEX_VERSION = "0.160.0"
+REQUIRED_FAILURE ="required MCP servers failed to initialize: "
 REQUIRED_FAILURE_LIMIT = 2000  # characters retained from the aggregate error, as in #436's pinned port source
 # The servers the stack-worker profile promises before a worker's first turn. Codex waits only for servers whose
 # effective `enabled` and `required` are both true (openai/codex@a956835d, tag rust-v0.160.0:

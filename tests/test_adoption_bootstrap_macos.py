@@ -259,9 +259,9 @@ class PinsSchemaTests(unittest.TestCase):
     MAC_PIN_LAGS_LINUX = {
         "ai-memory": ("2.3.2", "2.4.1", "evidence/receipts/ai-memory-241-qualification-20260925.json"),
         "mcporter": ("0.13.13", "0.14.1", "evidence/receipts/mcporter-0141-qualification-20260925.json"),
-        # Linux moved to 0.159.3 on 2026-10-01; the Mac keeps 0.155.1 until its own
-        # qualification (the receipts' limitations).
-        "codex": ("0.155.1", "0.159.3", "evidence/receipts/codex-01593-native-queue-20261001.json"),
+        # Linux selects 0.160.0 on 2026-10-03; the Mac keeps 0.155.1 until its own
+        # qualification.
+        "codex": ("0.155.1", "0.160.0", "evidence/receipts/runtime-sdk-20261003.json"),
         # Linux moved 2026-09-27 (cooldown waived by the user); the Mac keeps 1.14.0 until its own qualification.
         "socraticode": ("1.14.0", "1.15.0", "evidence/receipts/socraticode-1150-qualification-20260927.json"),
     }
@@ -3557,7 +3557,9 @@ class CIEmbedModelCacheOrderTests(unittest.TestCase):
     def test_the_cache_key_is_derived_from_the_pin_not_a_literal_hash(self):
         cache_index = self._step_index("Restore the cached pinned embedding model")
         cache_step = self.steps[cache_index]
-        self.assertEqual(cache_step["uses"].split("@")[0], "actions/cache")
+        # Restore only since 2026-10-04 (docs/decisions/2026-10-04-ci-least-privilege.md): the separate save
+        # step below writes the entry, on trusted events alone.
+        self.assertEqual(cache_step["uses"].split("@")[0], "actions/cache/restore")
         key = cache_step["with"]["key"]
         self.assertIn("${{ steps.embed-model-pin.outputs.sha256 }}", key)
         # No literal 64-hex-char sha256 anywhere in the key: a changed pin
@@ -3574,6 +3576,27 @@ class CIEmbedModelCacheOrderTests(unittest.TestCase):
         cache_steps = [step for step in self.steps if "Cache the pinned embedding model" in step.get("name", "")
                        or "Restore the cached pinned embedding model" in step.get("name", "")]
         self.assertEqual(len(cache_steps), 1, cache_steps)
+
+    def test_the_cache_is_saved_only_off_pull_requests_after_the_bootstrap_verified_it(self):
+        # A pull_request run executes the pull request's code, so it only restores; the verified model is saved
+        # on push, schedule and workflow_dispatch, under the restore step's own primary key, and only on a miss
+        # (actions/cache save/README.md at the pinned v6.1.0, "Always save cache").
+        uses = [step.get("uses", "").split("@")[0] for step in self.steps]
+        self.assertNotIn("actions/cache", uses, "the combined action saves in its post step on every event")
+        self.assertEqual(uses.count("actions/cache/restore"), 1)
+        self.assertEqual(uses.count("actions/cache/save"), 1)
+        restore = self.steps[uses.index("actions/cache/restore")]
+        save_index = uses.index("actions/cache/save")
+        save = self.steps[save_index]
+        self.assertGreater(save_index, self._step_index("Run the macOS bootstrap into a disposable prefix"))
+        self.assertEqual(restore.get("id"), "embed-model-cache")
+        self.assertEqual(save["if"], "github.event_name != 'pull_request' && "
+                                     "steps.embed-model-cache.outputs.cache-hit != 'true'")
+        self.assertEqual(save["with"], {"path": restore["with"]["path"],
+                                        "key": "${{ steps.embed-model-cache.outputs.cache-primary-key }}"})
+        self.assertEqual(restore["uses"].split("@")[1], save["uses"].split("@")[1], "both from one actions/cache commit")
+        self.assertNotIn("cache-mode", self.workflow["jobs"]["bootstrap-macos"],
+                         "cache-mode takes no expression; read would skip the trusted-event save")
 
     def test_bootstrap_re_verifies_any_cached_file_via_fetch(self):
         # Confirms the invariant the step ordering above depends on:

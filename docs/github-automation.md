@@ -519,7 +519,7 @@ commands for the immutable tag releases. [`.github/pull_request_template.md`](..
 requires scope with a Lane line (exactly one `lane:*` label), base commit, a `### SOTA sources` section
 (enforced by the required `sota-sources` check), a per-claim evidence-class table, exact local
 commands run, a decision-record path and a checklist covering SHA pins,
-`contents: read`, no secrets, no paid hosting and preserved peer-owned
+top-level `permissions: {}`, no secrets, no paid hosting and preserved peer-owned
 untracked files.
 
 ## Ruleset upgrade, 2026-09-22
@@ -862,8 +862,8 @@ to the full commit SHA of `v2.4.4`
 annotated tag with `gh api repos/ossf/scorecard-action/git/tags/<sha>`) on a
 weekly schedule, `workflow_dispatch`, and push to `main`. `publish_results`
 is `false` -- results are never published to the public `api.scorecard.dev`
-dataset or badge. The workflow's top-level permission is `contents: read`;
-since 2026-09-22 the `analysis` job alone also holds `security-events: write`,
+dataset or badge. The workflow's top-level permissions are `{}` (since 2026-10-04)
+and the `analysis` job holds `contents: read`; since 2026-09-22 it alone also holds `security-events: write`,
 which it uses only to upload the SARIF report to code scanning with
 `github/codeql-action/upload-sarif` v4.38.1 (free for this public repository,
 no GitHub Advanced Security purchase). The SARIF report is also retained as a
@@ -1148,7 +1148,7 @@ reviewer's act. See "Live test, 2026-09-23" in the decision record.
 
 `propose` is the one job in this workflow with write permissions
 (`contents: write`, `pull-requests: write`, scoped to the job, not the
-workflow -- the top-level `permissions:` block stays `contents: read`),
+workflow -- the top-level `permissions:` block is `{}` and `freshness` holds `contents: read`),
 because it is the one job that opens a PR; it needs no `actions: write`
 since it no longer dispatches other workflows. It is still never a required
 check and it never merges anything by itself.

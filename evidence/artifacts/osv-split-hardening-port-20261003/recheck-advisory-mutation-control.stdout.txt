@@ -1,0 +1,21 @@
+2026-10-04T00:48:40Z tests/test_osv_lockfile_coverage.py sha256 before 86f372452299daf1be59452c3e0c13691a1c00058154d17a8a594a914c19dbe6
+2026-10-04T00:48:40Z tests/test_osv_lockfile_coverage.py (this head): frozen-id check present once, at line 612
+2026-10-04T00:48:40Z 4d7f4dd0e:tests/test_osv_lockfile_coverage.py (prior head): frozen-id check present once, at line 612
+2026-10-04T00:48:40Z frozen-id check present (line 612), mutation test: expected pass, observed pass; ran 1, failures 0, errors 0
+   test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs (head.FrozenPolicyMutationTests.test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs) ... ok
+2026-10-04T00:48:40Z advisory input: leaked entry id GHSA-vfj7-8cjw-p6xm, keys ['id', 'ignoreUntil', 'reason'], ignoreUntil in 30 days; ignore_entry_problems []; override_problems []
+2026-10-04T00:48:40Z advisory input against the guarded preflight test: expected fail, observed fail; ran 1, failures 1, errors 0
+   test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (head.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory) ... FAIL
+   FAIL: test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (head.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory)
+   AssertionError: Items in the first set but not the second:
+   last line: 'GHSA-vfj7-8cjw-p6xm' : the exception belongs in the frozen config, which only the frozen scan uses
+2026-10-04T00:48:40Z frozen-id check removed (scratch copy, line 612), mutation test: expected fail, observed fail; ran 1, failures 1, errors 0
+   test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs (scratch_without_frozen_id_check.FrozenPolicyMutationTests.test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs) (mutation='advisory') ... FAIL
+   FAIL: test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs (scratch_without_frozen_id_check.FrozenPolicyMutationTests.test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs) (mutation='advisory')
+   AssertionError: [] is not true : the actual preflight guard accepted the changed input
+2026-10-04T00:48:40Z failures are the advisory subtest only: True (1 failure)
+2026-10-04T00:48:40Z prior head 4d7f4dd0e, frozen-id check removed (scratch copy, line 612), mutation test: expected pass, observed pass; ran 1, failures 0, errors 0
+   test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs (prior_4d7f4dd0e_without_frozen_id_check.FrozenPolicyMutationTests.test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs) ... ok
+2026-10-04T00:48:40Z tests/test_osv_lockfile_coverage.py sha256 after 86f372452299daf1be59452c3e0c13691a1c00058154d17a8a594a914c19dbe6; unchanged: True
+2026-10-04T00:48:40Z all observations match expectations: True
+exit 0

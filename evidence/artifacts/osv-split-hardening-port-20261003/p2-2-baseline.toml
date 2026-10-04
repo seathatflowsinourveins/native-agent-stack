@@ -1,0 +1,4 @@
+[[IgnoredVulns]]
+id = "GHSA-test-unrelated"
+ignoreUntil = 2026-10-17
+reason = "synthetic native case-alias reproduction"

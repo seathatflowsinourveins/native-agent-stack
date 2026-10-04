@@ -1913,7 +1913,7 @@
     {
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.159.3",
+      "version": "0.160.0",
       "profile": "core",
       "role": "Native subscription coding client",
       "installation_assessment": "native installation/operation recorded in scoped public receipt",
@@ -2109,6 +2109,11 @@
             "id": "codex-01593-hindsight-native-memory-20261001",
             "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "runtime-sdk-20261003",
+            "path": "evidence/receipts/runtime-sdk-20261003.json",
+            "kind": "compatibility_attempt"
           }
         ],
         "retained_operation_ids": [],

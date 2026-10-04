@@ -1,0 +1,7 @@
+# Source-reviewed research-worker trial; not a foundation default.
+# DeepAgents 4394bcd00b8eb46e7c423939643a0dfcfb5d8773
+deepagents==0.7.21
+# LangChain OpenAI 026c3da2b615abe52f8446e37de460b844d07a43
+langchain-openai==1.6.7
+# Published SQLite package; matched source b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4.
+langgraph-checkpoint-sqlite==3.1.1

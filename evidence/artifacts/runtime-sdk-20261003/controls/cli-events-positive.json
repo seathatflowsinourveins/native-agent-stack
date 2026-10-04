@@ -1,0 +1,1 @@
+{"artifact": "exec-events.ndjson", "expected_marker": "CLI_01600_GATEWAY_CANARY_OK", "match": true, "observed_marker": "CLI_01600_GATEWAY_CANARY_OK"}
