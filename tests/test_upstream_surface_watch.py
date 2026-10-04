@@ -1412,8 +1412,9 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(seen["home"], seen["codex_home"])
         self.assertNotEqual(seen["home"], str(Path.home()))
         self.assertFalse(Path(seen["codex_home"]).exists())  # removed after the probe
+        # macOS adds __CF_USER_TEXT_ENCODING to every process it starts (Core Foundation), so the probe cannot keep it out.
         self.assertEqual(set(seen["env"]) - {"PATH", "HOME", "CODEX_HOME", "LANG", "NO_COLOR", "TERM", "LC_CTYPE",
-                                             "PWD", "SHLVL", "_"}, set())
+                                             "PWD", "SHLVL", "_", "__CF_USER_TEXT_ENCODING"}, set())
 
 
 # ----------------------------------------------------------------------------------------------- dispositions
