@@ -462,6 +462,36 @@ locally with `GH_TOKEN` set and no `--offline`, using
   assignment and both non-empty guards together, preserving the remaining
   groups' exhaustive/disjoint checks. See the hardening-port receipt above.
 
+  **WSL lock renamed out of discovery (2026-10-04).** The retired partition's
+  lock is now `blueprints/convergence-practice/wsl-retrieval/package-lock.json.frozen`,
+  byte-identical (SHA256 `5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb`).
+  This carries out, for the WSL lock, the 2026-10-03 decision in the alert-16
+  note to rename both frozen npm locks to `.frozen` and stop scanning them.
+  Following the removal list above, the change deletes:
+  - `.github/osv-scanner-frozen-wsl-retrieval.toml`, the grant that expires on
+    2026-10-17;
+  - the inventory key and the `FROZEN_LOCKS` row;
+  - the scan invocation, SARIF report and upload step;
+  - the `jq -e` assignment and both non-empty guards.
+
+  The ordinary and macOS groups stay exhaustive and disjoint. The preflight
+  still runs the partition's retirement tests, whose audit now also requires
+  that no lockfile name exists in the partition, on disk or in Git. The
+  dependency-free `package.json` moves to a new `dependency_free` inventory
+  class; the coverage tests require such a manifest to declare no dependency
+  field and to have no lockfile beside it. With the WSL clause gone, the macOS
+  assignment line lost its trailing `and`, so the macOS tripwire re-pins that
+  line, its copy in the coverage test and the edited `dependabot.yml` comment.
+  The macOS archive is otherwise unchanged, and its rename is a later
+  follow-up. Dependabot alert 17 and Scorecard alert 19 should read fixed once
+  main's dependency graph and the next Scorecard run no longer see the lock.
+  That means removed from discovery, not patched: braces 3.0.3 stays in the
+  archived bytes. If alert 17 stays open after the merge, its dismissal needs
+  the user's explicit authorization naming it; alert 19 is never dismissed.
+  Evidence: `evidence/receipts/wsl-lock-frozen-rename-20261004.json` and the
+  2026-10-04 addendum to
+  [2026-09-25-longmemeval-frozen-npm-lock.md](2026-09-25-longmemeval-frozen-npm-lock.md).
+
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
   check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day
@@ -1620,9 +1650,11 @@ Read-only `gh api` GETs are dated below.
     --no-ignores --persona regular --strict-collection` with the default exit codes,
     so findings exit 11-14 and fail the required `validate` check
     ([usage](https://docs.zizmor.sh/usage/)). No scope is added: the workflow stays
-    `contents: read`, and fork and Dependabot PRs get a read-only token
+    `contents: read`, fork PRs get a read-only token
     ([events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)),
-    which is all zizmor's API reads need. The gate adds impostor-commit,
+    and Dependabot PRs get one that is read-only by default (it can be raised:
+    [Troubleshooting Dependabot on GitHub Actions, "Changing `GITHUB_TOKEN` permissions"](https://docs.github.com/en/code-security/reference/supply-chain-security/troubleshoot-dependabot/dependabot-on-actions#changing-github_token-permissions);
+    wording qualified 2026-10-04), which is all zizmor's API reads need. The gate adds impostor-commit,
     known-vulnerable-actions and ref-confusion (online-only in the `regular`
     persona, [audits](https://docs.zizmor.sh/audits/)) and ref-version-mismatch
     (documented as offline-capable, but skipped offline by 1.30.1).
