@@ -52202,8 +52202,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "d403e9ab37f4a1ecdb827a608b388676fb70ce500e827783981e9bae7a224438",
-      "bytes": 59744
+      "sha256": "9138d033a5c8441af3c26905ba27fc3a8726433c6610ee815e1b56864ec60cd2",
+      "bytes": 60024
     },
     {
       "path": "tests/test_catalogs.py",

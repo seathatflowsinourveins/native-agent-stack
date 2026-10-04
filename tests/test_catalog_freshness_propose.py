@@ -489,6 +489,13 @@ class BuildReceiptTests(unittest.TestCase):
                                     "https://example.invalid/run/1", "2026-09-23T00:00:00Z")
         self.assertEqual(receipt["schema_version"], 1)
         self.assertEqual(receipt["kind"], fp.RECEIPT_KIND)
+        self.assertTrue(
+            receipt["claim"].startswith(
+                "Catalog-freshness run (https://example.invalid/run/1) "
+                "rebuilt the SOTA-convergence manifest and "
+            )
+        )
+        self.assertNotIn("Scheduled", receipt["claim"])
         self.assertIn("report-only", receipt["claim"])
         self.assertIn("was selected, evaluated, or changed", receipt["claim"])
         self.assertIn("pin bump requires its own separately qualified receipt", receipt["claim"])
