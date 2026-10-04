@@ -4483,8 +4483,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "82a78b1f5589c4bc6567f5a8e24223c06559feeb653f420fe62dbe2ad0cfe11b",
-      "bytes": 63862
+      "sha256": "76d66f3cd8df2c86a5c1e523d7bd590bb01c2fc85ac321d418e0413f042ed237",
+      "bytes": 63161
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -16124,8 +16124,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "2c48c1baefe729728ec2c977df99f7b207a79a75dcee2df4c47e417eed6db265",
-      "bytes": 145599
+      "sha256": "5e87cc6552a77bc0a32df9c9abd03d354463b9308468ce1246e03c4355148723",
+      "bytes": 143786
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -34396,56 +34396,6 @@
       "path": "evidence/artifacts/login-shell-contract-20260929/startup_placeholder_names.py",
       "sha256": "491bd010f639b4b353c76e4a18b4be4d510735fc0039cd17f214d50080c7cea4",
       "bytes": 2303
-    },
-    {
-      "path": "evidence/artifacts/mac-model-hosting-20260927/README.md",
-      "sha256": "1318d326e265b8d794aba873c91700b2f208f627c889cd5fe935ce6befe4d425",
-      "bytes": 22908
-    },
-    {
-      "path": "evidence/artifacts/mac-model-hosting-20260927/capacity.json",
-      "sha256": "1eb91f3aa06e3138ff49259964203c3f240630f8d270dbeddcc37512e29415ff",
-      "bytes": 3205
-    },
-    {
-      "path": "evidence/artifacts/mac-model-hosting-20260927/coresidency.json",
-      "sha256": "7aec6d2595e9945928c9395b98be84bdcd960a6294efe5a7346527b44cc80984",
-      "bytes": 5809
-    },
-    {
-      "path": "evidence/artifacts/mac-model-hosting-20260927/embed-acceptance.json",
-      "sha256": "a5b64858d49ff54c0ecca6e8f581e6248aa6a95b02719fcfb284c4d6a9ecfc9d",
-      "bytes": 1768
-    },
-    {
-      "path": "evidence/artifacts/mac-model-hosting-20260927/gate.json",
-      "sha256": "9944f8d614543e0743e4effc97dc8804ed79e32893500058df386053c3851581",
-      "bytes": 15361
-    },
-    {
-      "path": "evidence/artifacts/mac-model-hosting-20260927/li26-mac-descriptive.json",
-      "sha256": "586cde01ad338a2f435571e00e2b161ca20d97ffc141b948bb88dab1a8d469fc",
-      "bytes": 4046
-    },
-    {
-      "path": "evidence/artifacts/mac-model-hosting-20260927/li26-window-samples.json",
-      "sha256": "d5b1794bc28f8909fbbbd3a0a7495ce9208b586a7e6f8663ab96022481a44a0a",
-      "bytes": 838
-    },
-    {
-      "path": "evidence/artifacts/mac-model-hosting-20260927/li26_mac_descriptive.py",
-      "sha256": "935893d8beeee746716869b95d3a1c67ee595336b77e191751273763eb822ead",
-      "bytes": 9460
-    },
-    {
-      "path": "evidence/artifacts/mac-model-hosting-20260927/port-record-20261003.md",
-      "sha256": "8812eb21c999ac470f333f9d403f75bda588a4e5ff6409cb1986adb3aa452571",
-      "bytes": 15052
-    },
-    {
-      "path": "evidence/artifacts/mac-model-hosting-20260927/swap-event.json",
-      "sha256": "1f8a103c20d063e941523b95baa5820ed3f3a8b835ebf1e1efbd2fee509a00a7",
-      "bytes": 1766
     },
     {
       "path": "evidence/artifacts/mac-stage1-client-layer-20260927/README.md",
