@@ -601,7 +601,7 @@ class RenderTests(unittest.TestCase):
         # The user's choice of 2026-10-04, Opus 5.5, pinned by its full model name (the map's model entry overrides the
         # shared template's opus[1m], which other hosts keep); the advisor stays the template's.
         self.assertEqual(settings["model"], "claude-opus-5-5")
-        self.assertEqual(settings["advisorModel"], "fable")
+        self.assertEqual(settings["advisorModel"], "opus")
         self.assertEqual(json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text())["model"],
                          "opus[1m]")
         self.assertEqual(settings["effortLevel"], "xhigh")
