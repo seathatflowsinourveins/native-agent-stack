@@ -15415,13 +15415,13 @@
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "4a37a821f5608da528a8fa1f1774a7ba7ad82b6af17d11815c2d3ac6283b3375",
-      "bytes": 403074
+      "sha256": "29847c58005f6f18efc6503f305c8615c8f1f1d681ec323f01f41bc4fddf38cc",
+      "bytes": 437223
     },
     {
       "path": "catalogs/sota-convergence/README.md",
-      "sha256": "76ee44ca2cdb48b6ce62379b6b1b7fd71276b868c5724138751b333331b1106c",
-      "bytes": 16558
+      "sha256": "62166aff5e47c2f4cc394ca818626f013f0d21aca17e787728877c9df0191fbd",
+      "bytes": 17216
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
@@ -15447,6 +15447,11 @@
       "path": "catalogs/sota-convergence/manifest-20260929.json",
       "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
       "bytes": 1149103
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261004.json",
+      "sha256": "9b02873756df67e8edddaa0092394daecb99430e2eab96d1611254663cd4d28c",
+      "bytes": 942818
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -16232,6 +16237,11 @@
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
       "sha256": "4efed6abf346d5ae4a9742ba8a527625d5d95f252f58611c2de9e98dc486e174",
       "bytes": 37516
+    },
+    {
+      "path": "docs/decisions/2026-10-04-skills-landscape-sweep.md",
+      "sha256": "f924e9df7e5d05357ab38d871d706753a48129d4c049e9cebe56dfb98b6368f4",
+      "bytes": 168277
     },
     {
       "path": "docs/direct-results.md",
@@ -33507,6 +33517,206 @@
       "path": "evidence/artifacts/landscape-sweep-20260929/vshulcz-deja-vu.json",
       "sha256": "1ecffbbd16d616fe5a3728d23cf16824fd84579c55544c4fc131086486b628d1",
       "bytes": 2160
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526-attempts/child-usage-wf_47005bb5-412.json",
+      "sha256": "210e0e215c0c59ca27a3081c8f1adc3abd719e911e89d9b02c1d374eb9718814",
+      "bytes": 3545594
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526-attempts/child-usage-wf_c1b19948-f8d.json",
+      "sha256": "a179f0f8c7e5e18d2717b71ad87cb52a6dbfc0353f2b2f1fc2bcab50115940f9",
+      "bytes": 115787
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526-attempts/stopped-result.json",
+      "sha256": "14e5e0521714d1e5b21e8f115ea713cf41fab2b99ec8e8d63071755b1dee6c61",
+      "bytes": 23228
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/addyosmani-agent-skills-spec-driven-development.json",
+      "sha256": "4bd83e3c5d116dba8b69d56d7d33e0eb1bdfcf5c37ac9fb151ae8e0205b92990",
+      "bytes": 3317
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/addyosmani-agent-skills-test-driven-development.json",
+      "sha256": "6970f1fea7d07eabc262893c7db97b4a5d4f0c61cd1fe349981dac3b4a388cfe",
+      "bytes": 3320
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/affaan-m-ecc-intent-driven-development.json",
+      "sha256": "9da22a44f45ee7eb483aad1e05b1fb6c5873b6faae231e835b9c9c04a517c6a0",
+      "bytes": 3542
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/affaan-m-ecc-tdd-workflow.json",
+      "sha256": "6c4a56fc4716761e49b642cde1171963d08934517c8d3dead189382dc36383f3",
+      "bytes": 3258
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/anthropics-claude-plugins-official-build-mcp-server.json",
+      "sha256": "fc9bce69d3b1db368a173c66d696ece3c832937447d44fb54db5530ecbb8ee68",
+      "bytes": 3596
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/anthropics-claude-plugins-official-claude-md-improver.json",
+      "sha256": "7a4c7bedeb0ffeda0b7ae7890527854a8a96936f7f58f0c0b50093ed247111c2",
+      "bytes": 3290
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/anthropics-knowledge-work-plugins-debug.json",
+      "sha256": "ac0a955c8df26fed9d4447cea3e9518b78660f80895309b2542a64c6ad6fffb9",
+      "bytes": 3675
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/bgauryy-octocode-octocode-research.json",
+      "sha256": "ce13caba50c4cd9a84b1092723484f490200694446dcfc642590a4be6485f290",
+      "bytes": 3267
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/cathrynlavery-diagram-design-diagram-design.json",
+      "sha256": "410b9aa925f0912f892f157c372eb7789f897bb264694d612c35c42d05111efd",
+      "bytes": 2939
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/codybrom-clairvoyance-red-flags.json",
+      "sha256": "63d7d3cae0f789a8505c9543385c15b835b0250685d1ddfd7a6f0fd54c709598",
+      "bytes": 3254
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/convert-summary.json",
+      "sha256": "fb5ac5257e88b47d060bf6aa8bcedfad49d832a93fc3f0b8dd2caf684abc31e3",
+      "bytes": 2936
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/fission-ai-openspec-openspec-explore.json",
+      "sha256": "22027debbf6d8d6ca2c7fc1e6354c2b84c7ae3d0c7018600bc5d4342ecbbbdd7",
+      "bytes": 3398
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/getsentry-skills-skill-writer.json",
+      "sha256": "290afd20c11cb50fb4d1a3885db5315eee8b2864b75f1af4719b4c329ebbed68",
+      "bytes": 3567
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/github-awesome-copilot-build-evidence-map.json",
+      "sha256": "4befa10fcd7f37bab58d9dc7dc5111ad57315b45500d028371402bd41c0f3efa",
+      "bytes": 3631
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/github-awesome-copilot-threat-model-analyst.json",
+      "sha256": "f215daa7a0cb947a5cc14d571ad4f9e1fc8a351495b067a45d3c91f1e3aedd98",
+      "bytes": 3509
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/haacked-dotfiles-resolve-conflicts.json",
+      "sha256": "33ac59df4da2914ce108900ccfc557d9ef264d15c14b2fe85f10a5a8aa2c47bc",
+      "bytes": 3279
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/hegeldev-hegel-skill-hegel-review.json",
+      "sha256": "929bfa1adb1018ddb1839ba694c14c4359b84230edc978fe47b0d69b1c2f3b02",
+      "bytes": 3115
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/laurigates-claude-plugins-property-based-testing.json",
+      "sha256": "48ca64e0fb1950eeb00aa77572dc078ceb4d8beea3ccce1e01fd1199302c0f3f",
+      "bytes": 3520
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/neeeophytee-finding-unknowns-skills-assumption-test.json",
+      "sha256": "1c688c1a157da06360bc35998310bc60b2965d486f42ce4f4ecec904cde880ae",
+      "bytes": 3863
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/neeeophytee-finding-unknowns-skills-interview-me.json",
+      "sha256": "f1f85e97c75d513d0e105df2edacdb2433c1e7746f47b359298604aa200b564e",
+      "bytes": 3625
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/nvidia-skillspector-skill-inspector.json",
+      "sha256": "a4007199036a3464af3cf9a90b73368c8ce8c47a2b5faabeb8fd33e28f587352",
+      "bytes": 3121
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/obra-superpowers-systematic-debugging.json",
+      "sha256": "93eff5e94f91708db23318395d55a2692238610c8c6873c6c3dd2218eee70b72",
+      "bytes": 2989
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/redaction-receipt.json",
+      "sha256": "20155917fd2ba154faba660d653410ebc82cfb629cf20565c41204298855c740",
+      "bytes": 4955
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json",
+      "sha256": "ece55009cd4e032452e728d17a9888ced9a6e0c2e5964eb95b892bfd3f06cdd2",
+      "bytes": 1973169
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/shihyuho-skills-writing-agents-md.json",
+      "sha256": "e6bac08606dd575728b806ec50b71d344bd3abcbbc1c89c1cefc8ce245288086",
+      "bytes": 3931
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/softaworks-agent-toolkit-agent-md-refactor.json",
+      "sha256": "8e317e81f6788eea63a823686ba1ba2783f8671dc717c56c8ecd8fb90af3dc78",
+      "bytes": 3326
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json",
+      "sha256": "799fbf386e773e79ce70deae5517c5707ccc77389770acfadaf1a826a13a6e2a",
+      "bytes": 10461
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/tech-leads-club-agent-skills-gh-fix-ci.json",
+      "sha256": "3c0e2c0cb82a8e5985ebdda332234eaf827257c3af4f1468d4bcb0b20d32a331",
+      "bytes": 3293
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/tech-leads-club-agent-skills-security-threat-model.json",
+      "sha256": "c1659673e36dba6e3da56f7e2f4ca493b862221fb014e55686833acd58c1d8df",
+      "bytes": 3980
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/trailofbits-skills-ask-questions-if-underspecified.json",
+      "sha256": "938b1fe7ce42c04dac3e7dd2b87b88eb9cd7b152ff2233de1199c00269771793",
+      "bytes": 3795
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/trailofbits-skills-atheris.json",
+      "sha256": "0d969b46ff5063e2b410efdeb91188653537e2cae07c8579ae41451885c5470a",
+      "bytes": 3592
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/trailofbits-skills-semgrep-rule-creator.json",
+      "sha256": "a67d9ad0779322cafe82518141e0901fcb023dd14aa6d8cb0806692ddb98010e",
+      "bytes": 3532
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/tt-a1i-archify-archify.json",
+      "sha256": "677fcf5b86524b0e70d47d94472d87f8b3ec2f1bfc69d7d65e70b3568fa33839",
+      "bytes": 3338
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/tw93-waza-hunt.json",
+      "sha256": "4998ffdc008927ad057bd0068ceb473405c862939167be3d39fc9e205f994549",
+      "bytes": 3122
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/upstash-context7-find-docs.json",
+      "sha256": "0caa21ab0e567685aa187a0e68f8aef70447a22e8c4ce683265e3d5f5f748c4a",
+      "bytes": 2847
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/wshobson-agents-python-testing-patterns.json",
+      "sha256": "51011cbe6260a5743d9e36007c7a53eb7d1649ce71fac81b1abb342b31a466b3",
+      "bytes": 3666
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-skills-20261004-0526/wshobson-agents-uv-package-manager.json",
+      "sha256": "081b1c48b7d0d20a89465ac217a91a22e51efe929994b86055352b561e9e41b2",
+      "bytes": 3783
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/README.md",
