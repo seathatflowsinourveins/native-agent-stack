@@ -848,6 +848,7 @@ unchanged.
   2026-10-04: `opus` resolves to Opus 5.5 on the Anthropic API today, and Opus 4.7 and later run with the 1M window
   without a suffix). Claude Code resolves the same model as before; what changes is that the new distribution keeps it
   when the shared template moves. `advisorModel` stays the template's `fable`.
+  2026-10-04 (~15:10Z): the user changed the advisor to Opus 5.5; the template now carries `advisorModel: "opus"` (see [Advisor model](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model)).
 - **Counts.** 385 pieces, 293 wired, 79 not wired and 13 authorization pieces (Decisions 2 and 14 above).
 
 What would overturn it: Codex matching a project's trust by a parent directory or by another key form; a decision that
