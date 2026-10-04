@@ -348,6 +348,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LANE = ROOT / "tools" / "lane.js"
+sys.path.insert(0, str(ROOT / "tools/lib"))
 
 
 def run_check(script):
@@ -355,9 +356,12 @@ def run_check(script):
 
 
 def main(dest):
+    import lane_rules  # from the directory put on sys.path above, imported lazily
+
     digest = hashlib.sha256(LANE.read_bytes()).hexdigest()
     shutil.copy2(LANE, Path(dest) / LANE.name)
     run_check(ROOT / "scripts" / "lane_check.py")
+    lane_rules.check()
     return digest
 
 
@@ -373,6 +377,12 @@ READS_FILES = {
           python3 scripts/install_lanes.py "$RUNNER_TEMP"
 """,
     "scripts/install_lanes.py": INSTALL_LANES,
+    # Imported through the directory install_lanes.py puts on sys.path (acceptance probe of 2026-10-04
+    # on 7c1d24cc5: verdict_review_gate.py imports record_verdicts the same way).
+    "tools/lib/lane_rules.py": ('import json\nfrom pathlib import Path\n\n\ndef check():\n'
+                                '    return json.loads((Path(__file__).resolve().parents[2] / "policy" / '
+                                '"lane_rules.json").read_text())\n'),
+    "policy/lane_rules.json": "{}\n",
     "tools/lane.js": "const target = 'src/app.py';\nconst notes = require('fs').readFileSync('docs/a.md');\n",
     "scripts/lane_check.py": ('import json\nfrom pathlib import Path\n\n'
                               'print(json.loads((Path(__file__).resolve().parents[1] / "policy" / "lane.json")'
@@ -417,9 +427,15 @@ class Runner:
         return subprocess.run(argv, check=False)
 
 
+RUNNER = ("bash", "scripts/bound.sh")
+
+
 def main(name, dest):
     subprocess.run([sys.executable, str(ROOT / "scripts" / "direct.py")], check=True)
     subprocess.run(["bash", "scripts/direct.sh"], check=True)
+    cmd = [sys.executable, str(ROOT / "scripts" / "argv.py")]
+    subprocess.run(cmd, check=True)
+    subprocess.run(RUNNER, check=True)
     run_script(ROOT / "scripts" / "wrapped.py")
     Runner().command("lane", ["node", str(ROOT / "tools" / "lane.mjs")])
     run_it(ROOT / "scripts" / "helped.py")
@@ -624,10 +640,14 @@ class GateReadsTests(unittest.TestCase):
                     # The workflow script read as data is protected; the check run through a wrapper is
                     # followed, so what it reads is protected too.
                     "scripts/install_lanes.py": "ci_named", "tools/lane.js": "ci_read",
-                    "scripts/lane_check.py": "ci_read", "policy/lane.json": "ci_read"}
+                    "scripts/lane_check.py": "ci_read", "policy/lane.json": "ci_read",
+                    # A module imported lazily from the directory a gate script puts on sys.path is gate
+                    # code, so the data it reads is protected.
+                    "tools/lib/lane_rules.py": "ci_import", "policy/lane_rules.json": "ci_read"}
         for path, rule in expected.items():
             with self.subTest(path=path):
                 self.assertEqual(derived.files.get(path), rule)
+        self.assertEqual(derived.syspath, {"tools/lib"})
         self.assertEqual(derived.globs, {"policy/limits-*.json": "ci_read", "policy/checks/*.json": "ci_read"})
         protected = self.g.Protected([derived], set())
         # src/app.py and docs/a.md are only named in the text of tools/lane.js, which no gate code runs.
@@ -643,7 +663,8 @@ class GateReadsTests(unittest.TestCase):
         # protected. A code file is followed only when a call that executes code receives it.
         tracked = {"scripts/direct.py", "scripts/direct.sh", "scripts/wrapped.py", "tools/lane.mjs",
                    "scripts/helped.py", "scripts/run_path.py", "scripts/loaded.py", "scripts/compiled.py",
-                   "tools/hashed.js", "tools/copied.js", "scripts/parsed.py", "scripts/helpers.py"}
+                   "tools/hashed.js", "tools/copied.js", "scripts/parsed.py", "scripts/helpers.py",
+                   "scripts/argv.py", "scripts/bound.sh"}
         blobs = {"scripts/check.py", *tracked}
         dirs = self.g.patch_policy.parent_dirs(blobs)
         reader = self.gr.GateReads("scripts/check.py", EXEC_FORMS)
@@ -651,6 +672,8 @@ class GateReadsTests(unittest.TestCase):
         self.assertEqual(executed, {
             "scripts/direct.py",  # subprocess.run with sys.executable
             "scripts/direct.sh",  # a path string in an argv list
+            "scripts/argv.py",  # an argv list bound to a local name (acceptance probe of 2026-10-04)
+            "scripts/bound.sh",  # an argv tuple bound to a module constant
             "scripts/wrapped.py",  # through a module-local wrapper function
             "tools/lane.mjs",  # through a method that passes its argv on
             "scripts/helped.py",  # a function imported from outside the standard library
@@ -758,6 +781,11 @@ class RepositoryWorkflowTests(unittest.TestCase):
                     # Cross-family review P1 of 2026-10-04: scripts/validate_convergence.py reads this
                     # schema as read_json(CONTRACT / "contract.schema.json").
                     "blueprints/convergence-practice/contract.schema.json": "ci_read",
+                    # Acceptance probe of 2026-10-04 on 7c1d24cc5: validate.yml runs
+                    # scripts/verdict_review_gate.py, which puts tools/sota-convergence on sys.path and
+                    # imports record_verdicts; that imports export_isolation_check lazily, which imports
+                    # blind_checkout, and blind_checkout reads this label file.
+                    "catalogs/foundation/automation.json": "ci_read",
                     "blueprints/runtime-workers/openhands/README.md": None}
         for path, rule in expected.items():
             with self.subTest(path=path):
@@ -1056,6 +1084,7 @@ class GateDataReadTests(unittest.TestCase):
             "policy/inner.json": '{"skip": true}\n',  # read by a script that script runs
             "tools/lane.js": "// replaced\n",  # read as data: hashed and copied
             "policy/lane.json": '{"skip": true}\n',  # read by a script a gate script runs through a wrapper
+            "policy/lane_rules.json": '{"skip": true}\n',  # read by a module imported through sys.path
         }
         for name, data in cases.items():
             with self.subTest(path=name):

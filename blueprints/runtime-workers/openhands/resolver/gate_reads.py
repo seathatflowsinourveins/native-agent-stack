@@ -93,6 +93,7 @@ DATA = Value("data", "", False, "data", False, None, None)
 UNKNOWN = Value("unknown", "", False, "unknown", False, None, None)
 OUTSIDE = Value("outside", "", False, None, False, None, None)
 MAX_ALTERNATIVES = 32
+MAX_CONTAINER_DEPTH = 4  # nesting of literal containers executed() looks into (an argv list, a dict of args)
 PATH_TYPES = frozenset({"Path", "PurePath", "PosixPath", "PurePosixPath"})
 SAME_PATH = frozenset({"str", "fspath", "abspath", "realpath", "normpath", "expanduser", "resolve", "absolute",
                        "as_posix"})
@@ -783,10 +784,43 @@ class GateReads:
             self._executor_names = executors
         return self._executor_names
 
+    def _leaf_values(self, node, depth=0):
+        """The alternatives of `node`, with a literal container replaced by the values of its elements
+        (a list or tuple's items, a dict's keys and values), to MAX_CONTAINER_DEPTH: an argv bound to a
+        name (`cmd = [sys.executable, script]`, then `subprocess.run(cmd)`) runs `script`."""
+        results = []
+        for value in self.value(node):
+            if value.kind == "seq" and depth < MAX_CONTAINER_DEPTH:
+                for element in value.node.elts:
+                    results += self._leaf_values(element.value if isinstance(element, ast.Starred) else element,
+                                                 depth + 1)
+            elif value.kind == "map" and depth < MAX_CONTAINER_DEPTH:
+                for item in [*(key for key in value.node.keys if key is not None), *value.node.values]:
+                    results += self._leaf_values(item, depth + 1)
+            else:
+                results.append(value)
+        return results
+
+    def imported_modules(self):
+        """Dotted names of this file's absolute imports at any depth, lazy imports inside functions
+        included: `import X`, `from X import Y` (X and X.Y), and import_module or __import__ with a
+        literal name. Relative imports are left to patch_policy.python_references."""
+        names = []
+        for node in ast.walk(self.module):
+            if isinstance(node, ast.Import):
+                names += [alias.name for alias in node.names]
+            elif isinstance(node, ast.ImportFrom) and not node.level and node.module:
+                names += [node.module, *(f"{node.module}.{alias.name}" for alias in node.names if alias.name != "*")]
+            elif (isinstance(node, ast.Call) and self._call_name(node) in ("import_module", "__import__")
+                  and node.args and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str)):
+                names.append(node.args[0].value)
+        return list(dict.fromkeys(names))
+
     def executed(self, blobs, dirs):
         """(paths, computed) that this file runs: the repository files spelled inside the arguments of a
-        call that executes code (`_executes`), and "<file>:<line>" of such calls whose argument is a
-        computed location under the repository, which may run any file there."""
+        call that executes code (`_executes`), literal containers included (`_leaf_values`), and
+        "<file>:<line>" of such calls whose argument is a computed location under the repository,
+        which may run any file there."""
         executors = self._executors()
         top_dirs = {path.split("/", 1)[0] for path in blobs if "/" in path}
         paths, computed = set(), set()
@@ -797,7 +831,7 @@ class GateReads:
                 for node in ast.walk(argument):
                     if not isinstance(node, ast.expr):
                         continue
-                    for value in self.value(node):
+                    for value in self._leaf_values(node):
                         if value.kind == "str" and value.exact:
                             candidate = value.path[2:] if value.path.startswith("./") else value.path
                             path = normal("", candidate) if candidate and not any(c.isspace() for c in candidate) else None

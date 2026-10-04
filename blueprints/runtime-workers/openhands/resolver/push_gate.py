@@ -611,6 +611,7 @@ class CiProtected:
     def __init__(self):
         self.files, self.prefixes, self.globs, self.workflows, self.interpolations = {}, {}, {}, [], []
         self.unresolved = []  # "<gate file>:<line>" of reads gate_reads.GateReads could not resolve
+        self.syspath = set()  # directories gate code puts on sys.path (each also a ci_import prefix)
 
     def add_file(self, path, rule):
         self.files[path] = _stronger(self.files.get(path), rule)
@@ -729,6 +730,7 @@ def derive_ci_protected(tree):
             pending.append(name)
         for name in rule_dirs:
             result.add_prefix(name, "ci_import")
+            result.syspath.add(name)
     _add_gate_reads(result, tree, blobs, dirs, sorted(traced - test_modules), test_modules)
     return result
 
@@ -750,7 +752,14 @@ def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
     (gate_reads.GateReads.executed). A code file that Python gate code only reads, such as a
     workflow script it hashes and copies, is data: protected, not followed (2026-10-04, after
     main's #679 made tools/adoption/install_claude_profile.py read
-    examples/claude-native/workflows/*.js). Test modules are protected but not followed: what
+    examples/claude-native/workflows/*.js). A module that gate code imports from a directory
+    that gate code puts on sys.path is gate code too: Python searches those directories for
+    every later import in the process (docs.python.org/3.13/library/sys.html#sys.path), so
+    each followed Python file's absolute imports, lazy ones included
+    (gate_reads.GateReads.imported_modules), are resolved there as well, to a fixpoint over
+    the directories found (the acceptance probe of 2026-10-04 on 7c1d24cc5: verdict_review_gate.py
+    puts tools/sota-convergence on sys.path and imports record_verdicts, which imports
+    export_isolation_check and, through it, blind_checkout). Test modules are protected but not followed: what
     they read, like what they import, is mostly the code and data under test (decision
     record, residual risks). The gate fails closed (PushGate.check, gate_input_unresolved) on
     a read the reader leaves unresolved, on an executing call whose argument is a computed
@@ -799,52 +808,68 @@ def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
     queue = [*gate_python, *sorted(path for path, rule in result.files.items()
                                    if rule in ("ci_named", "ci_import") and not path.endswith(".py"))]
     done, followed = set(test_modules), set(gate_python)
+    python_files, resolved_against = [], {}
     while queue:
-        path = queue.pop(0)
-        if path in done or path not in blobs:
-            continue
-        done.add(path)
-        named, runs = [], []
-        if path.endswith(".py"):
-            reader = analyzer(path)
-            try:
-                if reader is None:
-                    raise RecursionError  # unparseable here or too deep: unresolved
-                files, prefixes, globs, unresolved = reader.reads(blobs, dirs)
-                executed, computed = reader.executed(blobs, dirs)
-            except RecursionError:
-                result.unresolved.append(f"{path}:0")
+        while queue:
+            path = queue.pop(0)
+            if path in done or path not in blobs:
                 continue
-            for name in prefixes:
-                result.add_prefix(name, "ci_read")
-            for pattern in globs:
-                result.add_glob(pattern, "ci_read")
-            result.unresolved.extend(sorted(unresolved | computed))
-            named, runs = sorted(files | executed), sorted(executed)
-            if path not in followed:  # reached by a name or a read: its imports run too
+            done.add(path)
+            named, runs = [], []
+            if path.endswith(".py"):
+                reader = analyzer(path)
                 try:
-                    imports, import_dirs = patch_policy.python_references(path, tree.read(path), blobs, dirs)
-                except (SyntaxError, ValueError, UnicodeDecodeError):
-                    imports, import_dirs = (), ()
+                    if reader is None:
+                        raise RecursionError  # unparseable here or too deep: unresolved
+                    files, prefixes, globs, unresolved = reader.reads(blobs, dirs)
+                    executed, computed = reader.executed(blobs, dirs)
+                except RecursionError:
                     result.unresolved.append(f"{path}:0")
-                for name in imports:
-                    result.add_file(name, "ci_import")
-                    queue.append(name)
-                for name in import_dirs:
-                    result.add_prefix(name, "ci_import")
-        elif is_code(path):
-            text = _without_pattern_lists(patch_policy.executable_lines(tree.read(path)))
-            for kind, name in patch_policy.names_in_text(text, blobs, dirs):
-                if kind == "dir":
+                    continue
+                python_files.append(path)
+                for name in prefixes:
                     result.add_prefix(name, "ci_read")
-                else:
-                    named.append(name)
-            runs = named
-        for name in named:
-            result.add_file(name, "ci_read")
-        for name in runs:
-            if name in blobs and name not in done and (name.endswith(".py") or is_code(name)):
-                queue.append(name)
+                for pattern in globs:
+                    result.add_glob(pattern, "ci_read")
+                result.unresolved.extend(sorted(unresolved | computed))
+                named, runs = sorted(files | executed), sorted(executed)
+                if path not in followed:  # reached by a name, a read or a sys.path import: its imports run too
+                    try:
+                        imports, import_dirs = patch_policy.python_references(path, tree.read(path), blobs, dirs)
+                    except (SyntaxError, ValueError, UnicodeDecodeError):
+                        imports, import_dirs = (), ()
+                        result.unresolved.append(f"{path}:0")
+                    for name in imports:
+                        result.add_file(name, "ci_import")
+                        queue.append(name)
+                    for name in import_dirs:
+                        result.add_prefix(name, "ci_import")
+                        result.syspath.add(name)
+            elif is_code(path):
+                text = _without_pattern_lists(patch_policy.executable_lines(tree.read(path)))
+                for kind, name in patch_policy.names_in_text(text, blobs, dirs):
+                    if kind == "dir":
+                        result.add_prefix(name, "ci_read")
+                    else:
+                        named.append(name)
+                runs = named
+            for name in named:
+                result.add_file(name, "ci_read")
+            for name in runs:
+                if name in blobs and name not in done and (name.endswith(".py") or is_code(name)):
+                    queue.append(name)
+        # The modules followed Python files import from directories on sys.path, against every
+        # directory found so far; a new directory re-resolves the files already followed.
+        for path in python_files:
+            new = result.syspath - resolved_against.get(path, set())
+            if not new:
+                continue
+            resolved_against[path] = set(result.syspath)
+            for module in analyzer(path).imported_modules():
+                for found in sorted(patch_policy.resolve_module(module.split("."), tuple(sorted(new)), blobs, dirs)):
+                    result.add_file(found, "ci_import")
+                    if found not in done:
+                        queue.append(found)
 
 
 def policy_tests(tree, cache=None):
