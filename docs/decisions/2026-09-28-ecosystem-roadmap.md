@@ -336,3 +336,10 @@ Decision rights stay as recorded:
   The 12 trading layers stay staged. The trading lane will schedule them after the paper series, depending on Claude weekly capacity.
 - **Durable memory: ai-memory is a candidate only.** The user restated that ai-memory is a candidate while the memory evals run, not an assured winner. That matches the recorded target above (S3 decides; ai-memory is the reference arm).
 - **Capacity.** The shared Claude weekly window read 71% at 05:07Z and about 75% later (resets 2026-09-30 18:00Z). Codex weekly is at 94% (resets 2026-10-04 00:35Z). Non-critical Claude fan-outs are paused across sessions, and GPT-6 reviews run through native Codex.
+
+### 2026-10-03, main `9b0b8d6d`
+
+- **F-WK-2 is retired.** #488 closes after the route-settlement record merges; its draft head and review remain preserved for any successor comparison.
+- **The route is settled by the user's direction, unmeasured.** The landscape sweep and cross-family research and review use OmniRoute; the native Codex defaults remain as recorded.
+- **Item 5 needs no confirmation.** The user already directed the route (`2026-09-27-omniroute-account-pool.md:304-305`). Who confirms the criterion is read two ways: the 2026-09-29 update records it as an owner decision under the delegation (line 311), while the status line (line 3), item 5 itself (line 252) and `2026-09-28-delegated-decisions.md:5-8` support keeping it user-only, as #488's draft noted ([PREREGISTRATION.md L9–13](https://github.com/seathatflowsinourveins/native-agent-stack/blob/caea04f28d7dcd5d428155cf1a24b28423cba1ce/blueprints/gate-b-gpt6-route/PREREGISTRATION.md#L9)). The route is user-directed under either reading, and the user can take this back.
+- See [the route settlement](2026-10-03-sweep-gpt6-route-settlement.md) for the sources, preserved design, independent M5 prerequisites and overturn conditions.

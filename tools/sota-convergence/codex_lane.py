@@ -368,7 +368,14 @@ def network_authority(command: str, match) -> bool:
     #206, P2; independent review of #206, C1)."""
     path = match.group(1)
     scheme = URL_SCHEME_BEFORE.search(command[max(0, match.start(1) - 32):match.start(1)])
-    return path.startswith("//") and not path.startswith("///") and bool(scheme) and scheme.group(1).lower() != "file"
+    return path.startswith("//") and not path.startswith("///") and bool(scheme) and not local_scheme(scheme.group(1))
+
+
+def local_scheme(scheme: str) -> bool:
+    """A scheme whose authority names a local path: ``file``, fsspec's ``local`` and any ``unix`` one
+    (``http+unix://%2Frun%2F...``) (independent review of #206 at 891ab70f)."""
+    scheme = scheme.lower()
+    return scheme in ("file", "local") or "unix" in scheme
 
 
 def outside_paths(command: str, allowed_roots) -> list:
@@ -827,23 +834,57 @@ def child_executable(name: str):
 SHELL_INTERPRETERS = frozenset({"sh", "bash", "dash", "zsh", "ksh", "mksh", "ash", "fish"})
 
 
-def codex_launch_issue(name: str = "codex"):
-    """None unless the codex the caller's PATH resolves is a shell-script launcher (pnpm's cmd-shim runs
-    ``exec node ...`` by name), which a blind child's PATH cannot run: it would exit 127 on every layer, so a blind run
-    is refused up front with the launcher named (independent review of #206, R2-2)."""
-    program = child_executable(name)
-    if program is None:
-        return None
+def launcher_shebang(program: str) -> tuple[list, bool]:
+    """The shared interpreter words and whether they follow env, using the lane's existing env/-S subset.
+    GNU coreutils env invocation and Linux execve(2), Interpreter scripts, describe the native grammar."""
     try:
         with open(program, "rb") as handle:
             first = handle.readline(256)
     except OSError:
-        return None
+        return [], False
     words = first[2:].decode("utf-8", errors="replace").split() if first.startswith(b"#!") else []
-    if words and os.path.basename(words[0]) in SHELL_INTERPRETERS:
+    if len(words) >= 2 and os.path.basename(words[0]) == "env":
+        # Only env's own -S; an interpreter's -S (python -S) stays (R2-6).
+        return (words[2:] if words[1] == "-S" else words[1:]), True
+    return words, False
+
+
+def codex_launch_issue(name: str = "codex"):
+    """Refuse absolute-shell launchers as before, and env-shell launchers only when a blind --version probe exits
+    126/127. The telemetry identity launcher can exec an absolute binary; asdf shims run a tool by name.
+    Other probe failures are console diagnostics, not refusal (PR #216 custody F1; blind_path_issue pattern)."""
+    program = child_executable(name)
+    if program is None:
+        return None
+    words, env_style = launcher_shebang(program)
+    if not words or os.path.basename(words[0]) not in SHELL_INTERPRETERS:
+        return None
+    if not env_style:
         return (f"{program} is a shell-script launcher ({' '.join(words)}); it runs its tools by name, which a blind "
                 f"child's PATH ({BLIND_CHILD_PATH}) does not resolve, so a blind run is refused. Put a native codex "
                 "binary or an env-style launcher (#!/usr/bin/env node) first on PATH")
+    try:
+        with tempfile.TemporaryDirectory(prefix="codex-launch-probe-") as scratch:
+            home = Path(scratch) / "codex-home"
+            home.mkdir()
+            env = child_env(home)
+            Path(env["HOME"]).mkdir()
+            Path(env["TMPDIR"]).mkdir()
+            result = subprocess.run(blind_child_argv([program, "--version"]), env=env, stdin=subprocess.DEVNULL,
+                                    capture_output=True, text=True, encoding="utf-8", errors="replace",
+                                    timeout=5, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        detail = "timed out after 5 seconds" if isinstance(exc, subprocess.TimeoutExpired) else str(exc)
+        print(f"codex_lane: {program} launcher --version probe {detail}; continuing", file=sys.stderr)
+        return None
+    if result.returncode:
+        lines = [line for line in (result.stderr or "").splitlines() if line.strip()]
+        detail = lines[-1][-400:] if lines else "no stderr"
+        message = (f"{program} is a shell-script launcher ({' '.join(words)}); --version exited {result.returncode} "
+                   f"under the blind child's PATH ({BLIND_CHILD_PATH}): {detail}")
+        if result.returncode in (126, 127):
+            return message + "; a blind run is refused"
+        print(f"codex_lane: {message}; continuing", file=sys.stderr)
     return None
 
 
@@ -863,18 +904,11 @@ def blind_child_argv(cmd: list) -> list:
     program = child_executable(cmd[0])
     if program is None:
         return list(cmd)
-    try:
-        with open(program, "rb") as handle:
-            first = handle.readline(256)
-    except OSError:
-        return [program, *cmd[1:]]
-    words = first[2:].decode("utf-8", errors="replace").split() if first.startswith(b"#!") else []
-    if len(words) >= 2 and os.path.basename(words[0]) == "env":
-        # Only env's own -S; an interpreter's -S (python -S) stays (R2-6).
-        rest = words[2:] if words[1] == "-S" else words[1:]
-        interpreter = shutil.which(rest[0]) if rest and not rest[0].startswith("-") else None
+    words, env_style = launcher_shebang(program)
+    if env_style:
+        interpreter = shutil.which(words[0]) if words and not words[0].startswith("-") else None
         if interpreter:
-            return [interpreter, *rest[1:], program, *cmd[1:]]
+            return [interpreter, *words[1:], program, *cmd[1:]]
     return [program, *cmd[1:]]
 
 

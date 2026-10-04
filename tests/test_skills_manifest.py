@@ -125,10 +125,27 @@ class SkillEntryTests(unittest.TestCase):
                 self.assertIsInstance(skill["gap"], str)
                 self.assertTrue(skill["gap"].strip(), f"{skill['name']} gap must not be empty")
 
-    def test_status_is_kept_or_trial(self):
+    def test_status_is_kept_trial_or_held(self):
+        # held (2026-10-03, wave-2 skills ruling, change 6): not installed until the measurement held_for names returns.
         for skill in self.skills:
             with self.subTest(skill=skill["name"]):
-                self.assertIn(skill["status"], ("kept", "trial"))
+                self.assertIn(skill["status"], ("kept", "trial", "held"))
+                if skill["status"] == "held":
+                    self.assertTrue(skill["held_for"].strip())
+        self.assertEqual([s["name"] for s in self.skills if s["status"] == "held"], ["agent-browser"])
+
+    def test_a_global_entry_names_its_agents_and_only_a_claude_code_copy(self):
+        # skill-creator is a copy for Claude Code only: Codex keeps the skill-creator it embeds (wave-2 skills ruling,
+        # change 6; the layer consensus's skill-authoring row).
+        for skill in self.skills:
+            with self.subTest(skill=skill["name"]):
+                agents = skill.get("agents", ["claude-code", "codex"])
+                self.assertTrue(agents and set(agents) <= {"claude-code", "codex"} and len(set(agents)) == len(agents))
+                if skill.get("copy"):
+                    self.assertEqual(agents, ["claude-code"])
+        copies = {s["name"]: s for s in self.skills if s.get("copy")}
+        self.assertEqual(sorted(copies), ["skill-creator"])
+        self.assertIs(copies["skill-creator"]["codex_enabled"], False)
 
     def test_claude_listing_is_one_of_the_four_allowed_values(self):
         for skill in self.skills:
@@ -170,7 +187,8 @@ class BudgetTests(unittest.TestCase):
                 with self.subTest(skill=skill["name"]):
                     self.assertIsInstance(skill["upstream_allow_implicit_invocation"], bool)
         explicit_only = {s["name"] for s in self.skills if s.get("upstream_allow_implicit_invocation") is False}
-        self.assertEqual(explicit_only, {"grill-me", "improve-codebase-architecture"})
+        # The two that set it, grill-me and improve-codebase-architecture, were retired on 2026-10-03.
+        self.assertEqual(explicit_only, set())
         shown = [s for s in self.skills if s["codex_enabled"] and s.get("upstream_allow_implicit_invocation", True)]
         self.assertEqual(self.budget["codex_catalog_description_chars"],
                          sum(skill["description_chars"] for skill in shown))
@@ -205,6 +223,13 @@ class ExcludedEntryTests(unittest.TestCase):
         retired = {entry["skills"]: entry for entry in self.excluded if "retired" in entry}
         # mattpocock/skills removed it in daa01d8 (2026-09-24); it is absent at d81f3a18.
         self.assertIn("resolving-merge-conflicts", retired)
+        # Retired on 2026-10-03 by the wave-2 skills ruling (changes 1 and 3), each with its historical pin in the reason.
+        for name, pin in (("grill-me", "c55ee46073ed923f86ce59a5eb3b6d895095d1b7"),
+                          ("improve-codebase-architecture", "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"),
+                          ("semgrep", "82fe8226252622fa807643bdca1710901198553a")):
+            with self.subTest(retired=name):
+                self.assertEqual(retired[name]["retired"], "2026-10-03")
+                self.assertIn(pin, retired[name]["reason"])
         selected = {skill["name"] for skill in self.manifest["skills"]}
         for name, entry in retired.items():
             with self.subTest(skill=name):
@@ -270,8 +295,11 @@ class ListingBudgetTemplateTests(unittest.TestCase):
         # codex-rs/ext/skills/src/render.rs L18 and L127-133 at rust-v0.157.1: a set value is capped at 10,000.
         self.assertTrue(1 <= budget <= 10_000, budget)
         self.assertEqual(budget, 6000)
-        # Per-skill disables come from tools/adoption/install_skills.py --print-codex-config, never the template.
-        self.assertNotIn("config", skills)
+        # Per-skill disables of manifest skills come from tools/adoption/install_skills.py --print-codex-config, never
+        # the template. Its one rule turns off Codex's bundled skill-installer by path (wave-2 skills ruling), a path
+        # relative to the Codex home that holds config.toml (tests/test_render_config.py,
+        # test_the_bundled_skill_installer_rule_follows_the_codex_home).
+        self.assertEqual(skills.get("config"), [{"path": "skills/.system/skill-installer/SKILL.md", "enabled": False}])
 
     def test_codex_template_comment_counts_the_skills_the_catalog_shows(self):
         text = CODEX_TEMPLATE_PATH.read_text(encoding="utf-8")

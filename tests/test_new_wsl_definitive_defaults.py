@@ -2,7 +2,8 @@
 
 Structural checks over committed files only (evidence/artifacts/new-wsl-definitive-defaults-20261001, and the
 layer-consensus record that its assembler reads last). They do not judge any pick; they hold the manifest to its own rule.
-One class runs a committed program: the install plan's acceptance of the consensus row skill-authoring, against stand-ins.
+Two classes run committed programs against stand-ins: the install plan's acceptance of the consensus row skill-authoring,
+and the statusline row's helper commands and acceptance.
 """
 import hashlib
 import json
@@ -104,7 +105,12 @@ class Manifest(unittest.TestCase):
         cls.decisions = {d["slot_id"]: d for d in cls.convergence["decisions"] + cls.convergence["added_slots"]}
         cls.combined = load(ROOT / cls.convergence["combined"]["path"])
         cls.consensus = load(CONSENSUS_ART / "consensus.json")
-        cls.consensus_rows = {row["slot_id"]: row for row in cls.consensus["add_rows"]}
+        # The record's own rows and amendments, then its wave-2 batch's (2026-10-03), in the order the assembler applies them.
+        cls.wave2 = cls.consensus["wave2"]
+        cls.added_rows = cls.consensus["add_rows"] + cls.wave2["add_rows"]
+        cls.amend_rows = cls.consensus["amend_rows"] + cls.wave2["amend_rows"]
+        cls.consensus_rows = {row["slot_id"]: row for row in cls.added_rows}
+        cls.interims = {entry["slot_id"]: entry["interim"] for entry in cls.wave2["interim_rows"]}
         cls.rows = cls.manifest["slots"]
 
     def source_slots(self):
@@ -403,9 +409,14 @@ class Manifest(unittest.TestCase):
         self.assertIn("decision-round", rule)
         self.assertNotEqual(rule, self.foundation["decision_rule"])
         self.assertEqual(self.manifest.get("decision_rule_before_amendment_2"), self.foundation["decision_rule"])
-        # The consensus record's rule is appended whole, after the rounds' rule.
-        self.assertTrue(rule.endswith(" " + self.consensus["rule"]))
+        # The consensus record's rule is appended whole, after the rounds' rule, and amendment 3 of its wave-2 batch after it.
+        self.assertTrue(rule.endswith(" " + self.consensus["rule"] + " " + self.wave2["interim_rule"]))
         self.assertLess(rule.index("decision-round"), rule.index(self.consensus["rule"]))
+        self.assertTrue(self.wave2["interim_rule"].startswith("Amendment 3 "))
+        # Amendment 3 states its exception beside the no-install rule, which stays as the first round wrote it.
+        self.assertEqual(self.manifest["no_install_rule"], self.foundation["no_install_rule"])
+        self.assertEqual(self.manifest["no_install_rule_exception"], self.wave2["no_install_rule_exception"])
+        self.assertIn("exception to the no-install rule", self.manifest["no_install_rule_exception"])
 
     def test_counts_include_states_and_installed_rows(self):
         counts = self.manifest["counts"]
@@ -740,36 +751,43 @@ class Manifest(unittest.TestCase):
         counts, by_catalog = self.manifest["counts"], {}
         for row in self.rows:
             by_catalog[row["catalog"]] = by_catalog.get(row["catalog"], 0) + 1
-        self.assertEqual(counts["slots"], 89)
-        self.assertEqual(by_catalog, {"foundation": 69, "us-equities": 20})
+        self.assertEqual(counts["slots"], 90)
+        self.assertEqual(by_catalog, {"foundation": 70, "us-equities": 20})
         self.assertEqual(counts["layers"], 37)
-        # 56 after the layer consensus, and the two local-model slots settled by their measurement (2026-10-03).
-        self.assertEqual(counts["installed"], 58)
-        self.assertEqual(counts["by_row_kind"]["consensus"], 5)
-        self.assertEqual(counts["by_state"]["resolved"], 22)
+        # 56 after the layer consensus, 57 with its wave-2 statusline row, and the two local-model slots settled by their
+        # measurement (2026-10-03).
+        self.assertEqual(counts["installed"], 59)
+        self.assertEqual(counts["interim"], 3)
+        self.assertEqual(counts["by_row_kind"]["consensus"], 6)
+        self.assertEqual(counts["by_state"]["resolved"], 23)
         self.assertEqual(counts["by_state"]["measurement"], 6)
         self.assertEqual(counts["by_state"]["split"], 5)
 
     def test_consensus_rows_are_the_records_rows_with_its_states(self):
         rows = {row["slot_id"]: row for row in self.rows}
         self.assertEqual(sorted(self.consensus_rows), ["credential-custody", "cross-family-review", "research-skill",
-                                                       "skill-authoring", "skill-discovery"])
+                                                       "skill-authoring", "skill-discovery", "statusline"])
         self.assertEqual({row["slot_id"] for row in self.rows if row["row_kind"] == "consensus"}, set(self.consensus_rows))
         # The fields a consensus row must carry are the ones the assembler writes for a row the rounds decided.
         fields = load_assembler().ROW_FIELDS
         self.assertEqual(tuple(key for key in self.rows[0] if key != "amendments"), fields)
+        amended = {}
+        for entry in self.amend_rows:
+            amended.setdefault(entry["slot_id"], []).append(entry["amendment"])
         for sid, recorded in self.consensus_rows.items():
             with self.subTest(slot=sid):
                 self.assertEqual(rows[sid]["state"], recorded["state"])
-                self.assertEqual(rows[sid], recorded)  # copied as the record gives it
-                self.assertEqual(tuple(rows[sid]), fields)
+                # Copied as the record gives it; a later amendment (the wave-2 batch amends one) is recorded beside it.
+                self.assertEqual({key: value for key, value in rows[sid].items() if key != "amendments"}, recorded)
+                self.assertEqual(rows[sid].get("amendments"), amended.get(sid))
+                self.assertEqual(tuple(key for key in rows[sid] if key != "amendments"), fields)
         # Each is placed after the last row the rounds decided in its layer, in the record's order.
         for lid in sorted({row["layer_id"] for row in self.consensus_rows.values()}):
             in_layer = [row for row in self.rows if row["layer_id"] == lid]
             kinds = [row["row_kind"] == "consensus" for row in in_layer]
             self.assertEqual(kinds, sorted(kinds), lid)
             self.assertEqual([row["slot_id"] for row in in_layer if row["row_kind"] == "consensus"],
-                             [row["slot_id"] for row in self.consensus["add_rows"] if row["layer_id"] == lid])
+                             [row["slot_id"] for row in self.added_rows if row["layer_id"] == lid])
 
     def test_no_consensus_row_is_definitive(self):
         for row in self.rows:
@@ -793,12 +811,16 @@ class Manifest(unittest.TestCase):
         before = {row["slot_id"]: row for row in decided}
         self.assertEqual(set(before), {row["slot_id"] for row in self.rows} - set(self.consensus_rows))
         recorded = {}
-        for entry in self.consensus["amend_rows"]:
+        for entry in self.amend_rows:
             self.assertEqual(set(entry), {"slot_id", "amendment"})
             self.assertEqual(set(entry["amendment"]) & PROTECTED, set(), entry["slot_id"])
+            self.assertNotIn("interim", entry["amendment"])
             recorded.setdefault(entry["slot_id"], []).append(entry["amendment"])
         self.assertTrue(recorded)
-        self.assertTrue(set(recorded) <= set(before), "an amendment names a row that no round decided")
+        # The record's own amendments name rows the rounds decided; the wave-2 batch also amends a row the record added.
+        self.assertTrue({entry["slot_id"] for entry in self.consensus["amend_rows"]} <= set(before),
+                        "an amendment names a row that no round decided")
+        self.assertTrue(set(recorded) <= set(before) | set(self.consensus_rows), "an amendment names an unknown row")
         for row in self.rows:
             sid = row["slot_id"]
             with self.subTest(slot=sid):
@@ -810,8 +832,11 @@ class Manifest(unittest.TestCase):
                 else:
                     self.assertNotIn("amendments", row)
                 if row["row_kind"] != "consensus":
-                    # Every other field is the one the assembler builds before the consensus step.
-                    self.assertEqual({key: value for key, value in row.items() if key != "amendments"}, before[sid])
+                    # Every other field is the one the assembler builds before the consensus step; an interim (amendment 3)
+                    # is the one the record gives, beside them.
+                    self.assertEqual({key: value for key, value in row.items() if key not in ("amendments", "interim")},
+                                     before[sid])
+                    self.assertEqual(row.get("interim"), self.interims.get(sid))
 
     def test_consensus_records_are_the_hashed_published_copies(self):
         records = self.consensus["records"]
@@ -873,7 +898,7 @@ class Manifest(unittest.TestCase):
                     self.assertNotIn("decides", label)
                     self.assertNotIn("deciding_measurement", resolution)
         gated = {row["slot_id"]: row for row in rows if "open_acceptance_gates" in row["resolution"]}
-        self.assertEqual(sorted(gated), ["cross-family-review", "skill-authoring", "skill-discovery"])
+        self.assertEqual(sorted(gated), ["cross-family-review", "skill-authoring", "skill-discovery", "statusline"])
         for sid, row in gated.items():
             with self.subTest(gated=sid):
                 # Installed or resolved, not waiting: the gates are acceptance on the destination, not a hold on the install.
@@ -904,7 +929,8 @@ class Manifest(unittest.TestCase):
                          "qualify the update; the selected 5.5.1 stays until the owner of that review accepts it")
         # The amendment carries its qualification into the manifest beside the row; the row's own fields do not change.
         guard = next(row for row in self.rows if row["slot_id"] == "credential-guard")
-        self.assertEqual(guard["amendments"][-1]["qualifications"], amendment["qualifications"])
+        carried = next(item for item in guard["amendments"] if item["decision"] == amendment["decision"])
+        self.assertEqual(carried["qualifications"], amendment["qualifications"])
 
     def test_tables_show_consensus_rows_by_their_label_and_list_the_amendments(self):
         lines = RECORD.read_text(encoding="utf-8").splitlines()
@@ -921,13 +947,23 @@ class Manifest(unittest.TestCase):
         self.assertEqual(table[:2], [["Slot", "Date", "Decision"], ["---"] * 3])
         self.assertEqual(table[2:], [[row["slot_id"], amendment["date_utc"], amendment["decision"]]
                                      for row in self.rows for amendment in row.get("amendments", [])])
-        self.assertEqual(len(table) - 2, len(self.consensus["amend_rows"]))
+        self.assertEqual(len(table) - 2, len(self.amend_rows))
+        # The interim installs of amendment 3 have their own table, before the amendments.
+        start = lines.index("### Interim installs (amendment 3)")
+        stop = lines.index("### Amendments by direct consensus")
+        table = [[cell.strip() for cell in line.split("|")[1:-1]] for line in lines[start:stop] if line.startswith("| ")]
+        self.assertEqual(table[0], ["Slot", "Date", "Interim", "Authority", "Decided by"])
+        self.assertEqual(table[2:], [[row["slot_id"], row["interim"]["date_utc"], row["interim"]["default"],
+                                      row["interim"]["authority"]["kind"].replace("_", " "), row["interim"]["decided_by"]]
+                                     for row in self.rows if row.get("interim")])
 
     def test_consensus_decision_record_quotes_the_rule_and_the_owner(self):
         text = CONSENSUS_RECORD.read_text(encoding="utf-8")
         self.assertIn(self.consensus["rule"], text)
+        self.assertIn(self.wave2["interim_rule"], text)
+        self.assertIn(self.wave2["no_install_rule_exception"], text)
         self.assertIn(self.consensus["authorization"]["verbatim"], text)
-        for sid in list(self.consensus_rows) + [entry["slot_id"] for entry in self.consensus["amend_rows"]]:
+        for sid in list(self.consensus_rows) + [entry["slot_id"] for entry in self.amend_rows] + list(self.interims):
             self.assertIn(f"`{sid}`", text, sid)
         for sentence in self.consensus["not_established"]:
             self.assertIn(sentence, text)
@@ -942,6 +978,329 @@ class Manifest(unittest.TestCase):
                 text = path.read_text(encoding="utf-8")
                 self.assertIsNone(re.search(PRIVATE_SHAPES[0], text), str(path.relative_to(ROOT)))
                 self.assertIsNone(re.search(PRIVATE_SHAPES[1], text, re.I), str(path.relative_to(ROOT)))
+
+    # Amendment 3 (wave 2, 2026-10-03): interim installs on rows whose decided default installs nothing.
+
+    def test_interims_are_the_records_beside_the_decided_rows(self):
+        _, _, decided, _, _ = load_assembler().assemble_rows()
+        before = {row["slot_id"]: row for row in decided}
+        carried = {row["slot_id"]: row for row in self.rows if row.get("interim")}
+        self.assertEqual(sorted(carried), ["code-search", "context-supply", "memory-owner"])
+        self.assertEqual(sorted(carried), sorted(self.interims))
+        self.assertEqual(self.manifest["counts"]["interim"], len(carried))
+        assembler = load_assembler()
+        for sid, row in carried.items():
+            with self.subTest(slot=sid):
+                self.assertEqual(row["interim"], self.interims[sid])
+                # The row stays as the rounds decided it, and its decided default installs nothing.
+                self.assertEqual({key: value for key, value in row.items() if key not in ("interim", "amendments")}, before[sid])
+                self.assertFalse(assembler.installs(row))
+                self.assertTrue(assembler.installs_now(row))
+                self.assertTrue(set(assembler.INTERIM_FIELDS) <= set(row["interim"]))
+                self.assertTrue(row["interim"]["repository"].startswith("https://"))
+                for ref in row["interim"]["records"]:
+                    self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
+        # The protected rows keep their decided states: one split, one waiting measurement, one definitive no-install row.
+        self.assertEqual({sid: (row["state"], row["definitive"]) for sid, row in carried.items()},
+                         {"code-search": ("split", False), "context-supply": ("definitive", True),
+                          "memory-owner": ("measurement", False)})
+        # The browser hold and the local-model rows carry no interim.
+        for sid in ("playwright-cli", "local-generation-model", "embedding-model"):
+            self.assertNotIn("interim", next(row for row in self.rows if row["slot_id"] == sid))
+
+    def test_interim_labels_name_their_authority_and_what_decides(self):
+        """The rule's label clause for an interim: it starts with 'interim install', names its authority and what decides it,
+        and claims no consensus, measurement or blind result it does not have."""
+        self.assertIn("its label starts with 'interim install'", self.wave2["interim_rule"])
+        for sid, interim in self.interims.items():
+            label, authority = interim["label"], interim["authority"]
+            with self.subTest(slot=sid):
+                self.assertTrue(label.startswith("interim install on the owner's "), label)
+                self.assertEqual(authority["kind"], "owner_decision")
+                self.assertRegex(label, r"\bdecides\b")
+                self.assertIn("not a blind result", label)
+                self.assertNotIn("consensus", label)
+                self.assertTrue(authority["decision"].strip() and authority["relayed_by"].strip())
+                self.assertEqual(set(interim["reviews"]), {"claude", "gpt"})
+                self.assertTrue(interim["decided_by"].strip())
+        # The GPT family's standing position is carried as it was: it disagreed on the context layer and recommended the
+        # holds that the owner's decision lifted; the owner's own words are quoted where the relaying record quotes them.
+        self.assertIn("disagreed", self.interims["context-supply"]["reviews"]["gpt"])
+        for sid in ("memory-owner", "code-search"):
+            self.assertIn("hold", self.interims[sid]["reviews"]["gpt"])
+        self.assertIn("context mode", self.interims["context-supply"]["authority"]["verbatim"])
+        self.assertIn("definitive", self.interims["context-supply"]["label"])
+        self.assertIn("never removed automatically", self.interims["context-supply"]["decided_by"])
+        # The memory server listens where the host and client templates point (wave-2 synthesis X5), not on 21374.
+        self.assertIn("127.0.0.1:29374", self.interims["memory-owner"]["configuration"]["listen"])
+
+    def test_no_installed_job_is_owned_twice_with_the_interims(self):
+        assembler = load_assembler()
+        owners = {}
+        for row in self.rows:
+            if assembler.installs_now(row):
+                self.assertNotIn(row["job"], owners, f"{row['slot_id']} and {owners.get(row['job'])}")
+                owners[row["job"]] = row["slot_id"]
+
+    def test_the_wave2_batch_names_the_acknowledgements_it_owes(self):
+        assembler = load_assembler()
+        acknowledged = assembler.acknowledged_families(self.wave2["acknowledgements"])
+        self.assertEqual(self.wave2["acknowledgements_owed"], sorted(set(assembler.FAMILIES) - acknowledged))
+        self.assertEqual(self.manifest["consensus_wave2"]["acknowledgements_owed"], self.wave2["acknowledgements_owed"])
+        self.assertEqual(self.manifest["consensus_wave2"]["acknowledgements"], self.wave2["acknowledgements"])
+        for name, ref in self.wave2["records"].items():
+            with self.subTest(record=name):
+                self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
+        # A wave-2 row or amendment says that its acknowledgements are owed while they are.
+        if self.wave2["acknowledgements_owed"]:
+            for row in self.wave2["add_rows"]:
+                self.assertIn("acknowledgements owed", row["label"])
+            for entry in self.wave2["amend_rows"]:
+                self.assertIn("acknowledgements owed", entry["amendment"]["by"])
+
+    def test_the_assembler_refuses_an_interim_outside_the_rule(self):
+        assembler = load_assembler()
+        record = self.wave2["interim_rows"][0]
+
+        def attempt(change, slot="memory-owner"):
+            _, _, rows, _, _ = assembler.assemble_rows()
+            by_slot = {row["slot_id"]: row for row in rows}
+            entry = json.loads(json.dumps(record))
+            entry["slot_id"] = slot
+            change(entry, by_slot)
+            with self.assertRaises(ValueError) as caught:
+                assembler.apply_interims(rows, by_slot, [entry])
+            return str(caught.exception)
+
+        cases = [
+            ("a row whose decided default installs", lambda e, b: None, "serena",
+             "consensus serena: an interim installs only on a row whose decided default installs nothing"),
+            ("an unknown slot", lambda e, b: None, "no-such-slot", "consensus no-such-slot: interim for unknown slot"),
+            ("a missing authority", lambda e, b: e["interim"].pop("authority"), "memory-owner",
+             "consensus memory-owner: an interim carries its fields: missing ['authority']; unknown []"),
+            ("an unknown field", lambda e, b: e["interim"].update(state="definitive"), "memory-owner",
+             "consensus memory-owner: an interim carries its fields: missing []; unknown ['state']"),
+            ("an authority of another kind", lambda e, b: e["interim"]["authority"].update(kind="consensus"), "memory-owner",
+             "consensus memory-owner: an interim's authority is one of owner_decision, direct_consensus, not consensus"),
+            ("an owner's decision without its decision", lambda e, b: e["interim"]["authority"].pop("decision"), "memory-owner",
+             "consensus memory-owner: the owner's decision needs its decision"),
+            ("a direct consensus with one acknowledgement",
+             lambda e, b: e["interim"].update(authority={"kind": "direct_consensus", "acknowledgements": [
+                 {"family": "claude", "url": "https://github.com/example/example/pull/1#issuecomment-1"}]}), "memory-owner",
+             "consensus memory-owner: a direct consensus needs an acknowledgement of each family"),
+            ("one family's review missing", lambda e, b: e["interim"]["reviews"].pop("gpt"), "memory-owner",
+             "consensus memory-owner: an interim records each family's review"),
+            ("a records file whose hash differs", lambda e, b: e["interim"]["records"][0].update(sha256="0" * 64),
+             "memory-owner", "consensus memory-owner interim: evidence sha256 mismatch"),
+            ("no records", lambda e, b: e["interim"].update(records=[]), "memory-owner",
+             "consensus memory-owner: an interim names its hashed records"),
+            ("a repository that is not an https URL", lambda e, b: e["interim"].update(repository="akitaonrails/ai-memory"),
+             "memory-owner", "consensus memory-owner: an interim names its repository by an https URL"),
+            ("a blank pin", lambda e, b: e["interim"].update(pin=" "), "memory-owner",
+             "consensus memory-owner: an interim needs a non-empty pin"),
+            ("a job an installed row owns", lambda e, b: b["memory-owner"].update(job=b["serena"]["job"]), "memory-owner",
+             "consensus memory-owner: installed job also owned by serena"),
+            ("a second interim on the row", lambda e, b: b["memory-owner"].update(interim={"default": "x"}), "memory-owner",
+             "consensus memory-owner: duplicate interim"),
+            # The owner's decision is resolved in the hashed record its relayed_by names (review of 2026-10-03, minor 2).
+            ("a decision relayed in another form",
+             lambda e, b: e["interim"]["authority"].update(relayed_by="the owner, by word of mouth"), "memory-owner",
+             "consensus memory-owner: the owner's decision is relayed by '<records file> owner_decisions[<n>]'"),
+            ("a decision relayed by a file that is not a hashed record",
+             lambda e, b: e["interim"]["authority"].update(relayed_by="other-records.json owner_decisions[0]"),
+             "memory-owner", "consensus memory-owner: the owner's decision is relayed by other-records.json, which is not "
+                             "one of the interim's hashed records"),
+            ("a decision relayed by an entry the record lacks",
+             lambda e, b: e["interim"]["authority"].update(relayed_by="wave2-records.json owner_decisions[9]"),
+             "memory-owner", "consensus memory-owner: wave2-records.json has no owner_decisions[9]"),
+            ("a relayed decision that names neither the slot nor the owner",
+             lambda e, b: e["interim"]["authority"].update(relayed_by="wave2-records.json owner_decisions[1]"),
+             "memory-owner", "consensus memory-owner: wave2-records.json owner_decisions[1] names neither the slot nor "
+                             "ai-memory"),
+            ("a decision dated otherwise than the entry it relays",
+             lambda e, b: e["interim"]["authority"].update(date_utc="2026-10-04"), "memory-owner",
+             "consensus memory-owner: the owner's decision is dated 2026-10-04, and the entry it relays 2026-10-03"),
+            # The browser hold stays: the owner's decision that lifted two holds kept this one, so it names no browser owner.
+            ("an interim on the held browser row",
+             lambda e, b: e["interim"].update(repository="https://github.com/microsoft/playwright-cli"), "playwright-cli",
+             "consensus playwright-cli: wave2-records.json owner_decisions[0] names neither the slot nor playwright-cli"),
+            # A mention is not an authorization (the Codex root lane's read of b6828c7d, finding 1): the kept browser hold
+            # names crawl4ai as a candidate to measure first, which the mention check alone took for the owner's authority.
+            ("a browser interim for the tool the kept hold names to measure first",
+             lambda e, b: e["interim"].update(repository="https://github.com/unclecode/crawl4ai"), "playwright-cli",
+             "consensus playwright-cli: wave2-records.json owner_decisions[0] authorizes no install or use of "
+             "https://github.com/unclecode/crawl4ai in the slot playwright-cli"),
+            ("a repository the decision authorizes, in another slot it authorizes",
+             lambda e, b: e["interim"].update(repository="https://github.com/MinishLab/semble"), "memory-owner",
+             "consensus memory-owner: wave2-records.json owner_decisions[0] authorizes no install or use of "
+             "https://github.com/MinishLab/semble in the slot memory-owner"),
+        ]
+        for name, change, slot, message in cases:
+            with self.subTest(case=name):
+                self.assertTrue(attempt(change, slot).startswith(message), attempt(change, slot))
+
+    def test_an_owner_decision_authorizes_only_the_exact_pairs_its_record_lists(self):
+        """An owner's decision authorizes an interim only where the record that relays it lists the interim's exact slot
+        and repository under an affirmative action (the Codex root lane's read of b6828c7d, finding 1). The negative
+        control: the browser interim that the mention check alone admitted is refused, and so is an entry whose grant is
+        missing, of another action, slot or repository, while the unchanged entry still admits its interim."""
+        assembler = load_assembler()
+        ref = self.wave2["records"]["wave2_records"]
+        record = load(ROOT / ref["path"])
+        # Each recorded interim is one listed pair of the entry its authority relays, under the decision's own verb.
+        for sid, interim in self.interims.items():
+            with self.subTest(slot=sid):
+                index = int(re.fullmatch(r"wave2-records\.json owner_decisions\[([0-9]+)\]",
+                                         interim["authority"]["relayed_by"]).group(1))
+                grants = [grant for grant in record["owner_decisions"][index]["authorizes"] if grant["slot_id"] == sid]
+                self.assertEqual([(grant["action"], grant["repository"]) for grant in grants],
+                                 [({"memory-owner": "install", "code-search": "install", "context-supply": "use"}[sid],
+                                   interim["repository"])])
+                self.assertIn(grants[0]["action"], assembler.AUTHORIZING_ACTIONS)
+        # The old input: the kept browser hold names crawl4ai as a token, which is all the mention check asked for, and no
+        # entry lists the browser slot or crawl4ai.
+        self.assertRegex(record["owner_decisions"][0]["decision"].lower(), r"(?<![a-z0-9])crawl4ai(?![a-z0-9])")
+        listed = [(grant["slot_id"], grant["repository"]) for entry in record["owner_decisions"] for grant in entry["authorizes"]]
+        self.assertFalse([pair for pair in listed if pair[0] == "playwright-cli" or "crawl4ai" in pair[1]], listed)
+        crawl = json.loads(json.dumps(self.interims["memory-owner"]))
+        crawl["repository"] = "https://github.com/unclecode/crawl4ai"
+        with self.assertRaises(ValueError) as caught:
+            assembler.relayed_decision("playwright-cli", crawl, crawl["authority"])
+        self.assertEqual(str(caught.exception), "consensus playwright-cli: wave2-records.json owner_decisions[0] authorizes "
+                                                "no install or use of https://github.com/unclecode/crawl4ai in the slot "
+                                                "playwright-cli")
+        # A scratch copy of the record, changed in the one grant the memory interim rests on.
+        interim = self.interims["memory-owner"]
+
+        def attempt(change):
+            with tempfile.TemporaryDirectory() as scratch:
+                copy = Path(scratch) / ref["path"]
+                copy.parent.mkdir(parents=True)
+                doc = json.loads(json.dumps(record))
+                change(doc["owner_decisions"][0])
+                copy.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+                assembler.ROOT = Path(scratch)
+                try:
+                    return assembler.relayed_decision("memory-owner", interim, interim["authority"])
+                finally:
+                    assembler.ROOT = ROOT
+
+        self.assertEqual(attempt(lambda entry: None), record["owner_decisions"][0])
+        refusal = ("consensus memory-owner: wave2-records.json owner_decisions[0] authorizes no install or use of "
+                   "https://github.com/akitaonrails/ai-memory in the slot memory-owner")
+        for name, change in (
+                ("no authorizes", lambda entry: entry.pop("authorizes")),
+                ("a hold, not an affirmative action", lambda entry: entry["authorizes"][0].update(action="hold")),
+                ("another slot", lambda entry: entry["authorizes"][0].update(slot_id="embedding-model")),
+                ("another repository", lambda entry: entry["authorizes"][0].update(
+                    repository="https://github.com/akitaonrails/ai-memory-fork"))):
+            with self.subTest(change=name):
+                with self.assertRaises(ValueError) as caught:
+                    attempt(change)
+                self.assertEqual(str(caught.exception), refusal)
+
+
+class InterimPlanChecks(unittest.TestCase):
+    """The install plan's side of amendment 3, as check_plan.py and install.sh hold it. check_plan.py refuses a plan that
+    does not install a recorded interim, one whose owner is not the interim's, and one whose interim install function does
+    not call the acknowledgement gate first; the gate (install.sh's interim_acknowledged) refuses while an acknowledgement
+    of the layer consensus's wave-2 batch is owed. Each case changes one thing in a scratch copy of the plan."""
+
+    GATE_LINE = '  interim_acknowledged {slot} || return "$?"\n'
+
+    def run_check(self, change_rows=None, change_install=None):
+        """(exit status, output) of check_plan.py over a scratch copy of the plan and the manifest."""
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            plan_dir = scratch / "plan"
+            shutil.copytree(PLAN, plan_dir, ignore=shutil.ignore_patterns("__pycache__"))
+            manifest = scratch / "definitive-manifest.json"
+            shutil.copy2(ART / "definitive-manifest.json", manifest)
+            if change_rows:
+                for name in ("install-plan.json", "owners.json"):    # the two files list the same rows
+                    data = load(plan_dir / name)
+                    change_rows({row["slot"]: row for row in data["owners"]})
+                    (plan_dir / name).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+            if change_install:
+                path = plan_dir / "install.sh"
+                path.write_text(change_install(path.read_text(encoding="utf-8")), encoding="utf-8")
+            result = subprocess.run([sys.executable, "-B", str(PLAN / "check_plan.py"), "--plan-dir", str(plan_dir),
+                                     "--manifest", str(manifest)], capture_output=True, text=True, timeout=180)
+        return result.returncode, result.stdout + result.stderr
+
+    def test_the_unchanged_copy_passes(self):
+        code, out = self.run_check()
+        self.assertEqual(code, 0, out)
+        self.assertTrue(out.startswith("OK: "), out)
+
+    def test_an_interim_the_plan_does_not_install_is_refused(self):
+        code, out = self.run_check(change_rows=lambda rows: rows["code-search"].update(installed=False))
+        self.assertEqual(code, 1, out)
+        self.assertIn("[manifest] row code-search: the manifest records an interim install, and the plan does not install "
+                      "it", out)
+
+    def test_a_plan_owner_that_is_not_the_interims_is_refused(self):
+        code, out = self.run_check(change_rows=lambda rows: rows["memory-owner"].update(owner="agentmemory 0.9.0"))
+        self.assertEqual(code, 1, out)
+        self.assertIn("[manifest] row memory-owner: owner/repository differ from the manifest's interim's "
+                      "default/repository", out)
+
+    def test_an_interim_install_function_without_the_gate_first_is_refused(self):
+        for slot in ("memory-owner", "code-search", "context-supply"):
+            with self.subTest(slot=slot):
+                line = self.GATE_LINE.format(slot=slot)
+                code, out = self.run_check(change_install=lambda text: text.replace(line, "", 1) if line in text
+                                           else self.fail(f"install.sh has no gate line for {slot}"))
+                self.assertEqual(code, 1, out)
+                self.assertIn(f"[interim] row {slot}: its install function in install.sh does not call "
+                              f"`interim_acknowledged {slot}` before anything else", out)
+
+    def test_an_install_script_without_the_gate_function_is_refused(self):
+        code, out = self.run_check(change_install=lambda text: text.replace("interim_acknowledged() {",
+                                                                            "interim_unused() {", 1))
+        self.assertEqual(code, 1, out)
+        self.assertIn("[interim] install.sh has no interim_acknowledged function that reads the wave-2 batch's "
+                      "acknowledgements_owed", out)
+
+    def run_gate(self, consensus, slot="memory-owner"):
+        """(exit status, stderr) of install.sh's own gate function, cut from the script, with repo_root at a scratch folder
+        whose consensus.json is `consensus` (None: no file)."""
+        if not (shutil.which("bash") and shutil.which("jq")):
+            self.skipTest("bash and jq are needed to run the gate")
+        function = re.search(r"(?ms)^interim_acknowledged\(\) \{.*?^\}$", (PLAN / "install.sh").read_text(encoding="utf-8"))
+        self.assertIsNotNone(function)
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch) / CONSENSUS_ART.relative_to(ROOT) / "consensus.json"
+            path.parent.mkdir(parents=True)
+            if consensus is not None:
+                path.write_text(json.dumps(consensus), encoding="utf-8")
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", f"{function.group(0)}\ninterim_acknowledged {slot}\n"],
+                                    env={**os.environ, "repo_root": scratch}, capture_output=True, text=True, timeout=60)
+        return result.returncode, result.stderr
+
+    def test_the_gate_refuses_while_an_acknowledgement_is_owed_and_passes_once_none_is(self):
+        code, err = self.run_gate({"wave2": {"acknowledgements_owed": ["claude", "gpt"]}})
+        self.assertEqual(code, 1)
+        self.assertIn("memory-owner: refused: an interim install waits for the acknowledgements of the wave-2 batch still "
+                      "owed by: claude, gpt", err)
+        self.assertEqual(self.run_gate({"wave2": {"acknowledgements_owed": []}}), (0, ""))
+        # The same inputs the client configuration's owed_acknowledgements refuses (tests/test_new_wsl_client_config.py,
+        # AcknowledgementGateTests), and a file that is not there.
+        for broken in ({}, {"wave2": {}}, {"wave2": {"acknowledgements_owed": "claude"}},
+                       {"wave2": {"acknowledgements_owed": [""]}}, None):
+            with self.subTest(consensus=broken):
+                code, err = self.run_gate(broken, slot="code-search")
+                self.assertEqual(code, 1)
+                self.assertIn("code-search: refused: the acknowledgements of the wave-2 batch cannot be read", err)
+
+    def test_the_gate_reads_the_committed_batch(self):
+        owed = load(CONSENSUS_ART / "consensus.json")["wave2"]["acknowledgements_owed"]
+        if not (shutil.which("bash") and shutil.which("jq")):
+            self.skipTest("bash and jq are needed to run the gate")
+        function = re.search(r"(?ms)^interim_acknowledged\(\) \{.*?^\}$", (PLAN / "install.sh").read_text(encoding="utf-8"))
+        result = subprocess.run(["bash", "-euo", "pipefail", "-c", f"{function.group(0)}\ninterim_acknowledged context-supply\n"],
+                                env={**os.environ, "repo_root": str(ROOT)}, capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 1 if owed else 0, result.stderr)
 
 
 class SkillAuthoringAcceptance(unittest.TestCase):
@@ -1054,6 +1413,255 @@ class SkillAuthoringAcceptance(unittest.TestCase):
             with self.subTest(case=name):
                 status, _, stderr = self.run_case(errexit=False, **case)
                 self.assertEqual(status, 1, stderr)
+
+
+class StatuslineInstallAndAcceptance(unittest.TestCase):
+    """The install plan's statusline row (claude-hud 0.10.0): its helper commands and its acceptance, against stand-ins.
+
+    Review of 2026-10-03 ("Run claude-hud setup before wiring its copied launcher"): the row stopped after the plugin
+    install, while the status line Claude Code runs names the launcher that upstream's helper copies to
+    <config dir>/plugins/claude-hud/statusline.mjs, and the acceptance ran the cached launcher directly, so it passed with
+    that copy missing. The row now runs the helper (scripts/setup.mjs inspect, then install, with --shell posix) and adds
+    refreshInterval 5 when absent; the acceptance runs the configured command. Review of 2026-10-03 at 99a2e3c6: the
+    helper keeps an earlier claude-hud statusLine with its refreshInterval (setup.mjs L94), and the acceptance, which
+    required exactly 5, rejected that installed configuration; it now takes any positive integer, the settings schema's
+    integer with minimum 1, and install then acceptance run on one scratch home. Review of 2026-10-03 at 06f6259f (macOS
+    run 37141171758): the exact-one check of the cached versions compared the `wc -l` count as a string, which BSD and
+    macOS wc pad; it now compares numbers, and stand-ins print both formats. Each program here is the row's own string
+    in install-plan.json, run as install.sh and accept.sh run it (bash -euo pipefail -c), with a scratch HOME, a PATH of
+    links to the system tools the programs use and a stand-in runtime that records its arguments and, as node does for a
+    script file that is not there, fails unless its argument exists, else prints two lines. The fixtures are our own:
+    upstream's helper and launcher do not run here.
+    """
+
+    INTERVAL_CHECK = '(.statusLine.refreshInterval | type == "number" and . >= 1 and . == floor)'
+    INTERVAL_CHECK_BEFORE_REVIEW = ".statusLine.refreshInterval == 5"
+    COUNT_CHECK = '"$versions" -eq 1'
+    COUNT_CHECK_BEFORE_REVIEW = '"$versions" == 1'
+    # The two printf formats of a `wc -l` count read from stdin: GNU coreutils prints the bare number; BSD and macOS wc
+    # print " %7ju" (apple-oss-distributions/text_cmds@592aaf8a wc/wc.c L214-215), so one line reads "       1".
+    WC_FORMATS = {"unpadded": "%d\\n", "padded": " %7d\\n"}
+
+    TOOLS = ("bash", "sh", "jq", "ls", "wc", "cmp", "readlink", "mktemp", "chmod", "mv", "rm", "cat")
+    LAUNCHER = "// claude-hud 0.10.0 launcher (stand-in)\n"
+    RUNTIME = ('#!/bin/sh\nprintf \'%s\\n\' "$*" >>"${STUB_LOG:-/dev/null}"\ncase "$1" in */setup.mjs) exit 0 ;; esac\n'
+               '[ -f "$1" ] || { printf "Error: Cannot find module %s\\n" "$1" >&2; exit 1; }\n'
+               'cat >/dev/null\nprintf \'HUD line 1\\nHUD line 2\\n\'\n')
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tools = {name: shutil.which(name) for name in cls.TOOLS}
+        if not all(cls.tools.values()):
+            raise unittest.SkipTest(f"needs {', '.join(n for n, p in cls.tools.items() if not p)} to run the programs")
+        cls.row = next(r for r in load(PLAN / "install-plan.json")["owners"] if r["slot"] == "statusline")
+        cls.program = cls.row["acceptance"]["post_install"]["command"]
+        cls.helper, cls.refresh = cls.row["commands"][2:]
+
+    def run_program(self, program, scratch, runtime=True):
+        """(exit status, stderr, the runtime's recorded calls) of one program, with HOME at <scratch>/home."""
+        bin_dir = scratch / "bin"
+        bin_dir.mkdir(exist_ok=True)
+        for name, path in self.tools.items():
+            if not (bin_dir / name).exists():
+                (bin_dir / name).symlink_to(path)
+        if runtime and not (bin_dir / "node").exists():
+            (bin_dir / "node").write_text(self.RUNTIME, encoding="utf-8")
+            (bin_dir / "node").chmod(0o755)
+        log = scratch / "calls"
+        env = {"HOME": str(scratch / "home"), "PATH": str(bin_dir), "STUB_LOG": str(log), "LANG": "C"}
+        result = subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
+                                timeout=60)
+        calls = log.read_text(encoding="utf-8").splitlines() if log.exists() else []
+        return result.returncode, result.stderr, calls
+
+    def cache(self, scratch, version="0.10.0", marketplace="claude-hud"):
+        scripts = scratch / "home/.claude/plugins/cache" / marketplace / "claude-hud" / version / "scripts"
+        scripts.mkdir(parents=True)
+        (scripts / "statusline.mjs").write_text(self.LAUNCHER, encoding="utf-8")
+        (scripts / "setup.mjs").write_text("// stand-in\n", encoding="utf-8")
+        return scripts
+
+    def test_the_programs_are_the_ones_the_scripts_run(self):
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        accept = checker.functions((PLAN / "accept.sh").read_text(encoding="utf-8"))
+        self.assertEqual(checker.checks_of(accept["statusline"]), [("post_install", "statusline", "smoke", self.program)])
+        install = checker.functions((PLAN / "install.sh").read_text(encoding="utf-8"))
+        self.assertEqual(checker.run_commands("statusline", install, set()), self.row["commands"])
+
+    def test_the_helper_runs_inspect_then_install_from_the_one_pinned_cache(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            scripts = self.cache(scratch)
+            status, stderr, calls = self.run_program(self.helper, scratch)
+            self.assertEqual(status, 0, stderr)
+            self.assertEqual(calls, [f"{scripts}/setup.mjs inspect --shell posix", f"{scripts}/setup.mjs install --shell posix"])
+        for name, plant, message in (
+                ("no cached 0.10.0", lambda scratch: self.cache(scratch, version="0.9.0"), "not in exactly one marketplace"),
+                ("0.10.0 in two marketplaces", lambda scratch: (self.cache(scratch), self.cache(scratch, marketplace="m2")),
+                 "not in exactly one marketplace"),
+                ("no node or bun", lambda scratch: self.cache(scratch), "no node or bun")):
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                plant(scratch)
+                status, stderr, calls = self.run_program(self.helper, scratch, runtime=name != "no node or bun")
+                self.assertEqual(status, 1, stderr)
+                self.assertIn(message, stderr)
+                self.assertEqual(calls, [])
+
+    def skip_without_gnu_coreutils(self):
+        chmod = subprocess.run([self.tools["chmod"], "--version"], capture_output=True, text=True)
+        if "GNU coreutils" not in chmod.stdout:
+            self.skipTest("the command uses GNU chmod --reference and readlink -f, as on the plan's Ubuntu")
+
+    def test_refresh_interval_5_is_added_only_when_absent_in_the_file_itself(self):
+        self.skip_without_gnu_coreutils()
+        status_line = {"type": "command", "command": "'/x/node' '/x/statusline.mjs'"}
+        for name, before, link in (("absent", status_line, False), ("absent, through a link", status_line, True),
+                                   ("present", dict(status_line, refreshInterval=3), False)):
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                config = scratch / "home/.claude"
+                config.mkdir(parents=True)
+                target = scratch / "dotfiles/settings.json" if link else config / "settings.json"
+                target.parent.mkdir(parents=True, exist_ok=True)
+                text = json.dumps({"theme": "dark", "statusLine": before}, indent=2) + "\n"
+                target.write_text(text, encoding="utf-8")
+                target.chmod(0o640)
+                if link:
+                    (config / "settings.json").symlink_to(target)
+                status, stderr, _ = self.run_program(self.refresh, scratch)
+                self.assertEqual(status, 0, stderr)
+                if "refreshInterval" in before:
+                    self.assertEqual(target.read_text(encoding="utf-8"), text)
+                else:
+                    self.assertEqual(load(target), {"theme": "dark", "statusLine": dict(before, refreshInterval=5)})
+                self.assertEqual(target.stat().st_mode & 0o777, 0o640)
+                self.assertEqual((config / "settings.json").is_symlink(), link)
+                self.assertEqual(sorted(p.name for p in target.parent.iterdir()), ["settings.json"])  # no temporary left
+
+    def plant(self, scratch, launcher="same", refresh=5, second_version=False, run_cached=False):
+        """A scratch home as the plugin install and upstream's helper leave it: the cached 0.10.0, its user-scope entry, the
+        launcher copy (setup.mjs L79-80) and a statusLine that runs it, with an earlier claude-hud statusLine's other keys
+        kept (L94), here refreshInterval. Returns the settings.json path."""
+        config = scratch / "home/.claude"
+        scripts = self.cache(scratch)
+        if second_version:
+            self.cache(scratch, version="0.9.0")
+        (config / "plugins/installed_plugins.json").write_text(json.dumps(
+            {"version": 2, "plugins": {"claude-hud@claude-hud": [{"scope": "user", "version": "0.10.0"}]}}), encoding="utf-8")
+        copy = config / "plugins/claude-hud/statusline.mjs"
+        if launcher is not None:
+            copy.parent.mkdir(parents=True)
+            copy.write_text(self.LAUNCHER if launcher == "same" else "// another version's launcher\n", encoding="utf-8")
+        runs = scripts / "statusline.mjs" if run_cached else copy
+        status_line = {"type": "command", "command": f"'{scratch}/bin/node' '{runs}'"}
+        if refresh is not None:
+            status_line["refreshInterval"] = refresh
+        settings = config / "settings.json"
+        settings.write_text(json.dumps({"theme": "dark", "statusLine": status_line}), encoding="utf-8")
+        return settings
+
+    def stand_in_wc(self, bin_dir, form):
+        """A wc in <bin_dir> that takes only -l on stdin, counts with the system wc and prints the count in WC_FORMATS[form],
+        whatever the system wc's own format; run_program keeps it in place of the link to the system wc."""
+        bin_dir.mkdir(exist_ok=True)
+        (bin_dir / "wc").write_text(
+            '#!/bin/sh\n[ "$#" -eq 1 ] && [ "$1" = -l ] || { echo "stand-in wc: only -l on stdin" >&2; exit 2; }\n'
+            f"""printf '{self.WC_FORMATS[form]}' "$(( $('{self.tools["wc"]}' -l) ))"\n""", encoding="utf-8")
+        (bin_dir / "wc").chmod(0o755)
+
+    def acceptance(self, program=None, wc=None, **state):
+        """The acceptance's exit status and stderr for one state of a scratch home; `wc`, a key of WC_FORMATS, runs it with
+        the stand-in wc that prints that format."""
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            self.plant(scratch, **state)
+            if wc is not None:
+                self.stand_in_wc(scratch / "bin", wc)
+            status, stderr, _ = self.run_program(program or self.program, scratch)
+            return status, stderr
+
+    def install_then_accept(self, before, program=None):
+        """(settings.json as planted, as install leaves it, the acceptance's exit status and stderr) on one scratch home.
+
+        The helper's writes are planted (see plant; refreshInterval `before`, None for absent); then the row's helper
+        command (the stand-in runtime) and its refreshInterval command run as install.sh runs them, and the acceptance
+        reads the file they leave."""
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            settings = self.plant(scratch, refresh=before)
+            planted = settings.read_text(encoding="utf-8")
+            for step in (self.helper, self.refresh):
+                status, stderr, _ = self.run_program(step, scratch)
+                self.assertEqual(status, 0, stderr)
+            installed = settings.read_text(encoding="utf-8")
+            status, stderr, _ = self.run_program(program or self.program, scratch)
+            return planted, installed, status, stderr
+
+    def test_the_acceptance_passes_what_install_leaves_an_added_5_or_a_kept_earlier_value(self):
+        self.skip_without_gnu_coreutils()
+        for name, before, after in (("absent before install: 5 added", None, 5), ("an earlier claude-hud 3: kept", 3, 3)):
+            with self.subTest(case=name):
+                planted, installed, status, stderr = self.install_then_accept(before)
+                expected = json.loads(planted)
+                expected["statusLine"]["refreshInterval"] = after
+                self.assertEqual(json.loads(installed), expected)
+                if before is not None:
+                    self.assertEqual(installed, planted)  # the refreshInterval command leaves the file as it was
+                self.assertEqual(status, 0, stderr)
+
+    def test_the_interval_check_before_the_review_rejected_the_kept_value(self):
+        """Negative control: the same install-then-acceptance run with the check as it was at 99a2e3c6 (exactly 5)."""
+        self.skip_without_gnu_coreutils()
+        self.assertEqual(self.program.count(self.INTERVAL_CHECK), 1)
+        before_review = self.program.replace(self.INTERVAL_CHECK, self.INTERVAL_CHECK_BEFORE_REVIEW)
+        for before, passes in ((None, True), (3, False)):
+            with self.subTest(before=before):
+                _, _, status, stderr = self.install_then_accept(before, before_review)
+                self.assertEqual(status == 0, passes, stderr)
+
+    def test_the_acceptance_passes_the_wired_state_and_fails_each_planted_condition(self):
+        for refresh in (5, 1, 3):
+            with self.subTest(passes=f"refreshInterval {refresh}"):
+                status, stderr = self.acceptance(refresh=refresh)
+                self.assertEqual(status, 0, stderr)
+        cases = {
+            "the copied launcher the configured command runs is missing (the reviewed case)": dict(launcher=None),
+            "no refreshInterval": dict(refresh=None),
+            "a non-numeric refreshInterval": dict(refresh="five"),
+            "a refreshInterval in a string": dict(refresh="5"),
+            "a zero refreshInterval": dict(refresh=0),
+            "a negative refreshInterval": dict(refresh=-5),
+            "a fractional refreshInterval": dict(refresh=2.5),
+            "the copied launcher is another version's": dict(launcher="other"),
+            "a second cached version": dict(second_version=True),
+            "the configured command runs the cached launcher, not the copy": dict(run_cached=True),
+        }
+        for name, case in cases.items():
+            with self.subTest(case=name):
+                status, stderr = self.acceptance(**case)
+                self.assertNotEqual(status, 0, stderr)
+
+    def test_the_acceptance_takes_the_count_padded_or_not_and_still_requires_one_version(self):
+        """macOS run 37141171758 (at 2f5d8b01): the wired state with refreshInterval 5, 1 and 3 exited 1 there, with an empty
+        stderr. Here each wc format runs through its stand-in, so the case does not rest on the host's own wc."""
+        self.assertEqual(self.program.count(self.COUNT_CHECK), 1)
+        for form in self.WC_FORMATS:
+            for refresh in (5, 1, 3):
+                with self.subTest(wc=form, passes=f"refreshInterval {refresh}"):
+                    status, stderr = self.acceptance(wc=form, refresh=refresh)
+                    self.assertEqual(status, 0, stderr)
+            with self.subTest(wc=form, fails="a second cached version"):
+                status, stderr = self.acceptance(wc=form, second_version=True)
+                self.assertNotEqual(status, 0, stderr)
+
+    def test_the_count_check_before_the_review_rejected_the_padded_count(self):
+        """Negative control: the wired state, with the exact-one check as it was at 06f6259f (a string comparison)."""
+        before_review = self.program.replace(self.COUNT_CHECK, self.COUNT_CHECK_BEFORE_REVIEW)
+        for form, passes in (("unpadded", True), ("padded", False)):
+            with self.subTest(wc=form):
+                status, stderr = self.acceptance(before_review, wc=form)
+                self.assertEqual(status == 0, passes, stderr)
 
 
 class LocalModelAcceptance(unittest.TestCase):

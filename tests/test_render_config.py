@@ -152,6 +152,33 @@ class RenderConfigTests(unittest.TestCase):
         self.assertNotIn("model_providers", user)
         self.assertNotIn("model_provider", user)
 
+    def test_the_bundled_skill_installer_rule_follows_the_codex_home(self):
+        # The wave-2 skills ruling turns Codex's bundled skill-installer off by its path. Codex installs its bundled
+        # skills in <Codex home>/skills/.system (openai/codex rust-v0.160.0 codex-rs/skills/src/lib.rs L62-69) and
+        # resolves a relative path in config.toml against the folder that file is in (config/src/loader/mod.rs L557,
+        # L573-582 and L1424-1445), so the rule is relative and selects the bundled copy under any Codex home, ~/.codex
+        # or another CODEX_HOME, which codex_home.py and apply_codex_lane.py honor. scripts/skills_status.py
+        # codex_rule_path models that resolution. Planted negative: the rule's earlier form, ${HOME}/.codex/..., resolved
+        # the same way, misses the bundled copy under another Codex home, and Codex keeps a path rule that matches no
+        # skill without a word (skills_config.rs L91-93), so the bundled installer would have stayed on.
+        import tomllib  # Python 3.11+, as above
+
+        from scripts import skills_status
+
+        text = (TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8")
+        rules = tomllib.loads(string.Template(text).substitute(FIXTURE_VALUES))["skills"]["config"]
+        self.assertEqual(rules, [{"path": "skills/.system/skill-installer/SKILL.md", "enabled": False}])
+        home = Path(FIXTURE_VALUES["HOME"])
+        with tempfile.TemporaryDirectory() as scratch:
+            other = Path(scratch) / "codex-home"
+            for codex_home in (home / ".codex", other):
+                with self.subTest(codex_home=str(codex_home)):
+                    self.assertEqual(skills_status.codex_rule_path(rules[0]["path"], home, codex_home),
+                                     os.path.realpath(codex_home / "skills/.system/skill-installer/SKILL.md"))
+            earlier = FIXTURE_VALUES["HOME"] + "/.codex/skills/.system/skill-installer/SKILL.md"
+            self.assertNotEqual(skills_status.codex_rule_path(earlier, home, other),
+                                os.path.realpath(other / "skills/.system/skill-installer/SKILL.md"))
+
     def test_recipe_project_form_mirrors_start_mjs_and_approves_tools(self):
         # recipes/README.md "Retained Context Mode": the project-scoped form runs the bare `context-mode` CLI,
         # which skips upstream start.mjs. start.mjs sets both CLAUDE_PROJECT_DIR and CONTEXT_MODE_PROJECT_DIR

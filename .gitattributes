@@ -5,6 +5,9 @@ evidence/artifacts/retrieved-code.txt whitespace=-blank-at-eof
 evidence/artifacts/direct-desktop-search.txt whitespace=-blank-at-eof
 # Keep native Promptfoo export bytes unchanged; upstream includes trailing spaces.
 evidence/artifacts/promptfoo-nemotron-upstream-20260921/report.html -whitespace
+# Keep the retained native codex --version/--help output bytes unchanged: blank help lines carry trailing spaces
+# and the capture ends with a blank line.
+evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-client-check-20261003.txt -whitespace
 # Keep the retained native `codex exec --help` captures byte-exact; their help text has trailing spaces, and
 # evidence/artifacts/runtime-sdk-20261003/retained-records.json binds their sha256 with no sanitization.
 evidence/artifacts/runtime-sdk-20261003/exec-help-0.159.3.txt whitespace=-blank-at-eol

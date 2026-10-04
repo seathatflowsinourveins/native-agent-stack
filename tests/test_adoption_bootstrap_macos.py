@@ -3696,7 +3696,14 @@ class CIWorkflowTriggerPathsTests(unittest.TestCase):
     pattern list is asserted to match `push`'s `paths:` list in
     tests.test_workflow_hardening.AdoptionBootstrapMacosRequiredTests
     (that assertion lives there, not duplicated here, since it needs the
-    text parser for the job's embedded shell script, not YAML)."""
+    text parser for the job's embedded shell script, not YAML).
+
+    2026-10-03 (docs/decisions/2026-10-03-macos-ci-scope.md, D8): every input
+    listed below is also in the `changes` job's MACOS_PATTERNS, so a pull
+    request that changes one runs validate-macos in full, except
+    manifests/evidence.json, which stays only in the push paths as the
+    post-merge net (D11). tests.test_workflow_hardening.MacosPatternsTests
+    reads this list and asserts that."""
 
     def setUp(self):
         try:
@@ -3725,9 +3732,12 @@ class CIWorkflowTriggerPathsTests(unittest.TestCase):
             self.assertIn(expected, self.triggers["push"]["paths"], expected)
 
     def test_pull_request_trigger_has_no_path_filter(self):
-        # A bare `pull_request:` key with no mapping parses as None; that
-        # emptiness is exactly what makes validate-macos reachable on every
-        # pull request (the required-check readiness this change makes).
+        # A bare `pull_request:` key with no mapping parses as None. That
+        # emptiness keeps the required validate-macos check reported on every
+        # pull request: since 2026-10-03 it runs full, changed-tests or is
+        # skipped by its own job-level `if:`, which reports success, as the
+        # `changes` job decides (docs/decisions/2026-10-03-macos-ci-scope.md);
+        # a workflow skipped by a `paths:` filter would leave it pending.
         self.assertIsNone(self.triggers["pull_request"])
 
 
