@@ -475,7 +475,7 @@ def surface_data_time(record: dict, generated: datetime) -> tuple[datetime | Non
     """(the time of the oldest data in the watch report, or None with the reason it cannot be told). The watch writes
     generated_at as that time already; this recomputes it from coverage.sources, so that a report whose required or
     probed source came from the cache (origin "cache..."; a --network fetch that failed falls back to it) is aged by
-    that cached fetch_utc even when generated_at says otherwise. Cross-checks are report-only and do not age it."""
+    that cached fetched_utc even when generated_at says otherwise. Cross-checks are report-only and do not age it."""
     coverage = record.get("coverage")
     sources = coverage.get("sources") if isinstance(coverage, dict) else None
     if not isinstance(sources, list):

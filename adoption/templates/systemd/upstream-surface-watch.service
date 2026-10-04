@@ -23,7 +23,9 @@
 # writes only ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/surface-watch/ (cache/ and latest.json, mode
 # 0600). It runs `codex features list` with an empty temporary HOME and CODEX_HOME, so the host's Codex home is
 # neither read nor written. PATH holds the ecosystem bin directory for gh and codex, as in stack-currency.service.
-# TimeoutStartSec= bounds the whole run (each fetch is bounded at 60 s). docs/upstream-surface-watch.md.
+# TimeoutStartSec=600 is the bound on the whole run. The script's 60 s HTTP timeout is urllib's timeout for each
+# blocking socket operation (the connect, each read), not for a whole fetch, so a slow body can outlast it; each
+# subprocess (a gh api call, codex --version, codex features list) has a 60 s timeout. docs/upstream-surface-watch.md.
 [Unit]
 Description=Write the upstream-surface watch report for the currency notice (public fetches, no model call)
 

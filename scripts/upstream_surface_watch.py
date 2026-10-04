@@ -329,7 +329,9 @@ def bounded(name: str, values, bound_key: str):
 
 
 def http_get(url: str, timeout: int = HTTP_TIMEOUT) -> bytes:
-    """GET ``url`` (urllib follows redirects) and return the body. Raises OSError, ValueError or HTTPException."""
+    """GET ``url`` (urllib follows redirects) and return the body. Raises OSError, ValueError or HTTPException.
+    ``timeout`` is urllib's, for each blocking socket operation (the connect, each read), not for the whole fetch:
+    the unit's TimeoutStartSec= bounds the run."""
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - fixed https sources
         body = response.read(MAX_BYTES + 1)
@@ -1012,7 +1014,7 @@ def load_baseline(path: Path) -> dict:
 
 def validate_dispositions(document) -> list[str]:
     """Schema and key-uniqueness errors of the dispositions catalog (docs/upstream-surface-watch.md#dispositions);
-    an empty list means valid. Linear in the rows, so the judged ledger's ~1,200 rows check in milliseconds."""
+    an empty list means valid. Linear in the rows, so the judged ledger's ~1,200 rows check well under a second."""
     if not isinstance(document, dict):
         return ["dispositions: expected a JSON object"]
     errors = [f"dispositions: unknown top-level field {key!r}" for key in sorted(set(document) - CATALOG_FIELDS)]

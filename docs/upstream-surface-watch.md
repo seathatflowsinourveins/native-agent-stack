@@ -143,7 +143,7 @@ Each row has ten fields:
 
 The catalog's `rules` block documents every value. `baseline-unreviewed` marks a name grandfathered at the baseline
 version; like every row, it is excluded from the unreviewed count. `adopt-pending` is decided but not yet applied.
-Validation is linear in the rows: about 1,200 rows check in milliseconds.
+Validation is linear in the rows: about 1,200 rows check well under a second (the test's bound is 1.0 s).
 
 ## Daily run
 
