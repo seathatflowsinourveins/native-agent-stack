@@ -654,7 +654,7 @@ class RenderTests(unittest.TestCase):
         # Each hook runs a file the repository copies, ai-memory (an interim install) at the link the plan's
         # memory-owner row makes, or rtk (the owner's directive of 2026-10-04); context-mode writes its own cache-heal hook.
         ai_memory = "/home/example/.local/bin/ai-memory "
-        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 6)
+        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 4)
         self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) or command == "rtk hook claude"
                             for command in commands), commands)
         self.assertTrue(any(command.startswith(ai_memory) for command in events["SessionStart"]), events)
@@ -667,7 +667,9 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(settings["env"]["RTK_TELEMETRY_DISABLED"], "1")
         self.assertEqual(settings["env"]["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"], "1")
         self.assertEqual(events["PreToolUse"][0], "rtk hook claude")
-        self.assertTrue([c for c in events["SubagentStart"] if "token-lanes-subagent-start.py" in c], events)
+        # The token-lane carriers are this repository's own adaptation, so the clean default holds them out (the owner's
+        # directive of 2026-10-04): neither the SubagentStart nor the SessionStart hook runs a carrier file.
+        self.assertEqual([c for c in commands if "token-lanes" in c], [])
         self.assertTrue([c for c in events["SessionStart"] if "currency-due-notice.py" in c], events)
 
     def test_the_overlay_keeps_its_bell_and_the_notification_channel(self):
@@ -871,12 +873,25 @@ class RenderTests(unittest.TestCase):
                 for group in groups:
                     for hook in group["hooks"]:
                         referenced.update(re.findall(r"\.claude/hooks/([A-Za-z0-9_.-]+)", hook["command"]))
-        self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py", "currency-due-notice.py",
-                                      "token-lanes-subagent-start.py", "token-lanes-session-start.py"})
+        self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py", "currency-due-notice.py"})
         for name in referenced:
             source = icp.HOOKS[name]
             self.assertTrue(source.is_file(), name)
             self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(), icp.expected_sha256(source), name)
+
+    def test_the_token_lane_carriers_are_held_out_of_the_clean_default(self):
+        # The carriers are this repository's own adaptation, not a feature of an upstream tool, so the owner's directive of
+        # 2026-10-04 (a clean install: upstream installers with upstream defaults) holds them out of the new distribution:
+        # the two hook entries and the nine files install_claude_profile.py copies are unwired, and no rendered file other
+        # than the wiring record runs or names one.
+        carriers = [v for v in cfg.analyse(ROOT)[0] if "token-lanes" in v.piece.key]
+        self.assertEqual(len(carriers), 11, [v.piece.key for v in carriers])
+        for v in carriers:
+            self.assertFalse(v.wired, v.piece.key)
+            self.assertIn("own adaptation", v.reason)
+        for name, text in self.files.items():
+            if name != "wiring.json":
+                self.assertNotIn("token-lanes", text, name)
 
     def test_a_checksum_that_does_not_match_fails_the_check_and_the_install(self):
         def wrong_for_the_guard(source):
@@ -1442,8 +1457,7 @@ class ApplyTests(ApplyCase):
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
         hooks = sorted(p.name for p in (self.home / ".claude/hooks").iterdir())
-        self.assertEqual(hooks, sorted(["currency-due-notice.py", "effort-default-guard.py", "secret_path_guard.py",
-                                        *(name for name in icp.HOOKS if name.startswith("token-lanes"))]))
+        self.assertEqual(hooks, ["currency-due-notice.py", "effort-default-guard.py", "secret_path_guard.py"])
         for name in hooks:
             self.assertEqual(hashlib.sha256((self.home / ".claude/hooks" / name).read_bytes()).hexdigest(),
                              icp.expected_sha256(icp.HOOKS[name]))
