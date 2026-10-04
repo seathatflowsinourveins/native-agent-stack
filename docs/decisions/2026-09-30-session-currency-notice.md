@@ -213,6 +213,28 @@ only. See the [current behavior and bounded schedule decision](2026-10-02-daily-
   `pin_behind_upstream` rows to `pins_behind`.
 - A check's JSON shape changes: update `aggregate()` in the script. Its tests quote the shapes it reads.
 
+## Addendum 2026-10-03: host alerts
+
+The wave-2 lifecycle ruling (change 7; its records are in
+`evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json`, layer lifecycle) makes this notice the
+channel through which a failed backup or a stopped service on the new WSL distribution reaches a session: Alertmanager
+there has only a `sink` receiver, Dagu mail needs SMTP, and a job that Dagu schedules cannot report Dagu's outage. A
+fifth count, `host_alerts`, adds:
+
+- from the state directory's `backup-status.json` and `restore-check-status.json`, whose shape the same ruling's change
+  8 sets (`last_success {snapshot_id, time}` kept apart from `last_attempt {result, exit_code, time}`): a last attempt
+  that failed or was partial (a result other than `ok`, or a nonzero exit code; restic exits 3 for a partial snapshot),
+  a last success older than 48 h (backup) or 8 days (restore check) or never recorded, and a record that cannot be read;
+- from `systemctl --user show`, each stage-2 unit of the wave-2 install order (`ecosystem-otelcol`,
+  `ecosystem-prometheus`, `ecosystem-alertmanager`, `omniroute`, `ai-memory`, `ollama`) and `dagu.service` that is
+  enabled and `failed` (a start-limit-hit included) or `inactive`.
+
+A record or a unit that a host does not have is no alert there, so the workstation's notice is unchanged unless such a
+unit of its own has stopped; a host whose user manager cannot be asked says so in the coverage entry. The SessionStart
+line reaches the new distribution's sessions only once its plan installs the stack-currency timer and the client
+configuration wires the notice hook (adoption/new-wsl/client-config-map.json keeps it unwired until then). Overturn:
+the backup or restore-check DAG writes another record shape, or the destination's unit names change.
+
 ## Sources
 
 Fetched on 2026-09-30.

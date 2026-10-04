@@ -519,3 +519,7 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
 - **One host.** These are this workstation's results. The trading lane's `blueprints/us-equities/routing/README.md:26`
   still says no Linux gateway is proposed, and `catalogs/foundation/surfaces.json` still describes the Windows
   gateway. Those files are not edited here.
+
+## Updates
+
+- 2026-10-03: for the landscape sweep and for cross-family research and review, see [the route settlement](2026-10-03-sweep-gpt6-route-settlement.md); line 318 still states the default.

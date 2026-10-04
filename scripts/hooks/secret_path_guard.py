@@ -69,7 +69,9 @@ K4 also inspects credential_run.py started commands, usage and secret mentions
 (only a valid --only NAME argument before -- grants a name-mention exemption).
 It restricts visible local HTTP management requests to the exact method/path/
 query/body matrix in docs/secret-storage.md: provider-limits POST on 20128 may
-synchronize live quota state; compression preview POST is 20129-only. Actual
+synchronize live quota state; compression preview POST is 20129-only. The new
+WSL distribution's gateway port 21128 takes 20128's rows, and its WebSocket
+port 21129 none. Actual
 omniroute api/sync commands refuse. Other tightenings cover manager environment
 writes, literal keyring feeds with quote provenance, explicit ps personalities,
 canary comparison/user-run invocations, both Claude OAuth/messaging token names,
@@ -2218,11 +2220,13 @@ def current_reading(command: str, texts: tuple[str, str], words_list: list[list[
 # data-tree name, a manager verb, a here-document operator, an environment source. Quote removal never splits these literals (they hold no
 # quote or backslash) and every word of a command is made of its unquoted() characters in order, so one scan of the unquoted text tells which
 # rules can apply at all: an ordinary command pays one charged pass for K4, and a rule whose literal is absent does no work.
-K4_ANCHOR = re.compile(r"<<|CLAUDE_CODE_|omniroute|credential_run\.py|kernel_keyring\.py|tvly-keyring|2012|curl|environment|environ"
-                       r"|process|PS_PERSONALITY|CMD_ENV|I_WANT_A_BROKEN_PS|canary_proof\.py")
+K4_ANCHOR = re.compile(r"<<|CLAUDE_CODE_|omniroute|credential_run\.py|kernel_keyring\.py|tvly-keyring|2012|2112|curl|environment"
+                       r"|environ|process|PS_PERSONALITY|CMD_ENV|I_WANT_A_BROKEN_PS|canary_proof\.py")
 K4_ANCHOR_KEYS = {"environment": ("environment", "environ")}
-# The gateway rules run when a gateway port shows, the omniroute CLI is named, or curl runs (its URL globbing can spell a port: 2012[8-9]).
-K4_GATEWAY_ANCHORS = frozenset({"2012", "omniroute", "curl"})
+# The gateway rules run when a gateway port shows (2012x on the workstation, 2112x on the new WSL distribution), the omniroute CLI
+# is named, or curl runs (its URL globbing can spell a port: 2012[8-9]).
+K4_GATEWAY_PORT_ANCHORS = frozenset({"2012", "2112"})
+K4_GATEWAY_ANCHORS = K4_GATEWAY_PORT_ANCHORS | {"omniroute", "curl"}
 # A K4 walk differs from B's only where a runner or keyring start (or tvly-keyring) can hide a shell string or start a command, or where a
 # string-tuple deduplication dropped a segment with other descriptors (note_identity_collision).
 K4_SELECTORS = frozenset({"PS_PERSONALITY", "CMD_ENV", "I_WANT_A_BROKEN_PS"})
@@ -4164,11 +4168,11 @@ def k4_gateway_reason(r: K4Reading, segments: list[list[str]]) -> str | None:
     port shows, in interpreter code (k4_gateway_code): region bodies, inline code, and the words of a command line whose options could not
     all be read."""
     reason = k4_gateway_shell(segments)
-    if reason or "2012" not in r.anchors:
+    if reason or not (K4_GATEWAY_PORT_ANCHORS & r.anchors):
         return reason
     for unit in k4_code_units(r, segments):
         k4_charge(unit.code)
-        if "2012" not in unit.code:
+        if not any(anchor in unit.code for anchor in K4_GATEWAY_PORT_ANCHORS):
             continue
         if unit.kind == "uncertain":
             if any(k4_gateway_url(found.group(), unresolved=True) for found in K4_GW_FIND.finditer(unit.code)):
@@ -4182,27 +4186,33 @@ def k4_gateway_reason(r: K4Reading, segments: list[list[str]]) -> str | None:
     return None
 
 
-K4_GW_HEAD = re.compile(r"^(?:http://)?(?:(?P<user>[^/\s@?#]*)@)?(?P<host>127\.0\.0\.1|localhost|\[::1\]|10\.0\.2\.2|host\.docker\.internal):(?P<port>20128|20129)(?P<rest>(?:[/\\?#].*)?)$", re.I | re.S)
+# The covered gateway ports: the workstation's two gateways (20128, and the second instance on 20129), and the new WSL
+# distribution's gateway (21128: dashboard, /v1 and /api in one port) and its live-dashboard WebSocket (21129), added on
+# 2026-10-03 before that gateway holds accounts (wave-2 custody ruling, change 11; the gateway dossier's port list).
+K4_GW_PORTS = ("20128", "20129", "21128", "21129")
+K4_GW_HEAD = re.compile(r"^(?:http://)?(?:(?P<user>[^/\s@?#]*)@)?(?P<host>127\.0\.0\.1|localhost|\[::1\]|10\.0\.2\.2|host\.docker\.internal):(?P<port>20128|20129|21128|21129)(?P<rest>(?:[/\\?#].*)?)$", re.I | re.S)
 K4_PERCENT_ESCAPE = re.compile(r"%([0-9A-Fa-f]{2})")
 # A covered target inside other text (the words of an interpreter command line whose options could not all be read).
 K4_GW_FIND = re.compile(r"(?:[Hh][Tt][Tt][Pp]://)?(?:127\.0\.0\.1|[Ll][Oo][Cc][Aa][Ll][Hh][Oo][Ss][Tt]|\[::1\]|10\.0\.2\.2"
-                        r"|[Hh][Oo][Ss][Tt]\.[Dd][Oo][Cc][Kk][Ee][Rr]\.[Ii][Nn][Tt][Ee][Rr][Nn][Aa][Ll]):2012[89][^\s'\"]*")
+                        r"|[Hh][Oo][Ss][Tt]\.[Dd][Oo][Cc][Kk][Ee][Rr]\.[Ii][Nn][Tt][Ee][Rr][Nn][Aa][Ll]):(?:2012[89]|2112[89])[^\s'\"]*")
 K4_GW_ID = re.compile(r"\A[A-Za-z0-9-]{1,64}\Z")
 K4_GW_NUMBER = re.compile(r"\A[0-9]{1,5}\Z")
 K4_GW_METHOD = re.compile(r"\A[A-Z]+\Z")
 K4_GW_ENCODE_DATA = re.compile(r"\A[A-Za-z0-9_-]+=[A-Za-z0-9_.~-]*\Z")
+# 21128 takes the rows of 20128, the gateway it replaces; 21129 is a WebSocket with no management route, so no row names
+# it and every covered /api/ request to it refuses.
 K4_GW_ROWS = {
-    ('GET', '/api/health'): ((20128, 20129), 'none', False),
-    ('GET', '/api/settings/compression'): ((20128, 20129), 'none', False),
-    ('GET', '/api/context/combos'): ((20128, 20129), 'none', False),
-    ('GET', '/api/model-capability-overrides'): ((20128, 20129), 'none', False),
-    ('GET', '/api/resilience'): ((20128, 20129), 'none', False),
-    ('GET', '/api/settings/feature-flags'): ((20128, 20129), 'none', False),
-    ('GET', '/api/cache'): ((20128, 20129), 'none', False),
-    ('GET', '/api/analytics/compression'): ((20128, 20129), 'analytics', False),
-    ('GET', '/api/usage/call-logs'): ((20128, 20129), 'logs', False),
-    ('GET', '/api/usage/provider-limits'): ((20128,), 'none', True),
-    ('POST', '/api/usage/provider-limits'): ((20128,), 'none', True),
+    ('GET', '/api/health'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/settings/compression'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/context/combos'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/model-capability-overrides'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/resilience'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/settings/feature-flags'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/cache'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/analytics/compression'): ((20128, 20129, 21128), 'analytics', False),
+    ('GET', '/api/usage/call-logs'): ((20128, 20129, 21128), 'logs', False),
+    ('GET', '/api/usage/provider-limits'): ((20128, 21128), 'none', True),
+    ('POST', '/api/usage/provider-limits'): ((20128, 21128), 'none', True),
     ('POST', '/api/compression/preview'): ((20129,), 'none', False),
 }
 # curl 8.5.0 (`curl --help all` and curl(1), read 2026-09-30): the transport and output options the documented replay uses and a few more
@@ -4268,7 +4278,7 @@ def k4_curl_expansions(url: str) -> list[str] | None:
 def k4_gateway_url(url: str, method='GET', body=False, additions=(), unresolved=False) -> bool:
     """Whether one request is a covered management request the frozen matrix (contract-v2 section 5.1, K4_GW_ROWS) does not permit.
     Covered: scheme http (a scheme-less client operand is http, amendment A11), host 127.0.0.1, localhost, [::1], 10.0.2.2 or
-    host.docker.internal (ASCII case folded), port 20128 or 20129. Under /api/ every request refuses unless its effective method, complete
+    host.docker.internal (ASCII case folded), port 20128, 20129, 21128 or 21129 (K4_GW_PORTS). Under /api/ every request refuses unless its effective method, complete
     path (exact segments; <id> a single [A-Za-z0-9-]{1,64} segment of the call-logs route), query (none; exactly since=all on analytics;
     limit=D and/or offset=D, D of 1 to 5 ASCII digits, once each, joined by one `&`, on call-logs) and body condition (none on provider-limits)
     match a row. Management targeting is evident when the path, dot and slash segments resolved and percent escapes decoded, reaches /api;
@@ -4306,7 +4316,7 @@ def k4_gateway_url(url: str, method='GET', body=False, additions=(), unresolved=
     row = K4_GW_ROWS.get((method, path))
     if row is None and method == 'GET' and path.startswith('/api/usage/call-logs/') \
             and K4_GW_ID.fullmatch(path[len('/api/usage/call-logs/'):]):
-        row = ((20128, 20129), 'none', False)
+        row = ((20128, 20129, 21128), 'none', False)
     if row is None or int(found['port']) not in row[0] or (row[2] and body):
         return True
     if query is None:
@@ -4411,7 +4421,8 @@ def k4_curl_requests(words: list[str]) -> bool:
                 targets = k4_curl_expansions(url)
                 if targets is None:
                     lowered = url.lower()
-                    if '/' in url and ('2012' in url or any(name in lowered for name in K4_GW_HOST_NAMES)):
+                    if '/' in url and (any(anchor in url for anchor in K4_GATEWAY_PORT_ANCHORS)
+                                       or any(name in lowered for name in K4_GW_HOST_NAMES)):
                         return True  # an unreadable glob over what could be a covered management URL
                     continue
             for target in targets:
@@ -4670,9 +4681,9 @@ def k4_gateway_code(code, tokens, structure, language):
     spend('words', 6 * (len(tokens) + 1))
     pairs, calls, _output, _iteration = structure
     targets = [(at, token) for at, token in enumerate(tokens) if token.kind == 'string'
-        and ('20128' in token.value or '20129' in token.value) and k4_gateway_url(token.value, unresolved=True)]
+        and any(port in token.value for port in K4_GW_PORTS) and k4_gateway_url(token.value, unresolved=True)]
     if not targets:
-        if 'HTTPConnection' in code and '/api/' in code and ('20128' in code or '20129' in code) \
+        if 'HTTPConnection' in code and '/api/' in code and any(port in code for port in K4_GW_PORTS) \
                 and any(host in code for host in ('127.0.0.1', 'localhost', '::1', '10.0.2.2', 'host.docker.internal')):
             return 'gateway_credential_route'
         return None

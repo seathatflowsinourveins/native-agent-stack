@@ -1182,30 +1182,6 @@
       "merit_note": "Official minimal MCP caller entrypoint for GPT Researcher; closes tool discovery only, with research quality and tool setup verified separately. Source: assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4 skills/gpt-researcher/SKILL.md:1"
     },
     {
-      "name": "grill-me",
-      "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/grill-me",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
-      "path": "skills/productivity/grill-me",
-      "tree_sha": "3df14e2d3a89459bf300614be9247e3ce74798f8",
-      "skill_md_sha256": "caaf8b8de1684f96e26b28f3c29189db5c89cce4b73e1c93d86164f66ef88637",
-      "skill_md_bytes": 157,
-      "description_chars": 51,
-      "upstream_disable_model_invocation": true,
-      "scenarios": [
-        "planning-and-specs"
-      ],
-      "roles": [
-        "coding",
-        "orchestration",
-        "research",
-        "extraction-caller"
-      ],
-      "status": "trial",
-      "merit_note": "Turns requirements into bounded designs or specifications before implementation. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/productivity/grill-me/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json"
-    },
-    {
       "name": "handoff",
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/handoff",
@@ -1250,30 +1226,6 @@
       ],
       "status": "trial",
       "merit_note": "Checks and improves repository instructions and feedback loops for autonomous workers. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/improve-agent-readiness/SKILL.md:1"
-    },
-    {
-      "name": "improve-codebase-architecture",
-      "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/improve-codebase-architecture",
-      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
-      "path": "skills/engineering/improve-codebase-architecture",
-      "tree_sha": "39bd9cc130f7dfcc4e3ea0b3613f6ebed0d0ad2b",
-      "skill_md_sha256": "552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392",
-      "skill_md_bytes": 6000,
-      "description_chars": 125,
-      "upstream_disable_model_invocation": true,
-      "scenarios": [
-        "planning-and-specs",
-        "code-review"
-      ],
-      "roles": [
-        "coding",
-        "orchestration",
-        "extraction-caller"
-      ],
-      "status": "trial",
-      "merit_note": "Provides interface and module-boundary criteria for testable caller integrations. Source: mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60 skills/engineering/improve-codebase-architecture/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "incident-retrospective",
@@ -2282,28 +2234,6 @@
       "reuse_ref": "adoption/skills/manifest.json"
     },
     {
-      "name": "semgrep",
-      "source": "trailofbits/skills",
-      "url": "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep",
-      "ref": "82fe8226252622fa807643bdca1710901198553a",
-      "path": "plugins/static-analysis/skills/semgrep",
-      "tree_sha": "32c70e1f8ab600ce747ae84821f987ae05242c60",
-      "skill_md_sha256": "52162605593f871cf45f48f9cf00b7c2d7e0759ccb7507981088442b7cc5d76c",
-      "skill_md_bytes": 15678,
-      "description_chars": 707,
-      "upstream_disable_model_invocation": false,
-      "scenarios": [
-        "security"
-      ],
-      "roles": [
-        "coding",
-        "orchestration"
-      ],
-      "status": "trial",
-      "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@82fe8226252622fa807643bdca1710901198553a plugins/static-analysis/skills/semgrep/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json"
-    },
-    {
       "name": "setup-agents-md",
       "source": "OpenHands/extensions",
       "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/setup-agents-md",
@@ -3122,9 +3052,7 @@
         "frontend-design",
         "gitlab",
         "gitlab-issue-to-mr",
-        "grill-me",
         "improve-agent-readiness",
-        "improve-codebase-architecture",
         "linear",
         "linear-triage",
         "mainframe-planning",
@@ -3166,9 +3094,7 @@
         "executing-plans",
         "gitlab",
         "gitlab-issue-to-mr",
-        "grill-me",
         "improve-agent-readiness",
-        "improve-codebase-architecture",
         "linear",
         "linear-triage",
         "mainframe-planning",
@@ -3192,7 +3118,6 @@
       "research": [
         "brainstorming",
         "domain-modeling",
-        "grill-me",
         "prd",
         "to-spec",
         "writing-plans"
@@ -3201,8 +3126,6 @@
         "brainstorming",
         "codebase-design",
         "domain-modeling",
-        "grill-me",
-        "improve-codebase-architecture",
         "prd",
         "to-spec",
         "writing-plans"
@@ -3334,7 +3257,6 @@
         "codebase-design",
         "frontend-design",
         "gh-address-comments",
-        "improve-codebase-architecture",
         "migration-mapping",
         "migration-report",
         "migration-scoring",
@@ -3351,7 +3273,6 @@
         "code-simplifier",
         "codebase-design",
         "gh-address-comments",
-        "improve-codebase-architecture",
         "migration-mapping",
         "migration-report",
         "migration-scoring",
@@ -3364,8 +3285,7 @@
       ],
       "research": [],
       "extraction-caller": [
-        "codebase-design",
-        "improve-codebase-architecture"
+        "codebase-design"
       ]
     },
     "security": {
@@ -3378,7 +3298,6 @@
         "security-audit",
         "security-best-practices",
         "security-threat-model",
-        "semgrep",
         "supply-chain-risk-auditor",
         "variant-analysis"
       ],
@@ -3391,7 +3310,6 @@
         "security-audit",
         "security-best-practices",
         "security-threat-model",
-        "semgrep",
         "supply-chain-risk-auditor",
         "variant-analysis"
       ],
@@ -4062,6 +3980,48 @@
       "upstream_disable_model_invocation": false,
       "reason": "Main removed it from its skills trial under the conflict rule M4 (#464, c0966da2; decision docs/decisions/2026-09-28-delegated-decisions.md, #462) and lists it under its own excluded. Its SKILL.md at this pin requires a fresh run of the verification command before any completion claim and rates a previous run as not sufficient (L17-20, L42), which conflicts with AGENTS.md:16, \"Reuse passing evidence when its inputs still match\". A worker whose work directory is a checkout of this repository loads that AGENTS.md too: OpenHands with project loading on reads it from the work directory and the Git root (skill.py:1084-1106 at fcc102a6), and Claude Code imports it through CLAUDE.md's first line, @AGENTS.md. Main no longer lists it among its skills, so this exclusion carries no adoption_ref; the pin fields record the revision main read.",
       "overturn": "Main re-admits it, that is adoption/skills/manifest.json lists verification-before-completion under skills again (main's own overturn: an upstream revision drops the absolute freshness requirement, is re-read in full and is re-pinned there). Then replace this exclusion with a reuse_ref entry at main's pin and restore its scenarios (tdd, github-ci-fix, code-review) and roles (coding, orchestration, extraction-caller). test_verification_before_completion_stays_excluded_until_main_readmits_it and the coverage contract both fail as soon as main re-admits it."
+    },
+    {
+      "name": "grill-me",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/grill-me",
+      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "path": "skills/productivity/grill-me",
+      "tree_sha": "3df14e2d3a89459bf300614be9247e3ce74798f8",
+      "skill_md_sha256": "caaf8b8de1684f96e26b28f3c29189db5c89cce4b73e1c93d86164f66ef88637",
+      "skill_md_bytes": 157,
+      "description_chars": 51,
+      "upstream_disable_model_invocation": true,
+      "reason": "Main retired it on 2026-10-03 (adoption/skills/manifest.json, excluded, retired 2026-10-03; wave-2 skills ruling, evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json): a one-line stub at its pin that calls the excluded grilling skill (SKILL.md line 7). The reuse_ref entry and its coverage selections left with it, as adoption/skills/lifecycle.md (Retire and remove) asks; its scenarios were planning-and-specs and its roles coding, orchestration, research, extraction-caller. Main no longer lists it among its skills, so this exclusion carries no adoption_ref; the pin fields record the revision main read.",
+      "overturn": "Main re-admits it, that is adoption/skills/manifest.json lists it under skills again; then replace this exclusion with a reuse_ref entry at main's pin and restore its scenarios and roles."
+    },
+    {
+      "name": "improve-codebase-architecture",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/improve-codebase-architecture",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "path": "skills/engineering/improve-codebase-architecture",
+      "tree_sha": "39bd9cc130f7dfcc4e3ea0b3613f6ebed0d0ad2b",
+      "skill_md_sha256": "552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392",
+      "skill_md_bytes": 6000,
+      "description_chars": 125,
+      "upstream_disable_model_invocation": true,
+      "reason": "Main retired it on 2026-10-03 (adoption/skills/manifest.json, excluded, retired 2026-10-03; wave-2 skills ruling, evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json): it calls the excluded grilling and domain-modeling skills (SKILL.md lines 64-66) and writes GLOSSARY.md and ADRs (lines 68-70). The reuse_ref entry and its coverage selections left with it, as adoption/skills/lifecycle.md (Retire and remove) asks; its scenarios were planning-and-specs, code-review and its roles coding, orchestration, extraction-caller. Main no longer lists it among its skills, so this exclusion carries no adoption_ref; the pin fields record the revision main read.",
+      "overturn": "Main re-admits it, that is adoption/skills/manifest.json lists it under skills again; then replace this exclusion with a reuse_ref entry at main's pin and restore its scenarios and roles."
+    },
+    {
+      "name": "semgrep",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep",
+      "ref": "82fe8226252622fa807643bdca1710901198553a",
+      "path": "plugins/static-analysis/skills/semgrep",
+      "tree_sha": "32c70e1f8ab600ce747ae84821f987ae05242c60",
+      "skill_md_sha256": "52162605593f871cf45f48f9cf00b7c2d7e0759ccb7507981088442b7cc5d76c",
+      "skill_md_bytes": 15678,
+      "description_chars": 707,
+      "upstream_disable_model_invocation": false,
+      "reason": "Main retired it on 2026-10-03 (adoption/skills/manifest.json, excluded, retired 2026-10-03; wave-2 skills ruling, evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json): its plan-approval gate (SKILL.md lines 5, 14, 24 and 184) conflicts with AGENTS.md's no separate planning approval for bounded work. The reuse_ref entry and its coverage selections left with it, as adoption/skills/lifecycle.md (Retire and remove) asks; its scenarios were security and its roles coding, orchestration. Main no longer lists it among its skills, so this exclusion carries no adoption_ref; the pin fields record the revision main read.",
+      "overturn": "Main re-admits it, that is adoption/skills/manifest.json lists it under skills again; then replace this exclusion with a reuse_ref entry at main's pin and restore its scenarios and roles."
     }
   ],
   "openhands_inventory": [
@@ -4532,7 +4492,7 @@
       "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
       "resolved_via": "gh api repos/mattpocock/skills/commits/c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
       "commit_date": "2026-09-18T10:12:29Z",
-      "selected_skills": 11,
+      "selected_skills": 9,
       "tree_response_truncated": false
     },
     {
@@ -4556,7 +4516,7 @@
       "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
       "resolved_via": "gh api repos/trailofbits/skills/commits/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
       "commit_date": "2026-09-24T18:57:03Z",
-      "selected_skills": 9,
+      "selected_skills": 8,
       "tree_response_truncated": false
     },
     {
@@ -4593,9 +4553,9 @@
     }
   ],
   "budget": {
-    "selected_count": 137,
-    "skill_md_bytes": 1042408,
-    "description_chars": 37215,
+    "selected_count": 134,
+    "skill_md_bytes": 1020573,
+    "description_chars": 36332,
     "provider_input_tokens_before": null,
     "provider_input_tokens_after": null,
     "meaning": "Catalog byte/character sums only, not first-prompt tokens. Measure native requests as specified in README."

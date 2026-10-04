@@ -1,0 +1,39 @@
+........FF
+======================================================================
+FAIL: test_package_json_and_the_lock_still_pin_next_16_3_5_or_are_absent (tests.test_frozen_macos_variant_no_use.FrozenVariantLockTests.test_package_json_and_the_lock_still_pin_next_16_3_5_or_are_absent)
+Absent frozen files pass: removing the variant is not a use.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 492, in test_package_json_and_the_lock_still_pin_next_16_3_5_or_are_absent
+    self.assertEqual(importer.groups(), (NEXT_VERSION, NEXT_VERSION), f"{LOCK}: {REOPEN}.")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('16.3.6', '16.3.6') != ('16.3.5', '16.3.5')
+
+First differing element 0:
+'16.3.6'
+'16.3.5'
+
+- ('16.3.6', '16.3.6')
+?        ^         ^
+
++ ('16.3.5', '16.3.5')
+?        ^         ^
+ : evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml: reopen Dependabot alert 16 and remove the frozen OSV exception (its config .github/osv-scanner-frozen-macos.toml, its inventory key in .github/osv-scanner-lockfiles.json and its FROZEN_LOCKS row in tests/test_osv_lockfile_coverage.py) before installing, building or serving from the lock (docs/decisions/2026-09-22-github-automation-closure.md, 'Dependabot alert 16').
+
+======================================================================
+FAIL: test_the_lock_has_the_sha256_that_frozen_locks_binds_or_is_absent (tests.test_frozen_macos_variant_no_use.FrozenVariantLockTests.test_the_lock_has_the_sha256_that_frozen_locks_binds_or_is_absent)
+An absent lock passes: removing the variant is not a use.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 505, in test_the_lock_has_the_sha256_that_frozen_locks_binds_or_is_absent
+    self.assertEqual(hashlib.sha256((ROOT / LOCK).read_bytes()).hexdigest(), expected, f"{LOCK}: {REOPEN}.")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '23111eedd2826595e865dcb8898ddab4eb43d5ac5cae53144c67a4ed2ff71d77' != 'f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2'
+- 23111eedd2826595e865dcb8898ddab4eb43d5ac5cae53144c67a4ed2ff71d77
++ f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2
+ : evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml: reopen Dependabot alert 16 and remove the frozen OSV exception (its config .github/osv-scanner-frozen-macos.toml, its inventory key in .github/osv-scanner-lockfiles.json and its FROZEN_LOCKS row in tests/test_osv_lockfile_coverage.py) before installing, building or serving from the lock (docs/decisions/2026-09-22-github-automation-closure.md, 'Dependabot alert 16').
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.396s
+
+FAILED (failures=2)
