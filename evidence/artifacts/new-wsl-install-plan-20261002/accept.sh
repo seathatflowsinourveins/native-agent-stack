@@ -410,11 +410,20 @@ command-output() {
     post_install)
       # Kind: smoke; Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L121 (--version); https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L193 (rtk git log); https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L309 (rtk proxy, the raw passthrough); https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L524 (RTK_TELEMETRY_DISABLED)
       # The version line is exact as the archive's binary printed it on 2026-10-04; the two log lines run in this checkout.
+      # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L2940-L2952 (excluded commands exit 1 with No rewrite; the positive control exits 0 with its rewrite).
       check command-output smoke 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"
 [[ "$("$e/bin/rtk" --version)" == "rtk 0.50.0" ]]
 cd "$repo_root"
 RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" git log -n 3
-RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" proxy git log -n 3'
+RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" proxy git log -n 3
+e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"
+for command in "git show HEAD:README.md | tail -20" "diff a b" "jq . x.json" "git branch -a"; do
+  rc=0
+  decision=$(RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" hook check "$command" 2>&1) || rc=$?
+  [[ "$rc" -eq 1 && "$decision" == "No rewrite for: $command" ]]
+done
+decision=$(RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" hook check "git status" 2>&1)
+[[ "$decision" == "rtk git status" ]]'
       ;;
     *) skipped command-output ;;
   esac
@@ -517,7 +526,14 @@ api-docs() {
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://raw.githubusercontent.com/andrewyng/context-hub/v0.1.4/cli/src/index.js#L53 (the version flag, -V, --cli-version)
-      check api-docs smoke '[[ "$(CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/chub" --cli-version)" == 0.1.4 ]]'
+      # Planned. Source: https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js#L5-L14 (the runtime functions); https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/config.js#L23-L40 (the persisted config). Keep the version probe, then unset both environment overrides in a scratch CHUB_DIR.
+      check api-docs smoke '[[ "$(CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/chub" --cli-version)" == 0.1.4 ]]
+e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"
+chub_source_config="${CHUB_DIR:-$HOME/.chub}/config.yaml"
+chub_check_dir=$(mktemp -d "${TMPDIR:-/tmp}/new-wsl-chub-check.XXXXXX")
+trap '"'"'rm -rf -- "$chub_check_dir"'"'"' EXIT
+install -m 0600 -- "$chub_source_config" "$chub_check_dir/config.yaml"
+env -u CHUB_TELEMETRY -u CHUB_FEEDBACK CHUB_DIR="$chub_check_dir" "$e/bin/node" --input-type=module -e '"'"'const { pathToFileURL } = await import("node:url"); const { isTelemetryEnabled, isFeedbackEnabled } = await import(pathToFileURL(process.argv[1]).href); const telemetry = isTelemetryEnabled(); const feedback = isFeedbackEnabled(); console.log("telemetry=" + telemetry + " feedback=" + feedback); if (telemetry !== false || feedback !== false) process.exit(1);'"'"' "$e/tools/context-hub-0.1.4/lib/node_modules/@aisuite/chub/src/lib/telemetry.js"'
       ;;
     *) skipped api-docs ;;
   esac

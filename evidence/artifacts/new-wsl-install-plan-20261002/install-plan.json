@@ -1294,7 +1294,9 @@
       "route": "release-binary",
       "commands": [
         "fetch_verified https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/rtk-0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz\"",
-        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; mkdir -p \"$e/tools/rtk-0.50.0\" \"$e/bin\"; tar -xf \"$e/downloads/rtk-0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz\" -C \"$e/tools/rtk-0.50.0\"; [[ -x \"$e/tools/rtk-0.50.0/rtk\" ]]; ln -sfn \"$e/tools/rtk-0.50.0/rtk\" \"$e/bin/rtk\""
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; mkdir -p \"$e/tools/rtk-0.50.0\" \"$e/bin\"; tar -xf \"$e/downloads/rtk-0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz\" -C \"$e/tools/rtk-0.50.0\"; [[ -x \"$e/tools/rtk-0.50.0/rtk\" ]]; ln -sfn \"$e/tools/rtk-0.50.0/rtk\" \"$e/bin/rtk\"",
+        "rtk_config_dir=\"$HOME/.config/rtk\"; if [[ \"${XDG_CONFIG_HOME:-}\" == /* ]]; then rtk_config_dir=\"$XDG_CONFIG_HOME/rtk\"; fi; mkdir -p -- \"$rtk_config_dir\"; if [[ ! -e \"$rtk_config_dir/config.toml\" ]]; then install -m 0600 -- \"$plan_dir/config/rtk-config.toml\" \"$rtk_config_dir/config.toml\"; elif ! cmp -s -- \"$plan_dir/config/rtk-config.toml\" \"$rtk_config_dir/config.toml\"; then printf \"Existing RTK config.toml differs; retained. Review hook exclusions before client configuration.\\n\" >&2; fi",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; for command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do rc=0; decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?; [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]; done; decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1); [[ \"$decision\" == \"rtk git status\" ]]"
       ],
       "needs": {
         "sudo": false,
@@ -1312,7 +1314,7 @@
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n[[ \"$(\"$e/bin/rtk\" --version)\" == \"rtk 0.50.0\" ]]\ncd \"$repo_root\"\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" git log -n 3\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" proxy git log -n 3",
+          "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n[[ \"$(\"$e/bin/rtk\" --version)\" == \"rtk 0.50.0\" ]]\ncd \"$repo_root\"\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" git log -n 3\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" proxy git log -n 3\ne=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\nfor command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do\n  rc=0\n  decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?\n  [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]\ndone\ndecision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1)\n[[ \"$decision\" == \"rtk git status\" ]]",
           "kind": "smoke",
           "source": {
             "url": "https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/README.md#L121",
@@ -1322,9 +1324,10 @@
       },
       "config_paths": [
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/rtk-0.50.0",
-        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/rtk"
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/rtk",
+        "$XDG_CONFIG_HOME/rtk/config.toml (absolute XDG_CONFIG_HOME only; otherwise $HOME/.config/rtk/config.toml)"
       ],
-      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The release archive goes through the plan's checksum-verified download (fetch_verified) instead of gh release download, so the plan needs no GitHub sign-in; the digest is the one adoption/pins-linux-x86_64.json records (the release's checksums.txt line and the GitHub asset digest), and the archive holds only the rtk executable (listed 2026-10-04). The pin stays 0.50.0: v0.51.0 (2026-10-02) lists a breaking CLI change. The plan installs the binary only: the Claude Code hook, its exclude_commands configuration (recipes/README.md) and RTK_TELEMETRY_DISABLED=1 are the client configuration's, and rtk init --global --codex is never run at 0.50.0 (Codex calls rtk explicitly)."
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The release archive goes through the plan's checksum-verified download (fetch_verified) instead of gh release download, so the plan needs no GitHub sign-in; the digest is the one adoption/pins-linux-x86_64.json records (the release's checksums.txt line and the GitHub asset digest), and the archive holds only the rtk executable (listed 2026-10-04). The pin stays 0.50.0: v0.51.0 (2026-10-02) lists a breaking CLI change. The command-output slot installs the binary and the recipe's exact five-entry [hooks] exclude_commands table at RTK's Linux config path ($XDG_CONFIG_HOME/rtk/config.toml only when XDG_CONFIG_HOME is absolute; otherwise $HOME/.config/rtk/config.toml), mode 0600, preserving existing files and warning on a difference. Native hook checks verify the four exclusions and a git status positive control before client configuration can wire the hook. The Claude Code hook and RTK_TELEMETRY_DISABLED=1 remain the client configuration's; rtk init --global --codex is never run at 0.50.0 (Codex calls rtk explicitly)."
     },
     {
       "layer": "token-efficiency",
@@ -1406,7 +1409,7 @@
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools/jcodemunch-mcp",
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"
       ],
-      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The pin is manifests/stack.json's at f77a35eb (source 8f7b34abe16fb459e0bf1c04747d584216dfe32e), installed where the project template runs ${ECO_ROOT}/bin/jcodemunch-mcp (recipes/README.md, Focused jCodeMunch retrieval); no artifact digest is recorded for it, so uv's index hashes are the only artifact check. It is registered per project, never at user scope (docs/decisions/2026-09-25-codex-mcp-scope.md, decision 2): the registration and its index are the client configuration's and the project's, and jcodemunch-mcp init, which writes a prompt policy and hooks, is not run."
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The pin is manifests/stack.json's at f77a35eb (source 8f7b34abe16fb459e0bf1c04747d584216dfe32e), installed where the project template runs ${ECO_ROOT}/bin/jcodemunch-mcp (recipes/README.md, Focused jCodeMunch retrieval); no artifact digest is recorded for it, so uv's index hashes are the only artifact check. It is registered per project, never at user scope (docs/decisions/2026-09-25-codex-mcp-scope.md, decision 2): the registration and its index are the client configuration's and the project's, and jcodemunch-mcp init, which writes a prompt policy and hooks, is not run. Registration is per project (adoption/bootstrap.md, \"jCodeMunch, per project\"), and no user-scope registration is written."
     },
     {
       "layer": "token-efficiency",
@@ -1585,7 +1588,8 @@
       "route": "none",
       "commands": [
         "fetch_verified https://registry.npmjs.org/@aisuite/chub/-/chub-0.1.4.tgz ca9fb94a21d3b5ae3025923ded305dd11f189626da5adab48a8b947bc523888f \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/context-hub-0.1.4/chub-0.1.4.tgz\"",
-        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; npm install --global --prefix \"$e/tools/context-hub-0.1.4\" \"$e/downloads/context-hub-0.1.4/chub-0.1.4.tgz\"; mkdir -p \"$e/bin\"; ln -sfn \"$e/tools/context-hub-0.1.4/bin/chub\" \"$e/bin/chub\""
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; npm install --global --prefix \"$e/tools/context-hub-0.1.4\" \"$e/downloads/context-hub-0.1.4/chub-0.1.4.tgz\"; mkdir -p \"$e/bin\"; ln -sfn \"$e/tools/context-hub-0.1.4/bin/chub\" \"$e/bin/chub\"",
+        "chub_config_dir=\"${CHUB_DIR:-$HOME/.chub}\"; mkdir -p -- \"$chub_config_dir\"; if [[ ! -e \"$chub_config_dir/config.yaml\" ]]; then install -m 0600 -- \"$plan_dir/config/chub-config.yaml\" \"$chub_config_dir/config.yaml\"; elif ! cmp -s -- \"$plan_dir/config/chub-config.yaml\" \"$chub_config_dir/config.yaml\"; then printf \"Existing Context Hub config.yaml differs; retained. Review telemetry and feedback opt-outs before ordinary sessions.\\n\" >&2; fi"
       ],
       "needs": {
         "sudo": false,
@@ -1603,7 +1607,7 @@
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "[[ \"$(CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/chub\" --cli-version)\" == 0.1.4 ]]",
+          "command": "[[ \"$(CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/chub\" --cli-version)\" == 0.1.4 ]]\ne=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\nchub_source_config=\"${CHUB_DIR:-$HOME/.chub}/config.yaml\"\nchub_check_dir=$(mktemp -d \"${TMPDIR:-/tmp}/new-wsl-chub-check.XXXXXX\")\ntrap 'rm -rf -- \"$chub_check_dir\"' EXIT\ninstall -m 0600 -- \"$chub_source_config\" \"$chub_check_dir/config.yaml\"\nenv -u CHUB_TELEMETRY -u CHUB_FEEDBACK CHUB_DIR=\"$chub_check_dir\" \"$e/bin/node\" --input-type=module -e 'const { pathToFileURL } = await import(\"node:url\"); const { isTelemetryEnabled, isFeedbackEnabled } = await import(pathToFileURL(process.argv[1]).href); const telemetry = isTelemetryEnabled(); const feedback = isFeedbackEnabled(); console.log(\"telemetry=\" + telemetry + \" feedback=\" + feedback); if (telemetry !== false || feedback !== false) process.exit(1);' \"$e/tools/context-hub-0.1.4/lib/node_modules/@aisuite/chub/src/lib/telemetry.js\"",
           "kind": "smoke",
           "source": {
             "url": "https://raw.githubusercontent.com/andrewyng/context-hub/v0.1.4/cli/src/index.js#L53",
@@ -1613,9 +1617,10 @@
       },
       "config_paths": [
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-hub-0.1.4",
-        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/chub"
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/chub",
+        "${CHUB_DIR:-$HOME/.chub}/config.yaml"
       ],
-      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). Classification gap: no npm-local route in the permitted enum; the package installs into its own prefix under the ecosystem root. The registry tarball goes through the plan's checksum-verified download against the digest adoption/pins-linux-x86_64.json records. Telemetry and feedback stay off: telemetry: false and feedback: false in ~/.chub/config.yaml, written by the client configuration, and CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 where HOME or CHUB_DIR is overridden (recipes/README.md, Context Hub opt-out). The CLI's version flag is --cli-version (cli/src/index.js:53 at v0.1.4); the --version row of its docs/cli-reference.md does not match the code."
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). Classification gap: no npm-local route in the permitted enum; the package installs into its own prefix under the ecosystem root. The registry tarball goes through the plan's checksum-verified download against the digest adoption/pins-linux-x86_64.json records. The api-docs slot persists telemetry: false and feedback: false in ${CHUB_DIR:-$HOME/.chub}/config.yaml, mode 0600, preserving existing files and warning on a difference. Post-install acceptance copies that configuration into a scratch CHUB_DIR and requires both upstream runtime functions to return false with CHUB_TELEMETRY and CHUB_FEEDBACK unset; the pinned CLI version probe is retained. The stack-worker profile keeps CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 for workers using another HOME or CHUB_DIR (recipes/README.md, Context Hub opt-out). The CLI's version flag is --cli-version (cli/src/index.js:53 at v0.1.4); the --version row of its docs/cli-reference.md does not match the code."
     },
     {
       "layer": "token-efficiency",

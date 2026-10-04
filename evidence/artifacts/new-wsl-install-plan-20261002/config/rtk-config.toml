@@ -1,0 +1,8 @@
+[hooks]
+exclude_commands = [
+  "^git show [^ ]*:",
+  "diff",
+  '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:',
+  '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)',
+  "jq",
+]

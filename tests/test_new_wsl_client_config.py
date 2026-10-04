@@ -387,6 +387,28 @@ class MapTests(unittest.TestCase):
         verdicts = {v.piece.key: v for v in cfg.analyse(ROOT)[0]}
         self.assertTrue(verdicts[hook].wired)
         self.assertIn("slot command-output installs RTK 0.50.0", verdicts[hook].reason)
+        with tempfile.TemporaryDirectory() as tmp:     # a directive adds an owner beside a different installed default
+            root = make_catalog(Path(tmp))
+
+            def other_owner(data):
+                row = next(row for row in data["slots"]
+                           if row.get("catalog") == "foundation" and row["slot_id"] == "command-output")
+                row.pop("interim", None)
+                row.update(default="Other command-output tool", installs_nothing_extra=False)
+
+            edit_json(root / cfg.MANIFEST_REL, other_owner)
+            record = next(e["directive"] for e in json.loads((root / cfg.MAP_REL).read_text())["entries"]
+                          if e["match"] == [hook])
+            verdicts = {v.piece.key: v for v in cfg.analyse(root)[0]}
+            self.assertTrue(verdicts[hook].wired)
+            self.assertIn("the owner's directive (", verdicts[hook].reason)
+            self.assertIn(record, verdicts[hook].reason)
+            # With the very same installed default, removing the directive removes the hook.
+            edit_json(root / cfg.MAP_REL, lambda d: next(e for e in d["entries"] if e["match"] == [hook]).pop(
+                "directive"))
+            verdicts = {v.piece.key: v for v in cfg.analyse(root)[0]}
+            self.assertFalse(verdicts[hook].wired)
+            self.assertIn("not 'rtk'", verdicts[hook].reason)
         with tempfile.TemporaryDirectory() as tmp:     # the record the directive names is gone
             root = make_catalog(Path(tmp))
             record = next(e["directive"] for e in json.loads((root / cfg.MAP_REL).read_text())["entries"] if "directive" in e)
@@ -462,7 +484,7 @@ class AgentGapTests(unittest.TestCase):
         gaps = cfg.agent_gaps(ROOT, results, plan)
         # Wave 3 wires the token servers; context-mode's plugin tools and skill retain their native names.
         wired_servers = {"serena", "qmd", "ai-memory", "semble", "socraticode", "headroom", "codebase-memory",
-                         "jcodemunch", "plugin_context-mode_context-mode"}
+                         "plugin_context-mode_context-mode"}
         for path in sorted((ROOT / cfg.CLAUDE_AGENTS_REL).glob("*.md")):
             text = path.read_text()
             head = re.match(r"---\n(.*?)\n---\n", text, re.S).group(1)
@@ -474,8 +496,15 @@ class AgentGapTests(unittest.TestCase):
             gap = gaps.get(path.name, {"mcp_tools": [], "skills": []})
             self.assertEqual({tool.split("__")[1] for tool in gap["mcp_tools"]}, expected_servers, path.name)
             self.assertEqual(gap["skills"], expected_skills, path.name)
-        # The owner-selected token stack supplies every server and skill the project agents name.
-        self.assertEqual(gaps, {})
+        # jCodeMunch is available only after the project's own registration, never from the user profile.
+        project_tools = ["mcp__jcodemunch__route", "mcp__jcodemunch__order"]
+        self.assertEqual(gaps, {
+            "evidence-reviewer.md": {"mcp_tools": project_tools, "skills": []},
+            "isolated-builder.md": {"mcp_tools": project_tools, "skills": []},
+            "security-reviewer.md": {"mcp_tools": project_tools, "skills": []},
+            "stack-researcher.md": {"mcp_tools": ["mcp__jcodemunch__route", "mcp__jcodemunch__menu",
+                                                 "mcp__jcodemunch__order"], "skills": []},
+        })
         # The skills rows run install_skills.py over adoption/skills/manifest.json (wave-2 skills ruling, change 7): the
         # selected rows, without the retired, pruned and held ones.
         selected = {skill["name"] for skill in json.loads((ROOT / cfg.SKILLS_MANIFEST_REL).read_text())["skills"]
@@ -504,7 +533,9 @@ class AgentGapTests(unittest.TestCase):
             edit_json(root / cfg.MANIFEST_REL, install)
             after = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
         self.assertIn("socraticode", json.dumps(before["evidence-reviewer.md"]))
-        self.assertNotIn("evidence-reviewer.md", after)    # jCodeMunch is wired too, so no gap remains
+        self.assertNotIn("socraticode", json.dumps(after["evidence-reviewer.md"]))
+        self.assertEqual(after["evidence-reviewer.md"], {
+            "mcp_tools": ["mcp__jcodemunch__route", "mcp__jcodemunch__order"], "skills": []})
 
 
 class ManifestRuleTests(unittest.TestCase):
@@ -585,8 +616,10 @@ class ManifestRuleTests(unittest.TestCase):
         self.assertEqual({s for s in slots if cfg.installs(rows[s])},
                          {"serena", "tobi-qmd", "otel-collector-contrib", "gpt-gateway", "claude-code", "mise",
                           "mcp-inspector", "context-supply", "memory-owner", "code-search", "statusline",
-                          "container-engine", "command-output", "output-compression", "code-index", "code-graph",
+                          "container-engine", "command-output", "output-compression", "code-graph",
                           "api-docs"})
+        self.assertNotIn("code-index", slots)  # its console script installs, but neither user profile registers it
+        self.assertTrue(cfg.installs(rows["code-index"]))
         self.assertEqual({s for s in slots if rows[s].get("interim")}, {"memory-owner", "code-search"})
 
 
@@ -680,7 +713,7 @@ class RenderTests(unittest.TestCase):
         servers = json.loads(self.files["mcp-servers.json"])["mcpServers"]
         # The owner-selected token stack joins Serena, QMD and the interim memory/search installs.
         self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd",
-                                         "jcodemunch", "semble"])
+                                         "semble"])
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
@@ -696,12 +729,12 @@ class RenderTests(unittest.TestCase):
         config = tomllib.loads(self.files["codex.config.toml"])
         # semble comes from the new distribution's additions, merged after the shared template's servers.
         self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory",
-                                                      "qmd", "context-mode", "jcodemunch", "semble"])
+                                                      "qmd", "context-mode", "semble"])
         pinned_search = host["ECO_ROOT"] + "/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
         self.assertEqual(servers["socraticode"]["args"], [pinned_search.replace(host["ECO_ROOT"], "${ECO_ROOT}")])
         self.assertEqual(config["mcp_servers"]["socraticode"]["args"], [pinned_search])
-        self.assertEqual(servers["jcodemunch"], {"type": "stdio", "command": "${ECO_ROOT}/bin/jcodemunch-mcp", "args": []})
-        self.assertEqual(config["mcp_servers"]["jcodemunch"], {"command": host["ECO_ROOT"] + "/bin/jcodemunch-mcp"})
+        self.assertNotIn("jcodemunch", servers)
+        self.assertNotIn("jcodemunch", config["mcp_servers"])
         self.assertEqual(config["mcp_servers"]["ai-memory"], {"url": f"http://{host['AI_MEMORY_URL']}/mcp"})
         semble = config["mcp_servers"]["semble"]
         self.assertEqual((semble["command"], semble["enabled_tools"]), ("semble", ["search", "find_related"]))
@@ -1463,7 +1496,7 @@ class ApplyTests(ApplyCase):
                              icp.expected_sha256(icp.HOOKS[name]))
         self.assertEqual(len(list((self.home / ".claude/agents").iterdir())), 11)
         self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())),
-                         ["ai-memory", "codebase-memory", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
+                         ["ai-memory", "codebase-memory", "headroom", "qmd", "semble", "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["Notification", "PostToolUse", "PreCompact", "PreToolUse",
@@ -3487,6 +3520,103 @@ class AdditiveOptionTests(unittest.TestCase):
             text = (home / ".profile").read_text()
         self.assertEqual(text.count("profile-path:begin"), 1)
         self.assertIn('PATH="$HOME/.local/bin${PATH:+:$PATH}"', text)
+
+
+class PlanConfigurationTests(unittest.TestCase):
+    """Run only the plan's configuration writes in scratch homes, without installing tools or contacting providers."""
+
+    def config_command(self, slot, filename):
+        plan = json.loads((ROOT / cfg.PLAN_REL / "install-plan.json").read_text())
+        row = next(row for row in plan["owners"] if row["slot"] == slot)
+        commands = [command for command in row["commands"] if f"config/{filename}" in command]
+        self.assertEqual(len(commands), 1, f"{slot} must persist {filename} before client hooks are wired")
+        return commands[0]
+
+    def test_rtk_install_persists_the_recipe_exclusions_and_preserves_existing_configuration(self):
+        command = self.config_command("command-output", "rtk-config.toml")
+        source = ROOT / cfg.PLAN_REL / "config/rtk-config.toml"
+        recipe = (ROOT / "recipes/README.md").read_text()
+        expected = re.search(r"```toml\n(\[hooks\]\nexclude_commands = \[.*?\n\])\n```", recipe, re.S).group(1) + "\n"
+        self.assertEqual(source.read_text(), expected)
+        for xdg in (None, "absolute", "relative"):
+            with self.subTest(xdg=xdg), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp) / "home"
+                config_root = Path(tmp) / "xdg" if xdg == "absolute" else home / ".config"
+                target = config_root / "rtk/config.toml"
+                env = dict(os.environ, HOME=str(home), plan_dir=str(ROOT / cfg.PLAN_REL),
+                           ECO_ROOT=str(Path(tmp) / "ecosystem"))
+                env.pop("XDG_CONFIG_HOME", None)
+                if xdg:
+                    env["XDG_CONFIG_HOME"] = str(config_root) if xdg == "absolute" else "relative-config"
+
+                def write_config():
+                    result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                            cwd=tmp, env=env, capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    return result
+
+                self.assertFalse(target.exists())
+                write_config()
+                self.assertEqual(target.read_text(), expected)
+                self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o600)
+                self.assertEqual(write_config().stderr, "")   # an identical rerun has no warning
+                target.write_text("# operator configuration\n[hooks]\nexclude_commands = [\"curl\"]\n")
+                original = target.read_bytes()
+                result = write_config()
+                self.assertEqual(target.read_bytes(), original)
+                self.assertIn("differs; retained", result.stderr)
+                self.assertFalse((Path(tmp) / "relative-config/rtk/config.toml").exists())
+
+    def test_chub_install_persists_both_opt_outs_and_preserves_existing_configuration(self):
+        command = self.config_command("api-docs", "chub-config.yaml")
+        source = ROOT / cfg.PLAN_REL / "config/chub-config.yaml"
+        self.assertEqual([line for line in source.read_text().splitlines() if not line.startswith("#")],
+                         ["telemetry: false", "feedback: false"])
+        for override in (False, True):
+            with self.subTest(chub_dir=override), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp) / "home"
+                target = (Path(tmp) / "custom-chub" if override else home / ".chub") / "config.yaml"
+                env = dict(os.environ, HOME=str(home), plan_dir=str(ROOT / cfg.PLAN_REL),
+                           XDG_CONFIG_HOME=str(Path(tmp) / "xdg"), ECO_ROOT=str(Path(tmp) / "ecosystem"))
+                env.pop("CHUB_DIR", None)
+                if override:
+                    env["CHUB_DIR"] = str(target.parent)
+
+                def write_config():
+                    result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                            cwd=tmp, env=env, capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    return result
+
+                self.assertFalse(target.exists())
+                write_config()
+                self.assertEqual(target.read_bytes(), source.read_bytes())
+                self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o600)
+                self.assertEqual(write_config().stderr, "")
+                target.write_text("# operator configuration\ntelemetry: true\nfeedback: true\n")
+                original = target.read_bytes()
+                result = write_config()
+                self.assertEqual(target.read_bytes(), original)
+                self.assertIn("differs; retained", result.stderr)
+                if override:
+                    self.assertFalse((home / ".chub/config.yaml").exists())
+
+    def test_plan_checker_counts_direct_config_installs_and_refuses_an_uncopied_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            plan_dir = Path(tmp) / "plan"
+            shutil.copytree(ROOT / cfg.PLAN_REL, plan_dir)
+            args = [sys.executable, "-B", str(ROOT / cfg.PLAN_REL / "check_plan.py"), "--plan-dir", str(plan_dir),
+                    "--manifest", str(ROOT / cfg.MANIFEST_REL)]
+            result = subprocess.run(args, cwd=tmp, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("acceptance entries agree with the scripts", result.stdout)
+            (plan_dir / "config/uncopied-config.yaml").write_text("telemetry: false\n")
+            # A filename mentioned in an installation comment cannot turn an uncopied file into an installed one.
+            with (plan_dir / "install.sh").open("a") as stream:
+                stream.write('\n# install -m 0600 -- "$plan_dir/config/uncopied-config.yaml" "$HOME/config.yaml"\n')
+            result = subprocess.run(args, cwd=tmp, capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("config/uncopied-config.yaml is copied by no install function", result.stdout)
 
 
 class RecordTests(unittest.TestCase):

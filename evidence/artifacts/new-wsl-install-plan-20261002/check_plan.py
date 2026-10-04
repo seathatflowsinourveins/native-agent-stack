@@ -302,9 +302,12 @@ def main():
         if r["route"] == "mise" and not r.get("mise_tool"):
             bad("mise", f"row {r['slot']} has route mise but names no mise_tool")
 
-    # config files: each copy_config target exists and every file is copied; ports do not collide between rows
+    # Config files: service copy_config calls and direct, preserving tool-config installs both consume plan files.
+    # Ports do not collide between rows. Only the install source operand counts, never an arbitrary filename mention.
     config = {p.name for p in (plan_dir / "config").iterdir()}
     copied = set(re.findall(r"copy_config '([^']+)'", install_text))
+    commands = "\n".join(command for row in rows for command in row["commands"])
+    copied.update(re.findall(r'install -m 0600 -- "\$plan_dir/config/([A-Za-z0-9._-]+)" "[^"\n]+"', commands))
     for name in sorted(copied - config):
         bad("config", f"install.sh copies config/{name}, which does not exist")
     for name in sorted(config - copied):

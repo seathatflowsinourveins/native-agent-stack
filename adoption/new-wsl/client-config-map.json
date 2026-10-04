@@ -426,18 +426,6 @@
     },
     {
       "match": [
-        "claude/mcp/server/jcodemunch",
-        "codex/config/mcp_servers.jcodemunch.*"
-      ],
-      "wiring": "slot:code-index",
-      "owner": "jcodemunch",
-      "names": [
-        "jcodemunch"
-      ],
-      "source": "jgravelle/jcodemunch-mcp 1.108.319, revision 8f7b34abe16fb459e0bf1c04747d584216dfe32e README.md: user-scope `claude mcp add -s user jcodemunch` and Codex [mcp_servers.jcodemunch]. The install plan's code-index row installs the jcodemunch-mcp console script into ${ECO_ROOT}/bin. The 2604 additions register that executable only; jcodemunch-mcp init is never invoked."
-    },
-    {
-      "match": [
         "claude/profile/hook-file/effort-default-guard.py",
         "claude/profile/hook-file/secret_path_guard.py"
       ],
