@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "record": "wsl-lock-frozen-rename-20261004",
-  "purpose": "Retains the evidence for storing the retired WSL retrieval lock as package-lock.json.frozen. No dependency scanner reads that name, so the lock leaves the discovery that raised Dependabot alert 17 and Scorecard code-scanning alert 19, and the dedicated OSV-Scanner grant that expired on 2026-10-17 is deleted with its scan group.",
+  "purpose": "Retains the evidence for storing the retired WSL retrieval lock as package-lock.json.frozen. No dependency scanner reads that name, so the lock leaves the discovery that raised Dependabot alert 17 and Scorecard code-scanning alert 19, and the dedicated OSV-Scanner grant, due to expire on 2026-10-17, is deleted with its scan group.",
   "fixed_means": "If GitHub reports alert 17 or alert 19 as fixed after this change merges, fixed means the lock was removed from name-based discovery. Nothing was patched: the archived bytes still pin braces 3.0.3, which GHSA-vfj7-8cjw-p6xm (CVE-2026-93687, high) affects and for which no patched release exists.",
   "checked_commit": "f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5",
   "observed_utc": "2026-10-04T08:24:12Z",

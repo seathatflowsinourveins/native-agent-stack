@@ -149,7 +149,7 @@ GitHub's dependency graph, Scorecard's OSV-Scanner run and OSV-Scanner itself fi
 lockfiles by file name. Under its npm name this lock raised Dependabot alert 17
 (braces 3.0.3, GHSA-vfj7-8cjw-p6xm, high, no patched release) and the Scorecard
 code-scanning alert 19 that carries the same advisory. It also needed a dedicated
-OSV-Scanner grant that expired on 2026-10-17. No scanner reads the `.frozen` name,
+OSV-Scanner grant, due to expire on 2026-10-17. No scanner reads the `.frozen` name,
 so that grant and its scan group are deleted. "Fixed" means the lock was removed
 from discovery, not that braces was patched: the archived bytes still pin braces
 3.0.3. Active QMD's own exposure to the advisory is unchanged and unresolved.
