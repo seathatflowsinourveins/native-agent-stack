@@ -20,7 +20,7 @@
         "RTK_TELEMETRY_DISABLED",
         "rtk"
       ],
-      "note": "RTK 0.50.0 owns command-output under the owner's full-stack decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md). A copy of the variable inside an MCP server's table follows that server's own entry, so an unwired server never gets a table of its own.",
+      "note": "RTK 0.51.0 owns command-output under the owner's full-stack decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md). A copy of the variable inside an MCP server's table follows that server's own entry, so an unwired server never gets a table of its own.",
       "directive": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md"
     },
     {

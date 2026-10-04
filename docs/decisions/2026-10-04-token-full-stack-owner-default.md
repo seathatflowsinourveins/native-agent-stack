@@ -150,9 +150,9 @@ These limits stay as rules of use; none removes a row.
 - ccusage is a meter, never a saving. Native finalized accounting stays authoritative: the same pull request reports that
   "the supplemental ccusage run omits 653,816 tokens across three natural-compaction records". Reports stay token-only
   (`--no-cost`) unless every model is priced (`recipes/README.md`, the ccusage row).
-- RTK stays at 0.50.0. Its v0.51.0 release (2026-10-02, read from the GitHub release page on 2026-10-04) lists a breaking
+- RTK stayed at 0.50.0 when this record was written; it moved to 0.51.0 with main's PR #693, see "Refresh onto main after PR #693" below. Its v0.51.0 release (2026-10-02, read from the GitHub release page on 2026-10-04) lists a breaking
   change: "callers that relied on implicit shell expansion in positional arguments must pass the script explicitly". A
-  move is its own qualification. At 0.50.0, never run `rtk init --global --codex` (`docs/token-session-handbook.md:373`).
+  move is its own qualification. At 0.50.0, never run `rtk init --global --codex` (`docs/token-session-handbook.md:397`).
 - Headroom runs as an MCP server only, `headroom mcp serve --proxy-url http://127.0.0.1:1`, a dead proxy URL that reroutes
   no model traffic, with its offline variables set (`docs/decisions/2026-09-25-codex-mcp-scope.md:73-74`,
   `adoption/templates/codex.config.template.toml`). The `[mcp]` extra, not `[all]`.

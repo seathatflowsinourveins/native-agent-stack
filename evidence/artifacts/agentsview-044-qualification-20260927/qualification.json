@@ -71,7 +71,7 @@
       },
       {
         "path": "scripts/native_token_ci.py",
-        "enforced_by": "scripts/native_token_ci.py:1749-1752 stops a run with 'Manifest pin changed' when PINS differs from manifests/stack.json.",
+        "enforced_by": "scripts/native_token_ci.py:1749-1751 stops a run with 'Manifest pin changed' when PINS differs from manifests/stack.json.",
         "locations": [
           {"line_at_record": 64, "kind": "checked_mirror", "match": "\"agentsview\": \"0.43.0\""},
           {"line_at_record": 635, "kind": "version_specific_guidance", "match": "(internal/telemetry/telemetry.go at v0.43.0)", "change": "Re-verify the telemetry opt-out at the new tag and update the citation."}

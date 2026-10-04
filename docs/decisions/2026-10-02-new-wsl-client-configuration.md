@@ -176,7 +176,7 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    `skill-creator` (the name appears nowhere on that page). The plan installs no plugin (`install.sh` L171 adds a
    marketplace and L180 installs the six skills), so nothing the plan does provides a `skill-creator` for Claude Code. That
    is read from the plan and those two pages: no destination host was built here, so it is not observed. The settings
-   template's `"skill-creator": "on"` (`adoption/templates/claude.settings.template.json` L407) then names a skill the plan
+   template's `"skill-creator": "on"` (`adoption/templates/claude.settings.template.json` L417) then names a skill the plan
    does not provide; the
    settings reference (read 2026-10-02) describes `skillOverrides` as hiding or collapsing a skill and says nothing of a
    name with no skill. The repository's own Claude-side record is a pinned trial copy of `anthropics/skills`
@@ -446,7 +446,7 @@ implementation is the reference: `adoption/bootstrap.md` steps 2, 4 and 4a,
 - Repository files read for the same question: `adoption/templates/codex.hooks.template.json`;
   `adoption/templates/codex.config.template.toml` L144-200 (the `[projects]` grants and the `[hooks.state]` approvals of
   the source host); `docs/secret-storage.md` L185-187, L1610-1611 and L2014-2056; `docs/token-session-handbook.md` L372;
-  `recipes/README.md` L158; `adoption/bootstrap.md` L362-381 (the trust-state warning); and for the files the plan leaves,
+  `recipes/README.md` L158; `adoption/bootstrap.md` L366-385 (the trust-state warning); and for the files the plan leaves,
   `install.sh` L171-173 and the row `trail-of-bits-security-skills-trailofbits-skills` of `install-plan.json`.
 
 - For the fourth round (read 2026-10-02): the Claude Code settings reference, `permissions.defaultMode` (L1665-1679) and

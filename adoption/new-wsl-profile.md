@@ -200,7 +200,7 @@ have no default-install precedence.
 | CPython 3.13 | 3.13.15 | [reviewed install source](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md) |
 | Codex | 0.160.0 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.160.0/README.md), [npm version syntax](https://docs.npmjs.com/cli/v11/commands/npm-install) |
 | Claude Code | 2.1.284 | [reviewed install source](https://code.claude.com/docs/en/setup#install-a-specific-version) |
-| mcporter | 0.14.1 | [reviewed install source](https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md) |
+| mcporter | 0.14.2 | [reviewed install source](https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md) |
 | MCP Inspector | 2.9.0 | [reviewed install source](https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md) |
 | sandbox-runtime | 0.0.77 | [reviewed install source](https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md) |
 | Worktrunk | 0.80.0 | [exact release installer and shell setup](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0) |
@@ -221,7 +221,7 @@ have no default-install precedence.
 | ai-memory | 2.5.2 | [upstream mise example](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1622), [GitHub backend version syntax](https://mise.jdx.dev/dev-tools/backends/github.html) |
 | Hindsight | 0.10.2 | [reviewed install source](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/README.md) |
 | agentmemory | 0.9.29 | [reviewed install source](https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md) |
-| RTK | 0.50.0 | [release asset](https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md#L113) through the [archive procedure](../recipes/README.md#official-release-archives) (until 2026-10-04: the [upstream Git install](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md#L106) with [Cargo tag/lock syntax](https://doc.rust-lang.org/cargo/commands/cargo-install.html)) |
+| RTK | 0.51.0 | [release asset](https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L113) through the [archive procedure](../recipes/README.md#official-release-archives) (0.50.0 until the #693 refresh of 2026-10-04) |
 | sqz | 1.9.0 | [reviewed install source](https://github.com/ojuschugh1/sqz/blob/726e77bd7e9d6ae7529e2750da69d86e622ca699/README.md) |
 | Headroom | 0.37.0 | [reviewed install source](https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md); since 2026-10-04 the [uv tool form](https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md#L92) with the `[mcp]` extra, not `[all]` |
 | Phoenix | 20.18.0 | [reviewed install source](https://github.com/Arize-ai/phoenix/blob/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md) |
