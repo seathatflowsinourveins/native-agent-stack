@@ -182,3 +182,80 @@ template-injection (High, High, Regular). It exited 0 with --no-exit-codes and 1
 The repository's .github at the base, extracted from git, gave 0 findings and exit 0. A
 workflow with broken YAML under --strict-collection exited 1 with "fatal: no audit was
 performed", so the gate fails closed on it (zizmor_failed).
+
+
+6. Main's e0c329ae9 and CodeQL alert 90, 2026-10-04 (merge d1bb9cf15 of main f474f6d22, fixes
+   36440d64a and 9602c2274)
+
+The merge brought main's e0c329ae9, the only workflow change since the merge base d2fc3803e. Its
+`changes` step in adoption-bootstrap.yml compares `git diff --name-only` output with two bash
+arrays of path globs (PATTERNS, MACOS_PATTERNS) through `case` patterns. It neither runs nor reads
+the listed files. The derivation read the listed words as names. It then traced two listed scripts'
+sys.path entries (scripts/credential_boot_receipt.py, tools/adoption/managed_block.py), so the
+whole scripts/ and tools/adoption/ directories became protected prefixes. An echoed summary line
+naming `tests/` also relabelled the discovery prefix `tests` as ci_named, because
+adoption-bootstrap.yml sorts before validate.yml. validate-macos (changed-tests mode) on the PR's
+merge with main failed test_the_derivation_protects_the_ci_gate_files twice. The same failure on
+the merge commit, 2026-10-04T04:26:36Z:
+$ python3 -m unittest tests.test_runtime_worker_openhands_push_gate.RepositoryWorkflowTests
+exit 1; Ran 3 tests; FAILED (failures=2, skipped=1): 'ci_named' != 'ci_discovered' for
+tests/test_brand_new_module.py, and 'scripts' unexpectedly found in the derived prefixes.
+
+Failing first for the new tests, 2026-10-04T04:34:31Z. Method: the working tree copied into
+<scratch> and committed there, with push_gate.py and resolver.py restored from the merge commit
+d1bb9cf15:
+$ python3 -m unittest tests.test_runtime_worker_openhands_push_gate
+exit 1; Ran 36 tests; FAILED (failures=6, errors=14, skipped=1):
+- 14 errors, no push_gate.pattern_lists (the recognizer test and its 13 variants);
+- the fixture step that only lists paths was refused for scripts/listed_only.py and
+  scripts/neighbour.py;
+- the repository test failed both ways, as on CI;
+- the rule order leaked into the labels in both orders.
+The fail-closed control test_a_list_the_step_also_runs_stays_protected passed there, as it
+should.
+$ python3 -m unittest ...ResolverRunTests.test_the_printed_dry_run_plan_carries_no_value_from_the_trusted_identity
+exit 1; KeyError: 'push_gate' (the plan printed push_gate_trusted_commit instead).
+
+CodeQL alert 90: py/clear-text-logging-sensitive-data, CodeQL 2.27.1, at resolver.py:1692 of
+40f12ba51, the dry-run print. Read with `gh api` from the analysis SARIF (python, id 1887731909).
+Its two flows start at resolver.py:1647, the assignment `trusted_commit = None`, and at
+resolver.py:1651, the call `trusted_identity(...)`. Both reach plan["push_gate_trusted_commit"],
+and both are classified "secret" by name: github/codeql codeql-cli/v2.27.1
+shared/concepts/codeql/concepts/internal/SensitiveDataHeuristics.qll:59-60 maybeSecret matches
+`trusted`; python/ql/lib/semmle/python/dataflow/new/SensitiveDataSources.qll:250
+SensitiveVariableAssignment and :100 SensitiveFunctionCall. The value is a commit id of the
+checkout of main and authenticates nothing. The plan now prints only
+"push_gate": "trusted_copy_checked".
+
+Planted defects on the fixed tree, 2026-10-04T04:32:50Z to 04:34:15Z, with the runner and method
+of part 2: the unmutated copy passes (exit 0). M1 to M17 are as in part 2, each exit 1 again.
+The new ones:
+M18 a list expanded outside its loops still counts as patterns: exit 1, failures=3;
+    test_a_list_used_any_other_way_keeps_its_names
+M19 a loop variable used outside case patterns still counts: exit 1, failures=4;
+    test_a_list_used_any_other_way_keeps_its_names, test_a_list_the_step_also_runs_stays_protected
+M20 eval and indirect expansion ignored: exit 1, failures=2; test_a_list_used_any_other_way_keeps_its_names
+    (the nameref variant stays refused by the writer check, a second line of defence)
+M21 writes to the list ignored: exit 1, failures=2; test_a_list_used_any_other_way_keeps_its_names
+M22 the first rule read wins: exit 1, failures=3;
+    test_the_recorded_rule_is_the_most_specific_whatever_the_order, test_the_derivation_protects_the_ci_gate_files
+M23 the dry-run plan prints the trusted-identity result: exit 1, failures=1;
+    test_the_printed_dry_run_plan_carries_no_value_from_the_trusted_identity
+Detected 23 of 23.
+
+The workflow reader against PyYAML 6.0.1 on the merged tree's 21 workflows, including main's
+rewritten adoption-bootstrap.yml:
+$ /usr/bin/python3 -m unittest ...push_gate.RepositoryWorkflowTests ...push_gate.WorkflowReaderTests
+exit 0; Ran 11 tests; OK.
+
+Local rehearsal on the merged tree, 2026-10-04T04:35:14Z to 04:35:45Z. Method of part 4: the gate
+loaded from 9602c2274 with real zizmor 1.30.1, one planted commit per clone, the clone removed after
+each check. Each record had 14 reachable workflows, 304 protected files and 5 prefixes; the
+new-test case had 305 files. Every record named the trusted commit, and each check took 2.2
+seconds.
+benign docs edit: pass; zizmor 0 findings on main's workflows
+scripts/credential_boot_receipt.py edit (listed only in MACOS_PATTERNS): pass
+tools/adoption/managed_block.py edit (listed only in MACOS_PATTERNS): pass
+scripts/validate.py edit (run by the workflows): fail protected_path [ci_named]
+new test module (tests/test_resolver_added.py): fail protected_path [ci_discovered]
+.github/workflows/adoption-bootstrap.yml edit: fail protected_path [github]

@@ -335,7 +335,12 @@ refuses, with no push, a change to:
   each `run:` or `script:` text, without its comment lines, the derivation takes the files,
   directories and dotted modules it names (the patch validator's reviewed tokenizer,
   `patch_policy.names_in_text`), resolved from the repository root, each `working-directory` and
-  each `cd` target. It adds the test modules, start directories and packages that unittest
+  each `cd` target. The words of a bash list that a step uses only as `case` patterns are set
+  aside: such a list names paths to compare with other paths, and the step neither runs nor reads
+  them. That is what the `changes` step of `adoption-bootstrap.yml` (main `e0c329ae9`) does with
+  its `PATTERNS` and `MACOS_PATTERNS` globs. Any other use of a list, a list holding an
+  expansion, or a script with `eval`, indirect expansion or a nameref keeps its words as names
+  (`push_gate.pattern_lists`). It adds the test modules, start directories and packages that unittest
   discovery reaches (Python's documented rules: the default pattern `test*.py`, and since 3.11
   only subdirectories with `__init__.py`), and the import closure of the gate scripts named
   (`patch_policy.python_references`). Test modules are protected themselves, but their imports,
@@ -364,12 +369,35 @@ of reviewed main, never from the agent's tree or branch. At run time the gate:
 - requires the same three files at the base to equal the trusted ones, so a stale gate refuses;
 - records the trusted commit.
 
-`plan_run` checks the location and the files before any container; the push repeats every check
-against the clone. Each check leaves one record per commit: pass or fail, its reason codes, the
+`plan_run` checks the location and the files before any container, and its printed dry-run plan
+says only that the check passed; the push repeats every check against the clone. When several
+rules derive the same path, the record names the most specific one (local action, then unittest
+discovery, then a step's name, then an import), whatever order the workflows are read in. Each
+check leaves one record per commit: pass or fail, its reason codes, the
 paths that triggered it with their rules, the trusted commit, and zizmor's version and failing
 audits. The record goes into `GhHarness.gates`, beside the write journal, and into the attempt's
 `resolver-outcome.json`. The receipt keeps codes, hashes and counts, and names a path only when
 the base already has it.
+
+**CodeQL alert 90 (2026-10-04): a name-based false positive, resolved structurally.** CodeQL
+2.27.1's `py/clear-text-logging-sensitive-data` flagged the dry-run `print` of the plan. The rule's
+help says that "Sensitive data should not be logged"
+([query help](https://codeql.github.com/codeql-query-help/python/py-clear-text-logging-sensitive-data/)).
+The analysis SARIF names two sources, both reaching the plan field `push_gate_trusted_commit`:
+- the assignment `trusted_commit = None`. `SensitiveVariableAssignment` marks "the expression
+  that is _assigned_ to the variable" as the source
+  (`python/ql/lib/semmle/python/dataflow/new/SensitiveDataSources.qll:250`);
+- the call `trusted_identity(...)` (`SensitiveFunctionCall`, `:100`).
+
+Both are classified "secret" by name alone. `maybeSecret()` matches `trusted`, as "secret or
+trusted data" (`shared/concepts/codeql/concepts/internal/SensitiveDataHeuristics.qll:59-60,130`,
+github/codeql at `codeql-cli/v2.27.1`). The value was the commit id of the coordinator's checkout
+of main. It authenticates nothing and is published on GitHub, so this is a false positive. The
+alert is not dismissed. `plan_run` still runs the check, but the printed plan now holds only
+`"push_gate": "trusted_copy_checked"`, so no value from either source reaches the print. The gate
+record keeps the commit per pushed commit in `resolver-outcome.json`, which is not printed. A test
+pins the printed plan's fields, and checks that a sentinel return value from the trusted-identity
+check and planted `GH_TOKEN` and `GITHUB_TOKEN` values never appear in it.
 
 **What this change leaves to a separate defence-in-depth PR.** Workflow hardening belongs to a
 separate PR, not this one:
@@ -402,6 +430,8 @@ The tripwire stays a regression check there; it does not stand in for the gate.
 - The protected list is broad by design. Every `tests/**` file and every file a reachable `run:`
   step names, such as `scripts/validate.py`, `.gitleaks.toml` and `manifests/evidence.json`, is
   refused. A resolver task whose owned paths need those files fails at the gate, with no push.
+  Paths that appear only inside echoed text still count as names (the `changes` step's summary
+  names `docs/decisions/2026-10-03-macos-ci-scope.md`). That over-protects in the safe direction.
   Narrowing the list is a reviewed change to the gate on main.
 
 **Evidence** (local integration and synthetic checks, not upstream acceptance or a live run):
@@ -411,8 +441,9 @@ The tripwire stays a regression check there; it does not stand in for the gate.
   gate-script edit and a local-action edit; a benign commit passes; the gate refuses to run from
   inside the agent tree; an unavailable zizmor fails closed.
 - [evidence/push-gate-fail-first.txt](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt)
-  keeps the tests' failing run at the base, 17 planted defects in the gate code, each failing its
-  test, and a local rehearsal on this repository's own trees with the real zizmor.
+  keeps the tests' failing run at the base, 23 planted defects in the gate code, each failing its
+  test, and a local rehearsal on this repository's own trees with the real zizmor. Its part 6
+  covers the round after main's `e0c329ae9` and CodeQL alert 90.
 
 **Overturn.** If the pre-push gate cannot be kept immutable to the agent, switch to option 2
 (fork isolation). That happens when the agent can reach the trusted checkout, the gate's files or
@@ -595,6 +626,17 @@ its versioned primary sources. Do not weaken or skip the validator's refusal ass
   Discovery"](https://docs.python.org/3/library/unittest.html#test-discovery) with the installed
   CPython 3.13.15 `Lib/unittest/loader.py` `_find_test_path`, and the installed zizmor 1.30.1
   `--help` (`--offline`, `--no-config`, `--no-ignores`, `--collect`, `--no-exit-codes`).
+- CodeQL alert 90, read 2026-10-04 (HTTP 200): the [py/clear-text-logging-sensitive-data query
+  help](https://codeql.github.com/codeql-query-help/python/py-clear-text-logging-sensitive-data/), and
+  [github/codeql `codeql-cli/v2.27.1`](https://github.com/github/codeql/tree/codeql-cli/v2.27.1),
+  the alert's CodeQL version:
+  - `shared/concepts/codeql/concepts/internal/SensitiveDataHeuristics.qll:59-60,130`
+    (`maybeSecret`, classification `secret`);
+  - `python/ql/lib/semmle/python/dataflow/new/SensitiveDataSources.qll:100,250`
+    (`SensitiveFunctionCall`, `SensitiveVariableAssignment`);
+  - `python/ql/src/Security/CWE-312/CleartextLogging.ql` and `.qhelp`.
+
+  The flow itself comes from the alert's analysis SARIF (read with `gh api`).
 - Repository, for the gate: `.github/requirements-ci.txt` (the zizmor pin) and
   `.github/workflows/validate.yml` (CI's zizmor flags and the whole-suite `python3 -m unittest`
   run). The gate also reuses `blueprints/runtime-workers/openhands/resolver/patch_policy.py`

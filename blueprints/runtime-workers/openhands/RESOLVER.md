@@ -71,7 +71,7 @@ mutations, each of which fails its test. It also keeps the observations behind t
 cited CI facts and the Docker template, and the text of both helper scripts.
 [evidence/push-gate-fail-first.txt](evidence/push-gate-fail-first.txt) does the same
 for the pre-push gate of 2026-10-04. It keeps the gate tests' failing run at the base,
-seventeen planted defects in the gate and harness code, each failing its test, the
+23 planted defects in the gate, harness and driver code, each failing its test, the
 PyYAML cross-check of the workflow reader, and a local rehearsal of the gate on this
 repository's own trees with the real zizmor 1.30.1. The rehearsal ran no resolver, no
 container and no GitHub call.
@@ -459,7 +459,9 @@ command center adopted that refinement. The gate:
 - refuses any change to `.github/**`, a `CODEOWNERS` file anywhere, the resolver's own
   gate and harness code, the workflow-policy tests, and every file a reachable workflow's
   `run:` steps name, import (for gate scripts), discover or use as a local action. That
-  list is derived from the workflow files by a deterministic reader;
+  list is derived from the workflow files by a deterministic reader. Paths a step only
+  lists as `case` patterns, such as the `changes` step's `PATTERNS` globs, do not count;
+  any other use of such a list does;
 - refuses a step that interpolates untrusted event text;
 - runs the zizmor version CI pins, with the gate's own flags. Its excessive-permissions,
   dangerous-triggers, cache-poisoning, artipacked and template-injection findings refuse,
@@ -672,7 +674,8 @@ REVIEWER="$HOME/.local/bin/claude -p --safe-mode --tools '' --strict-mcp-config 
 python3 -c 'import hashlib, shlex, sys; print(hashlib.sha256(b"".join(a.encode() + b"\0" for a in shlex.split(sys.argv[1]))).hexdigest())' "$REVIEWER"
 # 7. Dry run: every read-only step; prints the plan (base, branch, rules, gates, skill pin, the installer's
 #    dry-run status per skill, instruction hash). It needs skills and node on PATH, as the real run does.
-#    The plan also records the gate's trusted commit (push_gate_trusted_commit); a refusal there names the gate check.
+#    The plan reports "push_gate": "trusted_copy_checked" once the gate's trusted copy passes; a refusal names the
+#    gate check. The trusted commit is not printed: the gate record in resolver-outcome.json keeps it per commit.
 PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/resolver.py" run --issue <N> --owned-path <path> --task "<task>" --lane lane:foundation --arm control --zizmor "$ZIZMOR" --dry-run
 # 8. The real run (a background task: the checks wait alone is bounded at 60 minutes). Before its push, the trusted
 #    gate checks the exact commit; a refusal stops at stage push with push_gate_refused, and resolver-outcome.json
