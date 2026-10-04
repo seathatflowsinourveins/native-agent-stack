@@ -9429,8 +9429,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "3bef3150f4d6c7e3b3877c69292a4d87b7a00b96fb8fe3ed947714873ee02461",
-      "bytes": 72164
+      "sha256": "92a03fc2b4ad9b4c9551a542fba7c39060b831b07e529e8e4effadc4ef2134b0",
+      "bytes": 72677
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -16078,6 +16078,11 @@
       "bytes": 61167
     },
     {
+      "path": "docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md",
+      "sha256": "dbb6de8a5b1dde770ea8615b0646b24570e86146b402c9ee4b917c6f668dd57e",
+      "bytes": 43121
+    },
+    {
       "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
       "sha256": "2c73507dea5faf517e4068b7a6efad57483250e0eb51f3dcba781d4fd922dfe9",
       "bytes": 16044
@@ -16096,6 +16101,11 @@
       "path": "docs/decisions/2026-10-03-retire-pr508-token-stack-winner.md",
       "sha256": "59f58e14e624f1783b5182ae0ea0bd3caa92298b4b5b6ebab556eae26d76c70d",
       "bytes": 21398
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-token-stack-release-review.md",
+      "sha256": "0be1428ff335868f64f2e46b823135d7a9ec3cdb7d9ade1e5c6ef9e7a123e596",
+      "bytes": 23109
     },
     {
       "path": "docs/decisions/2026-10-03-sweep-gpt6-route-settlement.md",
@@ -16234,8 +16244,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "b9b5ba0a33324b7d7fb79710280118c2ab2bdfcadcb29d49217dce8e565f51d3",
-      "bytes": 157860
+      "sha256": "ba40ee18240efcfbd7a6aae355da1b64fa8a8d9e3b65b2e9878b276fb53e9a70",
+      "bytes": 167611
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16404,8 +16414,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "41337b4ec009a2085a08ce776b998a27519a14fa5a6acd7b34188de4d497fd63",
-      "bytes": 183431
+      "sha256": "61039915b9fe31c5931f3cffbd60bdc686fa3433a495ce91dd56501bb67b0ef7",
+      "bytes": 184073
     },
     {
       "path": "docs/stack.md",
@@ -32486,6 +32496,11 @@
       "path": "evidence/artifacts/jev-p1-20261003/freeze-manifest.draft.json",
       "sha256": "db5bd2869276d35d1e07bb3d2b6d1970fdee2f0f6459427d424be2bbc528c92f",
       "bytes": 5824
+    },
+    {
+      "path": "evidence/artifacts/k4-timing-gc-20261003/summary.json",
+      "sha256": "4569f912234abf37f455c7653b2dd468b633bb40b3a8b18e442db02f3a4fe4ff",
+      "bytes": 19674
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
@@ -51749,8 +51764,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "a8def2e5f22eff792f5ddc36779b8db1c1c903e705d93b72bc5665e54167f64d",
-      "bytes": 367709
+      "sha256": "577aa3bc6902431328ace00e58e97eabf7f3306138ca4e9b67c0a72a6c733fd2",
+      "bytes": 368728
     },
     {
       "path": "tests/test_security_identity.py",
@@ -52134,8 +52149,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "97e8c945026711f1ef4ce8fd115d3ef83becb5a402ac2d0c8d19876d9129c023",
-      "bytes": 186012
+      "sha256": "20c70c09d8b293c23caccb1086f5a379f2f9c823f37555d17bfb202038f9a4b2",
+      "bytes": 188578
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -52299,8 +52314,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "fc304fcd5fca49dcc17330e09621700ba2e2b8a18e631b2d7a96cef59d4d00e5",
-      "bytes": 12503
+      "sha256": "2d41e61a25e03789f51c0dfe1a5849f15c5f7cd84812ec554d78a1ef5df8188f",
+      "bytes": 13526
     },
     {
       "path": "tools/sota-convergence/practice_references.py",
