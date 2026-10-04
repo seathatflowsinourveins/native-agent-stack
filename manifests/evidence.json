@@ -4379,7 +4379,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "cb5b70d1bc86d6a8b5049e82e3136301b1e30a5b9a50ceb254e276c789db1ecf",
+      "sha256": "8871902ad6b25cc5bd3034914359fb026010e3ce1e31d7ea382fc3b543600eae",
       "bytes": 950
     },
     {
@@ -15900,8 +15900,8 @@
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
-      "sha256": "fce32c03fe3dde94c76ea874e5e2327409f73eca65b51ce1297382416a350137",
-      "bytes": 14083
+      "sha256": "a5e0dd9edfdb58382ca6f64860ffb392a1d35f3ebce6f6c397abb6e2b2aed6cd",
+      "bytes": 17777
     },
     {
       "path": "docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md",
@@ -51575,8 +51575,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "7b1ec8fa5c6127060c81e23b80e5fe9f7dfec9af045960e928e38763bbb95790",
-      "bytes": 276717
+      "sha256": "c6b8cfdc073d42ae147c58b7455a849e6e96a5204e40a20288477b46f75dcd4c",
+      "bytes": 282757
     },
     {
       "path": "scripts/host_receipts.py",
@@ -52645,8 +52645,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "577aa3bc6902431328ace00e58e97eabf7f3306138ca4e9b67c0a72a6c733fd2",
-      "bytes": 368728
+      "sha256": "76c73612f40298c273153a63bf683525bc1bb626175e420f66db472b9f3b3e0b",
+      "bytes": 376783
     },
     {
       "path": "tests/test_security_identity.py",
