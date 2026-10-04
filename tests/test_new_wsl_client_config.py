@@ -664,7 +664,8 @@ class RenderTests(unittest.TestCase):
     def test_settings_keep_the_practice_pieces_and_drop_the_old_profile_pieces(self):
         settings = json.loads(self.files["settings.json"])
         # The user's choice of 2026-10-04, Opus 5.5, pinned by its full model name (the map's model entry overrides the
-        # shared template's opus[1m], which other hosts keep); the advisor stays the template's.
+        # shared template's opus[1m], which other hosts keep); the advisor is Opus 5.5 too, by the map's override, the user's
+        # decision of 2026-10-04 and the value NativeStack carries.
         self.assertEqual(settings["model"], "claude-opus-5-5")
         self.assertEqual(settings["advisorModel"], "opus")
         self.assertEqual(json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text())["model"],
@@ -755,6 +756,10 @@ class RenderTests(unittest.TestCase):
     def test_the_codex_config_meets_what_the_codex_home_tool_requires(self):
         config = tomllib.loads(self.files["codex.config.toml"])
         self.assertIs(config["features"]["daemon_auto_start"], False)
+        # The changelog parity of 2026-10-04: the experimental allowance-history feature (the shared template's, on both hosts)
+        # and the fast service tier (this distribution's additions; NativeStack runs both).
+        self.assertIs(config["features"]["analytics_plan_history"], True)
+        self.assertEqual(config["service_tier"], "fast")
         eco = json.loads((ROOT / "adoption/hosts/example.json").read_text())["ECO_ROOT"]
         self.assertEqual(config["shell_environment_policy"]["set"]["PATH"].split(":")[0], eco + "/bin")
         self.assertNotIn("projects", config)
@@ -1820,12 +1825,14 @@ def leaves(node, prefix=()):
 
 
 class AuthorizationTests(ApplyCase):
-    """The settings that grant a permission or suppress a confirmation are written only on request: the four that stand
+    """The settings that grant a permission or suppress a confirmation are written only on request: the five that stand
     alone, the main checkout's Codex trust grant, and the tool approval modes and allow rules tied to the slot that wires
     their server."""
 
-    FOUR = ("claude/settings/setting/permissions.defaultMode", "claude/settings/setting/skipDangerousModePermissionPrompt",
-            "codex/config/approval_policy", "codex/config/sandbox_mode")
+    STANDALONE = ("claude/settings/setting/permissions.defaultMode", "claude/settings/setting/skipDangerousModePermissionPrompt",
+                  "codex/config/approval_policy", "codex/config/sandbox_mode",
+                  # the user's directive of 2026-10-04 (the wave-2 messaging ruling left it unset)
+                  "claude/settings/setting/crossSessionInbound")
     # The coordinator's decision of 2026-10-04: the main checkout is trusted, and Codex looks a linked worktree's trust
     # up under it (codex-rs/git-utils/src/trust.rs at rust-v0.160.0); every other project still asks.
     TRUST = ('codex/config/projects."${PROJECT_ROOT}".trust_level',)
@@ -1839,16 +1846,16 @@ class AuthorizationTests(ApplyCase):
     # semble's exact-name allow rules for Claude Code (wave-2 code-search ruling, change 3).
     ALLOW = ("claude/settings/permission/allow/mcp__semble__search",
              "claude/settings/permission/allow/mcp__semble__find_related")
-    ALL = FOUR + TRUST + APPROVAL + ALLOW
+    ALL = STANDALONE + TRUST + APPROVAL + ALLOW
     SLOT_OF = dict(zip(APPROVAL + ALLOW, (("memory-owner", "ai-memory"), ("code-search", "semble"),
                                           ("context-supply", "context-mode"), ("memory-owner", "ai-memory"),
                                           ("code-search", "SocratiCode"), ("output-compression", "headroom"),
                                           ("code-search", "semble"), ("code-search", "semble"))))
     WAITING = APPROVAL[4:]                        # negative-control fixtures remove these two installed owners
-    WRITTEN = FOUR + TRUST + APPROVAL + ALLOW     # what the option writes today
+    WRITTEN = STANDALONE + TRUST + APPROVAL + ALLOW     # what the option writes today
     OPTION = "--with-authorization-settings"
-    DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode and "
-                    "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, the trust_level of the wired "
+    DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode, "
+                    "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level of the wired "
                     "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
                     "and a value of theirs that a file has is not touched; --with-authorization-settings adds the ones a "
                     "file lacks)")
@@ -1915,6 +1922,7 @@ class AuthorizationTests(ApplyCase):
         self.assertNotIn("defaultMode", settings["permissions"])
         self.assertNotIn("allow", settings["permissions"])
         self.assertNotIn("skipDangerousModePermissionPrompt", settings)
+        self.assertNotIn("crossSessionInbound", settings)
         self.assertNotIn("approval_policy", codex)
         self.assertNotIn("sandbox_mode", codex)
         self.assertNotIn("projects", codex)
@@ -1923,6 +1931,7 @@ class AuthorizationTests(ApplyCase):
         settings_on, codex_on = self.render(self.OPTION)
         self.assertEqual(settings_on["permissions"]["defaultMode"], "bypassPermissions")
         self.assertIs(settings_on["skipDangerousModePermissionPrompt"], True)
+        self.assertEqual(settings_on["crossSessionInbound"], "accept")
         self.assertEqual(settings_on["permissions"]["allow"], ["mcp__semble__search", "mcp__semble__find_related"])
         self.assertEqual((codex_on["approval_policy"], codex_on["sandbox_mode"]), ("never", "danger-full-access"))
         self.assertEqual({name: server["default_tools_approval_mode"] for name, server in codex_on["mcp_servers"].items()
@@ -1935,7 +1944,8 @@ class AuthorizationTests(ApplyCase):
         # The two renders differ in those keys and in nothing else; the deny list is in both.
         for off, on in ((settings, settings_on), (codex, codex_on)):
             self.assertEqual(sorted(set(leaves(on)) - set(leaves(off))), sorted(
-                [("permissions", "defaultMode"), ("skipDangerousModePermissionPrompt",), ("permissions", "allow")]
+                [("permissions", "defaultMode"), ("skipDangerousModePermissionPrompt",), ("crossSessionInbound",),
+                 ("permissions", "allow")]
                 if on is settings_on else
                 [("approval_policy",), ("sandbox_mode",), ("mcp_servers", "ai-memory", "default_tools_approval_mode"),
                  ("mcp_servers", "semble", "default_tools_approval_mode"),
@@ -1948,7 +1958,8 @@ class AuthorizationTests(ApplyCase):
 
     # In the order of the pieces: the additions (semble's allow rules and server) merge after the shared template's keys.
     ALLOW_LABELS = "Claude Code allow rule mcp__semble__search, Claude Code allow rule mcp__semble__find_related"
-    ADDED_CLAUDE = f"added: Claude Code permissions.defaultMode, {ALLOW_LABELS}, Claude Code skipDangerousModePermissionPrompt"
+    ADDED_CLAUDE = (f"added: Claude Code permissions.defaultMode, {ALLOW_LABELS}, Claude Code skipDangerousModePermissionPrompt, "
+                    "Claude Code crossSessionInbound")
     CODEX_CONFIG = ("Codex approval_policy, Codex sandbox_mode, Codex mcp_servers.ai-memory.default_tools_approval_mode, "
                     "Codex mcp_servers.context-mode.default_tools_approval_mode, "
                     "Codex mcp_servers.semble.default_tools_approval_mode, "
@@ -2148,15 +2159,16 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual(tree(self.home), before)
 
     def test_settings_that_are_kept_beside_a_step_that_is_not_reached_say_not_applied(self):
-        # The file already has every Claude Code one (two of its own values, and semble's two allow rules), and the steps
+        # The file already has every Claude Code one (three of its own values, and semble's two allow rules), and the steps
         # that write the Codex ones are skipped: nothing is added.
         self.seed({"permissions": {"defaultMode": "default", "allow": ["mcp__semble__search", "mcp__semble__find_related"]},
-                   "skipDangerousModePermissionPrompt": False})
+                   "skipDangerousModePermissionPrompt": False, "crossSessionInbound": "hold"})
         code, out, _ = self.apply(self.OPTION, "--skip", "codex-config", "--skip", "codex-files")
         self.assertEqual(code, 0, out[-600:])
         self.assertEqual(self.authorization_line(out), (
             "authorization settings: not applied (--with-authorization-settings; kept your value: Claude Code "
-            f"permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt; already the same: {self.ALLOW_LABELS}; "
+            f"permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt, Claude Code crossSessionInbound; "
+            f"already the same: {self.ALLOW_LABELS}; "
             f"not reached, its step codex-config was skipped: {self.CODEX_CONFIG}; not reached, its step codex-files was "
             f"skipped: {self.STACK_WORKER})"))
 
@@ -2217,7 +2229,7 @@ class AuthorizationTests(ApplyCase):
             self.assertIn(recipe_tests.AUTHORIZATION_LINE_SENTENCE, " ".join(places[place].split()), place)
 
     def test_the_map_refuses_an_authorization_setting_classed_practice_or_slot(self):
-        for key in self.FOUR:
+        for key in self.STANDALONE:
             for wiring, owner in (("practice", None), ("slot:serena", "serena")):
                 with self.subTest(piece=key, wiring=wiring), tempfile.TemporaryDirectory() as tmp:
                     root = make_catalog(Path(tmp))
@@ -2225,6 +2237,8 @@ class AuthorizationTests(ApplyCase):
                     def reclass(data):
                         entry = next(e for e in data["entries"] if key in e["match"])
                         entry["match"].remove(key)
+                        if not entry["match"]:
+                            data["entries"].remove(entry)
                         data["entries"].insert(0, {"match": [key], "wiring": wiring, **({"owner": owner} if owner else {})})
                     edit_json(root / cfg.MAP_REL, reclass)
                     errors = cfg.analyse(root)[3]
@@ -2399,13 +2413,13 @@ class AuthorizationTests(ApplyCase):
             root = make_catalog(Path(tmp))
 
             def drop(data):
-                entry = next(e for e in data["entries"] if self.FOUR[2] in e["match"])
-                entry["match"].remove(self.FOUR[2])
-                data["entries"].insert(0, {"match": [self.FOUR[2]], "wiring": "not_wired:a decision to drop it"})
+                entry = next(e for e in data["entries"] if self.STANDALONE[2] in e["match"])
+                entry["match"].remove(self.STANDALONE[2])
+                data["entries"].insert(0, {"match": [self.STANDALONE[2]], "wiring": "not_wired:a decision to drop it"})
             edit_json(root / cfg.MAP_REL, drop)
             self.assertEqual(cfg.analyse(root)[3], [])
             results, *_ = cfg.analyse(root, authorization=True)
-        self.assertFalse(next(v for v in results if v.piece.key == self.FOUR[2]).wired)
+        self.assertFalse(next(v for v in results if v.piece.key == self.STANDALONE[2]).wired)
         # An allow rule would grant too: the tool classes it as authorization whatever the map says.
         self.assertTrue(cfg.is_authorization_piece("claude/settings/permission/allow/Bash(git status)"))
         self.assertFalse(cfg.is_authorization_piece("claude/settings/permission/deny/Bash(git push -f *)"))
@@ -2445,7 +2459,7 @@ class AuthorizationTests(ApplyCase):
             rows_of_key = [row for row in tables[1].splitlines() if key in row]
             self.assertEqual(len(rows_of_key), 1, key)
             slot_cell = rows_of_key[0].rstrip("|").rsplit("|", 1)[1].strip()
-            self.assertEqual(slot_cell, "-" if key in self.FOUR + self.TRUST else
+            self.assertEqual(slot_cell, "-" if key in self.STANDALONE + self.TRUST else
                              "slot `%s` installing `%s`" % self.SLOT_OF[key], key)
 
     def test_the_help_text_names_the_option_what_it_writes_and_who_it_is_for(self):

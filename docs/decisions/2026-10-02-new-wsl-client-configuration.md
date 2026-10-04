@@ -48,8 +48,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    config (`adoption/new-wsl/templates/`, the 2026-10-03 addendum); the two instruction blocks; and six steps of the tool
    itself (the launcher, the login-shell PATH block, the skills step, the two PATH directories and the remote plugin
    rules). A piece goes to the first entry that matches it. A piece no entry
-   matches, and an entry no piece reaches, fail the check. Today: 393 pieces, 345 wired (205 practice, 140 through a slot),
-   35 not wired (0 through a slot that does not install, 35 by their own entry) and 13 authorization pieces (the four
+   matches, and an entry no piece reaches, fail the check. Today: 396 pieces, 347 wired (207 practice, 140 through a slot),
+   35 not wired (0 through a slot that does not install, 35 by their own entry) and 14 authorization pieces (the five
    settings, the main checkout's Codex trust grant of the 2026-10-04 addendum, the six tool approval modes of Decision 14
    and semble's two allow rules, which also wait for their slots),
    each listed below; a slot whose install is another owner (an interim install, the 2026-10-03 addendum) counts as one
@@ -289,7 +289,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
     (L2430), both read at `rust-v0.160.0`. The four servers' slots install nothing today, so nothing wrote the key, but a
     plain `--apply` would have written it, with no check, the day one of those slots installed, and likewise for a wired
     server such as `serena` whose template gained the key.
-    - **The class.** One map entry gives the four their own wiring, `authorization:<reason>`. The tool knows which pieces
+    - **The class.** Two map entries give the five their own wiring, `authorization:<reason>` (the fifth, `crossSessionInbound`,
+      since the 2026-10-04 changelog-parity record, `docs/decisions/2026-10-04-new-wsl-changelog-parity.md`). The tool knows which pieces
       they are (`is_authorization_piece`: `AUTHORIZATION_PIECES`, any `permission/allow` rule, which would grant too, any
       `default_tools_approval_mode` whatever its value, and any `approval_mode` whose value is `approve`), so a map that
       classes one as practice or as a slot fails `--check`, and a map that classes another piece as authorization fails it
@@ -302,9 +303,10 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
       Since the wave-2 records (the 2026-10-03 addendum), the option writes the approval modes of ai-memory (in the user
       config and the stack-worker profile), semble and context-mode and semble's two allow rules, because their slots
       install those owners as interim installs; SocratiCode's and headroom's wait, because their slots install another
-      owner. Since the 2026-10-04 addendum the option also writes the main checkout's Codex trust grant. Thirteen pieces
-      are in the class (`--check` counts `authorization: 13`, and 35 pieces are not wired).
-    - **The default.** `--render` and `--apply` neither render nor write the four, and an existing value of those keys in a
+      owner. Since the 2026-10-04 addendum the option also writes the main checkout's Codex trust grant, and since the
+      changelog-parity record Claude Code's `crossSessionInbound = "accept"`. Fourteen pieces
+      are in the class (`--check` counts `authorization: 14`, and 35 pieces are not wired).
+    - **The default.** `--render` and `--apply` neither render nor write the five, and an existing value of those keys in a
       person's files is never touched: the render lacks the keys, so the Claude merge leaves the file's keys as they are,
       and so does the Codex merge.
     - **The option.** `--with-authorization-settings`, on `--render` and `--apply`, renders and applies them. Even then an
@@ -849,7 +851,9 @@ unchanged.
   without a suffix). Claude Code resolves the same model as before; what changes is that the new distribution keeps it
   when the shared template moves. `advisorModel` stays the template's `fable`.
   2026-10-04 (~15:10Z): the user changed the advisor to Opus 5.5; the template now carries `advisorModel: "opus"` (see [Advisor model](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model)).
-- **Counts.** 393 pieces, 345 wired, 35 not wired and 13 authorization pieces (Decisions 2 and 14 above).
+  when the shared template moves. `advisorModel` is `opus` (Opus 5.5) too, by its own override entry: the user's decision of
+  2026-10-04 and the value NativeStack carries (`docs/decisions/2026-10-04-new-wsl-changelog-parity.md`).
+- **Counts.** 396 pieces, 347 wired, 35 not wired and 14 authorization pieces (Decisions 2 and 14 above).
 
 What would overturn it: Codex matching a project's trust by a parent directory or by another key form; a decision that
 the repository's root should ask again (the entry returns to `not_wired`); the user choosing another main model, or the
@@ -911,6 +915,7 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `claude/settings/permission/allow/mcp__semble__search` | `"mcp__semble__search"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
 | `claude/settings/permission/allow/mcp__semble__find_related` | `"mcp__semble__find_related"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
 | `claude/settings/setting/skipDangerousModePermissionPrompt` | `true` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
+| `claude/settings/setting/crossSessionInbound` | `"accept"` | no | "accept" delivers messages from the user's other sessions to Claude without the approval hold that otherwise applies to a sender that is not in bypass mode, so it is written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/approval_policy` | `"never"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/sandbox_mode` | `"danger-full-access"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |

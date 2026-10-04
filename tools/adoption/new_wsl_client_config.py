@@ -36,7 +36,7 @@ requirement needs, so the shared templates stay what render_config.py and the bo
   --render   --host NAME --out DIR [--with-authorization-settings]: settings.json (and the WSL overlay),
              mcp-servers.json, codex.config.toml, codex.hooks.json and the two Codex profiles for that host value file,
              with wired pieces only; the authorization settings (the ones that grant a permission or suppress a
-             confirmation: Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy
+             confirmation: Claude Code permissions.defaultMode, skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy
              and sandbox_mode, a Codex project's trust_level, and the tool approval mode of a Codex MCP server, which
              also needs its server wired) only with the option. Placeholders
              are filled by tools/adoption/render_config.py. The telemetry endpoint, the gateway port and AI_MEMORY_BIN
@@ -169,6 +169,7 @@ PLUGIN_MANIFESTS = (".codex-plugin/plugin.json", ".claude-plugin/plugin.json", "
 AUTHORIZATION_PIECES = (
     "claude/settings/setting/permissions.defaultMode",
     "claude/settings/setting/skipDangerousModePermissionPrompt",
+    "claude/settings/setting/crossSessionInbound",
     "codex/config/approval_policy",
     "codex/config/sandbox_mode",
 )
@@ -2041,8 +2042,8 @@ class Apply:
         Then it says what each setting came to: added, kept (the file's own value), already the same, or not reached
         because its step was skipped or failed."""
         if not self.args.with_authorization_settings:
-            print("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode and "
-                  "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, the trust_level of the wired "
+            print("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode, "
+                  "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level of the wired "
                   "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
                   f"and a value of theirs that a file has is not touched; {AUTHORIZATION_OPTION} adds the ones a file "
                   "lacks)")
@@ -2505,8 +2506,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true", help="--apply: report each step; run no client, write nothing")
     parser.add_argument("--with-authorization-settings", action="store_true",
                         help="--render and --apply: also render and write the authorization settings, the ones that grant "
-                             "a permission or suppress a confirmation (Claude Code permissions.defaultMode and "
-                             "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, the trust_level "
+                             "a permission or suppress a confirmation (Claude Code permissions.defaultMode, "
+                             "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level "
                              "of the host's main checkout in Codex, and the tool approval mode of a Codex MCP server "
                              "whose slot installs it). By default they "
                              "are neither rendered nor written and a value a file already has is never touched; with this "

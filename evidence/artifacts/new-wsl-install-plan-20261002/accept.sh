@@ -527,13 +527,14 @@ api-docs() {
     post_install)
       # Kind: smoke; Source: https://raw.githubusercontent.com/andrewyng/context-hub/v0.1.4/cli/src/index.js#L53 (the version flag, -V, --cli-version)
       # Planned. Source: https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js#L5-L14 (the runtime functions); https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/config.js#L23-L40 (the persisted config). Keep the version probe, then unset both environment overrides in a scratch CHUB_DIR.
+      # node is the one the plan installs through mise and this script puts on PATH (refresh_path); no plan command links it into ${ECO_ROOT}/bin.
       check api-docs smoke '[[ "$(CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/chub" --cli-version)" == 0.1.4 ]]
 e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"
 chub_source_config="${CHUB_DIR:-$HOME/.chub}/config.yaml"
 chub_check_dir=$(mktemp -d "${TMPDIR:-/tmp}/new-wsl-chub-check.XXXXXX")
 trap '"'"'rm -rf -- "$chub_check_dir"'"'"' EXIT
 install -m 0600 -- "$chub_source_config" "$chub_check_dir/config.yaml"
-env -u CHUB_TELEMETRY -u CHUB_FEEDBACK CHUB_DIR="$chub_check_dir" "$e/bin/node" --input-type=module -e '"'"'const { pathToFileURL } = await import("node:url"); const { isTelemetryEnabled, isFeedbackEnabled } = await import(pathToFileURL(process.argv[1]).href); const telemetry = isTelemetryEnabled(); const feedback = isFeedbackEnabled(); console.log("telemetry=" + telemetry + " feedback=" + feedback); if (telemetry !== false || feedback !== false) process.exit(1);'"'"' "$e/tools/context-hub-0.1.4/lib/node_modules/@aisuite/chub/src/lib/telemetry.js"'
+env -u CHUB_TELEMETRY -u CHUB_FEEDBACK CHUB_DIR="$chub_check_dir" node --input-type=module -e '"'"'const { pathToFileURL } = await import("node:url"); const { isTelemetryEnabled, isFeedbackEnabled } = await import(pathToFileURL(process.argv[1]).href); const telemetry = isTelemetryEnabled(); const feedback = isFeedbackEnabled(); console.log("telemetry=" + telemetry + " feedback=" + feedback); if (telemetry !== false || feedback !== false) process.exit(1);'"'"' "$e/tools/context-hub-0.1.4/lib/node_modules/@aisuite/chub/src/lib/telemetry.js"'
       ;;
     *) skipped api-docs ;;
   esac

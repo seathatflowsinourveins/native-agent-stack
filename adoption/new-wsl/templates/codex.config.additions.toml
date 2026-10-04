@@ -7,6 +7,13 @@
 # creates /run/user/UID; pam_systemd(8) sets $XDG_RUNTIME_DIR to it, systemd 255), which the tool fills from that
 # user's id.
 
+# The fast service tier, the user's choice of 2026-10-03 for every route that honours it, which NativeStack runs (measured
+# 2026-10-03: 61 against 33 output tokens per second through the gateway). The 0.160.0 config schema (codex-rs/core/
+# config.schema.json, service_tier) calls `fast` the legacy spelling of the `priority` tier and says it still works. Fast
+# counts 2.5 times against included usage, so the user's later policy of 2026-10-04 ("Fast where it matters") keeps bulk
+# fan-out jobs on the standard tier in their own worker homes; this is the interactive default.
+service_tier = "fast"
+
 # ai-memory, the memory slot's interim install (definitive manifest, amendment 3): its tools carry no MCP annotations, so
 # under approval_policy = "never" Codex refuses every call unless the approval mode approves it (codex-rs/core/src/
 # mcp_tool_call.rs at rust-v0.160.0). The new distribution's standing requirement is no permission prompts (wave-2
