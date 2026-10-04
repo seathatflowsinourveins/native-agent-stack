@@ -284,40 +284,99 @@ def a2_input(pack: dict) -> dict:
                       for case in sorted(pack["cases"], key=lambda item: item["case_id"])]}
 
 
+SHA256_HEX = re.compile(r"[0-9a-f]{64}")
+A2_CHANGE_FIELDS = ("claim", "excerpt")
+JSON_KINDS = {type(None): "JSON null", list: "a JSON array", str: "a JSON string", bool: "a JSON boolean",
+              int: "a JSON number", float: "a JSON number"}
+
+
+def json_kind(value) -> str:
+    return JSON_KINDS.get(type(value), f"a {type(value).__name__}")
+
+
+def sha256_field_problem(record: dict, field: str) -> str | None:
+    """Why record[field] is not a sha256 as hexdigest writes it (64 lowercase hex characters), or None.
+    A missing or null hash is refused here and never compared: None would equal None."""
+    if field not in record:
+        return f"has no {field}"
+    if record[field] is None:
+        return f"has a null {field}"
+    if not isinstance(record[field], str) or SHA256_HEX.fullmatch(record[field]) is None:
+        return f"has a {field} that is not 64 lowercase hex characters"
+    return None
+
+
+def a2_result_problems(result, case_ids=None) -> list[str]:
+    """The A2 result contract (A2_RESULT_SCHEMA), defined once for both gates: apply_a2 refuses a result
+    with any problem before it records a pass, and p1_freeze.py --final checks every custody original
+    against it. An A2 result is an object with that schema, input_sha256 a sha256 string, checks giving
+    {"passed": true} for every A2 check, and "changed", when present, an object keyed by case id whose
+    values each give a non-empty claim or excerpt text (A2_CHANGE_FIELDS) and no other field; absent, no
+    case changed. With case_ids, a changed case outside them is a problem too. Other top-level fields
+    are not part of the contract and stay allowed, as apply_a2 has always allowed them. Problems name
+    fields and case ids, never a text."""
+    if not isinstance(result, dict):
+        return [f"is {json_kind(result)}, not an A2 result object"]
+    problems = []
+    if result.get("schema") != A2_RESULT_SCHEMA:
+        problems.append(f"does not have schema {A2_RESULT_SCHEMA}")
+    reason = sha256_field_problem(result, "input_sha256")
+    if reason:
+        problems.append(reason)
+    checks = result.get("checks")
+    unpassed = [name for name in A2_CHECKS if not isinstance(checks, dict)
+                or not isinstance(checks.get(name), dict) or checks[name].get("passed") is not True]
+    if unpassed:
+        problems.append(f"does not show these A2 checks passed: {unpassed}")
+    changed = result.get("changed", {})
+    if not isinstance(changed, dict):
+        return problems + [f'gives "changed" as {json_kind(changed)}, not an object keyed by case id']
+    wrong = {"values that are not objects": [], "an empty change": [], "fields other than claim and excerpt": [],
+             "a claim or excerpt that is not a non-empty string": []}
+    for case_id, texts in sorted(changed.items()):
+        if not isinstance(texts, dict):
+            wrong["values that are not objects"].append(case_id)
+            continue
+        if not texts:
+            wrong["an empty change"].append(case_id)
+        if set(texts) - set(A2_CHANGE_FIELDS):
+            wrong["fields other than claim and excerpt"].append(case_id)
+        if any(not isinstance(texts[field], str) or not texts[field].strip()
+               for field in A2_CHANGE_FIELDS if field in texts):
+            wrong["a claim or excerpt that is not a non-empty string"].append(case_id)
+    problems += [f'gives "changed" {what} for cases {ids[:5]}' for what, ids in wrong.items() if ids]
+    unknown = sorted(set(changed) - set(case_ids)) if case_ids is not None else []
+    if unknown:
+        problems.append(f'gives "changed" for cases the pack does not hold: {unknown[:5]}')
+    return problems
+
+
 def apply_a2(pack: dict, result: dict) -> dict:
     """Record an A2 pass (report r1 section 3.1) and freeze its output bytes; only then is a pack ready.
 
     The result is written by whoever runs gitleaks 8.30.1, the host-path and identity rule and the
     home-directory and user-name canary over a2_input's bytes. It names input_sha256 (refused unless it
     equals the pack's current bytes), a passed flag per check, and under "changed" the post-A2 claim or
-    excerpt of each case the rule changed, keyed by case id. Code applies those texts, so the labeller
-    and every arm see the post-A2 bytes, and records the share of cases changed (section 3.1)."""
+    excerpt of each case the rule changed, keyed by case id. A result outside a2_result_problems'
+    contract, which p1_freeze.py --final also applies to every custody original, is refused. Code
+    applies those texts, so the labeller and every arm see the post-A2 bytes, and records the share of
+    cases changed (section 3.1)."""
     if any(case["pending_insertion"] for case in pack["cases"]):
         raise ValueError("write every adversarial insertion before the A2 pass")
-    if result.get("schema") != A2_RESULT_SCHEMA:
-        raise ValueError(f"an A2 result has schema {A2_RESULT_SCHEMA}")
-    before = case_bytes_sha256(pack)
-    if result.get("input_sha256") != before:
-        raise ValueError("the A2 result was not run over this pack's current bytes")
-    checks = result.get("checks") or {}
-    failed = [name for name in A2_CHECKS if (checks.get(name) or {}).get("passed") is not True]
-    if failed:
-        raise ValueError("A2 checks did not pass: " + ", ".join(failed))
     cases = {case["case_id"]: case for case in pack["cases"]}
-    changed = result.get("changed") or {}
-    if not isinstance(changed, dict) or not all(isinstance(texts, dict) for texts in changed.values()):
-        raise ValueError('an A2 result gives "changed" as {"<case_id>": {"claim" or "excerpt": "<post-A2 text>"}}')
-    unknown = sorted(set(changed) - set(cases))
-    if unknown:
-        raise ValueError(f"A2 changes name cases the pack does not hold: {unknown[:5]}")
+    problems = a2_result_problems(result, set(cases))
+    if problems:
+        raise ValueError("the A2 result " + "; ".join(problems))
+    before = case_bytes_sha256(pack)
+    if result["input_sha256"] != before:
+        raise ValueError("the A2 result was not run over this pack's current bytes")
+    changed = result.get("changed", {})
     # A top-up pass rescans every case, but the cases an earlier pass froze may already carry labels.
     frozen = {case["case_id"] for case in pack["cases"][:pack["a2_passes"][-1]["cases"]]} if pack.get("a2_passes") else set()
     if set(changed) & frozen:
         raise ValueError(f"an A2 pass may not change a case an earlier pass froze: {sorted(set(changed) & frozen)[:5]}")
     for case_id, texts in sorted(changed.items()):
-        case = cases[case_id]
-        if not texts or set(texts) - {"claim", "excerpt"} or any(
-                not isinstance(text, str) or not text.strip() or text == case[field] for field, text in texts.items()):
+        if any(text == cases[case_id][field] for field, text in texts.items()):
             raise ValueError(f"{case_id}: an A2 change gives a new, non-empty claim or excerpt")
     for case_id, texts in sorted(changed.items()):     # every change is valid; only now is the pack edited
         case = cases[case_id]

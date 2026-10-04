@@ -113,16 +113,20 @@ excerpt (the only case-dependent bytes in the packet and in every rendered input
 A2 result must name; gitleaks 8.30.1 scans that file, and the host-path and identity rule and the
 home-directory and user-name canary run over each claim and excerpt. `p1_casepack.py a2` then takes
 the result (`jev-p1-a2-result/1`: `input_sha256`, a `passed` flag for each of the three checks, and
-the post-A2 claim or excerpt of every case the rule changed). It refuses a result over other bytes, a
-failed check, or a change to a case an earlier pass froze; it applies the changed texts (a changed
+under `changed` the post-A2 claim or excerpt of every case the rule changed: an object keyed by case
+id whose values give a non-empty `claim` or `excerpt` and nothing else, absent when no case changed).
+`a2_result_problems` defines that contract once, for `a2` and for the freeze. `a2` refuses a result
+outside it (a failed check included), a result over other bytes, or a change to a case an earlier pass
+froze or to the text it already has; it applies the changed texts (a changed
 claim's universal and numeric-or-date strata are computed again from the post-A2 claim), records the
 pass (input, output and result sha256, and the share of cases changed) and only then marks the pack
 `ready_for_labels` and the packet `ready`. A top-up batch sends the pack back to `awaiting_a2`.
 `p1_freeze.py --final` refuses a pack whose bytes are not the output of its last A2 pass; A2 custody
 files that are not, in pass order, the original results of the recorded passes (canonical
 `result_sha256`, the pass's input bytes and every check passed; a missing, extra, duplicate or
-mismatched original is refused, and so are a custody file that is not a JSON A2 result object and a
-pass whose `input_sha256` or `result_sha256` is missing, null or not 64 lowercase hex characters,
+mismatched original is refused, and so are a custody file outside that A2 result contract (its
+`changed` naming only cases the pack holds) and a pass whose `input_sha256` or `result_sha256` is
+missing, null or not 64 lowercase hex characters,
 each under its own reason before any pair is compared); a label packet that is not
 `label_packet(pack)` in full (cases, rules, criteria, claim types and instructions); a label or
 re-label record outside the packet's `label_record` contract (exactly `case_id`, `label`,

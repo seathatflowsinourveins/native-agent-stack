@@ -10,8 +10,9 @@ draft (default) records what exists and lists every missing role. --final refuse
 a pending adversarial insertion, a pack whose current bytes are not the output of its last A2 pass,
 A2 custody files that are not the original results of the recorded passes (item i is pass i, matched
 by the canonical result_sha256 the pass recorded; a missing, extra, duplicate or mismatched original
-is refused, and so are a custody file that is not a JSON A2 result object and a pass whose input or
-result sha256 is missing, null or malformed, each under its own reason), a label packet that is not
+is refused, and so are a custody file that is not an A2 result under the contract apply_a2 records a
+pass under (p1_casepack.a2_result_problems, "changed" included) and a pass whose input or result
+sha256 is missing, null or malformed, each under its own reason), a label packet that is not
 label_packet(pack) in full (cases, rules, criteria, claim
 types and instructions), a label or re-label record outside the packet's label_record contract, an
 unlabelled case, a re-label list that differs from the drawn one, a re-label written less than 24
@@ -27,7 +28,6 @@ import argparse
 import functools
 import hashlib
 import json
-import re
 from datetime import timedelta
 from pathlib import Path
 
@@ -128,39 +128,26 @@ def _casepack_module():
     return module
 
 
-SHA256_HEX = re.compile(r"[0-9a-f]{64}")
 # A custody file whose bytes are not JSON. The loader keeps it apart from a file that holds JSON null,
 # so each is refused under its own reason.
 NOT_JSON = object()
-JSON_KINDS = {type(None): "JSON null", list: "a JSON array", str: "a JSON string", bool: "a JSON boolean",
-              int: "a JSON number", float: "a JSON number"}
 
 
-def sha256_field_problem(record: dict, field: str) -> str | None:
-    """Why record[field] is not a sha256 as hexdigest writes it (64 lowercase hex characters), or None.
-    A missing or null hash is refused here and never compared: None would equal None."""
-    if field not in record:
-        return f"has no {field}"
-    if record[field] is None:
-        return f"has a null {field}"
-    if not isinstance(record[field], str) or SHA256_HEX.fullmatch(record[field]) is None:
-        return f"has a {field} that is not 64 lowercase hex characters"
-    return None
-
-
-def a2_custody_problems(passes: list, originals: list) -> list[str]:
+def a2_custody_problems(passes: list, originals: list, case_ids=None) -> list[str]:
     """Bind the a2_custody files to the recorded A2 passes. Item i is the original result of pass i: its
     canonical sha256 (p1_casepack.canonical_sha256, the domain apply_a2 records as result_sha256) equals
     that pass's result_sha256, and it names that pass's input bytes and shows every check passed. A
     missing, extra, duplicate or mismatched original is refused.
 
     Before any pair is compared, every recorded pass must be an object whose input_sha256 and
-    result_sha256 are sha256 strings, and every item an A2 result object: the schema apply_a2 requires,
-    an input_sha256 sha256 string and a passed flag for every A2 check. NOT_JSON stands for a file that
-    is not JSON and None for one that holds JSON null. Each malformation is refused under its own reason
-    and never defaulted. Every pair is then compared on each field both sides hold well formed; a pair
-    with a malformed side is already refused by that malformation, so no pair passes unchecked."""
+    result_sha256 are sha256 strings, and every item an A2 result under p1_casepack.a2_result_problems,
+    the one contract apply_a2 records a pass under: schema, input_sha256, every check passed and the
+    shape of "changed" (with case_ids, the pack's cases, it names only those). NOT_JSON stands for a file
+    that is not JSON and None for one that holds JSON null. Each malformation is refused under its own
+    reason and never defaulted. Every pair is then compared on each field both sides hold well formed; a
+    pair with a malformed side is already refused by that malformation, so no pair passes unchecked."""
     casepack = _casepack_module()
+    sha256_field_problem = casepack.sha256_field_problem
     problems, failed = [], set()
 
     def refuse(position: int, reason: str) -> None:
@@ -183,20 +170,8 @@ def a2_custody_problems(passes: list, originals: list) -> list[str]:
         if item is NOT_JSON:
             refuse(position, f"item {position} is not JSON")
             continue
-        if not isinstance(item, dict):
-            kind = JSON_KINDS.get(type(item), f"a {type(item).__name__}")
-            refuse(position, f"item {position} is {kind}, not an A2 result object")
-            continue
-        if item.get("schema") != casepack.A2_RESULT_SCHEMA:
-            refuse(position, f"item {position} does not have schema {casepack.A2_RESULT_SCHEMA}")
-        reason = sha256_field_problem(item, "input_sha256")
-        if reason:
+        for reason in casepack.a2_result_problems(item, case_ids):
             refuse(position, f"item {position} {reason}")
-        checks = item.get("checks")
-        unpassed = [name for name in casepack.A2_CHECKS if not isinstance(checks, dict)
-                    or not isinstance(checks.get(name), dict) or checks[name].get("passed") is not True]
-        if unpassed:
-            refuse(position, f"item {position} does not show these A2 checks passed: {unpassed}")
     given = [casepack.canonical_sha256(item) if isinstance(item, dict) else None for item in originals]
     repeated = [index + 1 for index, value in enumerate(given) if value is not None and given.count(value) > 1]
     if repeated:
@@ -226,7 +201,7 @@ def final_checks(pack: dict, labels, relabels, rendered: dict | None, render: di
     if (pack.get("status") != "ready_for_labels" or not passes
             or passes[-1].get("output_sha256") != casepack.case_bytes_sha256(pack)):
         problems.append("the case pack's bytes are not the output of a recorded A2 pass")
-    problems += a2_custody_problems(passes, a2_originals)
+    problems += a2_custody_problems(passes, a2_originals, {case["case_id"] for case in pack["cases"]})
     # The whole packet, not only its cases: the labelling rules, criteria, claim types and instructions
     # the user labelled under are frozen inputs too (section 5.0).
     expected_packet = casepack.label_packet(pack)

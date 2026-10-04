@@ -97,8 +97,8 @@
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_casepack.py",
-    "sha256": "2d0b1425f419608b8d7b5016fff95beb6bf743cfc0f1f0ca1df52470022e18f9",
-    "bytes": 49148
+    "sha256": "790f504cf09825e54a2cce2b7077b4efe0ec444e36ad5c2bb877cfbf556e9a3e",
+    "bytes": 52229
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_scoring.py",
@@ -107,8 +107,8 @@
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_freeze.py",
-    "sha256": "6e2e2e70387b655e7992f95b3dde0cd7bef3345c30e13e9f7376a78750e79ed6",
-    "bytes": 20783
+    "sha256": "03b36700340bd74ce64eb6911c108a70631fc72bf924fd1db6887a4fb0eac091",
+    "bytes": 19578
    },
    {
     "path": "blueprints/native-skill-practice/p1/requirements-scoring.in",
