@@ -1969,30 +1969,52 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
 
 The OpenHands resolver (#489) pushes agent-written commits to
 same-repository branches, and its pre-push gate keeps them out of
-`.github/**`. A `pull_request` run from a same-repository branch gets the
-repository's secrets and the job's `GITHUB_TOKEN` scopes as written; only a
-fork's pull request has its secrets withheld and its write scopes turned to
-read
+`.github/**`. An ordinary `pull_request` run from a same-repository branch
+gets the repository's secrets and the job's `GITHUB_TOKEN` scopes as written.
+By default GitHub withholds secrets from a fork's pull request and turns its
+write scopes to read; only a private repository can choose to send them. A
+Dependabot-triggered run gets a read-only token and only Dependabot secrets
 ([events, "Workflows in forked repositories"](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request);
 [workflow syntax, "How permissions are calculated for a workflow job"](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions);
-both read 2026-10-04).
+[repository Actions settings, "Enabling workflows for forks of private repositories"](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#enabling-workflows-for-forks-of-private-repositories);
+[Troubleshooting Dependabot on GitHub Actions](https://docs.github.com/en/code-security/dependabot/troubleshooting-dependabot/troubleshooting-dependabot-on-github-actions);
+all read 2026-10-04).
 
 - **Pinned.** `tests/test_workflow_hardening.py`'s
   `PullRequestReachableJobsTests`: no job of a workflow triggered by
   `pull_request*`, `issue_comment` or `workflow_run` (or of a local reusable
   workflow such a job calls; none today), whatever its `if:`, reads the
-  `secrets` context, passes `secrets:` or falls back to the repository
-  default; no such workflow grants `write-all` or a workflow-level write; and
-  the jobs holding a write scope are exactly `PULL_REQUEST_WRITE_ALLOWLIST`:
-  `security-scan.yml`'s `osv-sarif-upload` and `zizmor-sarif-upload`, each
-  with only `security-events: write` (sections 3 and 4). A form its text
-  reader cannot parse fails. At `3bdacab` it reads 24 jobs in 11 workflows
-  and passes.
+  `secrets` context, passes `secrets:`, declares `environment:`, calls a
+  remote reusable workflow (whose environment-bound jobs read secrets the
+  caller never passes:
+  [reuse workflows, "Using inputs and secrets in a reusable workflow"](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows#using-inputs-and-secrets-in-a-reusable-workflow))
+  or falls back to the repository default; no such workflow grants
+  `write-all` or a workflow-level write; and the jobs holding a write scope
+  are exactly `PULL_REQUEST_WRITE_ALLOWLIST`: `security-scan.yml`'s
+  `osv-sarif-upload` and `zizmor-sarif-upload`, each with only
+  `security-events: write` (sections 3 and 4).
+  `PULL_REQUEST_SECRET_SOURCE_ALLOWLIST` is empty. Every workflow must stay in
+  the plain block YAML subset the text checks read (`YAML_SUBSET_LINE`).
+  That rules out flow mappings, anchors, aliases, tags, quoted keys,
+  multi-line scalars and any backslash in a double-quoted scalar, whose
+  `\x`, `\u` and `\U` escapes spell any character
+  ([YAML 1.2.2, 5.7](https://yaml.org/spec/1.2.2/#57-escaped-characters)).
+  Each reachable workflow must also keep the job layout `jobs()` reads.
+  Anything else fails rather than being skipped. At `3bdacab` it reads 24
+  jobs in 11 workflows and passes.
 - **Evidence class.** A locally authored test, run locally. On planted
-  copies of the workflows it failed for each of 14 mutations and passed
+  copies of the workflows it failed for each of 30 mutations and passed
   unmutated. A `${{ secrets.X }}` step and `contents: write` on a
   pull-request job passed every earlier test in the module and
   `zizmor --offline --persona regular` at this repository's pin, 1.30.1.
+- **Cross-family review (2026-10-04).** A read-only GPT-6.1 Sol review of
+  #682 at `5e2f85e5` found three P1 gaps: flow-form jobs went unread,
+  escaped double-quoted scalars hid secrets, events and permission keys, and
+  an `environment:` or remote reusable workflow could bring secrets without
+  the caller passing any. It also found a P2: this section overstated
+  GitHub's fork guarantee. The YAML subset, job layout and secret-source
+  rules above close the P1s. Each of the 16 mutations added for them passed
+  the class at `5e2f85e5` and fails it now.
 - **Alternatives.** zizmor's `secrets-inherit` and `excessive-permissions`
   audits caught `secrets: inherit` and a job left on the repository default
   in the same runs
@@ -2002,8 +2024,10 @@ both read 2026-10-04).
   ([checks.md at f1ebd76](https://github.com/ossf/scorecard/blob/f1ebd76756593c0454d782b4ba36ebc33ad131b6/docs/checks.md)).
   These are general rules: none forbids a secret in a `pull_request` job or
   a write scope outside an allowlist.
-- **Overturn.** A job a pull request starts needs a secret or another write
-  scope: move it to a workflow no pull request starts, or add an allowlist
-  entry with its reason in the constant and here. If the resolver's gate
-  stops excluding `.github/**`, the exposure reopens regardless of this
-  test, since a pull request's own workflow files then run.
+- **Overturn.** A job a pull request starts needs a secret, an environment,
+  a remote reusable workflow or another write scope: move it to a workflow no
+  pull request starts, or add an entry to the matching allowlist with its
+  reason in the constant and here. If CI gains a maintained YAML parser, the
+  text subset can give way to checks on parsed YAML. If the resolver's gate
+  stops excluding `.github/**`, the exposure reopens regardless of this test,
+  since a pull request's own workflow files then run.
