@@ -4463,8 +4463,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "4ed3605282cd0f6f407b35a0b8a017863db4e8476d1d9503b302ced68abb7292",
-      "bytes": 64541
+      "sha256": "99e39090a4fb2aa129b0c0abb598102872fbf1050b69add447edfbeda4383ad7",
+      "bytes": 65436
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4478,13 +4478,18 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "f6e47f4e72f582870eef6fb22116160cfbfcad64923bad816a07308602fd4021",
-      "bytes": 950
+      "sha256": "032b710787fb62ffffd532758eea07c6ead6f9e064396f7d3f2802b192901ae3",
+      "bytes": 1137
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
       "sha256": "2f7a53031e6eabf6b9d08989b619b74204fa36dac2559e520fb72b06225a81d3",
       "bytes": 2888
+    },
+    {
+      "path": "adoption/hooks/claude/token-lanes-block.main.md",
+      "sha256": "9fdb10a34f2c2e313ca5c986d7682f30c934329e820e0b29cb3950f109b51b15",
+      "bytes": 1842
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.md",
@@ -4510,6 +4515,11 @@
       "path": "adoption/hooks/claude/token-lanes-block.verifier.md",
       "sha256": "a2eb3298126efd82622150e5717f10eb700f4aa3076d027c86ae1fe653f29eb0",
       "bytes": 2186
+    },
+    {
+      "path": "adoption/hooks/claude/token-lanes-session-start.py",
+      "sha256": "e6e3151d27e439a9392e1f3673f1168b6fb60a9c8b8616af01fff2b163757839",
+      "bytes": 1653
     },
     {
       "path": "adoption/hooks/claude/token-lanes-subagent-start.py",
@@ -4568,13 +4578,43 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "381645d1470125614137eef39a3b802e0a91ec480f6453a45051fbe99c743f21",
-      "bytes": 215375
+      "sha256": "48a1db80f4cbbeecc975d275d4ed92e71d8f1cc06a5e918259c9aab3e52c1ab2",
+      "bytes": 253361
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "83ecd0b5c2fedd3b30e025497968893475db41a67662500413e1dee22da29151",
-      "bytes": 19586
+      "sha256": "0d4a20bc8aa9af402fc2f40f08888126fb37b8dd4c25b363425f0a745231fc9e",
+      "bytes": 20932
+    },
+    {
+      "path": "adoption/new-wsl/claude-user-instructions.md",
+      "sha256": "fdc3823c4a905937e08d9aba033f5b67937f1632b955062402bbd25a74eab04e",
+      "bytes": 13372
+    },
+    {
+      "path": "adoption/new-wsl/client-config-map.json",
+      "sha256": "de9503b9662c5e60710499e905cf4ac9b6fb041973bd3ac72a3f3b4a4fccdf7c",
+      "bytes": 48327
+    },
+    {
+      "path": "adoption/new-wsl/codex-user-instructions.md",
+      "sha256": "d6e9d8067fdf492a2f2f97ccfe93af3a12e01b360c6d73ed84eef4df081a4ec5",
+      "bytes": 7977
+    },
+    {
+      "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
+      "sha256": "e49bdf7ceed1e63344485d38f2a421f4371aed9fedebd00eb413361076de38e5",
+      "bytes": 1331
+    },
+    {
+      "path": "adoption/new-wsl/templates/claude.settings.additions.json",
+      "sha256": "86a51eb928ef3d38033f2630bbaa06447a0c9c7a62cdfdd6a6d77614591aa646",
+      "bytes": 2197
+    },
+    {
+      "path": "adoption/new-wsl/templates/codex.config.additions.toml",
+      "sha256": "bbcb0e73b42b218a37808d1b31e7f39c4c309300297fb56117acb5b0ce566deb",
+      "bytes": 5643
     },
     {
       "path": "adoption/paired/README.md",
@@ -4683,8 +4723,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "5e27edf9147dfb60cc7311d4fe2e76312a8fd602021c60936023a9ce2273edeb",
-      "bytes": 13003
+      "sha256": "8b3945c1a146b1a56bccd55ac19aba7fb9a8ce40af0175bc2790474c0a570a12",
+      "bytes": 13294
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -4693,8 +4733,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "4a30d0449f0b1fc041647121f4a05d1df209c53eb1f2fd51999843f953a47145",
-      "bytes": 17078
+      "sha256": "6ff9288499a0039af4a77a9c48b2273b54ffe6569130ac11ed621407af7b934f",
+      "bytes": 17530
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -15448,6 +15488,11 @@
       "bytes": 105311
     },
     {
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "sha256": "35306c969c85d2cd3234d0dae17fcdc31673e729f1c7d2cfe625d5fcd7fd4813",
+      "bytes": 306165
+    },
+    {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
       "sha256": "37636424b34850e43e2655136b6daf90624f6633efa1b60a8b5175f65fc6815c",
       "bytes": 11875
@@ -16189,8 +16234,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
-      "sha256": "423b886bef0774ecc4a2835a55e6a0d6d8f50ed55c0a53ed77d855dd241289d6",
-      "bytes": 69053
+      "sha256": "5953f7058de0f34fd6d7a9f2abcc5a3bbefe1fd4a4744d6a5efe5f042cd37c65",
+      "bytes": 70941
     },
     {
       "path": "docs/decisions/2026-09-28-an13-m4-m5.md",
@@ -16284,8 +16329,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "0e21305ef8e6c1388a004a143d6a441085da11f711519c49b9a89fad383ea425",
-      "bytes": 67948
+      "sha256": "006e79e9f70ee1641dafe5c378355b3aca5d52ed652abdc8fbe9c71052c5c2af",
+      "bytes": 75384
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
@@ -16309,8 +16354,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "ac6d9270b9af2e01cfea6c323996eafaa2cf4f77c184e29cacb72a8806fd1a72",
-      "bytes": 128176
+      "sha256": "2a8b5945e4ac0cfc88f51b8676ea404bc0504b3d1862eebc27aaf6a1ae0c3e45",
+      "bytes": 116432
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -16423,9 +16468,34 @@
       "bytes": 15230
     },
     {
+      "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
+      "sha256": "aa1e7b5ad354b6a86c9dac099053944aaadcfd951c08ec861430812a64552805",
+      "bytes": 6304
+    },
+    {
+      "path": "docs/decisions/2026-10-04-new-wsl-clean-default-holdouts.md",
+      "sha256": "d8e18a2206728eec59b99868c4302154e46a277fa99968caff37b10e15eca730",
+      "bytes": 4510
+    },
+    {
+      "path": "docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md",
+      "sha256": "c213f14dcee47a9e1755fe58601929058e0f54d5d6bacba400f81c21ebe280c7",
+      "bytes": 6203
+    },
+    {
+      "path": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md",
+      "sha256": "51bb422d713c5df21d6228f7e83440dafa48a576e424a02db5e867dfd8d7b2c5",
+      "bytes": 10057
+    },
+    {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
       "sha256": "635fb536fb82377c4f1dd8d1acefe73d4fa6cc9298ce578164c372142ac36a8a",
       "bytes": 16799
+    },
+    {
+      "path": "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+      "sha256": "d6d0ba48d8881d746bdb9d4dc214339c2f8dba9842fad4152675437811a818d5",
+      "bytes": 26023
     },
     {
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
@@ -16694,13 +16764,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "54eeb8ea606b3f4f123320dc2f2f7f07c356d969a538c3d935de17b771fa5420",
-      "bytes": 561055
+      "sha256": "239e20f04537d1cfc274d3cc108018e1f86201e8fc821101c9ed10c1874a46d9",
+      "bytes": 644653
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "aa04b30d16fc14acac62d0af23e670ad254feb7e59ea85dfe233d361a992f59a",
-      "bytes": 323968
+      "sha256": "cc595637e8b581b2ac1bd3aee12c2b99b76d472609d92fb0a3717c3766c16012",
+      "bytes": 351688
     },
     {
       "path": "docs/next-host-stages.md",
@@ -16814,8 +16884,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "b85424755d2152313a6a7cfcbef8871c98f0f8f756e932287fa1aa1bf7e49a46",
-      "bytes": 92944
+      "sha256": "dfe5fab38071bc90ceb5599d05696147774b0c858e2600cf2d84410b25903740",
+      "bytes": 95587
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -17184,8 +17254,8 @@
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/qualification.json",
-      "sha256": "647df6bd01449c47f600e867f2bad851a99f31b604abc01be29fb7ecbacb8e24",
-      "bytes": 24730
+      "sha256": "b8f970b15beb013fa6634d2415c10989203529222fdf703bdd0c2b4f27706dd3",
+      "bytes": 25912
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/returned-output.txt",
@@ -37874,8 +37944,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
-      "sha256": "aab1e5f2b1c2f407eaeb1f5d0322ca14ed6c301ebaffb0e3fbe6a9a38878530c",
-      "bytes": 42497
+      "sha256": "4a71281806941f6b57fdfda3d815a8937f0901ea02c6aedc9dca36bdfd387987",
+      "bytes": 58578
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
@@ -37919,8 +37989,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "ee6aa8f87396528de2157270bb50d523524879c4e86196b535784f259eccea28",
-      "bytes": 147539
+      "sha256": "5c52af47584bfaf324a9c89dc925c96604a87ed6d4cb4f292582d274983d954f",
+      "bytes": 194291
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -37999,8 +38069,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/render_tables.py",
-      "sha256": "21d18f4324ac288cafb1b4b572f72629cc2a104d7da667925a351e643cf4abce",
-      "bytes": 8259
+      "sha256": "f64d40f119fdbdfa1024925c63a68976e2bb06c96a0464980fcc6e368fa5a76d",
+      "bytes": 10890
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/save_claude_returns.py",
@@ -38639,7 +38709,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "09120036b32a73586a8d064c32749f2607819a18cfc298cd7961fd99aa6c573d",
+      "sha256": "3d03019cab76f8188d3fce18925b103b43eecb048863be9656d10adee01d34b7",
       "bytes": 4174
     },
     {
@@ -38649,33 +38719,38 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "4cf1450ec736f6e2680937a04fc9c74a268cfacc13e4c88556bce34224efd447",
-      "bytes": 29322
+      "sha256": "50f0b630c1981b33cf25ae4a1d84fd1445ffddaaa46f7da798afe8397e08a8c4",
+      "bytes": 32752
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "002e4e911b3090ed9cb2c1bb8c29b13dd723ad4a2dcaad59a2f6ed24ea948d31",
-      "bytes": 78148
+      "sha256": "df1400036052037a2975c18dcc6287c40ea3e44f61161d6caf2a913e3e453702",
+      "bytes": 87297
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
-      "sha256": "38b7d2a065158045c1327b1f1ed0bfa593eec9083a3268221009533480d7501b",
-      "bytes": 43209
+      "sha256": "76ea2dad2bb65ca2a13d6e2bea172fb80962e5e188f2269385e1d2727485e619",
+      "bytes": 50261
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "9784eacbfc921b3497a7f4c139599d6891160d95e233334bd6dd8838855f8517",
-      "bytes": 46778
+      "sha256": "d498b3a4251bcff9720ceab86662bb16ec0ab0905e3bff2ea37cf596778aaa51",
+      "bytes": 61609
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "98884df306b8fec24e8cfb45d3c6a68f662723f4e22eb48cb03f63f6aecc2e7b",
-      "bytes": 19345
+      "sha256": "28d1ba2c91088d425caeb0eb28918e4d110349d878f0b141c3dd63fdc65d0efc",
+      "bytes": 20233
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/alertmanager.yaml",
       "sha256": "b4ff240a87515fa2c9b606c3570ed9c6c64dc36bd2cbad52c8ee62f22745f6a4",
       "bytes": 528
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/chub-config.yaml",
+      "sha256": "fed711cbdbff5fbe1acf149a875611d360c4b20e45fc61d36ce355af36326fd9",
+      "bytes": 148
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana.ini",
@@ -38708,19 +38783,24 @@
       "bytes": 321
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/rtk-config.toml",
+      "sha256": "082e07e315b1d184ef7c0bce3147e35afef5158141d061a8cc6b5a93c263853d",
+      "bytes": 246
+    },
+    {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/container-validation.json",
       "sha256": "13ff53f8185c76732813ef1df3ed29c8dae1fe835cbf389c732005a017933159",
       "bytes": 9927
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "a80c274336f7f3475c2d9195d17bd49f8c0f2cd652149db93b708a54b1db0aad",
-      "bytes": 159349
+      "sha256": "9137c8a7ac916244e075726daa7aad5a4290829190bb0f35e4f73da56a646802",
+      "bytes": 197398
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "4f14fd789389a78a7445e9df6f99b30a8c33f9bea452ab3e0ee5101cea22d2e8",
-      "bytes": 62057
+      "sha256": "c73a8984d1fdc0020d478268e0735031c56287d4add292cb1af5a54b3a56db1e",
+      "bytes": 84035
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -38744,8 +38824,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "2159ce758a7a66f8ef5479c438edd27f0b5ea8177ac39e5fdfe14f016890d823",
-      "bytes": 29314
+      "sha256": "f4e8440b60b3b646f2b62276d11999ff5b7358aa7e1494be3bb3e7eda66000d9",
+      "bytes": 32982
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
@@ -38784,8 +38864,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "e6897728fd866a4d17583109f0d48bcd578c59b237e7186e31ec8ff09e83abf4",
-      "bytes": 53347
+      "sha256": "3de80d94c8a14c870714dad764ab085c1a074dbe9492b7e6e765e00c1ee47d4a",
+      "bytes": 101934
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/copy-notes.json",
@@ -52009,8 +52089,8 @@
     },
     {
       "path": "scripts/build_new_wsl_handbook.py",
-      "sha256": "a78239b6a2558c916b30f4cbc852fe948904a849e99ae37cfadc1c810a6df20e",
-      "bytes": 69692
+      "sha256": "8a66e5eebe1429924d62545e2eee389f1fdd58e6c2f679d8280cec3e99027cf8",
+      "bytes": 75103
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -52814,8 +52894,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "8b00b113c872dcd5ba621f685d2aad0e9020c1fd2b61128f78a1c4d96bbdca7b",
-      "bytes": 114899
+      "sha256": "0f6d9599bc58d46ec8ebe01c0c4a42f391f93e85a8dcea3d917d825c06bcb552",
+      "bytes": 116102
     },
     {
       "path": "tests/test_install_skills.py",
@@ -52988,19 +53068,24 @@
       "bytes": 18369
     },
     {
+      "path": "tests/test_new_wsl_client_config.py",
+      "sha256": "78cb1d7b07b88dd7c26b7a0394c44e975cfeaa8f7b3c1b7a3987f7282c4f0d1e",
+      "bytes": 246096
+    },
+    {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "3e36c0ae42c39ac21a197ccec87017ccf0d9aac6b04f601382500ff3f933eee4",
-      "bytes": 128971
+      "sha256": "6737c1b521a73030ab5df93549f1a8b3bb7acac74a6a645193950cbbb0119462",
+      "bytes": 156386
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "5d2a8afcb5acd61f3f195a8612c298e730927f78f7f870270c5bb00309ab4309",
-      "bytes": 78167
+      "sha256": "2cc7884b5be18de0368711787748042461cd788d4300d8c84a0d55690d6f884b",
+      "bytes": 83332
     },
     {
       "path": "tests/test_new_wsl_profile.py",
-      "sha256": "5cb42181a6d18d490b0e3a12eb5f10b2002a5b35e00005a7264f2debec063a81",
-      "bytes": 17372
+      "sha256": "49aa447fb050a329eafc6106a3a25f9f966a66db9f583c4ba04e990bfa2e8b00",
+      "bytes": 19560
     },
     {
       "path": "tests/test_observability.py",
@@ -53288,6 +53373,11 @@
       "bytes": 15415
     },
     {
+      "path": "tests/test_token_lanes_session_start.py",
+      "sha256": "2439a883ef232a8e672e2de78ccb22ef0baff3dead8bc782e244abd145dc8154",
+      "bytes": 12494
+    },
+    {
       "path": "tests/test_token_lanes_subagent_start.py",
       "sha256": "8d2ed091ed91928e88b74806f38eb146c30dd5fde3faf6fb43e52381163e7ae7",
       "bytes": 24974
@@ -53409,8 +53499,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "99e3a9410f0c8494a57a27a0653db72af36d7f2e6a658e63fd127578e01b95bd",
-      "bytes": 23961
+      "sha256": "3bb8ce0b260625892517c2b4e2d59a69bc76ceb9f6e717cab475791885e85b40",
+      "bytes": 24328
     },
     {
       "path": "tools/adoption/install_skills.py",
@@ -53421,6 +53511,11 @@
       "path": "tools/adoption/managed_block.py",
       "sha256": "4a5d7c2001be450209aa903af691e653b39989af654bf0e61d70b2199012bba8",
       "bytes": 23567
+    },
+    {
+      "path": "tools/adoption/new_wsl_client_config.py",
+      "sha256": "ff5ae788cfa9196f83e35fcedfe985e43a2767ac429936c2eac639961d368784",
+      "bytes": 151287
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
