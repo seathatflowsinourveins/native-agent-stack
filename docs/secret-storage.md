@@ -17,7 +17,7 @@ against it.
 | `alpaca-paper-2` | Alpaca paper broker key pair, second paper account (isolated incentive-monitor study) | optional | `<store>/alpaca-paper-2.env`, pointer `PAPER_ENV_FILE_2` | `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY` (optional, not secret: `APCA_API_BASE_URL`) |
 | `sec-contact` | SEC/EDGAR contact string. This is private personal data, not an auth secret | required now | `<store>/sec-contact.env` | `SEC_USER_AGENT` (optional: `EDGAR_IDENTITY`) |
 | `databento` | Databento API key | only when you buy it | `<store>/databento.env` | `DATABENTO_API_KEY` |
-| `typesafe` | Typesafe key, for the live-judge mode of `gap_crosswalk.py` only | only when you pay for it | `<store>/typesafe.env` | `TYPESAFE_API_KEY` |
+| `typesafe` | Typesafe key, for the live-judge mode of `gap_crosswalk.py` and the native-skill-practice Jev provider in `blueprints/native-skill-practice/promptfooconfig.yaml`; start each through `tools/credentials/credential_run.py typesafe -- <command>`. A trading-lane use needs its own, separately authorized key | only when you pay for it | `<store>/typesafe.env` | `TYPESAFE_API_KEY` |
 | `omniroute` | OmniRoute local gateway key, one per lane. The workstation gateway runs keyless on loopback, so callers pass the placeholder `local-loopback` ([decision](decisions/2026-09-27-omniroute-account-pool.md)) | optional | `<store>/omniroute.env` | `OMNIROUTE_API_KEY` |
 | `tavily` | Tavily API key. Until 2026-09-29 it lived only in the kernel keyring; its first file write comes from that copy through the create-only chain in [Kernel keyring](#kernel-keyring-transport-and-per-boot-spare-2026-09-29) | optional | `<store>/tavily.env` | `TAVILY_API_KEY` |
 | `grafana-admin` | Local Grafana admin account and secret key | generated locally | `~/.config/ecosystem-observability/ecosystem-grafana.env` | `GF_SECURITY_*` |
@@ -1556,7 +1556,14 @@ This follows [CPython's `timeit` repetition guidance](https://docs.python.org/3/
 and uses its [maintained reference implementation](https://github.com/python/cpython/blob/3.14/Lib/timeit.py)
 for the five reference measurements. A clean later sample can resolve timing
 noise; three identical quadratic helper rounds of 10, 40 and 160 ms remain
-rejected at host factors 1.0, 2.6 and 4.0.
+rejected at host factors 1.0, 2.6 and 4.0. The timed `check()` calls of the
+helper rounds and the nesting probe, which run inside the test process, run
+with the cyclic garbage collector disabled, so no collection of any generation
+runs inside a timed window, and with its prior state restored, as
+[`timeit.Timer.timeit` does by default](https://docs.python.org/3/library/timeit.html#timeit.Timer.timeit)
+([source](https://github.com/python/cpython/blob/58ed60b7415e218ce3d608302e39b5e55bfb0e88/Lib/timeit.py#L177-L183)),
+because a full collection costs in proportion to the whole test process's heap,
+not to the input, so one that lands inside a timed window is not the helper's work.
 
 An unscaled first-round pass costs one guarded measurement per named row,
 three per helper, and no references. Calibration alone can accept the first

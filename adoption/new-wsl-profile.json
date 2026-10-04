@@ -445,7 +445,7 @@
       "repository": "https://github.com/openai/codex",
       "layer_id": "native-clients",
       "owner_layer_id": "native-clients",
-      "pin": "0.159.3",
+      "pin": "0.160.0",
       "component_id": "codex",
       "source_selection_layer": "native-clients",
       "source_selection_name": "Codex",
@@ -457,19 +457,19 @@
       "default_install": true,
       "blocking_gaps": [],
       "artifact": {
-        "name": "codex-0.159.3.tgz",
-        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz"
+        "name": "codex-0.160.0.tgz",
+        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0.tgz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79",
-        "source": "https://registry.npmjs.org/%40openai%2Fcodex/0.159.3",
+        "value": "373517768e912eeb5054024ae9215e2c90a1420957b66fe134ef745a00948d4a",
+        "source": "https://registry.npmjs.org/%40openai%2Fcodex/0.160.0",
         "kind": "artifact"
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "npm install -g @openai/codex@0.159.3",
-        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/README.md",
+        "command": "npm install -g @openai/codex@0.160.0",
+        "source": "https://github.com/openai/codex/blob/rust-v0.160.0/README.md",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
         "scope": "Upstream npm install form with the accepted package version supplied using npm documented version syntax. This is a reviewed example; the selected bootstrap keeps its existing isolated-prefix installation path.",
         "execution_status": "UNRUN"
@@ -486,24 +486,25 @@
         "scope": "Official noninteractive example. No model request, result-quality assessment, account activation or destination-host execution occurred."
       },
       "provisioning_status": "unprovisioned_source_review",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_reason": "PR #626 merged at accepted main f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5 and moved the shared Linux Codex pin to 0.160.0 (evidence/artifacts/runtime-sdk-20261003/receipt.json). Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/native-clients.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/openai/codex/blob/rust-v0.159.3/README.md",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/README.md",
         "https://developers.openai.com/codex/noninteractive",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "evidence/artifacts/runtime-sdk-20261003/receipt.json"
       ],
       "release": {
-        "tag": "rust-v0.159.3",
-        "source": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
-        "published_at": "2026-09-30T22:57:34Z"
+        "tag": "rust-v0.160.0",
+        "source": "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+        "published_at": "2026-10-01T20:19:13Z"
       },
       "source_pin_kind": "release_or_artifact_version",
-      "source_commit": "01fc69f4026735edfdf6789820549727a4867b11",
-      "artifact_scope": "Thin npm launcher package only (4,904 bytes); the platform dependency and complete native package are separate artifacts. The npm archive was downloaded and rehashed, not installed.",
+      "source_commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "artifact_scope": "Thin npm launcher package only (4,902 bytes); the platform dependency and complete native package are separate artifacts. For this profile the npm archive was downloaded and rehashed, not installed; the runtime-sdk-20261003 receipt of PR #626 records the 0.160.0 pair's installation facts on the existing host.",
       "native_update": {
         "command": "codex update",
         "help_observation": "`codex update --help` on codex-cli 0.159.3 prints: Update Codex to the latest version.",
@@ -515,7 +516,7 @@
         "after_update": "The acceptance command then runs on the version that results. A release newer than the pin counts as installed and not yet qualified until that acceptance has passed on that host.",
         "execution_status": "UNRUN",
         "receipt_fields": {
-          "floor": "The pin of this entry, 0.159.3: the release the bootstrap installs.",
+          "floor": "The pin of this entry, 0.160.0: the release the bootstrap installs.",
           "version_after_native_update": "The version that PATH resolves to after the native update, or after the updater's refusal.",
           "acceptance_result_on_that_version": "The result of this entry's acceptance command on that version."
         }
@@ -523,22 +524,22 @@
       "native_release_artifacts": [
         {
           "name": "codex-package-x86_64-unknown-linux-musl.tar.gz",
-          "url": "https://github.com/openai/codex/releases/download/rust-v0.159.3/codex-package-x86_64-unknown-linux-musl.tar.gz",
+          "url": "https://github.com/openai/codex/releases/download/rust-v0.160.0/codex-package-x86_64-unknown-linux-musl.tar.gz",
           "checksum": {
             "algorithm": "sha256",
-            "value": "3930f31ac5fca861ea3e444e2683f261190d96b63fba58e0a40a879174369cdf",
-            "source": "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.159.3",
+            "value": "4fcc47ab57f52ff75363951a8761146cd10c8288bd86fed45487dbb204a16b71",
+            "source": "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.160.0",
             "kind": "artifact"
           },
           "integrity_observation": "published_digest_not_rehashed"
         },
         {
           "name": "codex-x86_64-unknown-linux-musl.tar.gz",
-          "url": "https://github.com/openai/codex/releases/download/rust-v0.159.3/codex-x86_64-unknown-linux-musl.tar.gz",
+          "url": "https://github.com/openai/codex/releases/download/rust-v0.160.0/codex-x86_64-unknown-linux-musl.tar.gz",
           "checksum": {
             "algorithm": "sha256",
-            "value": "b48ca1b2d6b1bf42b944e02c3d937c898e24651916684cdc35fdedf31b291bcb",
-            "source": "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.159.3",
+            "value": "306865417d4ee7a927785852910a527f41e1e159add390ac5ae3accb67d44a13",
+            "source": "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.160.0",
             "kind": "artifact"
           },
           "integrity_observation": "published_digest_not_rehashed"
@@ -1537,7 +1538,7 @@
       "repository": "https://github.com/openai/codex",
       "layer_id": "agent-sdks",
       "owner_layer_id": "agent-sdks",
-      "pin": "0.159.3",
+      "pin": "0.160.0",
       "component_id": null,
       "source_selection_layer": "agent-sdks",
       "source_selection_name": "Codex Python SDK",
@@ -1549,27 +1550,27 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "openai_codex-0.159.3-py3-none-any.whl",
-        "url": "https://files.pythonhosted.org/packages/6f/24/524be7ef0fb11e587a506514f4e9b70473a1b27ba745b1afc660ced25850/openai_codex-0.159.3-py3-none-any.whl"
+        "name": "openai_codex-0.160.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/09/a6/3e848b805f31a9a736ee1e54f92c2457de2c4e9d0553404975f2bac2dd33/openai_codex-0.160.0-py3-none-any.whl"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "5148065fb13cfb3f106c6493f3a5dc26457da98f6350e193e85eda8b65263b8f",
-        "source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+        "value": "61d2d855ca2ebedfd51280fbeb60ff31fc47ccbd55ebce186505e3f3da096921",
+        "source": "https://pypi.org/pypi/openai-codex/0.160.0/json",
         "kind": "artifact"
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "python -m pip install openai-codex==0.159.3",
-        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md",
+        "command": "python -m pip install openai-codex==0.160.0",
+        "source": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md",
         "pinning_source": "https://pip.pypa.io/en/stable/cli/pip_install/",
-        "package_source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+        "package_source": "https://pypi.org/pypi/openai-codex/0.160.0/json",
         "execution_status": "UNRUN",
         "scope": "Upstream package installed using pip documented module invocation and exact version syntax; run in the owned Python environment, never the OS Python."
       },
       "acceptance": {
         "command": "python - <<'PY'\nfrom openai_codex import Codex\n\nwith Codex() as codex:\n    thread = codex.thread_start()\n    result = thread.run(\"Explain this repository in three bullets.\")\n    print(result.final_response)\nPY",
-        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md#quickstart",
+        "source": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md#quickstart",
         "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
@@ -1579,22 +1580,23 @@
         "scope": "The Python body is the unchanged upstream quickstart; the here-document is only its shell carrier. No SDK/provider/model execution or output-quality acceptance occurred."
       },
       "provisioning_status": "unprovisioned_source_review",
-      "provisioning_reason": "PR #580 merged at accepted main 85543efe5abcddb7b7cddb14e8774e83b6758616; this profile records the accepted SDK pin but has performed no SDK installation, sign-in, provider call or new-host acceptance.",
+      "provisioning_reason": "PR #626 merged at accepted main f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5; this profile records the accepted SDK pin but has performed no SDK installation, sign-in, provider call or new-host acceptance.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "evidence/artifacts/runtime-sdk-20261003/receipt.json"
       ],
       "release": {
-        "tag": "0.159.3",
-        "source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+        "tag": "0.160.0",
+        "source": "https://pypi.org/pypi/openai-codex/0.160.0/json",
         "kind": "native_package_release"
       },
       "source_pin_kind": "release_or_artifact_version",
-      "source_commit": "01fc69f4026735edfdf6789820549727a4867b11"
+      "source_commit": "a956835d020762cb2b570053af06f643a11c0ecc"
     },
     {
       "name": "QMD",
@@ -4038,8 +4040,8 @@
     "meaning": "Source-review recommendations and isolated comparison arms, not merit winners or new-host acceptance.",
     "new_host_acceptance_verified": false,
     "primary_client": "Codex",
-    "accepted_codex_cli_pin": "0.159.3",
-    "sdk_gate": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/580",
+    "accepted_codex_cli_pin": "0.160.0",
+    "sdk_gate": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626",
     "default_profile": "Minimal native foundation only: existing bootstrap component_ids [codex, claude-code], implicit Node/uv/gh pins, and CPython 3.13.15 via uv; Git and OS utilities are prerequisites.",
     "install_dispatch": "Do not iterate over entries. The existing bootstrap installs only the named native profile and its implicit toolchain; every optional row and comparison arm is excluded. Examples are not an authorization to install.",
     "bootstrap": {
@@ -4215,10 +4217,10 @@
       "Historical acceptance receipts retain their original host/input scope.",
       "Install and functional/source-test commands remain UNRUN; the current host help/version probes and archive hashes qualify only those observations."
     ],
-    "accepted_python_sdk_pin": "0.159.3",
+    "accepted_python_sdk_pin": "0.160.0",
     "proposed_typescript_sdk_pin": "0.159.3",
-    "sdk_gate_status": "merged_at_2026-10-01T21:18:12Z",
-    "accepted_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+    "sdk_gate_status": "merged_at_2026-10-04T06:53:20Z",
+    "accepted_main": "f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5",
     "review_update": "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
     "command_gap_semantics": "An empty blocking_gaps list means the recorded source fields are populated; it does not establish prerequisites, installation, functional execution, sign-in, merit selection or new-host acceptance."
   },

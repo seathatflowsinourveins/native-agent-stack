@@ -5,6 +5,10 @@ pass-through cases below record known bypasses so no reader mistakes the
 hook for a security boundary.
 """
 
+import ast
+import gc
+import hashlib
+import importlib.util
 import io
 import itertools
 import json
@@ -748,6 +752,59 @@ BLOCKED["bash <<'EOF'\nprintf ' #x'\nprintenv\nEOF\n#" + "x" * 200000] = "enviro
 # The first review's ps input in full: 70,000 `E`, a letter that is no flag and a dump (a regular expression backtracked on it for 13 s, past the
 # hook timeout; PATHOLOGICAL times it, this row blocks it behind rtk proxy and a keyring exec as well).
 BLOCKED["ps " + "E" * 70000 + "q; printenv"] = "environment_dump"
+# Launcher grammar of GNU coreutils and of uutils coreutils, which Ubuntu 26.04 ships as its coreutils (rust-coreutils 0.8.0-0ubuntu3, with
+# the multi-call binary /usr/bin/coreutils: the package file list of resolute on packages.ubuntu.com, read 2026-10-04). Each row runs a command
+# the guard refuses on a host of one implementation or both, as the sources read on 2026-10-04 show. uutils timeout (clap; uu_app in
+# src/uu/timeout/src/timeout.rs, `.trailing_var_arg(true)` at :177 of 0.8.0, :171 of 0.10.0 and :173 of 0.12.0, `.infer_long_args(true)` on
+# the next line) still reads options and an end-of-options `--` after the duration and runs the command after them, where GNU timeout
+# (getopt_long "+fk:ps:v", src/timeout.c at v9.7 and v9.12) runs the word right after the duration (`--`: exit 127). Both accept an
+# unambiguous prefix of a long option (getopt_long; clap's infer_long_args) in timeout, nice, stdbuf and env. env takes a value after
+# -a/--argv0 (GNU env.c from v9.7, uutils env.rs), -f/--file (uutils only) and --env0-from (GNU v9.12), and the last letter of a cluster
+# (`-vu NAME`) takes the next word. The multi-call binary runs the utility its first argument names (src/bin/coreutils.rs main, 0.8.0).
+# The strings are input data for check(), never run; every name in them is a placeholder.
+LAUNCHER_GRAMMAR_BLOCKED = {
+    # The coordinator's evidence rows (allowed at f77a35eb) and the timeout forms of the brief.
+    "timeout 5 -- printenv APCA_API_SECRET_KEY": "environment_dump",
+    "timeout 5 -- env": "environment_dump",
+    "timeout 5s -- gdb -p 1": "process_trace",
+    "timeout --signal=TERM 5 -- printenv APCA_API_SECRET_KEY": "environment_dump",
+    "timeout -- 5 printenv EXAMPLE_TOKEN": "environment_dump",  # `--` before the duration: getopt and clap both end options there
+    "timeout -k 2 5 -- printenv EXAMPLE_TOKEN": "environment_dump",
+    "timeout 5 -- nice -n 1 -- printenv EXAMPLE_TOKEN": "environment_dump",
+    "timeout 5 -- env -u EXAMPLE_NAME": "environment_dump",
+    # Options after the duration (uutils), with a redirection among them and a launcher named by its path.
+    "timeout 5 -s KILL printenv EXAMPLE_TOKEN": "environment_dump",
+    "timeout 5s --signal=KILL -v printenv EXAMPLE_TOKEN": "environment_dump",
+    "timeout 5 -k 1 --foreground -- cat .env": "dotenv_read",
+    "timeout 5 < /dev/null -- printenv EXAMPLE_TOKEN": "environment_dump",
+    "/usr/bin/timeout 5 -- gdb -p 1": "process_trace",
+    # Abbreviated long options (GNU getopt_long and clap's infer_long_args accept an unambiguous prefix).
+    "timeout --sig KILL 5 printenv EXAMPLE_TOKEN": "environment_dump",
+    "timeout --kill 2 5 -- printenv EXAMPLE_TOKEN": "environment_dump",
+    "nice --adj 5 printenv EXAMPLE_TOKEN": "environment_dump",
+    "stdbuf --out L printenv EXAMPLE_TOKEN": "environment_dump",
+    "env --un EXAMPLE_NAME printenv EXAMPLE_TOKEN": "environment_dump",
+    # env's value options and clusters; `env -f FILE` alone prints the environment it built.
+    "env -a NAME printenv EXAMPLE_TOKEN": "environment_dump",
+    "env --argv0 NAME printenv EXAMPLE_TOKEN": "environment_dump",
+    "env -f FILE printenv EXAMPLE_TOKEN": "environment_dump",
+    "env -f FILE": "environment_dump",
+    "env --env0-from FILE printenv EXAMPLE_TOKEN": "environment_dump",
+    "env -vu EXAMPLE_NAME printenv EXAMPLE_TOKEN": "environment_dump",
+    "env -vC /tmp printenv EXAMPLE_TOKEN": "environment_dump",
+    "env -vS 'printenv EXAMPLE_TOKEN'": "environment_dump",
+    # The uutils multi-call binary.
+    "coreutils printenv EXAMPLE_TOKEN": "environment_dump",
+    "/usr/bin/coreutils env": "environment_dump",
+    "coreutils timeout 5 -- cat .env": "dotenv_read",
+    "sudo coreutils env": "environment_dump",
+    # Refused before and still (a no-loosening control, not a failing-first row). The current reading reads -a's value and finds
+    # `coreutils EXAMPLE_TOKEN`; the prior reading keeps c26800f3's env table, takes -a for a flag and refuses printenv. On Linux the uutils
+    # 0.8.0 multi-call binary names the utility from the executed path, not argv[0] (binary_path in src/common/validation.rs), so this runs
+    # nothing there; a uutils build for another system takes argv[0] and would run printenv.
+    "env -a printenv coreutils EXAMPLE_TOKEN": "environment_dump",
+}
+BLOCKED.update(LAUNCHER_GRAMMAR_BLOCKED)
 
 # The documented kernel keyring form (docs/secret-storage.md, recipes/tavily.md), and the same with a
 # variable that is not one of the guard's secret names, so only the keyring rules can catch it.
@@ -1174,6 +1231,25 @@ ALLOWED = [
     "python3 scripts/kernel_keyring.py status",
     "python3 scripts/kernel_keyring.py exec --help",
 ]
+# Negative controls of LAUNCHER_GRAMMAR_BLOCKED: the same launcher forms around a command that shows nothing stay allowed.
+LAUNCHER_GRAMMAR_ALLOWED = [
+    "timeout 5 -- ls",
+    "timeout -- 5 ls -l",
+    "timeout -k 2 5 -- sleep 1",
+    "timeout 5s -v -- sleep 1",
+    "timeout 5 -s TERM sleep 1",
+    "timeout --sig TERM 5 -- sleep 1",
+    "timeout 5 -- nice -n 1 -- ls",
+    "nice --adj 5 ls",
+    "stdbuf --out L ls",
+    "env --un EXAMPLE_NAME ls",
+    "env -a NAME ls -l",
+    "env -vu EXAMPLE_NAME ls",
+    "coreutils ls -l",
+    "coreutils --version",
+    "/usr/bin/coreutils sleep 1",
+]
+ALLOWED.extend(LAUNCHER_GRAMMAR_ALLOWED)
 
 # Negative corpus: ordinary repository and shell work that must never be blocked.
 SAFE_CORPUS = [
@@ -1904,6 +1980,47 @@ def fenced_lines(path):
             for line in block.splitlines()]
 
 
+def review_685_monotonicity_commands():
+    """Existing fixture rows and literal check inputs, plus the supplied oracle and launcher variants. No command is executed."""
+    commands = set(BLOCKED) | set(KEYRING_BLOCKED) | set(LAUNCHER_GRAMMAR_BLOCKED)
+    for table in (ALLOWED, LAUNCHER_GRAMMAR_ALLOWED, SAFE_CORPUS, EXPECTED_PASS_THROUGH, SUBSTITUTION_BODIES,
+                  REAL_COMMIT_MESSAGES, PATHOLOGICAL, ORACLE_MUST_BLOCK, ORACLE_MUST_ALLOW, ORACLE_MUST_STAY,
+                  ORACLE_STAY_ALLOWED, K4_F_ALLOW, K4_F_REJECT, K4_PRIOR_ONLY, K4_BASE_REFUSED):
+        commands.update(row if isinstance(row, str) else row[0] for row in table)
+    commands.update(command for rows in K4_CASES.values() for command, _ in rows)
+    commands.update(command for command, _ in K4_REVIEW_CONTROLS.values())
+    commands.update(command for command, _ in K4_F_LABELED)
+    commands.update(command for _, command in K4_DOCUMENTED_GATEWAY)
+    for _, command, _, control in K4_REPAIR_CASES.values():
+        commands.update((command, control))
+    tree = ast.parse(Path(__file__).read_text())
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == "blocked" for target in node.targets) \
+                and isinstance(node.value, ast.Dict):
+            commands.update(key.value for key in node.value.keys if isinstance(key, ast.Constant) and isinstance(key.value, str))
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "check" \
+                and isinstance(node.func.value, ast.Name) and node.func.value.id == "guard" and node.args \
+                and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
+            commands.add(node.args[0].value)
+    oracle = json.loads((ROOT / "tests/fixtures/guard_685/monotonicity.json").read_text())
+    variants = (
+        "env -vS '-a printenv' EXAMPLE_OTHER",
+        "env --split-string='-a printenv' EXAMPLE_OTHER",
+        "env EXAMPLE_OTHER=1 -vS 'ls -l' printenv",
+        "env EXAMPLE_OTHER=1 --split-string='ls -l' printenv",
+        "env --split-string 'systemd-run --description kernel_keyring.py exec name X -- cat .env' EXAMPLE_OTHER",
+        "env --unset EXAMPLE_NAME -S 'systemd-run --description kernel_keyring.py exec name X -- cat .env' EXAMPLE_OTHER",
+        "coreutils --coreutils-prog=sudo -u /tmp/kernel_keyring.py exec name X -- cat .env",
+        "coreutils --coreutils-prog-shebang=true /tmp/kernel_keyring.py exec name X -- cat .env",
+    )
+    for command in (*oracle["cases"].values(), *variants):
+        for prefix in (*oracle["prefixes"], "env ", "rtk proxy timeout 5 -- "):
+            commands.add(prefix + command)
+    for command in BLOCKED:
+        commands.update(prefix + command for prefix in ("rtk proxy ", "rtk -v proxy --skip-env ", EXEC + " "))
+    return commands
+
+
 class SecretPathGuardTests(unittest.TestCase):
     def test_blocked_commands(self):
         for command, reason in {**BLOCKED, **KEYRING_BLOCKED}.items():
@@ -1980,6 +2097,223 @@ class SecretPathGuardTests(unittest.TestCase):
         for command in SAFE_CORPUS:
             with self.subTest(command=command):
                 self.assertIsNone(guard.check(command))
+
+    def test_launcher_grammar_of_gnu_and_uutils_coreutils(self):
+        # LAUNCHER_GRAMMAR_BLOCKED and LAUNCHER_GRAMMAR_ALLOWED (sources above them): every launcher form that runs a refused command on a
+        # GNU or a uutils host is refused, and the same forms around a harmless command pass.
+        for command, reason in LAUNCHER_GRAMMAR_BLOCKED.items():
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), reason)
+        for command in LAUNCHER_GRAMMAR_ALLOWED:
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_both_readings_take_the_command_after_timeouts_duration(self):
+        # Both word readings (strip_prefix and the prior reading's prior_strip_prefix) step over timeout's options, its duration, then the
+        # options and the `--` that uutils timeout still reads after the duration. A second `--` is the command for GNU and uutils alike.
+        for text, command in (
+                ("timeout 5 -- printenv X", ["printenv", "X"]),
+                ("timeout -- 5 printenv X", ["printenv", "X"]),
+                ("timeout -k 2 5 -- printenv X", ["printenv", "X"]),
+                ("timeout --signal=TERM 5 -- printenv X", ["printenv", "X"]),
+                ("timeout 5 -s KILL -v printenv X", ["printenv", "X"]),
+                ("timeout 5 -- nice -n 1 -- printenv X", ["printenv", "X"]),
+                ("timeout 5 -- -- printenv X", ["--", "printenv", "X"]),
+                ("timeout 5 printenv X", ["printenv", "X"])):
+            with self.subTest(command=text):
+                self.assertEqual(guard.strip_prefix(text.split()), command)
+                self.assertEqual(guard.prior_strip_prefix(text.split()), command)
+
+    def test_review_685_preserves_gnu_timeout_command_paths(self):
+        # GNU v9.12 src/timeout.c stops getopt before the duration; the next word is the executable unchanged.
+        # These strings are inspected by the guard only, including the inert setup string; no shell executes them.
+        blocked = {
+            "timeout 5 -/printenv EXAMPLE_TOKEN": "environment_dump",
+            "timeout 5 -/env": "environment_dump",
+            "timeout 5 -/gdb -p 1": "process_trace",
+            "timeout 5 -/cat .env": "dotenv_read",
+            "timeout -- 5 -/printenv EXAMPLE_TOKEN": "environment_dump",
+            "timeout -- 5 -/env": "environment_dump",
+            "timeout -k 2 5 -/printenv EXAMPLE_TOKEN": "environment_dump",
+            "timeout 5 -/env -u EXAMPLE_OTHER printenv EXAMPLE_TOKEN": "environment_dump",
+            "mkdir -p -- -; ln -sf /usr/bin/printenv ./-/printenv; timeout 5 -/printenv EXAMPLE_TOKEN": "environment_dump",
+        }
+        for command, reason in blocked.items():
+            for prefix in ("", "rtk proxy ", "timeout 10 "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertEqual(guard.check(prefix + command), reason)
+        for command in ("timeout 5 -/ls -l", "timeout -- 5 -/ls -l", "timeout 5 -- ls -l"):
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+        for command in ("timeout 5 -/printenv EXAMPLE_TOKEN", "timeout 5 -/env", "timeout 5 -/gdb -p 1", "timeout 5 -/cat .env",
+                        "timeout -- 5 -/printenv EXAMPLE_TOKEN", "timeout -- 5 -/env"):
+            words = shlex.split(command)
+            expected = words[3:] if words[1] == "--" else words[2:]
+            with self.subTest(command=command, parser="current"):
+                self.assertEqual(guard.strip_prefix(words), expected)
+            with self.subTest(command=command, parser="prior"):
+                self.assertEqual(guard.prior_strip_prefix(words), expected)
+
+    def test_review_685_env_split_string_effective_argv(self):
+        # GNU v9.12 src/env.c parse_split_string/parse_split_arguments and uutils 0.8.0/0.12.0 env.rs.
+        # Trailing argv is essential: the old no-command dump fallback could mask broken split parsing.
+        blocked = {
+            "env -vS'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            'env --split "printenv EXAMPLE_TOKEN" EXAMPLE_OTHER': "environment_dump",
+            "env -vS 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -ivS'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env --split-string='printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -S 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -S 'env -S \"printenv EXAMPLE_TOKEN\"' EXAMPLE_OTHER": "environment_dump",
+            "env -S 'timeout 5 -/printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -S 'cat' .env": "dotenv_read",
+            "env -S 'gdb' -p 1": "process_trace",
+            r"env -S 'printenv\_EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -S '\"printenv\" EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -vS'-- -/printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env --split 'EXAMPLE_OTHER=1 -/printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            # R1-R4: preserve the prior table's command and the GNU expansion alongside the uutils reading.
+            "env -S '-a printenv' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 -S 'ls -l' printenv": "environment_dump",
+            "env --split 'systemd-run --description kernel_keyring.py exec name X -- cat .env' EXAMPLE_OTHER": "dotenv_read",
+            "env --un EXAMPLE_NAME -S 'systemd-run --description kernel_keyring.py exec name X -- cat .env' EXAMPLE_OTHER": "dotenv_read",
+            # The raw no-command check retains these specific historical refusals; the union test below covers other command tails.
+            'env --split-string "ls -l"': "environment_dump",
+            'env -S "ls -l"': "environment_dump",
+            "env -vS'ls -l'": "environment_dump",
+            "env -S 'ls -l;printenv EXAMPLE_TOKEN'": "environment_dump",
+            "env -S 'ls -l' -S 'printenv EXAMPLE_TOKEN'": "environment_dump",
+        }
+        for command, reason in blocked.items():
+            for prefix in ("", "rtk proxy ", "timeout 5 -- "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertEqual(guard.check(prefix + command), reason)
+        for option in ("-vS", "-vvS", "--split-string", "-S"):
+            for tail in ("", " EXAMPLE_OTHER"):
+                if not tail and option in {"--split-string", "-S"}:
+                    continue  # refused by the historical raw no-command backstop above
+                command = f'env {option} "ls -l"{tail}'
+                with self.subTest(command=command):
+                    self.assertIsNone(guard.check(command))
+        for command in ("env -vS'ls -l' EXAMPLE_OTHER", "env --split='ls -l' EXAMPLE_OTHER",
+                        'env --split "ls -l" EXAMPLE_OTHER', 'env -ivS "ls -l" EXAMPLE_OTHER',
+                        "env -S 'ls -l;printenv EXAMPLE_TOKEN' EXAMPLE_OTHER"):
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_review_685_uutils_split_preprocessing(self):
+        # uutils 0.10.0 env.rs process_all_string_arguments (also reviewed at 0.8.0/0.12.0):
+        # only literal --split-string/-S/-vS/-vvS prefixes expand; inferred options discard their payload.
+        # Preprocessing continues after assignment operands, before clap locates the program.
+        blocked = {
+            'env --split "ls -l"': "environment_dump",
+            "env --split 'EXAMPLE_OTHER=1 ls -l'": "environment_dump",
+            "env --split '-- ls -l'": "environment_dump",
+            "env --split='ls -l'": "environment_dump",
+            'env --spl "ls -l"': "environment_dump",
+            'env -ivS "ls -l"': "environment_dump",
+            "env EXAMPLE_OTHER=1 -S 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 -vS 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 --split-string='printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 --split-string 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 -S'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 -vvS'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -S 'env EXAMPLE_OTHER=1 -vS \"printenv EXAMPLE_TOKEN\" EXAMPLE_OTHER' EXAMPLE_OTHER": "environment_dump",
+            "env EXAMPLE_OTHER=1 -S 'cat' .env": "dotenv_read",
+            "env EXAMPLE_OTHER=1 -S 'gdb' -p 1": "process_trace",
+            "env -S '--split \"ls -l\"'": "environment_dump",
+        }
+        for command, reason in blocked.items():
+            for prefix in ("", "rtk proxy ", "timeout 5 -- ", "env ", "coreutils --coreutils-prog=env "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertEqual(guard.check(prefix + command), reason)
+        allowed = (
+            'env -vS "ls -l"',
+            "env EXAMPLE_OTHER=1 -S 'ls -l' EXAMPLE_OTHER",
+            "env EXAMPLE_OTHER=1 -vS 'ls -l' EXAMPLE_OTHER",
+            "env EXAMPLE_OTHER=1 --split-string='ls -l' EXAMPLE_OTHER",
+            "env --split 'EXAMPLE_OTHER=1 ls -l' EXAMPLE_OTHER",
+            "env -- ls -S 'printenv EXAMPLE_TOKEN'",
+            "env ls -S 'printenv EXAMPLE_TOKEN'",
+            "env -S 'ls -l' -S 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER",
+        )
+        for command in allowed:
+            for prefix in ("", "rtk proxy ", "timeout 5 -- "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertIsNone(guard.check(prefix + command))
+
+    def test_review_685_gnu_single_binary_dispatch(self):
+        # GNU v9.12 src/coreutils.c main: --coreutils-prog=NAME and --coreutils-prog-shebang=NAME.
+        blocked = {
+            "coreutils --coreutils-prog=printenv EXAMPLE_TOKEN": "environment_dump",
+            "coreutils --coreutils-prog=env": "environment_dump",
+            "coreutils --coreutils-prog=env -S 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "coreutils --coreutils-prog=timeout 5 -/cat .env": "dotenv_read",
+            "coreutils --coreutils-prog-shebang=printenv /tmp/example-script EXAMPLE_TOKEN": "environment_dump",
+            "coreutils --coreutils-prog-shebang=env /tmp/example-script": "environment_dump",
+            "coreutils --coreutils-prog-shebang=env /tmp/example-script -S 'cat' .env": "dotenv_read",
+            r"find . -exec coreutils --coreutils-prog=cat .env \;": "dotenv_read",
+            "coreutils --coreutils-prog=sudo -u kernel_keyring.py exec a B -- cat .env": "dotenv_read",
+            "coreutils --coreutils-prog-shebang=true kernel_keyring.py exec name X -- cat .env": "dotenv_read",
+        }
+        for command, reason in blocked.items():
+            for prefix in ("", "rtk proxy ", "timeout 5 -- "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertEqual(guard.check(prefix + command), reason)
+        for command in ("coreutils --coreutils-prog=ls -l",
+                        "coreutils --coreutils-prog-shebang=ls /tmp/example-script -l",
+                        "env -S 'coreutils --coreutils-prog=ls -l' EXAMPLE_OTHER",
+                        r"find . -exec coreutils --coreutils-prog=cat README.md \;"):
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_review_685_monotonicity_against_pinned_baselines(self):
+        # These immutable repository guard snapshots avoid a Git-history/network dependency in shallow CI checkouts.
+        pins = {
+            "f77a35eb2": "7b1ec8fa5c6127060c81e23b80e5fe9f7dfec9af045960e928e38763bbb95790",
+            "a7888d31": "ac4e4ac67b27bd0a3406665d21f9899e45dba8f7b75d34ddfe1e945acfcd4933",
+        }
+        baselines = []
+        for revision, digest in pins.items():
+            path = ROOT / "tests/fixtures/guard_685" / revision / "secret_path_guard.py"
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
+            name = "guard685_baseline_" + revision
+            spec = importlib.util.spec_from_file_location(name, path)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[name] = module
+            spec.loader.exec_module(module)
+            baselines.append((revision, module))
+        for command in sorted(review_685_monotonicity_commands()):
+            # The separately quoted harmless -vS control is the documented correction; every other baseline refusal must remain.
+            if command == 'env -vS "ls -l"':
+                continue
+            for revision, baseline in baselines:
+                try:
+                    before = baseline.check(command)
+                except baseline.WorkBudgetExceeded:
+                    before = "command_too_complex"
+                if before is not None:
+                    with self.subTest(revision=revision, command=command):
+                        try:
+                            after = guard.check(command)
+                        except guard.WorkBudgetExceeded:
+                            after = "command_too_complex"
+                        self.assertIsNotNone(after)
+
+    def test_the_current_reading_reads_gnu_and_uutils_env_and_the_multicall_binary(self):
+        # The current reading reads env's value options of both implementations, clusters and long-option prefixes, and the multi-call
+        # binary; the prior reading keeps c26800f3's table (ENV_ARG_OPTIONS), so a command it refused stays refused.
+        for text, start in (("env -a NAME printenv X", 3), ("env --argv0 NAME printenv X", 3), ("env -f FILE printenv X", 3),
+                            ("env --file FILE printenv X", 3), ("env --env0-from FILE printenv X", 3), ("env -vu NAME printenv X", 3),
+                            ("env -uNAME printenv X", 2), ("env --un NAME printenv X", 3), ("env --unset=NAME printenv X", 2),
+                            ("env --ignore-signal printenv X", 2), ("env -i printenv X", 2), ("env -f FILE", None)):
+            with self.subTest(command=text):
+                self.assertEqual(guard.env_command_start(text.split()), start)
+        self.assertEqual(guard.prior_env_command_start("env -a printenv X".split()), 2)
+        self.assertEqual(guard.strip_prefix("/usr/bin/coreutils printenv X".split()), ["printenv", "X"])
+        self.assertEqual(guard.prior_strip_prefix("coreutils printenv X".split()), ["coreutils", "printenv", "X"])
+        self.assertEqual(guard.uutils_env_argv(shlex.split("env --un EXAMPLE_OTHER -S 'cat' .env")),
+                         ["env", "--un", "EXAMPLE_OTHER", "cat", ".env"])
 
     def test_every_secret_name_is_caught_by_a_search(self):
         for name in guard.SECRET_NAMES:
@@ -5001,9 +5335,18 @@ class K4GuardTests(unittest.TestCase):
         for _ in range(K4_TIMING_MAX_ROUNDS):
             spans = {}
             for depth, text in nesting_texts.items():
-                cpu = time.process_time()
-                self.assertIsNone(guard.check(text))
-                spans[depth] = time.process_time() - cpu
+                # Timed with the cyclic collector off, restoring its prior state, as CPython's timeit.Timer.timeit does by default
+                # (Lib/timeit.py): a full (generation-2) collection costs in proportion to the whole test process's heap, not to
+                # this text, so one that lands inside the window is not input-dependent work. The helper rounds below do the same.
+                gc_was_enabled = gc.isenabled()
+                gc.disable()
+                try:
+                    cpu = time.process_time()
+                    self.assertIsNone(guard.check(text))
+                    spans[depth] = time.process_time() - cpu
+                finally:
+                    if gc_was_enabled:
+                        gc.enable()
             nesting_rounds.append(spans)
             if k4_nesting_passes(nesting_rounds):
                 break
@@ -5036,13 +5379,20 @@ class K4GuardTests(unittest.TestCase):
                             finally:
                                 _inside.append(time.process_time() - cpu)
 
+                        # Collector off while timing, as for the nesting probe above (timeit.Timer.timeit's default).
+                        gc_was_enabled = gc.isenabled()
                         with mock.patch.object(guard, name, timed):
-                            cpu = time.process_time()
+                            gc.disable()
                             try:
-                                guard.check(text)
-                            except guard.WorkBudgetExceeded:
-                                pass
-                            total = time.process_time() - cpu
+                                cpu = time.process_time()
+                                try:
+                                    guard.check(text)
+                                except guard.WorkBudgetExceeded:
+                                    pass
+                                total = time.process_time() - cpu
+                            finally:
+                                if gc_was_enabled:
+                                    gc.enable()
                         self.assertTrue(inside, f"{name} not reached at {size}")
                         helper_totals[size], totals[size] = sum(inside), total
                     return helper_totals, totals

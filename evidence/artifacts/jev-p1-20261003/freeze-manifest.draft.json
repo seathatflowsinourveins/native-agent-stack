@@ -1,0 +1,147 @@
+{
+ "schema": "jev-p1-freeze-manifest/1",
+ "status": "draft",
+ "required_roles": {
+  "case_pack": "drawn cases, strata, provenance, seed, frame commit and frame sha256",
+  "label_packet": "the blind packet the user labelled, with the frozen labelling rules",
+  "labels": "the user's blind labels (label and claim type per case), each in the packet's label_record contract",
+  "relabels": "the seeded 15% re-labels, written at least 24 hours later and before any model call, in the same record contract",
+  "promptfoo_tests": "the generated test rows (case_id, repeat_index, source, claim, arm_group): the bytes p1_casepack.py tests writes from the pack, the labels' native repeats and three local repeats",
+  "rendered_inputs": "sha256 of the exact bytes per case and arm input, after the A2 pass: the native prompt (O, S, G), the jev-state prompt (L) and each J provider's HTTP request body",
+  "render_check": "promptfoo output reproducing every rendered input with no model call: the echo provider for the prompts, loopback copies of the J providers for the request bodies",
+  "harness": "promptfoo config, prompts (question text and option orders), provider adapters",
+  "draw_and_scoring_code": "frame extractor, case pack, scoring code and its hash-locked requirements",
+  "native_launch_contexts": "hash of each native arm's init event (O, S, G) from the smoke checks",
+  "arm_l_checkpoint": "arm L checkpoint name, full revision and file hashes",
+  "a2_custody": "each A2 result the case pack records, in pass order: item i is the original result of a2_passes[i], whose canonical sha256 is that pass's result_sha256 (gitleaks 8.30.1, the host-path and identity rule and the home-directory and user-name canary over the exact bytes)",
+  "canary": "the A1 canary: 10 frozen cases and their stored answers"
+ },
+ "roles": {
+  "case_pack": [
+   {
+    "external": "case-pack.draft.json (private until labels exist)",
+    "sha256": "55bf5d005803df58dc51b701ea528122baf117968d65c3ced1590fbb20485855",
+    "bytes": 359906
+   }
+  ],
+  "label_packet": [
+   {
+    "external": "label-packet.draft.json (private until labels exist)",
+    "sha256": "de0731c93c332b8b8b2ee3d01ef3c4e01663d7a2dca17f345d68f219ae70cbdb",
+    "bytes": 119542
+   }
+  ],
+  "labels": [],
+  "relabels": [],
+  "promptfoo_tests": [],
+  "rendered_inputs": [
+   {
+    "external": "rendered-inputs.draft.json",
+    "sha256": "cf993d37d676419c690ee9f1477f492789b2c6f8206b98918a3c148bca423424",
+    "bytes": 67827
+   }
+  ],
+  "render_check": [],
+  "harness": [
+   {
+    "path": "blueprints/native-skill-practice/p1/promptfooconfig.yaml",
+    "sha256": "825d6a5a5e3f849bc512c2c2b4190cf975dd434fb29aa52d13013f42919d5085",
+    "bytes": 11198
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/render-check.yaml",
+    "sha256": "23d5ab009c53a7ab5fe46442ec50bfb673a8194b66a36c507057e68168ea3c8d",
+    "bytes": 5215
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/prompts/jev-state.txt",
+    "sha256": "45a5e1ac87e3a032c8b2f19f3c4c5fb114bf7e7833cea4242d3e225953232a02",
+    "bytes": 60
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/prompts/native-question.txt",
+    "sha256": "21c969947e04020a43d0cbf6b5052d2789debd1fcfbe55818290bfddc610f743",
+    "bytes": 933
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/l_nli_provider.py",
+    "sha256": "663be5925c2021bd97ae7d32c0eb3824a5caf293f3d311870ad6a80628f0ce81",
+    "bytes": 4043
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/response-model.cjs",
+    "sha256": "8c56dd69d5a11627b92c19a9783f38f135ca7531dcb0e4f263faf61977f4be99",
+    "bytes": 971
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/render_echo_server.py",
+    "sha256": "575db5a8df6dec0d73419d4b2af56764a2bb764e7f97d00571fdd9f8c80b2d8e",
+    "bytes": 1676
+   },
+   {
+    "path": "blueprints/native-skill-practice/response.cjs",
+    "sha256": "c990b1db80f116ecceddb649a175af1aab35d5a1a58762e71f7be13ee7dcb5b7",
+    "bytes": 1764
+   },
+   {
+    "path": "blueprints/native-skill-practice/gate.cjs",
+    "sha256": "e7e94404b06e67b389ea1bb8348457f5fe67f25d4bc7b7286e1f37f733c2ffcc",
+    "bytes": 1187
+   }
+  ],
+  "draw_and_scoring_code": [
+   {
+    "path": "blueprints/native-skill-practice/p1/p1_frame.py",
+    "sha256": "662d7756f82c3a85bc99139fc86a88f41505deac493dc9ef06b53531a3fcc078",
+    "bytes": 50384
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/p1_casepack.py",
+    "sha256": "790f504cf09825e54a2cce2b7077b4efe0ec444e36ad5c2bb877cfbf556e9a3e",
+    "bytes": 52229
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/p1_scoring.py",
+    "sha256": "a0fb3e05d960b8115cb66b69c9d9e05eb19347e07d4d980111932b27ddb1240f",
+    "bytes": 45560
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/p1_freeze.py",
+    "sha256": "03b36700340bd74ce64eb6911c108a70631fc72bf924fd1db6887a4fb0eac091",
+    "bytes": 19578
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/requirements-scoring.in",
+    "sha256": "b98e7dbf7e918d82a1f43364cdf72152950f94b998a94e7c7157be8b03d9cf34",
+    "bytes": 47
+   },
+   {
+    "path": "blueprints/native-skill-practice/p1/requirements-scoring.lock",
+    "sha256": "9d80ef024b33d62ae15a048d67614ef55c498a9fe32988829ea5abbd0fa5ec10",
+    "bytes": 15625
+   }
+  ],
+  "native_launch_contexts": [],
+  "arm_l_checkpoint": [],
+  "a2_custody": [],
+  "canary": []
+ },
+ "missing_roles": [
+  "labels",
+  "relabels",
+  "promptfoo_tests",
+  "render_check",
+  "native_launch_contexts",
+  "arm_l_checkpoint",
+  "a2_custody",
+  "canary"
+ ],
+ "draft_checks": {
+  "render_check": {
+   "expected": 525,
+   "matched": 525,
+   "passed": true
+  },
+  "render_check_method": "render-check.yaml: the echo provider for the prompts and loopback copies of the J providers for the request bodies, in a network namespace with only loopback; no model call"
+ }
+}

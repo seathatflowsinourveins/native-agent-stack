@@ -293,6 +293,23 @@ class NativeCollectorTests(unittest.TestCase):
             time.sleep(0.2)
         self.fail("the file exporter did not receive every record")
 
+    def test_lane_name_stays_on_the_resource_and_a_malformed_one_is_dropped(self):
+        now = time.time_ns()
+        body = {"resourceLogs": [
+            {"resource": {"attributes": otlp_attrs({"service.name": "codex_exec", "ecosystem.lane": lane})},
+             "scopeLogs": [{"scope": {"name": "synthetic"}, "logRecords": [
+                 {"timeUnixNano": str(now + i), "body": {"stringValue": self.SECRET},
+                  "attributes": otlp_attrs({"event.name": "codex.tool_result", "tool_name": "read_file"})}]}]}
+            for i, lane in enumerate(("runtime", "Runtime Lane"))]}
+        request = urllib.request.Request(f"http://127.0.0.1:{self.otlp}/v1/logs", data=json.dumps(body).encode(),
+                                         headers={"Content-Type": "application/json"}, method="POST")
+        urllib.request.urlopen(request, timeout=10).read()
+        self.exported(2)
+        lanes = sorted(str({a["key"]: next(iter(a["value"].values())) for a in rl["resource"].get("attributes", [])}
+                           .get("ecosystem.lane")) for line in self.output.read_text().splitlines() if line.strip()
+                       for rl in json.loads(line)["resourceLogs"])
+        self.assertEqual(lanes, ["None", "runtime"])
+
     def test_names_survive_and_command_text_does_not(self):
         secret = self.SECRET
         self.post("claude-code", [

@@ -1,5 +1,5 @@
 {
-  "description": "Every tracked dependency lockfile or manifest that security-scan.yml's osv-scanner job scans. A lockfile entry without a parser lets OSV-Scanner infer it from the file name; parser names the OSV-Scanner v2 extractor for names it cannot infer (--lockfile=<parser>:<path>). A covered_by_lockfile entry is a manifest OSV-Scanner v2.6.0 has no source extractor for; its sibling lockfile is scanned instead. An excluded entry is a tracked lockfile deliberately left out of the scan; it needs a reason and an evidence path, and only a deliberately vulnerable test fixture qualifies. A lockfile entry that names a config is scanned in an invocation of its own under that config alone (an explicit --config applies to every input of one invocation), and every other entry together under .github/osv-scanner.toml; the tests bind each such config to its one lock. tests/test_osv_lockfile_coverage.py fails when a tracked lockfile or manifest is in none of the three lists.",
+  "description": "Every tracked dependency lockfile or manifest that security-scan.yml's osv-scanner job scans. A lockfile entry without a parser lets OSV-Scanner infer it from the file name; parser names the OSV-Scanner v2 extractor for names it cannot infer (--lockfile=<parser>:<path>). A covered_by_lockfile entry is a manifest OSV-Scanner v2.6.0 has no source extractor for; its sibling lockfile is scanned instead. A dependency_free entry is a package.json that declares no dependency and has no lockfile beside it, so nothing is scanned for it; it needs a reason and an evidence path. An excluded entry is a tracked lockfile deliberately left out of the scan; it needs a reason and an evidence path, and only a deliberately vulnerable test fixture qualifies. A lockfile entry that names a config is scanned in an invocation of its own under that config alone (an explicit --config applies to every input of one invocation), and every other entry together under .github/osv-scanner.toml; the tests bind each such config to its one lock. tests/test_osv_lockfile_coverage.py fails when a tracked lockfile or manifest is in none of the four lists.",
   "lockfiles": [
     {
       "path": "examples/claude-runtime-sdk/worker.py.lock",
@@ -12,6 +12,18 @@
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
       "parser": "uv.lock"
+    },
+    {
+      "path": "examples/deepagents-omniroute/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "examples/openhands-native-capabilities/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "examples/openhands-native-capabilities/cli-constraints.txt",
+      "parser": "requirements.txt"
     },
     {
       "path": ".github/requirements-ci.txt",
@@ -34,10 +46,6 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/uv.lock"
-    },
-    {
-      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
-      "config": ".github/osv-scanner-frozen-wsl-retrieval.toml"
     },
     {
       "path": "blueprints/memory-stack/native-qualification/uv.lock"
@@ -185,9 +193,25 @@
     {
       "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
       "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/requirements-scoring.in",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/requirements-scoring.lock",
+      "parser": "requirements.txt"
     }
   ],
   "covered_by_lockfile": [
+    {
+      "path": "examples/deepagents-omniroute/requirements.in",
+      "lockfile": "examples/deepagents-omniroute/requirements.lock"
+    },
+    {
+      "path": "examples/openhands-native-capabilities/requirements.in",
+      "lockfile": "examples/openhands-native-capabilities/requirements.lock"
+    },
     {
       "path": "blueprints/convergence-practice/application-delivery/package.json",
       "lockfile": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml"
@@ -195,10 +219,6 @@
     {
       "path": "blueprints/convergence-practice/application-delivery/pyproject.toml",
       "lockfile": "blueprints/convergence-practice/application-delivery/uv.lock"
-    },
-    {
-      "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
-      "lockfile": "blueprints/convergence-practice/wsl-retrieval/package-lock.json"
     },
     {
       "path": "blueprints/memory-stack/native-qualification/pyproject.toml",
@@ -227,6 +247,13 @@
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.in",
       "lockfile": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock"
+    }
+  ],
+  "dependency_free": [
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+      "reason": "Retirement guard of the retired WSL retrieval partition: private, with no dependency, workspace, override or script field, and devEngines.runtime.name=retired-wsl-retrieval with onFail=error. Its historical lock is kept byte-identical as package-lock.json.frozen since 2026-10-04, a name no scanner reads, so there is no dependency here for OSV-Scanner or GitHub's dependency graph to report.",
+      "evidence": "evidence/receipts/wsl-lock-frozen-rename-20261004.json"
     }
   ],
   "excluded": [

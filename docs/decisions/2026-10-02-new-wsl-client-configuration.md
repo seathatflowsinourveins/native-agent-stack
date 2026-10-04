@@ -48,11 +48,15 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    config (`adoption/new-wsl/templates/`, the 2026-10-03 addendum); the two instruction blocks; and six steps of the tool
    itself (the launcher, the login-shell PATH block, the skills step, the two PATH directories and the remote plugin
    rules). A piece goes to the first entry that matches it. A piece no entry
-   matches, and an entry no piece reaches, fail the check. Today: 385 pieces, 293 wired (200 practice, 93 through a slot),
-   80 not wired (41 through a slot that does not install, 39 by their own entry) and 12 authorization pieces (the four
-   settings, the six tool approval modes of Decision 14 and semble's two allow rules, which also wait for their slots),
+   matches, and an entry no piece reaches, fail the check. Today: 387 pieces, 294 wired (200 practice, 94 through a slot),
+   80 not wired (41 through a slot that does not install, 39 by their own entry) and 13 authorization pieces (the four
+   settings, the main checkout's Codex trust grant of the 2026-10-04 addendum, the six tool approval modes of Decision 14
+   and semble's two allow rules, which also wait for their slots),
    each listed below; a slot whose install is another owner (an interim install, the 2026-10-03 addendum) counts as one
-   that does not install the piece's owner.
+   that does not install the piece's owner. On 2026-10-04 the counts moved from 385 pieces, 293 wired and 93 through a
+   slot because #674 adds Serena's `required = true` key to the stack-worker profile, a piece the serena slot wires.
+   On 2026-10-04 the counts moved again because #687 adds the `gpt-6.1-sol` notice key under
+   `tui.model_availability_nux`, a piece that is not wired.
 3. **A piece follows its slot.** A piece mapped to a slot that does not install is not wired; it is wired when the manifest
    says the slot installs the owner its entry names. So the memory slot, once its head-to-head returns with ai-memory,
    wires the ai-memory pieces, and brings back the sentences of the instruction blocks that name it, without an edit to the
@@ -298,7 +302,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
       Since the wave-2 records (the 2026-10-03 addendum), the option writes the approval modes of ai-memory (in the user
       config and the stack-worker profile), semble and context-mode and semble's two allow rules, because their slots
       install those owners as interim installs; SocratiCode's and headroom's wait, because their slots install another
-      owner. Twelve pieces are in the class (`--check` counts `authorization: 12`, and 80 pieces are not wired).
+      owner. Since the 2026-10-04 addendum the option also writes the main checkout's Codex trust grant. Thirteen pieces
+      are in the class (`--check` counts `authorization: 13`, and 80 pieces are not wired).
     - **The default.** `--render` and `--apply` neither render nor write the four, and an existing value of those keys in a
       person's files is never touched: the render lacks the keys, so the Claude merge leaves the file's keys as they are,
       and so does the Codex merge.
@@ -808,6 +813,48 @@ manifest changed under it.
 What would overturn it: the deciding measurement of each interim slot (amendment 3 names it), and the usage overturn for
 the statusline row.
 
+## Addendum 2026-10-04: the main checkout's Codex trust grant and the model
+
+Branch `c5/new-wsl-codex-0160`, the coordinator's follow-up to PR #626 (Codex 0.160.0). The rule of Decision 1 is
+unchanged.
+
+- **The trust grant.** Codex 0.160.0 asks whether to trust a folder when a session moves into a project that has no
+  saved answer (openai/codex PR #49160, merged 2026-09-29 and in `rust-v0.160.0`, lets `/cd` request folder trust). The
+  coordinator's decision of 2026-10-04 (R16 review) keeps that dialog, with the repository's own root pre-trusted and
+  unknown projects still asked about. The shared template's `projects."${PROJECT_ROOT}".trust_level` piece is now wired
+  as an authorization setting: `is_authorization_piece` names `codex/*/projects.*.trust_level`, the one pattern the
+  observation under "Left for the coordinator" asked for, so the grant is rendered and written only with
+  `--with-authorization-settings`, and a file's own answer stays. The publication checkout's grant and every other
+  `projects.*` piece stay not wired.
+- **Why one entry.** At `rust-v0.160.0`, `codex-rs/tui/src/config_update.rs` L264-279 finds a project's entry by its
+  exact key (case-insensitively only for a Windows path), and L305-337 tries the working directory, the project root and
+  then the git trust root, which `codex-rs/git-utils/src/trust.rs` L12-24 resolves to the main repository's root for a
+  linked worktree (upstream tests `codex-rs/core/src/git_info_tests.rs` L829-968, which also refuse a worktree whose
+  back-link or common directory does not match). A trusted project's `.codex/config.toml` layers load instead of loading
+  disabled (`codex-rs/config/src/loader/mod.rs` L131-133), and the TUI asks nothing for it (`config_update.rs`
+  L338-366). So the entry for the main checkout covers it and every linked worktree, and an entry for a parent directory
+  covers neither. On the new distribution `${PROJECT_ROOT}` is the main checkout:
+  `adoption/templates/wsl/host.new-distro.json.template` sets it to the `native-agent-stack` checkout in the home, and no
+  committed file holds the rendered path.
+- **A new Codex home.** `codex_home.py` drops every `[projects]` table from a `config.toml` it creates. It gains
+  `--keep-project-trust`, which this tool passes beside `--keep-hook-trust`, so a new home and a later merge end with the
+  same file and the authorization line's `added` is true. The bootstrap passes neither flag and is unchanged.
+- **The merge's report.** The merge looked an authorization piece up under its template path. A key that names a
+  placeholder is now looked up as the render filled it, so a grant the file already has is reported as already the same,
+  or as kept when the file's answer differs.
+- **The model.** The user chose Opus 5.5 on 2026-10-04 (question tool) as the new distribution's main model. The map's
+  own entry for `claude/settings/setting/model` overrides the shared template's `opus[1m]` with `claude-opus-5-5`, the
+  full model name the model-config page gives for pinning a version (https://code.claude.com/docs/en/model-config, read
+  2026-10-04: `opus` resolves to Opus 5.5 on the Anthropic API today, and Opus 4.7 and later run with the 1M window
+  without a suffix). Claude Code resolves the same model as before; what changes is that the new distribution keeps it
+  when the shared template moves. `advisorModel` stays the template's `fable`.
+  2026-10-04 (~15:10Z): the user changed the advisor to Opus 5.5; the template now carries `advisorModel: "opus"` (see [Advisor model](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model)).
+- **Counts.** 385 pieces, 293 wired, 79 not wired and 13 authorization pieces (Decisions 2 and 14 above).
+
+What would overturn it: Codex matching a project's trust by a parent directory or by another key form; a decision that
+the repository's root should ask again (the entry returns to `not_wired`); the user choosing another main model, or the
+floating `opus` alias, for the new distribution.
+
 ## Pieces that are not wired
 
 `python3 -B tools/adoption/new_wsl_client_config.py --check --markdown` prints these three tables (the pieces that are not wired, the authorization
@@ -869,9 +916,9 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `codex/config/mcp_servers.headroom.env.DO_NOT_TRACK` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'headroom' |
 | `codex/config/mcp_servers.codebase-memory.command` | `not_wired` | no slot of the manifest names a code-graph tool (the code-navigation slot's owner is Serena) |
 | `codex/config/mcp_servers.context-mode.env.RTK_TELEMETRY_DISABLED` | `slot:context-supply` | slot context-supply installs 'context-mode 1.0.169' (interim install), not 'rtk' |
-| `codex/config/projects."${PROJECT_ROOT}".trust_level` | `not_wired` | trust grants belong to one host; adoption/bootstrap.md step 4 and tools/adoption/codex_home.py leave them out, and Codex asks on this host |
 | `codex/config/projects."${HOME}/code/native-agent-stack-publication".trust_level` | `not_wired` | trust grants belong to one host; adoption/bootstrap.md step 4 and tools/adoption/codex_home.py leave them out, and Codex asks on this host |
 | `codex/config/tui.model_availability_nux.gpt-6-astra` | `not_wired` | a counter of how often Codex showed a model notice on the source host, which is client state and not configuration |
+| `codex/config/tui.model_availability_nux."gpt-6.1-sol"` | `not_wired` | a counter of how often Codex showed a model notice on the source host, which is client state and not configuration |
 | `codex/config/hooks.state."${PROJECT_ROOT}/.codex/hooks.json:pre_tool_use:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
 | `codex/config/hooks.state."${HOME}/.codex/hooks.json:pre_tool_use:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
 | `codex/config/hooks.state."${HOME}/.codex/hooks.json:post_tool_use:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
@@ -907,6 +954,7 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `codex/config/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
 | `codex/config/mcp_servers.context-mode.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `context-supply` installing `context-mode` |
 | `codex/config/mcp_servers.semble.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-search` installing `semble` |
+| `codex/config/projects."${PROJECT_ROOT}".trust_level` | `"trusted"` | no | a trusted project's own .codex/config.toml layers load and Codex asks nothing about the folder, so the grant is written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
 | `codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-search` installing `SocratiCode` |
 | `codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `context-supply` installing `headroom` |

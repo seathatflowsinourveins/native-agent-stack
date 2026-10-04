@@ -1,0 +1,5 @@
+Publication validation failed:
+observability/grand-dashboard/state.json: SHA-256 mismatch
+observability/grand-dashboard/state.json: byte count mismatch
+evidence/artifacts/osv-split-hardening-port-20261003/red-R2.txt: contains possible personal home path
+evidence/artifacts/osv-split-hardening-port-20261003/red-R3.txt: contains possible personal home path
