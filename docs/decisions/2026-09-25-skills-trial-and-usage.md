@@ -1725,3 +1725,41 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
 | Skills CLI deny rules and `Edit(~/.agents/**)` in the Claude template | our-integration | `tests/test_install_claude_profile.py` `test_a_session_cannot_install_or_remove_skills_through_the_skills_cli` failed against the previous template first (66 failures); it models the permissions page's documented matching, not a Claude Code run |
 | Every pin against its upstream git objects | our-integration | [`pin-verification.json`](../../evidence/artifacts/skills-pin-verification-20260930/pin-verification.json): 28 rows, 0 failures at 18:02Z, and a byte-identical recheck at 22:53Z after a fresh fetch |
 | Overflow, invocation and cost on any host | live-run-pending | The measurement plan above; no host run is claimed |
+
+## Addendum 2026-10-03: three retirements, a held skill and a Claude-Code-only copy (wave 2)
+
+**Decided by** the wave-2 skills ruling of 2026-10-03 (both model families: a Claude dossier, the GPT family's check,
+verdict agree with conditions, and a Claude ruling), recorded with its cited changes in
+[`wave2-records.json`](../../evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json) (`layers.skills`,
+changes 1, 3, 5, 6 and 7). It applies the [retire procedure](../../adoption/skills/lifecycle.md#retire-and-remove) and
+adds the [held state](../../adoption/skills/lifecycle.md#held).
+
+| Skill | Before | After | Reason |
+| --- | --- | --- | --- |
+| grill-me | trial, `user-invocable-only` | retired 2026-10-03, `off` | At `c55ee460` its SKILL.md line 7 is only "Call the Skill tool with \"grilling\"", and grilling is excluded here (change 1) |
+| improve-codebase-architecture | trial, `user-invocable-only` | retired 2026-10-03, `off` | At `d81f3a18` it calls grilling (line 64) and domain-modeling (line 66), and writes GLOSSARY.md and ADRs (lines 68-70) (change 1) |
+| semgrep | trial, `on` | retired 2026-10-03, `off` | At `82fe8226` its plan-approval gate (lines 5, 14, 24, 184) conflicts with AGENTS.md; removed under this record's conflict rule (L284-286) (change 3) |
+| agent-browser | trial, `on` | held, `on` | Waits for the browser-tool measurement; the installer skips a held skill (change 6) |
+| skill-creator | trial, Codex path rule | trial, Claude Code copy | `agents ["claude-code"]`, `copy: true`: no shared copy beside Codex's embedded one, so no Codex rule (change 6) |
+
+- Each retired entry keeps its historical pin in its reason and an explicit `off` in the template's `skillOverrides`.
+  The runtime-worker manifest drops their `reuse_ref` entries and coverage selections and records each as an exclusion
+  with the same reason (134 skills, from 137). grilling stays excluded: it is the named candidate for the user-invoked
+  plan stress-test job, which has no owner now (change 2), and it enters only through a dated record and the native
+  evals.
+- `tools/adoption/install_skills.py` skips a `held` skill as it skips a `pruned` one and refuses it under `--only`;
+  `scripts/skills_status.py` reports it as `held`. A global entry may name `agents` and `copy`; the installer passes
+  `--copy -a claude-code` for skill-creator and reads the copy back from Claude Code's folder. The copy counts as
+  installed only as a real folder there with no entry of its name in `~/.agents/skills`, where Codex loads skills; a
+  link at the Claude entry or a same-name shared entry is `misplaced`, refused in every mode (`--check-only`, which the
+  install plan's smoke check runs, included) with exit 1 and nothing deleted (added after the Codex root lane's source
+  read of `b6828c7d`, finding 3).
+- The Codex template disables Codex's bundled `.system/skill-installer` by its path, so skills reach a host only
+  through the installer. Rules for an account's remote plugin skills (change 5) are per account: they are generated
+  from the account's plugin cache on the host and are not in the template.
+- Budgets after the change (manifest `budget`): 25 selected skills, Claude `on` sum 9,484 characters, Codex 9,165
+  characters for the 24 skills its catalog shows, about 2,790 tokens of the configured 6,000.
+
+**Not established.** No host ran these changes; the destination's removal of the three folders and the re-pin of the
+mattpocock skills are the coordinator's steps (wave-2 synthesis 1.6). The overturn conditions are in each retired
+entry; for agent-browser, the browser-tool measurement's result.

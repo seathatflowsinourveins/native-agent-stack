@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "scope": "Sanitized retained canary programs and argument vectors; no new model request.",
+  "caller_exit_codes": {
+    "sdk_native_account": 0,
+    "sdk_gateway": 0,
+    "cli_exec_gateway": 0,
+    "provenance": "Coordinator-verified contract A3/session record; SDK exits are not fields in the supplied qualification-facts.json. CLI exit 0 is also in the supplied facts."
+  },
+  "sdk_native_account": {
+    "source": "canary-native/native-canary.reconstructed.py",
+    "source_reconstructed": true,
+    "source_exactness": "Original heredoc source absent from the supplied facts; exact byte identity cannot be verified.",
+    "caller_argv": null,
+    "working_directory": null,
+    "stdout": "canary-native/native-canary.json",
+    "stderr": "canary-native/native-canary.stderr",
+    "started_at": null,
+    "ended_at": null
+  },
+  "sdk_gateway": {
+    "source": "canary-gateway/run.py",
+    "source_reconstructed": false,
+    "caller_argv": null,
+    "working_directory": null,
+    "caller_argv_limit": "The exact script is retained; its outer Python executable/cwd were not retained in the supplied files.",
+    "stdout": "canary-gateway/gateway-canary.json",
+    "stderr": "canary-gateway/gateway-canary.stderr",
+    "started_at": null,
+    "ended_at": null
+  },
+  "cli_exec_gateway": {
+    "source": "canary-gateway/exec-canary.sh",
+    "source_reconstructed": false,
+    "argv": [
+      "<PRIVATE_RUN_DIR>/prefix/bin/codex",
+      "exec",
+      "--skip-git-repo-check",
+      "-s",
+      "read-only",
+      "-m",
+      "cx/gpt-6.1-sol",
+      "-c",
+      "model_provider=\"omniroute\"",
+      "-c",
+      "model_reasoning_effort=\"max\"",
+      "-c",
+      "web_search=\"disabled\"",
+      "-o",
+      "<PRIVATE_RUN_DIR>/canary-gateway/exec-last.txt",
+      "--json",
+      "Reply with exactly this text and nothing else: CLI_01600_GATEWAY_CANARY_OK"
+    ],
+    "working_directory": "<PRIVATE_RUN_DIR>/canary-gateway/empty",
+    "stdin": "/dev/null",
+    "stdout": "canary-gateway/exec-events.ndjson",
+    "original_stdout_capture_name": "exec-events.jsonl",
+    "stderr": "canary-gateway/exec-stderr.txt",
+    "last_message": "canary-gateway/exec-last.txt",
+    "started_at": null,
+    "ended_at": null,
+    "exit_code_provenance": "qualification-facts.json and coordinator contract; the script prints the inner codex exit but does not propagate it as its own exit code."
+  },
+  "time_provenance": "Per-file source mtimes in retained-records.json. They are filesystem timestamps, not exact process start/end observations.",
+  "backend_effort_observed": false
+}

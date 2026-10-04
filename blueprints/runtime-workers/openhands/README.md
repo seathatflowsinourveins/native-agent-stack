@@ -147,7 +147,14 @@ Failed attempts are retained. The coordinator runs installation and acceptance.
 ## Arms
 
 `OPENHANDS_ARM=control|engines-on` defaults to `control`, and `--arm` overrides
-it. Control stays the default until the #431 A/B selects the engines arm.
+it. Control stays the default. The #431 A/B that would have selected the engines
+arm was retired unrun on 2026-10-03
+([record](../../../docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md)).
+Making engines-on the default needs a completed qualifying comparison under a
+new preregistration on the current gateway build. That is a policy, not a code
+gate: `environment_selection()` in `recipe.py` still accepts an explicit
+`engines-on` (the switch below or `--arm engines-on`) and routes it to the 20129
+gateway. Such a run is not that comparison and does not change the default.
 `OPENHANDS_MODEL`, `OPENHANDS_BASE_URL` and `OPENHANDS_COMPRESSION` are
 optional explicit overrides that must match the selected arm. The control arm
 retains the existing `cx/gpt-6-*` variant support; the engines-on arm admits

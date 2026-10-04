@@ -1,0 +1,68 @@
+{
+  "evidence_class": "local_integration_check",
+  "controls": [
+    {
+      "mode": "source",
+      "executable": "rtk",
+      "argv": [
+        "proxy",
+        "python3",
+        "blueprints/convergence-practice/wsl-retrieval/run.py",
+        "--mode",
+        "source",
+        "--run-dir",
+        "<owned-scratch>/source",
+        "--source",
+        "blueprints/convergence-practice/wsl-retrieval/seed/planner.py",
+        "--rg",
+        "<owned-scratch>/unused-rg",
+        "--ast-grep",
+        "<owned-scratch>/unused-ast-grep",
+        "--node",
+        "<owned-scratch>/unused-node",
+        "--package-prefix",
+        "<owned-scratch>"
+      ],
+      "cwd": "<owned-source-worktree>",
+      "started_utc": "2026-10-03T01:25:38.516Z",
+      "finished_utc": "2026-10-03T01:25:38.560Z",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "WSL retrieval fixture retired: source/QMD replay is disabled. Run audit.py for offline historical consistency checks; see README.md for the separate current QMD recipe and unresolved advisory.\n",
+      "output_directory_exists": false,
+      "scratch_entries": []
+    },
+    {
+      "mode": "qmd",
+      "executable": "rtk",
+      "argv": [
+        "proxy",
+        "python3",
+        "blueprints/convergence-practice/wsl-retrieval/run.py",
+        "--mode",
+        "qmd",
+        "--run-dir",
+        "<owned-scratch>/qmd",
+        "--source",
+        "blueprints/convergence-practice/wsl-retrieval/seed/planner.py",
+        "--rg",
+        "<owned-scratch>/unused-rg",
+        "--ast-grep",
+        "<owned-scratch>/unused-ast-grep",
+        "--node",
+        "<owned-scratch>/unused-node",
+        "--package-prefix",
+        "<owned-scratch>"
+      ],
+      "cwd": "<owned-source-worktree>",
+      "started_utc": "2026-10-03T01:25:38.562Z",
+      "finished_utc": "2026-10-03T01:25:38.603Z",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "WSL retrieval fixture retired: source/QMD replay is disabled. Run audit.py for offline historical consistency checks; see README.md for the separate current QMD recipe and unresolved advisory.\n",
+      "output_directory_exists": false,
+      "scratch_entries": []
+    }
+  ],
+  "publication_policy": "Original worker native command/output record with task-owned paths replaced by role markers. Published digests bind only these published bytes; source tests are authored integration checks, not upstream suites."
+}

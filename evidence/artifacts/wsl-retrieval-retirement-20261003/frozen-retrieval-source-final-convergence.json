@@ -1,0 +1,19 @@
+{
+  "executable": "rtk",
+  "argv": [
+    "proxy",
+    "python3",
+    "scripts/validate_convergence.py",
+    "blueprints/convergence-practice/wsl-retrieval/experiment.json",
+    "--root",
+    ".",
+    "--json"
+  ],
+  "cwd": "<owned-source-worktree>",
+  "started_utc": "2026-10-03T01:23:37.786Z",
+  "finished_utc": "2026-10-03T01:23:37.857Z",
+  "exit_code": 1,
+  "stdout": "{\"records\": [{\"errors\": [\"record.primary_sources_and_pins[4].revision: invalid text format\", \"record.primary_sources_and_pins[5].revision: invalid text format\", \"record.primary_sources_and_pins[6].revision: invalid text format\"], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-retrieval/experiment.json\", \"valid\": false}], \"valid\": false}\n",
+  "stderr": "",
+  "publication_policy": "Original worker native command/output record with task-owned paths replaced by role markers. Published digests bind only these published bytes; source tests are authored integration checks, not upstream suites."
+}

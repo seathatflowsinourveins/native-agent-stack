@@ -1,11 +1,17 @@
 """Offline regressions for selected WSL native retrieval evidence."""
 import hashlib
 import importlib.util
+from importlib.machinery import SourceFileLoader
+import io
 import json
+import os
 import shutil
 import subprocess
+import sys
 import tempfile
+import types
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -17,6 +23,10 @@ SPEC.loader.exec_module(MODULE)
 RUN_SPEC = importlib.util.spec_from_file_location("wsl_retrieval_runner", ROOT/"run.py")
 RUNNER = importlib.util.module_from_spec(RUN_SPEC)
 RUN_SPEC.loader.exec_module(RUNNER)
+RECORDING_SPEC = importlib.util.spec_from_loader('wsl_retrieval_recording_archive',
+        SourceFileLoader('wsl_retrieval_recording_archive', str(ROOT/'run-recording-aid.py.txt')))
+RECORDING_ARCHIVE = importlib.util.module_from_spec(RECORDING_SPEC)
+RECORDING_SPEC.loader.exec_module(RECORDING_ARCHIVE)
 
 
 class WslRetrievalEvidenceTests(unittest.TestCase):
@@ -83,6 +93,11 @@ class WslRetrievalEvidenceTests(unittest.TestCase):
             'qmd-attempt-1.json': '452901227a56f61229b249a56c8b4233faeb3763058610856d399149f81655e6',
             'qmd-receipt.json': 'cad5b3dc802323e5aad8fcdb4ca98f7d1c3e92749b8e891dc32149c70d3f9527',
             'install-receipt.json': '8a3f343e92aa6b0b4ce814ed1b21b56851a37e26f88488cc5ae1119f83063654',
+            'package-original.json.txt': '7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8',
+            'run-recording-aid.py.txt': 'be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12',
+            'package-lock.json.frozen': '5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb',
+            'source-review.json': '9ecd2bf01d7c19248b848dcbd0b77f286b4f1aee775068d7778fabf37721d423',
+            'verification.json': '1cb605f4574a662272194625d75689ab5cdcae3e3dbb3ba35afbbd827a474cbe',
         }
         for name, digest in originals.items():
             with self.subTest(artifact=name):
@@ -197,6 +212,27 @@ class WslRetrievalEvidenceTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 self.audit(target)
 
+    def test_original_manifest_is_resolved_without_rewriting_receipt_names(self):
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder)/'leaf'
+            shutil.copytree(ROOT, target)
+            archive = target/'package-original.json.txt'
+            (target/'package.json').write_text('{"private": true}\n')
+            try:
+                result = self.audit(target)
+            except ValueError as exc:
+                self.fail('historical manifest must resolve to its preserved archive: '+str(exc))
+            self.assertTrue(result['evidence_consistent'])
+
+    def test_changed_original_manifest_archive_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder)/'leaf'
+            shutil.copytree(ROOT, target)
+            archive = target/'package-original.json.txt'
+            archive.write_bytes(archive.read_bytes()+b'\n')
+            with self.assertRaisesRegex(ValueError, 'changed frozen input: package.json'):
+                self.audit(target)
+
     def test_unknown_usage_or_global_scope_claim_rejected(self):
         self.qmd['whole_task_provider_usage'] = 0
         with self.assertRaises(ValueError):
@@ -207,17 +243,17 @@ class WslRetrievalEvidenceTests(unittest.TestCase):
             self.audit()
 
 
-class FutureCommandRecordingTests(unittest.TestCase):
+class ArchivedCommandRecordingTests(unittest.TestCase):
     def record(self, directory, response=None, error=None):
         run = Path(directory)
         argv = [run/'owned tools/node', '--index', 'named index', 'aéé.md',
                 '--input=' + str(run/'corpus/a file.md')]
         facts = []
         result = {'facts': facts, 'cleanup': {'timed_out_commands': 0}}
-        with patch.object(RUNNER.subprocess, 'run', return_value=response, side_effect=error) as invoked:
+        with patch.object(RECORDING_ARCHIVE.subprocess, 'run', return_value=response, side_effect=error) as invoked:
             try:
-                RUNNER.record_command('test', argv, run, {'LANG': 'C.UTF-8'},
-                                      {str(run): '<RUN>'}, facts, result)
+                RECORDING_ARCHIVE.record_command('test', argv, run, {'LANG': 'C.UTF-8'},
+                                                {str(run): '<RUN>'}, facts, result)
             except (subprocess.TimeoutExpired, OSError):
                 if error is None:
                     raise
@@ -254,6 +290,219 @@ class FutureCommandRecordingTests(unittest.TestCase):
             result = self.record(folder, error=FileNotFoundError('unavailable executable'))
             self.assertEqual(result['facts'][0]['failure'], 'launch_error')
             self.assertIsNone(result['facts'][0]['exit_code'])
+
+
+class RetiredRunnerTests(unittest.TestCase):
+    def test_old_modes_fail_before_subprocess_or_output_creation(self):
+        for mode in ['source', 'qmd']:
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as folder:
+                run = Path(folder)/'uncreated-output'
+                stderr, stdout = io.StringIO(), io.StringIO()
+                argv = [str(ROOT/'run.py'), '--mode', mode, '--run-dir', str(run)]
+                argv += ['--source', str(ROOT/'seed/planner.py'), '--rg', str(Path(folder)/'unused-rg'),
+                         '--ast-grep', str(Path(folder)/'unused-ast-grep'),
+                         '--node', str(Path(folder)/'unused-node'), '--package-prefix', folder]
+                with patch.object(sys, 'argv', argv), redirect_stderr(stderr), redirect_stdout(stdout), \
+                        patch.object(subprocess, 'run', side_effect=AssertionError('retired runner launched a subprocess')) as invoked:
+                    try:
+                        status = RUNNER.main()
+                    except SystemExit as exc:
+                        status = exc.code
+                self.assertEqual(status, 1)
+                self.assertFalse(run.exists(), 'retired mode created its output directory')
+                invoked.assert_not_called()
+                self.assertIn('retired', stderr.getvalue().lower())
+                self.assertEqual(stdout.getvalue(), '')
+
+    def test_offline_cli_rejects_changed_recording_aid_archive(self):
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder)/'leaf'
+            shutil.copytree(ROOT, target)
+            archive = target/'run-recording-aid.py.txt'
+            archive.write_bytes(archive.read_bytes()+b'\n')
+            result = subprocess.run([sys.executable, str(target/'audit.py')],
+                                    text=True, capture_output=True, check=False)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn('changed retirement artifact: run-recording-aid.py.txt', result.stderr)
+
+    def test_offline_cli_checks_retirement_without_qualifying_history(self):
+        result = subprocess.run([sys.executable, str(ROOT/'audit.py')],
+                                text=True, capture_output=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        assessment = json.loads(result.stdout)
+        self.assertFalse(assessment['native_acceptance_established'])
+        self.assertEqual(assessment['status'], 'incomplete_historical_reference')
+        self.assertIn('current_retirement_assessment', assessment)
+        current = assessment['current_retirement_assessment']
+        self.assertTrue(current['artifacts_consistent'])
+        self.assertEqual(current['active_qmd_advisory_status'], 'unresolved')
+        self.assertFalse(current['native_npm_guard_acceptance_established'])
+        # Out of name-based discovery, not patched: braces 3.0.3 is still in the archived bytes.
+        self.assertEqual(current['retained_lock'], {
+            'archive': 'package-lock.json.frozen',
+            'sha256': '5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb',
+            'scanner_discovered': False, 'dependency_patched': False})
+
+    def test_offline_cli_rejects_restored_install_routes(self):
+        for change in ['missing-runtime-guard', 'restored-dependency', 'restored-script']:
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as folder:
+                target = Path(folder)/'leaf'
+                shutil.copytree(ROOT, target)
+                manifest = {
+                    'name': 'retired-wsl-retrieval', 'version': '1.0.0', 'private': True,
+                    'devEngines': {'runtime': {'name': 'retired-wsl-retrieval', 'onFail': 'error'}},
+                }
+                if change == 'missing-runtime-guard':
+                    del manifest['devEngines']
+                elif change == 'restored-dependency':
+                    manifest['dependencies'] = {'@tobilu/qmd': '2.8.3'}
+                else:
+                    manifest['scripts'] = {'install': 'node replay.js'}
+                (target/'package.json').write_text(json.dumps(manifest)+'\n')
+                result = subprocess.run([sys.executable, str(target/'audit.py')],
+                                        text=True, capture_output=True, check=False)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn('retirement manifest', result.stderr)
+
+
+class LockDiscoveryGuardTests(unittest.TestCase):
+    """audit_retirement keeps the retained lock out of name-based scanner discovery (2026-10-04 rename).
+
+    Each scenario runs the guard on a scratch Git repository holding a copy of the partition, and the code
+    mutants prove that removing any one requirement lets its scenario through. These are local fault-injection
+    checks of the guard; the OSV-Scanner discovery controls are retained in the rename's receipt.
+    """
+
+    module = MODULE
+    # Fixed here, not read from the module, so that a name dropped from the guard fails its subtest.
+    LOCK_NAMES = ['package-lock.json', 'npm-shrinkwrap.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lock', 'deno.lock']
+
+    def git(self, root, *argv):
+        environment = {key: value for key, value in os.environ.items() if not key.startswith('GIT_')}
+        environment.update(GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL=os.devnull)
+        subprocess.run(['git', '-C', str(root), *argv], env=environment, check=True, capture_output=True)
+
+    def partition(self, tracked=True):
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        root = Path(folder.name)/'wsl-retrieval'
+        shutil.copytree(ROOT, root)
+        if tracked:
+            self.git(root, 'init', '-q')
+            self.git(root, 'add', '-A')
+        return root
+
+    def assert_rejected(self, root):
+        with self.assertRaises(ValueError):
+            self.module.audit_retirement(root)
+
+    def test_unchanged_partition_passes(self):
+        result = self.module.audit_retirement(self.partition())
+        self.assertEqual(result['retained_lock'], {
+            'archive': 'package-lock.json.frozen',
+            'sha256': '5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb',
+            'scanner_discovered': False, 'dependency_patched': False})
+
+    def test_missing_or_changed_archive_rejected(self):
+        for change in ['deleted', 'one-byte-edit']:
+            with self.subTest(change=change):
+                root = self.partition()
+                archive = root/'package-lock.json.frozen'
+                if change == 'deleted':
+                    archive.unlink()
+                else:
+                    data = bytearray(archive.read_bytes())
+                    data[100] ^= 0x20  # same size, different digest
+                    archive.write_bytes(bytes(data))
+                self.assert_rejected(root)
+
+    def test_changed_assessment_lock_identity_rejected(self):
+        for field, value in [('path', 'package-lock.json.frozen'), ('bytes', 1), ('sha256', '0'*64)]:
+            with self.subTest(field=field):
+                root = self.partition()
+                path = root/'retirement-assessment.json'
+                assessment = json.loads(path.read_text())
+                assessment['retained_lock'][field] = value
+                path.write_text(json.dumps(assessment))
+                self.assert_rejected(root)
+
+    def test_restored_npm_name_rejected_on_disk(self):
+        # The archived bytes copied back to the npm name beside the archive, untracked.
+        root = self.partition()
+        shutil.copyfile(root/'package-lock.json.frozen', root/'package-lock.json')
+        self.assert_rejected(root)
+
+    def test_archive_moved_back_to_the_npm_name_rejected(self):
+        root = self.partition()
+        self.git(root, 'mv', 'package-lock.json.frozen', 'package-lock.json')
+        self.assert_rejected(root)
+
+    def test_every_discovered_lock_name_rejected_on_disk(self):
+        for name in self.LOCK_NAMES:
+            with self.subTest(name=name):
+                root = self.partition()
+                (root/name).write_text('{}\n')
+                self.assert_rejected(root)
+
+    def test_nested_lock_name_rejected_on_disk(self):
+        root = self.partition()
+        (root/'seed/package-lock.json').write_text('{}\n')
+        self.assert_rejected(root)
+
+    def test_case_varied_lock_name_rejected_on_disk(self):
+        root = self.partition()
+        (root/'Package-Lock.json').write_text('{}\n')
+        self.assert_rejected(root)
+
+    def test_lock_name_tracked_in_git_rejected(self):
+        # Staged, then removed from the working tree, so only the index still names it.
+        root = self.partition()
+        (root/'pnpm-lock.yaml').write_text('lockfileVersion: 9.0\n')
+        self.git(root, 'add', 'pnpm-lock.yaml')
+        (root/'pnpm-lock.yaml').unlink()
+        self.assert_rejected(root)
+
+    def test_untracked_archive_rejected(self):
+        root = self.partition()
+        self.git(root, 'rm', '-q', '--cached', 'package-lock.json.frozen')
+        self.assert_rejected(root)
+
+    def test_partition_outside_git_rejected(self):
+        # Fails closed; which check fires depends on whether a repository encloses the scratch directory.
+        self.assert_rejected(self.partition(tracked=False))
+
+    def test_each_requirement_is_enforced_by_a_scenario(self):
+        source = (ROOT/'audit.py').read_text(encoding='utf-8')
+        mutants = [
+            ('archive digest unchecked', 'test_missing_or_changed_archive_rejected',
+             'require(hashlib.sha256(archive).hexdigest() == LOCK_SHA256,', 'require(True,'),
+            ('assessment digest unchecked', 'test_changed_assessment_lock_identity_rejected',
+             "assessment['retained_lock']['sha256'] == LOCK_SHA256", 'True'),
+            ('disk names unchecked', 'test_restored_npm_name_rejected_on_disk',
+             "require(not restored, 'retired lock restored under", "require(True, 'retired lock restored under"),
+            ('npm-shrinkwrap.json not a lock name', 'test_every_discovered_lock_name_rejected_on_disk',
+             "'npm-shrinkwrap.json', ", ''),
+            ('top-level walk only', 'test_nested_lock_name_rejected_on_disk',
+             'in os.walk(root)', 'in [next(os.walk(root))]'),
+            ('case-sensitive names', 'test_case_varied_lock_name_rejected_on_disk',
+             'Path(name).name.lower() in', 'Path(name).name in'),
+            ('archive tracking unchecked', 'test_untracked_archive_rejected',
+             'require(LOCK_ARCHIVE in tracked,', 'require(True,'),
+            ('index names unchecked', 'test_lock_name_tracked_in_git_rejected',
+             "require(not restored, 'retired lock tracked under", "require(True, 'retired lock tracked under"),
+        ]
+        for name, check, old, new in mutants:
+            with self.subTest(mutant=name, check=check):
+                self.assertEqual(source.count(old), 1, name)
+                mutant = types.ModuleType('wsl_retrieval_audit_mutant')
+                mutant.__file__ = str(ROOT/'audit.py')
+                exec(compile(source.replace(old, new, 1), mutant.__file__, 'exec'), mutant.__dict__)
+                case = type(self)(check)
+                case.module = mutant
+                result = unittest.TestResult()
+                case.run(result)
+                self.assertEqual(result.errors, [], result.errors)
+                self.assertTrue(result.failures, f'{name} survived {check}')
 
 
 if __name__ == '__main__':

@@ -45,8 +45,10 @@ SOURCES = (OWNERSHIP, SELECTION, EDITION, RESEARCH, TRADING, DISTRO,
 FAMILIES = ("claude", "codex")
 # The manifest producer's closed sets: rows_of() states and row kinds and apply_convergence() outcomes in
 # assemble_manifest.py at 675bdd51c96af28aa98012d9e4ff772a77a38f3d. "" is a slot with no decision yet (counted as open).
+# Its later apply_consensus() step adds the row kind "consensus": such a row comes from the layer-consensus record that
+# the manifest names under sources.consensus, is never definitive, and carries an outcome that is none of OUTCOMES.
 SLOT_STATES = {"", "definitive", "resolved", "split", "measurement"}
-ROW_KINDS = {"first_round", "added", "judged", "pinned", "project_practice", "no_blind_default_today"}
+ROW_KINDS = {"first_round", "added", "judged", "pinned", "project_practice", "no_blind_default_today", "consensus"}
 OUTCOMES = {"final", "installed_on_critic", "not_installed", "split", "kept"}
 HOST_PATH = re.compile(
     r"(?<!\w)/(?:home|Users|tmp|var/tmp)/[^\s<]"
@@ -331,7 +333,8 @@ def manifest_source_path(source):
 
     assemble_manifest.py build() at 675bdd51c96af28aa98012d9e4ff772a77a38f3d writes `file`, relative to the
     manifest's folder, for the two compact catalogs, the settlements and the convergence decisions, and `path`,
-    relative to the repository root, for the rule and the combined results that convergence.json cites.
+    relative to the repository root, for the rule and the combined results that convergence.json cites. The
+    layer-consensus record that its apply_consensus() step reads is named by `path` as well.
     """
     require(isinstance(source, dict), "defaults manifest source must be an object")
     require(re.fullmatch(r"[a-fA-F0-9]{64}", str(source.get("sha256", ""))), "defaults manifest source needs SHA-256")
@@ -344,13 +347,14 @@ def manifest_source_path(source):
 def read_manifest_sources(inputs, sources, catalogs):
     """Read every source the manifest names and bind each to its declared SHA-256.
 
-    The catalogs and the convergence decisions are parsed because they give the slot inventory. The other files are
-    hashed only, so the handbook's provenance lists exactly the inputs the manifest rests on.
+    The catalogs, the convergence decisions and the layer-consensus record are parsed because they give the slot
+    inventory. The other files are hashed only, so the handbook's provenance lists exactly the inputs the manifest
+    rests on.
     """
     data = {}
     for name, source in sources.items():
         path = manifest_source_path(source)
-        data[name] = inputs.read(path, as_json=name in catalogs or name == "convergence")
+        data[name] = inputs.read(path, as_json=name in catalogs or name in {"convergence", "consensus"})
         require(inputs.sources[path]["sha256"] == source["sha256"].lower(),
                 f"defaults manifest source {name} differs from its declared SHA-256")
     return data
@@ -361,8 +365,9 @@ def default_slot_inventory(data, catalogs):
 
     Reference: assemble_manifest.py build(), rows_of() and apply_convergence() at
     675bdd51c96af28aa98012d9e4ff772a77a38f3d: one row for each catalog slot, role or multi-default part, one for each
-    pinned requirement, and one for each added slot of convergence.json. Read identifiers and owners only;
-    recommendations and states stay supplied.
+    pinned requirement, and one for each added slot of convergence.json. Its apply_consensus() step adds one row for
+    each add_rows entry of the layer-consensus record, where the manifest names that record. Read identifiers and
+    owners only; recommendations and states stay supplied.
     """
     inventory, layer_catalogs = {}, {}
     for catalog in catalogs:
@@ -387,7 +392,28 @@ def default_slot_inventory(data, catalogs):
         require(layer_id in layer_catalogs, f"added slot {identifier} names an unknown layer: {layer_id}")
         require(identifier not in inventory, f"duplicate slot in catalog inventory: {identifier}")
         inventory[identifier] = (layer_catalogs[layer_id], layer_id)
+    for identifier, layer_id in consensus_slots(data):
+        require(layer_id in layer_catalogs, f"consensus slot {identifier} names an unknown layer: {layer_id}")
+        require(identifier not in inventory, f"duplicate slot in catalog inventory: {identifier}")
+        inventory[identifier] = (layer_catalogs[layer_id], layer_id)
     return inventory
+
+
+def consensus_slots(data):
+    """(slot, layer) of each row that the layer-consensus record adds, in its first batch (add_rows) and its wave-2 batch
+    (wave2.add_rows, 2026-10-03); none where the manifest names no such record."""
+    consensus = data.get("consensus")
+    require(consensus is None or isinstance(consensus, dict), "defaults manifest consensus source must be an object")
+    wave2 = (consensus or {}).get("wave2")
+    require(wave2 is None or isinstance(wave2, dict), "defaults manifest consensus wave-2 batch must be an object")
+    rows = (consensus or {}).get("add_rows", [])
+    added = (wave2 or {}).get("add_rows", [])
+    require(isinstance(rows, list) and isinstance(added, list), "defaults manifest consensus rows must be lists")
+    rows = rows + added
+    require(all(isinstance(row, dict) and isinstance(row.get("slot_id"), str)
+                and isinstance(row.get("layer_id"), str) for row in rows),
+            "defaults manifest consensus source needs slot and layer identifiers")
+    return [(row["slot_id"], row["layer_id"]) for row in rows]
 
 
 def require_slot_inventory(identifiers, inventory):
@@ -426,7 +452,9 @@ def read_default_decisions(inputs, reference, override=None):
     catalogs = sorted({row["catalog"] for row in layers.values()})
     for catalog in catalogs:
         require(catalog in sources, "defaults manifest layer has unknown source catalog")
-    inventory = default_slot_inventory(read_manifest_sources(inputs, sources, set(catalogs)), catalogs)
+    source_data = read_manifest_sources(inputs, sources, set(catalogs))
+    inventory = default_slot_inventory(source_data, catalogs)
+    by_consensus = {identifier for identifier, _ in consensus_slots(source_data)}
     declarations = set()
     for row in layers.values():
         for field in ("owns", "uses"):
@@ -455,13 +483,27 @@ def read_default_decisions(inputs, reference, override=None):
                 "defaults manifest definitive flag differs from its state")
         kind = slot["row_kind"]
         require(kind in ROW_KINDS, "unknown defaults manifest row kind")
+        require((kind == "consensus") == (identifier in by_consensus),
+                f"defaults manifest consensus row differs from the layer-consensus record: {identifier}")
         require(all(isinstance(slot.get(field), str) for field in ("default", "label", "repository", "claude", "gpt")),
                 "defaults manifest slot recommendation and provenance must be text")
         require(isinstance(slot.get("job"), str) and slot["job"].strip(),
                 f"defaults manifest slot needs its job: {identifier}")
         resolution, measurement = slot.get("resolution"), slot.get("measurement")
-        require(isinstance(resolution, dict) and resolution.get("outcome") in OUTCOMES,
-                f"defaults manifest slot needs a known outcome: {identifier}")
+        outcome = resolution.get("outcome") if isinstance(resolution, dict) else None
+        if kind == "consensus":
+            # The producer's rule for a row added by direct consensus: never definitive, and no outcome of the rounds.
+            require(isinstance(outcome, str) and outcome.strip() and outcome not in OUTCOMES and not slot["definitive"],
+                    f"defaults manifest consensus slot is never definitive and carries no outcome of the rounds: {identifier}")
+        else:
+            require(isinstance(resolution, dict) and outcome in OUTCOMES,
+                    f"defaults manifest slot needs a known outcome: {identifier}")
+        amendments = slot.get("amendments")
+        require(amendments is None or (isinstance(amendments, list) and amendments and all(
+            isinstance(item, dict) and all(isinstance(item.get(key), str) and item[key].strip()
+                                           for key in ("date_utc", "by", "decision"))
+            for item in amendments)),
+                f"defaults manifest slot amendment needs its date, its author and its decision: {identifier}")
         require(measurement is None or (isinstance(measurement, dict) and isinstance(measurement.get("returned"), bool)),
                 f"defaults manifest slot measurement must be empty or say whether it returned: {identifier}")
         require(isinstance(slot.get("installs_nothing_extra"), bool),
@@ -487,12 +529,17 @@ def read_default_decisions(inputs, reference, override=None):
     counts = {"layers": len(layers), "slots": len(identifiers),
               "definitive": sum(slot["definitive"] for slot in value["slots"]),
               "by_row_kind": kinds, "by_state": states, "installed": installed}
+    if value.get("consensus_wave2") is not None:
+        # Amendment 3 of the decision rule (the layer consensus's wave-2 batch): the rows that carry an interim install,
+        # counted apart from the decided installs, as the producer counts them.
+        counts["interim"] = sum(1 for slot in value["slots"] if slot.get("interim"))
     require(value["counts"] == counts, "defaults manifest counts differ from its records")
     return {"source": DEFAULTS_MANIFEST,
             "status": "supplied-preview" if override is not None else "published-source",
             "metadata": {key: child for key, child in value.items() if key not in {"layers", "slots"}},
             "inventory": dict(counts, not_installed=len(identifiers) - installed,
-                              measurements_pending=pending, measurements_returned=returned),
+                              measurements_pending=pending, measurements_returned=returned,
+                              amendments=sum(len(slot.get("amendments", [])) for slot in value["slots"])),
             "layers": layers, "slots": slots}
 
 
@@ -904,8 +951,10 @@ def inventory_sentence(counts):
     """One sentence of counts, every one of them computed from the manifest's rows."""
     states = ", ".join(f"{state} {counts['by_state'][state]}" for state in STATE_ORDER if state in counts["by_state"])
     kinds = ", ".join(f"{kind} {count}" for kind, count in sorted(counts["by_row_kind"].items()))
+    interim = (f" {counts['interim']} of the slots that install nothing by their decided default carry an interim install "
+               "(amendment 3 of the decision rule)." if counts.get("interim") else "")
     return (f"The manifest holds {counts['slots']} slots in {counts['layers']} layers. By state: {states}. "
-            f"By row kind: {kinds}. {counts['installed']} slots install something and {counts['not_installed']} install nothing. "
+            f"By row kind: {kinds}. {counts['installed']} slots install something and {counts['not_installed']} install nothing.{interim} "
             f"Measurements not yet returned: {counts['measurements_pending']}; returned: {counts['measurements_returned']}.")
 
 
@@ -968,7 +1017,10 @@ def render_markdown(data):
         lines += ["## Slot default decisions", "", f"Source: {link(defaults['source'])}; {defaults['status']}.", "",
                   defaults["metadata"]["meaning"], "", defaults["metadata"]["not_claimed"], "",
                   inventory_sentence(defaults["inventory"]), "",
-                  "An empty source state is displayed as open. A row that installs nothing by the manifest's own rule (a default, and not installs_nothing_extra) is shown as not installed, with the manifest's reason; that includes every split row, every measurement row whose measurement has not returned and every row resolved as not installed. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.", ""]
+                  "An empty source state is displayed as open. A row that installs nothing by the manifest's own rule (a default, and not installs_nothing_extra) is shown as not installed, with the manifest's reason; that includes every split row, every measurement row whose measurement has not returned and every row resolved as not installed. A row that carries an interim install (amendment 3 of the decision rule) is shown with that install, beside its decided default's reason. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.", ""]
+        if defaults["inventory"]["by_row_kind"].get("consensus") or defaults["inventory"]["amendments"]:
+            lines += ["A row of kind `consensus` was added by a recorded direct consensus of the two model families; its source basis says so and it is never definitive. An amendment by direct consensus is listed under its layer's table and changes no field of its row. "
+                      f"Rows of kind consensus: {defaults['inventory']['by_row_kind'].get('consensus', 0)}; amendments: {defaults['inventory']['amendments']}.", ""]
     lines += [f"Profile: {link(data['profile']['source']) if data['profile']['status'] == 'published' else 'pending publication'}; native manifest registration: {data['profile']['native_manifest_registered']}.", ""]
     lines += render_host_prerequisites(data)
     lines += [data["comparison_order_text"], "", "## Five finality gates", ""]
@@ -996,7 +1048,12 @@ def render_markdown(data):
                 recommendation = record["default"] or "none"
                 if record["repository"]:
                     recommendation = f"[{recommendation}]({record['repository']})"
+                interim = record.get("interim")
                 install = "installed" if slot["installed"] else "not installed: " + slot["not_installed_reason"]
+                if not slot["installed"] and isinstance(interim, dict) and interim.get("default"):
+                    # Amendment 3: the row installs its interim meanwhile; its own decision still waits, for the reason shown.
+                    install = (f"interim install ({interim['date_utc']}, amendment 3): [{interim['default']}]"
+                               f"({interim['repository']}); its decided default is {install}")
                 lines.append("| " + " | ".join(map(cell, [
                     record["slot_id"], slot["state"], record["job"], recommendation, install,
                     record["repository"] or "none", record["resolution"]["outcome"], record["label"],
@@ -1005,6 +1062,13 @@ def render_markdown(data):
             if not row["default_slots"]:
                 lines.append("| pending slot publication | " + " | ".join(["pending"] * 9) + " |")
             lines += [""]
+            # An amendment stays beside its row: the table above shows the row as the rounds decided it.
+            amended = [(slot["record"]["slot_id"], item) for slot in row["default_slots"]
+                       for item in slot["record"].get("amendments", [])]
+            if amended:
+                lines += [f"- Amendment to `{slot_id}` ({item['date_utc']}; {item['by']}): {item['decision']}."
+                          + (" " + " ".join(item["text"].split()) if isinstance(item.get("text"), str) else "")
+                          for slot_id, item in amended] + [""]
         lines += ["| Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |", "| --- | --- | --- | --- | --- | --- |"]
         for key in row["tools"]:
             tool = tools[key]

@@ -1,0 +1,120 @@
+{
+  "observed_utc": "2026-10-03T19:24:50Z",
+  "evidence_class": "source_review",
+  "sources": [
+    {
+      "repository": "https://github.com/google/osv-scanner",
+      "pin": "v2.6.0",
+      "file": "docs/configuration.md",
+      "url": "https://github.com/google/osv-scanner/blob/v2.6.0/docs/configuration.md",
+      "original_file_sha256": "6bb6562e3d05bc9c1cfddc3836f77ff1a3db85f3727714ad01e682650398997e",
+      "excerpts": [
+        {
+          "start_line": 18,
+          "end_line": 25,
+          "text": "/child-dir/nested-dir/package-lock.json\n```\n\n`osv-scanner.toml (1)` will only apply to `Cargo.lock`, `osv-scanner.toml (2)` will only apply to `go.mod`, and no config will apply to `package-lock.json`.\n\nTo override `osv-scanner.toml` files, pass the `--config=/path/to/config.toml` flag with the path to the configuration you want to apply instead, this will apply `config.toml` to all files parsed, and ignore `osv-scanner.toml` in all directories.\n\n## Ignore vulnerabilities by ID"
+        },
+        {
+          "start_line": 48,
+          "end_line": 63,
+          "text": "\n```toml\n[[PackageOverrides]]\n# One or more fields to match each package against:\nname = \"lib\"\n# nameIsRegex = true # Optional: treat name as a regular expression pattern\nversion = \"1.0.0\"\necosystem = \"Go\"\ngroup = \"dev\"\n\n# Actions to take for matching packages:\nignore = true # Ignore this package completely, including both reporting vulnerabilities and license violations\nvulnerability.ignore = true # Ignore vulnerabilities for this package, while still checking the license (if not also ignored)\nlicense.ignore = true # Ignore the license of the package, while still checking for vulnerabilities (if not also ignored)\nlicense.override = [\"MIT\", \"0BSD\"] # Override the license of the package, if it is not ignored from license scanning completely\n"
+        },
+        {
+          "start_line": 92,
+          "end_line": 107,
+          "text": "name = \"axios\"\necosystem = \"npm\"\ngroup = \"dev\"\nignore = true\n\n# ignore packages matching a regex pattern (e.g. all internal packages)\n[[PackageOverrides]]\nname = \"internal-.*\"\nnameIsRegex = true\nignore = true\nreason = \"internal packages should not be checked\"\n\n# ... and so on\n```\n\nWhen `nameIsRegex` is set to `true`, the `name` field is treated as a regular expression pattern. The pattern is automatically anchored to match the full package name (i.e. `^pattern$`). Standard [Go regular expression syntax](https://pkg.go.dev/regexp/syntax) is supported. An invalid regex pattern will cause a config loading error."
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/google/osv-scanner",
+      "pin": "v2.6.0",
+      "file": "go.mod",
+      "url": "https://github.com/google/osv-scanner/blob/v2.6.0/go.mod",
+      "original_file_sha256": "47db8d4f9e4b49922097899d76692a37a84e29143f439cc47fdf925b4feab615",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 12,
+          "text": "module github.com/google/osv-scanner/v2\n\ngo 1.27.0\n\nrequire (\n\tcharm.land/glamour/v2 v2.0.1\n\tcharm.land/lipgloss/v2 v2.0.6\n\tgithub.com/BurntSushi/toml v1.6.0\n\tgithub.com/CycloneDX/cyclonedx-go v0.12.0\n\tgithub.com/gkampitakis/go-snaps v0.5.23\n\tgithub.com/go-git/go-git/v5 v5.19.2\n\tgithub.com/gobwas/glob v0.2.3"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/google/osv-scanner",
+      "pin": "v2.6.0",
+      "file": "internal/config/manager.go",
+      "url": "https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/manager.go",
+      "original_file_sha256": "f58fa2447b0f9a2236acc05be379bda716590c1a15ca682c14fc8aad9a17262d",
+      "excerpts": [
+        {
+          "start_line": 24,
+          "end_line": 46,
+          "text": "// UseOverride updates the Manager to use the config at the given path in place\n// of any other config files that would be loaded when calling Get\nfunc (m *Manager) UseOverride(configPath string) error {\n\tconfig, configErr := tryLoadConfig(configPath)\n\tif configErr != nil {\n\t\treturn configErr\n\t}\n\tm.OverrideConfig = &config\n\n\treturn nil\n}\n\n// Get returns the appropriate config to use based on the targetPath\nfunc (m *Manager) Get(targetPath string) Config {\n\tif m.OverrideConfig != nil {\n\t\treturn *m.OverrideConfig\n\t}\n\n\tconfigPath, err := normalizeConfigLoadPath(targetPath)\n\tif err != nil {\n\t\t// TODO: This can happen when target is not a file (e.g. Docker container, git hash...etc.)\n\t\t// Figure out a more robust way to load config from non files\n\t\t// r.PrintErrorf(\"Can't find config path: %s\\n\", err)"
+        },
+        {
+          "start_line": 110,
+          "end_line": 129,
+          "text": "\n// tryLoadConfig attempts to parse the config file at the given path as TOML,\n// returning the Config object if successful or otherwise the error\nfunc tryLoadConfig(configPath string) (Config, error) {\n\tconfig := Config{}\n\tc, err := toml.DecodeFile(configPath, &config)\n\tif err == nil {\n\t\tunknownKeys := c.Undecoded()\n\n\t\tif len(unknownKeys) > 0 {\n\t\t\tkeys := make([]string, 0, len(unknownKeys))\n\n\t\t\tfor _, key := range unknownKeys {\n\t\t\t\tkeys = append(keys, key.String())\n\t\t\t}\n\n\t\t\treturn Config{}, fmt.Errorf(\"unknown keys in config file: %s\", strings.Join(keys, \", \"))\n\t\t}\n\n\t\tconfig.LoadPath = configPath"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/google/osv-scanner",
+      "pin": "v2.6.0",
+      "file": "internal/config/config.go",
+      "url": "https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go",
+      "original_file_sha256": "a49970f7f8fb7383b6ce2255f024698a90331404b917a65fdde3151642efdcd4",
+      "excerpts": [
+        {
+          "start_line": 22,
+          "end_line": 34,
+          "text": "\t// set by the scanner after having successfully parsed the file\n\tLoadPath string `toml:\"-\"`\n}\n\ntype IgnoreEntry struct {\n\tID          string    `toml:\"id\"`\n\tIgnoreUntil time.Time `toml:\"ignoreUntil\"`\n\tReason      string    `toml:\"reason\"`\n\n\tUsed bool `toml:\"-\"`\n}\n\nfunc (ie *IgnoreEntry) MarkAsUsed() {"
+        },
+        {
+          "start_line": 52,
+          "end_line": 82,
+          "text": "func (e PackageOverrideEntry) matches(pkg *extractor.Package) bool {\n\tif e.Name != \"\" {\n\t\tif e.NameIsRegex {\n\t\t\tre, err := cachedregexp.Compile(\"^\" + e.Name + \"$\")\n\t\t\tif err != nil {\n\t\t\t\t// This should not happen as regex is validated at config load time\n\t\t\t\treturn false\n\t\t\t}\n\t\t\tif !re.MatchString(imodels.Name(pkg)) {\n\t\t\t\treturn false\n\t\t\t}\n\t\t} else if e.Name != imodels.Name(pkg) {\n\t\t\treturn false\n\t\t}\n\t}\n\tif e.Version != \"\" && e.Version != imodels.Version(pkg) {\n\t\treturn false\n\t}\n\t// If there is an ecosystem filter, the filter must not match both the:\n\t//  - Full ecosystem + suffix\n\t//  - The base ecosystem\n\tif e.Ecosystem != \"\" && (e.Ecosystem != imodels.Ecosystem(pkg).String() && e.Ecosystem != string(imodels.Ecosystem(pkg).Ecosystem)) {\n\t\treturn false\n\t}\n\tif e.Group != \"\" && !slices.Contains(imodels.DepGroups(pkg), e.Group) {\n\t\treturn false\n\t}\n\n\treturn true\n}\n"
+        },
+        {
+          "start_line": 104,
+          "end_line": 115,
+          "text": "func (c *Config) ShouldIgnore(vulnID string) (bool, *IgnoreEntry) {\n\tindex := slices.IndexFunc(c.IgnoredVulns, func(e *IgnoreEntry) bool { return e.ID == vulnID })\n\tif index == -1 {\n\t\treturn false, &IgnoreEntry{}\n\t}\n\tignoredLine := c.IgnoredVulns[index]\n\n\treturn shouldIgnoreTimestamp(ignoredLine.IgnoreUntil), ignoredLine\n}\n\nfunc (c *Config) filterPackageVersionEntries(pkg *extractor.Package, condition func(PackageOverrideEntry) bool) (bool, PackageOverrideEntry) {\n\tindex := slices.IndexFunc(c.PackageOverrides, func(e PackageOverrideEntry) bool {"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/BurntSushi/toml",
+      "pin": "v1.6.0",
+      "file": "decode.go",
+      "url": "https://github.com/BurntSushi/toml/blob/v1.6.0/decode.go",
+      "original_file_sha256": "4f9aa86faf2339423f39b6000f7499b0d5530be77ab71fac6f9142c101a74956",
+      "excerpts": [
+        {
+          "start_line": 105,
+          "end_line": 115,
+          "text": "// # Key mapping\n//\n// TOML keys can map to either keys in a Go map or field names in a Go struct.\n// The special `toml` struct tag can be used to map TOML keys to struct fields\n// that don't match the key name exactly (see the example). A case insensitive\n// match to struct names will be tried if an exact match can't be found.\n//\n// The mapping between TOML values and Go values is loose. That is, there may\n// exist TOML values that cannot be placed into your representation, and there\n// may be parts of your representation that do not correspond to TOML values.\n// This loose mapping can be made stricter by using the IsDefined and/or"
+        },
+        {
+          "start_line": 305,
+          "end_line": 330,
+          "text": "\t}\n\n\tfor key, datum := range tmap {\n\t\tvar f *field\n\t\tfields := cachedTypeFields(rv.Type())\n\t\tfor i := range fields {\n\t\t\tff := &fields[i]\n\t\t\tif ff.name == key {\n\t\t\t\tf = ff\n\t\t\t\tbreak\n\t\t\t}\n\t\t\tif f == nil && strings.EqualFold(ff.name, key) {\n\t\t\t\tf = ff\n\t\t\t}\n\t\t}\n\t\tif f != nil {\n\t\t\tsubv := rv\n\t\t\tfor _, i := range f.index {\n\t\t\t\tsubv = indirect(subv.Field(i))\n\t\t\t}\n\n\t\t\tif isUnifiable(subv) {\n\t\t\t\tmd.decoded[md.context.add(key).String()] = struct{}{}\n\t\t\t\tmd.context = append(md.context, key)\n\n\t\t\t\terr := md.unify(datum, subv)"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/github/docs",
+      "pin": "b32e08ff7345b996e5bb059bfd5bfc11d08bcc36",
+      "file": "content/actions/reference/workflows-and-actions/expressions.md",
+      "url": "https://github.com/github/docs/blob/b32e08ff7345b996e5bb059bfd5bfc11d08bcc36/content/actions/reference/workflows-and-actions/expressions.md",
+      "original_file_sha256": "61fcae832a7bc5134b94eacef043123f409208b93890db1cb305bd20d9f95c77",
+      "excerpts": [
+        {
+          "start_line": 320,
+          "end_line": 356,
+          "text": "## Status check functions\n\nYou can use the following status check functions as expressions in `if` conditionals. A default status check of `success()` is applied unless you include one of these functions. For more information about `if` conditionals, see [AUTOTITLE](/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idif) and [AUTOTITLE](/actions/reference/workflows-and-actions/metadata-syntax#runsstepsif).\n\nOutside `if` conditionals, you can use `job.status` to access the job status. For more information, see [AUTOTITLE](/actions/reference/workflows-and-actions/contexts#job-context).\n\n### success\n\nReturns `true` when all previous steps have succeeded.\n\n#### Example of `success`\n\n```yaml\nsteps:\n  ...\n  - name: The job has succeeded\n    if: {% raw %}${{ success() }}{% endraw %}\n```\n\n### always\n\nCauses the step to always execute, and returns `true`, even when canceled. The `always` expression is best used at the step level or on tasks that you expect to run even when a job is canceled. For example, you can use `always` to send logs even when a job is canceled.\n\n> [!WARNING]\n> Avoid using `always` for any task that could suffer from a critical failure, for example: getting sources, otherwise the workflow may hang until it times out. If you want to run a job or step regardless of its success or failure, use the recommended alternative: `if: {% raw %}${{ !cancelled() }}{% endraw %}`\n\n#### Example of `always`\n\n```yaml\nif: {% raw %}${{ always() }}{% endraw %}\n```\n\n### cancelled\n\nReturns `true` if the workflow was canceled.\n\n#### Example of `cancelled`"
+        }
+      ]
+    }
+  ]
+}

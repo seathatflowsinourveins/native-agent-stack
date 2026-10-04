@@ -13,7 +13,7 @@
     "Microsoft's product-scoped skill repositories (azure-skills, skills-for-fabric, power-platform-skills, skills-for-copilot-studio, Dataverse-skills, win-dev-skills, aspire-skills, agent365-skills and others; gh api search 'skills in:name org:microsoft', 2026-09-30) are off-domain for these tasks; microsoft-skills is Microsoft's general skill repository.",
     "alpacahq-alpaca-skills and vercel-labs-agent-skills serve no task: the paper-trading skills have the model submit orders, which deterministic code owns here, and the React/Vercel skills have no code here (the manifest's excluded reasons).",
     "Install counts, registry rank and stars are discovery guides, never evidence of quality or fit.",
-    "The installed lists and open gaps follow adoption/skills/manifest.json as unit F3 (#553) left it on 2026-09-30: skill-creator is pinned and serves skills-skill-lifecycle, resolving-merge-conflicts is retired, every skill is listed on in Claude except the user-invocable-only grill-me and improve-codebase-architecture, and every skill but skill-creator is enabled in Codex. Each layer input carries the installed skills' claude_listing and codex_enabled from the manifest itself (build_inputs.py)."
+    "The installed lists and open gaps follow adoption/skills/manifest.json as unit F3 (#553) left it on 2026-09-30: skill-creator is pinned and serves skills-skill-lifecycle, resolving-merge-conflicts is retired, every skill is listed on in Claude except the user-invocable-only grill-me and improve-codebase-architecture, and every skill but skill-creator is enabled in Codex. Each layer input carries the installed skills' claude_listing and codex_enabled from the manifest itself (build_inputs.py). On 2026-10-03 the wave-2 skills ruling retired grill-me, improve-codebase-architecture and semgrep (changes 1 and 3) and held agent-browser (change 6); the installed lists follow the manifest, and the design-intake task has no installed skill."
   ],
   "sources": [
     {"source_id": "addyosmani-agent-skills", "kind": "github-skills-repo", "url": "https://github.com/addyosmani/agent-skills", "pin": "2686b620fc1fed2e8f60c704839c766b8594c6b6"},
@@ -66,10 +66,10 @@
       "layer_id": "skills-design-intake",
       "lifecycle_task": "design-intake",
       "requirement": "Interrogate requirements before building: stress-test an ambiguous request or plan (assumptions, open decisions, acceptance) before implementation starts. The skill must be model-invocable (no true-valued disable-model-invocation (true/yes/on/1) in SKILL.md and no allow_implicit_invocation: false in agents/openai.yaml), so a worker or the main session can run it without a user trigger, and it must not make intake, brainstorming or a planning approval mandatory for bounded work (AGENTS.md; the manifest's obra/superpowers exclusion).",
-      "installed": ["grill-me"],
+      "installed": [],
       "source_ids": ["mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "bgauryy-octocode", "openai-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "The installed grill-me is not model-invocable: upstream sets disable-model-invocation, and its Claude listing is user-invocable-only, which this task's requirement excludes."
+        "No skill serves this task since 2026-10-03: the wave-2 skills ruling retired grill-me (change 1), which did nothing but call the excluded grilling skill, so the task waits for a candidate that passes the comparison below."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen ambiguous-request and bounded-request prompts shows a model-invocable candidate asking the decisive questions on the ambiguous ones while adding no intake step to the bounded ones, in Claude Code and in Codex; or grill-me's upstream drops disable-model-invocation."
     },
@@ -77,10 +77,10 @@
       "layer_id": "skills-architecture",
       "lifecycle_task": "architecture",
       "requirement": "Improve codebase architecture: review a grown module and propose deeper modules and narrower interfaces, with a shared module/interface vocabulary for refactoring the large single-file validators (scripts/validate.py, scripts/landscape.py). The skill must be model-invocable (no true-valued disable-model-invocation (true/yes/on/1) in SKILL.md and no allow_implicit_invocation: false in agents/openai.yaml).",
-      "installed": ["improve-codebase-architecture", "codebase-design"],
+      "installed": ["codebase-design"],
       "source_ids": ["mattpocock-skills", "affaan-m-ecc", "microsoft-skills", "addyosmani-agent-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "improve-codebase-architecture is not model-invocable (upstream disable-model-invocation; Claude listing user-invocable-only)."
+        "The wave-2 skills ruling retired improve-codebase-architecture on 2026-10-03 (change 1): it calls the excluded grilling and domain-modeling skills, so codebase-design alone serves this task."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen refactor prompts over scripts/validate.py and scripts/landscape.py shows a model-invocable candidate producing accepted module and interface proposals more often than the installed pair at no higher token or time cost, in Claude Code and in Codex; or improve-codebase-architecture's upstream drops disable-model-invocation."
     },
@@ -132,11 +132,12 @@
       "layer_id": "skills-security",
       "lifecycle_task": "security",
       "requirement": "Security review with retained reasoning: secure-coding guidance for scripts/ and tools/, a threat model for the paper-lane broker adapters and credential stores, custom static rules and CodeQL alert triage, SARIF reading and diffing, dependency and agentic Actions risk audits, false-positive triage of Scorecard, zizmor and CodeQL alerts, and a whole-repository audit with a coverage ledger and a confirmed/needs_validation/rejected verdict contract.",
-      "installed": ["security-best-practices", "security-threat-model", "semgrep", "codeql", "supply-chain-risk-auditor", "agentic-actions-auditor", "sarif-parsing", "fp-check", "security-audit"],
+      "installed": ["security-best-practices", "security-threat-model", "codeql", "supply-chain-risk-auditor", "agentic-actions-auditor", "sarif-parsing", "fp-check", "security-audit"],
       "source_ids": ["openai-skills", "trailofbits-skills", "cloudflare-security-audit-skill", "semgrep-skills", "superagent-ai-skills", "getsentry-skills", "addyosmani-agent-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
         "security-audit is listed in Claude and enabled in Codex since 2026-09-30 (unit F3, #553), so the model may load it on an ordinary security question, where it is guidance only unless a prompt asks for the full audit; its M5c bake-off against /security-review decides its promotion (the manifest's security-audit row).",
-        "Stale source: replacement via this sweep. security-best-practices and security-threat-model come from openai/skills, which has had no main commit since 2026-06-24 (the openai-skills source's maintenance record)."
+        "Stale source: replacement via this sweep. security-best-practices and security-threat-model come from openai/skills, which has had no main commit since 2026-06-24 (the openai-skills source's maintenance record).",
+        "The custom static rules have no owner since 2026-10-03: the wave-2 skills ruling retired the semgrep skill (change 3), whose plan-approval gate conflicts with the repository's rule against a separate planning approval for bounded work; codeql covers SAST for the languages it lists."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen security-review tasks with known true and false positives shows a candidate with higher precision and recall than the installed skill it would replace at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed, relicensed or fails a later audit."
     },

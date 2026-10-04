@@ -2,7 +2,10 @@ name: Catalog freshness (report-only)
 
 on:
   schedule:
-    - cron: '17 6 * * *'
+    # Daily at 06:17 UTC; github.event.schedule identifies Monday proposals.
+    # https://github.com/github/docs/blob/2bd66de8cea336061c9ea060c9b37385136e6ab3/data/reusables/repositories/actions-scheduled-workflow-example.md#L34-L51
+    - cron: '17 6 * * 1'
+    - cron: '17 6 * * 0,2-6'
   workflow_dispatch:
     inputs:
       max_repos:
@@ -14,13 +17,18 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: read
+# No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
 
 jobs:
   freshness:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    # Raised from 30 to 60 on 2026-10-04: the job took 1687 of its 1800 s in run 37104350733 (its test suite step
+    # 1502 s) and 1623 s in run 37116574776, and the suite grows with most merged changes. The limit stays a hang guard;
+    # the suite step below aborts five minutes before it.
+    timeout-minutes: 60
+    permissions:
+      contents: read
     outputs:
       drift: ${{ steps.diff.outputs.drift }}
       upstream_errors: ${{ steps.diff.outputs.upstream_errors }}
@@ -72,11 +80,14 @@ jobs:
           # table in drift.md: every pinned trading component (selected us-equities
           # cards plus extract_layers.py's TRADING_PIN_SOURCES) vs upstream, with a
           # dormancy signal relative to --checked-at. The manifest itself is unchanged.
+          # --runtime-freshness-out does the same for the GPT runtime table: the runtime workers,
+          # SDKs and agents in extract_layers.py's RUNTIME_PIN_SOURCES and RUNTIME_WATCH_SOURCES.
           printf '{"lanes": [], "critic": null, "lost": []}\n' > "$RUNNER_TEMP/freshness/lanes.json"
           python3 tools/sota-convergence/build_manifest.py \
             --work-dir "$RUNNER_TEMP/freshness" --lanes "$RUNNER_TEMP/freshness/lanes.json" \
             --out "$RUNNER_TEMP/freshness/manifest-$(date -u +%Y%m%d).json" \
             --trading-freshness-out "$RUNNER_TEMP/freshness/trading-freshness.json" \
+            --runtime-freshness-out "$RUNNER_TEMP/freshness/runtime-freshness.json" \
             --checked-at "$(date -u +%Y-%m-%d)" --id "catalog-freshness-$(date -u +%Y%m%d)"
       - name: Diff the rebuilt manifest against the published pins/upstream
         id: diff
@@ -97,7 +108,9 @@ jobs:
           print((work_dir / "drift.md").read_text())
           print(f"drifted={len(result['drifted'])} unfetched={len(result['unfetched'])} "
                 f"no_release={len(result['no_release'])} trading={len(result['trading'])} "
-                f"dormant={len(result['dormant'])} archived={len(result['archived'])}")
+                f"dormant={len(result['dormant'])} archived={len(result['archived'])} "
+                f"runtime={len(result['runtime'])} runtime_behind={len(result['runtime_behind'])} "
+                f"runtime_unresolved={len(result['runtime_unresolved'])}")
           PYEOF
           {
             echo "drift=$(cat "$RUNNER_TEMP/freshness/drift-status.txt")"
@@ -140,9 +153,17 @@ jobs:
           python3 scripts/validate_convergence.py
           --all-recorded --root . --json
       - name: Run project test suite
+        # --durations 50 lists the 50 slowest tests at the end of the run (Python 3.12+; this job sets up 3.13). GNU
+        # timeout sends SIGABRT at 55 minutes, five under the job's limit, and SIGKILL 60 s later; with
+        # PYTHONFAULTHANDLER faulthandler first prints every thread's Python traceback, so a hang names the test it
+        # stopped in. A timeout fails the step with status 124. The steps before this one took 127 to 178 s in the eight
+        # completed runs 35934519434 to 37116574776.
+        env:
+          PYTHONFAULTHANDLER: '1'
         run: |
           set -o pipefail
-          python3 -m unittest 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
+          timeout --signal=ABRT --kill-after=60s 55m \
+            python3 -m unittest --durations 50 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
       - name: Report the test suite's skipped-test count
         if: ${{ !cancelled() }}
         run: |
@@ -168,6 +189,7 @@ jobs:
             ${{ runner.temp }}/freshness/manifest-*.json
             ${{ runner.temp }}/freshness/github-freshness.json
             ${{ runner.temp }}/freshness/trading-freshness.json
+            ${{ runner.temp }}/freshness/runtime-freshness.json
             ${{ runner.temp }}/freshness/drift.md
           if-no-files-found: error
           include-hidden-files: false
@@ -180,7 +202,7 @@ jobs:
   # registration -- it never selects, evaluates, or writes catalogs/sota-convergence/*,
   # catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* (owned by the
   # separate SOTA-convergence lane review). Off by default: it only runs from an explicit
-  # manual `open_pr: true` dispatch, or from a schedule when the repository variable
+  # manual `open_pr: true` dispatch, or from Monday's schedule when the repository variable
   # CATALOG_FRESHNESS_PROPOSE is set to 'true' -- and, either way, only when this run's own
   # freshness fetch was unbounded and free of both full fetch errors and partial errors (a
   # releases/tags/commit sub-fetch that failed and fell back, e.g. a 503 on releases papered
@@ -192,7 +214,8 @@ jobs:
       github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' &&
       (inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' &&
       needs.freshness.outputs.partial_errors == '0' &&
-      (inputs.open_pr == true || (github.event_name == 'schedule' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))
+      (inputs.open_pr == true || (github.event_name == 'schedule' &&
+      github.event.schedule == '17 6 * * 1' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     concurrency:

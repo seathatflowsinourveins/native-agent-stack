@@ -340,7 +340,7 @@ locally with `GH_TOKEN` set and no `--offline`, using
   together. The carried-forward oauthlib review holds: the four oauthlib source files it names are byte-identical in the new
   venv and oauthlib 3.3.1 is unchanged. The macOS lock is a frozen evidence artifact for which the tree records no owner (its
   only commit is #201, and neither its experiment record nor `docs/lanes.md` names one), so it is not patched: its advisory is
-  excepted until 2026-12-24 under the policy above. **The exception is scoped by the scanner, not by a reader of the lock.**
+  excepted until 2026-12-24 under the policy above. **The workflow scopes the exception to its reviewed input.**
   OSV-Scanner 2.6.0 applies an explicit `--config` to every input of one invocation (`docs/configuration.md`,
   `internal/config/manager.go`, `Manager.Get`), so an `[[IgnoredVulns]]` entry in the one config would hide the advisory in
   every lock of the inventory. The exception therefore lives in `.github/osv-scanner-frozen-macos.toml` (one entry, nothing
@@ -362,10 +362,135 @@ locally with `GH_TOKEN` set and no `--offline`, using
   decision point, and an ignore needs its own reachability review); nested `osv-scanner.toml` files next to the locks (OSV's
   per-directory lookup applies only without an explicit `--config`, which would move every existing repo-wide ignore into
   per-directory files; a later cleanup could do that). **Overturn:** the frozen lock stops being kept, or an application built
-  from it is run (then bump `next` and delete the config, the inventory key and the `FROZEN_LOCKS` row); OSV lists an advisory
-  for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes. **Not covered:** the image's server binary (PyInstaller
+  from it is run (then bump `next` and delete the dedicated config, the inventory key and the `FROZEN_LOCKS` row); or OSV
+  lists an advisory for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes.
+  Removing an archive also removes its scan invocation, SARIF report, upload step, exact assignment in the `jq -e`
+  block and both non-empty array guards; an empty archive group fails the step. Keep the remaining ordinary, macOS
+  and WSL groups exhaustive and disjoint. **Not covered:** the image's server binary (PyInstaller
   build of upstream's unchanged uv.lock, urllib3 2.7.0 and PyJWT 2.13.0 or older) and the grader venv, as for the earlier PyJWT
   relock. Evidence: `evidence/receipts/osv-urllib3-next-20260930.json`.
+  **Dependabot alert 16 (2026-10-03).** Dependabot raised the same advisory (GHSA-vcvr-r3jv-pc5j, critical) as alert 16
+  on the frozen variant's `package.json`. Dependabot alerts come from GitHub's dependency graph, whose inputs are the
+  repository's manifests and lock files and dependency submissions, not OSV-Scanner configs (GitHub Docs, read
+  2026-10-03), so the alert is independent of the OSV exception's scope and needed a decision of its own. It was
+  dismissed as `not_used` at 2026-10-03T04:51:57Z with a comment citing this review: the artifact keeps only
+  `package.json` and its lock, nothing installs, builds or serves it, and "Live recipe lock pins next 16.3.6+". That
+  lock, `blueprints/convergence-practice/application-delivery/pnpm-lock.yaml`, pins `next` 16.3.8 since #587; the frozen
+  config's reason, written when it pinned 16.3.6, still says 16.3.6. The `authorization` of
+  `evidence/receipts/dependabot-alert-16-dismissal-20261003.json`, which also holds the API readback, sources and
+  reasoning, records the authority for the dismissal: it describes the user's message of 2026-10-03 and its limits,
+  without quoting it, and how far section 8's precedent ("Fixture alerts dismissed", alerts 7-15) carries.
+  `tests/test_frozen_macos_variant_no_use.py` is a tripwire for direct references, not a proof of no use. It fails when
+  a scanned file names the artifact directory, in any ASCII letter case, on a line it does not pin, or a pinned line is no
+  longer found; when the artifact directory gains a file, OS metadata excepted; when the variant's `package.json` or
+  lock no longer pins `next` 16.3.5, or the lock's sha256 differs from the value `FROZEN_LOCKS` binds; when
+  `.github/osv-scanner-frozen-macos.toml` no longer holds exactly one exception for the advisory, with `ignoreUntil`
+  2026-12-24 and no key besides `id`, `ignoreUntil` and `reason`; and when `git ls-files` cannot run. It scans every
+  tracked file except `*.md`, `evidence/**`, `manifests/evidence.json` and `catalogs/**`, and in those reads only the
+  configuration and scripts it recognises by name, suffix, directory, shebang or Git mode (the module lists them; agent,
+  command and skill definitions under `.claude`, `.codex` or `.agents`, names matched in any ASCII letter case, are
+  configuration), so another file there, such as a JSON launch configuration under `evidence/**`, is not scanned; a
+  route that never spells the directory's name, such as a step that reads the path from the OSV inventory, is not
+  caught either (the receipt's `indirect_routes` records why these routes stay limits, the alternatives declined, the
+  dated backstop of the OSV exception, and the same day's convergence decision to rename both files to `.frozen` and
+  stop scanning them in a follow-up pull request, which supersedes this dismissal when it merges), and the guard is
+  only as strong as review of the module itself, since any part of it can be changed in the change that adds a use
+  and the main ruleset requires no code-owner review.
+  **Overturn:** reopen the alert if an application is built, run or served from the frozen lock (then the overturn
+  above applies). The dismissal lasts until the alert is reopened: recheck alert 16 when the exception in
+  `.github/osv-scanner-frozen-macos.toml` (`ignoreUntil` 2026-12-24) is renewed, changed or removed, which that
+  module's review-date test (or, for a changed reason, its pinned reason line) turns into a failure, or when the
+  tripwire fails.
+  **Recheck, tripwire failure on #673 (2026-10-04).** After main merged into the OSV split-scan hardening port (#673,
+  porting #555), CI's full unittest run failed the tripwire on two new lines that name the frozen lock:
+  - the port's retained copy of the split-scan control
+    (`blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-osv-split-hardening.osv-split-controls.py.txt`),
+    its `FROZEN` constant;
+  - `tests/test_osv_lockfile_coverage.py`, a copy of the workflow's assignment check that the split-scan mutants use to
+    prove the frozen config keeps this lock alone.
+
+  Both only scan or check the lock, and nothing builds, runs or serves an application from it, so the dismissal
+  stands. Both lines are pinned in `PINNED_LINES` under the hashes of their already-pinned originals: the 2026-09-30
+  relock control's `FROZEN` constant, and `SCAN_ASSIGNMENT`. The change adds pins only; no recogniser, scope rule or
+  excluded class changes. The receipt's `guard_mutation_checks.module_sha256` stays the dated hash of the module as
+  mutation-tested on 2026-10-03.
+  **Retired historical WSL retrieval partition (2026-10-03).** The original
+  `blueprints/convergence-practice/wsl-retrieval/package-lock.json` remains at
+  SHA256 `5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb`.
+  Its braces 3.0.3 advisory, GHSA-vfj7-8cjw-p6xm, is assigned only to
+  `.github/osv-scanner-frozen-wsl-retrieval.toml`, expiring at the bare TOML
+  date 2026-10-17. The dated reason names the supported-entry-point retirement,
+  its limitations, the exact lock and digest, the retirement assessment and
+  `evidence/receipts/wsl-retrieval-retirement-20261003.json`. Retirement preserves
+  vulnerable historical bytes; it does not qualify active QMD.
+
+  The workflow now scans three exhaustive, disjoint inventory groups under
+  ordinary, frozen macOS and retired WSL configs. Before invoking OSV, the
+  native unittest preflight rejects unlisted or duplicated inputs, unknown
+  configs, advisory or package-override leakage, digest changes, missing or
+  mismatched retirement evidence, a restored assessment status, unbound reasons
+  and expired grants. The shell also checks the two exact archive assignments.
+  Each group's primary and SARIF statuses are retained, and the largest observed
+  status becomes the step status. Off pull requests, all three reports are kept
+  and uploaded under separate categories by the existing tool-free write job.
+  Removing this WSL archive also removes its dedicated config, inventory key,
+  `FROZEN_LOCKS` row, scan invocation, SARIF report, upload step, exact assignment
+  in the `jq -e` block and both non-empty array guards; leaving an empty group
+  fails the step. The same removal list applies to the macOS archive.
+  The policy-key and override guards, later-upload conditions and discriminating
+  mutations are retained in `evidence/receipts/osv-split-hardening-port-20261003.json`.
+
+  **Sources and correction.** Reuse the reviewed macOS partition at repository
+  revision `56473e4b840f0e6940c031801d866e7e9bf29baf`, and OSV-Scanner v2.6.0
+  (`e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6`): installed version/help, the
+  [tagged release](https://github.com/google/osv-scanner/releases/tag/v2.6.0),
+  [configuration reference](https://github.com/google/osv-scanner/blob/v2.6.0/docs/configuration.md),
+  [Manager.Get](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/manager.go)
+  and [ShouldIgnore](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go).
+  The older prose attributed path scope to the scanner. `Manager.Get` returns
+  the explicit override for every target path; caller partitioning enforces
+  scope. Mutation tests exercise the actual policy guards, and recording doubles
+  execute the workflow shell to verify routing, error propagation and SARIF
+  retention. These are local integration and synthetic checks; native scanner
+  controls and final integrated CI remain separate acceptance evidence.
+  **Overturn:** supported replay/install entry points return, the lock changes,
+  the source/evidence binding fails, or the date reaches 2026-10-17. Reassess the
+  disposition and remove or replace the dedicated grant; do not extend it to
+  active inputs or relock historical evidence without its owner.
+  If reassessment removes this archive, remove its dedicated config, inventory
+  key, `FROZEN_LOCKS` row, scan invocation, SARIF report, upload step, `jq -e`
+  assignment and both non-empty guards together, preserving the remaining
+  groups' exhaustive/disjoint checks. See the hardening-port receipt above.
+
+  **WSL lock renamed out of discovery (2026-10-04).** The retired partition's
+  lock is now `blueprints/convergence-practice/wsl-retrieval/package-lock.json.frozen`,
+  byte-identical (SHA256 `5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb`).
+  This carries out, for the WSL lock, the 2026-10-03 decision in the alert-16
+  note to rename both frozen npm locks to `.frozen` and stop scanning them.
+  Following the removal list above, the change deletes:
+  - `.github/osv-scanner-frozen-wsl-retrieval.toml`, the grant that expires on
+    2026-10-17;
+  - the inventory key and the `FROZEN_LOCKS` row;
+  - the scan invocation, SARIF report and upload step;
+  - the `jq -e` assignment and both non-empty guards.
+
+  The ordinary and macOS groups stay exhaustive and disjoint. The preflight
+  still runs the partition's retirement tests, whose audit now also requires
+  that no lockfile name exists in the partition, on disk or in Git. The
+  dependency-free `package.json` moves to a new `dependency_free` inventory
+  class; the coverage tests require such a manifest to declare no dependency
+  field and to have no lockfile beside it. With the WSL clause gone, the macOS
+  assignment line lost its trailing `and`, so the macOS tripwire re-pins that
+  line, its copy in the coverage test and the edited `dependabot.yml` comment.
+  The macOS archive is otherwise unchanged, and its rename is a later
+  follow-up. Dependabot alert 17 and Scorecard alert 19 should read fixed once
+  main's dependency graph and the next Scorecard run no longer see the lock.
+  That means removed from discovery, not patched: braces 3.0.3 stays in the
+  archived bytes. If alert 17 stays open after the merge, its dismissal needs
+  the user's explicit authorization naming it; alert 19 is never dismissed.
+  Evidence: `evidence/receipts/wsl-lock-frozen-rename-20261004.json` and the
+  2026-10-04 addendum to
+  [2026-09-25-longmemeval-frozen-npm-lock.md](2026-09-25-longmemeval-frozen-npm-lock.md).
 
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
@@ -1382,6 +1507,10 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
 
 ## validate-macos required (2026-09-25)
 
+> **Superseded in part 2026-10-03:** flake overturn met 09-30; the prescribed non-required lane was rejected; see
+> [2026-10-03-macos-ci-scope.md](2026-10-03-macos-ci-scope.md). `validate-macos` stays required; on a pull request it
+> now runs in full, runs only the changed test modules, or is skipped, as the `changes` job decides.
+
 - **Evidence.** PR #219's shared fail-closed credential guard did run `validate-macos` (the PR
   touched `manifests/evidence.json`, which was already in the `pull_request` `paths:` filter) and
   failed there: 5 failures and 13 errors, because `/var` and `/tmp` are OS-level symlinks on macOS
@@ -1521,9 +1650,11 @@ Read-only `gh api` GETs are dated below.
     --no-ignores --persona regular --strict-collection` with the default exit codes,
     so findings exit 11-14 and fail the required `validate` check
     ([usage](https://docs.zizmor.sh/usage/)). No scope is added: the workflow stays
-    `contents: read`, and fork and Dependabot PRs get a read-only token
+    `contents: read`, fork PRs get a read-only token
     ([events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)),
-    which is all zizmor's API reads need. The gate adds impostor-commit,
+    and Dependabot PRs get one that is read-only by default (it can be raised:
+    [Troubleshooting Dependabot on GitHub Actions, "Changing `GITHUB_TOKEN` permissions"](https://docs.github.com/en/code-security/reference/supply-chain-security/troubleshoot-dependabot/dependabot-on-actions#changing-github_token-permissions);
+    wording qualified 2026-10-04), which is all zizmor's API reads need. The gate adds impostor-commit,
     known-vulnerable-actions and ref-confusion (online-only in the `regular`
     persona, [audits](https://docs.zizmor.sh/audits/)) and ref-version-mismatch
     (documented as offline-capable, but skipped offline by 1.30.1).

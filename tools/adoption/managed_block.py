@@ -222,7 +222,11 @@ def sh_double_quoted(text: str) -> str:
 
 
 def shell_dir(path: str, home: str, what: str) -> str:
-    """path as the inside of a POSIX sh double-quoted string: under home it is written as $HOME/<relative>."""
+    """path as the inside of a POSIX sh double-quoted string: under home it is written as $HOME/<relative>.
+
+    A path of slashes only is the root directory and stays "/", as POSIX basename makes it (for "//" that is
+    implementation-defined, and Linux takes "//" as the root), so the result is never empty: an empty PATH component
+    names the current directory (XBD 8.3, PATH)."""
     normal = os.path.normpath(path)
     base = os.path.normpath(home)
     if not os.path.isabs(normal):
@@ -232,11 +236,12 @@ def shell_dir(path: str, home: str, what: str) -> str:
     relative = os.path.relpath(normal, base) if base != "/" else None
     if relative is not None and relative != "." and not relative.startswith(".."):
         return "$HOME/" + sh_double_quoted(relative)
-    return sh_double_quoted(normal.rstrip("/"))
+    return sh_double_quoted(normal.rstrip("/") or "/")
 
 
 def profile_block(eco_root: str, home: str, extra_dirs: tuple[str, ...] = ()) -> str:
-    directory = shell_dir(eco_root, home, "ecosystem root") + "/bin"
+    root = shell_dir(eco_root, home, "ecosystem root")
+    directory = ("" if root == "/" else root) + "/bin"  # the root's bin directory is /bin, not //bin
     extras = ""
     if extra_dirs:
         # Each extra directory goes in front of the system path unless it is already on PATH, in reverse order so the

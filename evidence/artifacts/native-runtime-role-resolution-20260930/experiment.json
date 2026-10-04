@@ -1,0 +1,827 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Resolve current maintained native runtime roles beyond OpenHands, qualify missing CLI/SDK/persisted-research interfaces through supported upstream practice, and preserve installation, state-scope and actual task failures without broad default or token-savings claims.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+    },
+    {
+      "url": "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+    },
+    {
+      "url": "https://github.com/OpenHands/OpenHands-CLI/tree/2963442dacc7cea44e39b7c4e73724295c853465",
+      "revision": "2963442dacc7cea44e39b7c4e73724295c853465"
+    },
+    {
+      "url": "https://github.com/OpenHands/software-agent-sdk/tree/1e1390acc8788346ba4804c34323284009bf3f5e",
+      "revision": "1e1390acc8788346ba4804c34323284009bf3f5e"
+    },
+    {
+      "url": "https://github.com/langchain-ai/deepagents/tree/4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+      "revision": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773"
+    },
+    {
+      "url": "https://github.com/openai/openai-agents-python/tree/fdf21db62c303a3db54b0dfbee82de2141fa2799",
+      "revision": "fdf21db62c303a3db54b0dfbee82de2141fa2799"
+    },
+    {
+      "url": "https://github.com/pydantic/pydantic-ai/tree/4de1ee3cf6026caa7f58b293ae929a1130b6b388",
+      "revision": "4de1ee3cf6026caa7f58b293ae929a1130b6b388"
+    },
+    {
+      "url": "https://github.com/langchain-ai/langgraph/tree/49cce0ca852be4cfb567a1cbe0e511ff325a1682",
+      "revision": "49cce0ca852be4cfb567a1cbe0e511ff325a1682"
+    },
+    {
+      "url": "https://github.com/temporalio/sdk-python/tree/a4c2bb38c3bad43498dfa6bd849e8d85bb684e94",
+      "revision": "a4c2bb38c3bad43498dfa6bd849e8d85bb684e94"
+    },
+    {
+      "url": "https://github.com/earendil-works/pi/tree/005af57d88ee23b33778f343a9595b32e67ff788",
+      "revision": "005af57d88ee23b33778f343a9595b32e67ff788"
+    },
+    {
+      "url": "https://github.com/anomalyco/opencode/tree/aec0b9a6d8898f68f923aaf08b7306d931fd9d76",
+      "revision": "aec0b9a6d8898f68f923aaf08b7306d931fd9d76"
+    },
+    {
+      "url": "https://github.com/aaif-goose/goose/tree/302b60806639ea9f0ae8f053f49f8bf0e88b26f4",
+      "revision": "302b60806639ea9f0ae8f053f49f8bf0e88b26f4"
+    },
+    {
+      "url": "https://github.com/cline/cline/tree/20d70ceed8b749f9350bc8c573a81faaa236b289",
+      "revision": "20d70ceed8b749f9350bc8c573a81faaa236b289"
+    },
+    {
+      "url": "https://github.com/mastra-ai/mastra/tree/5306a14346d2edc79cf885646182bc131e6e1c34",
+      "revision": "5306a14346d2edc79cf885646182bc131e6e1c34"
+    },
+    {
+      "url": "https://github.com/agno-agi/agno/tree/8063a7ec3ac6ab4902bdc7966870d3b5c5f51ffc",
+      "revision": "8063a7ec3ac6ab4902bdc7966870d3b5c5f51ffc"
+    },
+    {
+      "url": "https://github.com/microsoft/agent-framework/tree/703fbce285ee0f026e5effcadfb9e65aab7f5d84",
+      "revision": "703fbce285ee0f026e5effcadfb9e65aab7f5d84"
+    },
+    {
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/tree/9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "revision": "9e44f1b77ed7c912bf58baf30db8560937e7ce53"
+    },
+    {
+      "url": "https://github.com/harbor-framework/harbor/tree/1e5c5c6db929a10a140d05e606882c671ae20729",
+      "revision": "1e5c5c6db929a10a140d05e606882c671ae20729"
+    },
+    {
+      "url": "https://github.com/alphaXiv/OpenResearch/tree/ea3b9689c2e0d3820d07bd1f62a8b9592c5d7d95",
+      "revision": "ea3b9689c2e0d3820d07bd1f62a8b9592c5d7d95"
+    },
+    {
+      "url": "https://github.com/langchain-ai/langgraph/tree/b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4/libs/checkpoint-sqlite",
+      "revision": "b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4"
+    },
+    {
+      "url": "https://github.com/BerriAI/litellm/tree/cd1bd0f4b8af865f8d05fbd938392fdd4703babc",
+      "revision": "cd1bd0f4b8af865f8d05fbd938392fdd4703babc"
+    },
+    {
+      "url": "https://github.com/langchain-ai/langchain/blob/04ac76c07ec173a44e3e57de54861d0b637e3299/libs/core/langchain_core/load/dump.py",
+      "revision": "04ac76c07ec173a44e3e57de54861d0b637e3299"
+    }
+  ],
+  "discovery_provenance": [
+    "Bounded primary-source wave inspected352 public starred repositories and four dated awesome lists recorded in the source packet. Stars/list inclusion are leads, not acceptance.",
+    "Installed native interfaces and exact upstream release/source/artifact evidence resolved task roles; prior qualified coding lane retained."
+  ],
+  "license_and_compatibility": "Selected OpenHands CLI/SDK and DeepAgents primary LICENSE files are MIT. CLI uses Python3.12 and SDK1.21; newer SDK1.50.1 and DeepAgents use separate Python3.13 environments. Native resolved dependencies differ from unchanged upstream locks; exact LiteLLM1.93.2 patch retained and OSV actual environments scanned. Optional frameworks keep their row-specific licensing/platform gates.",
+  "baseline_and_candidate": {
+    "baseline": "Retain scoped enhanced CodexSDK0.159.2/Dagu2.16.6 evidence from draftPR551; missing new CLI/SDK native capability and persisted research roles recorded before install.",
+    "candidate": "Separate supported native OpenHands CLI/SDK capabilities and DeepAgents explicit-specialist SQLite research/continuation trials; alternate runtime roles remain source-reviewed/conditional."
+  },
+  "frozen_inputs": {
+    "base_revision": "29458b4342422c979ad3b9bc62532ea6f05073c1",
+    "tasks": [
+      "cli-capabilities",
+      "cli-cache-scope",
+      "sdk-capabilities",
+      "research-capabilities",
+      "research",
+      "continuation",
+      "initial-negative",
+      "empty-thread-negative",
+      "missing-resume-negative",
+      "wrong-resume-negative",
+      "llm-roundtrip",
+      "llm-output-negative",
+      "peer-review"
+    ],
+    "roles": [
+      "cli",
+      "sdk",
+      "research-worker",
+      "integration-oracle",
+      "peer-review"
+    ],
+    "sources": [
+      {
+        "path": "examples/deepagents-omniroute/requirements.in",
+        "sha256": "841fa9696a90f2b032291c20d9926179c9769f703d0ba0ef9f86868e34ac4bb2"
+      },
+      {
+        "path": "examples/deepagents-omniroute/requirements.lock",
+        "sha256": "3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11"
+      },
+      {
+        "path": "examples/openhands-native-capabilities/requirements.in",
+        "sha256": "76d6ee6158f3b8c543a0fc6583553ef2b71bd68059817fe1c7b90946e67dce88"
+      },
+      {
+        "path": "examples/openhands-native-capabilities/requirements.lock",
+        "sha256": "16e1a44ed7ca8b8333f2e2fca963efe544fad581198d1271d021b83b78a4bfe8"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "examples/openhands-native-capabilities/acceptance-plan.json",
+        "sha256": "9bcd676c11a4345afdad3c73e84f610ba549ea17dfadde36d7aa0495574537ca"
+      },
+      {
+        "path": "examples/openhands-native-capabilities/llm-trial-plan.json",
+        "sha256": "c1af0192456f44bfa9f110069b1c5baffd3afbcc4c66c1bd4533af3029503848"
+      },
+      {
+        "path": "examples/deepagents-omniroute/acceptance-plan.json",
+        "sha256": "83814b20a46b57cc3ac1cba7ecf2a1b88a0b25fa889edd31baafcef2b72ac5b1"
+      },
+      {
+        "path": "examples/deepagents-omniroute/task-trial-plan.json",
+        "sha256": "7d3e4520293674a3d0a1621b6305c5adba401fb3d25b340a665951e420aab737"
+      },
+      {
+        "path": "examples/deepagents-omniroute/task-repair-plan.json",
+        "sha256": "43912996dcd78d34136fe8fa7b2cb9a32a3abdea8e8caa70d28d3d0722d5c315"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/native-runtime-role-resolution-20260930/executed-source/acceptance_oracle.py.txt",
+        "sha256": "2a1d3b770d0b828d239575fe0c79694489df420c99dc11535072630198cae171"
+      },
+      {
+        "path": "evidence/artifacts/native-runtime-role-resolution-20260930/executed-source/native-llm-trial.py.txt",
+        "sha256": "0f119e83a5367e12e1729d0376e71cc250b776b7c56afcab8d97a785435fca9b"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Native version/dependency/source/test integrity plus scoped private-state conditions; frozen model task oracles require exact source findings, selected skill, one returned specialist, checkpoint continuation and same-oracle negative controls. OpenHands provider trial requires exact text and no tool calls.",
+    "usage_rule": "Count raw native graph-update AI messages once by stable ID; keep failed/repaired/resumed usage separate and wire observation independent. Cache/reasoning are subsets; missing billing/usage unknown. No savings comparison."
+  },
+  "runtime_and_platform": {
+    "platform": "One Linux host; owned Python3.12/3.13 environments and existing local worker gateway.",
+    "tools": [
+      {
+        "name": "OpenHands CLI",
+        "version": "1.16.0"
+      },
+      {
+        "name": "OpenHands SDK/tools",
+        "version": "1.50.1"
+      },
+      {
+        "name": "LiteLLM",
+        "version": "1.93.2"
+      },
+      {
+        "name": "DeepAgents",
+        "version": "0.7.21"
+      },
+      {
+        "name": "langchain-openai integration",
+        "version": "1.6.7"
+      },
+      {
+        "name": "langchain-openai upstream test lock",
+        "version": "1.1.14"
+      },
+      {
+        "name": "SQLite checkpoint",
+        "version": "3.1.1"
+      },
+      {
+        "name": "mitmproxy",
+        "version": "12.2.3"
+      },
+      {
+        "name": "OSV Scanner",
+        "version": "2.6.0"
+      }
+    ],
+    "isolation": "Private owned state and explicit skill/tools; local FilesystemBackend is not OS confinement. CLI home Jinja cache remains held; no HOME override. Only owned observer stopped."
+  },
+  "commands": [
+    "[\"rtk\",\"proxy\",\"uv\",\"run\",\"--no-sync\",\"--python\",\"<owned-private-state>/openhands/cli-tools/openhands/bin/python\",\"python\",\"-m\",\"pytest\",\"tests/stores/test_env_llm_overrides.py\",\"tests/settings/test_skills_loading.py\",\"tests/tui/test_headless_mode.py\",\"tests/mcp/test_mcp_utils.py\",\"--junitxml=<owned-private-state>/openhands/cli-upstream-tests.xml\"]",
+    "[\"rtk\",\"<owned-private-state>/openhands/cli-tools/openhands/bin/python\",\"-c\",\"from openhands.sdk.context.prompts.prompt import _get_env; import pathlib,json; p=pathlib.Path(_get_env('<owned-private-state>/openhands/cli-tools/openhands/lib/python3.12/site-packages/openhands/sdk/context/prompts/templates').bytecode_cache.directory); print(json.dumps({\\\"cache_dir\\\":str(p),\\\"private_scope\\\":p.is_relative_to(pathlib.Path('<owned-private-state>/openhands'))})); assert p.is_relative_to(pathlib.Path('<owned-private-state>/openhands')), \\\"CLI pinned SDK cache escapes assigned private namespace\\\"\"]",
+    "[\"rtk\",\"proxy\",\"uv\",\"run\",\"--no-sync\",\"--python\",\"<owned-private-state>/openhands/sdk-venv/bin/python\",\"python\",\"-m\",\"pytest\",\"tests/sdk/llm/test_responses_parsing_and_kwargs.py\",\"tests/sdk/llm/test_llm_timeout.py\",\"tests/sdk/llm/test_prompt_caching_cross_conversation.py\",\"tests/sdk/skills/test_agentskills_fields.py\",\"tests/sdk/skills/test_installed_skills.py\",\"tests/sdk/skills/test_load_project_skills.py\",\"tests/sdk/plugin/test_installed_plugins.py\",\"tests/sdk/mcp/test_create_mcp_tool.py\",\"tests/sdk/mcp/test_mcp_config_secrets.py\",\"tests/sdk/context/condenser/test_llm_summarizing_condenser.py\",\"--junitxml=<owned-private-state>/openhands/sdk-upstream-tests.xml\"]",
+    "[\"rtk\",\"proxy\",\"uv\",\"run\",\"--no-sync\",\"--python\",\"<owned-private-state>/openhands/sdk-venv/bin/python\",\"python\",\"-m\",\"pytest\",\"tests/sdk/llm/test_responses_parsing_and_kwargs.py\",\"tests/sdk/llm/test_llm_timeout.py\",\"tests/sdk/llm/test_prompt_caching_cross_conversation.py\",\"tests/sdk/skills/test_agentskills_fields.py\",\"tests/sdk/skills/test_installed_skills.py\",\"tests/sdk/skills/test_load_project_skills.py\",\"tests/sdk/plugin/test_installed_plugins.py\",\"tests/sdk/mcp/test_create_mcp_tool.py\",\"tests/sdk/mcp/test_mcp_config_secrets.py\",\"tests/sdk/context/condenser/test_llm_summarizing_condenser.py\",\"--basetemp=<owned-private-state>/openhands/pytest-sdk-private\",\"--junitxml=<owned-private-state>/openhands/sdk-upstream-tests-private.xml\"]",
+    "[\"rtk\",\"proxy\",\"uv\",\"run\",\"--no-sync\",\"--python\",\"<owned-private-state>/openhands/sdk-venv/bin/python\",\"python\",\"-m\",\"pytest\",\"tests/sdk/llm/test_responses_parsing_and_kwargs.py\",\"tests/sdk/llm/test_llm_timeout.py\",\"tests/sdk/llm/test_prompt_caching_cross_conversation.py\",\"tests/sdk/skills/test_agentskills_fields.py\",\"tests/sdk/skills/test_installed_skills.py\",\"tests/sdk/skills/test_load_project_skills.py\",\"tests/sdk/plugin/test_installed_plugins.py\",\"tests/sdk/mcp/test_create_mcp_tool.py\",\"tests/sdk/mcp/test_mcp_config_secrets.py\",\"tests/sdk/context/condenser/test_llm_summarizing_condenser.py\",\"--basetemp=<owned-private-state>/openhands/pytest-sdk-private-final\",\"--junitxml=<owned-private-state>/openhands/sdk-upstream-tests-private-final.xml\"]",
+    "[\"rtk\",\"make\",\"test\",\"TEST_FILE=tests/unit_tests/middleware/test_skills_middleware.py tests/unit_tests/middleware/test_skills_middleware_async.py tests/unit_tests/middleware/test_subagent_middleware_init.py tests/unit_tests/test_subagents.py tests/unit_tests/test_graph.py\",\"PYTEST_EXTRA=-n 2\"]",
+    "[\"rtk\",\"proxy\",\"timeout\",\"--signal=TERM\",\"--kill-after=5s\",\"600s\",\"<owned-private-state>/deepagents/integration-venv/bin/python\",\"<owned-private-state>/checkout/examples/deepagents-omniroute/worker.py\",\"--workspace\",\"<owned-private-state>/deepagents/trial-workspace\",\"--checkpoint\",\"<owned-private-state>/deepagents/trial-checkpoint.sqlite\",\"--thread-id\",\"foundation-native-research-20260930\",\"--skill\",\"/skills\",\"--api-key-env\",\"OMNIROUTE_WORKER_API_KEY\",\"--base-url\",\"http://127.0.0.1:25371/v1\",\"--prompt-file\",\"<owned-private-state>/deepagents/initial-prompt.txt\"]",
+    "[\"rtk\",\"proxy\",\"timeout\",\"--signal=TERM\",\"--kill-after=5s\",\"600s\",\"<owned-private-state>/deepagents/integration-venv/bin/python\",\"<owned-private-state>/checkout/examples/deepagents-omniroute/worker.py\",\"--workspace\",\"<owned-private-state>/deepagents/trial-workspace\",\"--checkpoint\",\"<owned-private-state>/deepagents/trial-checkpoint.sqlite\",\"--thread-id\",\"foundation-native-research-20260930\",\"--skill\",\"/skills\",\"--api-key-env\",\"OMNIROUTE_WORKER_API_KEY\",\"--base-url\",\"http://127.0.0.1:25371/v1\",\"--prompt-file\",\"<owned-private-state>/deepagents/repair-prompt.txt\"]",
+    "[\"rtk\",\"proxy\",\"timeout\",\"--signal=TERM\",\"--kill-after=5s\",\"600s\",\"<owned-private-state>/deepagents/integration-venv/bin/python\",\"<owned-private-state>/checkout/examples/deepagents-omniroute/worker.py\",\"--workspace\",\"<owned-private-state>/deepagents/trial-workspace\",\"--checkpoint\",\"<owned-private-state>/deepagents/trial-checkpoint.sqlite\",\"--thread-id\",\"foundation-native-research-20260930\",\"--skill\",\"/skills\",\"--api-key-env\",\"OMNIROUTE_WORKER_API_KEY\",\"--base-url\",\"http://127.0.0.1:25371/v1\",\"--prompt-file\",\"<owned-private-state>/deepagents/resume-prompt.txt\"]",
+    "[\"rtk\",\"proxy\",\"<owned-private-state>/deepagents/integration-venv/bin/python\",\"<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py\",\"--phase\",\"initial\",\"--workspace\",\"<owned-private-state>/deepagents/trial-workspace\",\"--events\",\"<owned-private-state>/deepagents/logs/27-worker-inspect-offline.stdout\",\"--expected-marker\",\"<owned-private-state>/deepagents/expected-marker.txt\"]",
+    "[\"rtk\",\"proxy\",\"<owned-private-state>/deepagents/integration-venv/bin/python\",\"<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py\",\"--phase\",\"empty-thread\",\"--workspace\",\"<owned-private-state>/deepagents/trial-workspace\",\"--events\",\"<owned-private-state>/deepagents/logs/live-08-empty-thread-inspect.stdout\",\"--expected-marker\",\"<owned-private-state>/deepagents/expected-marker.txt\"]",
+    "[\"rtk\",\"proxy\",\"<owned-private-state>/deepagents/integration-venv/bin/python\",\"<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py\",\"--phase\",\"resume\",\"--workspace\",\"<owned-private-state>/deepagents/trial-workspace\",\"--events\",\"<owned-private-state>/deepagents/logs/live-12-continuation-worker.jsonl\",\"--expected-marker\",\"<owned-private-state>/deepagents/expected-marker.txt\"]",
+    "[\"rtk\",\"proxy\",\"<owned-private-state>/deepagents/integration-venv/bin/python\",\"<owned-private-state>/checkout/examples/deepagents-omniroute/acceptance_oracle.py\",\"--phase\",\"resume\",\"--workspace\",\"<owned-private-state>/deepagents/trial-workspace\",\"--events\",\"<owned-private-state>/deepagents/logs/live-12-continuation-worker.jsonl\",\"--expected-marker\",\"<owned-private-state>/deepagents/expected-marker.txt\"]",
+    "rtk proxy env PYTHONDONTWRITEBYTECODE=1 OPENHANDS_SUPPRESS_BANNER=1 timeout --signal=TERM --kill-after=5s 240s '<owned-private-state>/openhands/sdk-venv/bin/python' examples/openhands-native-capabilities/native-llm-trial.py --mode generate --persistence-dir '<owned-private-state>/openhands/sdk-state/.openhands' > '<owned-private-state>/openhands/logs/root-native-llm-generate.stdout' 2> '<owned-private-state>/openhands/logs/root-native-llm-generate.stderr'",
+    "rtk proxy '<owned-private-state>/openhands/sdk-venv/bin/python' examples/openhands-native-capabilities/native-llm-trial.py --mode check-output --output wrong",
+    "rtk proxy timeout 180 claude -p --model opus --effort max --tools Read,Grep,Glob --permission-mode plan --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --output-format json --name native-landscape-capability-peer --no-session-persistence < <owned-private-peer-prompt>"
+  ],
+  "observations": [
+    {
+      "id": "oh-cli-tests",
+      "task": "cli-capabilities",
+      "role": "cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "cli-capabilities",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-install.json",
+          "sha256": "70c7a5626785f4998e3eeb9d810c0c6e4031320a91d3323bd90b2816a6453a19"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "oh-cli-scope-held",
+      "task": "cli-cache-scope",
+      "role": "cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "cli-cache-scope",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-install.json",
+          "sha256": "70c7a5626785f4998e3eeb9d810c0c6e4031320a91d3323bd90b2816a6453a19"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "oh-sdk-scope-failure",
+      "task": "sdk-capabilities",
+      "role": "sdk",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "native_cli_execution",
+      "scope": "sdk-capabilities",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-install.json",
+          "sha256": "70c7a5626785f4998e3eeb9d810c0c6e4031320a91d3323bd90b2816a6453a19"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "oh-sdk-private-naming-failure",
+      "task": "sdk-capabilities",
+      "role": "sdk",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "sdk-capabilities",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-install.json",
+          "sha256": "70c7a5626785f4998e3eeb9d810c0c6e4031320a91d3323bd90b2816a6453a19"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "oh-sdk-final",
+      "task": "sdk-capabilities",
+      "role": "sdk",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 4,
+      "evidence_class": "native_cli_execution",
+      "scope": "sdk-capabilities",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-install.json",
+          "sha256": "70c7a5626785f4998e3eeb9d810c0c6e4031320a91d3323bd90b2816a6453a19"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "da-upstream-tests",
+      "task": "research-capabilities",
+      "role": "research-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "research-capabilities",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-install.json",
+          "sha256": "5385215a4cf017370b9e05aeab516206cf9eff1060d3f5bb9fc5e1163d1a17c1"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "da-original-failed",
+      "task": "research",
+      "role": "research-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 6,
+      "evidence_class": "model_task_execution",
+      "scope": "research",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-task.json",
+          "sha256": "5f111032ee9dc200b4829d7731de92523dfbc357c9320f6d81460e732977c1a9"
+        }
+      ],
+      "usage": {
+        "uncached_input": 45944,
+        "cache_creation": 0,
+        "cache_read": 254592,
+        "output": 7422,
+        "reasoning_in_output": 4130,
+        "total": 307958,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "da-repair",
+      "task": "research",
+      "role": "research-worker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 7,
+      "evidence_class": "model_task_execution",
+      "scope": "Native saved-context repair of original bounded research task",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-task.json",
+          "sha256": "5f111032ee9dc200b4829d7731de92523dfbc357c9320f6d81460e732977c1a9"
+        }
+      ],
+      "usage": {
+        "uncached_input": 19787,
+        "cache_creation": 0,
+        "cache_read": 13696,
+        "output": 556,
+        "reasoning_in_output": 337,
+        "total": 34039,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "da-continuation",
+      "task": "continuation",
+      "role": "research-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 8,
+      "evidence_class": "recovery_execution",
+      "scope": "continuation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-task.json",
+          "sha256": "5f111032ee9dc200b4829d7731de92523dfbc357c9320f6d81460e732977c1a9"
+        }
+      ],
+      "usage": {
+        "uncached_input": 674,
+        "cache_creation": 0,
+        "cache_read": 22656,
+        "output": 170,
+        "reasoning_in_output": 98,
+        "total": 23500,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "live-01-missing-initial-oracle",
+      "task": "initial-negative",
+      "role": "integration-oracle",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "offline_artifact_check",
+      "scope": "initial-negative",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-task.json",
+          "sha256": "5f111032ee9dc200b4829d7731de92523dfbc357c9320f6d81460e732977c1a9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "live-09-empty-thread-oracle",
+      "task": "empty-thread-negative",
+      "role": "integration-oracle",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 10,
+      "evidence_class": "offline_artifact_check",
+      "scope": "empty-thread-negative",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-task.json",
+          "sha256": "5f111032ee9dc200b4829d7731de92523dfbc357c9320f6d81460e732977c1a9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "live-15-missing-resume-control",
+      "task": "missing-resume-negative",
+      "role": "integration-oracle",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 11,
+      "evidence_class": "offline_artifact_check",
+      "scope": "missing-resume-negative",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-task.json",
+          "sha256": "5f111032ee9dc200b4829d7731de92523dfbc357c9320f6d81460e732977c1a9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "live-16-wrong-resume-control",
+      "task": "wrong-resume-negative",
+      "role": "integration-oracle",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 12,
+      "evidence_class": "offline_artifact_check",
+      "scope": "wrong-resume-negative",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-task.json",
+          "sha256": "5f111032ee9dc200b4829d7731de92523dfbc357c9320f6d81460e732977c1a9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "oh-native-llm",
+      "task": "llm-roundtrip",
+      "role": "sdk",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 13,
+      "evidence_class": "model_task_execution",
+      "scope": "llm-roundtrip",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-llm.json",
+          "sha256": "47ec4560beb7adf1007c89e1b7c87275e6ea12532a3b1f69055115b0e60bdc96"
+        }
+      ],
+      "usage": {
+        "uncached_input": 36,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 49,
+        "reasoning_in_output": 34,
+        "total": 85,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "oh-wrong-output",
+      "task": "llm-output-negative",
+      "role": "integration-oracle",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 14,
+      "evidence_class": "offline_artifact_check",
+      "scope": "llm-output-negative",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-llm.json",
+          "sha256": "47ec4560beb7adf1007c89e1b7c87275e6ea12532a3b1f69055115b0e60bdc96"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-claude-peer-timeout",
+      "task": "peer-review",
+      "role": "peer-review",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 15,
+      "evidence_class": "native_cli_execution",
+      "scope": "peer-review",
+      "status": "failed",
+      "exit_code": 124,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/native-runtime-role-resolution-20260930.json",
+          "sha256": "09ca4ef4a20e2c2f966838f0a6ffe89856e03bd06e5c48447c44b8125e459ac2"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "oh-cli-scope-held",
+      "reason": "Native CLI SDK1.21 cache oracle reports private_scopefalse; strict cache isolation held."
+    },
+    {
+      "run_id": "oh-sdk-scope-failure",
+      "reason": "184 tests passed but independent native private-cache condition failed."
+    },
+    {
+      "run_id": "oh-sdk-private-naming-failure",
+      "reason": "182 passed/2 failed original .openhands-substring assertions."
+    },
+    {
+      "run_id": "da-original-failed",
+      "reason": "Original24-step GraphRecursionError; exact262-character quote exceeded240; original oracle exit2."
+    },
+    {
+      "run_id": "live-01-missing-initial-oracle",
+      "reason": "Missing initial artifacts fail unchanged oracle."
+    },
+    {
+      "run_id": "live-09-empty-thread-oracle",
+      "reason": "Native different-thread marker-presence oracle fails."
+    },
+    {
+      "run_id": "live-15-missing-resume-control",
+      "reason": "Missing resume artifact fails same oracle."
+    },
+    {
+      "run_id": "live-16-wrong-resume-control",
+      "reason": "Wrong literal resume artifact fails same oracle."
+    },
+    {
+      "run_id": "oh-wrong-output",
+      "reason": "Wrong exact output rejected by same local output oracle."
+    },
+    {
+      "run_id": "native-claude-peer-timeout",
+      "reason": "180-second native read-only peer deadline reached; no verdict/usage returned."
+    }
+  ],
+  "limitations": [
+    "CLI SDK1.21 Jinja cache hard-codes real user home; strict cache isolation remains held.",
+    "Final SDK native configuration/tests exercise skills/plugins/MCP/condenser interfaces; production MCP, full Conversation/condenser/provider execution and optional extensions are not qualified by them.",
+    "Original DeepAgents24-step attempt failed; one changed32-step saved-context repair passed. No arbitrary interrupted-tool replay, OS confinement or comparative winner is qualified.",
+    "Complete provider billing/backend identity and whole-task token savings remain unknown; cached/reasoning counters are subsets.",
+    "Native Claude Opus/Max peer timed out180s exit124 without a verdict; later peer turns reached account usage limits. Completed earlier reviews are preserved; no new acknowledgement/approval is claimed.",
+    "Original full output stays private with exact hashes; public excerpts replace private paths and omit raw conversations, marker values, credentials and flow identifiers.",
+    "This record verifies declared consistency and artifact hashes, not underlying model quality or a universal framework ranking.",
+    "Predeclared original/repaired plans are separate frozen conditions; repaired prompt/cap changes prevent a baseline savings comparison.",
+    "One expected upstream test xfail retained. All installation/OSV parser failures and source/config corrections remain in linked original-output artifacts and receipt anti-patterns.",
+    "Exact executed sources remain archived. Initial whitespace/comment cleanup had identical ASTs; current worker subsequently adopts native secret-aware serialization, source/offline/checkpoint tested after a CodeQL finding without another provider run."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "Scoped native capability recipes and bounded interoperability/research/continuation trials; shared default promotion and comparative framework selection remain separate.",
+    "qualification_run_ids": []
+  },
+  "rollback": "Remove only the newly owned private candidate environments, trial workspace/checkpoint and example registrations; native parents, underlying gateway, O1 and peer-owned state are retained.",
+  "next_decision_changing_test": "Owner-acknowledged same-role frozen task comparisons with complete provider usage; native MCP/Conversation/plugin/condenser and interruption-recovery acceptance before broader framework/default promotion. CLI isolation requires a supported upstream fix or qualified sandbox recipe.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [
+      "oh-cli-tests",
+      "oh-cli-scope-held",
+      "oh-sdk-scope-failure",
+      "oh-sdk-private-naming-failure",
+      "oh-sdk-final",
+      "da-upstream-tests",
+      "da-original-failed",
+      "da-repair",
+      "da-continuation",
+      "live-01-missing-initial-oracle",
+      "live-09-empty-thread-oracle",
+      "live-15-missing-resume-control",
+      "live-16-wrong-resume-control",
+      "oh-native-llm",
+      "oh-wrong-output",
+      "native-claude-peer-timeout"
+    ],
+    "coverage_artifact": null
+  }
+}
