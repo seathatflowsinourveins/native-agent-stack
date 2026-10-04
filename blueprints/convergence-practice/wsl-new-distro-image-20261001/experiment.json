@@ -72,7 +72,7 @@
     "candidate": "Provisional 26.04.1 default arm, ubuntu-26.04.1-wsl-amd64.wsl, exact SHA-256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104. Signature, whole-image hash and packaged source facts observed only; size unknown. Same P1-P3/W1-W7/F1-F9/R1 criteria and paths A/B as the rollback. Both acceptance comparisons unrun."
   },
   "frozen_inputs": {
-    "base_revision": "a73a564b5f8b52d2772c839b3b5be0a5e67ac8fe",
+    "base_revision": "14048b840425c2569e0df60a6596e94e601da15b",
     "tasks": [
       "wsl-new-distro-stage1-first-boot"
     ],

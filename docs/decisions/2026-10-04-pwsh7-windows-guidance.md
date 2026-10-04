@@ -72,14 +72,14 @@ but its native version probe exited 1 with `UtilBindVsockAnyPort: socket failed 
 in this bounded environment. Host PowerShell 7.6.6 remains supplied context;
 the release metadata and upstream sources above were independently read.
 
-The coordinator's completed-head validation report for `91ec598e1` is
-**LANDABLE** for repository integration.
+For the earlier round's head `91ec598e1`, which the 2026-10-04 rebase onto `14048b840` replaced, the
+coordinator's completed-head validation report was **LANDABLE** for repository integration.
 The handbook and its receipt output digests were regenerated under the
 [2026-10-01 generator contract](2026-10-01-new-wsl-handbook-generator.md).
 The recipe, skill-usage, docs-consistency and handbook tests pass.
 `python3 scripts/validate.py` passes (exit 0), and
 `python3 scripts/build_ecosystem.py --check` passes (exit 0).
-These results supersede the earlier attempts below; the native Windows probe
+For that round, these results superseded the earlier attempts below; the native Windows probe
 retains the limitation stated above. This repair independently reran both
 validation commands against the unchanged incoming head, each with exit 0.
 
@@ -160,7 +160,7 @@ This corrects the existence-only prerequisite; unversioned feed selection and
 an unqualified newer minor are rejected alternatives. The supported handbook
 generator ran with `--write`, its receipt changed only the two output digests
 by string replacement, and the recipe/checklist frozen pins and base revision
-were refreshed following `3e84987f91aa73ae2b4547817d758c3a24c98293`.
+were refreshed following `a6aa50266` (the rebased form of `3e84987f9`).
 
 The primary install and upgrade references both document exact `--version`
 selection and `--installer-type`:
@@ -211,3 +211,15 @@ the changed files and reruns aggregate convergence/publication validation;
 the six ledger fixtures need a temporary directory outside Git worktrees.
 The native version gate and WinGet commands were documented and source-checked,
 without executing PowerShell, WinGet or a distribution command.
+
+**Completed-head acceptance after the rebase (coordinator, 2026-10-04).** The branch was rebased onto
+`14048b840` (main after #693), so `frozen_inputs.base_revision` now names that merge base. The value the
+repair round wrote, `a73a564b5`, was a pre-rebase commit no ref reaches; the Claude cross-family read of
+`d0aff4755` caught it. On the rebased tree with this paragraph and its registry commit:
+`python3 scripts/build_new_wsl_handbook.py --check` exit 0; `python3 scripts/validate.py` exit 0;
+`python3 scripts/validate_convergence.py --all-recorded` exit 0. The nine test modules that reference the
+recipe, checklist, handbook, skill-usage or docs-consistency, plus the client-configuration and profile
+modules, ran with `TMPDIR` outside every Git worktree: `Ran 1639 tests`, `OK (skipped=22)`. That run
+includes the six call-ledger fixtures, which the repair round could only run inside its worktree. The
+merge-tree landing check against `14048b840` is recorded in the PR. The native Windows gate and the
+WinGet commands remain source-reviewed and unexecuted, as stated above.
