@@ -72,7 +72,7 @@
     "candidate": "Provisional 26.04.1 default arm, ubuntu-26.04.1-wsl-amd64.wsl, exact SHA-256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104. Signature, whole-image hash and packaged source facts observed only; size unknown. Same P1-P3/W1-W7/F1-F9/R1 criteria and paths A/B as the rollback. Both acceptance comparisons unrun."
   },
   "frozen_inputs": {
-    "base_revision": "91ec598e170db3257a72322a21b6f920ad5b6094",
+    "base_revision": "a73a564b5f8b52d2772c839b3b5be0a5e67ac8fe",
     "tasks": [
       "wsl-new-distro-stage1-first-boot"
     ],
@@ -82,7 +82,7 @@
     "sources": [
       {
         "path": "adoption/platforms/linux-wsl2-new-distro.md",
-        "sha256": "578e29b860d384a2fd1ee0cd87590e11061c9e722bece4323f1adcc948518413"
+        "sha256": "ff94e93390875a4c6d2baa352fa7075e66acc7a966b33f1ef62338fb9988b7f3"
       },
       {
         "path": "adoption/templates/wsl/cloud-init.user-data.template",
@@ -102,7 +102,7 @@
     "evaluation": [
       {
         "path": "adoption/templates/wsl/first-boot-checklist.md",
-        "sha256": "7275b1bb7ab29a9332d6dc2a001629598a33b0ac49b96c7983a12803975593a2"
+        "sha256": "1a06df0e6d50b07b439317a61a450e450127052589f63254e769d99166e3603b"
       },
       {
         "path": "adoption/templates/wsl/stage1-receipt.example.json",

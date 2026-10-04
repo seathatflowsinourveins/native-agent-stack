@@ -142,15 +142,23 @@ upstream behavior behind each.
 **Prerequisite: PowerShell 7 installed on the Windows host.** A stock Windows installation does not include it.
 This guidance uses [PowerShell v7.6.6](https://github.com/PowerShell/PowerShell/releases/tag/v7.6.6)
 (2026-09-08; current stable release checked 2026-10-04). Run
-`winget install --id Microsoft.PowerShell --source winget --installer-type wix` in a Windows command shell
-([Microsoft's install instructions](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-powershell-using-winget)).
+`winget install --id Microsoft.PowerShell --source winget --installer-type wix --version 7.6.6` in a Windows command shell
+([Microsoft's install instructions](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-powershell-using-winget),
+[WinGet install reference: `--version` selects an exact version](https://learn.microsoft.com/en-us/windows/package-manager/winget/install#options)).
 WinGet defaults to MSIX since 7.6; `--installer-type wix` selects the MSI installation, whose default directory is
 `C:\Program Files\PowerShell\7`
 ([installation options](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-the-msi-package-with-command-line-options)).
 If `/mnt/c/Program Files/PowerShell/7/pwsh.exe` is absent, stop the Windows-side steps and install it first. When WinGet
-is unavailable, [download the stable MSI](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-the-msi-package),
-double-click it and follow the prompts, retaining the default directory; check that executable path before resuming
+is unavailable, download the **7.6.6 MSI** from the [reviewed release](https://github.com/PowerShell/PowerShell/releases/tag/v7.6.6)
+and follow [Microsoft's MSI installation steps](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-the-msi-package):
+double-click it and follow the prompts, retaining the default directory; run the version gate before resuming
 ([Microsoft's installer steps, lines 84–92](https://github.com/MicrosoftDocs/PowerShell-Docs/blob/a3de8f22552170e70852470d46cd52cd9ca471ec/reference/docs-conceptual/install/install-powershell-on-windows.md#L84-L92)).
+Before any Windows-side block, run the [PowerShell version gate from bash in the workstation distribution](linux-wsl2-new-distro.md#powershell-version-gate-before-w1).
+It prints and records `$PSVersionTable.PSVersion` from this exact executable and permits only 7.6.6 or a later stable
+7.6 patch. An older version takes
+`winget upgrade --id Microsoft.PowerShell --source winget --installer-type wix --version 7.6.6` in a Windows command
+shell ([WinGet upgrade reference](https://learn.microsoft.com/en-us/windows/package-manager/winget/upgrade#options)),
+or the 7.6.6 MSI fallback when WinGet is unavailable; rerun the gate and retain its new version log before continuing.
 Do not fall back to Windows PowerShell 5.1. NativeStack disables `appendWindowsPath`, so invoke the quoted absolute
 path below even when Windows has the executable on its PATH.
 

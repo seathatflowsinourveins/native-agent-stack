@@ -10,14 +10,15 @@ blocks. The WSL launcher is the quoted absolute MSI path
 `-NonInteractive`, `-ExecutionPolicy Bypass` and `-File "$(wslpath -w step.ps1)"`.
 NativeStack disables `appendWindowsPath`, so a bare executable name is
 insufficient. Each recipe requires PowerShell 7 on the Windows host and tells
-the reader to stop and install it when that path is absent.
+the reader to stop and install it when that path is absent, and to pass the
+new-distro recipe's version gate before any Windows-side block.
 
 The documented command is
-`winget install --id Microsoft.PowerShell --source winget --installer-type wix`.
+`winget install --id Microsoft.PowerShell --source winget --installer-type wix --version 7.6.6`.
 Microsoft's default WinGet package since 7.6 is MSIX, so selecting MSI is
 necessary for this recipe's fixed path. When WinGet is unavailable, follow
-Microsoft's manual stable-MSI download and installer prompts, retaining the
-default directory, and verify the executable path before resuming. A missing
+Microsoft's manual 7.6.6-MSI download and installer prompts, retaining the
+default directory, and pass the version gate before resuming. A missing
 PowerShell 7 installation does not select Windows PowerShell 5.1.
 
 Primary sources checked on 2026-10-04:
@@ -140,3 +141,73 @@ sweep must retain the packaging and interop checks identified above. Native
 Windows installation and host acceptance retain their separate evidence scope.
 The coordinator re-registers the repaired files in `manifests/evidence.json`
 last.
+
+2026-10-04 — PR #694's P2 thread, **Enforce the documented PowerShell
+version** (`chatgpt-codex-connector`), identified that an existing
+`PowerShell\7\pwsh.exe` could be older than the reviewed release and an
+unversioned WinGet install could advance to another revision. This repair pins
+both MSI installation and an older installation's upgrade to `--version
+7.6.6`. Before W1 or any other Windows-side block, the recipe's bash gate
+invokes the quoted MSI path with `-NoLogo -NoProfile -Command`, prints
+`$PSVersionTable.PSVersion`, and keeps the observed version in a private
+temporary log. Only stable 7.6 patches at or above 7.6.6 pass; the command
+rejects prereleases and other minor releases, and bash's `pipefail` preserves
+that rejection through `tee`. A single-quoted command argument preserves the
+PowerShell variable across bash. Upgrade or manual 7.6.6 MSI installation is
+followed by the same gate again. Both platform pages and the checklist carry
+the version requirement and retain the Windows PowerShell 5.1 prohibition.
+This corrects the existence-only prerequisite; unversioned feed selection and
+an unqualified newer minor are rejected alternatives. The supported handbook
+generator ran with `--write`, its receipt changed only the two output digests
+by string replacement, and the recipe/checklist frozen pins and base revision
+were refreshed following `3e84987f91aa73ae2b4547817d758c3a24c98293`.
+
+The primary install and upgrade references both document exact `--version`
+selection and `--installer-type`:
+[WinGet install](https://learn.microsoft.com/en-us/windows/package-manager/winget/install#options)
+and [WinGet upgrade](https://learn.microsoft.com/en-us/windows/package-manager/winget/upgrade#options),
+re-read with their original sources at
+`MicrosoftDocs/windows-dev-docs@00fc4a365ecd5a51478d98a6f034bc3571e6d736`,
+`hub/package-manager/winget/{install,upgrade}.md`. The existing pinned
+PowerShell installation and `about_pwsh` sources above were also re-read, and
+the gate's `Major`, `Minor`, `Patch` and `PreReleaseLabel` fields were verified
+in [PowerShell v7.6.6's `PSVersionInfo.cs`, lines 559–574](https://github.com/PowerShell/PowerShell/blob/f260eb9c31ec72c5282f98e5ea24d9be4f8d7536/src/System.Management.Automation/engine/PSVersionInfo.cs#L559-L574).
+Research stayed within the maintained native commands, reviewed source,
+existing generator and Git precedent; no new installation or test harness
+was needed.
+
+Completeness critic for this thread: the prerequisite search covered
+`7.6.6`, `pwsh.exe` and `--installer-type wix`, finding both maintained
+platform pages and the checklist; launcher fixtures and historical receipts
+retain their original scope. The recipe/checklist pin search found the
+convergence record, generated handbook and coordinator-owned evidence
+registry. The next Windows lifecycle sweep must still check packaging,
+absolute-path interop and the supported minor together; a supported path
+change or demonstrated script incompatibility in an allowed stable patch
+would reopen this gate. Acceptance below is repository integration and source
+review; this bounded repair executes no Windows or distribution commands.
+
+2026-10-04 acceptance for this thread, with
+`TMPDIR=.bounded-job-039/tmp`: the combined recipe, skill-usage,
+docs-consistency, handbook, client-configuration and profile modules returned
+`Ran 592 tests in 159.155s` and `FAILED (failures=6, skipped=9)` (exit 1).
+All six failures are the unchanged call-ledger fixtures: their temporary paths
+are inside this Git worktree, and
+`tools/skill-usage/skill_usage.py:2372-2377` rejects that location before the
+conditions those cases exercise. This matches the earlier recorded fixture
+limitation; the prescribed temporary directory and guard were retained.
+The handbook `--check` and native `bash -n` on the extracted gate each returned
+exit 0. The explicit repaired convergence record returned exit 0 with no
+errors; `validate_convergence.py --all-recorded` returned exit 1 at record
+discovery because the reserved evidence registry is stale.
+`validate.py` returned exit 1 with only the changed files' registered SHA-256
+and byte-count mismatches. Its first attempt also found session identifiers
+in two transient official-document HTML cache files; those cache files were
+removed after the pinned Markdown sources were verified, and the repeat
+retained only registry drift. The first failed output is preserved separately.
+`git diff --check` returned exit 0. Logs remain under `.bounded-job-039/tmp`,
+with workspace paths redacted from the test log. The coordinator re-registers
+the changed files and reruns aggregate convergence/publication validation;
+the six ledger fixtures need a temporary directory outside Git worktrees.
+The native version gate and WinGet commands were documented and source-checked,
+without executing PowerShell, WinGet or a distribution command.

@@ -6,8 +6,8 @@
   "generator_sha256": "a78239b6a2558c916b30f4cbc852fe948904a849e99ae37cfadc1c810a6df20e",
   "profile_sha256": "381645d1470125614137eef39a3b802e0a91ec480f6453a45051fbe99c743f21",
   "outputs": {
-    "docs/new-wsl-handbook.json": "c8d480477f3e6d674c01095c45b63bf35d815fc851597ed0de515868b58219c4",
-    "docs/new-wsl-handbook.md": "d2a3af849400ae0dc58a6ec931804d45a6de6bcfc359cbb564af5e7c8e3efce7"
+    "docs/new-wsl-handbook.json": "54eeb8ea606b3f4f123320dc2f2f7f07c356d969a538c3d935de17b771fa5420",
+    "docs/new-wsl-handbook.md": "aa04b30d16fc14acac62d0af23e670ad254feb7e59ea85dfe233d361a992f59a"
   },
   "inventory": {"layers": 37, "profile_entries": 69, "projected_tools": 73, "canonical_package_ids": 20},
   "validation": [
