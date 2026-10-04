@@ -9354,8 +9354,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "58e13cf6a946e0ddf21d308c02fe103df5b385ecb8017af53e820c4c209886ee",
-      "bytes": 40753
+      "sha256": "af2b23d9612b310899fe1ff3ec02ebea1c2a72a1837cb7097bfee3a8ce13c2b7",
+      "bytes": 40795
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -15914,8 +15914,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
-      "sha256": "14fb2b73896106699fc643045373e89a2a8dc9cc043a1796326e686e93b2d073",
-      "bytes": 27620
+      "sha256": "2a25590d46bcf8f81486c927dc6e1dd8df97b920a125c07c82613c1535c62dec",
+      "bytes": 29058
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
