@@ -4052,6 +4052,28 @@
         "Exact executed sources are archived. Initial whitespace/comment cleanup had identical ASTs; the current worker subsequently adopts native secret-aware serialization after CodeQL, verified by native fixture and fresh saved-state checks. No new provider run is claimed."
       ],
       "path": "evidence/receipts/native-runtime-role-resolution-20260930.json"
+    },
+    {
+      "id": "runtime-sdk-20261003",
+      "kind": "compatibility_attempt",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Retained coordinator results for the same-host Codex SDK/CLI 0.160.0 pair report strict-hash installation, matching bundled/npm-platform binaries and completed native-account SDK, gateway SDK and gateway CLI marker canaries. Sanitized outputs, native CLI usage, scripts, hashes, mtimes and discriminating replay controls are now retained; missing original SDK invocation/source and process start/end evidence limit this to a compatibility attempt. The separate A4 record adds fail-closed Linux package-resolution/executable-tree repairs, offline integration controls and a fresh isolated bootstrap of the shipped Codex pin; it does not upgrade the SDK/gateway canary evidence class.",
+      "limitations": [
+        "Existing-host compatibility observations and completed marker canaries only; incomplete original command/timing provenance prevents native_cli_e2e acceptance. Not new-host or model-quality acceptance.",
+        "Gateway backend model and effort were not read from the call log; configured/requested routes and efforts do not prove backend selection.",
+        "The shared host launcher, daemon and production prefix still run 0.159.3 until a separate coordinated switch.",
+        "The 0.159.3 queue, Hindsight and October 1 SDK receipts retain their original scope; they do not qualify 0.160.0.",
+        "Sanitized native canary stdout/stderr, CLI events/last message and their hashes are retained. SDK caller exit codes 0 are coordinator-verified, not fields in the supplied facts. Gateway backend billed usage and monetary cost remain unrecorded.",
+        "Original process start/end times and SDK outer executable/cwd are unrecorded. Source mtimes are filesystem observations only. The native heredoc is reconstructed from facts and the retained gateway example, not attested as the original source.",
+        "SDK last and total usage snapshots match for each canary and must be counted once; cached input and reasoning output are subsets, not additional tokens.",
+        "No unchanged upstream test suite, shared daemon restart, whole-system cleanup/recovery acceptance, package signature or provenance attestation verification is recorded here. The separate A4 bootstrap record retains local migration/publication fault injection and an isolated native installation.",
+        "The move is inside the seven-day cooldown recorded in docs/decisions/2026-09-25-workstation-sota-refresh.md, as the prior 0.159.2 and 0.159.3 moves were (docs/decisions/2026-09-27-model-currency.md).",
+        "This repository change records existing coordinator qualification; it performs no new model run or shared-host switch.",
+        "The CLI script prints the inner Codex exit but does not propagate it as its own final shell exit; the recorded inner exit 0 is supported by the coordinator facts and completed native events."
+      ],
+      "path": "evidence/receipts/runtime-sdk-20261003.json"
     }
   ],
   "files": [
@@ -4067,8 +4089,8 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "5b26e1858d40e23de54d5d346dae2a5cea5a20e17f413ad09159fcb4a61bde97",
-      "bytes": 735
+      "sha256": "b056917f02d463c8c1044c85cbb5f77755755eb1a4107fd821665363d75424fb",
+      "bytes": 1123
     },
     {
       "path": ".github/CODEOWNERS",
@@ -4252,8 +4274,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "ddb393a6d4a6ca317e14d75ba4fe5b2a357d93704adcea8f0cf8eb449e6c1da3",
-      "bytes": 18600
+      "sha256": "f35e4f688275badf7536be8ecb1f1c6d8462061073c4c447e60ffa46d0f2f588",
+      "bytes": 19053
     },
     {
       "path": "adoption/agents/claude/blind-adjudicator.md",
@@ -4332,18 +4354,18 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "42327b8373ad0d9d41e79458b917dc2858f4bb26485336b835fbd07dab3fd901",
-      "bytes": 54160
+      "sha256": "487d25bff2a412883e4875f98be230c89ea37bf9737d71dd558da20d8e94f2ad",
+      "bytes": 74740
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "6de83675793823b2f0fc046c123c1082f2b7cbe622daa492ffa01c4c5b9dbb59",
-      "bytes": 81790
+      "sha256": "ef54b618c903cfabcd74538e40e6fa84d81e5b5904c3e6a5e472fc6d942c4474",
+      "bytes": 78067
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "6dea6c237af665b86011affbf02fb496de6ed3dff16b49c5429160b08b0aa55b",
-      "bytes": 63434
+      "sha256": "939e23df38be742d3882c2214c9d995460875380fb69e09d272f2168b32c78d0",
+      "bytes": 63848
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4357,28 +4379,28 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "9c5ebc195a0b3aae6d7732eb7eb12ad2fddb68c318383c7a3bbf988e4e846528",
+      "sha256": "cb5b70d1bc86d6a8b5049e82e3136301b1e30a5b9a50ceb254e276c789db1ecf",
       "bytes": 950
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
-      "sha256": "c81a91c4ffb2fa906feb403d5a11bd294b6cf2db45795d80f9acd662c5004973",
-      "bytes": 2877
+      "sha256": "2f7a53031e6eabf6b9d08989b619b74204fa36dac2559e520fb72b06225a81d3",
+      "bytes": 2888
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.md",
-      "sha256": "d6c3c19d6e94d3f48d2788963c8c9be45ec57e6bb81cab92b2c30d9fd5c8e8d6",
-      "bytes": 4088
+      "sha256": "dcd6996e9247f3c8f3d543545eb958518236b21449492ddf92721590aa3f60c8",
+      "bytes": 4099
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.researcher.md",
-      "sha256": "47cc80b262468557b8cfe5c243598030757270674bc7bf286fba8c0c573abc28",
-      "bytes": 3075
+      "sha256": "149ac69352a788ad67c84b4d545cab461015c4e73a9ba4c8675259402c955e4a",
+      "bytes": 3086
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.reviewer.md",
-      "sha256": "19857a44a201948aa1d1fc9be3e24d5f3f7cc385f333ab3893411889258af4ed",
-      "bytes": 2088
+      "sha256": "ec7c6b2a80c58e0156daab25b7cfd4eea6f2e3eac77137067051601045f9d2f8",
+      "bytes": 2099
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.scout.md",
@@ -4487,8 +4509,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "0dd40eea9c39e1e61ca73c9e8f55cfe0e92106d0af5cd1933318f3bf7a3a31cf",
-      "bytes": 31759
+      "sha256": "f9b362b7caec258e13fc06d42894ea8a7a8f9dcc5dd6405a130ff41c7627604d",
+      "bytes": 34163
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -4502,13 +4524,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "149b05c61320363dca3264f88962019fcd51523dbbc78f1be818a6df9fbd3cba",
-      "bytes": 25956
+      "sha256": "95f59e4cc13c2b03237cb6c973b2f8203275eccd1b0eb023c24a6a307db42504",
+      "bytes": 26347
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "abed4bbede40ac704c5209251905cdab37812e28879ed436b3257382385e7c6b",
-      "bytes": 64672
+      "sha256": "1b5e869a66be1647c8e38134e1b25e2822adec89e08c39a1ed8d738724306c5d",
+      "bytes": 64773
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -4532,17 +4554,17 @@
     },
     {
       "path": "adoption/sdk/README.md",
-      "sha256": "351bd9d5893b7f7b596946b184200d0b29f0303082164cde373695f4c6e2b861",
-      "bytes": 4383
+      "sha256": "3f5f1f6eac2e437853ad9b9f050186b3c7919e6df2fa786a87d4d162c4b0b6de",
+      "bytes": 5415
     },
     {
       "path": "adoption/sdk/accepted-constraints.txt",
-      "sha256": "80ab416bbe2accea98d259150952a7abf6b3c882e3315da23dab5fd42edf2aaa",
-      "bytes": 961
+      "sha256": "e9ef5be2300d651bc8db67e4cb00731e69b6fb1757e623ce49263f6a62844d00",
+      "bytes": 1048
     },
     {
       "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
-      "sha256": "9e215b2c85823b33b881ae1ff38a2c666ebd46d75d34568f5e8747d350f8ef74",
+      "sha256": "3a17fa09d3c598e30ed8a6e833eb061ca84cad8a3af99fd975a4024c4031cddc",
       "bytes": 77578
     },
     {
@@ -4592,8 +4614,8 @@
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
-      "sha256": "cf8adbabcd3db19ed32f53d9868e98bbb3b774cb6d1a7f2ab3e709a930ae227e",
-      "bytes": 2701
+      "sha256": "a6822a173f78b007478480f9e681c012ef60e75f17f36091ad1d1470fd6258af",
+      "bytes": 2941
     },
     {
       "path": "adoption/templates/systemd/omniroute-fw.service",
@@ -10003,8 +10025,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "cafdde5e9aabfbe9d61bc138e4201596e2b0436f978b4dd8a8039eaed70dcd32",
-      "bytes": 483389
+      "sha256": "2fb075a1da7547e26d910e0657df0a679bcdad3db93dc411e0e88931b00ca20e",
+      "bytes": 483567
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15098,8 +15120,8 @@
     },
     {
       "path": "blueprints/us-equities/workers/README.md",
-      "sha256": "7e2623020f40c784638b832f823cc0acd0fe29d5656af44fd4205e085c9e59e0",
-      "bytes": 14235
+      "sha256": "bf84fc7f15c3d8a53331e9b36fea43a98b80191195ceadddda64d83280b12b78",
+      "bytes": 14924
     },
     {
       "path": "blueprints/us-equities/workers/native_worker.py",
@@ -15118,7 +15140,7 @@
     },
     {
       "path": "blueprints/us-equities/workers/requirements.txt",
-      "sha256": "d3c2fabc8a13457e448dcdb4880e341a2fc96a4115302e416075637d8c22e241",
+      "sha256": "4599ab41626fcd31297ccf485e072c36f495097f98645b58386a712e8d04891c",
       "bytes": 96
     },
     {
@@ -15343,7 +15365,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "3cb76b4e7cd3d1d122f088bcf5598d5aa51d9699497d8caddf8e35d5f55c2778",
+      "sha256": "0d3d76860873ca27160bff8254a8d901b18ce98b69fb28f1297f801f6b8237c3",
       "bytes": 287704
     },
     {
@@ -15353,8 +15375,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "2217a36d560e887b651aaf57028580175e1644c45134c6ef3d8208913998b02c",
-      "bytes": 251264
+      "sha256": "c958ec9e5eea90cf1b6437f2b84c51649995766f100fe606e4df0e12777aef72",
+      "bytes": 252353
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -15978,8 +16000,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
-      "sha256": "9a300299c01e31908b754bf4d003fe80e8fd279b5ca881c0e86d57d61b8f9762",
-      "bytes": 56858
+      "sha256": "423b886bef0774ecc4a2835a55e6a0d6d8f50ed55c0a53ed77d855dd241289d6",
+      "bytes": 69053
     },
     {
       "path": "docs/decisions/2026-09-28-an13-m4-m5.md",
@@ -16115,6 +16137,11 @@
       "path": "docs/decisions/2026-10-03-gpt-lane-omniroute-failover.md",
       "sha256": "fc541ea35372fed4256af2927371fbd366b365ccbb27096bf9ce4a7b3f041946",
       "bytes": 23761
+    },
+    {
+      "path": "docs/decisions/2026-10-03-linux-bootstrap-security-repair.md",
+      "sha256": "54d81df1c2dfc6bb524ae11742458874cc3b39622f8935fe472ad9c9cb7b2c56",
+      "bytes": 7738
     },
     {
       "path": "docs/decisions/2026-10-03-macos-ci-scope.md",
@@ -16308,8 +16335,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "f0702bff6d6728674bd5cdd1361bfcf1d7cae7fb9d79afb25018bb7c21968220",
-      "bytes": 172250
+      "sha256": "13a7db94d4a2f86c0fe2d439e43be44a4c34b46bf36742a5617d75307e41c1ef",
+      "bytes": 173460
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16428,7 +16455,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "245c7942ca34c078ddb8adc0d8a845efee8f42ea35e0fc4709175a14a9d79abb",
+      "sha256": "6a427fd1526902fbc105e06e70d3dd632db7ec85e0dc0fb818f6b49894246cba",
       "bytes": 18483
     },
     {
@@ -16558,8 +16585,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "173fe5e0cf2121eb7d3ad76bf397843e24f52a2fd388a17a133e2691d61fc3d5",
-      "bytes": 90784
+      "sha256": "b85424755d2152313a6a7cfcbef8871c98f0f8f756e932287fa1aa1bf7e49a46",
+      "bytes": 92944
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -32547,6 +32574,16 @@
       "bytes": 2065
     },
     {
+      "path": "evidence/artifacts/jcodemunch-route-args-20260927/README.md",
+      "sha256": "3691f77945bc13b05210623bc68c34f293a52e6736365eb3ba92f6c12f98eeb9",
+      "bytes": 5147
+    },
+    {
+      "path": "evidence/artifacts/jcodemunch-route-args-20260927/probes.json",
+      "sha256": "b7d415ab6119eeb6ed31bff86a0a805dca14dda5a2fde20389d97a112e2e241f",
+      "bytes": 3031
+    },
+    {
       "path": "evidence/artifacts/jev-p1-20261003/README.md",
       "sha256": "bd0149a7003e7c05a80dd864491fbb565dc4b7aedaae5f03095a2d8236ceb032",
       "bytes": 1800
@@ -43762,6 +43799,256 @@
       "bytes": 7684
     },
     {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-canary.sh",
+      "sha256": "5f403fd2356f2dcc7c1beba7d423f85abe769d6052000da3643add8f2e4632df",
+      "bytes": 860
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-events.ndjson",
+      "sha256": "36173272d2ebc5c5a9c5c309c51fbb982c9f36bdb67de2257486da9fd6dcb326",
+      "bytes": 346
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-last.txt",
+      "sha256": "a2cfa1ce034fbe0362560432afc64e811e169fb180c6105414829655f50ef230",
+      "bytes": 27
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/exec-stderr.txt",
+      "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+      "bytes": 39
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/gateway-canary.json",
+      "sha256": "0a7b7f4e7b12122859c1e49c913de7172077b62970619f1e6dd119e00fd9c499",
+      "bytes": 468
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/gateway-canary.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/run.py",
+      "sha256": "61df9cdc175abd76dc751cb2b24366167377c6af0f737a8eb45497d609b7cfc7",
+      "bytes": 1223
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-native/native-canary.json",
+      "sha256": "3a972da9f28f17e7ea32dbb43851e01b4ed33af878da6a58676490acc823b259",
+      "bytes": 501
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-native/native-canary.reconstructed.py",
+      "sha256": "45112f741da09a4b6971f4fa5a48b222bed3b61686f009d7082cc155eb242697",
+      "bytes": 894
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/canary-native/native-canary.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-negative.json",
+      "sha256": "56b36db8990f7d03f7559f3e790d2dde0b6d9fab8f2744ae32b42ee97728b3e1",
+      "bytes": 145
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-negative.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-positive.json",
+      "sha256": "d4fa8bcb49e187b0263e0ec6f64d32bec9464237a0430e48412ea3e17ce0dff7",
+      "bytes": 150
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-events-positive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-negative.json",
+      "sha256": "22bfa79885acaf96088cc44e645dd42d763d903cdaf2f7e4fcc4a788b5ca08f6",
+      "bytes": 140
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-negative.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-positive.json",
+      "sha256": "94277e33e38ad81334c66431151ca7e0f8e5c46593623afe53d88dac54558634",
+      "bytes": 145
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/cli-last-positive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-negative.json",
+      "sha256": "acb5a3f3182805162e39d95b459eb341f49ab05456d8656c8a969c37bc1bbf6c",
+      "bytes": 146
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-negative.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-positive.json",
+      "sha256": "71b781bb906e8cc658e18ab6de06ae20bd992ebec4a6ea2dceeb2c23984e95aa",
+      "bytes": 151
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-gateway-positive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-negative.json",
+      "sha256": "3ba8ae690fe430056d0bffb2de42c18d089410cc311c065028fc6a44c2a0628e",
+      "bytes": 144
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-negative.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-positive.json",
+      "sha256": "95a06d838c88db93d260d4715905f3398d6c7d3d63d588a238152d659e06257f",
+      "bytes": 148
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/controls/sdk-native-positive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/exec-help-0.159.3.txt",
+      "sha256": "0e82cfde0122715250e93dc65866caa956b2ac5b9d0b20ec4ad4f9e81486509e",
+      "bytes": 4031
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/exec-help-0.160.0.txt",
+      "sha256": "0e82cfde0122715250e93dc65866caa956b2ac5b9d0b20ec4ad4f9e81486509e",
+      "bytes": 4031
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/exec-help.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/invocations.json",
+      "sha256": "000b2bd95c7e0dbcac873879f3a4af09890ed2d1238a5ecf46eacd98631ab9c5",
+      "bytes": 2594
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/bootstrap.log",
+      "sha256": "d2354220da06487ccd63bb96b2f20f5098a7ced75e1b7a257ef057e5ceeca077",
+      "bytes": 2540
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/initial-regression-failure.log",
+      "sha256": "bb4766ea862584eb2106294b7e7c1fa26e8484ac46b5f1e7271712550f5d0bc1",
+      "bytes": 3377
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/installed-versions.txt",
+      "sha256": "305f8b6ee81b8102f2f8c651fe8fa53cdfc4459501c75a61c9bd5e9822ec0672",
+      "bytes": 1055
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/macos-parity-regression-failure.log",
+      "sha256": "a5f6bbccccc1ec631f2990a4de3cbaf6226ab3e7341c7512c820b69ca9e5b19c",
+      "bytes": 1722
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/native-installation.json",
+      "sha256": "a844e065e1ba31e29b2693681659299227dd07d42ecaf92c2fc438d73252931f",
+      "bytes": 2095
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/platform-tests.log",
+      "sha256": "3ba5edc4d104d18caf0c358404aad3de3a4f394d8a05f732fb58dd6c9a6deaca",
+      "bytes": 19882
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/publication-validation-failure.json",
+      "sha256": "73df23a90b43a188d8dc3f9555ca27a347bd9d3c8734f5afd005da07c0a1f277",
+      "bytes": 501
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/receipt.json",
+      "sha256": "b1af4cec10dea8cdb04880801c1ea49a1cf690be679cc0a36af6ff6c1d302fa0",
+      "bytes": 9703
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/red-controls.log",
+      "sha256": "032453fa92b377922619316ad1c4845e0b4e3fd1cf09f57124a537f7f022971d",
+      "bytes": 3719
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/registry-tests.log",
+      "sha256": "7581cbd4b21705bfbb22f87e01cf8c5cb2ed559c0dd31cf503596abb2ea22d15",
+      "bytes": 101
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/regression-tests.log",
+      "sha256": "99cf9409ef66c0b9d795fde306e2202cc3a210514cc6e8ba7154d53816a39e30",
+      "bytes": 752
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/sanitization.json",
+      "sha256": "ce3623709ade44688c4ec54e1753a717d3f49d48c981ac26b1fe6854cbdf639a",
+      "bytes": 409
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/toolchain.json",
+      "sha256": "73e9c9f7884c2be7a2335047cad41bbd7a41312e118b152f0f1c3f33766f8d75",
+      "bytes": 325
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/marker_check.py",
+      "sha256": "f833f52d401d124987b19de3cdf48bfe1f1f5f169b20dc3f8a79e101c8dbd82b",
+      "bytes": 1088
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/npm-dist-linux-x64.json",
+      "sha256": "be86da1a7e99e0a435c58fe3a9a5231f770bcbf696767133c4ba56cb772cbc9e",
+      "bytes": 214
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/npm-dist.json",
+      "sha256": "62d95da79ec7b999cbc2f10dd75fffc46ac01e4c3d9950e3cea7f98315979846",
+      "bytes": 204
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/npm-install.log",
+      "sha256": "f6b3015540a8faaeab0d34bc590d69ab23310b3000fe44bf48780dbb883292f1",
+      "bytes": 24
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/qualification-facts.json",
+      "sha256": "ac7e7efc086c1c9e40575f26eae4ed9e20bdcc1407ebc182ac1d8606b24aba76",
+      "bytes": 5321
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/receipt.json",
+      "sha256": "9ca254b27ad94779733f8a42f402916f3f9e0a51c4a71839ac769ed437cbbb10",
+      "bytes": 19042
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20261003/retained-records.json",
+      "sha256": "24ec145868a396074b67dc0a0e384d15bb698b922f0da9b2536e5d157e279657",
+      "bytes": 20488
+    },
+    {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
       "sha256": "e494120421102202312b567d699025c96e85c0e925a88a143c4ea11af2a791a2",
       "bytes": 169217
@@ -50282,6 +50569,11 @@
       "bytes": 32488
     },
     {
+      "path": "evidence/receipts/runtime-sdk-20261003.json",
+      "sha256": "e5ad4e1e95bf4e621bcecd35bcdd16ec6d55a5e39933414f96cb704559a4093b",
+      "bytes": 4748
+    },
+    {
       "path": "evidence/receipts/runtime-tools.json",
       "sha256": "67b25345616bf4ff12abb62439b69f4f38d9589ca94134fd455ef61ea0e24540",
       "bytes": 1840
@@ -50923,8 +51215,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "b10693331a67883d86a47ec40b6345f5f48d80aa287a991e20df4b40355ed72a",
-      "bytes": 100006
+      "sha256": "5dce41e9a72a965566c24b6c47ae0d887f47f8655763c6c55eb01437efcffad0",
+      "bytes": 100811
     },
     {
       "path": "observability/README.md",
@@ -51118,8 +51410,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "af4e5bc44d826ceece379c51269de39c6f8b00460bbfa6a1350c0b10987b797c",
-      "bytes": 24324
+      "sha256": "6dc4f85e48a3ddc5b3b9f9f5e485aa66aaeb53b9a1e173c57d857a4e04da6274",
+      "bytes": 24794
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -51208,8 +51500,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "b85079af8ac6d065a768d356c3f52871bc86e148a4b2336bda81cb1b730661cc",
-      "bytes": 125316
+      "sha256": "94ccf5e86f0af7338f92aa17cb503200d0e210052dd97baa5898b0b16cfc1437",
+      "bytes": 126072
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -51653,17 +51945,27 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "b99fddfa4d116fc4591286780873a2f0f52d47cbbd7030e411c06135720d8ebc",
-      "bytes": 105447
+      "sha256": "e4e23c487f6376a5a9e711a98f360cd68442920d2deb2e0800cc2130ea45f37a",
+      "bytes": 105903
+    },
+    {
+      "path": "tests/test_adoption_bootstrap_linux_platform.py",
+      "sha256": "702f81f588772fdfd0e8246e7a00efddadce765a5c390fdbd7df675ede502ec8",
+      "bytes": 28940
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "b4469dcd218a0b691a77b1d69cc0302febe5cdac6398a03ebd5cad59670862d7",
-      "bytes": 228732
+      "sha256": "a085835f7fdf40f8eac5d7f257f3667f7c8581cdcf08f78a5ab38c985a192862",
+      "bytes": 228690
+    },
+    {
+      "path": "tests/test_adoption_bootstrap_parity.py",
+      "sha256": "45efb2e26dbd8633690404432d1711fc1de7715504cc8bace502321cb5de4bf2",
+      "bytes": 1073
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "adf4af9443a046733c7382442e870c99209c092178ab37ac51b5cb47bff09a1a",
+      "sha256": "8bfd38217d9759122787d511eb79e86e33fa68ec1c75e542ffbd121324f6caae",
       "bytes": 24092
     },
     {
@@ -51828,7 +52130,7 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "1f63efdc8a1d2dd14507eedaa9603cd4a382b4b7e4835fbb982923d669360abd",
+      "sha256": "b044dbd842570b38de679381208cc193ecf2b1a8d5f22a4139aa6eb9786f0644",
       "bytes": 155728
     },
     {
@@ -52323,7 +52625,7 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "050b57bfb55ff2afc8f15769c7e82f8fb8f701948b5cd93b7fe2b2913881715b",
+      "sha256": "e8a7d735d73063ef82c4cff28bfa09a737d75a4fb69d84b49aec335ae2ba62b4",
       "bytes": 45406
     },
     {
@@ -52468,8 +52770,8 @@
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
-      "sha256": "13276b5068067da4786c6ac4c020562a10fb4de22c3d7e4345c4662932d0366e",
-      "bytes": 23034
+      "sha256": "8d2ed091ed91928e88b74806f38eb146c30dd5fde3faf6fb43e52381163e7ae7",
+      "bytes": 24974
     },
     {
       "path": "tests/test_token_measurement.py",
@@ -52563,13 +52865,13 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "9e7446dda320da39b1a5846c50c43fb634621727dd49a89a7239e21063ac7cce",
-      "bytes": 80788
+      "sha256": "a5a1d210bded93924796d18c8775fdcf76f31a3b7dd17c0c8a888f547d2194a9",
+      "bytes": 81028
     },
     {
       "path": "tools/adoption/codex_roles.py",
-      "sha256": "340857eb6297972242a61fb68e773aaf4959956bdf91c60082f2b4cc0b05cadc",
-      "bytes": 34220
+      "sha256": "d02975b4d5e7f4e43ab347f18d99a4973a9e262cdad816147e63410c0543feff",
+      "bytes": 34229
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
