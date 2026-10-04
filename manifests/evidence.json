@@ -9500,8 +9500,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "9c4ed33b4d78fd4e2d46ffc2b2dc84edb078b11d9125a600ddcca5a776e08cb9",
-      "bytes": 56474
+      "sha256": "a936e7f0f5a7c6f83244872b54f7e5cdf301e7dea5d8aee0929d02fc52bdaaa1",
+      "bytes": 61691
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -9610,8 +9610,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt",
-      "sha256": "b710a162d491e07f70dd111411425f0e21a629e2bbd8a758c12af2351d050890",
-      "bytes": 378281
+      "sha256": "fb3173c0bb5025836936649d53076a0e9e4efcea5537b3517e1ad3d2768c911b",
+      "bytes": 562463
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/receipt-red.txt",
@@ -9965,8 +9965,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
-      "sha256": "a49d7e9044da763036c037d1cf251ac4d52a64ec75c2b3167cccb9e93bbce240",
-      "bytes": 23029
+      "sha256": "426f94947d3defb5f22371daea6226011390ca0206a10ebb039fbd44514d2a39",
+      "bytes": 23058
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -10020,8 +10020,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/receipt.py",
-      "sha256": "8aa7fdddd3209de8e6e53575ad8ac8613a904f31caaa0561fc47898495b0a045",
-      "bytes": 32216
+      "sha256": "6868f565727789903f0176666c69e97f8ee2f2e999e969197dfb0cae6073bfb3",
+      "bytes": 32518
     },
     {
       "path": "blueprints/runtime-workers/openhands/recipe.py",
@@ -10040,13 +10040,13 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver.py",
-      "sha256": "15d90e19daaf246d2a3c1621d5a20933ce9176f9cbfe6ab4808f8b751aec6c76",
-      "bytes": 98864
+      "sha256": "4ecb93b74409789faab361efcecf582bbbf479281492a15403d45be0a675e046",
+      "bytes": 99458
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gate_reads.py",
-      "sha256": "b4ecb2ee1a68e0fea924075f04a17a7a74673be7c42d401416187cd184e3acac",
-      "bytes": 60722
+      "sha256": "7e5aa4f95f42dd3ad2ef905d7644cd49698b22173b81b0ada73c431891476b89",
+      "bytes": 55520
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gh_harness.py",
@@ -10065,8 +10065,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
-      "sha256": "edecb30c4c21980bf7bb95251f3e35054d83a6bb955aa8c8efbfbfbffbe26596",
-      "bytes": 59501
+      "sha256": "97856f3b796c63728b9e436aca44df0ddbb2f6dc3aafa627923d69a2cdc9b196",
+      "bytes": 58600
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -10080,8 +10080,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/skills/resolver/SKILL.md",
-      "sha256": "7d140cddce8c498b4bb35affef2ada64947369ad1c85d7b9f79d525a3c54ca1d",
-      "bytes": 5633
+      "sha256": "d62b9aafe5f7ecf1fd700edf1944b29ca1aa3169ae280c7326246a793dc7470f",
+      "bytes": 5770
     },
     {
       "path": "blueprints/runtime-workers/openhands/worker.py",
@@ -16115,8 +16115,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
-      "sha256": "9ad89edbd44b765d83ef048382cd68e2ef90298262437f8dde0eb4d974ce607b",
-      "bytes": 72483
+      "sha256": "4e20f8bfdc1102a33605a2521683b9d6a1b4394ec0e6e83406b6b80a92cc6a54",
+      "bytes": 75201
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
@@ -52790,13 +52790,13 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "05831abaa04411932d4c7f14bb95afe874446c3c807106f2836d7c4fa1d14ce5",
-      "bytes": 100208
+      "sha256": "ee2bf2500efa497559f55641b57355190b13db07152d353749f64ec64f25cbfa",
+      "bytes": 102335
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "20c5bbfcc44f392914cf3d7fc7e2d4f3b623f8cd08b37dbc062a824426aa5dd1",
-      "bytes": 264024
+      "sha256": "8a32636c073d46334e7064964adaa68a5d6856230f9765b7d831fbb2c7368702",
+      "bytes": 263758
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
