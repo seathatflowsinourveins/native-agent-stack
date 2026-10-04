@@ -22,7 +22,7 @@
     "The unfiltered session export includes pre-10-03 activity: 17 rows worth $1,252.96 have lastActivity before 2026-10-03T04:00Z. The raw and activity-selected shares have different denominators. Filtering lastActivity does not restrict the dates of every token in a session total; neither view is established as spend since 10-03.",
     "The reproduction artifact extends the supplied analysis with advisor-cohort rows. Original executor output is unchanged. Its private raw output includes source identifiers; only sanitized aggregates are retained here.",
     "Advisor iterations are absent from calls.tsv and retained only as per-file tot values in files.jsonl. Grouping them by file first_ts reproduces the reviewed cohorts, but files can cross window boundaries. Executor-plus-advisor-cohort IET is an estimate with mixed timestamp scopes, not an exact call-window total; advisor iterations have no recorded effort here.",
-    "IET uses pooled relative weights across models; Fable dollar shares from ccusage and Fable IET shares are different measures. Historical Fable usage precedes the new Opus advisor decision."
+    "IET applies the same coefficients to every model: input 1, cache read 0.1, five-minute and unclassified cache writes 1.25, one-hour cache writes 2, and output 5, with thinking already in output. There is no model-specific base-price multiplier. Advisor aggregates lack cache-write duration splits and weight all cache writes at 1.25. Thus IET model shares and window ratios are relative-index measures, not dollar shares or actual spend ratios; Fable dollars from ccusage remain separate. Historical Fable usage precedes the new Opus advisor decision."
   ],
   "data": {
     "recorded_date": "2026-10-04",
@@ -80,6 +80,11 @@
           "source": "agg.py",
           "sha256": "5448cb65b62fe81ff400cc1e29fa3f26a3c73ba3a4011d419f63b4a664ca8601",
           "bytes": 17045
+        },
+        {
+          "source": "report.py",
+          "sha256": "0ece28b4c8f066787038938a10037e1a9ee3981fa27ef34e9f4f70bbc4cb01e3",
+          "bytes": 12028
         },
         {
           "source": "out/calls.tsv",
@@ -148,7 +153,7 @@
           "source": "SPEND-DIAGNOSIS-20261004.md",
           "sha256": "3a2b88e0923362bc2247245ea36315adb914ba5c037f13f9d184cac550d2e56a",
           "bytes": 4094,
-          "reason": "Coordinator updated the diagnosis with the job-012 prefix correction after the original build."
+          "reason": "Coordinator updated the diagnosis with the job-012 prefix correction after the original build. The old +1.2K-token attachment quote is superseded: the pinned 4162-byte revision explicitly states net +0.8K tokens and identifies +1.2K as positive-only growth."
         }
       ]
     },
@@ -426,6 +431,32 @@
     "ccusage_session_view": {
       "command": "ccusage session --since 20261003 --json --offline",
       "selection": "agent == claude. Top-level shares are the unfiltered raw export; activity_selected_view is separately filtered by lastActivity. Workflow parents use folder names only.",
+      "workflow_row_count_observation": {
+        "checked_on": "2026-10-04",
+        "source": "ccusage-session-1003.json",
+        "source_sha256": "41d5d3a9cf072dcb723b2c7b55716d2e0b2b8aafbd9765f34a6add3521504b32",
+        "parent_mapping_source": "out/files.jsonl",
+        "parent_mapping_sha256": "f821aceff9028ab78028c18606c22b534e359d4036f953d171e17bf8864b3047",
+        "method": "Select agent == claude; match each wf_ period to a workflow folder component in files.jsonl and its parent session; select metadata.lastActivity >= 2026-10-03T04:00:00Z. Publish coordinator names and counts only.",
+        "mapped_workflow_rows": 102,
+        "ambiguous_parent_mappings": 0,
+        "coordinator_counts": [
+          {
+            "session_name": "native-agent-stack-5f",
+            "raw_workflow_rows": 38,
+            "activity_selected_workflow_rows": 36,
+            "excluded_workflow_rows": 2
+          },
+          {
+            "session_name": "wsl-architecture-design",
+            "raw_workflow_rows": 58,
+            "activity_selected_workflow_rows": 50,
+            "excluded_workflow_rows": 8
+          }
+        ],
+        "exit_code": 0,
+        "claim_boundary": "Independent count of retained session-selection rows; lastActivity selection does not establish daily token membership or distinct workflow launches."
+      },
       "rows": 179,
       "total_cost_usd": 12404.875934150008,
       "workflow_run_rows": 102,
@@ -670,6 +701,21 @@
       "transcript_file_records": 8500,
       "context_definition": "input + top-level cache creation + cache read tokens",
       "iet_definition": "input + 0.1*cache_read + 1.25*(cache_write_5m + max(0,cache_write-cache_write_5m-cache_write_1h)) + 2*cache_write_1h + 5*output; relative index, not USD; thinking is already in output",
+      "iet_weight_scope": {
+        "source": "report.py:3,7-13,57-60; evidence/artifacts/claude-spend-window-compare.py.txt:34-37,120",
+        "same_coefficients_for_every_model": true,
+        "coefficients": {
+          "input": 1,
+          "cache_read": 0.1,
+          "cache_write_5m": 1.25,
+          "cache_write_1h": 2,
+          "cache_write_unclassified": 1.25,
+          "output_including_thinking": 5
+        },
+        "model_specific_base_price_multiplier": null,
+        "advisor_cache_writes": "All retained advisor cache writes receive 1.25 because the per-file aggregates lack duration splits.",
+        "claim_boundary": "Pooling applies shared token-category coefficients, not pooled or fitted model prices. Model shares and window ratios describe the relative index only; do not equate them with ccusage dollar shares, actual spend ratios or post-change advisor savings."
+      },
       "call_definition": "one row per message identifier, per-field maximum across duplicates, including synthetic zero-usage rows",
       "subagent_definition": "non-main file whose first_ts falls in the window; mean calls uses that file's entire calls field",
       "windows": {
@@ -1417,7 +1463,7 @@
     "numeric_review": {
       "verified": "Claude daily dollar figures; Prometheus UTC dollar figures; scanner file/row counts, durations, IET, model/effort shares, first-call context, per-file calls; session-view tree and workflow shares; context-mode tool-call shares. Protocol budgets and future PR/day counts are decisions, not measured outcomes.",
       "scope_notes": [
-        "The diagnosis's 40 workflow runs for native-agent-stack-5f is its whole retained scanner tree; 34 have file starts in B, while ccusage has 38 selected workflow rows. These counts have different scopes.",
+        "The diagnosis's 40 workflow runs for native-agent-stack-5f is its whole retained scanner tree; 34 have file starts in B, while ccusage has 38 raw workflow rows and 36 after the lastActivity cutoff. The pinned session export and scanner parent mapping independently reproduce 38 minus 2 equals 36 (data.ccusage_session_view.workflow_row_count_observation). These counts have different scopes.",
         "The 10-04 similar-pace statement is a projection from a partial local day; it is not a completed daily cost.",
         "Historical hook-text sizes, the approximately 22 KB auto-memory index, and the under-1% trimming effect are not independently recoverable from the supplied count-only inputs; no claimed verification is made for them.",
         "Coordinator timestamps, restart version/time, listener absence and policy acceptance are coordinator context, not independently observed spend metrics.",
@@ -1427,11 +1473,18 @@
         {
           "doc": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
           "claim": "Injected start context grew about 1.2K tokens per subagent.",
+          "status": "superseded; the decision record now states about 0.8K tokens per subagent",
           "source_value": "Net attachment growth excluding UI is 2877.926255 bytes, or 799.423960 rough tokens; the 1.2K estimate uses positive-only growth (4287.520911 bytes) and ignores decreases."
         },
         {
           "doc": "SPEND-DIAGNOSIS-20261004.md",
           "claim": "Injected attachments grew about 4.3 KB (+1.2K tokens).",
+          "status": "superseded source revision; retained as the historical mismatch",
+          "quoted_revision_sha256": "3a2b88e0923362bc2247245ea36315adb914ba5c037f13f9d184cac550d2e56a",
+          "quoted_revision_bytes": 4094,
+          "superseded_by_revision_sha256": "0efb89be1c65a642287102f2f326ca65e781c62ddc616d4d4896711b5ba60adf",
+          "corrected_net_rough_tokens": 799.423960,
+          "current_revision_note": "The pinned 4162-byte diagnosis states net +0.8K tokens; +1.2K counts only the attachment families that grew.",
           "source_value": "Net 2877.926255 bytes (+799.423960 rough tokens) excluding hook_success; positive-only 4287.520911 bytes."
         },
         {
@@ -1486,6 +1539,24 @@
         "evidence": "Subagent ratio is 2.8235294; executor-plus-advisor-cohort ratio is 2.141423902025669 rather than the review summary's 2.12.",
         "correction": "Round the subagent ratio to 2.824 and the combined cohort ratio to 2.141, while retaining their separate scopes.",
         "enforced_by": "Receipt claim, numeric_review and window_comparison; the registry copies the receipt metadata."
+      },
+      {
+        "mistake": "Requiring a dated historical template quote to remain in a superseded mutable template",
+        "evidence": "CI run 37215586738 and the local one-test reproduction both reject the old advisorModel fable quote after the user's Opus selection.",
+        "correction": "Preserve the historical route and quote through the unchanged September 27 source statement; append October 4 forward pointers in both records to the user's current advisor decision and PR #691.",
+        "enforced_by": "tests/test_task_model_routing.py and existing template advisorModel integration checks"
+      },
+      {
+        "mistake": "Calling the raw 38 workflow rows the activity-selected count",
+        "evidence": "Pinned ccusage session export plus files.jsonl parent mapping independently yield 38 raw rows, two before the cutoff and 36 selected for native-agent-stack-5f.",
+        "correction": "Cite both counts and their selection scopes; retain the independent count observation.",
+        "enforced_by": "data.ccusage_session_view.workflow_row_count_observation and numeric_review.scope_notes"
+      },
+      {
+        "mistake": "Expanding an abbreviated source revision before resolving it natively",
+        "evidence": "git rev-parse b629b5b4 returns b629b5b413d75deb4c98dd26d62b129173b87d44; the initially transcribed full value was corrected before acceptance.",
+        "correction": "Use the native returned full commit ID for the frozen inventory's source revision.",
+        "enforced_by": "data.dispatch_observation_protocol.baseline_inventory_selection.source_revision"
       }
     ],
     "completeness_critic": {
@@ -1496,16 +1567,22 @@
         "All three scanner windows, kinds, models and effort",
         "Net versus positive-only prefix growth",
         "UI hook records excluded from context",
-        "Source-body reproduction and privacy checks"
+        "Source-body reproduction and privacy checks",
+        "Fixed baseline candidate membership and scoring eligibility",
+        "Independent raw-versus-activity-selected workflow row counts",
+        "Superseded diagnosis quote revision and net +0.8K-token correction",
+        "Shared IET coefficients and absence of model-specific price weights",
+        "Dated advisor forward pointers and retained historical quote source"
       ],
       "remaining_limits": [
         "Original hook text and model-input tokenization are absent from aggregate inputs",
         "Subscription meter and quality A/B are absent",
         "Session/daily snapshot difference has no established cause",
         "Advisor iteration timestamps are absent; file cohorts are approximate.",
-        "Historical PR P1/repair counters need complete review records, not author trailers or missing-label zeros."
+        "Historical PR P1/repair counters need complete review records, not author trailers or missing-label zeros.",
+        "The fixed ten-PR inventory is a purposive screening set, not an exhaustive or random baseline sample."
       ],
-      "next_sweep": "A lifecycle-task sweep for spend attribution should retain bounded hook-text length observations and aligned native export timestamps; no new tool adoption follows from this receipt."
+      "next_sweep": "A lifecycle-task sweep for spend attribution should retain bounded hook-text length observations and aligned native export timestamps, qualify builder attribution and complete counters for the fixed candidate inventory, and retain explicit quote revision and row-selection scopes; no new tool adoption follows from this receipt."
     },
     "advisor_model_decision": {
       "decided_at_utc_approx": "2026-10-04T15:10Z",
@@ -1530,6 +1607,14 @@
     "dispatch_observation_protocol": {
       "status": "pending baseline completeness; no quality-unchanged conclusion",
       "baseline_scope": "Candidate foundation changes merged 2026-10-03T00:00Z through 2026-10-04T14:20Z at main b629b5b4. A Claude coauthor alone does not prove the builder family. Freeze actual builder-role attribution and complete counters before comparison.",
+      "baseline_inventory_selection": {
+        "rule": "Exactly the enumerated ten candidate PRs below, frozen at main b629b5b4; a purposive foundation implementation-change inventory, not a census of merges or a claim to be the ten most recent merges. Keep every candidate regardless of review outcome or missing data.",
+        "candidate_pr_numbers": [683, 688, 681, 626, 672, 673, 665, 680, 676, 635],
+        "source_revision": "b629b5b413d75deb4c98dd26d62b129173b87d44",
+        "source": "The retained baseline_prs inventory and native git merge history through b629b5b4, inspected on 2026-10-04.",
+        "scoring_selection": "Score all candidates whose actual Claude builder family, contract-build eligibility, exact review heads and complete P1/read/repair counters are confirmed. Preregistered role exemptions and Claude-only builds are excluded. Require at least five complete eligible Claude baseline PRs; incomplete rows remain unknown rather than zero.",
+        "limit": "No exhaustive historical inventory query is retained. This fixed screening rule does not establish representative sampling or a controlled comparison."
+      },
       "baseline_prs": [
         {
           "pr": 683,
