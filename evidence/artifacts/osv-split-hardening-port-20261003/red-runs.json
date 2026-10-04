@@ -1,0 +1,83 @@
+[
+  {
+    "id": "R1",
+    "expectation": "survives",
+    "started_utc": "2026-10-03T19:11:41Z",
+    "finished_utc": "2026-10-03T19:11:44Z",
+    "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+    "exit_code": 0,
+    "tests_run": 54,
+    "skipped": [],
+    "failing_tests": [],
+    "wall_seconds": 2.413,
+    "evidence_class": "synthetic",
+    "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R1.txt",
+    "selection": "R1 within the single red-controls invocation"
+  },
+  {
+    "id": "R2",
+    "expectation": "caught",
+    "started_utc": "2026-10-03T19:11:44Z",
+    "finished_utc": "2026-10-03T19:11:46Z",
+    "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+    "exit_code": 1,
+    "tests_run": 5,
+    "skipped": [],
+    "failing_tests": [
+      "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate",
+      "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan (mutation='unknown-config')"
+    ],
+    "wall_seconds": 2.303,
+    "evidence_class": "synthetic",
+    "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R2.txt",
+    "selection": "R2 within the single red-controls invocation"
+  },
+  {
+    "id": "R3",
+    "expectation": "caught",
+    "started_utc": "2026-10-03T19:11:46Z",
+    "finished_utc": "2026-10-03T19:11:48Z",
+    "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+    "exit_code": 1,
+    "tests_run": 5,
+    "skipped": [],
+    "failing_tests": [
+      "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained (primary=(0, 0, 0), sarif=(0, 0, 1))",
+      "tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained (primary=(0, 0, 0), sarif=(0, 0, 7))"
+    ],
+    "wall_seconds": 2.048,
+    "evidence_class": "synthetic",
+    "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R3.txt",
+    "selection": "R3 within the single red-controls invocation"
+  },
+  {
+    "id": "R4-override",
+    "expectation": "survives",
+    "started_utc": "2026-10-03T19:11:48Z",
+    "finished_utc": "2026-10-03T19:11:48Z",
+    "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+    "exit_code": 0,
+    "tests_run": 2,
+    "skipped": [],
+    "failing_tests": [],
+    "wall_seconds": 0.003,
+    "evidence_class": "synthetic",
+    "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-override.txt",
+    "selection": "R4-override within the single red-controls invocation"
+  },
+  {
+    "id": "R4-key",
+    "expectation": "survives",
+    "started_utc": "2026-10-03T19:11:48Z",
+    "finished_utc": "2026-10-03T19:11:48Z",
+    "command": "rtk proxy env TMPDIR=/var/tmp PYTHONPATH=. nice -n 19 python3 /tmp/pr555-red-controls.py",
+    "exit_code": 0,
+    "tests_run": 2,
+    "skipped": [],
+    "failing_tests": [],
+    "wall_seconds": 0.004,
+    "evidence_class": "synthetic",
+    "output": "evidence/artifacts/osv-split-hardening-port-20261003/red-R4-key.txt",
+    "selection": "R4-key within the single red-controls invocation"
+  }
+]
