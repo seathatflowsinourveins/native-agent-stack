@@ -23,6 +23,7 @@ import sys
 import tempfile
 import traceback
 import unittest
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -266,7 +267,7 @@ class StateCases(unittest.TestCase):
 
     def order(self, intent="buy", qty=10, price="100.00", side="BUY", **extra):
         self.transport.current_intent = intent
-        payload = {"symbol": "SYNTH.TEST", "side": side, "quantity": qty,
+        payload = {"symbol": extra.pop("symbol", "SYNTH.TEST"), "side": side, "quantity": qty,
                    "limit_price": price, "currency": extra.pop("currency", "USD")}
         return self.action("submit", intent, payload, self.transport,
                            quote_price=extra.pop("quote_price", price),
@@ -388,11 +389,11 @@ class StateCases(unittest.TestCase):
 
     def test_execution_identity_requires_owned_reference_and_native_id(self):
         """Invalid fill identity never binds or books; missing identity remains a permanent contradiction."""
-        cases = [(None, "unknown_execution_order"),
-                 ({"order_ref": "foreign"}, "unknown_order_reference"),
-                 ({"order_id": 0}, "invalid_native_id"),
-                 ({"order_id": None, "perm_id": None}, "native_id_unobserved")]
-        for index, (changes, reason) in enumerate(cases):
+        cases = [(None, "unknown_execution_order", "contradiction_requires_adjudication"),
+                 ({"order_ref": "foreign"}, "unknown_order_reference", "contradiction_requires_adjudication"),
+                 ({"order_id": 0}, "invalid_native_id", "contradiction_requires_adjudication"),
+                 ({"order_id": None, "perm_id": None}, "native_id_unobserved", "unresolved_order_or_cancel")]
+        for index, (changes, reason, reconcile_reason) in enumerate(cases):
             with self.subTest(reason=reason):
                 self.close_state()
                 self.db_path = Path(self.tmp.name)/("fill-identity-"+str(index)+".sqlite")
@@ -414,7 +415,11 @@ class StateCases(unittest.TestCase):
                 self.assertEqual(snap["executions"], [])
                 self.economics(0, 1000000, 0, 0)
                 self.assertFalse(snap["ready"])
+                self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+                self.assertEqual(self.state.snapshot()["alerts"][-1], reconcile_reason)
                 self.restart()
+                self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+                self.assertEqual(self.state.snapshot()["alerts"][-1], reconcile_reason)
                 self.assertFalse(self.state.snapshot()["ready"])
                 self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"])
 
@@ -692,6 +697,93 @@ class StateCases(unittest.TestCase):
             self.order("new", qty=1)
         self.restart()
         self.assertFalse(self.state.snapshot()["ready"])
+
+    def test_tick_valid_fill_exposure_overflow_keeps_ledger_and_blocks(self):
+        """Own fill fits cents but 11-share marked total overflows; no booking and permanent economic contradiction."""
+        self.order(qty=10)
+        self.fill(quantity=10)
+        self.fee(amount="0")
+        self.order("extra", qty=1)
+        fill_price = "50000000000000000000000000.00"
+        self.assertEqual(self.module.price(fill_price), Decimal("5e25"))
+        self.assertEqual(self.module.cents(fill_price), 5*10**27)
+        before = self.state.snapshot()
+        self.assertFalse(self.fill("extra-exec", 1, fill_price, "extra"))
+        after = self.state.snapshot()
+        for field in ["orders", "executions", "commissions", "positions", "cash_cents", "fees_cents",
+                      "gross_loss_cents", "gross_loss_exact_cents", "halt"]:
+            self.assertEqual(after[field], before[field], field)
+        self.assertIn("invalid_execution_economics", after["alerts"])
+        self.assertEqual([e["exec_id"] for e in after["executions"]], ["e1"])
+        self.assertFalse(after["ready"])
+        with self.assertRaisesRegex(self.module.Refused, "^reconciliation_required$"):
+            self.order("new", qty=1)
+        self.restart()
+        self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+        self.assertEqual(self.state.snapshot()["alerts"][-1], "contradiction_requires_adjudication")
+        self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"]*2)
+
+    def test_execution_product_arithmetic_error_blocks_before_booking(self):
+        """A reduced exponent ceiling exposes raw qty*px Overflow; no fill is booked and contradiction persists."""
+        self.order(qty=10)
+        before = self.state.snapshot()
+        context = self.module._MONEY_CONTEXT.copy()
+        context.Emax = 3
+        self.record["sequence"].append({"operation": "synthetic_exponent_ceiling", "Emax": 3})
+        with patch.object(self.module, "_MONEY_CONTEXT", context):
+            self.assertFalse(self.fill(quantity=10, price="1000.00"))
+        after = self.state.snapshot()
+        for field in ["orders", "executions", "commissions", "positions", "cash_cents", "fees_cents",
+                      "gross_loss_cents", "gross_loss_exact_cents", "halt"]:
+            self.assertEqual(after[field], before[field], field)
+        self.assertIn("invalid_execution_economics", after["alerts"])
+        with self.assertRaisesRegex(self.module.Refused, "^reconciliation_required$"):
+            self.order("new", qty=1)
+        self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+        self.assertEqual(self.state.snapshot()["alerts"][-1], "contradiction_requires_adjudication")
+
+    def test_sell_cumulative_loss_quantization_overflow_keeps_ledger_and_blocks(self):
+        """Three distinct 4e27-cent costs overflow loss quantization on sell3; prior two sales remain intact."""
+        self.close_state()
+        self.db_path = Path(self.tmp.name)/"sell-loss-overflow.sqlite"
+        limits = replace(self.module.Limits(), start_cash_cents=10**32, exposure_cents=10**32,
+                         gross_loss_cents=10**32, drawdown_cents=10**32)
+        self.state = self.open_state(limits=limits)
+        self.broker.cash = Decimal("1e30")
+        self.record["sequence"].append({"operation": "synthetic_arithmetic_boundary_limits",
+                                        "limits": asdict(limits), "opening_cash_usd": "1e30"})
+        fill_price = "40000000000000000000000000.00"
+        symbols = ["SYNTH.A", "SYNTH.B", "SYNTH.C"]
+        for index, symbol in enumerate(symbols):
+            intent, execution = "buy"+str(index), "buy-exec"+str(index)
+            self.order(intent, qty=1, symbol=symbol)
+            self.assertTrue(self.fill(execution, 1, fill_price, intent))
+            self.fee(execution, "0")
+        self.clock.now += 60_000_000_000
+        for index, symbol in enumerate(symbols[:2]):
+            intent, execution = "sell"+str(index), "sell-exec"+str(index)
+            self.order(intent, qty=1, side="SELL", symbol=symbol)
+            self.assertTrue(self.fill(execution, 1, "100.00", intent))
+            self.fee(execution, "0")
+        self.order("sell2", qty=1, side="SELL", symbol=symbols[2])
+        before = self.state.snapshot()
+        self.assertEqual(before["gross_loss_cents"], 8*10**27-20000)
+        self.assertEqual(before["positions"], {"SYNTH.C": 1})
+        self.assertFalse(self.fill("sell-exec2", 1, "100.00", "sell2"))
+        after = self.state.snapshot()
+        for field in ["orders", "executions", "commissions", "positions", "cash_cents", "fees_cents",
+                      "gross_loss_cents", "gross_loss_exact_cents", "halt"]:
+            self.assertEqual(after[field], before[field], field)
+        self.assertIn("invalid_execution_economics", after["alerts"])
+        self.assertNotIn("sell-exec2", [e["exec_id"] for e in after["executions"]])
+        self.assertEqual(after["cash_cents"], 10**32-12*10**27+20000)
+        with self.assertRaisesRegex(self.module.Refused, "^reconciliation_required$"):
+            self.order("new", qty=1, symbol="SYNTH.C")
+        self.close_state()
+        self.state = self.open_state(limits=limits)
+        self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+        self.assertEqual(self.state.snapshot()["alerts"][-1], "contradiction_requires_adjudication")
+        self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"]*6)
 
     def test_unset_double_mark_blocks_without_replacing_mark(self):
         """Unrepresentable mark latches invalid_position_mark and retains the last valid economics."""

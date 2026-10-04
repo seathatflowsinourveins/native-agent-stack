@@ -504,7 +504,7 @@ class PaperState:
                 qty = whole(quantity)
                 px = price(fill_price)
                 amount = cents(qty*px)
-            except Refused:
+            except (Refused, ArithmeticError):
                 return self._block("invalid_execution_economics", contradiction=True)
             if currency != "USD":
                 return self._block("unknown_execution_currency", contradiction=True)
@@ -518,37 +518,46 @@ class PaperState:
             original = json.loads(order["payload"])
             if order["status"] == "rejected" or order["filled"]+qty > original["quantity"]:
                 return self._block("execution_quantity_contradiction", contradiction=True)
-            symbol = original["symbol"]
-            position = self.db.execute("SELECT * FROM positions WHERE symbol=?", (symbol,)).fetchone()
-            old_qty = position["quantity"] if position else 0
-            old_cost = decimal(position["cost"]) if position else Decimal(0)
-            if original["side"] == "BUY":
-                new_qty, new_cost = old_qty+qty, old_cost+Decimal(amount)
-                cash_delta = -amount
-            else:
-                if qty > old_qty:
-                    return self._block("execution_short_position", contradiction=True)
-                disposed_cost = old_cost*Decimal(qty)/Decimal(old_qty)
-                new_qty, new_cost = old_qty-qty, old_cost-disposed_cost
-                cash_delta = amount
-                realized = Decimal(amount)-disposed_cost
-                if realized < 0:
-                    exact_loss = decimal(self._get("gross_loss_exact_cents"))-realized
-                    self._set("gross_loss_exact_cents", str(exact_loss))
-                    self._set("gross_loss_cents", int(exact_loss.quantize(Decimal("1"), rounding=ROUND_HALF_EVEN)))
-            self.db.execute("INSERT INTO executions VALUES(?,?,?)", (exec_id, intent, encoded))
-            self._set("cash_cents", self._get("cash_cents")+cash_delta)
-            if new_qty:
-                self.db.execute("INSERT OR REPLACE INTO positions VALUES(?,?,?,?)", (symbol, new_qty, str(new_cost), str(px)))
-            else:
-                self.db.execute("DELETE FROM positions WHERE symbol=?", (symbol,))
-            filled = order["filled"]+qty
-            cancelled = max(0, original["quantity"]-filled) if order["status"] == "cancelled" else 0
-            status = "filled" if filled == original["quantity"] else order["status"]
-            reserve = 0 if status in ["cancelled", "filled"] or original["side"] == "SELL" else cents((original["quantity"]-filled)*decimal(original["limit_price"]))
-            self.db.execute("UPDATE orders SET filled=?,cancelled=?,status=?,reserved_cents=? WHERE intent=?", (filled, cancelled, status, reserve, intent))
-            self._event("execution", {"exec_id": exec_id, **payload, "cash_delta_cents": cash_delta})
-            self._risk_latch()
+            # Keep the refusal in the outer transaction while discarding every
+            # economic write if any derived total or loss cannot be represented.
+            self.db.execute("SAVEPOINT execution_booking")
+            try:
+                symbol = original["symbol"]
+                position = self.db.execute("SELECT * FROM positions WHERE symbol=?", (symbol,)).fetchone()
+                old_qty = position["quantity"] if position else 0
+                old_cost = decimal(position["cost"]) if position else Decimal(0)
+                if original["side"] == "BUY":
+                    new_qty, new_cost = old_qty+qty, old_cost+Decimal(amount)
+                    cash_delta = -amount
+                else:
+                    if qty > old_qty:
+                        return self._block("execution_short_position", contradiction=True)
+                    disposed_cost = old_cost*Decimal(qty)/Decimal(old_qty)
+                    new_qty, new_cost = old_qty-qty, old_cost-disposed_cost
+                    cash_delta = amount
+                    realized = Decimal(amount)-disposed_cost
+                    if realized < 0:
+                        exact_loss = decimal(self._get("gross_loss_exact_cents"))-realized
+                        self._set("gross_loss_exact_cents", str(exact_loss))
+                        self._set("gross_loss_cents", int(exact_loss.quantize(Decimal("1"), rounding=ROUND_HALF_EVEN)))
+                self.db.execute("INSERT INTO executions VALUES(?,?,?)", (exec_id, intent, encoded))
+                self._set("cash_cents", self._get("cash_cents")+cash_delta)
+                if new_qty:
+                    self.db.execute("INSERT OR REPLACE INTO positions VALUES(?,?,?,?)", (symbol, new_qty, str(new_cost), str(px)))
+                else:
+                    self.db.execute("DELETE FROM positions WHERE symbol=?", (symbol,))
+                filled = order["filled"]+qty
+                cancelled = max(0, original["quantity"]-filled) if order["status"] == "cancelled" else 0
+                status = "filled" if filled == original["quantity"] else order["status"]
+                reserve = 0 if status in ["cancelled", "filled"] or original["side"] == "SELL" else cents((original["quantity"]-filled)*decimal(original["limit_price"]))
+                self.db.execute("UPDATE orders SET filled=?,cancelled=?,status=?,reserved_cents=? WHERE intent=?", (filled, cancelled, status, reserve, intent))
+                self._event("execution", {"exec_id": exec_id, **payload, "cash_delta_cents": cash_delta})
+                self._risk_latch()
+            except (Refused, ArithmeticError):
+                self.db.execute("ROLLBACK TO execution_booking")
+                return self._block("invalid_execution_economics", contradiction=True)
+            finally:
+                self.db.execute("RELEASE execution_booking")
         self._cancel_halted(transport)
         return True
 

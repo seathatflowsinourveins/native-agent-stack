@@ -109,6 +109,24 @@ control requests, unavailable halt transport and execution-supplied identities
 are also exercised. This file's new plan digest is frozen before the repair's
 acceptance execution and registered with the three owned files after edits.
 
+Delta repair — 2026-10-04, round `643-p3`: the first repair still let arithmetic
+errors escape from post-fill marked exposure, cumulative SELL loss quantization
+and the quantity × price expression. Execution now catches both `Refused` and
+`ArithmeticError`. Booking uses SQLite `SAVEPOINT`, `ROLLBACK TO` and `RELEASE`
+inside the existing outer transaction and writer mutex: an arithmetic failure
+discards all economic writes, then commits `invalid_execution_economics` with
+`contradiction=True` in that same outer transaction. These native primitives
+were exercised on installed SQLite `3.53.1`; this is a local primitive check,
+not an unchanged upstream test. The 10-share plus tick-valid `5e25` fill and
+cumulative SELL-loss regression cases fail against the preceding source and
+retain the prior ledger after repair. The SELL case uses explicitly recorded
+large synthetic cash/exposure/loss/drawdown bindings across three symbols;
+the product-overflow case temporarily reduces the test's exponent ceiling and
+restores it afterward. Identity subtests also check reconciliation's exact
+permanent or unresolved reason before and after restart; disabling the
+contradiction latch makes the three permanent cases fail. This revision's plan
+digest is frozen before the round's final acceptance execution.
+
 Source: `nautechsystems/nautilus_trader` Python `2.0.0rc5`, revision
 `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`, execution `parse.rs` 55–73,
 85–147 and `core_updates.rs` 240–280. Installed `model/__init__.pyi` has SHA256
