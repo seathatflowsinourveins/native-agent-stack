@@ -988,15 +988,25 @@ jobs:
         if: env.VALIDATE_MACOS_MODE == 'full'
         id: full_suite
         shell: bash
+        # --durations 50 lists the 50 slowest tests (Python 3.12+; this job sets up 3.13), and the sed below copies that
+        # list through unittest's "Ran N tests" line from the log into this step's output. PYTHONFAULTHANDLER prints
+        # every thread's Python traceback on a fatal signal. Unlike the Linux suite steps, this one has no GNU timeout
+        # wrapper: the macos-15 image lists no GNU coreutils (actions/runner-images@6d942e630479cd99a93dadfc766af11242bfa402,
+        # images/macos/macos-15-arm64-Readme.md and images/macos/toolsets/toolset-15.json), and the steps before
+        # this one took 248 to 384 s in the five full-mode runs 37183272890 to 37185901760, more than the five minutes
+        # such a wrapper leaves under the job's limit.
+        env:
+          PYTHONFAULTHANDLER: '1'
         run: |
           # Gating since PR #126: the full suite passed on macos-15 (run
           # 35898879109: 3156 tests OK, skipped=435) once the path-safety and
           # platform-specific fixes landed. The log is still uploaded below.
           set +e
-          python3 -m unittest -v >full-suite-macos.log 2>&1
+          python3 -m unittest -v --durations 50 >full-suite-macos.log 2>&1
           code=$?
           set -e
           echo "Full python3 -m unittest exit code on macOS: $code"
+          sed -n '/^Slowest test durations$/,/^Ran [0-9]/p' full-suite-macos.log
           tail -n 5 full-suite-macos.log
           exit "$code"
       - name: Run the changed test modules (changed-tests mode)
