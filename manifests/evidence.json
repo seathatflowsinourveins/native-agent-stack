@@ -4148,155 +4148,6 @@
         "The host note reports a five-second refresh effect, but these retained records do not include a new interactive terminal observation. Plugin details reported approximately zero always-on tokens; this is a native projection, not measured provider counts."
       ],
       "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json"
-    },
-    {
-      "id": "jcodemunch-1108327-qualification-20261003",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "jcodemunch-mcp"
-      ],
-      "claim": "The recorded version command printed \"jcodemunch-mcp 1.108.327\" (exit 0); the recorded get_session_stats smoke returned \"visible_tools\":6, \"catalog_tools\":94, \"schema_tokens_visible\":1050 and \"schema_tokens_catalog\":27880 (exit 0).",
-      "limitations": [
-        "Only get_session_stats and schema listing ran at 1.108.327; index_folder, search_symbols and get_symbol_source were not repeated.",
-        "The recorded integrity_source says \"The Sigstore signature and certificate chain were NOT verified\".",
-        "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
-        "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
-        "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
-      ],
-      "path": "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
-    },
-    {
-      "id": "playwright-cli-0122-qualification-20261003",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "playwright-cli"
-      ],
-      "claim": "The recorded version command printed \"0.1.22\" (exit 0); the help smoke printed \"Usage: playwright-cli <command> [args] [options]\" and \"--version                   print version\" (exit 0).",
-      "limitations": [
-        "The recorded help smoke is installation/help evidence; no browser E2E or upstream npm test ran at 0.1.22. Bundled Playwright remains 1.64.0-alpha-1790635538000.",
-        "The recorded smoke notes an anonymous update-check GET and cli-update-check.json under the overridden HOME.",
-        "The recorded integrity_source says \"Registry signatures and attestation were not cryptographically verified\".",
-        "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
-        "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
-        "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
-      ],
-      "path": "evidence/receipts/playwright-cli-0122-qualification-20261003.json"
-    },
-    {
-      "id": "openresearch-0215-qualification-20261003",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "openresearch"
-      ],
-      "claim": "The isolated recorded version command printed \"orx 0.2.15\" (exit 0). The documented discover/paper smoke output is \"NOT RUN\"; its -1 value is a not-run sentinel.",
-      "limitations": [
-        "The recorded smoke output says \"NOT RUN\" and identifies the live-service and PAPER_ID prerequisites; no functional discovery or retrieval is claimed.",
-        "Version/integrity/source qualification is the accepted scope; historical 0.2.7 search receipts do not establish 0.2.15 operation.",
-        "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
-        "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
-        "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
-      ],
-      "path": "evidence/receipts/openresearch-0215-qualification-20261003.json"
-    },
-    {
-      "id": "mcp-inspector-290-qualification-20261003",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "mcp-inspector"
-      ],
-      "claim": "The recorded npm ls output contained \"@modelcontextprotocol/inspector@2.9.0\" (exit 0). The integration tools/list returned set_tool_tier, announce_model, jcodemunch_guide, order, menu and route (exit 0); tools/call order/get_session_stats returned \"visible_tools\":6 (exit 0), and the unknown-tool control returned \"tool_not_found\" (exit 5).",
-      "limitations": [
-        "No upstream npm run validate, HTTP/SSE, interactive OAuth, web UI, TUI or MCP Apps run was recorded at 2.9.0.",
-        "--stored-auth-only ran against a stdio server requiring no credentials; it does not qualify OAuth or the secret-store migration.",
-        "npm attestation metadata and subject digest were read; this packet records no cryptographic signature verification for 2.9.0.",
-        "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
-        "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
-        "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
-      ],
-      "path": "evidence/receipts/mcp-inspector-290-qualification-20261003.json"
-    },
-    {
-      "id": "claude-hud-0100-qualification-20261003",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "claude-hud"
-      ],
-      "claim": "The three recorded package/plugin/marketplace version reads printed \"0.10.0\". The recorded synthetic stdin render printed \"[Opus 5] \u2502 workspace\" and \"Context \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591 0%\" (exit 0); the upstream test:stdin payload render printed \"[Opus]\" and \"Context \u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591 23%\" (exit 0).",
-      "limitations": [
-        "The recorded smoke says \"formatting only\" and \"/claude-hud:setup ... was NOT run\"; no live interactive plugin installation or render is claimed.",
-        "The recorded version output says \"dist/index.js has no --version handling\"; version identity is the three manifest reads.",
-        "The recorded integrity_source says \"No published checksum exists\"; the archive SHA256 is a local rehash corroborated by the peeled tag and 310 Git blob matches.",
-        "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
-        "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
-        "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
-      ],
-      "path": "evidence/receipts/claude-hud-0100-qualification-20261003.json"
-    },
-    {
-      "id": "otelcol-contrib-0162-qualification-20261003",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "opentelemetry-collector-contrib"
-      ],
-      "claim": "The recorded version command printed \"otelcol-contrib version 0.162.0\" (exit 0). The recorded validate command returned empty output with exit 0.",
-      "limitations": [
-        "The recorded validate smoke has empty output and exit 0; no running host service, live-traffic pipeline or service replacement was exercised.",
-        "The recorded integrity_source says the Sigstore bundle \"was NOT verified\".",
-        "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
-        "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
-        "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
-      ],
-      "path": "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json"
-    },
-    {
-      "id": "worktrunk-0800-qualification-20261003",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "worktrunk"
-      ],
-      "claim": "The recorded version command printed \"wt v0.80.0\" (exit 0). The synthetic repository wt list smoke printed \"\u25cb Showing 1 worktree\" (exit 0).",
-      "limitations": [
-        "The recorded wt list smoke uses \"a one-commit synthetic scratch repo\"; it does not qualify create/remove, dirty-refusal, copy-ignored, shell integration or upstream cargo test at 0.80.0.",
-        "The host installation and rollback launcher were not switched.",
-        "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
-        "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
-        "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
-      ],
-      "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json"
-    },
-    {
-      "id": "mcporter-0142-qualification-20261003",
-      "kind": "compatibility_attempt",
-      "component_ids": [
-        "mcporter"
-      ],
-      "claim": "mcporter 0.14.2 remains an unaccepted compatibility attempt: version and an ad-hoc stdio canary passed, but npm ls --all returned ELSPROBLEMS (bundled core 2.2.0 beside resolved server 2.3.0). The persistent daemon and serve roles used by foundation-cpu and token-efficiency were not qualified. The selected Linux pin remains 0.14.1; the independently held macOS pin remains 0.13.13.",
-      "limitations": [
-        "The original documented host-config smoke is \"NOT RUN\"; the ad-hoc stdio canary is evidence for the hold only and does not establish daemon or serve acceptance.",
-        "No daemon restart/recovery, mixed-version daemon, OAuth, Windows retry, serve operation or upstream test suite was exercised.",
-        "The judge records npm ls --all ELSPROBLEMS from bundled core 2.2.0 beside resolved server 2.3.0; the canary covers client stdio calls, not serve.",
-        "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
-        "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
-        "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
-      ],
-      "path": "evidence/receipts/mcporter-0142-qualification-20261003.json"
-    },
-    {
-      "id": "syft-1540-qualification-20261003",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "syft"
-      ],
-      "claim": "The recorded version JSON returned \"version\": \"1.54.0\", \"gitCommit\": \"cc326e45a6213360266dda4b30cc68095946d676\" and \"schemaVersion\": \"16.1.11\" (exit 0). The recorded inventory smoke excerpt reports \"36 artifacts, 166 files, 177 relationships\" and \"CycloneDX 1.7, 123 components (36 library + 87 file)\" (exit 0).",
-      "limitations": [
-        "The recorded smoke says \"No stdout or stderr\"; inventory counts are the supplied output-file observations, not a new scan performed by this integration.",
-        "Signature verification and SPDX output were not exercised; 1.52.0 signature evidence does not apply to 1.54.0.",
-        "No SDK source fingerprint was captured; identical recorded package tuples are the comparison evidence.",
-        "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
-        "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
-        "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
-      ],
-      "path": "evidence/receipts/syft-1540-qualification-20261003.json"
     }
   ],
   "files": [
@@ -4382,7 +4233,7 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "d73428cfa772bee46d9f18e835cc7b054267ba05c324d749b745cdb7debbf772",
+      "sha256": "0153fc7595f7dd64d077366b2b0251cbe78f13a47f90798ab6d3d746624c2aec",
       "bytes": 25235
     },
     {
@@ -4427,7 +4278,7 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "652bf181e1097963b1ce23d81eefb9bc9fb4c0f3051c3c5611c07ede4ab8a291",
+      "sha256": "5b52e3f50cf6ecb26cfe36f8ca54c577b5ff07ec4027a20102bc731c066cf4e5",
       "bytes": 20110
     },
     {
@@ -4462,8 +4313,8 @@
     },
     {
       "path": ".github/workflows/supply-chain.yml",
-      "sha256": "8c70b40953230c79e3d3df75fc492d689bf8884cb53acd7b6b6eadb63f2558c9",
-      "bytes": 7589
+      "sha256": "92ab3fa8354aa9fbaad781597354ef5a942c709b5950109bb13c8b77780a40f8",
+      "bytes": 7576
     },
     {
       "path": ".github/workflows/token-report.yml",
@@ -4612,8 +4463,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "6f10356b5586de2e5d4c9e480d975c9d1201f1078d539629a2de202fec479aee",
-      "bytes": 67335
+      "sha256": "4ed3605282cd0f6f407b35a0b8a017863db4e8476d1d9503b302ced68abb7292",
+      "bytes": 64541
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4712,8 +4563,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "4aedebfa4528918a008d99c2ef6044b307a6fcf7646afe8857ee8db936241714",
-      "bytes": 20038
+      "sha256": "7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a",
+      "bytes": 20102
     },
     {
       "path": "adoption/new-wsl-profile.json",
@@ -4757,8 +4608,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "7e210c9c56953ff5091c35909a0e3b5c94a4a519932eeda82878afb22b3c2961",
-      "bytes": 37151
+      "sha256": "804eba0e086670c75e6b2f3725734477914318987c99fb90195680188be337c9",
+      "bytes": 37335
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -4772,8 +4623,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "31f87db022f1fbadc33ae6483d09c9a2f094919660c9f0895c28cfa4be8952ed",
-      "bytes": 30087
+      "sha256": "317a997ce3e794298d985f035af05285e27bc3690fd9e09be068991a82fe2056",
+      "bytes": 29535
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -4832,8 +4683,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "f389b2b98e28c856136ca9d2e19cfb1464b45207719e5ae48e5e6b1e7d72e4ed",
-      "bytes": 13207
+      "sha256": "5e27edf9147dfb60cc7311d4fe2e76312a8fd602021c60936023a9ce2273edeb",
+      "bytes": 13003
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -10273,8 +10124,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a943eea648fdfa7606cb2058e4280340d680937664a6c955857ecd3cfa3d4d9d",
-      "bytes": 490293
+      "sha256": "9eece716982d44ddc5ff844003680c9b04f45fbe7b21d35f18188ee6a70de15c",
+      "bytes": 484284
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15498,7 +15349,7 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "a28a218e0927f099b698208b4ac4fc8fbafee240447d633a2c247d619bd73137",
+      "sha256": "ccf259a9b7bca8cf81cfa0ddfbe5f54e7bc95a073defebc74a28877bfee5f084",
       "bytes": 34986
     },
     {
@@ -15613,8 +15464,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "4b45aa982068205635f95776bbfc7a4c73d283ea48586e480f3870e613450ecf",
-      "bytes": 287577
+      "sha256": "d1f0f17e142e8bfca223006f72cb16fce65456609248a32b5cf7958ba9f54dd2",
+      "bytes": 287704
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -15623,8 +15474,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "8312bf92a96b1e1899ae6c816b7b45d2d9757b65f8f69899268c492071840a85",
-      "bytes": 280716
+      "sha256": "975b5a515271c24b1a158594568a76f1b6d65db6eb920f561db77e056e20b8b1",
+      "bytes": 253392
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -16083,8 +15934,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "4334eda38f9961f971e4c5394cd6fef418cef236d3ad73c34a0e080b5b71be21",
-      "bytes": 56958
+      "sha256": "6e7ebbe64011f460b59ab310a328211737deec2f83543fb99c41d761958bff06",
+      "bytes": 56411
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -16387,11 +16238,6 @@
       "bytes": 21453
     },
     {
-      "path": "docs/decisions/2026-10-03-currency-wave-w1.md",
-      "sha256": "57e9b58c006d2d678b58e528088f3bd2e6c5a961cf642581de8ed155c9f43916",
-      "bytes": 39135
-    },
-    {
       "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
       "sha256": "a4c5ddf98c9fa778d07b60507a183818b1d243dda789bc06ee8bcd612fcbcedb",
       "bytes": 16588
@@ -16578,8 +16424,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "53273e2c45893786c20d934d3c0b6dfea59c69029f5acbd3b2ee8046c850f3da",
-      "bytes": 40049
+      "sha256": "d86649c5c4f7fe5686d588586588ad20f6b84f95b0b109cca510f82c5d0b40c4",
+      "bytes": 39778
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -16618,7 +16464,7 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "1fe05b805ab475cb4cb163985574aa5428797298b095b93b1141086a93fee3c2",
+      "sha256": "506dab27e1618ac53a688b38eb21e3219f56acd65940f1315a77a588bcdae035",
       "bytes": 98818
     },
     {
@@ -16628,8 +16474,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "bb111490ddde5df7aff71c3f82e39d52c995277364cc23d3c57ed6845985b555",
-      "bytes": 185565
+      "sha256": "5ea6aab2571aa0f7d4077666473271cd89e46440b60134606415214818803b7a",
+      "bytes": 184183
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16748,8 +16594,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "c1b9e9cd27feb0ed823a2c0e942a741671e5ad2b84753e5196e09442b0fb1e3c",
-      "bytes": 18484
+      "sha256": "feacb3a295970f1269ea2004127e5dd11a4f43c9e2fb29166e501346205091af",
+      "bytes": 18483
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -16758,12 +16604,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "1f7210a94d384aa9e01c269b473ea48f95474d7208e6851e9bd230ed87cef592",
+      "sha256": "54eeb8ea606b3f4f123320dc2f2f7f07c356d969a538c3d935de17b771fa5420",
       "bytes": 561055
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "caf93328832fdad3ffa3398bb7280123a1d2a5c56470b1b4d6152640eed1f581",
+      "sha256": "aa04b30d16fc14acac62d0af23e670ad254feb7e59ea85dfe233d361a992f59a",
       "bytes": 323968
     },
     {
@@ -16858,7 +16704,7 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "9c5ae97dd6257f96b1bb66103c711bdb00b56c885efaccad73e6df4a551a0e30",
+      "sha256": "c701409aa29644941e107e1102c1f0cc765509553f93c93872f27bf661cdde94",
       "bytes": 591301
     },
     {
@@ -16878,7 +16724,7 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "2be6f8cc0bfbf11a88cb3036f1c91d0f61a06691f73637645e817c422be39776",
+      "sha256": "b85424755d2152313a6a7cfcbef8871c98f0f8f756e932287fa1aa1bf7e49a46",
       "bytes": 92944
     },
     {
@@ -18495,41 +18341,6 @@
       "path": "evidence/artifacts/context-mode-codex-binding-20260926/upstream-resolver-tests.txt",
       "sha256": "b849a10dea3bd5741faa9828be0ee934a36214819056de3012cbcf028c652e6a",
       "bytes": 14197
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/move-hold-judges.json",
-      "sha256": "e48737f157409da08ed1a6009fa21b5d86b1238a9247121c4de2a4e5c4be76ea",
-      "bytes": 108109
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/repair-round-2-replies.md",
-      "sha256": "df3c6d23bf54dbba84f2e758bce9e5f9e7f6c3bdbcafb0d2324dac332e1c7696",
-      "bytes": 13041
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/repair-round-replies.md",
-      "sha256": "b938dead74e41883796fe004c7e4ba0f11695a690a8048676226cd4dfe4a0b19",
-      "bytes": 28233
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/review-round-findings.json",
-      "sha256": "2b91bfe41d4f0a71667d7a440810630c0d031cce985bfa3a857732d922d47bc3",
-      "bytes": 18135
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1-20261003/native-checks.json",
-      "sha256": "a0194f7ce41dc4efc6320e10662f53e2b21afe7e15d477752947cb7ec160cb60",
-      "bytes": 74214
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1-20261003/review-bot-repair-checks.json",
-      "sha256": "c9d4db925ee8a28bdbcbddd088a1e410569ba840d3e4209bc2d8848d98fea8c4",
-      "bytes": 121015
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1-20261003/review-repair-checks.json",
-      "sha256": "11fe9d5941ecc06385093613e9f6e63f582f5ecb1a721a179866e0d06d71039f",
-      "bytes": 26125
     },
     {
       "path": "evidence/artifacts/dashboard-gap-resolution-20260921/resolution.json",
@@ -38733,7 +38544,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "fbb1226abc6cda0b7f8202126c8b0830114f7e9e707145555abc50da7fa1feac",
+      "sha256": "09120036b32a73586a8d064c32749f2607819a18cfc298cd7961fd99aa6c573d",
       "bytes": 4174
     },
     {
@@ -50512,11 +50323,6 @@
       "bytes": 20645
     },
     {
-      "path": "evidence/receipts/claude-hud-0100-qualification-20261003.json",
-      "sha256": "75698ca95984619fc89b578639bf0c0bce89810923e7dae6a951c5abe0965b59",
-      "bytes": 10611
-    },
-    {
       "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json",
       "sha256": "b0c9e1d7c58e339dc2906e6a977ec04e6c1a808e826f9422407449ab34dd4f09",
       "bytes": 7294
@@ -50732,11 +50538,6 @@
       "bytes": 17126
     },
     {
-      "path": "evidence/receipts/jcodemunch-1108327-qualification-20261003.json",
-      "sha256": "96342602475607ade1f1091782aa86ec7c9641b8f5b7decb4b3f0368a872eb5c",
-      "bytes": 8187
-    },
-    {
       "path": "evidence/receipts/local-inference-c2-serving-switch-20260926.json",
       "sha256": "84153b7486e2cd9b970d0cb017bcb73b12930158efb2e793e323a6347f09d3e3",
       "bytes": 14360
@@ -50762,19 +50563,9 @@
       "bytes": 11753
     },
     {
-      "path": "evidence/receipts/mcp-inspector-290-qualification-20261003.json",
-      "sha256": "ea5909301508d3ef61ef5c79a920da793e4904a5d219e20a9c32c2fd83f45ba3",
-      "bytes": 10165
-    },
-    {
       "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
       "sha256": "5379b1e326d99eeb09a72b88fa447c6020e76211b3d918ac96d8daa09241ce32",
       "bytes": 15000
-    },
-    {
-      "path": "evidence/receipts/mcporter-0142-qualification-20261003.json",
-      "sha256": "b1beab03a1aca6fae782b9e8d5d3264bb597ad5c38b111451e715f98ba1256bb",
-      "bytes": 10463
     },
     {
       "path": "evidence/receipts/mcporter-0142-qualification-20261004.json",
@@ -51057,11 +50848,6 @@
       "bytes": 149558
     },
     {
-      "path": "evidence/receipts/openresearch-0215-qualification-20261003.json",
-      "sha256": "d31ec509e1e4ae96fb0eaf8d13062a712fce2d5c46ba271a1cee096b44b2fe34",
-      "bytes": 7517
-    },
-    {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
       "sha256": "f89e3a45ac10d44d00c268cc617c1fb7b5f77636fb1150af3c9e7bf4b26441ef",
       "bytes": 21768
@@ -51087,19 +50873,9 @@
       "bytes": 24256
     },
     {
-      "path": "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json",
-      "sha256": "6a862a8a71de692044b07da70437f4730ca8cabf2997540c07a167cd58d4ed53",
-      "bytes": 6732
-    },
-    {
       "path": "evidence/receipts/pit-availability.json",
       "sha256": "1bbae79fec7cd519571f42470e05b4784e36d72d21da34a210ab8adc864823f4",
       "bytes": 107713
-    },
-    {
-      "path": "evidence/receipts/playwright-cli-0122-qualification-20261003.json",
-      "sha256": "5ea837cdf29f1754acb74cf44bdd3b8447627e3048f6f26719a61dc9d110230a",
-      "bytes": 7731
     },
     {
       "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
@@ -51177,11 +50953,6 @@
       "bytes": 135042
     },
     {
-      "path": "evidence/receipts/syft-1540-qualification-20261003.json",
-      "sha256": "ee883617198dd98f733bb549503a6c412a0ab20fc653442aafbbb8366dc75858",
-      "bytes": 7946
-    },
-    {
       "path": "evidence/receipts/tavily-research-qualification-20260926.json",
       "sha256": "a8bdb6e6dea4aa99938bce568ee86e8391fe33929a1940ae141ae519a7100b4a",
       "bytes": 8690
@@ -51255,11 +51026,6 @@
       "path": "evidence/receipts/vllm-compatibility.json",
       "sha256": "33adf727233d608e0d76bf8da12e30909b279582e2f73bc74ceccde520fb8a99",
       "bytes": 1939
-    },
-    {
-      "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json",
-      "sha256": "65699cc135a04abbbc479e5a9ace268e99bc3807bf82b6ccede8ac282f3b1629",
-      "bytes": 6655
     },
     {
       "path": "evidence/receipts/worktrunk-list.json",
@@ -51798,18 +51564,18 @@
     },
     {
       "path": "manifests/landscape.json",
-      "sha256": "5af66a7bce3e2d8d6cdde10f353a49b65a86becbecb2dc23ad4d01ebea623dfc",
+      "sha256": "bdb43cf59a1875cd49578d025a3ac76fcc173b7b63c449fd9921d1fe45558f48",
       "bytes": 21467
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "32e90f075c5b6dd52fe64a79698592e22b4765b19a496486b5237d7f37d3bf6e",
-      "bytes": 104274
+      "sha256": "bcbc611c905081a00ca6762d8fad0e478841b0e101a9adc4ce4d09450710c943",
+      "bytes": 101523
     },
     {
       "path": "observability/README.md",
-      "sha256": "64e714cc5708df81bf8931ea84b02d3ff4536e136da665fa0c8670d2d56be203",
-      "bytes": 16029
+      "sha256": "7c7795560a7ef6541c91dfb8b0bf4e693f5dcdf9cfc75f262d8e4832057177e3",
+      "bytes": 15625
     },
     {
       "path": "observability/backends/README.md",
@@ -51908,8 +51674,8 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "d0ec9824b54c8d8433b7e0dbb5279c9f4d089112944e1dab77ee76c7a4afa526",
-      "bytes": 45613
+      "sha256": "df33394028df2a687f7e39beefe0aa02978a0d6a0b97fd9d8a14f12e6075d3d6",
+      "bytes": 44636
     },
     {
       "path": "observability/collector/claude-settings.json.example",
@@ -52088,8 +51854,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "d9cc6ab495526b8520e1866c9305fbb2361e24c450116c418079866df765e293",
-      "bytes": 131699
+      "sha256": "5ce6c88fac8855b5c8138f6fa553073580f990ea3dd853a17b760a41e60ca9fa",
+      "bytes": 128045
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -52113,8 +51879,8 @@
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
-      "sha256": "6fe32c4ad23d7dfb56794fdae88e9a57334d9b7e0ec8c44a9c3286d604605859",
-      "bytes": 6586
+      "sha256": "a398b26bd0d3c0a5de3b1addec8ff0b5d27bb013e4f1df14e5235bb26001267c",
+      "bytes": 5706
     },
     {
       "path": "recipes/saturation-sweep.md",
@@ -52213,7 +51979,7 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "6c903a399bb22e37e65836dc0cdd47ee1b0d947ef1462f387429fd1a6cddd2bf",
+      "sha256": "a5dce8ae180876bd6f676464fbfbda2bf60e479b1b865ca801c592d96e427e81",
       "bytes": 115304
     },
     {
@@ -52583,8 +52349,8 @@
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",
-      "sha256": "0910d97cd4c7ff2dceeacf2a8d2a46bbefea2c8b66bf4abd0a73df42abe080a6",
-      "bytes": 52214
+      "sha256": "6621649f533fb9b1d62e902d3953447bd43ec6bb26ee3e1f35e693023200fb06",
+      "bytes": 52213
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
@@ -52635,11 +52401,6 @@
       "path": "tests/test_apply_claude_settings.py",
       "sha256": "1bd3e90b095c326edf6327202bcbeeab7ed6ccc6c5789dc794062024baf6d64f",
       "bytes": 18302
-    },
-    {
-      "path": "tests/test_blind_checkout.py",
-      "sha256": "d27efdf89e9ff89b0bd50c03a59e4efad5529e617d77ead110621616c20800f8",
-      "bytes": 67881
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
@@ -53138,18 +52899,18 @@
     },
     {
       "path": "tests/test_observability_run_correlation.py",
-      "sha256": "291762ddf9a1484ee6c1c8b2d4f27bd23cfaee2db9586db1e934cdd05c50bca1",
-      "bytes": 34441
+      "sha256": "2babc329578ffafc509075294cafa1ac25ae2a749e3f87a136dab9447f47fda5",
+      "bytes": 34089
     },
     {
       "path": "tests/test_observability_tool_names.py",
-      "sha256": "ed7e6db7559dfb09c79be5d5a6150ec57710278b096293e73373b5681a2d5724",
-      "bytes": 25971
+      "sha256": "01643e542017a248c166302b90f7218e42c83eceb3e4084b1a99a4bb73617a89",
+      "bytes": 25617
     },
     {
       "path": "tests/test_observability_writer_identity.py",
-      "sha256": "96b901ada162f4a9d5c7445a4f5272ca86011d5e9227211405051ad12fe79665",
-      "bytes": 38105
+      "sha256": "2f58b64cbd4f1af2b23ed869147278e2f84ad3357fef11a13c6496154fb1f15b",
+      "bytes": 37789
     },
     {
       "path": "tests/test_observability_writer_identity_host.py",
@@ -53253,8 +53014,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "9eae1b97d637079056994268e754f878bbafd4702fe8182cfef21f2f7b9bfcec",
-      "bytes": 47956
+      "sha256": "e8a7d735d73063ef82c4cff28bfa09a737d75a4fb69d84b49aec335ae2ba62b4",
+      "bytes": 45406
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -53293,8 +53054,8 @@
     },
     {
       "path": "tests/test_sdk_usage_scope.py",
-      "sha256": "e1a0e758e0f5d50411f5a18a2114eabdbe7091aae600e80ddeca51ecaeb1c532",
-      "bytes": 9774
+      "sha256": "7e47c3b4cede14ce7e664daf5fe379f16bb173d845b6feafd4a9b82ba758c352",
+      "bytes": 9712
     },
     {
       "path": "tests/test_secret_path_guard.py",
@@ -53722,11 +53483,6 @@
       "bytes": 27482
     },
     {
-      "path": "tools/sota-convergence/export_isolation_check.py",
-      "sha256": "7c0218c6545ea8d0274c71df8d4789a9f3e983dab45015905ad362dc6f0d3742",
-      "bytes": 34727
-    },
-    {
       "path": "tools/sota-convergence/extract_layers.py",
       "sha256": "4be73f7d3b09fa9ea88ecb238d998e43b648c7c16bb56b8853e8672ca883bb2a",
       "bytes": 46061
@@ -54043,7 +53799,7 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "f93756235e3983a86eb632eb92f66417d48ab22a49506fcd5442cca5364d3947",
+      "sha256": "17e56072c6b5568af421dd67b7dfb4db51906d11511e950448f611d58ba73808",
       "bytes": 25833
     },
     {
