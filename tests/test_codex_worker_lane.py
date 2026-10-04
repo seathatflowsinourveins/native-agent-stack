@@ -9,7 +9,7 @@ Evidence classes (docs/acceptance-evidence-policy.md):
   `expectedVersion`, a null value deleting a key) and answers `mcp get`, `mcp list` and `debug prompt-input`;
 - the prove verdict tests read event fixtures cut from real `codex exec --json` runs of codex-cli 0.157.1
   (tests/fixtures/codex-worker-lane/, paths masked; see that directory's items for what each run was);
-- CodexIntegrationTests runs the real codex app-server of the pinned version (lane.CODEX_VERSION, 0.160.0) against a
+- CodexIntegrationTests runs the real codex app-server of the pinned version (lane.CODEX_VERSION) against a
   scratch Codex home, only when NAS_CODEX_INTEGRATION=1 and that codex is on PATH (local integration evidence;
   skipped in CI).
 """
@@ -56,7 +56,8 @@ TOP_RULE_SHA256 = "3201144dccd9d134110a2459a1e795d55e8cb747a9592e779e4c4778d8b8b
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
-# A minimal TOML writer for the fake (tables, strings, numbers, booleans, string arrays): enough for these fixtures.
+# A minimal TOML writer for the fake (tables, arrays of tables, strings, numbers, booleans, string arrays): enough for
+# these fixtures, including the user template's [[skills.config]].
 EMITTER = r'''
 def key(k):
     return k if re.fullmatch(r"[A-Za-z0-9_-]+", k) else json.dumps(k)
@@ -72,17 +73,24 @@ def scalar(v):
     return json.dumps(v)
 
 
+def tables(v):
+    return isinstance(v, list) and bool(v) and all(isinstance(x, dict) for x in v)
+
+
 def emit(tree):
     lines = []
 
-    def table(path, t):
+    def table(path, t, header="[{}]"):
         if path:
-            lines.append("[" + ".".join(key(p) for p in path) + "]")
-        lines.extend(f"{key(k)} = {scalar(v)}" for k, v in t.items() if not isinstance(v, dict))
+            lines.append(header.format(".".join(key(p) for p in path)))
+        lines.extend(f"{key(k)} = {scalar(v)}" for k, v in t.items() if not isinstance(v, dict) and not tables(v))
         lines.append("")
         for k, v in t.items():
             if isinstance(v, dict):
                 table(path + [k], v)
+            elif tables(v):
+                for item in v:
+                    table(path + [k], item, "[[{}]]")
     table([], tree)
     return "\n".join(lines).strip("\n") + "\n"
 '''
@@ -201,7 +209,13 @@ if argv[:1] == ["app-server"]:
             print(json.dumps({"method": "remoteControl/status/changed", "params": {"status": "disabled"}}))
             layer = {"name": {"type": "user", "file": str(HOME / "config.toml"), "profile": None},
                      "version": version(config), "config": config}
-            print(json.dumps({"id": msg["id"], "result": {"config": config, "origins": {}, "layers": [layer]}}))
+            # Further layers, listed as Codex lists them (highest precedence first), come from a file beside this
+            # script because the rehearsal's environment is closed: {"above": [...], "below": [...]} around the user
+            # layer. Only config/read reports them; `mcp get` and prompt input below merge the user file and profile.
+            extra_file = Path(__file__).with_name("config-layers.json")
+            extra = json.loads(extra_file.read_text()) if extra_file.is_file() else {}
+            layers = [*extra.get("above", []), layer, *extra.get("below", [])]
+            print(json.dumps({"id": msg["id"], "result": {"config": config, "origins": {}, "layers": layers}}))
         elif method == "config/batchWrite":
             if race or params.get("expectedVersion") != version(config):
                 print(json.dumps({"id": msg["id"], "error": {"code": -32600, "message": "Configuration was modified",
@@ -220,18 +234,30 @@ if argv[:1] == ["app-server"]:
         sys.stdout.flush()
     sys.exit(0)
 if argv[:2] == ["mcp", "get"]:
+    fail_file = Path(__file__).with_name("mcp-get-fail")  # servers whose lookup fails, one name per line
+    if fail_file.is_file() and argv[2] in fail_file.read_text().split():
+        print(f"Error: fake lookup failure for {argv[2]}", file=sys.stderr); sys.exit(1)
     table = effective().get("mcp_servers", {}).get(argv[2])
     if table is None:
         print(f"Error: No MCP server named '{argv[2]}' found.", file=sys.stderr); sys.exit(1)
     transport = ({"type": "streamable_http", "url": table["url"]} if "url" in table else
                  {"type": "stdio", "command": table.get("command"), "args": table.get("args", []),
                   "env": table.get("env"), "env_vars": [], "cwd": table.get("cwd")})
-    print(json.dumps({"name": argv[2], "enabled": table.get("enabled", True), "transport": transport,
-                      "enabled_tools": table.get("enabled_tools"), "disabled_tools": table.get("disabled_tools")}))
+    print(json.dumps({"name": argv[2], "enabled": table.get("enabled", True), "disabled_reason": None,
+                      "transport": transport, "enabled_tools": table.get("enabled_tools"),
+                      "disabled_tools": table.get("disabled_tools")}))
     sys.exit(0)
 if argv[:2] == ["mcp", "list"]:
     print(json.dumps([{"name": n} for n in effective().get("mcp_servers", {})])); sys.exit(0)
 if argv[:2] == ["debug", "prompt-input"]:
+    failure_file = Path(__file__).with_name("required-start-failure.json")
+    # Codex waits only for servers both enabled and required (codex-mcp/src/connection_manager.rs:270-275 at a956835d).
+    required = [name for name, table in effective().get("mcp_servers", {}).items()
+                if table.get("required") is True and table.get("enabled", True) is not False]
+    if failure_file.is_file() and required:
+        failure = json.loads(failure_file.read_text())
+        if failure["codex_home"] == str(HOME):
+            print(failure["stderr"], file=sys.stderr); sys.exit(1)
     text = ""
     for name in ("AGENTS.override.md", "AGENTS.md"):
         path = HOME / name
@@ -258,6 +284,134 @@ if argv[:2] == ["doctor", "--json"]:
     sys.stdout.write(doctor_output(mode, has_roles, HOME)); sys.exit(1)
 print("fake codex: unsupported " + " ".join(argv), file=sys.stderr); sys.exit(64)
 '''
+
+
+# Port source: PR #436 b18d9f031fdf854e74f59586529df1022e805975, same file.
+# Upstream oracle: openai/codex@rust-v0.160.0:codex-rs/core/tests/suite/code_mode.rs:271-300,7874
+# and core/tests/common/responses.rs:753,773,784,821,1011. No provider or real MCP server is contacted.
+FIXTURE_MCP_SERVER = r'''import json, os, sys, time
+ARGS = sys.argv[1:]
+
+def option(name, default=None):
+    return ARGS[ARGS.index(name) + 1] if name in ARGS[:-1] else default
+
+TOOL, DELAY, HOME = option("--tool", "fixture_tool"), float(option("--delay", "0")), option("--require-home")
+if HOME is not None and os.environ.get("HOME") != HOME:
+    print("fixture MCP server: HOME is not the home it is bound to", file=sys.stderr); sys.exit(1)
+
+def reply(msg_id, result=None, error=None):
+    message = {"jsonrpc": "2.0", "id": msg_id}
+    message.update({"error": error} if error is not None else {"result": result})
+    sys.stdout.write(json.dumps(message) + "\n"); sys.stdout.flush()
+
+while True:
+    line = sys.stdin.readline()
+    if not line:
+        break
+    try:
+        message = json.loads(line)
+    except ValueError:
+        continue
+    if not isinstance(message, dict) or "id" not in message or "method" not in message:
+        continue
+    method = message["method"]
+    if method == "initialize":
+        time.sleep(DELAY)
+        reply(message["id"], {"protocolVersion": (message.get("params") or {}).get("protocolVersion", "2025-06-18"),
+                              "capabilities": {"tools": {"listChanged": False}},
+                              "serverInfo": {"name": "nas-fixture-mcp", "version": "0.0.0"}})
+    elif method == "tools/list":
+        reply(message["id"], {"tools": [{"name": TOOL, "description": "A fixture tool.",
+                                         "inputSchema": {"type": "object", "properties": {}}}]})
+    elif method == "ping":
+        reply(message["id"], {})
+    else:
+        reply(message["id"], error={"code": -32601, "message": "method not found: " + method})
+'''
+
+RESPONSES_DRIVER = r'''import http.server, json, os, subprocess, sys, threading, time
+OUT, ARGV = sys.argv[1], json.loads(sys.argv[2])
+GUIDANCE = b"Some deferred nested tools may be omitted"
+CODE = "text(JSON.stringify(ALL_TOOLS.map(({ name }) => name)));"  # names no tool: every listed name came from Codex
+USAGE = {"input_tokens": 0, "input_tokens_details": None, "output_tokens": 0, "output_tokens_details": None,
+         "total_tokens": 0}
+
+def stream(response_id, item):
+    events = [{"type": "response.created", "response": {"id": response_id}},
+              {"type": "response.output_item.done", "item": item},
+              {"type": "response.completed", "response": {"id": response_id, "usage": USAGE}}]
+    return "".join("event: %s\ndata: %s\n\n" % (event["type"], json.dumps(event)) for event in events).encode()
+
+EXEC = stream("resp-exec", {"type": "custom_tool_call", "call_id": "call-1", "name": "exec", "input": CODE})
+DONE = stream("resp-fixture", {"type": "message", "role": "assistant", "id": "msg-fixture",
+                               "content": [{"type": "output_text", "text": "done"}]})
+REQUESTS, STARTED = [], [0.0]
+
+def listed_tools(raw):
+    """The names in this request's custom_tool_call_output for call-1 (its last non-empty text), or None."""
+    try:
+        items = json.loads(raw).get("input") or []
+    except ValueError:
+        return None
+    for item in items:
+        if isinstance(item, dict) and item.get("type") == "custom_tool_call_output" and item.get("call_id") == "call-1":
+            output = item.get("output")
+            parts = [output] if isinstance(output, str) else [part.get("text") or "" for part in output or []]
+            parts = [part for part in parts if part.strip()]
+            try:
+                return json.loads(parts[-1]) if parts else None
+            except ValueError:
+                return None
+    return None
+
+class Handler(http.server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        raw = self.rfile.read(int(self.headers.get("Content-Length") or 0))
+        first = not any(request["path"].endswith("/responses") for request in REQUESTS)
+        REQUESTS.append({"path": self.path, "t": round(time.monotonic() - STARTED[0], 6),
+                         "deferred_tool_guidance": GUIDANCE in raw, "listed_tools": listed_tools(raw)})
+        if not self.path.endswith("/responses"):
+            self.send_error(404)
+            return
+        body = EXEC if first else DONE
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        self.send_error(404)
+
+    def log_message(self, *args):
+        pass
+
+server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+threading.Thread(target=server.serve_forever, daemon=True).start()
+url = "http://127.0.0.1:%d/v1" % server.server_address[1]
+with open(OUT + ".stderr", "w") as err:
+    started_at_utc = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    STARTED[0] = time.monotonic()
+    proc = subprocess.Popen([arg.replace("{BASE_URL}", url) for arg in ARGV], stdin=subprocess.DEVNULL,
+                            stdout=subprocess.DEVNULL, stderr=err, start_new_session=True)
+    try:
+        code = proc.wait(timeout=120)
+    except subprocess.TimeoutExpired:
+        code = "timeout"
+    elapsed = round(time.monotonic() - STARTED[0], 6)
+    ended_at_utc = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+server.shutdown()
+with open(OUT + ".stderr") as err, open(OUT, "w") as handle:
+    json.dump({"exit": code, "stderr": err.read()[-4000:], "requests": REQUESTS, "elapsed_sec": elapsed,
+               "started_at_utc": started_at_utc, "ended_at_utc": ended_at_utc}, handle)
+'''
+
+
+def write_fixture_mcp_server(directory: Path) -> Path:
+    """Write the pinned port's stdio fixture in a scratch directory."""
+    path = directory / "fixture_mcp_server.py"
+    path.write_text(FIXTURE_MCP_SERVER, encoding="utf-8")
+    return path
 
 
 def template_segments() -> tuple[str, str, str]:
@@ -374,16 +528,35 @@ class TemplateTests(unittest.TestCase):
         self.assertLessEqual({"ctx_upgrade", "ctx_purge"}, set(profile["mcp_servers"]["context-mode"]["disabled_tools"]))
         self.assertNotIn("default_tools_approval_mode", profile["mcp_servers"]["context-mode"])
 
+    def test_the_fixture_toml_writer_round_trips_the_rendered_user_template(self):
+        # The native tests re-emit the rendered user template through emit_toml (the strict-config test registers a
+        # working fixture Serena that way), and the template's [[skills.config]] is an array of tables.
+        fixture = {"HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
+                   "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
+                   "OTEL_ENDPOINT": "127.0.0.1:1", "AI_MEMORY_URL": "127.0.0.1:1", "QDRANT_URL": "127.0.0.1:1",
+                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0", "CODEX_MODEL": "gpt-6.1-sol"}
+        rendered = string.Template((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
+        data = tomllib.loads(rendered.substitute(fixture))
+        nested = {"a": {"b": [{"x": 1, "c": {"y": "z"}}, {"x": 2}], "d": [], "e": ["s"]}}
+        for label, tree in (("rendered user template", data), ("nested arrays of tables", nested)):
+            with self.subTest(case=label):
+                self.assertEqual(tomllib.loads(emit_toml(tree)), tree)
+
     def test_worker_startup_timeouts_layer_over_user_servers(self):
-        # openai/codex rust-v0.157.1: RawMcpServerConfig.startup_timeout_sec in
-        # core/config.schema.json; codex-mcp/src/rmcp_client.rs:103 defaults to 30 s.
+        # openai/codex rust-v0.160.0: config/src/mcp_types.rs:248-256 and
+        # codex-mcp/src/rmcp_client.rs:105 (same MCP implementation at lane.CODEX_VERSION).
         # config/src/config_layer_source.rs: profile 21 < project 25 < session 30.
         profile = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
         user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         for name in ("serena", "codebase-memory"):
             with self.subTest(server=name):
                 self.assertIn("command", user["mcp_servers"][name])
-                self.assertEqual(profile["mcp_servers"].get(name), {"startup_timeout_sec": 60})
+                expected = {"startup_timeout_sec": 60}
+                if name == "serena":
+                    expected["required"] = True
+                self.assertEqual(profile["mcp_servers"].get(name), expected)
+        self.assertNotIn("mcp_optional_startup_grace_ms", profile)
+        self.assertNotIn("startup_readiness", profile["mcp_servers"]["serena"])
 
     def test_project_jcodemunch_approves_only_read_front_door(self):
         # openai/codex rust-v0.157.1 codex-mcp/src/mcp/mod.rs:89-98 and core/config.schema.json;
@@ -475,11 +648,12 @@ class TemplateTests(unittest.TestCase):
 
     def test_landscape_sweep_lane_home_matches_the_omniroute_profile(self):
         # The sweep's gateway lane cannot use `-p omniroute` (its one --profile slot is stack-worker), so its lane
-        # home writes the route itself. Every model, provider and feature key it writes must equal the profile's, or
-        # one of them drifted. Its config.toml has no env_key_instructions, key filter or web_search: web_search =
-        # "live" comes from the stack-worker profile and the runner's -c flag, and without the filter a real key in
-        # the sweep's environment reaches the model's commands (recipes/README.md, "Codex through OmniRoute"). No
-        # assertion here pins those absences, so the sweep lane can add the filter without breaking this test.
+        # home writes the route itself. Every model, provider, feature and key-filter setting it writes must equal the
+        # profile's, or one of them drifted. Since #393 its config.toml writes the profile's
+        # [shell_environment_policy.filters] (build_args.py stage_lane_home), which keeps a real key in the sweep's
+        # environment out of the model's commands (recipes/README.md, "Codex through OmniRoute"). It has no
+        # env_key_instructions or web_search: web_search = "live" comes from the stack-worker profile and the runner's
+        # -c flag. No assertion here pins those two absences.
         spec = importlib.util.spec_from_file_location(
             "landscape_sweep_build_args_for_lane_test", ROOT / "tools/sota-convergence/landscape-sweep/build_args.py")
         build_args = importlib.util.module_from_spec(spec)
@@ -502,6 +676,7 @@ class TemplateTests(unittest.TestCase):
         for key, value in staged["model_providers"]["omniroute"].items():
             self.assertEqual(value, provider.get(key), f"model_providers.omniroute.{key}")
         self.assertEqual(staged["features"], profile["features"])
+        self.assertEqual(staged.get("shell_environment_policy"), profile["shell_environment_policy"])
         self.assertEqual(build_args.OMNIROUTE_KEY_ENV, provider["env_key"])
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_URL, provider["base_url"])
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_MODEL, profile["model"])
@@ -531,7 +706,8 @@ class FakeHost:
     """A scratch home, ecosystem prefix and fake codex for one test."""
 
     def __init__(self, testcase: unittest.TestCase):
-        self.tmp = Path(tempfile.mkdtemp(prefix="codex-worker-lane-test-"))
+        # Canonicalize once: macOS's /var and /private/var spellings must match the installer's read-back paths (R1).
+        self.tmp = Path(tempfile.mkdtemp(prefix="codex-worker-lane-test-")).resolve()
         testcase.addCleanup(shutil.rmtree, self.tmp, True)
         self.codex_home = self.tmp / "home" / ".codex"
         self.codex_home.mkdir(parents=True)
@@ -952,6 +1128,195 @@ class ApplyFlowTests(unittest.TestCase):
         self.assertNotIn("[model_providers.omniroute]", step)  # no table here, so none is listed
         self.assertIn("`codex debug prompt-input probe`", step)  # the read-back covers a launch without the profile
         self.assertIn("Model provider `omniroute` not found", step)
+
+
+class RequiredStartTests(unittest.TestCase):
+    """Synthetic parser regressions from #436, restricted to Serena (not native startup evidence)."""
+
+    def test_only_serena_is_required_and_failure_names_are_best_effort(self):
+        self.assertEqual(lane.required_servers(), ["serena"])
+        failure = ("required MCP servers failed to initialize: serena: handshake failed\n"
+                   "  detail retained; codebase-memory: a nested diagnostic; serena: repeated")
+        stderr = "log line\nError: " + failure + "\n"
+        self.assertEqual(lane.required_failure_text(stderr), failure)
+        self.assertEqual(lane.required_start_failures(stderr), ["serena"])
+        self.assertEqual(lane.required_start_failures(lane.REQUIRED_FAILURE + "other: failed"), [])
+        self.assertEqual(lane.required_failure_text("unrelated stderr\n"), "")
+        self.assertEqual(lane.required_start_failures("unrelated stderr\n"), [])
+
+    def test_the_last_aggregate_error_is_preserved(self):
+        stderr = (lane.REQUIRED_FAILURE + "serena: old\nlog\n" + lane.REQUIRED_FAILURE
+                  + "serena: new\n  multiline detail\n")
+        self.assertEqual(lane.required_failure_text(stderr), lane.REQUIRED_FAILURE + "serena: new\n  multiline detail")
+
+    def test_apply_retains_bounded_failure_and_a_canonical_rollback_path(self):
+        host = FakeHost(self)
+        host.config["mcp_servers"]["serena"] = {"command": "/bin/false"}
+        host.write_config(host.config)
+        before = host.read_config()
+        failure = "required MCP servers failed to initialize: serena: " + "x" * 2200 + "\n  last detail"
+        (host.codex.parent / "required-start-failure.json").write_text(
+            json.dumps({"codex_home": str(host.codex_home), "stderr": "Error: " + failure + "\n"}))
+        # The synthetic scratch server starts; no rehearsal relaxation is justified by this fixture.
+        code, out = host.run()
+        self.assertEqual(code, 0, out)
+        code, out = host.apply()
+        self.assertEqual(code, 3, out)
+        run = host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        captured = record["readback"]["prompt_input_profile"]["required_failure"]
+        self.assertEqual(captured, {"text": failure[:2000], "names_best_effort": ["serena"]})
+        self.assertIn(captured["text"], out)
+        # Path.resolve handles /private/var vs /var on macOS as well as symlinked Linux temp roots (R1).
+        self.assertIn(f"--rollback {run.resolve()}", out)
+        code, out = host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertEqual(host.read_config(), before)
+
+
+class SerenaReadbackTests(unittest.TestCase):
+    """The read-back's effective Serena state (the P2 repair on #674). Codex waits only for servers whose effective
+    `enabled` and `required` are both true (openai/codex@a956835d, tag rust-v0.160.0:
+    codex-rs/codex-mcp/src/connection_manager.rs:270-275; byte-identical at rust-v0.159.3). No command that takes
+    `--profile` prints `required` (cli/src/mcp_cmd.rs:970-983, cli/src/main.rs:1861-1885), so `enabled` comes from
+    `codex -p stack-worker mcp get --json` and `required` from Codex's `config/read` layers with the installed profile
+    placed at precedence 21 (app-server-protocol/src/protocol/v2/config.rs:115-131). Synthetic: the fake codex above."""
+
+    PROFILE = {"mcp_servers": {"serena": {"startup_timeout_sec": 60, "required": True}}}
+    OK = {"enabled": True, "disabled_reason": None, "enabled_tools": None, "disabled_tools": None, "env": {},
+          "required": True, "required_from": "profile stack-worker", "startup_readiness": "connection",
+          "startup_readiness_from": "default"}
+
+    @staticmethod
+    def layer(kind: str, table: dict, **name) -> dict:
+        return {"name": {"type": kind, **name}, "version": "sha256:x", "config": {"mcp_servers": {"serena": table}}}
+
+    def test_the_first_turn_servers_are_the_profiles_required_servers(self):
+        self.assertEqual(list(need(self, lane, "FIRST_TURN_SERVERS")), lane.required_servers())
+
+    def test_effective_settings_follow_codex_layer_precedence(self):
+        settings = need(self, lane, "effective_server_settings")
+        profile = "profile stack-worker"
+        user = self.layer("user", {"command": "x"}, profile=None)
+        cases = [
+            ("the profile alone", [], self.PROFILE, (True, profile, "connection", "default")),
+            ("a user layer ranks below the profile", [self.layer("user", {"command": "x", "required": False},
+                                                                 profile=None)],
+             self.PROFILE, (True, profile, "connection", "default")),
+            ("a project layer ranks above it", [self.layer("project", {"required": False}, dotCodexFolder="/x/.codex"),
+                                                user],
+             self.PROFILE, (False, "project", "connection", "default")),
+            ("session flags set the readiness", [self.layer("sessionFlags", {"startup_readiness": "catalog"}), user],
+             self.PROFILE, (True, profile, "catalog", "sessionFlags")),
+            ("legacy managed MDM ranks highest", [self.layer("legacyManagedConfigTomlFromMdm", {"required": False})],
+             self.PROFILE, (False, "legacyManagedConfigTomlFromMdm", "connection", "default")),
+            ("a disabled layer is skipped", [{**self.layer("project", {"required": False}),
+                                              "disabled_reason": "the project is not trusted"}, user],
+             self.PROFILE, (True, profile, "connection", "default")),
+            ("an unplaced layer that sets the key", [self.layer("futureLayer", {"required": False}), user],
+             self.PROFILE, ("unknown", "unplaced layer futureLayer", "connection", "default")),
+            ("an unplaced layer that does not", [self.layer("futureLayer", {"enabled": True}), user],
+             self.PROFILE, (True, profile, "connection", "default")),
+            ("no layer sets it", [user], {}, (False, "default", "connection", "default")),
+            ("a lower layer decides when the profile is silent", [self.layer("enterpriseManaged", {"required": True})],
+             {}, (True, "enterpriseManaged", "connection", "default")),
+        ]
+        for label, layers, prof, (required, required_from, readiness, readiness_from) in cases:
+            with self.subTest(case=label):
+                self.assertEqual(settings(layers, prof, "serena"),
+                                 {"required": required, "required_from": required_from,
+                                  "startup_readiness": readiness, "startup_readiness_from": readiness_from})
+
+    def test_validation_fails_closed_on_serena(self):
+        def problems(entry):
+            found = {"profile_servers": {} if entry is None else {"serena": entry}}
+            return [problem for problem in lane.check_readbacks(found, "/eco") if "serena" in problem]
+
+        self.assertEqual(problems(self.OK), [])
+        cases = [("a recorded lookup error", {"error": "Error: boom"},
+                  "-p stack-worker serena: codex mcp get failed: Error: boom"),
+                 ("no read-back", None, "-p stack-worker serena: no read-back"),
+                 ("disabled", {**self.OK, "enabled": False, "disabled_reason": "requirements"},
+                  "-p stack-worker serena is not enabled (enabled False, disabled_reason requirements)"),
+                 ("required unknown", {**self.OK, "required": "unknown", "required_from": "config/read failed: x"},
+                  "-p stack-worker serena required is unknown (config/read failed: x)"),
+                 ("required missing", {**self.OK, "required": False, "required_from": "default"},
+                  "-p stack-worker serena required is False (default)")]
+        for label, entry, expected in cases:
+            with self.subTest(case=label):
+                got = problems(entry)
+                self.assertEqual(len(got), 1, got)
+                self.assertIn(expected, got[0])
+
+    def test_an_inherited_enabled_false_fails_the_rehearsal_and_the_apply(self):
+        host = FakeHost(self)
+        host.config["mcp_servers"]["serena"] = {"command": f"{host.eco}/bin/serena", "enabled": False}
+        host.write_config(host.config)
+        before = host.read_config()
+        code, out = host.run()
+        self.assertEqual(code, 3, out)
+        self.assertIn("-p stack-worker serena is not enabled", out)
+        code, out = host.apply()
+        self.assertEqual(code, 3, out)
+        self.assertIn("-p stack-worker serena is not enabled", out)
+        run = host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        self.assertIs(record["readback"]["profile_servers"]["serena"]["enabled"], False)
+        code, out = host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertEqual(host.read_config(), before)
+
+    def test_a_profile_without_required_fails_the_read_back(self):
+        host = FakeHost(self)
+        text = (TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8")
+        self.assertEqual(text.count("required = true\n"), 1)
+        template = host.tmp / "stack-worker.without-required.toml"
+        template.write_text(text.replace("required = true\n", ""), encoding="utf-8")
+        with mock.patch.object(lane, "PROFILE_TEMPLATE", template):
+            self.assertEqual(lane.required_servers(), [])
+            code, out = host.run()
+        self.assertEqual(code, 3, out)
+        self.assertIn("-p stack-worker serena required is False (default)", out)
+
+    def test_a_recorded_lookup_error_fails_the_read_back(self):
+        for name in ("serena", "codebase-memory"):  # neither table has a key the old comparisons read
+            with self.subTest(server=name):
+                host = FakeHost(self)
+                (host.codex.parent / "mcp-get-fail").write_text(name + "\n")
+                code, out = host.run()
+                self.assertEqual(code, 3, out)
+                self.assertIn(f"-p stack-worker {name}: codex mcp get failed: Error: fake lookup failure for {name}",
+                              out)
+
+    def test_a_higher_layer_that_clears_required_fails_and_a_disabled_one_does_not(self):
+        for disabled_reason, expected in ((None, 3), ("the project is not trusted", 0)):
+            with self.subTest(disabled_reason=disabled_reason):
+                host = FakeHost(self)
+                layer = self.layer("project", {"required": False}, dotCodexFolder=str(host.tmp / ".codex"))
+                if disabled_reason:
+                    layer["disabled_reason"] = disabled_reason
+                (host.codex.parent / "config-layers.json").write_text(json.dumps({"above": [layer]}))
+                code, out = host.run()
+                self.assertEqual(code, expected, out)
+                if expected:
+                    self.assertIn("-p stack-worker serena required is False (project)", out)
+                else:
+                    self.assertIn('"required_from": "profile stack-worker"', out)
+
+    def test_a_failed_config_read_leaves_required_unknown_and_fails(self):
+        host = FakeHost(self)
+        (host.codex_home / "stack-worker.config.toml").write_bytes(
+            (TEMPLATES / "codex.stack-worker.config.toml").read_bytes())
+        env = {"HOME": str(host.tmp / "home"), "CODEX_HOME": str(host.codex_home), "LANG": "C.UTF-8",
+               "PATH": os.defpath}
+        with mock.patch.object(lane, "AppServer", side_effect=lane.Failed("codex app-server, config/read: boom")):
+            found = lane.readbacks(str(host.codex), env, None, host.tmp)
+        serena = found["profile_servers"]["serena"]
+        self.assertIs(serena.get("enabled"), True)
+        self.assertEqual(serena.get("required"), "unknown")
+        self.assertIn("config/read failed: codex app-server, config/read: boom", str(serena.get("required_from")))
+        self.assertTrue(any("serena required is unknown" in problem
+                            for problem in lane.check_readbacks(found, str(host.eco))))
 
 
 def snapshot(root: Path) -> dict:
@@ -2125,7 +2490,7 @@ class SandboxProbeControlTests(unittest.TestCase):
 
 
 @unittest.skipUnless(os.environ.get("NAS_CODEX_INTEGRATION") == "1" and shutil.which("codex"),
-                     "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server")
+                     f"set NAS_CODEX_INTEGRATION=1 with codex-cli {lane.CODEX_VERSION} on PATH to run the real app-server")
 class CodexIntegrationTests(unittest.TestCase):
     """Local integration with the real codex: its app-server writes a scratch Codex home and rollback restores it
     byte for byte; a project config outranks the profile but not the pinned flags; the gateway profile loads under
@@ -2159,6 +2524,131 @@ class CodexIntegrationTests(unittest.TestCase):
         (root / "cwd").mkdir()
         return {"HOME": str(root / "home"), "CODEX_HOME": str(codex_home), "LANG": "C.UTF-8",
                 "PATH": os.pathsep.join([str(Path(shutil.which("codex")).parent), os.defpath])}
+
+    def serena_startup_observation(self, profile_text: str, *, broken: bool = False,
+                                   flags: tuple[str, ...] = ()) -> dict:
+        """#436's native race instrument, scoped to Serena; first-turn ALL_TOOLS is the oracle."""
+        with tempfile.TemporaryDirectory(prefix="serena-startup-") as tmp:
+            root = Path(tmp)
+            wrapper = self.isolation(root)
+            self.assertTrue(wrapper, "the startup instrument requires working bwrap --unshare-net")
+            home = root / "home" / ".codex"
+            home.mkdir(parents=True)
+            (root / "cwd").mkdir()
+            server = write_fixture_mcp_server(root)
+            base = ('model_provider = "nasfake"\ncheck_for_update_on_startup = false\n'
+                    '[features]\ndaemon_auto_start = false\n'
+                    '[model_providers.nasfake]\nname = "nas-fake"\nbase_url = "http://127.0.0.1:9/v1"\n'
+                    'wire_api = "responses"\nrequires_openai_auth = false\nrequest_max_retries = 0\n'
+                    'stream_max_retries = 0\n')
+            for name in tomllib.loads(profile_text)["mcp_servers"]:
+                base += f'\n[mcp_servers."{name}"]\n'
+                if name == "serena":
+                    command = "/bin/false" if broken else sys.executable
+                    args = [] if broken else [str(server), "--tool", "fixture_serena", "--delay", "2.5"]
+                    base += f"command = {json.dumps(command)}\nargs = {json.dumps(args)}\n"
+                else:
+                    # Every partial profile table has a base transport. Only Serena is under trial.
+                    base += 'command = "/bin/false"\nenabled = false\n'
+            (home / "config.toml").write_text(base, encoding="utf-8")
+            (home / "stack-worker.config.toml").write_text(profile_text, encoding="utf-8")
+            driver = root / "responses_driver.py"
+            driver.write_text(RESPONSES_DRIVER, encoding="utf-8")
+            argv = [shutil.which("codex"), "exec", "-p", lane.PROFILE_NAME,
+                    "-c", 'model_providers.nasfake.base_url="{BASE_URL}"', *flags, *lane.worker_pins(),
+                    "-s", "read-only", "--skip-git-repo-check", "reply ok"]
+            env = {"HOME": str(root / "home"), "CODEX_HOME": str(home), "LANG": "C.UTF-8",
+                   "PATH": os.pathsep.join([str(Path(shutil.which("codex")).parent), os.defpath])}
+            out = root / "result.json"
+            got = subprocess.run([*wrapper, sys.executable, str(driver), str(out), json.dumps(argv)],
+                                 cwd=root / "cwd", env=env, stdin=subprocess.DEVNULL, capture_output=True,
+                                 text=True, timeout=150)
+            self.assertEqual(got.returncode, 0, got.stderr[-500:])
+            self.assertTrue(out.is_file(), got.stderr[-500:])
+            result = json.loads(out.read_text())
+            # Codex stderr includes a session banner and the synthetic prompt/answer; retain diagnostics only.
+            diagnostics = [line for line in result["stderr"].splitlines()
+                           if line.startswith(("WARNING:", "Error:", "mcp:"))
+                           or re.match(r"^\d{4}-\d\d-\d\dT.*\b(?:ERROR|WARN)\b", line)]
+            result["stderr"] = "\n".join(diagnostics).replace(str(home), "<CODEX_HOME>").replace(str(root), "<SCRATCH>")
+            result["stderr"] = re.sub(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}",
+                                      "<SESSION_ID>", result["stderr"], flags=re.I)
+            result["command"] = ["codex", *argv[1:]]
+            result["working_directory"] = "<SCRATCH>/cwd"
+            result["profile_sha256"] = hashlib.sha256(profile_text.encode()).hexdigest()
+            result["driver_sha256"] = hashlib.sha256(RESPONSES_DRIVER.encode()).hexdigest()
+            result["mcp_fixture_sha256"] = hashlib.sha256(FIXTURE_MCP_SERVER.encode()).hexdigest()
+        responses = [r for r in result["requests"] if r["path"].endswith("/responses")]
+        result["first_request_sec"] = responses[0]["t"] if responses else None
+        result["first_turn_tools"] = (responses[1:2] or [{}])[0].get("listed_tools") or []
+        return result
+
+    @staticmethod
+    def retain_startup_observations(observations: list[dict]) -> None:
+        """Optional private trial capture; never changes a public receipt or a host configuration."""
+        path = os.environ.get("NAS_CODEX_STARTUP_OBSERVATIONS")
+        if path:
+            Path(path).write_text(json.dumps({"codex_version": lane.CODEX_VERSION, "runs": observations}, indent=2)
+                                  + "\n", encoding="utf-8")
+
+    def test_required_serena_starts_before_the_first_turn_on_a_custom_provider(self):
+        profile = (TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8")
+        observations = []
+        for label, broken, flags in (("profile", False, ()),
+                                     ("control", False, ("-c", "mcp_servers.serena.required=false")),
+                                     ("cannot start", True, ())):
+            observed = self.serena_startup_observation(profile, broken=broken, flags=flags)
+            observations.append({"case": label, **observed})
+            self.retain_startup_observations(observations)
+        results = {r["case"]: r for r in observations}
+        tool = "mcp__serena__fixture_serena"
+        with self.subTest(case="profile"):
+            self.assertEqual(results["profile"]["exit"], 0, results["profile"]["stderr"])
+            self.assertIn(tool, results["profile"]["first_turn_tools"])
+            self.assertGreaterEqual(results["profile"]["first_request_sec"], 2.5)
+        with self.subTest(case="control"):
+            self.assertEqual(results["control"]["exit"], 0, results["control"]["stderr"])
+            self.assertTrue(results["control"]["first_turn_tools"])
+            self.assertNotIn(tool, results["control"]["first_turn_tools"])
+            self.assertLess(results["control"]["first_request_sec"], 2.5)
+        with self.subTest(case="difference"):
+            self.assertEqual(set(results["profile"]["first_turn_tools"])
+                             ^ set(results["control"]["first_turn_tools"]), {tool})
+        with self.subTest(case="cannot start"):
+            self.assertNotIn(results["cannot start"]["exit"], (0, "timeout"), results["cannot start"]["stderr"])
+            self.assertIn("required MCP servers failed to initialize: serena", results["cannot start"]["stderr"])
+            self.assertEqual(results["cannot start"]["requests"], [])
+
+    @unittest.skipUnless(os.environ.get("NAS_CODEX_STARTUP_TRIAL") == "1", "set NAS_CODEX_STARTUP_TRIAL=1 for the trial")
+    def test_serena_startup_trial(self):
+        # Preregistered in the 2026-10-03 addendum before execution. C is excluded by upstream's process-scoped cache.
+        profile = (TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8")
+        baseline = profile.replace("required = true\n", "")
+        arms = {"control": baseline,
+                "A": baseline.replace("[mcp_servers.serena]\n", "[mcp_servers.serena]\nrequired = true\n"),
+                "B": "mcp_optional_startup_grace_ms = 0\n" + baseline}
+        observations = []
+        for arm, text in arms.items():
+            for broken in (False, True):
+                for run in range(1, 4):
+                    observed = self.serena_startup_observation(text, broken=broken)
+                    observations.append({"arm": arm, "fixture": "cannot_start" if broken else "delayed_initialize",
+                                         "run": run, **observed})
+                    self.retain_startup_observations(observations)
+        for observed in observations:
+            with self.subTest(arm=observed["arm"], fixture=observed["fixture"], run=observed["run"]):
+                tool_present = "mcp__serena__fixture_serena" in observed["first_turn_tools"]
+                if observed["fixture"] == "delayed_initialize":
+                    self.assertEqual(observed["exit"], 0, observed["stderr"])
+                    self.assertTrue(observed["first_turn_tools"])
+                    self.assertEqual(tool_present, observed["arm"] != "control")
+                elif observed["arm"] == "A":
+                    self.assertNotIn(observed["exit"], (0, "timeout"), observed["stderr"])
+                    self.assertIn("required MCP servers failed to initialize: serena", observed["stderr"])
+                    self.assertEqual(observed["requests"], [])
+                else:
+                    self.assertEqual(observed["exit"], 0, observed["stderr"])
+                    self.assertFalse(tool_present)
 
     def test_the_omniroute_profile_loads_strictly_and_names_its_key(self):
         # --strict-config rejects an unknown key at load. With the key unset, Codex then stops at the provider's
@@ -2298,7 +2788,10 @@ class CodexIntegrationTests(unittest.TestCase):
             root = Path(tmp)
             env = self.gateway_home(root, "")
             codex_home = Path(env["CODEX_HOME"])
-            (codex_home / "config.toml").write_text(base.substitute(fixture))
+            server = write_fixture_mcp_server(root)
+            registered = tomllib.loads(base.substitute(fixture))
+            registered["mcp_servers"]["serena"].update(command=sys.executable, args=[str(server)])
+            (codex_home / "config.toml").write_text(emit_toml(registered))
             (codex_home / "stack-worker.config.toml").write_bytes(
                 (TEMPLATES / "codex.stack-worker.config.toml").read_bytes())
             strict = self.strict_exec(root, env, "-p", "stack-worker")
@@ -2345,10 +2838,11 @@ class CodexIntegrationTests(unittest.TestCase):
     def test_real_app_server_apply_and_byte_exact_rollback(self):
         host = FakeHost(self)
         host.base_args[1] = shutil.which("codex")
+        server = write_fixture_mcp_server(host.tmp)
         text = ('# a comment the writer keeps\nmodel = "gpt-6-astra"\nmodel_reasoning_effort = "ultra"\n\n'
                 f'[features]\ndaemon_auto_start = false\n\n[shell_environment_policy.set]\n'
                 f'PATH = "{host.eco}/bin:/usr/bin:/bin"\n\n[mcp_servers.ai-memory]\nurl = "http://127.0.0.1:1/mcp"\n\n'
-                f'[mcp_servers.serena]\ncommand = "{host.eco}/bin/serena"\n\n'
+                f'[mcp_servers.serena]\ncommand = {json.dumps(sys.executable)}\nargs = {json.dumps([str(server)])}\n\n'
                 '[mcp_servers.codebase-memory]\ncommand = "/bin/false"\n\n'
                 f'[mcp_servers.socraticode]\ncommand = "{host.eco}/bin/node"\nstartup_timeout_sec = 120\n\n'
                 f'[mcp_servers.headroom]\ncommand = "{host.eco}/bin/headroom"\n\n[mcp_servers.headroom.env]\n'
@@ -2480,13 +2974,15 @@ class CodexIntegrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             home, project = root / "home", root / "project"
+            server = write_fixture_mcp_server(root)
             (home / ".codex").mkdir(parents=True)
             (project / ".codex").mkdir(parents=True)
             shutil.copy(TEMPLATES / "codex.stack-worker.config.toml", home / ".codex" / "stack-worker.config.toml")
             (home / ".codex" / "config.toml").write_text(
                 'model_reasoning_effort = "max"\n[mcp_servers.ai-memory]\nurl = "http://127.0.0.1:1/mcp"\n'
                 '[mcp_servers.socraticode]\ncommand = "/bin/false"\n[mcp_servers.headroom]\ncommand = "/bin/false"\n'
-                '[mcp_servers.serena]\ncommand = "/bin/false"\n[mcp_servers.codebase-memory]\ncommand = "/bin/false"\n'
+                f'[mcp_servers.serena]\ncommand = {json.dumps(sys.executable)}\nargs = {json.dumps([str(server)])}\n'
+                '[mcp_servers.codebase-memory]\ncommand = "/bin/false"\n'
                 f'[mcp_servers.context-mode]\ncommand = "/bin/false"\n[projects."{project}"]\ntrust_level = "trusted"\n')
             (project / ".codex" / "config.toml").write_text('model_reasoning_effort = "ultra"\n')
             subprocess.run(["git", "-C", str(project), "init", "-q"], check=True)

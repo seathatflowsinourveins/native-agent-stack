@@ -713,7 +713,7 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(set(profile), {"model", "model_reasoning_effort", "web_search", "mcp_servers"})
         # Serena, and the ai-memory and context-mode tables of the interim installs; without the option no approval mode.
         self.assertEqual(profile["mcp_servers"], {
-            "serena": {"startup_timeout_sec": 60},
+            "serena": {"startup_timeout_sec": 60, "required": True},
             "ai-memory": {"enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status",
                                             "memory_briefing"]},
             "context-mode": {"disabled_tools": ["ctx_upgrade", "ctx_purge"]}})
