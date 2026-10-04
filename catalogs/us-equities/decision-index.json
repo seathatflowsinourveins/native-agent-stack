@@ -94,6 +94,12 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/16/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
       "collection": "/layers/2/candidates",
       "repository_field": "repository",
       "kind": "research_supplement"
@@ -398,7 +404,7 @@
     "repositories": 875,
     "public_star_repositories": 357,
     "beyond_public_stars": 518,
-    "references": 2045,
+    "references": 2051,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 69,
@@ -2509,6 +2515,12 @@
           "kind": "research_supplement",
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/0/candidates/3",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/16/candidates/2",
           "disposition": "conditional"
         },
         {
@@ -11198,6 +11210,12 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/16/candidates/5",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/2/candidates/4",
           "disposition": "conditional"
         },
@@ -14882,6 +14900,12 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/16/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/2/candidates/1",
           "disposition": "selected"
         },
@@ -15024,7 +15048,13 @@
           "kind": "research_supplement",
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/0/candidates/2",
-          "disposition": "conditional"
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/16/candidates/1",
+          "disposition": "unqualified"
         },
         {
           "kind": "research_supplement",
@@ -15405,6 +15435,12 @@
           "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
           "pointer": "/candidates/2",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/16/candidates/3",
           "disposition": "conditional"
         },
         {
@@ -20372,6 +20408,12 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/12/candidates/2",
           "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/16/candidates/4",
+          "disposition": "unqualified"
         },
         {
           "kind": "research_supplement",
