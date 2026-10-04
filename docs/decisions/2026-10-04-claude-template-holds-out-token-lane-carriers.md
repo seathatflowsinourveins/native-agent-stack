@@ -32,17 +32,21 @@ left the shared template unchanged.
    the same command or `--keep-held-out-hooks` is given. The test is an exact allowlist, not a recognised grammar:
    `SHIPPED_CARRIER_COMMANDS` holds the four strings the history shows (git log -S over the template and the opt-in entries file,
    each with where it first appeared): `python3 "${HOME}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true`, the same
-   for `token-lanes-session-start.py`, and both with `$HOME`. A hook is retired when its command equals one of them, or one of them as
-   `render_config.py` renders the settings template for the host (one `string.Template` substitution of the home directory for the
-   placeholder; `tests/test_install_claude_profile.py` shows the rendered form), exactly: no trimming, because the shell treats a
-   no-break space, a next-line character or a carriage return around a command as part of a word, and nothing is parsed or
-   expanded. The home is the one the settings file belongs to: its resolved path (relative paths made absolute, symlinks
-   followed) must be `<home>/.claude/settings.json`, and for any other path nothing is retired, because whose file it is cannot
-   be told (the tool never borrows the operator's own home). Everything else is the host's own and is kept: a carrier path mentioned as an argument, a wrapper, a chained command, an option, a substitution, a hand-edited carrier
+   for `token-lanes-session-start.py`, and both with `$HOME`. A hook is retired when its command equals one of them exactly
+   (no trimming, because the shell treats a no-break space, a next-line character or a carriage return around a command as part
+   of a word), as shipped or with the placeholder replaced by the text `render_config.py` writes there. The renderer substitutes
+   the `HOME` it is given as written (one `string.Template` pass, no normalisation; `tests/test_install_claude_profile.py` shows
+   the rendered form), so that text is whatever spelling of the home the installer was given: a trailing slash, a `.` or `..`
+   segment, a doubled or doubled leading slash, a symlink alias. It counts when it is an absolute path with no control character,
+   quote, dollar sign, backtick or backslash (the shell expands or interprets those inside the double quotes around it, so
+   `.../$X/..` is the home to a lexical reading and its parent to the shell) whose realpath is the realpath of the home the
+   settings file belongs to; nothing else is parsed or expanded. That home is the settings file's resolved path
+   `<home>/.claude/settings.json` (relative paths made absolute, symlinks followed), and for any other path nothing is retired,
+   because whose file it is cannot be told (the tool never borrows the operator's own home). Everything else is the host's own and is kept: a carrier path mentioned as an argument, a wrapper, a chained command, an option, a substitution, a hand-edited carrier
    command (the fail-closed residual: it keeps running until its owner edits it). A group or event left empty is dropped, every
    other hook keeps its value and order, and a second merge changes nothing. On a copy of NativeStack's live settings of 2026-10-04
    the merge removes exactly one hook, the SubagentStart carrier, and with `--keep-held-out-hooks` it stays (a one-off check at the
-   round-4 head, not retained as a receipt). Four cross-family reads found a defect in each earlier matcher or in what it was
+   round-4 head, not retained as a receipt). Five cross-family reads found a defect in each earlier matcher or in what it was
    given (the addendum at the end), which is why none recognises a grammar any more.
 4. **Opting in is one documented step** (`adoption/hooks/claude/README.md`): install the files with `--hook`, then
    `apply_claude_settings.py --template adoption/hooks/claude/held-out-hook-entries.json`, and apply the default template with
@@ -106,9 +110,10 @@ left the shared template unchanged.
 
 ## Addendum (2026-10-04, evening): the cross-family reads of this change and the extra rounds
 
-Four cross-family reads of this change found a defect in the retirement matcher: one P2, then two, then three, then two P2 and a
-P3. The bounded loop allows one review and one repair round; the second, third and fourth repairs are extra rounds, taken because
-each finding was a way for a re-apply to delete a hook that the host wrote for itself, which the change promises never to do.
+Five cross-family reads of this change found a defect in the retirement matcher: one P2, then two, then three, then two P2 and a
+P3, then two P2. The bounded loop allows one review and one repair round; the second to fifth repairs are extra rounds, taken
+because each finding was a way for a re-apply to delete a hook that the host wrote for itself, which the change promises never
+to do (the fifth read's two findings were the other way round, a carrier kept, and the fifth repair is the final round).
 
 | Read (head) | Finding | Matcher before the fix | Fix |
 | --- | --- | --- | --- |
@@ -116,12 +121,15 @@ each finding was a way for a re-apply to delete a hook that the host wrote for i
 | second, `998420e9f`, 2 x P2 | python option values are not the script operand (`-c '... # <path>'`, `-X <path> -c ...` deleted; `-X utf8 <path>` kept); `;(`, `&&(` and substitutions slip past shlex's tokens | the first non-option word, then shlex tokens | one anchored pattern over the whole command |
 | third, `e2b355cdf`, 3 x P2 | options after `--` still select a host script; an unquoted `-X` or `-W` value is globbed by the shell; an unquoted `$HOME` word-splits the script operand | the anchored pattern, a recognised grammar | the exact allowlist |
 | fourth, `1b28148bb`, 2 x P2 and P3 | `str.strip()` also removes a no-break space, a next-line character and a carriage return, so a command the shell runs differently was retired; the home: a relative target gave the home `.`, an external target fell back to the operator's home, a symlinked alias was not resolved, a trailing slash rendered `//.claude`; sequential `$HOME` and `${HOME}` replaces added aliases the renderer never writes (P3) | the allowlist after trimming, a home from the path string with an operator fallback, two sequential replaces | equality without trimming; the home is the resolved `<home>/.claude/settings.json` or nothing; one `string.Template` pass over a normalised home |
+| fifth, `d48973ce0`, 2 x P2 (both keep a carrier) | `render_config.py` substitutes `HOME` as written, so a carrier installed with a home spelled with a trailing slash, a `.` or `..` segment, a doubled slash or a doubled leading slash ran and was kept (the trailing-slash test even expected the doubled form to survive); with a symlinked home (alias to real) the renderer and the installer write the alias, the settings file's resolved home is `real`, and the alias-rendered carrier was kept (the alias test built its command for `real`) | the shipped strings rendered once for one normalised spelling of the resolved home | the shipped commands with a hole where `HOME` is: the hole's text may be any plain absolute path whose realpath is the home's (a check on a path, not on shell syntax) |
 
 Every grammar fix opened the next edge (shell and Python syntax, expansion, splitting), so the third repair recognises no grammar:
 `SHIPPED_CARRIER_COMMANDS` is the finite set the history shows, a hook is retired only when its command equals a member as shipped
 or as rendered for the host, and nothing else is. The fourth repair left that set alone and removed what still guessed around it:
-the trimming, the fallback home and the sequential rendering. Tests (`HeldOutHookTests`, red first: 78 failures and one error
-on the third-round code, all green after): the four strings and where each first appeared, and the allowlist equal to them;
+the trimming, the fallback home and the sequential rendering. The fifth replaced the last guess, the spelling of the home, with a
+check on the path the renderer wrote (`names_home`): one hole in four fixed shapes, not a grammar. Tests (`HeldOutHookTests`; the
+fourth round's were red first, 78 failures and one error on the third-round code, and the fifth round's nine failures on the
+fourth-round code, all green after): the four strings and where each first appeared, and the allowlist equal to them;
 every shipped string retired as shipped and as rendered; the shipped template and opt-in files carry only allowlisted commands (a
 new shipped shape fails there until it is added, with its source); no whitespace around a shipped command tolerated (nine
 paddings, including the three characters above); a mutation test (at every position of the six strings the deletion of the
@@ -129,9 +137,18 @@ character, an insertion of each of ten characters and a replacement by each of t
 read's 25 shapes and the third read's 30, all kept (the pattern matcher retired 26 of the 55); another host's home does not
 retire; applying to a temporary home retires the carrier rendered for that home; a relative target, a symlinked alias and a
 home with a trailing slash name the right home; a target that is not a home's `.claude/settings.json` retires nothing and does
-not borrow the operator's home; a home that itself contains the placeholder is substituted once. The merge against a copy of this
+not borrow the operator's home; a home that itself contains the placeholder is substituted once; the carriers rendered by the
+real `render_config.render_one` with seven spellings of one home (canonical, trailing slash, `.` segment, doubled slash,
+`child/..` segment, doubled leading slash, `./../home/`) all retire when applied to `<home>/.claude/settings.json`; a carrier
+rendered for the alias of a home or for the real one retires when applied through either path; spellings that must be kept: a
+sibling, the parent, a child, a relative path, an empty one, `~`, another case, and every one the shell would expand or
+interpret (a dollar sign, a substitution, a backtick, a backslash, a quote, a newline, a no-break space), including `.../$X/..`,
+which realpath reduces to the home and the shell does not. The first four rounds' shape and mutation tests are unchanged. The merge against a copy of this
 host's live settings still removes exactly one hook (a one-off check at this head, not retained as a receipt). Residuals: a host
 that hand-edited a carrier command keeps it, and a carrier that a host hook wraps or chains keeps running there until its owner
 edits that hook; the applier does not report such hooks, and an operator who wants a list can search the live settings for the
 two file names. The applier's default target is `~/.claude/settings.json` and does not read `CLAUDE_CONFIG_DIR`; a settings file
-outside a `.claude` directory has no home this tool can name, so its carrier entry stays until its owner removes it.
+outside a `.claude` directory, or inside a `.claude` that is a symlink to a differently named directory, resolves to a path
+with no `.claude` parent and has no home this tool can name, so its carrier entry stays until its owner removes it. A
+differently cased spelling of a home names the same directory on a case-insensitive filesystem and is kept, because
+`realpath` does not fold case; that was not exercised.

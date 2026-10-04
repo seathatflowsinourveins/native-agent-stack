@@ -23,9 +23,12 @@ repository, byte-pinned in `SHA256SUMS`:
 
 The template registers neither hook, `install_claude_profile.py` copies none of these files unless `--hook NAME` names
 it, and `apply_claude_settings.py` removes a live hook entry whose command equals, exactly (no trimming), one of the carrier
-commands this repository shipped (`SHIPPED_CARRIER_COMMANDS`, as shipped or with the placeholder replaced by the host's home
-directory, as `render_config.py` renders it). The home is the one the settings file belongs to: its resolved path must be
-`<home>/.claude/settings.json`, and for any other path nothing is removed. Any other hook, including one that wraps, chains or
+commands this repository shipped (`SHIPPED_CARRIER_COMMANDS`, as shipped or with the placeholder replaced by the text
+`render_config.py` writes there). The renderer substitutes the `HOME` it is given as written, so that text may be any spelling of
+the home (a trailing slash, a `.` or `..` segment, a doubled slash, a symlink alias); it counts when it is an absolute path with no
+control character, quote, `$`, backtick or backslash whose realpath is the realpath of the settings file's home. The home is the
+one the settings file belongs to: its resolved path must be `<home>/.claude/settings.json`, and for any other path nothing is
+removed. Any other hook, including one that wraps, chains or
 edits a carrier command, is the host's and is kept, so a host that applied an older template ends up clean unless it edited the
 entry itself.
 

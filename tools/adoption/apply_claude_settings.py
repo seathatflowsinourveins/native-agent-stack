@@ -11,8 +11,8 @@ ahead of a `!` carve-out), combines hooks
 per event de-duplicated by command, writes atomically, and preserves the
 original file's mode bits. The one thing a merge removes from the live hooks is a hook
 object whose command is, byte for byte, a held-out token-lane carrier command this repository shipped
-(SHIPPED_CARRIER_COMMANDS, as shipped or rendered for the host's home; any other hook, even one that runs a carrier, is the
-host's own and stays), so a host
+(SHIPPED_CARRIER_COMMANDS, as shipped or rendered for the host's home in any spelling of it: render_config.py substitutes the
+HOME it is given as written; any other hook, even one that runs a carrier, is the host's own and stays), so a host
 that applied an older template ends up clean; a template that itself carries the
 command keeps it, and --keep-held-out-hooks keeps the ones a host opted into (see
 adoption/hooks/claude/README.md). Supports --dry-run (prints the would-be result and exits
@@ -74,14 +74,16 @@ def command_key(cmd: str) -> str:
 
 
 # The carrier commands this repository has shipped, as shipped, with where each first appeared (git log -S over the two files that
-# carry hook commands, oldest first). A hook is retired only when its command is one of these strings, or one of them as
-# render_config.py renders the settings template for the host (one string.Template substitution of its home directory for HOME;
-# tests/test_install_claude_profile.py shows the rendered form), and the command equals it exactly: no trimming, because the shell
-# treats a no-break space, a next-line character or a carriage return around a command as part of a word. Nothing is parsed or
-# expanded, so nothing a host wrote for itself, a wrapper, a chained command, an option, a substitution or a hand-edited carrier
-# command, can be mistaken for a carrier: it stays. Three rounds of cross-family reads found a defect in each matcher that
-# recognised a grammar; the allowlist is finite and is the only thing to review. A new shipped shape is added here, with its source,
-# in the commit that ships it.
+# carry hook commands, oldest first). A hook is retired only when its command is one of these strings, or one of them rendered for
+# the host. render_config.py substitutes the HOME it is given into the template as written (one string.Template pass, no
+# normalisation; tests/test_install_claude_profile.py shows the rendered form), so a carrier carries whatever spelling of its home the
+# installer was given. The command must equal a shipped string exactly, no trimming (the shell treats a no-break space, a next-line
+# character or a carriage return around a command as part of a word), except at one place: where the template says HOME, the text
+# may be any plain absolute path that names the settings file's own home (names_home). Nothing else is parsed or expanded, so
+# nothing a host wrote for itself, a wrapper, a chained command, an option, a substitution or a hand-edited carrier command can be
+# mistaken for a carrier: it stays. Rounds 1 to 3 of the cross-family reads found a defect in each matcher that recognised a grammar;
+# the allowlist is finite, and its one semantic check is on a path, not on shell syntax. A new shipped shape is added here, with its
+# source, in the commit that ships it.
 SHIPPED_CARRIER_COMMANDS = (
     ('python3 "${HOME}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true',
      "adoption/templates/claude.settings.template.json, 0c33b37a9 (main, #378; first written as abaa8425d)"),
@@ -94,10 +96,26 @@ SHIPPED_CARRIER_COMMANDS = (
 )
 
 
+def carrier_frames() -> tuple:
+    """What each shipped command has before and after the text that stands for HOME: the command with a NUL where the placeholder
+    is, split there (the same one-pass string.Template substitution that renders it)."""
+    frames = []
+    for command, _ in SHIPPED_CARRIER_COMMANDS:
+        before, hole, after = string.Template(command).substitute(HOME="\0").partition("\0")
+        if not hole or "\0" in after:
+            raise ValueError(f"a shipped carrier command must name HOME exactly once: {command!r}")
+        frames.append((before, after))
+    return tuple(dict.fromkeys(frames))
+
+
+CARRIER_FRAMES = carrier_frames()
+
+
 def carrier_commands(home: str | None) -> frozenset:
     """The strings that retire a hook on the host whose home directory is ``home`` (an absolute path; a trailing slash is
-    dropped): each shipped command as shipped, and as the renderer writes it for that host. A host whose home is not known (None,
-    or not absolute) has none: retirement then removes nothing."""
+    dropped): each shipped command as shipped, and as the renderer writes it for that spelling of the home. A host whose home is not
+    known (None, or not absolute) has none: retirement then removes nothing. runs_held_out_hook also accepts the other spellings of
+    the home (names_home)."""
     if not home or not os.path.isabs(home):
         return frozenset()
     home = os.path.normpath(home)
@@ -107,11 +125,32 @@ def carrier_commands(home: str | None) -> frozenset:
     return frozenset(shipped + rendered)
 
 
+def names_home(text: str, home: str) -> bool:
+    """True when ``text``, what stands where a rendered carrier command has its home, runs as written and names the directory
+    ``home``: an absolute path (a relative one resolves against whatever directory the hook runs in) with no control character,
+    quote, dollar sign, backtick or backslash (the shell expands or interprets those inside the double quotes the command puts around
+    it, so ".../$X/.." is the home to a lexical reading and its parent to the shell) whose realpath is the realpath of ``home``. A
+    trailing slash, a "." or ".." segment, a doubled or doubled leading slash and a symlink alias of the home are thus the home they
+    spell, which is what render_config.py wrote when it was given one of them."""
+    if not text.startswith("/") or any(not char.isprintable() or char in '"$`\\' for char in text):
+        return False
+    try:
+        return os.path.realpath(text) == os.path.realpath(home)
+    except (OSError, ValueError):
+        return False
+
+
 def runs_held_out_hook(entry: dict, home: str | None = None) -> bool:
-    """True when a hooks-array entry's command is exactly a carrier command this repository shipped (SHIPPED_CARRIER_COMMANDS, as
-    shipped or rendered for ``home``): string equality, no trimming. Without a known ``home`` nothing is retired."""
+    """True when a hooks-array entry's command is a carrier command this repository shipped: exactly a SHIPPED_CARRIER_COMMANDS
+    string, as shipped or rendered for ``home``, or one of them whose home text is another spelling of ``home`` (names_home). No
+    trimming. Without a known ``home`` nothing is retired."""
     cmd = hook_command(entry)
-    return cmd is not None and cmd in carrier_commands(home)
+    if cmd is None or not home or not os.path.isabs(home):
+        return False
+    if cmd in carrier_commands(home):
+        return True
+    return any(len(cmd) > len(before) + len(after) and cmd.startswith(before) and cmd.endswith(after)
+               and names_home(cmd[len(before):len(cmd) - len(after)], home) for before, after in CARRIER_FRAMES)
 
 
 def retire_held_out_hooks(base_hooks, incoming_hooks, home: str | None = None):

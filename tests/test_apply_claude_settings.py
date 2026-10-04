@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 
 import apply_claude_settings as acs  # noqa: E402
+import render_config  # noqa: E402
 
 
 class MergeSettingsTests(unittest.TestCase):
@@ -508,10 +509,94 @@ class HeldOutHookTests(unittest.TestCase):
             self.assertIn("token-lanes-subagent-start.py", text)
             self.assertIn("memory-hook", text)
 
-    def test_a_home_with_a_trailing_slash_renders_the_same_commands(self):
+    def test_a_home_with_a_trailing_slash_names_the_same_commands(self):
         self.assertEqual(acs.carrier_commands(self.HOME + "/"), acs.carrier_commands(self.HOME))
         self.assertTrue(acs.runs_held_out_hook({"command": self.SUB}, self.HOME + "/"))
-        self.assertFalse(acs.runs_held_out_hook({"command": self.SUB.replace(self.HOME, self.HOME + "/")}, self.HOME + "/"))
+        # render_config.py substitutes HOME as given, so a home given with a trailing slash renders a doubled slash: it runs, and retires.
+        self.assertTrue(acs.runs_held_out_hook({"command": self.SUB.replace(self.HOME, self.HOME + "/")}, self.HOME))
+        self.assertTrue(acs.runs_held_out_hook({"command": self.SUB.replace(self.HOME, self.HOME + "/")}, self.HOME + "/"))
+
+    def rendered_by_the_renderer(self, directory, home_text):
+        """The two historical carrier commands as render_config.py renders them when it is given ``home_text`` for HOME."""
+        template = Path(directory) / "carriers.template.json"
+        template.write_text(json.dumps({"hooks": {
+            "SubagentStart": [{"matcher": "", "hooks": [{"type": "command", "command": self.HISTORY[0][0]}]}],
+            "SessionStart": [{"matcher": "startup", "hooks": [{"type": "command", "command": self.HISTORY[1][0]}]}]}}), encoding="utf-8")
+        rendered = json.loads(render_config.render_one(template, {"HOME": home_text}))
+        return [hook["command"] for groups in rendered["hooks"].values() for group in groups for hook in group["hooks"]]
+
+    def settings_with_commands(self, path, commands):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"hooks": {"SubagentStart": [{"matcher": "", "hooks": [
+            {"type": "command", "command": "memory-hook"}] + [{"type": "command", "command": command} for command in commands]}]}}),
+            encoding="utf-8")
+
+    def test_a_home_spelled_any_way_the_renderer_was_given_is_retired(self):
+        # The first reader of round 5 rendered the historical template with these spellings of one home and installed the carrier: it
+        # ran, and applying to <home>/.claude/settings.json kept it, because retirement compared one normalised spelling.
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as scratch:
+            parent = Path(scratch).resolve()
+            home = parent / "home"
+            (parent / "child").mkdir()
+            home.mkdir()
+            spellings = {"canonical": str(home), "trailing_slash": str(home) + "/", "dot_segment": str(home) + "/.",
+                         "repeated_separator": f"{parent}//home", "parent_segment": f"{parent}/child/../home",
+                         "two_leading_slashes": "/" + str(home), "dot_then_parent": f"{home}/./../home/"}
+            for label, spelled in spellings.items():
+                with self.subTest(label=label):
+                    commands = self.rendered_by_the_renderer(parent, spelled)
+                    self.assertEqual(len(commands), 2)
+                    self.settings_with_commands(home / ".claude" / "settings.json", commands)
+                    text = self.applied(home / ".claude" / "settings.json")
+                    self.assertNotIn("token-lanes", text)
+                    self.assertIn("memory-hook", text)
+
+    def test_a_carrier_rendered_for_the_alias_of_a_home_is_retired_through_either_spelling(self):
+        # When the home is a symlink (alias -> real) the renderer and the installer write the alias; the settings file is the same
+        # file through either path, and the carrier is the same carrier.
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as scratch:
+            parent = Path(scratch).resolve()
+            real, alias = parent / "real", parent / "alias"
+            real.mkdir()
+            alias.symlink_to(real, target_is_directory=True)
+            for rendered_for in (alias, real):
+                for applied_through in (alias, real):
+                    with self.subTest(rendered_for=rendered_for.name, applied_through=applied_through.name):
+                        commands = self.rendered_by_the_renderer(parent, str(rendered_for))
+                        self.settings_with_commands(real / ".claude" / "settings.json", commands)
+                        text = self.applied(applied_through / ".claude" / "settings.json")
+                        self.assertNotIn("token-lanes", text)
+                        self.assertIn("memory-hook", text)
+
+    def test_a_spelling_that_names_another_directory_or_expands_in_the_shell_is_kept(self):
+        # The text where the template says HOME must name this home and run as written: another directory, a relative or empty
+        # path, and anything the shell would expand inside the double quotes (a dollar sign, a backtick, a backslash, a quote, a
+        # control or no-break character) is kept even when its lexical form would reduce to this home (".../$X/.." is `home/..`
+        # to realpath and a different directory to the shell, which expands $X to nothing).
+        import string
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as scratch:
+            parent = Path(scratch).resolve()
+            home = parent / "home"
+            home.mkdir()
+            spellings = {"sibling": f"{parent}/home2", "parent": str(parent), "child": f"{home}/child", "dollar": f"{home}/$X/..",
+                         "command_substitution": f"{home}/$(x)/..", "backtick": f"{home}/`x`/..", "backslash": f"{home}/\\x/..",
+                         "quote": f'{home}/"/..', "newline": f"{home}/\n/..", "no_break_space": f"{home}/\xa0/..",
+                         "relative": "home", "empty": "", "tilde": "~", "other_case": str(parent) + "/Home"}
+            for label, spelled in spellings.items():
+                with self.subTest(label=label):
+                    # render_config.py's own one-pass substitution, on the command strings (a quote or a newline would break the
+                    # JSON text it normally substitutes into, and what is under test is the command, not the JSON around it)
+                    commands = [string.Template(command).substitute(HOME=spelled) for command, _ in self.HISTORY[:2]]
+                    self.settings_with_commands(home / ".claude" / "settings.json", commands)
+                    text = self.applied(home / ".claude" / "settings.json")
+                    self.assertIn("token-lanes-subagent-start.py", text)
+                    self.assertIn("token-lanes-session-start.py", text)
 
     def test_a_home_that_contains_a_placeholder_is_substituted_once(self):
         # render_config.py substitutes in one pass; sequential replaces would add an alias that it never writes.
