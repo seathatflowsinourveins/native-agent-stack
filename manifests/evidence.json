@@ -4088,8 +4088,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "2ebf209587e336a146348151a16f9c2e99e98d67597047baa2f93cd12c536dfe",
-      "bytes": 11008
+      "sha256": "2a9086aabdc96b01a48aaee0ebf2a4d3c268accae2c1e6755e952eba9658f986",
+      "bytes": 11260
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -9116,6 +9116,76 @@
       "path": "blueprints/native-skill-practice/native-receipt.json",
       "sha256": "e48a17904d2baa4363f0a841f0669ed00314f3b16d4f5dfc60592af72cb3c304",
       "bytes": 23044
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/README.md",
+      "sha256": "c9fdd718cbb253feafe20c960e8a02ae07a52211faddb35e48fdf7890b718a93",
+      "bytes": 24918
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/l_nli_provider.py",
+      "sha256": "663be5925c2021bd97ae7d32c0eb3824a5caf293f3d311870ad6a80628f0ce81",
+      "bytes": 4043
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/p1_casepack.py",
+      "sha256": "790f504cf09825e54a2cce2b7077b4efe0ec444e36ad5c2bb877cfbf556e9a3e",
+      "bytes": 52229
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/p1_frame.py",
+      "sha256": "662d7756f82c3a85bc99139fc86a88f41505deac493dc9ef06b53531a3fcc078",
+      "bytes": 50384
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/p1_freeze.py",
+      "sha256": "03b36700340bd74ce64eb6911c108a70631fc72bf924fd1db6887a4fb0eac091",
+      "bytes": 19578
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/p1_scoring.py",
+      "sha256": "a0fb3e05d960b8115cb66b69c9d9e05eb19347e07d4d980111932b27ddb1240f",
+      "bytes": 45560
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/promptfooconfig.yaml",
+      "sha256": "825d6a5a5e3f849bc512c2c2b4190cf975dd434fb29aa52d13013f42919d5085",
+      "bytes": 11198
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/prompts/jev-state.txt",
+      "sha256": "45a5e1ac87e3a032c8b2f19f3c4c5fb114bf7e7833cea4242d3e225953232a02",
+      "bytes": 60
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/prompts/native-question.txt",
+      "sha256": "21c969947e04020a43d0cbf6b5052d2789debd1fcfbe55818290bfddc610f743",
+      "bytes": 933
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/render-check.yaml",
+      "sha256": "23d5ab009c53a7ab5fe46442ec50bfb673a8194b66a36c507057e68168ea3c8d",
+      "bytes": 5215
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/render_echo_server.py",
+      "sha256": "575db5a8df6dec0d73419d4b2af56764a2bb764e7f97d00571fdd9f8c80b2d8e",
+      "bytes": 1676
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/requirements-scoring.in",
+      "sha256": "b98e7dbf7e918d82a1f43364cdf72152950f94b998a94e7c7157be8b03d9cf34",
+      "bytes": 47
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/requirements-scoring.lock",
+      "sha256": "9d80ef024b33d62ae15a048d67614ef55c498a9fe32988829ea5abbd0fa5ec10",
+      "bytes": 15625
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/response-model.cjs",
+      "sha256": "8c56dd69d5a11627b92c19a9783f38f135ca7531dcb0e4f263faf61977f4be99",
+      "bytes": 971
     },
     {
       "path": "blueprints/native-skill-practice/promptfooconfig.yaml",
@@ -32393,6 +32463,21 @@
       "bytes": 2065
     },
     {
+      "path": "evidence/artifacts/jev-p1-20261003/README.md",
+      "sha256": "bd0149a7003e7c05a80dd864491fbb565dc4b7aedaae5f03095a2d8236ceb032",
+      "bytes": 1800
+    },
+    {
+      "path": "evidence/artifacts/jev-p1-20261003/draw-record.draft.json",
+      "sha256": "81aa2f561bbc99e4956a866e4f46844aeafd4e135138cee34486bd221a3bb59a",
+      "bytes": 23175
+    },
+    {
+      "path": "evidence/artifacts/jev-p1-20261003/freeze-manifest.draft.json",
+      "sha256": "db5bd2869276d35d1e07bb3d2b6d1970fdee2f0f6459427d424be2bbc528c92f",
+      "bytes": 5824
+    },
+    {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
       "sha256": "801d59237231fddcae82ab5a19d3b25b09388e9b6f6f61e974073cf1251e63be",
       "bytes": 14819
@@ -51291,6 +51376,16 @@
       "path": "tests/test_jcodemunch_config.py",
       "sha256": "8316931b0d82ddb539518ed3322736879d7da6ea358c9ccd5344031eb4e859da",
       "bytes": 13287
+    },
+    {
+      "path": "tests/test_jev_p1_casepack.py",
+      "sha256": "67617ecc3e04ecee099635e5b06bed3b0eff5cbbea60fa7965e070b8e670fecf",
+      "bytes": 73346
+    },
+    {
+      "path": "tests/test_jev_p1_scoring.py",
+      "sha256": "71d8c5298bbd57ebabd22910d02c7a196e716353ba0a131391806a4522894986",
+      "bytes": 37886
     },
     {
       "path": "tests/test_job_recovery.py",
