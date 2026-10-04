@@ -9,7 +9,7 @@ The caller must verify native bindings and supply observed identities/events.
 
 from contextlib import closing, contextmanager
 from dataclasses import asdict, dataclass
-from decimal import Decimal, InvalidOperation, ROUND_HALF_EVEN
+from decimal import Context, Decimal, DivisionByZero, InvalidOperation, Overflow, ROUND_HALF_EVEN, localcontext
 import fcntl
 import hashlib
 import json
@@ -24,6 +24,13 @@ class Refused(ValueError):
     """Admission or journal binding refused before transport."""
 
 
+# Use the installed decimal.Context/localcontext contract, independently of
+# caller precision, exponent limits, rounding, flags and signal traps.
+_MONEY_CONTEXT = Context(prec=28, rounding=ROUND_HALF_EVEN, Emin=-999999,
+                         Emax=999999, capitals=1, clamp=0, flags=[],
+                         traps=[InvalidOperation, DivisionByZero, Overflow])
+
+
 def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
 
@@ -31,23 +38,33 @@ def canonical(value):
 def decimal(value):
     if isinstance(value, bool) or value is None:
         raise Refused("invalid_decimal")
-    try:
-        result = Decimal(str(value))
-    except (InvalidOperation, ValueError):
-        raise Refused("invalid_decimal") from None
+    with localcontext(_MONEY_CONTEXT):
+        try:
+            result = Decimal(str(value))
+        except (ArithmeticError, ValueError):
+            raise Refused("invalid_decimal") from None
     if not result.is_finite():
         raise Refused("nonfinite_decimal")
     return result
 
 
 def cents(value):
-    return int((decimal(value) * 100).quantize(Decimal("1"), rounding=ROUND_HALF_EVEN))
+    result = decimal(value)
+    with localcontext(_MONEY_CONTEXT):
+        try:
+            return int((result * 100).quantize(Decimal("1"), rounding=ROUND_HALF_EVEN))
+        except ArithmeticError:
+            raise Refused("invalid_decimal") from None
 
 
 def price(value):
     result = decimal(value)
-    if result <= 0 or result % Decimal("0.01") != 0:
-        raise Refused("invalid_tick_price")
+    with localcontext(_MONEY_CONTEXT):
+        try:
+            if result <= 0 or result % Decimal("0.01") != 0:
+                raise Refused("invalid_tick_price")
+        except ArithmeticError:
+            raise Refused("invalid_tick_price") from None
     return result
 
 
@@ -204,7 +221,7 @@ class PaperState:
 
     @contextmanager
     def _tx(self):
-        with self._mutex:
+        with self._mutex, localcontext(_MONEY_CONTEXT):
             self.db.execute("BEGIN IMMEDIATE")
             try:
                 yield
@@ -354,9 +371,9 @@ class PaperState:
         """Reserve and commit one attempt before any submit; same ID never resends."""
         if not isinstance(intent, str) or not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", intent):
             raise Refused("invalid_intent_identity")
-        self._payload(payload)
-        encoded = canonical(payload)
-        with self._mutex:
+        with self._mutex, localcontext(_MONEY_CONTEXT):
+            self._payload(payload)
+            encoded = canonical(payload)
             previous = self._order(intent)
             if previous:
                 if previous["payload"] != encoded:
@@ -471,19 +488,26 @@ class PaperState:
         """Economic fill keyed by observed execution ID; status does not post cash."""
         with self._tx():
             order = self._order(intent)
-            if not order or not order["identity"]:
+            if not order:
+                return self._block("unknown_execution_order", contradiction=True)
+            if identity is not None:
+                if not self._bind_identity(intent, identity):
+                    return False
+                if order["status"] == "unknown":
+                    self.db.execute("UPDATE orders SET status='accepted' WHERE intent=?", (intent,))
+                order = self._order(intent)
+            if not order["identity"]:
                 return self._block("unknown_execution_order", contradiction=True)
             if not isinstance(exec_id, str) or not exec_id or len(exec_id) > 160:
                 return self._block("unknown_execution_identity", contradiction=True)
             try:
                 qty = whole(quantity)
                 px = price(fill_price)
+                amount = cents(qty*px)
             except Refused:
                 return self._block("invalid_execution_economics", contradiction=True)
             if currency != "USD":
                 return self._block("unknown_execution_currency", contradiction=True)
-            if identity is not None and not self._bind_identity(intent, identity):
-                return False
             payload = {"intent": intent, "quantity": qty, "price": str(px), "currency": currency}
             encoded = canonical(payload)
             previous = self.db.execute("SELECT payload FROM executions WHERE exec_id=?", (exec_id,)).fetchone()
@@ -498,7 +522,6 @@ class PaperState:
             position = self.db.execute("SELECT * FROM positions WHERE symbol=?", (symbol,)).fetchone()
             old_qty = position["quantity"] if position else 0
             old_cost = decimal(position["cost"]) if position else Decimal(0)
-            amount = cents(qty*px)
             if original["side"] == "BUY":
                 new_qty, new_cost = old_qty+qty, old_cost+Decimal(amount)
                 cash_delta = -amount
@@ -555,7 +578,10 @@ class PaperState:
                 return True
             if old and old["payload"] == encoded:
                 return True
-            posted = cents(value) if posting == "final" else 0
+            try:
+                posted = cents(value) if posting == "final" else 0
+            except Refused:
+                return self._block("invalid_commission", contradiction=True)
             self.db.execute("INSERT OR REPLACE INTO commissions VALUES(?,?,?,?)", (exec_id, encoded, posting, posted))
             if posting == "final":
                 self._set("fees_cents", self._get("fees_cents")+posted)
@@ -666,6 +692,8 @@ class PaperState:
                 return self._block("incomplete_position_marks")
             try:
                 values = {s: str(price(v)) for s, v in marks.items()}
+                # Validate marked totals before replacing any retained mark.
+                self._numeric_guard_values(values)
             except Refused:
                 return self._block("invalid_position_mark")
             for symbol, value in values.items():
@@ -679,7 +707,7 @@ class PaperState:
         """Latch first, then apply cancel-owned; failures retain blocked ownership."""
         with self._tx():
             self._halt(str(reason))
-        orders = self.db.execute("SELECT intent FROM orders WHERE status NOT IN ('filled','cancelled','rejected','cancel_pending','cancel_unknown')").fetchall()
+        orders = self.db.execute("SELECT intent FROM orders WHERE status NOT IN ('filled','cancelled','rejected','cancel_pending','cancel_unknown') ORDER BY intent").fetchall()
         for order in orders:
             try:
                 self.cancel(order[0], transport)

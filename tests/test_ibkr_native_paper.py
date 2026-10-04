@@ -10,12 +10,13 @@ import argparse
 import copy
 from contextlib import closing
 from dataclasses import asdict, replace
-from decimal import Decimal, ROUND_HALF_EVEN
+from decimal import Context, Decimal, ROUND_HALF_EVEN, ROUND_UP, getcontext, localcontext
 import hashlib
 import importlib.util
 import io
 import json
 from pathlib import Path
+import re
 import sqlite3
 import subprocess
 import sys
@@ -33,7 +34,8 @@ RUN_ATTEMPT = "normal"
 NOW = 1_500_000_000_000
 ACCOUNT = "ba8321e3eb5d7d550215e79e1070cd7b2e2324e6684e4704cfe5b808b12be468"
 PIN = "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
-SOURCE = "d1a2fe665d5d0ff91c7c0d75893293b854b862fa807911b2b6d811794e0ca2b6"
+SOURCE = "fb2491805ad2331d2c08d0d2f04ed79107195655dc0fce9b8c68cff64b5f92c0"
+UNSET_DOUBLE = "1.7976931348623157e308"
 
 
 def sanitized(value):
@@ -104,10 +106,13 @@ class FakeBroker:
             if intent not in self.orders or exec_id in self.executions or currency != "USD":
                 return
             order = self.orders[intent]
+            try:
+                amount = (Decimal(str(fill_price))*quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
+            except (ArithmeticError, ValueError):
+                return
             self.executions[exec_id] = (intent, quantity, fill_price, currency)
             symbol = order["payload"]["symbol"]
             signed = quantity if order["payload"]["side"] == "BUY" else -quantity
-            amount = (Decimal(str(fill_price))*quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
             self.cash += -amount if signed > 0 else amount
             self.positions[symbol] = self.positions.get(symbol, 0)+signed
             if not self.positions[symbol]:
@@ -117,9 +122,15 @@ class FakeBroker:
                 order["status"] = "filled"
         elif method == "commission":
             exec_id, amount, currency, posting = args
-            if exec_id not in self.executions or exec_id in self.commissions or currency != "USD" or posting != "final" or Decimal(str(amount)) == -1:
+            if exec_id not in self.executions or exec_id in self.commissions or currency != "USD" or posting != "final":
                 return
-            amount = Decimal(str(amount)).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
+            try:
+                value = Decimal(str(amount))
+                if value == -1:
+                    return
+                amount = value.quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
+            except (ArithmeticError, ValueError):
+                return
             self.commissions[exec_id] = amount
             self.cash -= amount
             self.fees += amount
@@ -222,10 +233,10 @@ class StateCases(unittest.TestCase):
         if getattr(self, "transport", None):
             self.record["transport_calls"] = self.transport.calls
 
-    def open_state(self, binding=None, db_path=None):
+    def open_state(self, binding=None, db_path=None, limits=None):
         return self.module.PaperState(db_path or self.db_path, binding or self.binding,
                                      lock_root=Path(self.tmp.name) / "locks", clock=self.clock,
-                                     stop_path=Path(self.tmp.name) / "STOP")
+                                     stop_path=Path(self.tmp.name) / "STOP", limits=limits)
 
     def close_state(self):
         if getattr(self, "state", None):
@@ -240,7 +251,10 @@ class StateCases(unittest.TestCase):
     def action(self, method, *args, **kwargs):
         self.record["sequence"].append({"operation": method, "args": sanitized(args), "kwargs": sanitized(kwargs),
                                         "clock_ns": self.clock.now})
-        self.broker.received(method, args)
+        # Keep the independent fake account's arithmetic stable while testing
+        # the controller against a caller's hostile ambient decimal context.
+        with localcontext(Context(prec=28, rounding=ROUND_HALF_EVEN)):
+            self.broker.received(method, args)
         try:
             result = getattr(self.state, method)(*args, **kwargs)
         except BaseException as exc:
@@ -350,6 +364,59 @@ class StateCases(unittest.TestCase):
         self.assertFalse(self.action("status", "buy", "filled", 10))
         self.economics(0, 1000000, 0, 0)
         self.assertFalse(self.state.snapshot()["ready"])
+
+    def test_execution_identity_recovers_lost_ack_before_lookup(self):
+        """Owned fill identity binds before lookup; partial fill and matching snapshot recover without resubmit."""
+        self.transport.submit_mode = "lost"
+        self.assertEqual(self.order(qty=5), "unknown")
+        identity = copy.deepcopy(self.transport.calls[0]["fake_broker_accepted_identity"])
+        self.assertTrue(self.fill(quantity=3, identity=identity))
+        order = self.state.snapshot()["orders"][0]
+        self.assertEqual((order["identity"], order["status"], order["reserved_cents"]),
+                         (identity, "accepted", 20000))
+        self.economics(3, 970000, 0, 3)
+        self.fee(amount="0")
+        self.assertTrue(self.action("reconcile", self.complete_snapshot()))
+        self.assertTrue(self.state.snapshot()["ready"])
+        self.restart()
+        self.assertTrue(self.action("reconcile", self.complete_snapshot()))
+        self.assertEqual(self.order(qty=5), "accepted")
+        self.fill("e2", quantity=2)
+        self.fee("e2", "0")
+        self.economics(5, 950000, 0, 5)
+        self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"])
+
+    def test_execution_identity_requires_owned_reference_and_native_id(self):
+        """Invalid fill identity never binds or books; missing identity remains a permanent contradiction."""
+        cases = [(None, "unknown_execution_order"),
+                 ({"order_ref": "foreign"}, "unknown_order_reference"),
+                 ({"order_id": 0}, "invalid_native_id"),
+                 ({"order_id": None, "perm_id": None}, "native_id_unobserved")]
+        for index, (changes, reason) in enumerate(cases):
+            with self.subTest(reason=reason):
+                self.close_state()
+                self.db_path = Path(self.tmp.name)/("fill-identity-"+str(index)+".sqlite")
+                self.broker = FakeBroker()
+                self.transport = Transport(self)
+                self.state = self.open_state()
+                self.transport.submit_mode = "lost"
+                self.order(qty=3)
+                identity = copy.deepcopy(self.transport.calls[0]["fake_broker_accepted_identity"])
+                if changes is None:
+                    identity = None
+                else:
+                    identity.update(changes)
+                    identity = {k: v for k, v in identity.items() if v is not None}
+                self.assertFalse(self.fill(quantity=3, identity=identity))
+                snap = self.state.snapshot()
+                self.assertIn(reason, snap["alerts"])
+                self.assertIsNone(snap["orders"][0]["identity"])
+                self.assertEqual(snap["executions"], [])
+                self.economics(0, 1000000, 0, 0)
+                self.assertFalse(snap["ready"])
+                self.restart()
+                self.assertFalse(self.state.snapshot()["ready"])
+                self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"])
 
     def test_changed_execution_replay_freezes_without_second_effect(self):
         """Same execution ID changed quantity: position3/cash970000 and retained alert."""
@@ -568,6 +635,113 @@ class StateCases(unittest.TestCase):
         self.economics(0, 999997, 0)
         self.assertEqual(self.state.snapshot()["gross_loss_cents"], 3)
 
+    def test_money_arithmetic_ignores_ambient_context_and_restores_it(self):
+        """Average-cost thirds, half-cent fees and helper refusals agree under changed precision, rounding and traps."""
+        normal = Context(prec=28, rounding=ROUND_HALF_EVEN)
+        hostile = Context(prec=6, rounding=ROUND_UP, Emin=-9, Emax=9, capitals=0, clamp=1)
+        for signal in hostile.traps:
+            hostile.traps[signal] = True
+        permissive = hostile.copy()
+        for signal in permissive.traps:
+            permissive.traps[signal] = False
+        expected = None
+        for index, context in enumerate([normal, hostile, permissive]):
+            with self.subTest(context=index):
+                self.close_state()
+                self.db_path = Path(self.tmp.name)/("money-context-"+str(index)+".sqlite")
+                self.broker = FakeBroker()
+                self.transport = Transport(self)
+                with localcontext(context):
+                    ambient = repr(getcontext())
+                    self.state = self.open_state()
+                    self.assertEqual(self.module.cents("1234.565"), 123456)
+                    self.assertEqual(self.module.price("100.01"), Decimal("100.01"))
+                    for helper in [self.module.cents, self.module.price]:
+                        for value in ["1e30", UNSET_DOUBLE]:
+                            with self.assertRaises(self.module.Refused):
+                                helper(value)
+                    with self.assertRaisesRegex(self.module.Refused, "invalid_decimal"):
+                        self.module.decimal("1e999999999999999999999999")
+                    self.order(qty=3, price="100.01")
+                    self.fill(quantity=1, price="100.01")
+                    self.fee(amount="0.005")
+                    self.fill("e2", quantity=2)
+                    self.fee("e2", "0.015")
+                    self.order("sell", qty=3, side="SELL")
+                    for i in range(3):
+                        self.fill("s"+str(i), 1, "100.00", "sell")
+                        self.fee("s"+str(i), "0")
+                    self.assertTrue(self.action("reconcile", self.complete_snapshot()))
+                    self.economics(0, 999997, 2)
+                    snap = self.state.snapshot()
+                    self.assertEqual(snap["gross_loss_cents"], 1)
+                    self.assertEqual(repr(getcontext()), ambient)
+                if expected is None:
+                    expected = snap
+                else:
+                    self.assertEqual(snap, expected)
+
+    def test_unset_double_fill_blocks_without_economic_effect(self):
+        """Unrepresentable fill latches invalid_execution_economics instead of escaping and leaving admission ready."""
+        self.order(qty=3)
+        self.assertFalse(self.fill(quantity=3, price=UNSET_DOUBLE))
+        self.assertIn("invalid_execution_economics", self.state.snapshot()["alerts"])
+        self.assertEqual(self.state.snapshot()["executions"], [])
+        self.economics(0, 1000000, 0, 0)
+        with self.assertRaisesRegex(self.module.Refused, "reconciliation_required"):
+            self.order("new", qty=1)
+        self.restart()
+        self.assertFalse(self.state.snapshot()["ready"])
+
+    def test_unset_double_mark_blocks_without_replacing_mark(self):
+        """Unrepresentable mark latches invalid_position_mark and retains the last valid economics."""
+        self.order(qty=3)
+        self.fill(quantity=3)
+        self.fee(amount="0")
+        self.assertFalse(self.action("observe_risk", {"SYNTH.TEST": UNSET_DOUBLE}))
+        self.assertIn("invalid_position_mark", self.state.snapshot()["alerts"])
+        self.assertEqual(self.state.db.execute("SELECT mark FROM positions").fetchone()[0], "100.00")
+        self.economics(3, 970000, 0, 3)
+        with self.assertRaisesRegex(self.module.Refused, "reconciliation_required"):
+            self.order("new", qty=1)
+        self.restart()
+        self.assertFalse(self.state.snapshot()["ready"])
+
+    def test_unset_double_snapshot_cash_and_fee_retain_conflict(self):
+        """Unrepresentable snapshot cash or fees become retained snapshot_malformed conflicts, never balancing entries."""
+        for field in ["cash", "fees"]:
+            with self.subTest(field=field):
+                self.close_state()
+                self.db_path = Path(self.tmp.name)/("snapshot-unset-"+field+".sqlite")
+                self.state = self.open_state()
+                snapshot = self.complete_snapshot()
+                snapshot[field] = UNSET_DOUBLE
+                self.assertFalse(self.action("reconcile", snapshot))
+                snap = self.state.snapshot()
+                self.assertIn("snapshot_malformed", snap["alerts"])
+                self.assertEqual(snap["observation_conflicts"][0]["reason"], "snapshot_malformed")
+                self.economics(0, 1000000, 0)
+                self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+                with self.assertRaisesRegex(self.module.Refused, "reconciliation_required"):
+                    self.order("new", qty=1)
+                self.restart()
+                self.assertFalse(self.state.snapshot()["ready"])
+
+    def test_unset_double_final_commission_blocks_without_posting(self):
+        """Unrepresentable final commission latches invalid_commission and leaves cash and fees unchanged."""
+        self.order(qty=3)
+        self.fill(quantity=3)
+        self.assertFalse(self.fee(amount=UNSET_DOUBLE))
+        self.assertIn("invalid_commission", self.state.snapshot()["alerts"])
+        self.assertEqual(self.state.snapshot()["commissions"], [])
+        self.economics(3, 970000, 0, 3)
+        self.fee(amount="0")
+        with self.assertRaisesRegex(self.module.Refused, "reconciliation_required"):
+            self.order("new", qty=1)
+        self.restart()
+        self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+        self.assertIn("contradiction_requires_adjudication", self.state.snapshot()["alerts"])
+
     def test_no_short_or_overlapping_sell_reservation(self):
         """Sell larger than holdings or reserved twice produces no submit or changed journal."""
         with self.assertRaises(self.module.Refused):
@@ -635,6 +809,39 @@ class StateCases(unittest.TestCase):
         with self.assertRaisesRegex(self.module.Refused, "reconciliation_required|request_budget"):
             self.order("after_restart", qty=1)
         self.assertEqual(self.state.snapshot()["budget"]["used"], 8)
+
+    def test_request_control_reserve_refusal_restart_and_window_renewal(self):
+        """Explicit snapshot requests consume the reserve, refuse exhaustion and renew without clearing submit backoff."""
+        for i in range(5):
+            self.order(str(i), qty=1)
+        self.clock.now += 59_999_999_999
+        with self.assertRaisesRegex(self.module.Refused, "^request_budget_exhausted$"):
+            self.order("overflow", qty=1)
+        for _ in range(3):
+            self.assertIsNone(self.action("request_control"))
+        self.assertEqual(self.state.snapshot()["budget"]["used"], 8)
+        with self.assertRaisesRegex(self.module.Refused, "^request_budget_exhausted$"):
+            self.action("request_control")
+        deadline = self.state.snapshot()["budget"]["blocked_until_ns"]
+        self.restart()
+        self.assertEqual(self.state.snapshot()["budget"]["used"], 8)
+        self.clock.now = NOW+60_000_000_000
+        self.assertIsNone(self.action("request_control"))
+        budget = self.state.snapshot()["budget"]
+        self.assertEqual((budget["window_start_ns"], budget["used"], budget["blocked_until_ns"]),
+                         (self.clock.now, 1, deadline))
+        self.assertGreater(deadline, self.clock.now)
+        self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"]*5)
+
+    def test_regressed_clock_refuses_submit_and_control_without_mutation(self):
+        """Clock before the durable window start refuses before any request, intent or transport mutation."""
+        self.clock.now = NOW-1
+        before = self.state.snapshot()
+        for operation in [lambda: self.action("request_control"), lambda: self.order(qty=1)]:
+            with self.assertRaisesRegex(self.module.Refused, "^clock_regressed$"):
+                operation()
+            self.assertEqual(self.state.snapshot(), before)
+        self.assertEqual(self.transport.calls, [])
 
     def test_disconnect_requires_all_snapshot_parts(self):
         """Disconnect blocks submits; incomplete snapshot stays blocked; complete agreeing snapshot restores ready."""
@@ -758,12 +965,101 @@ class StateCases(unittest.TestCase):
         self.assertFalse(self.state.snapshot()["ready"])
         self.economics(0, 1000000, 0)
 
+    def test_stop_control_budget_uses_intent_order_under_reversed_query_plan(self):
+        """Five pending orders and three control slots cancel a,b,c in intent order; d,z remain owned and halted."""
+        for intent in ["z", "d", "a", "c", "b"]:
+            self.order(intent, qty=1)
+        self.state.db.execute("PRAGMA reverse_unordered_selects=ON")
+        self.assertFalse(self.action("stop", "operator_STOP", self.transport))
+        cancels = [c["identity"]["order_id"] for c in self.transport.calls if c["kind"] == "cancel"]
+        self.assertEqual(cancels, [73, 75, 74])
+        snap = self.state.snapshot()
+        self.assertEqual([o["status"] for o in snap["orders"]],
+                         ["cancel_pending"]*3+["accepted"]*2)
+        self.assertEqual([o["reserved_cents"] for o in snap["orders"]], [10000]*5)
+        self.assertIn("stop_cancel_refused:request_budget_exhausted", snap["alerts"])
+        self.assertEqual(snap["halt"], "operator_STOP")
+        self.assertFalse(snap["ready"])
+        self.restart()
+        self.assertEqual(self.state.snapshot()["halt"], "operator_STOP")
+
+    def test_numeric_halt_without_transport_retains_owned_orders_and_alert(self):
+        """After restart, risk halt with no transport retains reservation and halt_cancel_transport_unavailable."""
+        self.order(qty=5)
+        self.fill(quantity=5)
+        self.fee(amount="0")
+        self.order("pending", qty=5)
+        self.restart()
+        self.assertFalse(self.action("observe_risk", {"SYNTH.TEST": "501.00"}))
+        snap = self.state.snapshot()
+        self.assertEqual(snap["halt"], "aggregate_exposure_cap_exceeded")
+        self.assertIn("halt_cancel_transport_unavailable", snap["alerts"])
+        pending = next(o for o in snap["orders"] if o["intent"] == "pending")
+        self.assertEqual((pending["status"], pending["reserved_cents"]), ("accepted", 50000))
+        self.economics(5, 950000, 0)
+        self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"]*2)
+        self.restart()
+        self.assertIn("halt_cancel_transport_unavailable", self.state.snapshot()["alerts"])
+        self.assertFalse(self.state.snapshot()["ready"])
+
+    def test_fresh_journal_binding_and_limit_refusals_have_exact_reasons(self):
+        """Fresh journal rejects every binding/limit guard before database creation, including live-port literals."""
+        self.close_state()
+        cases = [(change, {}, "unsupported_broker_endpoint_schema") for change in [
+            {"broker": "ALPACA"}, {"endpoint": "127.0.0.1:4001"},
+            {"endpoint": "127.0.0.1:7496"}, {"endpoint": "127.0.0.1:7497"}, {"schema": 2}]]
+        cases += [({"client_id": value}, {}, "invalid_client_owner")
+                  for value in [0, -1, True, 176.0, 1000]]
+        cases += [({field: value}, {}, "full_digest_required")
+                  for field in ["plan_sha256", "source_sha256"] for value in ["abc", "G"*64]]
+        cases += [({"source_version": "2.0.0rc6"}, {}, "selected_rc5_source_required"),
+                  ({"source_revision": "d"*40}, {}, "selected_rc5_source_required")]
+        limits = self.module.Limits()
+        cases += [({}, {field: 0}, "positive_integer_limits_required") for field in asdict(limits)]
+        cases += [({}, {"order_shares": value}, "positive_integer_limits_required")
+                  for value in [-1, True, 10.0]]
+        cases += [({}, change, "contradictory_limits") for change in [
+            {"control_reserve": limits.request_calls},
+            {"session_close_ns": limits.session_open_ns},
+            {"backoff_initial_ns": limits.backoff_max_ns+1}]]
+        for index, (binding_change, limit_change, reason) in enumerate(cases):
+            with self.subTest(binding=binding_change, limits=limit_change):
+                path = Path(self.tmp.name)/("invalid-binding-"+str(index)+".sqlite")
+                with self.assertRaises(self.module.Refused) as result:
+                    self.open_state(replace(self.binding, **binding_change), path,
+                                    replace(limits, **limit_change))
+                self.assertEqual(str(result.exception), reason)
+                self.assertFalse(path.exists())
+                self.record["sequence"].append({"operation": "fresh_invalid_binding",
+                                                "binding_change": binding_change, "limit_change": limit_change,
+                                                "expected": reason, "actual": str(result.exception),
+                                                "journal_created": path.exists()})
+        self.state = self.open_state()
+
+    def test_journal_symlink_refused_before_mutating_target(self):
+        """Symlink journal refuses with journal_symlink_refused, preserving target bytes and account ownership recovery."""
+        self.close_state()
+        before = hashlib.sha256(self.db_path.read_bytes()).hexdigest()
+        alias = Path(self.tmp.name)/"alias.sqlite"
+        alias.symlink_to(self.db_path)
+        with self.assertRaises(self.module.Refused) as result:
+            self.open_state(db_path=alias)
+        self.assertEqual(str(result.exception), "journal_symlink_refused")
+        after = hashlib.sha256(self.db_path.read_bytes()).hexdigest()
+        self.assertEqual(after, before)
+        self.assertTrue(alias.is_symlink())
+        self.record["sequence"].append({"operation": "open_symlink", "expected": "journal_symlink_refused",
+                                        "actual": str(result.exception), "journal_sha256_before": before,
+                                        "journal_sha256_after": after})
+        self.state = self.open_state()
+
     def test_account_endpoint_client_plan_source_schema_reopen_before_mutation(self):
         """Changed immutable binding refuses opening before journal mutation; file digest unchanged."""
         self.order()
         self.close_state()
         before = hashlib.sha256(self.db_path.read_bytes()).hexdigest()
-        changes = [{"broker": "ALPACA"}, {"endpoint": "127.0.0.1:7497"},
+        changes = [{"broker": "ALPACA"}, {"endpoint": "127.0.0.1:4001"},
+                   {"endpoint": "127.0.0.1:7496"}, {"endpoint": "127.0.0.1:7497"},
                    {"account_fingerprint": "a"*64}, {"client_id": 177},
                    {"plan_sha256": "b"*64}, {"source_sha256": "c"*64},
                    {"source_revision": "d"*40}, {"source_version": "2.0.0rc6"}, {"schema": 2}]
@@ -774,6 +1070,7 @@ class StateCases(unittest.TestCase):
                 self.record["sequence"].append(entry)
                 with self.assertRaises(self.module.Refused) as result:
                     self.open_state(replace(self.binding, **change))
+                self.assertEqual(str(result.exception), "immutable_binding_mismatch")
                 after = hashlib.sha256(self.db_path.read_bytes()).hexdigest()
                 entry.update({"actual": str(result.exception), "journal_sha256_after": after})
                 self.assertEqual(after, before)
@@ -956,9 +1253,12 @@ runpy.run_path(target,run_name='__main__')
         result = subprocess.run([sys.executable, "-c", code, str(Path(__file__)), str(evidence), attempt],
                                 capture_output=True, text=True)
         artifact = json.loads((evidence/(attempt+".json")).read_text())
+        returned_output = re.sub(r"(?m)^(Ran \d+ tests? in )\d+\.\d+s$", r"\1<elapsed>s",
+                                 (result.stdout+result.stderr).replace(str(evidence), "<private-evidence>").replace(str(ROOT), "<checkout>"))
         self.record["sequence"].append({"operation": "required_skip_cli_probe", "expected_exit": 1,
                                         "actual_exit": result.returncode, "artifact": artifact,
-                                        "returned_output": (result.stdout+result.stderr).replace(str(evidence), "<private-evidence>").replace(str(ROOT), "<checkout>")})
+                                        "returned_output": returned_output})
+        self.assertIn("Ran 1 test in <elapsed>s", returned_output)
         self.assertEqual(result.returncode, 1)
         self.assertEqual((artifact["tests"], artifact["skips"], artifact["exit_code"]), (1, 1, 1))
         self.assertEqual(artifact["cases"][0]["actual"], "skipped")
