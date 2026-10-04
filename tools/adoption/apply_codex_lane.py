@@ -46,6 +46,13 @@ Modes:
               (it is 1 in a scratch home, where auth.credentials fails) and startup warnings that rise with the
               role files fail the rehearsal, while an unreadable config.load is only a warning.
               Nothing under the target Codex home is written; the scratch home is removed afterwards.
+              The stack-worker profile marks serena required, so each `-p stack-worker` read starts it as a
+              worker's session start does; where the scratch HOME cannot start serena, the rehearsal fails
+              ("the rehearsal failed; do not apply"). No relaxation flags are ported, and this path has so far
+              run only against a fixture serena, not the real server. The read-back also fails on any profile
+              server lookup that recorded an error, and unless serena's effective `enabled` (from `codex -p
+              stack-worker mcp get --json`) and `required` (from config/read's layers plus the installed profile,
+              as no command that takes --profile prints it) are both true: Codex waits only for such servers.
   --apply     refuses while a `codex` process runs or when a file differs from the --expect-* hash the dry run
               printed. Writes a run record and 0600 backups of config.toml and AGENTS.md first (never auth.json
               or any other file), prints the rollback command, then makes the changes, each read back.
@@ -127,6 +134,26 @@ CODEX_VERSION = "0.160.0"
 # That pin's file. A host on one of its codex row's dated holds (docs/decisions/2026-10-04-codex-dated-holds.md) is
 # refused like any other version; the refusal only names the hold and its until date (codex_hold).
 PINS_FILE = ROOT / "adoption" / "pins-linux-x86_64.json"
+REQUIRED_FAILURE ="required MCP servers failed to initialize: "
+REQUIRED_FAILURE_LIMIT = 2000  # characters retained from the aggregate error, as in #436's pinned port source
+# The servers the stack-worker profile promises before a worker's first turn. Codex waits only for servers whose
+# effective `enabled` and `required` are both true (openai/codex@a956835d, tag rust-v0.160.0:
+# codex-rs/codex-mcp/src/connection_manager.rs:270-275), so the read-back checks both for each of these.
+FIRST_TURN_SERVERS = ("serena",)
+# No command that accepts --profile prints `required` or `startup_readiness`: `codex mcp get --json` prints
+# `enabled` (cli/src/mcp_cmd.rs:970-983) and --profile is refused for `codex app-server` (cli/src/main.rs:1861-1885).
+# The read-back therefore derives them as Codex merges layers, enabled layers from the lowest precedence up, each
+# overlaying the last (config/src/state.rs:475-479 and 548-551). config/read reports every layer except the profile,
+# highest precedence first, with disabled ones marked (app-server/src/config_manager_service.rs:167-176); the
+# profile is $CODEX_HOME/<name>.config.toml (core/src/config/mod.rs:268 and 2025-2033), a user layer ranked 21.
+# Ranks are ConfigLayerSource::precedence (app-server-protocol/src/protocol/v2/config.rs:115-131). The same text is
+# at rust-v0.159.3 (01fc69f4), where the profile path function sits at core/src/config/mod.rs:2017-2025.
+LAYER_PRECEDENCE = {"packagedDefaults": -10, "mdm": 0, "system": 10, "enterpriseManaged": 15, "user": 20,
+                    "project": 25, "sessionFlags": 30, "legacyManagedConfigTomlFromFile": 40,
+                    "legacyManagedConfigTomlFromMdm": 50}
+PROFILE_PRECEDENCE = 21
+# Serde defaults of the two keys when no layer sets them (config/src/mcp_types.rs:216-226 and 248-256).
+SERVER_START_DEFAULTS = {"required": False, "startup_readiness": "connection"}
 CONTEXT_MODE_VERSION = "1.0.169"
 # start.mjs of context-mode 1.0.169: the npm install and the plugin pin 6f0cc684 carry the same file.
 START_MJS_SHA256 = "0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26e57b"
@@ -328,6 +355,74 @@ def worker_command() -> str:
     """How a worker lane starts: the profile plus the pinned flags, stdin closed."""
     pins = " ".join(f"'{flag}'" if '"' in flag else flag for flag in worker_pins())
     return f"codex exec -p {PROFILE_NAME} {pins} -s <sandbox> ... < /dev/null"
+
+
+def required_servers() -> list[str]:
+    """Required servers in the worker profile, sorted as upstream validates them.
+
+    openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/connection_manager.rs:270-275 and
+    connection_manager/required.rs:17-63 (identical at rust-v0.159.3).
+    """
+    profile = tomllib.loads(PROFILE_TEMPLATE.read_text(encoding="utf-8"))
+    return sorted(name for name, table in profile.get("mcp_servers", {}).items() if table.get("required") is True)
+
+
+def required_failure_text(stderr: str) -> str:
+    """The last aggregate required-server error, with its multiline details; empty when none is present.
+
+    Failure prefix: openai/codex@rust-v0.160.0:codex-rs/codex-mcp/src/connection_manager/required.rs:61.
+    Parser port: PR #436 b18d9f031fdf854e74f59586529df1022e805975, this file.
+    """
+    at = stderr.rfind(REQUIRED_FAILURE)
+    return stderr[at:].strip() if at >= 0 else ""
+
+
+def required_start_failures(stderr: str) -> list[str]:
+    """Required names from the aggregate error, in order and once each, best effort.
+
+    A nested '<name>: ' after '; ' can resemble another server's diagnostic, so retain the full bounded
+    text beside the names. Port source: #436 b18d9f031fdf854e74f59586529df1022e805975, this file.
+    """
+    text = required_failure_text(stderr)
+    required, names = set(required_servers()), []
+    for part in text[len(REQUIRED_FAILURE):].split("; ") if text else []:
+        match = re.match(r"([A-Za-z0-9_-]+): ", part)
+        if match and match.group(1) in required and match.group(1) not in names:
+            names.append(match.group(1))
+    return names
+
+
+def effective_server_settings(layers: list, profile: dict, name: str) -> dict:
+    """Effective `required` and `startup_readiness` of one MCP server under `-p stack-worker`, each with the layer that
+    decided it: "default" when no layer sets the key, and the value "unknown" when a layer of a type this script cannot
+    rank sets it. `layers` are config/read's (highest precedence first) and `profile` the parsed profile file, placed
+    at 21; disabled layers are skipped and the highest enabled layer that sets a key wins (see LAYER_PRECEDENCE)."""
+    ranked, unplaced = [], []
+    for layer in layers:
+        if layer.get("disabled_reason"):
+            continue
+        source = layer.get("name") or {}
+        kind, config = source.get("type"), layer.get("config") or {}
+        if kind == "user" and source.get("profile"):
+            ranked.append((PROFILE_PRECEDENCE, f"profile {source['profile']}", config))
+        elif kind in LAYER_PRECEDENCE:
+            ranked.append((LAYER_PRECEDENCE[kind], kind, config))
+        else:
+            unplaced.append((str(kind), config))
+    ranked.append((PROFILE_PRECEDENCE, f"profile {PROFILE_NAME}", profile))
+    ranked.sort(key=lambda entry: -entry[0])  # stable: config/read's own order holds within one rank
+    settings = {}
+    for key, default in SERVER_START_DEFAULTS.items():
+        path = ["mcp_servers", name, key]
+        blind = [kind for kind, config in unplaced if get_path(config, path)[0]]
+        decided = [(label, get_path(config, path)[1]) for _, label, config in ranked if get_path(config, path)[0]]
+        if blind:
+            settings[key], settings[f"{key}_from"] = "unknown", "unplaced layer " + ", ".join(blind)
+        elif decided:
+            settings[f"{key}_from"], settings[key] = decided[0]
+        else:
+            settings[key], settings[f"{key}_from"] = default, "default"
+    return settings
 
 
 def agents_block() -> str:
@@ -789,7 +884,14 @@ def readbacks(codex: str, env: dict, wrapper: list[str] | None, cwd: Path, omnir
         inputs.append(("prompt_input_omniroute", ["-p", OMNIROUTE_PROFILE]))
     for label, extra in inputs:
         got = run_codex(codex, [*extra, "debug", "prompt-input", "probe"], env, cwd, wrapper=wrapper)
-        out[label] = prompt_input_counts(got.stdout) if got.returncode == 0 else {"error": last_line(got.stderr)}
+        if got.returncode == 0:
+            out[label] = prompt_input_counts(got.stdout)
+            continue
+        out[label] = {"error": last_line(got.stderr)}
+        failure = required_failure_text(got.stderr)
+        if failure:
+            out[label]["required_failure"] = {"text": failure[:REQUIRED_FAILURE_LIMIT],
+                                              "names_best_effort": required_start_failures(got.stderr)}
     profile = tomllib.loads(PROFILE_TEMPLATE.read_text(encoding="utf-8"))
     out["profile_servers"] = {}
     for name in sorted(profile.get("mcp_servers", {})):
@@ -798,11 +900,39 @@ def readbacks(codex: str, env: dict, wrapper: list[str] | None, cwd: Path, omnir
             out["profile_servers"][name] = {"error": last_line(got.stderr)}
             continue
         entry = json.loads(got.stdout)
-        out["profile_servers"][name] = {"enabled_tools": entry.get("enabled_tools"),
+        out["profile_servers"][name] = {"enabled": entry.get("enabled"),
+                                        "disabled_reason": entry.get("disabled_reason"),
+                                        "enabled_tools": entry.get("enabled_tools"),
                                         "disabled_tools": entry.get("disabled_tools"),
                                         "env": {key: ((entry.get("transport") or {}).get("env") or {}).get(key)
                                                 for key in profile["mcp_servers"][name].get("env", {})}}
+    for name, settings in first_turn_settings(codex, env, wrapper, cwd).items():
+        out["profile_servers"].setdefault(name, {}).update(settings)
     return out
+
+
+def first_turn_settings(codex: str, env: dict, wrapper: list[str] | None, cwd: Path) -> dict:
+    """{server: effective_server_settings} for FIRST_TURN_SERVERS, from config/read's layers as seen from cwd and the
+    profile file Codex loads for `-p stack-worker`; each value "unknown", with the reason, when either is unreadable.
+    This certifies only the read-back's own context: a worker's project config or `-c` flags are not seen here."""
+    codex_home = Path(env.get("CODEX_HOME") or Path(env.get("HOME") or Path.home()) / ".codex")
+    try:
+        profile = tomllib.loads((codex_home / f"{PROFILE_NAME}.config.toml").read_text(encoding="utf-8"))
+        reason = None
+    except (OSError, ValueError) as error:
+        reason = f"profile file unreadable: {error}"
+    if reason is None:
+        try:
+            with AppServer(codex, env, cwd, wrapper) as server:
+                read = server.request("config/read", {"includeLayers": True, "cwd": os.path.abspath(cwd)})
+            layers = read.get("layers") or []
+        except (Failed, AppServerError, codex_quota.ProbeError, OSError, subprocess.SubprocessError) as error:
+            reason = f"config/read failed: {error}"
+    if reason is not None:
+        return {name: {setting: value for key in SERVER_START_DEFAULTS
+                       for setting, value in ((key, "unknown"), (f"{key}_from", reason))}
+                for name in FIRST_TURN_SERVERS}
+    return {name: effective_server_settings(layers, profile, name) for name in FIRST_TURN_SERVERS}
 
 
 def context_mode_problems(entry: dict, eco_root: str) -> list[str]:
@@ -832,21 +962,42 @@ def check_readbacks(found: dict, eco_root: str) -> list[str]:
     labelled = [("default", plain), ("-p stack-worker", profiled)]
     if "prompt_input_omniroute" in found:
         labelled.append((f"-p {OMNIROUTE_PROFILE}", found["prompt_input_omniroute"]))
+    not_started = [label for label, counts in labelled if counts.get("required_failure")]
+    for label in not_started:
+        failure = dict(labelled)[label]["required_failure"]
+        problems.append(f"{label} prompt input: required MCP servers did not start (read from the error, best "
+                        f"effort: {', '.join(failure['names_best_effort']) or 'none'}): {failure['text']}")
+    labelled = [(label, counts) for label, counts in labelled if label not in not_started]
     for label, counts in labelled:
         if counts.get("top_rule") != 1 or counts.get("rtk_exceptions") != 1 or counts.get("prefix_rule", 0) < 1:
             problems.append(f"{label} prompt input: {counts}")
-    for label, counts in labelled[1:]:
+    for label, counts in labelled:
+        if label == "default":
+            continue
         if not counts.get("no_spawn_unless_asked") or counts.get("proactive_delegation"):
             problems.append(f"the {label} profile's effort did not reach the prompt input "
                             "(max turns proactive delegation off)")
     profile = tomllib.loads(PROFILE_TEMPLATE.read_text(encoding="utf-8"))
-    for name, table in profile.get("mcp_servers", {}).items():
-        got = found.get("profile_servers", {}).get(name, {})
+    tables = profile.get("mcp_servers", {})
+    for name in [*tables, *(server for server in FIRST_TURN_SERVERS if server not in tables)]:
+        table, got = tables.get(name, {}), found.get("profile_servers", {}).get(name) or {}
+        if "error" in got or not got:  # no recorded lookup error escapes the comparisons below
+            problems.append(f"-p {PROFILE_NAME} {name}: "
+                            + (f"codex mcp get failed: {got['error']}" if "error" in got else "no read-back"))
+            continue
         for key in ("enabled_tools", "disabled_tools"):
             if key in table and got.get(key) != table[key]:
                 problems.append(f"-p {PROFILE_NAME} {name} {key} is {got.get(key)}")
         if table.get("env", {}) and got.get("env") != table["env"]:
             problems.append(f"-p {PROFILE_NAME} {name} env is {got.get('env')}")
+        if name in FIRST_TURN_SERVERS:  # Codex waits only for servers both enabled and required (FIRST_TURN_SERVERS)
+            if got.get("enabled") is not True:
+                problems.append(f"-p {PROFILE_NAME} {name} is not enabled (enabled {got.get('enabled')}, "
+                                f"disabled_reason {got.get('disabled_reason')}); Codex waits only for an enabled, "
+                                "required server")
+            if got.get("required") is not True:
+                problems.append(f"-p {PROFILE_NAME} {name} required is {got.get('required')} "
+                                f"({got.get('required_from')}); Codex waits only for an enabled, required server")
     return problems
 
 
@@ -1095,7 +1246,7 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
         latest.unlink()
     latest.symlink_to(run.name)
     print(f"run record: {run}/record.json")
-    print(f"to undo: python3 {Path(__file__).resolve().relative_to(ROOT)} --rollback {run}"
+    print(f"to undo: python3 {Path(__file__).resolve().relative_to(ROOT)} --rollback {run.resolve()}"
           + (f" --codex-home {plan.codex_home}" if args.codex_home else ""))
     env = codex_env(plan.codex_home)
     try:
@@ -1196,7 +1347,7 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
         record["error"] = str(error)
         write_record(run, record)
         print(f"FAILED: {error}")
-        print(f"undo with: python3 {Path(__file__).resolve().relative_to(ROOT)} --rollback {run}"
+        print(f"undo with: python3 {Path(__file__).resolve().relative_to(ROOT)} --rollback {run.resolve()}"
               + (f" --codex-home {plan.codex_home}" if args.codex_home else ""))
         return 3
     record["status"] = "applied"

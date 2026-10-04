@@ -125,8 +125,12 @@ RECHECK = (
 # Every scanned file that names the artifact when this module was last changed (main at d2777ee7, plus this module),
 # with the sha256 of each referencing line after strip() and what the line is. A file may hold each pinned line as many
 # times as it is listed, and no other line that names the artifact.
-SCAN_ASSIGNMENT = "351433a1e19559754ec9f115b4ed30b44af29f8312a2db9015c75d808cfc8eeb"
-OSV_SCANNED = "51ca9efbdc11db2f25aecb6526904e1a517f22246cc5820fb245d04a5bedca55"
+# The workflow's assignment check, the last clause of its jq -e block since the retired WSL group was removed on
+# 2026-10-04; SCAN_ASSIGNMENT_THREE_GROUP is the same line with the trailing " and" of the three-group block (#622,
+# #673), which the retained copies of that step keep.
+SCAN_ASSIGNMENT = "ef6e115280f50c59ce304676bed671f417a6594cd3f461ec82877d07fea44e0f"
+SCAN_ASSIGNMENT_THREE_GROUP = "351433a1e19559754ec9f115b4ed30b44af29f8312a2db9015c75d808cfc8eeb"
+OSV_SCANNED ="51ca9efbdc11db2f25aecb6526904e1a517f22246cc5820fb245d04a5bedca55"
 OSV_FILTERED = "99ed1345f35841de29e655641a9a1446c8d822c5f88da1be4d3b796b197a211e"
 OSV_JSON_SOURCE = "6bb997ea6522f0ee3b0465bb074557ef270a657874536028b254da3b8dcfeea1"
 # A JSON "path" member naming the variant lock, the variant manifest or the run summary (the same line in each file).
@@ -140,7 +144,7 @@ SPLIT_PORT = "blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-os
 RETIREMENT = "evidence/artifacts/wsl-retrieval-retirement-20261003/"
 PINNED_LINES: dict[str, list[tuple[str, str]]] = {
     ".github/dependabot.yml": [
-        ("ab5865176070741a611bdce92641d5602a217f9eaf824ccfef49032a39f1007d", "comment on the frozen npm manifests"),
+        ("0aff72e75928d5620d72d7ca2d8b83710b80b66df2fb13bbcd1efbebc8fd1385", "comment on the frozen npm manifests"),
     ],
     ".github/osv-scanner-frozen-macos.toml": [
         ("b1da0e974ad07fe290e4eb8ab11fed6c9542794f21952c417e4e0cc347a7f510", "header comment naming its one lock"),
@@ -199,8 +203,8 @@ PINNED_LINES: dict[str, list[tuple[str, str]]] = {
         ("db08ced20b9691d8e4fa52c06d1c74869eaca358a67ea38d03bc89cf7b7a5953", "the frozen entry's --lockfile argument"),
     ],
     # Retained copies of the security-scan.yml scan step (#622's evidence): scripts, so scanned inside evidence/**.
-    RETIREMENT + "completion-workflow-scan.sh": [(SCAN_ASSIGNMENT, "the copied assignment check")],
-    RETIREMENT + "final-scan-workflow-scan.sh": [(SCAN_ASSIGNMENT, "the copied assignment check")],
+    RETIREMENT + "completion-workflow-scan.sh": [(SCAN_ASSIGNMENT_THREE_GROUP, "the copied assignment check")],
+    RETIREMENT + "final-scan-workflow-scan.sh": [(SCAN_ASSIGNMENT_THREE_GROUP, "the copied assignment check")],
     # FROZEN_LOCKS binds the lock to its OSV config, advisory and sha256.
     COVERAGE_TESTS: [
         ("af7168e33bdbbc62c9508daa9d89c98155b510026be7f1e9d0a64e110e9659d9", "the FROZEN_LOCKS key"),
