@@ -42,7 +42,12 @@ left the shared template unchanged.
    `codex_config_prune.py` reads `codex features list` for the removed names and deletes the matching keys of the base
    `[features]` table with `config/batchWrite` (value null, `expectedVersion`, the writer `apply_codex_lane.py` uses). It is a dry
    run by default; `--apply` refuses while a codex process runs, backs up `config.toml` (0600) first and reads the result back. On
-   NativeStack today its dry run names `plugin_hooks` and nothing else.
+   NativeStack today its dry run names `plugin_hooks` and nothing else. The tests drive `--apply` against a fake app-server; as
+   native execution, on 2026-10-04 at 20:07Z `--apply` also ran against the real `codex app-server` (codex-cli 0.159.3) on a
+   scratch copy of NativeStack's `config.toml`: it deleted exactly the `plugin_hooks = true` line, read the result back through
+   `config/read`, wrote a 0600 backup, a second dry run found nothing to prune, and the live `config.toml` kept its hash. That run
+   pointed `--codex-process-name` at a name no process has, because five other codex processes were running; the live apply must
+   not, and stays a quiet-window host step.
 6. **jCodeMunch is registered at user scope in both shared user templates**, on the user's directive of the same day that every
    fresh session starts with the tools ready (`docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md`, which keeps the
    measured cost visible). The repository's own tests require the Claude and Codex user-scope sets to mirror each other, so the
