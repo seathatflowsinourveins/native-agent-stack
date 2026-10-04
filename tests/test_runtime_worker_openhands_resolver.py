@@ -284,7 +284,7 @@ class IssueSelectionTests(unittest.TestCase):
         for stale in ("Add or update tests", "write the failing test first"):
             self.assertNotIn(stale, instruction)
             self.assertNotIn(stale, skill)
-        rules = {*(rule for rule in gate.RULE_PRECEDENCE if rule != "ci_read"), "github", "codeowners", "gate_code", "workflow_policy_test",
+        rules = {*gate.RULE_PRECEDENCE, "github", "codeowners", "gate_code", "workflow_policy_test",
                  "pr_text_interpolation", "zizmor_finding", "unresolved_read"}
         self.assertEqual(set(gate.AGENT_RULE_PHRASES) | gate.GATE_ONLY_RULES, rules)
         self.assertEqual(set(receipt.PUSH_GATE_RULES), rules)
@@ -2369,10 +2369,23 @@ class CommandLineTests(unittest.TestCase):
                     '(docs/decisions/2026-09-28-openhands-resolver-isolation.md)')
         output = io.StringIO()
         with mock.patch.object(self.r, "build_parser", side_effect=AssertionError("parser reached")), \
+                mock.patch("subprocess.run", side_effect=AssertionError("subprocess reached")), \
+                mock.patch("socket.create_connection", side_effect=AssertionError("network reached")), \
                 contextlib.redirect_stderr(output):
-            code = self.r.main(["run"], runner=mock.Mock(side_effect=AssertionError("external call reached")))
-        self.assertNotEqual(code, 0)
+            code = self.r.main(["run"])
+        self.assertEqual(code, 3)
         self.assertEqual(output.getvalue().strip(), expected)
+
+    def test_dormant_run_parser_keeps_stage_2_options_without_gate_or_run_id(self):
+        parser = self.r.build_parser()
+        run_parser = next(action for action in parser._actions
+                          if isinstance(action, self.r.argparse._SubParsersAction)).choices["run"]
+        listed = run_parser.format_help()
+        for option in ("--issue", "--owned-path", "--task", "--task-file", "--lane", "--arm", "--port", "--prefix",
+                       "--state", "--gh", "--git", "--gitleaks", "--zizmor", "--reviewer-command", "--dry-run"):
+            self.assertIn(option, listed)
+        self.assertNotIn("--run-id", listed)
+        self.assertNotIn("--gate", listed)
 
     def test_plan_prints_the_selection_summary_and_writes_the_instruction(self):
         issue = self.write_json("issue.json", issue_fixture())

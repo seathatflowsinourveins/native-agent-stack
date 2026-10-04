@@ -29,10 +29,14 @@ characters without whitespace. Counts are `null` when derivation never ran.
 
 Refusals outside the read derivation remain: `.github/`, CODEOWNERS anywhere, the trusted
 gate and driver files, the test tree, files/directories named by workflow run steps and
-their existing workflow import/discovery closure, local actions and reusable workflows,
-PR- or issue-text interpolation, trusted-checkout and pinned zizmor checks, and
-unparseable workflows or gate scripts. Advisory results never add `protected_path` or
-`gate_input_unresolved`; the latter now retains only the gate-script parser boundary.
+the `executable_lines`/`names_in_text` closure of the non-Python code they name,
+recursively, plus the `python_references` import closure of workflow-named Python and
+Python reached through those non-Python names. Discovery, local actions/reusable
+workflows, PR- or issue-text interpolation and trusted-checkout/zizmor checks remain.
+GateReads inventories add no path protection. The independent parser check also covers
+advisory-followed files, so an unparseable such file still adds `gate_input_unresolved`.
+`RecursionError` at GateReads construction is enforced; one inside `reads()`/`executed()`
+is advisory. Tree-read `GateError`/`OSError` propagates to fail-closed handling.
 
 The refreshed [monitoring baseline](evidence/unclassified-gate-reads-20261004.json) names
 the measured tree `3636e7182b220be945818a367e4daefa643bfc26`. It has 321 unclassified
@@ -61,11 +65,38 @@ their source identifiers are retained rather than presenting this round as a rep
 - **Opus r2 P2 #2:** computed residuals are reported only at three read sinks, leaving helper, shutil and returned-path forms silent.
 
 [Evidence part 14](evidence/push-gate-fail-first.txt) retains the review sources, actual
-failed attempts, refreshed measurements and native acceptance results. The earlier
+failed attempts, refreshed measurements and native results: the two-module suite exited
+1 with installed gitleaks raising `gitleaks_failed`; its cause was not independently
+established. A passing suite at the PR head is still required. The earlier
 [set comparison](evidence/gate-reads-set-diff-20261004.json) is historical fixture/tree
 evidence, not a proof of the reader's completeness. The decision's overturn condition
 is: "a derivation that passes an adversarial corpus with no losses against b8eb9352b
 could be reconsidered as a second layer, never as the only gate".
+
+### Retained closure and parser boundary, 489-r7 (2026-10-04)
+
+The prior re-scope's claim that the closure was unchanged was incorrect. This round
+restores names found in workflow-named non-Python code, recursively, and the Python
+import closure reached through those names. Those names remain enforced `ci_read`/
+`ci_import` categories, separate from GateReads inventories. The gate completes and
+parse-checks this closure before monitoring, tracks enforced/GateReads/sys.path routes,
+and checks every subsequently queued Python file outside the monitor's error handling.
+A monitoring crash cannot skip the enforced queue's parse checks.
+
+On merged head `eb2fa338b280a95035d6b6656ef1a3432acfd98f`, explicit refusal categories
+cover 645/10607 tracked files, up from 448 before this correction; 318/3451 outside
+`evidence/`, `tests/`, `.github/`, up from 121 (cap 862); and 4/2610 `blueprints/` files
+outside gate code (cap 52). There are zero enforced parse failures. The advisory inventory
+has 282 files, 21 prefixes, 145 globs and zero unresolved diagnostics. Item 1 changes
+neither the unclassified locations nor their shapes: 321 locations in 29 scripts. The
+dated baseline therefore remains unchanged, as instructed; the table above retains the
+earlier tree's historical measurements. [Evidence part 15](evidence/push-gate-fail-first.txt)
+records the current measurements, failing-first controls and native command results.
+
+The dormant `run` parser still exposes neither `--gate` nor `--run-id`. The disabled
+public driver still exits 3 before parsing or external calls; its control now patches
+both `subprocess.run` and `socket.create_connection`. The later owned-path allowlist
+gate remains the enablement precondition, and the monitoring reader's known gaps remain.
 
 ## Superseded design and runbook notes (2026-10-04)
 

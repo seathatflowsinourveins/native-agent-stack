@@ -16,12 +16,16 @@ of a rename count), check() refuses a change to:
 - the resolver's gate and harness code: resolver/** and resolver.py (`gate_code`);
 - workflow-policy tests: tests/**.py files whose text names `.github`
   (`workflow_policy_test`);
-- the files/directories workflow run steps name, their existing workflow import closure,
-  unittest discovery and local actions/reusable workflows (`ci_named`, `ci_import`,
-  `ci_discovered`, `ci_local_action`).
-Unparseable workflows or gate scripts still fail closed. GateReads-derived files, prefixes,
-globs, computed-execution/unresolved diagnostics and unclassified reads are MONITORING ONLY,
-reported under advisory_gate_reads on stderr and in the receipt; they never refuse a commit.
+- the files/directories workflow run steps name; names_in_text over the non-Python
+  code they name, recursively (`ci_read`); the python_references import closure of
+  workflow-named Python and Python reached through those non-Python names (`ci_import`);
+  unittest discovery and local actions/reusable workflows (`ci_named`, `ci_discovered`,
+  `ci_local_action`).
+GateReads path inventories and evaluator diagnostics are MONITORING ONLY, under
+advisory_gate_reads on stderr and in the receipt. They do not protect paths. The parser
+boundary also checks advisory-followed files: unparseable workflows/scripts and
+RecursionError at GateReads construction fail closed. RecursionError in reads()/executed()
+is advisory. Tree-read GateError/OSError propagates to the existing fail-closed handling.
 The resolver entry point is disabled until a later owned-path allowlist gate lands. It
 also refuses a `run:` or `script:` text that interpolates untrusted event text
 (`pr_text_interpolated`), and it runs the zizmor version CI pins on the commit's workflows
@@ -568,7 +572,8 @@ def _without_pattern_lists(code):
 # When several rules derive the same path or prefix, the record names the most specific reason,
 # whatever order the workflows are read in: a local action or unittest discovery runs the file,
 # a step names it, or a gate script imports it.
-# ci_read is an advisory provenance tag only; Protected never receives read inventories.
+# ci_read also labels enforced names in non-Python workflow code.
+# GateReads inventories use it separately; Protected never receives those collectors.
 RULE_PRECEDENCE = ("ci_local_action", "ci_discovered", "ci_named", "ci_import", "ci_read")
 
 # Every rule a refused path can carry, with the phrase the agent's instructions use for it
@@ -584,6 +589,7 @@ AGENT_RULE_PHRASES = {
     "ci_discovered": "tests/",
     "ci_named": "workflow steps",
     "ci_import": "workflow steps",
+    "ci_read": "workflow steps",
     "ci_local_action": "workflow steps",
     "pr_text_interpolation": "pull-request or issue text",
     "zizmor_finding": "workflow or action",
@@ -605,7 +611,7 @@ class CiProtected:
 
     def __init__(self):
         self.files, self.prefixes, self.globs, self.workflows, self.interpolations = {}, {}, {}, [], []
-        self.unresolved = []  # enforced parse failures; advisory collector holds computed diagnostics
+        self.unresolved = []  # parse failures include advisory-followed files; evaluator failures are advisory
         self.unclassified, self.unclassified_shapes = [], {}
         self.advisory = None
         self.monitoring_only = False
@@ -729,42 +735,47 @@ def derive_ci_protected(tree):
         for name in rule_dirs:
             result.add_prefix(name, "ci_import")
             result.syspath.add(name)
-    try:
-        _add_gate_reads(result, tree, blobs, dirs, sorted(traced - test_modules), test_modules)
-    except Exception:  # failure of the monitoring layer is advisory too
-        if result.advisory is None:
-            result.advisory = CiProtected()
-            result.advisory.monitoring_only = True
-        result.advisory.unresolved.append(f"{RESOLVER_DIR}/gate_reads.py:0")
+    _add_gate_reads(result, tree, blobs, dirs, sorted(traced - test_modules), test_modules)
     return result
 
 
-def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
-    """Inventory what the static reader finds; no read-derived result is enforced.
+def _add_gate_reads(enforced, tree, blobs, dirs, gate_python, test_modules):
+    """Keep the workflow-named closure enforced, then collect monitoring results.
 
-    Keep workflow-named/import/discovery categories in `enforced`. All GateReads files,
-    prefixes, globs, followed execution/import paths, computed diagnostics and unclassified
-    entries go into its separate advisory collector. Only unparseable/too-deep gate scripts
-    add an enforced gate_input_unresolved failure. This separation is the 2026-10-04
-    monitoring-only decision; it makes no completeness or security claim for the reader.
+    The first queue follows only workflow names: executable_lines/names_in_text for
+    non-Python code, recursively, and python_references for Python reached that way.
+    Its files/prefixes remain ci_read/ci_import refusals. GateReads results and paths
+    followed only through reads/executed or sys.path re-resolution are advisory.
+
+    Every queued Python file is construction/parse-checked outside the advisory try,
+    including advisory-followed files. Syntax/Value errors and RecursionError at
+    GateReads construction add gate_input_unresolved. RecursionError inside reads()
+    or executed() is advisory. GateError/OSError from tree reads always propagate.
     """
-    enforced = result
     result = CiProtected()
     result.monitoring_only = True
     enforced.advisory = result
-    result.syspath = set(enforced.syspath)
     analyzers, active, entries = {}, set(), tree.entries()
 
     def analyzer(path):
-        """The file's GateReads, or None when it cannot be read (unresolved)."""
+        """Construct/cache a reader outside monitoring error handling; None means parse failure."""
         if path not in analyzers:
+            source = tree.read(path).decode("utf-8", "surrogateescape")
             try:
                 analyzers[path] = gate_reads.GateReads(
-                    path, tree.read(path).decode("utf-8", "surrogateescape"),
+                    path, source,
                     imported=lambda module, name, level: imported(path, module, name, level))
             except (SyntaxError, ValueError, RecursionError):
                 analyzers[path] = None
         return analyzers[path]
+
+    def parse_check(path):
+        reader = analyzer(path)
+        if reader is None:
+            location = f"{path}:0"
+            if location not in enforced.unresolved:
+                enforced.unresolved.append(location)
+        return reader
 
     def imported(path, module, name, level):
         here = posixpath.dirname(path)
@@ -793,77 +804,121 @@ def _add_gate_reads(result, tree, blobs, dirs, gate_python, test_modules):
     def is_code(path):
         return posixpath.splitext(path)[1] in patch_policy.CODE_SUFFIXES or entries[path][0] == "100755"
 
-    queue = [*gate_python, *sorted(path for path, rule in enforced.files.items()
-                                   if rule in ("ci_named", "ci_import") and not path.endswith(".py"))]
-    done, followed = set(test_modules), set(gate_python)
-    python_files, resolved_against = [], {}
+    def references(path):
+        source = tree.read(path)  # I/O failures must reach check()'s fail-closed handling
+        try:
+            return patch_policy.python_references(path, source, blobs, dirs)
+        except (SyntaxError, ValueError, UnicodeDecodeError):
+            location = f"{path}:0"
+            if location not in enforced.unresolved:
+                enforced.unresolved.append(location)
+            return (), ()
+
+    # Complete and parse-check the enforced name closure before the monitor runs.
+    # These queue entries never originate in GateReads or sys.path re-resolution.
+    named_queue = [*gate_python, *sorted(path for path, rule in enforced.files.items()
+                                       if rule in ("ci_named", "ci_import") and not path.endswith(".py"))]
+    named_done, named_python = set(test_modules), set()
+    while named_queue:
+        path = named_queue.pop(0)
+        if path in named_done or path not in blobs:
+            continue
+        named_done.add(path)
+        if path.endswith(".py"):
+            named_python.add(path)
+            if parse_check(path) is None:
+                continue
+            if path not in gate_python:  # the initial workflow import closure is already traced
+                imports, import_dirs = references(path)
+                for name in imports:
+                    enforced.add_file(name, "ci_import")
+                    named_queue.append(name)
+                for name in import_dirs:
+                    enforced.add_prefix(name, "ci_import")
+                    enforced.syspath.add(name)
+        elif is_code(path):
+            text = _without_pattern_lists(patch_policy.executable_lines(tree.read(path)))
+            for kind, name in patch_policy.names_in_text(text, blobs, dirs):
+                if kind == "dir":
+                    enforced.add_prefix(name, "ci_read")
+                else:
+                    enforced.add_file(name, "ci_read")
+                    if name.endswith(".py") or is_code(name):
+                        named_queue.append(name)
+
+    result.syspath = set(enforced.syspath)
+    # Each later queue entry records its route. An enforced route dominates an
+    # advisory one; its name closure has already been handled by the first queue.
+    queue = [(path, "enforced") for path in sorted(named_python)]
+    done, python_files, resolved_against = set(test_modules), [], {}
     while queue:
         while queue:
-            path = queue.pop(0)
+            path, origin = queue.pop(0)
             if path in done or path not in blobs:
                 continue
             done.add(path)
-            named, runs = [], []
             if path.endswith(".py"):
-                reader = analyzer(path)
+                reader = parse_check(path)  # enforced even for gate_reads/sys_path routes
                 if reader is None:
-                    enforced.unresolved.append(f"{path}:0")  # parser failure still fails closed
-                    continue
-                try:
-                    files, prefixes, globs, unresolved = reader.reads(blobs, dirs)
-                    executed, computed = reader.executed(blobs, dirs)
-                except Exception:  # advisory analysis failures cannot become enforcement
-                    result.unresolved.append(f"{path}:0")
                     continue
                 python_files.append(path)
-                for name in prefixes:
-                    result.add_prefix(name, "ci_read")
-                for pattern in globs:
-                    result.add_glob(pattern, "ci_read")
-                result.unresolved.extend(sorted(unresolved | computed))
-                result.unclassified = sorted(set(result.unclassified) | reader.unclassified.keys())
-                for location, shapes in reader.unclassified.items():
-                    if shapes:
-                        existing = result.unclassified_shapes.get(location, [])
-                        result.unclassified_shapes[location] = sorted(set(existing) | shapes)
-                named, runs = sorted(files | executed), sorted(executed)
-                if path not in followed:  # reached by a name, a read or a sys.path import: its imports run too
-                    try:
-                        imports, import_dirs = patch_policy.python_references(path, tree.read(path), blobs, dirs)
-                    except (SyntaxError, ValueError, UnicodeDecodeError):
-                        imports, import_dirs = (), ()
-                        enforced.unresolved.append(f"{path}:0")
+                if origin != "enforced" and path not in named_python:
+                    imports, import_dirs = references(path)
                     for name in imports:
                         result.add_file(name, "ci_import")
-                        queue.append(name)
+                        queue.append((name, origin))
                     for name in import_dirs:
                         result.add_prefix(name, "ci_import")
                         result.syspath.add(name)
+                try:
+                    files, prefixes, globs, unresolved = reader.reads(blobs, dirs)
+                    executed, computed = reader.executed(blobs, dirs)
+                    for name in prefixes:
+                        result.add_prefix(name, "ci_read")
+                    for pattern in globs:
+                        result.add_glob(pattern, "ci_read")
+                    result.unresolved.extend(sorted(unresolved | computed))
+                    result.unclassified = sorted(set(result.unclassified) | reader.unclassified.keys())
+                    for location, shapes in reader.unclassified.items():
+                        if shapes:
+                            existing = result.unclassified_shapes.get(location, [])
+                            result.unclassified_shapes[location] = sorted(set(existing) | shapes)
+                    for name in sorted(files | executed):
+                        result.add_file(name, "ci_read")
+                    for name in sorted(executed):
+                        if name in blobs and (name.endswith(".py") or is_code(name)):
+                            queue.append((name, "gate_reads"))
+                except (GateError, OSError):
+                    raise
+                except Exception:  # includes evaluator recursion; continue all pending parse checks
+                    result.unresolved.append(f"{path}:0")
             elif is_code(path):
+                # Reached only through the monitor: this text/import closure stays advisory.
                 text = _without_pattern_lists(patch_policy.executable_lines(tree.read(path)))
                 for kind, name in patch_policy.names_in_text(text, blobs, dirs):
                     if kind == "dir":
                         result.add_prefix(name, "ci_read")
                     else:
-                        named.append(name)
-                runs = named
-            for name in named:
-                result.add_file(name, "ci_read")
-            for name in runs:
-                if name in blobs and name not in done and (name.endswith(".py") or is_code(name)):
-                    queue.append(name)
-        # The modules followed Python files import from directories on sys.path, against every
-        # directory found so far; a new directory re-resolves the files already followed.
+                        result.add_file(name, "ci_read")
+                        if name.endswith(".py") or is_code(name):
+                            queue.append((name, origin))
+        # Re-resolution is advisory even when its source Python file is enforced.
         for path in python_files:
             new = result.syspath - resolved_against.get(path, set())
             if not new:
                 continue
             resolved_against[path] = set(result.syspath)
-            for module in analyzer(path).imported_modules():
-                for found in sorted(patch_policy.resolve_module(module.split("."), tuple(sorted(new)), blobs, dirs)):
-                    result.add_file(found, "ci_import")
-                    if found not in done:
-                        queue.append(found)
+            try:
+                for module in analyzer(path).imported_modules():
+                    found_paths = patch_policy.resolve_module(module.split("."), tuple(sorted(new)), blobs, dirs)
+                    for found in sorted(found_paths):
+                        result.add_file(found, "ci_import")
+                        if found not in done:
+                            queue.append((found, "sys_path"))
+            except (GateError, OSError):
+                raise
+            except Exception:
+                result.unresolved.append(f"{path}:0")
 
 
 def advisory_gate_reads(derived):
@@ -1048,11 +1103,11 @@ class PushGate:
                 if any(rule for rule in paths.values()):
                     reasons.append("protected_path")
                 # Refusals retained: .github/, CODEOWNERS, trusted gate/driver files,
-                # workflow-named/import/discovery/test/local-action categories, PR/issue
+                # workflow-named/non-Python-name/import/discovery/test/local-action categories, PR/issue
                 # interpolation, trusted-checkout/zizmor checks and unparseable workflows
-                # or gate scripts. GateReads files/prefixes/globs, followed read/execution
-                # paths, computed/unresolved diagnostics and unclassified entries are
-                # advisory only and cannot add protected_path or gate_input_unresolved.
+                # or gate scripts, including advisory-followed files. Constructor recursion
+                # is enforced; reads()/executed() recursion and other evaluator diagnostics
+                # are advisory. GateReads inventories add no protected_path themselves.
                 unresolved = sorted(set().union(*(item.unresolved for item in derived)))
                 if unresolved:
                     reasons.append("gate_input_unresolved")

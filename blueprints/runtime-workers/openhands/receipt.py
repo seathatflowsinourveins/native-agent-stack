@@ -242,7 +242,7 @@ def _matching(value, pattern):
 # The trusted pre-push gate's records (resolver/push_gate.py, journaled by GhHarness.gates).
 # The rules a path can break, and zizmor's audit names (docs.zizmor.sh/audits).
 PUSH_GATE_RULES = frozenset({"github", "codeowners", "gate_code", "workflow_policy_test", "ci_named", "ci_import",
-                             "ci_discovered", "ci_local_action", "pr_text_interpolation", "zizmor_finding",
+                             "ci_read", "ci_discovered", "ci_local_action", "pr_text_interpolation", "zizmor_finding",
                              "unresolved_read"})
 AUDIT_NAME = re.compile(r"[a-z][a-z0-9-]{0,63}")
 SEMVER = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")

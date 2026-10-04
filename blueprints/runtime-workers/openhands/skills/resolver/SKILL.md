@@ -63,7 +63,8 @@ paths, it refuses, with no push, a change to:
 - the resolver's own gate and driver: `blueprints/runtime-workers/openhands/resolver/`
   and `blueprints/runtime-workers/openhands/resolver.py`;
 - all of `tests/`, because CI runs the whole suite, plus the files workflow steps name
-  or import, local actions and reusable workflows;
+  or import, names in the non-Python scripts they run recursively, the Python import
+  closure of those names, local actions and reusable workflows;
 - a workflow or action step that uses pull-request or issue text, and a workflow or action
   that zizmor flags.
 

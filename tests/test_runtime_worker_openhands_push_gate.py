@@ -22,6 +22,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 from tests import hermetic_git_environment
 from tests.test_runtime_worker_openhands_resolver import (
@@ -925,7 +926,7 @@ class GateReadsTests(unittest.TestCase):
         derived = self.derive(READS_FILES)
         self.assertEqual(derived.unresolved, [])
         expected = {"policy/contract/contract.schema.json": "ci_read", "policy/rules.toml": "ci_read",
-                    "policy/ci.yaml": "ci_read", "policy/shell.txt": "ci_read", "scripts/read_policy.py": "ci_read",
+                    "policy/ci.yaml": "ci_read", "scripts/read_policy.py": "ci_read",
                     "scripts/inner_check.py": "ci_read", "policy/inner.json": "ci_read",
                     # The workflow script read as data is reported; the check run through a wrapper is
                     # followed, so what it reads is reported too.
@@ -939,7 +940,8 @@ class GateReadsTests(unittest.TestCase):
                 self.assertEqual(derived.files.get(path), rule)
         enforced = self.g.derive_ci_protected(self.g.patch_policy.MemoryTree({**GATE_FILES, **READS_FILES}))
         for path, rule in (("scripts/read_policy.py", "ci_named"), ("scripts/check_shell.sh", "ci_named"),
-                           ("scripts/gate_paths.py", "ci_import"), ("scripts/install_lanes.py", "ci_named")):
+                           ("scripts/gate_paths.py", "ci_import"), ("scripts/install_lanes.py", "ci_named"),
+                           ("policy/shell.txt", "ci_read"), ("scripts/inner_check.py", "ci_read")):
             self.assertEqual(self.g.Protected([enforced], set()).rule(path), rule)
         self.assertIsNone(self.g.Protected([enforced.advisory], set()).rule("policy/inner.json"))
         self.assertEqual(derived.syspath, {"tools/lib"})
@@ -1398,6 +1400,127 @@ class GateDataReadTests(unittest.TestCase):
         self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_input_unresolved"]))
         self.assertEqual(record["unresolved"], ["scripts/read_unknown.py:0"])
 
+    def test_workflow_named_shell_paths_remain_enforced(self):
+        for path, text in (("policy/shell.txt", "lax\n"),
+                           ("scripts/inner_check.py", "print('weakened')\n")):
+            with self.subTest(path=path):
+                record = self.check({path: text})
+                self.assertEqual((record["status"], record["reasons"]), ("fail", ["protected_path"]))
+                self.assertEqual(record["paths"], [{"path": path, "rule": "ci_read", "known": True}])
+                [summary] = load_resolver()._recipe("receipt").push_gate_summary([record])
+                self.assertEqual(summary["paths"], [{"path": path, "rule": "ci_read"}])
+
+    def test_enforced_names_follow_nested_shell_and_python_imports(self):
+        files = {**READS_FILES,
+                 "scripts/check_shell.sh": "bash scripts/nested.sh\n",
+                 "scripts/nested.sh": "grep -q strict policy/shell.txt\npython3 scripts/inner_check.py\n",
+                 "scripts/inner_check.py": "from scripts import inner_helpers\ninner_helpers.check()\n",
+                 "scripts/inner_helpers.py": "from scripts import inner_deep\ndef check(): pass\n",
+                 "scripts/inner_deep.py": "STRICT = True\n"}
+        fixture = GateFixture(self.tmp / f"nested-{secrets.token_hex(3)}", files)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for path, rule in (("scripts/nested.sh", "ci_read"), ("policy/shell.txt", "ci_read"),
+                           ("scripts/inner_check.py", "ci_read"), ("scripts/inner_helpers.py", "ci_import"),
+                           ("scripts/inner_deep.py", "ci_import")):
+            with self.subTest(path=path):
+                record = self.check({path: "changed\n"}, fixture=fixture, gate=gate)
+                self.assertIn("protected_path", record["reasons"])
+                self.assertIn({"path": path, "rule": rule, "known": True}, record["paths"])
+
+    def test_shell_paths_reached_only_by_monitor_remain_advisory(self):
+        files = {**READS_FILES,
+                 "scripts/install_lanes.py": INSTALL_LANES +
+                    '\nimport subprocess\nsubprocess.run(["bash", str(ROOT / "scripts" / "monitor_only.sh")])\n',
+                 "scripts/monitor_only.sh": "cat policy/monitor_only.txt\npython3 scripts/monitor_child.py\n",
+                 "policy/monitor_only.txt": "strict\n",
+                 "scripts/monitor_child.py": "from scripts import monitor_helper\n",
+                 "scripts/monitor_helper.py": "STRICT = True\n"}
+        fixture = GateFixture(self.tmp / f"monitor-shell-{secrets.token_hex(3)}", files)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for path in ("scripts/monitor_only.sh", "policy/monitor_only.txt", "scripts/monitor_child.py",
+                     "scripts/monitor_helper.py"):
+            with self.subTest(path=path):
+                record = self.check({path: "changed\n"}, fixture=fixture, gate=gate)
+                self.assertEqual((record["status"], record["reasons"], record["paths"]), ("pass", [], []))
+                self.assertIn(path, record["advisory_gate_reads"]["files"])
+
+    def test_monitor_failure_cannot_skip_queued_parse_checks(self):
+        files = {**READS_FILES,
+                 ".github/workflows/ci.yml": READS_FILES[".github/workflows/ci.yml"] +
+                    "      - run: python3 scripts/zz_broken.py\n",
+                 "scripts/zz_broken.py": "def broken(:\n"}
+        fixture = GateFixture(self.tmp / f"monitor-crash-{secrets.token_hex(3)}", files)
+        module = load_gate(fixture.trusted)
+        gate = module.PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        original = module.gate_reads.GateReads.reads
+
+        def corrupt_monitor_output(reader, *args):
+            result = original(reader, *args)
+            if reader.path == "scripts/check_gate.py":
+                reader.unclassified = None  # a monitor failure after reads() returns
+            return result
+
+        with mock.patch.object(module.gate_reads.GateReads, "reads", corrupt_monitor_output):
+            record = self.check({"docs/guide.md": "changed\n"}, fixture=fixture, gate=gate)
+        self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_input_unresolved"]))
+        self.assertEqual(record["unresolved"], ["scripts/zz_broken.py:0"])
+        self.assertIn("scripts/check_gate.py:0", record["advisory_gate_reads"]["unresolved"])
+
+    def test_unparseable_advisory_followed_script_still_refuses(self):
+        files = {**READS_FILES, "scripts/lane_check.py": "def broken(:\n"}
+        fixture = GateFixture(self.tmp / f"advisory-parse-{secrets.token_hex(3)}", files)
+        module = load_gate(fixture.trusted)
+        derived = module.derive_ci_protected(module.patch_policy.MemoryTree({**GATE_FILES, **files}))
+        self.assertIsNone(module.Protected([derived], set()).rule("scripts/lane_check.py"))
+        gate = module.PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        record = self.check({"docs/guide.md": "changed\n"}, fixture=fixture, gate=gate)
+        self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_input_unresolved"]))
+        self.assertEqual(record["unresolved"], ["scripts/lane_check.py:0"])
+
+    def test_constructor_recursion_refuses_but_evaluator_recursion_is_advisory(self):
+        for stage in ("constructor", "reads", "executed"):
+            with self.subTest(stage=stage):
+                fixture = GateFixture(self.tmp / f"recursion-{secrets.token_hex(3)}", READS_FILES)
+                module = load_gate(fixture.trusted)
+                gate = module.PushGate(git=REAL_GIT, zizmor=self.zizmor)
+                reader_class = module.gate_reads.GateReads
+
+                def construct(path, *args, **kwargs):
+                    if path == "scripts/check_gate.py":
+                        raise RecursionError("constructor")
+                    return reader_class(path, *args, **kwargs)
+
+                patch = (mock.patch.object(module.gate_reads, "GateReads", side_effect=construct)
+                         if stage == "constructor" else
+                         mock.patch.object(reader_class, stage, side_effect=RecursionError(stage)))
+                with patch:
+                    record = self.check({"docs/guide.md": "changed\n"}, fixture=fixture, gate=gate)
+                if stage == "constructor":
+                    self.assertEqual(record["reasons"], ["gate_input_unresolved"])
+                    self.assertEqual(record["unresolved"], ["scripts/check_gate.py:0"])
+                else:
+                    self.assertEqual((record["status"], record["reasons"]), ("pass", []))
+                    self.assertIn("scripts/check_gate.py:0", record["advisory_gate_reads"]["unresolved"])
+
+    def test_tree_read_errors_keep_fail_closed_handling(self):
+        for error, reason in (("gate", "fixture_tree_read_failed"), ("os", "gate_error_oserror")):
+            with self.subTest(error=error):
+                fixture = GateFixture(self.tmp / f"read-error-{secrets.token_hex(3)}", READS_FILES)
+                module = load_gate(fixture.trusted)
+                gate = module.PushGate(git=REAL_GIT, zizmor=self.zizmor)
+                original = module.patch_policy.GitTree.read
+
+                def read(tree, path):
+                    if path == "scripts/check_shell.sh":
+                        if error == "gate":
+                            raise module.GateError(reason)
+                        raise OSError("fixture read failure")
+                    return original(tree, path)
+
+                with mock.patch.object(module.patch_policy.GitTree, "read", read):
+                    record = self.check({"docs/guide.md": "changed\n"}, fixture=fixture, gate=gate)
+                self.assertEqual((record["status"], record["reasons"]), ("fail", [reason]))
+
     def test_data_a_gate_script_reads_is_advisory(self):
         cases = {
             "policy/contract/contract.schema.json": '{"type": "object"}\n',  # the requirement dropped
@@ -1407,7 +1530,6 @@ class GateDataReadTests(unittest.TestCase):
             "policy/limits-lax.json": "{}\n",  # a new file the f-string can select
             "policy/checks/one.json": '{"skip": true}\n',
             "policy/checks/added.json": "{}\n",  # a new file the glob reads
-            "policy/shell.txt": "lax\n",  # named by the shell script the step runs
             "policy/inner.json": '{"skip": true}\n',  # read by a script that script runs
             "tools/lane.js": "// replaced\n",  # read as data: hashed and copied
             "policy/lane.json": '{"skip": true}\n',  # read by a script a gate script runs through a wrapper
