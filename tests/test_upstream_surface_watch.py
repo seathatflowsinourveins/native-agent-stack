@@ -1407,6 +1407,61 @@ class BaselineWriteTests(unittest.TestCase):
         self.assertEqual(watch.baseline.read_bytes(), baseline)
 
 
+    def failed_rollback(self, fail_unlink=False):
+        """Seed, run once so that the earlier report names the new switch, then make the baseline write and every
+        later rewrite of latest.json fail (a full filesystem fails a rewrite, not an unlink), and with ``fail_unlink``
+        the removal of latest.json as well."""
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        upstream.settings_extra = ["laterSetting"]
+        code, _, stderr = watch.run("--network", upstream=upstream)
+        self.assertEqual(code, 0, stderr)
+        self.assertTrue(any("laterSetting" in key for key in json.loads(watch.latest.read_text())["unreviewed"]))
+        real_write, real_unlink, written = usw.write_atomic, Path.unlink, []
+
+        def write(path, data, *arguments, **keywords):
+            written.append(Path(path))
+            if Path(path) == watch.baseline or written.count(watch.latest) > 1:
+                raise OSError(f"simulated failure writing {Path(path).name}")
+            return real_write(path, data, *arguments, **keywords)
+
+        def unlink(path, *arguments, **keywords):
+            if path.name == usw.LATEST_FILE:
+                raise OSError("simulated failure removing latest.json")
+            return real_unlink(path, *arguments, **keywords)
+
+        with mock.patch.object(usw, "write_atomic", side_effect=write), \
+                (mock.patch.object(Path, "unlink", unlink) if fail_unlink else contextlib.nullcontext()):
+            code, _, stderr = watch.run("--network", "--write-baseline", "--force", upstream=upstream)
+        return watch, code, stderr
+
+    def reader_outcome(self, watch):
+        """What scripts/currency_due.py makes of the state directory: (count, coverage)."""
+        surface = {"record": cd.read_record(watch.latest), "observed_before": watch.latest.parent.is_dir()}
+        count, _, coverage = cd.surface_findings(surface, datetime(2026, 10, 4, 12, 0, tzinfo=timezone.utc))
+        return count, coverage
+
+    def test_a_report_that_cannot_be_put_back_is_removed_not_left_to_say_nothing_new(self):
+        # The report of a --write-baseline run is built against the new baseline and says "nothing new". Beside the old
+        # baseline, which the failed write left, it reads as a fresh report with no unreviewed switch, and the currency
+        # job clears the notice for the switch that the earlier report named. No report is an incomplete check.
+        watch, code, stderr = self.failed_rollback()
+        self.assertEqual(code, 1, stderr)
+        count, coverage = self.reader_outcome(watch)
+        self.assertIsNone(count, "the currency job reads the failed run's report as fresh with nothing unreviewed")
+        self.assertEqual(coverage["surface_watch"], cd.SURFACE_STALE)
+        self.assertFalse(watch.latest.exists())
+        self.assertIn("could not be restored", stderr)
+        self.assertIn("the report of this run was removed", stderr)
+
+    def test_a_report_that_can_be_neither_put_back_nor_removed_is_named(self):
+        watch, code, stderr = self.failed_rollback(fail_unlink=True)
+        self.assertEqual(code, 1, stderr)
+        self.assertIn("could not be restored", stderr)
+        self.assertIn("could not be removed", stderr)
+        self.assertIn(str(watch.latest), stderr)  # the one case that cannot be repaired here: the message says where
+
+
 class LifecycleUnitTests(unittest.TestCase):
     """adoption/lifecycle.md is the canonical installation block (the review thread on stack-currency.service, P1): it
     renders every unit that a unit it installs Wants= or Requires= and that has its own template, and verifies each."""

@@ -36,8 +36,10 @@ needs `--network` (a usage error without it), refuses to replace an existing fil
 was not observed, and refuses (exit 4) when any recorded source came from the cache or was unavailable, because a baseline
 made from a cached artifact would grandfather every switch added since that fetch. It writes the cache and `latest.json`
 first and the baseline last: a failed earlier write leaves the old baseline, and a failed baseline write puts the earlier
-`latest.json` back (or removes this run's when there was none), because a re-baselining run's report says "nothing new"
-and must not sit beside the old baseline. `--claude-channel`
+`latest.json` back, or removes this run's when there was none or the earlier one cannot be rewritten (a full filesystem
+fails a rewrite, not an unlink), because a re-baselining run's report says "nothing new" and must not sit beside the old
+baseline: a lost report is an incomplete check for the currency job, where a fresh one with nothing unreviewed would clear
+the notice. A report that can be neither put back nor removed is named in the error. `--claude-channel`
 selects the npm dist-tag under watch (default `latest`, the channel of `autoUpdatesChannel` in
 `adoption/templates/claude.settings.template.json`). `--codex-bin none` skips the Codex probe.
 

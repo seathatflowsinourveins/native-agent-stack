@@ -196,3 +196,24 @@ integration test sends its corrupt schema over the synthetic network, since an o
 Residual: the rollback restores `latest.json` only; the cache entries a failed run committed stay, being inputs and not claims, and a
 rollback that fails is reported, not retried. The tests drive a synthetic network and a patched `write_atomic`; no real
 `--write-baseline` run against the live upstream was made in this round, and no unit is installed on any host by this change.
+
+## Addendum (2026-10-04, evening): the delta read of `e513181c` and one more fix, a second repair round beyond the bounded loop
+
+A cross-family delta read at `e513181c` (523 tests in eight modules, exit 0; the old-head controls red) verified all six
+threads fixed or already fixed and found one P2 in the fix of the second thread. When the baseline write and the restore of the
+earlier report both fail (a full filesystem fails every rewrite), `restore_report()` returned a diagnostic and left the new
+report in place. That report is built against the new baseline and says "nothing new", so beside the baseline that was not
+replaced it is a fresh report with nothing unreviewed: the currency job read it so and cleared the notice that the earlier
+report had earned (the read reproduced this with the repository's fixtures; the head before the fix of the second thread did not
+have the defect, because it wrote the baseline first and nothing after it).
+
+`restore_report()` now removes the failed run's report when it cannot put the earlier one back, and when there was none, so that
+`scripts/currency_due.py` finds a lost report, an incomplete check that keeps the notice (`surface watch stale`); a report that
+can be neither restored nor removed is named with its path and the instruction to delete it. `BaselineWriteTests` gains two
+tests: the first drives the currency job's own reader (`surface_findings()`) over the state after both writes fail and fails on
+the earlier code with the count 0 and `fresh`, and the second covers a removal that also fails.
+
+This is a second repair round, past the bounded loop's one review and one repair round, taken because the finding is a
+regression that the first round introduced. The loop stops here. Residual: the report and the baseline are still two writes, so
+a process killed between them leaves the new report beside the old baseline until the next daily run, which compares against the
+old baseline and reports the new switches again; no unit is installed on any host by this change.

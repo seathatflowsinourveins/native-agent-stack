@@ -1667,15 +1667,25 @@ def read_if_present(path: Path) -> bytes | None:
 
 
 def restore_report(path: Path, earlier: bytes | None) -> str:
-    """Put back the report that a failed --write-baseline run replaced (none: remove this run's), and say so."""
+    """Put back the report that a failed --write-baseline run replaced, and say so. When it cannot be put back (a full
+    filesystem fails a rewrite, not an unlink), or there was none, remove the report of this run instead: it was built
+    against the baseline that was not replaced and says "nothing new", so scripts/currency_due.py would read it as a
+    fresh report with nothing unreviewed and clear the notice that the earlier report earned. A lost report is an
+    incomplete check there. A report that can be neither put back nor removed is named for the operator."""
+    failure = None
+    if earlier is not None:
+        try:
+            write_atomic(path, earlier)
+            return "the earlier report was restored"
+        except OSError as error:
+            failure = f"the earlier report could not be restored ({type(error).__name__}: {error})"
     try:
-        if earlier is None:
-            path.unlink(missing_ok=True)
-            return "the report of this run was removed"
-        write_atomic(path, earlier)
-        return "the earlier report was restored"
+        path.unlink(missing_ok=True)
     except OSError as error:
-        return f"the earlier report could not be restored ({type(error).__name__}: {error})"
+        return (f"{failure} and " if failure else "") + (
+            f"the report of this run could not be removed ({type(error).__name__}: {error}); delete {path} by hand: "
+            f"it says \"nothing new\" against a baseline that was not replaced")
+    return (f"{failure}, so " if failure else "") + "the report of this run was removed"
 
 
 def render_text(document: dict, action: str) -> str:
