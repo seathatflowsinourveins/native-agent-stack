@@ -38,9 +38,14 @@ CHUB_FEEDBACK = "0"
 # Partial tables retain user commands; profile 21 < project 25 < -c 30 (source in header).
 [mcp_servers.serena]
 startup_timeout_sec = 60
-# Wait for Serena before the first turn, or fail session start; preserve the other servers' optional startup.
-# openai/codex@rust-v0.160.0:codex-rs/config/src/mcp_types.rs:248-256;
-# codex-rs/codex-mcp/src/connection_manager/required.rs:35,61 (identical at rust-v0.159.3).
+# Codex waits only for servers whose effective enabled and required are both true, so a fresh connection to an
+# enabled Serena completes before the first turn or fails session start; other servers keep their optional startup.
+# Where cached start-up is permitted, a valid catalog the process already holds satisfies that check without a live
+# connection (the catalog cache is process-scoped). This table sets neither enabled nor startup_readiness: the user
+# config (an inherited enabled = false lifts the wait), a project config or -c decides them, and
+# tools/adoption/apply_codex_lane.py reads back the effective enabled and required. openai/codex@a956835d
+# (rust-v0.160.0; the same files at rust-v0.159.3): codex-rs/codex-mcp/src/connection_manager.rs:270-275,
+# connection_manager/required.rs:29-35 and 61, tool_catalog_cache.rs:36-49; codex-rs/config/src/mcp_types.rs:244-256.
 # Trial and scope: docs/decisions/2026-09-26-codex-worker-lane.md, addendum 2026-10-03.
 required = true
 

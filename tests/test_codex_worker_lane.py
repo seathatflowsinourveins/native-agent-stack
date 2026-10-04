@@ -197,7 +197,13 @@ if argv[:1] == ["app-server"]:
             print(json.dumps({"method": "remoteControl/status/changed", "params": {"status": "disabled"}}))
             layer = {"name": {"type": "user", "file": str(HOME / "config.toml"), "profile": None},
                      "version": version(config), "config": config}
-            print(json.dumps({"id": msg["id"], "result": {"config": config, "origins": {}, "layers": [layer]}}))
+            # Further layers, listed as Codex lists them (highest precedence first), come from a file beside this
+            # script because the rehearsal's environment is closed: {"above": [...], "below": [...]} around the user
+            # layer. Only config/read reports them; `mcp get` and prompt input below merge the user file and profile.
+            extra_file = Path(__file__).with_name("config-layers.json")
+            extra = json.loads(extra_file.read_text()) if extra_file.is_file() else {}
+            layers = [*extra.get("above", []), layer, *extra.get("below", [])]
+            print(json.dumps({"id": msg["id"], "result": {"config": config, "origins": {}, "layers": layers}}))
         elif method == "config/batchWrite":
             if race or params.get("expectedVersion") != version(config):
                 print(json.dumps({"id": msg["id"], "error": {"code": -32600, "message": "Configuration was modified",
@@ -216,20 +222,26 @@ if argv[:1] == ["app-server"]:
         sys.stdout.flush()
     sys.exit(0)
 if argv[:2] == ["mcp", "get"]:
+    fail_file = Path(__file__).with_name("mcp-get-fail")  # servers whose lookup fails, one name per line
+    if fail_file.is_file() and argv[2] in fail_file.read_text().split():
+        print(f"Error: fake lookup failure for {argv[2]}", file=sys.stderr); sys.exit(1)
     table = effective().get("mcp_servers", {}).get(argv[2])
     if table is None:
         print(f"Error: No MCP server named '{argv[2]}' found.", file=sys.stderr); sys.exit(1)
     transport = ({"type": "streamable_http", "url": table["url"]} if "url" in table else
                  {"type": "stdio", "command": table.get("command"), "args": table.get("args", []),
                   "env": table.get("env"), "env_vars": [], "cwd": table.get("cwd")})
-    print(json.dumps({"name": argv[2], "enabled": table.get("enabled", True), "transport": transport,
-                      "enabled_tools": table.get("enabled_tools"), "disabled_tools": table.get("disabled_tools")}))
+    print(json.dumps({"name": argv[2], "enabled": table.get("enabled", True), "disabled_reason": None,
+                      "transport": transport, "enabled_tools": table.get("enabled_tools"),
+                      "disabled_tools": table.get("disabled_tools")}))
     sys.exit(0)
 if argv[:2] == ["mcp", "list"]:
     print(json.dumps([{"name": n} for n in effective().get("mcp_servers", {})])); sys.exit(0)
 if argv[:2] == ["debug", "prompt-input"]:
     failure_file = Path(__file__).with_name("required-start-failure.json")
-    required = [name for name, table in effective().get("mcp_servers", {}).items() if table.get("required") is True]
+    # Codex waits only for servers both enabled and required (codex-mcp/src/connection_manager.rs:270-275 at a956835d).
+    required = [name for name, table in effective().get("mcp_servers", {}).items()
+                if table.get("required") is True and table.get("enabled", True) is not False]
     if failure_file.is_file() and required:
         failure = json.loads(failure_file.read_text())
         if failure["codex_home"] == str(HOME):
@@ -1134,6 +1146,151 @@ class RequiredStartTests(unittest.TestCase):
         code, out = host.run("--rollback", str(run))
         self.assertEqual(code, 0, out)
         self.assertEqual(host.read_config(), before)
+
+
+class SerenaReadbackTests(unittest.TestCase):
+    """The read-back's effective Serena state (the P2 repair on #674). Codex waits only for servers whose effective
+    `enabled` and `required` are both true (openai/codex@a956835d, tag rust-v0.160.0:
+    codex-rs/codex-mcp/src/connection_manager.rs:270-275; byte-identical at rust-v0.159.3). No command that takes
+    `--profile` prints `required` (cli/src/mcp_cmd.rs:970-983, cli/src/main.rs:1861-1885), so `enabled` comes from
+    `codex -p stack-worker mcp get --json` and `required` from Codex's `config/read` layers with the installed profile
+    placed at precedence 21 (app-server-protocol/src/protocol/v2/config.rs:115-131). Synthetic: the fake codex above."""
+
+    PROFILE = {"mcp_servers": {"serena": {"startup_timeout_sec": 60, "required": True}}}
+    OK = {"enabled": True, "disabled_reason": None, "enabled_tools": None, "disabled_tools": None, "env": {},
+          "required": True, "required_from": "profile stack-worker", "startup_readiness": "connection",
+          "startup_readiness_from": "default"}
+
+    @staticmethod
+    def layer(kind: str, table: dict, **name) -> dict:
+        return {"name": {"type": kind, **name}, "version": "sha256:x", "config": {"mcp_servers": {"serena": table}}}
+
+    def test_the_first_turn_servers_are_the_profiles_required_servers(self):
+        self.assertEqual(list(need(self, lane, "FIRST_TURN_SERVERS")), lane.required_servers())
+
+    def test_effective_settings_follow_codex_layer_precedence(self):
+        settings = need(self, lane, "effective_server_settings")
+        profile = "profile stack-worker"
+        user = self.layer("user", {"command": "x"}, profile=None)
+        cases = [
+            ("the profile alone", [], self.PROFILE, (True, profile, "connection", "default")),
+            ("a user layer ranks below the profile", [self.layer("user", {"command": "x", "required": False},
+                                                                 profile=None)],
+             self.PROFILE, (True, profile, "connection", "default")),
+            ("a project layer ranks above it", [self.layer("project", {"required": False}, dotCodexFolder="/x/.codex"),
+                                                user],
+             self.PROFILE, (False, "project", "connection", "default")),
+            ("session flags set the readiness", [self.layer("sessionFlags", {"startup_readiness": "catalog"}), user],
+             self.PROFILE, (True, profile, "catalog", "sessionFlags")),
+            ("legacy managed MDM ranks highest", [self.layer("legacyManagedConfigTomlFromMdm", {"required": False})],
+             self.PROFILE, (False, "legacyManagedConfigTomlFromMdm", "connection", "default")),
+            ("a disabled layer is skipped", [{**self.layer("project", {"required": False}),
+                                              "disabled_reason": "the project is not trusted"}, user],
+             self.PROFILE, (True, profile, "connection", "default")),
+            ("an unplaced layer that sets the key", [self.layer("futureLayer", {"required": False}), user],
+             self.PROFILE, ("unknown", "unplaced layer futureLayer", "connection", "default")),
+            ("an unplaced layer that does not", [self.layer("futureLayer", {"enabled": True}), user],
+             self.PROFILE, (True, profile, "connection", "default")),
+            ("no layer sets it", [user], {}, (False, "default", "connection", "default")),
+            ("a lower layer decides when the profile is silent", [self.layer("enterpriseManaged", {"required": True})],
+             {}, (True, "enterpriseManaged", "connection", "default")),
+        ]
+        for label, layers, prof, (required, required_from, readiness, readiness_from) in cases:
+            with self.subTest(case=label):
+                self.assertEqual(settings(layers, prof, "serena"),
+                                 {"required": required, "required_from": required_from,
+                                  "startup_readiness": readiness, "startup_readiness_from": readiness_from})
+
+    def test_validation_fails_closed_on_serena(self):
+        def problems(entry):
+            found = {"profile_servers": {} if entry is None else {"serena": entry}}
+            return [problem for problem in lane.check_readbacks(found, "/eco") if "serena" in problem]
+
+        self.assertEqual(problems(self.OK), [])
+        cases = [("a recorded lookup error", {"error": "Error: boom"},
+                  "-p stack-worker serena: codex mcp get failed: Error: boom"),
+                 ("no read-back", None, "-p stack-worker serena: no read-back"),
+                 ("disabled", {**self.OK, "enabled": False, "disabled_reason": "requirements"},
+                  "-p stack-worker serena is not enabled (enabled False, disabled_reason requirements)"),
+                 ("required unknown", {**self.OK, "required": "unknown", "required_from": "config/read failed: x"},
+                  "-p stack-worker serena required is unknown (config/read failed: x)"),
+                 ("required missing", {**self.OK, "required": False, "required_from": "default"},
+                  "-p stack-worker serena required is False (default)")]
+        for label, entry, expected in cases:
+            with self.subTest(case=label):
+                got = problems(entry)
+                self.assertEqual(len(got), 1, got)
+                self.assertIn(expected, got[0])
+
+    def test_an_inherited_enabled_false_fails_the_rehearsal_and_the_apply(self):
+        host = FakeHost(self)
+        host.config["mcp_servers"]["serena"] = {"command": f"{host.eco}/bin/serena", "enabled": False}
+        host.write_config(host.config)
+        before = host.read_config()
+        code, out = host.run()
+        self.assertEqual(code, 3, out)
+        self.assertIn("-p stack-worker serena is not enabled", out)
+        code, out = host.apply()
+        self.assertEqual(code, 3, out)
+        self.assertIn("-p stack-worker serena is not enabled", out)
+        run = host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        self.assertIs(record["readback"]["profile_servers"]["serena"]["enabled"], False)
+        code, out = host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertEqual(host.read_config(), before)
+
+    def test_a_profile_without_required_fails_the_read_back(self):
+        host = FakeHost(self)
+        text = (TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8")
+        self.assertEqual(text.count("required = true\n"), 1)
+        template = host.tmp / "stack-worker.without-required.toml"
+        template.write_text(text.replace("required = true\n", ""), encoding="utf-8")
+        with mock.patch.object(lane, "PROFILE_TEMPLATE", template):
+            self.assertEqual(lane.required_servers(), [])
+            code, out = host.run()
+        self.assertEqual(code, 3, out)
+        self.assertIn("-p stack-worker serena required is False (default)", out)
+
+    def test_a_recorded_lookup_error_fails_the_read_back(self):
+        for name in ("serena", "codebase-memory"):  # neither table has a key the old comparisons read
+            with self.subTest(server=name):
+                host = FakeHost(self)
+                (host.codex.parent / "mcp-get-fail").write_text(name + "\n")
+                code, out = host.run()
+                self.assertEqual(code, 3, out)
+                self.assertIn(f"-p stack-worker {name}: codex mcp get failed: Error: fake lookup failure for {name}",
+                              out)
+
+    def test_a_higher_layer_that_clears_required_fails_and_a_disabled_one_does_not(self):
+        for disabled_reason, expected in ((None, 3), ("the project is not trusted", 0)):
+            with self.subTest(disabled_reason=disabled_reason):
+                host = FakeHost(self)
+                layer = self.layer("project", {"required": False}, dotCodexFolder=str(host.tmp / ".codex"))
+                if disabled_reason:
+                    layer["disabled_reason"] = disabled_reason
+                (host.codex.parent / "config-layers.json").write_text(json.dumps({"above": [layer]}))
+                code, out = host.run()
+                self.assertEqual(code, expected, out)
+                if expected:
+                    self.assertIn("-p stack-worker serena required is False (project)", out)
+                else:
+                    self.assertIn('"required_from": "profile stack-worker"', out)
+
+    def test_a_failed_config_read_leaves_required_unknown_and_fails(self):
+        host = FakeHost(self)
+        (host.codex_home / "stack-worker.config.toml").write_bytes(
+            (TEMPLATES / "codex.stack-worker.config.toml").read_bytes())
+        env = {"HOME": str(host.tmp / "home"), "CODEX_HOME": str(host.codex_home), "LANG": "C.UTF-8",
+               "PATH": os.defpath}
+        with mock.patch.object(lane, "AppServer", side_effect=lane.Failed("codex app-server, config/read: boom")):
+            found = lane.readbacks(str(host.codex), env, None, host.tmp)
+        serena = found["profile_servers"]["serena"]
+        self.assertIs(serena.get("enabled"), True)
+        self.assertEqual(serena.get("required"), "unknown")
+        self.assertIn("config/read failed: codex app-server, config/read: boom", str(serena.get("required_from")))
+        self.assertTrue(any("serena required is unknown" in problem
+                            for problem in lane.check_readbacks(found, str(host.eco))))
 
 
 def snapshot(root: Path) -> dict:
