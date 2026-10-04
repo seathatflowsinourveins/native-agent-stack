@@ -1,0 +1,139 @@
+{
+ "lane": "landscape-sweep-skills-20261004-0526",
+ "layers": 13,
+ "proposals": 137,
+ "survivors": 47,
+ "lost": [],
+ "excluded_layers": [],
+ "degraded_discovery": [
+  "skills-skill-lifecycle:first",
+  "skills-design-intake:first",
+  "skills-design-intake:followup",
+  "skills-implement:first",
+  "skills-implement:followup",
+  "skills-test:first",
+  "skills-debug:first",
+  "skills-agent-docs:first",
+  "skills-browser:first"
+ ],
+ "critic_lost": false,
+ "effort_deviations": [],
+ "effort_deviations_unmapped": [],
+ "web_search": {
+  "calls": 40,
+  "capped": 0,
+  "capped_children": []
+ },
+ "web_search_capped": [],
+ "web_search_capped_unmapped": [],
+ "refuted_by_absence": {},
+ "retained_failures": {
+  "skills-skill-lifecycle": [
+   "first:discovery_missing",
+   "first:gpt6_copy"
+  ],
+  "skills-design-intake": [
+   "first:discovery_missing",
+   "first:gpt6_copy",
+   "followup:discovery_missing"
+  ],
+  "skills-implement": [
+   "first:discovery_missing",
+   "first:gpt6_copy",
+   "followup:discovery_missing"
+  ],
+  "skills-test": [
+   "first:discovery_missing",
+   "first:gpt6_copy"
+  ],
+  "skills-debug": [
+   "first:discovery_missing",
+   "first:gpt6_copy"
+  ],
+  "skills-agent-docs": [
+   "first:discovery_missing",
+   "first:gpt6_copy"
+  ],
+  "skills-browser": [
+   "first:discovery_missing",
+   "first:gpt6_copy"
+  ]
+ },
+ "reopened_layers": [
+  "skills-agent-docs",
+  "skills-browser",
+  "skills-debug",
+  "skills-design-intake",
+  "skills-implement",
+  "skills-skill-lifecycle",
+  "skills-test"
+ ],
+ "calls": {
+  "web_search": 123,
+  "web_fetch": 35,
+  "gh_api": 606,
+  "gpt6_web_search": 119,
+  "gpt6_web_fetch": 75,
+  "gpt6_gh_api": 440
+ },
+ "skills_usage": {
+  "discover_claude": {
+   "search-first": 20,
+   "iterative-retrieval": 19,
+   "supply-chain-risk-auditor": 18,
+   "fp-check": 17,
+   "skill-creator": 16,
+   "skill-creator (read only, local plugin copy)": 1,
+   "modern-python": 1
+  },
+  "discover_gpt6": {
+   "search-first": 11,
+   "iterative-retrieval": 11,
+   "supply-chain-risk-auditor": 11,
+   "fp-check": 11,
+   "skill-installer": 5,
+   "property-based-testing": 1,
+   "mcp-builder": 1
+  },
+  "facts": {
+   "fp-check": 20,
+   "supply-chain-risk-auditor": 19,
+   "skill-creator": 1,
+   "iterative-retrieval": 4
+  },
+  "fit_claude": {
+   "fp-check": 20,
+   "search-first": 3,
+   "iterative-retrieval": 10,
+   "supply-chain-risk-auditor": 15,
+   "skill-creator": 16,
+   "property-based-testing": 1,
+   "mcp-builder": 1
+  },
+  "fit_gpt6": {
+   "search-first": 13,
+   "iterative-retrieval": 12,
+   "supply-chain-risk-auditor": 20,
+   "fp-check": 20,
+   "property-based-testing": 1,
+   "mcp-builder": 1
+  }
+ },
+ "gpt6_jobs": 40,
+ "gpt6_by_status": {
+  "ok": 31,
+  "failed_exit_null": 7,
+  "failed_exit_124": 2
+ },
+ "gpt6_copy_check": {
+  "match": 31,
+  "file_only": 7
+ },
+ "run": {
+  "runId": "wf_47005bb5-412",
+  "status": "completed",
+  "durationMs": 7860449,
+  "agentCount": 101,
+  "totalTokens": 12217498
+ }
+}

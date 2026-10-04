@@ -1,0 +1,4154 @@
+{
+ "schema_version": 1,
+ "measurement": {
+  "tool": "native-agent-stack examples/claude-native/workflows/child-usage.mjs",
+  "tool_commit": "3bdacabd5b7bbc1b8c39f4e5fa3c694951a85751",
+  "tool_sha256": "3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4",
+  "command": "node examples/claude-native/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_c1b19948-f8d --require-effort max",
+  "exit_code": 0,
+  "raw_output_sha256": "7405ab13b9a131437047c3451b0b60efbc9871b4659e5bfa03b31b5bcf3f3c7e",
+  "measured_at_utc": "2026-10-04T06:14:08Z",
+  "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). web_search counts each child's WebSearch calls and those the session's WebSearch cap refused (capped). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
+ },
+ "child_usage": {
+  "transcript_dir": "<session-transcripts>/subagents/workflows/wf_c1b19948-f8d",
+  "status": "complete",
+  "reason": "every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result that is neither empty nor a wait notice, with no background task left running at its final message",
+  "multi_model_children": [],
+  "web_search": {
+   "calls": 1,
+   "capped": 0,
+   "capped_children": []
+  },
+  "children": [
+   {
+    "agent_id": "a3324c79d107b76aa",
+    "label": "gpt6-discover:skills-research",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 13047,
+     "cache_read_input_tokens": 174356,
+     "cache_creation_input_tokens": 98988
+    },
+    "usage_by_model": {
+     "claude-sonnet-5-5": {
+      "input_tokens": 10,
+      "output_tokens": 13047,
+      "cache_read_input_tokens": 174356,
+      "cache_creation_input_tokens": 98988
+     }
+    },
+    "first_request_cache_read": 16930,
+    "first_request_prompt_tokens": 50715,
+    "complete": true,
+    "issues": [],
+    "return_quality": "ok",
+    "final_return": {
+     "status": "measured",
+     "final": "tool_use",
+     "empty_text": 0,
+     "wait_notice": 0,
+     "background_started": 0,
+     "background_pending": 0,
+     "background_pending_with_events": 0
+    },
+    "lanes": {
+     "tool_calls": 5,
+     "bash_calls": 4,
+     "mcp_calls": {},
+     "skill_calls": {},
+     "tool_search": {
+      "calls": 0,
+      "loaded": {}
+     },
+     "rtk": {
+      "hook_rewrites": 0,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 0,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "workflow-subagent"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 50715,
+     "measurement": {
+      "m3": {
+       "results": 5,
+       "bytes": 22321,
+       "large_results": 1,
+       "large_bytes": 22227,
+       "max_bytes": 22227,
+       "large_json": 1,
+       "large_uniform_keys": 0,
+       "large_uniform_flat": 0,
+       "large_shape_unknown": 0,
+       "large_result_share": 0.2,
+       "large_byte_share": 0.9958
+      },
+      "m4": {
+       "ctx_fetch_and_index": 0,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 0,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 0,
+       "routed_share": null,
+       "routed_share_lower_bound": null,
+       "unclassifiable_share": null,
+       "status": "not_applicable",
+       "by_carrier": {
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        }
+       }
+      },
+      "m5": {
+       "results": 0,
+       "bytes": 0,
+       "large_results": 0,
+       "large_bytes": 0,
+       "max_bytes": 0,
+       "large_json": 0,
+       "large_uniform_keys": 0,
+       "large_uniform_flat": 0,
+       "large_shape_unknown": 0,
+       "large_result_share": null,
+       "large_byte_share": null
+      },
+      "by_carrier": {
+       "bash": {
+        "results": 4,
+        "bytes": 22282,
+        "large_results": 1,
+        "large_bytes": 22227,
+        "max_bytes": 22227,
+        "large_json": 1,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0.25,
+        "large_byte_share": 0.9975
+       },
+       "other": {
+        "results": 1,
+        "bytes": 39,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 39,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "observed_covered_succeeded_calls": 0,
+       "eligible_call_states": {
+        "attempted": 0,
+        "executed": 0,
+        "succeeded": 0,
+        "failed": 0,
+        "interrupted": 0,
+        "rejected": 0,
+        "invalid": 0,
+        "cancelled_with_result": 0,
+        "cancelled_or_unfinished": 0,
+        "unknown": 0
+       },
+       "status": "not_measured",
+       "unknown_call_share": null,
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 411,
+          "cache_read_input_tokens": 16930,
+          "cache_creation_input_tokens": 33783
+         },
+         "cache_creation_5m": 33783,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 176,
+          "cache_read_input_tokens": 50713,
+          "cache_creation_input_tokens": 2301
+         },
+         "cache_creation_5m": 2301,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 239,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 53220
+         },
+         "cache_creation_5m": 53220,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 164,
+          "cache_read_input_tokens": 53220,
+          "cache_creation_input_tokens": 273
+         },
+         "cache_creation_5m": 273,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 5,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 12057,
+          "cache_read_input_tokens": 53493,
+          "cache_creation_input_tokens": 9411
+         },
+         "cache_creation_5m": 9411,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        }
+       ],
+       "totals": {
+        "input_tokens": 10,
+        "output_tokens": 13047,
+        "cache_read_input_tokens": 174356,
+        "cache_creation_input_tokens": 98988
+       },
+       "unidentified_messages": 0,
+       "complete": true,
+       "advisor_iterations": [],
+       "advisor_totals": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+       },
+       "totals_including_advisor": {
+        "input_tokens": 10,
+        "output_tokens": 13047,
+        "cache_read_input_tokens": 174356,
+        "cache_creation_input_tokens": 98988
+       },
+       "iteration_issues": {
+        "unread_entries": {},
+        "inconsistent_messages": 0,
+        "advisor_results_without_usage": 0,
+        "advisor_calls_without_result": 0
+       }
+      },
+      "final_return": {
+       "status": "measured",
+       "final": "tool_use",
+       "empty_text": 0,
+       "wait_notice": 0,
+       "background_started": 0,
+       "background_pending": 0,
+       "background_pending_with_events": 0
+      },
+      "hook_context": {
+       "inserted": 1,
+       "inserted_blocks": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "hook_names_folded": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       },
+       "blocks_by_event": {
+        "SubagentStart": 1
+       },
+       "claimed_by_event": {
+        "SubagentStart": 1
+       },
+       "claimed_plain_stdout": {},
+       "other_hook_rows": {}
+      },
+      "call_states": {
+       "attempted": 5,
+       "decided": null,
+       "executed": 5,
+       "succeeded": 5,
+       "failed": 0,
+       "interrupted": 0,
+       "rejected": 0,
+       "invalid": 0,
+       "cancelled_with_result": 0,
+       "cancelled_or_unfinished": 0,
+       "unknown": 0,
+       "rejected_by_source": {
+        "config": 0,
+        "hook": 0,
+        "user": 0,
+        "other": 0,
+        "declined": 0
+       },
+       "background": 0,
+       "sandbox": 0,
+       "by_server": {}
+      },
+      "m15": {
+       "threshold": 0.01,
+       "by_server": {}
+      },
+      "mcp_states": {},
+      "mcp_attempted": {
+       "ctx": 0,
+       "non_ctx": 0
+      },
+      "loaded_not_called": {},
+      "loaded": {},
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "invocations": 0,
+       "nested": 0,
+       "in_ctx_code": 0,
+       "prefix_rule_calls": 0,
+       "rule": "command_position",
+       "acceptance_or_exception_share": null
+      },
+      "cli_lanes": {
+       "status": "measured",
+       "parser": {
+        "versions": {
+         "tree_sitter_bash": "0.25.1",
+         "web_tree_sitter": "0.27.0"
+        },
+        "wasm_sha256": {
+         "tree_sitter_bash": "8292919c88a0f7d3fb31d0cd0253ca5a9531bc1ede82b0537f2c63dd8abe6a7a",
+         "web_tree_sitter": "c03bccdc3b448a32848f5ae327e209c982bbb0840d43eec8bc2d5759544a1ed3"
+        }
+       },
+       "lanes": {},
+       "mcporter_downstream": {},
+       "excluded_version_help": {},
+       "calls_with_lane_invocation": 0,
+       "unresolved_programs": 0,
+       "remote_invocations": 0,
+       "parse_errors": 0
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   },
+   {
+    "agent_id": "abe25b291fb68045a",
+    "label": "discover:skills-research",
+    "phase": "Discover",
+    "agent_type": "landscape-sweep-worker",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 59,
+    "usage": {
+     "input_tokens": 120,
+     "output_tokens": 126681,
+     "cache_read_input_tokens": 9167844,
+     "cache_creation_input_tokens": 265054
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 120,
+      "output_tokens": 126681,
+      "cache_read_input_tokens": 9167844,
+      "cache_creation_input_tokens": 265054
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 55125,
+    "complete": true,
+    "issues": [],
+    "return_quality": "ok",
+    "final_return": {
+     "status": "measured",
+     "final": "tool_use",
+     "empty_text": 0,
+     "wait_notice": 0,
+     "background_started": 0,
+     "background_pending": 0,
+     "background_pending_with_events": 0
+    },
+    "lanes": {
+     "tool_calls": 60,
+     "bash_calls": 36,
+     "mcp_calls": {
+      "plugin_context-mode_context-mode": 8
+     },
+     "skill_calls": {
+      "search-first": 1,
+      "iterative-retrieval": 1,
+      "supply-chain-risk-auditor": 1,
+      "fp-check": 1
+     },
+     "tool_search": {
+      "calls": 1,
+      "loaded": {
+       "plugin_context-mode_context-mode": 4,
+       "built-in": 1
+      }
+     },
+     "rtk": {
+      "hook_rewrites": 3,
+      "model_typed": 1,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 0,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "landscape-sweep-worker"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 55125,
+     "measurement": {
+      "m3": {
+       "results": 60,
+       "bytes": 169561,
+       "large_results": 13,
+       "large_bytes": 101360,
+       "max_bytes": 17631,
+       "large_json": 1,
+       "large_uniform_keys": 0,
+       "large_uniform_flat": 0,
+       "large_shape_unknown": 0,
+       "large_result_share": 0.2167,
+       "large_byte_share": 0.5978
+      },
+      "m4": {
+       "ctx_fetch_and_index": 0,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 11,
+       "fetch_mentions_unconfirmed": 1,
+       "remote_fetches": 11,
+       "routed_share": 0,
+       "routed_share_lower_bound": 0,
+       "unclassifiable_share": 1,
+       "status": "incomplete",
+       "by_carrier": {
+        "read": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 8,
+         "fetch_mentions_unconfirmed": 1,
+         "remote_fetches": 8,
+         "routed_share": 0,
+         "routed_share_lower_bound": 0,
+         "unclassifiable_share": 1,
+         "status": "incomplete"
+        },
+        "ctx": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 3,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 3,
+         "routed_share": 0,
+         "routed_share_lower_bound": 0,
+         "unclassifiable_share": 1,
+         "status": "incomplete"
+        },
+        "rtk_proxy": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        }
+       }
+      },
+      "m5": {
+       "results": 8,
+       "bytes": 44682,
+       "large_results": 3,
+       "large_bytes": 32112,
+       "max_bytes": 17631,
+       "large_json": 0,
+       "large_uniform_keys": 0,
+       "large_uniform_flat": 0,
+       "large_shape_unknown": 0,
+       "large_result_share": 0.375,
+       "large_byte_share": 0.7187
+      },
+      "by_carrier": {
+       "read": {
+        "results": 8,
+        "bytes": 47180,
+        "large_results": 5,
+        "large_bytes": 37827,
+        "max_bytes": 10305,
+        "large_json": 1,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0.625,
+        "large_byte_share": 0.8018
+       },
+       "other": {
+        "results": 8,
+        "bytes": 3291,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 2482,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "bash": {
+        "results": 35,
+        "bytes": 74377,
+        "large_results": 5,
+        "large_bytes": 31421,
+        "max_bytes": 8155,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0.1429,
+        "large_byte_share": 0.4225
+       },
+       "ctx": {
+        "results": 8,
+        "bytes": 44682,
+        "large_results": 3,
+        "large_bytes": 32112,
+        "max_bytes": 17631,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0.375,
+        "large_byte_share": 0.7187
+       },
+       "rtk_proxy": {
+        "results": 1,
+        "bytes": 31,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 31,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "observed_covered_succeeded_calls": 0,
+       "eligible_call_states": {
+        "attempted": 0,
+        "executed": 0,
+        "succeeded": 0,
+        "failed": 0,
+        "interrupted": 0,
+        "rejected": 0,
+        "invalid": 0,
+        "cancelled_with_result": 0,
+        "cancelled_or_unfinished": 0,
+        "unknown": 0
+       },
+       "status": "not_measured",
+       "unknown_call_share": null,
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 128,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 55123
+         },
+         "cache_creation_5m": 55123,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 8563,
+          "cache_read_input_tokens": 55123,
+          "cache_creation_input_tokens": 6491
+         },
+         "cache_creation_5m": 6491,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 795,
+          "cache_read_input_tokens": 61614,
+          "cache_creation_input_tokens": 14892
+         },
+         "cache_creation_5m": 14892,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 217,
+          "cache_read_input_tokens": 76506,
+          "cache_creation_input_tokens": 1581
+         },
+         "cache_creation_5m": 1581,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 5,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 439,
+          "cache_read_input_tokens": 78087,
+          "cache_creation_input_tokens": 4223
+         },
+         "cache_creation_5m": 4223,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 6,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 226,
+          "cache_read_input_tokens": 82310,
+          "cache_creation_input_tokens": 1584
+         },
+         "cache_creation_5m": 1584,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 7,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 491,
+          "cache_read_input_tokens": 83894,
+          "cache_creation_input_tokens": 333
+         },
+         "cache_creation_5m": 333,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 8,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 351,
+          "cache_read_input_tokens": 84227,
+          "cache_creation_input_tokens": 3234
+         },
+         "cache_creation_5m": 3234,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 9,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2998,
+          "cache_read_input_tokens": 87461,
+          "cache_creation_input_tokens": 2995
+         },
+         "cache_creation_5m": 2995,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 10,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1465,
+          "cache_read_input_tokens": 90456,
+          "cache_creation_input_tokens": 4397
+         },
+         "cache_creation_5m": 4397,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 11,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3556,
+          "cache_read_input_tokens": 94853,
+          "cache_creation_input_tokens": 4494
+         },
+         "cache_creation_5m": 4494,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 12,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3319,
+          "cache_read_input_tokens": 99347,
+          "cache_creation_input_tokens": 4852
+         },
+         "cache_creation_5m": 4852,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 13,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1187,
+          "cache_read_input_tokens": 104199,
+          "cache_creation_input_tokens": 5036
+         },
+         "cache_creation_5m": 5036,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 14,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 371,
+          "cache_read_input_tokens": 109235,
+          "cache_creation_input_tokens": 2200
+         },
+         "cache_creation_5m": 2200,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 15,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1217,
+          "cache_read_input_tokens": 111435,
+          "cache_creation_input_tokens": 420
+         },
+         "cache_creation_5m": 420,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 16,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1284,
+          "cache_read_input_tokens": 111855,
+          "cache_creation_input_tokens": 4119
+         },
+         "cache_creation_5m": 4119,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 17,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2349,
+          "cache_read_input_tokens": 115974,
+          "cache_creation_input_tokens": 4002
+         },
+         "cache_creation_5m": 4002,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 18,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 676,
+          "cache_read_input_tokens": 119976,
+          "cache_creation_input_tokens": 3469
+         },
+         "cache_creation_5m": 3469,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 19,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 915,
+          "cache_read_input_tokens": 123445,
+          "cache_creation_input_tokens": 2146
+         },
+         "cache_creation_5m": 2146,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 20,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1055,
+          "cache_read_input_tokens": 125591,
+          "cache_creation_input_tokens": 3246
+         },
+         "cache_creation_5m": 3246,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 21,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 794,
+          "cache_read_input_tokens": 128837,
+          "cache_creation_input_tokens": 4750
+         },
+         "cache_creation_5m": 4750,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 22,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 966,
+          "cache_read_input_tokens": 133587,
+          "cache_creation_input_tokens": 2692
+         },
+         "cache_creation_5m": 2692,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 23,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 554,
+          "cache_read_input_tokens": 136279,
+          "cache_creation_input_tokens": 1947
+         },
+         "cache_creation_5m": 1947,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 24,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 142,
+          "cache_read_input_tokens": 138226,
+          "cache_creation_input_tokens": 615
+         },
+         "cache_creation_5m": 615,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 25,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 213,
+          "cache_read_input_tokens": 138841,
+          "cache_creation_input_tokens": 181
+         },
+         "cache_creation_5m": 181,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 26,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1099,
+          "cache_read_input_tokens": 139022,
+          "cache_creation_input_tokens": 311
+         },
+         "cache_creation_5m": 311,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 27,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 855,
+          "cache_read_input_tokens": 139333,
+          "cache_creation_input_tokens": 9860
+         },
+         "cache_creation_5m": 9860,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 28,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2086,
+          "cache_read_input_tokens": 149193,
+          "cache_creation_input_tokens": 1814
+         },
+         "cache_creation_5m": 1814,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 29,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1103,
+          "cache_read_input_tokens": 151007,
+          "cache_creation_input_tokens": 5268
+         },
+         "cache_creation_5m": 5268,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 30,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3010,
+          "cache_read_input_tokens": 156275,
+          "cache_creation_input_tokens": 1232
+         },
+         "cache_creation_5m": 1232,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 31,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1119,
+          "cache_read_input_tokens": 157507,
+          "cache_creation_input_tokens": 4178
+         },
+         "cache_creation_5m": 4178,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 32,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1586,
+          "cache_read_input_tokens": 161685,
+          "cache_creation_input_tokens": 1378
+         },
+         "cache_creation_5m": 1378,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 33,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 613,
+          "cache_read_input_tokens": 163063,
+          "cache_creation_input_tokens": 3138
+         },
+         "cache_creation_5m": 3138,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 34,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1298,
+          "cache_read_input_tokens": 166201,
+          "cache_creation_input_tokens": 1678
+         },
+         "cache_creation_5m": 1678,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 35,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2104,
+          "cache_read_input_tokens": 167879,
+          "cache_creation_input_tokens": 3291
+         },
+         "cache_creation_5m": 3291,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 36,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 393,
+          "cache_read_input_tokens": 171170,
+          "cache_creation_input_tokens": 2350
+         },
+         "cache_creation_5m": 2350,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 37,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 5784,
+          "cache_read_input_tokens": 173520,
+          "cache_creation_input_tokens": 549
+         },
+         "cache_creation_5m": 549,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 38,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1172,
+          "cache_read_input_tokens": 174069,
+          "cache_creation_input_tokens": 6357
+         },
+         "cache_creation_5m": 6357,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 39,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 8,
+          "cache_read_input_tokens": 180426,
+          "cache_creation_input_tokens": 2421
+         },
+         "cache_creation_5m": 2421,
+         "cache_creation_1h": 0,
+         "speed": null,
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 40,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1245,
+          "cache_read_input_tokens": 182847,
+          "cache_creation_input_tokens": 1562
+         },
+         "cache_creation_5m": 1562,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 41,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 466,
+          "cache_read_input_tokens": 184409,
+          "cache_creation_input_tokens": 2158
+         },
+         "cache_creation_5m": 2158,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 42,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1895,
+          "cache_read_input_tokens": 186567,
+          "cache_creation_input_tokens": 2589
+         },
+         "cache_creation_5m": 2589,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 43,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1475,
+          "cache_read_input_tokens": 189156,
+          "cache_creation_input_tokens": 3049
+         },
+         "cache_creation_5m": 3049,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 44,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 509,
+          "cache_read_input_tokens": 192205,
+          "cache_creation_input_tokens": 2506
+         },
+         "cache_creation_5m": 2506,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 45,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1452,
+          "cache_read_input_tokens": 194711,
+          "cache_creation_input_tokens": 2491
+         },
+         "cache_creation_5m": 2491,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 46,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1002,
+          "cache_read_input_tokens": 197202,
+          "cache_creation_input_tokens": 3906
+         },
+         "cache_creation_5m": 3906,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 47,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 976,
+          "cache_read_input_tokens": 201108,
+          "cache_creation_input_tokens": 1340
+         },
+         "cache_creation_5m": 1340,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 48,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3350,
+          "cache_read_input_tokens": 202448,
+          "cache_creation_input_tokens": 3363
+         },
+         "cache_creation_5m": 3363,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 49,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 553,
+          "cache_read_input_tokens": 205811,
+          "cache_creation_input_tokens": 4214
+         },
+         "cache_creation_5m": 4214,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 50,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2854,
+          "cache_read_input_tokens": 210025,
+          "cache_creation_input_tokens": 1103
+         },
+         "cache_creation_5m": 1103,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 51,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1831,
+          "cache_read_input_tokens": 211128,
+          "cache_creation_input_tokens": 5094
+         },
+         "cache_creation_5m": 5094,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 52,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 917,
+          "cache_read_input_tokens": 216222,
+          "cache_creation_input_tokens": 3062
+         },
+         "cache_creation_5m": 3062,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 53,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 388,
+          "cache_read_input_tokens": 219284,
+          "cache_creation_input_tokens": 2061
+         },
+         "cache_creation_5m": 2061,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 54,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 9755,
+          "cache_read_input_tokens": 221345,
+          "cache_creation_input_tokens": 666
+         },
+         "cache_creation_5m": 666,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 55,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4234,
+          "cache_read_input_tokens": 222011,
+          "cache_creation_input_tokens": 10035
+         },
+         "cache_creation_5m": 10035,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 56,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1819,
+          "cache_read_input_tokens": 232046,
+          "cache_creation_input_tokens": 4800
+         },
+         "cache_creation_5m": 4800,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 57,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 388,
+          "cache_read_input_tokens": 475631,
+          "cache_creation_input_tokens": 3731
+         },
+         "cache_creation_5m": 3731,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 58,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 23448,
+          "cache_read_input_tokens": 240577,
+          "cache_creation_input_tokens": 826
+         },
+         "cache_creation_5m": 826,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 59,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 11623,
+          "cache_read_input_tokens": 241403,
+          "cache_creation_input_tokens": 23651
+         },
+         "cache_creation_5m": 23651,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        }
+       ],
+       "totals": {
+        "input_tokens": 120,
+        "output_tokens": 126681,
+        "cache_read_input_tokens": 9167844,
+        "cache_creation_input_tokens": 265054
+       },
+       "unidentified_messages": 0,
+       "complete": true,
+       "advisor_iterations": [
+        {
+         "message_ordinal": 57,
+         "model": "claude-fable-5-1",
+         "usage": {
+          "input_tokens": 240941,
+          "output_tokens": 10437,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0
+         },
+         "cache_creation_5m": 0,
+         "cache_creation_1h": 0,
+         "speed": null,
+         "service_tier": null,
+         "inference_geo": null
+        }
+       ],
+       "advisor_totals": {
+        "input_tokens": 240941,
+        "output_tokens": 10437,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+       },
+       "totals_including_advisor": {
+        "input_tokens": 241061,
+        "output_tokens": 137118,
+        "cache_read_input_tokens": 9167844,
+        "cache_creation_input_tokens": 265054
+       },
+       "iteration_issues": {
+        "unread_entries": {},
+        "inconsistent_messages": 0,
+        "advisor_results_without_usage": 0,
+        "advisor_calls_without_result": 0
+       }
+      },
+      "final_return": {
+       "status": "measured",
+       "final": "tool_use",
+       "empty_text": 0,
+       "wait_notice": 0,
+       "background_started": 0,
+       "background_pending": 0,
+       "background_pending_with_events": 0
+      },
+      "hook_context": {
+       "inserted": 1,
+       "inserted_blocks": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "hook_names_folded": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       },
+       "blocks_by_event": {
+        "SubagentStart": 1
+       },
+       "claimed_by_event": {
+        "SubagentStart": 1
+       },
+       "claimed_plain_stdout": {},
+       "other_hook_rows": {}
+      },
+      "call_states": {
+       "attempted": 60,
+       "decided": null,
+       "executed": 60,
+       "succeeded": 59,
+       "failed": 1,
+       "interrupted": 0,
+       "rejected": 0,
+       "invalid": 0,
+       "cancelled_with_result": 0,
+       "cancelled_or_unfinished": 0,
+       "unknown": 0,
+       "rejected_by_source": {
+        "config": 0,
+        "hook": 0,
+        "user": 0,
+        "other": 0,
+        "declined": 0
+       },
+       "background": 0,
+       "sandbox": 0,
+       "by_server": {
+        "plugin_context-mode_context-mode": {
+         "attempted": 8,
+         "executed": 8,
+         "succeeded": 7,
+         "failed": 1,
+         "interrupted": 0,
+         "rejected": 0,
+         "invalid": 0,
+         "cancelled_with_result": 0,
+         "cancelled_or_unfinished": 0,
+         "unknown": 0
+        }
+       }
+      },
+      "m15": {
+       "threshold": 0.01,
+       "by_server": {
+        "plugin_context-mode_context-mode": {
+         "attempted": 8,
+         "succeeded": 7,
+         "ctx": true,
+         "classes": {
+          "module": 1
+         },
+         "infrastructure_errors": 1,
+         "new_class_errors": 0,
+         "unknowns": 0,
+         "unassigned_errors": 0,
+         "rate": 0.125,
+         "rate_lower_bound": 0.125,
+         "rate_upper_bound": 0.125,
+         "over_threshold": true,
+         "threshold_sensitive": false,
+         "every_error_classified": true
+        }
+       }
+      },
+      "mcp_states": {
+       "plugin_context-mode_context-mode": {
+        "attempted": 8,
+        "succeeded": 7,
+        "failed": 1,
+        "unfinished": 0
+       }
+      },
+      "mcp_attempted": {
+       "ctx": 8,
+       "non_ctx": 0
+      },
+      "loaded_not_called": {},
+      "loaded": {
+       "plugin_context-mode_context-mode": 4
+      },
+      "proxy": {
+       "calls": 1,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 1,
+       "invocations": 1,
+       "nested": 0,
+       "in_ctx_code": 0,
+       "prefix_rule_calls": 1,
+       "rule": "command_position",
+       "acceptance_or_exception_share": 0
+      },
+      "cli_lanes": {
+       "status": "measured",
+       "parser": {
+        "versions": {
+         "tree_sitter_bash": "0.25.1",
+         "web_tree_sitter": "0.27.0"
+        },
+        "wasm_sha256": {
+         "tree_sitter_bash": "8292919c88a0f7d3fb31d0cd0253ca5a9531bc1ede82b0537f2c63dd8abe6a7a",
+         "web_tree_sitter": "c03bccdc3b448a32848f5ae327e209c982bbb0840d43eec8bc2d5759544a1ed3"
+        }
+       },
+       "lanes": {
+        "rtk_proxy": {
+         "calls": 1,
+         "invocations": 1,
+         "succeeded": 1,
+         "failed": 0,
+         "not_executed": 0,
+         "unfinished": 0,
+         "unknown": 0,
+         "interrupted": 0,
+         "background": 0,
+         "ambiguous": 1,
+         "via_mcporter": 0,
+         "by_carrier": {
+          "bash": 0,
+          "rtk_proxy": 1,
+          "ctx": 0,
+          "nested": 0
+         }
+        }
+       },
+       "mcporter_downstream": {},
+       "excluded_version_help": {},
+       "calls_with_lane_invocation": 1,
+       "unresolved_programs": 1,
+       "remote_invocations": 0,
+       "parse_errors": 0
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   },
+   {
+    "agent_id": "abada53b671bedfc4",
+    "label": "gpt6-refute-fit:skills-research",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 13,
+    "usage": {
+     "input_tokens": 30,
+     "output_tokens": 38945,
+     "cache_read_input_tokens": 1177303,
+     "cache_creation_input_tokens": 260142
+    },
+    "usage_by_model": {
+     "claude-sonnet-5-5": {
+      "input_tokens": 30,
+      "output_tokens": 38945,
+      "cache_read_input_tokens": 1177303,
+      "cache_creation_input_tokens": 260142
+     }
+    },
+    "first_request_cache_read": 16930,
+    "first_request_prompt_tokens": 61442,
+    "complete": true,
+    "issues": [],
+    "return_quality": "ok",
+    "final_return": {
+     "status": "measured",
+     "final": "tool_use",
+     "empty_text": 0,
+     "wait_notice": 0,
+     "background_started": 0,
+     "background_pending": 0,
+     "background_pending_with_events": 0
+    },
+    "lanes": {
+     "tool_calls": 18,
+     "bash_calls": 10,
+     "mcp_calls": {},
+     "skill_calls": {},
+     "tool_search": {
+      "calls": 0,
+      "loaded": {}
+     },
+     "rtk": {
+      "hook_rewrites": 3,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 0,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "workflow-subagent"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 61442,
+     "measurement": {
+      "m3": {
+       "results": 18,
+       "bytes": 34277,
+       "large_results": 2,
+       "large_bytes": 21088,
+       "max_bytes": 12103,
+       "large_json": 1,
+       "large_uniform_keys": 0,
+       "large_uniform_flat": 0,
+       "large_shape_unknown": 0,
+       "large_result_share": 0.1111,
+       "large_byte_share": 0.6152
+      },
+      "m4": {
+       "ctx_fetch_and_index": 0,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 0,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 0,
+       "routed_share": null,
+       "routed_share_lower_bound": null,
+       "unclassifiable_share": null,
+       "status": "not_applicable",
+       "by_carrier": {
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "read": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        }
+       }
+      },
+      "m5": {
+       "results": 0,
+       "bytes": 0,
+       "large_results": 0,
+       "large_bytes": 0,
+       "max_bytes": 0,
+       "large_json": 0,
+       "large_uniform_keys": 0,
+       "large_uniform_flat": 0,
+       "large_shape_unknown": 0,
+       "large_result_share": null,
+       "large_byte_share": null
+      },
+      "by_carrier": {
+       "bash": {
+        "results": 10,
+        "bytes": 5877,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 1976,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "read": {
+        "results": 5,
+        "bytes": 27936,
+        "large_results": 2,
+        "large_bytes": 21088,
+        "max_bytes": 12103,
+        "large_json": 1,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0.4,
+        "large_byte_share": 0.7549
+       },
+       "other": {
+        "results": 3,
+        "bytes": 464,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 218,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "observed_covered_succeeded_calls": 0,
+       "eligible_call_states": {
+        "attempted": 0,
+        "executed": 0,
+        "succeeded": 0,
+        "failed": 0,
+        "interrupted": 0,
+        "rejected": 0,
+        "invalid": 0,
+        "cancelled_with_result": 0,
+        "cancelled_or_unfinished": 0,
+        "unknown": 0
+       },
+       "status": "not_measured",
+       "unknown_call_share": null,
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 5079,
+          "cache_read_input_tokens": 16930,
+          "cache_creation_input_tokens": 44510
+         },
+         "cache_creation_5m": 44510,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1855,
+          "cache_read_input_tokens": 61440,
+          "cache_creation_input_tokens": 10741
+         },
+         "cache_creation_5m": 10741,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 14648,
+          "cache_read_input_tokens": 152505,
+          "cache_creation_input_tokens": 11265
+         },
+         "cache_creation_5m": 11265,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1093,
+          "cache_read_input_tokens": 83446,
+          "cache_creation_input_tokens": 12462
+         },
+         "cache_creation_5m": 12462,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 5,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 603,
+          "cache_read_input_tokens": 95908,
+          "cache_creation_input_tokens": 1399
+         },
+         "cache_creation_5m": 1399,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 6,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 230,
+          "cache_read_input_tokens": 97307,
+          "cache_creation_input_tokens": 651
+         },
+         "cache_creation_5m": 651,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 7,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 191,
+          "cache_read_input_tokens": 16930,
+          "cache_creation_input_tokens": 81295
+         },
+         "cache_creation_5m": 81295,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 8,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 855,
+          "cache_read_input_tokens": 16930,
+          "cache_creation_input_tokens": 81527
+         },
+         "cache_creation_5m": 81527,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 9,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 370,
+          "cache_read_input_tokens": 98457,
+          "cache_creation_input_tokens": 1041
+         },
+         "cache_creation_5m": 1041,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 10,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3770,
+          "cache_read_input_tokens": 99498,
+          "cache_creation_input_tokens": 4329
+         },
+         "cache_creation_5m": 4329,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 11,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4809,
+          "cache_read_input_tokens": 103827,
+          "cache_creation_input_tokens": 4035
+         },
+         "cache_creation_5m": 4035,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 12,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 276,
+          "cache_read_input_tokens": 107862,
+          "cache_creation_input_tokens": 4928
+         },
+         "cache_creation_5m": 4928,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 13,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 5166,
+          "cache_read_input_tokens": 226263,
+          "cache_creation_input_tokens": 1959
+         },
+         "cache_creation_5m": 1959,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        }
+       ],
+       "totals": {
+        "input_tokens": 30,
+        "output_tokens": 38945,
+        "cache_read_input_tokens": 1177303,
+        "cache_creation_input_tokens": 260142
+       },
+       "unidentified_messages": 0,
+       "complete": true,
+       "advisor_iterations": [
+        {
+         "message_ordinal": 3,
+         "model": "claude-fable-5-1",
+         "usage": {
+          "input_tokens": 76124,
+          "output_tokens": 6062,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0
+         },
+         "cache_creation_5m": 0,
+         "cache_creation_1h": 0,
+         "speed": null,
+         "service_tier": null,
+         "inference_geo": null
+        },
+        {
+         "message_ordinal": 13,
+         "model": "claude-fable-5-1",
+         "usage": {
+          "input_tokens": 99589,
+          "output_tokens": 1739,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0
+         },
+         "cache_creation_5m": 0,
+         "cache_creation_1h": 0,
+         "speed": null,
+         "service_tier": null,
+         "inference_geo": null
+        }
+       ],
+       "advisor_totals": {
+        "input_tokens": 175713,
+        "output_tokens": 7801,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+       },
+       "totals_including_advisor": {
+        "input_tokens": 175743,
+        "output_tokens": 46746,
+        "cache_read_input_tokens": 1177303,
+        "cache_creation_input_tokens": 260142
+       },
+       "iteration_issues": {
+        "unread_entries": {},
+        "inconsistent_messages": 0,
+        "advisor_results_without_usage": 0,
+        "advisor_calls_without_result": 0
+       }
+      },
+      "final_return": {
+       "status": "measured",
+       "final": "tool_use",
+       "empty_text": 0,
+       "wait_notice": 0,
+       "background_started": 0,
+       "background_pending": 0,
+       "background_pending_with_events": 0
+      },
+      "hook_context": {
+       "inserted": 2,
+       "inserted_blocks": 2,
+       "claimed": 2,
+       "with_marker": 0,
+       "hook_names_folded": 0,
+       "by_hook": {
+        "SubagentStart": 1,
+        "PreToolUse:Read": 1
+       },
+       "by_event": {
+        "SubagentStart": 1,
+        "PreToolUse": 1
+       },
+       "blocks_by_event": {
+        "SubagentStart": 1,
+        "PreToolUse": 1
+       },
+       "claimed_by_event": {
+        "SubagentStart": 1,
+        "PreToolUse": 1
+       },
+       "claimed_plain_stdout": {},
+       "other_hook_rows": {}
+      },
+      "call_states": {
+       "attempted": 18,
+       "decided": null,
+       "executed": 18,
+       "succeeded": 18,
+       "failed": 0,
+       "interrupted": 0,
+       "rejected": 0,
+       "invalid": 0,
+       "cancelled_with_result": 0,
+       "cancelled_or_unfinished": 0,
+       "unknown": 0,
+       "rejected_by_source": {
+        "config": 0,
+        "hook": 0,
+        "user": 0,
+        "other": 0,
+        "declined": 0
+       },
+       "background": 0,
+       "sandbox": 0,
+       "by_server": {}
+      },
+      "m15": {
+       "threshold": 0.01,
+       "by_server": {}
+      },
+      "mcp_states": {},
+      "mcp_attempted": {
+       "ctx": 0,
+       "non_ctx": 0
+      },
+      "loaded_not_called": {},
+      "loaded": {},
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "invocations": 0,
+       "nested": 0,
+       "in_ctx_code": 0,
+       "prefix_rule_calls": 0,
+       "rule": "command_position",
+       "acceptance_or_exception_share": null
+      },
+      "cli_lanes": {
+       "status": "measured",
+       "parser": {
+        "versions": {
+         "tree_sitter_bash": "0.25.1",
+         "web_tree_sitter": "0.27.0"
+        },
+        "wasm_sha256": {
+         "tree_sitter_bash": "8292919c88a0f7d3fb31d0cd0253ca5a9531bc1ede82b0537f2c63dd8abe6a7a",
+         "web_tree_sitter": "c03bccdc3b448a32848f5ae327e209c982bbb0840d43eec8bc2d5759544a1ed3"
+        }
+       },
+       "lanes": {},
+       "mcporter_downstream": {},
+       "excluded_version_help": {},
+       "calls_with_lane_invocation": 0,
+       "unresolved_programs": 0,
+       "remote_invocations": 0,
+       "parse_errors": 0
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   },
+   {
+    "agent_id": "a2fc3bbf632c00708",
+    "label": "refute-facts:skills-research",
+    "phase": "Refute",
+    "agent_type": "landscape-sweep-worker",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 18,
+    "usage": {
+     "input_tokens": 38,
+     "output_tokens": 75386,
+     "cache_read_input_tokens": 2217837,
+     "cache_creation_input_tokens": 167223
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 38,
+      "output_tokens": 75386,
+      "cache_read_input_tokens": 2217837,
+      "cache_creation_input_tokens": 167223
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 64857,
+    "complete": true,
+    "issues": [],
+    "return_quality": "ok",
+    "final_return": {
+     "status": "measured",
+     "final": "tool_use",
+     "empty_text": 0,
+     "wait_notice": 0,
+     "background_started": 0,
+     "background_pending": 0,
+     "background_pending_with_events": 0
+    },
+    "lanes": {
+     "tool_calls": 23,
+     "bash_calls": 15,
+     "mcp_calls": {
+      "plugin_context-mode_context-mode": 1
+     },
+     "skill_calls": {
+      "fp-check": 1,
+      "supply-chain-risk-auditor": 1
+     },
+     "tool_search": {
+      "calls": 1,
+      "loaded": {
+       "plugin_context-mode_context-mode": 4,
+       "serena": 2,
+       "built-in": 1
+      }
+     },
+     "rtk": {
+      "hook_rewrites": 3,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 1,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "landscape-sweep-worker"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 64857,
+     "measurement": {
+      "m3": {
+       "results": 23,
+       "bytes": 58477,
+       "large_results": 5,
+       "large_bytes": 41510,
+       "max_bytes": 9486,
+       "large_json": 1,
+       "large_uniform_keys": 0,
+       "large_uniform_flat": 0,
+       "large_shape_unknown": 0,
+       "large_result_share": 0.2174,
+       "large_byte_share": 0.7099
+      },
+      "m4": {
+       "ctx_fetch_and_index": 1,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 2,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 3,
+       "routed_share": 0.3333,
+       "routed_share_lower_bound": 0.3333,
+       "unclassifiable_share": 0.6667,
+       "status": "incomplete",
+       "by_carrier": {
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "read": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 2,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 2,
+         "routed_share": 0,
+         "routed_share_lower_bound": 0,
+         "unclassifiable_share": 1,
+         "status": "incomplete"
+        },
+        "ctx": {
+         "ctx_fetch_and_index": 1,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 1,
+         "routed_share": 1,
+         "routed_share_lower_bound": 1,
+         "unclassifiable_share": 0,
+         "status": "measured"
+        }
+       }
+      },
+      "m5": {
+       "results": 1,
+       "bytes": 1376,
+       "large_results": 0,
+       "large_bytes": 0,
+       "max_bytes": 1376,
+       "large_json": 0,
+       "large_uniform_keys": 0,
+       "large_uniform_flat": 0,
+       "large_shape_unknown": 0,
+       "large_result_share": 0,
+       "large_byte_share": 0
+      },
+      "by_carrier": {
+       "other": {
+        "results": 6,
+        "bytes": 1125,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 563,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "read": {
+        "results": 1,
+        "bytes": 9486,
+        "large_results": 1,
+        "large_bytes": 9486,
+        "max_bytes": 9486,
+        "large_json": 1,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 1,
+        "large_byte_share": 1
+       },
+       "bash": {
+        "results": 15,
+        "bytes": 46490,
+        "large_results": 4,
+        "large_bytes": 32024,
+        "max_bytes": 9113,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0.2667,
+        "large_byte_share": 0.6888
+       },
+       "ctx": {
+        "results": 1,
+        "bytes": 1376,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 1376,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "observed_covered_succeeded_calls": 0,
+       "eligible_call_states": {
+        "attempted": 0,
+        "executed": 0,
+        "succeeded": 0,
+        "failed": 0,
+        "interrupted": 0,
+        "rejected": 0,
+        "invalid": 0,
+        "cancelled_with_result": 0,
+        "cancelled_or_unfinished": 0,
+        "unknown": 0
+       },
+       "status": "not_measured",
+       "unknown_call_share": null,
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 9681,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 64855
+         },
+         "cache_creation_5m": 64855,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1544,
+          "cache_read_input_tokens": 64855,
+          "cache_creation_input_tokens": 24225
+         },
+         "cache_creation_5m": 24225,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2338,
+          "cache_read_input_tokens": 89080,
+          "cache_creation_input_tokens": 3194
+         },
+         "cache_creation_5m": 3194,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 7352,
+          "cache_read_input_tokens": 92274,
+          "cache_creation_input_tokens": 3244
+         },
+         "cache_creation_5m": 3244,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 5,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 7660,
+          "cache_read_input_tokens": 95518,
+          "cache_creation_input_tokens": 12038
+         },
+         "cache_creation_5m": 12038,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 6,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 333,
+          "cache_read_input_tokens": 107556,
+          "cache_creation_input_tokens": 7782
+         },
+         "cache_creation_5m": 7782,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 7,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 544,
+          "cache_read_input_tokens": 115338,
+          "cache_creation_input_tokens": 794
+         },
+         "cache_creation_5m": 794,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 8,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4340,
+          "cache_read_input_tokens": 116132,
+          "cache_creation_input_tokens": 680
+         },
+         "cache_creation_5m": 680,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 9,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 174,
+          "cache_read_input_tokens": 116812,
+          "cache_creation_input_tokens": 4469
+         },
+         "cache_creation_5m": 4469,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 10,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2027,
+          "cache_read_input_tokens": 121281,
+          "cache_creation_input_tokens": 4265
+         },
+         "cache_creation_5m": 4265,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 11,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1635,
+          "cache_read_input_tokens": 125546,
+          "cache_creation_input_tokens": 4111
+         },
+         "cache_creation_5m": 4111,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 12,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1881,
+          "cache_read_input_tokens": 129657,
+          "cache_creation_input_tokens": 5533
+         },
+         "cache_creation_5m": 5533,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 13,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2119,
+          "cache_read_input_tokens": 135190,
+          "cache_creation_input_tokens": 4563
+         },
+         "cache_creation_5m": 4563,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 14,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3288,
+          "cache_read_input_tokens": 139753,
+          "cache_creation_input_tokens": 5486
+         },
+         "cache_creation_5m": 5486,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 15,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1626,
+          "cache_read_input_tokens": 145239,
+          "cache_creation_input_tokens": 4335
+         },
+         "cache_creation_5m": 4335,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 16,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3752,
+          "cache_read_input_tokens": 149574,
+          "cache_creation_input_tokens": 2328
+         },
+         "cache_creation_5m": 2328,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 17,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 9605,
+          "cache_read_input_tokens": 151902,
+          "cache_creation_input_tokens": 4345
+         },
+         "cache_creation_5m": 4345,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 18,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 15487,
+          "cache_read_input_tokens": 322130,
+          "cache_creation_input_tokens": 10976
+         },
+         "cache_creation_5m": 10976,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        }
+       ],
+       "totals": {
+        "input_tokens": 38,
+        "output_tokens": 75386,
+        "cache_read_input_tokens": 2217837,
+        "cache_creation_input_tokens": 167223
+       },
+       "unidentified_messages": 0,
+       "complete": true,
+       "advisor_iterations": [
+        {
+         "message_ordinal": 18,
+         "model": "claude-fable-5-1",
+         "usage": {
+          "input_tokens": 167596,
+          "output_tokens": 6374,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0
+         },
+         "cache_creation_5m": 0,
+         "cache_creation_1h": 0,
+         "speed": null,
+         "service_tier": null,
+         "inference_geo": null
+        }
+       ],
+       "advisor_totals": {
+        "input_tokens": 167596,
+        "output_tokens": 6374,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+       },
+       "totals_including_advisor": {
+        "input_tokens": 167634,
+        "output_tokens": 81760,
+        "cache_read_input_tokens": 2217837,
+        "cache_creation_input_tokens": 167223
+       },
+       "iteration_issues": {
+        "unread_entries": {},
+        "inconsistent_messages": 0,
+        "advisor_results_without_usage": 0,
+        "advisor_calls_without_result": 0
+       }
+      },
+      "final_return": {
+       "status": "measured",
+       "final": "tool_use",
+       "empty_text": 0,
+       "wait_notice": 0,
+       "background_started": 0,
+       "background_pending": 0,
+       "background_pending_with_events": 0
+      },
+      "hook_context": {
+       "inserted": 1,
+       "inserted_blocks": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "hook_names_folded": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       },
+       "blocks_by_event": {
+        "SubagentStart": 1
+       },
+       "claimed_by_event": {
+        "SubagentStart": 1
+       },
+       "claimed_plain_stdout": {},
+       "other_hook_rows": {}
+      },
+      "call_states": {
+       "attempted": 23,
+       "decided": null,
+       "executed": 23,
+       "succeeded": 23,
+       "failed": 0,
+       "interrupted": 0,
+       "rejected": 0,
+       "invalid": 0,
+       "cancelled_with_result": 0,
+       "cancelled_or_unfinished": 0,
+       "unknown": 0,
+       "rejected_by_source": {
+        "config": 0,
+        "hook": 0,
+        "user": 0,
+        "other": 0,
+        "declined": 0
+       },
+       "background": 0,
+       "sandbox": 0,
+       "by_server": {
+        "plugin_context-mode_context-mode": {
+         "attempted": 1,
+         "executed": 1,
+         "succeeded": 1,
+         "failed": 0,
+         "interrupted": 0,
+         "rejected": 0,
+         "invalid": 0,
+         "cancelled_with_result": 0,
+         "cancelled_or_unfinished": 0,
+         "unknown": 0
+        }
+       }
+      },
+      "m15": {
+       "threshold": 0.01,
+       "by_server": {
+        "plugin_context-mode_context-mode": {
+         "attempted": 1,
+         "succeeded": 1,
+         "ctx": true,
+         "classes": {},
+         "infrastructure_errors": 0,
+         "new_class_errors": 0,
+         "unknowns": 0,
+         "unassigned_errors": 0,
+         "rate": 0,
+         "rate_lower_bound": 0,
+         "rate_upper_bound": 0,
+         "over_threshold": false,
+         "threshold_sensitive": false,
+         "every_error_classified": true
+        }
+       }
+      },
+      "mcp_states": {
+       "plugin_context-mode_context-mode": {
+        "attempted": 1,
+        "succeeded": 1,
+        "failed": 0,
+        "unfinished": 0
+       }
+      },
+      "mcp_attempted": {
+       "ctx": 1,
+       "non_ctx": 0
+      },
+      "loaded_not_called": {
+       "serena": 2
+      },
+      "loaded": {
+       "plugin_context-mode_context-mode": 4,
+       "serena": 2
+      },
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "invocations": 0,
+       "nested": 0,
+       "in_ctx_code": 0,
+       "prefix_rule_calls": 0,
+       "rule": "command_position",
+       "acceptance_or_exception_share": null
+      },
+      "cli_lanes": {
+       "status": "measured",
+       "parser": {
+        "versions": {
+         "tree_sitter_bash": "0.25.1",
+         "web_tree_sitter": "0.27.0"
+        },
+        "wasm_sha256": {
+         "tree_sitter_bash": "8292919c88a0f7d3fb31d0cd0253ca5a9531bc1ede82b0537f2c63dd8abe6a7a",
+         "web_tree_sitter": "c03bccdc3b448a32848f5ae327e209c982bbb0840d43eec8bc2d5759544a1ed3"
+        }
+       },
+       "lanes": {},
+       "mcporter_downstream": {},
+       "excluded_version_help": {},
+       "calls_with_lane_invocation": 0,
+       "unresolved_programs": 1,
+       "remote_invocations": 0,
+       "parse_errors": 0
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   },
+   {
+    "agent_id": "aa79f7db0115df7cd",
+    "label": "refute-fit:skills-research",
+    "phase": "Refute",
+    "agent_type": "landscape-sweep-worker",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 24,
+    "usage": {
+     "input_tokens": 50,
+     "output_tokens": 61307,
+     "cache_read_input_tokens": 2892052,
+     "cache_creation_input_tokens": 146635
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 50,
+      "output_tokens": 61307,
+      "cache_read_input_tokens": 2892052,
+      "cache_creation_input_tokens": 146635
+     }
+    },
+    "first_request_cache_read": 17554,
+    "first_request_prompt_tokens": 64953,
+    "complete": true,
+    "issues": [],
+    "return_quality": "ok",
+    "final_return": {
+     "status": "measured",
+     "final": "tool_use",
+     "empty_text": 0,
+     "wait_notice": 0,
+     "background_started": 0,
+     "background_pending": 0,
+     "background_pending_with_events": 0
+    },
+    "lanes": {
+     "tool_calls": 26,
+     "bash_calls": 3,
+     "mcp_calls": {
+      "plugin_context-mode_context-mode": 19
+     },
+     "skill_calls": {
+      "fp-check": 1
+     },
+     "tool_search": {
+      "calls": 1,
+      "loaded": {
+       "plugin_context-mode_context-mode": 4,
+       "built-in": 1
+      }
+     },
+     "rtk": {
+      "hook_rewrites": 0,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 0,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "landscape-sweep-worker"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 64953,
+     "measurement": {
+      "m3": {
+       "results": 26,
+       "bytes": 89976,
+       "large_results": 6,
+       "large_bytes": 41609,
+       "max_bytes": 9486,
+       "large_json": 1,
+       "large_uniform_keys": 0,
+       "large_uniform_flat": 0,
+       "large_shape_unknown": 0,
+       "large_result_share": 0.2308,
+       "large_byte_share": 0.4624
+      },
+      "m4": {
+       "ctx_fetch_and_index": 0,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 3,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 3,
+       "routed_share": 0,
+       "routed_share_lower_bound": 0,
+       "unclassifiable_share": 1,
+       "status": "incomplete",
+       "by_carrier": {
+        "read": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "ctx": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 3,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 3,
+         "routed_share": 0,
+         "routed_share_lower_bound": 0,
+         "unclassifiable_share": 1,
+         "status": "incomplete"
+        },
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        }
+       }
+      },
+      "m5": {
+       "results": 19,
+       "bytes": 77854,
+       "large_results": 5,
+       "large_bytes": 32123,
+       "max_bytes": 8067,
+       "large_json": 0,
+       "large_uniform_keys": 0,
+       "large_uniform_flat": 0,
+       "large_shape_unknown": 0,
+       "large_result_share": 0.2632,
+       "large_byte_share": 0.4126
+      },
+      "by_carrier": {
+       "read": {
+        "results": 1,
+        "bytes": 9486,
+        "large_results": 1,
+        "large_bytes": 9486,
+        "max_bytes": 9486,
+        "large_json": 1,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 1,
+        "large_byte_share": 1
+       },
+       "other": {
+        "results": 3,
+        "bytes": 486,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 422,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "ctx": {
+        "results": 19,
+        "bytes": 77854,
+        "large_results": 5,
+        "large_bytes": 32123,
+        "max_bytes": 8067,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0.2632,
+        "large_byte_share": 0.4126
+       },
+       "bash": {
+        "results": 3,
+        "bytes": 2150,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 1634,
+        "large_json": 0,
+        "large_uniform_keys": 0,
+        "large_uniform_flat": 0,
+        "large_shape_unknown": 0,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "observed_covered_succeeded_calls": 0,
+       "eligible_call_states": {
+        "attempted": 0,
+        "executed": 0,
+        "succeeded": 0,
+        "failed": 0,
+        "interrupted": 0,
+        "rejected": 0,
+        "invalid": 0,
+        "cancelled_with_result": 0,
+        "cancelled_or_unfinished": 0,
+        "unknown": 0
+       },
+       "status": "not_measured",
+       "unknown_call_share": null,
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 519,
+          "cache_read_input_tokens": 17554,
+          "cache_creation_input_tokens": 47397
+         },
+         "cache_creation_5m": 47397,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 7233,
+          "cache_read_input_tokens": 64951,
+          "cache_creation_input_tokens": 13066
+         },
+         "cache_creation_5m": 13066,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 257,
+          "cache_read_input_tokens": 78017,
+          "cache_creation_input_tokens": 10668
+         },
+         "cache_creation_5m": 10668,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1082,
+          "cache_read_input_tokens": 88685,
+          "cache_creation_input_tokens": 3707
+         },
+         "cache_creation_5m": 3707,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 5,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3830,
+          "cache_read_input_tokens": 92392,
+          "cache_creation_input_tokens": 3547
+         },
+         "cache_creation_5m": 3547,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 6,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1378,
+          "cache_read_input_tokens": 95939,
+          "cache_creation_input_tokens": 6510
+         },
+         "cache_creation_5m": 6510,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 7,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1064,
+          "cache_read_input_tokens": 102449,
+          "cache_creation_input_tokens": 3099
+         },
+         "cache_creation_5m": 3099,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 8,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1168,
+          "cache_read_input_tokens": 105548,
+          "cache_creation_input_tokens": 2182
+         },
+         "cache_creation_5m": 2182,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 9,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 539,
+          "cache_read_input_tokens": 107730,
+          "cache_creation_input_tokens": 2203
+         },
+         "cache_creation_5m": 2203,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 10,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 713,
+          "cache_read_input_tokens": 109933,
+          "cache_creation_input_tokens": 2134
+         },
+         "cache_creation_5m": 2134,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 11,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 726,
+          "cache_read_input_tokens": 112067,
+          "cache_creation_input_tokens": 2217
+         },
+         "cache_creation_5m": 2217,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 12,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1597,
+          "cache_read_input_tokens": 114284,
+          "cache_creation_input_tokens": 2997
+         },
+         "cache_creation_5m": 2997,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 13,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1431,
+          "cache_read_input_tokens": 117281,
+          "cache_creation_input_tokens": 3159
+         },
+         "cache_creation_5m": 3159,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 14,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 735,
+          "cache_read_input_tokens": 120440,
+          "cache_creation_input_tokens": 3281
+         },
+         "cache_creation_5m": 3281,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 15,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2045,
+          "cache_read_input_tokens": 123721,
+          "cache_creation_input_tokens": 1867
+         },
+         "cache_creation_5m": 1867,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 16,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2778,
+          "cache_read_input_tokens": 125588,
+          "cache_creation_input_tokens": 3808
+         },
+         "cache_creation_5m": 3808,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 17,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3006,
+          "cache_read_input_tokens": 129396,
+          "cache_creation_input_tokens": 4407
+         },
+         "cache_creation_5m": 4407,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 18,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2892,
+          "cache_read_input_tokens": 133803,
+          "cache_creation_input_tokens": 5651
+         },
+         "cache_creation_5m": 5651,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 19,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2442,
+          "cache_read_input_tokens": 139454,
+          "cache_creation_input_tokens": 5227
+         },
+         "cache_creation_5m": 5227,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 20,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1609,
+          "cache_read_input_tokens": 144681,
+          "cache_creation_input_tokens": 3292
+         },
+         "cache_creation_5m": 3292,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 21,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 635,
+          "cache_read_input_tokens": 147973,
+          "cache_creation_input_tokens": 2984
+         },
+         "cache_creation_5m": 2984,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 22,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3076,
+          "cache_read_input_tokens": 150957,
+          "cache_creation_input_tokens": 1283
+         },
+         "cache_creation_5m": 1283,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 23,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 5932,
+          "cache_read_input_tokens": 152240,
+          "cache_creation_input_tokens": 3191
+         },
+         "cache_creation_5m": 3191,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        },
+        {
+         "ordinal": 24,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 14620,
+          "cache_read_input_tokens": 316969,
+          "cache_creation_input_tokens": 8758
+         },
+         "cache_creation_5m": 8758,
+         "cache_creation_1h": 0,
+         "speed": "standard",
+         "service_tier": "standard",
+         "inference_geo": "not_available"
+        }
+       ],
+       "totals": {
+        "input_tokens": 50,
+        "output_tokens": 61307,
+        "cache_read_input_tokens": 2892052,
+        "cache_creation_input_tokens": 146635
+       },
+       "unidentified_messages": 0,
+       "complete": true,
+       "advisor_iterations": [
+        {
+         "message_ordinal": 24,
+         "model": "claude-fable-5-1",
+         "usage": {
+          "input_tokens": 163785,
+          "output_tokens": 10979,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0
+         },
+         "cache_creation_5m": 0,
+         "cache_creation_1h": 0,
+         "speed": null,
+         "service_tier": null,
+         "inference_geo": null
+        }
+       ],
+       "advisor_totals": {
+        "input_tokens": 163785,
+        "output_tokens": 10979,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+       },
+       "totals_including_advisor": {
+        "input_tokens": 163835,
+        "output_tokens": 72286,
+        "cache_read_input_tokens": 2892052,
+        "cache_creation_input_tokens": 146635
+       },
+       "iteration_issues": {
+        "unread_entries": {},
+        "inconsistent_messages": 0,
+        "advisor_results_without_usage": 0,
+        "advisor_calls_without_result": 0
+       }
+      },
+      "final_return": {
+       "status": "measured",
+       "final": "tool_use",
+       "empty_text": 0,
+       "wait_notice": 0,
+       "background_started": 0,
+       "background_pending": 0,
+       "background_pending_with_events": 0
+      },
+      "hook_context": {
+       "inserted": 1,
+       "inserted_blocks": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "hook_names_folded": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       },
+       "blocks_by_event": {
+        "SubagentStart": 1
+       },
+       "claimed_by_event": {
+        "SubagentStart": 1
+       },
+       "claimed_plain_stdout": {},
+       "other_hook_rows": {}
+      },
+      "call_states": {
+       "attempted": 26,
+       "decided": null,
+       "executed": 26,
+       "succeeded": 26,
+       "failed": 0,
+       "interrupted": 0,
+       "rejected": 0,
+       "invalid": 0,
+       "cancelled_with_result": 0,
+       "cancelled_or_unfinished": 0,
+       "unknown": 0,
+       "rejected_by_source": {
+        "config": 0,
+        "hook": 0,
+        "user": 0,
+        "other": 0,
+        "declined": 0
+       },
+       "background": 0,
+       "sandbox": 0,
+       "by_server": {
+        "plugin_context-mode_context-mode": {
+         "attempted": 19,
+         "executed": 19,
+         "succeeded": 19,
+         "failed": 0,
+         "interrupted": 0,
+         "rejected": 0,
+         "invalid": 0,
+         "cancelled_with_result": 0,
+         "cancelled_or_unfinished": 0,
+         "unknown": 0
+        }
+       }
+      },
+      "m15": {
+       "threshold": 0.01,
+       "by_server": {
+        "plugin_context-mode_context-mode": {
+         "attempted": 19,
+         "succeeded": 19,
+         "ctx": true,
+         "classes": {},
+         "infrastructure_errors": 0,
+         "new_class_errors": 0,
+         "unknowns": 0,
+         "unassigned_errors": 0,
+         "rate": 0,
+         "rate_lower_bound": 0,
+         "rate_upper_bound": 0,
+         "over_threshold": false,
+         "threshold_sensitive": false,
+         "every_error_classified": true
+        }
+       }
+      },
+      "mcp_states": {
+       "plugin_context-mode_context-mode": {
+        "attempted": 19,
+        "succeeded": 19,
+        "failed": 0,
+        "unfinished": 0
+       }
+      },
+      "mcp_attempted": {
+       "ctx": 19,
+       "non_ctx": 0
+      },
+      "loaded_not_called": {},
+      "loaded": {
+       "plugin_context-mode_context-mode": 4
+      },
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "invocations": 0,
+       "nested": 0,
+       "in_ctx_code": 0,
+       "prefix_rule_calls": 0,
+       "rule": "command_position",
+       "acceptance_or_exception_share": null
+      },
+      "cli_lanes": {
+       "status": "measured",
+       "parser": {
+        "versions": {
+         "tree_sitter_bash": "0.25.1",
+         "web_tree_sitter": "0.27.0"
+        },
+        "wasm_sha256": {
+         "tree_sitter_bash": "8292919c88a0f7d3fb31d0cd0253ca5a9531bc1ede82b0537f2c63dd8abe6a7a",
+         "web_tree_sitter": "c03bccdc3b448a32848f5ae327e209c982bbb0840d43eec8bc2d5759544a1ed3"
+        }
+       },
+       "lanes": {},
+       "mcporter_downstream": {},
+       "excluded_version_help": {},
+       "calls_with_lane_invocation": 0,
+       "unresolved_programs": 2,
+       "remote_invocations": 0,
+       "parse_errors": 0
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   }
+  ],
+  "by_resolved_model": {
+   "claude-sonnet-5-5": {
+    "children": 2,
+    "input_tokens": 40,
+    "output_tokens": 51992,
+    "cache_read_input_tokens": 1351659,
+    "cache_creation_input_tokens": 359130
+   },
+   "claude-opus-5-5": {
+    "children": 3,
+    "input_tokens": 208,
+    "output_tokens": 263374,
+    "cache_read_input_tokens": 14277733,
+    "cache_creation_input_tokens": 578912
+   }
+  },
+  "effort_mismatches": []
+ }
+}

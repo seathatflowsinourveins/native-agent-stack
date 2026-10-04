@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-trailofbits-skills-ask-questions-if-underspecified",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "trailofbits/skills@ask-questions-if-underspecified",
+ "reviewed_commit": "daa4ad03eb6ae7c451665ff30b5daaa6cfbe613c",
+ "readme_path": "plugins/ask-questions-if-underspecified/skills/ask-questions-if-underspecified/SKILL.md",
+ "license": "CC-BY-SA-4.0",
+ "layers": [
+  "skills-design-intake"
+ ],
+ "claim": "Source review of the skill ask-questions-if-underspecified in trailofbits/skills at commit daa4ad03eb6ae7c451665ff30b5daaa6cfbe613c (the adjudicated pin; license CC-BY-SA-4.0), read from plugins/ask-questions-if-underspecified/skills/ask-questions-if-underspecified/SKILL.md and plugins/ask-questions-if-underspecified/skills/ask-questions-if-underspecified/agents/openai.yaml at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for ask-questions-if-underspecified; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 87fa7ff4bb3429b0bb835547fd7f10005d8eae4e. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 7360,
+  "pushed_at": "2026-10-02T10:05:35Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "CC-BY-SA-4.0",
+  "adjudicated_pin": "daa4ad03eb6ae7c451665ff30b5daaa6cfbe613c",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "plugins/ask-questions-if-underspecified/skills/, the first location the CLI searches that holds a valid folder named ask-questions-if-underspecified",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "fef9189249c46d08d5172f7010e0d83ae8dc104cc3d07714a909dd12f9e92e79",
+  "skill_md_bytes": 3987,
+  "survivor_skill_md_sha256": "fef9189249c46d08d5172f7010e0d83ae8dc104cc3d07714a909dd12f9e92e79",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "87fa7ff4bb3429b0bb835547fd7f10005d8eae4e",
+  "disable_model_invocation": false,
+  "openai_yaml_path": "plugins/ask-questions-if-underspecified/skills/ask-questions-if-underspecified/agents/openai.yaml",
+  "openai_yaml_reader": "subset reader (PyYAML is not installed)",
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no policy mapping: Codex defaults allow_implicit_invocation to true"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "plugins/ask-questions-if-underspecified/skills/ask-questions-if-underspecified/SKILL.md@daa4ad03eb6ae7c451665ff30b5daaa6cfbe613c",
+   "text": "Use this skill when a request has multiple plausible interpretations or key details (objective, scope, constraints, environment, or safety) are unclear."
+  },
+  {
+   "source": "plugins/ask-questions-if-underspecified/skills/ask-questions-if-underspecified/SKILL.md@daa4ad03eb6ae7c451665ff30b5daaa6cfbe613c",
+   "text": "Do not use this skill when the request is already clear, or when a quick, low-risk discovery read can answer the missing details."
+  },
+  {
+   "source": "plugins/ask-questions-if-underspecified/skills/ask-questions-if-underspecified/SKILL.md@daa4ad03eb6ae7c451665ff30b5daaa6cfbe613c",
+   "text": "Ask the minimum set of clarifying questions needed to avoid wrong work; do not start implementing until the must-have questions are answered (or the user explicitly approves proceeding with stated assumptions)."
+  }
+ ]
+}

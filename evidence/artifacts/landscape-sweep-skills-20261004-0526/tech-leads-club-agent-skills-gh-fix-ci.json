@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-tech-leads-club-agent-skills-gh-fix-ci",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "tech-leads-club/agent-skills@gh-fix-ci",
+ "reviewed_commit": "120b67676388241b314699fa8fa9af25ada6d1d4",
+ "readme_path": "packages/skills-catalog/skills/(tooling)/gh-fix-ci/SKILL.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill gh-fix-ci in tech-leads-club/agent-skills at commit 120b67676388241b314699fa8fa9af25ada6d1d4 (the adjudicated pin; license NOASSERTION), read from packages/skills-catalog/skills/(tooling)/gh-fix-ci/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for gh-fix-ci; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 280adb66198da5d553b53cb359565df251154706. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 7030,
+  "pushed_at": "2026-09-20T12:37:19Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "NOASSERTION",
+  "adjudicated_pin": "120b67676388241b314699fa8fa9af25ada6d1d4",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "the recursive search the CLI runs when no location it searches holds a valid skill",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "5eda940fb7f3614fa84ca7a0e0f7da716cdb7605b1b64e4da3f170c60669ecdb",
+  "skill_md_bytes": 3824,
+  "survivor_skill_md_sha256": "5eda940fb7f3614fa84ca7a0e0f7da716cdb7605b1b64e4da3f170c60669ecdb",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "280adb66198da5d553b53cb359565df251154706",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "packages/skills-catalog/skills/(tooling)/gh-fix-ci/SKILL.md@120b67676388241b314699fa8fa9af25ada6d1d4",
+   "text": "Use gh to locate failing PR checks, fetch GitHub Actions logs for actionable failures, summarize the failure snippet, then propose a fix plan and implement after explicit approval."
+  },
+  {
+   "source": "packages/skills-catalog/skills/(tooling)/gh-fix-ci/SKILL.md@120b67676388241b314699fa8fa9af25ada6d1d4",
+   "text": "- If a plan-oriented skill (for example `create-plan`) is available, use it; otherwise draft a concise plan inline and request approval before implementing."
+  },
+  {
+   "source": "packages/skills-catalog/skills/(tooling)/gh-fix-ci/SKILL.md@120b67676388241b314699fa8fa9af25ada6d1d4",
+   "text": "Prereq: authenticate with the standard GitHub CLI once (for example, run `gh auth login`), then confirm with `gh auth status` (repo + workflow scopes are typically required)."
+  }
+ ]
+}

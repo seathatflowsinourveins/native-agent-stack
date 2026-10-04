@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-trailofbits-skills-semgrep-rule-creator",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "trailofbits/skills@semgrep-rule-creator",
+ "reviewed_commit": "82fe8226252622fa807643bdca1710901198553a",
+ "readme_path": "plugins/semgrep-rule-creator/skills/semgrep-rule-creator/SKILL.md",
+ "license": "CC-BY-SA-4.0",
+ "layers": [
+  "skills-security"
+ ],
+ "claim": "Source review of the skill semgrep-rule-creator in trailofbits/skills at commit 82fe8226252622fa807643bdca1710901198553a (the adjudicated pin; license CC-BY-SA-4.0), read from plugins/semgrep-rule-creator/skills/semgrep-rule-creator/SKILL.md and plugins/semgrep-rule-creator/skills/semgrep-rule-creator/agents/openai.yaml at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for semgrep-rule-creator; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 480d8eb8e20d4b365fa49ae2c4694e2ef729de0b. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 7360,
+  "pushed_at": "2026-10-02T10:05:35Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "CC-BY-SA-4.0",
+  "adjudicated_pin": "82fe8226252622fa807643bdca1710901198553a",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "plugins/semgrep-rule-creator/skills/, the first location the CLI searches that holds a valid folder named semgrep-rule-creator",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "6ca2e3b8520ed20af1b0879b7cab318832fcbe89c19c17a9fa347a45a9f28913",
+  "skill_md_bytes": 7320,
+  "survivor_skill_md_sha256": "6ca2e3b8520ed20af1b0879b7cab318832fcbe89c19c17a9fa347a45a9f28913",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "480d8eb8e20d4b365fa49ae2c4694e2ef729de0b",
+  "disable_model_invocation": false,
+  "openai_yaml_path": "plugins/semgrep-rule-creator/skills/semgrep-rule-creator/agents/openai.yaml",
+  "openai_yaml_reader": "subset reader (PyYAML is not installed)",
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no policy mapping: Codex defaults allow_implicit_invocation to true"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "plugins/semgrep-rule-creator/skills/semgrep-rule-creator/SKILL.md@82fe8226252622fa807643bdca1710901198553a",
+   "text": "Create production-quality Semgrep rules with proper testing and validation."
+  },
+  {
+   "source": "plugins/semgrep-rule-creator/skills/semgrep-rule-creator/SKILL.md@82fe8226252622fa807643bdca1710901198553a",
+   "text": "**Ideal scenarios:** - Writing Semgrep rules for specific bug patterns - Writing rules to detect security vulnerabilities in your codebase - Writing taint mode rules for data flow vulnerabilities - Writing rules to enforce coding standards"
+  },
+  {
+   "source": "plugins/semgrep-rule-creator/skills/semgrep-rule-creator/SKILL.md@82fe8226252622fa807643bdca1710901198553a",
+   "text": "Do NOT use this skill for: - Running existing Semgrep rulesets - General static analysis without custom rules (use `static-analysis` skill)"
+  }
+ ]
+}

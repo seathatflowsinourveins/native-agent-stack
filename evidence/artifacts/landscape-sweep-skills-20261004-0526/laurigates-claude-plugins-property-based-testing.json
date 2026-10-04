@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-laurigates-claude-plugins-property-based-testing",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "laurigates/claude-plugins@property-based-testing",
+ "reviewed_commit": "9caa2be8e7b4b35823e4154c610e3846af05635c",
+ "readme_path": "testing-plugin/skills/property-based-testing/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill property-based-testing in laurigates/claude-plugins at commit 9caa2be8e7b4b35823e4154c610e3846af05635c (the adjudicated pin; license MIT), read from testing-plugin/skills/property-based-testing/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for property-based-testing; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is e8bb363af2e5c307757424bb4fcfa448d45cb85c. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 59,
+  "pushed_at": "2026-10-02T17:53:00Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "9caa2be8e7b4b35823e4154c610e3846af05635c",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "testing-plugin/skills/, the first location the CLI searches that holds a valid folder named property-based-testing",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "c52e65a7fd995e27ba376be55c89a4795af31129284c43fc3b727eeeb2f34a48",
+  "skill_md_bytes": 7920,
+  "survivor_skill_md_sha256": "c52e65a7fd995e27ba376be55c89a4795af31129284c43fc3b727eeeb2f34a48",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "e8bb363af2e5c307757424bb4fcfa448d45cb85c",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "testing-plugin/skills/property-based-testing/SKILL.md@9caa2be8e7b4b35823e4154c610e3846af05635c",
+   "text": "Expert knowledge for property-based testing - automatically generating test cases to verify code properties rather than testing specific examples."
+  },
+  {
+   "source": "testing-plugin/skills/property-based-testing/SKILL.md@9caa2be8e7b4b35823e4154c610e3846af05635c",
+   "text": "**Property-Based Testing Concept** - **Traditional testing**: Test specific examples - **Property-based testing**: Test properties that should hold for all inputs - **Generators**: Automatically create diverse test inputs - **Shrinking**: Minimize failing cases to simplest example - **Coverage**: Explore edge cases humans might miss"
+  },
+  {
+   "source": "testing-plugin/skills/property-based-testing/SKILL.md@9caa2be8e7b4b35823e4154c610e3846af05635c",
+   "text": "**When to Use Property-Based Testing** - Mathematical operations (commutative, associative properties) - Encoders/decoders (roundtrip properties) - Parsers and serializers - Data transformations - API contracts - Invariants and constraints"
+  }
+ ]
+}

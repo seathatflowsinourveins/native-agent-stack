@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-haacked-dotfiles-resolve-conflicts",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "haacked/dotfiles@resolve-conflicts",
+ "reviewed_commit": "ed1f1ce07d5063c92ded3213155d2cb658615d04",
+ "readme_path": "ai/skills/resolve-conflicts/SKILL.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill resolve-conflicts in haacked/dotfiles at commit ed1f1ce07d5063c92ded3213155d2cb658615d04 (the adjudicated pin; license NOASSERTION), read from ai/skills/resolve-conflicts/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for resolve-conflicts; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 4bc4a9f22ff4bf0c5611d7246082a9c51cdfd57e. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 134,
+  "pushed_at": "2026-10-02T22:10:54Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "NOASSERTION",
+  "adjudicated_pin": "ed1f1ce07d5063c92ded3213155d2cb658615d04",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "the recursive search the CLI runs when no location it searches holds a valid skill",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "526d9cddc3a0987d71eca1a99a5edcdfc620e09102e195e4b175a231c32ea594",
+  "skill_md_bytes": 8424,
+  "survivor_skill_md_sha256": "526d9cddc3a0987d71eca1a99a5edcdfc620e09102e195e4b175a231c32ea594",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "4bc4a9f22ff4bf0c5611d7246082a9c51cdfd57e",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "ai/skills/resolve-conflicts/SKILL.md@ed1f1ce07d5063c92ded3213155d2cb658615d04",
+   "text": "Resolve conflicts from any git operation (rebase, merge, cherry-pick, revert) with intelligent handling of lock files, migrations, mergiraf-supported languages, and stacked PR duplicates."
+  },
+  {
+   "source": "ai/skills/resolve-conflicts/SKILL.md@ed1f1ce07d5063c92ded3213155d2cb658615d04",
+   "text": "- No arguments: detect context, resolve conflicts, continue the operation - `--abort`: abort the current operation - `--continue`: skip resolution, just run the appropriate continue command"
+  },
+  {
+   "source": "ai/skills/resolve-conflicts/SKILL.md@ed1f1ce07d5063c92ded3213155d2cb658615d04",
+   "text": "- `/resolve-conflicts` -- detect context, resolve conflicts, continue - `/resolve-conflicts --abort` -- abort current rebase/merge/cherry-pick/revert - `/resolve-conflicts --continue` -- continue without resolving (e.g., after manual edits)"
+  }
+ ]
+}

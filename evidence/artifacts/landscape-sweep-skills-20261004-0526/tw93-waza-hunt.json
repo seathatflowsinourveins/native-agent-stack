@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-tw93-waza-hunt",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "tw93/Waza@hunt",
+ "reviewed_commit": "c3b74dd5845b39a80a79c36bb82b028947674a05",
+ "readme_path": "skills/hunt/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-debug"
+ ],
+ "claim": "Source review of the skill hunt in tw93/Waza at commit c3b74dd5845b39a80a79c36bb82b028947674a05 (the adjudicated pin; license MIT), read from skills/hunt/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for hunt; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is d62b8a89b441d0aa0e48ebf17b0fa8ead0e5faf6. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 7108,
+  "pushed_at": "2026-09-25T00:59:06Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "c3b74dd5845b39a80a79c36bb82b028947674a05",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named hunt",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "8ae2315c6242a7f59a938650e398d977569831ade1346e0fceee5a12cf69d1a1",
+  "skill_md_bytes": 17253,
+  "survivor_skill_md_sha256": "8ae2315c6242a7f59a938650e398d977569831ade1346e0fceee5a12cf69d1a1",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "d62b8a89b441d0aa0e48ebf17b0fa8ead0e5faf6",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/hunt/SKILL.md@c3b74dd5845b39a80a79c36bb82b028947674a05",
+   "text": "Prefix your first line with 🥷 inline, not as its own paragraph."
+  },
+  {
+   "source": "skills/hunt/SKILL.md@c3b74dd5845b39a80a79c36bb82b028947674a05",
+   "text": "A patch applied to a symptom creates a new bug somewhere else."
+  },
+  {
+   "source": "skills/hunt/SKILL.md@c3b74dd5845b39a80a79c36bb82b028947674a05",
+   "text": "- Outcome: the root cause is identified before any fix is applied. - Done when: one sentence explains the cause, every observed symptom fits it, and the fix or handoff is verified against a reproducible check. - Evidence: source trace, repro command or UI path, logs or state, targeted test/build output, and runtime evidence for UI or native defects. - Output: root cause, fix or handoff, verification result, and any unswept sibling risks. - Authorization: \"diagnose\", \"investigate\", \"why\", \"look i"
+  }
+ ]
+}

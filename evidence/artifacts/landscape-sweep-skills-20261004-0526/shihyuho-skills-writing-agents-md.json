@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-shihyuho-skills-writing-agents-md",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "shihyuho/skills@writing-agents-md",
+ "reviewed_commit": "c8951dd5c8447ccb4963ae24dde82c2b580d5910",
+ "readme_path": "skills/writing-agents-md/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-agent-docs"
+ ],
+ "claim": "Source review of the skill writing-agents-md in shihyuho/skills at commit c8951dd5c8447ccb4963ae24dde82c2b580d5910 (the adjudicated pin; license MIT), read from skills/writing-agents-md/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for writing-agents-md; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 6f1b20c278f9754b92e759385d2cff225619db87. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 0,
+  "pushed_at": "2026-10-01T10:10:26Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "c8951dd5c8447ccb4963ae24dde82c2b580d5910",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named writing-agents-md",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "a173c7d5770a48a005ac4a0a0c65aebc9cf567cae81c0235979a92b6305b746f",
+  "skill_md_bytes": 4557,
+  "survivor_skill_md_sha256": "a173c7d5770a48a005ac4a0a0c65aebc9cf567cae81c0235979a92b6305b746f",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "6f1b20c278f9754b92e759385d2cff225619db87",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/writing-agents-md/SKILL.md@c8951dd5c8447ccb4963ae24dde82c2b580d5910",
+   "text": "Design a small instruction interface, not a repository handbook. First remove repetition and conflicts; then place each surviving rule at its smallest correct scope. Add strong constraints only for costly mistakes, durable policy, or capability gaps demonstrated by target-host evaluation."
+  },
+  {
+   "source": "skills/writing-agents-md/SKILL.md@c8951dd5c8447ccb4963ae24dde82c2b580d5910",
+   "text": "1. **Bound the task.** Identify the target host, file, directory scope, and requested mode: `create`, `update`, `rewrite`, or `review`. A review stays read-only unless the user also asks for changes. Preserve output-only requests. 2. **Discover the active chain.** Locate applicable ancestor, target, override, nested, imported, and path-scoped instruction files before editing. Read [host-semantics.md](references/host-semantics.md) when host discovery or precedence affects the result. 3. **Establi"
+  },
+  {
+   "source": "skills/writing-agents-md/SKILL.md@c8951dd5c8447ccb4963ae24dde82c2b580d5910",
+   "text": "- **Keep** — Retain it here when it changes decisions across this file's scope and is concise, specific, verifiable, and stable enough to justify always-on load. - **Narrow** — Move standing guidance to the nearest nested `AGENTS.md`, nested `CLAUDE.md`, or path-scoped rule when only a subtree or file class needs it. - **Defer** — Move conditional, reference-heavy, or multi-step work to a skill or documentation. Leave a short pointer only when agents must know what material exists and the condit"
+  }
+ ]
+}

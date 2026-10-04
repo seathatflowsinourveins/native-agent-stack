@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-getsentry-skills-skill-writer",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "getsentry/skills@skill-writer",
+ "reviewed_commit": "d18b7aa8ba878354e5c348310230e652f7690f9c",
+ "readme_path": "skills/skill-writer/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-skill-lifecycle"
+ ],
+ "claim": "Source review of the skill skill-writer in getsentry/skills at commit d18b7aa8ba878354e5c348310230e652f7690f9c (the adjudicated pin; license Apache-2.0), read from skills/skill-writer/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for skill-writer; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is b80906c730a712bc3682367bc2f31e5a528a59ec. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 1036,
+  "pushed_at": "2026-10-02T19:29:06Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "d18b7aa8ba878354e5c348310230e652f7690f9c",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named skill-writer",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "d8597ec2e5f00cc8d87a73741369c7cc433a3bbb95801169c35e84a10d514d26",
+  "skill_md_bytes": 10017,
+  "survivor_skill_md_sha256": "d8597ec2e5f00cc8d87a73741369c7cc433a3bbb95801169c35e84a10d514d26",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "b80906c730a712bc3682367bc2f31e5a528a59ec",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/skill-writer/SKILL.md@d18b7aa8ba878354e5c348310230e652f7690f9c",
+   "text": "Use this as the single canonical workflow for skill creation and improvement. Primary success condition: maximize high-value input coverage before authoring while minimizing wasted runtime tokens."
+  },
+  {
+   "source": "skills/skill-writer/SKILL.md@d18b7aa8ba878354e5c348310230e652f7690f9c",
+   "text": "Follow the workflow steps in order. Load only the reference files required for the step you are on. `SKILL.md` is the primary router: every bundled reference file should be flat under `references/` and listed here with a direct \"open when...\" reason."
+  },
+  {
+   "source": "skills/skill-writer/SKILL.md@d18b7aa8ba878354e5c348310230e652f7690f9c",
+   "text": "1. Resolve the intended operation (`create`, `update`, `synthesize`, `iterate`) and inspect workspace prior art before choosing where files belong. 2. Choose the target skill root from observed conventions. If the canonical location is still unclear after inspection, ask one direct question before editing files. 3. Read `references/mode-selection.md` to choose the minimum required workflow paths. 4. Read `references/execution-shapes.md` to choose the primary execution shape. 5. Default to the si"
+  }
+ ]
+}

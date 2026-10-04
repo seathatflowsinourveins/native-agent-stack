@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-cathrynlavery-diagram-design-diagram-design",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "cathrynlavery/diagram-design@diagram-design",
+ "reviewed_commit": "f903933a534ba92cde1c85a28186267b3a317bb2",
+ "readme_path": "skills/diagram-design/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-architecture"
+ ],
+ "claim": "Source review of the skill diagram-design in cathrynlavery/diagram-design at commit f903933a534ba92cde1c85a28186267b3a317bb2 (the adjudicated pin; license MIT), read from skills/diagram-design/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for diagram-design; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 4757952e02e355232cca7f353356994e01e03c88. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 43304,
+  "pushed_at": "2026-10-01T17:03:07Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "f903933a534ba92cde1c85a28186267b3a317bb2",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named diagram-design",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "51383b8650b1efee700ea775d8c632538ca625f688288fd9fd54cd878f22071b",
+  "skill_md_bytes": 29706,
+  "survivor_skill_md_sha256": "51383b8650b1efee700ea775d8c632538ca625f688288fd9fd54cd878f22071b",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "4757952e02e355232cca7f353356994e01e03c88",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/diagram-design/SKILL.md@f903933a534ba92cde1c85a28186267b3a317bb2",
+   "text": "Create diagrams as self-contained HTML files with inline SVG and an editorial design system."
+  },
+  {
+   "source": "skills/diagram-design/SKILL.md@f903933a534ba92cde1c85a28186267b3a317bb2",
+   "text": "Forty-two visual types. Semantic patterns describe behavior; type references describe layout."
+  },
+  {
+   "source": "skills/diagram-design/SKILL.md@f903933a534ba92cde1c85a28186267b3a317bb2",
+   "text": "**Before generating your first diagram in a new project, verify the style guide has been customized.**"
+  }
+ ]
+}

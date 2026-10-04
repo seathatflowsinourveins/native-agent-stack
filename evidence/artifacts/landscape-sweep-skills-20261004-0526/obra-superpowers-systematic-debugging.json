@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-obra-superpowers-systematic-debugging",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "obra/superpowers@systematic-debugging",
+ "reviewed_commit": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+ "readme_path": "skills/systematic-debugging/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-debug"
+ ],
+ "claim": "Source review of the skill systematic-debugging in obra/superpowers at commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d (the adjudicated pin; license MIT), read from skills/systematic-debugging/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for systematic-debugging; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 9a48dfda84bf339cba4b03fd803ba0dca2e158e3. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 295173,
+  "pushed_at": "2026-09-27T02:37:47Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named systematic-debugging",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "808fc5717aa88ad65efff312b11c186294d3e6ee301afb584e2f86599b137787",
+  "skill_md_bytes": 9465,
+  "survivor_skill_md_sha256": "808fc5717aa88ad65efff312b11c186294d3e6ee301afb584e2f86599b137787",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "9a48dfda84bf339cba4b03fd803ba0dca2e158e3",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/systematic-debugging/SKILL.md@8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+   "text": "**Core principle:** ALWAYS find root cause before attempting fixes. Symptom fixes are failure."
+  },
+  {
+   "source": "skills/systematic-debugging/SKILL.md@8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+   "text": "**Violating the letter of this process is violating the spirit of debugging.**"
+  },
+  {
+   "source": "skills/systematic-debugging/SKILL.md@8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+   "text": "Use for ANY technical issue: - Test failures - Bugs in production - Unexpected behavior - Performance problems - Build failures - Integration issues"
+  }
+ ]
+}

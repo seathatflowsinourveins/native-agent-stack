@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-wshobson-agents-python-testing-patterns",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "wshobson/agents@python-testing-patterns",
+ "reviewed_commit": "156b7a5e7a8b93642628a339ee4039c925b34c7f",
+ "readme_path": "plugins/python-development/skills/python-testing-patterns/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill python-testing-patterns in wshobson/agents at commit 156b7a5e7a8b93642628a339ee4039c925b34c7f (the adjudicated pin; license MIT), read from plugins/python-development/skills/python-testing-patterns/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for python-testing-patterns; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 87259b0b73d75b3500405c1224fdda5b3263d308. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 40188,
+  "pushed_at": "2026-10-04T14:52:06Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "156b7a5e7a8b93642628a339ee4039c925b34c7f",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "plugins/python-development/skills/, the first location the CLI searches that holds a valid folder named python-testing-patterns",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "a1020718f31629c2a5b20731cad1804dbb81b18800495c5cebdf16e6cac9c175",
+  "skill_md_bytes": 7282,
+  "survivor_skill_md_sha256": "a1020718f31629c2a5b20731cad1804dbb81b18800495c5cebdf16e6cac9c175",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "87259b0b73d75b3500405c1224fdda5b3263d308",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "plugins/python-development/skills/python-testing-patterns/SKILL.md@156b7a5e7a8b93642628a339ee4039c925b34c7f",
+   "text": "Comprehensive guide to implementing robust testing strategies in Python using pytest, fixtures, mocking, parameterization, and test-driven development practices."
+  },
+  {
+   "source": "plugins/python-development/skills/python-testing-patterns/SKILL.md@156b7a5e7a8b93642628a339ee4039c925b34c7f",
+   "text": "- Writing unit tests for Python code - Setting up test suites and test infrastructure - Implementing test-driven development (TDD) - Creating integration tests for APIs and services - Mocking external dependencies and services - Testing async code and concurrent operations - Setting up continuous testing in CI/CD - Implementing property-based testing - Testing database operations - Debugging failing tests"
+  },
+  {
+   "source": "plugins/python-development/skills/python-testing-patterns/SKILL.md@156b7a5e7a8b93642628a339ee4039c925b34c7f",
+   "text": "- **Unit Tests**: Test individual functions/classes in isolation - **Integration Tests**: Test interaction between components - **Functional Tests**: Test complete features end-to-end - **Performance Tests**: Measure speed and resource usage"
+  }
+ ]
+}

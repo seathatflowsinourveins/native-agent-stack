@@ -1,0 +1,450 @@
+{
+ "sweep_id": "landscape-sweep-skills-20261004-0526",
+ "date": "2026-10-04",
+ "workflow_run": "wf_47005bb5-412",
+ "status": "stopped",
+ "manifest_ref": "catalogs/sota-convergence/manifest-20261004.json",
+ "lane": "landscape-sweep-skills-20261004-0526",
+ "prompts_sha256": "1ff8884aa87d8d4bbda1d42611cff44693f4ddf806aee8f71ae4022e3d8783c3",
+ "usage_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526-attempts/child-usage-wf_47005bb5-412.json",
+ "lower_bound_usage": true,
+ "returns_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json",
+ "record_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526-attempts/stopped-result.json",
+ "lost_workers": [
+  "critic"
+ ],
+ "notes": [
+  "The Workflow metadata reports completed with 101 agents, but its sanitized child usage has status incomplete and measurement exit 1. make_result.py refused a completed RESULT.json; this stopped record follows recipes/saturation-sweep.md section 4.",
+  "The usage record retains one incomplete critic child and one superseded critic attempt. A later critic return is present in the workflow and manifest; the lost_workers label binds to the incomplete child rather than claiming that all critic findings were lost. Unknown usage is not fabricated.",
+  "The native converter found 137 proposals and 47 vote-survivor occurrences in 13 lifecycle tasks. Seven GPT-6 discovery files finished after their outputs failed to reach the Workflow; their file_only copy failures and affected layers remain retained and reopened. Two follow-up GPT-6 discovery jobs timed out.",
+  "The native source reviewer wrote 33 reviews and stopped 13 unique skill-and-pin entries, covering 14 survivor occurrences. Reasons include missing judged hashes, CLI discovery mismatches or ambiguity, and git tree hash mismatches. The printed source-review results are retained; no refused review or judged hash was fabricated.",
+  "All 13 layers use votes not_returned with explanatory votes_note, and no survived/refuted outcomes in this stopped ledger entry. Actual vote outcomes remain in the returns and dated manifest. The stopped sweep neither counts nor resets saturation.",
+  "Publication redacted 14 string fields containing an upstream author home path or local session identifiers using scripts/validate.py PRIVATE_CONTENT. The original Workflow record, native job files and usage records were preserved.",
+  "North-star action: preserve evidence needed to select and trial skills for complex-system engineering and US-equities research and historical simulation. Skills adoption remains governed by separate paired benchmarks and trial decisions."
+ ],
+ "layers": [
+  {
+   "catalog": "skills",
+   "layer_id": "skills-research",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-research",
+   "calls": {
+    "web_search": 7,
+    "web_fetch": 0,
+    "gh_api": 34,
+    "gpt6_web_search": 12,
+    "gpt6_web_fetch": 8,
+    "gpt6_gh_api": 40
+   },
+   "proposed": [
+    "github/awesome-copilot@build-evidence-map",
+    "addyosmani/agent-skills@source-driven-development",
+    "bgauryy/octocode@octocode-research",
+    "teng-lin/notebooklm-py@notebooklm",
+    "EveryInc/compound-engineering-plugin@ce-pov",
+    "mattpocock/skills@research",
+    "upstash/context7@find-docs",
+    "affaan-m/ECC@search-first"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 4 vote survivors and 4 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: teng-lin/notebooklm-py@notebooklm; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-skill-lifecycle",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-skill-lifecycle",
+   "calls": {
+    "web_search": 16,
+    "web_fetch": 2,
+    "gh_api": 48,
+    "gpt6_web_search": 12,
+    "gpt6_web_fetch": 8,
+    "gpt6_gh_api": 40
+   },
+   "proposed": [
+    "NVIDIA/SkillSpector@skill-inspector",
+    "openai/plugins@plugin-eval",
+    "adhi-jp/agent-skills@skill-eval",
+    "microsoft/SkillOpt@skillopt-sleep",
+    "virgiliojr94/book-to-skill@book-to-skill",
+    "getsentry/skills@skill-writer",
+    "openai/plugins@evaluate-skill",
+    "promptfoo/promptfoo@promptfoo-evals",
+    "github/awesome-copilot@agent-skill-stack",
+    "anthropics/claude-plugins-official@session-report",
+    "openai/plugins@improve-skill",
+    "openai/plugins@metric-pack-designer",
+    "daymade/claude-code-skills@promptfoo-evaluation"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [
+    {
+     "trigger": "retained_failure",
+     "ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/failures/skills-skill-lifecycle"
+    }
+   ],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 4 vote survivors and 9 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: microsoft/SkillOpt@skillopt-sleep, virgiliojr94/book-to-skill@book-to-skill; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-design-intake",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-design-intake",
+   "calls": {
+    "web_search": 13,
+    "web_fetch": 0,
+    "gh_api": 62
+   },
+   "proposed": [
+    "affaan-m/ECC@intent-driven-development",
+    "addyosmani/agent-skills@interview-me",
+    "phuryn/pm-skills@strategy-red-team",
+    "tech-leads-club/agent-skills@tlc-discover",
+    "trailofbits/skills@ask-questions-if-underspecified",
+    "addyosmani/agent-skills@spec-driven-development",
+    "Neeeophytee/finding-unknowns-skills@interview-me",
+    "Neeeophytee/finding-unknowns-skills@assumption-test",
+    "github/spec-kit@speckit-clarify",
+    "github/spec-kit@speckit-assess-intake",
+    "garrytan/gstack@office-hours",
+    "Fission-AI/OpenSpec@openspec-explore"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [
+    {
+     "trigger": "retained_failure",
+     "ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/failures/skills-design-intake"
+    }
+   ],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 8 vote survivors and 4 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: garrytan/gstack@office-hours, github/spec-kit@speckit-assess-intake; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-architecture",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-architecture",
+   "calls": {
+    "web_search": 6,
+    "web_fetch": 2,
+    "gh_api": 34,
+    "gpt6_web_search": 13,
+    "gpt6_web_fetch": 7,
+    "gpt6_gh_api": 40
+   },
+   "proposed": [
+    "tt-a1i/archify@archify",
+    "cathrynlavery/diagram-design@diagram-design",
+    "codybrom/clairvoyance@red-flags",
+    "codybrom/clairvoyance@deep-modules",
+    "tech-leads-club/agent-skills@modular-design-principles",
+    "wondelai/skills@software-design-philosophy",
+    "tech-leads-club/agent-skills@coupling-analysis",
+    "addyosmani/agent-skills@api-and-interface-design"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 3 vote survivors and 5 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: none; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-implement",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-implement",
+   "calls": {
+    "web_search": 7,
+    "web_fetch": 1,
+    "gh_api": 73
+   },
+   "proposed": [
+    "anthropics/knowledge-work-plugins@build-dashboard",
+    "openai/plugins@dashboards-and-real-time-visualization",
+    "pbakaus/impeccable@impeccable",
+    "astral-sh/claude-code-plugins@uv",
+    "Leonxlnx/taste-skill@design-taste-frontend",
+    "google-labs-code/stitch-skills@taste-design",
+    "openai/plugins@visualization-strategy-and-critique",
+    "openai/plugins@accessibility-and-inclusive-visualization",
+    "laurigates/claude-plugins@ruff-linting",
+    "github/awesome-copilot@ruff-recursive-fix",
+    "openai/plugins@testing-data-visualizations",
+    "wshobson/agents@uv-package-manager"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [
+    {
+     "trigger": "retained_failure",
+     "ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/failures/skills-implement"
+    }
+   ],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 1 vote survivors and 11 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: none; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-test",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-test",
+   "calls": {
+    "web_search": 17,
+    "web_fetch": 4,
+    "gh_api": 70,
+    "gpt6_web_search": 7,
+    "gpt6_web_fetch": 8,
+    "gpt6_gh_api": 40
+   },
+   "proposed": [
+    "addyosmani/agent-skills@test-driven-development",
+    "trailofbits/skills@atheris",
+    "obra/superpowers@test-driven-development",
+    "affaan-m/ECC@tdd-workflow",
+    "laurigates/claude-plugins@property-based-testing",
+    "wshobson/agents@python-testing-patterns",
+    "hegeldev/hegel-skill@hegel-review",
+    "github/awesome-copilot@test-gap-audit",
+    "hegeldev/hegel-skill@hegel",
+    "wdm0006/python-skills@testing-python-libraries",
+    "copyleftdev/sk1llz@maciver-hypothesis-testing",
+    "aj-geddes/useful-ai-prompts@property-based-testing"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [
+    {
+     "trigger": "retained_failure",
+     "ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/failures/skills-test"
+    }
+   ],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 6 vote survivors and 6 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: none; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-debug",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-debug",
+   "calls": {
+    "web_search": 12,
+    "web_fetch": 10,
+    "gh_api": 70,
+    "gpt6_web_search": 9,
+    "gpt6_web_fetch": 2,
+    "gpt6_gh_api": 40
+   },
+   "proposed": [
+    "obra/superpowers@systematic-debugging",
+    "tw93/Waza@hunt",
+    "addyosmani/agent-skills@debugging-and-error-recovery",
+    "getsentry/skills@iterate-pr",
+    "warpdotdev/common-skills@diagnose-ci-failures",
+    "anthropics/knowledge-work-plugins@debug",
+    "github/awesome-copilot@bug-reproduction-brief",
+    "NousResearch/hermes-agent@python-debugpy",
+    "code-yeongyu/oh-my-openagent@debugging",
+    "openclaw/openclaw@python-debugpy",
+    "garrytan/gstack@investigate",
+    "warpdotdev/common-skills@reproduce-bug-report",
+    "ProfessioneIT/dap-mcp-server@dap-debugging"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [
+    {
+     "trigger": "retained_failure",
+     "ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/failures/skills-debug"
+    }
+   ],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 4 vote survivors and 9 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: warpdotdev/common-skills@diagnose-ci-failures; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-review",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-review",
+   "calls": {
+    "web_search": 10,
+    "web_fetch": 3,
+    "gh_api": 28,
+    "gpt6_web_search": 12,
+    "gpt6_web_fetch": 8,
+    "gpt6_gh_api": 40
+   },
+   "proposed": [
+    "trailofbits/skills@post-patch-validation",
+    "trailofbits/skills@trailmark-variant-neighborhood",
+    "tech-leads-club/agent-skills@the-judge",
+    "openai/plugins@verify-fix",
+    "addyosmani/agent-skills@code-review-and-quality",
+    "trailofbits/skills@review-walkthrough",
+    "trailofbits/skills@trailmark",
+    "getsentry/skills@find-bugs"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 0 vote survivors and 8 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: none; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-security",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-security",
+   "calls": {
+    "web_search": 8,
+    "web_fetch": 7,
+    "gh_api": 44,
+    "gpt6_web_search": 21,
+    "gpt6_web_fetch": 16,
+    "gpt6_gh_api": 80
+   },
+   "proposed": [
+    "getsentry/skills@security-review",
+    "trailofbits/skills@semgrep-rule-creator",
+    "anthropics/claude-plugins-official@claude-security",
+    "github/awesome-copilot@threat-model-analyst",
+    "openai/plugins@threat-model",
+    "openai/plugins@triage-finding",
+    "NVIDIA/SkillSpector@skill-inspector",
+    "tech-leads-club/agent-skills@security-threat-model",
+    "openai/plugins@security-scan",
+    "github/awesome-copilot@github-actions-hardening",
+    "openai/plugins@security-diff-scan",
+    "openai/plugins@validation",
+    "openai/plugins@track-findings",
+    "openai/plugins@finding-discovery",
+    "openai/plugins@assess-patch-risk"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 6 vote survivors and 9 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: openai/plugins@assess-patch-risk, openai/plugins@track-findings, openai/plugins@triage-finding; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-ci-pr",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-ci-pr",
+   "calls": {
+    "web_search": 8,
+    "web_fetch": 1,
+    "gh_api": 32,
+    "gpt6_web_search": 12,
+    "gpt6_web_fetch": 8,
+    "gpt6_gh_api": 40
+   },
+   "proposed": [
+    "getsentry/skills@iterate-pr",
+    "warpdotdev/common-skills@resolve-merge-conflicts",
+    "haacked/dotfiles@address-pr-reviews",
+    "haacked/dotfiles@resolve-conflicts",
+    "tech-leads-club/agent-skills@gh-fix-ci",
+    "github/awesome-copilot@copilot-pr-autopilot",
+    "warpdotdev/common-skills@diagnose-ci-failures",
+    "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 4 vote survivors and 4 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: warpdotdev/common-skills@diagnose-ci-failures, warpdotdev/common-skills@respond-to-pr-comments-in-blocklist; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-agent-docs",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-agent-docs",
+   "calls": {
+    "web_search": 10,
+    "web_fetch": 4,
+    "gh_api": 52,
+    "gpt6_web_search": 9,
+    "gpt6_web_fetch": 2,
+    "gpt6_gh_api": 40
+   },
+   "proposed": [
+    "shihyuho/skills@writing-agents-md",
+    "affaan-m/ECC@living-docs-governance",
+    "mblode/agent-skills@agents-md",
+    "anthropics/claude-plugins-official@claude-md-improver",
+    "blader/humanizer@humanizer",
+    "softaworks/agent-toolkit@agent-md-refactor",
+    "github/awesome-copilot@harness-engineering",
+    "github/awesome-copilot@docs-sync-audit",
+    "EveryInc/compound-engineering-plugin@ce-compound",
+    "zhaono1/agent-playbook@self-improving-agent",
+    "FlorianBruniaux/claude-code-ultimate-guide@eval-rules",
+    "tech-leads-club/agent-skills@harness-eval",
+    "github/awesome-copilot@memory-merger",
+    "wei18/Upkeep@upkeep-audit"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [
+    {
+     "trigger": "retained_failure",
+     "ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/failures/skills-agent-docs"
+    }
+   ],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 4 vote survivors and 10 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: blader/humanizer@humanizer; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-browser",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-browser",
+   "calls": {
+    "web_search": 5,
+    "web_fetch": 0,
+    "gh_api": 20
+   },
+   "proposed": [
+    "ChromeDevTools/chrome-devtools-mcp@chrome-devtools-cli",
+    "microsoft/playwright-cli@playwright-cli",
+    "affaan-m/ECC@browser-qa",
+    "openai/skills@playwright",
+    "bgauryy/octocode@octocode-chrome-devtools",
+    "addyosmani/agent-skills@browser-testing-with-devtools"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [
+    {
+     "trigger": "retained_failure",
+     "ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/failures/skills-browser"
+    }
+   ],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 0 vote survivors and 6 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: none; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  },
+  {
+   "catalog": "skills",
+   "layer_id": "skills-mcp-build",
+   "votes": "not_returned",
+   "discovery_ref": "evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json#/discovery/skills-mcp-build",
+   "calls": {
+    "web_search": 4,
+    "web_fetch": 1,
+    "gh_api": 39,
+    "gpt6_web_search": 12,
+    "gpt6_web_fetch": 8,
+    "gpt6_gh_api": 40
+   },
+   "proposed": [
+    "anthropics/claude-plugins-official@build-mcp-server",
+    "github/awesome-copilot@mcp-release-qa",
+    "saschb2b/skills@mcp-server",
+    "PrefectHQ/fastmcp@fastmcp-client-cli",
+    "yigitkonur/skills-by-yigitkonur@test-by-mcpc-cli",
+    "github/awesome-copilot@typescript-mcp-server-generator",
+    "anthropics/skills@mcp-builder",
+    "anthropics/claude-plugins-official@build-mcp-app"
+   ],
+   "survived": [],
+   "refuted": [],
+   "reopen": [],
+   "votes_note": "Stopped record under recipes/saturation-sweep.md section 4: child usage is incomplete (an interrupted critic child and a superseded critic attempt); usage is a lower bound. Actual vote returns are retained in evidence/artifacts/landscape-sweep-skills-20261004-0526/returns.json: 3 vote survivors and 5 refuted proposals. No completed outcomes are recorded in this stopped ledger entry. Source-review stops for this task: anthropics/claude-plugins-official@build-mcp-app, anthropics/skills@mcp-builder; details in evidence/artifacts/landscape-sweep-skills-20261004-0526/source-review-results.json."
+  }
+ ]
+}

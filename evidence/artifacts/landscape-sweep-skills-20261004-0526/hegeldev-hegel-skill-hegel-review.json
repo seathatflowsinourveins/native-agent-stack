@@ -1,0 +1,52 @@
+{
+ "schema_version": 1,
+ "id": "source-review-hegeldev-hegel-skill-hegel-review",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "hegeldev/hegel-skill@hegel-review",
+ "reviewed_commit": "a60b28243199b24aeebb2c90aece34082ee4997c",
+ "readme_path": "skills/hegel-review/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill hegel-review in hegeldev/hegel-skill at commit a60b28243199b24aeebb2c90aece34082ee4997c (the adjudicated pin; license MIT), read from skills/hegel-review/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for hegel-review; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is dea63ddc5ba83370ba09d9779324fda7e2138606. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 83,
+  "pushed_at": "2026-09-17T13:54:06Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "a60b28243199b24aeebb2c90aece34082ee4997c",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named hegel-review",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "41558e9e7db8d3fd21c6757214e76cb25e9dfc6b1386db4381095ddb29a225d9",
+  "skill_md_bytes": 2589,
+  "survivor_skill_md_sha256": "41558e9e7db8d3fd21c6757214e76cb25e9dfc6b1386db4381095ddb29a225d9",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "dea63ddc5ba83370ba09d9779324fda7e2138606",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/hegel-review/SKILL.md@a60b28243199b24aeebb2c90aece34082ee4997c",
+   "text": "Check every test against this list. When a check fails, quote the offending code and give the smallest change that fixes it."
+  },
+  {
+   "source": "skills/hegel-review/SKILL.md@a60b28243199b24aeebb2c90aece34082ee4997c",
+   "text": "1. **Narrowed generators**: drawn domains trimmed to dodge failures — ranges shrunk, characters filtered, sizes capped in the domain rather than at materialization, or a whole value class (subnormals, tiny magnitudes, exact bounds) excluded after it failed there, with or without an explanatory comment. The domain should be as wide as the contract. 2. **Fixed inputs in property clothing**: a \"property\" that only ever sees one value or a few hand-picked cases. 3. **Missing direction**: a parser or"
+  }
+ ]
+}

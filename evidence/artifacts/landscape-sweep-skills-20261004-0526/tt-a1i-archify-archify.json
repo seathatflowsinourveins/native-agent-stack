@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-tt-a1i-archify-archify",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "tt-a1i/archify@archify",
+ "reviewed_commit": "bb6f126f1748a4079df1d263302466eb4333e3b0",
+ "readme_path": "archify/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-architecture"
+ ],
+ "claim": "Source review of the skill archify in tt-a1i/archify at commit bb6f126f1748a4079df1d263302466eb4333e3b0 (the adjudicated pin; license MIT), read from archify/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for archify; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 3875a2e7c8aa87fb3068aeb1d89afde44df74992. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 77107,
+  "pushed_at": "2026-10-04T15:55:00Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "bb6f126f1748a4079df1d263302466eb4333e3b0",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "the repository root, the first location the CLI searches that holds a valid folder named archify",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "66dfe99b35d7ceff95bcbdb00f138b8b3ec8094629acf69efba1eeda1013aaf3",
+  "skill_md_bytes": 10897,
+  "survivor_skill_md_sha256": "66dfe99b35d7ceff95bcbdb00f138b8b3ec8094629acf69efba1eeda1013aaf3",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "3875a2e7c8aa87fb3068aeb1d89afde44df74992",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "archify/SKILL.md@bb6f126f1748a4079df1d263302466eb4333e3b0",
+   "text": "Create an interactive HTML diagram from typed JSON. Static output is the default; enable motion only when requested."
+  },
+  {
+   "source": "archify/SKILL.md@bb6f126f1748a4079df1d263302466eb4333e3b0",
+   "text": "Run commands from your working directory. Unless the user names another location, give each new diagram request its own folder `.archify/<type>-<slug>-<YYYYMMDD-HHMMSS>/` there (local time, chosen once when the request starts): keep `candidate.json` and `<slug>.html` in it, set `meta.output` to that relative HTML path, and reuse the folder for every repair rerun. A later request gets a new folder, so earlier versions stay intact. Replace `bin/archify.mjs` in the commands below with the installed"
+  },
+  {
+   "source": "archify/SKILL.md@bb6f126f1748a4079df1d263302466eb4333e3b0",
+   "text": "For a real codebase, read [Repository authoring](references/repository-authoring.md) while tracing the requested behavior. A system description uses the steps below; an existing JSON uses the handoff path."
+  }
+ ]
+}

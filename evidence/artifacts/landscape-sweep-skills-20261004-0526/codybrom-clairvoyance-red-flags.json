@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-codybrom-clairvoyance-red-flags",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "codybrom/clairvoyance@red-flags",
+ "reviewed_commit": "b11ca9349436fb7afd891a999d07d6d1a15b348b",
+ "readme_path": "skills/red-flags/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-architecture"
+ ],
+ "claim": "Source review of the skill red-flags in codybrom/clairvoyance at commit b11ca9349436fb7afd891a999d07d6d1a15b348b (the adjudicated pin; license MIT), read from skills/red-flags/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for red-flags; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 6fffcd9ab5414c761b7dd632cd1dc55ac4531fb2. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 12,
+  "pushed_at": "2026-09-20T00:46:02Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "b11ca9349436fb7afd891a999d07d6d1a15b348b",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named red-flags",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "a72890a6ffa13d3d110a71b7ee51205ead7199320fdf66440211e9c127ce8ab3",
+  "skill_md_bytes": 11413,
+  "survivor_skill_md_sha256": "a72890a6ffa13d3d110a71b7ee51205ead7199320fdf66440211e9c127ce8ab3",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "6fffcd9ab5414c761b7dd632cd1dc55ac4531fb2",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/red-flags/SKILL.md@b11ca9349436fb7afd891a999d07d6d1a15b348b",
+   "text": "When invoked with $ARGUMENTS, scope the scan to the specified file or directory. Read the target code first, then run every flag below against it. Each flag points to a deeper lens from Clairvoyance (https://clairvoyance.fyi). This skill works best when the full collection is installed."
+  },
+  {
+   "source": "skills/red-flags/SKILL.md@b11ca9349436fb7afd891a999d07d6d1a15b348b",
+   "text": "A red flag is a signal, not a diagnosis. It tells you something is wrong but not why. Each flag below points to a deeper lens that identifies the root cause."
+  },
+  {
+   "source": "skills/red-flags/SKILL.md@b11ca9349436fb7afd891a999d07d6d1a15b348b",
+   "text": "- Before merging a PR or completing a design review - When code \"feels wrong\" but the specific problem is unclear - When evaluating unfamiliar code for design quality - When asked for a \"red flags check\" or \"design diagnostic\""
+  }
+ ]
+}

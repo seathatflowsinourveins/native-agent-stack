@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-wshobson-agents-uv-package-manager",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "wshobson/agents@uv-package-manager",
+ "reviewed_commit": "83e95a4893fab062a539c49fde5a4c2db26da577",
+ "readme_path": "plugins/python-development/skills/uv-package-manager/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-implement"
+ ],
+ "claim": "Source review of the skill uv-package-manager in wshobson/agents at commit 83e95a4893fab062a539c49fde5a4c2db26da577 (the adjudicated pin; license MIT), read from plugins/python-development/skills/uv-package-manager/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for uv-package-manager; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is f80b5182adb7bec902841316352bb9e1b8871fbf. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 40188,
+  "pushed_at": "2026-10-04T14:52:06Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "83e95a4893fab062a539c49fde5a4c2db26da577",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "plugins/python-development/skills/, the first location the CLI searches that holds a valid folder named uv-package-manager",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "4479df2315c5230e7b6ef4eb7ab2db2e4b514ce4c777c8b7c1eb2e48d85b1bc0",
+  "skill_md_bytes": 7113,
+  "survivor_skill_md_sha256": "4479df2315c5230e7b6ef4eb7ab2db2e4b514ce4c777c8b7c1eb2e48d85b1bc0",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "f80b5182adb7bec902841316352bb9e1b8871fbf",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "plugins/python-development/skills/uv-package-manager/SKILL.md@83e95a4893fab062a539c49fde5a4c2db26da577",
+   "text": "Comprehensive guide to using uv, an extremely fast Python package installer and resolver written in Rust, for modern Python project management and dependency workflows."
+  },
+  {
+   "source": "plugins/python-development/skills/uv-package-manager/SKILL.md@83e95a4893fab062a539c49fde5a4c2db26da577",
+   "text": "- Setting up new Python projects quickly - Managing Python dependencies faster than pip - Creating and managing virtual environments - Installing Python interpreters - Resolving dependency conflicts efficiently - Migrating from pip/pip-tools/poetry - Speeding up CI/CD pipelines - Managing monorepo Python projects - Working with lockfiles for reproducible builds - Optimizing Docker builds with Python dependencies"
+  },
+  {
+   "source": "plugins/python-development/skills/uv-package-manager/SKILL.md@83e95a4893fab062a539c49fde5a4c2db26da577",
+   "text": "- **Ultra-fast package installer**: 10-100x faster than pip - **Written in Rust**: Leverages Rust's performance - **Drop-in pip replacement**: Compatible with pip workflows - **Virtual environment manager**: Create and manage venvs - **Python installer**: Download and manage Python versions - **Resolver**: Advanced dependency resolution - **Lockfile support**: Reproducible installations"
+  }
+ ]
+}

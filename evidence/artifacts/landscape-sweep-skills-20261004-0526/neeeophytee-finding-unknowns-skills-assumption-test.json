@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-neeeophytee-finding-unknowns-skills-assumption-test",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "Neeeophytee/finding-unknowns-skills@assumption-test",
+ "reviewed_commit": "ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc",
+ "readme_path": "skills/assumption-test/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-design-intake"
+ ],
+ "claim": "Source review of the skill assumption-test in Neeeophytee/finding-unknowns-skills at commit ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc (the adjudicated pin; license MIT), read from skills/assumption-test/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for assumption-test; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is fb841aab636b900f16ad4cf271abb336520841e3. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 342,
+  "pushed_at": "2026-09-28T03:37:40Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named assumption-test",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "65aae0c9f8e882213c122dba08e65d68faa97bf15b5485ff4544a2434327b430",
+  "skill_md_bytes": 2524,
+  "survivor_skill_md_sha256": "65aae0c9f8e882213c122dba08e65d68faa97bf15b5485ff4544a2434327b430",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "fb841aab636b900f16ad4cf271abb336520841e3",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/assumption-test/SKILL.md@ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc",
+   "text": "A plausible assumption can survive every planning conversation and still fail on contact with the system. Turn the consequential uncertainty into a question an experiment can answer."
+  },
+  {
+   "source": "skills/assumption-test/SKILL.md@ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc",
+   "text": "1. Read the request, relevant code, and existing evidence. If inspection already settles the question, cite that evidence and stop; do not manufacture an experiment. If several assumptions remain, select the one whose failure would most change the approach. 2. State the assumption as an observable prediction. Define what would refute it, what would support it within the tested scope, and what would leave it inconclusive. Set those criteria before observing the result. 3. Design the smallest disc"
+  },
+  {
+   "source": "skills/assumption-test/SKILL.md@ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc",
+   "text": "- One successful trial does not establish a universal claim. State the tested conditions and remaining uncertainty, particularly for concurrency and performance. - Do not use production writes, real payments, destructive operations, or newly incurred costs without authorization. An experiment does not grant additional permissions. - Distinguish the component failing from the experiment failing to run. Never turn missing access or a broken fixture into a verdict about the system. - Do not fix the"
+  }
+ ]
+}

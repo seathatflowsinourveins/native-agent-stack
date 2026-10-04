@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-anthropics-knowledge-work-plugins-debug",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "anthropics/knowledge-work-plugins@debug",
+ "reviewed_commit": "8444efcd48f7012f09797778a36a33e73d0861f4",
+ "readme_path": "engineering/skills/debug/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-debug"
+ ],
+ "claim": "Source review of the skill debug in anthropics/knowledge-work-plugins at commit 8444efcd48f7012f09797778a36a33e73d0861f4 (the adjudicated pin; license Apache-2.0), read from engineering/skills/debug/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for debug; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is de97f8ed52d0c07f5712683209d5b20d0eea5b6d. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 26067,
+  "pushed_at": "2026-10-04T09:33:02Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "8444efcd48f7012f09797778a36a33e73d0861f4",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "engineering/skills/, the first location the CLI searches that holds a valid folder named debug",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "e50bb92cbcb2715139f3a3cb9ff282a8f0f9ae794f8f35d81338654e2601d32a",
+  "skill_md_bytes": 4074,
+  "survivor_skill_md_sha256": "e50bb92cbcb2715139f3a3cb9ff282a8f0f9ae794f8f35d81338654e2601d32a",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "de97f8ed52d0c07f5712683209d5b20d0eea5b6d",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "engineering/skills/debug/SKILL.md@8444efcd48f7012f09797778a36a33e73d0861f4",
+   "text": "> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../../CONNECTORS.md)."
+  },
+  {
+   "source": "engineering/skills/debug/SKILL.md@8444efcd48f7012f09797778a36a33e73d0861f4",
+   "text": "Run a structured debugging session to find and fix issues systematically."
+  },
+  {
+   "source": "engineering/skills/debug/SKILL.md@8444efcd48f7012f09797778a36a33e73d0861f4",
+   "text": "``` ┌─────────────────────────────────────────────────────────────────┐ │ DEBUG │ ├─────────────────────────────────────────────────────────────────┤ │ Step 1: REPRODUCE │ │ ✓ Understand the expected vs. actual behavior │ │ ✓ Identify exact reproduction steps │ │ ✓ Determine scope (when did it start? who is affected?) │ │ │ │ Step 2: ISOLATE │ │ ✓ Narrow down the component, service, or code path │ │ ✓ Check recent changes (deploys, config changes, dependencies) │ │ ✓ Review logs and error messag"
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-softaworks-agent-toolkit-agent-md-refactor",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "softaworks/agent-toolkit@agent-md-refactor",
+ "reviewed_commit": "3027f20f3181758385a1bb8c022d4041dfb4de84",
+ "readme_path": "skills/agent-md-refactor/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-agent-docs"
+ ],
+ "claim": "Source review of the skill agent-md-refactor in softaworks/agent-toolkit at commit 3027f20f3181758385a1bb8c022d4041dfb4de84 (the adjudicated pin; license MIT), read from skills/agent-md-refactor/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for agent-md-refactor; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 89a8fede359cb48c66f1af44c5aa8fc07b82cded. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 2521,
+  "pushed_at": "2026-03-05T16:46:24Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "3027f20f3181758385a1bb8c022d4041dfb4de84",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named agent-md-refactor",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "f20e68b59875ba43cd2680519cf5e77f6c55b51330b927394291f8f11478c21e",
+  "skill_md_bytes": 7473,
+  "survivor_skill_md_sha256": "f20e68b59875ba43cd2680519cf5e77f6c55b51330b927394291f8f11478c21e",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "89a8fede359cb48c66f1af44c5aa8fc07b82cded",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/agent-md-refactor/SKILL.md@3027f20f3181758385a1bb8c022d4041dfb4de84",
+   "text": "Refactor bloated agent instruction files (AGENTS.md, CLAUDE.md, COPILOT.md, etc.) to follow **progressive disclosure principles** - keeping essentials at root and organizing the rest into linked, categorized files."
+  },
+  {
+   "source": "skills/agent-md-refactor/SKILL.md@3027f20f3181758385a1bb8c022d4041dfb4de84",
+   "text": "Use this skill when: - \"refactor my AGENTS.md\" / \"refactor my CLAUDE.md\" - \"split my agent instructions\" - \"organize my CLAUDE.md file\" - \"my AGENTS.md is too long\" - \"progressive disclosure for my instructions\" - \"clean up my agent config\""
+  },
+  {
+   "source": "skills/agent-md-refactor/SKILL.md@3027f20f3181758385a1bb8c022d4041dfb4de84",
+   "text": "**Look for:** - Contradictory style guidelines (e.g., \"use semicolons\" vs \"no semicolons\") - Conflicting workflow instructions - Incompatible tool preferences - Mutually exclusive patterns"
+  }
+ ]
+}

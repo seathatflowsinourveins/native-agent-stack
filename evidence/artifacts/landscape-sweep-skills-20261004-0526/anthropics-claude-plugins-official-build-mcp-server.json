@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-anthropics-claude-plugins-official-build-mcp-server",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "anthropics/claude-plugins-official@build-mcp-server",
+ "reviewed_commit": "d182ca456ca09d31d139f7d3818d1d333b103cce",
+ "readme_path": "plugins/mcp-server-dev/skills/build-mcp-server/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-mcp-build"
+ ],
+ "claim": "Source review of the skill build-mcp-server in anthropics/claude-plugins-official at commit d182ca456ca09d31d139f7d3818d1d333b103cce (the adjudicated pin; license Apache-2.0), read from plugins/mcp-server-dev/skills/build-mcp-server/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for build-mcp-server; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is d1d8f9dda0ceef1825a32ff84eb6575ecfe31231. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 37374,
+  "pushed_at": "2026-10-04T09:30:57Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "d182ca456ca09d31d139f7d3818d1d333b103cce",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "plugins/mcp-server-dev/skills/, the first location the CLI searches that holds a valid folder named build-mcp-server",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "088cd04be7f03ebbdfd24973cbcbf93c7a2e09117c4bba7b2b06bcc3e0a556f6",
+  "skill_md_bytes": 12084,
+  "survivor_skill_md_sha256": "088cd04be7f03ebbdfd24973cbcbf93c7a2e09117c4bba7b2b06bcc3e0a556f6",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "d1d8f9dda0ceef1825a32ff84eb6575ecfe31231",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "plugins/mcp-server-dev/skills/build-mcp-server/SKILL.md@d182ca456ca09d31d139f7d3818d1d333b103cce",
+   "text": "You are guiding a developer through designing and building an MCP server that works seamlessly with Claude. MCP servers come in many forms — picking the wrong shape early causes painful rewrites later. Your first job is **discovery, not code**."
+  },
+  {
+   "source": "plugins/mcp-server-dev/skills/build-mcp-server/SKILL.md@d182ca456ca09d31d139f7d3818d1d333b103cce",
+   "text": "**Load Claude-specific context first.** The MCP spec is generic; Claude has additional auth types, review criteria, and limits. Before answering questions or scaffolding, fetch `https://claude.com/docs/llms-full.txt` (the full export of the Claude connector docs) so your guidance reflects Claude's actual constraints."
+  },
+  {
+   "source": "plugins/mcp-server-dev/skills/build-mcp-server/SKILL.md@d182ca456ca09d31d139f7d3818d1d333b103cce",
+   "text": "Do not start scaffolding until you have answers to the questions in Phase 1. If the user's opening message already answers them, acknowledge that and skip straight to the recommendation."
+  }
+ ]
+}

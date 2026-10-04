@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-tech-leads-club-agent-skills-security-threat-model",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "tech-leads-club/agent-skills@security-threat-model",
+ "reviewed_commit": "120b67676388241b314699fa8fa9af25ada6d1d4",
+ "readme_path": "packages/skills-catalog/skills/(security)/security-threat-model/SKILL.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "skills-security"
+ ],
+ "claim": "Source review of the skill security-threat-model in tech-leads-club/agent-skills at commit 120b67676388241b314699fa8fa9af25ada6d1d4 (the adjudicated pin; license NOASSERTION), read from packages/skills-catalog/skills/(security)/security-threat-model/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for security-threat-model; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 82465fe26a23010db4487ed986780f3fcf5fdd06. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 7030,
+  "pushed_at": "2026-09-20T12:37:19Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "NOASSERTION",
+  "adjudicated_pin": "120b67676388241b314699fa8fa9af25ada6d1d4",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "the recursive search the CLI runs when no location it searches holds a valid skill",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "f4310efb41fba14d80fd69d08cc97a92535fc8f1ccfdbe9201a655c2c28fc412",
+  "skill_md_bytes": 5663,
+  "survivor_skill_md_sha256": "f4310efb41fba14d80fd69d08cc97a92535fc8f1ccfdbe9201a655c2c28fc412",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "82465fe26a23010db4487ed986780f3fcf5fdd06",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "packages/skills-catalog/skills/(security)/security-threat-model/SKILL.md@120b67676388241b314699fa8fa9af25ada6d1d4",
+   "text": "Deliver an actionable AppSec-grade threat model that is specific to the repository or a project path, not a generic checklist. Anchor every architectural claim to evidence in the repo and keep assumptions explicit. Prioritizing realistic attacker goals and concrete impacts over generic checklists."
+  },
+  {
+   "source": "packages/skills-catalog/skills/(security)/security-threat-model/SKILL.md@120b67676388241b314699fa8fa9af25ada6d1d4",
+   "text": "- Repo root path and any in-scope paths. - Intended usage, deployment model, internet exposure, and auth expectations (if known). - Any existing repository summary or architecture spec. - Use prompts in `references/prompt-template.md` to generate a repository summary. - Follow the required output contract in `references/prompt-template.md`. Use it verbatim when possible."
+  },
+  {
+   "source": "packages/skills-catalog/skills/(security)/security-threat-model/SKILL.md@120b67676388241b314699fa8fa9af25ada6d1d4",
+   "text": "- Identify primary components, data stores, and external integrations from the repo summary. - Identify how the system runs (server, CLI, library, worker) and its entrypoints. - Separate runtime behavior from CI/build/dev tooling and from tests/examples. - Map the in-scope locations to those components and exclude out-of-scope items explicitly. - Do not claim components, flows, or controls without evidence."
+  }
+ ]
+}

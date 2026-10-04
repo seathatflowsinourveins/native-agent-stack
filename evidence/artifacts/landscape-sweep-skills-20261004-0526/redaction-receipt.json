@@ -1,0 +1,119 @@
+{
+ "source": "tools/sota-convergence/landscape-sweep/README.md Run it step 8; scripts/validate.py PRIVATE_CONTENT",
+ "changes": [
+  {
+   "file": "returns.json",
+   "pointer": "/votes/skills-skill-lifecycle/10/facts/reasoning",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "70e120f3dc7d294a6e0e6a7090e1a084d045ee6f430348fb6f75dc69c27a4e64",
+   "after_sha256": "829caceee2190253762d8451eadd19d042e762f5b1cf92596e6343525f793280"
+  },
+  {
+   "file": "returns.json",
+   "pointer": "/votes/skills-skill-lifecycle/10/fit/claude/reasoning",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "f3f177ac57d0ceea80e030e8b9db8d4f15d20d3369c869a628b870d6ce8068d8",
+   "after_sha256": "78a4db4b289731aab7581cdfa06bc8fb17ae784bb84c5db64dc2ebf0dc758dd4"
+  },
+  {
+   "file": "returns.json",
+   "pointer": "/votes/skills-skill-lifecycle/10/fit/gpt6/reasoning",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "9b836b77fd568211b4fa9e4a00d7299d89ecca4185d03316fd696cb09d15b11a",
+   "after_sha256": "0098b8b3e9529e68ce8f92035366bf0682110c4f9401d6a203b65dae28c4b263"
+  },
+  {
+   "file": "returns.json",
+   "pointer": "/raw/skills-skill-lifecycle/followup/claude_discover/proposed/4/demonstrated_gap",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "ebcceb14c53c0d4a5b7deaa05be96198cf3d83d7166c2e89c4577c87d53875a3",
+   "after_sha256": "bb824ba39e10d0beb4128340ff7f15bc848183cc807a63142c027ee232abd6c2"
+  },
+  {
+   "file": "returns.json",
+   "pointer": "/raw/skills-skill-lifecycle/followup/claude_discover/proposed/4/evidence/0",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "d4ef016ae15d9094a6b613ad549fcac39cc460adb773d7c367d0f628f38a8be5",
+   "after_sha256": "1cfae7d41c3b1b79d04b795ecec1e2d772c46e3580ba0ed18385d28a98aaf43c"
+  },
+  {
+   "file": "returns.json",
+   "pointer": "/raw/skills-skill-lifecycle/followup/gpt6_discover/output/proposed/2/demonstrated_gap",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "e6fe3441675024e765bd7006c914ed2055b6e2059c1c83184add110a476d73dc",
+   "after_sha256": "0a5b38fff8548a1bd18999c8057ce4079b291f31537ab71361ea2bec1af213eb"
+  },
+  {
+   "file": "returns.json",
+   "pointer": "/raw/skills-test/followup/claude_discover/notes",
+   "kind": "local session identifier",
+   "replacements": 1,
+   "before_sha256": "30a102d06908b902abb0b1878ceba9e3e3cc85523de9cc282ca1e5afd5da6906",
+   "after_sha256": "f7db804b8f17c3043b56867e6f7e750b7c930065837bb15fb07602c6f5a7e581"
+  },
+  {
+   "file": "returns.json",
+   "pointer": "/raw/skills-debug/first/claude_discover/notes",
+   "kind": "local session identifier",
+   "replacements": 1,
+   "before_sha256": "8312df2c8d6f199e09dbcbaa31d91b1296cd456de9552844aae7a009d1524887",
+   "after_sha256": "158a6b5d8384eda43f8a6e6bc17413aaab63b7ef94eee37459c44d7cdf78650c"
+  },
+  {
+   "file": "returns.json",
+   "pointer": "/raw/skills-agent-docs/followup/claude_discover/notes",
+   "kind": "local session identifier",
+   "replacements": 1,
+   "before_sha256": "57699bd3af7ed08792fd0c490d742452f0e813e2a7845f28db468d0d2b7ac0af",
+   "after_sha256": "3f98c91845af4a344f67ef7e873cecd5b71e58c8b8b4641ceca59c5af074b9bc"
+  },
+  {
+   "file": "lanes.json",
+   "pointer": "/lanes/0/result/layers/1/new_candidates/10/demonstrated_gap",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "ebcceb14c53c0d4a5b7deaa05be96198cf3d83d7166c2e89c4577c87d53875a3",
+   "after_sha256": "bb824ba39e10d0beb4128340ff7f15bc848183cc807a63142c027ee232abd6c2"
+  },
+  {
+   "file": "lanes.json",
+   "pointer": "/lanes/0/result/layers/1/new_candidates/10/evidence/0",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "d4ef016ae15d9094a6b613ad549fcac39cc460adb773d7c367d0f628f38a8be5",
+   "after_sha256": "1cfae7d41c3b1b79d04b795ecec1e2d772c46e3580ba0ed18385d28a98aaf43c"
+  },
+  {
+   "file": "lanes.json",
+   "pointer": "/lanes/0/proposals/18/votes/0/reasoning",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "060270fe397f31ca2a501391a91762123d6e61b5aba675369ffba3e542b3a544",
+   "after_sha256": "b4a39a8b8e559ee2b88ec764c084ec1a06d2b86636f8aba843f3a8c4811236f5"
+  },
+  {
+   "file": "lanes.json",
+   "pointer": "/lanes/0/proposals/18/votes/1/reasoning",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "254f2524c94369d25664c257e61b4c21d5dbe980ddc06ed09716d25efc555c20",
+   "after_sha256": "d777f2bed47a1ba93cc134b8168b63a93aec3046daa242f4407b29ed717a2e2d"
+  },
+  {
+   "file": "lanes.json",
+   "pointer": "/lanes/0/proposals/18/votes/2/reasoning",
+   "kind": "personal home path",
+   "replacements": 1,
+   "before_sha256": "dc1cf6552032e9a088b8a85a57b688273c680aa6b94d56448b7553be7f80ead1",
+   "after_sha256": "6d9ea4638cde1fbf20bf0904715f35ee590e3a3e9a0d2521602e154071bcc56d"
+  }
+ ],
+ "remaining_private_findings": 0,
+ "original_workflow_and_job_files_modified": false
+}

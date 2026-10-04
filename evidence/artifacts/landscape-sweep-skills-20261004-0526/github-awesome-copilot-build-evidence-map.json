@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-github-awesome-copilot-build-evidence-map",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "github/awesome-copilot@build-evidence-map",
+ "reviewed_commit": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+ "readme_path": "skills/build-evidence-map/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-research"
+ ],
+ "claim": "Source review of the skill build-evidence-map in github/awesome-copilot at commit 143a3d976b3c1603cc8932984d5e1f28501cb5fc (the adjudicated pin; license MIT), read from skills/build-evidence-map/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for build-evidence-map; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is e5de9060f2171ee6f1b6d7dae5e30402aad9eb4d. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 39686,
+  "pushed_at": "2026-10-01T22:22:02Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named build-evidence-map",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "fb104196d94a0530eb5b86c56edfdaac0954a842f7cc71dfd4dcf87b20675fc9",
+  "skill_md_bytes": 5080,
+  "survivor_skill_md_sha256": "fb104196d94a0530eb5b86c56edfdaac0954a842f7cc71dfd4dcf87b20675fc9",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "e5de9060f2171ee6f1b6d7dae5e30402aad9eb4d",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/build-evidence-map/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "Turn one contested question into a portable decision artifact that shows what supports the current position, what pushes against it, and what remains unknown. Do not use a graph to decorate an answer that has not been sourced."
+  },
+  {
+   "source": "skills/build-evidence-map/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "For a simple factual claim or a general fact-checking request, use a verification workflow such as `doublecheck` instead. Use this skill when the relationships between evidence, intermediate claims, trade-offs, and missing facts matter."
+  },
+  {
+   "source": "skills/build-evidence-map/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "1. **Frame one decision.** Write one falsifiable question and one provisional position. Narrow the question until a reader can identify what action or belief the map is testing. 2. **Collect bounded source regions.** Prefer direct observations and primary sources. Record the URL or absolute local path, publisher, publication date, retrieval date, section/page/line/timestamp locator, and a short checkable excerpt. Read [references/evidence-ladder.md](references/evidence-ladder.md) when source qua"
+  }
+ ]
+}

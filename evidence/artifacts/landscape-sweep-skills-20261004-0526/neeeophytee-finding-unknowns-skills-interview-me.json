@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-neeeophytee-finding-unknowns-skills-interview-me",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "Neeeophytee/finding-unknowns-skills@interview-me",
+ "reviewed_commit": "ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc",
+ "readme_path": "skills/interview-me/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-design-intake"
+ ],
+ "claim": "Source review of the skill interview-me in Neeeophytee/finding-unknowns-skills at commit ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc (the adjudicated pin; license MIT), read from skills/interview-me/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for interview-me; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is c1c506188201229770b24f2c6cf7bc5bc62a6981. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 342,
+  "pushed_at": "2026-09-28T03:37:40Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named interview-me",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "93d61e365a19d41631d5e41c54028e3fc7dd5edcf471886316cc4ac59515f8b4",
+  "skill_md_bytes": 1792,
+  "survivor_skill_md_sha256": "93d61e365a19d41631d5e41c54028e3fc7dd5edcf471886316cc4ac59515f8b4",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "c1c506188201229770b24f2c6cf7bc5bc62a6981",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/interview-me/SKILL.md@ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc",
+   "text": "Brainstorming is over and there are still gaps between the user's map and the territory. Close them by asking, one question at a time, starting with the questions whose answers would change the most."
+  },
+  {
+   "source": "skills/interview-me/SKILL.md@ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc",
+   "text": "1. Read everything already established: the request, any spec, any prototypes, relevant code. Do not ask about things that are already answered. 2. Build a private list of open ambiguities and sort by blast radius: - **First: architecture-changers** — answers that would alter the data model, the interfaces, or the overall approach. - **Then: behavior definers** — edge cases, failure modes, defaults, permissions. - **Last: polish** — naming, copy, cosmetics. Often not worth asking; propose and mo"
+  },
+  {
+   "source": "skills/interview-me/SKILL.md@ca5696a0f08d2de6b2997fff1d6cc05c3ed587cc",
+   "text": "- One question at a time means one. No question bundles. - Never ask a question whose answer is discoverable from the codebase; go look instead. - If an answer contradicts an earlier decision, flag the conflict immediately rather than silently taking the newest answer."
+  }
+ ]
+}

@@ -1,5 +1,14 @@
 # SOTA repository convergence — 2026-09-22
 
+The [2026-10-04 skills sweep](../../docs/decisions/2026-10-04-skills-landscape-sweep.md)
+is retained separately by lifecycle task. Its [dated manifest](manifest-20261004.json)
+keeps the skills in `lane_groupings`: 137 proposals, 47 vote-survivor occurrences,
+33 source reviews, and 13 distinct source-review stops affecting 14 occurrences.
+The sweep is recorded as **stopped** because native child usage is incomplete;
+usage is a lower bound, and the record neither counts nor resets saturation.
+The decision record preserves the critic's leads, failed lanes and source-review
+refusals for the next sweep. Adoption remains a separate paired trial decision.
+
 One dated, per-layer list of the repositories this stack actually selects, confirmed
 against current upstream metadata, with every newcomer from the 342 starred
 repositories, the 35 awesome lists and a bounded 2026 web sweep examined and given a

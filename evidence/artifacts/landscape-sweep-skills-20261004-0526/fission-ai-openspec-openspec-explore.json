@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-fission-ai-openspec-openspec-explore",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "Fission-AI/OpenSpec@openspec-explore",
+ "reviewed_commit": "2500d6da971336167548b53731a35b2127df35ac",
+ "readme_path": "skills/openspec-explore/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-design-intake"
+ ],
+ "claim": "Source review of the skill openspec-explore in Fission-AI/OpenSpec at commit 2500d6da971336167548b53731a35b2127df35ac (the adjudicated pin; license MIT), read from skills/openspec-explore/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for openspec-explore; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is e0f35038ade89dd17e3c2ee893c19ec482520022. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 71034,
+  "pushed_at": "2026-10-02T17:44:49Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "2500d6da971336167548b53731a35b2127df35ac",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named openspec-explore",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "5bc03c568d0348c61b37f0647167252db5be1775ff5742ca9760b4e03ab9a5ac",
+  "skill_md_bytes": 22797,
+  "survivor_skill_md_sha256": "5bc03c568d0348c61b37f0647167252db5be1775ff5742ca9760b4e03ab9a5ac",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "e0f35038ade89dd17e3c2ee893c19ec482520022",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/openspec-explore/SKILL.md@2500d6da971336167548b53731a35b2127df35ac",
+   "text": "Enter explore mode. Think deeply. Visualize freely. Follow the conversation wherever it goes."
+  },
+  {
+   "source": "skills/openspec-explore/SKILL.md@2500d6da971336167548b53731a35b2127df35ac",
+   "text": "**IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, investigate the codebase, and run read-only commands or tools without confirmation, but you must NEVER write code or implement features. If the user asks you to implement something, do not start it here: say that explore mode does not implement, and point them at `/openspec-propose`, which turns the discussion into a change. The work happens from that change, never from explore mode. You MAY create or"
+  },
+  {
+   "source": "skills/openspec-explore/SKILL.md@2500d6da971336167548b53731a35b2127df35ac",
+   "text": "**This is a stance, not a workflow.** There are no fixed steps, no required sequence, no mandatory outputs. You're a thinking partner helping the user explore."
+  }
+ ]
+}

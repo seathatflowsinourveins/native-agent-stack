@@ -1,0 +1,364 @@
+[
+ {
+  "repository": "addyosmani/agent-skills@spec-driven-development",
+  "path": "addyosmani-agent-skills-spec-driven-development.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "addyosmani/agent-skills@test-driven-development",
+  "path": "addyosmani-agent-skills-test-driven-development.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "affaan-m/ECC@intent-driven-development",
+  "path": "affaan-m-ecc-intent-driven-development.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "affaan-m/ECC@tdd-workflow",
+  "path": "affaan-m-ecc-tdd-workflow.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "anthropics/claude-plugins-official@build-mcp-server",
+  "path": "anthropics-claude-plugins-official-build-mcp-server.json",
+  "layers": [
+   "skills-mcp-build"
+  ]
+ },
+ {
+  "repository": "anthropics/claude-plugins-official@claude-md-improver",
+  "path": "anthropics-claude-plugins-official-claude-md-improver.json",
+  "layers": [
+   "skills-agent-docs"
+  ]
+ },
+ {
+  "repository": "anthropics/knowledge-work-plugins@debug",
+  "path": "anthropics-knowledge-work-plugins-debug.json",
+  "layers": [
+   "skills-debug"
+  ]
+ },
+ {
+  "repository": "bgauryy/octocode@octocode-research",
+  "path": "bgauryy-octocode-octocode-research.json",
+  "layers": [
+   "skills-research"
+  ]
+ },
+ {
+  "repository": "cathrynlavery/diagram-design@diagram-design",
+  "path": "cathrynlavery-diagram-design-diagram-design.json",
+  "layers": [
+   "skills-architecture"
+  ]
+ },
+ {
+  "repository": "codybrom/clairvoyance@red-flags",
+  "path": "codybrom-clairvoyance-red-flags.json",
+  "layers": [
+   "skills-architecture"
+  ]
+ },
+ {
+  "repository": "Fission-AI/OpenSpec@openspec-explore",
+  "path": "fission-ai-openspec-openspec-explore.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "getsentry/skills@skill-writer",
+  "path": "getsentry-skills-skill-writer.json",
+  "layers": [
+   "skills-skill-lifecycle"
+  ]
+ },
+ {
+  "repository": "github/awesome-copilot@build-evidence-map",
+  "path": "github-awesome-copilot-build-evidence-map.json",
+  "layers": [
+   "skills-research"
+  ]
+ },
+ {
+  "repository": "github/awesome-copilot@threat-model-analyst",
+  "path": "github-awesome-copilot-threat-model-analyst.json",
+  "layers": [
+   "skills-security"
+  ]
+ },
+ {
+  "repository": "haacked/dotfiles@resolve-conflicts",
+  "path": "haacked-dotfiles-resolve-conflicts.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "hegeldev/hegel-skill@hegel-review",
+  "path": "hegeldev-hegel-skill-hegel-review.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "laurigates/claude-plugins@property-based-testing",
+  "path": "laurigates-claude-plugins-property-based-testing.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "Neeeophytee/finding-unknowns-skills@assumption-test",
+  "path": "neeeophytee-finding-unknowns-skills-assumption-test.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "Neeeophytee/finding-unknowns-skills@interview-me",
+  "path": "neeeophytee-finding-unknowns-skills-interview-me.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "NVIDIA/SkillSpector@skill-inspector",
+  "path": "nvidia-skillspector-skill-inspector.json",
+  "layers": [
+   "skills-skill-lifecycle"
+  ]
+ },
+ {
+  "repository": "obra/superpowers@systematic-debugging",
+  "path": "obra-superpowers-systematic-debugging.json",
+  "layers": [
+   "skills-debug"
+  ]
+ },
+ {
+  "repository": "shihyuho/skills@writing-agents-md",
+  "path": "shihyuho-skills-writing-agents-md.json",
+  "layers": [
+   "skills-agent-docs"
+  ]
+ },
+ {
+  "repository": "softaworks/agent-toolkit@agent-md-refactor",
+  "path": "softaworks-agent-toolkit-agent-md-refactor.json",
+  "layers": [
+   "skills-agent-docs"
+  ]
+ },
+ {
+  "repository": "tech-leads-club/agent-skills@gh-fix-ci",
+  "path": "tech-leads-club-agent-skills-gh-fix-ci.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "tech-leads-club/agent-skills@security-threat-model",
+  "path": "tech-leads-club-agent-skills-security-threat-model.json",
+  "layers": [
+   "skills-security"
+  ]
+ },
+ {
+  "repository": "trailofbits/skills@ask-questions-if-underspecified",
+  "path": "trailofbits-skills-ask-questions-if-underspecified.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "trailofbits/skills@atheris",
+  "path": "trailofbits-skills-atheris.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "trailofbits/skills@semgrep-rule-creator",
+  "path": "trailofbits-skills-semgrep-rule-creator.json",
+  "layers": [
+   "skills-security"
+  ]
+ },
+ {
+  "repository": "tt-a1i/archify@archify",
+  "path": "tt-a1i-archify-archify.json",
+  "layers": [
+   "skills-architecture"
+  ]
+ },
+ {
+  "repository": "tw93/Waza@hunt",
+  "path": "tw93-waza-hunt.json",
+  "layers": [
+   "skills-debug"
+  ]
+ },
+ {
+  "repository": "upstash/context7@find-docs",
+  "path": "upstash-context7-find-docs.json",
+  "layers": [
+   "skills-research"
+  ]
+ },
+ {
+  "repository": "wshobson/agents@python-testing-patterns",
+  "path": "wshobson-agents-python-testing-patterns.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "wshobson/agents@uv-package-manager",
+  "path": "wshobson-agents-uv-package-manager.json",
+  "layers": [
+   "skills-implement"
+  ]
+ },
+ {
+  "repository": "anthropics/claude-plugins-official@build-mcp-app",
+  "layers": [
+   "skills-mcp-build"
+  ],
+  "status": "stopped",
+  "pin": "d182ca456ca09d31d139f7d3818d1d333b103cce",
+  "pin_lookup": null,
+  "reason": "anthropics/claude-plugins-official@build-mcp-app: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "anthropics/skills@mcp-builder",
+  "layers": [
+   "skills-mcp-build"
+  ],
+  "status": "stopped",
+  "pin": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+  "pin_lookup": null,
+  "reason": "anthropics/skills@mcp-builder: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "blader/humanizer@humanizer",
+  "layers": [
+   "skills-agent-docs"
+  ],
+  "status": "stopped",
+  "pin": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+  "pin_lookup": "ok",
+  "reason": "the git tree listing does not hash to the id it gives the repository root (225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8), so the folder's id would not cover the bytes read"
+ },
+ {
+  "repository": "garrytan/gstack@office-hours",
+  "layers": [
+   "skills-design-intake"
+  ],
+  "status": "stopped",
+  "pin": "4015c2870b064644131ed6f7cfcc1469cfe9808c",
+  "pin_lookup": "ok",
+  "reason": "garrytan/gstack@office-hours: the root SKILL.md at 4015c2870b064644131ed6f7cfcc1469cfe9808c is the skill 'gstack', the only one the skills CLI discovers in this repository without --full-depth"
+ },
+ {
+  "repository": "github/spec-kit@speckit-assess-intake",
+  "layers": [
+   "skills-design-intake"
+  ],
+  "status": "stopped",
+  "pin": "ae5ade7234be5cb1d975f736c4e06dd46d1326d6",
+  "pin_lookup": null,
+  "reason": "github/spec-kit@speckit-assess-intake: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "microsoft/SkillOpt@skillopt-sleep",
+  "layers": [
+   "skills-skill-lifecycle"
+  ],
+  "status": "stopped",
+  "pin": "fa4ca184573e42ec11472959dd57422381418096",
+  "pin_lookup": "ok",
+  "reason": "microsoft/SkillOpt@skillopt-sleep at fa4ca184573e42ec11472959dd57422381418096: 4 unnested folders named skillopt-sleep in the CLI's recursive search: ['plugins/claude-code/skills/skillopt-sleep', 'plugins/codex/skills/skillopt-sleep', 'plugins/cursor/skills/skillopt-sleep', 'plugins/dsh/skills/skillopt-sleep'] (the CLI keeps whichever its directory listing returns first)"
+ },
+ {
+  "repository": "openai/plugins@assess-patch-risk",
+  "layers": [
+   "skills-security"
+  ],
+  "status": "stopped",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "pin_lookup": "ok",
+  "reason": "openai/plugins@assess-patch-risk at 5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f: no folder named assess-patch-risk in the locations the CLI searches without --full-depth"
+ },
+ {
+  "repository": "openai/plugins@track-findings",
+  "layers": [
+   "skills-security"
+  ],
+  "status": "stopped",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "pin_lookup": "ok",
+  "reason": "openai/plugins@track-findings at 5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f: no folder named track-findings in the locations the CLI searches without --full-depth"
+ },
+ {
+  "repository": "openai/plugins@triage-finding",
+  "layers": [
+   "skills-security"
+  ],
+  "status": "stopped",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "pin_lookup": "ok",
+  "reason": "openai/plugins@triage-finding at 5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f: no folder named triage-finding in the locations the CLI searches without --full-depth"
+ },
+ {
+  "repository": "teng-lin/notebooklm-py@notebooklm",
+  "layers": [
+   "skills-research"
+  ],
+  "status": "stopped",
+  "pin": "c5afa6d4a13aae0989644bf9c576f9395cea8af9",
+  "pin_lookup": "ok",
+  "reason": "the git tree listing does not hash to the id it gives the repository root (c5afa6d4a13aae0989644bf9c576f9395cea8af9), so the folder's id would not cover the bytes read"
+ },
+ {
+  "repository": "virgiliojr94/book-to-skill@book-to-skill",
+  "layers": [
+   "skills-skill-lifecycle"
+  ],
+  "status": "stopped",
+  "pin": "c108d25b0cb58e1bdc361f3de02ed9f37075152f",
+  "pin_lookup": "ok",
+  "reason": "the git tree listing does not hash to the id it gives the repository root (c108d25b0cb58e1bdc361f3de02ed9f37075152f), so the folder's id would not cover the bytes read"
+ },
+ {
+  "repository": "warpdotdev/common-skills@diagnose-ci-failures",
+  "layers": [
+   "skills-ci-pr",
+   "skills-debug"
+  ],
+  "status": "stopped",
+  "pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "pin_lookup": null,
+  "reason": "warpdotdev/common-skills@diagnose-ci-failures: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist",
+  "layers": [
+   "skills-ci-pr"
+  ],
+  "status": "stopped",
+  "pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "pin_lookup": null,
+  "reason": "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ }
+]

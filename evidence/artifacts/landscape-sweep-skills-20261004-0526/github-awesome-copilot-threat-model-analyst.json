@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-github-awesome-copilot-threat-model-analyst",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "github/awesome-copilot@threat-model-analyst",
+ "reviewed_commit": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+ "readme_path": "skills/threat-model-analyst/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-security"
+ ],
+ "claim": "Source review of the skill threat-model-analyst in github/awesome-copilot at commit 143a3d976b3c1603cc8932984d5e1f28501cb5fc (the adjudicated pin; license MIT), read from skills/threat-model-analyst/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for threat-model-analyst; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 4c51abac7859b9529f721ae5043fffc2f9812b5a. Survived the landscape-sweep-skills-20261004-0526 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 39686,
+  "pushed_at": "2026-10-01T22:22:02Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named threat-model-analyst",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "cdd72b75b224b20f006cb31602b0b68d0ea27c22a25c9a6458a2cf0b90a25fb3",
+  "skill_md_bytes": 5870,
+  "survivor_skill_md_sha256": "cdd72b75b224b20f006cb31602b0b68d0ea27c22a25c9a6458a2cf0b90a25fb3",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "4c51abac7859b9529f721ae5043fffc2f9812b5a",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/threat-model-analyst/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "You are an expert **Threat Model Analyst**. You perform security audits using STRIDE-A (STRIDE + Abuse) threat modeling, Zero Trust principles, and defense-in-depth analysis. You flag secrets, insecure boundaries, and architectural risks."
+  },
+  {
+   "source": "skills/threat-model-analyst/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "**FIRST — Determine which mode to use based on the user's request:**"
+  },
+  {
+   "source": "skills/threat-model-analyst/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "### Incremental Mode (Preferred for Follow-Up Analyses) If the user's request mentions **updating**, **refreshing**, or **re-running** a threat model AND a prior report folder exists: - Action words: \"update\", \"refresh\", \"re-run\", \"incremental\", \"what changed\", \"since last analysis\" - **AND** a baseline report folder is identified (either explicitly named or auto-detected as the most recent `threat-model-*` folder with a `threat-inventory.json`) - **OR** the user explicitly provides a baseline r"
+  }
+ ]
+}
