@@ -51691,6 +51691,11 @@
       "bytes": 7138
     },
     {
+      "path": "scripts/freshness_propose.py",
+      "sha256": "c96e99d80e922f257e6c95d8b28c9493e981e4aacd99cfbbe980b4053b55bcd1",
+      "bytes": 51393
+    },
+    {
       "path": "scripts/git-hooks/pre-commit",
       "sha256": "58fd9d28e55ac2396c487d1cd7f1ac1743737abcf16de5787ab75cb33cc4fb9a",
       "bytes": 608
