@@ -383,7 +383,20 @@ assignments, which can only add protection. The reads become protection as follo
   subprocess, os exec, spawn and system, asyncio subprocess, `pty.spawn`, runpy, importlib
   file-loader and `exec`/`compile` calls, matched by name; a function or method of the same
   module that passes a parameter on to one; or a function imported from outside the standard
-  library (`sys.stdlib_module_names`), whose body the reader does not read;
+  library (`sys.stdlib_module_names`), whose body the reader does not read. The reader looks into
+  literal containers there, so an argv list or tuple bound to a name counts
+  (`cmd = [sys.executable, script]`, then `subprocess.run(cmd)`);
+- a module that gate code imports from a directory that gate code puts on `sys.path` is gate code
+  too. Python searches those directories for every later import in the process
+  ([sys.path](https://docs.python.org/3.13/library/sys.html#sys.path)), so each followed Python
+  file's absolute imports, lazy ones inside functions included
+  (`gate_reads.GateReads.imported_modules`), are resolved there as well, to a fixpoint over the
+  directories found. `patch_policy` turns such a directory into a directory rule, which protects
+  the code but not the data it reads. The acceptance probe on `7c1d24cc5` found the gap: validate.yml runs
+  `scripts/verdict_review_gate.py`, which puts `tools/sota-convergence` on `sys.path` and imports
+  `record_verdicts`; that imports `export_isolation_check` lazily, and that imports
+  `blind_checkout`. Those two read `catalogs/foundation/automation.json`,
+  `catalogs/us-equities/runtime-target.json` and two `blueprints/` files, which were editable;
 - a code file that gate code only reads, such as a workflow script it hashes and copies, is data:
   protected as a file, but what its text names is not followed. The merge round of 2026-10-04
   added this line. Main's #679 made `tools/adoption/install_claude_profile.py`, which the
@@ -504,33 +517,38 @@ The tripwire stays a regression check there; it does not stand in for the gate.
   Narrowing the list is a reviewed change to the gate on main.
 - Following gate reads made the list much broader. The merged tree `4f963c9b2` (main
   `6af8e55bd`, #681) has 10,591 tracked files. There the gate protected 444 files (4.2%) before
-  the change and protects 7,617 (71.9%) after. Leaving out `evidence/`, `tests/` and `.github/`,
-  it was 122 of 3,447 (3.5%) and is 632 (18.3%). The derived set went from 307 files and 5
-  prefixes to 527 files, 18 prefixes and 10 globs, with no unresolved read or executing call. One
+  the change and protects 7,621 (72.0%) after. Leaving out `evidence/`, `tests/` and `.github/`,
+  it was 122 of 3,447 (3.5%) and is 636 (18.5%). The derived set went from 307 files and 5
+  prefixes to 552 files, 18 prefixes and 10 globs, with no unresolved read or executing call. One
   read accounts for most of it: `tools/sota-convergence/gap_wave_ledger.py` joins
   `root / "evidence/artifacts" / wave` with `wave` from its arguments, so all 6,478 files under
   `evidence/artifacts` are protected. The same script's `root / f"docs/{doc['id']}.md"` protects
   `docs/*.md` (196 files), so a resolver task on most documents is now refused at the gate.
-  `blueprints/` outside the gate code stays editable (12 of 2,608 protected). Two narrowings are
+  `blueprints/` outside the gate code stays editable (14 of 2,608 protected). Two narrowings are
   left for a later reviewed change, each with its own failing-first controls. One would trace
   argument values to the literal arguments of the step that runs the script; validate.yml passes
   `--wave gap-wave2-20260923 --wave gap-wave3-20260923`, so two wave directories and one ledger
   page would remain. The other would recognise files a check only compares with its own output.
   Until then the breadth is the price of failing closed, and a repository test bounds it
-  (18.3% of the tree outside `evidence/`, `tests/` and `.github/` against a ceiling of 25%; 12
+  (18.5% of the tree outside `evidence/`, `tests/` and `.github/` against a ceiling of 25%; 14
   `blueprints/` files against 52). That bound caught the merge with main `6af8e55bd`: the gate of
   `4eb6b4cc9`, which followed every code file gate code read, protected 10,218 of the merged
-  tree's files (96.5%) and all 2,608 in `blueprints/`. Deriving a tree takes about 2.6 s on this
+  tree's files (96.5%) and all 2,608 in `blueprints/`. Deriving a tree takes about 3.5 s on this
   host, and each check derives three.
 - The execution model is by name and within one module. A code file run through a construct it
   does not model is not followed: a method of an object from another module whose name is not an
-  executing call, a call through a variable or a decorator, or an installed copy that a later
-  step runs. Such a file stays protected as a file, but what it reads is not. The narrowing
-  unprotected 4 files on the pre-merge tree `4a03dd796`: 2 under `blueprints/`,
-  `catalogs/foundation/automation.json` and `catalogs/us-equities/runtime-target.json`.
-  `tools/sota-convergence/blind_checkout.py` and `export_isolation_check.py` read them, and
-  `scripts/verdict_review_gate.py` lists both scripts among its trust paths without running them.
-  CI runs them only through `tests/test_blind_checkout.py`, a test module.
+  executing call, a call through a decorator or a function held in a variable, an import by a
+  computed name, or an installed copy that a later step runs. Such a file stays protected as a
+  file, but what it reads is not. The acceptance probe on `7c1d24cc5` measured three widenings
+  (evidence part 9). Two are adopted: the container rule above, and imports through `sys.path`
+  directories, which brought back the 4 files the run-versus-read narrowing had exposed. The
+  third is not adopted: treating a local built from a parameter as the parameter when finding
+  wrappers. It would recognise `def run(path): cmd = [sys.executable, path]; subprocess.run(cmd)`,
+  but on this repository it made `scripts/release_due.py:194` unresolved, so every push would be
+  refused. That was a false positive. `git(*args)` counts as running code, and `mentioned()`
+  passes a derived path to `git check-ignore`, which only reads it. A shell string inside an
+  executing call (`["bash", "-c", "python3 scripts/x.py"]`) is not read for names either; reading
+  it changed nothing here.
 - What the reader treats as a subject stays editable. Where the data selecting a policy file is
   itself received rather than spelled in the code (a path taken from a file the script finds by
   enumeration, for example), that policy file is not protected. The reader also does not model
@@ -555,7 +573,9 @@ The tripwire stays a regression check there; it does not stand in for the gate.
   19 more planted defects (42 of 42 detected), the breadth before and after, and a rehearsal on the
   merged tree. Its part 8 covers the merge with main `6af8e55bd` (#681): the breadth under three
   gates on the merged tree, the run-versus-read tests failing against `4eb6b4cc9`'s gate, the
-  planted defects again with the new ones, #681's workflow-policy tests and a rehearsal.
+  planted defects again with the new ones, #681's workflow-policy tests and a rehearsal. Its part 9
+  covers the acceptance probe on `7c1d24cc5`: the three widenings measured, the adopted two failing
+  first against `7c1d24cc5`'s gate, and 50 of 50 planted defects detected.
 - The gate-data tests: every modelled read form on one script, in the unit tests (a module-constant
   schema, TOML, YAML, CSV, f-string, glob, `iterdir`, a literal-tuple loop, destructuring, `/=`, a
   received base, a received subject and a `globals()` name). A fixture whose gate step reads a
@@ -566,8 +586,10 @@ The tripwire stays a regression check there; it does not stand in for the gate.
   tests: each modelled executing form on one script, with hashed, copied and parsed code left as
   data; in the fixture, a workflow script that a gate script hashes and copies is refused while
   the files its text names stay editable, and a check that the gate script runs through a
-  wrapper has its data refused. The repository test checks that `contract.schema.json` is
-  `ci_read`, that nothing is unresolved, and the breadth bound.
+  wrapper has its data refused. An argv bound to a name counts as run, and the data that a module
+  imported lazily through a `sys.path` directory reads is refused. The repository test checks that
+  `contract.schema.json` and `catalogs/foundation/automation.json` are `ci_read`, that nothing is
+  unresolved, and the breadth bound.
 
 **Proposed, not adopted (2026-10-04): the owned paths as an allowlist in the gate as well.** The
 task's owned paths already act as an allowlist, applied before the gate. `patch_policy.validate_patch`
@@ -585,7 +607,7 @@ still protects CI inputs inside owned paths:
 
 Adopt the first when the plan's owned paths can reach `PushGate.check` through the harness without
 passing through anything the agent can influence. Adopt the second once the derivation's cost is
-acceptable at plan time: about 2.6 s per tree on this host. Neither replaces the derivation,
+acceptable at plan time: about 3.5 s per tree on this host. Neither replaces the derivation,
 because within the owned paths it is the only rule that knows what CI reads.
 
 **Overturn.** If the pre-push gate cannot be kept immutable to the agent, switch to option 2

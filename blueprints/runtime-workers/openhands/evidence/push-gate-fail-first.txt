@@ -440,6 +440,9 @@ blueprints/us-equities/research-evaluation/receipt.json, catalogs/foundation/aut
 catalogs/us-equities/runtime-target.json. tools/sota-convergence/blind_checkout.py and
 export_isolation_check.py read them; scripts/verdict_review_gate.py lists those two scripts as
 trust paths without running them, and CI runs them only through tests/test_blind_checkout.py.
+Correction (part 9): CI's verdict-review step imports both of them as gate code, through the
+directory scripts/verdict_review_gate.py puts on sys.path, so those 4 files had to stay protected.
+The second clause above is wrong.
 
 Failing first, 2026-10-04T08:25:46Z to 08:26:36Z. Method of part 7: the working tree copied into
 <scratch> and committed there, with resolver/push_gate.py and resolver/gate_reads.py restored from
@@ -501,3 +504,73 @@ tools/adoption/managed_block.py edit: fail protected_path [ci_read]
 new test module (tests/test_resolver_added.py): fail protected_path [ci_discovered]
 scripts/validate.py edit: fail protected_path [ci_named]
 .github/workflows/adoption-bootstrap.yml edit: fail protected_path [github]
+
+
+9. Acceptance probe on 7c1d24cc5, 2026-10-04 (fix on top of 7c1d24cc5)
+
+The acceptance of 7c1d24cc5 (10:43:06Z to 10:45:09Z) passed. A review of the new execution model
+then raised a specific gap: GateReads.executed read the arguments of an executing call one node at
+a time, so an argv list bound to a name (cmd = [sys.executable, script], then subprocess.run(cmd))
+was never looked into. A probe compared the committed derivation on the 7c1d24cc5 tree with
+widened ones, alone and combined:
+- A: look into literal containers in an executing call's arguments;
+- B: count a local built from a parameter as the parameter when finding wrappers;
+- C: read a whitespace string in an executing call with names_in_text, the run-step rule;
+- E: resolve each followed Python file's imports through the directories gate code puts on
+  sys.path as well.
+                       followed  protected  outside evidence/, tests/, .github/  unresolved
+committed (7c1d24cc5)  42        7,617      632                                  none
+A                      49        7,621      636                                  none
+A and C                49        7,621      636                                  none
+A and B                49        7,621      636                                  scripts/release_due.py:194
+E                      49        7,621      636                                  none
+A and E                51        7,621      636                                  none
+A, C and E             51        7,621      636                                  none
+The 4 files every variant protects again are those part 8 says the change unprotected:
+blueprints/convergence-practice/service-reboot/plan.json,
+blueprints/us-equities/research-evaluation/receipt.json, catalogs/foundation/automation.json and
+catalogs/us-equities/runtime-target.json. Part 8's attribution was wrong. validate.yml runs
+scripts/verdict_review_gate.py, which puts tools/sota-convergence on sys.path (lines 104-105) and
+imports record_verdicts (line 121). record_verdicts imports export_isolation_check lazily (line
+1222), which imports blind_checkout and lane_packets lazily (lines 432, 454, 486-487). Those modules
+are gate code, and they read the 4 files (blind_checkout.py lines 194 and 207;
+export_isolation_check.py lines 71 and 73). patch_policy.python_references turns a sys.path
+directory into a directory rule: tools/sota-convergence was protected as code, but what its modules
+read was not followed. Round 3's over-following had covered these files by accident, since
+verdict_review_gate.py spells the scripts' paths in TRUST_PATHS. E is the actual route. A reaches
+them only because changed_paths passes TRUST_PATHS to git as pathspecs, and git counts as an
+executor; that is a false positive, but in the safe direction.
+
+Adopted, on top of 7c1d24cc5: A, the container rule (GateReads._leaf_values), and E, imports
+through sys.path directories (GateReads.imported_modules, push_gate CiProtected.syspath, a fixpoint
+in _add_gate_reads over the directories found). B is not adopted, because it makes every push
+refused. scripts/release_due.py's git(*args) counts as running code, and mentioned() passes a
+derived path to git check-ignore, which only reads it. C changes nothing on this repository and is
+not adopted. Both are residuals in the decision record. On the merged tree with the fix: 552
+derived files, 18 prefixes and 10 globs, 7,621 of 10,591 files protected (72.0%), 636 of 3,447
+outside evidence/, tests/ and .github/ (18.5%), 14 of 2,608 in blueprints/, nothing unresolved,
+3.52 s to derive one tree.
+
+Failing first, 2026-10-04T14:04:39Z to 14:05:42Z. Method of part 7: the working tree copied into
+<scratch> and committed there, with resolver/push_gate.py and resolver/gate_reads.py restored from
+7c1d24cc5.
+$ python3 -m unittest tests.test_runtime_worker_openhands_push_gate
+exit 1; Ran 46 tests; FAILED (failures=5, errors=1, skipped=1):
+- the argv bound to a name (scripts/argv.py) and to a module tuple (scripts/bound.sh) were not run;
+- in the fixture, tools/lib/lane_rules.py, imported lazily through the directory
+  scripts/install_lanes.py puts on sys.path, had no rule, and neither did the data it reads
+  (policy/lane_rules.json); an edit of that data passed the gate;
+- on this repository, catalogs/foundation/automation.json had no rule (None != 'ci_read');
+- one error from the interface the fix adds, no CiProtected.syspath.
+The unchanged copy passed (46 tests, OK).
+
+Planted defects on the fixed tree, 2026-10-04T14:10:03Z to 14:13:43Z, with the runner and method
+of part 2: the unmutated copy passes (exit 0). M1 to M48 are as in part 8, each exit 1 again. The
+anchors of M33, M41 and M42 follow the follow loop's new indentation; a first run at 14:05:48Z
+with the old anchors could not apply those three (detected 47 of 50). The new ones:
+M49 modules imported through a directory on sys.path are not followed: exit 1, failures=3;
+    test_the_derivation_follows_imported_constants_and_script_text,
+    test_data_a_gate_script_reads_is_refused, test_the_derivation_protects_the_ci_gate_files
+M50 an argv bound to a name is not looked into: exit 1, failures=1;
+    test_only_code_a_gate_script_runs_is_followed
+Detected 50 of 50.

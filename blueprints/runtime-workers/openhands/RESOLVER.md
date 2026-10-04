@@ -473,11 +473,12 @@ command center adopted that refinement. The gate:
   `blueprints/convergence-practice/contract.schema.json` unprotected). `resolver/gate_reads.py`
   evaluates each gate script's expressions to the paths they spell. An exact path is a
   protected file; a computed one protects the directory or glob it resolves under; a gate
-  script in another language protects the paths its text names. Code that gate code runs
-  is followed in turn; code it only reads, such as a workflow script it hashes and
-  copies, is protected but not followed (`GateReads.executed`, since the merge with
-  main's #681, whose base carried #679). A read it cannot resolve, or a run of a computed
-  path, refuses every commit (`gate_input_unresolved`);
+  script in another language protects the paths its text names. Code that gate code runs,
+  and a module it imports, also from a directory it puts on `sys.path`, is followed in
+  turn. Code it only reads, such as a workflow script it hashes and copies, is protected
+  but not followed (`GateReads.executed`, since the merge with main's #681, whose base
+  carried #679). A read it cannot resolve, or a run of a computed path, refuses every
+  commit (`gate_input_unresolved`);
 - refuses a step that interpolates untrusted event text;
 - runs the zizmor version CI pins, with the gate's own flags. Its excessive-permissions,
   dangerous-triggers, cache-poisoning, artipacked and template-injection findings refuse,
@@ -605,7 +606,7 @@ free branch name.
     accepted.
   - The gate's protected list is broad by design. All of `tests/**` is protected,
     because validate.yml runs the whole suite, and so is every file a reachable step
-    names or a gate script reads. On the merged tree that is 7,617 of 10,591 tracked
+    names or a gate script reads. On the merged tree that is 7,621 of 10,591 tracked
     files, including all of `evidence/artifacts` and `docs/*.md`, against 444 before the
     gate followed reads ([record](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md),
     residual risks). A task whose owned paths need those files fails at the gate with no
