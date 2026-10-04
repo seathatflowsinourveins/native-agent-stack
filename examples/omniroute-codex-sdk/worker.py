@@ -41,7 +41,8 @@ PROVIDER = "omniroute_runtime"
 DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
 DEFAULT_BASE_URL = "http://127.0.0.1:20128/v1"
 # OmniRoute 0585aba5589d5a1f49243a13a8db249558e7c9e3:
-# open-sse/executors/codex/reasoningSuffix.ts. Fail closed for effort-bearing IDs.
+# open-sse/executors/codex/reasoningSuffix.ts: suffix tokens for a lexical
+# fail-closed guard, independent of gateway alias sets.
 GATEWAY_EFFORT_SUFFIXES = (
     "-none", "-low", "-medium", "-high", "-xhigh", "-max", "-ultra", "(max)", "(ultra)"
 )
@@ -585,7 +586,8 @@ def parse_args(argv=None) -> argparse.Namespace:
     if args.effort == ReasoningEffort.ultra.value and args.model.endswith(GATEWAY_EFFORT_SUFFIXES):
         parser.error(
             "--effort ultra requires a suffixless --model (e.g. cx/gpt-6.1-sol); "
-            "recognized effort suffixes override body effort"
+            "lexical fail-closed check also refuses IDs whose own name ends "
+            "in a listed token, regardless of gateway alias recognition"
         )
     if (args.require_mcp or args.require_skill) and not args.preflight:
         parser.error("require-mcp and require-skill require --preflight")

@@ -437,6 +437,22 @@ class NativeTransportTests(unittest.TestCase):
                 self.assertEqual(rejected.exception.code, 2)
                 self.assertIn("--effort ultra requires a suffixless --model", stderr.getvalue())
 
+    def test_ultra_effort_lexically_rejects_non_alias_model_id(self):
+        # OmniRoute 0585aba5 reasoningSuffix.ts excludes this base from its
+        # Max alias set. The worker's lexical policy deliberately refuses it.
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as rejected:
+            worker.parse_args(
+                [
+                    "--workspace", str(self.project),
+                    "--model", "cx/gpt-5.1-codex-max",
+                    "--effort", "ultra",
+                ]
+            )
+        self.assertEqual(rejected.exception.code, 2)
+        self.assertIn("lexical fail-closed check", stderr.getvalue())
+        self.assertIn("own name ends", stderr.getvalue())
+
     def test_ultra_effort_accepts_suffixless_model(self):
         args = worker.parse_args(
             ["--workspace", str(self.project), "--model", "cx/gpt-6.1-sol", "--effort", "ultra"]

@@ -72,10 +72,13 @@ its child launch configuration and the SDK's native `ReasoningEffort` at turn st
 it as `requested_effort`. The worker preserves accepted model and effort inputs;
 the default model remains `cx/gpt-6.1-sol-max`. The checked OmniRoute HTTP carry
 prioritizes force rules, then recognized model suffixes, then body effort.
-Before native startup, the worker rejects Ultra with an effort-bearing model
-ending in `-none`, `-low`, `-medium`, `-high`, `-xhigh`, `-max`, `-ultra`, `(max)`
-or `(ultra)`, following the pinned suffix parser below. This includes the default
-model paired with `--effort ultra`; supply the suffixless model explicitly.
+Before native startup, the worker applies a lexical fail-closed check: Ultra is
+refused for any model ID ending in `-none`, `-low`, `-medium`, `-high`, `-xhigh`,
+`-max`, `-ultra`, `(max)` or `(ultra)`. Gateway alias sets change between builds,
+so this check also refuses IDs whose own name ends in these tokens, such as
+`cx/gpt-5.1-codex-max`, even when the gateway parser treats that ID as suffixless.
+This includes the default model paired with `--effort ultra`; supply the
+suffixless model explicitly.
 Qualify the gateway's installed build and force rules separately.
 
 Native model metadata controls ordinary inference normalization. The bundled
@@ -215,8 +218,9 @@ the worker's model/provider check, the resumed `requested_effort`, native
 `ReasoningEffort.ultra` turn argument and normalized wire effort `xhigh`.
 These fixtures retain the real pinned SDK/CLI and return authored SSE responses;
 they do not qualify model switching at a live gateway. Argument checks reject
-invalid effort and Ultra with every listed effort suffix, accept suffixless
-Ultra, and retain the default/resume `max` behavior. The suite contains 30 tests.
+invalid effort and Ultra with every listed suffix token, including a non-alias
+`-max` ID, accept suffixless Ultra, and retain the default/resume `max` behavior.
+The suite contains 31 tests.
 The other fixture homes also disable plugins, and teardown checks that no
 `.tmp/plugins-clone-*` directories remain. No descendant-process or global egress
 assertion is made. Missing terminal events and an
