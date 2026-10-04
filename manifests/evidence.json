@@ -11487,8 +11487,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-mover.md",
-      "sha256": "a74574de8726cae6aef8caed2f041c13acbd13832a916e1d7c4a8527b7944e03",
-      "bytes": 21829
+      "sha256": "9b078007a0eb66dfa5f0c758034ad8fea9678520336cf8dc4f945159fa1f0a18",
+      "bytes": 23432
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-native.md",
@@ -11507,8 +11507,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-safety.md",
-      "sha256": "60f443999a3cc4071e074637285165cf3cf899606b3ab2fb0b65b485e42e08e4",
-      "bytes": 37422
+      "sha256": "659a2838d3171d1e83b5cf4bacc56c67ae9ee68e21584ed3067ac86c7917fa24",
+      "bytes": 38336
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-transport.md",
@@ -11632,8 +11632,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_runner.py",
-      "sha256": "aaa2e70202e011993c6827cda808155ef7737d752073245ceded55fd8b1eb5d7",
-      "bytes": 65768
+      "sha256": "0e0b656544232d0f286a0ffb17975e10275d2a0839dddebfdd9323b09328704a",
+      "bytes": 67054
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_simulation.py",
@@ -11827,13 +11827,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "34ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e",
-      "bytes": 153832
+      "sha256": "cefaab3caaad98e037c4d4a99e562d368b559a8ec976dd8c16c4706f9a224719",
+      "bytes": 153913
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "f43def730273be28dbb2b4a791dff31ca7e3f661735eb45e35ebccb75c4d0285",
-      "bytes": 88369
+      "sha256": "5d5e119798c1422bff6c5f612191eae51d984a9979dc359768d45379e115d55b",
+      "bytes": 88569
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/selector.py",
@@ -11867,8 +11867,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "8d1222f7b8e90cf2af0cd6efb88eb70704cf900c480a097e86576a8382435b16",
-      "bytes": 92936
+      "sha256": "a803afeea026d5a350179b2672c59448a10fc66bc9ca8529eac1673928fbb024",
+      "bytes": 93222
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -52027,8 +52027,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_mover_native.py",
-      "sha256": "2cf17ed5dd956d18b973fcdcf0ea1412dee8eec7040d29fa1d2e28781b7c16fa",
-      "bytes": 55169
+      "sha256": "ce89aa0ae3447017ae56778f19687d819a2f0701052cf4d780a650c37e0d4003",
+      "bytes": 55529
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
@@ -52124,6 +52124,11 @@
       "path": "tests/test_agentsview_qualification.py",
       "sha256": "348b5c7b4ee654df9a0a83d1ec1f3ced48101881de82130d6efd664c36213b1e",
       "bytes": 20136
+    },
+    {
+      "path": "tests/test_alpaca_admission_regressions.py",
+      "sha256": "09215f4405a9f6458c11a81d59fa99f041af73bc59ae87287ca538c0f27e2f2e",
+      "bytes": 27913
     },
     {
       "path": "tests/test_alpaca_capabilities.py",
