@@ -1,0 +1,293 @@
+===== toy-async-module on CPython 3.12.3: $ python -m unittest_parallel -j 2 --level module -v   (a directory holding only test_async_demo.py); exit 1
+Running 1 test suites (2 total tests) across 1 workers
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/__main__.py", line 12, in <module>
+    main()
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/main.py", line 160, in main
+    results = pool.map(test_fn, test_suites, chunksize=1)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+TypeError: cannot pickle '_contextvars.Context' object
+===== toy-async-module on CPython 3.13.16: $ python -m unittest_parallel -j 2 --level module -v   (a directory holding only test_async_demo.py); exit 1
+Running 1 test suites (2 total tests) across 1 workers
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<venv-3.13.16>/lib/python3.13/site-packages/unittest_parallel/__main__.py", line 12, in <module>
+    main()
+    ~~~~^^
+  File "<venv-3.13.16>/lib/python3.13/site-packages/unittest_parallel/main.py", line 160, in main
+    results = pool.map(test_fn, test_suites, chunksize=1)
+  File "<cpython-3.13.16>/lib/python3.13/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "<cpython-3.13.16>/lib/python3.13/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "<cpython-3.13.16>/lib/python3.13/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+    ~~~^^^^^^
+  File "<cpython-3.13.16>/lib/python3.13/multiprocessing/connection.py", line 211, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "<cpython-3.13.16>/lib/python3.13/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: cannot pickle '_contextvars.Context' object
+===== toy-async-class on CPython 3.12.3: $ python -m unittest_parallel -j 2 --level class -v   (a directory holding only test_async_demo.py); exit 1
+Running 2 test suites (2 total tests) across 2 workers
+
+test_plain (test_async_demo.PlainCase.test_plain) ...
+test_plain (test_async_demo.PlainCase.test_plain) ... ok
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/__main__.py", line 12, in <module>
+    main()
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/main.py", line 160, in main
+    results = pool.map(test_fn, test_suites, chunksize=1)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+TypeError: cannot pickle '_contextvars.Context' object
+===== toy-async-class on CPython 3.13.16: $ python -m unittest_parallel -j 2 --level class -v   (a directory holding only test_async_demo.py); exit 1
+Running 2 test suites (2 total tests) across 2 workers
+
+test_plain (test_async_demo.PlainCase.test_plain) ...
+test_plain (test_async_demo.PlainCase.test_plain) ... ok
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<venv-3.13.16>/lib/python3.13/site-packages/unittest_parallel/__main__.py", line 12, in <module>
+    main()
+    ~~~~^^
+  File "<venv-3.13.16>/lib/python3.13/site-packages/unittest_parallel/main.py", line 160, in main
+    results = pool.map(test_fn, test_suites, chunksize=1)
+  File "<cpython-3.13.16>/lib/python3.13/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "<cpython-3.13.16>/lib/python3.13/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "<cpython-3.13.16>/lib/python3.13/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+    ~~~^^^^^^
+  File "<cpython-3.13.16>/lib/python3.13/multiprocessing/connection.py", line 211, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "<cpython-3.13.16>/lib/python3.13/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: cannot pickle '_contextvars.Context' object
+===== toy-plain-module on CPython 3.12.3: $ python -m unittest_parallel -j 2 --level module -v   (a directory holding only test_plain_only.py); exit 0
+Running 1 test suites (2 total tests) across 1 workers
+
+test_a (test_plain_only.OnlyPlain.test_a) ...
+test_a (test_plain_only.OnlyPlain.test_a) ... ok
+test_b (test_plain_only.OnlyPlain.test_b) ...
+test_b (test_plain_only.OnlyPlain.test_b) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.089s
+
+OK
+===== toy-plain-module on CPython 3.13.16: $ python -m unittest_parallel -j 2 --level module -v   (a directory holding only test_plain_only.py); exit 0
+Running 1 test suites (2 total tests) across 1 workers
+
+test_a (test_plain_only.OnlyPlain.test_a) ...
+test_a (test_plain_only.OnlyPlain.test_a) ... ok
+test_b (test_plain_only.OnlyPlain.test_b) ...
+test_b (test_plain_only.OnlyPlain.test_b) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.088s
+
+OK
+===== version-probes-module on CPython 3.12.3: $ python -m unittest_parallel -j 2 --level module -s tests -t . -p test_adoption_version_probes.py   (the checkout root); exit 1
+Running 1 test suites (22 total tests) across 1 workers
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/__main__.py", line 12, in <module>
+    main()
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/main.py", line 160, in main
+    results = pool.map(test_fn, test_suites, chunksize=1)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+_pickle.PicklingError: Can't pickle <class 'tests.test_adoption_version_probes.LinuxReportUnderbash32Tests'>: attribute lookup LinuxReportUnderbash32Tests on tests.test_adoption_version_probes failed
+===== paper-fees-module on CPython 3.12.3: $ python -m unittest_parallel -j 2 --level module -s tests -t . -p test_adaptive_paper_fees.py   (the checkout root); exit 1
+Running 1 test suites (61 total tests) across 1 workers
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/__main__.py", line 12, in <module>
+    main()
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/main.py", line 160, in main
+    results = pool.map(test_fn, test_suites, chunksize=1)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+TypeError: cannot pickle '_contextvars.Context' object
+===== paper-transport-module on CPython 3.12.3: $ python -m unittest_parallel -j 2 --level module -s tests -t . -p test_adaptive_paper_transport.py   (the checkout root); exit 1
+Running 1 test suites (116 total tests) across 1 workers
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/__main__.py", line 12, in <module>
+    main()
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/main.py", line 160, in main
+    results = pool.map(test_fn, test_suites, chunksize=1)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+TypeError: cannot pickle '_contextvars.Context' object
+===== version-probes-class on CPython 3.12.3: $ python -m unittest_parallel -j 4 --level class -v -s tests -t . -p test_adoption_version_probes.py   (the checkout root); exit 1
+Running 6 test suites (22 total tests) across 4 workers
+
+test_every_pin_declares_a_supported_probe (tests.test_adoption_version_probes.DeclaredProbeTests.test_every_pin_declares_a_supported_probe) ...
+test_cleanup_stops_an_interrupted_probe_in_both_scripts (tests.test_adoption_version_probes.ReportStructureTests.test_cleanup_stops_an_interrupted_probe_in_both_scripts) ...
+test_every_pin_declares_a_supported_probe (tests.test_adoption_version_probes.DeclaredProbeTests.test_every_pin_declares_a_supported_probe) ... ok
+test_floor_pins_compare_as_minimum (tests.test_adoption_version_probes.DeclaredProbeTests.test_floor_pins_compare_as_minimum) ...
+test_cleanup_stops_an_interrupted_probe_in_both_scripts (tests.test_adoption_version_probes.ReportStructureTests.test_cleanup_stops_an_interrupted_probe_in_both_scripts) ... ok
+test_no_script_runs_a_flag_against_every_bin_dir_entry (tests.test_adoption_version_probes.ReportStructureTests.test_no_script_runs_a_flag_against_every_bin_dir_entry) ...
+test_floor_pins_compare_as_minimum (tests.test_adoption_version_probes.DeclaredProbeTests.test_floor_pins_compare_as_minimum) ... ok
+test_servers_without_a_version_flag_are_never_executed (tests.test_adoption_version_probes.DeclaredProbeTests.test_servers_without_a_version_flag_are_never_executed) ...
+test_no_script_runs_a_flag_against_every_bin_dir_entry (tests.test_adoption_version_probes.ReportStructureTests.test_no_script_runs_a_flag_against_every_bin_dir_entry) ... ok
+test_the_report_step_is_identical_in_both_scripts (tests.test_adoption_version_probes.ReportStructureTests.test_the_report_step_is_identical_in_both_scripts) ...
+test_servers_without_a_version_flag_are_never_executed (tests.test_adoption_version_probes.DeclaredProbeTests.test_servers_without_a_version_flag_are_never_executed) ... ok
+test_the_report_step_is_identical_in_both_scripts (tests.test_adoption_version_probes.ReportStructureTests.test_the_report_step_is_identical_in_both_scripts) ... ok
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/__main__.py", line 12, in <module>
+    main()
+  File "<venv-3.12.3>/lib/python3.12/site-packages/unittest_parallel/main.py", line 160, in main
+    results = pool.map(test_fn, test_suites, chunksize=1)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+_pickle.PicklingError: Can't pickle <class 'tests.test_adoption_version_probes.LinuxReportUnderbash32Tests'>: attribute lookup LinuxReportUnderbash32Tests on tests.test_adoption_version_probes failed
+===== paper-fees-class on CPython 3.12.3: $ python -m unittest_parallel -j 4 --level class -v -s tests -t . -p test_adaptive_paper_fees.py   (the checkout root); exit 1
+Running 9 test suites (61 total tests) across 4 workers
+[54 per-test result lines; last 3 lines follow]
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+TypeError: cannot pickle '_contextvars.Context' object
+===== paper-transport-class on CPython 3.12.3: $ python -m unittest_parallel -j 4 --level class -v -s tests -t . -p test_adaptive_paper_transport.py   (the checkout root); exit 1
+Running 9 test suites (116 total tests) across 4 workers
+[57 per-test result lines; last 3 lines follow]
+  File "<cpython-3.12.3>/lib/python3.12/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+TypeError: cannot pickle '_contextvars.Context' object
+===== order-throughput-serial on CPython 3.12.3: $ python -m unittest tests.test_order_throughput   (the checkout root); exit 0
+..............................................s.............................
+----------------------------------------------------------------------
+Ran 76 tests in 9.405s
+
+OK (skipped=1)
+===== order-throughput-unpooled on CPython 3.12.3: $ python -m unittest_parallel -j 2 --level module --disable-process-pooling -s tests -t . -p test_order_throughput.py   (the checkout root); exit 0
+Running 1 test suites (76 total tests) across 1 workers
+..............................................s.............................
+----------------------------------------------------------------------
+Ran 76 tests in 9.391s
+
+OK (skipped=1)
+===== order-throughput-serial on CPython 3.13.16: $ python -m unittest tests.test_order_throughput   (the checkout root); exit 0
+..............................................s.............................
+----------------------------------------------------------------------
+Ran 76 tests in 7.038s
+
+OK (skipped=1)
+===== order-throughput-unpooled on CPython 3.13.16: $ python -m unittest_parallel -j 2 --level module --disable-process-pooling -s tests -t . -p test_order_throughput.py   (the checkout root); exit 0
+Running 1 test suites (76 total tests) across 1 workers
+..............................................s.............................
+----------------------------------------------------------------------
+Ran 76 tests in 7.168s
+
+OK (skipped=1)
+===== source of test_async_demo.py
+import unittest
+
+
+class PlainCase(unittest.TestCase):
+    def test_plain(self):
+        self.assertTrue(True)
+
+
+class AsyncCase(unittest.IsolatedAsyncioTestCase):
+    async def test_async(self):
+        self.assertTrue(True)
+===== source of test_plain_only.py
+import unittest
+
+
+class OnlyPlain(unittest.TestCase):
+    def test_a(self):
+        self.assertTrue(True)
+
+    def test_b(self):
+        self.assertTrue(True)

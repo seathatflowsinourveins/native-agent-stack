@@ -1,0 +1,54 @@
+{
+  "schema": "suite-parallelism-control-expectations/1",
+  "control_file": "controls/test_zz_trial_controls.py",
+  "run_contract": "Copy the control file alone into an empty directory, run the arm's exact command there with stdout and stderr in log.txt, and record the exit status in exit-code.txt; store the run as <os>-<arm>-controls[-r<N>]. Every arm, S included, must report exactly what standalone_run lists.",
+  "standalone_run": {
+    "ran": 8,
+    "status_word": "FAILED",
+    "status_counts": {
+      "failures": 2,
+      "errors": 2,
+      "skipped": 1,
+      "expected failures": 1,
+      "unexpected successes": 1
+    },
+    "exit_status": "non-zero: 1 from python3 -m unittest (CPython Lib/unittest/main.py), 5 = 2 failures + 2 errors + 1 unexpected success from unittest-parallel (src/unittest_parallel/main.py:240-242)",
+    "records": [
+      ["test", "test_zz_trial_controls.TrialControlsA.test_pass", "ok"],
+      ["test", "test_zz_trial_controls.TrialControlsA.test_skip", "skipped"],
+      ["test", "test_zz_trial_controls.TrialControlsA.test_fail", "FAIL"],
+      ["test", "test_zz_trial_controls.TrialControlsA.test_error", "ERROR"],
+      ["derived", "test_zz_trial_controls.TrialControlsB.test_subtest_fails", "FAIL"],
+      ["subtest", "test_zz_trial_controls.TrialControlsB.test_subtest_fails (i=1)", "FAIL"],
+      ["test", "test_zz_trial_controls.TrialControlsB.test_expected_failure", "expected failure"],
+      ["test", "test_zz_trial_controls.TrialControlsB.test_unexpected_success", "unexpected success"],
+      ["test", "test_zz_trial_controls.TrialControlsB.test_multiline_docstring", "ok"],
+      ["fixture", "setUpClass (test_zz_trial_controls.TrialControlsFixture)", "ERROR"]
+    ],
+    "failing_ids": [
+      "test_zz_trial_controls.TrialControlsA.test_fail",
+      "test_zz_trial_controls.TrialControlsA.test_error",
+      "test_zz_trial_controls.TrialControlsB.test_subtest_fails (i=1)",
+      "test_zz_trial_controls.TrialControlsB.test_unexpected_success",
+      "setUpClass (test_zz_trial_controls.TrialControlsFixture)"
+    ],
+    "not_run_ids": [
+      "test_zz_trial_controls.TrialControlsFixture.test_not_run"
+    ],
+    "parallel_header": {
+      "total_tests": 9,
+      "suites_by_level": {
+        "module": 1,
+        "class": 3
+      },
+      "workers": "min(suites, jobs)"
+    }
+  },
+  "crash_control": {
+    "control_file": "controls/crash_control/test_crash.py",
+    "test_id": "test_crash.CrashControl.test_crash",
+    "run_contract": "Copy test_crash.py alone into an empty directory and run the arm's exact command there under a 300-second bound (timeout 300 <command>, which exits 124 when it fires); store the run as <os>-<arm>-crash[-r<N>] with the bound's exit status in exit-code.txt.",
+    "pass_condition": "the crash test started, the recorded exit status is non-zero, and no OK summary was printed; a hang ended by the bound is fail-closed and passes",
+    "observed_locally": "python3 -m unittest exits 3 with no summary; unittest-parallel 1.8.6 hangs after the worker dies until the bound fires (exit 124), pooled and unpooled, at module and class level"
+  }
+}
