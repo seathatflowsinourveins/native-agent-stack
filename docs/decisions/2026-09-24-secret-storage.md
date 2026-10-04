@@ -320,3 +320,97 @@ the started command:
 
 Ubuntu 26.04 was not run here. The coordinator's measurement there (uutils
 0.8.0 runs `timeout 5 -- CMD`, GNU 9.7 exits 127) is cited, not reproduced.
+
+## Addendum 2026-10-04: PR #685 bounded repair
+
+**Action served.** Protect credential output in the foundation's agent shell
+hook, which supports the research and runtime work. This repair starts at
+`385e3f6584d2524c8407d44a7a9ae0ddd1316cd1` and resolves the three P1 findings
+and the one P2 finding from that revision's review.
+
+**Sources selected with search-first.** GNU coreutils `v9.12`
+(`c0f8514d9891`), uutils coreutils `0.8.0` and `0.12.0`, and glibc
+`glibc-2.42`, read on 2026-10-04. The installed GNU env reports `9.4`;
+that version observation is separate from the pinned source review. GNU's
+`v9.12` NEWS identifies its September 14 stable release. No dependency or
+host installation was changed. The existing diagnosing-bugs and tdd skills
+fit this repair; the agreed seam is `check()` in the existing unittest module.
+
+- [GNU timeout.c](https://github.com/coreutils/coreutils/blob/v9.12/src/timeout.c#L522-L565)
+  stops option parsing before the duration. Both parser paths now preserve
+  the following hyphen-leading executable path, including `-/printenv`,
+  while retaining the uutils post-duration option/separator reading.
+  [glibc execvpe.c](https://github.com/bminor/glibc/blob/glibc-2.42/posix/execvpe.c#L81-L89)
+  confirms direct execution when the path contains a slash.
+- [GNU env.c](https://github.com/coreutils/coreutils/blob/v9.12/src/env.c#L603-L811),
+  [uutils env.rs](https://github.com/uutils/coreutils/blob/0.8.0/src/uu/env/src/env.rs#L507-L597)
+  and [its 0.12.0 split iterator](https://github.com/uutils/coreutils/blob/0.12.0/src/uu/env/src/split_iterator.rs)
+  specify splitting and insertion before trailing argv. The guard expands
+  separate, attached, clustered and abbreviated split options, quotes,
+  ASCII whitespace, comments and env escapes. It keeps option termination
+  and assignment state when locating the effective command. Both readings
+  check that argv. Harmless literal commands such as `env -vS "ls -l"`
+  and `env --split "ls -l"` pass. Invalid split strings and inherited
+  variable expansion are refused as `env_split_unclassified`; the guard
+  does not inspect inherited values.
+- [GNU coreutils.c](https://github.com/coreutils/coreutils/blob/v9.12/src/coreutils.c#L145-L176)
+  specifies `--coreutils-prog=NAME` and `--coreutils-prog-shebang=NAME`.
+  The guard reads the selected utility and its arguments, discarding the
+  shebang's script operand. The existing `find` file-reader check recognizes
+  the selected reader without copying each action's remaining argv.
+
+These changes close the earlier addendum's split-string and GNU dispatch
+open notes. The other launcher families remain outside this bounded repair.
+
+**Returned local evidence.** All command strings are inert test input; no
+refused launcher command or credential file was executed or read.
+
+- The three new test methods fail against the exact starting guard with
+  111 failing subtests and no errors: timeout 39, env 48, dispatch 24.
+  They pass with the repair. The first smaller fixture set produced 90
+  failing subtests; those runs are separate, not cumulative counts.
+- Follow-up controls first exposed three failed `find` dispatch subtests
+  and six failed env option/assignment-state subtests. Both are fixed and
+  retained in the same methods. Ordinary `README.md` reads and harmless
+  split-string commands serve as negative controls.
+- The plain local `python3 -m unittest tests.test_secret_path_guard` run
+  returned one installed-hook parity failure (88 tests, two skips).
+  The user-scope hook predates this branch. The repository suite passes in
+  its existing CI mode, which skips that host-install comparison. The host
+  copy is not changed in this owned worktree repair.
+- The branch/job did not retain the original ad-hoc 6,582-command replay
+  script or full corpus. A native Python unittest adapter replays 3,028
+  frozen fixture/document commands from `385e3f65`, plus 33 review rows
+  and P2 controls: **3,061 distinct commands**, **114 newly refused**,
+  **0 loosened**, **0 reason changes**, **0 errors**, versus the PR's
+  original main baseline `f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5`.
+  Corpus SHA256: `5d8be2ac060d9435654e6a89e281021c0787be3c60ef4a3bf409d757fd39f2a4`.
+  Against the intermediate starting head, the same corpus has 30 new
+  refusals and two allowances: exactly the two reported P2 false refusals.
+  This is a new scoped replay, not reproduction of the historical count.
+- The temporary repair artifacts retain the returned red/green logs and
+  `replay.py` / `replay.json`. `python3 scripts/validate.py` is required
+  after the final scoped evidence hash registration. It checks structural
+  consistency separately from parser behavior.
+
+**Repair anti-pattern log.**
+
+| Proven mistake | Correction / source |
+| --- | --- |
+| Assuming every hyphen-leading word after timeout's duration is only an option | Preserve executable paths; GNU timeout and glibc direct-path execution |
+| Treating an env split payload as an ordinary option value or one executable name | Expand literal argv and append trailing arguments; GNU and uutils split implementations |
+| Inferring an environment dump solely because an option walk consumed a harmless split command | Locate the effective command and retain harmless controls |
+| Assuming positional uutils dispatch covers GNU's single binary | Read both exact GNU dispatch spellings, including the script-operand difference |
+| A draft fixture escaped quotes at the env grammar layer and named a different executable | Correct the fixture to quote the executable; retain the final starting-revision red run |
+
+**Completeness critic and limits.** Both timeout parser paths, clustered and
+abbreviated env forms with trailing argv, nested launchers, GNU's shebang
+dispatch, and harmless controls are covered. The GNU
+[env-S upstream tests](https://github.com/coreutils/coreutils/blob/v9.12/tests/env/env-S.pl)
+were inspected as grammar references, not executed as upstream acceptance.
+These results are `local_integration` checks and pinned source review;
+neither Ubuntu 26.04 nor GNU's single-binary release was executed here.
+Generic `find -exec` environment-printer detection is an existing separate
+gap: its ordinary path classifies file readers. Invalid or inherited-value
+split strings remain an explicit conservative refusal. Full original replay
+availability and host-install parity remain coordinator follow-up conditions.

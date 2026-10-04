@@ -2080,6 +2080,93 @@ class SecretPathGuardTests(unittest.TestCase):
                 self.assertEqual(guard.strip_prefix(text.split()), command)
                 self.assertEqual(guard.prior_strip_prefix(text.split()), command)
 
+    def test_review_685_preserves_gnu_timeout_command_paths(self):
+        # GNU v9.12 src/timeout.c stops getopt before the duration; the next word is the executable unchanged.
+        # These strings are inspected by the guard only, including the inert setup string; no shell executes them.
+        blocked = {
+            "timeout 5 -/printenv EXAMPLE_TOKEN": "environment_dump",
+            "timeout 5 -/env": "environment_dump",
+            "timeout 5 -/gdb -p 1": "process_trace",
+            "timeout 5 -/cat .env": "dotenv_read",
+            "timeout -- 5 -/printenv EXAMPLE_TOKEN": "environment_dump",
+            "timeout -- 5 -/env": "environment_dump",
+            "timeout -k 2 5 -/printenv EXAMPLE_TOKEN": "environment_dump",
+            "timeout 5 -/env -u EXAMPLE_OTHER printenv EXAMPLE_TOKEN": "environment_dump",
+            "mkdir -p -- -; ln -sf /usr/bin/printenv ./-/printenv; timeout 5 -/printenv EXAMPLE_TOKEN": "environment_dump",
+        }
+        for command, reason in blocked.items():
+            for prefix in ("", "rtk proxy ", "timeout 10 "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertEqual(guard.check(prefix + command), reason)
+        for command in ("timeout 5 -/ls -l", "timeout -- 5 -/ls -l", "timeout 5 -- ls -l"):
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+        for command in ("timeout 5 -/printenv EXAMPLE_TOKEN", "timeout 5 -/env", "timeout 5 -/gdb -p 1", "timeout 5 -/cat .env",
+                        "timeout -- 5 -/printenv EXAMPLE_TOKEN", "timeout -- 5 -/env"):
+            words = shlex.split(command)
+            expected = words[3:] if words[1] == "--" else words[2:]
+            with self.subTest(command=command, parser="current"):
+                self.assertEqual(guard.strip_prefix(words), expected)
+            with self.subTest(command=command, parser="prior"):
+                self.assertEqual(guard.prior_strip_prefix(words), expected)
+
+    def test_review_685_env_split_string_effective_argv(self):
+        # GNU v9.12 src/env.c parse_split_string/parse_split_arguments and uutils 0.8.0/0.12.0 env.rs.
+        # Trailing argv is essential: the old no-command dump fallback could mask broken split parsing.
+        blocked = {
+            "env -vS'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            'env --split "printenv EXAMPLE_TOKEN" EXAMPLE_OTHER': "environment_dump",
+            "env -vS 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -ivS'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env --split-string='printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -S 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -S 'env -S \"printenv EXAMPLE_TOKEN\"' EXAMPLE_OTHER": "environment_dump",
+            "env -S 'timeout 5 -/printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -S 'cat' .env": "dotenv_read",
+            "env -S 'gdb' -p 1": "process_trace",
+            r"env -S 'printenv\_EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -S '\"printenv\" EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env -vS'-- -/printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "env --split 'EXAMPLE_OTHER=1 -/printenv EXAMPLE_TOKEN'": "environment_dump",
+        }
+        for command, reason in blocked.items():
+            for prefix in ("", "rtk proxy ", "timeout 5 -- "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertEqual(guard.check(prefix + command), reason)
+        for option in ("-vS", "--split", "--split-string", "-S", "-ivS"):
+            for tail in ("", " EXAMPLE_OTHER"):
+                command = f'env {option} "ls -l"{tail}'
+                with self.subTest(command=command):
+                    self.assertIsNone(guard.check(command))
+        for command in ("env -vS'ls -l'", "env --split='ls -l' EXAMPLE_OTHER",
+                        "env --split '-- ls -l'", "env --split 'EXAMPLE_OTHER=1 ls -l'",
+                        "env -S 'ls -l;printenv EXAMPLE_TOKEN'"):
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_review_685_gnu_single_binary_dispatch(self):
+        # GNU v9.12 src/coreutils.c main: --coreutils-prog=NAME and --coreutils-prog-shebang=NAME.
+        blocked = {
+            "coreutils --coreutils-prog=printenv EXAMPLE_TOKEN": "environment_dump",
+            "coreutils --coreutils-prog=env": "environment_dump",
+            "coreutils --coreutils-prog=env -S 'printenv EXAMPLE_TOKEN' EXAMPLE_OTHER": "environment_dump",
+            "coreutils --coreutils-prog=timeout 5 -/cat .env": "dotenv_read",
+            "coreutils --coreutils-prog-shebang=printenv /tmp/example-script EXAMPLE_TOKEN": "environment_dump",
+            "coreutils --coreutils-prog-shebang=env /tmp/example-script": "environment_dump",
+            "coreutils --coreutils-prog-shebang=env /tmp/example-script -S 'cat' .env": "dotenv_read",
+            r"find . -exec coreutils --coreutils-prog=cat .env \;": "dotenv_read",
+        }
+        for command, reason in blocked.items():
+            for prefix in ("", "rtk proxy ", "timeout 5 -- "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertEqual(guard.check(prefix + command), reason)
+        for command in ("coreutils --coreutils-prog=ls -l",
+                        "coreutils --coreutils-prog-shebang=ls /tmp/example-script -l",
+                        "env -S 'coreutils --coreutils-prog=ls -l' EXAMPLE_OTHER",
+                        r"find . -exec coreutils --coreutils-prog=cat README.md \;"):
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
     def test_the_current_reading_reads_gnu_and_uutils_env_and_the_multicall_binary(self):
         # The current reading reads env's value options of both implementations, clusters and long-option prefixes, and the multi-call
         # binary; the prior reading keeps c26800f3's table (ENV_ARG_OPTIONS), so a command it refused stays refused.
