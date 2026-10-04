@@ -9349,8 +9349,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "cc2cb788eea6508ba9248ce87c320557bfb4850edd77ace52f758bed165e64d7",
-      "bytes": 72361
+      "sha256": "92a03fc2b4ad9b4c9551a542fba7c39060b831b07e529e8e4effadc4ef2134b0",
+      "bytes": 72677
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -15979,8 +15979,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md",
-      "sha256": "df3e84c0d300e85b40865e2eff548c1a4b9c9e55b043621dbf5a63a1ce630868",
-      "bytes": 39404
+      "sha256": "dbb6de8a5b1dde770ea8615b0646b24570e86146b402c9ee4b917c6f668dd57e",
+      "bytes": 43121
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
@@ -16129,8 +16129,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5e87cc6552a77bc0a32df9c9abd03d354463b9308468ce1246e03c4355148723",
-      "bytes": 143786
+      "sha256": "5168bab4f2e44e3b181317715cc9d619840a067f2c485a7ad297748e1990a4f2",
+      "bytes": 153537
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
