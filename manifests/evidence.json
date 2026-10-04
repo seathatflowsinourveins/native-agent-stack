@@ -13146,13 +13146,13 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-native-paper/offline-FREEZE.md",
-      "sha256": "481b0dfa56c8a415f70ea55346113ca607ad3a883be557d7c1d96acee09b6816",
-      "bytes": 11717
+      "sha256": "8bba6198ed58283de1822893c14f9600215807160b7b0c0de57cb633ffe94e63",
+      "bytes": 13545
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-native-paper/state.py",
-      "sha256": "573f2c2b1990ce9739c917e9394a6cae93daacd522fc14643e093cc75b0c9c73",
-      "bytes": 46405
+      "sha256": "44c902e51e44718a39500f2dc4e0061f5fa8a178aa15861bff83b36fbd60fe0f",
+      "bytes": 47180
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",
@@ -49886,8 +49886,8 @@
     },
     {
       "path": "tests/test_ibkr_native_paper.py",
-      "sha256": "82ca70eba473bcf0f562245438df33bbce56b65354d24a97b0d52c78e04737ee",
-      "bytes": 87536
+      "sha256": "50f0617471aa27de3368900aa0f3577862514f8a012039f865ce414b4517bb03",
+      "bytes": 100958
     },
     {
       "path": "tests/test_ibkr_paper_orders.py",

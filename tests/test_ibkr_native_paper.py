@@ -423,6 +423,53 @@ class StateCases(unittest.TestCase):
                 self.assertFalse(self.state.snapshot()["ready"])
                 self.assertEqual([c["kind"] for c in self.transport.calls], ["submit"])
 
+    def test_oversize_native_identities_latch_without_binding_or_booking(self):
+        """Oversize venue/native IDs fail closed through execution and lookup, including a 4301-digit integer."""
+        cases = [("venue_order_id", "PERM-"+"9"*4301, "unknown_venue_order_id", "4301-digit-venue"),
+                 ("venue_order_id", str(1 << 63), "unknown_venue_order_id", "venue-above-int64"),
+                 ("order_id", 1 << 63, "invalid_native_id", "order-above-int64"),
+                 ("perm_id", 1 << 63, "invalid_native_id", "perm-above-int64"),
+                 ("perm_id", 10**4300, "invalid_native_id", "4301-digit-perm")]
+        for route in ["execution", "lookup"]:
+            for index, (key, value, reason, label) in enumerate(cases):
+                with self.subTest(route=route, identity=label):
+                    self.close_state()
+                    self.db_path = Path(self.tmp.name)/("oversize-id-"+route+"-"+str(index)+".sqlite")
+                    self.broker = FakeBroker()
+                    self.transport = Transport(self)
+                    self.state = self.open_state()
+                    self.transport.submit_mode = "lost"
+                    self.assertEqual(self.order(qty=1), "unknown")
+                    before = self.state.snapshot()
+                    observed = {"order_ref": before["orders"][0]["order_ref"], key: value}
+                    # Retain the input class rather than serialize an integer which
+                    # exceeds CPython's own int-string conversion limit.
+                    operation = {"operation": "oversize_identity", "route": route,
+                                 "identity_field": key, "input_class": label, "expected_reason": reason}
+                    self.record["sequence"].append(operation)
+                    if route == "execution":
+                        result = self.state.execution("buy", "oversize", 1, "100.00", "USD", identity=observed)
+                        self.assertFalse(result)
+                    else:
+                        with patch.object(self.transport, "lookup", return_value=observed):
+                            result = self.state.lookup("buy", self.transport)
+                        self.assertEqual(result, "blocked")
+                    operation["result"] = result
+                    after = self.state.snapshot()
+                    operation["journal_after"] = after
+                    for field in ["orders", "executions", "commissions", "positions", "cash_cents", "fees_cents"]:
+                        self.assertEqual(after[field], before[field], field)
+                    self.assertEqual(after["alerts"][-1], reason)
+                    self.assertFalse(after["ready"])
+                    with self.assertRaisesRegex(self.module.Refused, "^reconciliation_required$"):
+                        self.order("after_oversize_identity", qty=1)
+                    self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+                    self.assertEqual(self.state.snapshot()["alerts"][-1], "contradiction_requires_adjudication")
+                    self.restart()
+                    self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+                    self.assertEqual(self.state.snapshot()["alerts"][-1], "contradiction_requires_adjudication")
+                    self.assertEqual([call["kind"] for call in self.transport.calls], ["submit"])
+
     def test_changed_execution_replay_freezes_without_second_effect(self):
         """Same execution ID changed quantity: position3/cash970000 and retained alert."""
         self.order()
@@ -469,6 +516,36 @@ class StateCases(unittest.TestCase):
         self.assertFalse(self.fee(amount="0.40"))
         self.economics(3, 969970, 30, 3)
         self.assertFalse(self.state.snapshot()["ready"])
+
+    def test_final_commission_int64_overflow_latches_without_posting(self):
+        """Final fees/rebates of 1e17 USD retain pending economics and durably latch invalid_commission."""
+        for index, amount in enumerate(["100000000000000000.00", "-100000000000000000.00"]):
+            with self.subTest(amount=amount):
+                self.close_state()
+                self.db_path = Path(self.tmp.name)/("commission-int64-"+str(index)+".sqlite")
+                self.broker = FakeBroker()
+                self.transport = Transport(self)
+                self.state = self.open_state()
+                self.order(qty=1)
+                self.fill(quantity=1)
+                self.assertTrue(self.fee(amount="0", posting="pending"))
+                before = self.state.snapshot()
+                self.assertFalse(self.fee(amount=amount))
+                after = self.state.snapshot()
+                for field in ["orders", "executions", "commissions", "positions", "position_marks",
+                              "cash_cents", "fees_cents", "gross_loss_cents", "gross_loss_exact_cents",
+                              "peak_equity_cents", "halt"]:
+                    self.assertEqual(after[field], before[field], field)
+                self.assertEqual(after["alerts"][-1], "invalid_commission")
+                self.assertFalse(after["ready"])
+                with self.assertRaisesRegex(self.module.Refused, "^reconciliation_required$"):
+                    self.order("after_invalid_fee", qty=1)
+                self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+                self.assertEqual(self.state.snapshot()["alerts"][-1], "contradiction_requires_adjudication")
+                self.restart()
+                self.assertFalse(self.action("reconcile", self.complete_snapshot()))
+                self.assertEqual(self.state.snapshot()["alerts"][-1], "contradiction_requires_adjudication")
+                self.assertEqual([call["kind"] for call in self.transport.calls], ["submit"])
 
     def test_cancel_race_retains_late_fill_and_cancelled_remainder(self):
         """Cancel at5, late2, confirmed cancellation: position7/fees70/cash929930; cancelled3."""
@@ -873,9 +950,10 @@ class StateCases(unittest.TestCase):
             self.order("after_halt", qty=1)
 
     def test_stale_terminal_status_events_preserve_terminal_states(self):
-        """Cancelled after filled and rejected after cancelled retain the terminal ledger and latch contradiction."""
+        """Incompatible terminal reports retain the terminal ledger and latch contradiction, including every rejected pair."""
         for index, (terminal, stale, cumulative) in enumerate([
             ("filled", "cancelled", 3), ("cancelled", "rejected", 0),
+            ("filled", "rejected", 3), ("rejected", "filled", 0), ("rejected", "cancelled", 0),
         ]):
             with self.subTest(terminal=terminal, stale=stale):
                 self.close_state()
@@ -887,9 +965,11 @@ class StateCases(unittest.TestCase):
                 if terminal == "filled":
                     self.fill(quantity=3)
                     self.fee(amount="0")
-                else:
+                elif terminal == "cancelled":
                     self.action("cancel", "buy", self.transport)
                     self.assertTrue(self.action("status", "buy", "cancelled", 0))
+                else:
+                    self.assertTrue(self.action("status", "buy", "rejected", 0))
                 before = self.state.snapshot()
                 self.assertTrue(before["ready"])
                 self.assertFalse(self.action("status", "buy", stale, cumulative))
@@ -905,7 +985,59 @@ class StateCases(unittest.TestCase):
                 self.assertFalse(self.action("reconcile", self.complete_snapshot()))
                 self.assertEqual(self.state.snapshot()["alerts"][-1], "contradiction_requires_adjudication")
                 self.assertEqual([c["kind"] for c in self.transport.calls],
-                                 ["submit"] if terminal == "filled" else ["submit", "cancel"])
+                                 ["submit", "cancel"] if terminal == "cancelled" else ["submit"])
+
+    def test_cancelled_then_filled_status_recovers_after_late_execution(self):
+        """Filled status before a late execution blocks recoverably; booking plus agreeing reconcile clears it."""
+        self.order(qty=3)
+        self.assertEqual(self.action("cancel", "buy", self.transport), "cancel_pending")
+        self.assertTrue(self.action("status", "buy", "cancelled", 0))
+        cancelled = self.state.snapshot()["orders"]
+        self.assertFalse(self.action("status", "buy", "filled", 3))
+        self.assertEqual(self.state.snapshot()["alerts"][-1], "status_missing_executions")
+        self.assertEqual(self.state.snapshot()["orders"], cancelled)
+        with self.assertRaisesRegex(self.module.Refused, "^reconciliation_required$"):
+            self.order("before_late_fill", qty=1)
+        self.assertTrue(self.fill(quantity=3))
+        self.assertTrue(self.fee(amount="0"))
+        self.economics(3, 970000, 0, 3)
+        order = self.state.snapshot()["orders"][0]
+        self.assertEqual((order["status"], order["cancelled"], order["remaining"], order["reserved_cents"]),
+                         ("filled", 0, 0, 0))
+        self.assertFalse(self.state.snapshot()["ready"])
+        self.assertTrue(self.action("reconcile", self.complete_snapshot()))
+        self.assertTrue(self.state.snapshot()["ready"])
+        self.restart()
+        self.assertTrue(self.action("reconcile", self.complete_snapshot()))
+        self.assertTrue(self.state.snapshot()["ready"])
+        self.assertEqual([call["kind"] for call in self.transport.calls], ["submit", "cancel"])
+
+    def test_late_execution_then_stale_cancel_preserves_filled_order(self):
+        """Late execution before an older cancelled status retains every filled-order field and readiness."""
+        self.order(qty=3)
+        self.assertEqual(self.action("cancel", "buy", self.transport), "cancel_pending")
+        self.assertTrue(self.action("status", "buy", "cancelled", 0))
+        self.assertTrue(self.fill(quantity=3))
+        self.assertTrue(self.fee(amount="0"))
+        before = self.state.snapshot()
+        agreeing = self.complete_snapshot()
+        self.assertTrue(before["ready"])
+        self.assertTrue(self.action("status", "buy", "cancelled", 0))
+        after = self.state.snapshot()
+        for field in before:
+            if field != "event_count":
+                self.assertEqual(after[field], before[field], field)
+        self.assertEqual(after["event_count"], before["event_count"]+1)
+        event = self.state.db.execute("SELECT kind,payload FROM events ORDER BY seq DESC LIMIT 1").fetchone()
+        self.assertEqual(event["kind"], "stale_order_status")
+        self.assertEqual(json.loads(event["payload"]), {"intent": "buy", "status": "cancelled", "cumulative_filled": 0})
+        # Independently observed filled account facts precede the older status report.
+        self.assertTrue(self.action("reconcile", agreeing))
+        self.restart()
+        self.assertTrue(self.action("reconcile", agreeing))
+        self.economics(3, 970000, 0, 3)
+        self.assertTrue(self.state.snapshot()["ready"])
+        self.assertEqual([call["kind"] for call in self.transport.calls], ["submit", "cancel"])
 
     def test_fresh_quote_marks_held_exposure_before_admission(self):
         """Fresh quote300 retains mark and equity peak11000; refused buy leaves order and cash economics unchanged."""
@@ -1395,6 +1527,54 @@ sys.exit(0)
         self.assertEqual(skipped_parent["actual"], "skipped")
         self.assertEqual(skipped_parent["subtests"][0]["actual"], "skipped")
 
+    def test_acceptance_cli_probes_refuse_preexisting_artifacts(self):
+        """Each required-case CLI probe refuses a prior artifact before spawning its child."""
+        probes = [("test_acceptance_cli_rejects_required_skipped_case", "required-skip"),
+                  ("test_acceptance_cli_rejects_required_expected_failure", "required-expected-failure"),
+                  ("test_acceptance_cli_rejects_required_unexpected_success", "required-unexpected-success")]
+        for name, suffix in probes:
+            with self.subTest(probe=suffix):
+                evidence = Path(self.tmp.name)/("preexisting-"+suffix)
+                attempt = "freshness-"+suffix
+                with patch.dict(globals(), {"RUN_EVIDENCE_DIR": evidence, "RUN_ATTEMPT": "freshness"}):
+                    getattr(self, name)()
+                    target = evidence/(attempt+".json")
+                    original = target.read_bytes()
+                    with patch("subprocess.run", wraps=subprocess.run) as child:
+                        with self.assertRaisesRegex(AssertionError, "probe_artifact_already_exists"):
+                            getattr(self, name)()
+                        child.assert_not_called()
+                    self.assertEqual(target.read_bytes(), original)
+                self.record["sequence"].append({"operation": "probe_stale_artifact_control", "probe": suffix,
+                                                "expected": "refused_before_child", "actual": "refused_before_child"})
+
+    def test_acceptance_cli_probes_verify_child_artifact(self):
+        """All three CLI probes reject a child's artifact-exists stderr or a mismatched printed sha256."""
+        probes = [("test_acceptance_cli_rejects_required_skipped_case", "required-skip"),
+                  ("test_acceptance_cli_rejects_required_expected_failure", "required-expected-failure"),
+                  ("test_acceptance_cli_rejects_required_unexpected_success", "required-unexpected-success")]
+        native_run = subprocess.run
+        for name, suffix in probes:
+            for corruption in ["refusal_stderr", "printed_hash"]:
+                with self.subTest(probe=suffix, corruption=corruption):
+                    evidence = Path(self.tmp.name)/(suffix+"-"+corruption)
+
+                    def corrupt_child_output(*args, **kwargs):
+                        result = native_run(*args, **kwargs)
+                        if corruption == "refusal_stderr":
+                            result.stderr += "\nevidence_attempt_already_exists\n"
+                        else:
+                            result.stdout = re.sub(r"sha256=[0-9a-f]{64}", "sha256="+"0"*64, result.stdout)
+                        return result
+
+                    reason = "evidence_attempt_already_exists" if corruption == "refusal_stderr" else "probe_artifact_sha256_mismatch"
+                    with patch.dict(globals(), {"RUN_EVIDENCE_DIR": evidence, "RUN_ATTEMPT": "child-output"}):
+                        with patch("subprocess.run", side_effect=corrupt_child_output):
+                            with self.assertRaisesRegex(AssertionError, reason):
+                                getattr(self, name)()
+                    self.record["sequence"].append({"operation": "probe_child_output_control", "probe": suffix,
+                                                    "corruption": corruption, "expected": "refused", "actual": "refused"})
+
     def test_acceptance_cli_rejects_required_skipped_case(self):
         """One required case deliberately skipped: CLI exits1, retains skipped outcome rather than acceptance."""
         evidence = RUN_EVIDENCE_DIR or Path(self.tmp.name)/"skip-evidence"
@@ -1409,9 +1589,15 @@ unittest.TestLoader.loadTestsFromTestCase=required_skip
 sys.argv=[target,'--evidence-dir',evidence,'--attempt',attempt]
 runpy.run_path(target,run_name='__main__')
 """
+        target = evidence/(attempt+".json")
+        self.assertFalse(target.exists(), "probe_artifact_already_exists")
         result = subprocess.run([sys.executable, "-c", code, str(Path(__file__)), str(evidence), attempt],
                                 capture_output=True, text=True)
-        artifact = json.loads((evidence/(attempt+".json")).read_text())
+        self.assertNotIn("evidence_attempt_already_exists", result.stderr)
+        raw = target.read_bytes()
+        self.assertEqual(re.findall(r"(?m)^evidence=.* sha256=([0-9a-f]{64})$", result.stdout),
+                         [hashlib.sha256(raw).hexdigest()], "probe_artifact_sha256_mismatch")
+        artifact = json.loads(raw)
         returned_output = re.sub(r"(?m)^(Ran \d+ tests? in )\d+\.\d+s$", r"\1<elapsed>s",
                                  (result.stdout+result.stderr).replace(str(evidence), "<private-evidence>").replace(str(ROOT), "<checkout>"))
         self.record["sequence"].append({"operation": "required_skip_cli_probe", "expected_exit": 1,
@@ -1442,9 +1628,15 @@ unittest.TestLoader.loadTestsFromTestCase=required_expected_failure
 sys.argv=[target,'--evidence-dir',evidence,'--attempt',attempt]
 runpy.run_path(target,run_name='__main__')
 """
+        target = evidence/(attempt+".json")
+        self.assertFalse(target.exists(), "probe_artifact_already_exists")
         result = subprocess.run([sys.executable, "-c", code, str(Path(__file__)), str(evidence), attempt],
                                 capture_output=True, text=True)
-        artifact = json.loads((evidence/(attempt+".json")).read_text())
+        self.assertNotIn("evidence_attempt_already_exists", result.stderr)
+        raw = target.read_bytes()
+        self.assertEqual(re.findall(r"(?m)^evidence=.* sha256=([0-9a-f]{64})$", result.stdout),
+                         [hashlib.sha256(raw).hexdigest()], "probe_artifact_sha256_mismatch")
+        artifact = json.loads(raw)
         returned_output = re.sub(r"(?m)^(Ran \d+ tests? in )\d+\.\d+s$", r"\1<elapsed>s",
                                  (result.stdout+result.stderr).replace(str(evidence), "<private-evidence>").replace(str(ROOT), "<checkout>"))
         self.record["sequence"].append({"operation": "required_expected_failure_cli_probe", "expected_exit": 1,
@@ -1471,9 +1663,15 @@ unittest.TestLoader.loadTestsFromTestCase=required_unexpected_success
 sys.argv=[target,'--evidence-dir',evidence,'--attempt',attempt]
 runpy.run_path(target,run_name='__main__')
 """
+        target = evidence/(attempt+".json")
+        self.assertFalse(target.exists(), "probe_artifact_already_exists")
         result = subprocess.run([sys.executable, "-c", code, str(Path(__file__)), str(evidence), attempt],
                                 capture_output=True, text=True)
-        artifact = json.loads((evidence/(attempt+".json")).read_text())
+        self.assertNotIn("evidence_attempt_already_exists", result.stderr)
+        raw = target.read_bytes()
+        self.assertEqual(re.findall(r"(?m)^evidence=.* sha256=([0-9a-f]{64})$", result.stdout),
+                         [hashlib.sha256(raw).hexdigest()], "probe_artifact_sha256_mismatch")
+        artifact = json.loads(raw)
         returned_output = re.sub(r"(?m)^(Ran \d+ tests? in )\d+\.\d+s$", r"\1<elapsed>s",
                                  (result.stdout+result.stderr).replace(str(evidence), "<private-evidence>").replace(str(ROOT), "<checkout>"))
         self.record["sequence"].append({"operation": "required_unexpected_success_cli_probe", "expected_exit": 1,

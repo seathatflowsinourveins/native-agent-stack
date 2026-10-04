@@ -29,6 +29,8 @@ class Refused(ValueError):
 _MONEY_CONTEXT = Context(prec=28, rounding=ROUND_HALF_EVEN, Emin=-999999,
                          Emax=999999, capitals=1, clamp=0, flags=[],
                          traps=[InvalidOperation, DivisionByZero, Overflow])
+_SQLITE_INT64_MIN = -(1 << 63)
+_SQLITE_INT64_MAX = (1 << 63)-1
 
 
 def canonical(value):
@@ -441,16 +443,19 @@ class PaperState:
             return self._block("contradictory_client_order_id", contradiction=True)
         if "venue_order_id" in value:
             venue = value["venue_order_id"]
-            if not isinstance(venue, str) or not re.fullmatch(r"(?:PERM-)?[1-9][0-9]*", venue):
+            if not isinstance(venue, str) or not re.fullmatch(r"(?:PERM-)?[1-9][0-9]{0,18}", venue):
                 return self._block("unknown_venue_order_id", contradiction=True)
             key = "perm_id" if venue.startswith("PERM-") else "order_id"
             parsed = int(venue.removeprefix("PERM-"))
+            if parsed > _SQLITE_INT64_MAX:
+                return self._block("unknown_venue_order_id", contradiction=True)
             if key in value and value[key] != parsed:
                 return self._block("contradictory_venue_order_id", contradiction=True)
             value[key] = parsed
         if not any(key in value for key in ["order_id", "perm_id"]):
             return self._block("native_id_unobserved")
-        if any(type(value[k]) is not int or value[k] <= 0 for k in ["order_id", "perm_id"] if k in value):
+        if any(type(value[k]) is not int or not 0 < value[k] <= _SQLITE_INT64_MAX
+               for k in ["order_id", "perm_id"] if k in value):
             return self._block("invalid_native_id", contradiction=True)
         old = json.loads(order["identity"]) if order["identity"] else {}
         for key in set(old)&set(value):
@@ -578,7 +583,7 @@ class PaperState:
                 return self._block("unknown_commission_execution", contradiction=True)
             try:
                 value = decimal(amount)
-            except Refused:
+            except (Refused, ArithmeticError):
                 return self._block("invalid_commission", contradiction=True)
             if currency != "USD" or posting not in ["pending", "final"]:
                 return self._block("unknown_commission_currency_posting")
@@ -595,9 +600,11 @@ class PaperState:
                 return True
             try:
                 posted = cents(value) if posting == "final" else 0
-            except Refused:
+                if not _SQLITE_INT64_MIN <= posted <= _SQLITE_INT64_MAX:
+                    raise Refused("commission_cents_out_of_range")
+                self.db.execute("INSERT OR REPLACE INTO commissions VALUES(?,?,?,?)", (exec_id, encoded, posting, posted))
+            except (Refused, ArithmeticError):
                 return self._block("invalid_commission", contradiction=True)
-            self.db.execute("INSERT OR REPLACE INTO commissions VALUES(?,?,?,?)", (exec_id, encoded, posting, posted))
             if posting == "final":
                 self._set("fees_cents", self._get("fees_cents")+posted)
                 self._set("cash_cents", self._get("cash_cents")-posted)
@@ -617,7 +624,11 @@ class PaperState:
                 return self._block("unknown_order_status", contradiction=True)
             terminal = {"filled", "cancelled", "rejected"}
             if order["status"] in terminal and status in terminal and status != order["status"]:
-                return self._block("terminal_order_status_changed", contradiction=True)
+                if order["status"] == "filled" and status == "cancelled" and cumulative_filled < order["filled"]:
+                    self._event("stale_order_status", {"intent": intent, "status": status, "cumulative_filled": cumulative_filled})
+                    return True
+                if not (order["status"] == "cancelled" and status == "filled"):
+                    return self._block("terminal_order_status_changed", contradiction=True)
             if cumulative_filled > order["filled"]:
                 return self._block("status_missing_executions")
             if status == "filled" and order["filled"] != qty:
