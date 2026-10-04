@@ -4006,7 +4006,7 @@ class ConvertTests(unittest.TestCase):
                 self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
                                  prefix + "<project-dir>/session-fixture")
 
-    def test_cli_preserves_home_substring_in_prose(self):
+    def test_cli_redacts_encoded_profile_slugs_in_prose(self):
         notes = "see the " + "-".join(("", "home", "assistant", "core")) + " repo and /docs/" + \
             "-".join(("", "home", "page", "setup"))
         work = temp_dir(self)
@@ -4015,7 +4015,8 @@ class ConvertTests(unittest.TestCase):
         done = self.cli(work, res)
         self.assertEqual(done.returncode, 0, done.stderr)
         returns = json.loads((work / "out/returns.json").read_text())
-        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         "see the <project-dir> repo and /docs/<project-dir>")
 
     def test_cli_encoded_home_redaction_preserves_sentence_ending(self):
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
@@ -4082,10 +4083,9 @@ class ConvertTests(unittest.TestCase):
                 self.assert_anchored_profile_redaction(drive + "-" * (separators + 1) + users + "-fixtureuser")
 
     def test_cli_preserves_anchored_example_profiles(self):
-        # The converter exempts example (case-insensitively for Windows/WSL).
+        # Only lowercase example followed by the publication rule's tail is exempt.
         homes = (("", "home", "example"), ("", "Users", "example"),
-                 ("", "mnt", "c", "Users", "example"), ("D", "", "Users", "example"),
-                 ("", "mnt", "c", "Users", "ExAmPlE"), ("D", "", "Users", "ExAmPlE"))
+                 ("", "mnt", "c", "Users", "example"), ("D", "", "Users", "example"))
         for parts in homes:
             for prefix in ("projects/", "claude-1000/"):
                 with self.subTest(parts=parts, prefix=prefix):
@@ -4102,7 +4102,7 @@ class ConvertTests(unittest.TestCase):
         # The exemption must not include a distinct username that starts with 'example'.
         self.assert_anchored_profile_redaction("-".join(("", "home", "exampleuser")))
 
-    def test_cli_preserves_unanchored_profile_prose(self):
+    def test_cli_redacts_unanchored_project_slugs(self):
         homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
                  ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
         notes = "home-assistant and " + ", ".join("-".join(parts) + "-code-project" for parts in homes)
@@ -4112,10 +4112,12 @@ class ConvertTests(unittest.TestCase):
         done = self.cli(work, res)
         self.assertEqual(done.returncode, 0, done.stderr)
         returns = json.loads((work / "out/returns.json").read_text())
-        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         "home-assistant and " + ", ".join("<project-dir>" for _ in homes))
 
     def assert_bare_profile_conversion(self, encoded_home, expected_home="<project-dir>"):
-        for suffix in ("/session-fixture", '" quoted', "' quoted", " continued", "\tcontinued", "\ncontinued", ""):
+        for suffix in ("/session-fixture", "\\session-fixture", '" quoted', "' quoted", " continued",
+                       "\tcontinued", "\ncontinued", "` quoted", ")", "]", ""):
             with self.subTest(suffix=suffix):
                 work = temp_dir(self)
                 path = encoded_home + suffix
@@ -4156,9 +4158,7 @@ class ConvertTests(unittest.TestCase):
         controls = ["home-assistant", "my-home-page", "-".join(("", "home", ""))]
         for parts in homes:
             slug = "-".join(parts)
-            # '_' is a word character, but is not an alphanumeric token in a canonical dash encoding.
-            controls.extend((slug + "_", "word" + slug, "." + slug, "-" + slug,
-                             slug + "-code-project", slug + "."))
+            controls.extend(("word" + slug, "-" + slug))
         work = temp_dir(self)
         res = healthy_result()
         notes = {"strings": controls, "keys": {control: "retained control" for control in controls}}
@@ -4172,15 +4172,14 @@ class ConvertTests(unittest.TestCase):
 
     def test_cli_preserves_generic_bare_example_homes_for_each_terminator(self):
         homes = (("", "home", "example"), ("", "Users", "example"),
-                 ("", "mnt", "c", "Users", "example"), ("D", "", "Users", "example"),
-                 ("", "mnt", "c", "Users", "ExAmPlE"), ("D", "", "Users", "ExAmPlE"))
+                 ("", "mnt", "c", "Users", "example"), ("D", "", "Users", "example"))
         for parts in homes:
             with self.subTest(parts=parts):
                 slug = "-".join(parts)
                 self.assert_bare_profile_conversion(slug, expected_home=slug)
         self.assert_bare_profile_conversion("-".join(("", "home", "exampleuser")))
 
-    def test_cli_preserves_unanchored_profile_slugs_in_urls(self):
+    def test_cli_redacts_unanchored_profile_slugs_in_urls(self):
         homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
                  ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
         for parts in homes:
@@ -4195,6 +4194,9 @@ class ConvertTests(unittest.TestCase):
                             "docs/readme.md#" + encoded,
                             "docs/search?q=dir/" + encoded,
                             "search=dir/" + encoded,
+                            "?project=" + encoded + "-code-project",
+                            "/srv/" + encoded + "/notes.md#L4",
+                            "cache=/data/" + encoded + "/",
                             "?next=" + encoded, "#" + encoded, "=" + encoded]
                 work = temp_dir(self)
                 res = healthy_result()
@@ -4204,16 +4206,23 @@ class ConvertTests(unittest.TestCase):
                 done = self.cli(work, res, run_id=run_id)
                 self.assertEqual(done.returncode, 0, done.stderr)
                 returns = json.loads((work / "out/returns.json").read_text())
-                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
-                self.assertEqual(json.loads(done.stdout)["run"]["runId"], run_id)
+                expected = [control.replace(encoded + "-code-project", "<project-dir>")
+                            .replace(encoded, "<project-dir>") for control in controls]
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"strings": expected, "keys": {text: "retained control" for text in expected}})
+                self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+                self.assertNotIn(encoded, done.stdout + (work / "out/returns.json").read_text())
 
-    def test_cli_preserves_local_encoded_home_in_urls(self):
+    def test_cli_redacts_local_encoded_home_in_urls(self):
         work = temp_dir(self)
         home = Path("/") / "home" / "fixtureuser"
         encoded = "-".join(("", "home", "fixtureuser"))
         controls = ["https://example.test/" + encoded,
                     "https://example.test/dir/" + encoded + "-code-project",
-                    "docs/search?q=dir/" + encoded]
+                    "docs/search?q=dir/" + encoded,
+                    "?project=" + encoded + "-code-project",
+                    "/srv/" + encoded + "/notes.md#L4",
+                    "cache=/data/" + encoded + "/"]
         res = healthy_result()
         notes = {"strings": controls, "keys": {control: "retained control" for control in controls}}
         res["first"][0]["claude_discover"]["notes"] = notes
@@ -4227,8 +4236,69 @@ class ConvertTests(unittest.TestCase):
                                  "--out", str(work / "out")])
         self.assertEqual(code, 0, stderr.getvalue())
         returns = json.loads((work / "out/returns.json").read_text())
-        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
-        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], run_id)
+        expected = [control.replace(encoded + "-code-project", "<project-dir>")
+                    .replace(encoded, "<project-dir>") for control in controls]
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"strings": expected, "keys": {text: "retained control" for text in expected}})
+        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], " | ".join(expected))
+        self.assertNotIn(encoded, stdout.getvalue() + (work / "out/returns.json").read_text())
+
+    def test_cli_redacts_local_checkout_and_work_encodings_inside_urls(self):
+        work = temp_dir(self)
+        linux_home = Path("/") / "home" / "fixturelinux"
+        wsl_root = Path("/") / "mnt" / "c" / "Users" / "fixtureuser" / "code" / "project"
+        for root, private_path in ((ROOT, work), (wsl_root, wsl_root)):
+            with self.subTest(root=root, private_path=private_path):
+                encoded = re.sub(r"[^a-zA-Z0-9]", "-", str(private_path.resolve()))
+                path = "https://example.test/?project=" + encoded + "-nested"
+                expected = "https://example.test/?project=<project-dir>"
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = {"string": path, path: "retained note"}
+                run_file = write_json(work / "run.json", {"runId": path, "status": "completed", "result": res})
+                scope = write_json(work / "scope.json", scope_for())
+                write_codex_files(work, res)
+                patterns = sweep_common.private_content(ROOT)
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with mock.patch.object(convert.Path, "home", return_value=linux_home), \
+                        mock.patch.object(convert, "private_content", return_value=patterns), \
+                        contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                         "--work-dir", str(work), "--repo-root", str(root),
+                                         "--out", str(work / "out")])
+                self.assertEqual(code, 0, stderr.getvalue())
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"string": expected, expected: "retained note"})
+                self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], expected)
+                self.assertNotIn(encoded, stdout.getvalue() + (work / "out/returns.json").read_text())
+
+    def test_cli_redacts_publication_rule_name_and_boundary_cases(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        for parts in homes:
+            for suffix in ("_", ".person", ".", "-code-project"):
+                with self.subTest(parts=parts, suffix=suffix):
+                    encoded = "-".join(parts)
+                    path = "." + encoded + suffix
+                    expected = ".<project-dir>" + ("." if suffix == "." else "")
+                    work = temp_dir(self)
+                    res = healthy_result()
+                    res["first"][0]["claude_discover"]["notes"] = {"string": path, path: "retained note"}
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                     {"string": expected, expected: "retained note"})
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+                    self.assertNotIn(encoded, done.stdout)
+
+    def test_cli_redacts_publication_rule_example_case_and_suffix_variants(self):
+        homes = (("", "home"), ("", "Users"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        for parts in homes:
+            for name in ("ExAmPlE", "example.person", "exampleuser"):
+                with self.subTest(parts=parts, name=name):
+                    self.assert_anchored_profile_redaction("-".join((*parts, name)))
+                    self.assert_bare_profile_conversion("-".join((*parts, name)))
 
     def test_cli_redacts_anchored_profile_slugs_inside_urls(self):
         homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
@@ -4275,21 +4345,22 @@ class ConvertTests(unittest.TestCase):
             "details": [{private_key: "first note", "<work-dir>/one": "second note"}]}
         self.assert_cli_key_collision(work, res, "/raw/alpha/first/claude_discover/notes/details/0", [private_key])
 
-    def test_cli_uses_selected_validator_patterns_as_publication_backstop(self):
+    def test_cli_wires_selected_validator_patterns_to_publication_check(self):
         work = temp_dir(self)
-        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        marker = "fixture-publication-marker"
         validator_root = work / "publication-root"
         scripts = validator_root / "scripts"
         scripts.mkdir(parents=True)
         (scripts / "validate.py").write_text(
-            "import re\nPRIVATE_CONTENT = [('encoded home policy', re.compile(" +
-            repr(re.escape(encoded)) + "))]\n")
+            "import re\nPRIVATE_CONTENT = [('fixture publication policy', re.compile(" +
+            repr(re.escape(marker)) + "))]\n")
         res = healthy_result()
-        res["first"][0]["claude_discover"]["notes"] = encoded
-        done = self.cli(work, res, "--repo-root", validator_root)
+        res["first"][0]["claude_discover"]["notes"] = marker
+        done = self.cli(work, res, "--repo-root", validator_root, run_id=marker)
         self.assertEqual(done.returncode, 3, done.stderr)
-        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: encoded home policy", done.stderr)
-        self.assertNotIn(encoded, done.stderr)
+        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: fixture publication policy", done.stderr)
+        self.assertIn("printed summary#/run/runId: fixture publication policy", done.stderr)
+        self.assertNotIn(marker, done.stderr)
 
     def test_cli_redacts_unanchored_wsl_checkout_with_linux_home(self):
         work = temp_dir(self)

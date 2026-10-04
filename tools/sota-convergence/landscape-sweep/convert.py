@@ -41,16 +41,18 @@ Models and effort: each Claude vote names the resolved model and the effort its 
 names the model and effort its job reported.
 Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. Their dash encodings
 (every character outside ASCII letters and digits becomes '-') and project-directory suffixes become
-<project-dir>, including bare home segments. Generic roots are -home-, -Users-, -mnt-<drive>-Users- and
-<drive>--Users- (also multiple separators after the drive). Project slugs need projects/ or claude-<uid>/;
-bare homes need one ASCII alphanumeric username token followed by a slash, single/double quote, whitespace or
-end of string. The converter exempts example followed by a dash or word boundary; the Linux/macOS roots and
-exemption are case-sensitive, Windows/WSL case-insensitive. Unanchored encoded slugs inside scheme/protocol-relative
-URLs or query/fragment tokens are preserved. Redaction traverses strings and keys and keeps sentence-ending
-periods; key collisions fail with exit 3 before any artifacts are written. These rules will be aligned with
-scripts/validate.py's encoded-home rule when it lands. Until then, the private-content check uses the selected
-checkout's own PRIVATE_CONTENT patterns as the fail-closed backstop: retained matches are listed by pointer
-and kind (never their text), and the exit code is 3.
+<project-dir>, including bare home segments. Local and generic rules run over the whole text, including URLs,
+queries, fragments and assignments: privacy takes priority over preserving an encoded slug in a source URL.
+Generic roots are -home-, -Users-, -mnt-<drive>-Users- and <drive>--Users- (also multiple separators after the
+drive). The generic rule follows the coordinating #697 candidate's (?<![\\w-]) boundary, ASCII username class
+[A-Za-z0-9_.]+, and dash or slash/backslash, quote, whitespace, backtick, ')', ']' or end terminator. A dash
+starts a project suffix, which is redacted too. Only lowercase example followed by that tail is exempt;
+Windows/WSL roots remain case-insensitive. Ordinary words such as home-assistant and my-home-page stay unchanged.
+Redaction traverses strings and keys and keeps sentence-ending periods; key collisions fail with exit 3 before
+any artifacts are written. The private-content check still uses the selected checkout's own PRIVATE_CONTENT
+patterns: retained matches are listed by pointer and kind (never their text), and the exit code is 3.
+Until the encoded-home rule lands in scripts/validate.py, the publication check detects no dash-encoded path,
+so this redaction is the only line of defence for that form, and the fixture checks only the wiring.
 Integrity: with --work-dir, every GPT-6 output is compared with the file Codex wrote (gpt6/<job>/last.json). Exit 4
 when the workflow used an output that differs from that file (mismatch), that Codex never wrote (no_file) or that
 Codex wrote as non-JSON (file_unparseable), or when a job that finished with exit 0 wrote an output that never
@@ -93,20 +95,21 @@ SYNTHETIC_MODEL = "<synthetic>"  # child-usage.mjs: the model of client-written 
 COPY_FAILURES = ("mismatch", "no_file", "file_unparseable", "file_only")
 VOTE_ROLES = (("facts", "facts"), ("fit_claude", "Claude fit"), ("fit_gpt6", "GPT-6 fit"))
 SKILLS_CATALOG = "skills"  # build_inputs.SKILLS: the catalog of a skills-* layer, whose proposals are skill refs
-# Generic project directories need a native anchor; bare homes use the terminators below. Local paths are
-# derived at the redaction call site.
-# These are the converter's current roots and example exemption, not parity with an unlanded validator rule.
-# Windows/WSL roots and their example exemption are case-insensitive. A Windows drive begins the segment.
+# Follow #697's reviewed candidate encoded-home boundary, username class, tail and case-sensitive exemption.
+# Retain the converter's additional case-insensitive Windows/WSL roots and multiple Windows separators.
+# Local paths are derived at the redaction call site; no rule excludes URL contexts.
 ENCODED_PROFILE_ROOT = (
-    r"(?:-(?:home|Users)-(?!example(?:-|\b))"
-    r"|(?i:(?:-mnt-[a-z]-Users-|[a-z]-{2,}Users-)(?!example(?:-|\b))))")
+    r"(?:-(?:home|Users)-|(?i:-mnt-[a-z]-Users-|[a-z]-{2,}Users-))")
+ENCODED_HOME_END = r"[/\\\"'\s`)\]]"
+ENCODED_PROFILE_START = ENCODED_PROFILE_ROOT + r"(?!example(?:-|" + ENCODED_HOME_END + r"|$))"
 # Ending on a word character or dash preserves any sentence-ending periods.
 ENCODED_PROJECT_DIR = re.compile(
-    r"(?<![\w.-])(?P<prefix>projects/|claude-\d+/)" + ENCODED_PROFILE_ROOT + r"[\w.-]*[\w-](?![\w-])")
-# A dash after the username starts a longer slug, which still requires an anchor or a local path match.
-ENCODED_BARE_HOME = re.compile(r"(?<![\w.#=?-])" + ENCODED_PROFILE_ROOT + r"[A-Za-z0-9]+(?=[/\"'\s]|$)")
-# Protect whole URL/query/fragment tokens, including slugs deeper in their paths. Native anchors still redact.
-TEXT_TOKEN = re.compile(r"[^\s<>\"']+")
+    r"(?<![\w.-])(?P<prefix>projects/|claude-\d+/)" + ENCODED_PROFILE_START + r"[\w.-]*[\w-](?![\w-])")
+# The lookahead admits the candidate publication rule's name/tail; the consuming match includes project
+# suffixes but never ends on '.', so a sentence's punctuation survives the replacement.
+ENCODED_USER_PROFILE = re.compile(
+    r"(?<![\w-])" + ENCODED_PROFILE_START
+    + r"(?=[A-Za-z0-9_.]+(?:-|(?=" + ENCODED_HOME_END + r"|$)))[\w.-]*[\w-]")
 
 
 def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
@@ -702,37 +705,27 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
 
 
 def redact_project_dirs(value, work: Path | None = None, repo_root: Path | None = REPO_ROOT):
-    """Redact local encoded paths and native directory-anchored user profiles in strings and keys.
+    """Redact local and generic encoded user profiles throughout strings and keys, including URLs.
 
     Use host_replacements' home, checkout, optional work directory and realpath forms; a bare encoded home is
-    also private. Generic Linux/macOS/WSL/Windows project slugs require projects/ or claude-<uid>/. Bare slugs with
-    one ASCII alphanumeric username token need a slash, quote, whitespace or end terminator. Linux/macOS exempt
-    lowercase example; Windows/WSL exempt its case variants too. Unanchored URL/query/fragment tokens and longer
-    unrelated prose are preserved. Colliding keys raise RedactionKeyCollision. These rules will be aligned with
-    validate.py's encoded-home rule when it lands; its actual PRIVATE_CONTENT patterns remain the CLI backstop.
+    also private. Generic Linux/macOS/WSL/Windows slugs use the reviewed #697 candidate's boundary, ASCII username
+    class, terminators and lowercase example exemption; project suffixes are included. Windows/WSL root matching
+    retains the converter's wider case/separator coverage. Plain home-assistant and my-home-page prose survives;
+    URL, query, fragment and assignment contexts receive no exemption. Colliding keys raise RedactionKeyCollision.
+    The CLI uses the selected checkout's actual PRIVATE_CONTENT patterns. Until the encoded-home rule lands in
+    scripts/validate.py, the publication check detects no dash-encoded path, so this redaction is the only line
+    of defence for that form, and the fixture checks only the wiring.
     """
     encoded_paths = sorted({re.sub(r"[^a-zA-Z0-9]", "-", prefix)
                             for prefix, _ in host_replacements(work, repo_root)}, key=lambda form: -len(form))
     local = (re.compile(r"(?<![\w.-])(?:" + "|".join(re.escape(form) for form in encoded_paths)
                         + r")(?:-(?:[\w.-]*[\w-])?)?(?![\w-])") if encoded_paths else None)
 
-    def fix_unanchored(text):
+    def fix(text):
         if local:
             text = local.sub("<project-dir>", text)
-        return ENCODED_BARE_HOME.sub("<project-dir>", text)
-
-    def fix(text):
-        parts, start = [], 0
-        for match in TEXT_TOKEN.finditer(text):
-            token = match[0]
-            if not ("://" in token or token.startswith("//") or any(marker in token for marker in "?#=")):
-                continue
-            parts.append(fix_unanchored(text[start:match.start()]))
-            parts.append(token)
-            start = match.end()
-        parts.append(fix_unanchored(text[start:]))
-        # Apply anchors last so a placeholder cannot split a URL token before its protection is decided.
-        return ENCODED_PROJECT_DIR.sub(lambda match: match["prefix"] + "<project-dir>", "".join(parts))
+        text = ENCODED_PROJECT_DIR.sub(lambda match: match["prefix"] + "<project-dir>", text)
+        return ENCODED_USER_PROFILE.sub("<project-dir>", text)
 
     return rewrite_strings(value, fix)
 
