@@ -76,7 +76,20 @@ src/local-lock.ts:15-37,65-66; src/add.ts:2086-2160; src/agents.ts:815-820.
 A manifest marked "scope": "project" (the runtime-worker manifest) is refused
 without --project-dir, and so is --print-codex-config for it, which only prints
 but names each skill by its installed path in the project. A skill whose status
-is pruned is never installed, in either mode.
+is pruned is never installed, in either mode, and neither is a skill whose status
+is held: it waits for the measurement or gate its entry names (adoption/skills/lifecycle.md,
+"Held"), and --only refuses it as held.
+
+A global entry may name its own targets: "agents" (a subset of claude-code and codex, both by
+default) and "copy": true, which installs a copy into the one target agent's own skills folder
+instead of the shared canonical folder with links (skills@7407f389 README.md:91, :141-142). The
+one form this manifest uses is a Claude-Code-only copy (skill-creator: Codex keeps the copy it
+embeds, so no same-name folder may sit where Codex loads skills); the add and the rollback's remove
+name only the entry's agents, the installed folder read back is the Claude skills folder, and
+--print-codex-config prints no rule for an entry Codex never receives. Such a copy is 'ok' only as a
+real folder in Claude Code's skills folder with no entry of its name in the shared canonical folder:
+a link there, or a same-name entry in the shared folder, is 'misplaced', refused in every mode
+(--check-only, --dry-run and --force included) with exit status 1 and nothing deleted.
 
 --print-codex-config prints one `[[skills.config]]` table with `enabled = false` for
 every codex_enabled: false skill, selecting the installed SKILL.md by `path`, never by
@@ -147,6 +160,8 @@ REMOVE_TIMEOUT = 30
 # L157-159, and the skills@1.7.0 npm dist/cli.mjs L6834-6838, L6883-6914, isUniversalAgent L2180 and getAgentBaseDir
 # L2214; Codex rust-v0.157.1 (commit 36650394) codex-rs/ext/skills/src/host_roots.rs L103-108.
 SKILL_AGENTS = ("claude-code", "codex")
+# Statuses the installer never installs: pruned (left by a dated decision) and held (waits for a named measurement or gate).
+SKIPPED_STATUSES = ("pruned", "held")
 
 # Real-run and --dry-run each have their own notion of "nothing left to fix":
 # a dry run never executes `add`/`remove`, so 'planned' (not 'installed') is
@@ -203,6 +218,50 @@ def canonical_skill_dir(home: Path, name: str, project_dir: Path | None = None) 
     claude-code gets a relative symlink onto it (../../.agents/skills/<name>)."""
     return (project_dir / ".agents" / "skills" / name if project_dir is not None
             else node_path_join(str(home), ".agents", "skills", name))
+
+
+def skill_agents(skill: dict) -> tuple:
+    """The agents a global entry installs for: its "agents" (a subset of SKILL_AGENTS, each once) or both."""
+    agents = skill.get("agents")
+    if agents is None:
+        return SKILL_AGENTS
+    if (not isinstance(agents, list) or not agents or len(set(agents)) != len(agents)
+            or any(agent not in SKILL_AGENTS for agent in agents)):
+        raise InstallError(f"{skill.get('name')}: agents names claude-code and/or codex, each once")
+    return tuple(agent for agent in SKILL_AGENTS if agent in agents)
+
+
+def copy_mode(skill: dict) -> bool:
+    """Whether a global entry installs a copy into its one agent's own skills folder instead of the canonical folder
+    with links (skills@7407f389 README.md:91, :141-142). Only a Claude-Code-only copy is supported: Codex's own folder
+    would hold a same-name copy beside the skills it embeds."""
+    copy = skill.get("copy", False)
+    if not isinstance(copy, bool):
+        raise InstallError(f"{skill.get('name')}: copy is true or false")
+    if copy and skill_agents(skill) != ("claude-code",):
+        raise InstallError(f"{skill.get('name')}: copy installs only into Claude Code's own folder (agents [\"claude-code\"])")
+    return copy
+
+
+def installed_skill_dir(skill: dict, home: Path, project_dir: Path | None = None) -> Path:
+    """Where an entry's installed SKILL.md lives: Claude Code's skills folder for a global copy, else the canonical folder."""
+    if project_dir is None and copy_mode(skill):
+        return claude_skills_dir(home) / skill["name"]
+    return canonical_skill_dir(home, skill["name"], project_dir)
+
+
+def copy_placement_problem(skill: dict, home: Path) -> str | None:
+    """Why a global Claude-Code-only copy is not placed for Claude Code alone, else None. Its entry in Claude Code's skills
+    folder must be a real folder, not a link (a link reads another folder), and the shared canonical folder, where Codex
+    loads skills (codex-rs/ext/skills/src/host_roots.rs L103-108), must hold no entry of the same name, not even a
+    dangling link (os.path.lexists), since Codex keeps the copy it embeds. scripts/skills_status.py fails both layouts
+    the same way. Nothing here deletes either."""
+    claude, shared = installed_skill_dir(skill, home), canonical_skill_dir(home, skill["name"])
+    if claude.is_symlink():
+        return f"{claude} is a link, not Claude Code's own copy"
+    if os.path.lexists(shared):
+        return f"{shared} exists, in the shared folder where Codex loads skills"
+    return None
 
 
 # What JavaScript's String.prototype.trim removes (ECMA-262 WhiteSpace and LineTerminator): the 25 code points
@@ -320,11 +379,16 @@ def pinned_source_trees(source: str, ref: str) -> dict[str, str]:
 
 
 def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, agent: str = "universal") -> str:
-    """'ok' (a)), 'local-modified' (b), refused), or 'install' (needs an add:
-    either a fresh install, a locked-but-mismatched entry, or an unlocked
-    folder that already matches the manifest byte-for-byte)."""
+    """'ok' (a)), 'local-modified' (b), refused), 'misplaced' (a global
+    Claude-Code-only copy whose Claude entry is a link or whose name the shared
+    canonical folder also holds, copy_placement_problem: refused, never 'ok'),
+    or 'install' (needs an add: either a fresh install, a locked-but-mismatched
+    entry, or an unlocked folder that already matches the manifest
+    byte-for-byte)."""
     name = skill["name"]
-    skill_dir = canonical_skill_dir(home, name, project_dir)
+    skill_dir = installed_skill_dir(skill, home, project_dir)
+    if project_dir is None and copy_mode(skill) and copy_placement_problem(skill, home):
+        return "misplaced"
     if project_dir is not None and agent == "claude-code":
         # skills@7407f389 src/installer.ts:254-264 replaces existing aliases,
         # including real directories. Protect them regardless of lock state.
@@ -409,6 +473,15 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
     if state == "ok":
         note(f"{name}: ok (pinned ref already installed and locked)")
         return "ok"
+    if state == "misplaced":
+        # In every mode, --force included: an add would leave the shared entry where Codex loads it, and the rollback
+        # after a failed verification would remove the Claude copy. Nothing is deleted; the person removes the entry.
+        print(f"{name}: misplaced -- {copy_placement_problem(skill, home)}; a Claude-Code-only copy needs a real folder "
+              f"at {installed_skill_dir(skill, home)} and no entry of its name at {canonical_skill_dir(home, name)}. "
+              "Nothing was changed: remove the extra entry with the skills CLI (docs/decisions/"
+              "2026-09-25-skills-trial-and-usage.md, Addendum 2026-09-28: M4 host removal and the scoped-remove "
+              "correction), then run again", file=sys.stderr)
+        return "misplaced"
     if check_only:
         status = "local-modified" if state == "local-modified" else "missing-or-drifted"
         note(f"{name}: {status}")
@@ -420,7 +493,11 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
               f"(pass --force to overwrite it)", file=sys.stderr)
         return "local-modified"
 
-    add_args = ["add", skill["url"], "--skill", name, "-g", "-y", "-a", *SKILL_AGENTS]
+    # A global entry names its own agents (both by default) and may ask for a copy; --copy precedes -a, whose trailing
+    # words the CLI reads as agent names.
+    agents = skill_agents(skill)
+    copy = project_dir is None and copy_mode(skill)
+    add_args = ["add", skill["url"], "--skill", name, "-g", "-y", *(["--copy"] if copy else []), "-a", *agents]
     if project_dir is not None:
         # Keep the canonical folder even for a single non-universal agent.
         # src/add.ts:1775-1810 otherwise selects copy mode for one target dir.
@@ -457,7 +534,7 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
 
     # Remove exactly the add targets. skills@7407f389 src/remove.ts:209-333
     # otherwise removes other agents' copies, and may retain shared canonical data.
-    remove_args = (["remove", name, "-g", "-y", "-a", *SKILL_AGENTS] if project_dir is None
+    remove_args = (["remove", name, "-g", "-y", "-a", *agents] if project_dir is None
                    else ["remove", name, "-y", "-a", *targets])
     try:
         removed = run_skills_bin(skills_bin, remove_args, home, timeout=REMOVE_TIMEOUT, project_dir=project_dir)
@@ -467,12 +544,13 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
     # Read back what the remove left in either mode, whatever it reported (see SKILL_AGENTS): the global
     # canonical folder, lock and Claude link (where the CLI puts it, claude_skills_dir), or the project's.
     # The CLI alone deletes them. A read-back that cannot observe them does not confirm the rollback.
-    canonical = canonical_skill_dir(home, name, project_dir)
+    # For a Claude-Code-only copy the installed folder is the Claude one, so there is no separate link to read back.
+    canonical = installed_skill_dir(skill, home, project_dir)
     claude_link = claude_skills_dir(home, project_dir) / name
     try:
         canonical_retained = canonical.exists() or canonical.is_symlink()
         lock_retained = lock_retains(home, name, project_dir)
-        claude_retained = ((project_dir is None or agent == "claude-code")
+        claude_retained = (not copy and ((project_dir is None and "claude-code" in agents) or agent == "claude-code")
                            and (claude_link.exists() or claude_link.is_symlink()))
     except (OSError, ValueError) as error:
         print(f"{name}: error: rollback could not be verified (exit {removed.returncode}; "
@@ -528,6 +606,8 @@ def print_codex_config(skills: list[dict], home: Path, project_dir: Path | None 
     for skill in skills:
         if not isinstance(skill, dict) or skill.get("codex_enabled") is not False:
             continue
+        if project_dir is None and "codex" not in skill_agents(skill):
+            continue  # never installed where Codex loads skills (a Claude-Code-only entry): there is nothing to turn off
         name = skill.get("name")
         if not isinstance(name, str) or not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", name):
             raise InstallError(f"codex_enabled: false skill {name!r} is not one path component")
@@ -552,7 +632,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true",
                          help="Report planned actions without add/remove; project source lookups still run")
     parser.add_argument("--check-only", action="store_true",
-                         help="Read-only installed pin check; exit 1 for any missing/drifted skill")
+                         help="Read-only installed pin check; exit 1 for any missing/drifted skill or misplaced copy")
     parser.add_argument("--only", action="append", metavar="NAME",
                          help="Process only this manifest skill name; repeatable")
     parser.add_argument("--force", action="store_true",
@@ -620,21 +700,35 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     home = Path(args.home)
-    skills = [s for s in all_skills if not isinstance(s, dict) or s.get("status") != "pruned"]
+    skills = [s for s in all_skills if not isinstance(s, dict) or s.get("status") not in SKIPPED_STATUSES]
     if args.only:
         wanted = list(dict.fromkeys(args.only))
         by_name = {s["name"]: s for s in skills if isinstance(s, dict) and "name" in s}
-        # Look each name up in the whole manifest first: a pruned skill is known, not unknown.
-        known = {s["name"] for s in all_skills if isinstance(s, dict) and "name" in s}
-        unknown = [name for name in wanted if name not in known]
+        # Look each name up in the whole manifest first: a pruned or held skill is known, not unknown.
+        status_of = {s["name"]: s.get("status") for s in all_skills if isinstance(s, dict) and "name" in s}
+        unknown = [name for name in wanted if name not in status_of]
         if unknown:
             print(f"install-skills failed: unknown --only name(s): {unknown}", file=sys.stderr)
             return 1
-        pruned = [name for name in wanted if name not in by_name]
+        pruned = [name for name in wanted if name not in by_name and status_of[name] == "pruned"]
         if pruned:
             print(f"install-skills failed: pruned --only name(s), never installed: {pruned}", file=sys.stderr)
             return 1
+        held = [name for name in wanted if name not in by_name]
+        if held:
+            print(f"install-skills failed: held --only name(s), not installed while held: {held}", file=sys.stderr)
+            return 1
         skills = [by_name[name] for name in wanted]
+    if project_dir is None:
+        # Each global entry's targets, checked before any add (skill_agents, copy_mode).
+        try:
+            for skill in skills:
+                if isinstance(skill, dict):
+                    skill_agents(skill)
+                    copy_mode(skill)
+        except InstallError as error:
+            print(f"install-skills failed: {error}", file=sys.stderr)
+            return 1
 
     if project_dir is not None:
         # Bound the API and filesystem arguments to the pinned GitHub manifest schema.

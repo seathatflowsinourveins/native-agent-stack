@@ -1,0 +1,9 @@
+{
+  "_comment": "The new WSL distribution's additions to adoption/templates/claude.settings.template.json. Only tools/adoption/new_wsl_client_config.py reads this file (the `_comment` key is not a setting and is never rendered): it merges the keys below into the shared template (a key both files define is refused) and wires each through adoption/new-wsl/client-config-map.json, so the shared template stays what the bootstrap applies on every other host. The two allow rules name semble's tools exactly, so Claude Code calls them without asking outside bypass mode and an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3); an allow rule grants a permission, so the map classes them authorization: written only with --with-authorization-settings and only while the code-search slot installs semble.",
+  "permissions": {
+    "allow": [
+      "mcp__semble__search",
+      "mcp__semble__find_related"
+    ]
+  }
+}
