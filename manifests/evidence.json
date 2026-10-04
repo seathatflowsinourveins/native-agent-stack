@@ -12380,16 +12380,6 @@
       "bytes": 4310
     },
     {
-      "path": "blueprints/us-equities/adaptive-paper/trials/series-20261002/README.md",
-      "sha256": "5390eebb57ec278a9598dadacbcdd4d520af0c23c665933ba770d9f3f807bd83",
-      "bytes": 10891
-    },
-    {
-      "path": "blueprints/us-equities/adaptive-paper/trials/series-20261002/receipt.json",
-      "sha256": "c40f2301584c85c88e6d457cfa7923d51d69f9448fcd370198ed2c6896dd34fc",
-      "bytes": 38668
-    },
-    {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
       "sha256": "09d916f81d869a242e9c6d174f55d651deb7812e2e9d8cd6d108b00c6834576e",
       "bytes": 9126
@@ -50126,8 +50116,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "b0c08456764cc0443b54818ba809f4ba34a98fcd9eb974f3901344b5707d2a9c",
-      "bytes": 55855
+      "sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
+      "bytes": 55711
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
