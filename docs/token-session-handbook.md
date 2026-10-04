@@ -288,6 +288,30 @@ Show evidence before a success claim: the command and what it returned (code.cla
 
 Sources: the evidence sentence follows [Claude Code best practices, L52](https://code.claude.com/docs/en/best-practices.md) ("the command it ran and what it returned", read 2026-09-28); its file:line alternative is local policy, not in L52, and is evidence that a child without Bash can give. The carrier gives no instruction to verify finished work before claiming it done and names no verification skill; its codebase-memory caller-list check (above) verifies retrieved edges, not finished work. The [Opus 5 prompting guide, L61 and L81](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5.md), which the [Opus 5.5 guide, L9](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5.md) carries forward, says to remove explicit verification instructions, and [prompting best practices, L780](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md) makes Opus 5 the exception to self-check prompts ([verification-line addendum](decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-28-verification-line)). Already installed: [`skillOverrides` in `adoption/templates/claude.settings.template.json`](../adoption/templates/claude.settings.template.json) sets `search-first` to `name-only`. It is adopted; this hook adds no skill dependency and changes no setting.
 
+### Token lanes carried into the main session
+
+Since 2026-10-04 the settings template runs
+[`token-lanes-session-start.py`](../adoption/hooks/claude/token-lanes-session-start.py) at SessionStart for
+`startup|resume|clear|compact|fork`, every source the [hooks guide](https://code.claude.com/docs/en/hooks#sessionstart)
+documents (read 2026-10-04; resume and fork run SessionStart hooks again). The script returns its sibling
+[`token-lanes-block.main.md`](../adoption/hooks/claude/token-lanes-block.main.md) as `additionalContext`, which reaches
+the main session before its first prompt alongside the values of the other SessionStart hooks. The block complements
+context-mode's own SessionStart routing text instead of repeating it, and adds the ToolSearch line that context-mode
+1.0.169 gives only Agent-tool prompts ([`sessionstart.mjs` L49](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/sessionstart.mjs#L49),
+[`routing.mjs` L892-907](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/core/routing.mjs#L892-L907)).
+The profile installer's `guard` step copies both files against their `SHA256SUMS` rows. The script fails open like
+the subagent carrier: malformed input, a missing, empty or unreadable block or any error gives exit 0 and no output,
+and a session started as a `blind-*` agent or as `semantic-evidence-reviewer` gets nothing.
+
+It adds no enforcement. Context Mode 1.0.169's PreToolUse Read and Grep hooks stay advisory: Read guidance comes once
+per session and again for each read over 50,000 bytes, Grep guidance once, both as context and never as a denial
+([`routing.mjs` L843-872](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/core/routing.mjs#L843-L872)),
+and no setting makes them strict. RTK rewrites Bash calls only; Read, Grep and Glob bypass its hook
+([RTK 0.50.0 README](https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md), L153 and L368). The hooks guide prefers
+factual statements because imperative system text can trip prompt-injection defenses; the block stays imperative, like
+the subagent blocks, and names its source on its first line. Session 99's E2E counts the main session's lane calls;
+this text claims no saving.
+
 ### Known upstream limits behind the lanes
 
 These routing rules, added 2026-09-27, stay outside the carrier text above. Each answers a limit that the pinned upstream source shows or a retained receipt recorded; the linked recipe rows hold the commands.
