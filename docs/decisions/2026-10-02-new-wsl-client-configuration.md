@@ -1084,7 +1084,7 @@ Preserve the existing RTK-managed import when that component is installed.
 
 ```
 
-`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (23 unit(s) left out; 28 of 66 lines stay):
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (24 unit(s) left out; 24 of 65 lines stay):
 
 ```text
 line 11, sentence; names Promptfoo
@@ -1104,6 +1104,9 @@ Prefix every shell command with `rtk`: `rtk git status`, `rtk cargo test`,
 `rtk npm run build`, `rtk ls src/`. Keep the prefix inside chains:
 `rtk git add . && rtk git commit -m "msg"`. Commands RTK has no filter for
 run as-is, so the prefix is always safe.
+
+line 35, heading; nothing is kept under it
+# Command output
 
 line 37, paragraph; names rtk; wrapped over several lines, so a sentence cannot leave without cutting a line
 Command output here is condensed to save tokens, keeping every signal and
@@ -1135,34 +1138,34 @@ line 52, bullet; names rtk
 line 54, marker; names rtk
 <!-- native-agent-stack:rtk-exceptions -->
 
-line 55, heading; names rtk
-## Exceptions to the RTK prefix rule (rtk 0.51.0; earlier observations retained)
+line 56, sentence; names rtk
+rtk 0.51.0 positional expansion needs `--shell`.
 
-line 57, sentence; names rtk
+line 56, sentence; names rtk
 An explicit `rtk` prefix bypasses rtk's own exclusion list, so "the prefix is always safe" does not hold for these commands: rtk changes their output or exit status.
 
-line 57, sentence; names rtk
+line 56, sentence; names rtk
 Run them natively, or as `rtk proxy <command>` to keep the call tracked:
 
-line 58, bullet; names rtk
+line 57, bullet; names rtk
 - `git show REV:path` in any form, including `git -C DIR show REV:path`: rtk keeps about 8 KiB of the blob.
 
-line 59, bullet; names rtk; its first sentence names the tool, so the item goes with its other sentences
-- `diff`: rtk 0.51.0 returns exit 2 for unreadable or missing files, matching native diff ([bf23cff](https://github.com/rtk-ai/rtk/commit/bf23cff467aa3b4aa314d6a4b956630f1e275a5f)); the exit-1 mismatch was observed at 0.50.0. Use proxy when exact output matters.
+line 58, bullet; names rtk
+- `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
 
-line 60, bullet; names rtk
+line 59, bullet; names rtk
 - `git branch`: rtk can list a branch checked out in another worktree as remote-only.
 
-line 61, bullet; names rtk
+line 60, bullet; names rtk
 - `git log` when the complete history matters: rtk stops at 10 commits without a notice and drops merge commits.
 
-line 62, bullet; names rtk
+line 61, bullet; names rtk
 - `jq`: rtk keeps 40 lines of at most 120 characters.
 
-line 63, bullet; names rtk
+line 62, bullet; names rtk
 - `find` on a path that may not exist: rtk exits 0 with no output.
 
-line 65, sentence; names rtk
+line 64, sentence; names rtk
 Never put `rtk` in front of a shell builtin such as `cd`, `export` or `source`: rtk exits 127 and the rest of a `&&` chain does not run.
 
 ```

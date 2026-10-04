@@ -52,11 +52,10 @@ tokens; behavior and exit code are unchanged.
 - `rtk discover` — find past commands RTK could have condensed.
 
 <!-- native-agent-stack:rtk-exceptions -->
-## Exceptions to the RTK prefix rule (rtk 0.51.0; earlier observations retained)
 
-The other observations below retain their 0.50.0 evidence; they have not all been requalified at 0.51.0. An explicit `rtk` prefix bypasses rtk's own exclusion list, so "the prefix is always safe" does not hold for these commands: rtk changes their output or exit status. Run them natively, or as `rtk proxy <command>` to keep the call tracked:
+rtk 0.51.0 positional expansion needs `--shell`. An explicit `rtk` prefix bypasses rtk's own exclusion list, so "the prefix is always safe" does not hold for these commands: rtk changes their output or exit status. Run them natively, or as `rtk proxy <command>` to keep the call tracked:
 - `git show REV:path` in any form, including `git -C DIR show REV:path`: rtk keeps about 8 KiB of the blob.
-- `diff`: rtk 0.51.0 returns exit 2 for unreadable or missing files, matching native diff ([bf23cff](https://github.com/rtk-ai/rtk/commit/bf23cff467aa3b4aa314d6a4b956630f1e275a5f)); the exit-1 mismatch was observed at 0.50.0. Use proxy when exact output matters.
+- `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
 - `git branch`: rtk can list a branch checked out in another worktree as remote-only.
 - `git log` when the complete history matters: rtk stops at 10 commits without a notice and drops merge commits.
 - `jq`: rtk keeps 40 lines of at most 120 characters.
