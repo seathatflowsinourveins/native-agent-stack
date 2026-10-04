@@ -160,18 +160,36 @@ def host_replacements(work: Path | None = None, repo_root: Path | None = REPO_RO
     return sorted(dict(pairs).items(), key=lambda pair: -len(pair[0]))
 
 
+class RedactionKeyCollision(ValueError):
+    """Distinct keys would merge; path names the parent, never the colliding keys."""
+
+    def __init__(self, path):
+        self.path = path
+        super().__init__("redaction key collision")
+
+
+def rewrite_strings(value, fix, path=()):
+    """Rewrite strings and dict keys, refusing collisions instead of discarding a value."""
+    if isinstance(value, str):
+        return fix(value)
+    if isinstance(value, list):
+        return [rewrite_strings(item, fix, (*path, index)) for index, item in enumerate(value)]
+    if isinstance(value, dict):
+        result = {}
+        for key, item in value.items():
+            rewritten_key = fix(key) if isinstance(key, str) else key
+            if rewritten_key in result:
+                raise RedactionKeyCollision(path)
+            result[rewritten_key] = rewrite_strings(item, fix, (*path, rewritten_key))
+        return result
+    return value
+
+
 def sanitize(value, replacements):
-    """value with every string (dict keys included) rewritten by the (prefix, token) replacements."""
+    """Rewrite strings and keys with (prefix, token) replacements; fail on a key collision."""
     def fix(text: str) -> str:
         for prefix, token in replacements:
             text = text.replace(prefix, token)
         return text
 
-    if isinstance(value, str):
-        return fix(value)
-    if isinstance(value, list):
-        return [sanitize(item, replacements) for item in value]
-    if isinstance(value, dict):
-        return {(fix(key) if isinstance(key, str) else key): sanitize(item, replacements)
-                for key, item in value.items()}
-    return value
+    return rewrite_strings(value, fix)

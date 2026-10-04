@@ -692,23 +692,32 @@ records and the North Star R&D readiness they support.
 `convert.py` derives encoded local paths from the home, resolved checkout, optional work directory and their
 realpaths, replacing each non-alphanumeric character with `-`, following
 [sweep_common.host_replacements](sweep_common.py). It replaces each whole segment, bare or with a
-project-directory suffix, with `<project-dir>` even without a directory prefix. Generic Linux, macOS, WSL and
-Windows project-directory segments require `projects/` or `claude-<uid>/`, matching the private profile
-roots and `example` exemption in `scripts/validate.py`. To match the coordinating publication-rule extension
-in #697, generic bare homes with a single alphanumeric username token are also redacted without an anchor
-when followed by `/`, a double or single quote, whitespace or the end of the string. They use the same
-`(?<![\w.-])` left boundary and example exemption; a longer project-directory slug still requires an anchor
-or a known local path. WSL checkouts under a Windows profile are covered even
-when the native home is a Linux path; encoded Windows segments can begin with the drive letter. Redaction covers deeper
-strings and nested JSON fields and keys and preserves sentence-ending periods. Ordinary words and unanchored
-prose remain unchanged. The implementation follows the recursive string/key traversal of
+project-directory suffix, with `<project-dir>` even without a directory prefix, outside URL tokens.
+Encoding replaces every character outside ASCII letters and digits with `-`. Generic project-directory roots
+are `-home-`, `-Users-`, `-mnt-<drive>-Users-` and `<drive>--Users-` (also multiple separators after the drive).
+They require `projects/` or `claude-<uid>/`, with the left boundary `(?<![\w.-])`. Generic bare homes use those
+roots with one ASCII alphanumeric username token followed by `/`, a double or single quote, whitespace or
+the end of the string, with the stricter left boundary `(?<![\w.#=?-])`. A longer project-directory slug
+still requires an anchor or a known local path. The converter exempts `example` followed by a dash or word
+boundary; Linux/macOS roots and their exemption are case-sensitive, Windows/WSL case-insensitive.
+WSL checkouts under a Windows profile are covered even when the native home is a Linux path; encoded Windows
+segments can begin with the drive letter. Unanchored slugs stay unchanged inside scheme URLs, tokens beginning
+with `//`, or tokens containing `?`, `#` or `=`. Native `projects/` and `claude-<uid>/` anchors still redact
+inside those tokens. Redaction covers deeper strings and nested JSON fields and keys and preserves
+sentence-ending periods. Ordinary words and longer unanchored prose remain unchanged.
+The implementation follows the recursive string/key traversal of
 [sweep_common.sanitize](sweep_common.py) at the same `8c32a84b2` source baseline; it uses Python's standard-library
-regular expressions and the existing angle-bracket placeholder style. Fixtures cover notes, nested strings,
+regular expressions and the existing angle-bracket placeholder style. Both the host-path and encoded-path
+stages reject distinct keys that would redact to the same text: exit 3 with a `redaction key collision`
+finding at the parent JSON pointer, before any converted artifacts or summary are written.
+Fixtures cover notes, nested strings,
 bare local and anchored homes, all four profile forms, WSL checkouts, work directories, dict keys, the printed
-summary, bare-home terminators in strings and keys, example-user exemptions, prose and sentence endings.
-UUIDs retain the checkout's existing exit-3 publication
-gate. The separate CC change to `scripts/validate.py` owns detection of encoded home paths; this repair
-sanitizes them before that gate without editing the validator.
+summary, bare-home terminators in strings and keys, converter example-user exemptions, prose, sentence endings,
+URL controls and key collisions. These redaction rules will be aligned with `scripts/validate.py`'s encoded-home
+rule when it lands; they do not claim parity with the unlanded rule. The converter's private-content check uses
+the selected checkout's own `PRIVATE_CONTENT` patterns as the fail-closed publication backstop, returning
+exit 3 for any retained match (including UUIDs). A fixture supplies a selected validator pattern and verifies
+that an encoded slug left by redaction still triggers that gate. This repair does not edit the validator.
 
 Read these fields of `convert.py`'s summary before appending:
 

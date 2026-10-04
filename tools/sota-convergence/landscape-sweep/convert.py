@@ -40,12 +40,17 @@ Models and effort: each Claude vote names the resolved model and the effort its 
 <synthetic> rows name no model); without it, the requested alias and effort null (not measured). The GPT-6 vote
 names the model and effort its job reported.
 Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. Their dash encodings
-(non-alphanumerics become '-') and project-directory suffixes become <project-dir>, including bare home segments.
-Other hosts' Linux, macOS, WSL and Windows project-directory forms need a projects/ or claude-<uid>/ path anchor.
-Generic bare homes with a single alphanumeric username token are also redacted when followed by a slash, quote,
-whitespace or end of string. Both generic forms keep the validator's example-user exemption. Redaction traverses nested strings and dict keys and preserves
-sentence-ending periods. Ordinary words and unanchored prose stay unchanged. Any string still matching
-scripts/validate.py PRIVATE_CONTENT is listed by pointer and kind (never its text), and the exit code is 3.
+(every character outside ASCII letters and digits becomes '-') and project-directory suffixes become
+<project-dir>, including bare home segments. Generic roots are -home-, -Users-, -mnt-<drive>-Users- and
+<drive>--Users- (also multiple separators after the drive). Project slugs need projects/ or claude-<uid>/;
+bare homes need one ASCII alphanumeric username token followed by a slash, single/double quote, whitespace or
+end of string. The converter exempts example followed by a dash or word boundary; the Linux/macOS roots and
+exemption are case-sensitive, Windows/WSL case-insensitive. Unanchored encoded slugs inside scheme/protocol-relative
+URLs or query/fragment tokens are preserved. Redaction traverses strings and keys and keeps sentence-ending
+periods; key collisions fail with exit 3 before any artifacts are written. These rules will be aligned with
+scripts/validate.py's encoded-home rule when it lands. Until then, the private-content check uses the selected
+checkout's own PRIVATE_CONTENT patterns as the fail-closed backstop: retained matches are listed by pointer
+and kind (never their text), and the exit code is 3.
 Integrity: with --work-dir, every GPT-6 output is compared with the file Codex wrote (gpt6/<job>/last.json). Exit 4
 when the workflow used an output that differs from that file (mismatch), that Codex never wrote (no_file) or that
 Codex wrote as non-JSON (file_unparseable), or when a job that finished with exit 0 wrote an output that never
@@ -69,8 +74,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import (REPO_ROOT, canon, deviation_rounds, host_replacements, ledger_module, load_json,  # noqa: E402
-                          pointer_token, private_content, private_findings, sanitize, slug, write_json)
+from sweep_common import (REPO_ROOT, RedactionKeyCollision, canon, deviation_rounds, host_replacements,  # noqa: E402
+                          ledger_module, load_json, pointer_token, private_content, private_findings,
+                          rewrite_strings, sanitize, slug, write_json)
 from usage_record import superseded_at_required_effort  # noqa: E402
 
 # The Claude judgment roles all run on Opus (sweep.js WORKER, adoption/agents/claude/landscape-sweep-worker.md): the
@@ -89,9 +95,8 @@ VOTE_ROLES = (("facts", "facts"), ("fit_claude", "Claude fit"), ("fit_gpt6", "GP
 SKILLS_CATALOG = "skills"  # build_inputs.SKILLS: the catalog of a skills-* layer, whose proposals are skill refs
 # Generic project directories need a native anchor; bare homes use the terminators below. Local paths are
 # derived at the redaction call site.
-# Match scripts/validate.py's personal home and Windows user roots and example exemption. Windows/WSL roots
-# and their example exemption are case-insensitive, as in the validator. A Windows drive begins the segment.
-# Share roots and exemptions so the anchored and bare rules stay consistent.
+# These are the converter's current roots and example exemption, not parity with an unlanded validator rule.
+# Windows/WSL roots and their example exemption are case-insensitive. A Windows drive begins the segment.
 ENCODED_PROFILE_ROOT = (
     r"(?:-(?:home|Users)-(?!example(?:-|\b))"
     r"|(?i:(?:-mnt-[a-z]-Users-|[a-z]-{2,}Users-)(?!example(?:-|\b))))")
@@ -99,7 +104,9 @@ ENCODED_PROFILE_ROOT = (
 ENCODED_PROJECT_DIR = re.compile(
     r"(?<![\w.-])(?P<prefix>projects/|claude-\d+/)" + ENCODED_PROFILE_ROOT + r"[\w.-]*[\w-](?![\w-])")
 # A dash after the username starts a longer slug, which still requires an anchor or a local path match.
-ENCODED_BARE_HOME = re.compile(r"(?<![\w.-])" + ENCODED_PROFILE_ROOT + r"[A-Za-z0-9]+(?=[/\"'\s]|$)")
+ENCODED_BARE_HOME = re.compile(r"(?<![\w.#=?-])" + ENCODED_PROFILE_ROOT + r"[A-Za-z0-9]+(?=[/\"'\s]|$)")
+# Protect whole URL/query/fragment tokens, including slugs deeper in their paths. Native anchors still redact.
+TEXT_TOKEN = re.compile(r"[^\s<>\"']+")
 
 
 def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
@@ -699,30 +706,35 @@ def redact_project_dirs(value, work: Path | None = None, repo_root: Path | None 
 
     Use host_replacements' home, checkout, optional work directory and realpath forms; a bare encoded home is
     also private. Generic Linux/macOS/WSL/Windows project slugs require projects/ or claude-<uid>/. Bare slugs with
-    one alphanumeric username token need a slash, quote, whitespace or end terminator. Both rules share the
-    validator's example exemption; longer unanchored prose such as an unrelated home-assistant repo is preserved.
+    one ASCII alphanumeric username token need a slash, quote, whitespace or end terminator. Linux/macOS exempt
+    lowercase example; Windows/WSL exempt its case variants too. Unanchored URL/query/fragment tokens and longer
+    unrelated prose are preserved. Colliding keys raise RedactionKeyCollision. These rules will be aligned with
+    validate.py's encoded-home rule when it lands; its actual PRIVATE_CONTENT patterns remain the CLI backstop.
     """
     encoded_paths = sorted({re.sub(r"[^a-zA-Z0-9]", "-", prefix)
                             for prefix, _ in host_replacements(work, repo_root)}, key=lambda form: -len(form))
     local = (re.compile(r"(?<![\w.-])(?:" + "|".join(re.escape(form) for form in encoded_paths)
                         + r")(?:-(?:[\w.-]*[\w-])?)?(?![\w-])") if encoded_paths else None)
 
-    def fix(text):
+    def fix_unanchored(text):
         if local:
             text = local.sub("<project-dir>", text)
-        text = ENCODED_PROJECT_DIR.sub(lambda match: match["prefix"] + "<project-dir>", text)
         return ENCODED_BARE_HOME.sub("<project-dir>", text)
 
-    def walk(item):
-        if isinstance(item, str):
-            return fix(item)
-        if isinstance(item, list):
-            return [walk(part) for part in item]
-        if isinstance(item, dict):
-            return {(fix(key) if isinstance(key, str) else key): walk(part) for key, part in item.items()}
-        return item
+    def fix(text):
+        parts, start = [], 0
+        for match in TEXT_TOKEN.finditer(text):
+            token = match[0]
+            if not ("://" in token or token.startswith("//") or any(marker in token for marker in "?#=")):
+                continue
+            parts.append(fix_unanchored(text[start:match.start()]))
+            parts.append(token)
+            start = match.end()
+        parts.append(fix_unanchored(text[start:]))
+        # Apply anchors last so a placeholder cannot split a URL token before its protection is decided.
+        return ENCODED_PROJECT_DIR.sub(lambda match: match["prefix"] + "<project-dir>", "".join(parts))
 
-    return walk(value)
+    return rewrite_strings(value, fix)
 
 
 def main(argv=None) -> int:
@@ -753,16 +765,30 @@ def main(argv=None) -> int:
         return 2
     repo_root = args.repo_root.resolve()
     replacements = host_replacements(work, repo_root)
-    args.out.mkdir(parents=True, exist_ok=True)
-    findings = []
-    for name in ("returns", "lanes", "layers", "survivors"):
-        document = redact_project_dirs(sanitize(out[name], replacements), work, repo_root)
-        write_json(args.out / f"{name}.json", document)
-        findings.extend((f"{name}.json#{pointer}", kind) for pointer, kind in private_findings(document, patterns))
     summary = {**out["summary"], "run": meta}
     if meta.get("status") not in (None, "completed"):
         summary["warning"] = f"the run record's status is {meta.get('status')!r}, not completed"
-    print(json.dumps(redact_project_dirs(summary, work, repo_root), indent=1))
+    documents = {}
+    try:
+        for name in ("returns", "lanes", "layers", "survivors", "summary"):
+            value = summary if name == "summary" else out[name]
+            documents[name] = redact_project_dirs(sanitize(value, replacements), work, repo_root)
+    except RedactionKeyCollision as error:
+        parent = redact_project_dirs(sanitize(list(error.path), replacements), work, repo_root)
+        pointer = "/" + "/".join(pointer_token(part) for part in parent)
+        if private_findings(parent, patterns):
+            pointer = "<private-parent>"
+        location = "printed summary" if name == "summary" else f"{name}.json"
+        print(f"convert.py: {location}#{pointer}: redaction key collision (no artifacts written)", file=sys.stderr)
+        return EXIT_PRIVATE
+    args.out.mkdir(parents=True, exist_ok=True)
+    findings = []
+    for name, document in documents.items():
+        location = "printed summary" if name == "summary" else f"{name}.json"
+        if name != "summary":
+            write_json(args.out / location, document)
+        findings.extend((f"{location}#{pointer}", kind) for pointer, kind in private_findings(document, patterns))
+    print(json.dumps(documents["summary"], indent=1))
     if findings:
         print("possible private content (redact before registering; text not shown):", file=sys.stderr)
         for pointer, kind in findings:
