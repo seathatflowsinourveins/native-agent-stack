@@ -7,7 +7,7 @@ party, third-party trackers, what nothing maintained covers). The sources were r
 
 - `scripts/upstream_surface_watch.py`;
 - `catalogs/foundation/upstream-surface-baseline.json` and `upstream-surface-dispositions.json`;
-- the `surface_unreviewed` count in `scripts/currency_due.py`;
+- the `surface_unreviewed` count in `scripts/currency_due.py` and its handling of a stale or unreadable report;
 - `adoption/templates/systemd/upstream-surface-watch.service` and the `Wants=`/`After=` lines of
   `stack-currency.service`;
 - the tests, `docs/upstream-surface-watch.md` and this record.
@@ -31,7 +31,8 @@ signal when a release adds a switch. The repository's daily machinery (`scripts/
   is not missed.
 - **Codex config keys:** the `config-schema.json` asset of the stable GitHub release (generated from `ConfigToml`).
   It is reached through one `gh api .../releases/latest` call and verified against the asset's published sha256
-  digest.
+  digest; GitHub published one for rust-v0.160.0 (read 2026-10-04T14:36Z). A release without a digest is read
+  unverified, and its coverage record and a note say so.
 - **Codex features:** `codex features list` of the installed binary, run under an empty temporary `CODEX_HOME`.
 - **Changelogs:** Claude Code's `CHANGELOG.md`, and the Codex stable release notes. The notes come from GraphQL,
   because the REST release list carries about 176 assets per release, 9 MB for 30 releases.

@@ -7,8 +7,11 @@
 # units fail to start or cannot be added to the transaction, this has no impact on the validity of the transaction
 # as a whole, and this unit will still be started". For a service, After= waits until "all its configured start-up
 # commands have been invoked and they either failed or reported start-up success" (the same page), so a failed,
-# timed-out or missing watch never blocks the currency run; currency_due.py then counts the last report that is at
-# most three days old, or notes "surface watch not run".
+# timed-out or missing watch never blocks the currency run. currency_due.py then counts the last report whose data is
+# at most three days old (a source the watch took from the cache after a failed fetch keeps its fetch time); an older,
+# future-dated or unreadable report is "surface watch stale" or "surface watch unreadable", a check that could not
+# answer (the earlier notice stays and the line never says "nothing due"), and no report is the coverage note "surface
+# watch not run".
 #
 # @REPOSITORY@ is the live clone, as for stack-currency.service (never the working checkout or a build worktree).
 # Install both services and the timer together and verify them (adoption/lifecycle.md):

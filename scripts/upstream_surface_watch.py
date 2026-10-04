@@ -26,7 +26,8 @@ Sources (each URL re-read 2026-10-04):
 - S4  codex:config, the key paths of the stable release's config-schema.json asset (top-level keys, nested table keys
       and features.* keys; `*` stands for a map entry and `[]` for an array item, and a path is emitted only for a
       named property), found through one `gh api repos/openai/codex/releases/latest` call (the gh convention of
-      tools/sota-convergence/github_freshness.py) and verified against the asset's published sha256 digest; and
+      tools/sota-convergence/github_freshness.py) and verified against the asset's published sha256 digest (a
+      release without one is read unverified, and the source's digest_check and a coverage note say so); and
       codex:feature, (name, stage, enabled) from `codex features list` of the installed binary, run with an empty
       temporary CODEX_HOME and HOME, so it neither reads nor writes the host's Codex home and its enabled column is
       the binary's default.
@@ -46,10 +47,14 @@ trackers (amitray007/claude-code-schema release catalogs, chenrui333/codex-docs 
 failure never fails the run.
 
 With --network every fetched artifact is cached under <state-dir>/cache; without it (the default) the run reads that
-cache and says so ("surface watch (cache)" and each source's origin). Unless --dry-run, a successful run writes the
-cache and then <state-dir>/latest.json atomically (a temporary file in the same directory, fsync, mode 0600,
-os.replace); --dry-run writes nothing and creates no directory. The default state directory is
-${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/surface-watch, the directory scripts/currency_due.py reads.
+cache and says so ("surface watch (cache)" and each source's origin). A --network fetch that fails falls back to the
+cache, and the line says "surface watch (partial cache)" (or "(cache)" when every fetch fell back). latest.json's
+generated_at is the time of the oldest data the report holds, the oldest cached fetch when any source came from the
+cache, so scripts/currency_due.py never counts a report replayed or patched from an old cache as fresh; run_at is the
+run's time. Unless --dry-run, a successful run writes the cache and then <state-dir>/latest.json atomically (a
+temporary file in the same directory, fsync, mode 0600, os.replace); --dry-run writes nothing and creates no
+directory. The default state directory is ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/surface-watch, the
+directory scripts/currency_due.py reads.
 
   python3 scripts/upstream_surface_watch.py --network            # fetch, diff, write; one line for the journal
   python3 scripts/upstream_surface_watch.py --dry-run            # the report as text from the cache; write nothing
@@ -354,9 +359,11 @@ def http_fetch(url: str):
 class Fetcher:
     """Each source through one call: with --network fetch it (falling back to the cache, and saying so, when the fetch
     fails), without it read the cache. A cache entry is <id>.body plus <id>.json ({source, url, version, fetched_utc,
-    sha256, bytes}); a body whose sha256 does not match its record, or a record for another URL, is no cache. New
-    entries are written only by commit(), after the run has succeeded and just before latest.json, so an offline
-    run replays the run that wrote latest.json."""
+    sha256, bytes}); a body whose sha256 does not match its record, a record for another URL and a record without a
+    YYYY-MM-DDTHH:MM:SSZ fetched_utc (the time that ages a report built from it) are no cache. New entries are written
+    only by commit(), after the run has succeeded and just before latest.json, so an offline run replays the run that
+    wrote latest.json. Every record says whether its source is required and whether it is a report-only cross-check;
+    the data of every other source ages the report (cache_use())."""
 
     def __init__(self, state: Path, network: bool, now_text: str):
         self.directory = state / CACHE_DIR
@@ -373,10 +380,20 @@ class Fetcher:
             return None
         if not isinstance(meta, dict) or meta.get("sha256") != sha256_hex(body):
             return None
+        if not isinstance(meta.get("fetched_utc"), str) or not ISO_UTC.fullmatch(meta["fetched_utc"]):
+            return None
         return body, meta
 
     def obtain(self, source: str, url: str, fetch, *, version: str | None = None, required: bool = True,
-               digest: str | None = None) -> bytes | None:
+               digest: str | None = None, digest_expected: bool = False, cross_check: bool = False) -> bytes | None:
+        """The body of ``source``. With ``digest`` the body must match that published sha256 digest; a source whose
+        publisher normally gives one (``digest_expected``) and did not this time is read unverified, and its record
+        says so (digest_check)."""
+        flags = {"required": required, "cross_check": cross_check}
+        if digest:
+            flags["digest_check"] = "verified against the published sha256 digest"
+        elif digest_expected:
+            flags["digest_check"] = "unverified: no published sha256 digest"
         reason = None
         if self.network:
             try:
@@ -390,7 +407,7 @@ class Fetcher:
                 meta = {"source": source, "url": url, "version": observed_version, "fetched_utc": self.now_text,
                         "sha256": sha256_hex(body), "bytes": len(body)}
                 self.pending.append((source, body, meta))
-                self.records[source] = dict(meta, origin="network")
+                self.records[source] = dict(meta, origin="network", **flags)
                 return body
         entry = self.cached(source)
         if entry is not None:
@@ -403,16 +420,30 @@ class Fetcher:
                 origin = "cache" if reason is None else f"cache; the network fetch failed: {reason}"
                 self.records[source] = {"source": source, "url": url, "version": meta.get("version"),
                                         "fetched_utc": meta.get("fetched_utc"), "sha256": meta.get("sha256"),
-                                        "bytes": meta.get("bytes"), "origin": origin}
+                                        "bytes": meta.get("bytes"), "origin": origin, **flags}
                 return body
         detail = reason or "no cache; run with --network"
         if required:
             raise SourceUnavailable(source, detail)
-        self.records[source] = {"source": source, "url": url, "origin": "unavailable", "error": detail}
+        self.records[source] = {"source": source, "url": url, "origin": "unavailable", "error": detail, **flags}
         return None
 
     def skip(self, source: str, url: str, why: str) -> None:
-        self.records[source] = {"source": source, "url": url, "origin": "skipped", "error": why}
+        self.records[source] = {"source": source, "url": url, "origin": "skipped", "error": why, "required": False,
+                                "cross_check": False}
+
+    def cache_use(self) -> tuple[str | None, str]:
+        """(summary label, data time) of this run. The label is "cache" when every source that gave data came from
+        the cache (an offline run, or --network with every fetch failing), "partial cache" when some did, else None;
+        cross-checks are report-only and do not count. The data time is the oldest fetched_utc of a source that came
+        from the cache, else the run's time: a report replayed or patched from the cache is as old as that cache."""
+        used = [record for record in self.records.values() if not record.get("cross_check")
+                and (record.get("origin") == "network" or str(record.get("origin")).startswith("cache"))]
+        cached = [record for record in used if str(record.get("origin")).startswith("cache")]
+        label = None
+        if cached or not self.network:
+            label = "cache" if len(cached) == len(used) or not self.network else "partial cache"
+        return label, min([self.now_text, *(record["fetched_utc"] for record in cached)])
 
     def commit(self) -> None:
         for source, body, meta in self.pending:
@@ -998,7 +1029,7 @@ def observe(fetcher: Fetcher, channel: str, codex_binary: str | None) -> dict:
     release = parse_codex_release(fetcher.obtain("github-codex-latest-release", CODEX_LATEST_URL,
                                                  gh_fetch([CODEX_LATEST_PATH])))
     schema = fetcher.obtain("codex-config-schema", release["schema_url"], http_fetch(release["schema_url"]),
-                            version=release["tag"], digest=release["schema_digest"])
+                            version=release["tag"], digest=release["schema_digest"], digest_expected=True)
     names["codex:config"] = flatten_codex_schema(schema)
 
     features, binary_version = None, None
@@ -1073,7 +1104,8 @@ def compare_names(ours, theirs) -> dict:
 
 
 def cross_check_claude(fetcher: Fetcher, names: dict) -> dict:
-    body = fetcher.obtain("xc-amitray-latest-release", AMIT_LATEST_URL, gh_fetch([AMIT_LATEST_PATH]), required=False)
+    body = fetcher.obtain("xc-amitray-latest-release", AMIT_LATEST_URL, gh_fetch([AMIT_LATEST_PATH]), required=False,
+                          cross_check=True)
     if body is None:
         return {"status": "unavailable", "error": fetcher.records["xc-amitray-latest-release"]["error"]}
     release = json.loads(body)
@@ -1086,7 +1118,7 @@ def cross_check_claude(fetcher: Fetcher, names: dict) -> dict:
         digest = asset.get("digest") if isinstance(asset.get("digest"), str) else None
         data = fetcher.obtain(f"xc-amitray-{name.split('.')[0]}", asset["browser_download_url"],
                               http_fetch(asset["browser_download_url"]), version=release.get("tag_name"),
-                              required=False, digest=digest)
+                              required=False, digest=digest, digest_expected=True, cross_check=True)
         if data is None:
             return {"status": "unavailable", "tag": release.get("tag_name"), "error": f"{name} not fetched"}
         catalogs[name] = json.loads(data)
@@ -1111,7 +1143,7 @@ def cross_check_claude(fetcher: Fetcher, names: dict) -> dict:
 
 def cross_check_codex(fetcher: Fetcher, features: dict | None) -> dict:
     body = fetcher.obtain("xc-chenrui-lifecycle", CHENRUI_LIFECYCLE_URL, http_fetch(CHENRUI_LIFECYCLE_URL),
-                          required=False)
+                          required=False, cross_check=True)
     if body is None:
         return {"status": "unavailable", "error": fetcher.records["xc-chenrui-lifecycle"]["error"]}
     lifecycle = json.loads(body)
@@ -1162,10 +1194,11 @@ def details_command(root: Path, state: Path, args, needs_network: bool) -> str:
     return join_command(command)
 
 
-def summary_line(counts: list[str], tail: str, candidates: list[str], offline: bool) -> str:
+def summary_line(counts: list[str], tail: str, candidates: list[str], label: str | None) -> str:
     """The counts and the first candidate command that leaves them MIN_COUNTS_ROOM characters, within SUMMARY_LIMIT;
-    ``tail`` (the versions) is added only when it fits. No fitting candidate is a usage error (exit 2)."""
-    prefix = "surface watch (cache): " if offline else "surface watch: "
+    ``tail`` (the versions) is added only when it fits. ``label`` ("cache" or "partial cache", Fetcher.cache_use())
+    marks a line built from cached data. No fitting candidate is a usage error (exit 2)."""
+    prefix = f"surface watch ({label}): " if label else "surface watch: "
     for candidate in candidates:
         suffix = f"; details: {candidate}"
         room = SUMMARY_LIMIT - len(prefix) - len(suffix)
@@ -1235,7 +1268,9 @@ def run(args) -> tuple[dict, str]:
     from_xdg = args.state_dir is None and os.path.isabs(os.environ.get("XDG_STATE_HOME") or "")
     candidates = [command] + ([] if args.dry_run else [join_command(["cat", notice_path(latest_path)])]
                               + ([XDG_POINTER] if from_xdg else []))
-    summary_line(["nothing new"], "", candidates, not args.network)  # fail before any fetch when no line can fit
+    # Fail before any fetch when no line can fit, with the longest prefix this run can produce (a --network run whose
+    # fetch falls back to the cache says "partial cache").
+    summary_line(["nothing new"], "", candidates, "partial cache" if args.network else "cache")
     if args.write_baseline and baseline_path.exists() and not args.force:
         raise UsageError(f"baseline exists: {baseline_path}; pass --force to replace it")
     dispositions = load_dispositions(dispositions_path)
@@ -1274,10 +1309,20 @@ def run(args) -> tuple[dict, str]:
     npm_codex = observed["codex_tags"].get("latest")
     if version_key(npm_codex) != version_key(release["tag"]):
         notes.append(f"npm {CODEX_PACKAGE} latest {npm_codex} differs from the GitHub stable release {release['tag']}")
+    if not release["schema_digest"]:
+        notes.append(f"GitHub published no sha256 digest for the {CODEX_SCHEMA_ASSET} asset of {release['tag']}; "
+                     f"the schema was read unverified")
+    label, data_time = fetcher.cache_use()
+    from_cache = sorted(source for source, record in fetcher.records.items()
+                        if not record.get("cross_check") and str(record.get("origin")).startswith("cache"))
+    if args.network and from_cache:
+        notes.append(f"{len(from_cache)} source(s) came from the cache after a failed fetch, so generated_at is the "
+                     f"oldest cached fetch time, not the run time (run_at)")
     not_observed = {kind: fetcher.records.get("codex-features-list", {}).get("error", "not observed")
                     for kind in KINDS if kind not in observed["names"]}
     coverage = {
         "mode": "network" if args.network else "offline: read the cached fetches in the state directory",
+        "from_cache": from_cache,
         "sources": [fetcher.records[source] for source in sorted(fetcher.records)],
         "kinds_observed": [kind for kind in KINDS if kind in observed["names"]],
         "kinds_not_observed": not_observed,
@@ -1292,9 +1337,12 @@ def run(args) -> tuple[dict, str]:
     if stage_changed:
         counts.append(f"{len(stage_changed)} stage change" + ("" if len(stage_changed) == 1 else "s"))
     tail = f"(Claude Code {observed['watched']}, Codex {release['tag'].removeprefix('rust-v')})"
+    # generated_at is the time of the oldest data the report holds (scripts/currency_due.py ages the report by it):
+    # the run's time when every source came from the network, else the oldest cached fetch. run_at is the run's time.
     document = {
         "schema_version": SCHEMA_VERSION,
-        "generated_at": now_text,
+        "generated_at": data_time,
+        "run_at": now_text,
         "versions": versions,
         "new": new,
         "removed": removed,
@@ -1303,7 +1351,7 @@ def run(args) -> tuple[dict, str]:
         "unreviewed": unreviewed,
         "coverage": coverage,
         "cross_check": crossed,
-        "summary_line": summary_line(counts, tail, candidates, not args.network),
+        "summary_line": summary_line(counts, tail, candidates, label),
     }
     action = "dry run: wrote nothing"
     if not args.dry_run:
@@ -1341,10 +1389,13 @@ def render_text(document: dict, action: str) -> str:
                  f"release(s) newer than {codex['baseline']}")
     lines += [f"    {title}" for title in (claude["titles"] + codex["titles"])[:TITLE_LIMIT]]
     lines.append(f"coverage: {coverage['mode']}")
+    if document["generated_at"] != document["run_at"]:
+        lines.append(f"  data as of {document['generated_at']} (the oldest cached fetch); run at {document['run_at']}")
     for record in coverage["sources"]:
         lines.append(f"  {record['source']}: {record['origin']}" + (
             f", fetched {record['fetched_utc']}" if record.get("fetched_utc") else "") + (
-            f", version {record['version']}" if record.get("version") else ""))
+            f", version {record['version']}" if record.get("version") else "") + (
+            f", {record['digest_check']}" if record.get("digest_check") else ""))
     for kind, why in coverage["kinds_not_observed"].items():
         lines.append(f"  not observed: {kind}: {why}")
     lines += [f"  note: {note}" for note in coverage["notes"]]

@@ -1084,16 +1084,26 @@ class HostAlertTests(unittest.TestCase):
 
 class SurfaceWatchTests(unittest.TestCase):
     """The sixth count: scripts/upstream_surface_watch.py's latest.json in the state directory's surface-watch/,
-    read offline, counted only while at most three days old (synthetic reports, not watch output)."""
+    read offline, counted only while its data is at most three days old (synthetic reports in the watch's shape, not
+    watch output; tests/test_upstream_surface_watch.py FreshnessTests feeds real watch output to surface_findings)."""
 
     KEYS = ["claude:setting:newSetting", "claude:env:CLAUDE_CODE_NEW", "codex:feature:brand_new"]
 
+    @staticmethod
+    def source(name: str, origin: str, fetched_utc: str, cross_check: bool = False) -> dict:
+        return {"source": name, "url": f"https://example.com/{name}", "version": None, "fetched_utc": fetched_utc,
+                "sha256": "0" * 64, "bytes": 1, "origin": origin, "required": not cross_check,
+                "cross_check": cross_check}
+
     def report(self, checkout: Checkout, generated_at: str = "2026-09-29T12:00:00Z", unreviewed=None,
-               raw: str | None = None) -> None:
+               raw: str | None = None, sources=None, run_at: str | None = None) -> None:
         path = checkout.state / "surface-watch" / "latest.json"
         path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-        document = {"schema_version": 1, "generated_at": generated_at, "new": [], "removed": [], "stage_changed": [],
-                    "unreviewed": self.KEYS if unreviewed is None else unreviewed,
+        if sources is None:
+            sources = [self.source("claude-env-vars-page", "network", generated_at)]
+        document = {"schema_version": 1, "generated_at": generated_at, "run_at": run_at or generated_at, "new": [],
+                    "removed": [], "stage_changed": [], "unreviewed": self.KEYS if unreviewed is None else unreviewed,
+                    "coverage": {"mode": "network", "from_cache": [], "sources": sources},
                     "summary_line": "surface watch: 3 unreviewed of 3 new; details: python3 x --dry-run"}
         path.write_text(raw if raw is not None else json.dumps(document), encoding="utf-8")
 
@@ -1150,24 +1160,139 @@ class SurfaceWatchTests(unittest.TestCase):
                 self.assertEqual(document["due"].get("surface_unreviewed"), expected)
                 coverage = document["details"][-1]
                 if expected is None:
-                    self.assertEqual(coverage["surface_watch"], "surface watch not run")
+                    self.assertEqual(coverage["surface_watch"], "surface watch stale")
                     self.assertIn(generated_at, coverage["surface_watch_reason"])
 
-    def test_an_unreadable_report_is_a_coverage_note_never_an_error(self):
+    def test_a_report_is_aged_by_its_oldest_cached_source_not_by_generated_at_alone(self):
+        # H1: a --network run whose fetch fell back to the cache is as old as that cache. The watch writes
+        # generated_at so; this report says otherwise, and the per-source records still age it. A cross-check from
+        # the cache is report-only and does not.
+        old, fresh = "2026-09-26T12:00:00Z", "2026-09-30T06:00:00Z"
+        cases = {
+            "a required source from the cache": ([self.source("claude-env-vars-page", "network", fresh),
+                                                  self.source("claude-mods-overview-page",
+                                                              "cache; the network fetch failed: OSError: x", old)],
+                                                 None),
+            "an offline replay": ([self.source("claude-env-vars-page", "cache", old)], None),
+            "a cross-check from the cache": ([self.source("claude-env-vars-page", "network", fresh),
+                                              self.source("xc-chenrui-lifecycle", "cache", old, cross_check=True)],
+                                             3),
+        }
+        for label, (sources, expected) in cases.items():
+            with self.subTest(case=label):
+                checkout = Checkout(self)
+                self.report(checkout, fresh, sources=sources)
+                document = self.document(checkout)
+                self.assertEqual(document["due"].get("surface_unreviewed"), expected)
+                coverage = document["details"][-1]
+                if expected is None:
+                    self.assertEqual(coverage["surface_watch"], "surface watch stale")
+                    self.assertIn(f"data of {old} is more than 3 days old", coverage["surface_watch_reason"])
+
+    def test_an_unreadable_report_is_an_incomplete_check_never_an_error(self):
         cases = {"not JSON": "{not json", "an array": "[]",
                  "no unreviewed list": json.dumps({"generated_at": NOW, "unreviewed": "x"}),
                  "keys that are not strings": json.dumps({"generated_at": NOW, "unreviewed": [1]}),
-                 "no time": json.dumps({"generated_at": "yesterday", "unreviewed": []})}
+                 "no time": json.dumps({"generated_at": "yesterday", "unreviewed": []}),
+                 "no per-source records": json.dumps({"generated_at": NOW, "unreviewed": []}),
+                 "a cached source without a time": json.dumps({"generated_at": NOW, "unreviewed": [], "coverage": {
+                     "sources": [{"source": "s", "origin": "cache", "fetched_utc": None}]}}),
+                 "nested too deeply": "[" * 200000 + "]" * 200000}
         for label, raw in cases.items():
             with self.subTest(report=label):
                 checkout = Checkout(self)
                 self.report(checkout, raw=raw)
-                code, _, stderr = checkout.run()
+                code, stdout, stderr = checkout.run()
                 self.assertEqual(code, 0, stderr)
                 self.assertFalse(checkout.due_file.exists())
+                self.assertIn("(no due-file)", stdout)
                 document = self.document(checkout)
                 self.assertNotIn("surface_unreviewed", document["due"])
                 self.assertEqual(document["details"][-1]["surface_watch"], "surface watch output unreadable")
+                self.assertEqual(document["summary_line"], "stack currency: nothing known due, surface watch "
+                                                           f"unreadable; details: {checkout.command()}")
+
+    def test_a_stale_or_unreadable_report_keeps_the_earlier_due_file_and_never_says_nothing_due(self):
+        # M4: a report that exists but could not answer is a check that could not answer, as an incomplete skill
+        # check is: the earlier notice stays byte-identical and the line names the gap with a runnable command.
+        for label, change in (("stale", lambda c: self.report(c, "2026-09-26T12:00:00Z")),
+                              ("future-dated", lambda c: self.report(c, "2026-09-30T14:00:00Z")),
+                              ("unreadable", lambda c: self.report(c, raw="{not json"))):
+            with self.subTest(report=label):
+                checkout = Checkout(self)
+                change(checkout)
+                checkout.state.mkdir(parents=True, exist_ok=True)
+                checkout.due_file.write_text('{"earlier": true}\n', encoding="utf-8")
+                before = checkout.due_file.read_bytes()
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertEqual(checkout.due_file.read_bytes(), before)
+                self.assertIn(f"(kept {checkout.due_file})", stdout)
+                line = stdout.split(" (kept ", 1)[0]
+                self.assertTrue(line.startswith("stack currency: nothing known due, surface watch "), line)
+                self.assertNotIn("nothing due", line.replace("nothing known due", ""))
+                self.assertTrue(line.endswith(f"; details: {checkout.command()}"), line)
+                self.assertLessEqual(len(line), 160)
+                _, text, _ = checkout.run("--dry-run")
+                self.assertIn("surface watch: journalctl --user -u upstream-surface-watch.service", text)
+
+    def test_a_missing_report_stays_silent_and_nothing_due_still_clears_the_notice(self):
+        # No latest.json: the watch unit may not be installed on this host, so it is only the coverage note.
+        checkout = Checkout(self)
+        checkout.state.mkdir(parents=True, exist_ok=True)
+        checkout.due_file.write_text('{"earlier": true}\n', encoding="utf-8")
+        code, stdout, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertFalse(checkout.due_file.exists())
+        self.assertTrue(stdout.startswith("stack currency: nothing due (removed "), stdout)
+
+    def test_a_stale_report_beside_other_counts_writes_them_and_names_the_gap(self):
+        checkout = Checkout(self)
+        checkout.something_due()
+        self.report(checkout, "2026-09-26T12:00:00Z")
+        code, stdout, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertIn("; surface watch stale", stdout)
+        document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+        self.assertNotIn("surface_unreviewed", document["due"])
+        self.assertTrue(document["summary_line"].startswith("stack currency: 1 pin behind"), document["summary_line"])
+        self.assertEqual(document["details"][-1]["surface_watch"], "surface watch stale")
+
+    def test_the_gap_line_keeps_the_skill_only_form_and_its_limit(self):
+        zero = {key: 0 for key in cd.DUE_KEYS}
+        command = "python3 ~/code/native-agent-stack-live/scripts/currency_due.py --dry-run --network"
+        self.assertEqual(cd.summary_line(zero, command, False), "stack currency: nothing known due, skill check "
+                                                                 "incomplete")
+        self.assertEqual(cd.summary_line(zero, command, True, [], ("surface watch stale",)),
+                         f"stack currency: nothing known due, surface watch stale; details: {command}")
+        short = "python3 ~/live/scripts/currency_due.py --dry-run --network"
+        self.assertEqual(cd.summary_line(zero, short, False, [], ("surface watch stale",)),
+                         "stack currency: nothing known due, skill check incomplete, surface watch stale; details: "
+                         f"{short}")
+        # Both gaps and this command exceed 160 characters: the line keeps the gaps and drops the command.
+        self.assertEqual(cd.summary_line(zero, command, False, [], ("surface watch stale",)),
+                         "stack currency: nothing known due, skill check incomplete, surface watch stale")
+        long_line = cd.summary_line(zero, "python3 " + "z" * 150 + " --dry-run", True, ["cat /x"],
+                                    ("surface watch stale",))
+        self.assertEqual(long_line, "stack currency: nothing known due, surface watch stale")
+
+    def test_read_record_is_bounded_and_never_raises(self):
+        # L3: deep nesting (RecursionError in the json module), an oversized file, a directory and a FIFO (whose read
+        # would block) are each an unreadable record, never a traceback.
+        with tempfile.TemporaryDirectory(dir=short_temp_base()) as scratch:
+            base = Path(scratch)
+            deep = base / "deep.json"
+            deep.write_text("[" * 200000 + "]" * 200000, encoding="utf-8")
+            self.assertEqual(cd.read_record(deep), {"error": "not JSON"})
+            big = base / "big.json"
+            big.write_bytes(b" " * (cd.RECORD_MAX_BYTES + 1))
+            self.assertEqual(cd.read_record(big), {"error": f"larger than {cd.RECORD_MAX_BYTES} bytes"})
+            self.assertEqual(cd.read_record(base), {"error": "not a regular file"})
+            fifo = base / "fifo"
+            os.mkfifo(fifo)
+            self.assertEqual(cd.read_record(fifo), {"error": "not a regular file"})
+            self.assertIsNone(cd.read_record(base / "absent.json"))
+            self.assertEqual(cd.read_record(base / "absent.json" / "below"), None)
 
     def test_a_fresh_report_with_nothing_unreviewed_is_zero_and_clears_the_notice(self):
         checkout = Checkout(self)

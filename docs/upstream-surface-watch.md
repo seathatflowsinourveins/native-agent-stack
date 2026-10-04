@@ -25,7 +25,11 @@ python3 scripts/upstream_surface_watch.py --network --write-baseline --force  # 
 `--network` is off by default. Without it, the run reads the cached fetches in the state directory
 (`${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/surface-watch/cache`) and says so: the summary starts with
 `surface watch (cache):`, and every source in `coverage.sources` names its origin. A network fetch that fails falls
-back to the cache, and its origin says that too. `--dry-run` writes nothing, not even the cache, and creates no
+back to the cache, and its origin says that too; the summary (and so the journal line) then starts with
+`surface watch (partial cache):`, or `(cache)` when every fetch fell back. A report built partly or wholly from the
+cache is as old as that cache: `generated_at` is the oldest cached fetch time (`run_at` is the run's own time), so a
+gh sign-out or an outage cannot keep an old report looking fresh. A cache entry without a fetch time is no cache.
+`--dry-run` writes nothing, not even the cache, and creates no
 directory. Otherwise a successful run writes the cache and then `latest.json` atomically (temporary file in the same
 directory, fsync, mode 0600, `os.replace`). `--write-baseline` writes the baseline from the run's observations: it
 refuses to replace an existing file without `--force`, and refuses when a kind was not observed. `--claude-channel`
@@ -44,7 +48,7 @@ All URLs were re-read on 2026-10-04 (curl, HTTP 200); `S5` is report-only text.
 | S1 | trigger, versions | <https://registry.npmjs.org/-/package/@anthropic-ai/claude-code/dist-tags>, `.../@openai/codex/dist-tags` | a `latest` version |
 | S2 | `claude:setting`, `claude:hook` | the `sdk.d.ts` of the `@anthropic-ai/claude-agent-sdk` release whose `claudeCodeVersion` equals the watched version, resolved through <https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk> and read from `https://unpkg.com/@anthropic-ai/claude-agent-sdk@<version>/sdk.d.ts` | `interface Settings` (top-level keys, 50-2000); `HOOK_EVENTS: readonly [...]` (10-300) |
 | S3 | `claude:env`, `claude:mod` | <https://code.claude.com/docs/en/env-vars.md> (backticked upper-case tokens of two or more characters, page-wide); <https://code.claude.com/docs/en/plugins/mods/overview.md> (`cc-plugin-*`) | the `# Environment variables` title (100-5000 names); a built-in mods heading (1-300) |
-| S4 | `codex:config`, `codex:feature` | `gh api repos/openai/codex/releases/latest` (one REST call, gh's own sign-in as in `tools/sota-convergence/github_freshness.py`), its `config-schema.json` asset verified against the published sha256 digest; `codex features list` of the installed binary | root `properties` with `features` (200-50000 paths, 30+ top-level, 20+ `features.*`); name/stage/enabled rows (30-5000) |
+| S4 | `codex:config`, `codex:feature` | `gh api repos/openai/codex/releases/latest` (one REST call, gh's own sign-in as in `tools/sota-convergence/github_freshness.py`), its `config-schema.json` asset verified against the sha256 digest GitHub publishes for it (a release without one is read unverified: the source's `digest_check` and a coverage note say so); `codex features list` of the installed binary | root `properties` with `features` (200-50000 paths, 30+ top-level, 20+ `features.*`); name/stage/enabled rows (30-5000) |
 | S5 | changelog delta | <https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md>; Codex stable release notes (one `gh api graphql` call for the newest 100 releases, made only when the stable tag has moved past the baseline) | `## X.Y.Z` headings |
 | cross-check | report-only | `amitray007/claude-code-schema` latest release (`settings.catalog.json`, `environment.catalog.json`); <https://raw.githubusercontent.com/chenrui333/codex-docs/main/docs/feature-flags/lifecycle.json> | none: a failure is recorded, never fatal |
 
@@ -72,9 +76,11 @@ The parsing rules:
 
 ## latest.json and the resolver
 
-`latest.json` has the keys `schema_version`, `generated_at`, `versions` (watched, baseline and dist-tag versions;
-the SDK match), `new`, `removed`, `stage_changed`, `changelog`, `unreviewed`, `coverage` (mode, every source's URL,
-origin, fetch time, version and sha256; observed kinds; counts; notes) and `cross_check`, then `summary_line`.
+`latest.json` has the keys `schema_version`, `generated_at` (the time of the oldest data it holds), `run_at`,
+`versions` (watched, baseline and dist-tag versions; the SDK match), `new`, `removed`, `stage_changed`, `changelog`,
+`unreviewed`, `coverage` (mode; `from_cache`, the sources a `--network` run took from the cache; every source's URL,
+origin, fetch time, version, sha256, `required`, `cross_check` and, for a digest-published asset, `digest_check`;
+observed kinds; counts; notes) and `cross_check`, then `summary_line`.
 
 - Each `new` and `removed` item is `{key, surface, kind, name}`; a new `codex:feature` item also carries `stage` and
   `enabled`.
@@ -86,7 +92,13 @@ origin, fetch time, version and sha256; observed kinds; counts; notes) and `cros
 The resolver works through `unreviewed`. For each key it adds one dispositions row; a key that has a row no longer
 counts. Applying the decision itself (a settings template, a Codex profile) is the resolver's carrier, not this
 script's. `scripts/currency_due.py` reads the same file offline and adds `surface_unreviewed` to the session notice
-while `generated_at` is at most three days old.
+while the report's data is at most three days old (its `generated_at`, and the fetch time of every source it took
+from the cache, which it re-reads from `coverage.sources`; report-only cross-checks do not count) and neither
+`generated_at` nor `run_at` is more than one hour ahead of its clock. No `latest.json` is only the coverage note
+`surface watch not run` (the unit may not be installed on that host). A report that exists but is older, future-dated
+or unreadable is `surface watch stale` or `surface watch output unreadable`: a check that could not answer, handled
+as an incomplete skill check is. The earlier due-file stays, and with nothing else due the line says
+`stack currency: nothing known due, surface watch stale; details: <command>` instead of "nothing due".
 
 ## Dispositions
 

@@ -27,9 +27,11 @@ import sys
 import tempfile
 import time
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest import mock
 
+from scripts import currency_due as cd
 from scripts import upstream_surface_watch as usw
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -555,6 +557,123 @@ class SourceAvailabilityTests(unittest.TestCase):
         self.assertEqual(code, 4, stderr)
         self.assertIn("source unavailable: claude-mods-overview-page", stderr)
 
+    def test_a_cache_record_without_a_fetch_time_is_no_cache(self):
+        # The fetch time ages a report built from the cache; a record without one cannot be aged honestly.
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        meta_path = watch.state / usw.CACHE_DIR / "claude-mods-overview-page.json"
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        for value in (None, "yesterday"):
+            with self.subTest(fetched_utc=value):
+                meta_path.write_text(json.dumps(dict(meta, fetched_utc=value)), encoding="utf-8")
+                code, _, stderr = watch.run("--dry-run")
+                self.assertEqual(code, 4, stderr)
+                self.assertIn("source unavailable: claude-mods-overview-page", stderr)
+
+
+LATER = "2026-10-06T12:00:00Z"  # two days after NOW, the seed's fetch time
+
+
+class FreshnessTests(unittest.TestCase):
+    """H1: a --network run whose fetch falls back to the cache says so in its line and in the journal line, and its
+    generated_at is the cached fetch time, so scripts/currency_due.py stops counting it three days after that fetch."""
+
+    def test_a_failed_fetch_marks_the_line_partial_cache_and_ages_generated_at(self):
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        upstream.broken.add(usw.ENV_VARS_URL)
+        code, stdout, stderr = watch.run("--network", "--now", LATER, upstream=upstream)  # the journal line
+        self.assertEqual(code, 0, stderr)
+        self.assertTrue(stdout.startswith("surface watch (partial cache): nothing new"), stdout)
+        document = json.loads(watch.latest.read_text(encoding="utf-8"))
+        self.assertEqual((document["generated_at"], document["run_at"]), (NOW, LATER))
+        self.assertEqual(document["coverage"]["from_cache"], ["claude-env-vars-page"])
+        record = next(item for item in document["coverage"]["sources"] if item["source"] == "claude-env-vars-page")
+        self.assertTrue(record["origin"].startswith("cache; the network fetch failed"), record)
+        self.assertEqual((record["fetched_utc"], record["required"], record["cross_check"]), (NOW, True, False))
+        self.assertTrue(any("generated_at is the oldest cached fetch time" in note
+                            for note in document["coverage"]["notes"]))
+
+    def test_every_fetch_failing_under_network_says_cache(self):
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        upstream.broken.update(upstream.bodies())
+        upstream.broken.update({usw.CODEX_LATEST_PATH, "probe"})
+        document = watch.document("--network", "--now", LATER, upstream=upstream)
+        self.assertTrue(document["summary_line"].startswith("surface watch (cache): "), document["summary_line"])
+        self.assertEqual(document["generated_at"], NOW)
+
+    def test_a_clean_network_run_is_unmarked_and_dated_by_the_run(self):
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        document = watch.document("--network", "--now", LATER, upstream=upstream)
+        self.assertTrue(document["summary_line"].startswith("surface watch: "), document["summary_line"])
+        self.assertEqual((document["generated_at"], document["run_at"], document["coverage"]["from_cache"]),
+                         (LATER, LATER, []))
+
+    def test_the_currency_notice_stops_counting_three_days_after_the_cached_fetch(self):
+        # The reviewer's case: one good run, then a --network run with one source broken. Its generated_at stays at
+        # the cached fetch (NOW), so the notice counts it until NOW + 3 days and calls it stale after that.
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        upstream.settings_extra = ["newSetting"]
+        upstream.broken.add(usw.ENV_VARS_URL)
+        code, _, stderr = watch.run("--network", "--now", LATER, upstream=upstream)
+        self.assertEqual(code, 0, stderr)
+        surface = {"record": cd.read_record(watch.latest)}
+        count, _, coverage = cd.surface_findings(surface, datetime(2026, 10, 7, 11, 59, 59, tzinfo=timezone.utc))
+        self.assertEqual((count, coverage["surface_watch"]), (1, cd.SURFACE_FRESH))
+        count, details, coverage = cd.surface_findings(surface, datetime(2026, 10, 7, 12, 0, 1, tzinfo=timezone.utc))
+        self.assertEqual((count, details, coverage["surface_watch"]), (None, [], cd.SURFACE_STALE))
+        self.assertIn(f"data of {NOW} is more than 3 days old", coverage["surface_watch_reason"])
+
+    def test_a_cross_check_from_the_cache_does_not_age_the_report(self):
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        lifecycle = json.dumps({"codex_cli_version": "codex-cli 0.160.0", "cli_features": []}).encode()
+        original = upstream.http_get
+        upstream.http_get = lambda url, timeout=60: (lifecycle if url == usw.CHENRUI_LIFECYCLE_URL
+                                                     else original(url, timeout))
+        code, _, stderr = watch.run("--network", "--cross-check", upstream=upstream)  # caches the tracker at NOW
+        self.assertEqual(code, 0, stderr)
+        upstream.http_get = original  # the tracker is unreachable now; the run falls back to its cache
+        document = watch.document("--network", "--cross-check", "--now", LATER, upstream=upstream)
+        record = next(item for item in document["coverage"]["sources"] if item["source"] == "xc-chenrui-lifecycle")
+        self.assertTrue(record["origin"].startswith("cache; the network fetch failed"), record)
+        self.assertIs(record["cross_check"], True)
+        self.assertEqual((document["generated_at"], document["coverage"]["from_cache"]), (LATER, []))
+        self.assertTrue(document["summary_line"].startswith("surface watch: "), document["summary_line"])
+
+
+class DigestTests(unittest.TestCase):
+    """L4: the config-schema.json asset is verified against GitHub's published sha256 digest when there is one; when
+    the release publishes none, the schema is read unverified and the coverage says so."""
+
+    def test_a_published_digest_is_verified_and_recorded(self):
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        document = watch.document("--network", upstream=upstream)
+        record = next(item for item in document["coverage"]["sources"] if item["source"] == "codex-config-schema")
+        self.assertEqual(record["digest_check"], "verified against the published sha256 digest")
+
+    def test_a_missing_digest_is_recorded_as_unverified(self):
+        watch, upstream = Watch(self), Upstream()
+        watch.seed(self, upstream)
+        release = upstream.release
+
+        def without_digest():
+            answer = release()
+            for asset in answer["assets"]:
+                asset.pop("digest", None)
+            return answer
+
+        upstream.release = without_digest
+        document = watch.document("--network", upstream=upstream)
+        record = next(item for item in document["coverage"]["sources"] if item["source"] == "codex-config-schema")
+        self.assertEqual(record["digest_check"], "unverified: no published sha256 digest")
+        self.assertTrue(any("published no sha256 digest" in note for note in document["coverage"]["notes"]))
+        self.assertEqual(document["new"], [])
+
 
 class OfflineTests(unittest.TestCase):
     def test_network_off_uses_no_socket_no_gh_and_no_probe(self):
@@ -687,7 +806,7 @@ class WriteTests(unittest.TestCase):
         leftovers = [path.name for path in watch.state.rglob("*") if path.name.endswith(".tmp")]
         self.assertEqual(leftovers, [])
         document = json.loads(watch.latest.read_text(encoding="utf-8"))
-        self.assertEqual(list(document), ["schema_version", "generated_at", "versions", "new", "removed",
+        self.assertEqual(list(document), ["schema_version", "generated_at", "run_at", "versions", "new", "removed",
                                           "stage_changed", "changelog", "unreviewed", "coverage", "cross_check",
                                           "summary_line"])
 
@@ -781,7 +900,7 @@ class SummaryTests(unittest.TestCase):
 
     def test_a_long_command_gives_way_to_cat_of_latest_json(self):
         candidates = ["python3 " + "x" * 140 + " --dry-run", "cat /tmp/state/latest.json"]
-        line = usw.summary_line(["nothing new"], "(Claude Code 2.1.289, Codex 0.160.0)", candidates, False)
+        line = usw.summary_line(["nothing new"], "(Claude Code 2.1.289, Codex 0.160.0)", candidates, None)
         self.assertTrue(line.endswith("; details: cat /tmp/state/latest.json"), line)
         self.assertLessEqual(len(line), 160)
 
@@ -797,7 +916,7 @@ class SummaryTests(unittest.TestCase):
 
     def test_counts_are_truncated_rather_than_the_command(self):
         line = usw.summary_line(["9999 unreviewed of 9999 new", "9999 removed", "9999 stage changes"], "(tail)",
-                                ["python3 " + "y" * 90 + " --dry-run"], True)
+                                ["python3 " + "y" * 80 + " --dry-run"], "partial cache")
         self.assertIn("...; details: python3 y", line)
         self.assertLessEqual(len(line), 160)
         self.assertTrue(line.endswith("y --dry-run"))
