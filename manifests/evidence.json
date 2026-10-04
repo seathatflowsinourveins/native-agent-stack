@@ -16078,6 +16078,11 @@
       "bytes": 16044
     },
     {
+      "path": "docs/decisions/2026-10-03-retire-pr-515-catalog-index.md",
+      "sha256": "3bea5ca46d16828674678da49b3a5237f6642514b29b88e5a63997b6d97baa50",
+      "bytes": 28741
+    },
+    {
       "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
       "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
       "bytes": 19619
