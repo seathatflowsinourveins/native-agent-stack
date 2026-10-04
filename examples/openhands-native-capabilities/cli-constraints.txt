@@ -1,0 +1,10 @@
+# OpenHands/OpenHands-CLI 1.16.0,
+# 2963442dacc7cea44e39b7c4e73724295c853465/pyproject.toml and uv.lock.
+# Install with Python 3.12 in its own UV_TOOL_DIR; do not mix with SDK 1.50.1.
+openhands==1.16.0
+openhands-sdk==1.21.0
+openhands-tools==1.21.0
+openhands-workspace==1.11.1
+openhands-agent-server==1.9.1
+# Patched override allowed by SDK 1.21.0's declared litellm>=1.83.7 contract.
+litellm==1.93.2

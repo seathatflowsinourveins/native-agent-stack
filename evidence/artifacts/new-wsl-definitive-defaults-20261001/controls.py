@@ -36,6 +36,10 @@ CASES = [
     ("generated output: a final row whose GPT status is put back to the pending text", "test_no_family_status_is_stale", None),
     ("generated output: the decision rule put back to the earlier text", "test_decision_rule_states_the_current_rule", None),
     ("generated output: a resolved row without its first-round record", "test_resolved_rows_keep_their_first_round_record", None),
+    # A settlement whose slot the convergence decisions add is applied after them; it must still be refused unless that
+    # added row is a split (reranker-model is an added row resolved as not installed).
+    ("a settlement for an added slot that is not split", "test_manifest_is_current",
+     "settlement reranker-model: not a split or measurement row"),
 ]
 
 
@@ -45,6 +49,19 @@ def added(doc, slot_id):
 
 def amendment(doc, slot_id):
     return next(entry for entry in doc["amend_rows"] if entry["slot_id"] == slot_id)["amendment"]
+
+
+def interim(doc, slot_id):
+    """An interim install of the record's wave-2 batch (amendment 3)."""
+    return next(entry for entry in doc["wave2"]["interim_rows"] if entry["slot_id"] == slot_id)["interim"]
+
+
+def wave2_added(doc, slot_id):
+    return next(row for row in doc["wave2"]["add_rows"] if row["slot_id"] == slot_id)
+
+
+def wave2_amendment(doc, slot_id):
+    return next(entry for entry in doc["wave2"]["amend_rows"] if entry["slot_id"] == slot_id)["amendment"]
 
 
 # One case per refusal of the assembler's consensus step: (case, the refusal it must print, the mutation of consensus.json).
@@ -104,6 +121,35 @@ CONSENSUS_CASES = [
      lambda doc: doc.update(records={"acknowledgements": doc["records"]["acknowledgements"]})),
     ("consensus: an added row with a blank job", "consensus skill-discovery: an added row needs a job and an outcome that no round uses",
      lambda doc: added(doc, "skill-discovery").update(job=" ")),
+    # The wave-2 batch and its amendment 3 (interim installs): one case per refusal the batch and the interims rest on.
+    ("consensus: an interim on a row whose decided default installs",
+     "consensus serena: an interim installs only on a row whose decided default installs nothing",
+     lambda doc: next(entry for entry in doc["wave2"]["interim_rows"] if entry["slot_id"] == "memory-owner").update(slot_id="serena")),
+    ("consensus: an interim without its authority",
+     "consensus memory-owner: an interim carries its fields: missing ['authority']; unknown []",
+     lambda doc: interim(doc, "memory-owner").pop("authority")),
+    ("consensus: an interim whose records file hash differs", "consensus memory-owner interim: evidence sha256 mismatch",
+     lambda doc: interim(doc, "memory-owner")["records"][0].update(sha256="0" * 64)),
+    ("consensus: an owner's decision without its decision", "consensus code-search: the owner's decision needs its decision",
+     lambda doc: interim(doc, "code-search")["authority"].pop("decision")),
+    ("consensus: an interim whose job another installed row owns",
+     "consensus memory-owner: installed job also owned by statusline",
+     lambda doc: wave2_added(doc, "statusline").update(job="long-term memory across sessions and clients")),
+    ("consensus: an interim carried by an amendment",
+     "consensus credential-guard: an interim install is recorded under interim_rows, not as an amendment",
+     lambda doc: wave2_amendment(doc, "credential-guard").update(interim={"default": "a guard"})),
+    ("consensus: a wave-2 batch that owes no acknowledgement it lacks",
+     "consensus wave2: acknowledgements_owed must name exactly the families without an acknowledgement: ['claude', 'gpt']",
+     lambda doc: doc["wave2"].update(acknowledgements_owed=[])),
+    ("consensus: a wave-2 batch without its records", "consensus wave2: the batch names its hashed records",
+     lambda doc: doc["wave2"].update(records={})),
+    # A mention is not an authorization (the Codex root lane's read of b6828c7d, finding 1): a browser interim for the tool
+    # that the kept browser hold names to measure first, relayed by that same entry and dated as it is.
+    ("consensus: a browser interim for the tool the kept browser hold names to measure first",
+     "consensus playwright-cli: wave2-records.json owner_decisions[0] authorizes no install or use of "
+     "https://github.com/unclecode/crawl4ai in the slot playwright-cli",
+     lambda doc: doc["wave2"]["interim_rows"].append({"slot_id": "playwright-cli", "interim": dict(
+         json.loads(json.dumps(interim(doc, "memory-owner"))), repository="https://github.com/unclecode/crawl4ai")})),
 ]
 CASES += [(case, "test_manifest_is_current", refusal) for case, refusal, _ in CONSENSUS_CASES]
 # Records that the assembler accepts but whose labels break the rule's label clause: the label test must fail.
@@ -114,6 +160,13 @@ LABEL_CASES = [
      lambda doc: added(doc, "skill-discovery").update(label=added(doc, "credential-custody")["label"])),
 ]
 CASES += [(case, "test_consensus_labels_follow_the_rule", None) for case, _ in LABEL_CASES]
+# An interim the assembler accepts whose label claims a consensus its authority is not: the interim label test must fail.
+INTERIM_LABEL_CASES = [
+    ("consensus label: an interim on the owner's decision labelled as a direct consensus",
+     lambda doc: interim(doc, "memory-owner").update(
+         label="interim install by direct consensus of both families; the memory head-to-head decides")),
+]
+CASES += [(case, "test_interim_labels_name_their_authority_and_what_decides", None) for case, _ in INTERIM_LABEL_CASES]
 
 
 def run(root, *args):
@@ -123,6 +176,7 @@ def run(root, *args):
 def mutate(root, case):
     consensus = {entry[0]: entry[2] for entry in CONSENSUS_CASES}
     consensus.update(LABEL_CASES)
+    consensus.update(INTERIM_LABEL_CASES)
     if case in consensus:
         path = root / CONSENSUS
         doc = json.loads(path.read_text(encoding="utf-8"))
@@ -143,13 +197,15 @@ def mutate(root, case):
         else:
             decisions["claude-plugins-official-code-intelligence-lsp-pl"]["covered_by"] = ["memory-owner"]
         path.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    elif case in (CASES[1][0], CASES[2][0], CASES[6][0]):
+    elif case in (CASES[1][0], CASES[2][0], CASES[6][0], CASES[16][0]):
         path = root / ART / "settlements.json"
         doc = json.loads(path.read_text(encoding="utf-8"))
         if case == CASES[1][0]:
             doc[0]["receipts"][0]["sha256"] = "0" * 64
         elif case == CASES[2][0]:
             doc[0]["slot_id"] = "container-engine"
+        elif case == CASES[16][0]:
+            doc[1]["slot_id"] = "reranker-model"
         else:
             doc = []
         path.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

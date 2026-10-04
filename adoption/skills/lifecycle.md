@@ -60,6 +60,32 @@ skill's `agents/openai.yaml` sets `allow_implicit_invocation: false`, `claude_li
 and `codex_enabled`. Then update the budget sums and the runtime-worker `reuse_ref`
 copies.
 
+A global entry may name its own targets: `agents` (a subset of `claude-code` and
+`codex`, both when absent) and `copy: true`, which installs a copy into the one
+target's own skills folder instead of the shared canonical folder with links
+(skills 1.7.0 README:91, :141-142). The supported form is a copy for Claude Code
+only (`"agents": ["claude-code"], "copy": true`): `tools/adoption/install_skills.py`
+runs the add with `--copy -a claude-code` and reads the copy back from Claude
+Code's skills folder; it takes the copy for installed only as a real folder
+there with no entry of its name in `~/.agents/skills`, and reports a link or a
+same-name entry as `misplaced` (exit 1 in every mode, `--check-only`
+included, with nothing deleted). `--print-codex-config` prints no rule for it, and
+`scripts/skills_status.py` checks it there and fails when a same-name folder sits
+in `~/.agents/skills`, where Codex loads skills. `skill-creator` uses it, because
+Codex embeds its own (wave-2 skills ruling, 2026-10-03).
+
+### Held
+
+A selected skill whose install waits for a named measurement or gate has
+`status: "held"` and a `held_for` naming it. `install_skills.py` installs it
+neither in a full run nor with `--only`, which refuses it as held, and
+`skills_status.py` reports it as `held` (and whether a folder from an earlier
+install is still present) without failing. Its listing, budget and template
+entries stay, so the measurement's result changes only the status. A held skill
+that the measurement rejects leaves through a dated record as under
+[Retire and remove](#retire-and-remove). `agent-browser` is held for the
+browser-tool measurement (since 2026-10-03).
+
 Verify each pin from a blobless clone of its source repository
 (`git clone --filter=blob:none --no-checkout <repository>`, then
 `git rev-parse <ref>:<path>` and `git show <ref>:<path>/SKILL.md`), not with
@@ -193,6 +219,27 @@ gain by itself. Sources: [native eval guidance](https://developers.openai.com/bl
 and [Claude structured output](https://code.claude.com/docs/en/headless).
 
 ## Listing budget
+
+### Project-scope exception: 2026-10-03
+
+The repository-owned
+[`omniroute-runtime-worker`](../../.claude/skills/omniroute-runtime-worker/SKILL.md)
+is a Claude Code project skill, auto-listed only in this repository through
+`.claude/skills/omniroute-runtime-worker/SKILL.md`, following
+[Claude's native project-skill scope](https://code.claude.com/docs/en/skills).
+It is maintained with the SDK example rather than installed globally through
+the selected third-party skill manifest. Its description costs 129 characters
+(129 UTF-8 bytes), in addition to the manifest's listing totals; the body loads
+on invocation. Hosts whose `.git/info/exclude` hides `/.claude/` must retain it
+in the real review index with
+`rtk git add -f .claude/skills/omniroute-runtime-worker/SKILL.md`.
+On each SDK or route change, update the skill, example and dated decision
+together, verify the description length and native listing/read observation,
+and run the example's documented checks. The September 30 callsite receipt
+remains the historical listing/read observation; this repair adds no new
+Claude model run. See the
+[October 3 decision](../../docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md)
+for current qualification limits.
 
 - **Claude** fits the listing to `skillListingBudgetFraction` of the model's
   context window (default 0.01, with an 8,000-character fallback) and cuts each

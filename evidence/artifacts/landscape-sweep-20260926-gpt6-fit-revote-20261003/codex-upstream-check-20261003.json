@@ -1,0 +1,89 @@
+{
+  "observed_at_utc_date_u": "Sat Oct  3 10:49:41 UTC 2026",
+  "transport": "rtk proxy; native stdout retained below or as an exact numbered excerpt",
+  "release": {
+    "command_argv": [
+      "gh",
+      "api",
+      "repos/openai/codex/releases/tags/rust-v0.159.3"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "returned_fields": {
+      "tag_name": "rust-v0.159.3",
+      "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+      "published_at": "2026-09-30T22:57:34Z",
+      "body": "## New Features\n\n- Eligible local sessions signed in with ChatGPT can now show optional reminders to complete account security setup. (#49744)\n\n## Changelog\n\nFull Changelog: https://github.com/openai/codex/compare/rust-v0.159.2...rust-v0.159.3\n\n- #49744 [0.159] Backport account security setup reminders for 0.159.3 @andrewgu-oai\n\n\n"
+    }
+  },
+  "source": {
+    "command_argv": [
+      "gh",
+      "api",
+      "repos/openai/codex/contents/codex-rs/app-server-protocol/src/protocol/common.rs?ref=rust-v0.159.3",
+      "-H",
+      "Accept: application/vnd.github.raw"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "pinned_url": "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/app-server-protocol/src/protocol/common.rs",
+    "stdout_sha256": "d0cca691d21ffe282d3ca3d8ca9eaee8afe9aab058b04a3d4ef579f72a6918c7",
+    "stdout_bytes": 173534,
+    "consume_method_line": 1315,
+    "excerpt": [
+      {
+        "line": 1312,
+        "text": "        response: v2::GetAccountRateLimitsResponse,"
+      },
+      {
+        "line": 1313,
+        "text": "    },"
+      },
+      {
+        "line": 1314,
+        "text": ""
+      },
+      {
+        "line": 1315,
+        "text": "    ConsumeAccountRateLimitResetCredit => \"account/rateLimitResetCredit/consume\" {"
+      },
+      {
+        "line": 1316,
+        "text": "        params: v2::ConsumeAccountRateLimitResetCreditParams,"
+      },
+      {
+        "line": 1317,
+        "text": "        serialization: global(\"account-auth\"),"
+      },
+      {
+        "line": 1318,
+        "text": "        response: v2::ConsumeAccountRateLimitResetCreditResponse,"
+      },
+      {
+        "line": 1319,
+        "text": "    },"
+      },
+      {
+        "line": 1320,
+        "text": ""
+      },
+      {
+        "line": 1321,
+        "text": "    GetAccountTokenUsage => \"account/usage/read\" {"
+      },
+      {
+        "line": 1322,
+        "text": "        params: #[ts(optional, as = \"Option<GetAccountTokenUsageParamsTypeScript>\", inline)] #[serde(default, skip_serializing_if = \"Option::is_none\")] v2::NullableGetAccountTokenUsageParams,"
+      },
+      {
+        "line": 1323,
+        "text": "        serialization: None,"
+      },
+      {
+        "line": 1324,
+        "text": "        response: v2::GetAccountTokenUsageResponse,"
+      }
+    ]
+  },
+  "sanitization": "Only public release fields and the exact public source excerpt are retained. No account, quota, credential or generated-schema output was read."
+}

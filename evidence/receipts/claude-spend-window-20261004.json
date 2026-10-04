@@ -1,0 +1,1839 @@
+{
+  "schema_version": 1,
+  "id": "claude-spend-window-20261004",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "claude-code",
+    "ccusage",
+    "context-mode"
+  ],
+  "claim": "Retained Claude-only ccusage daily costs rise from $2,823.79 and $2,427.25 on October 1/2 to $5,940.56 on October 3. The supplied executor window comparison reproduces exactly from count-only scanner outputs: IET per 24 h rises 2.121 times, counted call rows 2.419 times, and subagents started 2.824 times, while mean context per call falls from 271,790 to 216,230 tokens. The unfiltered retained session-view export is $12,404.88 and its workflow share is 61.402%; removing 17 rows with pre-10-03 last activity leaves $11,151.92, with coordinator-tree shares 63.296% and 33.787%. These are session-selection views, not spend since 10-03. Net pre-first-call attachment growth excluding UI is about 2.9 KB (0.8K rough tokens), rather than the positive-only 4.3 KB (1.2K) estimate. These are scoped observations, not subscription charges or a quality comparison. Adding the retained advisor-cohort estimate gives 830.270M and 1,777.960M IET per 24 h (2.141 times); all 689 A and 1,209 B advisor iterations in those cohorts used Fable. Fable is $2,092.87, or 35.230% of priced Claude dollars on 10-03. The user subsequently selected an Opus 5.5 advisor.",
+  "limitations": [
+    "API-equivalent prices are not the subscription meter. ccusage leaves claude-sonnet-5-5 unpriced; its dollars therefore do not price every counted Claude model.",
+    "ccusage days are local time and Prometheus days are UTC. These scopes and the scanner windows must not be summed or equated.",
+    "Prometheus keeps one week; this retained export starts with the UTC day 2026-09-27 and ends with 2026-10-03.",
+    "The attr byte shares use unfitted weights, so they show direction only; receipt context shares exclude UI records before normalization.",
+    "The hook_success records are UI-only and are not counted as context. Pre-first-call attachment sizes are serialized metadata bytes, not exact model input or tokenization.",
+    "NativeStack only, because NativeStack2604's telemetry has no listener. This scope is the coordinator's stated observation boundary, not a new listener check.",
+    "10-04 is a partial day. The scanner ends at 14:00Z; no full-day projection is a measured total.",
+    "This is a re-derivation of retained native outputs and scanner aggregates, not a new provider/model run, an upstream acceptance test, or a quality/savings A/B.",
+    "window_compare.py includes synthetic zero-usage rows in its call counts and uses per-field maximum deduplication. Its subagent calls-per-file statistic spans each selected file, whereas its call and IET windows filter call timestamps.",
+    "Window hook text is not retained in the aggregate inputs. Historical hook-text estimates are reported as estimates; current installed carrier and upstream static hook sizes are distinct observations and do not establish historical hook outputs.",
+    "The unfiltered session export includes pre-10-03 activity: 17 rows worth $1,252.96 have lastActivity before 2026-10-03T04:00Z. The raw and activity-selected shares have different denominators. Filtering lastActivity does not restrict the dates of every token in a session total; neither view is established as spend since 10-03.",
+    "The reproduction artifact extends the supplied analysis with advisor-cohort rows. Original executor output is unchanged. Its private raw output includes source identifiers; only sanitized aggregates are retained here.",
+    "Advisor iterations are absent from calls.tsv and retained only as per-file tot values in files.jsonl. Grouping them by file first_ts reproduces the reviewed cohorts, but files can cross window boundaries. Executor-plus-advisor-cohort IET is an estimate with mixed timestamp scopes, not an exact call-window total; advisor iterations have no recorded effort here.",
+    "IET applies the same coefficients to every model: input 1, cache read 0.1, five-minute and unclassified cache writes 1.25, one-hour cache writes 2, and output 5, with thinking already in output. There is no model-specific base-price multiplier. Advisor aggregates lack cache-write duration splits and weight all cache writes at 1.25. Thus IET model shares and window ratios are relative-index measures, not dollar shares or actual spend ratios; Fable dollars from ccusage remain separate. Historical Fable usage precedes the new Opus advisor decision."
+  ],
+  "data": {
+    "recorded_date": "2026-10-04",
+    "evidence_class": "independent observation of retained native outputs; exact source replay and structural integration validation",
+    "north_star_action": "Attribute foundation coordinator spend so bounded builder dispatch preserves capacity for research and historical simulation.",
+    "provenance": {
+      "reference_receipt": "evidence/receipts/claude-spend-attribution-20260929.json",
+      "source_files": [
+        {
+          "source": "ccusage-daily.json",
+          "sha256": "505779222178da3cfc3cc5eabc98dd38c3fbda5fd52e84dadd0335125c08c9de",
+          "bytes": 25851
+        },
+        {
+          "source": "ccusage-session-1003.json",
+          "sha256": "41d5d3a9cf072dcb723b2c7b55716d2e0b2b8aafbd9765f34a6add3521504b32",
+          "bytes": 275727
+        },
+        {
+          "source": "prometheus-daily-20261004.json",
+          "sha256": "2d44dd0dbe1da6a2dc20fc85f111315d479a87c0e03abb5e7a84fdb61f4e06a8",
+          "bytes": 3340
+        },
+        {
+          "source": "window_compare.py",
+          "sha256": "410d92e1754911f0e24753507f48c4450b0b611ad3e43f685927f1d7b19efa92",
+          "bytes": 4722
+        },
+        {
+          "source": "window_compare.txt",
+          "sha256": "3957d1f20bbb7666581702cff6b58e60c76f93922d5642c7082047d97d4e4f87",
+          "bytes": 7338
+        },
+        {
+          "source": "prefix_compare.py",
+          "sha256": "fe2a2d79227bbd4427209b6a0117b5753dd9ab24f778172244038670feaf9b59",
+          "bytes": 1617
+        },
+        {
+          "source": "prefix_compare.txt",
+          "sha256": "e9ccbaabb3812904d384c0847bf1b224f5f1b2aaaf6c3d60c94001883f6ad6de",
+          "bytes": 1298
+        },
+        {
+          "source": "attr_compare.py",
+          "sha256": "3e9c20d65315967736b9eee075984b91725728067f63cfe2e1a0e38620649ec6",
+          "bytes": 1974
+        },
+        {
+          "source": "attr_compare.txt",
+          "sha256": "a0e878fc93bbfef9f9ea32cd96c8a4fc4d0b6be5a7b935d8efbfd7dbc08181ce",
+          "bytes": 4411
+        },
+        {
+          "source": "agg.py",
+          "sha256": "5448cb65b62fe81ff400cc1e29fa3f26a3c73ba3a4011d419f63b4a664ca8601",
+          "bytes": 17045
+        },
+        {
+          "source": "report.py",
+          "sha256": "0ece28b4c8f066787038938a10037e1a9ee3981fa27ef34e9f4f70bbc4cb01e3",
+          "bytes": 12028
+        },
+        {
+          "source": "out/calls.tsv",
+          "sha256": "b9c4eafedb6bc1e6fec90ef924cbf0b6db1c43b8fbfd273e227975fc6d57f3cc",
+          "bytes": 37305494
+        },
+        {
+          "source": "out/files.jsonl",
+          "sha256": "f821aceff9028ab78028c18606c22b534e359d4036f953d171e17bf8864b3047",
+          "bytes": 25890593
+        },
+        {
+          "source": "SPEND-DIAGNOSIS-20261004.md",
+          "sha256": "0efb89be1c65a642287102f2f326ca65e781c62ddc616d4d4896711b5ba60adf",
+          "bytes": 4162
+        }
+      ],
+      "artifact": {
+        "path": "evidence/artifacts/claude-spend-window-compare.py.txt",
+        "sha256": "ae21ed6f92ec91dd7567db0bdaac631dfdc5083173c1c3c7b3e855040e0b6770",
+        "bytes": 6309,
+        "source_body_sha256": "410d92e1754911f0e24753507f48c4450b0b611ad3e43f685927f1d7b19efa92",
+        "header_lines": 3,
+        "source_body_byte_identical": false,
+        "repair": "Preserve supplied executor analysis; add advisor_totals_by_window and advisor-cohort output using agg.py tot advisor fields."
+      },
+      "source_replays": [
+        {
+          "source": "window_compare.py",
+          "saved_output": "window_compare.txt",
+          "exact_output_match": true,
+          "exit_code": 0
+        },
+        {
+          "source": "prefix_compare.py",
+          "saved_output": "prefix_compare.txt",
+          "exact_output_match": true,
+          "exit_code": 0
+        },
+        {
+          "source": "attr_compare.py",
+          "saved_output": "attr_compare.txt",
+          "exact_output_match": true,
+          "exit_code": 0
+        }
+      ],
+      "repair_replay": {
+        "artifact_path": "evidence/artifacts/claude-spend-window-compare.py.txt",
+        "executor_output_exact_match": true,
+        "advisor_expected_totals_match_review": true,
+        "exit_code": 0,
+        "advisor_output_lines": [
+          "",
+          "== advisor file-start cohorts: iterations, input, output, IET/24h (M)",
+          "C_0926-27 advisor(claude-fable-5-1) 746 145564755 6451888 88.9",
+          "C_0926-27 advisor(claude-opus-5-5) 393 80093563 3104796 47.8",
+          "C_0926-27 executor IET plus advisor-cohort estimate/24h (M) 1901.1",
+          "A_1001-02 advisor(claude-fable-5-1) 689 141966410 5973717 85.9",
+          "A_1001-02 executor IET plus advisor-cohort estimate/24h (M) 830.3",
+          "B_1003-04 advisor(claude-fable-5-1) 1209 231924586 9979005 198.9",
+          "B_1003-04 executor IET plus advisor-cohort estimate/24h (M) 1778.0"
+        ]
+      },
+      "superseded_source_revisions": [
+        {
+          "source": "SPEND-DIAGNOSIS-20261004.md",
+          "sha256": "3a2b88e0923362bc2247245ea36315adb914ba5c037f13f9d184cac550d2e56a",
+          "bytes": 4094,
+          "reason": "Coordinator updated the diagnosis with the job-012 prefix correction after the original build. The old +1.2K-token attachment quote is superseded: the pinned 4162-byte revision explicitly states net +0.8K tokens and identifies +1.2K as positive-only growth."
+        }
+      ]
+    },
+    "research": {
+      "skill": "search-first",
+      "skill_source": "https://github.com/affaan-m/ECC/blob/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/search-first/SKILL.md",
+      "checked_on": "2026-10-04",
+      "selected_sources": [
+        {
+          "repository": "https://github.com/ccusage/ccusage",
+          "version": "20.0.26",
+          "revision": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+          "references": [
+            "https://ccusage.com/guide/daily-reports",
+            "https://ccusage.com/guide/session-reports"
+          ]
+        },
+        {
+          "repository": "https://github.com/mksglu/context-mode",
+          "version": "1.0.169",
+          "reference": "https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/routing-block.mjs"
+        },
+        {
+          "reference": "https://code.claude.com/docs/en/monitoring-usage",
+          "purpose": "Claude native cost/token metric semantics"
+        },
+        {
+          "reference": "evidence/artifacts/claude-spend-window-compare.py.txt",
+          "purpose": "Reuse the coordinator-supplied analysis rather than create a comparison harness"
+        },
+        {
+          "reference": "https://code.claude.com/docs/en/advisor#set-advisormodel-in-settings",
+          "purpose": "Supported advisorModel opus setting; checked 2026-10-04."
+        }
+      ],
+      "decision": "Reuse the specified upstream native exports, pinned source, supplied comparison scripts, and existing repository registry/validators. No new tool installation or benchmark.",
+      "search_channel_limits": "Web search returned no results and web open was unsupported; official primary pages and version refs were fetched with context-mode. No package-registry or unrelated-skill sweep was needed for this fixed evidence job."
+    },
+    "ccusage_daily": {
+      "version": "20.0.26",
+      "command": "ccusage daily --since 20260915 --json --offline",
+      "selection": "Each daily row combines Claude and Codex. Sum only modelBreakdowns whose modelName begins with claude-; exclude all GPT tokens and costs.",
+      "calendar": "local EDT, UTC-4",
+      "days": [
+        {
+          "date": "2026-09-24",
+          "partial": false,
+          "inputTokens": 27104,
+          "outputTokens": 13927451,
+          "cacheCreationTokens": 64658345,
+          "cacheReadTokens": 2574836783,
+          "totalTokens": 2653449683,
+          "cost_usd": 1008.2177801500002,
+          "unpriced_models": []
+        },
+        {
+          "date": "2026-09-25",
+          "partial": false,
+          "inputTokens": 61978,
+          "outputTokens": 41357851,
+          "cacheCreationTokens": 149822021,
+          "cacheReadTokens": 7070380068,
+          "totalTokens": 7261621918,
+          "cost_usd": 2776.65757559999,
+          "unpriced_models": []
+        },
+        {
+          "date": "2026-09-26",
+          "partial": false,
+          "inputTokens": 58117900,
+          "outputTokens": 74471298,
+          "cacheCreationTokens": 265447513,
+          "cacheReadTokens": 11623030488,
+          "totalTokens": 12021067199,
+          "cost_usd": 5442.353484550004,
+          "unpriced_models": []
+        },
+        {
+          "date": "2026-09-27",
+          "partial": false,
+          "inputTokens": 163706485,
+          "outputTokens": 78981254,
+          "cacheCreationTokens": 229610782,
+          "cacheReadTokens": 9638931008,
+          "totalTokens": 10111229529,
+          "cost_usd": 6034.909707950028,
+          "unpriced_models": []
+        },
+        {
+          "date": "2026-09-28",
+          "partial": false,
+          "inputTokens": 127061515,
+          "outputTokens": 66987783,
+          "cacheCreationTokens": 187086159,
+          "cacheReadTokens": 7567022102,
+          "totalTokens": 7948157559,
+          "cost_usd": 3793.678752000017,
+          "unpriced_models": [
+            "claude-sonnet-5-5"
+          ]
+        },
+        {
+          "date": "2026-09-29",
+          "partial": false,
+          "inputTokens": 118217143,
+          "outputTokens": 71584534,
+          "cacheCreationTokens": 233062364,
+          "cacheReadTokens": 10824225558,
+          "totalTokens": 11247089599,
+          "cost_usd": 2861.5834845000218,
+          "unpriced_models": [
+            "claude-sonnet-5-5"
+          ]
+        },
+        {
+          "date": "2026-09-30",
+          "partial": false,
+          "inputTokens": 108587956,
+          "outputTokens": 56369041,
+          "cacheCreationTokens": 189370663,
+          "cacheReadTokens": 10223167082,
+          "totalTokens": 10577494742,
+          "cost_usd": 3380.6636742000105,
+          "unpriced_models": [
+            "claude-sonnet-5-5"
+          ]
+        },
+        {
+          "date": "2026-10-01",
+          "partial": false,
+          "inputTokens": 82377408,
+          "outputTokens": 36028089,
+          "cacheCreationTokens": 92290700,
+          "cacheReadTokens": 4779954132,
+          "totalTokens": 4990650329,
+          "cost_usd": 2823.7901747999954,
+          "unpriced_models": [
+            "claude-sonnet-5-5"
+          ]
+        },
+        {
+          "date": "2026-10-02",
+          "partial": false,
+          "inputTokens": 70518680,
+          "outputTokens": 36901348,
+          "cacheCreationTokens": 83566873,
+          "cacheReadTokens": 4240982694,
+          "totalTokens": 4431969595,
+          "cost_usd": 2427.2465577999924,
+          "unpriced_models": [
+            "claude-sonnet-5-5"
+          ]
+        },
+        {
+          "date": "2026-10-03",
+          "partial": false,
+          "inputTokens": 174040664,
+          "outputTokens": 79036416,
+          "cacheCreationTokens": 208980411,
+          "cacheReadTokens": 9131768254,
+          "totalTokens": 9593825745,
+          "cost_usd": 5940.560124799993,
+          "unpriced_models": [
+            "claude-sonnet-5-5"
+          ]
+        },
+        {
+          "date": "2026-10-04",
+          "partial": true,
+          "inputTokens": 61911317,
+          "outputTokens": 43639921,
+          "cacheCreationTokens": 137850486,
+          "cacheReadTokens": 3169063979,
+          "totalTokens": 3412465703,
+          "cost_usd": 2382.0104777499937,
+          "unpriced_models": [
+            "claude-sonnet-5-5"
+          ]
+        }
+      ],
+      "totals": {
+        "inputTokens": 964628150,
+        "outputTokens": 599284986,
+        "cacheCreationTokens": 1841746317,
+        "cacheReadTokens": 80843362148,
+        "totalTokens": 84249021601,
+        "cost_usd": 38871.671794100046
+      },
+      "fable_cost_share_by_day": [
+        {
+          "date": "2026-09-24",
+          "fable_cost_usd": 0,
+          "claude_priced_cost_usd": 1008.2177801500002,
+          "share_of_priced_claude_cost": 0.0
+        },
+        {
+          "date": "2026-09-25",
+          "fable_cost_usd": 0,
+          "claude_priced_cost_usd": 2776.65757559999,
+          "share_of_priced_claude_cost": 0.0
+        },
+        {
+          "date": "2026-09-26",
+          "fable_cost_usd": 622.6599100000002,
+          "claude_priced_cost_usd": 5442.353484550004,
+          "share_of_priced_claude_cost": 0.1144100455377687
+        },
+        {
+          "date": "2026-09-27",
+          "fable_cost_usd": 1167.8825700000011,
+          "claude_priced_cost_usd": 6034.909707950028,
+          "share_of_priced_claude_cost": 0.19352113395524423
+        },
+        {
+          "date": "2026-09-28",
+          "fable_cost_usd": 0,
+          "claude_priced_cost_usd": 3793.678752000017,
+          "share_of_priced_claude_cost": 0.0
+        },
+        {
+          "date": "2026-09-29",
+          "fable_cost_usd": 75.86292949999999,
+          "claude_priced_cost_usd": 2861.5834845000218,
+          "share_of_priced_claude_cost": 0.02651082168698455
+        },
+        {
+          "date": "2026-09-30",
+          "fable_cost_usd": 1290.300993000001,
+          "claude_priced_cost_usd": 3380.6636742000105,
+          "share_of_priced_claude_cost": 0.3816709135685713
+        },
+        {
+          "date": "2026-10-01",
+          "fable_cost_usd": 1251.900596000001,
+          "claude_priced_cost_usd": 2823.7901747999954,
+          "share_of_priced_claude_cost": 0.443340517001647
+        },
+        {
+          "date": "2026-10-02",
+          "fable_cost_usd": 846.72583,
+          "claude_priced_cost_usd": 2427.2465577999924,
+          "share_of_priced_claude_cost": 0.348842117945964
+        },
+        {
+          "date": "2026-10-03",
+          "fable_cost_usd": 2092.869430000003,
+          "claude_priced_cost_usd": 5940.560124799993,
+          "share_of_priced_claude_cost": 0.3523016998452592
+        },
+        {
+          "date": "2026-10-04",
+          "fable_cost_usd": 764.4944299999994,
+          "claude_priced_cost_usd": 2382.0104777499937,
+          "share_of_priced_claude_cost": 0.3209450324173753
+        }
+      ],
+      "excluded_source_days": [
+        {
+          "date": "2026-09-23",
+          "reason": "Requested receipt window begins 2026-09-24; this row is excluded from selected daily totals.",
+          "claude_cost_usd": 0.3375112,
+          "inputTokens": 10,
+          "outputTokens": 1945,
+          "cacheCreationTokens": 32993,
+          "cacheReadTokens": 173136,
+          "totalTokens": 208084
+        }
+      ],
+      "unpriced_gap": {
+        "model": "claude-sonnet-5-5",
+        "first_source_day": "2026-09-28",
+        "effect": "Reported Claude dollars omit Sonnet 5.5 throughout the subsequent days; cross-instrument agreement is directional only."
+      }
+    },
+    "ccusage_session_view": {
+      "command": "ccusage session --since 20261003 --json --offline",
+      "selection": "agent == claude. Top-level shares are the unfiltered raw export; activity_selected_view is separately filtered by lastActivity. Workflow parents use folder names only.",
+      "workflow_row_count_observation": {
+        "checked_on": "2026-10-04",
+        "source": "ccusage-session-1003.json",
+        "source_sha256": "41d5d3a9cf072dcb723b2c7b55716d2e0b2b8aafbd9765f34a6add3521504b32",
+        "parent_mapping_source": "out/files.jsonl",
+        "parent_mapping_sha256": "f821aceff9028ab78028c18606c22b534e359d4036f953d171e17bf8864b3047",
+        "method": "Select agent == claude; match each wf_ period to a workflow folder component in files.jsonl and its parent session; select metadata.lastActivity >= 2026-10-03T04:00:00Z. Publish coordinator names and counts only.",
+        "mapped_workflow_rows": 102,
+        "ambiguous_parent_mappings": 0,
+        "coordinator_counts": [
+          {
+            "session_name": "native-agent-stack-5f",
+            "raw_workflow_rows": 38,
+            "activity_selected_workflow_rows": 36,
+            "excluded_workflow_rows": 2
+          },
+          {
+            "session_name": "wsl-architecture-design",
+            "raw_workflow_rows": 58,
+            "activity_selected_workflow_rows": 50,
+            "excluded_workflow_rows": 8
+          }
+        ],
+        "exit_code": 0,
+        "claim_boundary": "Independent count of retained session-selection rows; lastActivity selection does not establish daily token membership or distinct workflow launches."
+      },
+      "rows": 179,
+      "total_cost_usd": 12404.875934150008,
+      "workflow_run_rows": 102,
+      "workflow_run_cost_usd": 7616.856165599997,
+      "workflow_run_cost_share": 0.6140211482995304,
+      "unmapped_workflow_rows": 0,
+      "coordinator_trees": [
+        {
+          "session_name": "wsl-architecture-design",
+          "rows": 59,
+          "cost_usd": 8067.215296700007,
+          "workflow_runs": 58,
+          "workflow_cost_usd": 4763.052738799998,
+          "cost_share": 0.6503261571920573,
+          "workflow_cost_share_of_tree": 0.5904209276215032
+        },
+        {
+          "session_name": "native-agent-stack-5f",
+          "rows": 39,
+          "cost_usd": 3980.4105358,
+          "workflow_runs": 38,
+          "workflow_cost_usd": 2647.319879999999,
+          "cost_share": 0.3208746751623793,
+          "workflow_cost_share_of_tree": 0.6650871452052192
+        },
+        {
+          "session_name": "native-agent-stack-99",
+          "rows": 5,
+          "cost_usd": 188.0528616,
+          "workflow_runs": 4,
+          "workflow_cost_usd": 163.44353679999998,
+          "cost_share": 0.015159592292438798,
+          "workflow_cost_share_of_tree": 0.8691361323054707
+        },
+        {
+          "session_name": "other coordinators",
+          "rows": 76,
+          "cost_usd": 169.1972400500001,
+          "workflow_runs": 2,
+          "workflow_cost_usd": 43.040009999999995,
+          "cost_share": 0.01363957535312453,
+          "workflow_cost_share_of_tree": 0.25437773090909216
+        }
+      ],
+      "daily_oct03_oct04_cost_usd": 8322.570602549986,
+      "session_minus_daily_oct03_oct04_cost_usd": 4082.3053316000223,
+      "scope": "Unfiltered retained session-view export; not spend since 10-03.",
+      "raw_view": {
+        "rows": 179,
+        "total_cost_usd": 12404.875934150008,
+        "workflow_run_rows": 102,
+        "workflow_run_cost_usd": 7616.856165599997,
+        "workflow_run_cost_share": 0.6140211482995304,
+        "coordinator_trees": [
+          {
+            "session_name": "wsl-architecture-design",
+            "rows": 59,
+            "cost_usd": 8067.215296700007,
+            "workflow_runs": 58,
+            "workflow_cost_usd": 4763.052738799998,
+            "cost_share": 0.6503261571920573,
+            "workflow_cost_share_of_tree": 0.5904209276215032
+          },
+          {
+            "session_name": "native-agent-stack-5f",
+            "rows": 39,
+            "cost_usd": 3980.4105358,
+            "workflow_runs": 38,
+            "workflow_cost_usd": 2647.319879999999,
+            "cost_share": 0.3208746751623793,
+            "workflow_cost_share_of_tree": 0.6650871452052192
+          },
+          {
+            "session_name": "native-agent-stack-99",
+            "rows": 5,
+            "cost_usd": 188.0528616,
+            "workflow_runs": 4,
+            "workflow_cost_usd": 163.44353679999998,
+            "cost_share": 0.015159592292438798,
+            "workflow_cost_share_of_tree": 0.8691361323054707
+          },
+          {
+            "session_name": "other coordinators",
+            "rows": 76,
+            "cost_usd": 169.1972400500001,
+            "workflow_runs": 2,
+            "workflow_cost_usd": 43.040009999999995,
+            "cost_share": 0.01363957535312453,
+            "workflow_cost_share_of_tree": 0.25437773090909216
+          }
+        ]
+      },
+      "activity_selected_view": {
+        "rows": 162,
+        "total_cost_usd": 11151.916225750008,
+        "workflow_run_rows": 91,
+        "workflow_run_cost_usd": 6368.383088599999,
+        "workflow_run_cost_share": 0.571057292727439,
+        "coordinator_trees": [
+          {
+            "session_name": "wsl-architecture-design",
+            "rows": 51,
+            "cost_usd": 7058.691812700007,
+            "workflow_runs": 50,
+            "workflow_cost_usd": 3754.529254799999,
+            "cost_share": 0.6329577509200921,
+            "workflow_cost_share_of_tree": 0.5319015696428119
+          },
+          {
+            "session_name": "native-agent-stack-5f",
+            "rows": 37,
+            "cost_usd": 3767.8758491999997,
+            "workflow_runs": 36,
+            "workflow_cost_usd": 2434.7851933999996,
+            "cost_share": 0.3378680195337099,
+            "workflow_cost_share_of_tree": 0.6461957057096126
+          },
+          {
+            "session_name": "native-agent-stack-99",
+            "rows": 5,
+            "cost_usd": 188.0528616,
+            "workflow_runs": 4,
+            "workflow_cost_usd": 163.44353679999998,
+            "cost_share": 0.01686282947192358,
+            "workflow_cost_share_of_tree": 0.8691361323054707
+          },
+          {
+            "session_name": "other coordinators",
+            "rows": 69,
+            "cost_usd": 137.29570225000006,
+            "workflow_runs": 1,
+            "workflow_cost_usd": 15.6251036,
+            "cost_share": 0.012311400074274358,
+            "workflow_cost_share_of_tree": 0.11380621056548762
+          }
+        ],
+        "activity_cutoff_utc_inclusive": "2026-10-03T04:00:00Z",
+        "selection": "metadata.lastActivity >= cutoff; session totals may still include earlier entries",
+        "excluded_rows": 17,
+        "excluded_cost_usd": 1252.9597083999997
+      },
+      "session_minus_daily_oct03_oct04_cost_usd_note": "These are different populations; raw minus daily is descriptive arithmetic, not a same-window reconciliation."
+    },
+    "prometheus_daily": {
+      "retrieved_at_utc": "2026-10-04T14:18:26Z",
+      "retention": "1 week",
+      "method": "each point = increase over the 24 h ending at its UTC midnight stamp",
+      "queries": {
+        "tokens_by_type": "sum by (type) (increase(ecosystem_claude_code_token_usage_tokens_total[1d]))",
+        "cost_usd": "sum(increase(ecosystem_claude_code_cost_usage_USD_total[1d]))"
+      },
+      "days": [
+        {
+          "end_utc_exclusive": "2026-09-28T00:00Z",
+          "tokens_by_type": {
+            "cacheCreation": 159644750.21685714,
+            "cacheRead": 6554561170.338203,
+            "input": 121087543.49965088,
+            "output": 57803622.70938628
+          },
+          "cost_usd": 4281.38847756003,
+          "date_utc": "2026-09-27",
+          "start_utc": "2026-09-27T00:00Z"
+        },
+        {
+          "end_utc_exclusive": "2026-09-29T00:00Z",
+          "tokens_by_type": {
+            "cacheCreation": 161842495.53659025,
+            "cacheRead": 6129172992.35876,
+            "input": 119654308.81390686,
+            "output": 56086665.99990544
+          },
+          "cost_usd": 3679.2170879308505,
+          "date_utc": "2026-09-28",
+          "start_utc": "2026-09-28T00:00Z"
+        },
+        {
+          "end_utc_exclusive": "2026-09-30T00:00Z",
+          "tokens_by_type": {
+            "cacheCreation": 323462623.9925268,
+            "cacheRead": 13135610258.766579,
+            "input": 158963301.7182801,
+            "output": 91999050.82496437
+          },
+          "cost_usd": 6177.075928900642,
+          "date_utc": "2026-09-29",
+          "start_utc": "2026-09-29T00:00Z"
+        },
+        {
+          "end_utc_exclusive": "2026-10-01T00:00Z",
+          "tokens_by_type": {
+            "cacheCreation": 211677210.37408125,
+            "cacheRead": 11728022925.568775,
+            "input": 124715035.27855512,
+            "output": 61774023.66131152
+          },
+          "cost_usd": 5422.083415220099,
+          "date_utc": "2026-09-30",
+          "start_utc": "2026-09-30T00:00Z"
+        },
+        {
+          "end_utc_exclusive": "2026-10-02T00:00Z",
+          "tokens_by_type": {
+            "cacheCreation": 117529431.00625888,
+            "cacheRead": 6238635363.684565,
+            "input": 101505806.72918452,
+            "output": 40808858.31343905
+          },
+          "cost_usd": 3794.7150603673113,
+          "date_utc": "2026-10-01",
+          "start_utc": "2026-10-01T00:00Z"
+        },
+        {
+          "end_utc_exclusive": "2026-10-03T00:00Z",
+          "tokens_by_type": {
+            "cacheCreation": 61566163.609989904,
+            "cacheRead": 3746519890.9735794,
+            "input": 51391822.89616059,
+            "output": 26102172.719979733
+          },
+          "cost_usd": 2056.1440588329465,
+          "date_utc": "2026-10-02",
+          "start_utc": "2026-10-02T00:00Z"
+        },
+        {
+          "end_utc_exclusive": "2026-10-04T00:00Z",
+          "tokens_by_type": {
+            "cacheCreation": 223087575.5626735,
+            "cacheRead": 9835123525.215385,
+            "input": 185051588.86951554,
+            "output": 80888905.38822988
+          },
+          "cost_usd": 6600.641653562174,
+          "date_utc": "2026-10-03",
+          "start_utc": "2026-10-03T00:00Z"
+        }
+      ]
+    },
+    "window_comparison": {
+      "artifact_path": "evidence/artifacts/claude-spend-window-compare.py.txt",
+      "unique_counted_call_rows": 339468,
+      "transcript_file_records": 8500,
+      "context_definition": "input + top-level cache creation + cache read tokens",
+      "iet_definition": "input + 0.1*cache_read + 1.25*(cache_write_5m + max(0,cache_write-cache_write_5m-cache_write_1h)) + 2*cache_write_1h + 5*output; relative index, not USD; thinking is already in output",
+      "iet_weight_scope": {
+        "source": "report.py:3,7-13,57-60; evidence/artifacts/claude-spend-window-compare.py.txt:34-37,120",
+        "same_coefficients_for_every_model": true,
+        "coefficients": {
+          "input": 1,
+          "cache_read": 0.1,
+          "cache_write_5m": 1.25,
+          "cache_write_1h": 2,
+          "cache_write_unclassified": 1.25,
+          "output_including_thinking": 5
+        },
+        "model_specific_base_price_multiplier": null,
+        "advisor_cache_writes": "All retained advisor cache writes receive 1.25 because the per-file aggregates lack duration splits.",
+        "claim_boundary": "Pooling applies shared token-category coefficients, not pooled or fitted model prices. Model shares and window ratios describe the relative index only; do not equate them with ccusage dollar shares, actual spend ratios or post-change advisor savings."
+      },
+      "call_definition": "one row per message identifier, per-field maximum across duplicates, including synthetic zero-usage rows",
+      "subagent_definition": "non-main file whose first_ts falls in the window; mean calls uses that file's entire calls field",
+      "windows": {
+        "C_0926-27": {
+          "start_utc": "2026-09-26T04:00:00Z",
+          "end_utc_exclusive": "2026-09-28T04:00:00Z",
+          "hours": 48.0,
+          "all": {
+            "iet_per_24h": 1764361745.4499965,
+            "calls": 94507,
+            "calls_per_24h": 47253.5,
+            "mean_context_tokens_per_call": 230352.6322071381,
+            "output_tokens_per_24h": 72057144.5,
+            "share_of_window_iet": 1.0
+          },
+          "subagents_started": 1629,
+          "subagents_started_per_24h": 814.5,
+          "mean_calls_per_subagent": 50.06998158379374,
+          "first_call_context": {
+            "n": 1613,
+            "median_tokens": 39990,
+            "p90_tokens": 51572
+          },
+          "kinds": {
+            "main": {
+              "iet_per_24h": 329811150.1499995,
+              "calls": 12496,
+              "calls_per_24h": 6248.0,
+              "mean_context_tokens_per_call": 373812.3428297055,
+              "output_tokens_per_24h": 6943716.0,
+              "share_of_window_iet": 0.186929438365193
+            },
+            "sub:agent": {
+              "iet_per_24h": 183879300.39999923,
+              "calls": 10124,
+              "calls_per_24h": 5062.0,
+              "mean_context_tokens_per_call": 232132.30175819833,
+              "output_tokens_per_24h": 6176359.0,
+              "share_of_window_iet": 0.10421859398969298
+            },
+            "sub:workflow": {
+              "iet_per_24h": 1250671294.8999932,
+              "calls": 71887,
+              "calls_per_24h": 35943.5,
+              "mean_context_tokens_per_call": 205164.62994700015,
+              "output_tokens_per_24h": 58937069.5,
+              "share_of_window_iet": 0.7088519676451113
+            }
+          },
+          "models": {
+            "claude-opus-5-5": {
+              "iet_per_24h": 1489151878.474996,
+              "calls": 81069,
+              "calls_per_24h": 40534.5,
+              "mean_context_tokens_per_call": 229213.17617091612,
+              "output_tokens_per_24h": 59239642.0,
+              "share_of_window_iet": 0.8440173237235945
+            },
+            "<synthetic>": {
+              "iet_per_24h": 0.0,
+              "calls": 241,
+              "calls_per_24h": 120.5,
+              "mean_context_tokens_per_call": 0.0,
+              "output_tokens_per_24h": 0.0,
+              "share_of_window_iet": 0.0
+            },
+            "claude-sonnet-5": {
+              "iet_per_24h": 274334690.07500136,
+              "calls": 13116,
+              "calls_per_24h": 6558.0,
+              "mean_context_tokens_per_call": 242719.70738029887,
+              "output_tokens_per_24h": 12773061.0,
+              "share_of_window_iet": 0.1554866459684167
+            },
+            "claude-opus-4-8": {
+              "iet_per_24h": 383615.1,
+              "calls": 16,
+              "calls_per_24h": 8.0,
+              "mean_context_tokens_per_call": 151105.875,
+              "output_tokens_per_24h": 33835.0,
+              "share_of_window_iet": 0.00021742429010903304
+            },
+            "claude-haiku-4-5-20251001": {
+              "iet_per_24h": 491561.80000000016,
+              "calls": 65,
+              "calls_per_24h": 32.5,
+              "mean_context_tokens_per_call": 29597.8,
+              "output_tokens_per_24h": 10606.5,
+              "share_of_window_iet": 0.00027860601788020994
+            }
+          },
+          "effort": {
+            "xhigh": {
+              "iet_per_24h": 174998242.60000017,
+              "calls": 6975,
+              "calls_per_24h": 3487.5,
+              "mean_context_tokens_per_call": 338128.9016487455,
+              "output_tokens_per_24h": 3097789.0,
+              "share_of_window_iet": 0.09918501296646921
+            },
+            "max": {
+              "iet_per_24h": 1588851618.700005,
+              "calls": 87435,
+              "calls_per_24h": 43717.5,
+              "mean_context_tokens_per_call": 221986.86727283124,
+              "output_tokens_per_24h": 68946332.5,
+              "share_of_window_iet": 0.9005248627711387
+            },
+            "None": {
+              "iet_per_24h": 491561.80000000016,
+              "calls": 96,
+              "calls_per_24h": 48.0,
+              "mean_context_tokens_per_call": 20040.177083333332,
+              "output_tokens_per_24h": 10606.5,
+              "share_of_window_iet": 0.00027860601788020994
+            },
+            "low": {
+              "iet_per_24h": 20322.35,
+              "calls": 1,
+              "calls_per_24h": 0.5,
+              "mean_context_tokens_per_call": 141526.0,
+              "output_tokens_per_24h": 2416.5,
+              "share_of_window_iet": 1.1518244516697355e-05
+            }
+          },
+          "non_synthetic_call_rows": 94266,
+          "coordinator_iet_shares": [
+            {
+              "session_name": "other coordinators",
+              "iet": 3528723490.9000125,
+              "share": 1.0
+            }
+          ],
+          "population": "executor rows from calls.tsv; excludes advisor iterations retained only in files.jsonl"
+        },
+        "A_1001-02": {
+          "start_utc": "2026-10-01T04:00:00Z",
+          "end_utc_exclusive": "2026-10-03T04:00:00Z",
+          "hours": 48.0,
+          "all": {
+            "iet_per_24h": 744352644.52499,
+            "calls": 33869,
+            "calls_per_24h": 16934.5,
+            "mean_context_tokens_per_call": 271790.36909858574,
+            "output_tokens_per_24h": 33382248.5,
+            "share_of_window_iet": 1.0
+          },
+          "subagents_started": 602,
+          "subagents_started_per_24h": 301.0,
+          "mean_calls_per_subagent": 44.16943521594684,
+          "first_call_context": {
+            "n": 583,
+            "median_tokens": 28855,
+            "p90_tokens": 51660
+          },
+          "kinds": {
+            "main": {
+              "iet_per_24h": 249341532.7249996,
+              "calls": 7412,
+              "calls_per_24h": 3706.0,
+              "mean_context_tokens_per_call": 524378.2114139234,
+              "output_tokens_per_24h": 5200458.0,
+              "share_of_window_iet": 0.3349776944557205
+            },
+            "sub:workflow": {
+              "iet_per_24h": 371851838.550001,
+              "calls": 21454,
+              "calls_per_24h": 10727.0,
+              "mean_context_tokens_per_call": 174191.75118858955,
+              "output_tokens_per_24h": 23018266.5,
+              "share_of_window_iet": 0.4995640726006945
+            },
+            "sub:agent": {
+              "iet_per_24h": 123159273.24999982,
+              "calls": 5003,
+              "calls_per_24h": 2501.5,
+              "mean_context_tokens_per_call": 316103.7133719768,
+              "output_tokens_per_24h": 5163524.0,
+              "share_of_window_iet": 0.16545823294359913
+            }
+          },
+          "models": {
+            "claude-opus-5-5": {
+              "iet_per_24h": 563363141.4499971,
+              "calls": 26826,
+              "calls_per_24h": 13413.0,
+              "mean_context_tokens_per_call": 250984.3767986282,
+              "output_tokens_per_24h": 26888717.0,
+              "share_of_window_iet": 0.7568497883278272
+            },
+            "claude-sonnet-5-5": {
+              "iet_per_24h": 147621134.77499998,
+              "calls": 5882,
+              "calls_per_24h": 2941.0,
+              "mean_context_tokens_per_call": 331478.4603876232,
+              "output_tokens_per_24h": 5867779.5,
+              "share_of_window_iet": 0.1983215023964947
+            },
+            "claude-haiku-4-5-20251001": {
+              "iet_per_24h": 1065693.6000000006,
+              "calls": 158,
+              "calls_per_24h": 79.0,
+              "mean_context_tokens_per_call": 24057.07594936709,
+              "output_tokens_per_24h": 7193.5,
+              "share_of_window_iet": 0.0014317052647540131
+            },
+            "<synthetic>": {
+              "iet_per_24h": 0.0,
+              "calls": 83,
+              "calls_per_24h": 41.5,
+              "mean_context_tokens_per_call": 0.0,
+              "output_tokens_per_24h": 0.0,
+              "share_of_window_iet": 0.0
+            },
+            "claude-fable-5-1": {
+              "iet_per_24h": 32302674.699999988,
+              "calls": 920,
+              "calls_per_24h": 460.0,
+              "mean_context_tokens_per_call": 563917.1706521739,
+              "output_tokens_per_24h": 618558.5,
+              "share_of_window_iet": 0.043397004010933556
+            }
+          },
+          "effort": {
+            "max": {
+              "iet_per_24h": 743234828.92499,
+              "calls": 33704,
+              "calls_per_24h": 16852.0,
+              "mean_context_tokens_per_call": 273004.93816757656,
+              "output_tokens_per_24h": 33373976.0,
+              "share_of_window_iet": 0.9984982714735793
+            },
+            "None": {
+              "iet_per_24h": 1065693.6000000006,
+              "calls": 161,
+              "calls_per_24h": 80.5,
+              "mean_context_tokens_per_call": 23608.80745341615,
+              "output_tokens_per_24h": 7193.5,
+              "share_of_window_iet": 0.0014317052647540131
+            },
+            "xhigh": {
+              "iet_per_24h": 52122.000000000015,
+              "calls": 4,
+              "calls_per_24h": 2.0,
+              "mean_context_tokens_per_call": 27139.25,
+              "output_tokens_per_24h": 1079.0,
+              "share_of_window_iet": 7.002326166686995e-05
+            }
+          },
+          "non_synthetic_call_rows": 33786,
+          "coordinator_iet_shares": [
+            {
+              "session_name": "wsl-architecture-design",
+              "iet": 889269599.5499978,
+              "share": 0.5973442870734179
+            },
+            {
+              "session_name": "other coordinators",
+              "iet": 429223250.6000003,
+              "share": 0.28831982646740284
+            },
+            {
+              "session_name": "native-agent-stack-5f",
+              "iet": 170212438.90000024,
+              "share": 0.11433588645917926
+            }
+          ],
+          "population": "executor rows from calls.tsv; excludes advisor iterations retained only in files.jsonl"
+        },
+        "B_1003-04": {
+          "start_utc": "2026-10-03T04:00:00Z",
+          "end_utc_exclusive": "2026-10-04T14:00:00Z",
+          "hours": 34.0,
+          "all": {
+            "iet_per_24h": 1579028837.152913,
+            "calls": 58025,
+            "calls_per_24h": 40958.82352941176,
+            "mean_context_tokens_per_call": 216229.65320120638,
+            "output_tokens_per_24h": 78364456.94117647,
+            "share_of_window_iet": 1.0
+          },
+          "subagents_started": 1204,
+          "subagents_started_per_24h": 849.8823529411766,
+          "mean_calls_per_subagent": 43.62292358803987,
+          "first_call_context": {
+            "n": 1162,
+            "median_tokens": 34525,
+            "p90_tokens": 63376
+          },
+          "kinds": {
+            "main": {
+              "iet_per_24h": 257704649.50588372,
+              "calls": 5768,
+              "calls_per_24h": 4071.5294117647063,
+              "mean_context_tokens_per_call": 497577.6900138696,
+              "output_tokens_per_24h": 3985674.3529411764,
+              "share_of_window_iet": 0.16320452384551834
+            },
+            "sub:agent": {
+              "iet_per_24h": 241763144.22353008,
+              "calls": 7870,
+              "calls_per_24h": 5555.294117647059,
+              "mean_context_tokens_per_call": 261618.2040660737,
+              "output_tokens_per_24h": 9597614.823529411,
+              "share_of_window_iet": 0.1531087580765428
+            },
+            "sub:workflow": {
+              "iet_per_24h": 1079561043.4235153,
+              "calls": 44387,
+              "calls_per_24h": 31332.0,
+              "mean_context_tokens_per_call": 171621.47126410887,
+              "output_tokens_per_24h": 64781167.76470588,
+              "share_of_window_iet": 0.6836867180779489
+            }
+          },
+          "models": {
+            "claude-opus-5-5": {
+              "iet_per_24h": 1349042951.1882296,
+              "calls": 48983,
+              "calls_per_24h": 34576.23529411765,
+              "mean_context_tokens_per_call": 230292.62250168427,
+              "output_tokens_per_24h": 62271300.705882356,
+              "share_of_window_iet": 0.8543497873165115
+            },
+            "claude-sonnet-5-5": {
+              "iet_per_24h": 229355876.25882384,
+              "calls": 8833,
+              "calls_per_24h": 6235.058823529413,
+              "mean_context_tokens_per_call": 143299.3516359108,
+              "output_tokens_per_24h": 16092219.529411763,
+              "share_of_window_iet": 0.1452512271228477
+            },
+            "claude-haiku-4-5-20251001": {
+              "iet_per_24h": 630009.705882353,
+              "calls": 22,
+              "calls_per_24h": 15.529411764705884,
+              "mean_context_tokens_per_call": 24496.636363636364,
+              "output_tokens_per_24h": 936.7058823529412,
+              "share_of_window_iet": 0.0003989855606553073
+            },
+            "<synthetic>": {
+              "iet_per_24h": 0.0,
+              "calls": 187,
+              "calls_per_24h": 132.0,
+              "mean_context_tokens_per_call": 0.0,
+              "output_tokens_per_24h": 0.0,
+              "share_of_window_iet": 0.0
+            }
+          },
+          "effort": {
+            "xhigh": {
+              "iet_per_24h": 4828656.952941177,
+              "calls": 245,
+              "calls_per_24h": 172.94117647058823,
+              "mean_context_tokens_per_call": 72241.8693877551,
+              "output_tokens_per_24h": 135387.5294117647,
+              "share_of_window_iet": 0.0030579916207531367
+            },
+            "None": {
+              "iet_per_24h": 630009.705882353,
+              "calls": 26,
+              "calls_per_24h": 18.352941176470587,
+              "mean_context_tokens_per_call": 20727.923076923078,
+              "output_tokens_per_24h": 936.7058823529412,
+              "share_of_window_iet": 0.0003989855606553073
+            },
+            "max": {
+              "iet_per_24h": 1573570170.494092,
+              "calls": 57754,
+              "calls_per_24h": 40767.529411764706,
+              "mean_context_tokens_per_call": 216928.48015721855,
+              "output_tokens_per_24h": 78228132.70588236,
+              "share_of_window_iet": 0.9965430228185931
+            }
+          },
+          "non_synthetic_call_rows": 57838,
+          "coordinator_iet_shares": [
+            {
+              "session_name": "wsl-architecture-design",
+              "iet": 1195146824.0500035,
+              "share": 0.5342733662747406
+            },
+            {
+              "session_name": "native-agent-stack-5f",
+              "iet": 948460119.7999952,
+              "share": 0.42399558847983515
+            },
+            {
+              "session_name": "native-agent-stack-99",
+              "iet": 59134212.300000004,
+              "share": 0.026435107412546937
+            },
+            {
+              "session_name": "other coordinators",
+              "iet": 34216363.14999999,
+              "share": 0.015295937832877205
+            }
+          ],
+          "population": "executor rows from calls.tsv; excludes advisor iterations retained only in files.jsonl"
+        }
+      },
+      "B_over_A": {
+        "iet_per_24h": 2.1213451027107904,
+        "calls_per_24h": 2.4186615211203026,
+        "subagents_started_per_24h": 2.823529411764706,
+        "workflow_iet_per_24h": 2.903202113059748,
+        "executor_plus_advisor_cohort_iet_per_24h": 2.141423902025669
+      },
+      "advisor_comparison": {
+        "C_0926-27": {
+          "cohort_method": "file first_ts is in the window; tot values span that entire file",
+          "by_model": {
+            "advisor(claude-opus-5-5)": {
+              "iterations": 393,
+              "input_tokens": 80093563,
+              "output_tokens": 3104796,
+              "cache_read_tokens": 0,
+              "cache_creation_tokens": 0,
+              "iet": 95617543.0,
+              "iet_per_24h": 47808771.5
+            },
+            "advisor(claude-fable-5-1)": {
+              "iterations": 746,
+              "input_tokens": 145564755,
+              "output_tokens": 6451888,
+              "cache_read_tokens": 0,
+              "cache_creation_tokens": 0,
+              "iet": 177824195.0,
+              "iet_per_24h": 88912097.5
+            }
+          },
+          "advisor_cohort_iet_per_24h": 136720869.0,
+          "executor_iet_per_24h": 1764361745.4499965,
+          "executor_plus_advisor_cohort_iet_per_24h": 1901082614.4499965
+        },
+        "A_1001-02": {
+          "cohort_method": "file first_ts is in the window; tot values span that entire file",
+          "by_model": {
+            "advisor(claude-fable-5-1)": {
+              "iterations": 689,
+              "input_tokens": 141966410,
+              "output_tokens": 5973717,
+              "cache_read_tokens": 0,
+              "cache_creation_tokens": 0,
+              "iet": 171834995.0,
+              "iet_per_24h": 85917497.5
+            }
+          },
+          "advisor_cohort_iet_per_24h": 85917497.5,
+          "executor_iet_per_24h": 744352644.52499,
+          "executor_plus_advisor_cohort_iet_per_24h": 830270142.02499
+        },
+        "B_1003-04": {
+          "cohort_method": "file first_ts is in the window; tot values span that entire file",
+          "by_model": {
+            "advisor(claude-fable-5-1)": {
+              "iterations": 1209,
+              "input_tokens": 231924586,
+              "output_tokens": 9979005,
+              "cache_read_tokens": 0,
+              "cache_creation_tokens": 0,
+              "iet": 281819611.0,
+              "iet_per_24h": 198931490.11764705
+            }
+          },
+          "advisor_cohort_iet_per_24h": 198931490.11764705,
+          "executor_iet_per_24h": 1579028837.152913,
+          "executor_plus_advisor_cohort_iet_per_24h": 1777960327.2705603
+        }
+      }
+    },
+    "prefix_delta": {
+      "source": "prefix_compare.py and prefix_compare.txt",
+      "method": "non-main files with calls and non-resumed first_ts in A/B; exclude hook_success; means use all selected files per window",
+      "sample_counts": {
+        "B_1003-04": 1162,
+        "A_1001-02": 583
+      },
+      "families": [
+        {
+          "family": "advisor_tool",
+          "A_mean_bytes": 90.55060034305318,
+          "B_mean_bytes": 92.8657487091222,
+          "delta_bytes": 2.3151483660690246
+        },
+        {
+          "family": "credential_org",
+          "A_mean_bytes": 86.0,
+          "B_mean_bytes": 85.92598967297762,
+          "delta_bytes": -0.07401032702237842
+        },
+        {
+          "family": "date",
+          "A_mean_bytes": 38.0,
+          "B_mean_bytes": 37.96729776247849,
+          "delta_bytes": -0.032702237521512245
+        },
+        {
+          "family": "deferred_tools_delta",
+          "A_mean_bytes": 3777.6415094339623,
+          "B_mean_bytes": 4507.756454388985,
+          "delta_bytes": 730.1149449550226
+        },
+        {
+          "family": "environment",
+          "A_mean_bytes": 358.4253859348199,
+          "B_mean_bytes": 390.96127366609295,
+          "delta_bytes": 32.53588773127308
+        },
+        {
+          "family": "hook_additional_context",
+          "A_mean_bytes": 3222.746140651801,
+          "B_mean_bytes": 3237.40017211704,
+          "delta_bytes": 14.654031465238859
+        },
+        {
+          "family": "instructions",
+          "A_mean_bytes": 37829.91080617496,
+          "B_mean_bytes": 40573.20395869191,
+          "delta_bytes": 2743.293152516955
+        },
+        {
+          "family": "model",
+          "A_mean_bytes": 259.7975986277873,
+          "B_mean_bytes": 259.83820998278827,
+          "delta_bytes": 0.040611355000976346
+        },
+        {
+          "family": "output_style_instructions",
+          "A_mean_bytes": 0.0,
+          "B_mean_bytes": 1.2736660929432013,
+          "delta_bytes": 1.2736660929432013
+        },
+        {
+          "family": "prompt_snapshot",
+          "A_mean_bytes": 3883.6260720411665,
+          "B_mean_bytes": 3654.0197934595526,
+          "delta_bytes": -229.60627858161388
+        },
+        {
+          "family": "remote_session_change",
+          "A_mean_bytes": 221.9245283018868,
+          "B_mean_bytes": 210.4647160068847,
+          "delta_bytes": -11.45981229500211
+        },
+        {
+          "family": "session_context",
+          "A_mean_bytes": 2635.5025728987994,
+          "B_mean_bytes": 3398.7960413080896,
+          "delta_bytes": 763.2934684092902
+        },
+        {
+          "family": "skill_listing",
+          "A_mean_bytes": 10553.951972555746,
+          "B_mean_bytes": 9385.530120481928,
+          "delta_bytes": -1168.4218520738177
+        }
+      ],
+      "net_mean_bytes_delta": 2877.9262553768153,
+      "net_rough_tokens_delta_at_3_6_bytes_per_token": 799.4239598268931,
+      "positive_only_mean_bytes_delta": 4287.520910891793,
+      "positive_only_rough_tokens_delta_at_3_6_bytes_per_token": 1190.978030803276,
+      "first_call_median_tokens_delta": 5670
+    },
+    "hook_text_sizes": {
+      "historical_summary_estimates": {
+        "subagentstart_carrier_bytes_approx": 3100,
+        "subagentstart_carrier_tokens_approx": 870,
+        "context_mode_read_tip_bytes_approx": 420,
+        "context_mode_sessionstart_bytes_approx": 5100,
+        "verification": "Text not retained in aggregate inputs; these historical estimates cannot be remeasured from files.jsonl."
+      },
+      "current_carriers": [
+        {
+          "path": "adoption/hooks/claude/token-lanes-block.builder.md",
+          "sha256": "2f7a53031e6eabf6b9d08989b619b74204fa36dac2559e520fb72b06225a81d3",
+          "bytes": 2888,
+          "rough_tokens_at_3_6_bytes_per_token": 802.2222222222222
+        },
+        {
+          "path": "adoption/hooks/claude/token-lanes-block.md",
+          "sha256": "dcd6996e9247f3c8f3d543545eb958518236b21449492ddf92721590aa3f60c8",
+          "bytes": 4099,
+          "rough_tokens_at_3_6_bytes_per_token": 1138.611111111111
+        },
+        {
+          "path": "adoption/hooks/claude/token-lanes-block.researcher.md",
+          "sha256": "149ac69352a788ad67c84b4d545cab461015c4e73a9ba4c8675259402c955e4a",
+          "bytes": 3086,
+          "rough_tokens_at_3_6_bytes_per_token": 857.2222222222222
+        },
+        {
+          "path": "adoption/hooks/claude/token-lanes-block.reviewer.md",
+          "sha256": "ec7c6b2a80c58e0156daab25b7cfd4eea6f2e3eac77137067051601045f9d2f8",
+          "bytes": 2099,
+          "rough_tokens_at_3_6_bytes_per_token": 583.0555555555555
+        },
+        {
+          "path": "adoption/hooks/claude/token-lanes-block.scout.md",
+          "sha256": "81784c2edc0cc95c0c0eb3b443b5b228dd41e970236239553c66af90ddfc7eae",
+          "bytes": 1089,
+          "rough_tokens_at_3_6_bytes_per_token": 302.5
+        },
+        {
+          "path": "adoption/hooks/claude/token-lanes-block.verifier.md",
+          "sha256": "a2eb3298126efd82622150e5717f10eb700f4aa3076d027c86ae1fe653f29eb0",
+          "bytes": 2186,
+          "rough_tokens_at_3_6_bytes_per_token": 607.2222222222222
+        }
+      ],
+      "current_upstream_static_text": {
+        "version": "1.0.169",
+        "source": "https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/routing-block.mjs",
+        "read_guidance_bytes": 405,
+        "sessionstart_base_routing_block_bytes": 4631,
+        "method": "Import pure upstream routing-block constants and measure UTF-8 bytes; no hook lifecycle or model was run."
+      },
+      "window_serialized_additional_context_mean_bytes": {
+        "A_1001-02": 3222.746140651801,
+        "B_1003-04": 3237.40017211704
+      }
+    },
+    "content_and_tool_attribution": {
+      "source": "attr_compare.py, attr_compare.txt, and out/files.jsonl",
+      "method": "Group by file first_ts and main/subagent kind as in attr_compare.py; remove att:hook_success before calculating context shares; tool counters retain their original denominators",
+      "windows": {
+        "sub_A_1001-02": {
+          "estimated_context_share_excluding_ui": {
+            "assistant_out": 0.4378147393811412,
+            "res:Read": 0.19252768852424798,
+            "res:mcp:context-mode": 0.16691112400259026,
+            "res:Bash": 0.08136914582328202,
+            "att:prompt_snapshot": 0.04187807275726079,
+            "att:deferred_tools_record": 0.03354079421372269,
+            "att:mcp_instructions_delta": 0.010046676267729782,
+            "att:total_tokens_reminder": 0.007514383825253369
+          },
+          "tool_calls": 32782,
+          "context_mode_calls": 10775,
+          "context_mode_call_share": 0.3286864742846684,
+          "tool_call_counts": {
+            "Bash": 10813,
+            "mcp__plugin_context-mode_context-mode__ctx_execute": 8116,
+            "Read": 5859,
+            "mcp__plugin_context-mode_context-mode__ctx_search": 1730,
+            "Edit": 1629,
+            "Grep": 1603
+          },
+          "tool_result_byte_shares": {
+            "Read": 0.34472239053672904,
+            "mcp__plugin_context-mode_context-mode__ctx_execute": 0.31100760114918213,
+            "Bash": 0.1653427719731199,
+            "mcp__plugin_context-mode_context-mode__ctx_search": 0.0784715852110969
+          }
+        },
+        "sub_B_1003-04": {
+          "estimated_context_share_excluding_ui": {
+            "assistant_out": 0.44728703067043096,
+            "res:mcp:context-mode": 0.15259207407065303,
+            "res:Read": 0.14191056995814377,
+            "res:Bash": 0.11015027217049234,
+            "att:prompt_snapshot": 0.07355118153336647,
+            "att:deferred_tools_record": 0.03527245352651633,
+            "att:mcp_instructions_delta": 0.010774932296809548,
+            "att:total_tokens_reminder": 0.007959384376179796
+          },
+          "tool_calls": 61173,
+          "context_mode_calls": 18961,
+          "context_mode_call_share": 0.30995700717636865,
+          "tool_call_counts": {
+            "Bash": 26392,
+            "mcp__plugin_context-mode_context-mode__ctx_execute": 15867,
+            "Read": 6589,
+            "Edit": 3856,
+            "mcp__plugin_context-mode_context-mode__ctx_search": 1741,
+            "Write": 1282
+          },
+          "tool_result_byte_shares": {
+            "Read": 0.3252932835399451,
+            "mcp__plugin_context-mode_context-mode__ctx_execute": 0.29967735218251984,
+            "Bash": 0.25157503103747497,
+            "mcp__plugin_context-mode_context-mode__ctx_search": 0.046290091377927535
+          }
+        },
+        "main_A_1001-02": {
+          "estimated_context_share_excluding_ui": {
+            "assistant_out": 0.5535034776491138,
+            "res:Bash": 0.13897476595144112,
+            "att:other": 0.0566627883548133,
+            "user_text": 0.054055756764086534,
+            "res:mcp:context-mode": 0.04727904822796716,
+            "att:prompt_snapshot": 0.047080625326276666,
+            "compaction_summary": 0.04041946118606645,
+            "res:Read": 0.01782877508717906
+          },
+          "tool_calls": 3494,
+          "context_mode_calls": 197,
+          "context_mode_call_share": 0.05638236977676016,
+          "tool_call_counts": {
+            "Bash": 2548,
+            "SendMessage": 174,
+            "mcp__plugin_context-mode_context-mode__ctx_execute": 163,
+            "Write": 159,
+            "Read": 92,
+            "Edit": 74
+          },
+          "tool_result_byte_shares": {
+            "Bash": 0.5829009757312047,
+            "Read": 0.1572974653696495,
+            "mcp__plugin_context-mode_context-mode__ctx_execute": 0.1375221837203495,
+            "mcp__plugin_context-mode_context-mode__ctx_batch_execute": 0.03338030734957833
+          }
+        },
+        "main_B_1003-04": {
+          "estimated_context_share_excluding_ui": {
+            "assistant_out": 0.46929140500533373,
+            "res:Bash": 0.1578626168002534,
+            "res:Read": 0.15767901808177248,
+            "att:prompt_snapshot": 0.08620071919810088,
+            "res:mcp:context-mode": 0.05419057405748539,
+            "att:other": 0.020566732927720648,
+            "user_text": 0.011402063270741227,
+            "res:Grep": 0.009203541473566229
+          },
+          "tool_calls": 883,
+          "context_mode_calls": 112,
+          "context_mode_call_share": 0.12684031710079274,
+          "tool_call_counts": {
+            "Bash": 604,
+            "mcp__plugin_context-mode_context-mode__ctx_execute": 96,
+            "Read": 77,
+            "ToolSearch": 23,
+            "Agent": 16,
+            "Grep": 15
+          },
+          "tool_result_byte_shares": {
+            "Bash": 0.4817117489707539,
+            "Read": 0.33355468353070394,
+            "mcp__plugin_context-mode_context-mode__ctx_execute": 0.11119352414755904,
+            "Grep": 0.018767519512149344
+          }
+        }
+      }
+    },
+    "numeric_review": {
+      "verified": "Claude daily dollar figures; Prometheus UTC dollar figures; scanner file/row counts, durations, IET, model/effort shares, first-call context, per-file calls; session-view tree and workflow shares; context-mode tool-call shares. Protocol budgets and future PR/day counts are decisions, not measured outcomes.",
+      "scope_notes": [
+        "The diagnosis's 40 workflow runs for native-agent-stack-5f is its whole retained scanner tree; 34 have file starts in B, while ccusage has 38 raw workflow rows and 36 after the lastActivity cutoff. The pinned session export and scanner parent mapping independently reproduce 38 minus 2 equals 36 (data.ccusage_session_view.workflow_row_count_observation). These counts have different scopes.",
+        "The 10-04 similar-pace statement is a projection from a partial local day; it is not a completed daily cost.",
+        "Historical hook-text sizes, the approximately 22 KB auto-memory index, and the under-1% trimming effect are not independently recoverable from the supplied count-only inputs; no claimed verification is made for them.",
+        "Coordinator timestamps, restart version/time, listener absence and policy acceptance are coordinator context, not independently observed spend metrics.",
+        "Review P1-1 totals reproduce, but the stated advisor-inclusive ratio 2.12 is a numerical mismatch: the retained inputs produce 2.141423902025669, rounding to 2.141; the one-decimal headline remains 2.1."
+      ],
+      "mismatches": [
+        {
+          "doc": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
+          "claim": "Injected start context grew about 1.2K tokens per subagent.",
+          "status": "superseded; the decision record now states about 0.8K tokens per subagent",
+          "source_value": "Net attachment growth excluding UI is 2877.926255 bytes, or 799.423960 rough tokens; the 1.2K estimate uses positive-only growth (4287.520911 bytes) and ignores decreases."
+        },
+        {
+          "doc": "SPEND-DIAGNOSIS-20261004.md",
+          "claim": "Injected attachments grew about 4.3 KB (+1.2K tokens).",
+          "status": "superseded source revision; retained as the historical mismatch",
+          "quoted_revision_sha256": "3a2b88e0923362bc2247245ea36315adb914ba5c037f13f9d184cac550d2e56a",
+          "quoted_revision_bytes": 4094,
+          "superseded_by_revision_sha256": "0efb89be1c65a642287102f2f326ca65e781c62ddc616d4d4896711b5ba60adf",
+          "corrected_net_rough_tokens": 799.423960,
+          "current_revision_note": "The pinned 4162-byte diagnosis states net +0.8K tokens; +1.2K counts only the attachment families that grew.",
+          "source_value": "Net 2877.926255 bytes (+799.423960 rough tokens) excluding hook_success; positive-only 4287.520911 bytes."
+        },
+        {
+          "doc": "SPEND-DIAGNOSIS-20261004.md",
+          "claim": "Subagent context shares: assistant output 40%, context-mode 14%, Read 13%, Bash 10%.",
+          "source_value": "Excluding UI hook_success before normalization: assistant_out 44.729%, res:mcp:context-mode 15.259%, res:Read 14.191%, res:Bash 11.015%. The saved percentages retain UI records in their denominator."
+        },
+        {
+          "doc": "SPEND-DIAGNOSIS-20261004.md",
+          "claim": "API calls per 24 h: 16.9K and 41.0K.",
+          "source_value": "The reproduced scanner counts include 83 synthetic rows in A and 187 in B; excluding these leaves 16,893 and 40,826.824 API response rows per 24 h."
+        },
+        {
+          "doc": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
+          "claim": "The comparison labels the scanner count as API calls.",
+          "source_value": "The unchanged scanner counts synthetic rows (83 in A, 187 in B); the ratio still rounds to 2.4. The table label is corrected to Call rows."
+        },
+        {
+          "doc": "REVIEW-opus.md",
+          "claim": "Advisor-inclusive IET ratio is 2.12.",
+          "source_value": "2.141423902025669 (2.141 rounded to three decimals). The headline still rounds to 2.1."
+        }
+      ]
+    },
+    "anti_pattern_log": [
+      {
+        "mistake": "Treating positive-only attachment growth as net prefix growth",
+        "evidence": "prefix_compare.py mean deltas: instruction, tool and session additions are partly offset by skill-listing and prompt-snapshot decreases",
+        "correction": "Sum signed deltas; exclude UI hook_success.",
+        "enforced_by": "This receipt and factual correction in the linked decision."
+      },
+      {
+        "mistake": "Removing a UI category from findings but retaining it in the context-share denominator",
+        "evidence": "attr_compare.txt percentages include att:hook_success in their total",
+        "correction": "Exclude UI records before normalizing context shares.",
+        "enforced_by": "data.content_and_tool_attribution"
+      },
+      {
+        "mistake": "Calling an executor-only relative cost index total spend",
+        "evidence": "calls.tsv excludes advisor iterations retained under files.jsonl tot advisor keys",
+        "correction": "Report executor index and advisor-cohort estimate separately, with membership limits.",
+        "enforced_by": "tests/test_claude_spend_window.py"
+      },
+      {
+        "mistake": "Treating a session-view date argument as proof of token-window membership",
+        "evidence": "17 retained Claude rows have last activity before the nominal cutoff",
+        "correction": "Label raw selection, filter activity separately, and avoid since-day spend claims.",
+        "enforced_by": "tests/test_claude_spend_window.py"
+      },
+      {
+        "mistake": "Copying or rounding ratio prose without recomputing from full-precision values",
+        "evidence": "Subagent ratio is 2.8235294; executor-plus-advisor-cohort ratio is 2.141423902025669 rather than the review summary's 2.12.",
+        "correction": "Round the subagent ratio to 2.824 and the combined cohort ratio to 2.141, while retaining their separate scopes.",
+        "enforced_by": "Receipt claim, numeric_review and window_comparison; the registry copies the receipt metadata."
+      },
+      {
+        "mistake": "Requiring a dated historical template quote to remain in a superseded mutable template",
+        "evidence": "CI run 37215586738 and the local one-test reproduction both reject the old advisorModel fable quote after the user's Opus selection.",
+        "correction": "Preserve the historical route and quote through the unchanged September 27 source statement; append October 4 forward pointers in both records to the user's current advisor decision and PR #691.",
+        "enforced_by": "tests/test_task_model_routing.py and existing template advisorModel integration checks"
+      },
+      {
+        "mistake": "Calling the raw 38 workflow rows the activity-selected count",
+        "evidence": "Pinned ccusage session export plus files.jsonl parent mapping independently yield 38 raw rows, two before the cutoff and 36 selected for native-agent-stack-5f.",
+        "correction": "Cite both counts and their selection scopes; retain the independent count observation.",
+        "enforced_by": "data.ccusage_session_view.workflow_row_count_observation and numeric_review.scope_notes"
+      },
+      {
+        "mistake": "Expanding an abbreviated source revision before resolving it natively",
+        "evidence": "git rev-parse b629b5b4 returns b629b5b413d75deb4c98dd26d62b129173b87d44; the initially transcribed full value was corrected before acceptance.",
+        "correction": "Use the native returned full commit ID for the frozen inventory's source revision.",
+        "enforced_by": "data.dispatch_observation_protocol.baseline_inventory_selection.source_revision"
+      }
+    ],
+    "completeness_critic": {
+      "covered": [
+        "Claude/Codex separation in combined daily exports",
+        "Session-view tree mapping using folder names only",
+        "UTC day labels and one-week telemetry retention",
+        "All three scanner windows, kinds, models and effort",
+        "Net versus positive-only prefix growth",
+        "UI hook records excluded from context",
+        "Source-body reproduction and privacy checks",
+        "Fixed baseline candidate membership and scoring eligibility",
+        "Independent raw-versus-activity-selected workflow row counts",
+        "Superseded diagnosis quote revision and net +0.8K-token correction",
+        "Shared IET coefficients and absence of model-specific price weights",
+        "Dated advisor forward pointers and retained historical quote source"
+      ],
+      "remaining_limits": [
+        "Original hook text and model-input tokenization are absent from aggregate inputs",
+        "Subscription meter and quality A/B are absent",
+        "Session/daily snapshot difference has no established cause",
+        "Advisor iteration timestamps are absent; file cohorts are approximate.",
+        "Historical PR P1/repair counters need complete review records, not author trailers or missing-label zeros.",
+        "The fixed ten-PR inventory is a purposive screening set, not an exhaustive or random baseline sample."
+      ],
+      "next_sweep": "A lifecycle-task sweep for spend attribution should retain bounded hook-text length observations and aligned native export timestamps, qualify builder attribution and complete counters for the fixed candidate inventory, and retain explicit quote revision and row-selection scopes; no new tool adoption follows from this receipt."
+    },
+    "advisor_model_decision": {
+      "decided_at_utc_approx": "2026-10-04T15:10Z",
+      "user_decision": "Use Opus 5.5 for the advisor.",
+      "template_path": "adoption/templates/claude.settings.template.json",
+      "advisorModel": "opus",
+      "historical_fable_oct03": {
+        "date": "2026-10-03",
+        "fable_cost_usd": 2092.869430000003,
+        "claude_priced_cost_usd": 5940.560124799993,
+        "share_of_priced_claude_cost": 0.3523016998452592
+      },
+      "native_readback": {
+        "command": "claude -p \"/advisor\"",
+        "stdout": "Advisor: Opus 5.5",
+        "source": "Workstation read-back supplied by the coordinator/user with the repair request.",
+        "executed_by_this_repair": false
+      },
+      "upstream_reference": "https://code.claude.com/docs/en/advisor#set-advisormodel-in-settings",
+      "claim_boundary": "Setting selection and the reported read-back do not measure savings or quality after the change."
+    },
+    "dispatch_observation_protocol": {
+      "status": "pending baseline completeness; no quality-unchanged conclusion",
+      "baseline_scope": "Candidate foundation changes merged 2026-10-03T00:00Z through 2026-10-04T14:20Z at main b629b5b4. A Claude coauthor alone does not prove the builder family. Freeze actual builder-role attribution and complete counters before comparison.",
+      "baseline_inventory_selection": {
+        "rule": "Exactly the enumerated ten candidate PRs below, frozen at main b629b5b4; a purposive foundation implementation-change inventory, not a census of merges or a claim to be the ten most recent merges. Keep every candidate regardless of review outcome or missing data.",
+        "candidate_pr_numbers": [683, 688, 681, 626, 672, 673, 665, 680, 676, 635],
+        "source_revision": "b629b5b413d75deb4c98dd26d62b129173b87d44",
+        "source": "The retained baseline_prs inventory and native git merge history through b629b5b4, inspected on 2026-10-04.",
+        "scoring_selection": "Score all candidates whose actual Claude builder family, contract-build eligibility, exact review heads and complete P1/read/repair counters are confirmed. Preregistered role exemptions and Claude-only builds are excluded. Require at least five complete eligible Claude baseline PRs; incomplete rows remain unknown rather than zero.",
+        "limit": "No exhaustive historical inventory query is retained. This fixed screening rule does not establish representative sampling or a controlled comparison."
+      },
+      "baseline_prs": [
+        {
+          "pr": 683,
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/683",
+          "merged_at_utc": "2026-10-04T14:18:43Z",
+          "builder_family": "Claude-led candidate from native commit trailer; actual builder role still requires confirmation",
+          "p1_findings": null,
+          "cross_family_read_count": null,
+          "repair_rounds": null,
+          "measurement_complete": false,
+          "public_comment_count": 2,
+          "public_review_count": 0,
+          "review_source_urls": [
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/683#issuecomment-5980965585"
+          ]
+        },
+        {
+          "pr": 688,
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/688",
+          "merged_at_utc": "2026-10-04T14:15:06Z",
+          "builder_family": "Claude-led candidate from native commit trailer; actual builder role still requires confirmation",
+          "p1_findings": null,
+          "cross_family_read_count": null,
+          "repair_rounds": null,
+          "measurement_complete": false,
+          "public_comment_count": 4,
+          "public_review_count": 0,
+          "review_source_urls": [
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/688#issuecomment-5979166952",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/688#issuecomment-5980933514"
+          ]
+        },
+        {
+          "pr": 681,
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/681",
+          "merged_at_utc": "2026-10-04T08:07:19Z",
+          "builder_family": "Claude-led candidate from native commit trailer; actual builder role still requires confirmation",
+          "p1_findings": null,
+          "cross_family_read_count": null,
+          "repair_rounds": 1,
+          "measurement_complete": false,
+          "public_comment_count": 3,
+          "public_review_count": 0,
+          "review_source_urls": [
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/681#issuecomment-5977964968"
+          ],
+          "repair_rounds_source": "PR body names repair round 1; no full counter of independent P1 reads is retained."
+        },
+        {
+          "pr": 626,
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626",
+          "merged_at_utc": "2026-10-04T06:53:20Z",
+          "builder_family": "Claude-led candidate from native commit trailer; actual builder role still requires confirmation",
+          "p1_findings": null,
+          "cross_family_read_count": null,
+          "repair_rounds": null,
+          "measurement_complete": false,
+          "public_comment_count": 19,
+          "public_review_count": 4,
+          "review_source_urls": [
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5965067016",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5965213690",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5966215016",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5970674184",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5970736741",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5972694708",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5976488971",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5977474839"
+          ]
+        },
+        {
+          "pr": 672,
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/672",
+          "merged_at_utc": "2026-10-04T06:37:46Z",
+          "builder_family": "Claude-led candidate from native commit trailer; actual builder role still requires confirmation",
+          "p1_findings": null,
+          "cross_family_read_count": null,
+          "repair_rounds": null,
+          "measurement_complete": false,
+          "public_comment_count": 4,
+          "public_review_count": 0,
+          "review_source_urls": [
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/672#issuecomment-5973487177",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/672#issuecomment-5976196558",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/672#issuecomment-5977374283"
+          ]
+        },
+        {
+          "pr": 673,
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/673",
+          "merged_at_utc": "2026-10-04T05:48:14Z",
+          "builder_family": "Claude-led candidate from native commit trailer; actual builder role still requires confirmation",
+          "p1_findings": null,
+          "cross_family_read_count": null,
+          "repair_rounds": null,
+          "measurement_complete": false,
+          "public_comment_count": 10,
+          "public_review_count": 0,
+          "review_source_urls": [
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/673#issuecomment-5973365561",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/673#issuecomment-5973479292",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/673#issuecomment-5975178086",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/673#issuecomment-5975271214",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/673#issuecomment-5977055383"
+          ]
+        },
+        {
+          "pr": 665,
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/665",
+          "merged_at_utc": "2026-10-04T03:48:20Z",
+          "builder_family": "Claude-led candidate from native commit trailer; actual builder role still requires confirmation",
+          "p1_findings": null,
+          "cross_family_read_count": null,
+          "repair_rounds": null,
+          "measurement_complete": false,
+          "public_comment_count": 8,
+          "public_review_count": 0,
+          "review_source_urls": [
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/665#issuecomment-5971275172",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/665#issuecomment-5972850828",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/665#issuecomment-5976282748",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/665#issuecomment-5976591941"
+          ],
+          "last_reported_p1_findings": 0,
+          "last_reported_p1_source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/665#issuecomment-5976591941"
+        },
+        {
+          "pr": 680,
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/680",
+          "merged_at_utc": "2026-10-04T03:33:12Z",
+          "builder_family": "Claude-led candidate from native commit trailer; actual builder role still requires confirmation",
+          "p1_findings": null,
+          "cross_family_read_count": null,
+          "repair_rounds": null,
+          "measurement_complete": false,
+          "public_comment_count": 3,
+          "public_review_count": 0,
+          "review_source_urls": [
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/680#issuecomment-5975438633",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/680#issuecomment-5976191379"
+          ]
+        },
+        {
+          "pr": 676,
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/676",
+          "merged_at_utc": "2026-10-04T01:49:42Z",
+          "builder_family": "Claude-led candidate from native commit trailer; actual builder role still requires confirmation",
+          "p1_findings": null,
+          "cross_family_read_count": null,
+          "repair_rounds": null,
+          "measurement_complete": false,
+          "public_comment_count": 4,
+          "public_review_count": 14,
+          "review_source_urls": [
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/676#issuecomment-5973763939",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/676#issuecomment-5974043096",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/676#issuecomment-5974590293",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/676#issuecomment-5975368977"
+          ]
+        },
+        {
+          "pr": 635,
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/635",
+          "merged_at_utc": "2026-10-04T01:44:01Z",
+          "builder_family": "Claude-led candidate from native commit trailer; actual builder role still requires confirmation",
+          "p1_findings": null,
+          "cross_family_read_count": null,
+          "repair_rounds": null,
+          "measurement_complete": false,
+          "public_comment_count": 8,
+          "public_review_count": 16,
+          "review_source_urls": [
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/635#issuecomment-5965709188",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/635#issuecomment-5968043050",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/635#issuecomment-5969042147",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/635#issuecomment-5969356227",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/635#issuecomment-5970274360",
+            "https://github.com/seathatflowsinourveins/native-agent-stack/pull/635#issuecomment-5970511917"
+          ]
+        }
+      ],
+      "minimum_gpt_built_prs": 10,
+      "minimum_complete_claude_baseline_prs": 5,
+      "quality_metrics": {
+        "p1_findings_per_cross_family_read": "Sum newly confirmed P1 findings over every independent cross-family read, divided by number of those reads. Count a finding once per read; repeated mentions in repair replies are not additional findings. Record explicit zeroes and exact reviewed heads.",
+        "repair_rounds_per_pr": "Sum substantive code/document repairs requested by independent review, divided by eligible PRs. A rebase, evidence-hash refresh or re-read without a repair does not add a round.",
+        "eligibility": "Contract builds without Claude-only tools or preregistered family/model exemptions; preserve unknowns and exclude incomplete rows from the scored denominator.",
+        "comparison": "Revisit builder dispatch when either GPT-built mean exceeds the complete Claude-built baseline mean; no equal-quality claim until minimum sample and baseline-completeness conditions pass."
+      },
+      "review_conditions": {
+        "claude_built_arm": "GPT cross-family reviewer; historical models, effort and read budgets must be recovered per read.",
+        "gpt_built_arm": "One Claude Opus 5.5 reviewer, max effort, about 30 reads and a shared packet.",
+        "limit": "Reviewer family and historical budgets differ. These operational counters are not a controlled quality A/B and cannot establish non-inferiority."
+      },
+      "daily_spend_metric": {
+        "command_template": "ccusage claude session --since <YYYYMMDD> --until <YYYYMMDD> --json --offline",
+        "scope": "Local EDT day, Claude only, coordinator tree from main and workflow folder mapping. Sum priced totalCost for that day; retain per-model dollars and unpriced models. Qualify the native entry-date filter and capture aligned export times before scoring; lastActivity alone does not prove a daily token window.",
+        "baseline_day": "2026-10-03",
+        "baseline_values": null,
+        "baseline_status": "An exact per-coordinator one-day export is not in the supplied sources. The mixed session export is not a valid daily baseline. The cost gate stays pending until this export and date-filter evidence are retained.",
+        "comparison_days": 3,
+        "overturn": "For each active coordinator, revisit budgets/cap if the mean daily metric for three consecutive qualifying full days is not below that coordinator baseline."
+      },
+      "throughput": {
+        "metrics": [
+          "distinct accepted PRs merged per coordinator per local day",
+          "distinct completed bounded units per coordinator per local day"
+        ],
+        "deduplication": "A re-read/repair is the same unit; list linked PR/unit identifiers in a private ledger and publish counts only.",
+        "tolerance": "Both three-day means must be within 10% of their 10-03 per-day baseline; an inactive zero baseline is unscorable.",
+        "baseline_values": null,
+        "limit": "Baseline throughput counts are not retained in the spend exports. Without them the comparable-throughput cost gate cannot be scored."
+      },
+      "advisor_confound": "Report advisor model and per-model dollars for both baseline and follow-up days; the Fable-to-Opus change coincides with dispatch changes, so spend changes cannot be attributed to dispatch alone.",
+      "retrieval_limits": [
+        "Read-only gh API failed network access.",
+        "Public REST metadata/review comments were inspected through context-mode; a subsequent counter sweep returned HTTP 403 rate limit exceeded.",
+        "Available public priority labels and builder attribution do not provide complete baseline counters. Missing values remain null."
+      ]
+    }
+  }
+}

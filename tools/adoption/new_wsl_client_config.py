@@ -12,11 +12,15 @@ configures the two clients for that distribution, and the rule that decides ever
 adoption/new-wsl/client-config-map.json names every piece of the client templates (each hook entry, plugin,
 marketplace, status line, group of variables, permission rule, MCP server, Codex key, copied hook or agent file,
 instruction block and step of this tool) and gives it one wiring: `slot:<manifest slot>` (wired while that slot
-installs and its default is the owner the entry names), `practice`, `not_wired:<reason>`, or `authorization:<reason>` (a
+installs and its default is the owner the entry names; a row's interim install, amendment 3 of the manifest's decision rule,
+counts as what the slot installs while the row carries it), `practice`, `not_wired:<reason>`, or `authorization:<reason>` (a
 setting that grants a permission or suppresses a confirmation: written only with --with-authorization-settings and,
 when the entry also names a `slot` and its `owner`, only while that slot installs the owner). The map is a closed world:
 a piece it does not name is an error. The tool does not read the old bootstrap profile
-(adoption/bootstrap-linux.sh --profile, --configure-full-profile).
+(adoption/bootstrap-linux.sh --profile, --configure-full-profile). Three of the templates take the new distribution's
+additions (adoption/new-wsl/templates/, TEMPLATE_ADDITIONS): keys only this tool renders, such as the Codex shells'
+`inherit = "none"` with its set table, the semble servers and the tool approval modes the distribution's no-prompt
+requirement needs, so the shared templates stay what render_config.py and the bootstrap render on every other host.
 
   --check    reads the manifest, the map, the templates and the install plan; fails when a piece is unmapped, a map
              entry names no piece, a slot is unknown, a practice piece runs a tool outside the repository, a hook file
@@ -31,10 +35,11 @@ a piece it does not name is an error. The tool does not read the old bootstrap p
              mcp-servers.json, codex.config.toml, codex.hooks.json and the two Codex profiles for that host value file,
              with wired pieces only; the authorization settings (the ones that grant a permission or suppress a
              confirmation: Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy
-             and sandbox_mode, and the tool approval mode of a Codex MCP server, which also needs its server wired) only
-             with the option. Placeholders
-             are filled by tools/adoption/render_config.py. The telemetry endpoint and the gateway port come from the
-             install plan; HOST_PATH gains the directories of the wired path pieces.
+             and sandbox_mode, a Codex project's trust_level, and the tool approval mode of a Codex MCP server, which
+             also needs its server wired) only with the option. Placeholders
+             are filled by tools/adoption/render_config.py. The telemetry endpoint, the gateway port and AI_MEMORY_BIN
+             (the ai-memory executable the plan's memory-owner row links) come from the install plan; HOST_PATH gains
+             the directories of the wired path pieces.
   --write-blocks
              writes adoption/new-wsl/claude-user-instructions.md and codex-user-instructions.md: the two instruction blocks
              (examples/claude-native/CLAUDE.md, adoption/templates/codex.AGENTS.template.md) with every sentence, list item,
@@ -45,8 +50,16 @@ a piece it does not name is an error. The tool does not read the old bootstrap p
              own tools, one step each (the names --skip
              takes). It installs no tool and no pinned client; it backs up what it changes, runs again to the same files,
              and prints what it did and what it left out. --dry-run runs no client binary and writes nothing.
+             While the render wires an interim install (amendment 3 of the manifest's decision rule) and the layer
+             consensus's wave-2 batch still owes an acknowledgement (consensus.json wave2.acknowledgements_owed), a real
+             run refuses and writes nothing, and a dry run says so. While the map wires step/codex-remote-plugin-rules,
+             the Codex config also gets a [[skills.config]] name rule per skill of the account's remote plugins and an off
+             switch per plugin MCP server, read from the home's plugin cache (remote_plugin_rules); --render has no home
+             and leaves them out.
              An existing ~/.codex/config.toml is merged, never rewritten: every key and table it has stays as it is, what
-             the render has and it lacks is added, a value that differs stays (shown beside the render's, each value cut to
+             the render has and it lacks is added (a rule list, [[skills.config]], gains the render's rules it lacks after
+             its own, and one written as an inline array, an empty `config = []` included, is refused, with nothing
+             written), a value that differs stays (shown beside the render's, each value cut to
              300 characters with `...` in the display only, and the step ends `merged with conflicts kept`), the file is
              backed up first, read back with tomllib after the write and put back when it is not the merge.
              features.daemon_auto_start goes through Codex's own writer. A running Codex (`pgrep -x`) stops either write of
@@ -81,6 +94,7 @@ import re
 import shlex
 import shutil
 import stat
+import string
 import subprocess
 import sys
 import tempfile
@@ -102,6 +116,9 @@ from scripts import adoption_status  # noqa: E402
 MAP_REL = "adoption/new-wsl/client-config-map.json"
 MAP_SCHEMA = "native-agent-stack/new-wsl-client-config-map/v1"
 MANIFEST_REL = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
+# The layer consensus whose wave-2 batch records amendment 3 (the interim installs) and the acknowledgements both model
+# families owe it; --apply refuses to wire an interim install while one is owed (owed_acknowledgements).
+CONSENSUS_REL = "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json"
 PLAN_REL = "evidence/artifacts/new-wsl-install-plan-20261002"
 HOST_TEMPLATE_REL = "adoption/templates/wsl/host.new-distro.json.template"
 BOOTSTRAP_REL = "adoption/bootstrap-linux.sh"
@@ -114,6 +131,15 @@ TEMPLATES = {
     "codex/omniroute": "adoption/templates/codex.omniroute.config.toml",
     "codex/hooks": "adoption/templates/codex.hooks.template.json",
 }
+# The new distribution's additions to three shared templates: keys only this tool renders, because no other host takes
+# them (render_config.py, install_claude_profile.py and the bootstrap never read these files, so each shared template
+# stays what every other host renders). template_data merges a group's additions into its template; a key both define is
+# refused, and an additions file's `_comment` is not a piece.
+TEMPLATE_ADDITIONS = {
+    "claude/settings": "adoption/new-wsl/templates/claude.settings.additions.json",
+    "claude/mcp": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
+    "codex/config": "adoption/new-wsl/templates/codex.config.additions.toml",
+}
 CLAUDE_AGENTS_REL = "adoption/agents/claude"
 CODEX_ROLES_REL = "adoption/agents/codex"
 CLAUDE_MD_PIECE = "claude/instructions/claude-md"
@@ -125,7 +151,15 @@ BLOCK_TEXT_REL = {CLAUDE_MD_PIECE: "examples/claude-native/CLAUDE.md",
 GENERATED_BLOCKS = {CLAUDE_MD_PIECE: "adoption/new-wsl/claude-user-instructions.md",
                     CODEX_MD_PIECE: "adoption/new-wsl/codex-user-instructions.md"}
 RENDERED_BLOCKS = {CLAUDE_MD_PIECE: "claude-user-instructions.md", CODEX_MD_PIECE: "codex-user-instructions.md"}
-STEP_PIECES = ("step/claude-launcher", "step/login-path-block", "step/skills", "path/local-bin", "path/mise-shims")
+STEP_PIECES = ("step/claude-launcher", "step/login-path-block", "step/skills", "path/local-bin", "path/mise-shims",
+               "step/codex-remote-plugin-rules")
+REMOTE_PLUGIN_PIECE = STEP_PIECES[5]
+# The account's remote plugins, which no row of the definitive manifest selects: Codex keeps their bundles under
+# <Codex home>/plugins/cache/<marketplace>/<plugin>/<version>/ (core-plugin-common/src/installed.rs PLUGINS_CACHE_DIR,
+# core-plugins/src/store.rs plugin_root, remote.rs REMOTE_GLOBAL_MARKETPLACE_NAME at openai/codex rust-v0.160.0).
+REMOTE_MARKETPLACE = "openai-curated-remote"
+# Where a plugin's manifest may be, in the order Codex looks (exec-server-protocol/src/protocol.rs L49-53 at rust-v0.160.0).
+PLUGIN_MANIFESTS = (".codex-plugin/plugin.json", ".claude-plugin/plugin.json", ".cursor-plugin/plugin.json")
 # The settings that grant a permission or suppress a confirmation. A tool must not write them on a fresh host by default,
 # so the map classes them `authorization:<reason>`, and --with-authorization-settings is the one way to render and apply
 # them. The tool, not the map, says which pieces they are (is_authorization_piece): the map cannot class one of them as
@@ -136,7 +170,11 @@ AUTHORIZATION_PIECES = (
     "codex/config/approval_policy",
     "codex/config/sandbox_mode",
 )
-AUTHORIZATION_PATTERNS = ("claude/*/permission/allow/*",)   # an allow rule grants a permission too
+# An allow rule grants a permission too. A Codex project's trust_level is the saved answer to the folder-trust question:
+# a trusted project's own .codex/config.toml layers load instead of loading disabled (codex-rs/config/src/loader/mod.rs
+# L131-133 at rust-v0.160.0), and the TUI asks nothing for it (codex-rs/tui/src/config_update.rs L338-366); see the
+# addendum of 2026-10-04 in docs/decisions/2026-10-02-new-wsl-client-configuration.md.
+AUTHORIZATION_PATTERNS = ("claude/*/permission/allow/*", "codex/*/projects.*.trust_level")
 # Codex's tool approval modes (config.schema.json at rust-v0.160.0, AppToolApproval: auto, prompt, writes, approve). The key
 # `default_tools_approval_mode` is an authorization piece whatever its value; `approval_mode` (one tool's) is one when the
 # value approves. They sit under the table of an MCP server, so the map ties them to the slot that wires the server too.
@@ -241,7 +279,13 @@ def is_authorization_piece(key: str, value=None) -> bool:
 
 
 def authorization_label(key: str) -> str:
-    return ("Claude Code " if key.startswith("claude/") else "Codex ") + key.rsplit("/", 1)[1]
+    """How --apply names an authorization piece: the client, the Codex profile when the piece is in one (the same tool
+    approval mode can be in the user config and in the stack-worker profile), and an allow rule as one."""
+    group, _, name = key.rpartition("/")
+    if key.startswith("claude/"):
+        return f"Claude Code allow rule {name}" if group.endswith("/permission/allow") else f"Claude Code {name}"
+    profile = {"codex/stack-worker": " stack-worker profile", "codex/omniroute": " omniroute profile"}.get(group, "")
+    return f"Codex{profile} {name}"
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -258,11 +302,42 @@ def load_manifest(root: Path) -> dict:
 
 
 def installs(row: dict) -> bool:
-    """The install plan's rule (evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py L149-160): the row
-    names a default, installs something extra, is not resolved as not installed and is not split."""
+    """The install plan's rule (evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py L146-168): the row
+    carries an interim install (amendment 3 of the manifest's decision rule), or it names a default, installs something
+    extra, is not resolved as not installed and is not split."""
+    if row.get("interim"):
+        return True
     outcome = (row.get("resolution") or {}).get("outcome")
     return (bool(row.get("default")) and not row.get("installs_nothing_extra") and outcome != "not_installed"
             and (row.get("state") or "") != "split")
+
+
+def installed_default(row: dict) -> str:
+    """What the row installs: its interim's default while it carries one, otherwise its decided default."""
+    return str((row.get("interim") or {}).get("default") or row.get("default"))
+
+
+def owed_acknowledgements(root: Path) -> list:
+    """The model families whose acknowledgement of the layer consensus's wave-2 batch is still owed (wave2.
+    acknowledgements_owed). The interim installs of amendment 3 wait for both: 'Until all of that exists, nothing is
+    installed' (wave-2 code-search ruling, change 1); install.sh's interim_acknowledged reads the same list."""
+    owed = (read_json(root / CONSENSUS_REL).get("wave2") or {}).get("acknowledgements_owed")
+    if not (isinstance(owed, list) and all(isinstance(name, str) and name for name in owed)):
+        raise ConfigError(f"{CONSENSUS_REL}: wave2.acknowledgements_owed is not a list of names, so whether the interim "
+                          "installs may be wired is not known")
+    return owed
+
+
+def wired_interims(results: list, manifest: dict) -> list:
+    """The slots whose interim install (amendment 3) a wired piece belongs to: a slot entry's slot, or the slot an
+    authorization entry is tied to."""
+    slots = set()
+    for verdict in results:
+        kind, _, argument = verdict.entry.wiring.partition(":")
+        slot = argument if kind == "slot" else verdict.entry.slot if kind == "authorization" else ""
+        if verdict.wired and slot and (manifest.get(slot) or {}).get("interim"):
+            slots.add(slot)
+    return sorted(slots)
 
 
 def why_not_installed(slot: str, row: dict) -> str:
@@ -287,7 +362,8 @@ def load_plan(root: Path) -> dict:
                           r"\s*endpoint:\s*127\.0\.0\.1:(\d+)", otel)
     stated = re.search(r"OTLP grpc/http endpoint=127\.0\.0\.1:(\d+)/(\d+)",
                        rows["otel-collector-contrib"]["service"]["port_setting"])
-    env = re.search(r"^export PORT=(\d+)$", (base / "config" / "omniroute.env.example").read_text(encoding="utf-8"), re.M)
+    # Plain NAME=value lines since the wave-2 gateway ruling (change 12): systemd's EnvironmentFile= drops `export` lines.
+    env = re.search(r"^(?:export )?PORT=(\d+)$", (base / "config" / "omniroute.env.example").read_text(encoding="utf-8"), re.M)
     if not (listening and stated and env):
         raise ConfigError("the install plan's collector or gateway port could not be read")
     gateway = rows["gpt-gateway"]["service"]["port"]
@@ -301,16 +377,43 @@ def load_plan(root: Path) -> dict:
             "ports": {"collector_grpc_port": int(listening.group(1)), "collector_http_port": int(listening.group(2)),
                       "gateway_port": gateway},
             "codex_model": render_config.codex_model_for(release.group(1)),
-            "skills": installed_skills(rows)}
+            "skills": installed_skills(rows, root),
+            "ai_memory_bin": ai_memory_link(rows.get("memory-owner") or {})}
 
 
-def installed_skills(rows: dict) -> frozenset:
-    """The skills the plan's skills installer is told to add (its `-s` list)."""
+def ai_memory_link(row: dict):
+    """The path, under $HOME, of the ai-memory executable the plan's memory-owner row links, or None while the row does
+    not install it. The Claude hooks run AI_MEMORY_BIN; without it render_config.py derives the path from the platform's
+    pin (${ECO_ROOT}/tools/ai-memory-<version>/ai-memory), which is not where this plan installs ai-memory."""
+    if not row.get("installed"):
+        return None
+    for command in row.get("commands", []):
+        link = re.search(r'ln -sfn "\$HOME/[^"]+/ai-memory" "\$HOME/([^"$]+/ai-memory)"', command)
+        if link:
+            return link.group(1)
+    raise ConfigError("the install plan's memory-owner row installs ai-memory but links no ai-memory executable under "
+                      "$HOME, so the hooks' AI_MEMORY_BIN could not be read")
+
+
+SKILLS_MANIFEST_REL = "adoption/skills/manifest.json"
+SKILLS_INSTALLER = "tools/adoption/install_skills.py"
+
+
+def installed_skills(rows: dict, root: Path = ROOT) -> frozenset:
+    """The skills the plan installs. Since the wave-2 skills ruling (change 7) its skills rows run the repository's
+    installer against adoption/skills/manifest.json: over every selected skill (none pruned or held) without --only, or
+    over its --only names. A row that runs the skills CLI's own add names its skills after -s."""
+    selected = {skill["name"] for skill in read_json(root / SKILLS_MANIFEST_REL)["skills"]
+                if skill.get("status") not in ("pruned", "held")}
     found = set()
-    for command in rows["engineering-process-skills"]["commands"]:
-        match = re.search(r" -s ((?:[a-z0-9][a-z0-9-]* )+)-y", command)
-        if match:
-            found.update(match.group(1).split())
+    for row in rows.values():
+        for command in row.get("commands", []):
+            if SKILLS_INSTALLER in command and "--check-only" not in command:
+                only = re.findall(r"--only ([a-z0-9][a-z0-9._-]*)", command)
+                found.update(selected & set(only) if only else selected)
+            match = re.search(r" -s ((?:[a-z0-9][a-z0-9-]* )+)-y", command)
+            if match:
+                found.update(match.group(1).split())
     return frozenset(found)
 
 
@@ -359,6 +462,35 @@ def load_dependents(root: Path) -> list:
 
 # ---------------------------------------------------------------------------------------------------------------
 # the pieces of the templates
+
+def read_template(path: Path):
+    return tomllib.loads(path.read_text(encoding="utf-8")) if path.suffix == ".toml" else read_json(path)
+
+
+def merge_additions(base: dict, extra: dict, where: str, path: tuple = ()) -> dict:
+    """base with extra's keys added; a table both have is merged key by key, and any other key both define is refused."""
+    out = dict(base)
+    for key, value in extra.items():
+        here = path + (key,)
+        if key in out and isinstance(out[key], dict) and isinstance(value, dict):
+            out[key] = merge_additions(out[key], value, where, here)
+        elif key in out:
+            raise ConfigError(f"{where} defines {lane.key_path(list(here))}, which its shared template defines too; "
+                              "an addition adds a key, it never replaces one (a map entry's override does that)")
+        else:
+            out[key] = value
+    return out
+
+
+def template_data(root: Path, group: str):
+    """A group's template as this tool reads it: the shared template, with the new distribution's additions merged in
+    when TEMPLATE_ADDITIONS names a file for the group."""
+    data = read_template(root / TEMPLATES[group])
+    if group not in TEMPLATE_ADDITIONS:
+        return data
+    extra = {key: value for key, value in read_template(root / TEMPLATE_ADDITIONS[group]).items() if key != "_comment"}
+    return merge_additions(data, extra, TEMPLATE_ADDITIONS[group])
+
 
 def hook_key(group: str, event: str, matcher, hook: dict) -> str:
     tail = hook.get("command") or json.dumps(hook, sort_keys=True)
@@ -409,8 +541,8 @@ def toml_pieces(group: str, data: dict) -> list:
 def collect_pieces(root: Path) -> list:
     pieces = []
     for group in ("claude/settings", "claude/overlay"):
-        pieces += settings_pieces(group, read_json(root / TEMPLATES[group]))
-    for name, spec in read_json(root / TEMPLATES["claude/mcp"]).get("mcpServers", {}).items():
+        pieces += settings_pieces(group, template_data(root, group))
+    for name, spec in template_data(root, "claude/mcp").get("mcpServers", {}).items():
         command = " ".join([spec.get("command") or spec.get("url", ""), *spec.get("args", [])])
         pieces.append(Piece(f"claude/mcp/server/{name}", "claude/mcp", ("mcpServers", name), spec, command))
     pieces += [Piece(f"claude/profile/hook-file/{name}", "claude/profile", value=name) for name in icp.HOOKS]
@@ -418,8 +550,8 @@ def collect_pieces(root: Path) -> list:
                for path in sorted((root / CLAUDE_AGENTS_REL).glob("*.md"))]
     pieces.append(Piece(CLAUDE_MD_PIECE, "claude/instructions"))
     for group in ("codex/config", "codex/stack-worker", "codex/omniroute"):
-        pieces += toml_pieces(group, tomllib.loads((root / TEMPLATES[group]).read_text(encoding="utf-8")))
-    pieces += settings_pieces("codex/hooks", read_json(root / TEMPLATES["codex/hooks"]))
+        pieces += toml_pieces(group, template_data(root, group))
+    pieces += settings_pieces("codex/hooks", template_data(root, "codex/hooks"))
     pieces.append(Piece(CODEX_MD_PIECE, "codex/instructions"))
     pieces += [Piece(f"codex/role/{path.name}", "codex/role", value=path.name)
                for path in sorted((root / CODEX_ROLES_REL).glob("*.toml"))]
@@ -481,12 +613,14 @@ def slot_verdict(piece: Piece, entry: Entry, slot: str, manifest: dict, plan: di
         return False, f"unknown slot {slot}"
     if not installs(row):
         return False, why_not_installed(slot, row)
-    if entry.owner.casefold() not in str(row["default"]).casefold():
-        warnings.append(f"{piece.key}: slot {slot} installs {row['default']!r}; the map wires {entry.owner!r}")
-        return False, f"slot {slot} installs {row['default']!r}, not {entry.owner!r}"
+    default = installed_default(row)
+    interim = " (interim install)" if row.get("interim") else ""
+    if entry.owner.casefold() not in default.casefold():
+        warnings.append(f"{piece.key}: slot {slot} installs {default!r}{interim}; the map wires {entry.owner!r}")
+        return False, f"slot {slot} installs {default!r}{interim}, not {entry.owner!r}"
     if not plan["rows"].get(slot, {}).get("installed"):
         warnings.append(f"{piece.key}: the manifest installs slot {slot}, the install plan does not")
-    return True, f"slot {slot} installs {row['default']}"
+    return True, f"slot {slot} installs {default}{interim}"
 
 
 def verdicts(pieces: list, taken: dict, manifest: dict, plan: dict, authorization: bool = False) -> tuple:
@@ -860,16 +994,40 @@ def toml_value(value) -> str:
     raise ConfigError(f"a {type(value).__name__} value cannot be written as TOML")
 
 
+def is_table_array(value) -> bool:
+    """A non-empty list of tables, which TOML writes as an array of tables ([[...]]), as Codex writes [[skills.config]]."""
+    return isinstance(value, list) and bool(value) and all(isinstance(item, dict) for item in value)
+
+
 def table_lines(path: tuple, node: dict) -> list:
-    """The lines of one table and, below it, its sub-tables; each header has a blank line before it."""
-    scalars = [(k, v) for k, v in node.items() if not (isinstance(v, dict) and v)]
+    """The lines of one table and, below it, its arrays of tables and its sub-tables; each header has a blank line
+    before it. An array of tables is written as [[...]] items, so a later merge can append an item as text."""
+    scalars = [(k, v) for k, v in node.items() if not (isinstance(v, dict) and v) and not is_table_array(v)]
+    arrays = [(k, v) for k, v in node.items() if is_table_array(v)]
     subs = [(k, v) for k, v in node.items() if isinstance(v, dict) and v]
     lines = []
-    if path and (scalars or not subs):
+    if path and (scalars or not (subs or arrays)):
         lines += ["", "[" + ".".join(toml_key(part) for part in path) + "]"]
     lines += [f"{toml_key(k)} = {toml_value(v)}" for k, v in scalars]
+    for k, items in arrays:
+        for item in items:
+            lines += array_item_lines(path + (k,), item)
     for k, v in subs:
         lines += table_lines(path + (k,), v)
+    return lines
+
+
+def array_item_lines(path: tuple, item: dict) -> list:
+    """One [[...]] item of an array of tables: its scalars, then its own sub-tables, which belong to this item."""
+    lines = ["", "[[" + ".".join(toml_key(part) for part in path) + "]]"]
+    lines += [f"{toml_key(k)} = {toml_value(v)}" for k, v in item.items()
+              if not (isinstance(v, dict) and v) and not is_table_array(v)]
+    for k, v in item.items():
+        if is_table_array(v):
+            for sub in v:
+                lines += array_item_lines(path + (k,), sub)
+        elif isinstance(v, dict) and v:
+            lines += table_lines(path + (k,), v)
     return lines
 
 def emit_toml(data: dict, header: str) -> str:
@@ -920,8 +1078,14 @@ def host_values(host: str, plan: dict, home: Path | None, wired_dirs: list) -> d
                               f"written for")
         values = {k: (new + v[len(old):] if v == old or v.startswith(old + "/") else v) for k, v in values.items()}
     base = values["HOME"].rstrip("/")
+    # The systemd user runtime directory of the user this tool runs as, /run/user/UID (user@.service(5)), which the Codex
+    # shells' set table names, for systemctl --user and rootless Docker (codex.config.additions.toml); a host value file
+    # may name another.
+    values.setdefault("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
     values["OTEL_ENDPOINT"] = f"127.0.0.1:{plan['ports']['collector_http_port']}"
     values["CODEX_MODEL"] = plan["codex_model"]
+    if plan.get("ai_memory_bin"):
+        values["AI_MEMORY_BIN"] = f"{base}/{plan['ai_memory_bin']}"
     values["HOST_PATH"] = ":".join([*(f"{base}/{relative}" for relative in wired_dirs), values["HOST_PATH"]])
     return values
 
@@ -946,34 +1110,39 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
     files = {}
     # Claude settings (placeholders filled) and the WSL overlay (applied as it is, as the bootstrap applies it).
     keep, replaced = keep_of("claude/settings")
-    template = read_json(root / TEMPLATES["claude/settings"])
+    template = template_data(root, "claude/settings")
     text = json.dumps(prune_settings(template, keep, replaced), indent=2, ensure_ascii=False) + "\n"
     rendered = dedupe_paths(json.loads(substitute(text, values, ".json")))
     files["settings.json"] = json.dumps(rendered, indent=2, ensure_ascii=False) + "\n"
     keep, replaced = keep_of("claude/overlay")
-    overlay = prune_settings(read_json(root / TEMPLATES["claude/overlay"]), keep, replaced)
+    overlay = prune_settings(template_data(root, "claude/overlay"), keep, replaced)
     files["settings.linux-wsl2.overlay.json"] = json.dumps(overlay, indent=2, ensure_ascii=False) + "\n"
-    # The user-scope MCP servers: a wired server with the launch the entry gives it.
+    # The user-scope MCP servers: a wired server with the launch the entry gives it. ${HOME} and ${ECO_ROOT} stay for
+    # install_claude_profile.py, which fills them when it registers the file; an override's other placeholders are host
+    # values and are filled here (ai-memory's URL takes the host file's AI_MEMORY_URL, as the hooks and Codex do).
     servers = {}
-    for name, spec in read_json(root / TEMPLATES["claude/mcp"]).get("mcpServers", {}).items():
+    host_only = {key: value for key, value in values.items() if key not in ("HOME", "ECO_ROOT")}
+    for name, spec in template_data(root, "claude/mcp").get("mcpServers", {}).items():
         verdict = wired.get(f"claude/mcp/server/{name}")
         if verdict:
-            servers[name] = {**spec, **verdict.entry.raw.get("override", {})}
+            override = json.loads(string.Template(json.dumps(verdict.entry.raw.get("override", {}))).safe_substitute(
+                host_only))
+            servers[name] = {**spec, **override}
     files["mcp-servers.json"] = json.dumps({"mcpServers": servers}, indent=2, ensure_ascii=False) + "\n"
     # Codex: the user config (placeholders filled), the hooks and the two profiles.
     keep, replaced = keep_of("codex/config")
-    data = prune_toml(tomllib.loads((root / TEMPLATES["codex/config"]).read_text(encoding="utf-8")), keep, replaced)
+    data = prune_toml(template_data(root, "codex/config"), keep, replaced)
     interim = emit_toml(data, "")
     parsed = dedupe_paths(tomllib.loads(substitute(interim, values, ".toml")))
-    files["codex.config.toml"] = emit_toml(parsed, header(TEMPLATES["codex/config"]))
+    files["codex.config.toml"] = emit_toml(parsed, header("codex/config"))
     keep, replaced = keep_of("codex/hooks")
-    hooks = prune_settings(read_json(root / TEMPLATES["codex/hooks"]), keep, replaced)
+    hooks = prune_settings(template_data(root, "codex/hooks"), keep, replaced)
     files["codex.hooks.json"] = json.dumps({"hooks": {}, **hooks}, indent=2, ensure_ascii=False) + "\n"
     for group, name in (("codex/stack-worker", "codex.stack-worker.config.toml"),
                         ("codex/omniroute", "codex.omniroute.config.toml")):
         keep, replaced = keep_of(group)
-        profile = prune_toml(tomllib.loads((root / TEMPLATES[group]).read_text(encoding="utf-8")), keep, replaced)
-        files[name] = emit_toml(profile, header(TEMPLATES[group]))
+        profile = prune_toml(template_data(root, group), keep, replaced)
+        files[name] = emit_toml(profile, header(group))
     generated = generate_blocks(root, unwired_names(results, manifest if manifest is not None else load_manifest(root)))
     for piece, (_, text, _) in generated.items():
         if piece in wired:
@@ -981,8 +1150,119 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
     return files
 
 
-def header(template: str) -> str:
-    return (f"# Rendered by tools/adoption/new_wsl_client_config.py from {template}.\n"
+# ---------------------------------------------------------------------------------------------------------------
+# the account's remote plugins (wave-2 skills ruling, change 5)
+#
+# A remote plugin's local toggle does not hold: Codex replaces the local plugins.<id> entry with the synced remote one and
+# keeps only its mcp_servers (codex-rs/core-plugins/src/loader.rs merge_remote_plugin_config at rust-v0.160.0). The
+# ruling's local fallback, beside the account-level uninstall it names first: one [[skills.config]] name rule per skill of
+# each remote plugin no manifest row selects (none is selected), which Codex matches against the qualified name
+# <plugin namespace>:<skill name> (config/src/skills_config.rs resolve_disabled_paths; ext/skills/src/loader/namespace.rs
+# qualify), and plugins."<id>".mcp_servers.<server>.enabled = false for each MCP server such a plugin ships (the local
+# mcp_servers survive the merge). The rules are read from the plugin cache at --apply, so a run after the account's plugin
+# set changes renders the new set; a rule is never a bare name, so none can match a .system skill of Codex.
+
+def skill_name(skill_md: Path) -> str | None:
+    """The name Codex gives a SKILL.md: the `name` of its YAML frontmatter with its whitespace collapsed, or its directory's
+    name when the frontmatter has none (codex-rs/skills/src/parser.rs L44-69 and L200-221; ext/skills/src/loader/host.rs
+    default_skill_name and metadata.rs sanitize_single_line at rust-v0.160.0); None for a file without frontmatter, which
+    Codex does not load. Only a plain or quoted one-line value is read: any other form is refused, since a guessed name
+    would disable nothing."""
+    lines = skill_md.read_text(encoding="utf-8", errors="replace").splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None
+    end = next((number for number, line in enumerate(lines[1:], 1) if line.strip() == "---"), None)
+    if end is None or end == 1:
+        return None
+    name = None
+    for line in lines[1:end]:
+        match = re.match(r"name:(.*)$", line)
+        if not match:
+            continue
+        value = match.group(1).strip()
+        if len(value) >= 2 and value[0] in "'\"" and value[-1] == value[0]:
+            value = value[1:-1]
+        elif value[:1] in ("|", ">", "&", "*", "[", "{", "!", "'", '"'):
+            raise ConfigError(f"{skill_md}: the frontmatter's name is not a one-line value this tool reads, so the rule "
+                              "for the skill cannot be written; disable it by a [[skills.config]] path rule instead")
+        else:
+            value = re.sub(r"\s+#.*$", "", value)
+        name = " ".join(value.split())
+    return name or skill_md.parent.name
+
+
+def plugin_manifest(version_dir: Path) -> dict | None:
+    """A cached plugin's manifest, the first of PLUGIN_MANIFESTS that exists; None when it has none."""
+    for relative in PLUGIN_MANIFESTS:
+        path = version_dir / relative
+        if path.is_file():
+            data = json.loads(path.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else {}
+    return None
+
+
+def manifest_paths(version_dir: Path, value, default: str) -> list:
+    """The paths a manifest field names (a path or a list of them, relative to the plugin root), or the default path."""
+    items = [value] if isinstance(value, str) else value if isinstance(value, list) else []
+    paths = [version_dir / item for item in items if isinstance(item, str) and item.strip()]
+    return paths or [version_dir / default]
+
+
+def remote_plugin_rules(codex_home: Path) -> tuple:
+    """(qualified skill names, {plugin id: [MCP server names]}) of every plugin in the account's remote plugin cache, over
+    each cached version (a rule names no version). A plugin's namespace is its manifest's `name`, or the root's own name
+    when that is blank (utils/plugins/src/plugin_namespace.rs plugin_namespace_for_root_uri); its skills are under the
+    manifest's `skills` paths or skills/ (core-plugins/src/loader.rs plugin_skill_roots), its MCP servers in the manifest's
+    `mcpServers` object or file, or .mcp.json (plugin_mcp_config_paths), at rust-v0.160.0."""
+    base = codex_home / "plugins" / "cache" / REMOTE_MARKETPLACE
+    names, servers = set(), {}
+    for plugin_dir in sorted(path for path in base.iterdir() if path.is_dir()) if base.is_dir() else []:
+        plugin_id = f"{plugin_dir.name}@{REMOTE_MARKETPLACE}"
+        for version_dir in sorted(path for path in plugin_dir.iterdir() if path.is_dir()):
+            manifest = plugin_manifest(version_dir)
+            if manifest is None:
+                continue
+            namespace = str(manifest.get("name") or "").strip() or version_dir.name
+            for root in manifest_paths(version_dir, manifest.get("skills"), "skills"):
+                for skill_md in sorted(root.rglob("SKILL.md")) if root.is_dir() else []:
+                    name = skill_name(skill_md)
+                    if name:
+                        names.add(f"{namespace}:{name}")
+            declared = manifest.get("mcpServers")
+            found = dict(declared) if isinstance(declared, dict) else {}
+            if not isinstance(declared, dict):
+                for path in manifest_paths(version_dir, declared, ".mcp.json"):
+                    if path.is_file():
+                        data = json.loads(path.read_text(encoding="utf-8"))
+                        table = data.get("mcpServers", data) if isinstance(data, dict) else {}
+                        found.update(table if isinstance(table, dict) else {})
+            servers.setdefault(plugin_id, set()).update(name for name, spec in found.items() if isinstance(spec, dict))
+    return sorted(names), {plugin_id: sorted(found) for plugin_id, found in sorted(servers.items()) if found}
+
+
+def with_remote_plugin_rules(text: str, names: list, servers: dict) -> str:
+    """The rendered Codex config with a name rule per remote plugin skill after its own rules, and each remote plugin's MCP
+    servers turned off. The plugin's table also gets enabled = false: a local [plugins."<id>"] table is a PluginConfig
+    whose `enabled` defaults to true (config/src/types.rs L1004-1006; core-plugins/src/marketplace_policy.rs
+    configured_plugins_from_stack), a local entry the account's synced list lacks stays as configured
+    (core-plugins/src/loader.rs merge_configured_plugins_with_remote_installed), and load_plugin loads an enabled entry
+    whose bundle is cached (loader.rs, the `if !plugin.enabled` return), all at rust-v0.160.0; so a table with only
+    mcp_servers would turn on a cached plugin the account no longer installs. While the account installs the plugin, the
+    synced entry replaces this one and keeps only its mcp_servers (merge_remote_plugin_config)."""
+    data = tomllib.loads(text)
+    rules = data.setdefault("skills", {}).setdefault("config", [])
+    rules += [rule for rule in ({"name": name, "enabled": False} for name in names) if rule not in rules]
+    for plugin_id, found in servers.items():
+        table = data.setdefault("plugins", {}).setdefault(plugin_id, {})
+        table.setdefault("enabled", False)
+        for server in found:
+            table.setdefault("mcp_servers", {}).setdefault(server, {"enabled": False})
+    return emit_toml(data, header("codex/config"))
+
+
+def header(group: str) -> str:
+    sources = TEMPLATES[group] + (f" and {TEMPLATE_ADDITIONS[group]}" if group in TEMPLATE_ADDITIONS else "")
+    return (f"# Rendered by tools/adoption/new_wsl_client_config.py from {sources}.\n"
             "# Only the pieces the definitive manifest wires for the new distribution\n"
             "# (adoption/new-wsl/client-config-map.json); the template's comments are not carried,\n"
             "# because they explain pieces this file leaves out.\n")
@@ -1038,7 +1318,8 @@ def consistency_errors(root: Path, results: list, entries: list) -> list:
                 apply_rewrites(v.piece.key, v.piece.value, v.entry, {"gateway_port": 0})
             except ConfigError as error:
                 errors.append(str(error))
-    paths = [root / TEMPLATES[group] for group in TEMPLATES] + [root / rel for rel in BLOCK_TEXT_REL.values()]
+    paths = [root / TEMPLATES[group] for group in TEMPLATES] + [root / rel for rel in TEMPLATE_ADDITIONS.values()]
+    paths += [root / rel for rel in BLOCK_TEXT_REL.values()]
     paths += sorted((root / CLAUDE_AGENTS_REL).glob("*.md"))
     pool = "\n".join(path.read_text(encoding="utf-8") for path in paths)
     dead = {name for entry in entries for name in entry.names if not codex_roles.name_hits(pool, [name], True)}
@@ -1080,12 +1361,22 @@ def agent_gaps(root: Path, results: list, plan: dict) -> dict:
     """{agent file: {"mcp_tools": [...], "skills": [...]}}: what a project agent's frontmatter names that this
     distribution will not have (nothing is installed to fill the gap)."""
     servers = {v.piece.key.rsplit("/", 1)[1] for v in results if v.wired and v.piece.key.startswith("claude/mcp/server/")}
+    # A wired Claude Code plugin supplies its own MCP tools, named mcp__plugin_<plugin>_<server>__<tool>, and its skills,
+    # named <plugin>:<skill> (context-mode's plugin: mcp__plugin_context-mode_context-mode__ctx_execute and
+    # context-mode:context-mode).
+    plugins = {v.piece.key.rsplit("/", 1)[1].split("@", 1)[0] for v in results
+               if v.wired and v.piece.key.startswith("claude/settings/plugin/")}
+
+    def supplied(server: str) -> bool:
+        return server in servers or any(server.startswith(f"plugin_{plugin}_") for plugin in plugins)
+
     gaps = {}
     for path in sorted((root / CLAUDE_AGENTS_REL).glob("*.md")):
         fields = frontmatter(path.read_text(encoding="utf-8"))
         tools = [tool.strip() for tool in fields.get("tools", "").split(",") if tool.strip().startswith("mcp__")]
-        missing_tools = [tool for tool in tools if re.match(r"mcp__(.+?)__", tool).group(1) not in servers]
-        missing_skills = [skill for skill in fields.get("skills", "").split(",") if skill and skill not in plan["skills"]]
+        missing_tools = [tool for tool in tools if not supplied(re.match(r"mcp__(.+?)__", tool).group(1))]
+        missing_skills = [skill for skill in fields.get("skills", "").split(",") if skill and skill not in plan["skills"]
+                          and skill.partition(":")[0] not in (plugins if ":" in skill else ())]
         if missing_tools or missing_skills:
             gaps[path.name] = {"mcp_tools": missing_tools, "skills": missing_skills}
     return gaps
@@ -1289,12 +1580,19 @@ def drop_path(node: dict, path: tuple) -> bool:
     return not node
 
 
+# Arrays of tables that Codex reads as lists of rules ([[skills.config]]: codex-rs/config/src/skills_config.rs at
+# rust-v0.160.0, each item a path or name selector): the merge adds each rule of the render that the file lacks, after the
+# file's own, and never takes the two lists for a conflict.
+RULE_LISTS = {("skills", "config")}
+
+
 @dataclasses.dataclass
 class MergePlan:
     expected: dict      # the existing file's data with everything that was missing added
     keys: list          # [(path, value)]: keys the existing tables (or the top level) lack
     tables: list        # [(path, dict)]: whole tables the file lacks
     conflicts: list     # [(path, existing value, rendered value)]: the existing value stays
+    appends: list = dataclasses.field(default_factory=list)   # [(path, [item])]: rules a RULE_LISTS array lacks
 
     def without(self, path: tuple) -> "MergePlan":
         """The same plan with one key left out of the text edits (Codex's own writer adds it)."""
@@ -1304,18 +1602,28 @@ class MergePlan:
             if path[:len(table)] == table and drop_path(node, path[len(table):]):
                 continue
             tables.append((table, node))
-        return MergePlan(self.expected, [(p, v) for p, v in self.keys if p != path], tables, self.conflicts)
+        return MergePlan(self.expected, [(p, v) for p, v in self.keys if p != path], tables, self.conflicts,
+                         self.appends)
 
 
 def plan_merge(existing: dict, rendered: dict) -> MergePlan:
     """What adding the render to an existing config means: a key or table the file lacks is added, a table both have is
-    merged key by key, and a value that differs stays as the file has it (a conflict, reported)."""
-    keys, tables, conflicts = [], [], []
+    merged key by key, and a value that differs stays as the file has it (a conflict, reported). A rule list (RULE_LISTS)
+    gains the render's rules it lacks, after its own."""
+    keys, tables, conflicts, appends = [], [], [], []
 
     def walk(path: tuple, have: dict, want: dict) -> None:
         for key, value in want.items():
             here = path + (key,)
-            if key not in have:
+            # An existing rule list may be empty (`config = []`, which TOML writes only inline): it still gains the render's
+            # rules, so the text edit refuses it as an inline array instead of the rules being kept out as a conflict.
+            if here in RULE_LISTS and is_table_array(value) and (key not in have or is_table_array(have[key])
+                                                                  or have[key] == []):
+                mine = have.get(key, [])
+                missing = [item for item in value if not any(strict_equal(item, rule) for rule in mine)]
+                if missing:
+                    appends.append((here, copy.deepcopy(missing)))
+            elif key not in have:
                 (tables if isinstance(value, dict) and value else keys).append((here, copy.deepcopy(value)))
             elif isinstance(value, dict) and isinstance(have[key], dict):
                 walk(here, have[key], value)
@@ -1328,7 +1636,12 @@ def plan_merge(existing: dict, rendered: dict) -> MergePlan:
         for part in path[:-1]:
             holder = holder[part]
         holder[path[-1]] = copy.deepcopy(value)
-    return MergePlan(expected, keys, tables, conflicts)
+    for path, items in appends:
+        holder = expected
+        for part in path[:-1]:
+            holder = holder[part]
+        holder.setdefault(path[-1], []).extend(copy.deepcopy(items))
+    return MergePlan(expected, keys, tables, conflicts, appends)
 
 
 @dataclasses.dataclass
@@ -1457,6 +1770,16 @@ def merge_toml_text(text: str, plan: MergePlan) -> str:
             raise MergeError(f"cannot add [{lane.key_path(list(table))}]: [{lane.key_path(list(parent))}] is defined as an "
                              "inline table or with dotted keys, which text cannot extend")
         block += table_lines(table, node)
+    arrays = {line.path for _, line in headers if line.kind == "array-header"}
+    present = tomllib.loads(text)
+    for path, items in plan.appends:
+        found, value = lane.get_path(present, list(path))
+        if found and path not in arrays:
+            raise MergeError(f"cannot add {len(items)} item(s) to {lane.key_path(list(path))}: the file defines it as an "
+                             f"inline array, which text cannot extend; write it as [[{lane.key_path(list(path))}]] items"
+                             + ("; it is empty, so removing the key is enough" if value == [] else ""))
+        for item in items:
+            block += array_item_lines(path, item)
     if block:
         groups.setdefault(len(lines), []).append(([ADDED_NOTE, *block[1:]], False))
     out = []
@@ -1563,6 +1886,8 @@ def merge_report(plan: MergePlan) -> list:
         lines.append("top-level keys added: " + ", ".join(top))
     if nested:
         lines.append("keys added to tables the file has: " + ", ".join(nested))
+    for path, items in plan.appends:
+        lines.append(f"rules added to {lane.key_path(list(path))}: {len(items)}, after the file's own")
     for path, have, want in plan.conflicts:
         lines.append(f"conflict kept: {lane.key_path(list(path))}: the file has {shown(path, have)}; the render has "
                      f"{shown(path, want)}")
@@ -1640,12 +1965,39 @@ class Apply:
                 return 1
             self.values = host_values(args.host, self.plan, self.home, wired_path_dirs(self.results))
             self.files = render(self.root, self.results, self.plan, self.values, self.manifest)
+            interims = wired_interims(self.results, self.manifest)
+            owed = owed_acknowledgements(self.root) if interims else []
         except (ConfigError, render_config.RenderError, OSError, KeyError, ValueError) as error:
             print(f"apply failed: {error}", file=sys.stderr)
             return 1
+        if owed:
+            # The gate of amendment 3 (wave-2 code-search ruling, change 1), recorded in the wave-2 section of
+            # docs/decisions/2026-10-02-new-wsl-layer-consensus.md: no interim install is wired before both acknowledgements.
+            why = (f"the render wires the interim installs of {', '.join(interims)} (amendment 3 of the manifest's decision "
+                   f"rule), and the acknowledgement of the wave-2 batch is still owed by {', '.join(owed)} "
+                   f"({CONSENSUS_REL}, wave2.acknowledgements_owed)")
+            if not self.dry:
+                print(f"apply refused: {why}; nothing is written. Record both acknowledgements, then run again.",
+                      file=sys.stderr)
+                return 1
+            print(f"note: a real run refuses now: {why}")
         self.eco = Path(self.values["ECO_ROOT"])
         self.codex_home = self.home / ".codex"
         self.wired = {v.piece.key: v for v in self.results if v.wired}
+        if REMOTE_PLUGIN_PIECE in self.wired:
+            cache = self.codex_home / "plugins" / "cache" / REMOTE_MARKETPLACE
+            try:
+                names, servers = remote_plugin_rules(self.codex_home)
+                if names or servers:
+                    self.files["codex.config.toml"] = with_remote_plugin_rules(self.files["codex.config.toml"], names,
+                                                                               servers)
+            except (ConfigError, OSError, ValueError) as error:
+                print(f"apply failed: the account's remote plugins in {cache} could not be read: {error}", file=sys.stderr)
+                return 1
+            # Planned, not done: the codex-config step writes the rules and reads them back, or fails and says so.
+            print(f"remote plugins: {len(names)} skill name rule(s) and {sum(len(v) for v in servers.values())} plugin MCP "
+                  f"server off switch(es) planned, read from {cache} (wave-2 skills ruling, change 5); they are in place "
+                  "once the codex-config step has written and read them back")
         mode = "DRY RUN, nothing is written and no client runs" if self.dry else "applying"
         print(f"home {self.home}; eco root {self.eco}; {mode}")
         declared = render_config.load_host_values(args.host)["HOME"].rstrip("/")
@@ -1677,8 +2029,10 @@ class Apply:
         because its step was skipped or failed."""
         if not self.args.with_authorization_settings:
             print("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode and "
-                  "skipDangerousModePermissionPrompt and Codex approval_policy and sandbox_mode are not written, and a "
-                  f"value of theirs that a file has is not touched; {AUTHORIZATION_OPTION} adds the ones a file lacks)")
+                  "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, the trust_level of the wired "
+                  "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
+                  f"and a value of theirs that a file has is not touched; {AUTHORIZATION_OPTION} adds the ones a file "
+                  "lacks)")
             return
         verdict_of = {v.piece.key: v for v in self.results if v.authorization and v.wired}
         by_status = {status: [authorization_label(key) for key in verdict_of if self.authorization.get(key) == status]
@@ -1775,6 +2129,12 @@ class Apply:
                     and verdict.piece.group in ("claude/settings", "claude/overlay")):
                 continue
             path = list(verdict.piece.path)
+            if isinstance(path[-1], int):
+                # A rule of a permission list (an allow rule): the file has it or it is added; the merge unions the list.
+                present, rules = lane.get_path(current, path[:-1])
+                found[verdict.piece.key] = ("same" if present and isinstance(rules, list) and verdict.piece.value in rules
+                                            else "added")
+                continue
             have, mine = lane.get_path(current, path), lane.get_path(wanted, path)
             if have[0] and mine[0]:
                 name = ".".join(str(part) for part in path)
@@ -1881,8 +2241,12 @@ class Apply:
             return
         if running:
             self.say("codex-config", f"  DRY RUN: {self.codex_dry_note(running, how).strip()}")
+        # --keep-hook-trust and --keep-project-trust: the render's [hooks.state] approvals and [projects] trust grants are
+        # the ones the map wires (a grant only with --with-authorization-settings), which the merge into an existing
+        # config.toml adds too, so a new home and a second run end with the same file.
         argv = [str(ROOT / "tools/adoption/codex_home.py"), "--rendered", str(self.stage / "codex.config.toml"),
-                "--eco-root", str(self.eco), "--codex-home", str(self.codex_home)]
+                "--eco-root", str(self.eco), "--codex-home", str(self.codex_home), "--keep-hook-trust",
+                "--keep-project-trust"]
         codex = self.binary("codex", self.args.codex_bin)
         if codex:
             argv += ["--codex", codex]
@@ -1914,7 +2278,7 @@ class Apply:
             writer = self.binary("codex", self.args.codex_bin) if adds_daemon else None
             text_plan = plan.without(DAEMON_PATH) if writer else plan
             new_text = None
-            if text_plan.keys or text_plan.tables:
+            if text_plan.keys or text_plan.tables or text_plan.appends:
                 new_text = merge_toml_text(original.decode("utf-8"), text_plan)
                 wanted = copy.deepcopy(plan.expected)
                 if writer:
@@ -1931,9 +2295,13 @@ class Apply:
         found = {}
         for verdict in self.results:
             if verdict.authorization and verdict.wired and verdict.piece.group == "codex/config":
-                have = lane.get_path(existing, list(verdict.piece.path))
+                # A piece's path is the template's: a key that names a placeholder (a project's trust grant under
+                # projects."${PROJECT_ROOT}") is looked up as the render filled it.
+                path = [string.Template(part).safe_substitute(self.values) if isinstance(part, str) else part
+                        for part in verdict.piece.path]
+                have = lane.get_path(existing, path)
                 found[verdict.piece.key] = ("added" if not have[0] else "same" if strict_equal(
-                    have[1], lane.get_path(rendered, list(verdict.piece.path))[1]) else "kept")
+                    have[1], lane.get_path(rendered, path)[1]) else "kept")
         changes = new_text is not None or writer is not None
         label = "merged with conflicts kept" if plan.conflicts else "applied"
         if not changes:
@@ -2043,7 +2411,9 @@ class Apply:
             self.record("verify", "skipped", "a dry run starts no shell")
             return
         servers = json.loads((self.stage / "mcp-servers.json").read_text())["mcpServers"]
-        names = list(dict.fromkeys(["claude", "codex", "mise", *(spec["command"] for spec in servers.values())]))
+        # A stdio server runs a command a login shell must find; an http server (ai-memory) runs none here.
+        commands = (spec["command"] for spec in servers.values() if "command" in spec)
+        names = list(dict.fromkeys(["claude", "codex", "mise", *commands]))
         found = login_shell_resolution(self.home, names)
         launcher = self.eco / "bin" / "claude"
         problems = []
@@ -2123,8 +2493,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--with-authorization-settings", action="store_true",
                         help="--render and --apply: also render and write the authorization settings, the ones that grant "
                              "a permission or suppress a confirmation (Claude Code permissions.defaultMode and "
-                             "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, and the tool "
-                             "approval mode of a Codex MCP server whose slot installs it). By default they "
+                             "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, the trust_level "
+                             "of the host's main checkout in Codex, and the tool approval mode of a Codex MCP server "
+                             "whose slot installs it). By default they "
                              "are neither rendered nor written and a value a file already has is never touched; with this "
                              "option a missing one is added and a differing one is kept and printed beside the render's. "
                              "Use it only on a host whose owner asked for the repository's permission practice.")

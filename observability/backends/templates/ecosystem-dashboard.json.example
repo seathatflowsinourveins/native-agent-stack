@@ -2,7 +2,7 @@
   "uid": "ecosystem-native",
   "title": "Native agent ecosystem",
   "schemaVersion": 39,
-  "version": 10,
+  "version": 11,
   "links": [
     {
       "type": "link",
@@ -1125,6 +1125,255 @@
             "mean",
             "max"
           ]
+        }
+      }
+    },
+    {
+      "id": 39,
+      "type": "row",
+      "title": "Codex lanes",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 95,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 40,
+      "type": "timeseries",
+      "title": "Codex turns per minute by lane",
+      "description": "Completed Codex turns per minute by lane, from the native turn timer codex.turn.e2e_duration_ms, which records each turn when it ends (openai/codex rust-v0.160.0, codex-rs/core/src/tasks/mod.rs:404-406). codex.conversation.turn.count is not used: Codex records it once, at session shutdown. ecosystem_lane is the lane name that a lane's launch exports in OTEL_RESOURCE_ATTRIBUTES (ecosystem.lane=<lane>); the Collector keeps it and makes it a label. unattributed is a Codex process started without it. Writers without a launcher identity (instance=\"unscoped\") are included: a shared Codex delta stream undercounts, it does not inflate. Turns show activity, not outcomes; the lane board counts outcomes.",
+      "gridPos": {
+        "x": 0,
+        "y": 96,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace(60 * sum by (ecosystem_lane) (rate(ecosystem_codex_turn_e2e_duration_ms_milliseconds_count[$__rate_interval])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "turns/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 41,
+      "type": "timeseries",
+      "title": "Codex tool-call failure share by lane (1 h)",
+      "description": "Share of Codex tool calls (codex.tool.call) that failed (success=\"false\") over the trailing hour, by lane. The red line is the CodexLaneToolErrorBurst threshold: the alert fires when more than 10% of at least 30 calls fail in the hour, for 15 minutes. A lane without failures shows 0.",
+      "gridPos": {
+        "x": 8,
+        "y": 96,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace((sum by (ecosystem_lane) (increase(ecosystem_codex_tool_call_total{success=\"false\"}[1h])) or 0 * sum by (ecosystem_lane) (increase(ecosystem_codex_tool_call_total[1h]))) / sum by (ecosystem_lane) (increase(ecosystem_codex_tool_call_total[1h])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          },
+          "custom": {
+            "axisLabel": "failed share",
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 42,
+      "type": "timeseries",
+      "title": "Codex MCP error share by lane (1 h)",
+      "description": "Share of Codex MCP calls that returned an error (codex.mcp.call.error over codex.mcp.call) over the trailing hour, by lane. The red line is the CodexLaneMcpErrorRatio threshold: the alert fires when more than 10% of at least 20 calls fail in the hour, for 15 minutes. A lane without errors shows 0. The series also carry a tool label naming the MCP tool.",
+      "gridPos": {
+        "x": 16,
+        "y": 96,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace((sum by (ecosystem_lane) (increase(ecosystem_codex_mcp_call_error_total[1h])) or 0 * sum by (ecosystem_lane) (increase(ecosystem_codex_mcp_call_total[1h]))) / sum by (ecosystem_lane) (increase(ecosystem_codex_mcp_call_total[1h])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          },
+          "custom": {
+            "axisLabel": "error share",
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 43,
+      "type": "timeseries",
+      "title": "Codex goal blocked and usage-limited events by lane (15 min)",
+      "description": "Goal events over the trailing 15 minutes, the windows of the CodexLaneGoalBlocked (warning) and CodexLaneUsageLimited (critical) alerts. These counters reach Prometheus as delta points, and their series leave the Collector's exporter 5 minutes after the last export, so a line shows for about 15 minutes after an event and then ends; the alerts keep firing 30 minutes longer. increase() extrapolates, so one event can read slightly above 1. The lane board shows the current goal state.",
+      "gridPos": {
+        "x": 0,
+        "y": 104,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace(sum by (ecosystem_lane) (increase(ecosystem_codex_goal_blocked_total[15m])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}} blocked"
+        },
+        {
+          "refId": "B",
+          "expr": "label_replace(sum by (ecosystem_lane) (increase(ecosystem_codex_goal_usage_limited_total[15m])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}} usage-limited"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "custom": {
+            "axisLabel": "events"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 44,
+      "type": "timeseries",
+      "title": "Codex compactions by lane (4 h)",
+      "description": "Context compactions (codex.task.compact) over the trailing 4 hours, by lane. The counter also counts the compactions of in-process child threads, so it reads higher than the lane board's parent-thread count and is not compared with that count's WARN threshold (6 or more in 4 hours).",
+      "gridPos": {
+        "x": 12,
+        "y": 104,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace(sum by (ecosystem_lane) (increase(ecosystem_codex_task_compact_total[4h])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "custom": {
+            "axisLabel": "compactions"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
         }
       }
     }

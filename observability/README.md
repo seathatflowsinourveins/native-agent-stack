@@ -112,6 +112,8 @@ curl --fail --silent --get http://127.0.0.1:19090/api/v1/query \
 curl --fail --silent --get http://127.0.0.1:13100/loki/api/v1/query_range \
   --data-urlencode 'query={service_name="claude-code"}' --data-urlencode 'limit=5'
 curl --fail --silent 'http://127.0.0.1:18080/ecosystem-alerts/json?poll=1&since=all'
+# The Codex lane warnings' own topic (#671), added after receipt.json was recorded.
+curl --fail --silent 'http://127.0.0.1:18080/ecosystem-lanes/json?poll=1&since=all'
 ```
 
 The exact historical commands, status and counter semantics are recorded in

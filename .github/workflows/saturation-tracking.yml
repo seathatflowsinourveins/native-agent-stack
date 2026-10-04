@@ -16,8 +16,8 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: read
+# No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}

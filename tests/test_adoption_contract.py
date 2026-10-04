@@ -111,7 +111,7 @@ class AdoptionContractTests(unittest.TestCase):
         # The current SDK pair follows the client pin and its separately scoped
         # qualification; every other distribution stays bound to that inventory.
         # Sources: uv pip/compile/#adding-constraints; published openai-codex
-        # 0.159.2 requires openai-codex-cli-bin==0.159.2 (PyPI metadata).
+        # 0.160.0 requires openai-codex-cli-bin==0.160.0 (PyPI metadata).
         sdk_names = {'openai-codex', 'openai-codex-cli-bin'}
         self.assertEqual(set(pins), set(expected))
         self.assertEqual(
@@ -134,7 +134,7 @@ class AdoptionContractTests(unittest.TestCase):
             if reference == 'sdk_accepted_constraints':
                 self.assertEqual(required, pins)
 
-        qualification = json.loads((ROOT / 'evidence/artifacts/runtime-sdk-20261001/receipt.json').read_text())
+        qualification = json.loads((ROOT / 'evidence/artifacts/runtime-sdk-20261003/receipt.json').read_text())
         installation = qualification['installation']
         self.assertEqual(installation['lock'], self.adoption['toolchain']['sdk_lock'])
         self.assertEqual(installation['lock_sha256'], hashlib.sha256(lock.read_bytes()).hexdigest())
@@ -147,7 +147,7 @@ class AdoptionContractTests(unittest.TestCase):
 
     def test_sdk_upgrade_keeps_independent_inventory_and_client_guards(self):
         paths = ['blueprints/us-equities/supply-chain/receipt.json',
-                 'evidence/artifacts/runtime-sdk-20261001/receipt.json']
+                 'evidence/artifacts/runtime-sdk-20261003/receipt.json']
         paths.extend(self.adoption['toolchain'][key] for key in
                      ['sdk_lock', 'sdk_direct_requirements', 'sdk_accepted_constraints'])
         cases = [('duckdb', '0.0.0', 'historical non-SDK inventory'),

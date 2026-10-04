@@ -4,9 +4,9 @@ name: Dependency and workflow security scan
 # .github/osv-scanner-lockfiles.json (tests/test_osv_lockfile_coverage.py fails
 # when a tracked one is missing; its "excluded" list names deliberately vulnerable
 # test fixtures, each with a reason) and fails on any vulnerability not ignored in
-# .github/osv-scanner.toml, or the dedicated frozen macOS and retired WSL configs named by those entries.
+# .github/osv-scanner.toml, or the dedicated frozen macOS config named by its entry.
 # An explicit --config applies to every input of one invocation; the workflow and policy preflight bind
-# each dedicated config to its exact reviewed lock. Three exhaustive/disjoint groups are scanned separately;
+# each dedicated config to its exact reviewed lock. Two exhaustive/disjoint groups are scanned separately;
 # its pull_request run is a required check (branch ruleset
 # 23739774). The scan jobs hold only a read token: on push, schedule and dispatch
 # osv-sarif-upload and zizmor-sarif-upload, which run no installed tool, upload the SARIF.
@@ -24,8 +24,9 @@ on:
     - cron: '37 5 * * 3' # Weekly Wednesday 05:37 UTC, 40 minutes before the daily catalog report
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope and no cache access by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
+cache-mode: none
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
@@ -65,11 +66,10 @@ jobs:
           WRITE_SARIF: ${{ github.event_name != 'pull_request' }}
         run: |
           # `shell: bash` runs with -e; turn it off so a findings exit (1) is captured and
-          # all three SARIF results are still written, then fail with the worst observed status.
+          # both SARIF results are still written, then fail with the worst observed status.
           set +e -u -o pipefail
           inventory=.github/osv-scanner-lockfiles.json
           frozen_config=.github/osv-scanner-frozen-macos.toml
-          frozen_wsl_config=.github/osv-scanner-frozen-wsl-retrieval.toml
           # Scope comes from this caller, not OSV's explicit-config mechanism. Reject missing/duplicate inputs,
           # config drift, changed lock digests, missing evidence, expired policy and restored replay/install routes.
           python3 -m unittest \
@@ -88,28 +88,20 @@ jobs:
           while IFS= read -r lockfile; do
             frozen+=("$lockfile")
           done < <(jq -r --arg config "$frozen_config" '.lockfiles[] | select(.config == $config) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
-          frozen_wsl=()
-          while IFS= read -r lockfile; do
-            frozen_wsl+=("$lockfile")
-          done < <(jq -r --arg config "$frozen_wsl_config" '.lockfiles[] | select(.config == $config) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
           # Older Bash treats empty arrays as unset under -u; guard before expanding lengths.
           test -n "${lockfiles[0]+set}" || exit 1
           test -n "${frozen[0]+set}" || exit 1
-          test -n "${frozen_wsl[0]+set}" || exit 1
           test "${#lockfiles[@]}" -gt 0 || exit 1
           test "${#frozen[@]}" -gt 0 || exit 1
-          test "${#frozen_wsl[@]}" -gt 0 || exit 1
-          # Every entry is in exactly one scan: together the three lists are the inventory, so an entry that
+          # Every entry is in exactly one scan: together the two lists are the inventory, so an entry that
           # names any other config is in neither and fails here.
-          test "$(( ${#lockfiles[@]} + ${#frozen[@]} + ${#frozen_wsl[@]} ))" -eq "$(jq '.lockfiles | length' "$inventory")" || exit 1
-          # Also enforce unique inputs and the two exact archive assignments in the shell caller itself.
-          jq -e --arg mac_config "$frozen_config" --arg wsl_config "$frozen_wsl_config" '
+          test "$(( ${#lockfiles[@]} + ${#frozen[@]} ))" -eq "$(jq '.lockfiles | length' "$inventory")" || exit 1
+          # Also enforce unique inputs and the exact archive assignment in the shell caller itself.
+          jq -e --arg mac_config "$frozen_config" '
             .lockfiles as $entries | ($entries | map(.path)) as $paths |
             (($paths | length) == ($paths | unique | length)) and
             ([$entries[] | select(.config == $mac_config) | .path] ==
-              ["evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"]) and
-            ([$entries[] | select(.config == $wsl_config) | .path] ==
-              ["blueprints/convergence-practice/wsl-retrieval/package-lock.json"])
+              ["evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"])
           ' "$inventory" > /dev/null || exit 1
           # --no-resolve: scan the versions each file pins. Transitive resolution of the
           # unlocked manifests reported versions no lockfile installs (decision record).
@@ -117,25 +109,19 @@ jobs:
             --no-resolve "${lockfiles[@]}")
           scan_frozen=("$RUNNER_TEMP/osv-scanner/osv-scanner" scan source --config "$frozen_config"
             --no-resolve "${frozen[@]}")
-          scan_frozen_wsl=("$RUNNER_TEMP/osv-scanner/osv-scanner" scan source --config "$frozen_wsl_config"
-            --no-resolve "${frozen_wsl[@]}")
           "${scan[@]}"
           status=$?
           "${scan_frozen[@]}"
           frozen_status=$?
-          "${scan_frozen_wsl[@]}"
-          frozen_wsl_status=$?
-          statuses=("$status" "$frozen_status" "$frozen_wsl_status")
-          printf 'OSV primary exit codes: ordinary=%s frozen-macos=%s frozen-wsl=%s\n' "$status" "$frozen_status" "$frozen_wsl_status"
+          statuses=("$status" "$frozen_status")
+          printf 'OSV primary exit codes: ordinary=%s frozen-macos=%s\n' "$status" "$frozen_status"
           if [ "$WRITE_SARIF" = true ]; then
             "${scan[@]}" --format sarif --output-file "$RUNNER_TEMP/osv-scanner/osv-scanner.sarif"
             sarif_status=$?
             "${scan_frozen[@]}" --format sarif --output-file "$RUNNER_TEMP/osv-scanner/osv-scanner-frozen-macos.sarif"
             frozen_sarif_status=$?
-            "${scan_frozen_wsl[@]}" --format sarif --output-file "$RUNNER_TEMP/osv-scanner/osv-scanner-frozen-wsl-retrieval.sarif"
-            frozen_wsl_sarif_status=$?
-            statuses+=("$sarif_status" "$frozen_sarif_status" "$frozen_wsl_sarif_status")
-            printf 'OSV SARIF exit codes: ordinary=%s frozen-macos=%s frozen-wsl=%s\n' "$sarif_status" "$frozen_sarif_status" "$frozen_wsl_sarif_status"
+            statuses+=("$sarif_status" "$frozen_sarif_status")
+            printf 'OSV SARIF exit codes: ordinary=%s frozen-macos=%s\n' "$sarif_status" "$frozen_sarif_status"
             # 0: no vulnerabilities; 1: vulnerabilities (already reported above); other codes are scanner errors.
           fi
           # Preserve the worst status from every primary and SARIF invocation, including findings and scanner errors.
@@ -155,7 +141,6 @@ jobs:
           path: |
             ${{ runner.temp }}/osv-scanner/osv-scanner.sarif
             ${{ runner.temp }}/osv-scanner/osv-scanner-frozen-macos.sarif
-            ${{ runner.temp }}/osv-scanner/osv-scanner-frozen-wsl-retrieval.sarif
           if-no-files-found: error
           retention-days: 1
 
@@ -188,15 +173,12 @@ jobs:
           sarif_file: ${{ runner.temp }}/osv-scanner/osv-scanner.sarif
           category: osv-scanner
       - name: Upload the frozen-artifact OSV-Scanner SARIF to code scanning
+        # Keep this report uploadable after an earlier upload fails.
+        if: ${{ !cancelled() }}
         uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
         with:
           sarif_file: ${{ runner.temp }}/osv-scanner/osv-scanner-frozen-macos.sarif
           category: osv-scanner-frozen-macos
-      - name: Upload the retired WSL artifact OSV-Scanner SARIF to code scanning
-        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
-        with:
-          sarif_file: ${{ runner.temp }}/osv-scanner/osv-scanner-frozen-wsl-retrieval.sarif
-          category: osv-scanner-frozen-wsl-retrieval
 
   zizmor-online:
     if: github.event_name != 'pull_request'
