@@ -423,7 +423,7 @@ branches to an owner fork. The fork first needs a separately reviewed change to 
 driver's GitHub harness, which pushes to and opens PRs only in this repository (see
 Residuals). Neither option blocks CI egress, and under either the PR body publishes
 the final message unless `build_pr_body` drops it. Until the owner accepts one, and
-for the fork until that harness change has passed its own review, the first live
+for the fork until that harness change has passed its own review and landed, the first live
 run waits (the live runbook's precondition).
 
 ### 4. The review loop, after `host.run` returns
@@ -555,7 +555,7 @@ name, never a credential.
 # Precondition: the owner has accepted one option of the decision record's resolver-mode amendment
 # (docs/decisions/2026-09-28-openhands-resolver-isolation.md). Until then, stop here. Option 2 (an owner
 # fork) also needs its separately reviewed harness change first, because this driver pushes and opens
-# PRs only in this repository (Residuals). Until that change lands, stop here too.
+# PRs only in this repository (Residuals). Until that change has passed its own review and landed, stop here too.
 export PATH="$HOME/.local/share/codex-ecosystem/tools/docker-rootless-29.8.1/bin:$HOME/.local/share/codex-ecosystem/tools/skills-1.7.0/bin:$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:$HOME/.local/share/codex-ecosystem/bin:$PATH"
 RECIPE="$PWD/blueprints/runtime-workers/openhands"
 PREFIX="$HOME/.local/share/codex-ecosystem/tools/openhands-1.49.6"

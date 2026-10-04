@@ -229,23 +229,36 @@ The owner decides between two options:
    changes, and accept the final message as a second, guarded output. The resolver as built
    needs no code change for this option.
 2. **Push agent branches to an owner fork**, so that PR runs get no secret and a read-only token
-   whatever a workflow declares. This is the review's proposal. GitHub's fork-PR token and secret
-   limits, and its rules on which account may hold the fork, were not re-read for this amendment,
-   so that guarantee is unverified here.
-   - **Owner.** The fork's owner is this repository's owner, the User account
+   whatever a workflow declares. This is the review's proposal. GitHub states the token and secret
+   limits in [Events that trigger workflows](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows),
+   "Workflows in forked repositories" (read 2026-10-03): "With the exception of `GITHUB_TOKEN`,
+   secrets are not passed to the runner when a workflow is triggered from a forked repository. The
+   `GITHUB_TOKEN` has read-only permissions in pull requests from forked repositories." That
+   sources the guarantee for `pull_request` runs from a fork.
+   - **Holder: undetermined.** This repository's owner is the User account
      `seathatflowsinourveins`. The repository is public and has no fork
-     (`gh api repos/seathatflowsinourveins/native-agent-stack`, read 2026-10-03). That account is
-     also the admin login the resolver acts through (ruleset section above), so the fork needs
-     its own rules.
+     (`gh api repos/seathatflowsinourveins/native-agent-stack`, read 2026-10-03). GitHub's
+     [Forks](https://docs.github.com/en/pull-requests/reference/forks) reference, "Which
+     repositories can be forked?" (read 2026-10-03), says: "You can fork any public repository: To
+     your personal account; To an organization where you have permission to create repositories."
+     It says nothing on forking one's own repository. The holder is therefore an organization the
+     owner creates or a second account. Which one it is changes the push identity, the fork's
+     ruleset and the `--head <holder>:<branch>` value.
    - **A harness change.** The resolver as built pushes to and opens PRs only in this repository.
-     `resolver/gh_harness.py:44` fixes `REPO`. `op_push` (`:241-254`) pushes only to `origin`,
-     and `push` (`:704-709`) refuses unless the origin push URL equals `ORIGIN_URL`. `op_pr_create`
-     (`:257-259`) and its allowlist entry (`:448`) pass `--head <branch>` in this repository.
-     `check_repository` (`:627-628`) requires `full_name` to equal `REPO`, and `branch_rules`
-     (`:684-689`) reads this repository's rules. The ruleset section above binds only this
-     repository's `openhands/*` refs.
+     `blueprints/runtime-workers/openhands/resolver/gh_harness.py:44` fixes `REPO`. `op_push`
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:241-254`) pushes only to
+     `origin`, and `push` (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:704-709`)
+     refuses unless the origin push URL equals `ORIGIN_URL`. `op_pr_create`
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:257-259`) and its allowlist
+     entry (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:448`) pass
+     `--head <branch>` in this repository. `check_repository`
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:627-628`) requires `full_name`
+     to equal `REPO`, and `branch_rules`
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:684-689`) reads this
+     repository's rules. The ruleset section above binds only this repository's `openhands/*`
+     refs.
    - **Before a first run**, option 2 therefore needs a separately reviewed change: a fork remote
-     and push-URL check, `gh pr create --head <owner>:<branch>`, the branch-rules lookup and a
+     and push-URL check, `gh pr create --head <holder>:<branch>`, the branch-rules lookup and a
      `non_fast_forward` ruleset on the fork, and its own independent review.
    - **Condition 3.** A fork does not change what the PR body publishes. `build_pr_body`
      (`blueprints/runtime-workers/openhands/resolver.py:547-550`, `:590-592`) includes the final
@@ -256,8 +269,8 @@ The owner decides between two options:
 Neither option blocks CI egress. With a fork, main's `pull_request` workflows still run the pushed
 code on the same GitHub-hosted runners, whose egress is audited, not blocked. Either option can
 add an egress block to the PR jobs that run repository code; that is a workflow change outside the
-resolver PR. Until the owner accepts one option, and for option 2 until its harness change has
-passed its own review, this narrowing does not cover resolver mode's CI execution, and the
+resolver PR. Until the owner accepts one option, and for option 2 until its harness change
+has passed its own review and landed, this narrowing does not cover resolver mode's CI execution, and the
 resolver's first live run waits.
 
 ## GitHub harness (follow-up PR)
@@ -399,5 +412,8 @@ its versioned primary sources. Do not weaken or skip the validator's refusal ass
   `require-login/route.ts`, `apiKeys.ts`, at the lines cited above.
 - docs.github.com creating-rulesets-for-a-repository, available-rules-for-rulesets and
   managing-the-automatic-deletion-of-branches, fetched 2026-09-28.
+- docs.github.com events-that-trigger-workflows ("Workflows in forked repositories") and
+  pull-requests/reference/forks ("Which repositories can be forked?"), read 2026-10-03 for the
+  resolver-mode amendment's option 2.
 - Repository: `docs/decisions/2026-09-25-host-request-lane.md:176-178`,
   `docs/github-automation.md:479-481,493-494`, `.github/tag-ruleset.json` (the JSON shape).
