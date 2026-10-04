@@ -65,14 +65,18 @@ does not verify the latter two. Preserving the native prefix is important for
 cache reuse; no prompt rewrite, extra skill carrier or outer agent loop is added.
 
 `--effort` accepts `max` and `ultra`, with `max` retained as the compatibility
-default. Add `--model cx/gpt-6.1-sol --effort ultra` to the command above or to
+default. Ultra requires a suffixless model. Add
+`--model cx/gpt-6.1-sol --effort ultra` to the command above or to
 a resumed invocation to select native Ultra. The worker passes the selection to
 its child launch configuration and the SDK's native `ReasoningEffort` at turn start, and emits
-it as `requested_effort`. The worker preserves supplied model and effort inputs;
+it as `requested_effort`. The worker preserves accepted model and effort inputs;
 the default model remains `cx/gpt-6.1-sol-max`. The checked OmniRoute HTTP carry
-prioritizes force rules, then recognized model suffixes, then body effort. Use the
-suffixless model above for Ultra and qualify the gateway's installed build and
-force rules separately.
+prioritizes force rules, then recognized model suffixes, then body effort.
+Before native startup, the worker rejects Ultra with an effort-bearing model
+ending in `-none`, `-low`, `-medium`, `-high`, `-xhigh`, `-max`, `-ultra`, `(max)`
+or `(ultra)`, following the pinned suffix parser below. This includes the default
+model paired with `--effort ultra`; supply the suffixless model explicitly.
+Qualify the gateway's installed build and force rules separately.
 
 Native model metadata controls ordinary inference normalization. The bundled
 Sol6.1 metadata maps Ultra to `xhigh`; other models can resolve it differently.
@@ -204,9 +208,15 @@ destination before thread creation, and a private failure record after an
 incomplete turn.
 The effort checks use native config-read for both selections, observe the
 unchanged SDK turn receiving its native enum, and inspect the synthetic wire
-request after model-owned normalization. They also reject invalid effort before
-native startup and retain the default/resume `max` behavior. The suite contains
-28 tests.
+request after model-owned normalization. Start/resume subtests include starting
+with the default Max route, then resuming that thread with
+`--model cx/gpt-6.1-sol --effort ultra`. They observe the real thread read passing
+the worker's model/provider check, the resumed `requested_effort`, native
+`ReasoningEffort.ultra` turn argument and normalized wire effort `xhigh`.
+These fixtures retain the real pinned SDK/CLI and return authored SSE responses;
+they do not qualify model switching at a live gateway. Argument checks reject
+invalid effort and Ultra with every listed effort suffix, accept suffixless
+Ultra, and retain the default/resume `max` behavior. The suite contains 30 tests.
 The other fixture homes also disable plugins, and teardown checks that no
 `.tmp/plugins-clone-*` directories remain. No descendant-process or global egress
 assertion is made. Missing terminal events and an

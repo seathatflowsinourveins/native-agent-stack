@@ -40,6 +40,11 @@ SDK_VERSION = "0.160.0"
 PROVIDER = "omniroute_runtime"
 DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
 DEFAULT_BASE_URL = "http://127.0.0.1:20128/v1"
+# OmniRoute 0585aba5589d5a1f49243a13a8db249558e7c9e3:
+# open-sse/executors/codex/reasoningSuffix.ts. Fail closed for effort-bearing IDs.
+GATEWAY_EFFORT_SUFFIXES = (
+    "-none", "-low", "-medium", "-high", "-xhigh", "-max", "-ultra", "(max)", "(ultra)"
+)
 CLEANUP_TIMEOUT = 5.0
 _CLEANUP_TASKS: set[asyncio.Task] = set()
 
@@ -530,7 +535,10 @@ def parse_args(argv=None) -> argparse.Namespace:
         "--effort",
         choices=[ReasoningEffort.max.value, ReasoningEffort.ultra.value],
         default=ReasoningEffort.max.value,
-        help="requested native reasoning effort; default max",
+        help=(
+            "requested native reasoning effort; default max; "
+            "ultra requires a suffixless --model (e.g. cx/gpt-6.1-sol)"
+        ),
     )
     parser.add_argument("--base-url", type=gateway_url, default=DEFAULT_BASE_URL)
     parser.add_argument("--request-id", type=request_id, default=uuid.uuid4().hex)
@@ -574,6 +582,11 @@ def parse_args(argv=None) -> argparse.Namespace:
         parser.error("codex-home must be an existing private state directory")
     if not args.model.strip():
         parser.error("model must be nonempty")
+    if args.effort == ReasoningEffort.ultra.value and args.model.endswith(GATEWAY_EFFORT_SUFFIXES):
+        parser.error(
+            "--effort ultra requires a suffixless --model (e.g. cx/gpt-6.1-sol); "
+            "recognized effort suffixes override body effort"
+        )
     if (args.require_mcp or args.require_skill) and not args.preflight:
         parser.error("require-mcp and require-skill require --preflight")
     if args.catalog_details and not args.preflight:
