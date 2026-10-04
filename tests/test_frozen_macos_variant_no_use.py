@@ -135,6 +135,8 @@ MANIFEST_PATH = "3a6d91b040d5bb3cce275eeeb08484a60fcffff3f4809f0f945bb58a5afeed0
 RUN_SUMMARY_PATH = "58fcf5ef82c52b23c656d596ef8cb255ae4711320d86c7599b4b80d053b2ca95"
 EXPERIMENT = "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json"
 RELOCK = "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-"
+# The 2026-10-03 port of the OSV split-scan hardening (#673, porting #555) retains its own copy of the same control.
+SPLIT_PORT = "blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-osv-split-hardening."
 RETIREMENT = "evidence/artifacts/wsl-retrieval-retirement-20261003/"
 PINNED_LINES: dict[str, list[tuple[str, str]]] = {
     ".github/dependabot.yml": [
@@ -178,6 +180,10 @@ PINNED_LINES: dict[str, list[tuple[str, str]]] = {
     RELOCK + "urllib3.osv-split-controls.py.txt": [
         ("3612aae3ccb881f49e31d0e56d0ef3e8db05e86a25416e0e7bb5057221b30454", "the retained control's FROZEN constant"),
     ],
+    # The same constant in the port's retained control: it names the lock that the frozen-config scan control scans.
+    SPLIT_PORT + "osv-split-controls.py.txt": [
+        ("3612aae3ccb881f49e31d0e56d0ef3e8db05e86a25416e0e7bb5057221b30454", "the retained control's FROZEN constant"),
+    ],
     RELOCK + "urllib3.txt": [
         ("6f047ab824483b5f8af7d21d546df60eb0b0dc07c66e82bb510451dd4443cd31", "the ordinary-config scan command"),
         ("686c1f260638adc0461833b0cf31ce2f40bdbd3bcbfc0674a00df09d6981d19c", "the empty-config scan command"),
@@ -196,7 +202,11 @@ PINNED_LINES: dict[str, list[tuple[str, str]]] = {
     RETIREMENT + "completion-workflow-scan.sh": [(SCAN_ASSIGNMENT, "the copied assignment check")],
     RETIREMENT + "final-scan-workflow-scan.sh": [(SCAN_ASSIGNMENT, "the copied assignment check")],
     # FROZEN_LOCKS binds the lock to its OSV config, advisory and sha256.
-    COVERAGE_TESTS: [("af7168e33bdbbc62c9508daa9d89c98155b510026be7f1e9d0a64e110e9659d9", "the FROZEN_LOCKS key")],
+    COVERAGE_TESTS: [
+        ("af7168e33bdbbc62c9508daa9d89c98155b510026be7f1e9d0a64e110e9659d9", "the FROZEN_LOCKS key"),
+        # #673's split-scan mutants carry a copy of the workflow's assignment check, to prove it keeps this lock alone.
+        (SCAN_ASSIGNMENT, "the split-scan test's copy of the assignment check"),
+    ],
     THIS_MODULE: [("48df9b77f3b81b77dbab7d9dd55a4397fc1b056bd009e62988bc3475ef2d045e", "this module's ARTIFACT line")],
 }
 

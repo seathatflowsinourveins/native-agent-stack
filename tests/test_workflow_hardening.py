@@ -335,6 +335,12 @@ class SecurityScanTests(unittest.TestCase):
         # guard even if `uses:` were reordered ahead of `if:`.
         # The artifact step and the downstream upload job both need it.
         osv_job = jobs(self.text)["osv-scanner"]
+        upload = jobs(self.text)["osv-sarif-upload"]
+        for name in ("Upload the frozen-artifact OSV-Scanner SARIF to code scanning",
+                     "Upload the retired WSL artifact OSV-Scanner SARIF to code scanning"):
+            guard = block_if(step_block(upload, name))
+            self.assertIsNotNone(guard, f"{name} must run after an earlier upload fails")
+            self.assertRegex(guard, r"!\s*cancelled\(\)", name)
         for label, block in (("OSV SARIF artifact step", step_block(osv_job, "Keep the OSV-Scanner SARIF for the upload job")),
                              ("osv-sarif-upload job", jobs(self.text)["osv-sarif-upload"])):
             guard = block_if(block)

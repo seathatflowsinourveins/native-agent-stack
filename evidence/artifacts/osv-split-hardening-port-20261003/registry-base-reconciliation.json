@@ -1,0 +1,9 @@
+{
+  "observed_utc": "2026-10-03T19:38:52Z",
+  "head": "cac8700ba914950266272347468bff7ad630a4bf",
+  "current_origin_main": "1f5a791b02a230aced670c88bab3d3d0ebcf401a",
+  "path": "observability/grand-dashboard/state.json",
+  "changed_worktree_file": false,
+  "registered_sha256": "a72c591c08b3efe59ed339ace3e141c90f57cb81ed41349e5c826d89f87f616d",
+  "reason": "origin/main advanced after the pre-edit gate; the mandated registry read brought a newer dashboard hash into the older tested HEAD. Register unchanged tested HEAD bytes for local consistency, then coordinator re-registers after its required rebase."
+}
