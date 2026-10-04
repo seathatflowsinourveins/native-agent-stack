@@ -1,0 +1,9 @@
+test_every_ignore_has_id_reason_and_a_near_expiry (tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_every_ignore_has_id_reason_and_a_near_expiry) ... ok
+test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.001s
+
+OK
+
+exit_code=0

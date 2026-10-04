@@ -1,0 +1,32 @@
+test_each_primary_and_sarif_status_is_retained (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained) ... 
+  test_each_primary_and_sarif_status_is_retained (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained) (primary=(0, 0, 0), sarif=(0, 0, 1)) ... FAIL
+  test_each_primary_and_sarif_status_is_retained (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained) (primary=(0, 0, 0), sarif=(0, 0, 7)) ... FAIL
+test_pr_collects_three_primary_statuses_without_sarif (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_pr_collects_three_primary_statuses_without_sarif) ... ok
+test_preflight_failure_is_returned_before_scan (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_preflight_failure_is_returned_before_scan) ... ok
+test_three_invocations_keep_every_input_and_parser_separate (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_three_invocations_keep_every_input_and_parser_separate) ... ok
+test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan) ... ok
+
+======================================================================
+FAIL: test_each_primary_and_sarif_status_is_retained (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained) (primary=(0, 0, 0), sarif=(0, 0, 1))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scan-root>/tests/test_osv_lockfile_coverage.py", line 734, in test_each_primary_and_sarif_status_is_retained
+    self.assertEqual(result.returncode, expected, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 1 : 
+
+======================================================================
+FAIL: test_each_primary_and_sarif_status_is_retained (tests.test_osv_lockfile_coverage.SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained) (primary=(0, 0, 0), sarif=(0, 0, 7))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scan-root>/tests/test_osv_lockfile_coverage.py", line 734, in test_each_primary_and_sarif_status_is_retained
+    self.assertEqual(result.returncode, expected, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 7 : 
+
+----------------------------------------------------------------------
+Ran 5 tests in 2.045s
+
+FAILED (failures=2)
+
+exit_code=1
