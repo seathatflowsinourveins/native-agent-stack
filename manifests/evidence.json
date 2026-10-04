@@ -4159,13 +4159,13 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "7f5c689b669898bed99bc574c79fde64588b1f585b41557fdce68e3c31c07bfa",
-      "bytes": 57043
+      "sha256": "c030a123abeddab1c9f4d78e05683a74c0127dcd2823f21b7e4da6c0b4796441",
+      "bytes": 57956
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "5ef7dd00c1e14cea6c01fd302f4ce06bea0169fc8ce6539775a1f5bb09a8a33b",
-      "bytes": 24312
+      "sha256": "0153fc7595f7dd64d077366b2b0251cbe78f13a47f90798ab6d3d746624c2aec",
+      "bytes": 25235
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -4254,8 +4254,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "e72d2c20d5fef0f47900397daa4ee88dae9bcef1884e09e7a7b8ceff04fd360b",
-      "bytes": 38624
+      "sha256": "d88a2891939c8df5979150c1f3b6cab0759df0fef1b3b910189f6a66abee6eea",
+      "bytes": 39985
     },
     {
       "path": ".gitignore",
@@ -52725,8 +52725,8 @@
     },
     {
       "path": "tests/test_shell_parser_ci.py",
-      "sha256": "c53c41f48c564094c92501537e973139ce703d89c82eb9126d4f9d620e623a35",
-      "bytes": 42807
+      "sha256": "9a64956e57530dc7a42229a020471b8c63d059410be8b3e0662a1e45992badae",
+      "bytes": 43277
     },
     {
       "path": "tests/test_sim_capacity.py",
@@ -52855,8 +52855,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "88ae801f83099773a0fb03460a2f40aac9a4fb09430f15da2059a1580d98b8cc",
-      "bytes": 141543
+      "sha256": "102ec18f437ad4f2c68aa9c2c936804c970fcd1b8fbacb16ac8ac9d0d1922d9f",
+      "bytes": 149869
     },
     {
       "path": "tests/test_workflow_policy.py",
