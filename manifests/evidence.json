@@ -4727,9 +4727,19 @@
       "bytes": 7463
     },
     {
+      "path": "adoption/templates/systemd/stack-currency.service",
+      "sha256": "4d42e82fecc6ab262091c4205844e17424dc87e208588f64593e7c95f78e35a0",
+      "bytes": 3959
+    },
+    {
       "path": "adoption/templates/systemd/token-report-refresh.service",
       "sha256": "580f7e0d4e538d6013342dc943922ab3988b7567be34fe14b01faa97d2733cae",
       "bytes": 9260
+    },
+    {
+      "path": "adoption/templates/systemd/upstream-surface-watch.service",
+      "sha256": "08ba821c2e893e82764341ec05eb9b7a82ea93c4fe0aebb7a929347cda2e0325",
+      "bytes": 4278
     },
     {
       "path": "adoption/templates/wsl/cloud-init.user-data.template",
@@ -15249,8 +15259,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "b18a39bd5069a86701d53ce42a5a028900139523eda1aa4a09d828bd304c2afb",
-      "bytes": 3056
+      "sha256": "b849394c1855754c7dbcc1106e5b21c196a4dd2113d1f3862c9a07107c1b9715",
+      "bytes": 3355
     },
     {
       "path": "catalogs/convergence-practice/architecture-wave/README.md",
@@ -15386,6 +15396,16 @@
       "path": "catalogs/foundation/surfaces.json",
       "sha256": "be845c04926aa9bd1d7824911839090d8e636e6016d9a641bb683ad1c951aef1",
       "bytes": 20383
+    },
+    {
+      "path": "catalogs/foundation/upstream-surface-baseline.json",
+      "sha256": "8d4d28f94c10dae40e405bb5f7392f75dadaeae2656eaaf995cb39f0f23c24a5",
+      "bytes": 75469
+    },
+    {
+      "path": "catalogs/foundation/upstream-surface-dispositions.json",
+      "sha256": "223f61f126fb1fdca33c528aa89123838a6bb576e4856b5a57b143f02b7dddc7",
+      "bytes": 153291
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -16323,6 +16343,11 @@
       "bytes": 15230
     },
     {
+      "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
+      "sha256": "00edd5b1750f3bd99f3bf6e805d9e0535a1b91e7a9a2062f570bc1d6f4fb2f60",
+      "bytes": 13594
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -16716,6 +16741,11 @@
       "path": "docs/upstream-maintenance-pilot.md",
       "sha256": "4b3410eed8701056b412c65938aac3a453e4d72a2fb70ee59313170433c970de",
       "bytes": 7856
+    },
+    {
+      "path": "docs/upstream-surface-watch.md",
+      "sha256": "8e0ac7a98313a1d9e95c632f13cb1a98411cb9222c75adb9100dd65b197cd61a",
+      "bytes": 17155
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
@@ -51748,6 +51778,11 @@
       "bytes": 34277
     },
     {
+      "path": "scripts/currency_due.py",
+      "sha256": "25a06e95a3513696e924ae49c03f0de35564ecf8a89e3ef09e1ba9d17afd7c09",
+      "bytes": 53961
+    },
+    {
       "path": "scripts/env_freshness.py",
       "sha256": "93646b8896d9efa89536b0c1be350de1cb2ce63ce73a463d30d13c79f0e548db",
       "bytes": 7138
@@ -51836,6 +51871,11 @@
       "path": "scripts/trading_gates.py",
       "sha256": "06aadfbca9ee50371aac6e620fcda087f5843508afb3b81124b053673875a152",
       "bytes": 24948
+    },
+    {
+      "path": "scripts/upstream_surface_watch.py",
+      "sha256": "9463766f0ea1b717255374534f9ac09a402b73f3edffd893c17fd92e27962f99",
+      "bytes": 101878
     },
     {
       "path": "scripts/validate.py",
@@ -52371,6 +52411,11 @@
       "path": "tests/test_credential_tools.py",
       "sha256": "93aee1682d47a0ac54d1d39ef4d566ac141bbc12434ab9983d99b942156ccc99",
       "bytes": 34946
+    },
+    {
+      "path": "tests/test_currency_due.py",
+      "sha256": "e713820eccb514c557933ed9f3f54e638a0d5d17a11e5d84b623337b249699db",
+      "bytes": 101364
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -52996,6 +53041,11 @@
       "path": "tests/test_tvly_keyring.py",
       "sha256": "4879ed6cccb7be2f9dd7db5cfcd087e1884428cdcb97b16f7d17aef827ec5763",
       "bytes": 12126
+    },
+    {
+      "path": "tests/test_upstream_surface_watch.py",
+      "sha256": "0d84299b54815ef2454a97bb4e76a901e97a693a8571e93f2b18c9e31d14e966",
+      "bytes": 107425
     },
     {
       "path": "tests/test_validate.py",
