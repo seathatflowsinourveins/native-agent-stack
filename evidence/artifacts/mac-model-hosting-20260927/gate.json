@@ -1,0 +1,606 @@
+{
+  "configs": [
+    {
+      "argv_extra": "(none)",
+      "calls": [
+        {
+          "decode_tps": 14.59,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 12613,
+          "prompt_tokens": 4178,
+          "size": "4k",
+          "wall_s": 16.94
+        },
+        {
+          "decode_tps": 15.59,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 13583,
+          "prompt_tokens": 4403,
+          "size": "4k",
+          "wall_s": 17.63
+        },
+        {
+          "decode_tps": 15.49,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 13945,
+          "prompt_tokens": 4485,
+          "size": "4k",
+          "wall_s": 18.02
+        },
+        {
+          "decode_tps": 15.29,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 23155,
+          "prompt_tokens": 7363,
+          "size": "8k",
+          "wall_s": 27.28
+        },
+        {
+          "decode_tps": 14.14,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 23395,
+          "prompt_tokens": 7485,
+          "size": "8k",
+          "wall_s": 27.86
+        },
+        {
+          "decode_tps": 15.02,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 25755,
+          "prompt_tokens": 8161,
+          "size": "8k",
+          "wall_s": 29.96
+        }
+      ],
+      "label": "gate-qwen38-c0",
+      "model": "unsloth/Qwen3.8-27B-GGUF@4ca7207 UD-Q4_K_M",
+      "resident_after": [],
+      "runtime": "llama.cpp b11214 Metal (newest build)",
+      "startup_failure": null,
+      "summary": {
+        "4k": {
+          "calls": 3,
+          "errors": 0,
+          "max_wall_s": 18.02,
+          "median_prompt_tokens": 4403,
+          "median_wall_s": 17.63,
+          "over_gate": 0
+        },
+        "8k": {
+          "calls": 3,
+          "errors": 0,
+          "max_wall_s": 29.96,
+          "median_prompt_tokens": 7485,
+          "median_wall_s": 27.86,
+          "over_gate": 3
+        }
+      }
+    },
+    {
+      "argv_extra": "--spec-type draft-mtp --spec-draft-n-max 3",
+      "calls": [
+        {
+          "decode_tps": 20.78,
+          "draft_accepted": 43,
+          "draft_n": 60,
+          "error": null,
+          "prompt_ms": 13058,
+          "prompt_tokens": 4178,
+          "size": "4k",
+          "wall_s": 16.09
+        },
+        {
+          "decode_tps": 17.61,
+          "draft_accepted": 40,
+          "draft_n": 68,
+          "error": null,
+          "prompt_ms": 13857,
+          "prompt_tokens": 4403,
+          "size": "4k",
+          "wall_s": 17.44
+        },
+        {
+          "decode_tps": 22.03,
+          "draft_accepted": 44,
+          "draft_n": 55,
+          "error": null,
+          "prompt_ms": 14001,
+          "prompt_tokens": 4485,
+          "size": "4k",
+          "wall_s": 16.87
+        },
+        {
+          "decode_tps": 20.96,
+          "draft_accepted": 43,
+          "draft_n": 57,
+          "error": null,
+          "prompt_ms": 23480,
+          "prompt_tokens": 7363,
+          "size": "8k",
+          "wall_s": 26.49
+        },
+        {
+          "decode_tps": 21.67,
+          "draft_accepted": 44,
+          "draft_n": 55,
+          "error": null,
+          "prompt_ms": 24133,
+          "prompt_tokens": 7485,
+          "size": "8k",
+          "wall_s": 27.05
+        },
+        {
+          "decode_tps": 22.3,
+          "draft_accepted": 45,
+          "draft_n": 54,
+          "error": null,
+          "prompt_ms": 26252,
+          "prompt_tokens": 8161,
+          "size": "8k",
+          "wall_s": 29.08
+        }
+      ],
+      "label": "gate-qwen38-c2",
+      "model": "unsloth/Qwen3.8-27B-GGUF@4ca7207 UD-Q4_K_M",
+      "resident_after": [],
+      "runtime": "llama.cpp b11214 Metal (newest build)",
+      "startup_failure": null,
+      "summary": {
+        "4k": {
+          "calls": 3,
+          "errors": 0,
+          "max_wall_s": 17.44,
+          "median_prompt_tokens": 4403,
+          "median_wall_s": 16.87,
+          "over_gate": 0
+        },
+        "8k": {
+          "calls": 3,
+          "errors": 0,
+          "max_wall_s": 29.08,
+          "median_prompt_tokens": 7485,
+          "median_wall_s": 27.05,
+          "over_gate": 3
+        }
+      }
+    },
+    {
+      "argv_extra": null,
+      "calls": [
+        {
+          "decode_tps": 22.24,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 9258,
+          "prompt_tokens": 4190,
+          "size": "4k",
+          "wall_s": 10.78
+        },
+        {
+          "decode_tps": 35.88,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 10731,
+          "prompt_tokens": 4415,
+          "size": "4k",
+          "wall_s": 12.54
+        },
+        {
+          "decode_tps": 29.59,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 10725,
+          "prompt_tokens": 4496,
+          "size": "4k",
+          "wall_s": 11.42
+        },
+        {
+          "decode_tps": 24.8,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 17768,
+          "prompt_tokens": 7375,
+          "size": "8k",
+          "wall_s": 18.47
+        },
+        {
+          "decode_tps": 4.37,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 17930,
+          "prompt_tokens": 7496,
+          "size": "8k",
+          "wall_s": 18.18
+        },
+        {
+          "decode_tps": 28.42,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 19413,
+          "prompt_tokens": 8172,
+          "size": "8k",
+          "wall_s": 20.74
+        }
+      ],
+      "label": "gate-qwen38-ollama-mlx",
+      "model": "qwen3.8:27b-mlx",
+      "resident_after": [
+        {
+          "ctx": 16384,
+          "gib": 23.05,
+          "name": "qwen3.8:27b-mlx"
+        }
+      ],
+      "runtime": "Ollama 0.34.4 (MLX engine, nvfp4 safetensors)",
+      "startup_failure": null,
+      "summary": {
+        "4k": {
+          "calls": 3,
+          "errors": 0,
+          "max_wall_s": 12.54,
+          "median_prompt_tokens": 4415,
+          "median_wall_s": 11.42,
+          "over_gate": 0
+        },
+        "8k": {
+          "calls": 3,
+          "errors": 0,
+          "max_wall_s": 20.74,
+          "median_prompt_tokens": 7496,
+          "median_wall_s": 18.47,
+          "over_gate": 1
+        }
+      }
+    },
+    {
+      "argv_extra": null,
+      "calls": [
+        {
+          "decode_tps": 40.52,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 2741,
+          "prompt_tokens": 4190,
+          "size": "4k",
+          "wall_s": 3.17
+        },
+        {
+          "decode_tps": 40.99,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 2709,
+          "prompt_tokens": 4415,
+          "size": "4k",
+          "wall_s": 3.33
+        },
+        {
+          "decode_tps": 40.81,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 2820,
+          "prompt_tokens": 4496,
+          "size": "4k",
+          "wall_s": 3.34
+        },
+        {
+          "decode_tps": 40.54,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 4959,
+          "prompt_tokens": 7375,
+          "size": "8k",
+          "wall_s": 5.49
+        },
+        {
+          "decode_tps": 40.39,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 4832,
+          "prompt_tokens": 7496,
+          "size": "8k",
+          "wall_s": 5.37
+        },
+        {
+          "decode_tps": 39.28,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": 5223,
+          "prompt_tokens": 8172,
+          "size": "8k",
+          "wall_s": 5.77
+        }
+      ],
+      "label": "gate-production-qwen35-9b",
+      "model": "qwen3.5-9b-64k",
+      "resident_after": [
+        {
+          "ctx": 65536,
+          "gib": 11.14,
+          "name": "qwen3.5-9b-64k:latest"
+        }
+      ],
+      "runtime": "Ollama 0.34.4 (MLX engine, nvfp4 safetensors)",
+      "startup_failure": null,
+      "summary": {
+        "4k": {
+          "calls": 3,
+          "errors": 0,
+          "max_wall_s": 3.34,
+          "median_prompt_tokens": 4415,
+          "median_wall_s": 3.33,
+          "over_gate": 0
+        },
+        "8k": {
+          "calls": 3,
+          "errors": 0,
+          "max_wall_s": 5.77,
+          "median_prompt_tokens": 7496,
+          "median_wall_s": 5.49,
+          "over_gate": 0
+        }
+      }
+    },
+    {
+      "argv_extra": "--rerank --ctx-size 32768 --parallel 8 --gpu-layers 99",
+      "calls": [
+        {
+          "decode_tps": null,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": null,
+          "prompt_tokens": null,
+          "size": "4k",
+          "wall_s": 0.8
+        },
+        {
+          "decode_tps": null,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": null,
+          "prompt_tokens": null,
+          "size": "4k",
+          "wall_s": 0.72
+        },
+        {
+          "decode_tps": null,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": null,
+          "prompt_tokens": null,
+          "size": "4k",
+          "wall_s": 0.71
+        },
+        {
+          "decode_tps": null,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": null,
+          "prompt_tokens": null,
+          "size": "8k",
+          "wall_s": 1.39
+        },
+        {
+          "decode_tps": null,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": null,
+          "prompt_tokens": null,
+          "size": "8k",
+          "wall_s": 1.34
+        },
+        {
+          "decode_tps": null,
+          "draft_accepted": null,
+          "draft_n": null,
+          "error": null,
+          "prompt_ms": null,
+          "prompt_tokens": null,
+          "size": "8k",
+          "wall_s": 1.4
+        }
+      ],
+      "label": "gate-qwen3-reranker-0.6b",
+      "model": "ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF@a02f48bb qwen3-reranker-0.6b-q8_0.gguf",
+      "resident_after": [],
+      "runtime": "llama.cpp b11214 Metal (newest build), --rerank",
+      "startup_failure": null,
+      "summary": {
+        "4k": {
+          "calls": 3,
+          "documents": 27,
+          "errors": 0,
+          "max_wall_s": 0.8,
+          "median_wall_s": 0.72,
+          "over_gate": 0
+        },
+        "8k": {
+          "calls": 3,
+          "documents": 54,
+          "errors": 0,
+          "max_wall_s": 1.4,
+          "median_wall_s": 1.39,
+          "over_gate": 0
+        }
+      }
+    }
+  ],
+  "finished_utc": "2026-09-27T15:15:37Z",
+  "gate_seconds": 20.0,
+  "gpt6_via_mac_omniroute": {
+    "calls": [
+      {
+        "completion_tokens": 283,
+        "http": 200,
+        "model": "cx/gpt-6-luna",
+        "prompt_tokens": 3925,
+        "served_model": "gpt-6-luna",
+        "size": "4k",
+        "wall_s": 9.59
+      },
+      {
+        "completion_tokens": 108,
+        "http": 200,
+        "model": "cx/gpt-6-luna",
+        "prompt_tokens": 7184,
+        "served_model": "gpt-6-luna",
+        "size": "8k",
+        "wall_s": 5.72
+      },
+      {
+        "completion_tokens": 225,
+        "http": 200,
+        "model": "cx/gpt-6-luna",
+        "prompt_tokens": 7755,
+        "served_model": "gpt-6-luna",
+        "size": "8k",
+        "wall_s": 7.87
+      },
+      {
+        "completion_tokens": 69,
+        "http": 200,
+        "model": "cx/gpt-6-sol",
+        "prompt_tokens": 3925,
+        "served_model": "gpt-6-sol",
+        "size": "4k",
+        "wall_s": 9.27
+      },
+      {
+        "completion_tokens": 172,
+        "http": 200,
+        "model": "cx/gpt-6-sol",
+        "prompt_tokens": 7184,
+        "served_model": "gpt-6-sol",
+        "size": "8k",
+        "wall_s": 8.76
+      },
+      {
+        "completion_tokens": 65,
+        "http": 200,
+        "model": "cx/gpt-6-sol",
+        "prompt_tokens": 7755,
+        "served_model": "gpt-6-sol",
+        "size": "8k",
+        "wall_s": 5.81
+      },
+      {
+        "completion_tokens": 105,
+        "http": 200,
+        "model": "cx/gpt-6-astra",
+        "prompt_tokens": 3925,
+        "served_model": "gpt-6-astra",
+        "size": "4k",
+        "wall_s": 6.58
+      },
+      {
+        "completion_tokens": 80,
+        "http": 200,
+        "model": "cx/gpt-6-astra",
+        "prompt_tokens": 7184,
+        "served_model": "gpt-6-astra",
+        "size": "8k",
+        "wall_s": 5.52
+      },
+      {
+        "completion_tokens": 59,
+        "http": 200,
+        "model": "cx/gpt-6-astra",
+        "prompt_tokens": 7755,
+        "served_model": "gpt-6-astra",
+        "size": "8k",
+        "wall_s": 4.69
+      }
+    ],
+    "note": "network and provider latency on 2026-09-27; the answers were not scored",
+    "prompts": "the same rerank-shaped prompt builder as the local configurations; one 4k and two 8k calls per model, max_tokens 64",
+    "runtime": "this Mac's OmniRoute 3.8.51 gateway (loopback, keyless), two signed-in Codex accounts, codex providerConcurrency 4",
+    "summary": {
+      "cx/gpt-6-astra": {
+        "4k": {
+          "calls": 1,
+          "errors": 0,
+          "max_wall_s": 6.58,
+          "median_prompt_tokens": 3925,
+          "median_wall_s": 6.58,
+          "over_gate": 0
+        },
+        "8k": {
+          "calls": 2,
+          "errors": 0,
+          "max_wall_s": 5.52,
+          "median_prompt_tokens": 7469.5,
+          "median_wall_s": 5.11,
+          "over_gate": 0
+        }
+      },
+      "cx/gpt-6-luna": {
+        "4k": {
+          "calls": 1,
+          "errors": 0,
+          "max_wall_s": 9.59,
+          "median_prompt_tokens": 3925,
+          "median_wall_s": 9.59,
+          "over_gate": 0
+        },
+        "8k": {
+          "calls": 2,
+          "errors": 0,
+          "max_wall_s": 7.87,
+          "median_prompt_tokens": 7469.5,
+          "median_wall_s": 6.79,
+          "over_gate": 0
+        }
+      },
+      "cx/gpt-6-sol": {
+        "4k": {
+          "calls": 1,
+          "errors": 0,
+          "max_wall_s": 9.27,
+          "median_prompt_tokens": 3925,
+          "median_wall_s": 9.27,
+          "over_gate": 0
+        },
+        "8k": {
+          "calls": 2,
+          "errors": 0,
+          "max_wall_s": 8.76,
+          "median_prompt_tokens": 7469.5,
+          "median_wall_s": 7.29,
+          "over_gate": 0
+        }
+      }
+    }
+  },
+  "host_id": "mac-coordinator-64gb-20260925",
+  "kind": "mac_reranker_gate_timing",
+  "prompt_source": "this repository's docs, rerank-shaped (query + numbered 600-char passages); answers not scored",
+  "started_utc": "2026-09-27T15:08:34Z"
+}
