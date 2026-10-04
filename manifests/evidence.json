@@ -4088,8 +4088,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "2a9086aabdc96b01a48aaee0ebf2a4d3c268accae2c1e6755e952eba9658f986",
-      "bytes": 11260
+      "sha256": "1f93426a7ab9d1270542e98b606f244abe07ec2b9da90144441072e1dd308bdd",
+      "bytes": 11925
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -36418,6 +36418,81 @@
       "bytes": 4419
     },
     {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/completeness-critic.json",
+      "sha256": "bd8e02162e8e387259de10be6b7e282981cfe7ce3a0245beedfd8225da02d515",
+      "bytes": 3306
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-install.json",
+      "sha256": "5385215a4cf017370b9e05aeab516206cf9eff1060d3f5bb9fc5e1163d1a17c1",
+      "bytes": 21517
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-task.json",
+      "sha256": "5f111032ee9dc200b4829d7731de92523dfbc357c9320f6d81460e732977c1a9",
+      "bytes": 25326
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/executed-source/acceptance_oracle.py.txt",
+      "sha256": "2a1d3b770d0b828d239575fe0c79694489df420c99dc11535072630198cae171",
+      "bytes": 5290
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/executed-source/native-llm-trial.py.txt",
+      "sha256": "0f119e83a5367e12e1729d0376e71cc250b776b7c56afcab8d97a785435fca9b",
+      "bytes": 5839
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/executed-source/worker.py.txt",
+      "sha256": "66ae2bba78773b52abdd4a312965579d7c2a1b888f54c3e7f1e9776a957ff0ec",
+      "bytes": 6762
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/execution-source-bindings.json",
+      "sha256": "b20c57c51bc06560cfcf427159bfdd25dd89d895be61ca095247123d24b26ee9",
+      "bytes": 1852
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/experiment.json",
+      "sha256": "16f49752e540383339d8c338ef283a26e2809282bf6585a19de59c5db9cbafec",
+      "bytes": 36711
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-install.json",
+      "sha256": "70c7a5626785f4998e3eeb9d810c0c6e4031320a91d3323bd90b2816a6453a19",
+      "bytes": 48187
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-llm.json",
+      "sha256": "47ec4560beb7adf1007c89e1b7c87275e6ea12532a3b1f69055115b0e60bdc96",
+      "bytes": 4784
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/port-record-20261003.md",
+      "sha256": "18e5778a8f3125bbc8f427572d1dc016c0575cc47227d431ea833927812190e8",
+      "bytes": 11810
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/publication-checks.json",
+      "sha256": "690cb0f57c743993067ee447b9535da66cbe46430d1a9dbb6526da914e3328ae",
+      "bytes": 1652
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/role-packet-20260930.json",
+      "sha256": "d8c9922b0e85feba8002dd8df51db0d38eae895b9072bb8d8007ae8df0176a63",
+      "bytes": 18535
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/root-verification.json",
+      "sha256": "7bbe0f411ca1074db4e892d5b57ec60ecffc4f56c91b0233f117d42ce4520473",
+      "bytes": 3888
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/secret-aware-serialization.json",
+      "sha256": "0cfe0327c5babe0251b7b4047f88f69c027d75438c87abd8362b95faa85e7a75",
+      "bytes": 2164
+    },
+    {
       "path": "evidence/artifacts/native-service-reboot-20260920/cleanup.json",
       "sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
       "bytes": 111
@@ -49543,6 +49618,11 @@
       "bytes": 8633
     },
     {
+      "path": "evidence/receipts/native-runtime-role-resolution-20260930.json",
+      "sha256": "09ca4ef4a20e2c2f966838f0a6ffe89856e03bd06e5c48447c44b8125e459ac2",
+      "bytes": 8357
+    },
+    {
       "path": "evidence/receipts/native-sandbox-network-20260920.json",
       "sha256": "e934457a442f01bcf564fa1e37777f35e6a64eff0455c572efb382a6c652dd4b",
       "bytes": 2504
@@ -50093,6 +50173,46 @@
       "bytes": 2139
     },
     {
+      "path": "examples/deepagents-omniroute/README.md",
+      "sha256": "db694d5948539b98a36b62c08b7a641a2b6cc14ad7a9d2ac1829b15e8c29064b",
+      "bytes": 14694
+    },
+    {
+      "path": "examples/deepagents-omniroute/acceptance-plan.json",
+      "sha256": "83814b20a46b57cc3ac1cba7ecf2a1b88a0b25fa889edd31baafcef2b72ac5b1",
+      "bytes": 4716
+    },
+    {
+      "path": "examples/deepagents-omniroute/acceptance_oracle.py",
+      "sha256": "76299b821509f494a7a8ee76df65981e8c47c0618127795974d77c11e249aaa2",
+      "bytes": 5289
+    },
+    {
+      "path": "examples/deepagents-omniroute/requirements.in",
+      "sha256": "841fa9696a90f2b032291c20d9926179c9769f703d0ba0ef9f86868e34ac4bb2",
+      "bytes": 344
+    },
+    {
+      "path": "examples/deepagents-omniroute/requirements.lock",
+      "sha256": "3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11",
+      "bytes": 137489
+    },
+    {
+      "path": "examples/deepagents-omniroute/task-repair-plan.json",
+      "sha256": "43912996dcd78d34136fe8fa7b2cb9a32a3abdea8e8caa70d28d3d0722d5c315",
+      "bytes": 2544
+    },
+    {
+      "path": "examples/deepagents-omniroute/task-trial-plan.json",
+      "sha256": "7d3e4520293674a3d0a1621b6305c5adba401fb3d25b340a665951e420aab737",
+      "bytes": 4722
+    },
+    {
+      "path": "examples/deepagents-omniroute/worker.py",
+      "sha256": "cc6ebc1878b4b10f295e59a18cde7afc152a6dd7bd4faf6e7f5eb64ef2ede8cd",
+      "bytes": 6531
+    },
+    {
       "path": "examples/mcporter.json.example",
       "sha256": "cdb2e40a8b2feab0db591f5421b1ece60548bc572ddb384cd4d073d88c1cc0b4",
       "bytes": 1589
@@ -50166,6 +50286,46 @@
       "path": "examples/omniroute-codex-sdk/worker.py.lock",
       "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
       "bytes": 12840
+    },
+    {
+      "path": "examples/openhands-native-capabilities/README.md",
+      "sha256": "cdce306982ff13e0fadbce906b54f663ae4c9d88e40f8373f3fb59393fcc3805",
+      "bytes": 2948
+    },
+    {
+      "path": "examples/openhands-native-capabilities/acceptance-plan.json",
+      "sha256": "9bcd676c11a4345afdad3c73e84f610ba549ea17dfadde36d7aa0495574537ca",
+      "bytes": 4386
+    },
+    {
+      "path": "examples/openhands-native-capabilities/cli-constraints.txt",
+      "sha256": "a2e53b1491bf33ce020d8216cfea1ff5b0aaadc3ea41d75129df75d8154a1e24",
+      "bytes": 400
+    },
+    {
+      "path": "examples/openhands-native-capabilities/llm-trial-plan.json",
+      "sha256": "c1af0192456f44bfa9f110069b1c5baffd3afbcc4c66c1bd4533af3029503848",
+      "bytes": 3318
+    },
+    {
+      "path": "examples/openhands-native-capabilities/native-config.py",
+      "sha256": "ee062040c3797058ea91e5af7f1e0087bfb562b324094d3ba19d685469d3a193",
+      "bytes": 5880
+    },
+    {
+      "path": "examples/openhands-native-capabilities/native-llm-trial.py",
+      "sha256": "a96927350554a829bade31efe60ca2442943929f25384e7c517fb0d924b1e1b7",
+      "bytes": 5838
+    },
+    {
+      "path": "examples/openhands-native-capabilities/requirements.in",
+      "sha256": "76d6ee6158f3b8c543a0fc6583553ef2b71bd68059817fe1c7b90946e67dce88",
+      "bytes": 647
+    },
+    {
+      "path": "examples/openhands-native-capabilities/requirements.lock",
+      "sha256": "16e1a44ed7ca8b8333f2e2fca963efe544fad581198d1271d021b83b78a4bfe8",
+      "bytes": 296775
     },
     {
       "path": "examples/promptfoo-nemotron-upstream/promptfooconfig.yaml",
