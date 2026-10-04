@@ -1223,7 +1223,7 @@ class DispositionsTests(unittest.TestCase):
                 mock.patch.object(usw, "gh_api", side_effect=AssertionError):
             code, stdout, stderr = watch.run("--check-dispositions")
         self.assertEqual(code, 0, stderr)
-        self.assertIn("valid, 0 rows", stdout)
+        self.assertRegex(stdout, r"valid, \d+ rows")      # the shipped catalog: empty at first, then the reviewed rows
         self.assertFalse(watch.state.exists())
 
     def test_each_rule_violation_is_reported(self):
