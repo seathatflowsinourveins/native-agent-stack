@@ -792,16 +792,16 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
         self.assertNotIn("BASH_DEFAULT_TIMEOUT_MS", settings["env"])
         self.assertEqual(settings["statusLine"]["refreshInterval"], 5)
 
-    def test_the_advisor_is_fable_and_accepted_for_the_main_model(self):
-        # docs/decisions/2026-09-27-model-currency.md. https://code.claude.com/docs/en/settings-reference#advisormodel
+    def test_the_advisor_is_opus_and_accepted_for_the_main_model(self):
+        # docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md. https://code.claude.com/docs/en/settings-reference#advisormodel
         # (fetched 2026-09-27): scope "Any file"; "fable", "opus", "sonnet" or a full model ID; unset turns the advisor
         # off. https://code.claude.com/docs/en/advisor, "Choose an advisor model": an Opus 5.5 main model accepts "Fable,
         # and Opus 5 or later". The advisor needs feature-flag fetching, which DISABLE_GROWTHBOOK, DISABLE_TELEMETRY,
         # DO_NOT_TRACK and CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC turn off (env-vars, "Features that need feature-flag
         # fetching"), and CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 makes Claude Code ignore advisorModel.
         settings = self.settings()
-        self.assertEqual(settings.get("advisorModel"), "fable")
-        self.assertIn(settings["model"], ("opus", "opus[1m]"), "the pairing table accepts Fable for an Opus main model")
+        self.assertEqual(settings.get("advisorModel"), "opus")
+        self.assertIn(settings["model"], ("opus", "opus[1m]"), "the pairing table accepts Opus for an Opus main model")
         for name in ("DISABLE_GROWTHBOOK", "DISABLE_TELEMETRY", "DO_NOT_TRACK", "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
                      "CLAUDE_CODE_DISABLE_ADVISOR_TOOL"):
             with self.subTest(env=name):
