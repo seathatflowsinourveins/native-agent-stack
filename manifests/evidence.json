@@ -16098,6 +16098,11 @@
       "bytes": 21398
     },
     {
+      "path": "docs/decisions/2026-10-03-retire-token-stack-release-review.md",
+      "sha256": "0be1428ff335868f64f2e46b823135d7a9ec3cdb7d9ade1e5c6ef9e7a123e596",
+      "bytes": 23109
+    },
+    {
       "path": "docs/decisions/2026-10-03-sweep-gpt6-route-settlement.md",
       "sha256": "0b643c9cb062e534a0aa7cd6d8205d98cb9b87f95565f0b6ba1857fc2672edcf",
       "bytes": 34261
