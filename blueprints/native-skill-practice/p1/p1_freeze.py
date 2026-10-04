@@ -10,7 +10,9 @@ draft (default) records what exists and lists every missing role. --final refuse
 a pending adversarial insertion, a pack whose current bytes are not the output of its last A2 pass,
 A2 custody files that are not the original results of the recorded passes (item i is pass i, matched
 by the canonical result_sha256 the pass recorded; a missing, extra, duplicate or mismatched original
-is refused), a label packet that is not label_packet(pack) in full (cases, rules, criteria, claim
+is refused, and so are a custody file that is not a JSON A2 result object and a pass whose input or
+result sha256 is missing, null or malformed, each under its own reason), a label packet that is not
+label_packet(pack) in full (cases, rules, criteria, claim
 types and instructions), a label or re-label record outside the packet's label_record contract, an
 unlabelled case, a re-label list that differs from the drawn one, a re-label written less than 24
 hours after its first label, promptfoo test rows that differ from the rows the pack, the labels'
@@ -25,6 +27,7 @@ import argparse
 import functools
 import hashlib
 import json
+import re
 from datetime import timedelta
 from pathlib import Path
 
@@ -125,34 +128,90 @@ def _casepack_module():
     return module
 
 
-def a2_custody_problems(passes: list[dict], originals: list) -> list[str]:
+SHA256_HEX = re.compile(r"[0-9a-f]{64}")
+# A custody file whose bytes are not JSON. The loader keeps it apart from a file that holds JSON null,
+# so each is refused under its own reason.
+NOT_JSON = object()
+JSON_KINDS = {type(None): "JSON null", list: "a JSON array", str: "a JSON string", bool: "a JSON boolean",
+              int: "a JSON number", float: "a JSON number"}
+
+
+def sha256_field_problem(record: dict, field: str) -> str | None:
+    """Why record[field] is not a sha256 as hexdigest writes it (64 lowercase hex characters), or None.
+    A missing or null hash is refused here and never compared: None would equal None."""
+    if field not in record:
+        return f"has no {field}"
+    if record[field] is None:
+        return f"has a null {field}"
+    if not isinstance(record[field], str) or SHA256_HEX.fullmatch(record[field]) is None:
+        return f"has a {field} that is not 64 lowercase hex characters"
+    return None
+
+
+def a2_custody_problems(passes: list, originals: list) -> list[str]:
     """Bind the a2_custody files to the recorded A2 passes. Item i is the original result of pass i: its
     canonical sha256 (p1_casepack.canonical_sha256, the domain apply_a2 records as result_sha256) equals
     that pass's result_sha256, and it names that pass's input bytes and shows every check passed. A
-    missing, extra, duplicate or mismatched original is refused; None stands for a file that is not JSON."""
+    missing, extra, duplicate or mismatched original is refused.
+
+    Before any pair is compared, every recorded pass must be an object whose input_sha256 and
+    result_sha256 are sha256 strings, and every item an A2 result object: the schema apply_a2 requires,
+    an input_sha256 sha256 string and a passed flag for every A2 check. NOT_JSON stands for a file that
+    is not JSON and None for one that holds JSON null. Each malformation is refused under its own reason
+    and never defaulted. Every pair is then compared on each field both sides hold well formed; a pair
+    with a malformed side is already refused by that malformation, so no pair passes unchecked."""
     casepack = _casepack_module()
-    given = [None if item is None else casepack.canonical_sha256(item) for item in originals]
-    recorded = [item.get("result_sha256") for item in passes]
-    problems = []
-    if len(given) < len(recorded):
-        problems.append(f"A2 custody: {len(recorded) - len(given)} recorded pass(es) have no original result")
-    if len(given) > len(recorded):
-        problems.append(f"A2 custody: {len(given) - len(recorded)} original(s) beyond the {len(recorded)} recorded pass(es)")
+    problems, failed = [], set()
+
+    def refuse(position: int, reason: str) -> None:
+        problems.append(f"A2 custody: {reason}")
+        failed.add(position)
+
+    if len(originals) < len(passes):
+        problems.append(f"A2 custody: {len(passes) - len(originals)} recorded pass(es) have no original result")
+    if len(originals) > len(passes):
+        problems.append(f"A2 custody: {len(originals) - len(passes)} original(s) beyond the {len(passes)} recorded pass(es)")
+    for position, record in enumerate(passes, 1):
+        if not isinstance(record, dict):
+            refuse(position, f"recorded pass {position} is not an object")
+            continue
+        for field in ("input_sha256", "result_sha256"):
+            reason = sha256_field_problem(record, field)
+            if reason:
+                refuse(position, f"recorded pass {position} {reason}")
+    for position, item in enumerate(originals, 1):
+        if item is NOT_JSON:
+            refuse(position, f"item {position} is not JSON")
+            continue
+        if not isinstance(item, dict):
+            kind = JSON_KINDS.get(type(item), f"a {type(item).__name__}")
+            refuse(position, f"item {position} is {kind}, not an A2 result object")
+            continue
+        if item.get("schema") != casepack.A2_RESULT_SCHEMA:
+            refuse(position, f"item {position} does not have schema {casepack.A2_RESULT_SCHEMA}")
+        reason = sha256_field_problem(item, "input_sha256")
+        if reason:
+            refuse(position, f"item {position} {reason}")
+        checks = item.get("checks")
+        unpassed = [name for name in casepack.A2_CHECKS if not isinstance(checks, dict)
+                    or not isinstance(checks.get(name), dict) or checks[name].get("passed") is not True]
+        if unpassed:
+            refuse(position, f"item {position} does not show these A2 checks passed: {unpassed}")
+    given = [casepack.canonical_sha256(item) if isinstance(item, dict) else None for item in originals]
     repeated = [index + 1 for index, value in enumerate(given) if value is not None and given.count(value) > 1]
     if repeated:
         problems.append(f"A2 custody: items {repeated} are the same result")
-    mismatched = [index + 1 for index, (value, expected) in enumerate(zip(given, recorded)) if value != expected]
-
-    def names_the_pass(item: dict, record: dict) -> bool:
-        checks = item.get("checks") or {}
-        return (item.get("schema") == casepack.A2_RESULT_SCHEMA and item.get("input_sha256") == record.get("input_sha256")
-                and all((checks.get(name) or {}).get("passed") is True for name in casepack.A2_CHECKS))
-
-    unbound = [index + 1 for index, (item, record) in enumerate(zip(originals, passes))
-               if isinstance(item, dict) and given[index] == record.get("result_sha256") and not names_the_pass(item, record)]
-    if mismatched or unbound:
-        problems.append(f"A2 custody: items {sorted(mismatched + unbound)} are not the original result of the "
-                        "recorded pass at that position")
+    for position, (item, record) in enumerate(zip(originals, passes), 1):
+        if not isinstance(item, dict) or not isinstance(record, dict):
+            continue        # refused above: an item or pass record that is not an object has nothing to compare
+        if sha256_field_problem(record, "result_sha256") is None and given[position - 1] != record["result_sha256"]:
+            refuse(position, f"item {position}'s canonical sha256 is not the result_sha256 of recorded pass {position}")
+        if (sha256_field_problem(record, "input_sha256") is None and sha256_field_problem(item, "input_sha256") is None
+                and item["input_sha256"] != record["input_sha256"]):
+            refuse(position, f"item {position} names other input bytes than the input_sha256 of recorded pass {position}")
+    paired = sorted(position for position in failed if position <= min(len(originals), len(passes)))
+    if paired:
+        problems.append(f"A2 custody: items {paired} are not the original result of the recorded pass at that position")
     return problems
 
 
@@ -217,11 +276,13 @@ def _load_role(spec: dict, role: str, root: Path):
     return data.get("labels", data) if role in ("labels", "relabels") and isinstance(data, dict) else data
 
 
-def _json_or_none(path: Path):
+def _custody_original(path: Path):
+    """A custody file's JSON value, or NOT_JSON when its bytes are not UTF-8 JSON (never None, which is
+    what a file holding JSON null loads as)."""
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (ValueError, UnicodeDecodeError):
-        return None
+        return NOT_JSON
 
 
 def build_manifest(spec: dict, root: Path, final: bool) -> dict:
@@ -238,7 +299,7 @@ def build_manifest(spec: dict, root: Path, final: bool) -> dict:
         pack = _load_role(spec, "case_pack", root)
         rendered = _load_role(spec, "rendered_inputs", root)
         render = compare_render(rendered, _load_role(spec, "render_check", root))
-        originals = [_json_or_none(path) for path in _role_paths(spec, "a2_custody", root)]
+        originals = [_custody_original(path) for path in _role_paths(spec, "a2_custody", root)]
         test_rows = _role_paths(spec, "promptfoo_tests", root)[0].read_bytes().decode("utf-8", "replace")
         problems = final_checks(pack, _load_role(spec, "labels", root), _load_role(spec, "relabels", root),
                                 rendered, render, _load_role(spec, "label_packet", root), originals, test_rows)

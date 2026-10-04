@@ -15,6 +15,7 @@ import random
 import re
 import subprocess
 import tempfile
+import types
 import unittest
 import urllib.error
 from collections import Counter
@@ -684,6 +685,32 @@ def echo_document(pack: dict) -> dict:
     return {"results": {"results": rows}}
 
 
+# p1_freeze.py before the F2 repair. Its sha256 is the one manifests/evidence.json and the draft freeze
+# manifest recorded for p1_freeze.py at that commit, so the bytes have a second witness besides git.
+F2_DEFECT_COMMIT = "4fba3ce362a67a145103d239246f6582ba5e679a"
+F2_DEFECT_FREEZE_SHA256 = "d3c956d53e425c4181b56096e0beada211977e17fe18c35df9aa1761d7abd620"
+REMOVED = object()
+
+
+def freeze_source_at(commit: str) -> bytes | None:
+    """p1_freeze.py byte for byte as `git show <commit>:<path>` prints it; None when this clone does not
+    hold the commit (a shallow checkout, or a clone of main made after the PR branch was deleted)."""
+    try:
+        shown = subprocess.run(["git", "-C", str(ROOT), "show", f"{commit}:blueprints/native-skill-practice/p1/p1_freeze.py"],
+                               capture_output=True, check=False)
+    except FileNotFoundError:
+        return None
+    return shown.stdout if shown.returncode == 0 else None
+
+
+def freeze_module_from(name: str, source: bytes):
+    """Execute source as the p1 directory's p1_freeze.py, so it loads this checkout's p1_casepack.py."""
+    module = types.ModuleType(name)
+    module.__file__ = str(P1 / "p1_freeze.py")
+    exec(compile(source, module.__file__, "exec"), module.__dict__)
+    return module
+
+
 class FreezeTests(unittest.TestCase):
     @staticmethod
     def frozen_inputs() -> dict:
@@ -808,6 +835,132 @@ class FreezeTests(unittest.TestCase):
         # Negative controls: the right files in the wrong order, and the second pass alone.
         self.assertTrue(freeze.a2_custody_problems(pack["a2_passes"], [second, first]))
         self.assertTrue(freeze.a2_custody_problems(pack["a2_passes"], [second]))
+
+    @staticmethod
+    def final_spec(root: Path, inputs: dict, pack: dict, custody: str) -> dict:
+        """A --final spec over files written to root: the consistent inputs, the given case pack and one
+        custody file holding the given text."""
+        def external(name, content):
+            path = root / name
+            path.write_text(content if isinstance(content, str) else json.dumps(content), encoding="utf-8")
+            return [{"external": name, "file": str(path)}]
+
+        (root / "stub.txt").write_text("stub")
+        return {"case_pack": external("pack.json", pack), "label_packet": external("packet.json", inputs["packet"]),
+                "labels": external("labels.json", {"labels": inputs["labels"]}),
+                "relabels": external("relabels.json", inputs["relabels"]),
+                "promptfoo_tests": external("tests.jsonl", inputs["test_rows"]),
+                "rendered_inputs": external("rendered.json", inputs["rendered"]),
+                "render_check": external("render.json", echo_document(inputs["pack"])),
+                "harness": ["stub.txt"], "draw_and_scoring_code": ["stub.txt"],
+                "native_launch_contexts": external("init.json", {}), "arm_l_checkpoint": external("l.json", {}),
+                "a2_custody": external("a2-1.json", custody), "canary": external("canary.json", {})}
+
+    @staticmethod
+    def f2_cases(inputs: dict) -> list[tuple[str, dict, str, list[str], bool]]:
+        """Root's F2 cases on 4fba3ce3 (CODEX-ROOT-PR676-4FB-FINDINGS-20261003), each in an otherwise-valid
+        one-pass ready pack: the case, the pack with its pass record edited, the custody file's text, the
+        reasons the freeze must give, and whether the 4fba3ce3 predicate accepted the case."""
+        result = inputs["a2_originals"][0]
+        recorded = inputs["pack"]["a2_passes"][0]["result_sha256"]
+        no_input = {key: value for key, value in result.items() if key != "input_sha256"}
+        null_item, text_item = "item 1 is JSON null, not an A2 result object", "item 1 is not JSON"
+        not_hex = "recorded pass 1 has a result_sha256 that is not 64 lowercase hex characters"
+
+        def edited(**fields):
+            pack = json.loads(json.dumps(inputs["pack"]))
+            for field, value in fields.items():
+                if value is REMOVED:
+                    del pack["a2_passes"][0][field]
+                else:
+                    pack["a2_passes"][0][field] = value
+            return pack
+
+        return [
+            ("result_sha256 removed, custody file JSON null", edited(result_sha256=REMOVED), "null",
+             ["recorded pass 1 has no result_sha256", null_item], True),
+            ("result_sha256 removed, custody file not JSON", edited(result_sha256=REMOVED), "gitleaks: no leaks found",
+             ["recorded pass 1 has no result_sha256", text_item], True),
+            ("result_sha256 null, custody file JSON null", edited(result_sha256=None), "null",
+             ["recorded pass 1 has a null result_sha256", null_item], True),
+            ("result_sha256 null, custody file not JSON", edited(result_sha256=None), "gitleaks: no leaks found",
+             ["recorded pass 1 has a null result_sha256", text_item], True),
+            ("custody file a JSON array whose canonical sha256 the pass records",
+             edited(result_sha256=casepack.canonical_sha256([result])), json.dumps([result]),
+             ["item 1 is a JSON array, not an A2 result object"], True),
+            ("input_sha256 removed from the pass and from its original",
+             edited(input_sha256=REMOVED, result_sha256=casepack.canonical_sha256(no_input)), json.dumps(no_input),
+             ["recorded pass 1 has no input_sha256", "item 1 has no input_sha256"], True),
+            ("result_sha256 not hex", edited(result_sha256="g" * 64), json.dumps(result), [not_hex], False),
+            ("result_sha256 one character short", edited(result_sha256=recorded[:-1]), json.dumps(result), [not_hex], False),
+            ("custody file whose canonical sha256 is not the recorded one", edited(),
+             json.dumps(dict(result, note="edited")),
+             ["item 1's canonical sha256 is not the result_sha256 of recorded pass 1"], False),
+        ]
+
+    def test_a2_custody_refuses_malformed_hashes_and_custody_files(self):
+        inputs = self.frozen_inputs()
+        for case, pack, custody, reasons, _ in self.f2_cases(inputs):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch).resolve()
+                with self.assertRaises(SystemExit) as stopped:
+                    freeze.build_manifest(self.final_spec(root, inputs, pack, custody), root, final=True)
+                message = str(stopped.exception)
+                for reason in reasons:
+                    self.assertIn(f"A2 custody: {reason}", message)
+                self.assertIn("A2 custody: items [1] are not the original result of the recorded pass at that position",
+                              message)
+        # Negative control: the same files with the pack and the original result as recorded freeze.
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch).resolve()
+            spec = self.final_spec(root, inputs, inputs["pack"], json.dumps(inputs["a2_originals"][0]))
+            self.assertEqual(freeze.build_manifest(spec, root, final=True)["checks"]["problems"], [])
+
+    def test_a2_custody_checks_the_shape_of_every_item_and_pass(self):
+        inputs = self.frozen_inputs()
+        passes, result = inputs["pack"]["a2_passes"], inputs["a2_originals"][0]
+        for item, kind in ((None, "JSON null"), ([], "a JSON array"), ("x", "a JSON string"), (1, "a JSON number"),
+                           (1.5, "a JSON number"), (True, "a JSON boolean")):
+            with self.subTest(item=item):
+                self.assertIn(f"A2 custody: item 1 is {kind}, not an A2 result object",
+                              freeze.a2_custody_problems(passes, [item]))
+        self.assertIn("A2 custody: item 1 is not JSON", freeze.a2_custody_problems(passes, [freeze.NOT_JSON]))
+        self.assertIn("A2 custody: recorded pass 1 is not an object", freeze.a2_custody_problems(["x"], [result]))
+        # Schema and checks are validated on every pair, also when the pass records the item's own hash.
+        for change, reason in (({"schema": "jev-p1-a2-result/0"}, f"item 1 does not have schema {casepack.A2_RESULT_SCHEMA}"),
+                               ({"checks": []}, "item 1 does not show these A2 checks passed"),
+                               ({"checks": dict(result["checks"], canary=True)},
+                                "item 1 does not show these A2 checks passed: ['canary']")):
+            item = dict(result, **change)
+            forged = [dict(passes[0], result_sha256=casepack.canonical_sha256(item))]
+            with self.subTest(change=change):
+                found = freeze.a2_custody_problems(forged, [item])
+                self.assertTrue(any(problem.startswith(f"A2 custody: {reason}") for problem in found), found)
+        # Negative control: the recorded pass and its original result have no problem.
+        self.assertEqual(freeze.a2_custody_problems(passes, [result]), [])
+
+    def test_negative_control_the_4fba3ce3_predicate_accepts_the_f2_cases(self):
+        """The F2 cases against p1_freeze.py as commit 4fba3ce3 holds it, byte for byte from git show: its
+        full --final gate freezes every case marked accepted, and refuses the others only by the generic
+        mismatch, without the reason the repair gives. Skipped (untested) where the clone lacks the commit."""
+        source = freeze_source_at(F2_DEFECT_COMMIT)
+        if source is None:
+            self.skipTest(f"this clone does not hold commit {F2_DEFECT_COMMIT}")
+        self.assertEqual(hashlib.sha256(source).hexdigest(), F2_DEFECT_FREEZE_SHA256)
+        before = freeze_module_from("jev_p1_freeze_4fba3ce3", source)
+        inputs = self.frozen_inputs()
+        for case, pack, custody, reasons, accepted in self.f2_cases(inputs):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch).resolve()
+                spec = self.final_spec(root, inputs, pack, custody)
+                if accepted:
+                    manifest = before.build_manifest(spec, root, final=True)
+                    self.assertEqual((manifest["status"], manifest["checks"]["problems"]), ("frozen", []))
+                    continue
+                with self.assertRaises(SystemExit) as stopped:
+                    before.build_manifest(spec, root, final=True)
+                self.assertIn("are not the original result of the recorded pass at that position", str(stopped.exception))
+                self.assertFalse([reason for reason in reasons if reason in str(stopped.exception)])
 
     def test_final_manifest_end_to_end(self):
         inputs = self.frozen_inputs()

@@ -107,8 +107,8 @@
    },
    {
     "path": "blueprints/native-skill-practice/p1/p1_freeze.py",
-    "sha256": "d3c956d53e425c4181b56096e0beada211977e17fe18c35df9aa1761d7abd620",
-    "bytes": 17241
+    "sha256": "6e2e2e70387b655e7992f95b3dde0cd7bef3345c30e13e9f7376a78750e79ed6",
+    "bytes": 20783
    },
    {
     "path": "blueprints/native-skill-practice/p1/requirements-scoring.in",

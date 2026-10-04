@@ -121,11 +121,13 @@ pass (input, output and result sha256, and the share of cases changed) and only 
 `p1_freeze.py --final` refuses a pack whose bytes are not the output of its last A2 pass; A2 custody
 files that are not, in pass order, the original results of the recorded passes (canonical
 `result_sha256`, the pass's input bytes and every check passed; a missing, extra, duplicate or
-mismatched original is refused); a label packet that is not `label_packet(pack)` in full (cases,
-rules, criteria, claim types and instructions); a label or re-label record outside the packet's
-`label_record` contract (exactly `case_id`, `label`, `claim_type` and `labelled_at` as a UTC
-timestamp); and test rows that are not the bytes `tests` writes from the pack, the labels' native
-repeats and three local repeats.
+mismatched original is refused, and so are a custody file that is not a JSON A2 result object and a
+pass whose `input_sha256` or `result_sha256` is missing, null or not 64 lowercase hex characters,
+each under its own reason before any pair is compared); a label packet that is not
+`label_packet(pack)` in full (cases, rules, criteria, claim types and instructions); a label or
+re-label record outside the packet's `label_record` contract (exactly `case_id`, `label`,
+`claim_type` and `labelled_at` as a UTC timestamp); and test rows that are not the bytes `tests`
+writes from the pack, the labels' native repeats and three local repeats.
 
 ## Scoring
 
