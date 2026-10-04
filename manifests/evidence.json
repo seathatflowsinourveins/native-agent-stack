@@ -4534,8 +4534,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "f9b362b7caec258e13fc06d42894ea8a7a8f9dcc5dd6405a130ff41c7627604d",
-      "bytes": 34163
+      "sha256": "62ec522f64fc9fa782d11b44eb429b408bd7deadb122eff98f92336e9223f583",
+      "bytes": 36668
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -4619,8 +4619,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "550e733dd7c47ea1dd3662c12bf6a56cff44d62578e24ac8f23bbb6851c046a6",
-      "bytes": 16325
+      "sha256": "4a30d0449f0b1fc041647121f4a05d1df209c53eb1f2fd51999843f953a47145",
+      "bytes": 17078
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -16144,6 +16144,11 @@
       "bytes": 4885
     },
     {
+      "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
+      "sha256": "f09a48bb6e44a66663badc782122aa496a146f3481e5d5fc80a87aaada758c28",
+      "bytes": 122850
+    },
+    {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
       "sha256": "de41496b2958fd1270ff4f2936f75b6e9606e973877b4756e8b7acc71595715a",
       "bytes": 6141
@@ -16232,6 +16237,11 @@
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
       "sha256": "4efed6abf346d5ae4a9742ba8a527625d5d95f252f58611c2de9e98dc486e174",
       "bytes": 37516
+    },
+    {
+      "path": "docs/decisions/2026-10-04-codex-dated-holds.md",
+      "sha256": "77cd924e5e347929fe38f7f19d4ff25d179da65981c17fca03743d6f14208e68",
+      "bytes": 7862
     },
     {
       "path": "docs/direct-results.md",
@@ -51270,8 +51280,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "5dce41e9a72a965566c24b6c47ae0d887f47f8655763c6c55eb01437efcffad0",
-      "bytes": 100811
+      "sha256": "44fb32b1dc75858d673f87656f4a039520e6e351de8ab3e6ccb5058dc8c343ee",
+      "bytes": 101157
     },
     {
       "path": "observability/README.md",
@@ -51600,8 +51610,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "5017a00d36990b5e576fa17a5761e2ea2c6d879ea72252bb068baf7542b0447d",
-      "bytes": 89443
+      "sha256": "59dec1e9c568ae42a668d584b07bb343df90bf8c53a159f1e8c85760a01243a6",
+      "bytes": 94985
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -52040,8 +52050,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "e0db3aff5a7fcde5c25f2dd06f0a2bcb70fbd2339ac6eab2554a8b897ca31cc0",
-      "bytes": 146852
+      "sha256": "f19fdfcf543e4b32012db48c4d37d3c3433604698b83a9f618f954cc10d82bbb",
+      "bytes": 157034
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -52185,8 +52195,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "7422ae03d5d286ac9cd17997592436bab20ce04a75327de9dcca23507094e3d4",
-      "bytes": 186607
+      "sha256": "9ebe2cb3ae7a1ae9c404790567b5ada507f5f968f7db8d17b5077fe5235cf241",
+      "bytes": 189921
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -52629,6 +52639,11 @@
       "bytes": 7047
     },
     {
+      "path": "tests/test_pin_holds.py",
+      "sha256": "bad2ec0c5eabc07c180990cbe48bf6e54ff06335bc6aa3d33d6dfdeade60dce5",
+      "bytes": 12791
+    },
+    {
       "path": "tests/test_pit_availability.py",
       "sha256": "4f9cb899edcd84950a71014d4efe588a4d9d70e5ee74f91ecf0c3a40f860c40b",
       "bytes": 20615
@@ -52930,8 +52945,8 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "c35db4f1537ef038042750a10f72ddb14a87f7af2d658854f5dbd5b7a0041683",
-      "bytes": 91000
+      "sha256": "ed9bd6544f9c18ae318c224b8c8541d49f7dcd399fbbe371bacc4a458982b2d7",
+      "bytes": 92072
     },
     {
       "path": "tools/adoption/codex_roles.py",
