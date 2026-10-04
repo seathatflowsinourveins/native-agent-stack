@@ -4101,6 +4101,53 @@
         "IET applies the same coefficients to every model: input 1, cache read 0.1, five-minute and unclassified cache writes 1.25, one-hour cache writes 2, and output 5, with thinking already in output. There is no model-specific base-price multiplier. Advisor aggregates lack cache-write duration splits and weight all cache writes at 1.25. Thus IET model shares and window ratios are relative-index measures, not dollar shares or actual spend ratios; Fable dollars from ccusage remain separate. Historical Fable usage precedes the new Opus advisor decision."
       ],
       "path": "evidence/receipts/claude-spend-window-20261004.json"
+    },
+    {
+      "id": "rtk-051-qualification-20261004",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "rtk"
+      ],
+      "claim": "The retained NativeStack WSL2 run on 2026-10-04 installed rtk 0.51.0 from the checksummed Linux release archive and returned rtk 0.51.0 with exit 0. rtk verify returned 151/151 inline self-tests with exit 0; 24 hook payloads matched 0.50.0 output and exits (16 rewritten, 0 differing), and 26 permission-deny hook decisions matched with no auto-allows. Direct git/proxy calls succeeded and the existing tracking database was read and later updated. This receipt republishes bounded sanitized facts from the historical host records; it is not a new host or model run.",
+      "limitations": [
+        "No macOS execution; the Darwin archive is artifact-checked only. No upstream cargo test suite was run in these records; rtk verify is the native inline self-test, and the 115-test parser run (14 skipped) is local integration.",
+        "rtk gain, session and cc-economics are tool self-reports, not provider counts, invoice data or causal savings. Cumulative snapshots are not added together.",
+        "No fresh live-client acceptance or rtk init re-run was recorded. The --shell compatibility review is source-based; the host hook comparison covered only its 24 payloads and 26 deny entries. Existing exact-output exceptions and dated replay gates remain scoped to their original evidence.",
+        "gh attestation verification returned HTTP 404 (exit 1); no signature verification or source rebuild was recorded. Later upstream fixes and issue #4404 are follow-ups, not included in this stable pin.",
+        "NativeStack runs AgentsView 0.44.0 ahead of the repository pin. The 2026-09-27 qualification hold stands: synthetic_ccusage_parity failed, fresh_four_native_lanes is blocked, and the v0.44.0 MCP reported zero Codex counters. The recorded recipe rewire and qualification must pass in a separate follow-up before a repository pin move.",
+        "RTK replay is unavailable at 0.51.0: vendored child-usage.mjs and the test_token_measurement.py/test_skill_usage.py replay gates require exactly rtk 0.50.0. Skipped replay tests are not coverage; the kernel and gates remain unchanged.",
+        "The repair-round placeholder guard probes allowed the --shell form rtk test --shell sh 'cat ~/.ssh/config' (exit 0), while rtk proxy cat ~/.ssh/config was blocked (exit 2). These strings were guard input only; no credential reader was executed. This finding belongs to PR #685; the guard is unchanged in this pin move."
+      ],
+      "path": "evidence/receipts/rtk-051-qualification-20261004.json"
+    },
+    {
+      "id": "mcporter-0142-qualification-20261004",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "mcporter"
+      ],
+      "claim": "The retained NativeStack WSL2 run on 2026-10-04 installed mcporter 0.14.2 and returned version 0.14.2 with exit 0. Registry provenance matched openclaw/mcporter release.yml at v0.14.2, and a scratch npm audit verified 43 registry signatures and 15 attestations. Ad-hoc stdio jcodemunch session statistics and context-mode ctx_stats calls returned exit 0. Configured-daemon calls failed on a stale rendezvous and were not recovered. This receipt republishes sanitized historical host observations, not a new host execution.",
+      "limitations": [
+        "No macOS execution and no upstream test suite run. The npm tarball hash is artifact evidence and does not pin the transitive dependency tree or rolldown platform binding.",
+        "Configured-server list/call failures are retained. The stale daemon was not recovered and keep-alive transport acceptance is not claimed; dist/daemon/client.js was recorded byte-identical across 0.14.1 and 0.14.2.",
+        "npm audit signatures --global failed with EAUDITGLOBAL (exit 1); only the later scratch-project audit succeeded. The ad-hoc MCP statistics are self-reports, not provider counts or savings.",
+        "The Mac keeps its separately qualified MCPorter 0.13.13 pin until a Mac qualifies 0.14.2. The platform-independent tarball artifact check is not Mac execution or Mac qualification."
+      ],
+      "path": "evidence/receipts/mcporter-0142-qualification-20261004.json"
+    },
+    {
+      "id": "claude-hud-0100-qualification-20261004",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-hud"
+      ],
+      "claim": "The retained NativeStack WSL2 run on 2026-10-04 installed claude-hud 0.10.0 from tag v0.10.0 through native Claude plugin commands after an initial marketplace-source mismatch failed. Native marketplace remove/add and plugin install succeeded; plugin list showed version 0.10.0 enabled at user scope. Direct and configured statusline commands rendered a sample payload with exit 0. This is historical plugin and sample-render evidence, not a new interactive terminal session or model run.",
+      "limitations": [
+        "No macOS execution and no upstream test suite run. There are no release assets for this tag; the supported installation remains a native Claude Code plugin, not a tarball bootstrap kind.",
+        "First marketplace add failed with exit 1 due to the old source entry; native remove/add/install recovered it. Sample statusline rendering does not establish a fresh interactive Claude session or provider usage.",
+        "The host note reports a five-second refresh effect, but these retained records do not include a new interactive terminal observation. Plugin details reported approximately zero always-on tokens; this is a native projection, not measured provider counts."
+      ],
+      "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json"
     }
   ],
   "files": [
@@ -4371,37 +4418,37 @@
     },
     {
       "path": "adoption/agents/codex/SHA256SUMS",
-      "sha256": "6c0f818d9eadc0d8fa361c2012735f4159404fc0cafcf6d266032bb556b6203a",
+      "sha256": "b07d7697f01ed1b1472b727af2d6e77b20a9b2846410b655cd6354a2adca856c",
       "bytes": 174
     },
     {
       "path": "adoption/agents/codex/stack-researcher.toml",
-      "sha256": "ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00",
+      "sha256": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
       "bytes": 7223
     },
     {
       "path": "adoption/agents/codex/stack-verifier.toml",
-      "sha256": "281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd",
-      "bytes": 6349
+      "sha256": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
+      "bytes": 6685
     },
     {
       "path": "adoption/agents/codex/workers/SHA256SUMS",
-      "sha256": "dad872bde4e5653a2babf6c0e5fd1e5f9e225b80a78f5100c6e9c6cdb06280ae",
+      "sha256": "e5d75d7e7e6a68ac6460e4b447221c2fc254feb532f570661d7d95b1ba3064d2",
       "bytes": 275
     },
     {
       "path": "adoption/agents/codex/workers/evidence-reviewer.toml",
-      "sha256": "7bf4441da44d1539cabf1ce6a20459db015107a531a55db551e21e2586cacdd1",
+      "sha256": "91ed272d63ff5a7271be87550488ad1bff99bde09bd1a699332fdd3f41b06a6c",
       "bytes": 6148
     },
     {
       "path": "adoption/agents/codex/workers/isolated-builder.toml",
-      "sha256": "f6e8876d06706b2ee513bf0212df1ad37adea6130ecaab699df50f63ff4db574",
+      "sha256": "7c46a4cd994764101f2864e590fe71c8dfa8e3b78242f1a793eaac1d5af091d9",
       "bytes": 6656
     },
     {
       "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml",
-      "sha256": "0a406ec9687b23cefe2b351a4caf6047201df2f4c18b122f994a372800f2de9f",
+      "sha256": "5a2a28e12b6fa1a894fd45afa572f54bd7546408c40b2446c417d493d622ebae",
       "bytes": 6250
     },
     {
@@ -4416,8 +4463,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "939e23df38be742d3882c2214c9d995460875380fb69e09d272f2168b32c78d0",
-      "bytes": 63848
+      "sha256": "4ed3605282cd0f6f407b35a0b8a017863db4e8476d1d9503b302ced68abb7292",
+      "bytes": 64541
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4561,13 +4608,13 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "62ec522f64fc9fa782d11b44eb429b408bd7deadb122eff98f92336e9223f583",
-      "bytes": 36668
+      "sha256": "804eba0e086670c75e6b2f3725734477914318987c99fb90195680188be337c9",
+      "bytes": 37335
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "1d693b66002e8931af2370fc9da919f667bfbf3a1a22ddd54bdd2c1d81cf19e4",
-      "bytes": 43700
+      "sha256": "dc9162a3c70a1b0fcb31749c969e743cf72833db06d068b5c28c6ca1744dd218",
+      "bytes": 43485
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -4581,8 +4628,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "1b5e869a66be1647c8e38134e1b25e2822adec89e08c39a1ed8d738724306c5d",
-      "bytes": 64773
+      "sha256": "0ce2e9b995ada2a316a4a8abdd94f161297e8101f7ff099491c27520ba355b13",
+      "bytes": 65341
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -4636,12 +4683,12 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "0c5b31d7e4239b0f8ac111045e3fa924f50c6b1b028988f22565c3a308176a99",
-      "bytes": 13002
+      "sha256": "5e27edf9147dfb60cc7311d4fe2e76312a8fd602021c60936023a9ce2273edeb",
+      "bytes": 13003
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "6de588ac1fb849452370f9cd8891d5ff70e179505fda6f1355461c090184522d",
+      "sha256": "bc2ba57618b771c63fae870fbc8906a1f247d421d7645960d7e0c1992b7df459",
       "bytes": 8180
     },
     {
@@ -4686,7 +4733,7 @@
     },
     {
       "path": "adoption/templates/systemd/token-report-refresh.service",
-      "sha256": "47e88b71600dcb50f05f22ec70361a5fdb8338d207165008760715656502c0f8",
+      "sha256": "580f7e0d4e538d6013342dc943922ab3988b7567be34fe14b01faa97d2733cae",
       "bytes": 9260
     },
     {
@@ -10087,8 +10134,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "2fb075a1da7547e26d910e0657df0a679bcdad3db93dc411e0e88931b00ca20e",
-      "bytes": 483567
+      "sha256": "9eece716982d44ddc5ff844003680c9b04f45fbe7b21d35f18188ee6a70de15c",
+      "bytes": 484284
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15437,7 +15484,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "0d3d76860873ca27160bff8254a8d901b18ce98b69fb28f1297f801f6b8237c3",
+      "sha256": "d1f0f17e142e8bfca223006f72cb16fce65456609248a32b5cf7958ba9f54dd2",
       "bytes": 287704
     },
     {
@@ -15447,8 +15494,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "c958ec9e5eea90cf1b6437f2b84c51649995766f100fe606e4df0e12777aef72",
-      "bytes": 252353
+      "sha256": "975b5a515271c24b1a158594568a76f1b6d65db6eb920f561db77e056e20b8b1",
+      "bytes": 253392
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -16192,8 +16239,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "643d9ce4a9d18c88d1d3aa8308dcbdb4b03a6adeaa9ab08d8f94c833e5073e9c",
-      "bytes": 123047
+      "sha256": "ac6d9270b9af2e01cfea6c323996eafaa2cf4f77c184e29cacb72a8806fd1a72",
+      "bytes": 128176
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -16382,7 +16429,7 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "5a20461ffdd76482f30e8beb0f5ea670ccc53dc656931c5de91ec2dd2c80cea8",
+      "sha256": "d86649c5c4f7fe5686d588586588ad20f6b84f95b0b109cca510f82c5d0b40c4",
       "bytes": 39778
     },
     {
@@ -16432,8 +16479,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "2cdbf2b0b2ddccc6914ef3a1654e6f244c9c823f2d47d1cfce40454da6535aae",
-      "bytes": 175758
+      "sha256": "e404039f0ff6e51a62d88d11e00271b435569969b457e51a3b33762cff357927",
+      "bytes": 176430
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16537,8 +16584,8 @@
     },
     {
       "path": "docs/native-token-ci.md",
-      "sha256": "0901344256a68aad4800bef7a1b81a90505a7fea092c84c0842e0127364de35c",
-      "bytes": 10695
+      "sha256": "00d27f25f98cc2b906bff8f8887d28efe0b268a10c0d0b8e377f7aeb3313787c",
+      "bytes": 11644
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -16552,7 +16599,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "6a427fd1526902fbc105e06e70d3dd632db7ec85e0dc0fb818f6b49894246cba",
+      "sha256": "feacb3a295970f1269ea2004127e5dd11a4f43c9e2fb29166e501346205091af",
       "bytes": 18483
     },
     {
@@ -16662,8 +16709,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "b43af443e3ec7dd81efe16f7adc6ead8fe99a4748bc59a541f8ca8696799b80e",
-      "bytes": 587560
+      "sha256": "c701409aa29644941e107e1102c1f0cc765509553f93c93872f27bf661cdde94",
+      "bytes": 591301
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -50131,6 +50178,11 @@
       "bytes": 20645
     },
     {
+      "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json",
+      "sha256": "b0c9e1d7c58e339dc2906e6a977ec04e6c1a808e826f9422407449ab34dd4f09",
+      "bytes": 7294
+    },
+    {
       "path": "evidence/receipts/claude-max-default-effort-20260929.json",
       "sha256": "d6b3ee54f8620e28b029fe0a45f4139a57b5ae03a49c3620121ba420e49bac12",
       "bytes": 66356
@@ -50364,6 +50416,11 @@
       "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
       "sha256": "5379b1e326d99eeb09a72b88fa447c6020e76211b3d918ac96d8daa09241ce32",
       "bytes": 15000
+    },
+    {
+      "path": "evidence/receipts/mcporter-0142-qualification-20261004.json",
+      "sha256": "9399c393875decb817d49a1ed59e1629ff445070453c2a2ba819e98d17a24cd1",
+      "bytes": 9169
     },
     {
       "path": "evidence/receipts/memory-landscape-20260921.json",
@@ -50699,6 +50756,11 @@
       "path": "evidence/receipts/rtk-050-qualification-20260925.json",
       "sha256": "9de293b6df651c53d4792b72901df4f234bec31983183a4e722d9dcea8529879",
       "bytes": 32488
+    },
+    {
+      "path": "evidence/receipts/rtk-051-qualification-20261004.json",
+      "sha256": "cc8755ce20c23c94f8a1a0101002d4eae28be4a1161f05f11c898f643714f519",
+      "bytes": 20715
     },
     {
       "path": "evidence/receipts/runtime-sdk-20261003.json",
@@ -51047,33 +51109,33 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "38c67deeb7539d7e941117405b4bd9ed80b08686c96684aa44d00401b38011f2",
-      "bytes": 23679
+      "sha256": "071881280df5d12a7826ec4e1c162529f8f037027c45b01cfc9ed37a847c2ee3",
+      "bytes": 24461
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
-      "sha256": "dd61c8594f0ebd1e08294d7ae1d1a358064bcc4fdf40c412f749d1db92be8290",
+      "sha256": "b1f528c65c6f6004b2371e4dd4caf92fb19c0d7d6dbef782ea38fd6003b6a122",
       "bytes": 3127
     },
     {
       "path": "examples/codex-native/agents/isolated-builder.toml",
-      "sha256": "ba9a335a752931358cf44b3a56cc18f980faea5c04630ece6745c94aafeb1424",
+      "sha256": "548b1b6aed15f8947d9441259678ebae5ac0f34c0113a27ce76c146821c2dee4",
       "bytes": 3183
     },
     {
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
-      "sha256": "2c471a1d71165c46157aa75c0760a097a5adf057c11a73080c30baa92c5b02d0",
+      "sha256": "74e43905022e58fb6a2c3ce65f5e43212573f2e2dcd5026bf0dea41d14b1b1b8",
       "bytes": 4786
     },
     {
       "path": "examples/codex-native/agents/stack-researcher.toml",
-      "sha256": "ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00",
+      "sha256": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
       "bytes": 7223
     },
     {
       "path": "examples/codex-native/agents/stack-verifier.toml",
-      "sha256": "281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd",
-      "bytes": 6349
+      "sha256": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
+      "bytes": 6685
     },
     {
       "path": "examples/codex-native/config.agents.toml.example",
@@ -51352,8 +51414,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "44fb32b1dc75858d673f87656f4a039520e6e351de8ab3e6ccb5058dc8c343ee",
-      "bytes": 101157
+      "sha256": "bcbc611c905081a00ca6762d8fad0e478841b0e101a9adc4ce4d09450710c943",
+      "bytes": 101523
     },
     {
       "path": "observability/README.md",
@@ -51637,8 +51699,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "60d6fa573328004fda6bb761f31b7b408a1aaa32c9912b8d688280dc6104ae06",
-      "bytes": 127286
+      "sha256": "5ce6c88fac8855b5c8138f6fa553073580f990ea3dd853a17b760a41e60ca9fa",
+      "bytes": 128045
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -51762,8 +51824,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "a04bed6a106b51e2740ec5d4a49e328fbac2ed8a432ca8378d5d1339c9d9f4c6",
-      "bytes": 115098
+      "sha256": "a5dce8ae180876bd6f676464fbfbda2bf60e479b1b865ca801c592d96e427e81",
+      "bytes": 115304
     },
     {
       "path": "scripts/new_wsl_profile.py",
@@ -52122,8 +52184,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "98833aa56e9eef402f86c52db778b9636c4b01e0df12f8e2e28f22ad98895b71",
-      "bytes": 230571
+      "sha256": "2d1f03c09fc7697a7ed05280dd0b47709d798d97fdfa5435daa29ebcd0631ae1",
+      "bytes": 230983
     },
     {
       "path": "tests/test_adoption_bootstrap_parity.py",
@@ -52137,8 +52199,8 @@
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",
-      "sha256": "ad1cde3c41739de6fc54af2eee6670ff42c7654628731fd150b3f83d5740a1f1",
-      "bytes": 52212
+      "sha256": "6621649f533fb9b1d62e902d3953447bd43ec6bb26ee3e1f35e693023200fb06",
+      "bytes": 52213
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
@@ -52287,8 +52349,8 @@
     },
     {
       "path": "tests/test_codex_agents.py",
-      "sha256": "93adf29c47aebb893989648c1c6bd85a6e27c34eb68dc7071ef2bcb1a91c96bc",
-      "bytes": 39845
+      "sha256": "bbeb41fee103f03db2cc3f2f9ca22a182b53b4304997297b8ff1c16cb26b7d76",
+      "bytes": 39933
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -52297,7 +52359,7 @@
     },
     {
       "path": "tests/test_codex_roles.py",
-      "sha256": "98f8071ed61b3a78e584f01bece20511b08446ac753984ce41896d5fcdcd4000",
+      "sha256": "0cbc0a490d3e42223cb4442d53196bc5c6e9447c1180143f3c581b1b0c20fb03",
       "bytes": 33199
     },
     {
@@ -52642,8 +52704,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "e69ae65b5ab65b093805df7c20b2d3e01d4f28c8bfa2a3ccaa0d9db132fd443e",
-      "bytes": 108145
+      "sha256": "ff3152a8520417b0a7e8930401b1b0a2831c6545f5d64dd119597522c29db374",
+      "bytes": 108663
     },
     {
       "path": "tests/test_native_worker_fixture.py",
@@ -53597,7 +53659,7 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "d1f538abf502fc3575991144ea15f72fc93eae0fd67393fb5edc8be007f28d87",
+      "sha256": "17e56072c6b5568af421dd67b7dfb4db51906d11511e950448f611d58ba73808",
       "bytes": 25833
     },
     {

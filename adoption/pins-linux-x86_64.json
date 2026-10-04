@@ -2,7 +2,7 @@
   "schema_version": 1,
   "reviewed_at": "2026-09-22",
   "platform": "linux-x86_64",
-  "source": "Ported from agent-lab .devcontainer/bootstrap-linux.sh (node, uv, gh, codex, claude) plus fresh 2026-09-22 fetches for qmd, mcporter, rtk, ai-memory, context-mode. Each archive was downloaded into a disposable worktree temp directory and hashed with sha256sum; npm entries were additionally cross-checked against `npm view <pkg> dist.integrity` (sha512, base64) computed with `openssl dgst -sha512 -binary | base64` over the same downloaded tarball -- all five matched exactly.",
+  "source": "Ported from agent-lab .devcontainer/bootstrap-linux.sh (node, uv, gh, codex, claude) plus fresh 2026-09-22 fetches for qmd, mcporter, rtk, ai-memory, context-mode. Each archive was downloaded into a disposable worktree temp directory and hashed with sha256sum; npm entries were additionally cross-checked against `npm view <pkg> dist.integrity` (sha512, base64) computed with `openssl dgst -sha512 -binary | base64` over the same downloaded tarball -- all five matched exactly. 2026-10-04 bounded token pin move: RTK 0.51.0 and mcporter 0.14.2 follow their bounded host receipts; earlier paragraphs describe dated checks. NativeStack WSL2 host execution is distinct from new-host acceptance. claude-hud 0.10.0 has no release asset and remains a native Claude plugin, installed from tag v0.10.0 through the settings template and recipe rather than an unsupported bootstrap pin kind.",
   "tools": [
     {
       "id": "node",
@@ -136,18 +136,20 @@
     },
     {
       "id": "rtk",
-      "version": "0.50.0",
+      "version": "0.51.0",
       "kind": "tarball",
-      "url": "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz",
-      "sha256": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
-      "install_note": "Verified against the v0.50.0 release's checksums.txt fetched 2026-09-25 (`sha256sum --check --strict`: OK; the checksums.txt sha256 4c7116898ae812960dfa0de3b3acc5406a0da49209f0ad7bed4d4ed8c4785048 equals the GitHub API asset digest), matching recipes/README.md's rtk 0.50.0 row; qualified against 0.49.0 and switched on nativestack-5975wx-20260925 (evidence/receipts/rtk-050-qualification-20260925.json). The bootstrap installs the binary only: a host that runs the Claude hook also needs the ~/.config/rtk/config.toml exclude_commands in recipes/README.md, or 0.50.0's `git show <rev>:<path> | tail` blob window is live. 2026-09-26: that recipe's exclusions grew to four entries (#318), because the 2026-09-25 `^git show [^ ]*:` missed global-option forms such as `git -C . show HEAD:x` and rtk's `git branch -a` compaction misreports branches; the bootstrap reminder also asks the installed `rtk hook check` (#314).",
+      "url": "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz",
+      "sha256": "5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5",
+      "install_note": "Official rtk-ai/rtk v0.51.0 at e001f773f80b22b7dc4c7a79521b30e35aaef026; the existing single-binary tarball installer applies. NativeStack WSL2 installed and verified this Linux asset on 2026-10-04; this is historical host execution, not acceptance for another host. BREAKING: scripts relying on implicit shell expansion in executable positional arguments must use --shell, for example rtk test --shell sh 'cargo test && cargo clippy'. Direct argv, rtk proxy and hook-check inspection strings remain direct calls. For the Claude hook, keep the five-entry [hooks] exclude_commands value from recipes/README.md#native-context-mode-and-hooks in ~/.config/rtk/config.toml (or the absolute XDG_CONFIG_HOME equivalent). Replace the existing key rather than adding duplicate TOML tables. Bootstrap prints a reminder and does not write this configuration. rtk init was not re-run in the host upgrade. evidence/receipts/rtk-051-qualification-20261004.json",
       "version_probe": {
         "method": "exec",
         "command": "rtk",
         "args": [
           "--version"
         ]
-      }
+      },
+      "checksum_source": "publisher_checksum_file",
+      "checksum_ref": "rtk-ai/rtk v0.51.0 checksums.txt, rtk-x86_64-unknown-linux-musl.tar.gz; publisher SHA-256 matches. See evidence/receipts/rtk-051-qualification-20261004.json data.artifact_checks."
     },
     {
       "id": "ai-memory",
@@ -166,18 +168,20 @@
     },
     {
       "id": "mcporter",
-      "version": "0.14.1",
+      "version": "0.14.2",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz",
-      "sha256": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
-      "install_note": "npm dist.integrity sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ== matched, and the sha256 above equals the GitHub release v0.14.1 asset digest and its checksums.txt (checked 2026-09-25); `npm audit signatures` verified the registry signatures and mcporter's SLSA provenance (release.yml at refs/tags/v0.14.1, commit 93e0916cafe2d624b94271e31b75ca681a016514). `npm install --global --prefix tools/mcporter-0.14.1 mcporter@0.14.1`, matching recipes/README.md. Requires Node >=24, and `ps` on the PATH of whatever launches the mcporter daemon: 0.14.x runs `ps` from PATH (0.13.13 ran /bin/ps), and without it the daemon cannot connect keep-alive servers and `mcporter daemon stop` refuses. Qualified against 0.13.13 and switched on nativestack-5975wx-20260925 (evidence/receipts/mcporter-0141-qualification-20260925.json); that is one host's state, not evidence about any other Linux host.",
+      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.2.tgz",
+      "sha256": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b",
+      "install_note": "npm install --global --prefix tools/mcporter-0.14.2 mcporter@0.14.2; Node >=24 and ps on the daemon launch PATH are required. NativeStack WSL2 returned version 0.14.2 and two successful ad-hoc stdio calls on 2026-10-04. The host configured-daemon calls failed on a stale rendezvous; ad-hoc --stdio calls succeeded. No daemon recovery was attempted. evidence/receipts/mcporter-0142-qualification-20261004.json",
       "version_probe": {
         "method": "exec",
         "command": "mcporter",
         "args": [
           "--version"
         ]
-      }
+      },
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "Fresh mcporter@0.14.2 registry tarball (3,585,823 bytes) SHA-256 was computed on 2026-10-04; SHA-512 matches dist.integrity sha512-3ajjKzPLe/39hN582XqMuOw3S9vHQfLpSBq72zVakT03xso3GDXHcht/eVLu/l2MDqulIOtLevnTKreUxymHJQ== and SHA-1 matches dist.shasum ee7d91e7362e7dc5b44b5fcc5cfdea7cfaedb1fd. SLSA provenance attestation is present. See evidence/receipts/mcporter-0142-qualification-20261004.json data.artifact_checks."
     },
     {
       "id": "context-hub",
