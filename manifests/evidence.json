@@ -15534,8 +15534,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "f454ef0acbd533a4fff5b3bd780e98d9b10243eed396184911894721b011c3bb",
-      "bytes": 18333
+      "sha256": "2bd80b8c4b9fe96f1cf42356f3bad3e169f38926c85462330475335c255ea215",
+      "bytes": 24730
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -15719,8 +15719,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "bd069ef61bfa882b8a72fac124017f2012ea83707e0b8def722329632e738f2d",
-      "bytes": 70415
+      "sha256": "d2a2dee3252ffa1ffd37a9c03315ac493f0ad590df98821de64cf7c394864199",
+      "bytes": 72971
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -16011,6 +16011,11 @@
       "path": "docs/decisions/2026-09-25-codex-mcp-scope.md",
       "sha256": "f509b770de5cc91b50952356d04faefff91fe01d9223e7a5ae19ff5785630fd2",
       "bytes": 32507
+    },
+    {
+      "path": "docs/decisions/2026-09-25-live-go-authorship-control.md",
+      "sha256": "6aa74ccf8d79a7802ba1d603765aff2958f393c9243be18309d90881818db5f5",
+      "bytes": 11864
     },
     {
       "path": "docs/decisions/2026-09-25-longmemeval-frozen-npm-lock.md",
@@ -51834,8 +51839,8 @@
     },
     {
       "path": "scripts/trading_gates.py",
-      "sha256": "06aadfbca9ee50371aac6e620fcda087f5843508afb3b81124b053673875a152",
-      "bytes": 24948
+      "sha256": "9781ed54be63cef127a9bb2e99f9e0b24d0aea09b048cde5402f8a151bcde70f",
+      "bytes": 34570
     },
     {
       "path": "scripts/validate.py",
@@ -52984,8 +52989,8 @@
     },
     {
       "path": "tests/test_trading_gates.py",
-      "sha256": "10b1ce5b0cec4d3e68d792c83a9ad2b4fcbb70863305b0496961650deb34214f",
-      "bytes": 35512
+      "sha256": "36d822afc6da90a0976f15b36a01706a3ba1512c2ca870e8f563ece629e52d70",
+      "bytes": 64398
     },
     {
       "path": "tests/test_trading_gates_bindings.py",
