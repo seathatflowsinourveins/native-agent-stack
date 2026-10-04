@@ -15920,8 +15920,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "4348731213a87235a9f9d060bb7f6f9e8cb75cadc396884a13cf6374d09f5269",
-      "bytes": 155077
+      "sha256": "e7a04ffd9489c038674637c89e799d8bcc14265d3b6dbdf76148ef9327b305c4",
+      "bytes": 155413
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -16230,8 +16230,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "fbb0b96d881cce318dd73f22d570cf5f903e685905e211211409b17e78fb8088",
-      "bytes": 24976
+      "sha256": "4efed6abf346d5ae4a9742ba8a527625d5d95f252f58611c2de9e98dc486e174",
+      "bytes": 37516
     },
     {
       "path": "docs/direct-results.md",
@@ -52875,8 +52875,8 @@
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "c6de4a6bccc9e36d8daf055be0e5b195555400cef0071fe62a60cc61eda43186",
-      "bytes": 59896
+      "sha256": "646cec9f8e45b6f8666a7c6495744e6c7cb0d7dff3efc145370dad724accf418",
+      "bytes": 82767
     },
     {
       "path": "tests/test_workflow_security.py",

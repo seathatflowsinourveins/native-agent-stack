@@ -239,6 +239,151 @@ The cross-family review of `deea517e` (job-005, GPT-6.1 Sol at max) returned REJ
    expression can exclude pull requests. New controls: the reviewer's job-level case, and the same shape on a cache
    save step.
 
+## Reachability rules and repair round 2 (2026-10-04, superseding #682)
+
+#682 (held at `6e166809`) proposed a second, text-based tripwire in `tests/test_workflow_hardening.py` for the jobs a
+pull request can start. The coordinator chose to fold its assertions into this module instead, as rules on the parsed
+workflows with planted controls, so the repository keeps one workflow reader. Most of #682's checks were rules here
+already; three were not, and now are:
+
+| Rule | Fails on |
+| --- | --- |
+| `pull-request-environment` | an `environment:` on a job that a pull_request-family event reaches, whatever its `if:` |
+| `pull-request-remote-workflow` | such a job calling a reusable workflow by anything but `./.github/workflows/{file}` or `$/.github/workflows/{file}` |
+| `comment-event-secret` | a secret other than `GITHUB_TOKEN`, `secrets: inherit` or the whole `secrets` context in a workflow that `issue_comment`, `pull_request_review` or `pull_request_review_comment` triggers, read as `pull-request-secret` reads it |
+
+**Reachability** (`reachable()`, over the directory as a whole). The pull_request family is #682's event set: each
+`pull_request*` event, `issue_comment` and `workflow_run`. A workflow is reached by one of those triggers, then through
+each `./` or `$/` call a reached job makes, transitively and whatever the callee's own triggers, since a called
+workflow runs in its caller's event context. Last, a `workflow_call` trigger alone counts, as `PULL_REQUEST_EVENTS`
+already counts it: the scaffold's `sota-sources.yml.template` calls `sota-sources-gate.yml` from other repositories'
+`pull_request` workflows. That last step is stricter than #682, which reached a reusable workflow only through a
+caller in the same directory. The two job rules do not credit `if:`: `github.event_name != 'pull_request'` still lets
+`issue_comment` and review runs through, and in a called workflow `github.event_name` is the caller's.
+
+**Why these three.** Environment secrets "are only available to workflow jobs that reference the environment", an
+`environment` on a reusable workflow's job uses that environment's secret "and not the secret passed from the caller
+workflow", and an environment's required reviewers can release its secrets to the job they approve. A remote reusable
+workflow's file is never read here, so neither can be checked in it; zizmor's `unpinned-uses` only asks for a SHA pin,
+which the planted remote call has. An `issue_comment` run uses the default branch's workflow, and a review run from a
+same-repository branch gets the repository's secrets (a fork's run gets none); both run on text that outside users
+write. `GITHUB_TOKEN` stays allowed in those workflows, by property or by index, as in `pull-request-secret`: it is
+also `github.token`, and its scopes are what `pull-request-write-scope` and the reviewed write inventory bound. On
+`6af8e55b` no workflow declares an environment, calls a reusable workflow from a job, or has a comment or review
+trigger, so all three rules pass.
+
+**Repair round 2: the coordinator's P2 residuals on #681** (from the cross-family review of `de0b0043`).
+
+1. `excludes_pull_request` stripped whitespace before deciding whether one expression filled the value, so
+   `" ${{ github.event_name != 'pull_request' }}"`, the same with a trailing space, and the line break a `|` block
+   scalar keeps all counted as excluding pull requests. `ParseScalar` keeps each as a literal segment of a truthy
+   `format()` string.
+2. Its `}}` substring check refused valid guards such as
+   `github.event_name != 'pull_request' && contains('a}}b', 'a')`. `ParseScalar` closes an expression only at a `}}`
+   outside a single-quoted string literal.
+
+The helper now follows `ParseScalar`: a value either holds no `${{` (a bare expression, where whitespace does not
+matter) or opens one at its first character and closes it, quote-aware, at its last. A `${{` anywhere else, even
+quoted in a bare value, starts a segment, and the expression's text outside string literals may hold no delimiter.
+New planted controls: a leading and a trailing space at job and at cache-step level, and the block scalar. New accepted
+variants: a quoted `}}` in a job guard and in a cache-step guard.
+
+**Cross-family review of #686 at `aeb5ba25`** (one repair round). The secrets scan that `pull-request-secret`,
+`comment-event-secret` and `test_pull_request_jobs_hold_no_secret_and_no_write` share delimited expressions with the
+regex `\$\{\{(.*?)\}\}`, which stops at the first `}}` even inside a string literal.
+
+1. **P1.** `TOKEN: "${{ format('a}}b{0}', toJSON(secrets)) }}"` in a step's `env`, and
+   `${{ format('a}}b{0}', secrets['NPM_TOKEN']) }}` in a reusable workflow's `secrets` mapping, gave no violation for
+   any of the three comment and review events, nor `pull-request-secret` on `pull_request` (reproduced). Both are
+   valid: `format()` reads a doubled brace as one brace (Expressions, `format`), and `ParseScalar` does not close an
+   expression inside a literal. `secret_references()` now reads each expression as `expressions()` delimits it, with
+   `expression_end()`, the scan repair round 2 introduced; an expression that never closes is read to the end.
+2. **P2.** `secrets['GITHUB_TOKEN']` was a violation while `secrets.GITHUB_TOKEN` passed, although index and property
+   syntax access the same value (Contexts reference, "Available contexts"). Index access by one string literal now
+   names the secret it indexes (`SECRET_INDEX`; a `''` escape is unescaped, and a double-quoted key, which GitHub's
+   parser rejects, is read the same way), so the token passes in both forms. The whole context and an index that is
+   not one literal, such as `secrets[format('{0}_TOKEN', 'GITHUB')]`, stay violations whatever they compute.
+
+New planted controls: the reviewer's `env` form under `issue_comment`, `pull_request_review` and
+`pull_request_review_comment`; the indexed secret after a quoted `}}` in a called workflow's `secrets` mapping; the
+computed index; and the `env` form under `pull_request` for `pull-request-secret`. New accepted variants: the token by
+single-quoted and by double-quoted index. A unit test covers both access forms, both kinds of whole-context access and
+an unclosed expression.
+
+**Controls.** 59 planted entries (20 new: 4, 2 and 8 for the new rules, 5 for repair round 2, 1 for
+`pull-request-secret`), 15 accepted variants (9 new), and a reachability test that checks the caller is named and that
+a call is followed through a `$/` hop to a callee without `workflow_call`. In a scratch copy, breaking each new rule's
+predicate fails exactly that rule's planted controls (plus the reachability test for the environment rule); restoring
+#681's helper fails the 5 repair-round-2 planted controls, the 2 accepted variants that go with them and 7 unit cases;
+disabling call-following fails only the reachability test, because the `workflow_call` step still reaches the planted
+callee. Restoring the old expression regex fails the 5 quoted-marker controls and 3 unit cases, and reading every index
+as the whole context fails the 2 index-form variants and 5 unit cases. PyYAML 6.0.3 agrees with the loader on all 92
+texts.
+
+**Dependabot wording.** `2026-09-22-github-automation-closure.md` said fork and Dependabot pull requests get a
+read-only token. A Dependabot run's token is read-only by default (it can be raised): GitHub documents raising it with
+`permissions`. That sentence is qualified in place.
+
+**Not carried from #682.** Its text-subset and job-layout checks: this module's loader parses every job, decodes
+escapes and fails closed outside its subset. Its ban on `secrets.GITHUB_TOKEN` (above). Its check that a `./` callee is
+a file in this directory: a `./` or `$/` path names a file at the caller's commit, and every file present is checked on
+its own. Its pull-request write-scope allowlist, which ignored `if:`: `pull-request-write-scope` and `WRITE_GRANTS`
+cover it here, crediting only the `github.event_name != 'pull_request'` conjunct. The pull request that supersedes
+#682 maps each of its assertions.
+
+**Alternatives.** zizmor 1.30.1's overlapping audits are general. `dangerous-triggers` flags `pull_request_target` and
+`workflow_run`, as this module's `dangerous-trigger` rule does. `secrets-inherit` flags `secrets: inherit` wherever it
+appears. `unpinned-uses` flags a remote call by branch or tag but passes one pinned by SHA. `self-repository` (new in
+1.30.0) asks for `$/` instead of `./`, which is why both forms are local here. None flags an environment on a pull
+request job or a secret in a comment-triggered workflow, and `secrets-outside-env` pulls the other way, toward
+environment-scoped secrets, which these rules allow off the pull_request family.
+
+**Overturn.**
+
+- A job that a pull_request-family event reaches needs an environment or a remote reusable workflow: move it to a
+  workflow no such event starts, or add an `EXEMPTIONS` entry with its reason (`test_each_exemption_is_still_needed`
+  fails once the entry suppresses nothing).
+- A reusable workflow here needs an environment and no pull_request workflow calls it, here or elsewhere: exempt it by
+  name, or drop `reachable()`'s `workflow_call` step, which leaves #682's computation.
+- The coordinator decides `comment-event-secret` must refuse `secrets.GITHUB_TOKEN` too: give that rule a scan that
+  keeps it.
+- GitHub adds or changes a same-repository call form (`LOCAL_WORKFLOW_PREFIXES`), or actions/runner changes
+  `ParseScalar`'s scan (`expression_end`, `excludes_pull_request`): re-read the source and follow it.
+
+**Evidence class.** `local_integration`: `tests.test_workflow_policy` and `tests.test_workflow_hardening` with the
+system Python (no PyYAML), and the loader cross-check with PyYAML 6.0.3 through uv. `synthetic`: the planted controls
+and the scratch-copy mutations. `source_review`: the sources below. No workflow changed, and no hosted run exercises a
+new rule yet.
+
+**Sources** (read 2026-10-04 at 08:18Z):
+
+- GitHub, Secure use reference (formerly "Security hardening for GitHub Actions"; the old URL redirects here):
+  <https://docs.github.com/en/actions/reference/security/secure-use>: untrusted input, `pull_request_target` and
+  `workflow_run`, required reviewers for environment secrets.
+- GitHub, Using secrets in GitHub Actions:
+  <https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets>.
+- GitHub, Reuse workflows, "Using inputs and secrets in a reusable workflow" (`secrets: inherit`, environment secrets):
+  <https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows>; Reusing workflow configurations,
+  "`github` context": <https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations>;
+  Workflow syntax, `jobs.<job_id>.uses` and `jobs.<job_id>.secrets.inherit`:
+  <https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax>.
+- GitHub, Managing environments for deployment:
+  <https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments>; Deployments
+  and environments, "Environment secrets":
+  <https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments>.
+- GitHub, Events that trigger workflows (`issue_comment`, `pull_request_review`, `pull_request_review_comment`,
+  `workflow_run`): <https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows>.
+- GitHub, Troubleshooting Dependabot on GitHub Actions, "Changing `GITHUB_TOKEN` permissions":
+  <https://docs.github.com/en/code-security/reference/supply-chain-security/troubleshoot-dependabot/dependabot-on-actions#changing-github_token-permissions>.
+- zizmor `docs/audits.md` at `v1.30.1` (`99a054ed9283c90abdd2d5b9fb5101d27dde9783`): `dangerous-triggers`,
+  `secrets-inherit`, `unpinned-uses`, `self-repository`, `secrets-outside-env` (<https://docs.zizmor.sh/audits/>).
+- actions/runner `src/Sdk/DTObjectTemplating/ObjectTemplating/TemplateReader.cs` (`ParseScalar`) at
+  `d7bc179baf11a02110b46cfbbc4040f74ac3f60a`.
+- GitHub, Contexts reference, "Available contexts" (index and property dereference syntax):
+  <https://docs.github.com/en/actions/reference/workflows-and-actions/contexts>; Evaluate expressions in workflows and
+  actions, "Literals" (single-quoted strings only) and `format` (doubled braces):
+  <https://docs.github.com/en/actions/reference/workflows-and-actions/expressions> (both read 2026-10-04 at 14:15Z).
+
 ## Alternatives considered
 
 - **Keep workflow-level `contents: read`.** It already met OpenSSF Scorecard's Token-Permissions top score (read-only

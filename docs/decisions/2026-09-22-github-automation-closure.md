@@ -1650,9 +1650,11 @@ Read-only `gh api` GETs are dated below.
     --no-ignores --persona regular --strict-collection` with the default exit codes,
     so findings exit 11-14 and fail the required `validate` check
     ([usage](https://docs.zizmor.sh/usage/)). No scope is added: the workflow stays
-    `contents: read`, and fork and Dependabot PRs get a read-only token
+    `contents: read`, fork PRs get a read-only token
     ([events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)),
-    which is all zizmor's API reads need. The gate adds impostor-commit,
+    and Dependabot PRs get one that is read-only by default (it can be raised:
+    [Troubleshooting Dependabot on GitHub Actions, "Changing `GITHUB_TOKEN` permissions"](https://docs.github.com/en/code-security/reference/supply-chain-security/troubleshoot-dependabot/dependabot-on-actions#changing-github_token-permissions);
+    wording qualified 2026-10-04), which is all zizmor's API reads need. The gate adds impostor-commit,
     known-vulnerable-actions and ref-confusion (online-only in the `regular`
     persona, [audits](https://docs.zizmor.sh/audits/)) and ref-version-mismatch
     (documented as offline-capable, but skipped offline by 1.30.1).
