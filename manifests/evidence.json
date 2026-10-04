@@ -4450,13 +4450,13 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "160d85512e237a2d2f65de752aed86dd1f4da8633fc77feb35324e7c4499d028",
-      "bytes": 215818
+      "sha256": "1e08ba8e879b0c52fd5c53341ea60bb27ca70ebc64cb9af655d9ba5ae0a21cb0",
+      "bytes": 214941
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "ff4623cd10a960780f6abc361f81ceb04dbb7a998dde41970b89c4265538ee87",
-      "bytes": 19816
+      "sha256": "62fcb6658e588bece47042f4809f98fb93bbd14db5a12800596c9355c47fabef",
+      "bytes": 19269
     },
     {
       "path": "adoption/paired/README.md",
@@ -16396,12 +16396,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "93682c255f4cb4b06b250805b3529e155c7172e53e0387d97cacfd039fffa282",
-      "bytes": 561055
+      "sha256": "c54dd6ff904dcd699798e87a4c374d47f6b83f2df93f24c3e60a73dfe54ee226",
+      "bytes": 560927
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "73fff09e4c2d193cd4b05d3e0ecde1fc45307c1214367d616c53e7ff0766b03e",
+      "sha256": "c28e1c488cdc3e9e401ca65de69f61cbf15e22786404fac840a50fc823c96be3",
       "bytes": 323968
     },
     {
@@ -38181,7 +38181,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "e7154e3e62c367827c064cacbf6fd219dd52b4c12284262cad46efe34bdae3fa",
+      "sha256": "df9003c68fe4c0768b399142a9504cbd8fe848d7618895ca3d6be6349ba98259",
       "bytes": 4174
     },
     {
@@ -51861,8 +51861,8 @@
     },
     {
       "path": "tests/test_new_wsl_profile.py",
-      "sha256": "5cb42181a6d18d490b0e3a12eb5f10b2002a5b35e00005a7264f2debec063a81",
-      "bytes": 17372
+      "sha256": "b7689a2d17c412ab7251890082c89a50563ed5599f9e663c7d1e291b586c2801",
+      "bytes": 17209
     },
     {
       "path": "tests/test_observability.py",
