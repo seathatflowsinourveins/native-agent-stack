@@ -1,4 +1,4 @@
-You are the independent reviewer, from the GPT family, of one E2E unit for the new WSL (<machine>). The user asked for every layer finalised with its upstream repositories installed cleanly and wired into the native Claude Code and Codex workflow, a real E2E, and an independent review with the highest-quality harness.
+You are the independent reviewer, from the GPT family, of one E2E unit for the new WSL (NativeStack2604). The user asked for every layer finalised with its upstream repositories installed cleanly and wired into the native Claude Code and Codex workflow, a real E2E, and an independent review with the highest-quality harness.
 
 **Your input.** A Claude Sonnet executor probed the unit read-only and wrote its evidence to __EVIDENCE__: per slot, the commands it ran, their exit codes and output excerpts, and the status it proposes. The unit's slot list, with owner, repository, pin and class, is the entry "__UNIT__" in <host path> The install plan, with each slot's upstream install and acceptance commands, is evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json in <host path>, at origin/main.
 

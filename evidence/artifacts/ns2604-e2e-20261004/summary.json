@@ -231,5 +231,9 @@
     "none": 42,
     "plan": 30,
     "host": 8
+  },
+  "adjudication_split": {
+    "reviewer": 14,
+    "executor": 8
   }
 }

@@ -12,7 +12,7 @@ Slot: <slot_id> (unit <unit>). The Sonnet executor proposed <executor_status>; t
 
 Status definitions (from the review brief): READY = present at version, its upstream acceptance passes, wired natively, and used in a fresh headless session if the slot is client-facing. PARTIAL = some of these hold. FAIL = absent or broken. BY_DESIGN = nothing to install by design. INTERIM = an explicitly held interim the plan records (for example a token tool awaiting the token-layer PR #684); an INTERIM must not hide a missing install the current plan says should exist.
 
-Read: the executor evidence <e2e dir>/<unit>.json (this slot's record: commands, exit codes, output excerpts), the GPT review <e2e dir>/review-<unit>.json (this slot), the slot entry in <e2e dir>/units.json, and the install plan row in <host path>/code/.worktrees/native-agent-stack/c5/main-ro/evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json (origin/main).
+Read: the executor evidence <e2e dir>/<unit>.json (this slot's record: commands, exit codes, output excerpts), the GPT review <e2e dir>/review-<unit>.json (this slot), the slot entry in <e2e dir>/units.json, and the install plan row in <host path> (origin/main).
 
 Executor summary: <executor_summary>
 Reviewer reason: <review_reason>

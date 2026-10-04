@@ -61,7 +61,7 @@
       "status_source": "adjudicated",
       "agree": false,
       "reason": "The reviewer is right: the slot is PARTIAL. The SDK and exec parts of the slot are proven, but the app-server, which the slot also names, has never been run. What holds: - **Version.** @openai/codex-sdk 0.160.0 is installed locally (clients-1.json:482-487). Its bundled binary reports codex-cli 0.160.0 (clients-1.json:690-695), and so does the host codex (clients-1.json:425-429). - **Post-install check.** The plan's …",
-      "fix": "Plan change in the repository, then one run on the host.\n\n(1) Plan change. Add an app-server smoke to the after_sign_in stage, next to the existing SDK quickstart, in two places:\n- the acceptance of the codex-sdk-and-codex-exec-app-server row in install-plan.json;\n- the accept.sh function of the same name.\n\nCite rust-v0.160.0 codex-rs/cli/src/main.rs#L923 and codex-rs/app-server-test-client/src/lib.rs#L1072 and #L1994 as its source. The smoke:\n\n```sh\ncd \"$tool_root/codex-sdk\"\nout=\"$(codex debug app-server send-message-v2 'Reply with exactly 4. Do not use tools or modify files.' <<host path>)\"\ngrep -q '^< initialize response:' <<<\"$out\"\ngrep -q '^< thread/start response:' <<<\"$out\"\ngrep -q '^< turn/start response:' <<<\"$out\"\ngrep -qx '< turn/completed notification: Completed' <<<\"$out\"\ngrep -qF 'text: \"4\"' <<<\"$out\"\n```\n\nPoints to keep:\n- **No daemon.** The command starts a short-lived stdi",
+      "fix": "Plan change in the repository, then one run on the host.\n\n(1) Plan change. Add an app-server smoke to the after_sign_in stage, next to the existing SDK quickstart, in two places:\n- the acceptance of the codex-sdk-and-codex-exec-app-server row in install-plan.json;\n- the accept.sh function of the same name.\n\nCite rust-v0.160.0 codex-rs/cli/src/main.rs#L923 and codex-rs/app-server-test-client/src/lib.rs#L1072 and #L1994 as its source. The smoke:\n\n```sh\ncd \"$tool_root/codex-sdk\"\nout=\"$(codex debug app-server send-message-v2 'Reply with exactly 4. Do not use tools or modify files.' </dev/null)\"\ngrep -q '^< initialize response:' <<<\"$out\"\ngrep -q '^< thread/start response:' <<<\"$out\"\ngrep -q '^< turn/start response:' <<<\"$out\"\ngrep -qx '< turn/completed notification: Completed' <<<\"$out\"\ngrep -qF 'text: \"4\"' <<<\"$out\"\n```\n\nPoints to keep:\n- **No daemon.** The command starts a short-lived stdi",
       "fix_kind": "plan",
       "sources": [
         "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/cli/src/main.rs#L923 (verified in local clone a956835d: main.rs:191-192, 255-291, 565-576, 923-930)",
@@ -79,7 +79,7 @@
       "status_source": "adjudicated",
       "agree": false,
       "reason": "PARTIAL; the reviewer is right. What holds: - Both marketplace clones are at the reviewed 82fe8226 (clients-1.json:498-502, 730-733). The Codex config pins the ref (658-662). - The plan row's acceptance exited 0 (clients-1.json:578-582; install-plan.json:232-240; accept.sh:137-150). - Zero installed marketplace plugins matches the row's inventory-only note (install-plan.json:246; clients-1.json:849-867). - The eight trailofbits skills selected in the manifest pass the installer …",
-      "fix": "This is a host-state fix on <machine>. The plan already prescribes it (install-plan.json:307; manifest.json:875-880; claude.settings.template.json:392; adoption/skills/lifecycle.md:286-302).\n\n1. From a shell outside any Claude session, run:\n   \"$tool_root/skills-1.7.0/bin/skills\" remove semgrep -g -y\n   lifecycle.md:299-301 requires the outside shell: the settings template denies `skills remove` inside a session, so do not route around that rule.\n2. Set skillOverrides.semgrep to \"off\" in <host path>, matching template line 392, as a single-key merge. Re-running tools/adoption/apply_claude_settings.py would also apply it, but it re-merges the whole template.\n3. Verify:\n   - \"$tool_root/skills-1.7.0/bin/skills\" list -g -a claude-code codex --json lists exactly agentic-actions-auditor, codeql, fp-check, modern-python, property-based-testing, sarif-parsing, supply-chain-ris",
+      "fix": "This is a host-state fix on NativeStack2604. The plan already prescribes it (install-plan.json:307; manifest.json:875-880; claude.settings.template.json:392; adoption/skills/lifecycle.md:286-302).\n\n1. From a shell outside any Claude session, run:\n   \"$tool_root/skills-1.7.0/bin/skills\" remove semgrep -g -y\n   lifecycle.md:299-301 requires the outside shell: the settings template denies `skills remove` inside a session, so do not route around that rule.\n2. Set skillOverrides.semgrep to \"off\" in <host path> matching template line 392, as a single-key merge. Re-running tools/adoption/apply_claude_settings.py would also apply it, but it re-merges the whole template.\n3. Verify:\n   - \"$tool_root/skills-1.7.0/bin/skills\" list -g -a claude-code codex --json lists exactly agentic-actions-auditor, codeql, fp-check, modern-python, property-based-testing, sarif-parsing, supply-chain-ris",
       "fix_kind": "host",
       "sources": [
         "https://github.com/vercel-labs/skills/blob/v1.7.0/src/remove.ts",
@@ -114,7 +114,7 @@
       "status": "READY",
       "status_source": "adjudicated",
       "agree": false,
-      "reason": "On <machine> at origin/main 780bf5d (clients-2.json:3-10), the evidence meets all four READY criteria. (a) Present at version. The plan prefix binary reports skills 1.7.0 (clients-2.json:226), and npm latest is also 1.7.0 (:266). The installed find-skills folder matches the manifest: git tree 76a98a28 and SKILL.md sha256 c00eeea0 (:250). (b) Acceptance passes. The plan's acceptance command (install-plan.json:387) ran verbatim with npx …",
+      "reason": "On NativeStack2604 at origin/main 780bf5d (clients-2.json:3-10), the evidence meets all four READY criteria. (a) Present at version. The plan prefix binary reports skills 1.7.0 (clients-2.json:226), and npm latest is also 1.7.0 (:266). The installed find-skills folder matches the manifest: git tree 76a98a28 and SKILL.md sha256 c00eeea0 (:250). (b) Acceptance passes. The plan's acceptance command (install-plan.json:387) ran verbatim with npx …",
       "fix": "None needed for READY. Do not adopt the reviewer's fix: an in-session `npx --yes skills@1.7.0 add ...` contradicts adoption/skills/lifecycle.md:119-127 and matches the rendered Claude deny rule `Bash(npx *skills@* add *)` (claude.settings.template.json:128).\n\nOptional follow-ups, none of which affects the status:\n1. Repository wording: the slot's job text says \"finding and adding a skill from inside a session\" but should say \"finding a skill from inside a session, in both clients; adding runs through the coordinator's manifest pin and tools/adoption/install_skills.py (lifecycle.md:42-44, :119-121)\". Update docs/new-wsl-handbook.md:247, definitive-manifest.json:702 and consensus.json:54, plus a dated note beside the decision records 2026-10-02-new-wsl-layer-consensus.md:104 and 2026-10-01-new-wsl-definitive-defaults.md:58. Make the same correction in the host-side units.json.\n2. Fix lifec",
       "fix_kind": "none",
       "sources": [
@@ -133,7 +133,7 @@
       "status_source": "reviewer",
       "agree": true,
       "reason": "The pinned Claude copy and Codex embedded skill are present, and the inventory-based plan acceptance passes. The authoring tool's own validator fails under the session-default Python: s2-selftest exits 2 after two validator failures at exit 1; the embedded Codex validator also exits 1. Fresh Claude use reproduces ModuleNotFoundError for yaml, while Codex only reads the instructions. Upstream package_skill.py imports …",
-      "fix": "Add the Python prerequisite and dependency provisioning to the plan: uv pip install --python \"$(mise which python)\" PyYAML==6.0.3. Add acceptance through the session-default interpreter: python -B \"${CLAUDE_CONFIG_DIR:-<host path>\" \"<host path>\" and python -B \"${CODEX_HOME:-<host path>\" \"<host path>\". Apply the dependency step on this host. Complete fresh-session creation and evaluation in both clients; for Claude, use the pinned creator's paired with-skill/baseline workflow, scripts.aggregate_benchmark and eval-viewer/generate_review.py with --static for headless reporting.",
+      "fix": "Add the Python prerequisite and dependency provisioning to the plan: uv pip install --python \"$(mise which python)\" PyYAML==6.0.3. Add acceptance through the session-default interpreter: python -B \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/skill-creator/scripts/quick_validate.py\" \"$HOME/.agents/skills/find-skills\" and python -B \"${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py\" \"$HOME/.agents/skills/find-skills\". Apply the dependency step on this host. Complete fresh-session creation and evaluation in both clients; for Claude, use the pinned creator's paired with-skill/baseline workflow, scripts.aggregate_benchmark and eval-viewer/generate_review.py with --static for headless reporting.",
       "fix_kind": "plan",
       "sources": [
         "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/quick_validate.py",
@@ -185,7 +185,7 @@
       "status": "PARTIAL",
       "status_source": "adjudicated",
       "agree": false,
-      "reason": "The reviewer's PARTIAL is right. Its reasons and its fix need the corrections below. (a) Present at version, on demand: holds. On <machine>, npx -y @modelcontextprotocol/inspector@2.9.0 resolved and ran 2.9.0 (clients-2.json:751, 759, 767). That matches the plan release (install-plan.json:574) and the registry latest. The 2.8.0 pin in units.json is stale. (b) Upstream acceptance: only partly shown. Two things passed …",
+      "reason": "The reviewer's PARTIAL is right. Its reasons and its fix need the corrections below. (a) Present at version, on demand: holds. On NativeStack2604, npx -y @modelcontextprotocol/inspector@2.9.0 resolved and ran 2.9.0 (clients-2.json:751, 759, 767). That matches the plan release (install-plan.json:574) and the registry latest. The 2.8.0 pin in units.json is stale. (b) Upstream acceptance: only partly shown. Two things passed …",
       "fix": "This is a repository plan change followed by a run on 2604. Nothing is installed, and the on-demand policy stays.\n\n1) Change the plan checker first. check_plan.py:183-188 forbids commands, acceptance or an accept.sh function on a not-installed row. Let the ON_DEMAND rows (check_plan.py:22) carry a pinned on-demand command and an acceptance function, and update plan README.md:26 and :31 and the accept.sh skip loop (accept.sh:819-822) to match.\n\n2) Edit the mcp-inspector row (install-plan.json:569-592):\n- commands: [\"npx -y @modelcontextprotocol/inspector@2.9.0\"]\n- version_pinned: true\n- needs.node: true (upstream engines node >=22.19.0)\n- acceptance, run through the plan's own route against the installed qmd stdio server and labelled as our integration check:\n  - npx -y @modelcontextprotocol/inspector@2.9.0 --cli <qmd mcp command> --method tools/list (this already passes);\n  - a default w",
       "fix_kind": "plan",
       "sources": [
@@ -208,7 +208,8 @@
       "fix_kind": "none",
       "sources": [
         "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
-        "<host path>"
+        "<host path>",
+        "clients-2.json"
       ]
     },
     "cross:gpt6-harnesses/gpt-gateway": {
@@ -256,7 +257,7 @@
       "status_source": "reviewer",
       "agree": true,
       "reason": "Both tagged checkouts are recorded clean, and GPT Researcher completed a real research run with exit 0 and nine reference URLs. Its v3.7.0 source legitimately declares package version 0.16.0. The GPT Researcher CLI execution is an upstream functional smoke; wrapper preflight and the five-reference threshold are repository-specific assertions, not an upstream acceptance suite. DeerFlow only passed an import/configuration inspection: …",
-      "fix": "Host repair: apply the current managed instruction blocks with python3 tools/adoption/managed_block.py claude-md --example adoption/new-wsl/claude-user-instructions.md and python3 tools/adoption/managed_block.py codex-md --template adoption/new-wsl/codex-user-instructions.md from the destination checkout. Configure an active DeerFlow models entry using name: gpt-runtime, use: langchain_openai:ChatOpenAI, model: cx/gpt-6.1-sol-max, base_url: <host path> and api_key: local-loopback for the recorded keyless loopback gateway. Retain the upstream bundled DuckDuckGo search tool. Use DEER_FLOW_CONFIG_PATH=\"$tool_root/deer-flow/config.yaml\" and the installed backend interpreter to execute the documented DeerFlowClient().chat(query) API, requiring a nonempty cited research answer. Repository change: add this embedded DeerFlow functional acceptance alongside GPT Researcher in the ins",
+      "fix": "Host repair: apply the current managed instruction blocks with python3 tools/adoption/managed_block.py claude-md --example adoption/new-wsl/claude-user-instructions.md and python3 tools/adoption/managed_block.py codex-md --template adoption/new-wsl/codex-user-instructions.md from the destination checkout. Configure an active DeerFlow models entry using name: gpt-runtime, use: langchain_openai:ChatOpenAI, model: cx/gpt-6.1-sol-max, base_url: http://127.0.0.1:21128/v1 and api_key: local-loopback for the recorded keyless loopback gateway. Retain the upstream bundled DuckDuckGo search tool. Use DEER_FLOW_CONFIG_PATH=\"$tool_root/deer-flow/config.yaml\" and the installed backend interpreter to execute the documented DeerFlowClient().chat(query) API, requiring a nonempty cited research answer. Repository change: add this embedded DeerFlow functional acceptance alongside GPT Researcher in the ins",
       "fix_kind": "plan",
       "sources": [
         "https://github.com/assafelovic/gpt-researcher/blob/v3.7.0/pyproject.toml",
@@ -274,7 +275,7 @@
       "status_source": "reviewer",
       "agree": true,
       "reason": "S01/S06 establish installed version 1.7.0, which matches the install plan but conflicts with the unit's 2.0.0.dev0 pin. Live upstream identifies v1.7.0 as the latest release; the requested development commit declares 2.0.0.dev0. S06 passes the upstream-documented serena init check under a temporary HOME, proving initialization there. Native wiring is evidenced, but both original headless streams show find_symbol failing with 'No …",
-      "fix": "Reconcile the plan with the requested development pin: replace its 1.7.0 installation with uv tool install --force -p 3.13 'git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143'. On the host, configure <host path> with language_servers: [python], the upstream-supported override and language identifier, then run serena project index \"<host path>\". Repeat serena init at the installed pin and require successful find_symbol and find_referencing_symbols calls in fresh Claude Code and Codex sessions. Pin reconciliation and project-operation acceptance belong in the repository plan; the local override and indexing are host state.",
+      "fix": "Reconcile the plan with the requested development pin: replace its 1.7.0 installation with uv tool install --force -p 3.13 'git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143'. On the host, configure $HOME/code/native-agent-stack/.serena/project.local.yml with language_servers: [python], the upstream-supported override and language identifier, then run serena project index \"$HOME/code/native-agent-stack\". Repeat serena init at the installed pin and require successful find_symbol and find_referencing_symbols calls in fresh Claude Code and Codex sessions. Pin reconciliation and project-operation acceptance belong in the repository plan; the local override and indexing are host state.",
       "fix_kind": "plan",
       "sources": [
         "https://github.com/oraios/serena/releases/tag/v1.7.0",
@@ -296,7 +297,8 @@
       "fix_kind": "none",
       "sources": [
         "https://code.claude.com/docs/en/discover-plugins",
-        "<host path>"
+        "<host path>",
+        "context-1.json"
       ]
     },
     "code-navigation/structural-search": {
@@ -332,7 +334,7 @@
         "https://github.com/MinishLab/semble/releases/tag/v0.6.1",
         "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md#L87",
         "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/src/semble/cli.py#L266",
-        "<host path>"
+        "units.json"
       ]
     },
     "semantic-rag/embedding-model": {
@@ -344,7 +346,7 @@
       "status_source": "reviewer",
       "agree": true,
       "reason": "E02 passes the project manifest check, and E04 establishes that referenced blobs exist; these do not prove successful inference or hash verification of every blob's contents. The live Ollama registry manifest matches the requested ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d digest. E01/E03 show no Ollama listener and unsuccessful server requests, so the service acceptance has not passed. The health check uses upstream's documented embedding …",
-      "fix": "On the host, start the installed runtime using upstream's foreground command: OLLAMA_HOST=127.0.0.1:21434 ollama serve. From another shell, require curl -fsS <host path> to report 0.35.0, then run bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only embedding-model --stage service_health from the repository. Require successful ollama show output with num_ctx 8192 and an <host path> response containing one 1024-element vector. The plan already documents the server prerequisite and this acceptance stage; the evidenced blocker is host runtime state.",
+      "fix": "On the host, start the installed runtime using upstream's foreground command: OLLAMA_HOST=127.0.0.1:21434 ollama serve. From another shell, require curl -fsS http://127.0.0.1:21434/api/version to report 0.35.0, then run bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only embedding-model --stage service_health from the repository. Require successful ollama show output with num_ctx 8192 and an /api/embed response containing one 1024-element vector. The plan already documents the server prerequisite and this acceptance stage; the evidenced blocker is host runtime state.",
       "fix_kind": "host",
       "sources": [
         "https://registry.ollama.ai/v2/library/qwen3-embedding/manifests/0.6b",
@@ -366,7 +368,8 @@
       "fix_kind": "none",
       "sources": [
         "https://github.com/tobi/qmd/blob/v2.8.3/README.md#L554",
-        "<host path>"
+        "<host path>",
+        "context-1.json"
       ]
     },
     "document-retrieval/tobi-qmd": {
@@ -417,7 +420,9 @@
       "fix": "",
       "fix_kind": "none",
       "sources": [
-        "<host path>"
+        "<host path>",
+        "context-2.probe-H.txt",
+        "context-2.claude-stream.jsonl"
       ]
     },
     "web-research/playwright-cli": {
@@ -433,6 +438,7 @@
       "fix_kind": "none",
       "sources": [
         "https://github.com/microsoft/playwright-cli/blob/v0.1.22/README.md",
+        "units.json",
         "<host path>"
       ]
     },
@@ -450,7 +456,8 @@
       "sources": [
         "https://github.com/assafelovic/gpt-researcher/blob/v3.7.0/requirements.txt#L28",
         "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/packages/harness/pyproject.toml#L45",
-        "<host path>"
+        "<host path>",
+        "context-2.probe-H.txt"
       ]
     },
     "durable-memory/memory-owner": {
@@ -534,7 +541,7 @@
       "status_source": "adjudicated",
       "agree": false,
       "reason": "The status should be INTERIM, so the executor is right. The reviewer's PARTIAL is the strict a-d reading, which the executor already recorded as strict_status PARTIAL (context-3.json:359-361, :408). Facts both sides agree on, from the 19:10-19:28Z probe: - **Present:** rtk 0.50.0 is at ECO_ROOT/bin/rtk (context-3.json:363-366, :884, :1263). - **Standalone works:** rtk git log, rtk proxy and rtk read all …",
-      "fix": "**1. Repository plan change (this unblocks the slot).**\n- Finish the #684 refresh to rtk 0.51.0 (job-040, branch c5/token-layer-2604-r3). The row is in c5/token-layer-2604-wide install-plan.json:1287-1331:\n  - fetch_verified https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz, sha256 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5;\n  - link it into <host path>;\n  - install config/rtk-config.toml with mode 0600, carrying the five-entry [hooks] exclude_commands.\n- Pass the acceptance listed in job-040 TASK.md:33-40.\n- Update the client-config-map.json:23 note from 0.50.0 to 0.51.0.\n- Take #684 out of draft and merge it.\n\n**2. Host state, on <machine> only, after the merge.**\n- Run the plan's command-output install, then its accept.sh command-output function. It checks:\n  - `rtk --version` == `rtk 0.51.0`;\n  - `rtk git ",
+      "fix": "**1. Repository plan change (this unblocks the slot).**\n- Finish the #684 refresh to rtk 0.51.0 (job-040, branch c5/token-layer-2604-r3). The row is in c5/token-layer-2604-wide install-plan.json:1287-1331:\n  - fetch_verified https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz, sha256 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5;\n  - link it into ${ECO_ROOT}/bin/rtk;\n  - install config/rtk-config.toml with mode 0600, carrying the five-entry [hooks] exclude_commands.\n- Pass the acceptance listed in job-040 TASK.md:33-40.\n- Update the client-config-map.json:23 note from 0.50.0 to 0.51.0.\n- Take #684 out of draft and merge it.\n\n**2. Host state, on NativeStack2604 only, after the merge.**\n- Run the plan's command-output install, then its accept.sh command-output function. It checks:\n  - `rtk --version` == `rtk 0.51.0`;\n  - `rtk git ",
       "fix_kind": "plan",
       "sources": [
         "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md",
@@ -552,7 +559,7 @@
       "status_source": "adjudicated",
       "agree": false,
       "reason": "I side with the executor's INTERIM label, but not with its reasoning. Headroom is not on 2604 at all, so in operational terms the slot is FAIL and must not count toward readiness. Absence (executor and reviewer agree): context-3.json:416-458; which-tools shows headroom MISSING (:869-875); `headroom --version` gives command not found (:878-884); ECO_ROOT/bin holds only claude, node and rtk (:1257-1263); …",
-      "fix": "Repository plan change first; no new row is needed.\n\n1. Finish review of PR #684 (head 31b1b9406) and merge it. It already carries the output-compression row, the install and accept functions, the slot:output-compression wiring in the map and the template registrations.\n\nHost state on <machine>, after the merge:\n2. Move the checkout from 780bf5d0 (context-3.json:14) to the merge commit.\n3. Run `bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only output-compression`. This runs `UV_TOOL_DIR=\"${ECO_ROOT:-<host path>\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-<host path>\" uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'` (PR install-plan.json:1341). Keep 0.37.0, not 0.39.1.\n4. Wire both clients with `python3 tools/adoption/new_wsl_client_config.py --apply --host <2604 host file> --with-authorization-setting",
+      "fix": "Repository plan change first; no new row is needed.\n\n1. Finish review of PR #684 (head 31b1b9406) and merge it. It already carries the output-compression row, the install and accept functions, the slot:output-compression wiring in the map and the template registrations.\n\nHost state on NativeStack2604, after the merge:\n2. Move the checkout from 780bf5d0 (context-3.json:14) to the merge commit.\n3. Run `bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only output-compression`. This runs `UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'` (PR install-plan.json:1341). Keep 0.37.0, not 0.39.1.\n4. Wire both clients with `python3 tools/adoption/new_wsl_client_config.py --apply --host <2604 host file> --with-authorization-setting",
       "fix_kind": "plan",
       "sources": [
         "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/tests/test_ccr_mcp_server.py (L96-107, L168-192)",
@@ -569,7 +576,7 @@
       "status": "INTERIM",
       "status_source": "adjudicated",
       "agree": false,
-      "reason": "INTERIM, siding with the executor on the label. Strict delivery is FAIL and must count as not ready in any readiness figure; the executor records that itself (context-3.json:465, :508). Facts both sides share, confirmed in the executor's logs: jcodemunch-mcp is absent on <machine>. - `command -v` is MISSING (context-3.json:869) and `--version` gives \"command not found\" (:878). - Neither `claude …",
+      "reason": "INTERIM, siding with the executor on the label. Strict delivery is FAIL and must count as not ready in any readiness figure; the executor records that itself (context-3.json:465, :508). Facts both sides share, confirmed in the executor's logs: jcodemunch-mcp is absent on NativeStack2604. - `command -v` is MISSING (context-3.json:869) and `--version` gives \"command not found\" (:878). - Neither `claude …",
       "fix": "Plan change first, then host state.\n\n(1) Repository plan change in PR #684 (head 31b1b940). The PR already carries the row: install-plan.json:1373-1412, install.sh:405-409, accept.sh:442-450, the user-scope wiring in adoption/new-wsl/client-config-map.json:455-474, templates/claude-user.mcp.additions.json:4-9 and templates/codex.config.additions.toml:26-45.\n- Reconcile docs/decisions/2026-10-04-token-full-stack-owner-default.md:161 (\"registered per project, never at user scope\") with the same PR's user-scope decision (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md:21-23), docs/token-session-handbook.md:108 and the row note at install-plan.json:1412.\n- Per that record's header (lines 3-5), changing it means updating its sha256 in consensus.json wave3.records.decision_record and regenerating the manifest, its tables and the handbook.\n- Then complete the claude and gpt reviews a",
       "fix_kind": "plan",
       "sources": [
@@ -594,7 +601,7 @@
         "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
         "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md",
         "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/scripts/test.sh",
-        "<host path>"
+        "units.json"
       ]
     },
     "token-efficiency/repo-packing": {
@@ -648,7 +655,7 @@
         "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
         "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md",
         "https://github.com/microsoft/markitdown/blob/v0.1.8/.github/workflows/tests.yml",
-        "<host path>"
+        "units.json"
       ]
     },
     "token-efficiency/api-docs": {
@@ -684,7 +691,7 @@
         "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5",
         "https://github.com/ymtdzzz/otel-tui/blob/v0.7.5/README.md",
         "https://github.com/ymtdzzz/otel-tui/blob/v0.7.5/Makefile",
-        "<host path>"
+        "units.json"
       ]
     },
     "token-efficiency/token-lane-carriers": {
@@ -714,7 +721,7 @@
       "status_source": "reviewer",
       "agree": true,
       "reason": "C07-C09 establish a real acceptance failure: the unmodified post_install check exits 1 because NS2604_OBSERVABILITY_DATA is unset; the same upstream validate command passes with the service's environment. The collector is operational, both clients have telemetry configuration, and C14 correlates a fresh Claude session through its pipeline. Installed 0.162.0 matches the install plan and the live upstream latest release, but conflicts …",
-      "fix": "Repository change: supply the service's resolved data directory to acceptance, using NS2604_OBSERVABILITY_DATA=\"${XDG_DATA_HOME:-<host path>\" otelcol-contrib validate --config=\"$config_root/otel.yaml\". Ensure clean installation creates the configured otelcol/queue directory, or uses the upstream file_storage create_directory setting. Update the manifest and slot inventory to the verified 0.162.0 release already selected by the plan. Re-run the unchanged upstream validator and health check with this recorded configuration.",
+      "fix": "Repository change: supply the service's resolved data directory to acceptance, using NS2604_OBSERVABILITY_DATA=\"${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability\" otelcol-contrib validate --config=\"$config_root/otel.yaml\". Ensure clean installation creates the configured otelcol/queue directory, or uses the upstream file_storage create_directory setting. Update the manifest and slot inventory to the verified 0.162.0 release already selected by the plan. Re-run the unchanged upstream validator and health check with this recorded configuration.",
       "fix_kind": "plan",
       "sources": [
         "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0",
@@ -748,7 +755,7 @@
       "status": "READY",
       "status_source": "reviewer",
       "agree": true,
-      "reason": "Installed 3.7.8 matches the slot and plan pin. C07 records successful upstream configuration verification and <host path> checks; C08-C09 establish collector exports and queryable logs; C14 correlates eleven event types with the fresh Claude session. Upstream v3.7.8 source confirms -verify-config, and its HTTP API documentation defines readiness and OTLP ingestion. The live release digest matches the plan's Loki archive. …",
+      "reason": "Installed 3.7.8 matches the slot and plan pin. C07 records successful upstream configuration verification and /ready checks; C08-C09 establish collector exports and queryable logs; C14 correlates eleven event types with the fresh Claude session. Upstream v3.7.8 source confirms -verify-config, and its HTTP API documentation defines readiness and OTLP ingestion. The live release digest matches the plan's Loki archive. The …",
       "fix": "",
       "fix_kind": "none",
       "sources": [
@@ -765,8 +772,8 @@
       "status": "PARTIAL",
       "status_source": "reviewer",
       "agree": true,
-      "reason": "Grafana is operational, but the dashboard function is incomplete. Installed 13.2.3 matches the plan and live upstream latest release, while the slot and manifest specify 13.2.2. grafana cli -v is an upstream version check; <host path> is an upstream service check, and neither establishes dashboard correctness. C15-C16 demonstrate that three representative Claude queries recover data when their minimum step …",
-      "fix": "Repository change: in the provisioned token-layer dashboard source, change targets[].interval from \"1h\" to \"1m\" for the six affected Claude panels while retaining their [1h] PromQL lookbacks. Deploy the corrected file through Grafana's documented dashboard provisioning provider and validate the affected panels through POST <host path> Include an exercised SDK receipt workload in subsequent dashboard acceptance to resolve the three unexercised receipt panels. Use the Alertmanager plugin's documented testDatasource status request for its acceptance. Synchronize the manifest and inventory to 13.2.3, and reconcile the plan's measurement-only exclusion with the requested finalized installation.",
+      "reason": "Grafana is operational, but the dashboard function is incomplete. Installed 13.2.3 matches the plan and live upstream latest release, while the slot and manifest specify 13.2.2. grafana cli -v is an upstream version check; /api/health is an upstream service check, and neither establishes dashboard correctness. C15-C16 demonstrate that three representative Claude queries recover data when their minimum step changes …",
+      "fix": "Repository change: in the provisioned token-layer dashboard source, change targets[].interval from \"1h\" to \"1m\" for the six affected Claude panels while retaining their [1h] PromQL lookbacks. Deploy the corrected file through Grafana's documented dashboard provisioning provider and validate the affected panels through POST /api/ds/query. Include an exercised SDK receipt workload in subsequent dashboard acceptance to resolve the three unexercised receipt panels. Use the Alertmanager plugin's documented testDatasource status request for its acceptance. Synchronize the manifest and inventory to 13.2.3, and reconcile the plan's measurement-only exclusion with the requested finalized installation.",
       "fix_kind": "plan",
       "sources": [
         "https://github.com/grafana/grafana/releases/tag/v13.2.3",
@@ -787,6 +794,7 @@
       "fix": "",
       "fix_kind": "none",
       "sources": [
+        "units.json",
         "<host path>"
       ]
     },
@@ -798,8 +806,8 @@
       "status": "PARTIAL",
       "status_source": "reviewer",
       "agree": true,
-      "reason": "Ollama 0.35.0 is installed at the selected version, but its version-only acceptance passes while explicitly warning that no server is reachable. C06-C07 and C16 establish an inactive service, no listener and failed list/embed checks. Upstream v0.35.0 source confirms that ollama ls checks the server heartbeat, and its API documents POST <host path> Model manifests and GPU visibility do not …",
-      "fix": "Host state: during the designated GPU-owner window, start the installed server with the upstream foreground command OLLAMA_HOST=127.0.0.1:21434 ollama serve. In another terminal, run OLLAMA_HOST=127.0.0.1:21434 ollama ls, then run the existing acceptance request with pipeline failure propagation: curl -fsS <host path> -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Hello world\"}' | jq -e '(.embeddings | length) == 1'. Check OLLAMA_HOST=127.0.0.1:21434 ollama ps immediately afterward to establish GPU allocation, and record successful use by the intended native workflow. The plan already contains the pinned installation, manual startup instruction and embedding acceptance.",
+      "reason": "Ollama 0.35.0 is installed at the selected version, but its version-only acceptance passes while explicitly warning that no server is reachable. C06-C07 and C16 establish an inactive service, no listener and failed list/embed checks. Upstream v0.35.0 source confirms that ollama ls checks the server heartbeat, and its API documents POST /api/embed. Model manifests and GPU visibility do not establish …",
+      "fix": "Host state: during the designated GPU-owner window, start the installed server with the upstream foreground command OLLAMA_HOST=127.0.0.1:21434 ollama serve. In another terminal, run OLLAMA_HOST=127.0.0.1:21434 ollama ls, then run the existing acceptance request with pipeline failure propagation: curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Hello world\"}' | jq -e '(.embeddings | length) == 1'. Check OLLAMA_HOST=127.0.0.1:21434 ollama ps immediately afterward to establish GPU allocation, and record successful use by the intended native workflow. The plan already contains the pinned installation, manual startup instruction and embedding acceptance.",
       "fix_kind": "host",
       "sources": [
         "https://github.com/ollama/ollama/releases/tag/v0.35.0",
@@ -870,7 +878,7 @@
       "status_source": "adjudicated",
       "agree": false,
       "reason": "DISPATCH CORRECTION: the computed task names unit observe-eval-1 and its files, but this slot belongs to unit observe-eval-2 (units.json array index 9, slots[3]: pin 0.3.273, class FINAL). Its evidence is observe-eval-2.json:901-1064 and its review is review-observe-eval-2.json:50-65; observe-eval-1.json and review-observe-eval-1.json do not mention it. STATUS: PARTIAL. The reviewer is right on the status, but its fix is incomplete (see below). …",
-      "fix": "Repository plan change, then re-run on the host.\n\n1) Install the provider package in the tool's environment. In install-plan.json:1756 and install.sh:449, change the command to:\n`uv tool install --python 3.13 inspect-ai==0.3.273 --with openai==<release the plan selects and records, >=3.1.0 per providers.py:366>`\nThen re-run the slot's install on <machine>. Skip this step if the coordinator's environment check shows openai is already present at 0.3.273.\n\n2) Add a functional acceptance. In accept.sh:514-523 and install-plan.json:1772-1781, keep `inspect --version` as the post_install check. Add an after_sign_in stage that runs the unchanged upstream example through the existing loopback gateway:\n`inspect eval <inspect_ai checkout at tag 0.3.273><host path> --model openai-api/omniroute/cx/gpt-6.1-sol --model-base-url <host path> --limit 1 --log-dir <retai",
+      "fix": "Repository plan change, then re-run on the host.\n\n1) Install the provider package in the tool's environment. In install-plan.json:1756 and install.sh:449, change the command to:\n`uv tool install --python 3.13 inspect-ai==0.3.273 --with openai==<release the plan selects and records, >=3.1.0 per providers.py:366>`\nThen re-run the slot's install on NativeStack2604. Skip this step if the coordinator's environment check shows openai is already present at 0.3.273.\n\n2) Add a functional acceptance. In accept.sh:514-523 and install-plan.json:1772-1781, keep `inspect --version` as the post_install check. Add an after_sign_in stage that runs the unchanged upstream example through the existing loopback gateway:\n`inspect eval <inspect_ai checkout at tag 0.3.273>/examples/theory_of_mind.py --model openai-api/omniroute/cx/gpt-6.1-sol --model-base-url http://127.0.0.1:21128/v1 --limit 1 --log-dir <retai",
       "fix_kind": "plan",
       "sources": [
         "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/0.3.273/src/inspect_ai/_cli/main.py (cited by reviewer, not re-fetched)",
@@ -888,7 +896,7 @@
       "status_source": "adjudicated",
       "agree": false,
       "reason": "Slot location first: the computed task names unit observe-eval-1, but observe-eval-1.json and review-observe-eval-1.json contain no Harbor record. The slot belongs to observe-eval-2. Its records are the observe-eval-2 slots array in units.json (FINAL, pin v0.23.0, installed_on_2604 'planned', which is stale), observe-eval-2.json:1066-1238, review-observe-eval-2.json:67-80, disagreements.json:129-135 and executor-status.json:246-249. Coordinator citations should be corrected. Verdict: PARTIAL, siding with the reviewer. What holds: - harbor …",
-      "fix": "Repository plan change, followed by a host run.\n\n1) In the Harbor row (install-plan.json:1785-1822), keep `uv tool install --python 3.13 harbor==0.23.0`. Add a pinned fixture source, because the wheel ships no examples/: `git clone --depth 1 --branch v0.23.0 https://github.com/harbor-framework/harbor \"$tool_root/harbor-v0.23.0\"`, and record the tag's commit SHA in the row.\n\n2) Add a functional acceptance stage to the row and to accept.sh, after the version line and before after_sign_in, since it needs no sign-in:\n`DOCKER_HOST=uni<host path> harbor run -p \"$tool_root/harbor-v0.23.0/examples/tasks/hello-user\" -a oracle -e docker -n 1 -o <jobs-dir>`\n- Require the trial result.json (src/harbor/models/trial/paths.py:289-291) to show exception_info null and verifier_result.rewards.reward == 1.0.\n- Repeat with `-a nop` and require reward 0.0 with verification completed (neg",
+      "fix": "Repository plan change, followed by a host run.\n\n1) In the Harbor row (install-plan.json:1785-1822), keep `uv tool install --python 3.13 harbor==0.23.0`. Add a pinned fixture source, because the wheel ships no examples/: `git clone --depth 1 --branch v0.23.0 https://github.com/harbor-framework/harbor \"$tool_root/harbor-v0.23.0\"`, and record the tag's commit SHA in the row.\n\n2) Add a functional acceptance stage to the row and to accept.sh, after the version line and before after_sign_in, since it needs no sign-in:\n`DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock harbor run -p \"$tool_root/harbor-v0.23.0/examples/tasks/hello-user\" -a oracle -e docker -n 1 -o <jobs-dir>`\n- Require the trial result.json (src/harbor/models/trial/paths.py:289-291) to show exception_info null and verifier_result.rewards.reward == 1.0.\n- Repeat with `-a nop` and require reward 0.0 with verification completed (neg",
       "fix_kind": "plan",
       "sources": [
         "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/tests/integration/test_hello_user_e2e.py",
@@ -924,7 +932,7 @@
       "status_source": "adjudicated",
       "agree": false,
       "reason": "READY is supported on the stated definitions. The reviewer's PARTIAL rests on a criterion that does not apply to this slot. Each criterion holds: (1) Version: zizmor 1.30.1 is installed through mise from the global config (delivery-1.json:1224-1229). That matches the unit pin 1.30.1 (units.json:1, entry delivery-1 slots[0]), the plan's release v1.30.1 and its `mise use -g zizmor@1.30.1` (install-plan.json:1852-1856), and …",
-      "fix": "No fix is needed for READY. The pinned install, the plan acceptance and the repository audit already pass, and this slot needs no repository plan change or host change.\n\nDo not apply the reviewer's OMNIROUTE_API_KEY step to this slot. It is a credential action owned by cross:gpt6-harnesses/gpt-gateway, and delivery-2.json:366 contests its 'existing omniroute profile' premise.\n\nOptional, non-gating Codex-side proof: in <host path> on <machine>, run `codex exec --json` on the native default route (no -p omniroute) with a prompt that runs `zizmor --version; zizmor --offline .github/workflows .github/dependabot.yml`. Record the command_execution events and their exit codes (https://developers.openai.com/codex/noninteractive). This route ran without any credential step in delivery-2.json:366-378.\n\nOwned by other slots:\n1. The secrets-credentials/credential-guard owner adds",
+      "fix": "No fix is needed for READY. The pinned install, the plan acceptance and the repository audit already pass, and this slot needs no repository plan change or host change.\n\nDo not apply the reviewer's OMNIROUTE_API_KEY step to this slot. It is a credential action owned by cross:gpt6-harnesses/gpt-gateway, and delivery-2.json:366 contests its 'existing omniroute profile' premise.\n\nOptional, non-gating Codex-side proof: in <host path> on NativeStack2604, run `codex exec --json` on the native default route (no -p omniroute) with a prompt that runs `zizmor --version; zizmor --offline .github/workflows .github/dependabot.yml`. Record the command_execution events and their exit codes (https://developers.openai.com/codex/noninteractive). This route ran without any credential step in delivery-2.json:366-378.\n\nOwned by other slots:\n1. The secrets-credentials/credential-guard owner adds",
       "fix_kind": "none",
       "sources": [
         "https://raw.githubusercontent.com/zizmorcore/zizmor/v1.30.1/docs/quickstart.md#L3 (reviewer-cited; not re-fetched by me)",
@@ -1031,7 +1039,7 @@
       "status_source": "reviewer",
       "agree": true,
       "reason": "Git 2.53.0 and package 1:2.53.0-1ubuntu1 match the live Ubuntu resolute package. accept-git exits 0, but its upstream-documented git --version command checks version reporting only. The remote lookup succeeds, and both fresh native client sessions invoke Git. The decisive failure is commit identity: git var GIT_AUTHOR_IDENT returns 128 in both sessions; the separate author/committer probe reports 128 for both. This …",
-      "fix": "Host state only: in <host path>, run git config --local user.name '<user-approved name>' and git config --local user.email '<user-approved email>' using the user's chosen commit identity. Verify git var GIT_AUTHOR_IDENT and git var GIT_COMMITTER_IDENT both exit 0, including through the shell tools of fresh Claude Code and Codex sessions.",
+      "fix": "Host state only: in <host path> run git config --local user.name '<user-approved name>' and git config --local user.email '<user-approved email>' using the user's chosen commit identity. Verify git var GIT_AUTHOR_IDENT and git var GIT_COMMITTER_IDENT both exit 0, including through the shell tools of fresh Claude Code and Codex sessions.",
       "fix_kind": "host",
       "sources": [
         "https://packages.ubuntu.com/resolute/git",
@@ -1107,6 +1115,7 @@
       "fix_kind": "none",
       "sources": [
         "https://github.com/anthropics/claude-code-action/blob/main/README.md",
+        "units.json",
         "<host path>"
       ]
     },
@@ -1124,6 +1133,7 @@
       "sources": [
         "https://github.com/Wilfred/difftastic/blob/0.71.0/manual/src/usage.md",
         "https://github.com/Wilfred/difftastic/blob/0.71.0/manual/src/git.md",
+        "units.json",
         "<host path>"
       ]
     },
@@ -1136,7 +1146,7 @@
       "status_source": "adjudicated",
       "agree": false,
       "reason": "PARTIAL. The reviewer is right. It is true that nothing gets installed: install-plan.json:2508 has installed=false and :2522 has acceptance {}. But the same row records an open gate at :2524: \"the qualification of the Codex 0.160 review command on the destination, owned by the Codex lane\". consensus.json:190-192 lists that as this slot's open_acceptance_gates. The decision record names it as …",
-      "fix": "A repository plan change, then a run on 2604. Nothing needs installing or configuring. The Codex lane owns the GPT half (decision record :141-142).\n\n1) In install-plan.json:2502-2525, give the cross-family-review row an acceptance.after_sign_in check (kind smoke) that covers both directions. Source it to the record's own sources (:367-369) plus the headless doc. In accept.sh, remove the slot from the skip loop (:820), add a function with an after_sign_in branch following the pattern at :79-82, and rewrite the claim at :3.\n\n2) GPT reviewing Claude-authored work: use a pinned commit whose trailers name Claude (for example 8c32a84b) and run:\ncodex exec review --commit <CLAUDE_SHA> -m gpt-6.1-sol -c model_reasoning_effort=\"max\" -c 'sandbox_mode=\"read-only\"' --ephemeral --json -o <dir><host path> < <host path>\nDo not pass a prompt argument: 0.160.0 rejects a prompt together with --commit (record ",
+      "fix": "A repository plan change, then a run on 2604. Nothing needs installing or configuring. The Codex lane owns the GPT half (decision record :141-142).\n\n1) In install-plan.json:2502-2525, give the cross-family-review row an acceptance.after_sign_in check (kind smoke) that covers both directions. Source it to the record's own sources (:367-369) plus the headless doc. In accept.sh, remove the slot from the skip loop (:820), add a function with an after_sign_in branch following the pattern at :79-82, and rewrite the claim at :3.\n\n2) GPT reviewing Claude-authored work: use a pinned commit whose trailers name Claude (for example 8c32a84b) and run:\ncodex exec review --commit <CLAUDE_SHA> -m gpt-6.1-sol -c model_reasoning_effort=\"max\" -c 'sandbox_mode=\"read-only\"' --ephemeral --json -o <dir>/last.txt < /dev/null\nDo not pass a prompt argument: 0.160.0 rejects a prompt together with --commit (record ",
       "fix_kind": "plan",
       "sources": [
         "https://code.claude.com/docs/en/code-review#review-a-diff-locally",
@@ -1223,7 +1233,7 @@
       "status_source": "adjudicated",
       "agree": false,
       "reason": "The reviewer is right: PARTIAL. What holds: the image is present at version, Ubuntu 26.04.1 LTS with the Canonical WSL image markers and wsl-setup 0.6.3ubuntu~26.04.1 (host-1.json:84, 519, 527). Client wiring and a fresh headless session do not apply to an operating system image. What does not hold: upstream acceptance. - The plan defines none. The row has `acceptance {}` …",
-      "fix": "Change the repository plan, then re-run the checks on <machine>. No host state changes for this slot.\n\n(1) Give the row a real acceptance. Replace `acceptance {}` (install-plan.json:2649) with Canonical's own tests at the installed version: ubuntu/wsl-setup tag 0.6.3, pinned to commit 73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8. Remove 'base-distribution' from accept.sh's skip loop (accept.sh:820-822). Run inside the distribution as its default user, from a checkout of that commit (or its raw files):\n- `bash test/basic-assertions.sh \"$WSL_USER\"`\n- `bash test/systemd-assertions.sh`\n\nRecord each script's real exit code. Take the expected user from the recipe's `<WSL_USER>` or from the `[user] default=` line of <host path> Do not adopt the reviewer's literal `basic-assertions.sh <user>`: it would publish the host account name.\n\n(2) Do not expect exit 0 from systemd-assertions.sh on WSL",
+      "fix": "Change the repository plan, then re-run the checks on NativeStack2604. No host state changes for this slot.\n\n(1) Give the row a real acceptance. Replace `acceptance {}` (install-plan.json:2649) with Canonical's own tests at the installed version: ubuntu/wsl-setup tag 0.6.3, pinned to commit 73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8. Remove 'base-distribution' from accept.sh's skip loop (accept.sh:820-822). Run inside the distribution as its default user, from a checkout of that commit (or its raw files):\n- `bash test/basic-assertions.sh \"$WSL_USER\"`\n- `bash test/systemd-assertions.sh`\n\nRecord each script's real exit code. Take the expected user from the recipe's `<WSL_USER>` or from the `[user] default=` line of /etc/wsl.conf. Do not adopt the reviewer's literal `basic-assertions.sh <user>`: it would publish the host account name.\n\n(2) Do not expect exit 0 from systemd-assertions.sh on WSL",
       "fix_kind": "plan",
       "sources": [
         "https://raw.githubusercontent.com/ubuntu/wsl-setup/73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8/test/systemd-assertions.sh (lines 6-9, 11-15, 21-28, 30-33; tag 0.6.3 resolves to 73418e32 per git ls-remote)",
