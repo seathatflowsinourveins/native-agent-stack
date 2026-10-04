@@ -15230,13 +15230,13 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "755e9d1e85f8abca24355a8a3cc31421e00f434f140157ced62d12a435394db7",
-      "bytes": 139753
+      "sha256": "89091ead1eecd0cf5f030f75ef721fe750b34023705f770539923180b7e87163",
+      "bytes": 140288
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "1a71e2293de6578ba7099a7b7b8f8c6486ec1a923b38c8bf44ae205f77a95c5c",
-      "bytes": 26007
+      "sha256": "5a72d2cd395bdef2dbc807e6172c9526256f2784aa0dcb7acbfcefeda4061f6f",
+      "bytes": 29964
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -15285,8 +15285,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "3a269190055b12b581e24846a157f3691578727f304d2f9f1fe0cccdbc77aa73",
-      "bytes": 474603
+      "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+      "bytes": 479154
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -15340,8 +15340,8 @@
     },
     {
       "path": "catalogs/landscape/research-state.json",
-      "sha256": "f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1",
-      "bytes": 21131
+      "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
+      "bytes": 21449
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -15560,8 +15560,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "7c435e409c43857e429b369367469fd75e662a6fd8bc9f7a226b381f2afcf1ed",
-      "bytes": 755876
+      "sha256": "4b62678bee9f238e0df6179a44f88860ed5b3d4b96b3505fdcb82a539d6db004",
+      "bytes": 757289
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -16099,6 +16099,11 @@
       "bytes": 21453
     },
     {
+      "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+      "sha256": "a4c5ddf98c9fa778d07b60507a183818b1d243dda789bc06ee8bcd612fcbcedb",
+      "bytes": 16588
+    },
+    {
       "path": "docs/decisions/2026-10-03-gpt-lane-omniroute-failover.md",
       "sha256": "fc541ea35372fed4256af2927371fbd366b365ccbb27096bf9ce4a7b3f041946",
       "bytes": 23761
@@ -16290,8 +16295,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5f78066695b8cf2efe83bee0b110dd0545c0d864bcebbc0ba9f2e30f588ff9bc",
-      "bytes": 156427
+      "sha256": "a9d6524f3e32e3531aecbb389999c76566491a227d04c2d2eda031794c733161",
+      "bytes": 159253
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16420,12 +16425,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "c54dd6ff904dcd699798e87a4c374d47f6b83f2df93f24c3e60a73dfe54ee226",
+      "sha256": "dbe33bcdccdcc2ff2ae21abf2c8cb831e29e2a4add866bb565341eeb275c4f14",
       "bytes": 560927
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "c28e1c488cdc3e9e401ca65de69f61cbf15e22786404fac840a50fc823c96be3",
+      "sha256": "790307290b9b980cd2549e2449d2df559e27f71c04808adff11a9919cc2fcf9c",
       "bytes": 323968
     },
     {
@@ -38280,7 +38285,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "df9003c68fe4c0768b399142a9504cbd8fe848d7618895ca3d6be6349ba98259",
+      "sha256": "82a7cd57951f4d9d5eabeb8037c5847ad77e572c25311804d077c7095b3db750",
       "bytes": 4174
     },
     {
