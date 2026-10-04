@@ -40093,6 +40093,16 @@
       "bytes": 11941
     },
     {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.py.txt",
+      "sha256": "023b555522e1291b8e978326eaac31b31834b26fce74e7606ba1f31478888933",
+      "bytes": 6335
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/recheck-advisory-mutation-control.stdout.txt",
+      "sha256": "6c14c74d306c2a672fad9a94767ba9c10d7f453163c58802611a1b5d485daad6",
+      "bytes": 2895
+    },
+    {
       "path": "evidence/artifacts/osv-split-hardening-port-20261003/red-R1.txt",
       "sha256": "f7ec26a21667f324a924557e8060a61e3ed0f566c40a2aa6d6a6e73c3bc46f53",
       "bytes": 9327
@@ -40141,6 +40151,26 @@
       "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.stdout.txt",
       "sha256": "7e42d7dd71f3a3351a3b56db793aa7696cadae9c6d8a8b9b57c6772dfc630055",
       "bytes": 4226
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.py.txt",
+      "sha256": "b1449383dcfc2f5799d9bc1a5f144a1bd063f08dc6b776dac5f22d0af0135c7f",
+      "bytes": 2558
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-override-key-function.stdout.txt",
+      "sha256": "e71767e753c536e0e7cc4eab58723cef0e59844be9a2fc9dee992f44397df19a",
+      "bytes": 530
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stderr.txt",
+      "sha256": "824676798b6e82d6695738d40180680c6b160b905334435aaf55ffed745af77d",
+      "bytes": 28944
+    },
+    {
+      "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-three-module-unittest.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
     },
     {
       "path": "evidence/artifacts/osv-split-hardening-port-20261003/tests-final.stderr.txt",
@@ -49399,8 +49429,8 @@
     },
     {
       "path": "evidence/receipts/osv-split-hardening-port-20261003.json",
-      "sha256": "725545ea32efeec4ff37df16fd0c6c596728ec8f3dea15e5d123b9ffea28bdda",
-      "bytes": 104714
+      "sha256": "840e5d47577f12651e34cd165e6013f421c2989797649b36d7af8f1bc3828bda",
+      "bytes": 113894
     },
     {
       "path": "evidence/receipts/osv-urllib3-next-20260930.json",
@@ -51324,8 +51354,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "33fcb5e4580443d97e3dd0ac282651d10eec26d9b8e72cf10651c4426eb8f2d3",
-      "bytes": 75469
+      "sha256": "86f372452299daf1be59452c3e0c13691a1c00058154d17a8a594a914c19dbe6",
+      "bytes": 75774
     },
     {
       "path": "tests/test_path_safety.py",
