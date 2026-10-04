@@ -5,3 +5,6 @@ evidence/artifacts/retrieved-code.txt whitespace=-blank-at-eof
 evidence/artifacts/direct-desktop-search.txt whitespace=-blank-at-eof
 # Keep native Promptfoo export bytes unchanged; upstream includes trailing spaces.
 evidence/artifacts/promptfoo-nemotron-upstream-20260921/report.html -whitespace
+# Keep the retained native codex --version/--help output bytes unchanged: blank help lines carry trailing spaces
+# and the capture ends with a blank line.
+evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-client-check-20261003.txt -whitespace

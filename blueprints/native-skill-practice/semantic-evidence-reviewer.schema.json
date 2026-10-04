@@ -1,0 +1,66 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "semantic-evidence-reviewer return (one review call)",
+ "description": "A4 of the 2026-10-03 Jev rules (README.md, Jev rules). The caller supplies this schema, because agent frontmatter has no schema field: a workflow passes it to agent({agentType, schema}), which validates the return and fails the call after five invalid attempts; a coordinator validates the return of a single Agent-tool call against it; a Codex caller passes it with codex exec --output-schema. Validation checks the shape, not whether a disposition is right. Per case: final_disposition is the reviewer's own source review; retained_provider_disposition is the advisory provider label exactly as the coordinator supplied it, or null when none was supplied; source_refs cite file:line, the recorded pin or the docs; correction and limits are empty strings when there is nothing to report. skill_path and model are 'unavailable' when the client does not expose them. Every property is required and no other is allowed, as Codex strict output requires.",
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+  "cases": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+     "case_id": {
+      "type": "string"
+     },
+     "final_disposition": {
+      "type": "string",
+      "enum": [
+       "supported",
+       "contradicted",
+       "insufficient"
+      ]
+     },
+     "retained_provider_disposition": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "source_refs": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "correction": {
+      "type": "string"
+     },
+     "limits": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "case_id",
+     "final_disposition",
+     "retained_provider_disposition",
+     "source_refs",
+     "correction",
+     "limits"
+    ]
+   }
+  },
+  "skill_path": {
+   "type": "string"
+  },
+  "model": {
+   "type": "string"
+  }
+ },
+ "required": [
+  "cases",
+  "skill_path",
+  "model"
+ ]
+}

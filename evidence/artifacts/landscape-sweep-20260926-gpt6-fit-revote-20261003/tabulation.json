@@ -1,0 +1,4287 @@
+{
+ "schema_version": 1,
+ "label": "landscape-sweep-20260926-gpt6-fit-revote-20261003",
+ "workflow_run": "wf_555874dd-5a7",
+ "returns_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+ "returns_sha256": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
+ "sealed_votes": "facts and fit.claude are the sealed 2026-09-26 votes at facts_ref and fit_ref, used unchanged; only the gpt6 member is new. The sealed record is not changed.",
+ "rules": {
+  "fit": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+  "is_refuted": "convert.is_refuted: a vote refutes unless it says refuted: false, so a missing vote refutes",
+  "votes_by_slug": "convert.votes_by_slug over convert.gpt6_out({status: ok, output: last.json}): when a repository appears twice, the refuting vote wins",
+  "survives": "not is_refuted(facts) and not fit_refuted (convert.py line 562)",
+  "refuted_by_absence": "not survives and no returned vote refutes: not ((facts refuted and returned) or (Claude fit refuted and returned) or (GPT-6 fit refuted and returned)) (convert.py lines 562-567; scripts/saturation_ledger.py refuted_by_absence gives the same 27 before)",
+  "gpt6_member": "convert.py lines 549-551: model and effort, the vote's refuted, confidence, reasoning and refs (or missing: true), and the job's skills_used"
+ },
+ "lane_classes": {
+  "native": "jobs in <work-dir>/lane through Codex's built-in OpenAI provider; effort is the result line's effort and request_effort (max/max)",
+  "omniroute": "jobs in <work-dir>/lane-omni through OmniRoute 20128, kept in separate fields and never merged into the native tally; effort 'staged max, upstream unverified'. None started."
+ },
+ "counts": {
+  "rows": 71,
+  "decisive": {
+   "proposals": 27,
+   "repositories": 26,
+   "note": "27, not 28: openai/codex is decisive in workers/0 and web-research/3"
+  },
+  "after_native": {
+   "survives": 19,
+   "refuted_on_merit": 8,
+   "refuted_by_absence": 0
+  },
+  "after_omniroute": "no omniroute vote exists: no omniroute job started",
+  "non_decisive": {
+   "rows": 44,
+   "gpt6_refuted": 25,
+   "gpt6_not_refuted": 19,
+   "survives": 0
+  },
+  "gpt6_votes": {
+   "returned": 71,
+   "missing": 0,
+   "refuted": 33
+  }
+ },
+ "rows": [
+  {
+   "layer_id": "native-clients",
+   "index": 0,
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/0/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-native-clients",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.93,
+    "reasoning": "Refuted as scoped, despite genuine SessionStore functionality and supported subscription usage. Native cross-host JSONL transfer is already documented. The SDK mirrors entries after local writes; mirroring is asynchronous and best-effort. Its reference adapters explicitly are not maintained production implementations, and conformance does not establish resilience. SIGKILL with the database still on the originating workstation cannot qualify workstation-loss recovery or power-loss durability. The proposal needs an independent storage failure domain and matched CLI versions before its claimed recovery advantage is testable.",
+    "refs": [
+     "https://code.claude.com/docs/en/agent-sdk/sessions",
+     "https://code.claude.com/docs/en/agent-sdk/session-storage",
+     "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.160/src/claude_agent_sdk/_internal/transcript_mirror_batcher.py",
+     "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.160/examples/session_stores/README.md",
+     "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "native-clients",
+   "index": 1,
+   "repository": "https://github.com/openai/openai-agents-python",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/1/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-native-clients",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.98,
+    "reasoning": "The authentication correction is valid: v0.22.3 invokes the native Codex executable, supports exec resume, and supplies an API key only when provided. However, the proposal expressly identifies no capability gap. Wrapping those existing operations does not establish improved recovery, event fidelity or task quality. Handoffs and cross-thread orchestration are hypothetical future requirements. Correct the catalog's blanket API-backed characterization, but retain unqualified status rather than scheduling this comparison now.",
+    "refs": [
+     "https://github.com/openai/openai-agents-python/blob/v0.22.3/src/agents/extensions/experimental/codex/exec.py"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "native-clients",
+   "index": 2,
+   "repository": "https://github.com/earendil-works/pi",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/2/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-native-clients",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.88,
+    "reasoning": "The not_adopted disposition survives on requirement fit. The tagged documentation describes provider-owned OAuth implementations and Pi-managed credentials, rather than preserving the native clients' execution paths. No comparative result establishes a benefit for this layer's accounts, tools or recovery requirements. This supports rejecting the proposed integration without asserting inferior model quality, a blanket legal prohibition, or an absence of general session support.",
+    "refs": [
+     "https://github.com/earendil-works/pi/blob/v0.87.1/packages/ai/README.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "native-clients",
+   "index": 3,
+   "repository": "https://github.com/agentclientprotocol/claude-agent-acp",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/3/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-native-clients",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.97,
+    "reasoning": "The sessionFailure extension exists, but its tagged specification describes experimental, opt-in presentation records and recommended actions. It explicitly does not create independent lifecycle state. That is not evidence of stronger crash recovery or effect guarantees. The proposal acknowledges that no ACP-host requirement exists for this layer, so keep_but_compare adds a comparison without a demonstrated current gap. Preserve it as a conditional alternative.",
+    "refs": [
+     "https://github.com/agentclientprotocol/claude-agent-acp/blob/v0.81.2/docs/session-failure-extension.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "native-clients",
+   "index": 4,
+   "repository": "https://github.com/letta-ai/letta-code",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/4/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-native-clients",
+   "facts_refuted": true,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.97,
+    "reasoning": "Local backend support is real, but the proposed restoration mechanism is not established. The README at the September 26 cutoff says full AgentFile export/import and the corresponding commands were removed; memory and transcript exports remain distinct. It documents cross-computer agent continuity through Letta Cloud. Neither that cloud route nor persistent identity demonstrates local cross-host disaster recovery with preserved native tools and effects. The proposal needs a supported full-state restoration procedure and account path before comparison.",
+    "refs": [
+     "https://github.com/letta-ai/letta-code/blob/20332a3c7887f827a16725752cb64dd3e33ae5a6/README.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "native-clients",
+   "index": 5,
+   "repository": "https://github.com/aaif-goose/goose",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/5/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/5/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-native-clients",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.95,
+    "reasoning": "The rejection overstates the evidence. Tagged ACP documentation confirms that goose ACP providers lack session fork/resume. However, the same release explicitly retains deprecated native Claude Code and Codex CLI providers for backward compatibility, and documents session persistence for CLI providers. Source also confirms the Claude CLI subprocess path remains. Therefore ACP is not the only native-account route. This corrects the stated rejection reason; it does not qualify legacy recovery or establish a reason to adopt goose.",
+    "refs": [
+     "https://github.com/aaif-goose/goose/blob/v1.52.0/documentation/docs/guides/acp-providers.md",
+     "https://github.com/aaif-goose/goose/blob/v1.52.0/documentation/docs/guides/cli-providers.md",
+     "https://github.com/aaif-goose/goose/blob/v1.52.0/crates/goose/src/providers/claude_code.rs"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "native-clients",
+   "index": 6,
+   "repository": "https://github.com/nousresearch/hermes-agent",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/6/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-native-clients",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.99,
+    "reasoning": "The decisive rejection reason is contradicted by the proposed release itself. v2026.9.24 documents an opt-in Codex app-server runtime using the installed native executable and existing Codex login, with ChatGPT subscription billing and no API key requirement. It also documents persisted Codex thread IDs and thread/resume after restart. Thus Hermes does not necessarily require Nous SaaS or new provider credentials. These capabilities warrant correcting the record, although they do not independently establish superiority over native Codex.",
+    "refs": [
+     "https://github.com/NousResearch/hermes-agent/blob/v2026.9.24/website/docs/user-guide/features/codex-app-server-runtime.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "native-clients",
+   "index": 7,
+   "repository": "https://github.com/anomalyco/opencode",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/7/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-native-clients",
+   "facts_refuted": true,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.88,
+    "reasoning": "The not_adopted disposition survives as a bounded lack-of-advantage finding. Official documentation supports existing ChatGPT subscriptions, so credential availability alone would not justify rejection. Neither the supplied release observations nor the inspected model-by-harness benchmark establishes an advantage on this frozen native-account task or its recovery checks. Standing note: the repository explicitly reports no matched baseline for the winners; their comparative quality leadership remains unmeasured and must not be inferred from retention.",
+    "refs": [
+     "https://opencode.ai/docs/providers",
+     "https://github.com/akitaonrails/llm-coding-benchmark/blob/master/docs/success_report.v2.md",
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/full-stack-convergence.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "instructions-skills",
+   "index": 0,
+   "repository": "https://github.com/mattpocock/skills",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/0/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-instructions-skills",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.94,
+    "reasoning": "The proposal is superseded by the September 26 record: writing-for-agents is already pinned in the trial, with its gap explicitly narrowed to AGENTS.md and CLAUDE.md. That record identifies skill-authoring overlap with native skill-creator procedures. The proposed broader authoring comparison supplies no new results that justify another candidate designation. Continue the existing canonical-instruction trial; its inclusion does not establish superiority.",
+    "refs": [
+     "[September 26 trial manifest](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b5c6313b2d00ee075b7862c89d644853a0707027/adoption/skills/manifest.json)",
+     "[Pinned writing-for-agents procedure](https://github.com/mattpocock/skills/blob/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents/SKILL.md)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "instructions-skills",
+   "index": 1,
+   "repository": "https://github.com/agent-sh/agnix",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/1/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-instructions-skills",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.88,
+    "reasoning": "A bounded lint trial survives: instruction, hook and configuration validation supplies a plausible incremental capability, and v0.54.0 provides Linux x86_64 and macOS arm64 binaries under usable licensing. Correct two claims before interpreting results: the release tracks Claude 2.1.273, not the unreleased 2.1.278 baseline; --target is a legacy preset, not strict tool isolation. These corrections do not invalidate the proposed comparison. Rule counts and the supplied advisory claims do not establish quality or safety.",
+    "refs": [
+     "[Pinned capabilities and licensing](https://github.com/agent-sh/agnix/blob/v0.54.0/README.md)",
+     "[Release assets](https://github.com/agent-sh/agnix/releases/tag/v0.54.0)",
+     "[Release-specific changelog](https://github.com/agent-sh/agnix/blob/v0.54.0/CHANGELOG.md)",
+     "[Filtering and version configuration](https://github.com/agent-sh/agnix/blob/main/docs/CONFIGURATION.md)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "instructions-skills",
+   "index": 2,
+   "repository": "https://github.com/openai/plugins",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/2/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-instructions-skills",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.82,
+    "reasoning": "The narrowly selected plugin-eval survives. Its manifest declares MIT, its Node package declares no external dependencies, and its implementation provides local analysis plus Codex execution and usage artifacts. This supports a bounded measurement trial without adopting the catalog. The disabled arm must address the copied skill inside the temporary CODEX_HOME and control inherited configuration; disabling its original installation path is insufficient. Deprecation of openai/skills does not itself validate replacements. The supplied ECC, TypeSafe and OpenAI winner standings remain integration controls without measured comparative superiority.",
+    "refs": [
+     "[Plugin license declaration](https://github.com/openai/plugins/blob/1dc195897af4161d039b80d8471ec0a10c9bbc89/plugins/plugin-eval/.codex-plugin/plugin.json)",
+     "[Node package](https://github.com/openai/plugins/blob/1dc195897af4161d039b80d8471ec0a10c9bbc89/plugins/plugin-eval/package.json)",
+     "[Benchmark implementation](https://github.com/openai/plugins/blob/1dc195897af4161d039b80d8471ec0a10c9bbc89/plugins/plugin-eval/src/core/benchmark.js)",
+     "[Temporary workspace provisioning](https://github.com/openai/plugins/blob/1dc195897af4161d039b80d8471ec0a10c9bbc89/plugins/plugin-eval/src/core/benchmark-workspace.js)",
+     "[Path-specific skill controls](https://learn.chatgpt.com/docs/build-skills)",
+     "[Deprecation notice](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/README.md)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "instructions-skills",
+   "index": 3,
+   "repository": "https://github.com/anthropics/skills",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/3/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-instructions-skills",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.91,
+    "reasoning": "The measurement gap is real, but the September 26 manifest already records native skill-creator copies and excludes another copy as duplication. Upstream documents paired evaluation and aggregation, establishing an available procedure rather than a missing capability. The proposal supplies no verified difference from those existing copies. Validate aggregation and run the frozen comparison using the existing procedure before adding or promoting another source.",
+    "refs": [
+     "[Recorded native overlap](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b5c6313b2d00ee075b7862c89d644853a0707027/adoption/skills/manifest.json)",
+     "[Skill-creator evaluation procedure](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md)",
+     "[Native evaluation comparison](https://code.claude.com/docs/en/plugin-evals)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "instructions-skills",
+   "index": 4,
+   "repository": "https://github.com/trailofbits/skills",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/4/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-instructions-skills",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.97,
+    "reasoning": "This repeats an existing scoped trial. The September 26 manifest already pins agentic-actions-auditor, fp-check and property-based-testing, including the same agentic-CI gap. The proposal adds a future fixture plan but no new revision, verified finding or comparative result. Its specialist procedure remains worth evaluating; that does not justify treating the same known alternative as a new candidate or promoting it.",
+    "refs": [
+     "[Existing pinned trial entries](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b5c6313b2d00ee075b7862c89d644853a0707027/adoption/skills/manifest.json)",
+     "[Pinned CI audit procedure](https://github.com/trailofbits/skills/blob/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/agentic-actions-auditor/skills/agentic-actions-auditor/SKILL.md)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "instructions-skills",
+   "index": 5,
+   "repository": "https://github.com/obra/superpowers",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/5/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/5/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-instructions-skills",
+   "facts_refuted": true,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.94,
+    "reasoning": "The pinned diagnostic does not substantiate the claimed general discovery-gap coverage. Its timeline analyst checks missed and late triggers against installed Superpowers descriptions; other skills are inventoried when used, without equivalent trigger checks. It also mandates all seven analysts. Consequently, the proposed procedure does not directly establish coverage of missing ECC, TypeSafe or OpenAI skill activation in this stack. A generic upstream diagnostic mode or retained evidence on those cases is needed to reopen this proposal.",
+    "refs": [
+     "[Pinned diagnostic workflow](https://github.com/obra/superpowers/blob/v6.4.1/skills/diagnosing-superpowers/SKILL.md)",
+     "[Superpowers-specific trigger comparison](https://github.com/obra/superpowers/blob/v6.4.1/skills/diagnosing-superpowers/prompts/skill-timeline.md)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "instructions-skills",
+   "index": 6,
+   "repository": "https://github.com/anthropics/claude-plugins-official",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/6/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-instructions-skills",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.89,
+    "reasoning": "The proposal establishes no incremental gap for this repository's canonical AGENTS.md arrangement. The improver discovers and scores CLAUDE.md files and proposes additions there. Restricting it to read-only avoids the writing conflict but does not demonstrate coverage of the canonical instruction chain or an advantage over prompt-audit and the existing writing-for-agents trial. Its Apache-2.0 license is usable; age and official ownership are not the rejection grounds.",
+    "refs": [
+     "[Documented discovery and update scope](https://github.com/anthropics/claude-plugins-official/blob/main/plugins/claude-md-management/skills/claude-md-improver/SKILL.md)",
+     "[Selected plugin license](https://github.com/anthropics/claude-plugins-official/blob/main/plugins/claude-md-management/LICENSE)",
+     "[Native prompt-audit changelog](https://github.com/anthropics/claude-code/blob/v2.1.283/CHANGELOG.md)",
+     "[Canonical-instruction trial scope](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b5c6313b2d00ee075b7862c89d644853a0707027/adoption/skills/manifest.json)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "instructions-skills",
+   "index": 7,
+   "repository": "https://github.com/microsoft/skillopt",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/7/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-instructions-skills",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.87,
+    "reasoning": "Keep-but-compare is justified by published evidence for bounded, validation-gated skill optimization, rather than popularity or incumbency. Those benchmark results do not establish improvement on this repository. The proposal appropriately defers adoption until frozen held-out tasks, reviewed inputs and quality/token gates exist. The documented transcript privacy limitation rules out unreviewed harvesting, not the proposed reviewed-task comparison. Neither exclusivity among optimizers nor advisory cleanliness was established by this review.",
+    "refs": [
+     "[Primary optimization paper](https://arxiv.org/abs/2605.23904)",
+     "[Repository and MIT license](https://github.com/microsoft/SkillOpt)",
+     "[Task review and data-boundary documentation](https://github.com/microsoft/SkillOpt/blob/main/docs/sleep/README.md)",
+     "[Evaluation tooling release status](https://github.com/microsoft/SkillOpt/blob/main/CHANGELOG.md)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "workers",
+   "index": 0,
+   "repository": "https://github.com/openai/codex",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/0/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-workers",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.83,
+    "reasoning": "The cited release adds concrete cancellation cleanup and returned agent snapshots, providing new evidence for this known alternative. A bounded native-account comparison is justified. Correction: Worktrunk explicitly reserves automatic worktree isolation for Claude Code; the proposal must use its separate-process/worktree option or treat child ownership as unqualified. Standing note: the current winners remain provisional local controls, with unresolved accounting and no established comparative superiority.",
+    "refs": [
+     "https://github.com/openai/codex/releases/tag/rust-v0.157.0",
+     "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+     "https://worktrunk.dev/claude-code/",
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/b5c6313b2d00ee075b7862c89d644853a0707027/docs/foundation-convergence-20260921.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check",
+     "openai-docs"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "workers",
+   "index": 1,
+   "repository": "https://github.com/coleam00/archon",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/1/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-workers",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.85,
+    "reasoning": "The pinned documentation supports a concrete gap: persisted workflow state, approval gates, resumable completed-node tracking and per-run worktrees. Claude global authentication and disabled telemetry make a local trial feasible; documented installation covers the required platform families. Isolation is per run, so concurrent writers within one DAG are not thereby isolated. Abrupt-crash recovery remains a test obligation: the documented resume command covers failed or paused runs, not proof of recovery from every running-state crash.",
+    "refs": [
+     "https://github.com/coleam00/Archon/blob/v0.11.1/README.md",
+     "https://github.com/coleam00/Archon/blob/v0.11.1/packages/docs-web/src/content/docs/reference/commands.md",
+     "https://archon.diy/getting-started/ai-assistants/",
+     "https://api.github.com/repos/coleam00/Archon"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check",
+     "openai-docs"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "workers",
+   "index": 2,
+   "repository": "https://github.com/augani/agent-orchestrator",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/2/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-workers",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.97,
+    "reasoning": "Static source inspection breaks the central ownership claim. command_launch scans active jobs before creating its job record, without a lock spanning check and registration; concurrent launches can both pass. Cancellation also has a startup race: command_cancel signals only an already-recorded child PID, while command_worker does not check the cancellation marker before spawning or during its polling loop. These inferred failure paths directly undermine the proposed writer-conflict and cancellation acceptance cases. No candidate code was executed.",
+    "refs": [
+     "https://github.com/Augani/agent-orchestrator/blob/main/plugins/agent-orchestrator/scripts/cli_agent_job.py#L2856-L3098",
+     "https://github.com/Augani/agent-orchestrator/blob/main/plugins/agent-orchestrator/scripts/cli_agent_job.py#L3131-L3274",
+     "https://github.com/Augani/agent-orchestrator/blob/main/plugins/agent-orchestrator/scripts/cli_agent_job.py#L3597-L3619",
+     "https://api.github.com/repos/Augani/agent-orchestrator"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check",
+     "openai-docs"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "workers",
+   "index": 3,
+   "repository": "https://github.com/sipyourdrink-ltd/bernstein",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/3/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-workers",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.79,
+    "reasoning": "Keeping it for comparison is justified by pinned checkpoint/resume, manifest validation, native CLI adapters and independently verifiable receipts. Important limits: worktrees are not enforced filesystem containment; stronger sandboxing is opt-in. Journal verification does not prove exactly-once effects, and receipt completeness requires an independent seal. The cited isolation advisory affects versions below 3.15.0, so it does not establish vulnerability in 3.20.0. A quiet advisory interval is not a substitute for version-specific regression evidence.",
+    "refs": [
+     "https://github.com/sipyourdrink-ltd/bernstein/blob/v3.20.0/README.md",
+     "https://github.com/sipyourdrink-ltd/bernstein/security/advisories/GHSA-355g-cmh4-98hw",
+     "https://api.github.com/repos/sipyourdrink-ltd/bernstein"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check",
+     "openai-docs"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "workers",
+   "index": 4,
+   "repository": "https://github.com/loopx-project/loopx",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/4/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-workers",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.76,
+    "reasoning": "The published native-baseline comparison supplies new evidence sufficient for keep_but_compare, alongside documented durable ownership and handoffs. It establishes no winner: unequal budgets, one effective trial and unchanged strict solves confound the reward improvement, and bounded-task transfer remains unmeasured. The proposed repeated equal-budget restart comparison addresses those limitations. The examined launcher advisory was patched in 0.4.5; it is not evidence that the proposed 1.2.0 remains affected.",
+    "refs": [
+     "https://github.com/loopx-project/loopx/blob/v1.2.0/README.md#lhtb-results",
+     "https://github.com/loopx-project/loopx/blob/v1.2.0/README.md#try-loopx",
+     "https://github.com/loopx-project/loopx/security/advisories/GHSA-c42j-vw98-9jqm"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check",
+     "openai-docs"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "workers",
+   "index": 5,
+   "repository": "https://github.com/openai/symphony",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/5/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/5/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-workers",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.97,
+    "reasoning": "The proposed cancellation behavior conflicts with preserving owned edits. Terminal issues trigger workspace cleanup; the pinned implementation recursively removes the workspace and ignores before_remove hook failures. Thus cleanup can discard unreviewed edits. Blocked approvals also disappear on restart, explicitly failing the proposed recovery case. A hardened future implementation is not evidence for this artifact. Correction: bundled releases include Elixir/Erlang and list both required architectures, so installing that toolchain is not inherently necessary.",
+    "refs": [
+     "https://github.com/openai/symphony/blob/v0.0.3/elixir/README.md",
+     "https://github.com/openai/symphony/blob/v0.0.3/elixir/lib/symphony_elixir/workspace.ex#L159-L182",
+     "https://github.com/openai/symphony/blob/v0.0.3/elixir/lib/symphony_elixir/workspace.ex#L331-L395"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check",
+     "openai-docs"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "workers",
+   "index": 6,
+   "repository": "https://github.com/openhands/software-agent-sdk",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/6/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-workers",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.8,
+    "reasoning": "Keep_but_compare survives: the September 23 release provides new usage-normalization and orphan-observation evidence, while the pinned implementation exposes distinct pause and interruption semantics. Synthetic interruption records must not be accepted as actual tool failures; in-flight tool threads can outlive the interrupted run. The proposal correctly makes these acceptance conditions. Authentication needs qualification, but an API-key-only rejection would be wrong: the same pin implements ChatGPT subscription OAuth, although reuse of existing native-client credentials is not demonstrated.",
+    "refs": [
+     "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.49.5",
+     "https://github.com/OpenHands/software-agent-sdk/blob/v1.49.6/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py",
+     "https://github.com/OpenHands/software-agent-sdk/blob/v1.49.6/openhands-sdk/openhands/sdk/llm/auth/openai.py",
+     "https://github.com/OpenHands/software-agent-sdk/blob/v1.49.6/README.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check",
+     "openai-docs"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "workers",
+   "index": 7,
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/7/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-workers",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.92,
+    "reasoning": "This duplicates the already-listed conditional alternative without new requirement-specific evidence. Persistence and human-intervention primitives are relevant, but the proposal supplies no new release capability, retained comparison or supported native-worker integration demonstrating improved ownership, preserved failures or review-gated integration. Its suggested wrapper remains application work to qualify. This does not establish LangGraph as unsuitable generally; it fails the new-evidence threshold for this proposal.",
+    "refs": [
+     "https://docs.langchain.com/oss/javascript/langgraph/persistence",
+     "https://api.github.com/repos/langchain-ai/langgraph",
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/b5c6313b2d00ee075b7862c89d644853a0707027/docs/foundation-convergence-20260921.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check",
+     "openai-docs"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "index": 0,
+   "repository": "https://github.com/superradcompany/microsandbox",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/0/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-isolation",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.92,
+    "reasoning": "keep_but_compare survives. Tagged v0.7.3 documentation supports local live snapshots, branching, network policies and resource configuration; its release also tightens hostname enforcement. This supplies concrete new evidence for the VM comparison. KVM access, cleanup and restored-worker performance remain qualification gates. The PyPI 0.7.4 advisory claim does not establish safety of runtime 0.7.3. Standing note: the winners' scoped native receipts do not establish VM/resource/macOS superiority.",
+    "refs": [
+     "[Tagged README](https://github.com/superradcompany/microsandbox/blob/v0.7.3/README.md)",
+     "[Tagged snapshot API](https://github.com/superradcompany/microsandbox/blob/v0.7.3/docs/sdk/typescript/snapshots.mdx)",
+     "[v0.7.3 release](https://github.com/superradcompany/microsandbox/releases/tag/v0.7.3)",
+     "[Winner evidence and limitations](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/landscape/foundation.json)"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "index": 1,
+   "repository": "https://github.com/boxlite-ai/boxlite",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/1/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-isolation",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.97,
+    "reasoning": "Refuted as written because the acceptance trial confuses host and guest resource controls. v0.10.4 source defaults max_processes to 1024 for the host-side process tree; it does not establish the proposed 100-process guest fork-bomb ceiling. The cited maximum() guide conflicts with that source. The CLI also documents inbound networking enabled by default. BoxLite remains a plausible VM challenger, but the proposed targeted trial needs corrected enforcement semantics and explicit configuration.",
+    "refs": [
+     "[Security defaults and host process cap](https://github.com/boxlite-ai/boxlite/blob/v0.10.4/src/boxlite/src/runtime/advanced_options.rs)",
+     "[Resource-limit implementation](https://github.com/boxlite-ai/boxlite/blob/v0.10.4/src/boxlite/src/jailer/common/rlimit.rs)",
+     "[CLI networking and cleanup semantics](https://github.com/boxlite-ai/boxlite/blob/v0.10.4/docs/reference/cli/README.md)",
+     "[Conflicting integration guide](https://github.com/boxlite-ai/boxlite/blob/v0.10.4/docs/guides/ai-agent-integration.md)"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "index": 2,
+   "repository": "https://github.com/podman-container-tools/podman",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/2/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-isolation",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.84,
+    "reasoning": "targeted_candidate survives as qualification of the existing OCI alternative. The versioned run reference supplies concrete resource and networking controls, with explicit rootless delegation restrictions; v6.1.2 also fixes host-file overwrite during imports. These are requirement-relevant evidence beyond a generic rootless-container recommendation. The proposed Linux-first trial is bounded and correctly separates shared-kernel isolation from the Mac VM qualification.",
+    "refs": [
+     "[v6.1.2 run reference](https://docs.podman.io/en/v6.1.2/markdown/podman-run.1.html)",
+     "[v6.1.2 security fixes](https://github.com/podman-container-tools/podman/releases/tag/v6.1.2)",
+     "[Existing OCI comparison protocol](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/landscape/foundation.json)"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "index": 3,
+   "repository": "https://github.com/apple/container",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/3/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-isolation",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.85,
+    "reasoning": "targeted_candidate survives for the explicitly Mac-only role. Tagged documentation establishes Apple Silicon Linux VMs, signed installation, macOS 26 requirements and remove-on-exit operation. Release 1.4.1 adds cleanup and resource/status visibility relevant to the qualification gap. This supports advancing the existing conditional alternative to a bounded trial; it establishes neither crash-cleanup correctness nor Linux portability.",
+    "refs": [
+     "[1.4.1 platform and lifecycle documentation](https://github.com/apple/container/blob/1.4.1/README.md)",
+     "[1.4.1 cleanup and security changes](https://github.com/apple/container/releases/tag/1.4.1)",
+     "[Existing Mac qualification limitations](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/landscape/foundation.json)"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "index": 4,
+   "repository": "https://github.com/smol-machines/smolvm",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/4/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-isolation",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.89,
+    "reasoning": "keep_but_compare survives. The tagged README supports separate guest kernels, disabled-by-default networking, host allowlisting, configurable resources and ephemeral execution on both host architectures. It also explicitly discloses the unconfined VMM and unsigned, fail-open installer verification. Those limitations justify the proposal's confinement and release-verification gates. Neither release frequency nor the 'safest default' superlative establishes superiority.",
+    "refs": [
+     "[v1.19.0 capabilities and security limitations](https://github.com/smol-machines/smolvm/blob/v1.19.0/README.md)",
+     "[v1.19.0 release](https://github.com/smol-machines/smolvm/releases/tag/v1.19.0)"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "index": 5,
+   "repository": "https://github.com/multikernel/sandlock",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/5/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/5/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-isolation",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.83,
+    "reasoning": "The proposed resource advantage is not established against the available native composition. The retained host evidence already records a bounded systemd scope with MemoryMax and pids.max, although hostile-load enforcement still needs qualification. Sandlock's documented process limit excludes threads, so it is not equivalent to a task ceiling. Method/path ACLs are concrete, but no selected workload requirement needing that additional granularity is identified. A new process sandbox therefore lacks a demonstrated advantage for this trial.",
+    "refs": [
+     "[Tagged resource and HTTP policy semantics](https://github.com/multikernel/sandlock/blob/v0.8.8/docs/sandbox-reference.md)",
+     "[Existing native resource-scope evidence](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json)",
+     "[v0.8.8 release](https://github.com/multikernel/sandlock/releases/tag/v0.8.8)"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "index": 6,
+   "repository": "https://github.com/nolabs-ai/nono",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/6/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-isolation",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.85,
+    "reasoning": "The release verifies improvements to nono's own DNS handling, but supplies no comparative evidence that it closes sandbox-runtime's readiness or policy-enforcement gaps. The proposed cold-start and bypass checks remain prospective. This repeats a known native-policy alternative without establishing a winner-relative advantage or addressing the requested OCI/VM comparison. The linked advisories are not treated as proof that v0.78.0 remains vulnerable; affected ranges were not verified.",
+    "refs": [
+     "[v0.78.0 changes and advisories](https://github.com/nolabs-ai/nono/releases/tag/v0.78.0)",
+     "[Native policy runtime overview](https://github.com/nolabs-ai/nono)",
+     "[Current requirement and qualification gaps](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/landscape/foundation.json)"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "index": 7,
+   "repository": "https://github.com/lensapp/lens-sandbox",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/7/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-isolation",
+   "facts_refuted": true,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.91,
+    "reasoning": "Insufficient verifiable evidence under the uncertainty rule. The cached upstream README supports local microVMs and policy approvals, but a supported release pin, maintenance status, unattended enforcement and crash cleanup were not established. Repository and README API fetches returned 404; that does not prove abandonment or explain availability. The proposal consequently remains a discovery lead rather than a supported keep_but_compare verdict.",
+    "refs": [
+     "[Indexed upstream README](https://github.com/lensapp/lens-sandbox)",
+     "[Repository API checked](https://api.github.com/repos/lensapp/lens-sandbox)",
+     "[README API checked](https://api.github.com/repos/lensapp/lens-sandbox/contents/README.md)"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "index": 0,
+   "repository": "https://github.com/anthropics/claude-plugins-official",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/0/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-code-navigation",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.92,
+    "reasoning": "The targeted_candidate label holds. The pinned marketplace supplies Python and TS/JS servers, and official documentation confirms native navigation and automatic diagnostics. Avoiding an additional MCP bridge is a concrete fit advantage worth the proposed bounded comparison. Include ranged reads, diagnostics and server startup in total cost. Open Codex issues do not establish capability absence. Standing note: Serena's supplied native acceptance establishes operability, not superiority over this omitted comparison arm.",
+    "refs": [
+     "https://github.com/anthropics/claude-plugins-official/blob/0c186cf8c54bdf925cb2572e871ec16d04aa8425/.claude-plugin/marketplace.json",
+     "https://code.claude.com/docs/en/tools-reference#lsp-tool-behavior",
+     "https://api.github.com/repos/anthropics/claude-plugins-official"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "index": 1,
+   "repository": "https://github.com/probelabs/probe",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/1/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-code-navigation",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.87,
+    "reasoning": "The targeted_candidate label holds for structural retrieval. The September 22 source documents index-free ranked search, complete code blocks, symbol/range extraction and direct tools without the agent layer. Installation documentation lists both required architectures. This combination offers a plausible cold-start and extraction-cost advantage beyond merely duplicating ast-grep. The proposal correctly separates optional LSP indexing, includes tests and requires comparison with direct reads. Reference completeness remains unproven.",
+    "refs": [
+     "https://github.com/probelabs/probe/blob/2330752f52a82fccb693a2843fcd3f03e61d5fbb/README.md",
+     "https://github.com/probelabs/probe/blob/main/docs/installation.md",
+     "https://github.com/probelabs/probe/commit/2330752f52a82fccb693a2843fcd3f03e61d5fbb",
+     "https://api.github.com/repos/probelabs/probe"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "index": 2,
+   "repository": "https://github.com/cocoindex-io/cocoindex-code",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/2/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-code-navigation",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.85,
+    "reasoning": "The targeted_candidate label holds. The historical matched benchmark reports 0.557 MRR versus Serena's 0.401, providing a concrete retrieval-ranking lead worth testing. This aggregate is neither conceptual-only accuracy nor exhaustive reference recall. The pinned README supports local full installation and refresh-before-search; its default embedding model is approximately 22 million parameters under Apache-2.0, making a bounded local trial plausible on these hosts. Excluding unreleased structural search is appropriate.",
+    "refs": [
+     "https://github.com/lemoncrow-lab/lemoncrow/blob/main/BENCHMARKS.md#historical-matched-competitor-comparison",
+     "https://github.com/cocoindex-io/cocoindex-code/blob/8ec0ff3510be526e699028db5b64e10a0a8359b3/README.md",
+     "https://huggingface.co/Snowflake/snowflake-arctic-embed-xs",
+     "https://api.github.com/repos/cocoindex-io/cocoindex-code"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "index": 3,
+   "repository": "https://github.com/bug-ops/mcpls",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/3/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-code-navigation",
+   "facts_refuted": true,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.88,
+    "reasoning": "The keep_but_compare label holds. The source documents a standalone Rust bridge, references and call-hierarchy tools, and MIT/Apache dual licensing. Release v0.6.0 supplies checksummed Linux x86_64 and macOS ARM64 binaries and relevant readiness/lifecycle fixes. Packaging offers a plausible setup advantage, while the proposed source-read and restart checks address important limitations. This case does not depend on proving Codex lacks native LSP. Contributor commit counts alone do not establish bus factor.",
+    "refs": [
+     "https://github.com/bug-ops/mcpls/blob/5c9de0e6109d3939d565c286c18a3c73d3a4dd0a/README.md",
+     "https://github.com/bug-ops/mcpls/releases/tag/v0.6.0"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "index": 4,
+   "repository": "https://github.com/zzet/gortex",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/4/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-code-navigation",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.8,
+    "reasoning": "The keep_but_compare label survives on its persistent multi-hop graph combined with documented LSP edge confirmation. Correct the persistence premise: Serena's exact pin saves and reloads content-hashed document-symbol caches, so a restart-cost advantage is unproven. Gortex also requires separately installed language servers. The bounded Python/JS comparison remains justified, provided it measures graph freshness, unresolved edges, server costs and restricted tool exposure. Its structural results cannot establish dynamic runtime behavior.",
+    "refs": [
+     "https://github.com/zzet/gortex/blob/33107203de4900f1229a3eeff631ff9802c6725a/README.md",
+     "https://github.com/zzet/gortex/blob/33107203de4900f1229a3eeff631ff9802c6725a/docs/lsp.md",
+     "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/solidlsp/ls.py",
+     "https://github.com/zzet/gortex/releases/tag/v0.64.5"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "index": 5,
+   "repository": "https://github.com/tirth8205/code-review-graph",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/5/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/5/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-code-navigation",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.95,
+    "reasoning": "This duplicates an already-recorded alternative without new evidence. The repository's September 19 audit records this exact commit and incremental review-context role. The proposal repeats that commit's timings and graph-derived accuracy rather than supplying a newly demonstrated missed case or comparison. Upstream acknowledges circular recall and unusable historical co-change results. The proposed future experiment is useful, but co-changed files alone are not complete source/reference ground truth and do not make this a new qualification.",
+    "refs": [
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/us-equities/star-audit.json",
+     "https://github.com/tirth8205/code-review-graph/blob/6b12d11625cbec3b6773e076cb3d136464fa90e5/README.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "index": 6,
+   "repository": "https://github.com/lemoncrow-lab/lemoncrow",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/6/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-code-navigation",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.81,
+    "reasoning": "The keep_but_compare label holds. Its historical matched lexical MRR advantage provides evidence for comparison, although broader runtime savings cannot be attributed to navigation. Retrieved licensing explicitly grants Apache-2.0 to the public local runtime; installation documentation supports local operation without an account and skipping host integrations. Telemetry has documented opt-outs. The maintenance-mode assertion remains unverified and cannot justify rejection. Freeze a navigation-only configuration before measuring; neither adoption nor reference completeness is established.",
+    "refs": [
+     "https://github.com/lemoncrow-lab/lemoncrow/blob/main/BENCHMARKS.md#historical-matched-competitor-comparison",
+     "https://github.com/lemoncrow-lab/lemoncrow/blob/main/LICENSE",
+     "https://github.com/lemoncrow-lab/lemoncrow/blob/main/docs/setup/installation.md",
+     "https://github.com/lemoncrow-lab/lemoncrow/blob/main/README.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "index": 7,
+   "repository": "https://github.com/abhigyanpatwari/gitnexus",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/7/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-code-navigation",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.99,
+    "reasoning": "The not_adopted label holds. The pinned PolyForm Noncommercial license limits permitted purposes and qualifies personal research as having no anticipated commercial application. That fails the stated license gate irrespective of graph quality or popularity. Refuted=false endorses the proposal's exclusion, not adoption; a suitable license grant would be necessary before technical qualification.",
+    "refs": [
+     "https://github.com/abhigyanpatwari/GitNexus/blob/06ce60beb67494cac7801c0bdf97a4e9a4b65862/LICENSE"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 0,
+   "repository": "https://github.com/opendatalab/mineru",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/0/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-document-retrieval",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.99,
+    "reasoning": "Fails the custom-restrictive-license gate. The tagged code license imposes affiliate-wide commercial thresholds, service attribution obligations and automatic termination. These restrictions remain regardless of the model weights’ license. The OCR gap does not override this selection constraint. [Tagged license](https://github.com/opendatalab/MinerU/blob/mineru-4.0.7-released/LICENSE.md).",
+    "refs": [
+     "https://github.com/opendatalab/MinerU/blob/mineru-4.0.7-released/LICENSE.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 1,
+   "repository": "https://github.com/illuin-tech/colpali",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/1/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-document-retrieval",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.99,
+    "reasoning": "The proposed runtime conflicts with upstream convergence. ColPali deprecated colpali-engine and recommended Sentence Transformers for new integrations in an August 24 commit, before the evaluation cutoff. Its retained package supports research reproducibility, but that does not justify a new targeted integration when the supported successor is separately proposed. Preserve the visual-retrieval experiment and reassess its runtime and checkpoint. [Dated migration](https://github.com/illuin-tech/colpali/commit/97487f8871ff4d5d2284411fe61bdcd2cfe99894).",
+    "refs": [
+     "https://github.com/illuin-tech/colpali/commit/97487f8871ff4d5d2284411fe61bdcd2cfe99894",
+     "https://github.com/illuin-tech/colpali/blob/97487f8871ff4d5d2284411fe61bdcd2cfe99894/README.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 2,
+   "repository": "https://github.com/paddlepaddle/paddleocr",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/2/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-document-retrieval",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.93,
+    "reasoning": "Refute the standing: the reasons for withholding targeted_candidate status are materially outdated. Tagged documentation supports local Transformers inference and explicitly documents PaddleOCR-VL on Apple Silicon, including M4 verification and an MLX-VLM service path. M5 acceptance remains untested. [Runtime guide](https://github.com/PaddlePaddle/PaddleOCR/blob/v3.7.0/docs/version3.x/pipeline_usage/PaddleOCR-VL.en.md), [Apple guide](https://github.com/PaddlePaddle/PaddleOCR/blob/v3.7.0/docs/version3.x/pipeline_usage/PaddleOCR-VL-Apple-Silicon.en.md). Its permissive weights and measured parsing quality justify a bounded OCR/layout trial against the actual winners; a small margin over MinerU does not rebut that gap. [Model card](https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6).",
+    "refs": [
+     "https://github.com/PaddlePaddle/PaddleOCR/blob/v3.7.0/docs/version3.x/pipeline_usage/PaddleOCR-VL.en.md",
+     "https://github.com/PaddlePaddle/PaddleOCR/blob/v3.7.0/docs/version3.x/pipeline_usage/PaddleOCR-VL-Apple-Silicon.en.md",
+     "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6",
+     "https://github.com/opendatalab/OmniDocBench"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 3,
+   "repository": "https://github.com/docling-project/docling",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/3/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-document-retrieval",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.94,
+    "reasoning": "keep_but_compare holds. The published PDF comparison provides a concrete quality lead over MarkItDown: 0.882 versus 0.589 overall, although it establishes neither Office performance nor financial-corpus superiority. [Benchmark](https://github.com/opendataloader-project/opendataloader-pdf#extraction-benchmarks). The tagged release documents local execution, MIT licensing and both required architectures. [README](https://github.com/docling-project/docling/blob/v2.130.0/README.md). The cited advisories describe patched versions, not demonstrated vulnerabilities in this pin; its dependency floor also excludes the cited vulnerable docling-core versions. [Dependency declaration](https://github.com/docling-project/docling/blob/v2.130.0/pyproject.toml). Standing note: the supplied winners remain provisional integration controls, not measured best performers.",
+    "refs": [
+     "https://github.com/opendataloader-project/opendataloader-pdf#extraction-benchmarks",
+     "https://github.com/docling-project/docling/blob/v2.130.0/README.md",
+     "https://github.com/docling-project/docling/blob/v2.130.0/pyproject.toml",
+     "https://github.com/advisories/GHSA-q29v-xc37-wh5m",
+     "https://github.com/advisories/GHSA-vqxf-v2gg-x3hc"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 4,
+   "repository": "https://github.com/cinnamon/kotaemon",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/4/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-document-retrieval",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.88,
+    "reasoning": "The not_adopted rationale overstates its architectural limitations. Upstream supplies a reusable RAG framework and document-preview citations, alongside the UI. [Tagged README](https://github.com/Cinnamon/kotaemon/blob/v0.12.0/README.md). Its tests demonstrate programmatic retrieval without answer generation, while its local-model guide permits local embeddings and disabling LLM relevance scoring. Hosted Cohere defaults therefore do not establish an unavoidable hosted dependency. [Retrieval test](https://github.com/Cinnamon/kotaemon/blob/v0.12.0/libs/kotaemon/tests/test_indexing_retrieval.py), [Local configuration](https://github.com/Cinnamon/kotaemon/blob/v0.12.0/docs/local_model.md). Comparative superiority remains unestablished, but rejection on these grounds should be replaced by a narrowly scoped comparison or watch disposition.",
+    "refs": [
+     "https://github.com/Cinnamon/kotaemon/blob/v0.12.0/README.md",
+     "https://github.com/Cinnamon/kotaemon/blob/v0.12.0/libs/kotaemon/tests/test_indexing_retrieval.py",
+     "https://github.com/Cinnamon/kotaemon/blob/v0.12.0/docs/local_model.md",
+     "https://github.com/Cinnamon/kotaemon/commit/4015bb0f7cebd59d474624c4a570a4c119cdd826"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 5,
+   "repository": "https://github.com/huggingface/sentence-transformers",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/5/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/5/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-document-retrieval",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.97,
+    "reasoning": "The runtime has a plausible bounded trial, but the named checkpoint fails the license-clarity gate. ColPali’s table labels ColQwen2.5-v0.2 Apache-2.0, whereas its own model card identifies Qwen Research License terms for the backbone and MIT for the adapters. This unresolved primary-source conflict prevents accepting the proposal as written. [Model license](https://huggingface.co/vidore/colqwen2.5-v0.2#license), [Conflicting table](https://github.com/illuin-tech/colpali#list-of-colvision-models). Re-propose the supported runtime with an explicitly cleared checkpoint; the v6 retrieval and memory-control capabilities themselves are substantiated. [Release](https://github.com/huggingface/sentence-transformers/releases/tag/v6.0.0).",
+    "refs": [
+     "https://huggingface.co/vidore/colqwen2.5-v0.2#license",
+     "https://github.com/illuin-tech/colpali#list-of-colvision-models",
+     "https://github.com/huggingface/sentence-transformers/releases/tag/v6.0.0"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 6,
+   "repository": "https://github.com/arabold/docs-mcp-server",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/6/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-document-retrieval",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.87,
+    "reasoning": "keep_but_compare holds for a concrete ingestion advantage: version-specific official-site indexing, optional embeddings and a fetch-url command returning page Markdown. These provide a plausible controlled-ingestion complement to QMD’s collection workflow. [Tagged README](https://github.com/arabold/docs-mcp-server/blob/v3.2.0/README.md), [QMD workflow](https://github.com/tobi/qmd/blob/v2.8.3/README.md). Disable telemetry using the documented control. [Telemetry](https://github.com/arabold/docs-mcp-server/blob/v3.2.0/docs/infrastructure/telemetry.md). Correct the comparison baseline: Context Hub is an alternative in the supplied layer, so include QMD plus existing ingestion tools. Version-correct body retrieval and host acceptance remain trial gates; no retrieval-quality victory is established.",
+    "refs": [
+     "https://github.com/arabold/docs-mcp-server/blob/v3.2.0/README.md",
+     "https://github.com/arabold/docs-mcp-server/blob/v3.2.0/docs/infrastructure/telemetry.md",
+     "https://github.com/arabold/docs-mcp-server/blob/main/docs/setup/configuration.md",
+     "https://github.com/tobi/qmd/blob/v2.8.3/README.md"
+    ],
+    "skills_used": [
+     "search-first",
+     "iterative-retrieval",
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 0,
+   "repository": "https://github.com/flagopen/flagembedding",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/0/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-semantic-rag",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.96,
+    "reasoning": "The rejection's decisive inference is unsupported. The benchmark receipt explicitly says pipeline causation was not independently verified; differing chunking and coverage confound the comparison. Its tested alternative was bge-small-en-v1.5, which lost 725 chunks, not BGE-M3. Upstream documents BGE-M3's 8192-token dense, sparse and multivector retrieval, plus separate rerankers. These capabilities cannot be dismissed using the smaller model's result or the assertion that changing embeddings cannot help. This refutes the rejection rationale, without establishing that FlagEmbedding should be adopted.",
+    "refs": [
+     "[Benchmark limitations](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json)",
+     "[Pipeline comparison and unverified attribution](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json)",
+     "[FlagEmbedding capabilities](https://github.com/FlagOpen/FlagEmbedding/blob/master/README.md)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 1,
+   "repository": "https://github.com/osu-nlp-group/hipporag",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/1/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-semantic-rag",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.88,
+    "reasoning": "The not_adopted label survives: the supplied document-QA evidence does not demonstrate a code-span retrieval advantage sufficient to justify adding LLM extraction and graph state. The README at the last commit before September 26 confirms the additional LLM dependency and document-oriented evaluation. However, four GPUs are an example, not a minimum requirement: local compatible endpoints, persisted state, incremental updates and deletion are documented. The defensible rejection is insufficient demonstrated benefit for this code-index requirement, not categorical hardware infeasibility or mandatory paid APIs.",
+    "refs": [
+     "[README at the September 26 cutoff](https://github.com/OSU-NLP-Group/HippoRAG/blob/1438aba3fc44ff10573e5a5e1e7cc3c7f9794aff/README.md)",
+     "[Cutoff commit](https://github.com/OSU-NLP-Group/HippoRAG/commit/1438aba3fc44ff10573e5a5e1e7cc3c7f9794aff)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 2,
+   "repository": "https://github.com/lightonai/next-plaid",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/2/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-semantic-rag",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.91,
+    "reasoning": "The targeted trial survives. Version 1.7.0 supplies Linux x86_64 and macOS arm64 binaries; its local index, incremental updates and documented interruption repair offer a concrete lifecycle alternative. Both proposed checkpoints declare Apache-2.0 licensing. The proposed conceptual-question and rebuild tests are feasible. Two qualifications remain: the incumbent score difference does not establish pipeline causation, and LightOn's H100/FP32 score cannot be compared directly with MinishLab's CPU result without aligning versions, precision, flags and corpus. These limitations prevent promotion, but do not invalidate the candidate.",
+    "refs": [
+     "[Release assets](https://github.com/lightonai/next-plaid/releases/tag/v1.7.0)",
+     "[Pinned capabilities and benchmark conditions](https://github.com/lightonai/next-plaid/blob/v1.7.0/colgrep/README.md)",
+     "[LateOn-Code-edge model card](https://huggingface.co/lightonai/LateOn-Code-edge)",
+     "[LateOn-Code model card](https://huggingface.co/lightonai/LateOn-Code)",
+     "[MinishLab benchmark](https://github.com/MinishLab/semble/blob/v0.6.1/benchmarks/README.md)",
+     "[Incumbent comparison limitations](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 3,
+   "repository": "https://github.com/minishlab/semble",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/3/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-semantic-rag",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.9,
+    "reasoning": "The targeted_candidate label holds. CPU-only operation, per-repository cached indexes, incremental refresh and a small MIT-licensed model provide a concrete portability and resource-cost hypothesis. The pinned public benchmark supplies relevant comparative evidence, while the proposed local tests can establish whether it transfers. Its ranking stage uses code-aware heuristics, not a learned neural reranker. Vendor-generated and same-model-judged labels do not establish superiority over SocratiCode/Nemotron. Modification-time-based refresh also warrants preserved-timestamp restore tests. Neither uncertainty makes the bounded trial infeasible.",
+    "refs": [
+     "[Pinned README and refresh behavior](https://github.com/MinishLab/semble/blob/v0.6.1/README.md)",
+     "[Benchmark methodology and ablations](https://github.com/MinishLab/semble/blob/v0.6.1/benchmarks/README.md)",
+     "[Model licensing and architecture](https://huggingface.co/minishlab/potion-code-16M-v2)",
+     "[Version 0.6.1 release](https://github.com/MinishLab/semble/releases/tag/v0.6.1)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 4,
+   "repository": "https://github.com/yoanbernabeu/grepai",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/4/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-semantic-rag",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.88,
+    "reasoning": "The lifecycle trial survives, and v0.37.0 is independently verified with Linux amd64 and Darwin arm64 release assets. Its changelog documents atomic replacement, protection against reader overwrites, lifetime writer ownership and fail-closed watcher errors followed by startup repair. These provide concrete mechanisms to challenge the unresolved recovery requirement. Project scoping and writer locks alone are not advantages over SocratiCode, whose earlier releases already contain lock and recovery fixes. Promotion therefore requires the proposed comparative fault tests or retrieval improvement.",
+    "refs": [
+     "[Verified release and platform assets](https://github.com/yoanbernabeu/grepai/releases/tag/v0.37.0)",
+     "[Lifecycle changes](https://github.com/yoanbernabeu/grepai/blob/main/CHANGELOG.md)",
+     "[Local embedding integration and license](https://github.com/yoanbernabeu/grepai)",
+     "[Existing SocratiCode fixes](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/CHANGELOG.md)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 5,
+   "repository": "https://github.com/lightonai/pylate",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/5/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/5/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-semantic-rag",
+   "facts_refuted": true,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.89,
+    "reasoning": "The targeted reranking experiment holds. The pinned README documents index-free rank.rerank over existing candidates, making this distinct from replacing the index with ColGREP. Version 1.5.0 is verified, and Apache-2.0 ColBERT checkpoints provide a plausible bounded local inference path. Holding the candidate pool fixed permits a meaningful paired ranking comparison. Reranking cannot recover relevant spans absent from that pool, so candidate Recall@50 must accompany nDCG improvements. Native Mac execution and whole-stack recovery remain unqualified rather than established benefits.",
+    "refs": [
+     "[Pinned reranking interface](https://github.com/lightonai/pylate/blob/v1.5.0/README.md)",
+     "[Verified release](https://github.com/lightonai/pylate/releases/tag/v1.5.0)",
+     "[GTE-ModernColBERT checkpoint](https://huggingface.co/lightonai/GTE-ModernColBERT-v1)",
+     "[Small code-specific ColBERT checkpoint](https://huggingface.co/lightonai/LateOn-Code-edge)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 6,
+   "repository": "https://github.com/ollama/ollama",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/6/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-semantic-rag",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.9,
+    "reasoning": "Refuted under the duplicate-standing rule. The supplied September 23 sweep already retained Ollama, while this submission adds general platform/configuration documentation and an unspecified future checkpoint comparison. It supplies no new checkpoint qualification, measured result or dated capability change that revises that standing. The FAQ confirms local-only configuration, so this is not a rejection of Ollama's technical suitability. Preserve the existing candidate; reconsider its standing when a named model and indexer combination produces new compatibility or comparative evidence.",
+    "refs": [
+     "[Local-only configuration and platform operation](https://docs.ollama.com/faq)",
+     "[Existing GrepAI integration](https://github.com/yoanbernabeu/grepai)",
+     "[Canonical repository metadata](https://api.github.com/repos/ollama/ollama)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 7,
+   "repository": "https://github.com/giancarloerra/socraticode",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/7/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-semantic-rag",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.97,
+    "reasoning": "The upgrade trial survives because it contains new, directly relevant evidence. Release 1.15.0 and its source commit show getCollectionInfo awaiting the same process's collection initialization, with regression tests for delayed creation and failure propagation. This addresses a specific status-poll race; it does not establish cross-process coordination or whole-stack recovery. Standing note: the incumbent is operationally qualified, not demonstrated best for conceptual retrieval. Its corrected benchmark labels comparative standing inconclusive and documents identifier-heavy questions and a weak literal-search baseline.",
+    "refs": [
+     "[Version 1.15.0 release](https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0)",
+     "[Race fix and regression-test source](https://github.com/giancarloerra/SocratiCode/commit/5b8eb16e739eafe871c695e23dcc23a6de5448d5)",
+     "[Corrected comparative standing](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json)",
+     "[Question-set limitations](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json)"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 0,
+   "repository": "https://github.com/mirix-ai/mirix",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/0/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-durable-memory",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.94,
+    "reasoning": "The not_adopted label survives for the tested pins and local endpoints. The published trial records no persisted memories, and pinned upstream source corroborates the null-token parsing and missing embedding-model forwarding defects. These directly block durable capture; incumbency and PostgreSQL requirements are unnecessary rejection arguments. This does not establish that every supported backend fails.",
+    "refs": [
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/trials-20260926/mirix/README.md",
+     "https://github.com/Mirix-AI/MIRIX/blob/v0.1.6/mirix/schemas/openai/chat_completion_response.py",
+     "https://github.com/Mirix-AI/MIRIX/blob/8cb06a62bbb7c478beb33dd4f2815696a72df482/mirix/embeddings.py"
+    ],
+    "skills_used": [
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 1,
+   "repository": "https://github.com/campfirein/byterover-cli",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/1/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-durable-memory",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.82,
+    "reasoning": "The rejection overstates the trial. Its corrected record identifies 12,351/11,192 tokens as variable request totals, not fixed overhead; requests exceeded an 8,192-token server configuration, leaving the LLM path unevaluated. The recorded reopening condition is an adequate-context local endpoint. Requiring resumed development and an upstream benchmark harness before that bounded comparison is unsupported. Vendor QA claims remain insufficient for adoption, but the stated rejection rationale needs revision.",
+    "refs": [
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/trials-20260926/byterover-cli/README.md",
+     "https://github.com/campfirein/byterover-cli/blob/v3.16.1/README.md"
+    ],
+    "skills_used": [
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 2,
+   "repository": "https://github.com/rohitg00/agentmemory",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/2/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-durable-memory",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.92,
+    "reasoning": "The measured 0.821 versus 0.570 recall_all@5 establishes trial merit. Correction: C3 used ai-memory development commit 19b6429, not the catalog's accepted 2.3.2; ai-memory remains a retained control, not a measured best. C4, shipped capture, isolation and recovery remain unresolved. The pinned runtime supports both host architectures. Its ELv2 license must remain disclosed; its restrictions do not prohibit the proposed internal trial.",
+    "refs": [
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/foundation/memory-stack-20260925.json",
+     "https://github.com/rohitg00/agentmemory/blob/v0.9.29/README.md",
+     "https://github.com/iii-hq/iii/blob/iii/v0.11.2/engine/LICENSE"
+    ],
+    "skills_used": [
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 3,
+   "repository": "https://github.com/mempalace/mempalace",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/3/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-durable-memory",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.9,
+    "reasoning": "Committed results, a runnable upstream benchmark and local dual-client integration justify the targeted trial. The catalog explicitly distinguishes vendor-log rescoring from native reproduction and identifies raw-mode bypasses, tuning and model-driven palace capture. Those limitations prevent a superiority claim but are addressed by the proposed raw/palace, pooled-store and lifecycle comparisons. Supported CPU and multi-architecture installation paths avoid a GPU-capacity blocker.",
+    "refs": [
+     "https://github.com/MemPalace/mempalace/blob/v3.10.0/README.md",
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/foundation/memory-stack-20260925.json"
+    ],
+    "skills_used": [
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 4,
+   "repository": "https://github.com/vshulcz/deja-vu",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/4/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-durable-memory",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.91,
+    "reasoning": "Transcript indexing and persistent forgetting tombstones provide concrete capture and deletion comparison grounds. The pinned release supplies Linux amd64 and macOS arm64 artifacts. Vendor hit@5 and evidence-recall@5 are not recall_all@5, and pooled-store degradation prevents extrapolating superiority. The proposed matched evaluation and synthetic privacy/recovery checks address those uncertainties. Tombstones suppress retrieval; they do not erase original transcripts or backups.",
+    "refs": [
+     "https://github.com/vshulcz/deja-vu/blob/v0.21.2/README.md",
+     "https://github.com/vshulcz/deja-vu/releases/tag/v0.21.2",
+     "https://vshulcz.github.io/deja-vu/guide/benchmarks.html"
+    ],
+    "skills_used": [
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 5,
+   "repository": "https://github.com/vectorize-io/hindsight",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/5/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/5/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-durable-memory",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.91,
+    "reasoning": "The targeted label survives: v0.10.1 adds documented bank transfer and Codex capture fixes, providing concrete lifecycle evidence beyond its previously unqualified standing. Upstream documents both host architectures and local inference. Published QA results justify comparison, not ranking against C3 retrieval. The catalog's initial 100-question local-model subset makes the trial bounded; extraction cost, abstention, derived-memory deletion and restored client bindings remain acceptance gates.",
+    "refs": [
+     "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.1",
+     "https://github.com/vectorize-io/hindsight/blob/v0.10.1/README.md",
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/foundation/memory-stack-20260925.json"
+    ],
+    "skills_used": [
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 6,
+   "repository": "https://github.com/basicmachines-co/basic-memory",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/6/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-durable-memory",
+   "facts_refuted": true,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.87,
+    "reasoning": "The proposal supplies no new evidence warranting promotion of this known alternative. Markdown authority, local semantic retrieval and reranking were already documented at v0.23.2; ai-memory also documents inspectable Markdown and hybrid retrieval. A useful experiment is proposed, but no new comparative result or demonstrated lifecycle advantage establishes its priority. Separately, the catalog's blanket commercial-use objection to AGPL is incorrect: the license expressly permits running the unmodified program.",
+    "refs": [
+     "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/README.md",
+     "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/README.md",
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/foundation/memory-stack-20260925.json",
+     "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/LICENSE"
+    ],
+    "skills_used": [
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 7,
+   "repository": "https://github.com/vbcherepanov/total-agent-memory",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/7/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-durable-memory",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.88,
+    "reasoning": "keep_but_compare survives as an isolated comparison disposition. The tagged product documents local fast-mode retrieval, structured decisions and lifecycle tools, with reproducible evaluation artifacts. Correction: 95.1% is recall_any@5; upstream separately reports 85.7% recall_all@5. The 400-question QA submission is vendor-authored and has no maintainer endorsement. Those protocol limits preclude superiority claims but leave a concrete, credential-free retrieval trial.",
+    "refs": [
+     "https://github.com/vbcherepanov/total-agent-memory/blob/v14.5.1/README.md",
+     "https://github.com/xiaowu0162/LongMemEval/issues/56"
+    ],
+    "skills_used": [
+     "verification-before-completion",
+     "supply-chain-risk-auditor",
+     "fp-check"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 0,
+   "repository": "https://github.com/exa-labs/exa-mcp-server",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/0/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-web-research",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.91,
+    "reasoning": "Survives as a targeted trial. The retained Tavily receipt confirms the missed adapter guide, and the documentation benchmark supplies a plausible quality advantage. Upstream documents anonymous, rate-limited search/fetch without enabling its research agent. Benchmark task completion does not establish anonymous-MCP recall, so those limits and citation accuracy remain trial gates. Standing note: Tavily's receipt establishes integration, not comparative superiority.",
+    "refs": [
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/receipts/native-tavily-session-20260920.json",
+     "https://openbenchmarks.com/web-search/best-search-api-for-coding-agents",
+     "https://github.com/exa-labs/exa-mcp-server/blob/main/README.md"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 1,
+   "repository": "https://github.com/unclecode/crawl4ai",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/1/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-web-research",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.94,
+    "reasoning": "Refuted as written: historical advisories do not establish the asserted decisive rejection of current library-mode use. The checked launch-argument advisory affects versions through 0.8.9 and explicitly distinguishes trusted SDK callers; the AST escape was patched in 0.8.7. Version 0.9.4 postdates both fixes. Two releases without disclosures would not establish safety either. Non-adoption can still rest on the supplied absence of a required crawling task; this correction does not recommend adoption.",
+    "refs": [
+     "https://github.com/advisories/GHSA-r253-r9jw-qg44",
+     "https://github.com/advisories/GHSA-qxjp-w3pj-48m7",
+     "https://github.com/unclecode/crawl4ai/releases/tag/v0.9.4"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 2,
+   "repository": "https://github.com/adbar/trafilatura",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/2/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-web-research",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.93,
+    "reasoning": "Survives. Pinned agent-browser source confirms that its HTML fallback retains navigation/header/footer content. WCXB reports Trafilatura documentation-page F1 of 0.888, supporting a concrete extraction-quality hypothesis without proving superiority on this workload. Trafilatura's pinned Apache-2.0 Python package provides metadata and Markdown/JSON extraction without a server. A bounded comparison using human-verified gold and rendered HTML is feasible; attribution and both hosts still require qualification.",
+    "refs": [
+     "https://github.com/vercel-labs/agent-browser/blob/v0.38.1/cli/src/read.rs",
+     "https://webcontentextraction.org/",
+     "https://github.com/adbar/trafilatura/blob/v2.2.0/README.md",
+     "https://github.com/adbar/trafilatura/blob/v2.2.0/pyproject.toml"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 3,
+   "repository": "https://github.com/openai/codex",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/3/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-web-research",
+   "facts_refuted": false,
+   "claude_fit_refuted": false,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": false,
+    "confidence": 0.9,
+    "reasoning": "Survives as a native baseline trial: reusing the supplied existing accounts offers a concrete fit advantage over a separate retrieval credential. Official configuration documents search modes/domain controls; tagged source confirms optional structured search results, and release assets cover both architectures. Cached search remains hosted, not offline, and attributable JSONL results are not guaranteed. Standing note: the supplied local-integration classifications do not establish any of the three winners as measured best; OpenResearch has no comparative quality evidence in this input.",
+    "refs": [
+     "https://learn.chatgpt.com/docs/config-file/config-reference",
+     "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/exec/src/exec_events.rs",
+     "https://github.com/openai/codex/releases/tag/rust-v0.157.1"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": false,
+   "fit_refuted": false,
+   "survives": true,
+   "refuted_by_absence": false,
+   "decisive": true,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 4,
+   "repository": "https://github.com/microsoft/playwright-cli",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/4/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-web-research",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.84,
+    "reasoning": "The release fixes are real, but they repair Playwright's own failures rather than establish an advantage over agent-browser. Version 0.1.21 is already the known overlapping alternative, while pinned agent-browser also documents state save/load. Missing fixture provenance is an evaluation gap, not a demonstrated recovery failure. Retain the comparison question, but the proposal supplies insufficient evidence for promotion to targeted_candidate. This does not establish agent-browser's superiority.",
+    "refs": [
+     "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.21",
+     "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.20",
+     "https://github.com/vercel-labs/agent-browser/blob/v0.38.1/README.md",
+     "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/receipts/desktop-cli-workflows.json"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 5,
+   "repository": "https://github.com/firecrawl/cli",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/5/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/5/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-web-research",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.88,
+    "reasoning": "The benchmark supplies a plausible quality gap, so credentials alone are not grounds for rejection. However, licensing remains unresolved under the explicit unclear-license veto: v1.24.6 declares ISC in package.json, but its repository root contains no license text, and the proposal itself requires clarification before promotion. Hosted authentication and optional global skill setup are documented; neither requires adopting the self-hosted stack. Keep it unqualified until the license condition is resolved.",
+    "refs": [
+     "https://github.com/firecrawl/cli/blob/v1.24.6/package.json",
+     "https://api.github.com/repos/firecrawl/cli/contents?ref=v1.24.6",
+     "https://github.com/firecrawl/cli/blob/v1.24.6/README.md",
+     "https://openbenchmarks.com/web-search/best-search-api-for-coding-agents"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 6,
+   "repository": "https://github.com/knockoutez/wigolo",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/6/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-web-research",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.92,
+    "reasoning": "The central byte-exact provenance advantage is not established by the checked pinned implementation. Evidence is built from extracted Markdown; passage tests validate character offsets, and token-budget truncation can change excerpts while preserving their spans. This does not substantiate the proposed equality check against fetched source bytes. The single-query comparison cannot establish retrieval reliability. Keyless local operation remains promising; AGPL with optional commercial terms is not itself a rejection reason.",
+    "refs": [
+     "https://github.com/KnockOutEZ/wigolo/blob/v0.2.1/src/search/evidence.ts",
+     "https://github.com/KnockOutEZ/wigolo/blob/v0.2.1/tests/unit/search/passage-spans.test.ts",
+     "https://github.com/KnockOutEZ/wigolo/blob/v0.2.1/README.md",
+     "https://github.com/KnockOutEZ/wigolo/blob/main/LICENSING.md"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 7,
+   "repository": "https://github.com/d4vinci/scrapling",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/7/fit",
+   "lane_class": "native",
+   "job_id": "gpt6-fit-web-research",
+   "facts_refuted": false,
+   "claude_fit_refuted": true,
+   "gpt6": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "refuted": true,
+    "confidence": 0.97,
+    "reasoning": "No concrete requirement gap is established. Upstream confirms bounded extraction commands, but its published comparisons measure parser speed and element operations rather than primary-source coverage, attributable extraction quality or recovery against the winners. The proposal explicitly postpones identifying a required failure until future work. That supports an unqualified watchlist entry, not advancement under this sweep's evidence-backed-gap rule.",
+    "refs": [
+     "https://github.com/D4Vinci/Scrapling#cli--interactive-shell",
+     "https://github.com/D4Vinci/Scrapling#performance-benchmarks"
+    ],
+    "skills_used": [
+     "fp-check",
+     "supply-chain-risk-auditor",
+     "verification-before-completion"
+    ]
+   },
+   "gpt6_refuted": true,
+   "fit_refuted": true,
+   "survives": false,
+   "refuted_by_absence": false,
+   "decisive": false,
+   "before": {
+    "gpt6": {
+     "missing": true
+    },
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false
+   }
+  }
+ ],
+ "decisive": [
+  {
+   "layer_id": "native-clients",
+   "index": 2,
+   "repository": "https://github.com/earendil-works/pi",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/native-clients/2/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-native-clients",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.88,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-native-clients-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/native-clients/2",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": true,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": false,
+    "current_disposition": "refuted on fit by GPT-6 fit (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "instructions-skills",
+   "index": 0,
+   "repository": "https://github.com/mattpocock/skills",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/0/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-instructions-skills",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": true,
+    "gpt6_confidence": 0.94,
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false,
+    "outcome": "V1 refuted on merit by the native GPT-6 fit vote"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-instructions-skills-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/instructions-skills/2",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "workers",
+   "index": 0,
+   "repository": "https://github.com/openai/codex",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/0/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-workers",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.83,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-workers-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/workers/2",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "workers",
+   "index": 3,
+   "repository": "https://github.com/sipyourdrink-ltd/bernstein",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/workers/3/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-workers",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.79,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-workers-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/workers/0",
+    "facts_refuted": false,
+    "claude_fit_refuted": true,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": false,
+    "current_disposition": "refuted on fit by Claude fit (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "index": 0,
+   "repository": "https://github.com/superradcompany/microsandbox",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/0/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-isolation",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.92,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-isolation-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/isolation/1",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "index": 1,
+   "repository": "https://github.com/boxlite-ai/boxlite",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/isolation/1/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-isolation",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": true,
+    "gpt6_confidence": 0.97,
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false,
+    "outcome": "V1 refuted on merit by the native GPT-6 fit vote"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-isolation-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/isolation/0",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "index": 0,
+   "repository": "https://github.com/anthropics/claude-plugins-official",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/0/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-code-navigation",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.92,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-code-navigation-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/code-navigation/1",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "index": 7,
+   "repository": "https://github.com/abhigyanpatwari/gitnexus",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/code-navigation/7/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-code-navigation",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.99,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-code-navigation-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/code-navigation/0",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 0,
+   "repository": "https://github.com/opendatalab/mineru",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/0/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-document-retrieval",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": true,
+    "gpt6_confidence": 0.99,
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false,
+    "outcome": "V1 refuted on merit by the native GPT-6 fit vote"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-document-retrieval-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/document-retrieval/0",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 3,
+   "repository": "https://github.com/docling-project/docling",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/3/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-document-retrieval",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.94,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-document-retrieval-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/document-retrieval/1",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 4,
+   "repository": "https://github.com/cinnamon/kotaemon",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/4/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-document-retrieval",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": true,
+    "gpt6_confidence": 0.88,
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false,
+    "outcome": "V1 refuted on merit by the native GPT-6 fit vote"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-document-retrieval-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": false,
+    "in_other_layers_of_20260929": []
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 5,
+   "repository": "https://github.com/huggingface/sentence-transformers",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/5/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/5/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-document-retrieval",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": true,
+    "gpt6_confidence": 0.97,
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false,
+    "outcome": "V1 refuted on merit by the native GPT-6 fit vote"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-document-retrieval-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": false,
+    "in_other_layers_of_20260929": []
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "index": 6,
+   "repository": "https://github.com/arabold/docs-mcp-server",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/document-retrieval/6/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-document-retrieval",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.87,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-document-retrieval-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/document-retrieval/2",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 1,
+   "repository": "https://github.com/osu-nlp-group/hipporag",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/1/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-semantic-rag",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.88,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-semantic-rag-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": false,
+    "in_other_layers_of_20260929": []
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 2,
+   "repository": "https://github.com/lightonai/next-plaid",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/2/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-semantic-rag",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.91,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-semantic-rag-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/semantic-rag/1",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 3,
+   "repository": "https://github.com/minishlab/semble",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/3/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-semantic-rag",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.9,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-semantic-rag-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/semantic-rag/0",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 6,
+   "repository": "https://github.com/ollama/ollama",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/6/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/6/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-semantic-rag",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": true,
+    "gpt6_confidence": 0.9,
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false,
+    "outcome": "V1 refuted on merit by the native GPT-6 fit vote"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-semantic-rag-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/semantic-rag/3",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "index": 7,
+   "repository": "https://github.com/giancarloerra/socraticode",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/semantic-rag/7/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-semantic-rag",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.97,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-semantic-rag-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": false,
+    "in_other_layers_of_20260929": []
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 1,
+   "repository": "https://github.com/campfirein/byterover-cli",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/1/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-durable-memory",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": true,
+    "gpt6_confidence": 0.82,
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false,
+    "outcome": "V1 refuted on merit by the native GPT-6 fit vote"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-durable-memory-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/durable-memory/2",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": true,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": false,
+    "current_disposition": "refuted on fit by GPT-6 fit (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 2,
+   "repository": "https://github.com/rohitg00/agentmemory",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/2/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-durable-memory",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.92,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-durable-memory-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/durable-memory/3",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 3,
+   "repository": "https://github.com/mempalace/mempalace",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/3/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-durable-memory",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.9,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-durable-memory-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/durable-memory/4",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 4,
+   "repository": "https://github.com/vshulcz/deja-vu",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/4/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/4/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-durable-memory",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.91,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-durable-memory-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/durable-memory/0",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "index": 7,
+   "repository": "https://github.com/vbcherepanov/total-agent-memory",
+   "proposed_label": "keep_but_compare",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/7/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/durable-memory/7/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-durable-memory",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.88,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-durable-memory-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": false,
+    "in_other_layers_of_20260929": []
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 0,
+   "repository": "https://github.com/exa-labs/exa-mcp-server",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/0/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/0/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-web-research",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.91,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-web-research-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": false,
+    "in_other_layers_of_20260929": []
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 1,
+   "repository": "https://github.com/unclecode/crawl4ai",
+   "proposed_label": "not_adopted",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/1/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/1/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-web-research",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": true,
+    "gpt6_confidence": 0.94,
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": false,
+    "outcome": "V1 refuted on merit by the native GPT-6 fit vote"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-web-research-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/web-research/1",
+    "facts_refuted": false,
+    "claude_fit_refuted": true,
+    "gpt6_refuted": true,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": false,
+    "current_disposition": "refuted on fit by Claude fit and GPT-6 fit (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 2,
+   "repository": "https://github.com/adbar/trafilatura",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/2/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/2/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-web-research",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.93,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-web-research-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": true,
+    "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/web-research/0",
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6_refuted": false,
+    "gpt6_missing": false,
+    "gpt6_model": "cx/gpt-6-astra",
+    "gpt6_effort": "max",
+    "survives": true,
+    "current_disposition": "survived (landscape-sweep-20260929)"
+   }
+  },
+  {
+   "layer_id": "web-research",
+   "index": 3,
+   "repository": "https://github.com/openai/codex",
+   "proposed_label": "targeted_candidate",
+   "facts_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/3/facts",
+   "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/web-research/3/fit",
+   "before": {
+    "facts_refuted": false,
+    "claude_fit_refuted": false,
+    "gpt6": "missing (counts as refuted)",
+    "fit_refuted": true,
+    "survives": false,
+    "refuted_by_absence": true
+   },
+   "after_native": {
+    "job_id": "gpt6-fit-web-research",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "gpt6_refuted": false,
+    "gpt6_confidence": 0.9,
+    "fit_refuted": false,
+    "survives": true,
+    "refuted_by_absence": false,
+    "outcome": "V1 three-vote survival"
+   },
+   "after_omniroute": {
+    "vote": null,
+    "job_id": "gpt6-fit-web-research-omni",
+    "status": "not_running",
+    "note": "never started; the native job counted"
+   },
+   "landscape_sweep_20260929": {
+    "re_proposed": false,
+    "in_other_layers_of_20260929": [
+     "workers"
+    ]
+   }
+  }
+ ]
+}
