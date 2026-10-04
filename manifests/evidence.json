@@ -9429,8 +9429,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "3bef3150f4d6c7e3b3877c69292a4d87b7a00b96fb8fe3ed947714873ee02461",
-      "bytes": 72164
+      "sha256": "92a03fc2b4ad9b4c9551a542fba7c39060b831b07e529e8e4effadc4ef2134b0",
+      "bytes": 72677
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -16078,6 +16078,11 @@
       "bytes": 27952
     },
     {
+      "path": "docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md",
+      "sha256": "dbb6de8a5b1dde770ea8615b0646b24570e86146b402c9ee4b917c6f668dd57e",
+      "bytes": 43121
+    },
+    {
       "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
       "sha256": "2c73507dea5faf517e4068b7a6efad57483250e0eb51f3dcba781d4fd922dfe9",
       "bytes": 16044
@@ -16234,8 +16239,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "3ec6b6592eb4deaeffef6780f47f30512c2d012c1215324b22c97c37af3200b7",
-      "bytes": 146676
+      "sha256": "5f78066695b8cf2efe83bee0b110dd0545c0d864bcebbc0ba9f2e30f588ff9bc",
+      "bytes": 156427
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -52114,8 +52119,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "97e8c945026711f1ef4ce8fd115d3ef83becb5a402ac2d0c8d19876d9129c023",
-      "bytes": 186012
+      "sha256": "20c70c09d8b293c23caccb1086f5a379f2f9c823f37555d17bfb202038f9a4b2",
+      "bytes": 188578
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -52279,8 +52284,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "fc304fcd5fca49dcc17330e09621700ba2e2b8a18e631b2d7a96cef59d4d00e5",
-      "bytes": 12503
+      "sha256": "2d41e61a25e03789f51c0dfe1a5849f15c5f7cd84812ec554d78a1ef5df8188f",
+      "bytes": 13526
     },
     {
       "path": "tools/sota-convergence/practice_references.py",
