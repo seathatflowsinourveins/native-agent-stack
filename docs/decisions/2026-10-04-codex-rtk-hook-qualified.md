@@ -152,26 +152,65 @@ and rust-v0.160.0 `a956835d0207`, identical lines) and rtk v0.51.0 (`e001f773f80
    `cargo publish`, `systemctl stop`, `rm -rf` and the others above). The five `exclude_commands` change none of these decisions. "RTK never rewrites mutating
    commands" is false, so it cannot be the proof; rtk itself reads no Codex rules (`src/hooks/permissions.rs` L64-L72: Codex "enforces its native execution
    rules after updatedInput").
-5. **What changes, for whom.** On a host with no execution rules the class of a rewritten mutating command does not change: an unmatched command's decision
-   depends on the approval policy and the sandbox, not on its words, except for the forced-`rm` heuristic, which rtk leaves alone; under `untrusted` every
-   unmatched command prompts anyway, and rtk notes that known-safe commands may gain prompts. On a host whose rules name commands rtk rewrites, the rule no
-   longer matches the rewritten form, so a `forbidden` or `prompt` rule on `git push` is bypassed for `rtk git push`. NativeStack2604 runs the authorization
-   settings (approvals off), where no rule is consulted.
+5. **What changes, for whom.** Execution rules are evaluated before the approval-policy fallback (`exec_policy.rs` L327-L420), whatever the approval policy: a
+   `forbidden` match stays forbidden, an `allow` match is allowed, and under `approval_policy = "never"` a `prompt` match is rejected by policy and becomes
+   `forbidden` (`prompt_is_rejected_by_policy`, L216-L236; the match at L394-L415). So approvals off do not switch rules off; a first draft of this record
+   said that no rule is consulted on NativeStack2604, and the job-071 read (P3) corrected it. On a host with no applicable rule the class of a rewritten
+   command does not change: an unmatched command's decision depends on the approval policy and the sandbox, not on its words, except for the forced-`rm`
+   heuristic, which rtk leaves alone; under `untrusted` every unmatched command prompts anyway, and rtk notes that known-safe commands may gain prompts. On a
+   host whose rules name commands rtk rewrites, the rule no longer matches the rewritten form, so a `forbidden` or `prompt` rule on `git push` is bypassed for
+   `rtk git push`, with approvals on or off. What NativeStack2604's state means: its user layer has no `rules` directory (a read-only `ls` of
+   `<codex home>/rules` on 2026-10-05: no such directory; NativeStack has none either), so no user-layer rule exists for the rewrite to bypass. That is a
+   statement about the user layer; the tool does not see a project's `.codex/rules` or a managed layer.
 
-**Decision.** Keep the upstream install, and make activation conditional on the one host state that changes the class. `codex_hook_trust.py --apply`
-refuses (exit 2) while the user layer's `rules/` directory holds a rules file with content, names the files, and proceeds only with `--allow-exec-rules`,
-the explicit acceptance after the rtk forms of the rules are written or the commands are excluded in rtk's `exclude_commands`; `--check` and the dry run only
-name the rules. Six tests were written first (five red); the scratch run shows the refusal (exit 2), `--check` still 5, the accepted trust 0, and the
-evaluator's decisions (`plan-row-scratch-run.json`). The operating rule for rule authors: write both forms (`prefix_rule(pattern = ["rtk", "git", "push"],
-decision = "forbidden")` beside the plain one) and verify with `codex execpolicy check`. Limits: rules in a project's `.codex/rules` or a managed layer are not
-visible to the tool, and rules written after the grant are not re-checked. No live Codex session was run with a forbidding rule and the hook active; the
-session behaviour is derived from the dispatch order above and the same evaluator that `codex execpolicy check` runs (untested boundary).
+**Decision.** Keep the upstream install, and review the user layer's rules with the upstream tools before the hook is activated
+(`tools/adoption/codex_hook_trust.py`, second version of 2026-10-05: the first refused whenever a rules file existed, 705d and job-071 read it, and the command
+center asked for a refusal only where a rule could really be bypassed, since #713's `hcom-deny.rules` would otherwise block the row for nothing). The review
+lists `<codex home>/rules/*.rules` as Codex's `collect_policy_files` does (`exec_policy.rs` L1121-L1170: a missing directory is no rules, any other error
+fails, a symlink or another non-file is not loaded) and reads each file's `prefix_rule` literals with `ast` (the files are Starlark; a statement that is not a
+keyword call of `prefix_rule` or `host_executable`, a non-literal argument or a syntax error is refused, not guessed). It probes the commands the rules name
+(every spelling of each `pattern`, each `match` example) and a sample of the 36 commands rtk 0.51.0 rewrites (`REWRITE_SAMPLE`, which a test ties to
+`rtk-behaviour-probe.json`), so a rule broader than its own examples (`git`) is seen. For each probe `rtk hook check --agent codex` says whether the hook rewrites
+it (exit 0 and the rewrite on stdout; exit 1 and `No rewrite for:` on stderr), and for each rewritten one `codex execpolicy check` over all the files together
+(Codex merges them; the strictest decision wins, `forbidden > prompt > allow`, `codex-rs/execpolicy/README.md`) gives the decision on the original and on the
+rewrite. An exposure is an original `forbidden` or `prompt` whose rewrite is weaker (`forbidden > prompt > no match > allow`); an `allow` that the rewrite loses
+is only a note. A step that could not be done (a listing or read error, rules not readable as literals, no rtk or codex executable, an evaluator error or an
+unexpected answer) is an exposure too: the review fails closed. The evaluator runs with a throwaway `CODEX_HOME`, because `codex execpolicy check` creates
+`<CODEX_HOME>/tmp/arg0` (measured), so the review writes nothing into the home it reviews. `--apply` refuses (exit 2) on an exposure before the app-server
+starts, so before any write, even for an already trusted hook; `--check` exits 6 for a trusted hook beside an exposure (5 stays for an untrusted one), and the
+post_install acceptance runs `--check`, so a rule added after the grant is caught on the next acceptance run; `--allow-exec-rules` accepts an exposure (the rtk
+forms written, or the commands excluded). With no rule file nothing runs, and neither rtk nor the evaluator is needed. The plan's trust and check commands pass
+`--rtk "$e/bin/rtk"`.
 
-**Alternatives.** (a) *Limit the hook to a read-only rewrite set with `exclude_commands`*: rtk's option is exclusion-only (`src/core/config.rs` L119-L123;
-`src/discover/registry.rs` L1548-L1582: a pattern starting with `^` is a regex without look-around, any other is a literal prefix, and a trivial pattern is
-ignored), so an allow-list cannot be written, and a deny-list of every state-changing prefix among the registry's 96 patterns (`src/discover/rules.rs`) would
-track upstream's registry, change the shared config that the Claude hook and the recipe's five-entry table also read, and cost compression only on short
-mutating-command output; not done here, and it is the first thing to do if a rule bypass is ever observed. (b) *Prove rtk never rewrites mutating commands*:
-false (item 4). (c) *Hold the Codex hook out again*: against the user's directive of 2026-10-04. (d) *Ship `rtk ...` rules with the plan*: under
-`approval_policy = "never"` a `prompt` rule is rejected by policy and becomes `forbidden` (`exec_policy.rs` L216-L236 and the match at L407-L415), which would block the
-authorization-settings hosts.
+Evidence (`plan-row-scratch-run.json`, 33 steps, real rtk 0.51.0 and codex-cli 0.159.3 in scratch homes, `local_integration`): #713's four hcom rules
+(`fixtures/hcom-deny.rules`, 82 commands probed, 36 rewritten, none weakened) let the trust proceed; a `git push` forbid rule without an `rtk git push` twin is
+refused before anything is written (accepted with `--allow-exec-rules`, after which `--check` exits 6); with the twin the trust proceeds; an unreadable rules
+directory is refused; a `git push` rule added after a grant makes `--check` exit 6 and the trust refuse; each of the evaluator's six decisions needs exit 0 and a
+valid answer. 58 unit tests (`synthetic`: two local stand-ins for the programs, `FakeTools`) were written after the code and checked by mutation: 14 mutants of
+the review each fail at least one test (`rule_review_mutation_check.py`, `rule-review-mutation-check.txt`). The operating rule for rule authors stays: write both
+forms (`prefix_rule(pattern = ["rtk", "git", "push"], decision = "forbidden")` beside the plain one) and verify with `codex execpolicy check`.
+
+Limits and residuals: rules in a project's `.codex/rules` or a managed layer are not visible to the tool; the sample is rtk 0.51.0's measured surface, not its
+registry (96 patterns), so a rule on a rewritten command that neither its pattern, its examples nor the sample reach is not seen (the twin-form rule covers it);
+the review is a snapshot of the rules and of rtk's configuration when it runs (`--check` repeats it); a parse error in any rules file makes Codex load no file
+rules at all (`exec_policy.rs` L645-L660, `load_exec_policy_with_warning`) while a listing or read error fails the policy load, so the review reports a broken
+file that Codex itself would not apply; no live Codex session was run with a forbidding rule and the hook active (untested boundary: the session behaviour is
+derived from the dispatch order above and the evaluator that `codex execpolicy check` runs).
+
+**Review round (2026-10-05).** The first version of the guard (head 4739ea829) was read by two other families' sessions. 705d (Sol, through 5f): P1 `rule_files`
+failed open when the listing raised (`Path.glob` swallows the error); P2 the refusal came after the app-server started; P2 the scratch run accepted a failed
+evaluator as "no decision". Job-071 (through the command center): P2 the same listing hole; P2 rules were reported only for a hook still to be trusted (`--check`
+and an already trusted `--apply` returned 0 without naming a rule); P3 the claim that approvals-off hosts consult no rules. All are fixed in the second version
+above (the P3 in item 5, the third 705d finding in `plan_row_scratch_run.py`), and the exclusions default that job-071 recommended is alternative (a).
+
+**Alternatives.** (a) *Limit the hook to a read-only rewrite set with `exclude_commands`* (job-071 recommended exclusions for state-changing families as a
+default beside the guard): rtk's option is exclusion-only (`src/core/config.rs` L119-L123; `src/discover/registry.rs` L1548-L1582: a pattern starting with `^` is
+a regex without look-around, any other is a literal prefix, and a trivial pattern is ignored), so an allow-list cannot be written, and a deny-list of every
+state-changing prefix among the registry's 96 patterns (`src/discover/rules.rs`) would track upstream's registry, change the shared config that the Claude hook
+and the recipe's five-entry table also read, and cost compression only on short mutating-command output. That read's own probe shows the limit:
+`exclude_commands = ["git push"]` excludes `git push` but still rewrites `git -C /tmp push`, so exclusions reduce the risk without preserving a rule or
+constraining a command the model prefixes with `rtk` itself; not done here, and the first thing to add if a bypass is ever observed. (b) *Prove rtk never rewrites
+mutating commands*: false (item 4). (c) *Hold the Codex hook out again*: against the user's directive of 2026-10-04. (d) *Ship `rtk ...` rules with the plan*:
+under `approval_policy = "never"` a `prompt` rule is rejected by policy and becomes `forbidden` (`exec_policy.rs` L216-L236 and the match at L407-L415), which
+would block the authorization-settings hosts. (e) *Refuse whenever a rules file exists* (the first version of this guard): it blocks the row for nothing once #713
+installs `hcom-deny.rules`, whose rules rtk never rewrites; replaced by the review.

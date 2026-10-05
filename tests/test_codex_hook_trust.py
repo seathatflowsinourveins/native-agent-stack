@@ -1,18 +1,22 @@
 """tools/adoption/codex_hook_trust.py: trust the named hooks of one Codex home through config/batchWrite and read it back.
 
 The app-server is a fake that answers hooks/list and config/batchWrite the way the released codex-cli 0.159.3 does (the field
-names are those of its hooks/list response; the write shape is the TUI's write_hook_trusts); no real Codex, no real home, no
-network: local integration checks, not upstream tests. The real client was run against scratch homes in
-evidence/artifacts/token-stack-fresh-session-e2e-20261004/.
+names are those of its hooks/list response; the write shape is the TUI's write_hook_trusts); the rule review's two programs are
+local stand-ins too (FakeTools: `rtk hook check --agent codex` and `codex execpolicy check`, with the output shapes of rtk 0.51.0 and
+codex-rs/execpolicy); no real Codex, no real rtk, no real home, no network: synthetic local checks, not upstream tests. The real
+client and the real tools were run against scratch homes in evidence/artifacts/token-stack-fresh-session-e2e-20261004/.
 """
 
 from __future__ import annotations
 
+import ast
 import contextlib
 import copy
 import io
+import json
 import os
 import stat
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -84,6 +88,58 @@ class FakeServer:
         return [params for method, params in self.requests if method == "config/batchWrite"]
 
 
+def completed(command, code, out="", err=""):
+    return subprocess.CompletedProcess(command, code, out, err)
+
+
+class FakeTools:
+    """The two programs the rule review runs. `rtk hook check --agent codex <command>` rewrites the commands whose first word is in
+    ``rewrites`` to `rtk <command>` (stdout, exit 0) and says `No rewrite for: <command>` on stderr with exit 1 for the others, as rtk
+    0.51.0 does. `codex execpolicy check --rules F ... -- <argv>` reads prefix_rule calls from the files, merges them, takes the
+    strictest decision (decision defaults to allow) and answers with the JSON shape of codex-rs/execpolicy/README.md."""
+
+    ORDER = {"forbidden": 3, "prompt": 2, "allow": 1}
+
+    def __init__(self, rewrites=("git",), rtk_exit=None, codex_exit=None, rewrite_to=None):
+        self.rewrites, self.rtk_exit, self.codex_exit, self.rewrite_to = set(rewrites), rtk_exit, codex_exit, rewrite_to
+        self.calls, self.settings = [], []
+
+    def run(self, command, **kwargs):
+        self.calls.append(list(command))
+        self.settings.append(kwargs.get("env"))
+        return self.rtk(command) if Path(command[0]).name == "rtk" else self.codex(command)
+
+    def rtk(self, command):
+        assert command[1:5] == ["hook", "check", "--agent", "codex"], command
+        asked = command[5]
+        if self.rtk_exit is not None:
+            return completed(command, self.rtk_exit, "", "rtk: boom\n")
+        if asked.split()[0] in self.rewrites:
+            return completed(command, 0, (self.rewrite_to(asked) if self.rewrite_to else "rtk " + asked) + "\n")
+        return completed(command, 1, "", f"No rewrite for: {asked}\n")
+
+    def codex(self, command):
+        assert command[1:3] == ["execpolicy", "check"], command
+        if self.codex_exit is not None:
+            return completed(command, self.codex_exit, "", "Error: failed to parse policy at x.rules\n\nCaused by:\n    error: invalid decision: oops\n")
+        files = [command[i + 1] for i, token in enumerate(command) if token == "--rules"]
+        argv = command[command.index("--") + 1:]
+        matched = []
+        for path in files:
+            for node in ast.parse(Path(path).read_text(encoding="utf-8")).body:
+                if node.value.func.id != "prefix_rule":
+                    continue
+                keywords = {k.arg: ast.literal_eval(k.value) for k in node.value.keywords}
+                pattern = keywords["pattern"]
+                if len(argv) >= len(pattern) and all(argv[i] in (p if isinstance(p, list) else [p]) for i, p in enumerate(pattern)):
+                    matched.append((argv[:len(pattern)], keywords.get("decision", "allow")))
+        if not matched:
+            return completed(command, 0, json.dumps({"matchedRules": []}))
+        rules = [{"prefixRuleMatch": {"matchedPrefix": prefix, "decision": decision}} for prefix, decision in matched]
+        strictest = max((decision for _, decision in matched), key=self.ORDER.get)
+        return completed(command, 0, json.dumps({"matchedRules": rules, "decision": strictest}))
+
+
 class Case(unittest.TestCase):
     def setUp(self):
         self._scratch = tempfile.TemporaryDirectory()
@@ -97,12 +153,15 @@ class Case(unittest.TestCase):
         self.codex.write_text("#!/bin/sh\nexit 9\n", encoding="utf-8")
         self.codex.chmod(0o700)
 
-    def run_tool(self, server, *extra: str, running=()):
+    def run_tool(self, server, *extra: str, running=(), tools=None):
         out, err = io.StringIO(), io.StringIO()
+        self.tools = tools or FakeTools()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err), \
-                mock.patch.object(trust.lane, "AppServer", return_value=server), \
-                mock.patch.object(trust.lane, "codex_processes", return_value=list(running)):
-            code = trust.main(["--codex", str(self.codex), "--codex-home", str(self.home), "--command", RTK, *extra])
+                mock.patch.object(trust.lane, "AppServer", return_value=server) as self.app_server, \
+                mock.patch.object(trust.lane, "codex_processes", return_value=list(running)), \
+                mock.patch.object(trust.subprocess, "run", side_effect=self.tools.run):
+            code = trust.main(["--codex", str(self.codex), "--codex-home", str(self.home), "--rtk", "/opt/rtk/bin/rtk",
+                               "--command", RTK, *extra])
         return code, out.getvalue(), err.getvalue()
 
 
@@ -355,67 +414,314 @@ class CheckTests(Case):
         self.assertEqual(self.run_tool(server, "--check")[0], 0)
 
 
-class ExecutionRuleTests(Case):
-    """The hook rewrites a command to `rtk <command>` before Codex matches execution rules (codex-rs/core/src/tools/registry.rs L603-L660 at rust-v0.160.0;
-    codex-rs/core/src/exec_policy.rs L316-L420 matches the rules against the rewritten command's words), so a rule on `git push` does not match
-    `rtk git push`. Trusting the hook is what activates it, so --apply refuses while the user layer's rules directory holds a rules file."""
+# The rules of #713's config/hcom-deny.rules (head 5f295f254), kept as the positive control: prefix rules on `hcom ...` and `uvx hcom ...`
+# that rtk does not rewrite. #713 is not merged yet, so the fixture is a copy.
+HCOM_DENY_RULES = (ROOT / "evidence" / "artifacts" / "token-stack-fresh-session-e2e-20261004" / "fixtures" / "hcom-deny.rules") \
+    .read_text(encoding="utf-8")
+GIT_PUSH_FORBIDDEN = 'prefix_rule(pattern = ["git", "push"], decision = "forbidden")\n'
+GIT_PUSH_TWIN = 'prefix_rule(pattern = ["rtk", "git", "push"], decision = "forbidden")\n'
 
-    def rules(self, name="default.rules", body='prefix_rule(pattern = ["git", "push"], decision = "forbidden")\n'):
+
+class ExecutionRuleTests(Case):
+    """The hook rewrites a command to `rtk <command>` before Codex matches execution rules (codex-rs/core/src/tools/registry.rs L603-L660 at
+    rust-v0.160.0; codex-rs/core/src/exec_policy.rs L316-L420 matches the rules against the rewritten command's words), so a `forbidden` or
+    `prompt` rule on `git push` does not match `rtk git push`. Trusting the hook activates it, so the tool reviews the user layer's rules first:
+    for each command a rule names, and a sample of the commands rtk rewrites, it compares the decision on the original with the decision on
+    the rewrite, and refuses (--apply, before the app-server starts) or fails (--check) only when a restricting decision gets weaker."""
+
+    def rules(self, name="default.rules", body=GIT_PUSH_FORBIDDEN):
         directory = self.home / "rules"
         directory.mkdir(exist_ok=True)
         (directory / name).write_text(body, encoding="utf-8")
 
-    def test_a_rules_file_refuses_the_apply_before_any_write_or_backup(self):
+    def assert_refused_before_anything_was_written(self, code, server):
+        self.assertEqual(code, 2)
+        self.app_server.assert_not_called()
+        self.assertEqual(server.requests, [])
+        self.assertEqual(sorted(p.name for p in self.home.iterdir()), ["config.toml", "rules"])  # no backup, nothing created
+
+    # the CC's three controls
+    def test_hcom_style_rules_that_rtk_does_not_rewrite_let_the_apply_through(self):
+        self.rules("hcom-deny.rules", HCOM_DENY_RULES)
+        server = FakeServer([hook(KEY, RTK)])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(len(server.writes()), 1)
+        self.assertIn("hcom-deny.rules; 4 rule(s)", out)
+        self.assertIn("every rule keeps its decision under the rewrite", out)
+
+    def test_a_forbid_rule_without_an_rtk_twin_is_refused_before_the_server_starts(self):
         self.rules()
         server = FakeServer([hook(KEY, RTK)])
         code, out, err = self.run_tool(server, "--apply")
-        self.assertEqual(code, 2)
-        self.assertIn("default.rules", err)
-        self.assertIn("rtk git push", err)
+        self.assert_refused_before_anything_was_written(code, server)
+        self.assertIn("exposed: `git push origin main` is forbidden (git push), its rewrite `rtk git push origin main` is matched by no rule", out)
         self.assertIn("--allow-exec-rules", err)
-        self.assertEqual(server.writes(), [])
-        self.assertEqual(sorted(p.name for p in self.home.iterdir()), ["config.toml", "rules"])  # no backup
+        self.assertIn("rtk form", err)
 
-    def test_the_flag_lets_the_apply_through(self):
+    def test_a_twin_covered_rule_lets_the_apply_through(self):
+        self.rules("default.rules", GIT_PUSH_FORBIDDEN + GIT_PUSH_TWIN)
+        server = FakeServer([hook(KEY, RTK)])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertIn("every rule keeps its decision under the rewrite", out)
+
+    # what counts as a bypass
+    def test_a_broad_rule_is_seen_through_the_sample_though_its_head_is_not_rewritten(self):
+        self.rules("default.rules", 'prefix_rule(pattern = ["git"], decision = "prompt")\n')
+        server = FakeServer([hook(KEY, RTK)])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assert_refused_before_anything_was_written(code, server)
+        self.assertIn("`git commit -m x` is prompt (git), its rewrite `rtk git commit -m x` is matched by no rule", out)
+
+    def test_a_twin_that_is_weaker_than_the_rule_is_still_exposed(self):
+        self.rules("default.rules", GIT_PUSH_FORBIDDEN + 'prefix_rule(pattern = ["rtk", "git", "push"], decision = "prompt")\n')
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
+        self.assertEqual(code, 2)
+        self.assertIn("its rewrite `rtk git push origin main` is prompt", out)
+
+    def test_a_stricter_twin_is_not_an_exposure(self):
+        self.rules("default.rules", 'prefix_rule(pattern = ["git", "push"], decision = "prompt")\n' + GIT_PUSH_TWIN)
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
+        self.assertEqual(code, 0, err)
+
+    def test_an_allow_rule_whose_rewrite_matches_nothing_is_a_note_not_a_refusal(self):
+        self.rules("default.rules", 'prefix_rule(pattern = ["git", "status"], decision = "allow")\n')
+        server = FakeServer([hook(KEY, RTK)])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertIn("note: `git status` is allow (git status), its rewrite `rtk git status` is matched by no rule", out)
+        self.assertEqual(len(server.writes()), 1)
+
+    def test_match_examples_and_every_spelling_of_a_pattern_are_probed(self):
+        self.rules("default.rules", 'prefix_rule(pattern = ["git", ["push", "pull"]], decision = "forbidden", '
+                                    'match = ["git push --tags", ["git", "pull", "--rebase"]])\n')
+        _, out, _ = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
+        for command in ("git push --tags", "git pull --rebase", "git push", "git pull"):
+            self.assertIn(f"exposed: `{command}` is forbidden", out)
+
+    def test_every_rules_file_is_evaluated_together_so_a_twin_in_another_file_counts(self):
+        self.rules("default.rules")
+        self.rules("team.rules", GIT_PUSH_TWIN)
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertIn("default.rules, team.rules", out)
+        evaluations = [call for call in self.tools.calls if call[1:3] == ["execpolicy", "check"]]
+        self.assertTrue(evaluations)
+        for call in evaluations:
+            self.assertEqual(call.count("--rules"), 2)
+
+    # the flag and the other modes
+    def test_the_flag_accepts_an_exposure_and_the_report_still_names_it(self):
         self.rules()
         server = FakeServer([hook(KEY, RTK)])
         code, out, err = self.run_tool(server, "--apply", "--allow-exec-rules")
         self.assertEqual(code, 0, err)
         self.assertEqual(len(server.writes()), 1)
-        self.assertIn("trusted 1 hook(s)", out)
+        self.assertIn("exposed: `git push origin main`", out)
 
-    def test_a_dry_run_and_a_check_name_the_rules_and_are_not_refused(self):
+    def test_a_check_is_5_for_an_untrusted_hook_and_6_for_a_trusted_one_beside_an_exposure(self):
         self.rules()
-        for extra in ((), ("--check",)):
-            with self.subTest(extra=extra):
-                server = FakeServer([hook(KEY, RTK)])
-                code, out, err = self.run_tool(server, *extra)
-                self.assertEqual(code, 0 if not extra else 5, err)
-                self.assertIn("default.rules", out + err)
-                self.assertEqual(server.writes(), [])
+        self.assertEqual(self.run_tool(FakeServer([hook(KEY, RTK)]), "--check")[0], 5)
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK, "trusted")]), "--check")
+        self.assertEqual(code, 6)
+        self.assertIn("exposed: `git push origin main`", out)
+        self.assertIn("execution-rule exposure", err)
+        self.assertEqual(self.run_tool(FakeServer([hook(KEY, RTK, "trusted")]), "--check", "--allow-exec-rules")[0], 0)
 
-    def test_no_rules_directory_an_empty_one_and_other_files_do_not_refuse(self):
-        (self.home / "rules").mkdir()
-        (self.home / "rules" / "notes.txt").write_text("not a rules file\n", encoding="utf-8")
-        (self.home / "rules" / "empty.rules").write_text("  \n", encoding="utf-8")
-        server = FakeServer([hook(KEY, RTK)])
-        code, out, err = self.run_tool(server, "--apply")
+    def test_a_check_beside_rules_that_hold_is_0_and_names_them(self):
+        self.rules("hcom-deny.rules", HCOM_DENY_RULES)
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK, "trusted")]), "--check")
         self.assertEqual(code, 0, err)
+        self.assertIn("hcom-deny.rules; 4 rule(s)", out)
 
-    def test_every_rules_file_is_named(self):
-        self.rules("default.rules")
-        self.rules("team.rules", 'prefix_rule(pattern = ["git", "commit"], decision = "prompt")\n')
-        code, _, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
-        self.assertEqual(code, 2)
-        self.assertIn("default.rules", err)
-        self.assertIn("team.rules", err)
+    def test_a_dry_run_reports_and_says_the_apply_would_refuse(self):
+        self.rules()
+        server = FakeServer([hook(KEY, RTK)])
+        code, out, err = self.run_tool(server)
+        self.assertEqual(code, 0, err)
+        self.assertIn("exposed: `git push origin main`", out)
+        self.assertIn("--apply would refuse", out)
+        self.assertEqual(server.writes(), [])
 
-    def test_an_already_trusted_hook_is_nothing_to_do_even_with_rules(self):
+    def test_an_already_trusted_hook_is_still_refused_by_apply_because_the_review_comes_first(self):
         self.rules()
         server = FakeServer([hook(KEY, RTK, "trusted")])
         code, out, err = self.run_tool(server, "--apply")
+        self.assert_refused_before_anything_was_written(code, server)
+
+    # no rule files: nothing is run
+    def test_without_a_rules_directory_neither_rtk_nor_the_evaluator_runs(self):
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
         self.assertEqual(code, 0, err)
-        self.assertIn("nothing to do", out)
+        self.assertEqual(self.tools.calls, [])
+        self.assertNotIn("execution rules", out)
+
+    def test_other_files_empty_comment_only_files_and_non_files_are_no_rules_to_review(self):
+        directory = self.home / "rules"
+        directory.mkdir()
+        (directory / "notes.txt").write_text(GIT_PUSH_FORBIDDEN, encoding="utf-8")
+        (directory / "empty.rules").write_text("  \n", encoding="utf-8")
+        (directory / "comments.rules").write_text("# nothing here\n", encoding="utf-8")
+        (directory / "dir.rules").mkdir()
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.tools.calls, [])  # no rule: nothing to compare
+
+    def test_a_symlinked_rules_file_is_not_loaded_by_codex_so_it_is_not_reviewed(self):
+        (self.home / "rules").mkdir()
+        real = self.dir / "elsewhere.rules"
+        real.write_text(GIT_PUSH_FORBIDDEN, encoding="utf-8")
+        try:
+            (self.home / "rules" / "link.rules").symlink_to(real)
+        except OSError:
+            self.skipTest("no symlinks here")
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.tools.calls, [])
+
+    # fail closed (review of #705, finding P1: a failed listing used to read as no rules)
+    def test_a_listing_error_is_not_no_rules_it_refuses_before_any_write(self):
+        (self.home / "rules").mkdir()
+        server = FakeServer([hook(KEY, RTK)])
+        with mock.patch.object(trust.os, "scandir", side_effect=PermissionError(13, "Permission denied")):
+            code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 2)
+        self.assertIn("cannot list", out)
+        self.assertIn("could not be checked", err)
+        self.app_server.assert_not_called()
+        self.assertEqual(server.requests, [])
+        self.assertEqual(sorted(p.name for p in self.home.iterdir()), ["config.toml", "rules"])  # no backup
+
+    def test_an_error_on_one_entry_is_a_listing_error_too(self):
+        class Entry:
+            name = "x.rules"
+
+            def is_file(self, follow_symlinks=True):
+                raise PermissionError(13, "Permission denied")
+
+        class Listing:
+            def __enter__(self):
+                return iter([Entry()])
+
+            def __exit__(self, *exc):
+                return False
+
+        server = FakeServer([hook(KEY, RTK)])
+        with mock.patch.object(trust.os, "scandir", return_value=Listing()):
+            code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 2)
+        self.assertIn("cannot list", out)
+        self.assertEqual(server.requests, [])
+
+    def test_a_rules_path_that_is_a_file_is_a_listing_error_but_a_missing_one_is_not(self):
+        (self.home / "rules").write_text("not a directory\n", encoding="utf-8")
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
+        self.assertEqual(code, 2)
+        self.assertIn("cannot list", out)
+
+    def test_rules_the_tool_cannot_read_as_literals_fail_closed(self):
+        for name, body in (("assign", "NAMES = [\"git\"]\nprefix_rule(pattern = NAMES)\n"), ("syntax", "prefix_rule(pattern = [\n"),
+                           ("other", 'network_rule(host = "x")\n'), ("positional", 'prefix_rule(["git"])\n'),
+                           ("empty pattern", "prefix_rule(pattern = [])\n"), ("no pattern", 'prefix_rule(decision = "allow")\n')):
+            with self.subTest(name=name):
+                self.rules("default.rules", body)
+                server = FakeServer([hook(KEY, RTK)])
+                code, out, err = self.run_tool(server, "--apply")
+                self.assertEqual(code, 2)
+                self.assertIn("cannot read the rules of default.rules", out)
+                self.app_server.assert_not_called()
+
+    def test_a_pattern_with_too_many_spellings_fails_closed(self):
+        alternatives = ", ".join(f'"a{i}"' for i in range(30))
+        self.rules("default.rules", f"prefix_rule(pattern = [[{alternatives}], [{alternatives}]])\n")
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
+        self.assertEqual(code, 2)
+        self.assertIn("spells 900 commands", out)
+
+    def test_rules_without_an_rtk_executable_fail_closed(self):
+        self.rules()
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err), \
+                mock.patch.object(trust.lane, "AppServer") as app_server, mock.patch.object(trust.shutil, "which", return_value=None):
+            code = trust.main(["--codex", str(self.codex), "--codex-home", str(self.home), "--command", RTK, "--apply"])
+        self.assertEqual(code, 2)
+        self.assertIn("no rtk executable", out.getvalue())
+        app_server.assert_not_called()
+
+    def test_a_failing_rtk_or_evaluator_fails_closed(self):
+        self.rules()
+        for name, tools in (("rtk exit", FakeTools(rtk_exit=2)), ("codex exit", FakeTools(codex_exit=1))):
+            with self.subTest(name=name):
+                code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply", tools=tools)
+                self.assertEqual(code, 2)
+                self.assertIn("cannot check:", out)
+                self.app_server.assert_not_called()
+        self.assertIn("invalid decision: oops", out)  # the evaluator's own reason is shown
+
+    def test_a_response_that_is_not_the_evaluators_shape_fails_closed(self):
+        self.rules()
+
+        class Odd(FakeTools):
+            def codex(self, command):
+                return completed(command, 0, json.dumps({"matchedRules": [], "decision": "forbidden"}))
+
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply", tools=Odd())
+        self.assertEqual(code, 2)
+        self.assertIn("answered unexpectedly", out)
+
+    def test_a_compound_rewrite_is_not_compared_and_fails_closed(self):
+        self.rules()
+        tools = FakeTools(rewrite_to=lambda asked: f"rtk {asked} && rtk git status")
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply", tools=tools)
+        self.assertEqual(code, 2)
+        self.assertIn("compound command", out)
+
+    def test_a_rewrite_that_does_not_split_into_words_fails_closed(self):
+        self.rules()
+        tools = FakeTools(rewrite_to=lambda asked: f"rtk {asked} 'unbalanced")
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply", tools=tools)
+        self.assertEqual(code, 2)
+        self.assertIn("does not split into words", out)
+
+    def test_output_that_is_not_text_fails_closed_instead_of_raising(self):
+        self.rules()
+
+        class Binary(FakeTools):
+            def rtk(self, command):
+                raise UnicodeDecodeError("utf-8", b"\xff", 0, 1, "invalid start byte")
+
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply", tools=Binary())
+        self.assertEqual(code, 2)
+        self.assertIn("cannot run /opt/rtk/bin/rtk", out)
+
+    # the review leaves the home alone, and the sample is the measured one
+    def test_the_evaluator_runs_in_a_throwaway_codex_home_not_the_reviewed_one(self):
+        self.rules("hcom-deny.rules", HCOM_DENY_RULES)
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK, "trusted")]), "--check")
+        self.assertEqual(code, 0, err)
+        homes = {env["CODEX_HOME"] for call, env in zip(self.tools.calls, self.tools.settings) if call[1:3] == ["execpolicy", "check"]}
+        self.assertTrue(homes)
+        self.assertNotIn(str(self.home), homes)
+        for path in homes:
+            self.assertFalse(Path(path).exists())
+        self.assertEqual(sorted(p.name for p in self.home.iterdir()), ["config.toml", "rules"])
+
+    def test_the_rewrite_sample_is_the_set_rtk_0_51_0_rewrote_in_the_retained_probe(self):
+        record = json.loads((ROOT / "evidence" / "artifacts" / "token-stack-fresh-session-e2e-20261004" / "rtk-behaviour-probe.json")
+                            .read_text(encoding="utf-8"))
+        rewritten = [row["command"] for row in record["codex_hook_check"]["upstream_defaults"] if row.get("rewritten_to")]
+        self.assertEqual(len(rewritten), 36)
+        self.assertEqual(sorted(trust.REWRITE_SAMPLE), sorted(rewritten))
+
+    def test_read_rules_spells_patterns_and_reads_both_example_shapes(self):
+        self.rules("default.rules", 'host_executable(name = "git", paths = ["/usr/bin/git"])\n'
+                                    'prefix_rule(pattern = ["a", ["b", "c"], "d"], match = ["a b d x", ["a", "c", "d"]])\n'
+                                    'prefix_rule(pattern = ["z"], decision = "prompt", justification = "why", not_match = ["z y"])\n')
+        count, heads, examples = trust.read_rules(self.home / "rules" / "default.rules")
+        self.assertEqual(count, 2)
+        self.assertEqual(heads, [("a", "b", "d"), ("a", "c", "d"), ("z",)])
+        self.assertEqual(examples, [("a", "b", "d", "x"), ("a", "c", "d")])
 
 
 if __name__ == "__main__":

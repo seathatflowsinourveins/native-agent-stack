@@ -1,0 +1,16 @@
+baseline: 0 OK
+killed: a failed listing reads as no rules (P1 as reviewed): FAILED (failures=3)
+killed: the review comes after the app-server starts: FAILED (failures=21)
+killed: the sample is dropped: FAILED (failures=7)
+killed: heads are not probed: FAILED (failures=1)
+killed: examples are not probed: FAILED (failures=1)
+killed: any difference is an exposure: FAILED (failures=2)
+killed: a weaker twin passes (only no-match counts): FAILED (failures=1)
+killed: the files are evaluated one at a time: FAILED (failures=1)
+killed: the real home is the evaluator's home: FAILED (failures=1)
+killed: --check ignores an exposure: FAILED (failures=1)
+killed: a symlink is followed: FAILED (failures=1)
+killed: an unsupported statement is skipped: FAILED (failures=1)
+killed: no rtk executable is fine: FAILED (failures=1)
+killed: a failing evaluator is no decision: FAILED (failures=1)
+survivors: []

@@ -5,11 +5,16 @@
 
 The program text of every step is read from evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json (the exact strings the plan runs),
 not retyped here: the config install, `rtk init -g --codex`, the trust command, and the post_install acceptance program (run with bash -euo
-pipefail, as accept.sh does). Around them: a `--check` before the hook exists (exit 4), one after `rtk init` and before the trust (exit 5), and the
-execution-rule guard (Codex's own `codex execpolicy check` on a rule for `git push`, then the trust command refused beside a
-rules file and accepted with --allow-exec-rules), the jq filter and test of the after_sign_in program against synthetic streams of `codex exec --json` in the shape recorded from a real session (one that
-passes and five negative fixtures: a failed rewritten command, a non-zero exit, a declined command, no rtk prefix, no command item; the model call itself
-needs the sign-in and is not run). Nothing leaves the scratch HOME: rtk and Codex write their files there, and the live ~/.codex and rtk
+pipefail, as accept.sh does); the `--check` line is the last line of that program. Around them: a `--check` before the hook exists (exit 4), one
+after `rtk init` and before the trust (exit 5), the jq filter and test of the after_sign_in program against synthetic streams of `codex exec
+--json` in the shape recorded from a real session (one that passes and five negative fixtures: a failed rewritten command, a non-zero exit, a
+declined command, no rtk prefix, no command item; the model call itself needs the sign-in and is not run), and the execution-rule review of the
+trust tool in four more scratch homes, each with the real rtk and the real codex: the hcom rules of #713 (fixtures/hcom-deny.rules; rtk rewrites
+none of them: the trust proceeds, and a `git push` rule added after the grant makes `--check` exit 6 and the trust refuse), a `git push`
+forbid rule without an `rtk git push` twin (the trust is refused before anything is written; --allow-exec-rules accepts it), the same rule with
+its twin (the trust proceeds), and an unreadable rules directory (the trust is refused: the review fails closed). Codex's own `codex execpolicy
+check` is run on the rule for `git push` and `git commit`, and each answer must be an exit 0 with a valid response before its decision counts.
+Nothing leaves the scratch HOME: rtk and Codex write their files there, and the live ~/.codex and rtk
 configuration are not read or written. The scratch ECO_ROOT links the installed rtk instead of running the plan's download and extract steps.
 The trust command refuses while a codex process runs (the tool's own rule); when other codex processes run on the host, the scratch run appends
 `--codex-process-name no-such-process-name` to it and says so, as codex_hook_qual.py does. One run, one host: local_integration evidence.
@@ -26,8 +31,12 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[2]
 PLAN_DIR = ROOT / "evidence" / "artifacts" / "new-wsl-install-plan-20261002"
+HCOM_RULES = (HERE / "fixtures" / "hcom-deny.rules").read_text(encoding="utf-8")
+GIT_PUSH = 'prefix_rule(pattern = ["git", "push"], decision = "forbidden", justification = "pushes need the owner")\n'
+GIT_PUSH_TWIN = 'prefix_rule(pattern = ["rtk", "git", "push"], decision = "forbidden", justification = "pushes need the owner")\n'
 
 
 def stream(command: str | None, exit_code: int | None, status: str) -> str:
@@ -53,6 +62,18 @@ AFTER_SIGN_IN_FIXTURES = (
 )
 
 
+def evaluator_answer(done: subprocess.CompletedProcess) -> tuple[bool, dict]:
+    """A `codex execpolicy check` answer counts only with exit 0 and a JSON object whose matchedRules is a list (and a decision exactly when a rule
+    matched); anything else is invalid, not an unmatched command."""
+    try:
+        verdict = json.loads(done.stdout)
+    except ValueError:
+        return False, {}
+    valid = (done.returncode == 0 and isinstance(verdict, dict) and isinstance(verdict.get("matchedRules"), list)
+             and (verdict.get("decision") is None) == (not verdict["matchedRules"]))
+    return valid, verdict if valid else {}
+
+
 def main() -> int:
     for tool in ("rtk", "codex", "jq"):
         if not shutil.which(tool):
@@ -66,22 +87,35 @@ def main() -> int:
     assert "rtk-config.toml" in config_cmd and "init -g --codex" in init_cmd and "codex_hook_trust.py" in trust_cmd and "--apply" in trust_cmd
     post_program = row["acceptance"]["post_install"]["command"]
     after_program = row["acceptance"]["after_sign_in"]["command"]
-    check_cmd = 'python3 "$repo_root/tools/adoption/codex_hook_trust.py" --command "rtk hook codex" --check'
+    check_line = post_program.splitlines()[-1]
+    assert "codex_hook_trust.py" in check_line and check_line.endswith("--check"), check_line
+    check_cmd = 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; ' + check_line
     busy = subprocess.run(["pgrep", "-x", "codex"], capture_output=True, text=True, check=False).stdout.split()
     steps = []
     with tempfile.TemporaryDirectory(prefix="plan-row-") as scratch:
-        home = Path(scratch) / "fake-home"
         eco = Path(scratch) / "eco"
-        (home / ".codex").mkdir(parents=True)
         (eco / "bin").mkdir(parents=True)
         os.symlink(shutil.which("rtk"), eco / "bin" / "rtk")
-        (home / ".codex" / "hooks.json").write_text(json.dumps({"hooks": {"PreToolUse": [{"matcher": "", "hooks": [
-            {"type": "command", "command": "python3 /fixture/memory_hook.py"}]}]}}, indent=2) + "\n", encoding="utf-8")
-        (home / ".codex" / "config.toml").write_text("# scratch user layer\n", encoding="utf-8")
-        env = {**os.environ, "HOME": str(home), "XDG_CONFIG_HOME": str(home / ".config"), "XDG_DATA_HOME": str(home / ".local/share"),
-               "XDG_CACHE_HOME": str(home / ".cache"), "XDG_STATE_HOME": str(home / ".local/state"), "RTK_TELEMETRY_DISABLED": "1",
-               "ECO_ROOT": str(eco), "plan_dir": str(PLAN_DIR), "repo_root": str(ROOT)}
-        env.pop("CODEX_HOME", None)
+        hooks = json.dumps({"hooks": {"PreToolUse": [{"matcher": "", "hooks": [
+            {"type": "command", "command": "python3 /fixture/memory_hook.py"}]}]}}, indent=2) + "\n"
+
+        def make_home(name: str, rules: dict[str, str] | None = None) -> dict:
+            """A scratch HOME with a user-layer hooks.json (a memory hook), an empty config.toml and, when given, rules files; the environment for it."""
+            home = Path(scratch) / name
+            (home / ".codex").mkdir(parents=True)
+            (home / ".codex" / "hooks.json").write_text(hooks, encoding="utf-8")
+            (home / ".codex" / "config.toml").write_text("# scratch user layer\n", encoding="utf-8")
+            if rules is not None:
+                (home / ".codex" / "rules").mkdir()
+                for fname, body in rules.items():
+                    (home / ".codex" / "rules" / fname).write_text(body, encoding="utf-8")
+            settings = {**os.environ, "HOME": str(home), "XDG_CONFIG_HOME": str(home / ".config"), "XDG_DATA_HOME": str(home / ".local/share"),
+                        "XDG_CACHE_HOME": str(home / ".cache"), "XDG_STATE_HOME": str(home / ".local/state"), "RTK_TELEMETRY_DISABLED": "1",
+                        "ECO_ROOT": str(eco), "plan_dir": str(PLAN_DIR), "repo_root": str(ROOT)}
+            settings.pop("CODEX_HOME", None)
+            return settings
+
+        env = make_home("fake-home")
         deviation = None
         execpolicy: list[dict] = []
         if busy:
@@ -92,8 +126,8 @@ def main() -> int:
         def run(label: str, program: str, expect: int | None = None, environment: dict | None = None) -> None:
             done = subprocess.run(["bash", "-euo", "pipefail", "-c", program], cwd=ROOT, env=environment or env, capture_output=True, text=True,
                                   timeout=300, check=False, stdin=subprocess.DEVNULL)
-            clean = lambda text: [line.replace(scratch, "<scratch>")[:200] for line in text.splitlines() if line.strip()]  # noqa: E731
-            steps.append({"step": label, "exit": done.returncode, "expected_exit": expect, "stdout_tail": clean(done.stdout)[-6:],
+            clean = lambda text: [line.replace(scratch, "<scratch>")[:260] for line in text.splitlines() if line.strip()]  # noqa: E731
+            steps.append({"step": label, "exit": done.returncode, "expected_exit": expect, "stdout_tail": clean(done.stdout)[-12:],
                           "stderr_tail": clean(done.stderr)[-3:]})
 
         run("--check before any rtk hook exists", check_cmd, 4)
@@ -110,35 +144,59 @@ def main() -> int:
             fixture_file.write_text(fixture, encoding="utf-8")
             run(f"the after_sign_in filter and test on a synthetic stream: {label} (the model call is not run)",
                 f'ran=$(jq -rs {jq_program} "{fixture_file}"); printf "%s\\n" "$ran"; [[ "$ran" == "true" ]]', expected)
+
         # Execution rules and the rewritten command. Codex matches rules against the command words after the hook's rewrite, so a rule on `git push`
-        # does not match `rtk git push`: Codex's own evaluator, then the trust tool's refusal and its explicit acceptance, in a second scratch home.
+        # does not match `rtk git push`: Codex's own evaluator first, then the trust tool's review in scratch homes with the real rtk and codex.
         gate = Path(scratch) / "gate.rules"
-        gate.write_text('prefix_rule(pattern = ["git", "push"], decision = "forbidden", justification = "pushes need the owner")\n'
-                        'prefix_rule(pattern = ["git", "commit"], decision = "prompt", justification = "commits are reviewed")\n', encoding="utf-8")
+        gate.write_text(GIT_PUSH + 'prefix_rule(pattern = ["git", "commit"], decision = "prompt", justification = "commits are reviewed")\n', encoding="utf-8")
         for command in ("git push origin main", "rtk git push origin main", "git commit -m x", "rtk git commit -m x", "git status", "rtk git status"):
             done = subprocess.run(["codex", "execpolicy", "check", "--rules", str(gate), "--", *command.split()], env=env, capture_output=True,
                                   text=True, timeout=120, check=False, stdin=subprocess.DEVNULL)
-            verdict = json.loads(done.stdout) if done.returncode == 0 and done.stdout.strip() else {}
-            execpolicy.append({"command": command, "exit": done.returncode, "decision": verdict.get("decision"),
+            valid, verdict = evaluator_answer(done)
+            execpolicy.append({"command": command, "exit": done.returncode, "valid": valid, "decision": verdict.get("decision"),
                                "matched_prefixes": [m.get("prefixRuleMatch", {}).get("matchedPrefix") for m in verdict.get("matchedRules", [])]})
-        home2 = Path(scratch) / "fake-home-2"
-        (home2 / ".codex" / "rules").mkdir(parents=True)
-        (home2 / ".codex" / "hooks.json").write_text((home / ".codex" / "hooks.json").read_text(encoding="utf-8")
-                                                   .replace("rtk hook codex", "python3 /fixture/memory_hook.py"), encoding="utf-8")
-        (home2 / ".codex" / "config.toml").write_text("# scratch user layer\n", encoding="utf-8")
-        (home2 / ".codex" / "rules" / "default.rules").write_text(gate.read_text(encoding="utf-8"), encoding="utf-8")
-        env2 = {**env, "HOME": str(home2), "XDG_CONFIG_HOME": str(home2 / ".config"), "XDG_DATA_HOME": str(home2 / ".local/share"),
-                "XDG_CACHE_HOME": str(home2 / ".cache"), "XDG_STATE_HOME": str(home2 / ".local/state")}
-        run("a second Codex home with an execution rules file: rtk init -g --codex", init_cmd, 0, env2)
-        run("the plan's trust command is refused while the rules file is there", trust_cmd, 2, env2)
-        run("--check still reports the hook untrusted", check_cmd, 5, env2)
-        run("the explicit acceptance: the trust command with --allow-exec-rules", trust_cmd + " --allow-exec-rules", 0, env2)
-        run("--check after the accepted trust", check_cmd, 0, env2)
-    record = {"schema": "plan-row-scratch-run/1", "evidence_class": "local_integration: one run, one host, a scratch HOME (the stream is synthetic)",
+
+        def home_with_hook(name: str, rules: dict[str, str]) -> dict:
+            settings = make_home(name, rules)
+            run(f"{name}: plan command 3 (the exclusions config)", config_cmd, 0, settings)
+            run(f"{name}: plan command 5 (rtk init -g --codex)", init_cmd, 0, settings)
+            return settings
+
+        hcom = home_with_hook("rules-hcom", {"hcom-deny.rules": HCOM_RULES})
+        run("rules-hcom (#713's four hcom rules; rtk rewrites none of them): --check before the trust", check_cmd, 5, hcom)
+        run("rules-hcom: the plan's trust command proceeds", trust_cmd, 0, hcom)
+        run("rules-hcom: --check", check_cmd, 0, hcom)
+        (Path(hcom["HOME"]) / ".codex" / "rules" / "default.rules").write_text(GIT_PUSH, encoding="utf-8")
+        run("rules-hcom: a git push forbid rule is added after the grant: --check exits 6", check_cmd, 6, hcom)
+        run("rules-hcom: the trust command now refuses although the hook is already trusted", trust_cmd, 2, hcom)
+
+        exposed = home_with_hook("rules-exposed", {"default.rules": GIT_PUSH})
+        run("rules-exposed (a git push forbid rule, no rtk twin): the trust command is refused before anything is written", trust_cmd, 2, exposed)
+        run("rules-exposed: --check says the hook is not trusted (nothing was written)", check_cmd, 5, exposed)
+        run("rules-exposed: --allow-exec-rules accepts the exposure", trust_cmd + " --allow-exec-rules", 0, exposed)
+        run("rules-exposed: --check after the accepted trust exits 6", check_cmd, 6, exposed)
+        run("rules-exposed: --check --allow-exec-rules", check_cmd + " --allow-exec-rules", 0, exposed)
+
+        twin = home_with_hook("rules-twin", {"default.rules": GIT_PUSH + GIT_PUSH_TWIN})
+        run("rules-twin (the git push rule and its rtk git push twin): the trust command proceeds", trust_cmd, 0, twin)
+        run("rules-twin: --check", check_cmd, 0, twin)
+
+        unreadable = home_with_hook("rules-unreadable", {"default.rules": GIT_PUSH})
+        rules_dir = Path(unreadable["HOME"]) / ".codex" / "rules"
+        if os.geteuid() == 0:
+            steps.append({"step": "rules-unreadable: skipped (running as root, so a mode 000 directory is still listable)", "exit": 2,
+                          "expected_exit": 2, "stdout_tail": [], "stderr_tail": []})
+        else:
+            rules_dir.chmod(0)
+            try:
+                run("rules-unreadable (the rules directory cannot be listed): the trust command fails closed", trust_cmd, 2, unreadable)
+            finally:
+                rules_dir.chmod(0o755)
+    record = {"schema": "plan-row-scratch-run/2", "evidence_class": "local_integration: one run, one host, scratch HOMEs, the real rtk and codex (the stream is synthetic)",
               "rtk": subprocess.run(["rtk", "--version"], capture_output=True, text=True, check=False).stdout.strip(),
               "codex": subprocess.run(["codex", "--version"], capture_output=True, text=True, check=False).stdout.strip(),
               "deviation": deviation, "steps": steps, "execpolicy_check": execpolicy,
-              "all_as_expected": all(step["exit"] == step["expected_exit"] for step in steps) and
+              "all_as_expected": all(step["exit"] == step["expected_exit"] for step in steps) and all(e["valid"] for e in execpolicy) and
               [e["decision"] for e in execpolicy] == ["forbidden", None, "prompt", None, None, None]}
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")

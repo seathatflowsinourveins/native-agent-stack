@@ -608,7 +608,7 @@ command-output() {
       # Kind: smoke; Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L121 (--version); https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L193 (rtk git log); https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L313 (rtk proxy, the raw passthrough); https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L551 (RTK_TELEMETRY_DISABLED)
       # Planned exact 0.51.0 version; the archive digest was verified separately; the two log lines run in this checkout.
       # Planned. Source: https://github.com/rtk-ai/rtk/blob/v0.51.0/src/main.rs#L3072-L3100 (excluded commands exit 1 with No rewrite; the positive control exits 0 with its rewrite).
-      # Planned. Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L133 (rtk init --show --codex: the Global hook and RTK.md lines are [ok]); codex_hook_trust.py --check exits 0 only when the named hook is trusted at its current hash.
+      # Planned. Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L133 (rtk init --show --codex: the Global hook and RTK.md lines are [ok]); codex_hook_trust.py --check exits 0 only when the named hook is trusted at its current hash and no execution rule of the user layer would be bypassed by the rewrite (exit 5: not trusted; exit 6: trusted beside such a rule, which catches a rule added after the grant).
       check command-output smoke 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"
 [[ "$("$e/bin/rtk" --version)" == "rtk 0.51.0" ]]
 cd "$repo_root"
@@ -626,7 +626,7 @@ codex_home="${CODEX_HOME:-$HOME/.codex}"
 shown=$(RTK_TELEMETRY_DISABLED=1 "$e/bin/rtk" init --show --codex 2>&1)
 [[ "$shown" == *"[ok] Global hook: $codex_home/hooks.json"* ]]
 [[ "$shown" == *"[ok] Global RTK.md: $codex_home/RTK.md"* ]]
-python3 "$repo_root/tools/adoption/codex_hook_trust.py" --command "rtk hook codex" --check'
+python3 "$repo_root/tools/adoption/codex_hook_trust.py" --command "rtk hook codex" --rtk "$e/bin/rtk" --check'
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L133
