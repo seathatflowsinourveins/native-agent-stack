@@ -15823,8 +15823,8 @@
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.json",
-      "sha256": "d4e7d79f9b32c093632ae611bf5cdc13fb654907817137974e2987fd03202c73",
-      "bytes": 882688
+      "sha256": "d313bbc81c39b7b9ed020f60435e8ecee291deee991bc3ad6d7c243308423de1",
+      "bytes": 896235
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.md",
@@ -15908,8 +15908,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "4b62678bee9f238e0df6179a44f88860ed5b3d4b96b3505fdcb82a539d6db004",
-      "bytes": 757289
+      "sha256": "15bcf02837853bad02026d7ff31395fa71e51a8be659e47cc4c6832620b81fe9",
+      "bytes": 758875
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -16023,8 +16023,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "6cdc57719ada786b46fe8c27d6d36ce162ffe66304b4e21d9e4e5131f6fa153d",
-      "bytes": 22531
+      "sha256": "0e1c46f3f3788f4de7d0ba12ba7ef86f0219dcd7e8b2501b59d88af2757c477b",
+      "bytes": 22673
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -52368,8 +52368,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "07a9ba1f192497808897040543ae605a1da686c7743b23df58503e927f453520",
-      "bytes": 102293
+      "sha256": "71224507e37ecac0125c8b81a5a46044632fa4a0d0b7ca7fad248ce130fb5238",
+      "bytes": 102331
     },
     {
       "path": "observability/README.md",
