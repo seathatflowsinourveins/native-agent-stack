@@ -907,5 +907,5 @@
     }
   ],
   "evidence_class": "local_integration: scratch HOME/XDG, original peer fixture helpers and native RTK commands",
-  "sanitization": "The absolute temporary-directory prefix is replaced with <scratch>. Large synthetic stdout is represented by its sanitized hash and observed content counts; exact returned output stays in .tmp-build/rtk-f4-scratch-supplement.json."
+  "sanitization": "The absolute temporary-directory prefix is replaced with <scratch>. Large synthetic stdout is represented by its sanitized hash and observed content counts; exact sanitized returned output is retained beside this record in scratch-supplement.json."
 }

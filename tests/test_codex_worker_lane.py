@@ -471,14 +471,16 @@ class TemplateTests(unittest.TestCase):
         for needle in ("`git show REV:path`", "git -C DIR show REV:path", "`diff`", "`git branch`", "`git log`",
                        "`jq`", "`rtk proxy <command>`", "`cd`", "`export`", "`source`", "127"):
             self.assertIn(needle, exceptions)
-        self.assertNotIn("`find`", exceptions)
-        self.assertIn("With the bootstrap-installed rtk exclusions config", exceptions)
-        self.assertIn("otherwise it rewrites them", exceptions)
-        self.assertIn("An explicit `rtk` prefix bypasses exclusions: never prefix them", exceptions)
-        self.assertIn("bare: at most 10 one-line commits, drops merges, no notice", exceptions)
-        self.assertIn("`--stat`: at most 10, keeps merges, cap notice", exceptions)
-        self.assertIn("`--oneline`, `--format=%s`, `--graph --oneline` drop merges", exceptions)
-        self.assertIn("For full history or merges, use `-n <count>` or native git", exceptions)
+        self.assertIn("With installed rtk exclusions config (`fixtures/rtk-hook-exclusions.toml`)", exceptions)
+        self.assertIn("rewrite/installed hooks keep the first four native; else rewrite them", exceptions)
+        self.assertIn("Explicit `rtk` bypasses exclusions: use `rtk proxy <command>`, never prefix", exceptions)
+        self.assertIn("`diff`: rtk changes diagnostics; both exit 2 on missing files", exceptions)
+        self.assertIn("bare: max 10 commits, no notice", exceptions)
+        self.assertIn("`--stat`: max 10, notice, keeps merges", exceptions)
+        self.assertIn("Bare/`--oneline`/`--format=%s`/`--graph --oneline` drop merges", exceptions)
+        self.assertIn("For history/merges use `-n <count>` or `rtk proxy git log`", exceptions)
+        self.assertIn("`find NAME`: rtk uses patterns for missing bare names; no match exits 0", exceptions)
+        self.assertIn("Use `./NAME` or `rtk proxy find` for status", exceptions)
 
     def test_adoption_status_finds_the_rtk_text_inline(self):
         # scripts/adoption_status.py (#368) counts RTK as wired only when RTK.md's text is inline in what Codex

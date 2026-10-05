@@ -99,16 +99,17 @@ WORKTREE_SENTENCES = (
     "brief's base, and ask the coordinator for an owned worktree instead.",
     "Do not merge into another worker's branch.",
 )
-# Each role's own exact-shape sentence. `jq` output is in both: the F4 exceptions list five commands, jq included.
+# Each role's own exact-shape sentence. `jq` output is in both: the F4 exceptions list six commands, jq included.
 EXACT_SHAPES = {
     "stack-researcher": (
-        "For an exact blob from `git show REV:path`, a `diff` whose exit status matters, `git branch`, a complete "
-        "`git log`, or `jq` output, use the native command or "
+        "For an exact blob from `git show REV:path`, raw `diff` diagnostics, `git branch`, a complete `git log`, "
+        "`jq` output, or `find NAME` on a bare name that may not exist, use the native command or "
         "`rtk proxy <command>` (the RTK exceptions below)."
     ),
     "stack-verifier": (
-        "Use the native command or `rtk proxy <command>` for an exact blob from `git show REV:path`, a `diff` whose "
-        "exit status matters, `git branch`, a complete `git log`, and `jq` output (the RTK exceptions below)."
+        "Use the native command or `rtk proxy <command>` for an exact blob from `git show REV:path`, raw `diff` "
+        "diagnostics, `git branch`, a complete `git log`, `jq` output, and `find NAME` on a bare name that may "
+        "not exist (the RTK exceptions below)."
     ),
 }
 # Claude-only tool, frontmatter, hook and file names. Case-sensitive, as identifiers: a lowercase "bash" or
@@ -429,7 +430,7 @@ RULES = (
      "directory) and evidence/artifacts/token-adoption-e2e-20260926/README.md:370 (M13: no explicit cwd)",
      _rule_cwd),
     ("exact_shapes", ROLES,
-     "adoption/templates/codex.AGENTS.template.md, the five exceptions after its rtk-exceptions marker (jq included; "
+     "adoption/templates/codex.AGENTS.template.md, the six exceptions after its rtk-exceptions marker (jq included; "
      "cited by marker because the rule text above them moves their lines) and "
      "evidence/artifacts/token-adoption-e2e-20260926/README.md:363 (M6c: 0 exception commands wrapped in rtk)",
      _rule_exact_shapes),

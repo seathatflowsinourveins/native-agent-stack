@@ -102,7 +102,7 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
   spawn, message or follow up with other agents); working directory (a task's own instruction wins, and `cwd` goes to context-mode only for a
   directory other than the launch directory, which the server is already bound to: the "Codex workers" bullet of
   [the handbook](../../docs/token-session-handbook.md#context-mode-executor-and-session-store); the frozen M13 leg reads sentinel files with
-  no explicit `cwd`); and `jq` output among the exact command shapes (the F4 exceptions list five commands). The verifier also says that it
+  no explicit `cwd`); and `jq` output among the exact command shapes (the F4 exceptions list six commands). The verifier also says that it
   does not use web search.
 - **Registration.** Discovery only. Codex loads every `*.toml` under `$CODEX_HOME/agents/` (`load_agent_roles` in
   [`loader.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs)), so the roles carry no
@@ -143,8 +143,8 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 
 | File | SHA-256 |
 | --- | --- |
-| `stack-researcher.toml` | `f531430b620c852228365ddfc43deec11a5d942ea3c988487ca44464954c6a82` |
-| `stack-verifier.toml` | `55d021a13430980c0acbea1fdecfa87c62f874947de1f3ab6525602692c9f7dc` |
+| `stack-researcher.toml` | `22f13371e0e7848086206de8765884047f66de763744c16f17324f1f522a8ac0` |
+| `stack-verifier.toml` | `1c56b9a49591432d08ca1e860f116ff5f17a8361a22b722af9e9a92f74d63d06` |
 
 ### 2026-10-04: RTK pin guidance amendment
 
@@ -152,14 +152,24 @@ The maintained carriers now describe RTK 0.51.0's missing-file diff exit 2 ([bf2
 
 ### 2026-10-04: F4 exceptions at RTK 0.51.0
 
-The five-exception block now conditions the four leave-alone commands on the
-bootstrap-installed rtk exclusions config. Defaults rewrite them, and an explicit
-prefix bypasses exclusions ([src/discover/registry.rs:1553](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/discover/registry.rs#L1553),
+The six-exception block conditions the four leave-alone commands on an installed
+rtk exclusions config in the fixtures/rtk-hook-exclusions.toml form. Bootstrap
+only prints a reminder to create it; defaults rewrite those four. The hook path
+applies where a hook is installed; Codex uses explicit prefixes in this stack.
+An explicit prefix bypasses exclusions ([src/discover/registry.rs:1553](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/discover/registry.rs#L1553),
 [src/discover/registry.rs:1704](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/discover/registry.rs#L1704), [src/hooks/decision.rs:143](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/decision.rs#L143)).
 The log guidance distinguishes the silent bare cap, the stat cap notice and
 merge retention with an explicit count ([src/cmds/git/git_cmd.rs:1550](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/git_cmd.rs#L1550),
 [src/cmds/git/git_cmd.rs:1784](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/git_cmd.rs#L1784), [src/cmds/git/git_cmd.rs:1842](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/git_cmd.rs#L1842)).
-Both exact-command sentences retire find ([src/cmds/system/find_cmd.rs:417](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L417)).
+Both exact-command sentences preserve raw diff diagnostics; missing-file diff
+returns 2 natively and through rtk ([src/cmds/git/diff_cmd.rs:38](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/diff_cmd.rs#L38),
+[src/cmds/git/diff_cmd.rs:64](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/diff_cmd.rs#L64)).
+Both retain the narrow bare-name find exception: a missing bare name is a pattern
+and exits 0 silently; use an explicit path or `rtk proxy find` when status matters
+([src/cmds/system/find_cmd.rs:147](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L147),
+[src/cmds/system/find_cmd.rs:417](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L417)).
+For complete log history or merges use `-n <count>` or `rtk proxy git log`; a
+plain command can be rewritten by an installed hook.
 The table above and both SHA256SUMS files pin the revised carriers and mirrors.
 
 Our [probe rerun](../../evidence/artifacts/rtk-f4-remeasurement-20261004/rtk-behaviour-probe.json)

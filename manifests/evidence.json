@@ -4418,38 +4418,38 @@
     },
     {
       "path": "adoption/agents/codex/SHA256SUMS",
-      "sha256": "0e0f18604d2f5b7171ad251e6f93e59849142990fc82d4140c27cb94046e3c60",
+      "sha256": "deefd9275da75f242d878a16d8d6b8237e05a1a54a69a1337cdc1095e927ed73",
       "bytes": 174
     },
     {
       "path": "adoption/agents/codex/stack-researcher.toml",
-      "sha256": "f531430b620c852228365ddfc43deec11a5d942ea3c988487ca44464954c6a82",
-      "bytes": 7191
+      "sha256": "22f13371e0e7848086206de8765884047f66de763744c16f17324f1f522a8ac0",
+      "bytes": 7227
     },
     {
       "path": "adoption/agents/codex/stack-verifier.toml",
-      "sha256": "55d021a13430980c0acbea1fdecfa87c62f874947de1f3ab6525602692c9f7dc",
-      "bytes": 6653
+      "sha256": "1c56b9a49591432d08ca1e860f116ff5f17a8361a22b722af9e9a92f74d63d06",
+      "bytes": 6689
     },
     {
       "path": "adoption/agents/codex/workers/SHA256SUMS",
-      "sha256": "7c526fe3af45f7000cd614455bb15bff5717749074a4141341d5a26ff112243f",
+      "sha256": "32e75fbd6d1ae9c9466a4acdb01416afdcc8fd212b21bfda0f5310fa6d02bca4",
       "bytes": 275
     },
     {
       "path": "adoption/agents/codex/workers/evidence-reviewer.toml",
-      "sha256": "f83240aeb5a94eb9bc1080b6099c6a4a2e8d323ffa71b0fe7337704d948aa995",
-      "bytes": 6158
+      "sha256": "78407604e0c31b85a66725ea2c128819c2efe291a49e6b61d9194b510e7ad284",
+      "bytes": 6159
     },
     {
       "path": "adoption/agents/codex/workers/isolated-builder.toml",
-      "sha256": "e00b41875a66dd85f0737c65b2956def06538fbc2e65cc2114db56328434a920",
-      "bytes": 6666
+      "sha256": "b699cab2688fa0e9dd056415f21f618ed4f95372948a376b88ecc473cabdae83",
+      "bytes": 6667
     },
     {
       "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml",
-      "sha256": "dc216c9f2175a1e04aeb38ff94113714a729fd20139d89958f322a39890931d5",
-      "bytes": 6260
+      "sha256": "8c2a7483ce0b3c9836012f7ece55919402089dd9b8b3dfc81971a179bef34faa",
+      "bytes": 6261
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -4688,8 +4688,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "5ee5991c55602b3395a90fc0f52c4fe35f184e430258efc1943f6c5c40054c99",
-      "bytes": 8190
+      "sha256": "532e3d6374bd7a986c3c020fe95631413d89b10f2232d580b3d4e4d17f5cf454",
+      "bytes": 8191
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -16309,8 +16309,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "8f6763b671dd4c3c47147c790983702eaeecda03fe14f414d201112cfe553b3c",
-      "bytes": 130133
+      "sha256": "0d6b3a41548ba556e42ebec0c574781849cdb842f7cef948a36d8fb965a85d7b",
+      "bytes": 130132
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -16429,8 +16429,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-rtk-051-f4-exceptions.md",
-      "sha256": "b748014de8f5472276a0d48464f44302508206932c6ddb90d5ae3ddb5ed4f6ce",
-      "bytes": 13695
+      "sha256": "f48b4059d0ea9dc0baafad36a2b1a9830ace272653b2d644ca31772d27165598",
+      "bytes": 15918
     },
     {
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
@@ -16569,8 +16569,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "558c72ac427225c01467b9086b9525277939483ad20b74b7d3c0cfeb52539cc2",
-      "bytes": 185756
+      "sha256": "f73f9ce93962672b8c93ccf26041760ea8f5f2447826a05340fd4bcc1204fd45",
+      "bytes": 185944
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -44029,13 +44029,18 @@
     },
     {
       "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/hook-and-prefix-probe.json",
-      "sha256": "73d86970b73c936221f11d00e18e5192e44f5722be763bc43d810887dec99047",
-      "bytes": 30783
+      "sha256": "d5251099fa4a0d42b13e988e3b16aa66a45ab0d36a13521e1f9ee55834368789",
+      "bytes": 30800
     },
     {
       "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/rtk-behaviour-probe.json",
       "sha256": "3d7b5a0e527113a7e3ef13413dd35d5e15b3913ba8e87c96dcca6ee7888713e4",
       "bytes": 11041
+    },
+    {
+      "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/scratch-supplement.json",
+      "sha256": "840cb31e2fe3e596e0f358a7cdd1e11de241e218f3cf0209b95a39f3ebfeae15",
+      "bytes": 182211
     },
     {
       "path": "evidence/artifacts/rtk-native-git256-20261002/receipt.json",
@@ -51379,33 +51384,33 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "e82c7fd5ef81309378c2df5b2903a8f99c323eb9fa5d858dfddc08ef45d3ce05",
-      "bytes": 27147
+      "sha256": "794b6526da93715bd2d51c8295c553a28aaa30c968f394d8179cb7362b12b0d6",
+      "bytes": 28107
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
-      "sha256": "f600088a8043af71b9f0aa570414291813c414785aaf39afb21bb122ce1092ff",
-      "bytes": 3137
+      "sha256": "6f03dccd40eeb33cca796c0597a61db6552ae063112f385a16967e6f1c8bb746",
+      "bytes": 3138
     },
     {
       "path": "examples/codex-native/agents/isolated-builder.toml",
-      "sha256": "ad063055aba1a3a8fd08fac546b8927ca8369b884fa71a6fa4d6f7d8039da665",
-      "bytes": 3193
+      "sha256": "698ab336c9e9f1f0205228b0d5c07c6c35e69c4488caf49cafab40b5bc8a7fd1",
+      "bytes": 3194
     },
     {
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
-      "sha256": "bad12c8a52a14db6d639b4741bc48c84ce0a5b537edf219b05544622abec3e62",
-      "bytes": 4796
+      "sha256": "ab0b6c86f09c4310bcc4cd98c062b742c9267d198a52af9ef5e2054a13be6692",
+      "bytes": 4797
     },
     {
       "path": "examples/codex-native/agents/stack-researcher.toml",
-      "sha256": "f531430b620c852228365ddfc43deec11a5d942ea3c988487ca44464954c6a82",
-      "bytes": 7191
+      "sha256": "22f13371e0e7848086206de8765884047f66de763744c16f17324f1f522a8ac0",
+      "bytes": 7227
     },
     {
       "path": "examples/codex-native/agents/stack-verifier.toml",
-      "sha256": "55d021a13430980c0acbea1fdecfa87c62f874947de1f3ab6525602692c9f7dc",
-      "bytes": 6653
+      "sha256": "1c56b9a49591432d08ca1e860f116ff5f17a8361a22b722af9e9a92f74d63d06",
+      "bytes": 6689
     },
     {
       "path": "examples/codex-native/config.agents.toml.example",
@@ -51969,8 +51974,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "62405f1d7fa64ba2fbd2308a10c0d3e18a3b976fa5d6f3b308f9069ca78d7789",
-      "bytes": 129629
+      "sha256": "f742f6d05650e9a866a96924d266ebc2f7761636e3a91fbc502528d7d22bac70",
+      "bytes": 130262
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -52624,8 +52629,8 @@
     },
     {
       "path": "tests/test_codex_agents.py",
-      "sha256": "2bfe293524c373563b6873901749e059fa7dd937bbbb9fbf31e5ded8eac1d7ae",
-      "bytes": 39835
+      "sha256": "78c37a358631c63c8a2e0b842b438a74db9f5b519ee3c5b5666169adf2dbc1b4",
+      "bytes": 39915
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -52634,13 +52639,13 @@
     },
     {
       "path": "tests/test_codex_roles.py",
-      "sha256": "aefff15538f47b7affacd62ac5daca8ad44922553377964842f26e4a55a7824f",
-      "bytes": 33192
+      "sha256": "c322690e7d358aa77065b4d7f09400f0db71bdc20b80ee1b4797ad57bb17f4ff",
+      "bytes": 33204
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "b41eb278cc6f7e3266bf7f9caf8f292dba6d872c5692a3a54745e08aa61c9670",
-      "bytes": 190584
+      "sha256": "1c908cc88a01e8f454d222d3b477566da575f99f7bba452c64090b0c4293b322",
+      "bytes": 190873
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -53414,8 +53419,8 @@
     },
     {
       "path": "tools/adoption/codex_roles.py",
-      "sha256": "6541ce1a4c070f3b4847831485ad9c40b9186699bd3abd3ec291073c05d0ac08",
-      "bytes": 34136
+      "sha256": "b32ff615c5a48b452a95fb370de6a79ae49698963419ad6608cf00459426d7c8",
+      "bytes": 34215
     },
     {
       "path": "tools/adoption/embed_acceptance.py",

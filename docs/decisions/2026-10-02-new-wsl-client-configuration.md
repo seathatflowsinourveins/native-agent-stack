@@ -1093,7 +1093,7 @@ Preserve the existing RTK-managed import when that component is installed.
 
 ```
 
-`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (23 unit(s) left out; 24 of 64 lines stay):
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (23 unit(s) left out; 24 of 65 lines stay):
 
 ```text
 line 11, sentence; names Promptfoo
@@ -1148,30 +1148,30 @@ line 54, marker; names rtk
 <!-- native-agent-stack:rtk-exceptions -->
 
 line 56, sentence; names rtk
-With the bootstrap-installed rtk exclusions config, the hook leaves the first four commands native; otherwise it rewrites them.
+With installed rtk exclusions config (`fixtures/rtk-hook-exclusions.toml`), rewrite/installed hooks keep the first four native; else rewrite them.
 
 line 56, sentence; names rtk
-An explicit `rtk` prefix bypasses exclusions: never prefix them.
-
-line 56, sentence; names rtk
-Run natively or as `rtk proxy <command>`. rtk 0.51.0 positional expansion needs `--shell`.
+Explicit `rtk` bypasses exclusions: use `rtk proxy <command>`, never prefix. rtk 0.51.0: `--shell` for positional expansion.
 
 line 57, bullet; names rtk
-- `git show REV:path` (also `git -C DIR show REV:path`): rtk keeps about 8 KiB of the blob.
+- `git show REV:path`/`git -C DIR show REV:path`: rtk keeps ~8 KiB.
 
 line 58, bullet; names rtk
-- `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
+- `diff`: rtk changes diagnostics; both exit 2 on missing files.
 
 line 59, bullet; names rtk
-- `git branch`: rtk may list a branch in another worktree as remote-only.
+- `git branch`: rtk can mislabel other worktrees' branches remote-only.
 
 line 60, bullet; names rtk
-- `jq`: rtk keeps 40 lines of at most 120 characters.
+- `jq`: rtk caps at 40 lines/120 chars.
 
 line 61, bullet; names rtk; its first sentence names the tool, so the item goes with its other sentences
-- `git log` via rtk: bare: at most 10 one-line commits, drops merges, no notice; `--stat`: at most 10, keeps merges, cap notice. `--oneline`, `--format=%s`, `--graph --oneline` drop merges. For full history or merges, use `-n <count>` or native git.
+- `git log` via rtk: bare: max 10 commits, no notice; `--stat`: max 10, notice, keeps merges. Bare/`--oneline`/`--format=%s`/`--graph --oneline` drop merges. For history/merges use `-n <count>` or `rtk proxy git log`.
 
-line 63, sentence; names rtk
-Shell builtins (`cd`, `export`, `source`) stay in the calling shell: `rtk` exits 127 and halts a `&&` chain.
+line 62, bullet; names rtk
+- `find NAME`: rtk uses patterns for missing bare names; no match exits 0. Use `./NAME` or `rtk proxy find` for status.
+
+line 64, sentence; names rtk
+`cd`, `export`, `source` stay in shell: `rtk` exits 127, halting `&&`.
 
 ```
