@@ -451,20 +451,31 @@ class FileSdRegistrationTests(unittest.TestCase):
         return subprocess.run([sys.executable, str(SOURCE / "metrics.py"), *argv],
                               capture_output=True, text=True, timeout=60)
 
-    def start(self):
-        before = set(self.listed())
+    def start(self, *, port=0, timeout=30, file_sd=True):
+        registration = ["--file-sd", str(self.targets)] if file_sd else ["--no-file-sd"]
         process = subprocess.Popen([sys.executable, str(SOURCE / "metrics.py"), "--ledger", str(self.ledger_path),
-                                    "--port", "0", "--file-sd", str(self.targets)], stderr=subprocess.PIPE, text=True)
+                                    "--port", str(port), *registration], stderr=subprocess.PIPE, text=True)
         self.processes.append(process)
-        deadline = time.monotonic() + 30
+        os.set_blocking(process.stderr.fileno(), False)
+        output = b""
+        # metrics.main emits this after writing file_sd. A reused address need not be a new target.
+        readiness = (rb"listening on http://(127\.0\.0\.1:\d+)/metrics .*file_sd="
+                     + re.escape(os.fsencode(self.targets)) + rb"\)")
+        deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
-            added = set(self.listed()) - before
-            if added:
-                return process, added.pop()
+            try:
+                output += os.read(process.stderr.fileno(), 65536)
+            except BlockingIOError:
+                pass
             if process.poll() is not None:
-                self.fail(f"exporter exited {process.returncode} before registering: {process.stderr.read()}")
+                self.fail(f"exporter exited {process.returncode} before registering: {output.decode(errors='replace')}")
+            match = re.search(readiness, output)
+            if match:
+                target = match.group(1).decode("ascii")
+                if target in self.listed():
+                    return process, target
             time.sleep(0.05)
-        self.fail("exporter never registered its target")
+        self.fail(f"exporter never registered its target: {output.decode(errors='replace')}")
 
     def stop(self, process, signum=signal.SIGTERM):
         process.send_signal(signum)
@@ -477,6 +488,41 @@ class FileSdRegistrationTests(unittest.TestCase):
         with urllib.request.urlopen(f"http://{target}/metrics", timeout=5) as response:
             samples = parse(response.read().decode("utf-8"))
         self.assertEqual(samples[("paper_trial_active", ())], "1")
+
+    def test_a_reused_port_is_recognised_as_this_exporters_registration(self):
+        # CPython v3.13.15 Lib/http/server.py: HTTPServer.allow_reuse_address permits rebinding.
+        self.write_phase("starting")
+        first, target = self.start()
+        self.assertEqual(self.stop(first), 0)
+        self.assertIn(target, self.listed())
+        second, reused = self.start(port=int(target.rsplit(":", 1)[1]))
+        self.assertEqual(reused, target)
+        self.assertIsNone(second.poll())
+        with urllib.request.urlopen(f"http://{reused}/metrics", timeout=5) as response:
+            self.assertEqual(parse(response.read().decode("utf-8"))[("paper_trial_active", ())], "1")
+        self.assertEqual(self.stop(second), 0)
+        self.assertIn(reused, self.listed())
+
+    def test_an_unscraped_exporter_cannot_satisfy_readiness_with_an_old_registration(self):
+        self.write_phase("starting")
+        first, target = self.start()
+        self.assertEqual(self.stop(first), 0)
+        self.assertIn(target, self.listed())
+        started = time.monotonic()
+        with self.assertRaisesRegex(AssertionError, "exporter never registered its target") as failure:
+            self.start(port=int(target.rsplit(":", 1)[1]), timeout=1, file_sd=False)
+        self.assertLess(time.monotonic() - started, 3)
+        self.assertIn(f"listening on http://{target}/metrics", str(failure.exception))
+        self.assertIn("file_sd=None", str(failure.exception))
+        self.assertIsNone(self.processes[-1].poll())
+        self.assertEqual(self.listed(), [target])
+
+    def test_an_exporter_that_exits_fails_start_before_the_deadline(self):
+        self.targets.write_text("[not json")
+        started = time.monotonic()
+        with self.assertRaisesRegex(AssertionError, "exporter exited 2 before registering"):
+            self.start(timeout=5)
+        self.assertLess(time.monotonic() - started, 3)
 
     def test_a_clean_stop_of_a_finished_trial_deregisters_without_leaving_a_temporary_file(self):
         for status in ("passed", "completed_no_signals"):  # the runner's passing statuses for phase finished
