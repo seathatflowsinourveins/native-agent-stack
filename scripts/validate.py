@@ -488,6 +488,8 @@ def validate(root: Path) -> dict[str, int]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument("--decision-metadata", action="store_true",
+                        help="Check post-R5 decision metadata with PyYAML and full origin/main history")
     parser.add_argument(
         "--scan-file", action="append", default=[], type=Path, metavar="PATH",
         help="Scan an arbitrary file (repeatable) for PRIVATE_CONTENT patterns and "
@@ -495,6 +497,8 @@ def main() -> int:
              "Use this for a generated, gitignored artifact (e.g. a freshly built "
              "docs/ecosystem/index.html) that scan_publication() never walks.")
     args = parser.parse_args()
+    if args.decision_metadata and args.scan_file:
+        parser.error("--decision-metadata cannot be combined with --scan-file")
     if args.scan_file:
         findings = []
         for file_path in args.scan_file:
@@ -504,6 +508,13 @@ def main() -> int:
             return 1
         print(json.dumps({"status": "passed", "scanned_files": len(args.scan_file)}, sort_keys=True))
         return 0
+    if args.decision_metadata:
+        import decision_metadata
+        metadata_result = decision_metadata.check(args.root)
+        print(json.dumps({"decision_metadata": metadata_result}, sort_keys=True))
+        metadata_exit = decision_metadata.exit_code(metadata_result)
+        if metadata_exit:
+            return metadata_exit
     try:
         summary = validate(args.root)
     except InvalidPublication as error:

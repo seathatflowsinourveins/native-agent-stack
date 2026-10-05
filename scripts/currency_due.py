@@ -294,6 +294,39 @@ def query_units(units, systemctl: str = "systemctl"):
     return states
 
 
+def decision_reviews(root: Path, now: datetime) -> dict:
+    """Advisory index snapshot only; no YAML, Git, network or enforcement claim.
+
+    MADR/index contract: docs/decisions/2026-10-05-ci-decision-metadata.md.
+    JSON/date interfaces: https://docs.python.org/3/library/json.html and datetime.html.
+    """
+    index = root / "docs/decisions/decision-metadata-index.json"
+    try:
+        data = json.loads(index.read_text(encoding="utf-8"))
+        if not isinstance(data, dict) or data.get("schema_version") != 1 or not isinstance(data.get("records"), dict):
+            raise ValueError("invalid index schema")
+        selector = {"main_ref": "origin/main", "anchor": "docs/decisions/2026-10-05-ci-decision-metadata.md",
+                    "method": "first-parent-path-introduction"}
+        if data.get("baseline") != selector:
+            raise ValueError("invalid baseline selector")
+        overdue = []
+        for path, record in sorted(data["records"].items()):
+            if not isinstance(record, dict) or not isinstance(record.get("review_by"), str):
+                raise ValueError("invalid review date")
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", record["review_by"]):
+                raise ValueError("review date must be date-only ISO")
+            review = datetime.strptime(record["review_by"], "%Y-%m-%d").date()
+            if review < now.date():
+                overdue.append({"path": path, "review_by": record["review_by"]})
+        return {"state": "indexed_snapshot", "indexed_records": len(data["records"]),
+                "overdue_count": len(overdue), "overdue": overdue,
+                "enforcement": "not_observed"}
+    except FileNotFoundError:
+        return {"state": "not_available", "overdue_count": None, "enforcement": "not_observed"}
+    except (OSError, UnicodeError, ValueError, TypeError):
+        return {"state": "unknown", "overdue_count": None, "enforcement": "not_observed"}
+
+
 def collect(root: Path, now_text: str, network: bool, state: Path | None = None) -> dict:
     """Each check's report. The receipt report reaches saturation_ledger.py as a file, the way
     .github/workflows/saturation-tracking.yml composes them, in a temporary directory outside the checkout. With a state
@@ -682,6 +715,9 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
     gap = SURFACE_GAPS.get(surface_coverage.get("surface_watch"))
     line = summary_line(due, command, skills_complete is not False, due_file_pointers(due_file, from_xdg),
                         (gap,) if gap else ())
+    reviews = decision_reviews(root, now)
+    if reviews["state"] != "not_available":
+        details.insert(len(details) - 1, {"kind": "decision_review", **reviews})
     return {"generated_at": now_text, "root": str(root), "due": due, "summary_line": line,
             "details_command": command, "details": details}
 
@@ -731,7 +767,11 @@ def render_text(document: dict) -> str:
     lines = [document["summary_line"]]
     for item in document["details"]:
         kind = item["kind"]
-        if kind == "pin_mismatch":
+        if kind == "decision_review":
+            count = item.get("overdue_count")
+            lines.append(f"  decision reviews: {count if count is not None else 'unknown'} overdue "
+                         f"({item['state']}; index snapshot, enforcement not observed)")
+        elif kind == "pin_mismatch":
             lines.append(f"  pin: {item['component_id']} did not report its pin {item['pinned_version']} "
                          f"({', '.join(str(profile) for profile in item['profiles'])})")
         elif kind in ("skill_drift", "skill_pin_invalid"):

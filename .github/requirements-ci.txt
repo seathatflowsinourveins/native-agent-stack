@@ -4,6 +4,14 @@
 zizmor==1.30.1 \
     --hash=sha256:eee12266b793cb87ad4a7e3af2e72404f8a63e3de5eb099b80bf7b1cfd232a8e
 
+# PyYAML 6.0.3 for prospective MADR metadata checks. Linux x86_64 CPython 3.12-3.14
+# binary wheels, reviewed 2026-10-05; no source distribution or dependency rebuild.
+# https://pypi.org/pypi/PyYAML/6.0.3/json
+PyYAML==6.0.3 \
+    --hash=sha256:ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc \
+    --hash=sha256:0f29edc409a6392443abf94b9cf89ce99889a1dd5376d94316ae5145dfedd5d6 \
+    --hash=sha256:c458b6d084f9b935061bc36216e8a69a7e293a2f1e68bf956dcd9e6cbcd143f5
+
 # The adaptive-paper clock now requires real XNYS in the unit-test interpreter.
 # CI's promotion-gate venv is isolated and does not supply these imports.
 -r requirements-calendar.txt

@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "kind": "artifact_measurement",
+  "recorded_at": "2026-10-05T16:06:23Z",
+  "base_commit": "1796303f957c522e78b92667e553c06840fae3a2",
+  "purpose": "A8 R5 prospective metadata policy; explicitly partial CI integration",
+  "sources": [
+    {
+      "repository": "adr/madr",
+      "pin": "2475fe1973f66a12aaf58a91d8fa7b42c0f5ea3d",
+      "path": "template/adr-template.md",
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "yaml/pyyaml",
+      "pin": "49790e73684bebad1df05ef8d828fa12f685bffb",
+      "paths": [
+        "lib/yaml/__init__.py:117-125",
+        "lib/yaml/constructor.py:322-351"
+      ],
+      "version": "6.0.3",
+      "evidence_class": "source_review"
+    },
+    {
+      "url": "https://git-scm.com/docs/git-log/2.53.0",
+      "interfaces": [
+        "--first-parent",
+        "--diff-merges=first-parent",
+        "--diff-filter=A",
+        "--no-patch",
+        "--no-renames",
+        "log.follow=false"
+      ]
+    },
+    {
+      "url": "https://git-scm.com/docs/git-ls-tree/2.53.0"
+    },
+    {
+      "url": "https://git-scm.com/docs/git-rev-parse/2.53.0"
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/json.html"
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/datetime.html"
+    },
+    {
+      "url": "https://pypi.org/pypi/PyYAML/6.0.3/json",
+      "claim": "Reviewed binary hashes; lock integration held"
+    },
+    {
+      "url": "https://pip.pypa.io/en/stable/cli/pip_install/",
+      "version": "26.2.1",
+      "claim": "Installed native help and matching official docs support dry-run/report, binary-only and hash enforcement"
+    }
+  ],
+  "policy": {
+    "authority": "User A16, 2026-10-05: every record present at R5 main landing is grandfathered; no retrofit",
+    "baseline": "immutable first-parent fixed-anchor introduction tree on origin/main",
+    "anchor": "docs/decisions/2026-10-05-ci-decision-metadata.md",
+    "filename_dates_do_not_exempt": true,
+    "committed_index": "stable selector plus eligible metadata; resolved SHA/state are runtime only",
+    "pending_or_unknown_is_success": false,
+    "mode": "explicit --decision-metadata; default and arbitrary-file scan remain stdlib-only",
+    "currency": "advisory index snapshot; separate detail before final coverage row"
+  },
+  "construction": {
+    "route": "SDK builder attempted; source-backed coordinator recovery",
+    "sdk": {
+      "job": "ns2604-ci-r5-write-20261005",
+      "prepared_exit_code": 0,
+      "started_at": "2026-10-05T14:03:00Z",
+      "ended_at": "2026-10-05T14:28:00Z",
+      "runtime_max_seconds": 1500,
+      "start_wait_exit_code": 1,
+      "service_result": "timeout",
+      "exec_main_status": 0,
+      "task_status": "unfinished",
+      "run_report_available": false,
+      "repository_edits": 0,
+      "requests_to_model": null,
+      "usage": null,
+      "limits": "ExecMainStatus0 is not completion. No SDK retry; native journal and source inputs retained privately."
+    },
+    "preflight": {
+      "job": "ns2604-ci-r5-20261005",
+      "exit_code": 1,
+      "reason": "Source-freeze directory already existed; no run/model request",
+      "retained": true
+    },
+    "recovery_authority": "User A16 and AGENTS bounded completion; Astra read confirms no exclusive-constructor prohibition"
+  },
+  "checks": [
+    {
+      "evidence_class": "local_integration",
+      "command": "clean accepted PyYAML environment: python -m unittest tests.test_decision_metadata tests.test_currency_due tests.test_currency_due_notice tests.test_validate",
+      "exit_code": 0,
+      "tests": 196,
+      "duration_seconds": 34.975,
+      "actual_result": "Ran 196 tests in 34.975s; OK",
+      "parser_environment": "CPython3.13, PyYAML6.0.3 reviewed binary wheel",
+      "scope": "Repo metadata/Git integration and existing currency/validator contracts; not upstream tests or hosted enforcement"
+    },
+    {
+      "evidence_class": "synthetic",
+      "coverage": [
+        "all required field omissions",
+        "invalid YAML/date/types and native timestamp ValueError/datetime",
+        "90/91-day review boundary",
+        "backdated postlanding additions",
+        "baseline immutable after later main arrivals",
+        "concurrent-main squash and first-parent merge arrivals",
+        "index drift",
+        "missing ref/shallow/failed tree reads",
+        "pending non-success",
+        "default and scan stdlib-only",
+        "incompatible mode flags",
+        "invalid currency selector/date => unknown"
+      ]
+    },
+    {
+      "evidence_class": "native_proven",
+      "reused": true,
+      "repository": "yaml/pyyaml",
+      "pin": "49790e73684bebad1df05ef8d828fa12f685bffb",
+      "command": "unchanged upstream tests/legacy_tests with pytest -q -p no:cacheprovider",
+      "exit_code": 0,
+      "passed": 2608,
+      "warnings": 1,
+      "duration_seconds": 3.97,
+      "wheel_sha256": "0f29edc409a6392443abf94b9cf89ce99889a1dd5376d94316ae5145dfedd5d6",
+      "limits": "Historical accepted CP313 parser only; unchanged inputs reused; not new R5/CP312/hosted acceptance"
+    },
+    {
+      "evidence_class": "local_integration",
+      "command": "python scripts/validate.py --decision-metadata",
+      "exit_code": 2,
+      "actual_status": "pending_landing",
+      "main_sha": "cb339488e3e004b04e8a4e5b4fd246442a275e3c",
+      "limits": "Expected unlanded state, not acceptance"
+    },
+    {
+      "evidence_class": "source_review",
+      "command": "gh api --method GET repos/seathatflowsinourveins/native-agent-stack",
+      "exit_code": 0,
+      "observed_at": "2026-10-05T14:16:49Z",
+      "allow_squash_merge": true,
+      "allow_merge_commit": false,
+      "allow_rebase_merge": false
+    },
+    {
+      "evidence_class": "local_integration",
+      "command": "python3 scripts/validate.py after take-main/register_file/component_matrix/new_host_grand_list",
+      "exit_code": 0,
+      "actual_result": {
+        "status": "passed",
+        "components": 69,
+        "profiles": 4,
+        "receipts": 204,
+        "hashed_files": 10150
+      },
+      "observed_at": "2026-10-05T14:51:46Z",
+      "limits": "Integrity and scope only; no live provider/GPU or hosted gate execution"
+    },
+    {
+      "evidence_class": "local_integration",
+      "command": "native pip26.2.1 install --isolated --dry-run --ignore-installed --only-binary=:all: --require-hashes --index-url https://pypi.org/simple -r .github/requirements-ci.txt --report <private-native-report>",
+      "exit_code": 0,
+      "python_version": "3.13",
+      "install_candidates": 11,
+      "selected_pyyaml": {
+        "version": "6.0.3",
+        "wheel": "pyyaml-6.0.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+        "sha256": "0f29edc409a6392443abf94b9cf89ce99889a1dd5376d94316ae5145dfedd5d6"
+      },
+      "limits": "Dry-run resolution/hash checking only; no packages installed or built, not native CI312/hosted acceptance"
+    },
+    {
+      "evidence_class": "synthetic",
+      "command": "same native pip binary/hash dry-run with PyYAML6.0.3 and deliberately zeroed expected SHA256",
+      "expected_exit_code": 1,
+      "actual_exit_code": 1,
+      "actual_result": "Hash mismatch; selected CP313 wheel actual SHA2560f29edc409a6392443abf94b9cf89ce99889a1dd5376d94316ae5145dfedd5d6",
+      "limits": "Discriminating control for hash enforcement, not a real release defect"
+    },
+    {
+      "evidence_class": "local_integration",
+      "command": "post-735 clean accepted parser environment: python -m unittest tests.test_decision_metadata tests.test_currency_due tests.test_currency_due_notice tests.test_validate",
+      "exit_code": 0,
+      "tests": 196,
+      "duration_seconds": 35.233,
+      "actual_result": "Ran 196 tests in 35.233s; OK",
+      "base_commit": "095d4fad89c7896c7f1766fdaa9981554a19403a"
+    },
+    {
+      "evidence_class": "local_integration",
+      "command": "python -m unittest tests.test_workflow_policy.ZizmorConfigurationTests.test_the_analyzer_stays_pinned_by_hash tests.test_catalog_freshness_pins.CatalogFreshnessPinTableTests.test_zizmor_pin_matches_requirements_lock tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_repo_wide_ignores_hide_nothing_outside_their_allowed_lock",
+      "exit_code": 0,
+      "tests": 3,
+      "duration_seconds": 0.216,
+      "actual_result": "Ran 3 tests in 0.216s; OK",
+      "limits": "Targeted retained analyzer pin/hash and OSV include contracts; unchanged calendar/worker/macOS suites not repeated"
+    }
+  ],
+  "failed_conditions": [
+    {
+      "exit_code": 1,
+      "tests": 195,
+      "failures": 2,
+      "reason": "New top-level currency key violated existing schema; moved advisory into details"
+    },
+    {
+      "exit_code": 1,
+      "tests": 195,
+      "errors": 1,
+      "reason": "Appending after coverage violated last-row contract; inserted before coverage"
+    },
+    {
+      "exit_code": 1,
+      "command": "python3 scripts/validate.py before registry refresh",
+      "reason": "Expected stale hashes/bytes for changed currency_due.py and validate.py; final integrity results follow hot-file refresh"
+    }
+  ],
+  "corrections": [
+    "--diff-merges emits patches unless --no-patch is explicit",
+    "Copied source trailing blank line restored; all frozen bytes/blobs/SHA match originals",
+    "Canonical fixture metadata enum is synthetic, not synthetic_fixture",
+    "Full campaign owner_types does name SDK builder route; selected A8 alone omitted that detail",
+    "register_file is the documented Python API, not host_receipts CLI subcommand",
+    "Combined scan/metadata flags reject instead of silently skipping opt-in",
+    "Malformed selector/date returns unknown review count"
+  ],
+  "pending": [
+    {
+      "owner": "PR706",
+      "path": ".github/workflows/validate.yml",
+      "item": "After R5 landing/dependency provisioning, full-history origin/main and documented python3 scripts/validate.py --decision-metadata one-line wiring"
+    }
+  ],
+  "overturn": [
+    "Multi-commit rebase/fast-forward can introduce anchor before final landing tree",
+    "Anchor published separately/renamed/history introduction rewritten",
+    "Native counterexample wrongly grandfathers postlanding path"
+  ],
+  "hosted_acceptance": "unknown; no CI gate wired by this draft, no reruns dispatched",
+  "decision_record": "docs/decisions/2026-10-05-ci-decision-metadata.md",
+  "integration_updates": [
+    {
+      "authority": "User/co-op A17 follow-up: option(b), #735 lands first; then rebase/add reviewed stanza",
+      "dependency": {
+        "pr": 735,
+        "merged_at": "2026-10-05T15:01:11Z",
+        "merge_commit": "095d4fad89c7896c7f1766fdaa9981554a19403a",
+        "native_get_exit_code": 0
+      },
+      "rebase": {
+        "onto": "095d4fad89c7896c7f1766fdaa9981554a19403a",
+        "manifest_conflict_only": true,
+        "resolution": "Take main copy; re-register own files, no hand merge",
+        "pre_stanza_integrity_exit_code": 0,
+        "hashed_files": 10162
+      },
+      "lock": {
+        "path": ".github/requirements-ci.txt",
+        "version": "PyYAML6.0.3",
+        "upstream_metadata": "https://pypi.org/pypi/PyYAML/6.0.3/json",
+        "metadata_verified_at": "2026-10-05T15:10:04Z",
+        "linux_x86_64_binary_wheels": {
+          "cp312": "ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc",
+          "cp313": "0f29edc409a6392443abf94b9cf89ce99889a1dd5376d94316ae5145dfedd5d6",
+          "cp314": "c458b6d084f9b935061bc36216e8a69a7e293a2f1e68bf956dcd9e6cbcd143f5"
+        },
+        "existing_installer_unchanged": true,
+        "prior_zizmor_and_calendar_include_retained": true
+      },
+      "scope": "Lock stanza plus decision/receipt and registry refresh; no workflow/installer changes"
+    },
+    {
+      "authority": "User/co-op A17 follow-up 2: rebase onto current main and check PR706 live state before caller edits",
+      "observed_at": "2026-10-05T16:06:23Z",
+      "rebase": {
+        "onto": "1796303f957c522e78b92667e553c06840fae3a2",
+        "fetch_exit_code": 0,
+        "rebase_exit_code": 0,
+        "conflicts": false,
+        "main_ancestor_check_exit_code": 0,
+        "registry_resolution": "Take main copy and re-register this branch's eight evidence files; registry committed last"
+      },
+      "caller_owner": {
+        "pr": 706,
+        "native_get_exit_code": 0,
+        "state": "open",
+        "merged": false,
+        "head": "929ba811f9ca9fa037bf840ed55e56459da3e7ec",
+        "action": "Hold validate.yml caller; retain documented one-line wiring step after R5 lands"
+      },
+      "checks": [
+        {
+          "evidence_class": "local_integration",
+          "command": "accepted parser environment: python -m unittest tests.test_decision_metadata tests.test_currency_due tests.test_currency_due_notice tests.test_validate",
+          "exit_code": 0,
+          "tests": 196,
+          "duration_seconds": 30.514,
+          "actual_result": "Ran 196 tests in 30.514s; OK"
+        },
+        {
+          "evidence_class": "local_integration",
+          "command": "python -m unittest tests.test_workflow_policy.ZizmorConfigurationTests.test_the_analyzer_stays_pinned_by_hash tests.test_catalog_freshness_pins.CatalogFreshnessPinTableTests.test_zizmor_pin_matches_requirements_lock tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_repo_wide_ignores_hide_nothing_outside_their_allowed_lock",
+          "exit_code": 0,
+          "tests": 3,
+          "duration_seconds": 0.214,
+          "actual_result": "Ran 3 tests in 0.214s; OK"
+        }
+      ],
+      "reused_evidence": {
+        "binary_hash_pip_dry_run": "Prior native CP313 whole-lock dry-run exit0 and expected wrong-hash control exit1 retained; combined lock and installer inputs unchanged",
+        "parser_upstream_tests": "Historical unchanged PyYAML native tests reused separately; no new execution",
+        "sdk_attempt": "Retained 14:03:00Z-14:28:00Z timeout remains unfinished; no report/edits, requests and usage UNKNOWN, no retry"
+      },
+      "scope": "Current-main rebase and decision/receipt/registry refresh only; reviewed lock retained, no workflow/installer or other-owner source edit, no new hosted acceptance"
+    }
+  ]
+}
