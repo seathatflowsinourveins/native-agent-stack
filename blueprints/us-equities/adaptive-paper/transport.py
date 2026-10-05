@@ -1146,7 +1146,7 @@ class AlpacaPaperTransport:
                  order_update_timeout=10.0, request_observer=None, history_start=None,
                  max_snapshot_pages=20, required_quote_symbols=None, feed="iex",
                  extended_hours_allowed=False, include_margin=False, sink_status=None,
-                 fee_history_start=None):
+                 fee_history_start=None, order_quote_max_age_seconds=3):
         # sink_status receives every normalized trading status message of a subscribed
         # symbol (normalize_trading_status) on the owning loop, like sink_observation.
         self.sink_status = sink_status
@@ -1163,13 +1163,17 @@ class AlpacaPaperTransport:
                                        else _symbols(required_quote_symbols))
         if not set(self.required_quote_symbols).issubset(self.symbols):
             raise TransportError("required quote symbols must be subscribed")
-        if min(quote_timeout, start_timeout, order_update_timeout) <= 0 or queue_size < 1:
+        timeouts = (quote_timeout, start_timeout, order_update_timeout, order_quote_max_age_seconds)
+        if min(timeouts) <= 0 or queue_size < 1:
             raise TransportError("positive finite timeouts and queue size required")
-        if any(not __import__("math").isfinite(x) for x in (quote_timeout, start_timeout, order_update_timeout)):
+        if any(not __import__("math").isfinite(x) for x in timeouts):
             raise TransportError("finite timeout required")
         self.before_request, self.before_submit = before_request, before_submit
         self.sink_observation, self.request_observer = sink_observation, request_observer
         self.quote_timeout, self.start_timeout = quote_timeout, start_timeout
+        # Order admission is distinct from the stream-health watchdog. Keep
+        # integer nanoseconds through the final pre-POST comparison.
+        self.order_quote_max_age_ns = int(order_quote_max_age_seconds * 1_000_000_000)
         self.order_update_timeout = order_update_timeout
         self.history_start = history_start or datetime.now(timezone.utc)
         if self.history_start.tzinfo is None or not 1 <= max_snapshot_pages <= 100:
@@ -1325,7 +1329,7 @@ class AlpacaPaperTransport:
         # Runs after a possibly delayed budget reservation, immediately before POST.
         quote = self._quote_values.get(order.get("symbol"))
         if (self._stopping or not self._started or quote is None
-                or not -0.25 <= (time.time_ns() - quote["ts_ns"]) / 1e9 <= self.quote_timeout
+                or not -250_000_000 <= time.time_ns() - quote["ts_ns"] <= self.order_quote_max_age_ns
                 or (order.get("side") == "buy" and not self.ready)):
             raise SubmissionNotSent("quote or stream readiness changed before submission")
 

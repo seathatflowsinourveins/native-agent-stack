@@ -69,9 +69,9 @@ class NewWslProfileCliTests(unittest.TestCase):
         data = self.load()
         by_name = {row["name"]: row for row in data["entries"]}
         for name in ("ColGREP", "BM25", "ripgrep", "gVisor", "boxlite", "sqz",
-                     "Headroom", "no compression", "Docker Engine", "Ollama",
+                     "no compression", "Docker Engine", "Ollama",
                      "Ubuntu 26.04.1 LTS", "Ubuntu 24.04.5 LTS", "ai-memory",
-                     "Hindsight", "agentmemory", "deja-vu"):
+                     "Hindsight", "agentmemory", "deja-vu", "SocratiCode", "semble"):
             with self.subTest(name=name):
                 arm = by_name[name]
                 self.assertEqual(arm["status"], "head-to-head-arm")
@@ -81,6 +81,34 @@ class NewWslProfileCliTests(unittest.TestCase):
             self.assertEqual(row["layer_id"], row["owner_layer_id"])
         self.assertEqual(len(by_name), len(data["entries"]))
         self.assert_no_unmeasured_defaults(data)
+
+    def test_owner_defaults_of_the_token_layer_are_picked_and_installed_by_the_plan(self):
+        """The owner's decision of 2026-10-04 (amendment 4) makes the token-efficiency tools default installs: picked, no
+        comparison group, an install command and a documented or upstream acceptance, and the install_dispatch rule that
+        forbids iterating over entries kept as it was. RTK and Headroom were comparison arms until then."""
+        data = self.load()
+        by_name = {row["name"]: row for row in data["entries"]}
+        owner = ["RTK", "Headroom", "ccusage", "context-mode", "jcodemunch-mcp", "codebase-memory-mcp", "Repomix", "TOON",
+                 "MarkItDown", "Context Hub", "otel-tui", "agentsview"]
+        for name in owner:
+            row = by_name[name]
+            with self.subTest(name=name):
+                self.assertEqual((row["status"], row["default_install"], row.get("comparison_group")), ("picked", True, None))
+                self.assertTrue(row["install"]["command"] and row["install"]["source"])
+                self.assertTrue(row["acceptance"]["command"] and row["acceptance"]["source"])
+                self.assertIn("docs/decisions/2026-10-04-token-full-stack-owner-default.md", row["evidence_refs"])
+                self.assertEqual(row["layer_id"], "observation-inference" if name == "agentsview" else "token-efficiency")
+        self.assertIn("[mcp]", by_name["Headroom"]["install"]["command"])
+        self.assertNotIn("[all]", by_name["Headroom"]["install"]["command"])
+        self.assertNotIn("cargo", by_name["RTK"]["install"]["command"])
+        self.assertIn("rtk-x86_64-unknown-linux-musl.tar.gz", by_name["RTK"]["install"]["command"])
+        boundary = data["boundary"]
+        self.assertTrue(boundary["install_dispatch"].startswith("Do not iterate over entries."))
+        for name in owner:
+            self.assertIn(name, boundary["default_profile"])
+        # SocratiCode stays an arm: its install comes from the plan's code-search interim, never from this profile.
+        self.assertFalse(by_name["SocratiCode"]["default_install"])
+        self.assertTrue(by_name["SocratiCode"]["install"]["command"])
 
     def assert_no_unmeasured_defaults(self, data):
         manifest = json.loads((ROOT / DEFAULTS_SOURCE).read_text())
@@ -174,10 +202,12 @@ class NewWslProfileCliTests(unittest.TestCase):
     def test_accepted_cli_and_sdk_pins_do_not_assert_sdk_provisioning(self):
         data = self.load()
         rows = {row["name"]: row for row in data["entries"]}
-        self.assertEqual(rows["Codex"]["pin"], "0.159.3")
-        self.assertEqual(data["boundary"]["accepted_python_sdk_pin"], "0.159.3")
+        self.assertEqual(rows["Codex"]["pin"], "0.160.0")
+        self.assertEqual(data["boundary"]["accepted_codex_cli_pin"], "0.160.0")
+        self.assertEqual(data["boundary"]["accepted_python_sdk_pin"], "0.160.0")
+        self.assertEqual(rows["Codex Python SDK"]["pin"], "0.160.0")
+        self.assertEqual(rows["Codex TypeScript SDK"]["pin"], "0.159.3")
         for name in ("Codex TypeScript SDK", "Codex Python SDK"):
-            self.assertEqual(rows[name]["pin"], "0.159.3")
             self.assertEqual(rows[name]["provisioning_status"], "unprovisioned_source_review")
             self.assertFalse(rows[name]["default_install"])
 

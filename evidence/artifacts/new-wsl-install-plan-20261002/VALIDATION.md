@@ -1,10 +1,12 @@
 # Install-plan validation
 
+The sections are kept in the order they were written. The first two describe the 64-row revision and its clean run, and their counts are that revision's. The plan now has 70 rows: the section "Rows added from the layer consensus" covers the five added afterwards, whose two install commands and two acceptance checks have not run anywhere; the section "The two local-model rows" covers the two rows that became installable on 2026-10-03, whose commands and checks have not run as plan rows anywhere either; and the section "Wave 2" covers the wave-2 batch's interim installs, its added `statusline` row and its revised rows, whose commands and checks have not run anywhere.
+
 ## Revision to the merged manifest, after the real-distribution run
 
 ### Evidence class
 
-The result below is one run on one host: a throwaway Ubuntu 26.04.1 distribution on WSL 3.0.1, on 2026-10-02, executing this plan as it stood before this revision (branch `foundation/new-wsl-install-plan-20261002`, commit `bf5a08e2`). The coordinator recorded it in a findings note kept outside the repository. It is a historical host execution of the previous revision. It says nothing about the commands this revision changed or added. When this section was written they had not run on a distribution; their one run since then is the section "Clean run of this revision" below. The round 1 container run below is a separate, earlier class of evidence.
+The result below is one run on one host: a throwaway Ubuntu 26.04.1 distribution on WSL 3.0.1, on 2026-10-02, executing this plan as it stood before this revision (branch `foundation/new-wsl-install-plan-20261002`, commit `bf5a08e2`). The coordinator recorded it in a findings note kept outside the repository. It is a historical host execution of the previous revision. It says nothing about the commands this revision changed or added. When this section was written they had not run on a distribution; their run in a throwaway distribution since then is the section "Clean run of this revision" below, and their one run on the destination distribution is named in that section, after its list of results. The round 1 container run below is a separate, earlier class of evidence.
 
 ### Result of that run
 
@@ -69,15 +71,245 @@ no provider call, no model run. The distribution was removed afterwards.
   listener was left after the distribution was removed.
 
 Not established by this run: a signed-in client, a pulled or running model, the GPU, the gateway and the research
-harnesses as services, the three measurement-only owners, and a distribution that stays. On the destination
-distribution nothing has run: installation and acceptance there are UNRUN.
+harnesses as services, the three measurement-only owners, and a distribution that stays. Later on 2026-10-02 the plan
+at this revision, as merged to main (`6652b78e`), ran once on the destination distribution, the one meant to stay. The
+record of that run is private, its public receipt comes with that distribution's acceptance, and this file records no
+result of it.
 
 The record binds each phase to the commit that ran and to the SHA-256 of each plan file at that commit
 (`executed_files`). After both commits had run, the header comments of `install.sh` (lines 2 and 3) and of
 `accept.sh` (line 2) and the `status` text of `install-plan.json` were corrected, because they still said that this
-revision was unrun. No command, row or check changed and the corrected files were not run again, so the published
-files differ from the executed ones in those lines only. The raw outputs behind the record are private files; the
-record carries their hashes, and no reviewer has inspected them.
+revision was unrun. No command, row or check changed and the corrected files were not run again in a throwaway
+distribution, so the files merged to main (`6652b78e`) differ from the executed ones in those lines only; those merged
+files are the revision that ran once on the destination distribution. The raw outputs behind the record are private
+files; the record carries their hashes, and no reviewer has inspected them.
+
+## Rows added from the layer consensus (2026-10-02): static checks only
+
+### Evidence class
+
+Static checks of the plan's files and synthetic fixtures, on the workstation that holds the checkout. Nothing was
+installed, no installer command ran, no client loaded a skill and no distribution was used. Three read-only GitHub API
+reads supplied the tree hashes and the installer's source lines ([SOURCES.md](SOURCES.md), last section).
+
+The clean run above was made before these rows existed. Its record binds the files it executed by hash; `install.sh`,
+`accept.sh`, `install-plan.json` and `owners.json` have changed since, in more than their header lines, so the record
+describes the earlier files. No result of that run, of the previous revision's run or of round 1 applies to the rows
+below.
+
+### What changed
+
+Five rows, from the definitive manifest's five rows of kind `consensus`: 69 rows, 38 installed by default, three
+measurement-only and 28 not installed.
+
+- `skill-discovery` and `skill-authoring` install one skill folder each through the `skills` installer at 1.7.0, each
+  pinned to the commit in the consensus record. Both have one install command and one `post_install` check.
+- `research-skill`, `credential-custody` and `cross-family-review` are not installed: no command, no acceptance, no
+  function in either script, and the gate or measurement from the record in `notes`.
+
+### Checks run
+
+- `python3 -B check_plan.py`: exit 0, "OK: 69 rows: 38 installed by default, 3 measurement-only, 28 not installed; 67
+  commands and 57 acceptance entries agree with the scripts".
+- `bash -n` on `install.sh` and on `accept.sh`: exit 0 each.
+- `bash install.sh --list`: exit 0, 69 lines.
+- Python `json.loads` of `install-plan.json` and `owners.json`: exit 0; both files equal their own re-serialisation.
+- `check_plan.py` against defects planted one at a time in scratch copies (our own mutations, not an upstream test):
+  deleting the `skill-discovery` install function, dropping `--copy` from the `skill-authoring` command in `install.sh`
+  only, dropping the `cross-family-review` line from `--list`, marking `research-skill` installed, adding an acceptance
+  function for `credential-custody`, dropping the shared-copy line from the `skill-authoring` acceptance in the JSON
+  only, dropping `credential-custody` from the skipped-slot loop and removing `skill-discovery` from `owners.json` each
+  exit 1 and name the problem. The unmodified copy exits 0.
+- The two new acceptance programs against stand-ins (a stub `npx` that prints a canned `list --json` output, a canned
+  lock file and a scratch `HOME`; our own fixtures, with jq 1.7): the matching case exits 0 for both. A missing agent,
+  another tree hash and an absent skill each exit 1 for `skill-discovery`. Another tree hash, a listing without Claude
+  Code and a `skill-creator` folder under `$HOME/.agents/skills` each exit 1 for `skill-authoring`; another skill in
+  that shared directory does not fail it.
+- Then the `skill-authoring` acceptance was tightened, and its stand-ins became a committed test. The program also fails
+  on `skill-creator` in Codex's own global skills directory, `${CODEX_HOME:-$HOME/.codex}/skills` (the installer's
+  README, line 298), counts a dangling symbolic link as a copy in either directory, and requires the installer's
+  listing, now run without an agent filter, to name Claude Code as the only agent of `skill-creator`; Codex's embedded
+  skills under `skills/.system` are left alone. Both directories are tested in one `[[ ]]` as the program's last
+  command, so that its status is the program's on bash before 4.1 too (macOS `/bin/bash` is 3.2), where a failing
+  `[[ ]]` does not stop a `set -e` script (bash NEWS, bash-4.1, item j). The class `SkillAuthoringAcceptance` in
+  `tests/test_new_wsl_definitive_defaults.py` checks that its program is the one `accept.sh` runs and runs it as
+  `accept.sh` does, with a stub `npx` that records its arguments and prints a canned listing, a canned lock file and a
+  scratch `HOME` (our own fixtures, with jq 1.7 on the workstation). The expected state exits 0, with another skill in
+  the shared directory and Codex's embedded copy present, and the stub receives the unfiltered `list -g --json`. Each
+  condition planted on its own exits 1: a listing that also names Codex, names Codex alone or lacks the skill, another
+  tree hash, a folder or a dangling link in either directory, and a folder under a set `CODEX_HOME`. Each planted
+  folder or link also exits 1 with `-e` taken away; the earlier form, one `[[ ]]` per directory, exited 0 there for
+  both shared-directory cases (bash 5.2; no bash before 4.1 was run). Removing any one condition from the program,
+  in a scratch run of the test, made its planted case pass. The stub does not exercise the installer's own listing
+  logic.
+- `python3 -B scripts/validate.py`: exit 1; for this folder it reports only that the seven changed files differ from
+  the hashes and byte counts registered in `manifests/evidence.json`, to be re-registered by the coordinator.
+
+### Not established
+
+- That either install command works. The commit after `#` relies on the installer's fallback from a branch clone to a
+  fetch of the commit, which is read from its source and has never run under this plan.
+- That the installer records the folder's git tree hash in its lock file for an install pinned to a commit, and that
+  its listing shows the agents as the acceptance expects. The clean run showed both for `engineering-process-skills`,
+  which is pinned to a tag and installed for two agents.
+- That `--copy` with one agent leaves `$HOME/.agents/skills` without a `skill-creator` folder, and that the installer's
+  unfiltered listing then names Claude Code alone for it. Both are read from the installer's bundled code
+  (`installSkillForAgent`, `listInstalledSkills`).
+- That the embedded Codex `skill-creator` is available on the destination, and that any client loads or usefully
+  invokes either skill. Those are open gates of the consensus record.
+- Anything on the destination distribution for these rows. The plan's one run there was the 64-row revision (main
+  `6652b78e`), whose record is private and whose public receipt comes with that distribution's acceptance; it did not
+  include these rows, and none of the five has run there or anywhere else.
+
+## The two local-model rows (2026-10-03): static checks only
+
+### Evidence class
+
+Static checks of the plan's files, our own mutations and synthetic fixtures, on the workstation that holds the checkout.
+No command of either row ran, no model was created, no model server was started and no distribution was used. Reads:
+the registry's manifest for `qwen3-embedding:0.6b`, the Hugging Face Hub's model information and model-card files, and
+Ollama's sources at v0.35.0 ([SOURCES.md](SOURCES.md), section "The two local-model rows").
+
+The measurement that settled the two rows (`evidence/artifacts/new-wsl-local-models-20261002/`) created and ran the
+same models in a throwaway distribution, from the same file and library digest, by its own scripts. That is evidence for
+the systems measured; it is not a run of these plan rows' commands.
+
+### What changed
+
+69 rows: 40 installed (38 by the default run and two only when named), three measurement-only and 26 not installed.
+
+- `local-generation-model` has four commands (the GGUF at the pinned Hugging Face revision through `fetch_verified`
+  with its sha256, the placement of the two Modelfiles from `models/`, two `ollama create`) and two checks (`post_install`
+  on files, `service_health` through the server).
+- `embedding-model` has three commands (`ollama pull`, the pinned manifest digest as `/api/tags` reports it, one
+  `ollama create`) and the same two stages.
+- Both install only with `--only`, after the model server answers, and `accept.sh` gates both the same way.
+- `check_plan.py` checks the dispatch of such rows in both directions: a row that `install.sh` installs only when named
+  fails when `accept.sh` checks it in the default run, and a row that `install.sh` installs in the default run fails
+  when `accept.sh` skips it there.
+- Two repairs after the pull request's review (2026-10-03). `model_server_answers` in `install.sh`, which both rows run
+  before their first command, accepted any server that answered `ollama ls`; it now also stops the row unless
+  `GET /api/version` reports `0.35.0`, the measured server. The `local-model-server` row's `after_sign_in` check failed
+  every time in step F9, which runs that stage without any model row; it now prints `skipped`, which is not a pass,
+  until the `embedding-model` row's model is in the store. Neither repair changes a command or an acceptance entry of
+  `install-plan.json`.
+
+### Checks run
+
+- `python3 -B check_plan.py`: exit 0, "OK: 69 rows: 40 installed (38 by the default run, 2 only when named),
+  3 measurement-only, 26 not installed; 74 commands and 61 acceptance entries agree with the scripts".
+- `bash -n` on `install.sh` and on `accept.sh`: exit 0 each.
+- `bash install.sh --list`: exit 0, 69 lines; both rows print as `model-server | planned`.
+- Python `json.loads` of `install-plan.json` and `owners.json`: exit 0; both files equal their own re-serialisation
+  (`owners.json` at indent 1 without a final newline, as before this change).
+- `check_plan.py` against defects planted one at a time in scratch copies (our own mutations, not an upstream test):
+  `accept.sh` checking `embedding-model` in the default run; `install.sh` installing `local-generation-model` in the
+  default run; another GGUF sha256 in `install.sh` only; the server-wide context (`num_ctx` 64000) in the JSON's
+  embedding check only; no `Source:` comment above the 64k `ollama create`; the `--list` line of `embedding-model`
+  dropped; `owners.json` marking `local-generation-model` not installed; `local-generation-model` back in the
+  skipped-slot loop; no acceptance function for `embedding-model`; no post-install check for `local-generation-model`
+  in the JSON; and another owner for `embedding-model` than the manifest's default. Each exits 1 and names the problem.
+  The unmodified copy exits 0. With the second dispatch check taken out of a scratch copy of the checker, the defect
+  "`install.sh` installs `local-generation-model` in the default run" exited 0, which is why that check was added.
+- The four acceptance programs against stand-ins: the committed class `LocalModelAcceptance` in
+  `tests/test_new_wsl_definitive_defaults.py` checks that its programs are the ones `accept.sh` runs and runs them as
+  `accept.sh` does (`bash -euo pipefail -c`), with stub `ollama` and `curl` programs that print canned answers, a
+  scratch `HOME` and model store (our own fixtures, with jq on the workstation). The expected states exit 0. Each
+  planted condition exits 1: another 64k Modelfile, another model layer and no created model (generation files);
+  another library manifest and another derived layer (embedding files); another context, another quantization and an
+  empty answer (generation service); the server-wide context and 512 dimensions (embedding service). Taking any one of
+  the nine conditions out of its program, in a scratch run of the test, made its planted case pass.
+- The `local-model-server` row's `after_sign_in` check, repaired on 2026-10-03: it ran upstream's example
+  `ollama run embeddinggemma "Hello world"`, which would pull EmbeddingGemma, the embedding arm that lost; it is now one
+  `/api/embed` call to `qwen3-embedding-8k` that must return one vector, and the endpoint downloads nothing
+  (SOURCES.md, "The service checks"). `check_plan.py` exit 0 with the counts above (the entry was replaced, not added);
+  `bash -n accept.sh` exit 0. `LocalModelAcceptance.test_the_server_smoke_check` checks that the program names the settled
+  embedder and no other model and runs it against the stub `curl`: one vector exits 0, no vector and an error answer
+  exit 1. With the `jq -e` condition taken out in a scratch run, the no-vector case exited 0.
+- The two review repairs: `check_plan.py` exit 0 with the counts above (no command or acceptance entry changed) and
+  `bash -n` exit 0 on both scripts. `LocalModelAcceptance.test_the_server_smoke_check_waits_for_the_embedding_row` runs
+  `accept.sh --only local-model-server --stage after_sign_in` itself, with a scratch `HOME` and the stub `curl`: without
+  the embedder's manifest in the store it prints `skipped` and exits 0; with it, one vector prints 0 and exits 0, and no
+  vector prints 1 and exits 1. `ModelServerGuard` runs `model_server_answers`, read from `install.sh`, with stub
+  `ollama` and `curl`: version 0.35.0 exits 0; version 0.36.0, an answer without a version, a failed version request and
+  no server exit 1; and it checks that both rows run the guard before their first command. In scratch copies of this
+  folder (our own mutations, not an upstream test), the gate taken out of `accept.sh`, the version condition taken out,
+  the version written as a constant and `embedding-model`'s guard moved after its pull each failed its test; the
+  unmodified copy passed.
+- The `ollama show` table that the service checks read is rendered by a table writer with an empty first column and
+  space padding (`cmd/cmd.go:1362-1368`, parameter rows at `:1474-1480`, at v0.35.0); the measurement's record of that
+  output squeezes the spaces (`raw/M15-a2-setup.txt` in the private measurement folder, listed by sha256 in that
+  evidence folder's `files.json`), so the stand-ins imitate the layout read from the source.
+- The Swift Modelfile: `reconstruct_s2o_modelfile.py --check` exit 0, and with the measurement's own `FROM` line the
+  rebuilt file hashes to the recorded `8911245e…` (SOURCES.md, section "The two local-model rows").
+
+### Not established
+
+- That any command of the two rows works as a plan row: the 11.8 GB download through `fetch_verified`, the placement,
+  the two creates, the pull and the digest check have not run under this plan.
+- That the models the rows create carry the manifest digests the measurement recorded. Those digests are in `notes`
+  for comparison; no check reads them.
+- That the checks read the real `ollama show` table and the real answers as the stand-ins do, and that the guard reads
+  a real server's `/api/version` answer as it reads the stub's (the measurement's own calls returned `0.35.0`, SOURCES.md).
+  The stubs do not exercise the server.
+- That acceptance notices a server replaced after the rows were installed: the version guard runs when a row installs,
+  and no acceptance check compares the running server's version.
+- That the server reads the same model store as the user who runs the checks: the post-install checks read
+  `${OLLAMA_MODELS:-$HOME/.ollama/models}` and assume the server runs as that user with the same `OLLAMA_MODELS`.
+- GPU residency on the destination, and which distribution's model server holds the card. The measured co-residency
+  held under the preregistration's condition N (no other WSL process holding GPU memory, the workstation's two model
+  services stopped first); the README leaves GPU ownership to the lifecycle design.
+- Anything on the destination distribution for these rows.
+
+## Wave 2 (2026-10-03): static checks only
+
+### Evidence class
+
+Repository checks of the plan's files, run on the coordinating workstation from the branch's worktree; no command of the plan ran, nothing was installed and no distribution was touched. They show that the files agree with each other and with the manifest, not that an install or an acceptance check works.
+
+### What changed
+
+The wave-2 batch of the layer consensus made `memory-owner`, `code-search` and `context-supply` interim installs (amendment 3), added `statusline`, and revised `research-harnesses`, `tobi-qmd`, `gpt-gateway` and the three skills rows (README.md, section "Wave 2"; sources in SOURCES.md, section "Wave 2"). After the branch review of 2026-10-03: each interim row's install function calls `interim_acknowledged` first, and `check_plan.py` requires that; `memory-owner` runs ai-memory's own `install-hooks --agent codex --apply` once and checks its seven Codex events in `hooks.json`; `context-supply` checks that marketplace auto-update is off for context-mode. After the pull-request review of 2026-10-03: `statusline` runs upstream's helper (`scripts/setup.mjs inspect`, then `install --shell posix`), which copies the launcher that the configured status line runs, and adds `refreshInterval` 5 when absent; its acceptance runs the configured command instead of the cached launcher, which had passed with that copy missing. After the review of `99a2e3c6`: the acceptance takes any positive-integer `refreshInterval` (the settings schema's integer, minimum 1) instead of exactly 5, since the helper keeps an earlier claude-hud value and the install adds 5 only when absent; the exact-5 check had rejected such an installed configuration. After the review of `06f6259f` (macOS CI run 37141171758, at `2f5d8b01`): the acceptance's exact-one check of the cached versions compares the `wc -l` count as a number (`-eq 1`) instead of the string `1`, which the padded count of BSD and macOS `wc` failed; its other conditions are unchanged.
+
+### Checks run
+
+- `python3 -B check_plan.py`: exit 0, `OK: 70 rows: 42 installed by default, 3 measurement-only, 25 not installed; 87 commands and 62 acceptance entries agree with the scripts`.
+- `bash -n install.sh` and `bash -n accept.sh`: exit 0.
+- `tests/test_new_wsl_definitive_defaults.py`, class `InterimPlanChecks`: `check_plan.py` over a scratch copy of the plan fails, with its message, for an interim row set to `installed: false`, a plan owner that is not the interim's, an interim install function without the gate call first (each of the three rows) and a script without the gate function; the unchanged copy passes. The gate function itself, cut from `install.sh` and run with `bash` and `jq` against scratch `consensus.json` files, refuses while a family is owed, refuses a list it cannot read and passes an empty list; against the committed batch it refuses today, since both acknowledgements are owed.
+- The `jq` filter of `memory-owner`'s new acceptance line, against two scratch `hooks.json` files: false (exit 1) when an event has no ai-memory command, true when each named event has one.
+- `tests/test_new_wsl_definitive_defaults.py`, class `StatuslineInstallAndAcceptance` (our own fixtures: a scratch `HOME`, links to the system tools and a stand-in runtime; upstream's helper and launcher do not run): the helper command calls `setup.mjs inspect`, then `install`, with `--shell posix`, from the one cached 0.10.0, and refuses with no cached 0.10.0, with 0.10.0 in two marketplaces and with no `node` or `bun`; the `refreshInterval` command adds 5 only when absent, in the real file behind a link, with its mode kept; install, then the acceptance, on one scratch home (the helper's writes planted, then the helper and `refreshInterval` commands run): the acceptance passes the file the install leaves, with 5 added when absent and with an earlier 3 kept unchanged; the acceptance passes the wired state with a `refreshInterval` of 5, 1 or 3 and fails each planted condition: the copied launcher missing, a `refreshInterval` that is absent, non-numeric (`"five"`), quoted (`"5"`), zero, negative or fractional, another version's launcher copy, a second cached version, and a command that runs the cached launcher. Against the same missing-copy fixture, the acceptance as it was before the review exits 0. Negative control, kept as a test: in the install-then-acceptance run with an earlier 3, the acceptance as it was at `99a2e3c6` (exactly 5) exits 1; it exits 0 when the install added 5.
+- After main at `54a96ff3d` (the two local-model rows, section above) was merged into this branch: `python3 -B check_plan.py`: exit 0, `OK: 70 rows: 44 installed (42 by the default run, 2 only when named), 3 measurement-only, 23 not installed; 94 commands and 66 acceptance entries agree with the scripts`; `bash -n` on `install.sh` and on `accept.sh`: exit 0 each.
+- After the review of `06f6259f`: `python3 -B check_plan.py`: exit 0, the same summary line; `bash -n` on `install.sh` and on `accept.sh`: exit 0 each. `tests/test_new_wsl_definitive_defaults.py`, class `StatuslineInstallAndAcceptance`: with a stand-in `wc` that counts with the system one and prints the count either bare (GNU) or as `" %7d"` (BSD and macOS), the acceptance passes the wired state with a `refreshInterval` of 5, 1 or 3 in both formats and fails a second cached version in both. Negative control, kept as a test: the acceptance as it was at `06f6259f` (string `== 1`) exits 0 on the wired state with the bare count and nonzero with the padded one. No macOS host ran these; the padded format is the stand-in's.
+
+### Not established
+
+- Whether ai-memory 2.5.2's installer writes the seven events with commands that name `ai-memory`, as the acceptance expects: read in its source (SOURCES.md), not run.
+- Whether claude-hud 0.10.0's helper, run through mise's `node` shim, records the runtime path the client configuration renders (`process.execPath`, setup.mjs line 32), and whether its launcher prints two lines on the destination: read in its source, not run.
+- Anything about a client: no Claude Code or Codex session ran, no hook was trusted and no marketplace was added.
+
+## Wave 3 (2026-10-04): static checks and artifact checks only
+
+### Evidence class
+
+Repository checks of the plan's files, plus artifact checks in a scratch folder on the coordinating workstation (NativeStack), from the branch's worktree. No install command of the plan ran, nothing was installed on any host and no distribution was touched. The artifact checks show that the recorded downloads are the published ones and that four version checks hold against those archives' own binaries, not that an install or an acceptance check works on the destination.
+
+### What changed
+
+The wave-3 batch of the layer consensus, on the owner's decision of 2026-10-04 (amendment 4), added ten owner rows in token-efficiency, gave `ccusage`, `session-analytics` and `context-supply` owner defaults, and widened the `code-search` interim to semble and SocratiCode (README.md, section "Wave 3"; sources in SOURCES.md, section "Wave 3"). `interim_acknowledged` reads every wave batch; `context-supply` no longer calls it; `check_plan.py` refuses a gate call on a row without an interim.
+
+### Checks run
+
+- `python3 -B check_plan.py`: exit 0, `OK: 80 rows: 56 installed (54 by the default run, 2 only when named), 3 measurement-only, 21 not installed; 115 commands and 78 acceptance entries agree with the scripts`.
+- `bash -n install.sh` and `bash -n accept.sh`: exit 0 each; `bash -n -c` on every command and acceptance program of the new and changed rows: exit 0 each. `bash install.sh --list`: exit 0, 80 lines, 21 of them `excluded` (`ccusage` and `session-analytics` no longer).
+- Downloads, 2026-10-04: the four release archives (RTK 0.50.0, codebase-memory-mcp 0.11.0, otel-tui 0.7.5, agentsview 0.43.0) and the five npm tarballs (Repomix 1.18.1, TOON 4.1.1, Context Hub 0.1.4, ccusage 20.0.26, SocratiCode 1.15.0), fetched into a scratch folder: each matched the sha256 the plan records. The agentsview digest also equals the GitHub asset digest of its release (API, read 2026-10-04). Each archive's member list is the one the rows' notes give.
+- Version checks against the archives' binaries, with a scratch `HOME`: `rtk --version` printed `rtk 0.50.0`, `codebase-memory-mcp --version` `codebase-memory-mcp 0.11.0`, `otel-tui --version` `otel-tui version 0.7.5` and `agentsview --version` `agentsview v0.43.0 (commit 9be7745ad1906ee24e04eb05bb86c872ef0939a1, ...)`, exit 0 each. The four acceptance programs of `command-output`, `code-graph`, `trace-viewer` and `session-analytics`, run with `ECO_ROOT` on a scratch folder whose `bin` links to those binaries: exit 0 each; the `command-output` program with an expected version of 0.51.0: exit 1 (negative control). The extraction command of each of the four rows, run with the downloaded archive in a scratch `ECO_ROOT`: exit 0, the link points into the versioned prefix; with an archive that lacks the binary: exit 1 and no link.
+- `tests/test_new_wsl_definitive_defaults.py`, class `InterimPlanChecks`: the gate function, cut from `install.sh` and run with `bash` and `jq` against scratch `consensus.json` files, refuses while any wave batch owes an acknowledgement (naming each batch), passes when none does, and refuses a batch that cannot be read, a key that starts with `wave` and is not `wave<n>`, and a missing file; `check_plan.py` refuses a gate call put on `context-supply` or on an owner row.
+
+### Not established
+
+- Any install: no `fetch_verified`, `npm install`, `uv tool install` or extraction into a real ecosystem root ran, and the npm and uv routes resolve dependencies at install time that no recorded digest pins.
+- The acceptance programs of the npm and uv rows: their packages were not installed here, so their version lines and probes are read in the packages' sources (SOURCES.md), not run.
+- Anything about a client: no MCP server was registered or started, no hook was written, and SocratiCode has no Qdrant store or embedding endpoint on the destination.
 
 ## Round 1 install-plan repair (historical)
 
@@ -134,4 +366,53 @@ The container cannot establish these conditions; check them on the real distribu
 
 Unresolved evidence limits: the suppressed original mise/chezmoi/Codex diagnostic rows cannot be recovered from these logs. Five workflow/adoption rows have no source-backed host executable check, so their explicit unavailable entries are skipped. Neither a skip, source review, configuration validation nor a version proves provider/GPU/service acceptance. All revised target-distribution commands remain unrun; no upstream failure was waived.
 
-Historical: executed checks for the round 1 revision (the first plan, 53 rows; the current plan has 64 rows and its checks are in the two sections above): the requested Python JSON load, `bash -n` on both scripts and `bash install.sh --list` all returned 0. The list retained all 53 rows. TOML parsing, stage/schema/source agreement, all 156 slot/stage combinations, default/all-owner stages, unavailable/excluded skips, nonzero failure propagation and invalid arguments passed local fixtures. Additional Bash fixtures caught the original caller-directory and doctor-only false-pass patterns and verified the repairs. All 16 passing acceptance objects, original model/research examples, original HTTP endpoints and all seven exclusions were compared with the original plan and retained. The entire plan folder passed a personal-path/user-name scan; `git diff --check` passed. The fixtures ran no native owner programs, stack services or models. Independent Astra/Max source review confirmed the two review fixes and reported no remaining follow-up findings.
+Historical: executed checks for the round 1 revision (the first plan, 53 rows; the current plan has 69 rows: the checks of its 64-row revision are in the first two sections above, and those of the five rows added from the layer consensus, which have not run anywhere, are in the third): the requested Python JSON load, `bash -n` on both scripts and `bash install.sh --list` all returned 0. The list retained all 53 rows. TOML parsing, stage/schema/source agreement, all 156 slot/stage combinations, default/all-owner stages, unavailable/excluded skips, nonzero failure propagation and invalid arguments passed local fixtures. Additional Bash fixtures caught the original caller-directory and doctor-only false-pass patterns and verified the repairs. All 16 passing acceptance objects, original model/research examples, original HTTP endpoints and all seven exclusions were compared with the original plan and retained. The entire plan folder passed a personal-path/user-name scan; `git diff --check` passed. The fixtures ran no native owner programs, stack services or models. Independent Astra/Max source review confirmed the two review fixes and reported no remaining follow-up findings.
+
+## PR #684 refresh after PR #693 (2026-10-04)
+
+Source and repository checks only, against main
+`14048b840425c2569e0df60a6596e94e601da15b`. The active RTK rows now select
+0.51.0. A fresh Linux archive has SHA-256
+`5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5`, matching the
+[v0.51.0 publisher checksums](https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt)
+and release asset digest. The mcporter profile now selects 0.14.2; its fresh npm
+archive has SHA-256
+`f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b`, and its SHA-512
+and SHA-1 match the registry metadata. The claude-hud row already selected 0.10.0;
+the upstream tag resolves to `75683c6de1ac07f6bbef00d739001679dba0740c` and its
+plugin manifest states 0.10.0. No installation or acceptance function ran on a
+WSL distribution. The earlier RTK 0.50.0 observations above retain their dates.
+
+The persisted RTK TOML already matches the recipe byte for byte: one `[hooks]`
+table with five `exclude_commands` patterns, including the global-option forms
+of git show and git branch. The existing integration test checks that file and
+the plan's preservation of existing configuration. The release's positional
+shell change does not require a rewrite of the direct git/proxy and hook-check
+calls. The source ranges in the comments follow v0.51.0.
+
+The first full requested test run returned 1: 780 tests, five failures, five
+skips. The corrections were a stale RTK version assertion, removal of two
+unnecessary comments so the persisted TOML remains the exact upstream recipe
+projection, the current dropped-unit list in the client record, the profile
+input digest in the handbook receipt, and the architecture citation format.
+The latter was first changed to archived URLs in `pin_source`; the existing
+public generator requires local repository locators there
+(`scripts/build_ecosystem.py`, `architecture_pin_source`). Those locators now
+resolve the component fields on main, while the original sources for the dated
+pins remain explicit in `edition.scope`. No generator contract was changed.
+
+The subsequent full requested suite passed: 780 tests, five skips, exit 0.
+`new_wsl_client_config.py --check` passed with 404 pieces: 354 wired (207
+practice, 147 through a slot), 35 not wired and 15 authorization pieces.
+`check_plan.py` passed: 80 rows, 56 installed, 3 measurement-only, 21 not
+installed; 118 commands and 78 acceptance entries agree with the scripts.
+The handbook check and `git diff --check` passed. Receipt input and output
+digests were replaced in place without reformatting it.
+
+`validate.py` returned 1 with only registered SHA-256/byte-count drift. The
+protected `manifests/evidence.json` remains the coordinator's. The same drift
+blocks `validate_convergence.py --all-recorded` during record discovery; every
+one of its 30 declared records passes the validator's supported positional
+record mode, exit 0. Re-run the discovery mode after the coordinator refreshes
+the registry. The known RTK grep file-list exactness control is still a separate
+repair; `scripts/native_token_ci.py` was not edited.

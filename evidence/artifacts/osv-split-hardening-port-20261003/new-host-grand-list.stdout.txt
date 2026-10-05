@@ -1,0 +1,1 @@
+{"status": "written", "layers": 32, "winners": 66}

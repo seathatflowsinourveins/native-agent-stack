@@ -158,10 +158,12 @@ class CatalogTests(unittest.TestCase):
                         for name in named:
                             self.assertTrue(holds(pinned[name]),
                                             f"{name} {field} is {pinned[name][field]!r} in the manifest: {gap}")
-        # Both kinds are stated today (skill-creator off in Codex; the user-invocable-only listings of grill-me and
-        # improve-codebase-architecture), so the patterns still match the catalog's wording.
+        # The Codex kind is stated today (skill-creator off in Codex), so its pattern still matches the catalog's wording.
+        # The listing kind is not: its two user-invocable-only skills, grill-me and improve-codebase-architecture, were
+        # retired on 2026-10-03 (wave-2 skills ruling, change 1), and no pinned skill has a listing other than on.
         self.assertEqual({field: count > 0 for field, count in stated.items()},
-                         {"codex_enabled": True, "claude_listing": True})
+                         {"codex_enabled": True, "claude_listing": False})
+        self.assertEqual([skill["name"] for skill in self.manifest["skills"] if skill["claude_listing"] != "on"], [])
 
     def test_tasks_that_need_model_invocation_say_so(self):
         tasks = {task["lifecycle_task"]: task for task in self.catalog["tasks"]}
@@ -2541,8 +2543,7 @@ class SkillsYamlProvisioningControls(unittest.TestCase):
         start, end = yaml_provisioning_span(lines)
         step = lines[start:end]
         run_index = next(i for i, line in enumerate(step) if line.startswith("        run: |"))
-        suite_end = shell_ci.step_span(lines, next(i for i, line in enumerate(lines)
-                                                   if line.strip() == "run: python3 -m unittest"))[1]
+        suite_end = shell_ci.suite_step_span(lines)[1]
         return {
             "removed step": ("missing", "\n".join(lines[:start] + lines[end:])),
             "step after the suite": ("order", "\n".join(lines[:start] + lines[end:suite_end] + step + lines[suite_end:])),

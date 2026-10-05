@@ -1,6 +1,7 @@
 """Adoption preflight boundaries; no credentials, services, or model calls."""
 
 import contextlib
+from datetime import date, datetime, timezone
 import dis
 import errno
 import hashlib
@@ -1292,6 +1293,217 @@ class PinnedVersionsCheckTests(unittest.TestCase):
         for item in result["profiles"][0]["pinned_versions"]:
             for key, value in item.items():
                 self.assertTrue(value is None or isinstance(value, (bool, str)), repr((key, value)))
+
+
+class DatedHoldTests(unittest.TestCase):
+    """--pinned-versions with a pin's dated holds (docs/decisions/2026-10-04-codex-dated-holds.md). Synthetic: a real
+    tiny script on PATH stands in for codex. A probe that names a hold's version is held before the hold's until date
+    and mismatched, with the expiry stated, on and after it (an OSV-Scanner ignoreUntil's rule); any other version is
+    drift as before, and a malformed hold or a failing probe never turns drift into a hold."""
+
+    PLATFORM_DEPENDENCY = {
+        "name": "codex-linux-x64", "resolved_package": "@openai/codex", "version": "0.160.0-linux-x64",
+        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0-linux-x64.tgz",
+        "sha256": "1" * 64, "integrity": "sha512-" + "A" * 86 + "==", "checksum_ref": "synthetic fixture",
+        "installed_binary_check": {"path": "vendor/bin/codex", "sha256": "2" * 64},
+    }
+    HOLD = {"version": "0.159.3", "until": "2026-11-04", "reason": "X18: synthetic reason",
+            "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz", "sha256": "0" * 64,
+            "platform_dependency": {
+                **PLATFORM_DEPENDENCY, "version": "0.159.3-linux-x64",
+                "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3-linux-x64.tgz",
+                "sha256": "3" * 64, "integrity": "sha512-" + "B" * 86 + "==",
+                "installed_binary_check": {"path": "vendor/bin/codex", "sha256": "4" * 64},
+            }}
+    BEFORE, ON, AFTER = date(2026, 11, 3), date(2026, 11, 4), date(2026, 11, 5)
+    HELD_LINE = "    codex: 0.159.3 held until 2026-11-04 (X18: synthetic reason)\n"
+    EXPIRED_LINE = "    codex: 0.159.3 hold expired 2026-11-04 (X18: synthetic reason); reported as drift\n"
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        (self.root / "adoption").mkdir()
+        (self.root / "recipes").mkdir()
+        (self.root / "recipes/README.md").write_text("Native recipe\n")
+        self.path = self.root / "adoption/manifest.json"
+        self.path.write_text(json.dumps({
+            "schema_version": 1,
+            "supported_platforms": [{"os": "linux", "architecture": "x86_64", "python": "3.13"}],
+            "profiles": [{"id": "foundation-cpu", "label": "CPU foundation", "required_commands": ["codex"],
+                          "component_ids": ["codex"], "recipe_paths": ["recipes/README.md"]}],
+            "default_profile": "foundation-cpu",
+            "source": {"baseline_commit": "a" * 40, "repository": "https://github.com/example/reference"},
+        }), encoding="utf-8")
+        self.pins = self.root / "adoption/pins-linux-x86_64.json"
+        self.write_pin([dict(self.HOLD)])
+        self.bin = self.root / "bin"
+        self.bin.mkdir()
+        self.codex_prints("0.159.3")
+        self.enter = contextlib.ExitStack()
+        self.addCleanup(self.enter.close)
+        self.enter.enter_context(patch.dict("os.environ", {"PATH": str(self.bin)}))
+        self.enter.enter_context(patch("scripts.adoption_status.platform.system", return_value="Linux"))
+        self.enter.enter_context(patch("scripts.adoption_status.platform.machine", return_value="x86_64"))
+        self.enter.enter_context(patch("scripts.adoption_status.sys.version_info", (3, 13, 7)))
+        self.enter.enter_context(patch("scripts.adoption_status.shutil.which", side_effect=native_which))
+        self.enter.enter_context(patch("scripts.adoption_status.git_revision", return_value="a" * 40))
+
+    def write_pin(self, holds) -> None:
+        self.pins.write_text(json.dumps({"schema_version": 1, "platform": "linux-x86_64", "tools": [
+            {"id": "codex", "version": "0.160.0", "holds": holds, "platform_dependency": self.PLATFORM_DEPENDENCY,
+             "version_probe": {"method": "exec", "command": "codex", "args": ["--version"]}}]}), encoding="utf-8")
+
+    def codex_prints(self, version: str, status: int = 0) -> None:
+        executable = self.bin / "codex"
+        executable.write_text(f"#!/bin/sh\nprintf 'codex-cli {version}\\n'\nexit {status}\n")
+        executable.chmod(0o755)
+
+    def report(self, today: date) -> dict:
+        return inspect_adoption(self.path, self.root, with_pinned_versions=True, today=today)
+
+    def text(self, today: date) -> str:
+        output = io.StringIO()
+        with patch("scripts.adoption_status.utc_today", return_value=today), contextlib.redirect_stdout(output):
+            code = main(["--manifest", str(self.path), "--repo-root", str(self.root), "--pinned-versions"])
+        self.assertEqual(code, 0)  # a hold, held or expired, leaves the exit code the prerequisite result
+        return output.getvalue()
+
+    def test_a_hold_version_before_until_is_held_not_drift(self):
+        result = self.report(self.BEFORE)
+        self.assertEqual(result["profiles"][0]["pinned_versions"], [
+            {"id": "codex", "pinned_version": "0.160.0", "checked": True, "matches_pin": False,
+             "hold_version": "0.159.3", "hold_until": "2026-11-04", "hold_reason": "X18: synthetic reason",
+             "hold_expired": False}])
+        self.assertEqual(result["profiles"][0]["pinned_versions_summary"],
+                         {"matched": [], "mismatched": [], "unchecked": [], "held": ["codex"]})
+        self.assertIs(result["pinned_versions_match"], True)
+        self.assertIn("  pinned versions: 0 matched, held: codex\n" + self.HELD_LINE + "Pinned versions match: true\n",
+                      self.text(self.BEFORE))
+
+    def test_on_and_after_until_the_hold_is_drift_with_the_expiry_stated(self):
+        for today in (self.ON, self.AFTER):
+            with self.subTest(today=today.isoformat()):
+                result = self.report(today)
+                item = result["profiles"][0]["pinned_versions"][0]
+                self.assertEqual((item["matches_pin"], item["hold_until"], item["hold_expired"]),
+                                 (False, "2026-11-04", True))
+                self.assertEqual(result["profiles"][0]["pinned_versions_summary"],
+                                 {"matched": [], "mismatched": ["codex"], "unchecked": []})
+                self.assertIs(result["pinned_versions_match"], False)
+                self.assertIn("  pinned versions: 0 matched, mismatched: codex\n" + self.EXPIRED_LINE
+                              + "Pinned versions match: false\n", self.text(today))
+
+    def test_any_other_version_is_drift_as_before(self):
+        # "exact" is bounded by non-version characters, so 0.159.30 and 10.159.3 do not name the hold 0.159.3.
+        for version in ("0.159.2", "0.159.30", "10.159.3", "0.159.3.1"):
+            with self.subTest(version=version):
+                self.codex_prints(version)
+                result = self.report(self.BEFORE)
+                self.assertEqual(result["profiles"][0]["pinned_versions"], [
+                    {"id": "codex", "pinned_version": "0.160.0", "checked": True, "matches_pin": False}])
+                self.assertEqual(result["profiles"][0]["pinned_versions_summary"],
+                                 {"matched": [], "mismatched": ["codex"], "unchecked": []})
+                # The summary line is followed directly by the match line: no hold line, held or expired.
+                self.assertIn("  pinned versions: 0 matched, mismatched: codex\nPinned versions match: false\n",
+                              self.text(self.BEFORE))
+
+    def test_the_pin_itself_matches_and_reports_no_hold(self):
+        self.codex_prints("0.160.0")
+        result = self.report(self.BEFORE)
+        self.assertEqual(result["profiles"][0]["pinned_versions"], [
+            {"id": "codex", "pinned_version": "0.160.0", "checked": True, "matches_pin": True}])
+        self.assertEqual(result["profiles"][0]["pinned_versions_summary"],
+                         {"matched": ["codex"], "mismatched": [], "unchecked": []})
+
+    def test_a_failing_probe_that_names_the_hold_is_drift(self):
+        # As for the pin itself: bootstrap-linux.sh reports any nonzero exit as "FAILED (exit N)".
+        self.codex_prints("0.159.3", status=3)
+        result = self.report(self.BEFORE)
+        self.assertNotIn("hold_version", result["profiles"][0]["pinned_versions"][0])
+        self.assertEqual(result["profiles"][0]["pinned_versions_summary"]["mismatched"], ["codex"])
+
+    def test_a_malformed_hold_never_turns_drift_into_a_hold(self):
+        for holds in ([{key: value for key, value in self.HOLD.items() if key != "until"}],
+                      [{key: value for key, value in self.HOLD.items() if key != "reason"}],
+                      [{key: value for key, value in self.HOLD.items() if key != "version"}],
+                      [{**self.HOLD, "reason": "  "}], [{**self.HOLD, "version": ""}],
+                      [{**self.HOLD, "until": "2026-13-01"}], [{**self.HOLD, "until": "2026-02-30"}],
+                      [{**self.HOLD, "until": "04/11/2026"}], [{**self.HOLD, "until": "2026-11-04T00:00:00Z"}],
+                      [{**self.HOLD, "until": 20261104}], ["0.159.3"], [None], dict(self.HOLD), "0.159.3", None):
+            with self.subTest(holds=holds):
+                self.write_pin(holds)
+                result = self.report(self.BEFORE)
+                self.assertEqual(result["profiles"][0]["pinned_versions"], [
+                    {"id": "codex", "pinned_version": "0.160.0", "checked": True, "matches_pin": False}])
+                self.assertIs(result["pinned_versions_match"], False)
+
+    def test_the_first_usable_hold_naming_the_version_applies(self):
+        self.write_pin([{**self.HOLD, "until": "not a date"}, {**self.HOLD, "version": "0.159.2"},
+                        {**self.HOLD, "until": "2026-11-20", "reason": "second"}])
+        item = self.report(self.BEFORE)["profiles"][0]["pinned_versions"][0]
+        self.assertEqual((item["hold_version"], item["hold_until"], item["hold_reason"]), ("0.159.3", "2026-11-20", "second"))
+
+    def assert_hold_reports_drift(self, hold):
+        self.write_pin([hold])
+        with patch("scripts.adoption_status.run_version_probe", return_value=(0, "codex-cli 0.159.3\n")) as probe:
+            result = self.report(self.BEFORE)
+        probe.assert_called_once()
+        self.assertEqual(result["profiles"][0]["pinned_versions"], [
+            {"id": "codex", "pinned_version": "0.160.0", "checked": True, "matches_pin": False}])
+        self.assertEqual(result["profiles"][0]["pinned_versions_summary"],
+                         {"matched": [], "mismatched": ["codex"], "unchecked": []})
+        self.assertIs(result["pinned_versions_match"], False)
+
+    def test_a_hold_without_url_reports_drift(self):
+        self.assert_hold_reports_drift({key: value for key, value in self.HOLD.items() if key != "url"})
+
+    def test_a_hold_without_sha256_reports_drift(self):
+        self.assert_hold_reports_drift({key: value for key, value in self.HOLD.items() if key != "sha256"})
+
+    def test_a_hold_without_required_platform_dependency_reports_drift(self):
+        self.assert_hold_reports_drift({key: value for key, value in self.HOLD.items() if key != "platform_dependency"})
+
+    def test_a_hold_with_other_invalid_install_metadata_reports_drift(self):
+        mutations = {
+            "unknown field": lambda hold: hold.update(hosts=["a host"]),
+            "HTTP wrapper URL": lambda hold: hold.update(url="http://registry.npmjs.org/codex.tgz"),
+            "short wrapper digest": lambda hold: hold.update(sha256="0" * 63),
+            "uppercase wrapper digest": lambda hold: hold.update(sha256="A" * 64),
+            "non-string wrapper digest": lambda hold: hold.update(sha256=int("1" * 64)),
+            "null platform payload": lambda hold: hold.update(platform_dependency=None),
+            "platform shape": lambda hold: hold["platform_dependency"].pop("checksum_ref"),
+            "platform package": lambda hold: hold["platform_dependency"].update(name="other-linux-x64"),
+            "resolved package": lambda hold: hold["platform_dependency"].update(resolved_package="other"),
+            "platform version": lambda hold: hold["platform_dependency"].update(version="0.160.0-linux-x64"),
+            "HTTP platform URL": lambda hold: hold["platform_dependency"].update(url="http://registry.npmjs.org/codex.tgz"),
+            "platform digest": lambda hold: hold["platform_dependency"].update(sha256="3"),
+            "platform integrity": lambda hold: hold["platform_dependency"].update(integrity="sha256-x"),
+            "binary path": lambda hold: hold["platform_dependency"]["installed_binary_check"].update(path="bin/codex"),
+            "binary digest": lambda hold: hold["platform_dependency"]["installed_binary_check"].update(sha256="4"),
+            "binary shape": lambda hold: hold["platform_dependency"]["installed_binary_check"].pop("sha256"),
+        }
+        for label, mutate in mutations.items():
+            with self.subTest(mutation=label):
+                hold = json.loads(json.dumps(self.HOLD))
+                mutate(hold)
+                self.assert_hold_reports_drift(hold)
+
+    def test_the_default_date_is_today_in_utc(self):
+        with patch("scripts.adoption_status.utc_today", return_value=self.BEFORE):
+            held = inspect_adoption(self.path, self.root, with_pinned_versions=True)
+        with patch("scripts.adoption_status.utc_today", return_value=self.ON):
+            expired = inspect_adoption(self.path, self.root, with_pinned_versions=True)
+        self.assertEqual((held["pinned_versions_match"], expired["pinned_versions_match"]), (True, False))
+        before = datetime.now(timezone.utc).date()
+        observed = adoption_status.utc_today()
+        self.assertIn(observed, {before, datetime.now(timezone.utc).date()})
+
+    def test_held_output_is_value_free(self):
+        result = self.report(self.BEFORE)
+        self.assertNotIn(str(self.root), json.dumps(result))
+        for key, value in result["profiles"][0]["pinned_versions"][0].items():
+            self.assertTrue(value is None or isinstance(value, (bool, str)), repr((key, value)))
 
 
 def pin_manifest_disagreements(pins: dict, components: list[dict]) -> list[str]:

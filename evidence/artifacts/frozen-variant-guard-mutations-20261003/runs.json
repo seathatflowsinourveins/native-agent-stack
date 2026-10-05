@@ -1,0 +1,224 @@
+{
+ "schema_version": 1,
+ "record": "frozen-variant-guard-mutations-20261003",
+ "purpose": "Index of the retained runs of the mutation driver for tests/test_frozen_macos_variant_no_use.py (PR #635): round 8's final run and round 9's three control runs against the retained earlier modules, whose rows evidence/receipts/dependabot-alert-16-dismissal-20261003.json reports in guard_mutation_checks.",
+ "evidence_class": "Local fault injection with synthetic scenario fixtures, run in scratch clones on one host: not an upstream harness, and not run in CI. Each mutant writes scenario files into a scratch clone, runs python3 -m unittest tests.test_frozen_macos_variant_no_use there and restores the clone; nothing was installed, built or served.",
+ "driver": {
+  "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+  "sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+  "origin": "The round-6 driver (sha256 5fff1fa7c6323b059b778fc6ed1478f42b54e19d4d63d7f5e85640a81f336f2e, not retained) with three edits: M9's artifact directory name is assembled from fragments as PARENT's is, PARENT's comment is reworded and the docstring gains a round-7 sentence. Loading both drivers and recording every mutant's file operations gave the same calls for all 45 (the two that read the clone or run git were compared by source)."
+ },
+ "host": {
+  "system": "Linux (WSL2)",
+  "python": "3.13.16",
+  "git": "2.53.0"
+ },
+ "controls": {
+  "directory": "controls",
+  "note": "The earlier modules the control runs used, byte for byte (module_file_sha256 equals each run's module_sha256). They are kept as .txt files under evidence/** with Git mode 100644, no leading #! and no client configuration directory in their path, so the guard's recogniser does not read them and their lines naming the artifact are not referencing lines; nothing runs them. To rebuild a control: check out main's d2777ee7, copy the module to tests/test_frozen_macos_variant_no_use.py, commit, and run the driver with the run's ids."
+ },
+ "placeholders": {
+  "<repo>": "the owned checkout of PR #635's branch, from which the driver ran at its repository path; every run used the same driver file (driver_sha256)",
+  "<clone>": "the run's scratch clone (its root directory)",
+  "<out>": "the run's scratch output directory, whose files the run's subdirectory here holds",
+  "<python>": "the Python installation's prefix, which tracebacks name"
+ },
+ "sanitization": "Each copied file had every occurrence of its run's clone root replaced with <clone>, of the run's output directory with <out> and of the Python installation's prefix with <python> (counts in each run's replacements); nothing else was changed. An empty stderr was not copied (stderr_bytes). After the copy, a recursive grep of this directory for the host's home and temporary directory prefixes and its user name printed nothing.",
+ "runs": [
+  {
+   "name": "final",
+   "purpose": "all 45 rows against this round's module",
+   "argv": [
+    "python3",
+    "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+    "<clone>",
+    "<out>/results"
+   ],
+   "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+   },
+   "cwd": "<repo>",
+   "start_utc": "2026-10-03T12:04:09Z",
+   "end_utc": "2026-10-03T12:04:34Z",
+   "exit_code": 0,
+   "exit_code_expected": 0,
+   "exit_code_note": "every row came out as expected",
+   "clone": "a fresh clone of PR #635's branch, made for this run",
+   "clone_head": "a447a5114337b471ef1aae11013063a40db0a201",
+   "clone_head_on_remote_when_run": false,
+   "clone_head_note": "Round 8's content commit: the branch rebuilt as one content commit on main 4ced2923 (#636), whose tree equals round 7's first content commit 8f547913 apart from main's changes since 9b0b8d6d (AGENTS.md and manifests/evidence.json, which the module does not scan). It was not on the remote when the run was made and reached it with round 8's push (PR head 06c90dfc). The commits that follow it add this directory's run files and the retained modules and edit the receipt and the closure note; the module reads none of those files (.json, .log, .txt and .py.txt files under evidence/** and a Markdown record, all in excluded classes and none of them recognised configuration or a script). Round 7 ran the same 45 rows against 8f547913 (2026-10-03T10:46:37Z to 10:47:04Z, all as expected); 8f547913 was never pushed, and this run replaces that one.",
+   "clone_status": "git status --short --ignored printed nothing before and after the run",
+   "module_sha256": "bfd2c5cdaff2b82e7f8862391a3c325fb162dd417caab4692aadb4d4b6250da6",
+   "driver_sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+   "results_file": "final/results.json",
+   "results_sha256": "cabf4c842e4c67098cae5814cc8c3936f57f85283b9d4f0cab57b4e0a1ff7e97",
+   "logs": "final/results-<id>.log, one per row",
+   "stdout_file": "final/stdout.txt",
+   "stdout_sha256": "77a55cd4e79357fbcdcd2f5931eacaee1566fd96d1db9f7c6f28056f8324da20",
+   "stderr_bytes": 0,
+   "row_count": 45,
+   "rows_as_expected": 45,
+   "rows_not_as_expected": [],
+   "replacements": {
+    "<clone>": 154,
+    "<out>": 0,
+    "<python>": 9
+   }
+  },
+  {
+   "name": "round5-module",
+   "purpose": "N9 against the round-5 module, which compared the client configuration directory names as written",
+   "argv": [
+    "python3",
+    "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+    "<clone>",
+    "<out>/results",
+    "M0",
+    "N9"
+   ],
+   "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+   },
+   "cwd": "<repo>",
+   "start_utc": "2026-10-03T12:48:51Z",
+   "end_utc": "2026-10-03T12:48:52Z",
+   "exit_code": 1,
+   "exit_code_expected": 1,
+   "exit_code_note": "by design: N9 is expected to fail and passes against this module, the gap round 6 closed",
+   "clone": "a fresh clone with main's d2777ee7 checked out and the retained module (module_file) copied to tests/test_frozen_macos_variant_no_use.py and committed",
+   "clone_head": "b6ffec8645f1c2a0ead45dc36b02dda9511cee00",
+   "clone_head_on_remote_when_run": false,
+   "clone_head_note": "A scratch commit, on no remote: main's d2777ee7 plus the retained round-5 module (module_file), so anyone can rebuild it from the repository and that file. Round 7 ran the same rows in a clone of a scratch commit that put the round-5 module on PR #635's round-4 content commit 4af88b1d with the same outcomes, failing tests and messages; round 9 re-ran them on this base and this run replaces that one.",
+   "base_commit": "d2777ee76a6ca14e020856fcd76421ceebc1e4f0",
+   "module_file": "controls/round5-module.py.txt",
+   "module_file_sha256": "6006cede80c9df94028fc377dfc4efbbb8c3e283ec99bbf1ad25cd4040ddd054",
+   "clone_status": "git status --short --ignored printed nothing before and after the run",
+   "module_sha256": "6006cede80c9df94028fc377dfc4efbbb8c3e283ec99bbf1ad25cd4040ddd054",
+   "driver_sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+   "results_file": "round5-module/results.json",
+   "results_sha256": "f8e3294ad2ede150b6dc836b4b78bef395533578b9d8bf34ca1193fe007af846",
+   "logs": "round5-module/results-<id>.log, one per row",
+   "stdout_file": "round5-module/stdout.txt",
+   "stdout_sha256": "aa55340c73d051cc3f9e4c13e513f3df508f5c2375d4212ca9c503b7f3a4324e",
+   "stderr_bytes": 0,
+   "row_count": 2,
+   "rows_as_expected": 1,
+   "rows_not_as_expected": [
+    "N9"
+   ],
+   "replacements": {
+    "<clone>": 0,
+    "<out>": 0,
+    "<python>": 0
+   }
+  },
+  {
+   "name": "round4-module",
+   "purpose": "N4-N8 and X13 against the round-4 module",
+   "argv": [
+    "python3",
+    "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+    "<clone>",
+    "<out>/results",
+    "M0",
+    "N4",
+    "N5",
+    "N6",
+    "N7",
+    "N8",
+    "X13"
+   ],
+   "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+   },
+   "cwd": "<repo>",
+   "start_utc": "2026-10-03T12:48:52Z",
+   "end_utc": "2026-10-03T12:48:56Z",
+   "exit_code": 1,
+   "exit_code_expected": 1,
+   "exit_code_note": "by design: N4-N8 and X13 are expected to fail and pass against this module, the gaps round 5 closed",
+   "clone": "a fresh clone with main's d2777ee7 checked out and the retained module (module_file) copied to tests/test_frozen_macos_variant_no_use.py and committed",
+   "clone_head": "223cc34da51ed1aba191940dd5d6c35e96342bc1",
+   "clone_head_on_remote_when_run": false,
+   "clone_head_note": "A scratch commit, on no remote: main's d2777ee7 plus the retained round-4 module (module_file), so anyone can rebuild it from the repository and that file. Round 7 ran the same rows in a clone of PR #635's round-4 content commit 4af88b1d with the same outcomes, failing tests and messages; round 9 re-ran them on this base and this run replaces that one.",
+   "base_commit": "d2777ee76a6ca14e020856fcd76421ceebc1e4f0",
+   "module_file": "controls/round4-module.py.txt",
+   "module_file_sha256": "415d90caf23b81f0d0b4c2a3e3f23316db51f4058cbebed81ef0bf71a0d02242",
+   "clone_status": "git status --short --ignored printed nothing before and after the run",
+   "module_sha256": "415d90caf23b81f0d0b4c2a3e3f23316db51f4058cbebed81ef0bf71a0d02242",
+   "driver_sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+   "results_file": "round4-module/results.json",
+   "results_sha256": "f1d51be2d60c0d0cb5179d917167b21332d47d6a83d9df2cd89a2f52e32e0c41",
+   "logs": "round4-module/results-<id>.log, one per row",
+   "stdout_file": "round4-module/stdout.txt",
+   "stdout_sha256": "ee138ea5029c3b7cd52e325ecfe97cf4aee40b583fd97994fc25480176445034",
+   "stderr_bytes": 0,
+   "row_count": 7,
+   "rows_as_expected": 1,
+   "rows_not_as_expected": [
+    "N4",
+    "N5",
+    "N6",
+    "N7",
+    "N8",
+    "X13"
+   ],
+   "replacements": {
+    "<clone>": 0,
+    "<out>": 0,
+    "<python>": 0
+   }
+  },
+  {
+   "name": "round3-module",
+   "purpose": "N1-N3 against the round-3 module",
+   "argv": [
+    "python3",
+    "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+    "<clone>",
+    "<out>/results",
+    "M0",
+    "N1",
+    "N2",
+    "N3"
+   ],
+   "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+   },
+   "cwd": "<repo>",
+   "start_utc": "2026-10-03T12:48:56Z",
+   "end_utc": "2026-10-03T12:48:58Z",
+   "exit_code": 1,
+   "exit_code_expected": 1,
+   "exit_code_note": "by design: N1-N3 are expected to fail and pass against this module, the gaps round 4 closed",
+   "clone": "a fresh clone with main's d2777ee7 checked out and the retained module (module_file) copied to tests/test_frozen_macos_variant_no_use.py and committed",
+   "clone_head": "e55a098df8beed2464946463d4b75d12a538397e",
+   "clone_head_on_remote_when_run": false,
+   "clone_head_note": "A scratch commit, on no remote: main's d2777ee7 plus the retained round-3 module (module_file), so anyone can rebuild it from the repository and that file. Round 7 ran the same rows in a clone of PR #635's round-3 content commit faaa86f9 with the same outcomes, failing tests and messages; round 9 re-ran them on this base and this run replaces that one.",
+   "base_commit": "d2777ee76a6ca14e020856fcd76421ceebc1e4f0",
+   "module_file": "controls/round3-module.py.txt",
+   "module_file_sha256": "3058872c039726e7057addb1e54ea32cd5f24b1f8cbdd449a23befc10ee77bd2",
+   "clone_status": "git status --short --ignored printed nothing before and after the run",
+   "module_sha256": "3058872c039726e7057addb1e54ea32cd5f24b1f8cbdd449a23befc10ee77bd2",
+   "driver_sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+   "results_file": "round3-module/results.json",
+   "results_sha256": "3a33c3519e8dc00952bb597dc86147aa016098e2b589a9f97b399537de2039f2",
+   "logs": "round3-module/results-<id>.log, one per row",
+   "stdout_file": "round3-module/stdout.txt",
+   "stdout_sha256": "ee79004b83edf07465013981ddcb396e28fc0a98bc216f839f2b8c436e7b42ad",
+   "stderr_bytes": 0,
+   "row_count": 4,
+   "rows_as_expected": 1,
+   "rows_not_as_expected": [
+    "N1",
+    "N2",
+    "N3"
+   ],
+   "replacements": {
+    "<clone>": 0,
+    "<out>": 0,
+    "<python>": 0
+   }
+  }
+ ]
+}

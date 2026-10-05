@@ -1,0 +1,29 @@
+{
+  "executable": "rtk",
+  "argv": [
+    "proxy",
+    "python3",
+    "scripts/validate_convergence.py",
+    "blueprints/convergence-practice/wsl-retrieval/experiment.json",
+    "--root",
+    ".",
+    "--json"
+  ],
+  "cwd": "<owned-source-worktree>",
+  "started_utc": "2026-10-03T01:27:21.608Z",
+  "finished_utc": "2026-10-03T01:27:21.678Z",
+  "exit_code": 0,
+  "stdout": "{\"records\": [{\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-retrieval/experiment.json\", \"valid\": true}], \"valid\": true}\n",
+  "stderr": "",
+  "correction": {
+    "error": "npm tag strings did not meet the local convergence revision schema",
+    "verification_path": [
+      "blueprints/convergence-practice/contract.schema.json:57",
+      "npm11190-tag-ref-0126.json"
+    ],
+    "npm_tag": "v11.19.0",
+    "npm_commit": "bfacd33ccbcd908480610703b60455d2da5b57a9",
+    "prior_failed_output": "frozen-retrieval-source-final-convergence.json"
+  },
+  "publication_policy": "Original worker native command/output record with task-owned paths replaced by role markers. Published digests bind only these published bytes; source tests are authored integration checks, not upstream suites."
+}

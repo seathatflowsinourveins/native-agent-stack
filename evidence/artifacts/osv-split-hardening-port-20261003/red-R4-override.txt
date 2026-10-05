@@ -1,0 +1,9 @@
+test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory) ... ok
+test_no_other_suppression_mechanism_bypasses_the_policy (tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_no_other_suppression_mechanism_bypasses_the_policy) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+
+exit_code=0

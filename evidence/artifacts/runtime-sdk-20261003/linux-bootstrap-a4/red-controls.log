@@ -1,0 +1,42 @@
+test_wrapper_optional_dependency_key_mismatch_never_runs_unverified_binary (tests.test_adoption_bootstrap_linux_platform.LinuxPlatformDependencyTests.test_wrapper_optional_dependency_key_mismatch_never_runs_unverified_binary) ... FAIL
+test_rebuild_cannot_change_auxiliary_executable_before_linking (tests.test_adoption_bootstrap_linux_platform.LinuxPlatformDependencyTests.test_rebuild_cannot_change_auxiliary_executable_before_linking) ... FAIL
+test_missing_python3_names_the_prerequisite_before_any_write (tests.test_adoption_bootstrap_linux_platform.LinuxPrerequisiteTests.test_missing_python3_names_the_prerequisite_before_any_write) ... FAIL
+
+======================================================================
+FAIL: test_wrapper_optional_dependency_key_mismatch_never_runs_unverified_binary (tests.test_adoption_bootstrap_linux_platform.LinuxPlatformDependencyTests.test_wrapper_optional_dependency_key_mismatch_never_runs_unverified_binary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_adoption_bootstrap_linux_platform.py", line 319, in test_wrapper_optional_dependency_key_mismatch_never_runs_unverified_binary
+    self.assertNotIn("UNVERIFIED_PLATFORM_BINARY", executed.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'UNVERIFIED_PLATFORM_BINARY' unexpectedly found in 'UNVERIFIED_PLATFORM_BINARY\n'
+
+======================================================================
+FAIL: test_rebuild_cannot_change_auxiliary_executable_before_linking (tests.test_adoption_bootstrap_linux_platform.LinuxPlatformDependencyTests.test_rebuild_cannot_change_auxiliary_executable_before_linking)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_adoption_bootstrap_linux_platform.py", line 396, in test_rebuild_cannot_change_auxiliary_executable_before_linking
+    self.assert_refused(self.dep, "platform dependency tree changed after npm rebuild", variant="corrupt-auxiliary")
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKTREE>/tests/test_adoption_bootstrap_linux_platform.py", line 474, in assert_refused
+    self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0 : Installed and verified platform dependency fixture-linux-x64@1.2.3 (fixture-platform) for widget (resolves from <FIXTURE_ROOT>/eco/tools/widget-1.0.0-20261003050735-318/lib/node_modules/fixture-wrapper)
+Verified installed binary vendor/x86_64-unknown-linux-musl/bin/codex SHA-256 before publishing widget
+
+
+======================================================================
+FAIL: test_missing_python3_names_the_prerequisite_before_any_write (tests.test_adoption_bootstrap_linux_platform.LinuxPrerequisiteTests.test_missing_python3_names_the_prerequisite_before_any_write)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_adoption_bootstrap_linux_platform.py", line 500, in test_missing_python3_names_the_prerequisite_before_any_write
+    self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 88 != 4 : fixture refuses network
+<BUILD_ROOT>/A4-before-source/adoption/bootstrap-linux.sh: line 320: rm: command not found
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 5.960s
+
+FAILED (failures=3)

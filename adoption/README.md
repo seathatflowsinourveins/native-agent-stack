@@ -10,6 +10,8 @@ repository quality, native runtime review, profile selection and the current
 
 For daily Codex use, environment setup, reload decisions and the complete 24-repository token workflow, use the [session handbook](../docs/token-session-handbook.md). It maps native integration and upstream commands to the task that needs each capability. Its Context Mode section changed after `v2026.09.26.2`: the install check also accepts a default-branch revision whose only change from the reviewed one is `stats.json`, and the new [executor and session-store notes](../docs/token-session-handbook.md#context-mode-executor-and-session-store) give the working rules for coordinators, children and Codex workers.
 
+The current Linux Codex CLI and SDK pair are **0.160.0**, with completed same-host marker canaries retained as a compatibility attempt in [the October 3 receipt](../evidence/artifacts/runtime-sdk-20261003/receipt.json); macOS stays at **0.155.1**. The shared host launcher and daemon still run 0.159.3 until a coordinated switch. The separate replacement-WSL profile and its handbook retain their owner-reviewed versions until that owner updates them.
+
 The initial target is **Linux/WSL2 x86_64**. The SDK was recreated in a new prefix on the existing host with **Python 3.13.15 and uv 0.12.17**. A second physical machine, macOS, Windows-native and ARM are not accepted by that result. See [the receipt](receipt.json) and [SDK lock/replay](sdk/README.md).
 
 ## Choose a small starting profile

@@ -1,0 +1,27 @@
+Version report at 2026-10-03T05:03:02Z for profile codex-only-a4
+Each installed pin is checked with its version_probe from pins-linux-x86_64.json; other executables are listed, not run (npm-metadata probes run only bin/npm).
+Ubuntu 24.04.5 LTS (x86_64)
+git version 2.43.0
+-- node 24.21.0: node --version --
+v24.21.0
+result: verified (exact 24.21.0)
+-- uv 0.12.17: uv --version --
+uv 0.12.17 (x86_64-unknown-linux-gnu)
+result: verified (exact 0.12.17)
+-- gh 2.101.0: gh --version --
+gh version 2.101.0 (2026-09-15)
+https://github.com/cli/cli/releases/tag/v2.101.0
+result: verified (exact 2.101.0)
+-- codex 0.160.0: codex --version --
+codex-cli 0.160.0
+result: verified (exact 0.160.0)
+-- every entry in bin with its link target (this listing runs nothing) --
+codex -> tools/codex-0.160.0/bin/codex
+corepack -> tools/node-24.21.0/bin/corepack
+gh -> tools/gh-2.101.0/gh
+node -> tools/node-24.21.0/bin/node
+npm -> tools/node-24.21.0/bin/npm
+npx -> tools/node-24.21.0/bin/npx
+uv -> tools/uv-0.12.17/uv
+uvx -> tools/uv-0.12.17/uvx
+summary: 4 verified, 0 failed

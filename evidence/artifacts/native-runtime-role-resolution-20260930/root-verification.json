@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "kind": "root_native_evidence_verification",
+  "scope": "Root direct re-execution of unchanged read-only oracles and original raw-event usage derivation. This is a local integration check; an independent second post-provider peer review was unavailable after account usage limits.",
+  "oracles": [
+    {
+      "command_id": "repair-16-combined-initial-oracle",
+      "fresh_exit_code": 0,
+      "original_exit_code": 0,
+      "returned_output": {
+        "phase": "initial",
+        "checks": {
+          "filesystem_os_isolation": true,
+          "checkpoint_context_closes_connection": true,
+          "source_pins": true,
+          "specialist_artifact_and_citations": true,
+          "exactly_one_native_task": true,
+          "task_returned": true,
+          "actual_selected_skill_read": true,
+          "marker_in_native_checkpoint": true,
+          "filesystem_quote": true,
+          "sqlite_quote": true,
+          "quotes_support_claims": true
+        },
+        "passed": true
+      },
+      "stdout_sha256": "0a4c90567d876268c2e0fc46bd50124dc31ce99c369b5c2e09f0e0e6d5a89917"
+    },
+    {
+      "command_id": "live-13-continuation-oracle",
+      "fresh_exit_code": 0,
+      "original_exit_code": 0,
+      "returned_output": {
+        "phase": "resume",
+        "checks": {
+          "restored_before_new_turn": true,
+          "marker_recovered": true,
+          "new_events_avoid_reread_and_delegation": true
+        },
+        "passed": true
+      },
+      "stdout_sha256": "bc421024e8087c3212119144fdcd7eea4abf707dc617df37cc06f8ca9daff0b4"
+    },
+    {
+      "command_id": "live-09-empty-thread-oracle",
+      "fresh_exit_code": 2,
+      "original_exit_code": 2,
+      "returned_output": {
+        "phase": "empty-thread",
+        "checks": {
+          "checkpoint_contains_marker": false
+        },
+        "passed": false
+      },
+      "stdout_sha256": "e285029306ec517e60d4da7c3540d81cfb1ea46e7eeaa7639524023c603a17f3"
+    },
+    {
+      "command_id": "live-18-restored-continuation-oracle",
+      "fresh_exit_code": 0,
+      "original_exit_code": 0,
+      "returned_output": {
+        "phase": "resume",
+        "checks": {
+          "restored_before_new_turn": true,
+          "marker_recovered": true,
+          "new_events_avoid_reread_and_delegation": true
+        },
+        "passed": true
+      },
+      "stdout_sha256": "bc421024e8087c3212119144fdcd7eea4abf707dc617df37cc06f8ca9daff0b4"
+    }
+  ],
+  "raw_usage_derivation": [
+    {
+      "file": "live-02-initial-worker.jsonl",
+      "unique_new_ai_ids": 22,
+      "overlap_ids_excluded": 0,
+      "native_totals": {
+        "input_tokens": 300536,
+        "output_tokens": 7422,
+        "total_tokens": 307958
+      },
+      "file_sha256": "7d8d339e48ea7a38542299c77df70609dc0009323aa768da44e94ec090b30747"
+    },
+    {
+      "file": "repair-14-worker.jsonl",
+      "unique_new_ai_ids": 3,
+      "overlap_ids_excluded": 0,
+      "native_totals": {
+        "input_tokens": 33483,
+        "output_tokens": 556,
+        "total_tokens": 34039
+      },
+      "file_sha256": "b88b2b7cc1391fa25377096ecd93c0773dcc8e57eb0c5c5a4e4b0d0d0f2d9269"
+    },
+    {
+      "file": "live-12-continuation-worker.jsonl",
+      "unique_new_ai_ids": 2,
+      "overlap_ids_excluded": 0,
+      "native_totals": {
+        "input_tokens": 23330,
+        "output_tokens": 170,
+        "total_tokens": 23500
+      },
+      "file_sha256": "53802f47735741269ca27e57ed82203452e3694aa98ee29346afe5ec8fb42c40"
+    }
+  ],
+  "unique_ai_message_ids": 27,
+  "marker_input_removed": true,
+  "all_expected_oracle_exits_match": true,
+  "correction": "First root processor selected nonexistent kind key and yielded zero records. Original event keys show event/native; corrected graph_update filter reproduces27 unique AI IDs and exact original per-attempt totals. That zero was a processor failure, not zero native usage."
+}

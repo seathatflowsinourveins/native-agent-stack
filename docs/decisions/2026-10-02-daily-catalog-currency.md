@@ -44,14 +44,19 @@ explicit adoption uses native `/hooks` to inspect and review the actual hook.
 The command, matcher, timeout and shipped trust configuration are unchanged;
 this change registers or trusts no hook.
 
-**Review correction (2026-10-02):** the earlier unpublished template wording
+**Review correction (2026-10-02):** the template wording already published at
+`18eea2c1de992b46c266d79ef0cc40f93c9fb943`
 called bare `session_start:G:H` examples keys. They are suffixes; the full
-persisted key is `<source-path>:session_start:G:H`. The selected Codex 0.160.0
+persisted key is `<source-path>:session_start:G:H`. The destination-selected Codex 0.160.0
 source at `a956835d020762cb2b570053af06f643a11c0ecc` builds that key from
 `key_source`, event, group and handler, and discovery assigns `key_source` from
 the actual source path. The corrected template directs review to the actual
 native `/hooks` entry without guessing its namespace. This is a wording repair
 only, with no registration or trust change.
+
+The repository stack pin at the correction base remains Codex 0.159.3. The
+destination's 0.160.0 selection and its source review do not silently update
+that pin or establish an execution on either host.
 
 ## Verification boundary and overturn condition
 
@@ -100,6 +105,30 @@ support the adopted `--label`, `--add-label` and `--body-file` flags. Its source
 review and local integration receipts remain historical evidence. Neither the
 rebase nor a passing source regression check is a new scheduled Actions run,
 hosted bot proposal, target installation or provider acceptance.
+
+## 2026-10-03 residual correction
+
+The daily schedule above also made scheduled proposals eligible every day when
+`CATALOG_FRESHNESS_PROPOSE=true`. The selected nonsecret repository variable
+was observed as `true`; that established eligibility, not an observed proposal
+run. Keep daily reports at 06:17 UTC using disjoint Monday (`17 6 * * 1`) and
+other-day (`17 6 * * 0,2-6`) events. Require the exact Monday event for a
+scheduled proposal, alongside the existing variable and safety gates. Explicit
+manual `open_pr=true` remains available. This uses GitHub's
+[multiple-schedule/event.schedule reference](https://github.com/github/docs/blob/2bd66de8cea336061c9ea060c9b37385136e6ab3/data/reusables/repositories/actions-scheduled-workflow-example.md#L34),
+not a new scheduler or a change to catalog selections.
+
+The automation inventory and neighboring workflow comments now describe the
+daily report. Thursday's practice check is scheduled 24 minutes later, and
+Wednesday's security scan 40 minutes earlier; neither offset proves execution
+or API-budget isolation. No quota or hosted cadence outcome is claimed. The
+practice checker itself stays weekly.
+
+The hook-key correction above concerns already-published wording. Position zero
+can be **modified** because its stored hash differs; positions with no entry
+are **untrusted**. Both states are skipped. The remaining client-template and
+handbook wording belongs to the Claude lane and is handed off separately;
+this change activates or trusts no hook.
 
 ## Sources
 

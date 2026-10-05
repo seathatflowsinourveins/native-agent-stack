@@ -112,10 +112,40 @@ class MergeSettingsTests(unittest.TestCase):
             {"matcher": "", "hooks": [{"type": "command", "command": "d"}]},
         ]}}
         groups = acs.merge_settings(base, template)["hooks"]["SessionStart"]
-        self.assertEqual(len(groups), 2)
+        self.assertEqual(len(groups), 4)
         self.assertNotIn("matcher", groups[0])
-        self.assertEqual([h["command"] for h in groups[0]["hooks"]], ["a", "c"])
-        self.assertEqual([h["command"] for h in groups[1]["hooks"]], ["b", "d"])
+        self.assertEqual([h["command"] for h in groups[0]["hooks"]], ["a"])
+        self.assertEqual([h["command"] for h in groups[1]["hooks"]], ["b"])
+        self.assertNotIn("matcher", groups[2])
+        self.assertEqual([h["command"] for h in groups[2]["hooks"]], ["c"])
+        self.assertEqual(groups[3]["matcher"], "")
+        self.assertEqual([h["command"] for h in groups[3]["hooks"]], ["d"])
+
+    def test_same_matcher_keeps_native_memory_and_carrier_entries_separate(self):
+        canonical = json.loads((ROOT / "adoption/templates/claude.settings.template.json")
+                               .read_text(encoding="utf-8"))["hooks"]["SubagentStart"]
+        self.assertEqual(len(canonical), 2)
+        base = {"hooks": {"SubagentStart": [canonical[0]]}}
+        merged = acs.merge_settings(base, {"hooks": {"SubagentStart": canonical}})
+        self.assertEqual(merged["hooks"]["SubagentStart"], canonical)
+        self.assertEqual(acs.merge_settings(merged, {"hooks": {"SubagentStart": canonical}}), merged)
+
+    def test_existing_mixed_entry_is_split_without_changing_hook_values_or_order(self):
+        canonical = json.loads((ROOT / "adoption/templates/claude.settings.template.json")
+                               .read_text(encoding="utf-8"))["hooks"]["SubagentStart"]
+        host = {"type": "command", "command": "true", "timeout": 7}
+        original = canonical[0]["hooks"] + canonical[1]["hooks"] + [host]
+        base = {"theme": "retained", "hooks": {"SubagentStart": [
+            {"matcher": "", "hooks": original},
+        ]}}
+        incoming = {"hooks": {"SubagentStart": [canonical[1]]}}
+        merged = acs.merge_settings(base, incoming)
+        groups = merged["hooks"]["SubagentStart"]
+        self.assertEqual(len(groups), 3)
+        self.assertEqual([h for group in groups for h in group["hooks"]], original)
+        self.assertTrue(all(group["matcher"] == "" for group in groups))
+        self.assertEqual(merged["theme"], "retained")
+        self.assertEqual(acs.merge_settings(merged, incoming), merged)
 
     def test_list_union_inserts_a_new_template_entry_after_its_template_neighbour(self):
         # Base entries keep their order; a template entry the base lacks lands right after the template

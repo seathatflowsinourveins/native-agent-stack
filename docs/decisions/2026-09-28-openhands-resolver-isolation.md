@@ -205,6 +205,430 @@ hold:
 The narrowing takes effect only when this record merges, and the owner may reject it. The
 SWE-bench mode reads no issue text and needs no narrowing.
 
+### Resolver-mode amendment (proposed 2026-09-28; decided 2026-10-04: option 1 with trusted pre-push enforcement)
+
+Independent review of the resolver's stage 2 found that resolver mode does not meet conditions 2
+and 3 as written (`blueprints/runtime-workers/openhands/RESOLVER.md`, "The push runs the model's
+code in CI"):
+- **Condition 2.** The driver grades nothing. It pushes the agent's commit to a branch of this
+  repository and opens a draft PR. main's `pull_request` workflows then run repository code from
+  the PR's merge commit, including files in the owned paths, on GitHub-hosted runners whose
+  egress is audited, not blocked. So the patch runs with network.
+- **Condition 3.** Besides the validated patch, the PR body publishes up to 6000 characters of the
+  agent's final message, fenced and guarded, and its resolvable SOTA lines.
+
+The bounds were read at origin/main b0fb65b4 by parsing every workflow file
+(`blueprints/runtime-workers/openhands/evidence/stage2-repair-fail-first.txt`, "observations").
+11 of the 20 workflows run on `pull_request`. Each sets `contents: read` at the workflow level,
+and none uses a secret other than `GITHUB_TOKEN`. No workflow uses `pull_request_target` or
+`workflow_run`, and the only jobs with a write scope among the 11 skip `pull_request`. Check
+results on `openhands/*` are model-controlled and are not evidence.
+
+The owner was asked to decide between two options. Option 1 was chosen on 2026-10-04 with the
+refinement in "Decision" below; option 2 stays recorded as the alternative and the overturn
+target.
+1. **Accept CI execution** for resolver mode within those bounds, re-checked whenever a workflow
+   changes, and accept the final message as a second, guarded output. As proposed, the resolver
+   as built needed no code change for this option; as decided, it adds the trusted pre-push gate
+   below.
+2. **Push agent branches to an owner fork**, so that PR runs get no secret and a read-only token
+   whatever a workflow declares. This is the review's proposal. GitHub states the token and secret
+   limits in [Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows),
+   "Workflows in forked repositories" (read 2026-10-03): "With the exception of `GITHUB_TOKEN`,
+   secrets are not passed to the runner when a workflow is triggered from a forked repository. The
+   `GITHUB_TOKEN` has read-only permissions in pull requests from forked repositories." That
+   sources the guarantee for `pull_request` runs from a fork.
+   - **Holder: undetermined.** This repository's owner is the User account
+     `seathatflowsinourveins`. The repository is public and has no fork
+     (`gh api repos/seathatflowsinourveins/native-agent-stack`, read 2026-10-03). GitHub's
+     [Forks](https://docs.github.com/en/pull-requests/reference/forks) reference, "Which
+     repositories can be forked?" (read 2026-10-03), says: "You can fork any public repository: To
+     your personal account; To an organization where you have permission to create repositories."
+     It says nothing on forking one's own repository. The holder is therefore an organization the
+     owner creates or a second account. Which one it is changes the push identity, the fork's
+     ruleset and the `--head <holder>:<branch>` value.
+   - **A harness change.** The resolver as built pushes to and opens PRs only in this repository.
+     `blueprints/runtime-workers/openhands/resolver/gh_harness.py:47` fixes `REPO`. `op_push`
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:244-259`) pushes only to
+     `origin`, and `push` (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:733-762`)
+     refuses unless the origin push URL equals `ORIGIN_URL`. `op_pr_create`
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:262-264`) and its allowlist
+     entry (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:453`) pass
+     `--head <branch>` in this repository. `check_repository`
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:632-633`) requires `full_name`
+     to equal `REPO`, and `branch_rules`
+     (`blueprints/runtime-workers/openhands/resolver/gh_harness.py:713-718`) reads this
+     repository's rules. The ruleset section above binds only this repository's `openhands/*`
+     refs. (Line numbers as of the 2026-10-04 gate change.)
+   - **Before a first run**, option 2 therefore needs a separately reviewed change: a fork remote
+     and push-URL check, `gh pr create --head <holder>:<branch>`, the branch-rules lookup and a
+     `non_fast_forward` ruleset on the fork, and its own independent review.
+   - **Condition 3.** A fork does not change what the PR body publishes. `build_pr_body`
+     (`blueprints/runtime-workers/openhands/resolver.py:548-551`, `:591-593`) includes the final
+     message wherever the branch lives. Under option 2 the owner either accepts the final message
+     as a second, guarded output, as in option 1, or has it dropped from the PR body, which is a
+     further change to `build_pr_body`.
+
+Neither option blocks CI egress. With a fork, main's `pull_request` workflows still run the pushed
+code on the same GitHub-hosted runners, whose egress is audited, not blocked. Either option can
+add an egress block to the PR jobs that run repository code; that is a workflow change outside the
+resolver PR.
+
+#### Decision (2026-10-04): option 1, with enforcement before execution in trusted harness code
+
+**Delegation.** The owner delegated the choice to converged practice, in their words: "max quality
+sota convergenced resolution automation workflow at highest quality".
+
+**Proposal, cross-family vote and refinement.** The command center (Claude session
+`wsl-architecture-design`) proposed option 1 with a tripwire: an automated test plus zizmor,
+both inside PR CI. Its convergence sources were GitHub's Actions hardening guidance (`pull_request`
+rather than `pull_request_target`, a least-privilege `GITHUB_TOKEN`), the OpenSSF Scorecard
+Token-Permissions and Dangerous-Workflow checks, and zizmor. A GPT-family consensus job (bounded job
+004, GPT-6.1 Sol at max, read-only) voted **disagree** on sufficiency, while accepting option 1's
+architecture with trusted enforcement before execution. Its reasons, each checked against the
+source named:
+- A check inside PR CI cannot protect against the commit under test. "Any user with write access
+  to your repository has read access to all secrets configured in your repository" ([Secure use
+  reference](https://docs.github.com/en/actions/reference/security/secure-use)), and a
+  same-repository PR gets no fork boundary: secrets are withheld, and the token is read-only, only
+  "when a workflow is triggered from a forked repository" ([Events that trigger
+  workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows),
+  "Workflows in forked repositories"). The push itself already starts `push` workflows: "This
+  includes workflows that are not merged into the default branch" (same page, `push`). So an agent
+  commit that could change a workflow or a checker would run before any CI check judged it. The
+  job labels this timing an inference from the documented trust model; this record adopts it.
+- An explicit `permissions` block sets every scope it omits to none ("If you specify the access
+  for any of these permissions, all of those that are not specified are set to none", [Workflow
+  syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)), but
+  a job-level block can widen it, and a same-repository PR gets no fork downgrade.
+- Scorecard awards its highest Token-Permissions score to read-only top-level permissions with
+  write scopes declared at the run level, and Dangerous-Workflow detects named patterns (untrusted
+  checkout under `pull_request_target`/`workflow_run`, script injection) ([OpenSSF Scorecard
+  checks](https://github.com/ossf/scorecard/blob/main/docs/checks.md)); zizmor's audits detect
+  specified patterns ([zizmor audits](https://docs.zizmor.sh/audits/)). Their documented scope is
+  workflow hygiene, not containment of arbitrary test code.
+
+The command center adopted the refinement. The verdict, with its residual risks and sources, is
+kept outside the repository with the coordinator's bounded-job records; this record restates each
+point it relies on with its own source.
+
+**Chosen.** Option 1: CI executes the agent's commit within the bounds above, and the final
+message stays a second, guarded output (a fenced PR-body section of at most 6,000 characters, as
+built). Enforcement moves before execution, into trusted harness code: the resolver pushes only a
+commit that the trusted pre-push gate (`blueprints/runtime-workers/openhands/resolver/push_gate.py`)
+has passed.
+
+**The gate.** `GhHarness.push` runs `PushGate.check` on the exact agent commit before any push, and
+pushes that commit by name (`<sha>:refs/heads/<branch>`). `GhHarness.run` refuses any push of a
+commit the gate did not pass in that harness, and any push without a gate. The gate diffs the
+commit against its base (`git diff-tree`, renames off, so both names of a rename count) and
+refuses, with no push, a change to:
+- `.github/**`, which holds the workflows, local actions, rulesets, the zizmor pin and the
+  CODEOWNERS file there;
+- a file named `CODEOWNERS` in any location;
+- the resolver's gate and harness code (`resolver/**` and `resolver.py`);
+- the workflow-policy tests: `tests/**.py` files whose text names `.github`;
+- every repository file that a workflow the push or its draft PR can start executes or reads as
+  a gate. The list is derived from the workflow files, not written by hand. A workflow is
+  reachable unless all its triggers are `schedule`, `workflow_dispatch` or
+  `repository_dispatch`; local reusable workflows and local actions it uses are followed. For
+  each `run:` or `script:` text, without its comment lines, the derivation takes the files,
+  directories and dotted modules it names (the patch validator's reviewed tokenizer,
+  `patch_policy.names_in_text`), resolved from the repository root, each `working-directory` and
+  each `cd` target. The words of a bash list that a step uses only as `case` patterns are set
+  aside: such a list names paths to compare with other paths, and the step neither runs nor reads
+  them. That is what the `changes` step of `adoption-bootstrap.yml` (main `e0c329ae9`) does with
+  its `PATTERNS` and `MACOS_PATTERNS` globs. Any other use of a list, a list holding an
+  expansion, or a script with `eval`, indirect expansion or a nameref keeps its words as names
+  (`push_gate.pattern_lists`). It adds the test modules, start directories and packages that unittest
+  discovery reaches (Python's documented rules: the default pattern `test*.py`, and since 3.11
+  only subdirectories with `__init__.py`), and the import closure of the gate scripts named
+  (`patch_policy.python_references`). Test modules are protected themselves, but their imports,
+  the code they test, are not.
+
+**Gate data (cross-family review P1, repaired 2026-10-04).** The GPT-6.1 Sol full read of
+`40f12ba5` found that the derivation missed the data gate scripts read:
+`scripts/validate_convergence.py` reads `blueprints/convergence-practice/contract.schema.json` as
+`read_json(CONTRACT / "contract.schema.json")`, and that schema was editable. The derivation now
+adds the data the gate scripts read (rule `ci_read`, `resolver/gate_reads.py`). It evaluates every
+expression of each gate Python file to the repository locations it spells:
+- string literals; module, class and `self.X` constants; f-strings and `+`;
+- `Path(__file__)` chains (`.parent`, `.parents[k]`, `/`, `Path(a, b)`, `os.path.join`,
+  `joinpath`, `with_name`, `os.path.dirname`), `x /= y`, and the elements of literal tuples,
+  lists and dicts, destructured or not;
+- a `from module import NAME` of a repository module, resolved in that module.
+
+So a read is caught where its path is built, whatever then reads the bytes: `open`,
+`Path.read_text` or `read_bytes`, `json.load`, `tomllib.load`, `csv.reader`, a YAML loader or a
+helper. The reader's scopes follow Python's: a comprehension has its own scope, its first
+iterable is evaluated outside it (Language Reference 6.2.4), and an assignment expression inside it
+binds in the containing scope (PEP 572). Within a scope a name takes the union of its
+assignments, which can only add protection. The reads become protection as follows:
+- an exact location protects that file, tracked or not, since an agent could add it;
+- a path built dynamically (a glob, an f-string, a join over a directory or a value not fixed in
+  the code) protects the directory it resolves under, or its glob shape where the computed parts
+  sit inside a template or a glob pattern. An f-string `docs/{id}.md` protects `docs/*.md`, whose
+  `*` matches across directories, as `fnmatch` does;
+- a path the code receives (an argument, the environment, file content or another call's result)
+  selects the subjects a check judges, such as the documents a link check reads. Those stay
+  editable, while the file that selects them is protected wherever the code spells it;
+- a gate script in another language protects the paths its text names, by the same rule as a
+  `run:` step;
+- a code file that gate code runs is gate code too, followed to a fixpoint: its reads, its
+  imports or the names in its text. `adoption/bootstrap-linux.sh`, which `adoption-bootstrap.yml`
+  runs, runs `tools/adoption/*.py`; `managed_block.py` puts `scripts/` and `tools/adoption/` on
+  `sys.path`, so both are protected (`ci_import`). A code file in another language runs, or hands
+  on, every code file its text names. A Python file runs a file when the file's location, or text
+  read from it, reaches a call that executes code (`gate_reads.GateReads.executed`): the
+  subprocess, os exec, spawn and system, asyncio subprocess, `pty.spawn`, runpy, importlib
+  file-loader and `exec`/`compile` calls, matched by name; a function or method of the same
+  module that passes a parameter on to one; or a function imported from outside the standard
+  library (`sys.stdlib_module_names`), whose body the reader does not read. The reader looks into
+  literal containers there, so an argv list or tuple bound to a name counts
+  (`cmd = [sys.executable, script]`, then `subprocess.run(cmd)`);
+- a module that gate code imports from a directory that gate code puts on `sys.path` is gate code
+  too. Python searches those directories for every later import in the process
+  ([sys.path](https://docs.python.org/3.13/library/sys.html#sys.path)), so each followed Python
+  file's absolute imports, lazy ones inside functions included
+  (`gate_reads.GateReads.imported_modules`), are resolved there as well, to a fixpoint over the
+  directories found. `patch_policy` turns such a directory into a directory rule, which protects
+  the code but not the data it reads. The acceptance probe on `7c1d24cc5` found the gap: validate.yml runs
+  `scripts/verdict_review_gate.py`, which puts `tools/sota-convergence` on `sys.path` and imports
+  `record_verdicts`; that imports `export_isolation_check` lazily, and that imports
+  `blind_checkout`. Those two read `catalogs/foundation/automation.json`,
+  `catalogs/us-equities/runtime-target.json` and two `blueprints/` files, which were editable;
+- a code file that gate code only reads, such as a workflow script it hashes and copies, is data:
+  protected as a file, but what its text names is not followed. The merge round of 2026-10-04
+  added this line. Main's #679 made `tools/adoption/install_claude_profile.py`, which the
+  bootstrap runs, read the three `examples/claude-native/workflows/*.js` files to install them,
+  and their text names `blueprints` and `fixtures`. Following every code file that gate code
+  read made all of `blueprints/` protected;
+- a read the reader cannot resolve (a computed path at the root with a part of unknown origin,
+  such as a name bound through `globals()`) fails closed by refusing: every commit is refused
+  (`gate_input_unresolved`, rule `unresolved_read`), and the record names the script and line.
+  So does an executing call whose argument is a computed location, which may run any file under
+  it, and a gate Python file that the gate's interpreter cannot parse or that nests too deeply for
+  the reader, since CI's interpreter may run what the gate's cannot read.
+
+Refusing was chosen over protecting conservatively, because protecting the directory such a read
+resolves under means protecting the whole tree. A refusal blocks every commit just as surely, and
+it says which read to fix. On the merged tree no read and no executing call is unresolved, and a
+repository test keeps it so.
+
+Test modules stay protected but unfollowed, as for their imports: what a test reads is mostly the
+code and data it tests. Following their reads as well was measured and not adopted. It would
+protect 9,217 of the merged tree's 10,591 files, and leave 83 reads in 13 test modules
+unresolved, so every push would be refused.
+
+The resolver skill and the generated instruction name every category the gate refuses. They
+tell the agent to stop and report, without editing, when a fix would need such a change,
+including a new or changed test, since `tests/**` is protected on this repository. A test keeps
+both in step with the gate's rule list (`push_gate.AGENT_RULE_PHRASES`) and the receipt's (P2 of
+the same read).
+
+It also refuses a `run:` or `script:` step that interpolates untrusted event text: an expression
+reading a `github.event` value whose name ends in body, default_branch, email, head_ref, label,
+message, name, page_name, ref or title, or `github.head_ref` (GitHub's [script
+injections](https://docs.github.com/en/actions/concepts/security/script-injections) list). Finally
+it runs the zizmor version that `.github/requirements-ci.txt` pins for CI (1.30.1) on the commit's
+workflows and actions, read from the commit's own blobs. It uses the gate's own flags:
+`--no-config --no-ignores --persona regular --strict-collection` as in CI, plus `--offline`, because
+no token reaches the gate and all five audits below work offline. An excessive-permissions,
+dangerous-triggers, cache-poisoning, artipacked or template-injection finding refuses. A missing
+zizmor, another version, a tool failure or unreadable output fails closed, as does a workflow
+that the gate's text-level reader cannot read with certainty (flow collections, aliases or tags
+around the keys it reads).
+
+**Trusted-copy invariant.** The gate's code and its rules execute from the coordinator's checkout
+of reviewed main, never from the agent's tree or branch. At run time the gate:
+- takes its root only from its own file's location, never from an argument or the environment;
+- refuses when that checkout, its files or a tool path lie inside an agent tree (the attempt's
+  result directory, which holds the agent's workspace and the host clone);
+- requires the gate's four files (`push_gate.py`, `patch_policy.py`, `gate_reads.py`,
+  `gh_harness.py`) to equal the trusted commit's blobs, and the trusted commit to be on main's
+  history at the attempt's base;
+- requires the same four files at the base to equal the trusted ones, so a stale gate refuses;
+- records the trusted commit.
+
+`plan_run` checks the location and the files before any container, and its printed dry-run plan
+says only that the check passed; the push repeats every check against the clone. When several
+rules derive the same path, the record names the most specific one (local action, then unittest
+discovery, then a step's name, then an import, then a gate read), whatever order the workflows are
+read in. Each
+check leaves one record per commit: pass or fail, its reason codes, the
+paths that triggered it with their rules, the trusted commit, and zizmor's version and failing
+audits. The record goes into `GhHarness.gates`, beside the write journal, and into the attempt's
+`resolver-outcome.json`. The receipt keeps codes, hashes and counts, and names a path only when
+the base already has it.
+
+**CodeQL alert 90 (2026-10-04): a name-based false positive, resolved structurally.** CodeQL
+2.27.1's `py/clear-text-logging-sensitive-data` flagged the dry-run `print` of the plan. The rule's
+help says that "Sensitive data should not be logged"
+([query help](https://codeql.github.com/codeql-query-help/python/py-clear-text-logging-sensitive-data/)).
+The analysis SARIF names two sources, both reaching the plan field `push_gate_trusted_commit`:
+- the assignment `trusted_commit = None`. `SensitiveVariableAssignment` marks "the expression
+  that is _assigned_ to the variable" as the source
+  (`python/ql/lib/semmle/python/dataflow/new/SensitiveDataSources.qll:250`);
+- the call `trusted_identity(...)` (`SensitiveFunctionCall`, `:100`).
+
+Both are classified "secret" by name alone. `maybeSecret()` matches `trusted`, as "secret or
+trusted data" (`shared/concepts/codeql/concepts/internal/SensitiveDataHeuristics.qll:59-60,130`,
+github/codeql at `codeql-cli/v2.27.1`). The value was the commit id of the coordinator's checkout
+of main. It authenticates nothing and is published on GitHub, so this is a false positive. The
+alert is not dismissed. `plan_run` still runs the check, but the printed plan now holds only
+`"push_gate": "trusted_copy_checked"`, so no value from either source reaches the print. The gate
+record keeps the commit per pushed commit in `resolver-outcome.json`, which is not printed. A test
+pins the printed plan's fields, and checks that a sentinel return value from the trusted-identity
+check and planted `GH_TOKEN` and `GITHUB_TOKEN` values never appear in it.
+
+**What this change leaves to a separate defence-in-depth PR.** Workflow hardening belongs to a
+separate PR, not this one:
+- `permissions: {}` defaults with job-level grants;
+- `persist-credentials: false` on every checkout;
+- cache policy (`cache-mode`) for jobs that run repository code;
+- runner-label and timeout policy;
+- protected zizmor configuration;
+- a strict tripwire regression test on main.
+
+The tripwire stays a regression check there; it does not stand in for the gate.
+
+**Residual risks** (job 004's list, with GitHub's documentation where it states the behaviour):
+- Test code that CI runs has network access. It can read the checkout and whatever credentials
+  the job holds, and use the network; a `contents: read` token limits writes, not
+  confidentiality. The gate protects the checks, not the code under test. Hardening (credentials
+  not persisted, minimal tokens) narrows this; a credential-free sandbox with egress limits would
+  close it, and until then it is accepted.
+- PR runs can restore caches from the base and default branches, while caches they create are
+  scoped to `refs/pull/.../merge` ([Dependency caching
+  reference](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching),
+  "Restrictions for accessing a cache"). Keep credentials out of caches, and keep privileged
+  consumers from restoring untrusted state.
+- Artifacts, logs and the fenced PR body stay attacker-controlled data for any downstream
+  consumer. No workflow here uses `workflow_run` or `pull_request_target` (Secure use reference,
+  "Mitigating the risks of untrusted code checkout"). The gate refuses a step that interpolates
+  untrusted event text, and a test asserts that no workflow of this repository does.
+- GitHub-hosted runners are ephemeral (Secure use reference, "Hardening for self-hosted
+  runners"); resource use and external network effects remain.
+- The protected list is broad by design. Every `tests/**` file and every file a reachable `run:`
+  step names, such as `scripts/validate.py`, `.gitleaks.toml` and `manifests/evidence.json`, is
+  refused. A resolver task whose owned paths need those files fails at the gate, with no push.
+  Paths that appear only inside echoed text still count as names (the `changes` step's summary
+  names `docs/decisions/2026-10-03-macos-ci-scope.md`). That over-protects in the safe direction.
+  Narrowing the list is a reviewed change to the gate on main.
+- Following gate reads made the list much broader. The merged tree `4f963c9b2` (main
+  `6af8e55bd`, #681) has 10,591 tracked files. There the gate protected 444 files (4.2%) before
+  the change and protects 7,621 (72.0%) after. Leaving out `evidence/`, `tests/` and `.github/`,
+  it was 122 of 3,447 (3.5%) and is 636 (18.5%). The derived set went from 307 files and 5
+  prefixes to 552 files, 18 prefixes and 10 globs, with no unresolved read or executing call. One
+  read accounts for most of it: `tools/sota-convergence/gap_wave_ledger.py` joins
+  `root / "evidence/artifacts" / wave` with `wave` from its arguments, so all 6,478 files under
+  `evidence/artifacts` are protected. The same script's `root / f"docs/{doc['id']}.md"` protects
+  `docs/*.md` (196 files), so a resolver task on most documents is now refused at the gate.
+  `blueprints/` outside the gate code stays editable (14 of 2,608 protected). Two narrowings are
+  left for a later reviewed change, each with its own failing-first controls. One would trace
+  argument values to the literal arguments of the step that runs the script; validate.yml passes
+  `--wave gap-wave2-20260923 --wave gap-wave3-20260923`, so two wave directories and one ledger
+  page would remain. The other would recognise files a check only compares with its own output.
+  Until then the breadth is the price of failing closed, and a repository test bounds it
+  (18.5% of the tree outside `evidence/`, `tests/` and `.github/` against a ceiling of 25%; 14
+  `blueprints/` files against 52). That bound caught the merge with main `6af8e55bd`: the gate of
+  `4eb6b4cc9`, which followed every code file gate code read, protected 10,218 of the merged
+  tree's files (96.5%) and all 2,608 in `blueprints/`. Deriving a tree takes about 3.5 s on this
+  host, and each check derives three.
+- The execution model is by name and within one module. A code file run through a construct it
+  does not model is not followed: a method of an object from another module whose name is not an
+  executing call, a call through a decorator or a function held in a variable, an import by a
+  computed name, or an installed copy that a later step runs. Such a file stays protected as a
+  file, but what it reads is not. The acceptance probe on `7c1d24cc5` measured three widenings
+  (evidence part 9). Two are adopted: the container rule above, and imports through `sys.path`
+  directories, which brought back the 4 files the run-versus-read narrowing had exposed. The
+  third is not adopted: treating a local built from a parameter as the parameter when finding
+  wrappers. It would recognise `def run(path): cmd = [sys.executable, path]; subprocess.run(cmd)`,
+  but on this repository it made `scripts/release_due.py:194` unresolved, so every push would be
+  refused. That was a false positive. `git(*args)` counts as running code, and `mentioned()`
+  passes a derived path to `git check-ignore`, which only reads it. A shell string inside an
+  executing call (`["bash", "-c", "python3 scripts/x.py"]`) is not read for names either; reading
+  it changed nothing here.
+- What the reader treats as a subject stays editable. Where the data selecting a policy file is
+  itself received rather than spelled in the code (a path taken from a file the script finds by
+  enumeration, for example), that policy file is not protected. The reader also does not model
+  every form: a name bound through `globals()`, `exec`, or a path assembled inside a function and
+  returned to the caller through a parameter is either unresolved, so every commit is refused, or
+  treated as received. The unit tests pin each modelled form and the fail-closed cases.
+- Data a test module reads outside `tests/` is not protected unless another rule protects it
+  (everything under `tests/` is, through discovery). A test whose expected values live in such a
+  file can be weakened through that file, as the code under test can be changed.
+
+**Evidence** (local integration and synthetic checks, not upstream acceptance or a live run):
+- `tests/test_runtime_worker_openhands_push_gate.py` has fixture repositories, local git, a
+  stand-in zizmor and, when installed at the pin, the real zizmor 1.30.1. Its negative controls:
+  a planted workflow edit is refused before any push argv; so are a CODEOWNERS edit, a
+  gate-script edit and a local-action edit; a benign commit passes; the gate refuses to run from
+  inside the agent tree; an unavailable zizmor fails closed.
+- [evidence/push-gate-fail-first.txt](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt)
+  keeps the tests' failing run at the base, 23 planted defects in the gate code, each failing its
+  test, and a local rehearsal on this repository's own trees with the real zizmor. Its part 6
+  covers the round after main's `e0c329ae9` and CodeQL alert 90. Its part 7 covers the gate-data
+  repair: the new tests failing against `21b24dede`'s gate, with the planted schema commit pushed,
+  19 more planted defects (42 of 42 detected), the breadth before and after, and a rehearsal on the
+  merged tree. Its part 8 covers the merge with main `6af8e55bd` (#681): the breadth under three
+  gates on the merged tree, the run-versus-read tests failing against `4eb6b4cc9`'s gate, the
+  planted defects again with the new ones, #681's workflow-policy tests and a rehearsal. Its part 9
+  covers the acceptance probe on `7c1d24cc5`: the three widenings measured, the adopted two failing
+  first against `7c1d24cc5`'s gate, and 50 of 50 planted defects detected.
+- The gate-data tests: every modelled read form on one script, in the unit tests (a module-constant
+  schema, TOML, YAML, CSV, f-string, glob, `iterdir`, a literal-tuple loop, destructuring, `/=`, a
+  received base, a received subject and a `globals()` name). A fixture whose gate step reads a
+  schema through an imported constant: each of its data files, a new file under the glob, the
+  shell script's data file and the data of a script that shell script runs are refused, and the
+  subject and unrelated files pass. A read the reader cannot resolve, a gate script it cannot
+  parse and an executing call with a computed argument refuse every commit. The run-versus-read
+  tests: each modelled executing form on one script, with hashed, copied and parsed code left as
+  data; in the fixture, a workflow script that a gate script hashes and copies is refused while
+  the files its text names stay editable, and a check that the gate script runs through a
+  wrapper has its data refused. An argv bound to a name counts as run, and the data that a module
+  imported lazily through a `sys.path` directory reads is refused. The repository test checks that
+  `contract.schema.json` and `catalogs/foundation/automation.json` are `ci_read`, that nothing is
+  unresolved, and the breadth bound.
+
+**Proposed, not adopted (2026-10-04): the owned paths as an allowlist in the gate as well.** The
+task's owned paths already act as an allowlist, applied before the gate. `patch_policy.validate_patch`
+refuses any change outside them before the host commits, so the derivation only decides within the
+owned paths. A miss like P1's mattered only to a task that owns the schema's directory. Two
+additions would make the pair independent of each other, without replacing the derivation, which
+still protects CI inputs inside owned paths:
+- the gate re-checks, on the exact commit, that every changed path is owned, with the owned paths
+  passed from the trusted plan. That would catch a `patch_policy` defect, or a commit that differs
+  from the validated patch, which the current gate would let through wherever the derivation has
+  no rule;
+- `plan_run` refuses, before any container, owned paths that the derivation protects. With 72% of
+  the tree now protected, such a task would otherwise end in a refused push, and this saves the
+  run.
+
+Adopt the first when the plan's owned paths can reach `PushGate.check` through the harness without
+passing through anything the agent can influence. Adopt the second once the derivation's cost is
+acceptable at plan time: about 3.5 s per tree on this host. Neither replaces the derivation,
+because within the owned paths it is the only rule that knows what CI reads.
+
+**Overturn.** If the pre-push gate cannot be kept immutable to the agent, switch to option 2
+(fork isolation). That happens when the agent can reach the trusted checkout, the gate's files or
+the push credential, when a gate check is bypassed, or when the gate cannot run before every push.
+Before switching, verify that the fork's policy withholds secrets and write tokens from its PR
+runs; a fork still needs safe caches, artifacts and privileged downstream consumers. Reopen the
+list of protected files if a workflow change adds a path the derivation does not read, or if a gate
+script reads data or runs code through a form `gate_reads.py` does not model (the repository test
+fails on main when a read or an executing call becomes unresolved, or when the breadth passes its
+bound). Reopen the zizmor flags if CI's pinned version or flags change; #681 changed neither
+(`validate.yml` and `security-scan.yml` keep `--no-config --no-ignores --persona regular
+--strict-collection` and zizmor 1.30.1).
+
+**First live run.** The narrowing above covers resolver mode's CI execution only on these terms.
+The first live run waits until three things hold: this gate has landed on main, its negative
+controls pass on that main, and the stage gates are recorded (G2, P3 and G5 in
+`stage-gates.json`, and G4's reviewer argv). Run from a checkout of that main
+([RESOLVER.md](../../blueprints/runtime-workers/openhands/RESOLVER.md#live-runbook-first-attempt),
+precondition).
+
 ## GitHub harness (follow-up PR)
 
 The resolver's GitHub side is compared and built in the follow-up PR that adds resolver mode
@@ -253,7 +677,58 @@ No attempt network or container was created. No gateway or model request was mad
 host evidence for this design is the live P0-P2 probe
 ([sequence](../../blueprints/runtime-workers/openhands/README.md#live-probe-sequence-coordinator-not-run-yet)).
 
+## Portable alias-refusal fixture repair (2026-10-03)
+
+The custody repair serves the research-worker qualification step: exercise the resolver's
+existing path-refusal policy on both Linux and macOS before any separately gated live run.
+At PR head `501bcc9e`, the historical macOS full-suite artifact from run `36524134513`,
+job `109263298833`, artifact `11015337319` reports three failures in
+`PatchValidatorTests.test_case_unicode_and_filesystem_aliases_are_refused`: `docs/A.md`,
+`Docs/z.md` and the NFD spelling of `docs/café.md`. The fixture wrote these through the
+filesystem and exported them with `git add -A`; filesystem aliases and Git's filename
+normalization can remove the intended spellings before the validator sees the patch.
+`GitTree` instead reads the base with `ls-tree` and `cat-file`, and the refusal policy
+compares the patch's names with the base's casefold/NFD keys.
+
+**Chosen:** construct all seven test entries directly in the scratch repository's index,
+following git/git `v2.43.0` `t/t2107-update-index-basic.sh:59-69`: write each blob with
+`git hash-object -w --stdin`, then use `git update-index --add --cacheinfo
+100644,<oid>,<path>`. Export the cached diff without restaging the worktree, and assert
+that every intended path reached the validator. Keep every case, Unicode, trailing-dot,
+NTFS-short-name, NTFS-stream and HFS-ignorable-character refusal assertion.
+
+**Source-completeness finding:** index plumbing alone still allows Git's macOS argument
+normalization. `git.c:449` calls `precompose_argv_prefix`, and
+`compat/precompose_utf8.c:67-105` converts arguments when `core.precomposeUnicode` is true.
+The test therefore passes `-c core.precomposeunicode=false` only to its scratch-index
+insertion commands. This follows `Documentation/config/core.txt:44-51` and preserves the
+decomposed name without changing repository configuration or the production validator.
+
+**Alternatives:** a filesystem-prerequisite skip would leave these refusal checks unexercised
+on the failing host; the maintained Git plumbing makes that fallback unnecessary. A blanket
+platform skip would hide the regression and is not used. Worktree writes remain the default
+for the other fixtures, which exercise the actual dispatch export path.
+
+**Evidence and limits:** the original regression passes on Linux. Remapping only its three
+alias writes to their canonical spellings reproduces the same three failures with the
+existing unittest oracle; the repaired fixture passes that same synthetic check and all
+11 patch-validator tests with real local Git 2.43.0. This is local integration and synthetic
+evidence, not a new macOS run or upstream Git acceptance. Native macOS acceptance still
+requires the pushed head's `validate-macos` full-suite artifact. The production refusal
+gates and the proposed resolver-mode amendment above are unchanged.
+
+**Overturn:** if a native macOS run on the repaired head still loses an intended spelling,
+inspect that installed Git revision's argument/index handling and adjust the fixture from
+its versioned primary sources. Do not weaken or skip the validator's refusal assertions.
+
 ## Sources
+
+- [git/git `v2.43.0`](https://github.com/git/git/tree/v2.43.0),
+  `Documentation/RelNotes/2.43.0.txt`, `Documentation/git-hash-object.txt:18-35`,
+  `Documentation/git-update-index.txt:44-47,75-80,253-267`,
+  `t/t2107-update-index-basic.sh:59-69`, `builtin/update-index.c:421-446`, `git.c:449`,
+  `compat/precompose_utf8.c:44-105` and `Documentation/config/core.txt:29-51`, read
+  2026-10-03 after the installed `git version 2.43.0` and native command help.
 
 - docker/docs@4e9a5751518ed8223a8dcde53693badddd72604f
   `content/manuals/engine/network/port-publishing.md:121-131,186-192` (gateway modes; the
@@ -293,5 +768,162 @@ host evidence for this design is the live P0-P2 probe
   `require-login/route.ts`, `apiKeys.ts`, at the lines cited above.
 - docs.github.com creating-rulesets-for-a-repository, available-rules-for-rulesets and
   managing-the-automatic-deletion-of-branches, fetched 2026-09-28.
+- docs.github.com events-that-trigger-workflows ("Workflows in forked repositories") and
+  pull-requests/reference/forks ("Which repositories can be forked?"), read 2026-10-03 for the
+  resolver-mode amendment's option 2.
+- The amendment's decision of 2026-10-04, each page fetched that day (HTTP 200) and quoted above.
+  These are the six sources of the GPT-family job 004, which also cover the command center's
+  proposal (GitHub hardening, Scorecard, zizmor):
+  - [GitHub Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use):
+    write access and secrets, untrusted checkout under `pull_request_target`/`workflow_run`, and
+    hosted runners;
+  - [Workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax):
+    `permissions`, `cache-mode`, `steps[*].run`, `working-directory` and local `uses: ./`;
+  - [Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows):
+    `push` and `pull_request`, and the fork limits;
+  - [Dependency caching reference](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching):
+    cache restrictions and merge-ref scope;
+  - [OpenSSF Scorecard checks](https://github.com/ossf/scorecard/blob/main/docs/checks.md):
+    Token-Permissions and Dangerous-Workflow;
+  - [zizmor audits](https://docs.zizmor.sh/audits/): artipacked, cache-poisoning,
+    dangerous-triggers, excessive-permissions and template-injection, each marked as working
+    offline.
+
+  The gate's own mechanisms add three more: [GitHub Script
+  injections](https://docs.github.com/en/actions/concepts/security/script-injections) (the
+  untrusted-context endings), [Python unittest, "Test
+  Discovery"](https://docs.python.org/3/library/unittest.html#test-discovery) with the installed
+  CPython 3.13.15 `Lib/unittest/loader.py` `_find_test_path`, and the installed zizmor 1.30.1
+  `--help` (`--offline`, `--no-config`, `--no-ignores`, `--collect`, `--no-exit-codes`).
+- CodeQL alert 90, read 2026-10-04 (HTTP 200): the [py/clear-text-logging-sensitive-data query
+  help](https://codeql.github.com/codeql-query-help/python/py-clear-text-logging-sensitive-data/), and
+  [github/codeql `codeql-cli/v2.27.1`](https://github.com/github/codeql/tree/codeql-cli/v2.27.1),
+  the alert's CodeQL version:
+  - `shared/concepts/codeql/concepts/internal/SensitiveDataHeuristics.qll:59-60,130`
+    (`maybeSecret`, classification `secret`);
+  - `python/ql/lib/semmle/python/dataflow/new/SensitiveDataSources.qll:100,250`
+    (`SensitiveFunctionCall`, `SensitiveVariableAssignment`);
+  - `python/ql/src/Security/CWE-312/CleartextLogging.ql` and `.qhelp`.
+
+  The flow itself comes from the alert's analysis SARIF (read with `gh api`).
+- Cross-family review of `40f12ba5` (GPT-6.1 Sol, max), 2026-10-04: findings P1 (gate data) and P2
+  (the agent's instructions), relayed by the command center. The Python behaviour the gate-data
+  reader models, from docs.python.org/3.13 (read 2026-10-04, HTTP 200):
+  [pathlib](https://docs.python.org/3.13/library/pathlib.html) ("If a segment is an absolute
+  path, all previous segments are ignored (like os.path.join())"; `Path.rglob` "like calling
+  Path.glob() with "**/" added in front of the pattern"),
+  [os.path.join](https://docs.python.org/3.13/library/os.path.html#os.path.join),
+  [fnmatch](https://docs.python.org/3.13/library/fnmatch.html) ("the filename separator ('/' on
+  Unix) is not special to this module"), [tomllib.load](https://docs.python.org/3.13/library/tomllib.html)
+  ("a readable and binary file object"), [csv.reader](https://docs.python.org/3.13/library/csv.html)
+  ("an iterable of strings ... most commonly a file-like object"), the [Language Reference
+  6.2.4](https://docs.python.org/3.13/reference/expressions.html#displays-for-lists-sets-and-dictionaries)
+  (a comprehension's implicitly nested scope, its leftmost iterable evaluated in the enclosing
+  scope), [PEP 572](https://peps.python.org/pep-0572/) (an assignment expression in a
+  comprehension binds in the containing scope), and [ast](https://docs.python.org/3.13/library/ast.html).
+  Each path rule was also checked on the installed CPython 3.13.15 (`PurePosixPath("a") / "/b"`
+  and `os.path.join("a", "/b")` give `/b`; `fnmatchcase("docs/decisions/x.md", "docs/*.md")` is
+  true).
+- Merge round of 2026-10-04, the calls `GateReads.executed` treats as running code, from
+  docs.python.org/3.13 (read 2026-10-04, HTTP 200): [subprocess](https://docs.python.org/3.13/library/subprocess.html)
+  (`run`, `call`, `check_call`, `check_output`, `Popen`, `getoutput`, `getstatusoutput`),
+  [os](https://docs.python.org/3.13/library/os.html) "Process Management" (`system`, `popen`,
+  `posix_spawn`, the `exec*` and `spawn*` families), [asyncio
+  subprocesses](https://docs.python.org/3.13/library/asyncio-subprocess.html),
+  [pty.spawn](https://docs.python.org/3.13/library/pty.html), [runpy](https://docs.python.org/3.13/library/runpy.html)
+  ("Execute the code at the named filesystem location"), [importlib](https://docs.python.org/3.13/library/importlib.html)
+  (`util.spec_from_file_location`, `machinery.SourceFileLoader`), the builtins
+  [exec and compile](https://docs.python.org/3.13/library/functions.html), and
+  [sys.stdlib_module_names](https://docs.python.org/3.13/library/sys.html#sys.stdlib_module_names)
+  ("A frozenset of strings containing the names of standard library modules", new in 3.10).
+  In-repository: main's #679 (`tools/adoption/install_claude_profile.py` `checked_workflows`) and
+  #681 (`docs/decisions/2026-10-04-ci-least-privilege.md`, `tests/test_workflow_policy.py`).
+- Repository, for the gate: `.github/requirements-ci.txt` (the zizmor pin) and
+  `.github/workflows/validate.yml` (CI's zizmor flags and the whole-suite `python3 -m unittest`
+  run). The gate also reuses `blueprints/runtime-workers/openhands/resolver/patch_policy.py`
+  (`names_in_text`, `executable_lines`, `python_references`, `GitTree`) and
+  `tests/test_workflow_hardening.py` (the text-level workflow reading and `runs_whole_suite`).
 - Repository: `docs/decisions/2026-09-25-host-request-lane.md:176-178`,
   `docs/github-automation.md:479-481,493-494`, `.github/tag-ruleset.json` (the JSON shape).
+
+## Computed relative path repair exception (2026-10-04; cross-family read 489b)
+
+The coordinator authorized one bounded round at `b8eb9352b16f1ad2d9e1fe9b8a2cbb534f1c597c`
+for the computed relative-path finding at `7c1d24cc5`. This round is a recorded exception to
+the one-repair-round rule. It serves the foundation's trusted resolver gate, which must
+preserve CI's checks while a worker builds the complex systems used by the north-star R&D.
+The implementation and local synthetic checks remain subject to the coordinator's independent
+review; the builder has made no worktree commit or push and has issued no network command.
+
+The three rules for this round are:
+
+1. A whole path received at runtime remains the subject being checked. An argv, stdin or
+   file-content subject stays editable, and any repository file selecting it is protected.
+2. A computed path with a fixed directory protects the glob made of its fixed parts, with
+   `*` for every runtime segment, using the gate's existing fnmatch representation. This
+   includes relative strings and Path construction: f-strings, `+`, `%`, `str.format`,
+   `os.path.join`, `/`, `joinpath`, `with_name`, `with_suffix` and `with_stem`.
+3. Any other unclassifiable computed path is unresolved, naming the script and line, so the
+   gate refuses every commit. An environment value or an unfollowed function result used as
+   a base with a tail is opaque; it cannot be silently promoted to a received subject.
+
+The first five tests ran before changing `gate_reads.py`. The planted relative f-string,
+`os.path.join` glob and environment-base refusal failed; the Path-division and whole-argv
+subject controls already passed at this head. All five pass after the patch. Additional
+controls cover the other construction forms, multiple runtime segments, opaque bases,
+unclassifiable templates, whole stdin/file-content subjects, and a real fixture refusal
+record naming `scripts/check.py:2`. These are local integration checks with synthetic
+repositories, not upstream or provider acceptance.
+
+The real-tree result is a blocking failure, retained rather than weakening the rule. On the
+same `b8eb9352` tree, the working derivation reports 222 unresolved locations, including
+`scripts/credential_status.py:526` and `tools/adoption/render_config.py:93`. The repository
+test fails its unresolved-read assertion. The counts themselves remain below both caps:
+
+| Measure on the unchanged tracked tree | Before this round | After this round | Bound |
+| --- | ---: | ---: | ---: |
+| Protected tracked files | 7,621 / 10,591 | 7,628 / 10,591 | — |
+| Outside `evidence/`, `tests/`, `.github/` | 636 / 3,447 (18.5%) | 643 / 3,447 (18.7%) | 25% (861 files) |
+| Blueprints outside gate code | 14 / 2,608 | 14 / 2,608 | 52 files |
+| Derived files / prefixes / globs | 552 / 18 / 10 | 552 / 12 / 140 | — |
+| Unresolved locations | 0 | 222 | 0 |
+
+[Evidence part 10](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt)
+retains the returned failing-first output, the complete unresolved list, intermediate failed
+conditions, breadth snapshots and acceptance exit codes. The full two-module suite also
+reported `gitleaks_failed` in the installed-gitleaks outgoing-guard test, whose code is
+unchanged by this round. Neither failure is represented as passing acceptance.
+
+Offline research used the installed `search-first`, `diagnosing-bugs` and `tdd` skill bodies,
+the existing Value/glob model and fixture seam at `b8eb9352`, and the installed CPython
+3.13.15 source. The path reference implementation is
+[CPython v3.13.15 `Lib/posixpath.py:72`](https://github.com/python/cpython/blob/v3.13.15/Lib/posixpath.py#L72),
+[Path joining at `Lib/pathlib/_local.py:140`](https://github.com/python/cpython/blob/v3.13.15/Lib/pathlib/_local.py#L140),
+and [filename/stem/suffix replacement at `Lib/pathlib/_abc.py:204`](https://github.com/python/cpython/blob/v3.13.15/Lib/pathlib/_abc.py#L204).
+The builder extended the existing integration; no dependency or tool was installed. The
+user's no-network instruction excluded live registry, skills and upstream-currency searches,
+so this round makes no new convergence claim. Provider usage is unknown.
+
+Anti-pattern correction for 489b: silently ignoring a non-exact relative string, or treating
+an opaque computed base as the whole received subject, can bypass the trusted gate. The
+five-case failing-first run proves the relative f-string, joined filename and environment
+base gaps, and the repaired tests enforce their glob or unresolved outcomes. The repository
+test retains the resulting incompatibility with the current CI tree as a failure.
+
+Completeness critic: the bounded checks cover the named Python string/Path constructions,
+whole argv/stdin/file-content subjects, selector protection and unknown bases. Existing
+scope, import, execution and non-Python behavior remains covered by the original tests.
+Unresolved host-path builders and validator expressions in the real derivation remain an
+independent-review item; they are not waived, rewritten or called accepted by fixture passes.
+
+2026-10-04 — The narrow round for cross-family read 489b is a recorded exception to the one-repair-round rule; the coordinator selects option (ii), landing with rule (3)'s residual visible as an unclassified list and count in every gate run and receipt, without refusing for that list and with all pre-round refusals retained. Option (i), refining rule (3) by anchoring computed paths on the repository, was considered and measured at 222 unresolved reads in 22 scripts, mostly host reads by host-configuration tools; it is deferred to the blocking resolver-enablement precondition that every unclassified read must be classified before the first live run. The [dated baseline](../../blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json) records the current 222 locations, shapes and base commit; [evidence part 11](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) records zero legacy unresolved reads and the passing unchanged breadth bounds. The coordinator's reason is no extra exception round, quality first, and no security over-engineering.
+
+2026-10-04 — Following the independent GPT delta (489c) and Claude Opus reviews, this coordinator-authorized review repair on merged head `90a8c3f33` over main `8c32a84b` corrects the recorded exception's opaque computed-execution and assumed-literal protection regressions: `b8eb9352b` tail decisions are restored, residual provenance is separate, and no new refusal class is added. Runtime-only computed reads, unknown divisions, opaque enumerations and join aliases are covered; pure argv compositions remain subjects. The [refreshed baseline](../../blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json) records 321 locations in 29 scripts, and the [set comparison](../../blueprints/runtime-workers/openhands/evidence/gate-reads-set-diff-20261004.json) shows all old files, prefixes and globs retained with zero tracked protection losses. Exact-base `with_suffix`/`with_stem` read narrowing is intended and tested, while their previous execution refusals remain; receipts carry their own count, an omitted counter, restricted shapes and `null` before derivation. The merged tree's legacy unresolved `tests/test_new_host_grand_list.py:115` occurs with both readers and remains a blocking refusal; the unchanged breadth bounds pass. The GPT review's pre-existing concatenated literal argv-container limitation is deferred to resolver enablement alongside classification of every unclassified read. [Evidence part 12](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) retains the failing-first conditions and actual acceptance results; no historical mutation result is claimed as fresh acceptance.
+
+2026-10-04 — The coordinator authorizes one final micro-fix as a recorded exception because main commit `89cf253c0`, rather than a review finding, introduced the `g.LEDGERS.items()` read at `tests/test_new_host_grand_list.py:115`. The reader resolves imported literal dict/list/tuple containers through its existing constant resolver; dict `items()` with tuple unpacking, `values()`, `keys()` and plain list/tuple iteration select the literal paths, while non-literal or unresolved mappings retain their prior unresolved result. The merged tree now has zero unresolved reads, the unchanged 321-location unclassified baseline, passing unchanged breadth bounds and no loss from the old protected sets; the refreshed [set comparison](../../blueprints/runtime-workers/openhands/evidence/gate-reads-set-diff-20261004.json) and [evidence part 13](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) retain the measurements and native acceptance results. No refusal class changes, no further rounds follow, and any new finding becomes a residual for a follow-up PR.
+
+2026-10-04 — Final coordinator decision after GPT review 489d and Claude Opus r2: PR #489 ends with gate_reads as MONITORING ONLY, with no further derivation rounds. Its files, prefixes, globs, followed execution/import paths, computed/unresolved diagnostics and unclassified list protect no path and never refuse a commit; every gate run prints them on stderr and the receipt records them under advisory_gate_reads, with own counts, omitted counters, restricted shapes and null counts before derivation. Refusals outside the read derivation stay: .github/, CODEOWNERS, trusted gate/driver files, the test tree, workflow-named paths and their existing import/discovery closure, local actions/reusable workflows, PR/issue-text interpolation, trusted-checkout and zizmor checks, and unparseable workflows or gate scripts. The public resolver entry point exits non-zero before parsing, network, git push or model calls with “resolver disabled until the owned-path allowlist gate lands (docs/decisions/2026-09-28-openhands-resolver-isolation.md)”; the existing code paths remain dormant. A separate later PR will supply the real default-deny owned-path allowlist, allowing a resolver commit to touch only its task's declared paths. Known monitoring limitations from the final reviews are 489d P1-1 (dict ** expansions silently skipped), 489d P1-2 (stale baseline after the main merge; refreshed here with line-shift-insensitive script/shape comparisons), Opus r2 P1 #1 (opaque join alternatives multiply and collapse, losing paths), Opus r2 P1 #2 (mutated/nonliteral imported containers and evaluation in importer scope), Opus r2 P1 #3 (computed with_name narrowing loses alternatives/execution diagnostics), Opus r2 P2 #1 (embedded-expression suppression drops inner locations), and Opus r2 P2 #2 (computed residual reporting misses helpers, shutil and returns). The [refreshed advisory baseline](../../blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json) records 321 locations in 29 scripts at 3636e7182b220be945818a367e4daefa643bfc26; [RESOLVER.md](../../blueprints/runtime-workers/openhands/RESOLVER.md#monitoring-only-decision-and-disabled-driver-2026-10-04) and [evidence part 14](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) record the gaps, measurements and native acceptance. All earlier derived-read enforcement and resolver-enablement claims, including the residual-classification precondition and set-comparison security interpretation, remain as dated superseded notes. Overturn condition: "a derivation that passes an adversarial corpus with no losses against b8eb9352b could be reconsidered as a second layer, never as the only gate".
+
+2026-10-04 — 489-r7 corrects the bounded Claude Opus r3 findings on merged head eb2fa338b280a95035d6b6656ef1a3432acfd98f (main 780bf5d05). The prior re-scope claim that the closure was unchanged was incorrect: executable_lines/names_in_text over workflow-named non-Python code and its recursively named non-Python code, plus the python_references import closure of Python reached through those names, are restored as enforced ci_read/ci_import categories. GateReads inventories, evaluator diagnostics and files followed only through reads/executed or sys.path re-resolution remain advisory. The enforced name closure and its construction/parse checks complete before monitoring; every advisory-followed queued Python file also receives a parse check outside monitoring error handling. Unparseable queued scripts and RecursionError at GateReads construction retain gate_input_unresolved; RecursionError inside reads()/executed() is advisory. GateError/OSError from tree reads propagate to check()'s existing fail-closed handling. The dormant run parser's no --gate / no --run-id assertions are restored through build_parser(), and the public refusal control asserts exit 3 while subprocess.run and socket.create_connection are patched to fail. The preceding entry's “native acceptance” wording for evidence part 14 is superseded: that part records native results with suite exit 1 and installed-gitleaks RuntimeError(gitleaks_failed), whose environmental cause was not independently verified; no passing native suite at the PR head is claimed. [Evidence part 15](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) records this round's native results and measured retained closure: 645/10607 tracked files, 318/3451 outside evidence/tests/.github (cap 862), 4/2610 blueprints files outside gate code (cap 52), zero enforced parser failures, and 321 unclassified locations in 29 scripts. Item 1 changes neither that list nor its shapes, so the dated baseline is left unchanged. The reader receives no precision repair, the driver remains disabled, and the later default-deny owned-path allowlist gate remains the resolver-enablement precondition.
+
+2026-10-04 — 489-r8 addresses the sole P2 in the bounded Claude Opus r4 ACCEPT verdict at 677acc449c56c050a85c6f555ca580c2f4792acf. The preceding entry's tree-read exception statement is corrected: GitTree.read can raise KeyError or subprocess.CalledProcessError/TimeoutExpired, the latter two subclasses of subprocess.SubprocessError. Both monitoring exception boundaries now re-raise subprocess.SubprocessError and KeyError, alongside GateError/OSError, to check()'s existing fail-closed gate_error_* handling, including when an imported constant first reads its module inside reads()/executed(). The discriminating control covers all three real tree-read errors and keeps later non-monitor reads successful, while evaluator recursion remains advisory and the independent parser boundary remains enforced. This is an infrastructure-error propagation correction, not a read-derivation precision round; the monitoring-only decision, disabled driver and later owned-path allowlist enablement precondition remain. [Evidence part 15](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) now records the coordinator-reported 2026-10-04 host run at 677acc449: python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver, 213 tests, OK (skipped=1), exit 0, TMPDIR=/tmp/t489, with the installed-gitleaks test passing; its version and duration were not supplied. This supersedes the earlier statement that no passing suite at that head was recorded, and does not turn the earlier failed sandbox runs into passes. [Evidence part 16](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) retains this round's offline source references and failing-first/local results.
