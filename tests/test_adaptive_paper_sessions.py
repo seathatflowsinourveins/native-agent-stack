@@ -4,12 +4,11 @@ credentials, sockets, or broker execution; native tests use fakes only.
 """
 import asyncio
 from dataclasses import replace
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal as D
 import importlib.util
 from pathlib import Path
 import sys
-import time
 import unittest
 from unittest import mock
 from zoneinfo import ZoneInfo
@@ -23,6 +22,8 @@ from safety import Ledger, Quote, RiskLimits, SafetyError, evaluate_gap_risk  # 
 from transport import normalize_quote, normalize_trading_status  # noqa: E402
 from runner import Controller, validate_preflight  # noqa: E402
 from sessions import extended_session_close  # noqa: E402
+from exchange_calendars import exchange_calendar  # noqa: E402
+from exchange_calendars.errors import DateOutOfBounds  # noqa: E402
 
 try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
     from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
@@ -30,18 +31,43 @@ except ImportError:
     from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
 
 _HERMETIC_TOKEN = None
+_WALL_CLOCK_PATCH = None
+
+# Fixture timestamps and the preflight freshness oracle are explicit inputs.
+_FIXED_NOW = datetime(2026, 3, 10, 16, tzinfo=timezone.utc).timestamp()
 
 
 def setUpModule():
-    global _HERMETIC_TOKEN
+    global _HERMETIC_TOKEN, _WALL_CLOCK_PATCH
     _HERMETIC_TOKEN = patch_default_stop()
+    _WALL_CLOCK_PATCH = mock.patch("runner.time.time", return_value=_FIXED_NOW)
+    _WALL_CLOCK_PATCH.start()
 
 
 def tearDownModule():
     restore_default_stop(_HERMETIC_TOKEN)
+    _WALL_CLOCK_PATCH.stop()
 
 
 NY = ZoneInfo("America/New_York")
+
+# Immutable migration oracle copied from sessions.py at main f946c6d4c.
+# That version cites the NYSE published calendar; the 2027 table was checked
+# against XNYS 4.13.2 on 2026-09-24. Production never reads these sets.
+_PREVIOUS_HOLIDAYS = {
+    2026: frozenset(date.fromisoformat(d) for d in (
+        "2026-01-01", "2026-01-19", "2026-02-16", "2026-04-03", "2026-05-25",
+        "2026-06-19", "2026-07-03", "2026-09-07", "2026-11-26", "2026-12-25",
+    )),
+    2027: frozenset(date.fromisoformat(d) for d in (
+        "2027-01-01", "2027-01-18", "2027-02-15", "2027-03-26", "2027-05-31",
+        "2027-06-18", "2027-07-05", "2027-09-06", "2027-11-25", "2027-12-24",
+    )),
+}
+_PREVIOUS_EARLY_CLOSES = {
+    2026: frozenset((date(2026, 11, 27), date(2026, 12, 24))),
+    2027: frozenset((date(2027, 11, 26),)),
+}
 
 NATIVE = importlib.util.find_spec("nautilus_trader") is not None
 if NATIVE:
@@ -140,35 +166,114 @@ class SessionClockTests(unittest.TestCase):
         info = sess.session_at(datetime(2026, 3, 10, 14, 30, tzinfo=timezone.utc))
         self.assertEqual(info.kind, sess.SessionKind.RTH)
 
-    def test_exchange_calendars_agreement_or_absent(self):
-        result = sess.exchange_calendars_agrees_2026()
-        if result is None:
-            self.skipTest("exchange_calendars is not installed in this shared engine environment")
-        self.assertTrue(result)
+    def assert_previous_calendar_parity(self, year):
+        d = date(year, 1, 1)
+        sessions = early_closes = 0
+        while d.year == year:
+            with self.subTest(date=d):
+                expected_open = d.weekday() < 5 and d not in _PREVIOUS_HOLIDAYS[year]
+                info = sess.session_at(ny(d.year, d.month, d.day, 12, 0))
+                self.assertEqual(info.kind == sess.SessionKind.RTH, expected_open)
+                self.assertEqual(info.is_early_close, d in _PREVIOUS_EARLY_CLOSES[year])
+                if expected_open:
+                    close_hour = 13 if d in _PREVIOUS_EARLY_CLOSES[year] else 16
+                    self.assertEqual(info.open, ny(d.year, d.month, d.day, 9, 30))
+                    self.assertEqual(info.close, ny(d.year, d.month, d.day, close_hour, 0))
+                    post = sess.session_at(ny(d.year, d.month, d.day, close_hour, 0))
+                    self.assertEqual(post.kind, sess.SessionKind.POST)
+                    self.assertEqual(post.open, info.close)
+                    sessions += 1
+                    early_closes += info.is_early_close
+            d += timedelta(days=1)
+        self.assertEqual(sessions, 251)
+        self.assertEqual(early_closes, len(_PREVIOUS_EARLY_CLOSES[year]))
 
-    def test_exchange_calendars_agreement_2027_or_absent(self):
-        # The 2027 table (NYSE hours-calendars page, fetched 2026-09-24) must
-        # match XNYS session by session, including the 13:00 early close.
-        result = sess.exchange_calendars_agrees(2027)
-        if result is None:
-            self.skipTest("exchange_calendars is not installed in this shared engine environment")
-        self.assertTrue(result)
+    def test_previous_calendar_parity_2026(self):
+        self.assert_previous_calendar_parity(2026)
 
-    def test_year_outside_calendar_refused(self):
-        # D7/finding-6 (2026-09-24 fix round): dates outside the frozen
-        # table's year(s) must not be silently classified against another
-        # year's table. The exchange_calendars fallback is disabled here so
-        # the result does not depend on whether exchange_calendars is
-        # installed (fix round 3, item 10: CI only installs the lockfile
-        # into the separate promotion-gate venv, not this test interpreter,
-        # so that package is not reliably present here either way).
-        # 2027 is covered by HOLIDAYS_2027 (see test_2027_calendar_covered
-        # below); 2025 and 2028 are not.
-        with mock.patch.object(sess, "_exchange_calendars_day", return_value=None):
-            with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
-                sess.session_at(ny(2025, 12, 25, 12, 0))
-            with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
-                sess.session_at(ny(2028, 1, 1, 12, 0))
+    def test_previous_calendar_parity_2027(self):
+        self.assert_previous_calendar_parity(2027)
+
+    def test_out_of_bounds_provider_query_propagates(self):
+        # A real, deliberately narrower calendar proves range errors are not
+        # interpreted as closed sessions, even on a weekend or holiday.
+        cal = sess.xcals.get_calendar("XNYS", start="2026-01-01", end="2026-12-31")
+        with mock.patch.object(sess.xcals, "get_calendar", return_value=cal):
+            for d in (date(2027, 1, 1), date(2027, 1, 2), date(2027, 1, 4)):
+                with self.subTest(date=d), self.assertRaises(DateOutOfBounds):
+                    sess.session_at(ny(d.year, d.month, d.day, 12, 0))
+            with self.assertRaises(DateOutOfBounds):
+                sess.previous_trading_day(date(2026, 1, 2))
+            with self.assertRaises(DateOutOfBounds):
+                sess.next_trading_day(date(2026, 12, 31))
+
+    def test_calendar_construction_error_propagates(self):
+        with mock.patch.object(sess.xcals, "get_calendar", side_effect=RuntimeError("calendar_broken")):
+            with self.assertRaisesRegex(RuntimeError, "calendar_broken"):
+                sess.session_at(ny(2026, 3, 10, 12, 0))
+
+    def test_session_query_uses_no_network_or_wall_clock(self):
+        with mock.patch("socket.socket", side_effect=AssertionError("network_read")), \
+                mock.patch("time.time", side_effect=AssertionError("wall_clock_read")), \
+                mock.patch.object(sess, "datetime", wraps=datetime) as clock:
+            clock.now.side_effect = AssertionError("wall_clock_read")
+            clock.today.side_effect = AssertionError("wall_clock_read")
+            info = sess.session_at(ny(2031, 7, 3, 12, 0))
+            self.assertEqual(info.close, ny(2031, 7, 3, 13, 0))
+
+    def test_query_outside_upstream_timestamp_range_fails(self):
+        with self.assertRaises(ValueError):
+            sess.session_at(ny(1600, 1, 1, 12, 0))
+
+    def test_explicit_query_bounds_ignore_upstream_defaults(self):
+        # Upstream initializes these defaults at import; queries must never
+        # consume them. Poisoning them proves bounds do not depend on today.
+        with mock.patch.object(exchange_calendar, "GLOBAL_DEFAULT_START", None), \
+                mock.patch.object(exchange_calendar, "GLOBAL_DEFAULT_END", None), \
+                mock.patch.object(sess.xcals, "get_calendar", wraps=sess.xcals.get_calendar) as get:
+            info = sess.session_at(ny(2031, 7, 3, 12, 0))
+            self.assertEqual(info.kind, sess.SessionKind.RTH)
+            self.assertTrue(info.is_early_close)
+            self.assertEqual(info.close, ny(2031, 7, 3, 13, 0))
+            for call in get.call_args_list:
+                self.assertEqual(call.args, ("XNYS",))
+                self.assertEqual(call.kwargs, {"start": "2030-12-01", "end": "2032-01-31"})
+
+    def test_xnys_holidays(self):
+        for d in (date(2026, 4, 3), date(2026, 6, 19), date(2026, 7, 3),
+                  date(2026, 11, 26), date(2026, 12, 25), date(2027, 6, 18),
+                  date(2027, 7, 5), date(2027, 12, 24)):
+            with self.subTest(date=d):
+                info = sess.session_at(ny(d.year, d.month, d.day, 12, 0))
+                self.assertEqual(info.kind, sess.SessionKind.CLOSED)
+                self.assertFalse(info.is_early_close)
+
+    def test_new_year_sunday_observed_monday(self):
+        self.assertEqual(sess.next_trading_day(date(2022, 12, 30)), date(2023, 1, 3))
+        for d in (date(2023, 1, 1), date(2023, 1, 2)):
+            self.assertEqual(sess.session_at(ny(d.year, d.month, d.day, 12, 0)).kind,
+                             sess.SessionKind.CLOSED)
+
+    def test_new_year_saturday_has_no_friday_observance(self):
+        self.assertEqual(sess.session_at(ny(2021, 12, 31, 12, 0)).kind, sess.SessionKind.RTH)
+        self.assertEqual(sess.session_at(ny(2022, 1, 1, 12, 0)).kind, sess.SessionKind.CLOSED)
+        self.assertEqual(sess.next_trading_day(date(2021, 12, 31)), date(2022, 1, 3))
+
+    def test_dst_transition_days_and_both_sides(self):
+        for month, sunday, after, before_offset, after_offset in (
+                (3, 8, 9, -5, -4), (11, 1, 2, -4, -5)):
+            before_date = date(2026, month, sunday) - timedelta(days=2)
+            after_date = date(2026, month, after)
+            closed = sess.session_at(ny(2026, month, sunday, 12, 0))
+            self.assertEqual(closed.kind, sess.SessionKind.CLOSED)
+            self.assertEqual(closed.next_open, ny(2026, month, after, 4, 0))
+            for d, offset in ((before_date, before_offset), (after_date, after_offset)):
+                with self.subTest(date=d):
+                    info = sess.session_at(ny(d.year, d.month, d.day, 12, 0))
+                    self.assertEqual(info.open.utcoffset(), timedelta(hours=offset))
+                    self.assertEqual(info.close.utcoffset(), timedelta(hours=offset))
+                    self.assertEqual(info.open, ny(d.year, d.month, d.day, 9, 30))
+                    self.assertEqual(info.close, ny(d.year, d.month, d.day, 16, 0))
 
     def test_year_inside_calendar_still_works(self):
         info = sess.session_at(ny(2026, 12, 31, 12, 0))
@@ -1210,7 +1315,7 @@ class PreflightGuardSplitTests(unittest.TestCase):
 
     def observation(self, *, positions=(), orders=(), cash="10000", equity="10000",
                     is_open=True, window_seconds=10000):
-        now_ns = int(time.time() * 1e9)
+        now_ns = int(_FIXED_NOW * 1e9)
         return {"account": {"status": "ACTIVE", "currency": "USD", "trading_blocked": False,
                             "account_blocked": False, "trade_suspended_by_user": False,
                             "cash": cash, "equity": equity},
@@ -1258,10 +1363,10 @@ class SessionAwareRequireOpenTests(unittest.TestCase):
     def observation_at(self, ny_dt, *, is_open):
         # The session clock uses the synthetic ny_dt (this is the whole point
         # of the test); the benchmark-quote freshness gate is independent of
-        # the session clock and always compares against real wall-clock time
-        # (see validate_preflight), so quote timestamps must be real "now".
+        # the session clock. Its wall-clock oracle is frozen by setUpModule,
+        # so quote timestamps use that explicit fixture value.
         now_ns = int(ny_dt.astimezone(timezone.utc).timestamp() * 1e9)
-        real_now_ns = int(time.time() * 1e9)
+        real_now_ns = int(_FIXED_NOW * 1e9)
         return {"account": {"status": "ACTIVE", "currency": "USD", "trading_blocked": False,
                             "account_blocked": False, "trade_suspended_by_user": False,
                             "cash": "10000", "equity": "30000"},
@@ -1937,13 +2042,8 @@ class PriorClosePersistGuardTests(unittest.TestCase):
 
 @unittest.skipUnless(NATIVE, "nautilus_trader not installed")
 class CalendarBoundaryPreviousTradingDayTests(unittest.TestCase):
-    """D7 (round 5): previous_trading_day at the first trading day of the
-    frozen calendar (2026-01-02, since 2026-01-01 is a holiday) walks
-    back into 2025 -- outside sessions.CALENDAR_YEARS -- and raises
-    ValueError. _gap_risk_stop_symbols already treats that as
-    validation-unknown (do not arm, record it via the existing
-    "stale_prior_close_ignored" event), not a raised exception; this
-    test locks that in for the actual year-boundary date."""
+    """XNYS covers the prior December at a January query. Genuine calendar
+    errors still degrade gap-stop validation to unknown without arming."""
 
     def strategy(self, stop_bps="25"):
         from native_strategy import AdaptiveStrategy
@@ -1953,20 +2053,30 @@ class CalendarBoundaryPreviousTradingDayTests(unittest.TestCase):
         strategy._events = events
         return strategy
 
-    def test_previous_trading_day_at_year_boundary_raises(self):
-        with self.assertRaises(ValueError):
-            sess.previous_trading_day(date(2026, 1, 2))
+    def test_previous_trading_day_at_year_boundary_is_covered(self):
+        self.assertEqual(sess.previous_trading_day(date(2026, 1, 2)), date(2025, 12, 31))
 
-    def test_arming_on_2026_01_02_degrades_to_validation_unknown_not_a_raise(self):
+    def test_arming_at_year_boundary_uses_verified_prior_close(self):
         strategy = self.strategy()
-        # A prior close dated the actual trading day before (2025-12-31)
-        # would be the semantically-correct date, but it can never be
-        # confirmed as such (out-of-calendar) and so must stay unusable.
         strategy._prior_rth_close["SPY"] = D("100.00")
         strategy._prior_rth_close_session_date["SPY"] = date(2025, 12, 31)
         rth = ny(2026, 1, 2, 9, 35).astimezone(timezone.utc).timestamp()
         strategy.policy.latest["SPY"] = _FakeQuote(90.0, 90.02, rth)
-        triggered = strategy._gap_risk_stop_symbols(rth, {"SPY": D("1")})  # must not raise
+        # The verified gap arms a stop below this quote; it has not fired yet.
+        self.assertEqual(strategy._gap_risk_stop_symbols(rth, {"SPY": D("1")}), set())
+        self.assertIn("SPY", strategy._gap_risk_stop_price)
+
+    def test_arming_on_2026_01_02_degrades_to_validation_unknown_not_a_raise(self):
+        strategy = self.strategy()
+        # A prior close dated the actual trading day before (2025-12-31)
+        # is now supported by XNYS. Inject a genuine calendar failure to
+        # retain the refusal regression for unavailable calendar evidence.
+        strategy._prior_rth_close["SPY"] = D("100.00")
+        strategy._prior_rth_close_session_date["SPY"] = date(2025, 12, 31)
+        rth = ny(2026, 1, 2, 9, 35).astimezone(timezone.utc).timestamp()
+        strategy.policy.latest["SPY"] = _FakeQuote(90.0, 90.02, rth)
+        with mock.patch("native_strategy.previous_trading_day", side_effect=ValueError("calendar_failed")):
+            triggered = strategy._gap_risk_stop_symbols(rth, {"SPY": D("1")})  # must not raise
         self.assertEqual(triggered, set())
         self.assertNotIn("SPY", strategy._gap_risk_stop_price)
         ignored = [e for e in strategy._events if e["type"] == "stale_prior_close_ignored"]

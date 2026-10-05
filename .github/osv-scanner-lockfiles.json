@@ -30,6 +30,10 @@
       "parser": "requirements.txt"
     },
     {
+      "path": ".github/requirements-calendar.txt",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
       "parser": "requirements.txt"
     },
@@ -192,6 +196,10 @@
     },
     {
       "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
       "parser": "requirements.txt"
     },
     {

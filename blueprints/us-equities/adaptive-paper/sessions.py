@@ -1,10 +1,9 @@
 """Session-aware NYSE market clock for America/New_York equities trading.
 
 This module is deliberately pure: it never reads wall-clock time itself. Every
-function takes a timezone-aware ``datetime`` as an explicit input and derives
-the NYSE session (PRE / RTH / POST / CLOSED) that timestamp falls into, using
-only the Python standard library ``zoneinfo`` for DST-correct America/New_York
-conversion.
+query takes an explicit date or timezone-aware ``datetime`` and derives the
+NYSE session (PRE / RTH / POST / CLOSED), with ``zoneinfo`` for DST-correct
+America/New_York conversion.
 
 Session boundaries (Eastern local time, applied on every trading day):
     PRE     04:00 - 09:30
@@ -12,25 +11,18 @@ Session boundaries (Eastern local time, applied on every trading day):
     POST    16:00 - 20:00 (13:00 - 20:00 on a scheduled early-close day)
     CLOSED  outside the above, and all day on a weekend or full-closure holiday
 
-The 2026 NYSE full-closure holidays and scheduled 13:00 ET early closes below
-are taken from the NYSE published holiday calendar
-(https://www.nyse.com/markets/hours-calendars) and cross-checked against the
-standard NYSE observance rules: New Year's Day; Martin Luther King, Jr. Day
-(3rd Monday of January); Washington's Birthday (3rd Monday of February); Good
-Friday (Gregorian Easter Sunday minus two days); Memorial Day (last Monday of
-May); Juneteenth National Independence Day (June 19, fixed); Independence Day
-(July 4, observed the preceding Friday when it falls on a Saturday); Labor Day
-(1st Monday of September); Thanksgiving Day (4th Thursday of November);
-Christmas Day (December 25, observed the preceding Friday when it falls on a
-Saturday). Early closes are the Friday after Thanksgiving and Christmas Eve.
+The source for trading dates, holidays and RTH closing times is XNYS from the
+required exchange-calendars 4.13.2, gerrymanoim/exchange_calendars commit
+dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a:
+https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/exchange_calendars/exchange_calendar_xnys.py
+The native get_calendar/is_session/session_close/date_to_session APIs provide
+the schedule and session navigation; PRE/POST windows remain engine policy.
 
-An optional ``exchange_calendars`` cross-check is provided for environments
-that already have that package installed; it is never a hard dependency of
-this module or of the engine, and this shared engine environment deliberately
-does not install it (see the task's environment constraints). When present,
-its NYSE ("XNYS") calendar is compared against the frozen table above for
-every session date in 2026; a test skips this comparison when the package is
-absent.
+Every calendar is constructed with explicit bounds: December 1 of the year
+before the queried date through January 31 of the following year. Results
+therefore never use upstream's wall-clock-derived default bounds (upstream
+does initialize those unused defaults at import). Package, construction and
+out-of-bounds errors propagate to callers; there is no fallback calendar.
 """
 from __future__ import annotations
 
@@ -40,76 +32,14 @@ from decimal import Decimal
 from enum import Enum
 from zoneinfo import ZoneInfo
 
+import exchange_calendars as xcals
+
 NY = ZoneInfo("America/New_York")
-
-# NYSE 2026 full-closure holidays. Source: NYSE published holiday calendar,
-# https://www.nyse.com/markets/hours-calendars.
-HOLIDAYS_2026 = frozenset({
-    date(2026, 1, 1),    # New Year's Day
-    date(2026, 1, 19),   # Martin Luther King, Jr. Day
-    date(2026, 2, 16),   # Washington's Birthday
-    date(2026, 4, 3),    # Good Friday
-    date(2026, 5, 25),   # Memorial Day
-    date(2026, 6, 19),   # Juneteenth National Independence Day
-    date(2026, 7, 3),    # Independence Day (observed; Jul 4 falls on Saturday)
-    date(2026, 9, 7),    # Labor Day
-    date(2026, 11, 26),  # Thanksgiving Day
-    date(2026, 12, 25),  # Christmas Day
-})
-
-# NYSE 2026 scheduled early closes (regular session ends 13:00 ET). Source:
-# NYSE published holiday calendar, https://www.nyse.com/markets/hours-calendars.
-EARLY_CLOSES_2026 = frozenset({
-    date(2026, 11, 27),  # Friday after Thanksgiving
-    date(2026, 12, 24),  # Christmas Eve
-})
-
-# NYSE 2027 full-closure holidays. Source: the NYSE published holiday calendar,
-# https://www.nyse.com/markets/hours-calendars (fetched 2026-09-24; it lists
-# 2026, 2027 and 2028). Cross-checked the same day against exchange_calendars
-# 4.13.2's XNYS calendar, whose 2027 weekday closures and early closes equal
-# these two sets exactly.
-HOLIDAYS_2027 = frozenset({
-    date(2027, 1, 1),    # New Year's Day (Friday)
-    date(2027, 1, 18),   # Martin Luther King, Jr. Day
-    date(2027, 2, 15),   # Washington's Birthday
-    date(2027, 3, 26),   # Good Friday
-    date(2027, 5, 31),   # Memorial Day
-    date(2027, 6, 18),   # Juneteenth National Independence Day (observed; Jun 19 falls on Saturday)
-    date(2027, 7, 5),    # Independence Day (observed; Jul 4 falls on Sunday)
-    date(2027, 9, 6),    # Labor Day
-    date(2027, 11, 25),  # Thanksgiving Day
-    date(2027, 12, 24),  # Christmas Day (observed; Dec 25 falls on Saturday)
-})
-
-# NYSE 2027 scheduled early closes (regular session ends 13:00 ET). Only the
-# Friday after Thanksgiving applies this year: Christmas Eve (Dec 24, 2027)
-# is itself the observed Christmas Day full closure above (Dec 25 falls on a
-# Saturday), so there is no separate Christmas Eve half day in 2027. Same
-# source and cross-check as HOLIDAYS_2027 above.
-EARLY_CLOSES_2027 = frozenset({
-    date(2027, 11, 26),  # Friday after Thanksgiving
-})
 
 PRE_OPEN = dtime(4, 0)
 RTH_OPEN = dtime(9, 30)
 RTH_CLOSE = dtime(16, 0)
-RTH_EARLY_CLOSE = dtime(13, 0)
 POST_CLOSE = dtime(20, 0)
-
-_MAX_HOLIDAY_RUN_DAYS = 10  # bounds the trading-day search; NYSE never closes this long
-
-# year -> that year's frozen full-closure-holiday/early-close tables.
-_HOLIDAYS_BY_YEAR = {2026: HOLIDAYS_2026, 2027: HOLIDAYS_2027}
-_EARLY_CLOSES_BY_YEAR = {2026: EARLY_CLOSES_2026, 2027: EARLY_CLOSES_2027}
-
-# Years the frozen holiday/early-close tables above actually cover.
-# session_at()/is_trading_session() refuse any other year unless the optional
-# exchange_calendars backend is importable and can answer for that specific
-# date (D7): silently reusing a covered year's table for an uncovered year's
-# calendar would misclassify real holidays/early closes.
-CALENDAR_YEARS = frozenset(_HOLIDAYS_BY_YEAR)
-
 
 class SessionKind(str, Enum):
     PRE = "PRE"
@@ -129,67 +59,33 @@ class SessionInfo:
     seconds_to_close: float | None
 
 
-def _exchange_calendars_day(d: date):
-    """Best-effort out-of-range-year fallback (D7): (is_trading_day, rth_close)
-    for ``d`` via the optional exchange_calendars XNYS calendar, or None if
-    the package is not importable or cannot answer. Not exercised by any test
-    in this environment (exchange_calendars is deliberately not installed
-    here); treat as unverified pending a real installation elsewhere."""
-    try:
-        import exchange_calendars as xcals
-    except ImportError:
-        return None
-    try:
-        cal = xcals.get_calendar("XNYS")
-        if not bool(cal.is_session(d.isoformat())):
-            return False, None
-        _, close = cal.session_open_close(d.isoformat())
-        close_ny = close.tz_convert(NY)
-        return True, dtime(close_ny.hour, close_ny.minute)
-    except Exception:
-        return None
+def _xnys_calendar(d: date):
+    """Use native calendar caching with deterministic, padded query bounds."""
+    return xcals.get_calendar("XNYS", start=f"{d.year - 1:04d}-12-01",
+                              end=f"{d.year + 1:04d}-01-31")
 
 
-def _require_supported_calendar_year(d: date) -> None:
-    if d.year in CALENDAR_YEARS:
-        return
-    if _exchange_calendars_day(d) is not None:
-        return
-    raise ValueError("session_calendar_out_of_range")
-
-
-def _is_trading_day(d: date) -> bool:
-    if d.year in _HOLIDAYS_BY_YEAR:
-        return d.weekday() < 5 and d not in _HOLIDAYS_BY_YEAR[d.year]
-    fallback = _exchange_calendars_day(d)
-    if fallback is None:
-        raise ValueError("session_calendar_out_of_range")
-    return fallback[0]
+def _exchange_calendars_day(d: date) -> tuple[bool, dtime | None]:
+    """Return XNYS's trading-day status and local RTH close; errors propagate."""
+    cal = _xnys_calendar(d)
+    if not cal.is_session(d.isoformat()):
+        return False, None
+    return True, cal.session_close(d.isoformat()).tz_convert(NY).time()
 
 
 def _rth_close_time(d: date) -> dtime:
-    if d.year in _HOLIDAYS_BY_YEAR:
-        return RTH_EARLY_CLOSE if d in _EARLY_CLOSES_BY_YEAR.get(d.year, frozenset()) else RTH_CLOSE
-    fallback = _exchange_calendars_day(d)
-    if fallback is None or fallback[1] is None:
-        raise ValueError("session_calendar_out_of_range")
-    return fallback[1]
+    _, close = _exchange_calendars_day(d)
+    if close is None:
+        raise ValueError("not_a_trading_day")
+    return close
 
 
 def _next_trading_day(d: date) -> date:
-    for _ in range(_MAX_HOLIDAY_RUN_DAYS):
-        d = d + timedelta(days=1)
-        if _is_trading_day(d):
-            return d
-    raise ValueError("no_trading_day_found")
+    return _xnys_calendar(d).date_to_session(d + timedelta(days=1), direction="next").date()
 
 
 def _prev_trading_day(d: date) -> date:
-    for _ in range(_MAX_HOLIDAY_RUN_DAYS):
-        d = d - timedelta(days=1)
-        if _is_trading_day(d):
-            return d
-    raise ValueError("no_trading_day_found")
+    return _xnys_calendar(d).date_to_session(d - timedelta(days=1), direction="previous").date()
 
 
 def _boundaries(d: date):
@@ -212,10 +108,10 @@ def session_at(ts: datetime) -> SessionInfo:
         raise ValueError("ts must be timezone-aware")
     ts_ny = ts.astimezone(NY)
     d = ts_ny.date()
-    _require_supported_calendar_year(d)
-    is_early = d in _EARLY_CLOSES_BY_YEAR.get(d.year, frozenset())
+    is_trading_day, close_t = _exchange_calendars_day(d)
+    is_early = is_trading_day and close_t < RTH_CLOSE
 
-    if _is_trading_day(d):
+    if is_trading_day:
         pre_open, rth_open, rth_close, post_close = _boundaries(d)
         if ts_ny < pre_open:
             return SessionInfo(SessionKind.CLOSED, d, None, None, is_early, pre_open, None)
@@ -259,7 +155,7 @@ def next_trading_day(d: date) -> date:
     from native_strategy.py) is "today's session, extended through the
     next trading session", and needs this without reaching into this
     module's private ``_next_trading_day``. Raises ``ValueError`` on a date
-    outside the frozen session calendar, exactly like
+    outside the upstream calendar's bounds, exactly like
     ``previous_trading_day``; callers must fail closed on that, never guess
     a horizon."""
     return _next_trading_day(d)
@@ -427,41 +323,3 @@ def must_end_flat(policy: dict, *, is_final_boundary: bool) -> bool:
     if not policy.get("overnight_holds", False):
         return True
     return bool(is_final_boundary)
-
-
-# ---------------------------------------------------------------------------
-# Optional exchange_calendars cross-check (not a hard dependency; the shared
-# engine environment for this task deliberately does not install it).
-# ---------------------------------------------------------------------------
-
-def exchange_calendars_agrees_2026():
-    """The 2026 case of ``exchange_calendars_agrees``."""
-    return exchange_calendars_agrees(2026)
-
-
-def exchange_calendars_agrees(year):
-    """Return True/False if ``exchange_calendars`` is importable and its XNYS
-    calendar was compared against the frozen table for ``year`` above, or None
-    if the package is not installed. Never raises for an absent package."""
-    try:
-        import exchange_calendars as xcals
-    except ImportError:
-        return None
-    # Padded so every day of the year is inside the calendar's bounds even when
-    # the first or last day of the year is not a session.
-    cal = xcals.get_calendar("XNYS", start=f"{year - 1}-12-01", end=f"{year + 1}-01-31")
-    d = date(year, 1, 1)
-    end = date(year, 12, 31)
-    while d <= end:
-        expected_open = _is_trading_day(d)
-        actual_open = bool(cal.is_session(d.isoformat()))
-        if expected_open != actual_open:
-            return False
-        if expected_open:
-            open_close = cal.session_open_close(d.isoformat())
-            actual_close = open_close[1].tz_convert(NY)
-            expected_close_t = _rth_close_time(d)
-            if (actual_close.hour, actual_close.minute) != (expected_close_t.hour, expected_close_t.minute):
-                return False
-        d += timedelta(days=1)
-    return True
