@@ -1,5 +1,8 @@
-"""Mutation check of the execution-rule review: each mutant of codex_hook_trust.py must fail at least one test. Run from the repository root.
-Works on a temporary copy; the checkout is not touched."""
+"""Mutation check of the execution-rule review: each mutant of tools/adoption/codex_hook_trust.py must fail at least one test of
+tests/test_codex_hook_trust.py. Run from the repository root; it works on a temporary copy, the checkout is not touched.
+
+The tests were written after the code, so this is the check that they are not vacuous: a mutant that survives names an untested decision.
+"""
 import re
 import shutil
 import subprocess
@@ -8,48 +11,62 @@ import tempfile
 from pathlib import Path
 
 root = Path.cwd()
+LISTING = ('    try:\n        entries = os.scandir(directory)\n    except FileNotFoundError:\n        return []\n    found = []\n    with entries:\n'
+           '        for entry in entries:\n            is_file = entry.is_file(follow_symlinks=False)\n'
+           '            if is_file and Path(entry.name).suffix == ".rules":\n                found.append(directory / entry.name)\n    return sorted(found)')
 MUTANTS = {
-    "a failed listing reads as no rules (P1 as reviewed)": (
-        "    except FileNotFoundError:\n        return []\n    return sorted(found)",
-        "    except OSError:\n        return []\n    return sorted(found)"),
-    "the review comes after the app-server starts": (
-        "    review = review_rules(home, codex, args.rtk)\n    for line in review.lines(home):\n        print(line)\n    blocked = review.blocked and not args.allow_exec_rules\n    if args.apply and blocked:",
-        "    review = review_rules(home, codex, args.rtk)\n    for line in review.lines(home):\n        print(line)\n    blocked = review.blocked and not args.allow_exec_rules\n    if False:"),
-    "the sample is dropped": (
-        "for argv in dict.fromkeys([*(tuple(shlex.split(command)) for command in REWRITE_SAMPLE), *heads, *examples]):",
-        "for argv in dict.fromkeys([*heads, *examples]):"),
-    "heads are not probed": (
-        "for argv in dict.fromkeys([*(tuple(shlex.split(command)) for command in REWRITE_SAMPLE), *heads, *examples]):",
-        "for argv in dict.fromkeys([*(tuple(shlex.split(command)) for command in REWRITE_SAMPLE), *examples]):"),
-    "examples are not probed": (
-        "for argv in dict.fromkeys([*(tuple(shlex.split(command)) for command in REWRITE_SAMPLE), *heads, *examples]):",
-        "for argv in dict.fromkeys([*(tuple(shlex.split(command)) for command in REWRITE_SAMPLE), *heads]):"),
-    "any difference is an exposure": (
-        "if before_decision in RESTRICTING and RANK[after_decision] < RANK[before_decision]:",
-        "if after_decision != before_decision:"),
-    "a weaker twin passes (only no-match counts)": (
-        "if before_decision in RESTRICTING and RANK[after_decision] < RANK[before_decision]:",
-        "if before_decision in RESTRICTING and after_decision is None:"),
-    "the files are evaluated one at a time": (
-        "    for path in files:\n        command += [\"--rules\", str(path)]\n    done = invoke([*command, \"--\", *argv], runner, env)",
-        "    command += [\"--rules\", str(files[0])]\n    done = invoke([*command, \"--\", *argv], runner, env)"),
-    "the real home is the evaluator's home": (
-        "            settings = lane.codex_env(Path(scratch))",
-        "            settings = lane.codex_env(home)"),
-    "--check ignores an exposure": (
-        "                if blocked:\n                    print(\"not accepted:",
-        "                if False:\n                    print(\"not accepted:"),
+    "a FileNotFoundError on an entry or the iteration reads as no rules (705e finding 1)": (
+        LISTING,
+        '    found = []\n    try:\n        with os.scandir(directory) as entries:\n            for entry in entries:\n'
+        '                is_file = entry.is_file(follow_symlinks=False)\n                if is_file and Path(entry.name).suffix == ".rules":\n'
+        '                    found.append(directory / entry.name)\n    except FileNotFoundError:\n        return []\n    return sorted(found)'),
+    "the extension is looked at before the file type (an error on another entry is not seen)": (
+        '            is_file = entry.is_file(follow_symlinks=False)\n            if is_file and Path(entry.name).suffix == ".rules":',
+        '            if Path(entry.name).suffix == ".rules" and entry.is_file(follow_symlinks=False):'),
     "a symlink is followed": (
-        "entry.is_file(follow_symlinks=False)", "entry.is_file()"),
-    "an unsupported statement is skipped": (
-        "            raise ReviewError(f\"line {node.lineno}: {call.func.id}() is not read by this tool\")",
-        "            continue"),
-    "no rtk executable is fine": (
-        "        review.problems.append(\"no rtk executable on PATH (or --rtk): the rules cannot be compared with the rewrite\")\n        return review",
-        "        return review"),
-    "a failing evaluator is no decision": (
-        "    if done.returncode != 0:\n        raise ReviewError(f\"codex execpolicy check failed",
-        "    if done.returncode != 0 and False:\n        raise ReviewError(f\"codex execpolicy check failed"),
+        "is_file = entry.is_file(follow_symlinks=False)", "is_file = entry.is_file()"),
+    "host_executable arguments are not validated (705e finding 2)": (
+        "values[keyword.arg] = literal(keyword.value, node.lineno, builtin, keyword.arg)",
+        'values[keyword.arg] = literal(keyword.value, node.lineno, builtin, keyword.arg) if builtin == "prefix_rule" else None'),
+    "only pattern, decision, name and paths are validated": (
+        "values[keyword.arg] = literal(keyword.value, node.lineno, builtin, keyword.arg)",
+        'values[keyword.arg] = literal(keyword.value, node.lineno, builtin, keyword.arg) if keyword.arg in ("pattern", "decision", "name", "paths") else None'),
+    "an argument this tool does not know is accepted": (
+        "            if keyword.arg not in known:\n                raise ReviewError(", "            if False:\n                raise ReviewError("),
+    "an invalid decision is accepted": (
+        "        if decision not in DECISIONS:\n            raise ReviewError(", "        if False:\n            raise ReviewError("),
+    "only the first alternative of the first token is checked": (
+        "        first = rule.pattern[0] if isinstance(rule.pattern[0], list) else [rule.pattern[0]]",
+        "        first = [rule.pattern[0] if not isinstance(rule.pattern[0], list) else rule.pattern[0][0]]"),
+    "a path is not reduced to its basename": (
+        '    name = token.rsplit("/", 1)[-1]\n    for pattern, source in compiled:', '    name = token\n    for pattern, source in compiled:'),
+    "regex heads are ignored": (
+        'for entry in fixture["heads"]]', 'for entry in fixture["heads"] if not entry["regex"]]'),
+    "the version gate is dropped": (
+        'if done.returncode != 0 or reported != fixture["rtk_version_output"]:', "if False:"),
+    "configured transparent prefixes are ignored": (
+        '            extra.append((re.compile(re.escape(words[0].rsplit("/", 1)[-1])), "[hooks].transparent_prefixes of the rtk config"))',
+        "            pass"),
+    "user-global TOML filters are ignored": (
+        'extra = filter_heads(Path(first[len("Config: "):].strip()).parent / "filters.toml")', "extra = []"),
+    "an unreadable rtk config is accepted": (
+        '            raise ValueError("not the expected output")', "            pass"),
+    "no rtk executable is accepted": (
+        '        raise ReviewError("no rtk executable on PATH (or --rtk): the rules cannot be checked against what rtk rewrites")',
+        "        return []"),
+    "allow rules are exposures": (
+        "            if rule.decision in RESTRICTING:\n                review.exposed.append(", "            if True:\n                review.exposed.append("),
+    "forbidden and prompt rules are only notes": (
+        "            if rule.decision in RESTRICTING:\n                review.exposed.append(", "            if False:\n                review.exposed.append("),
+    "allow-only rules ask rtk": (
+        "        if review.restricting:\n            compiled = compiled + rtk_state(rtk, fixture, runner)", "        if True:\n            compiled = compiled + rtk_state(rtk, fixture, runner)"),
+    "--apply does not refuse on an exposure": (
+        "    if args.apply and blocked:", "    if False:"),
+    "--check ignores an exposure": (
+        "                if blocked:\n                    print(\"not accepted:", "                if False:\n                    print(\"not accepted:"),
+    "a bad rules file does not fail the review when another file is fine": (
+        '            review.problems.append(f"cannot read the rules of {path.name}: {error}")',
+        "            pass"),
 }
 
 with tempfile.TemporaryDirectory(prefix="mutants-") as scratch:
@@ -57,13 +74,13 @@ with tempfile.TemporaryDirectory(prefix="mutants-") as scratch:
     (base / "tools").mkdir(parents=True)
     shutil.copytree(root / "tools" / "adoption", base / "tools" / "adoption")
     (base / "tests").mkdir()
-    (base / "scripts").symlink_to(root / "scripts")
     shutil.copy(root / "tests" / "test_codex_hook_trust.py", base / "tests")
-    record = Path("evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-behaviour-probe.json")
-    (base / record.parent).mkdir(parents=True)
-    shutil.copy(root / record, base / record)
-    (base / record.parent / "fixtures").mkdir()
-    shutil.copy(root / record.parent / "fixtures" / "hcom-deny.rules", base / record.parent / "fixtures")
+    (base / "scripts").symlink_to(root / "scripts")
+    e2e = Path("evidence/artifacts/token-stack-fresh-session-e2e-20261004")
+    (base / e2e).parent.mkdir(parents=True)
+    shutil.copytree(root / e2e, base / e2e)
+    (base / "adoption").mkdir()
+    shutil.copy(root / "adoption" / "pins-linux-x86_64.json", base / "adoption")
     tool = base / "tools" / "adoption" / "codex_hook_trust.py"
     original = tool.read_text(encoding="utf-8")
 
@@ -84,9 +101,9 @@ with tempfile.TemporaryDirectory(prefix="mutants-") as scratch:
             continue
         tool.write_text(original.replace(old, new), encoding="utf-8")
         code, tail = run_tests()
-        failed = re.search(r"FAILED \((.*)\)", tail)
         print(f"{'killed' if code else 'SURVIVED'}: {name}: {tail}")
         if not code:
             survivors.append(name)
     tool.write_text(original, encoding="utf-8")
-    print("survivors:", survivors)
+    print(f"{len(MUTANTS)} mutants, survivors: {survivors}")
+    sys.exit(1 if survivors else 0)

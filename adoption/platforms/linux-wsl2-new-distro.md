@@ -1069,7 +1069,7 @@ after-sign-in checks one owner at a time, `bash evidence/artifacts/new-wsl-insta
 grant or hook approval of another host is carried over, so a project's own `.codex/config.toml` stays disabled until
 Codex trusts its directory; the Codex hooks wired here are the context-mode plugin's six, whose approvals the tool
 writes once their hashes were read back and compared on this host, and rtk's one, which the plan's `command-output` row
-installs with `rtk init -g --codex` and trusts at its current hash with `tools/adoption/codex_hook_trust.py` (which first reviews the user layer's Codex execution rules against the rewrite, because the hook rewrites commands before Codex matches rules by their words, and refuses only when a `forbidden` or `prompt` rule would be bypassed; `--check` exits 6 for a trusted hook beside such a rule; `--allow-exec-rules` accepts).
+installs with `rtk init -g --codex` and trusts at its current hash with `tools/adoption/codex_hook_trust.py` (which first reviews the user layer's Codex execution rules, because the hook rewrites commands before Codex matches rules by their words, and refuses unless every `forbidden` or `prompt` rule starts with a word that rtk 0.51.0 cannot route (hcom's rules pass; `tools/adoption/rtk_rewrite_heads.json` is re-derived when the rtk pin moves); `--check` exits 6 for a trusted hook beside such a rule; `--allow-exec-rules` accepts).
 
 Proof: `accept.sh` exits 0 (a `skipped` line is not a pass); `--check` ends with `check passed`; `--apply` ends with a
 `summary:` line in which no step is `failed` (`merged with conflicts kept` is not a failure: the step printed each key

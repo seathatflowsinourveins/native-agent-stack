@@ -17,28 +17,33 @@ hooks of the base user layer whose command equals one named with --command, neve
 Execution rules. Trusting the hook is what activates it, and an activated hook changes what Codex's execution rules see. Codex runs a
 PreToolUse hook before the tool handler and replaces the call with the hook's `updatedInput` (codex-rs/core/src/tools/registry.rs
 L603-L660, rust-v0.159.3 and rust-v0.160.0), and the handler's approval path matches execution rules against the command words of the
-rewritten call (codex-rs/core/src/exec_policy.rs L316-L420). rtk's hook rewrites `git push` to `rtk git push` and has no Codex rule
-source (rtk-ai/rtk v0.51.0 hooks/codex/README.md L14-L24, src/hooks/permissions.rs L64-L72), so a `forbidden` or `prompt` rule on
-`git push` does not match the rewritten command; a rule on a command that rtk does not rewrite (`hcom kill`) is not affected.
-When the user layer holds rule files, the tool reviews them with the upstream tools themselves, before anything else:
-  - it lists <codex home>/rules/*.rules as Codex's collect_policy_files does (exec_policy.rs L1121-L1170, rust-v0.160.0): a missing
-    directory is no rules, any other error is a failure, and a symlink or another non-file is not loaded;
-  - it reads each file with ast (the files are Starlark; the `prefix_rule` calls are Python-compatible literals) for the commands the
-    rules name, every spelling of each `pattern` and each `match` example, and adds REWRITE_SAMPLE, commands rtk 0.51.0 rewrites, so a
-    rule broader than its own examples (`git`) is seen;
-  - for every such command it asks `rtk hook check --agent codex` whether rtk rewrites it, and for each rewritten one `codex execpolicy
-    check` (all the files together, as Codex merges them; the strictest decision wins: forbidden > prompt > allow) for the decision on the
-    original and on the rewrite.
-It reports an exposure only when the original is `forbidden` or `prompt` and the rewrite's decision is weaker (forbidden > prompt > no
-match > allow). So hcom's rules (rtk rewrites none of them) and a rule with an `rtk ...` twin pass, and an allow rule whose rewrite
-matches nothing is only noted (the rewrite may add a prompt). A step that could not be done is an exposure as well, so the review fails
-closed: a directory listing or file read error, rules the tool cannot read as literals, no rtk or codex executable, an evaluator error
-(Codex itself drops every file rule when one file does not parse, exec_policy.rs L645-L660). --apply refuses with exit 2 on an exposure
-before the app-server starts, so before any write; --check exits 6 for a trusted hook beside one; --allow-exec-rules accepts it
-(write the rtk forms of the rules or exclude the commands in rtk's exclude_commands first). The review needs no rtk or codex when
-there is no rule file. Not seen: rules in a project's .codex/rules or a managed layer, and a rule on a rewritten command that
-neither its heads, its examples nor the sample reach; write the rtk form beside the plain one and check both with `codex execpolicy
-check`.
+rewritten call (codex-rs/core/src/exec_policy.rs L316-L420). rtk's hook rewrites `git push` to `rtk git push` (and `cat f` to `rtk read f`,
+`python3 -m pytest` to `rtk pytest`) and has no Codex rule source (rtk-ai/rtk v0.51.0 hooks/codex/README.md L14-L24,
+src/hooks/permissions.rs L64-L72), so a `forbidden` or `prompt` rule on a command rtk rewrites no longer matches it. The rewrite space is not
+finite (rtk strips env prefixes, global options, absolute paths and wrappers before it matches one anchored regex per tool), so no sample of
+commands and no `rtk` twin of a rule can show that a rule is preserved. The tool decides from what rtk can route at all:
+  - tools/adoption/rtk_rewrite_heads.json holds the command heads rtk 0.51.0 can rewrite, derived from rtk's source at the pin (the leading
+    tokens of the RULES patterns in src/discover/rules.rs and of the builtin TOML filters in src/filters, the process and shell wrappers and the
+    env prefix of src/discover/registry.rs), with line provenance (evidence/artifacts/token-stack-fresh-session-e2e-20261004/
+    derive_rtk_rewrite_heads.py), and was checked against the real binary (check_rtk_rewrite_heads.py). It is valid for the one rtk version it
+    names: `rtk --version` must report it, so a pin move must re-derive it (tests/test_codex_hook_trust.py compares it with the pin);
+  - a `forbidden` or `prompt` rule is exposed when its first pattern token (every alternative, a path reduced to its basename) is such a head, or
+    the first word of a `[hooks].transparent_prefixes` entry that `rtk config` reports; a twin does not change that. A rule on `hcom ...` or
+    `uvx hcom ...` is not exposed (neither is a head), so #713's hcom-deny.rules passes; an `allow` rule on a head is only noted (its
+    rewrite may need an approval);
+  - the rules are read with Python's ast (Starlark's keyword calls of prefix_rule and host_executable are Python literals): every argument of
+    both builtins must be a literal, because Codex evaluates argument expressions and a nested prefix_rule would register a rule this tool
+    never sees; anything else is refused, not guessed;
+  - the directory is listed as Codex's collect_policy_files does (codex-rs/core/src/exec_policy.rs L1121-L1170, rust-v0.160.0): only opening
+    it may report a missing directory (no rules), every other error, also on an entry and for every entry's file type before its extension, is a
+    failure; a symlink or another non-file is not loaded;
+  - any step that cannot be done (a listing or read error, rules not readable as literals, no rtk, another rtk version, an unreadable `rtk
+    config`, user-defined rtk TOML filters, which can add heads) is an exposure too: the review fails closed.
+--apply refuses with exit 2 on an exposure before the app-server starts, so before any write, even for an already trusted hook; --check
+exits 6 for a trusted hook beside one (the install plan's acceptance runs it, so a rule added after the grant is caught); --allow-exec-rules
+accepts it, after the rtk forms of the rules are written and checked with `codex execpolicy check`. The review runs only when rule files exist,
+and needs rtk (`rtk --version`, `rtk config`) only for a `forbidden` or `prompt` rule. Not seen: rules in a project's .codex/rules or a managed
+layer, rtk TOML filters that a project trusts with `rtk trust`, and Starlark beyond Python's parser (refused).
 
 A dry run makes no trust or config edit and no backup. It is not read-only: starting the app-server creates its own state files in
 the Codex home (SQLite databases, an installation id, the bundled skills; measured on a scratch home, 2026-10-04).
@@ -65,40 +70,38 @@ from __future__ import annotations
 
 import argparse
 import ast
-import itertools
 import json
 import os
+import re
 import shlex
 import shutil
 import subprocess
 import sys
-import tempfile
+import tomllib
+from dataclasses import dataclass
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import apply_codex_lane as lane  # noqa: E402
 
-# The commands `rtk hook check --agent codex` rewrote under upstream defaults at rtk v0.51.0 (e001f773f80b): 36 of the 55 measured in
-# evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-behaviour-probe.json (codex_hook_check, upstream_defaults). A sample of
-# rtk's registry (96 patterns, src/discover/rules.rs), not the registry: rtk decides at run time whether each one is still rewritten.
-REWRITE_SAMPLE = (
-    "git push origin main", "git push --force origin main", "git commit -m x", "git add -A", "git checkout -- .", "git checkout -b topic",
-    "git pull", "git stash", "git worktree add ../w", "gh pr merge 1", "gh pr create --fill", "gh api -X DELETE repos/o/r",
-    "gh release create v1", "docker run --rm alpine sh", "docker exec c sh", "docker build .", "kubectl apply -f x.yaml",
-    "helm install r chart", "pulumi up", "pip install x", "cargo install x", "make install", "curl -X POST http://x", "wget http://x",
-    "rsync -a --delete a/ b/", "aws s3 rm s3://b/k", "iptables -F", "git status", "git log --oneline -3", "git diff", "ls -la",
-    "cat a/x/util.py", "grep -rn needle .", "find . -name x", "pytest -q", "cargo test",
-)
-# Strictest first (codex-rs/execpolicy/README.md, "forbidden > prompt > allow"); None is no matching rule, which the approval policy decides.
-RANK = {"forbidden": 3, "prompt": 2, None: 1, "allow": 0}
+HEADS_FILE = Path(__file__).with_name("rtk_rewrite_heads.json")
 RESTRICTING = ("forbidden", "prompt")
-MAX_SPELLINGS = 512
-SHELL_OPERATORS = {"&&", "||", ";", "|", "&", ">", ">>", "<", "<<"}
+DECISIONS = ("allow", "prompt", "forbidden")
+PREFIX_RULE_KEYS = {"pattern", "decision", "justification", "match", "not_match"}
+HOST_EXECUTABLE_KEYS = {"name", "paths"}
 SHOWN = 8
 
 
 class ReviewError(Exception):
     """A step of the rule review that could not be done; the review fails closed on it."""
+
+
+@dataclass
+class Rule:
+    path: Path
+    line: int
+    pattern: list
+    decision: str
 
 
 class Review:
@@ -107,8 +110,8 @@ class Review:
     def __init__(self) -> None:
         self.files: list[Path] = []
         self.rules = 0
-        self.probed = 0
-        self.rewritten = 0
+        self.restricting = 0
+        self.version = ""
         self.exposed: list[str] = []
         self.notes: list[str] = []
         self.problems: list[str] = []
@@ -120,14 +123,14 @@ class Review:
     def lines(self, home: Path) -> list[str]:
         if not self.files:
             return [f"cannot check the execution rules: {problem}" for problem in self.problems]
-        out = [f"execution rules in {home / 'rules'}: {', '.join(path.name for path in self.files)}; {self.rules} rule(s); "
-               f"{self.probed} commands probed, {self.rewritten} rewritten by `rtk hook check --agent codex`"]
+        out = [f"execution rules in {home / 'rules'}: {', '.join(path.name for path in self.files)}; {self.rules} rule(s), {self.restricting} "
+               f"forbidden or prompt" + (f"; checked against the commands {self.version} can rewrite" if self.version else "")]
         for label, items in (("exposed", self.exposed), ("cannot check", self.problems), ("note", self.notes)):
             out += [f"  {label}: {item}" for item in items[:SHOWN]]
             if len(items) > SHOWN:
                 out.append(f"  {label}: and {len(items) - SHOWN} more")
-        if not self.blocked and not self.notes:
-            out.append("  every rule keeps its decision under the rewrite")
+        if not self.blocked and self.restricting:
+            out.append(f"  no forbidden or prompt rule starts with a command {self.version} can rewrite")
         return out
 
 
@@ -168,118 +171,150 @@ def read_back_problems(named: list[dict], listed: list[dict]) -> list[str]:
 
 def rule_files(home: Path) -> list[Path]:
     """The user layer's execution-rule files, listed as Codex's collect_policy_files does (codex-rs/core/src/exec_policy.rs L1121-L1170,
-    rust-v0.160.0): a missing directory is no rules, any other error is raised (Codex fails the load on it as well), and an entry counts
-    when its extension is `rules` and its own file type, symlinks not followed, is a file, so a symlink is not loaded."""
+    rust-v0.160.0). Only opening the directory may report it missing (no rules); an error from the open, the iteration or an entry's file type
+    is raised (Codex fails the load on it as well), and the file type of every entry is asked before its extension is looked at. An entry
+    counts when its extension is `rules` and its own file type, symlinks not followed, is a file, so a symlink is not loaded."""
     directory = home / "rules"
     try:
-        with os.scandir(directory) as entries:
-            found = [directory / entry.name for entry in entries
-                     if Path(entry.name).suffix == ".rules" and entry.is_file(follow_symlinks=False)]
+        entries = os.scandir(directory)
     except FileNotFoundError:
         return []
+    found = []
+    with entries:
+        for entry in entries:
+            is_file = entry.is_file(follow_symlinks=False)
+            if is_file and Path(entry.name).suffix == ".rules":
+                found.append(directory / entry.name)
     return sorted(found)
 
 
-def concretize(pattern: list) -> list[tuple[str, ...]]:
-    """Every command a prefix_rule pattern spells: an ordered list whose elements are a token or a list of alternative tokens."""
-    choices = [element if isinstance(element, list) else [element] for element in pattern]
-    total = 1
-    for choice in choices:
-        total *= len(choice)
-    if total > MAX_SPELLINGS:
-        raise ReviewError(f"a pattern spells {total} commands (more than {MAX_SPELLINGS})")
-    return [tuple(spelling) for spelling in itertools.product(*choices)]
-
-
-def literal(node: ast.expr | None, line: int, name: str):
-    if node is None:
-        raise ReviewError(f"line {line}: no {name}")
+def literal(node: ast.expr, line: int, call: str, name: str):
+    """One argument of a builtin as a Python literal. Codex evaluates argument expressions, so a nested call (`name = prefix_rule(...) or "git"`) can
+    register a rule that nothing here would count: an argument that is not a literal is refused."""
     try:
         return ast.literal_eval(node)
-    except (ValueError, TypeError) as error:
-        raise ReviewError(f"line {line}: {name} is not a literal ({error})") from error
+    except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError) as error:
+        raise ReviewError(f"line {line}: the {name} argument of {call}() is not a literal ({type(node).__name__} expression)") from error
 
 
-def read_rules(path: Path) -> tuple[int, list[tuple[str, ...]], list[tuple[str, ...]]]:
-    """One rules file: how many prefix_rule calls it holds, the commands their patterns spell and their `match` examples. The files are
-    Starlark (codex-rs/execpolicy/README.md); the keyword calls of prefix_rule and host_executable read as Python literals, and anything
-    else is refused rather than guessed."""
+def read_rules(path: Path) -> list[Rule]:
+    """The prefix rules of one file. The files are Starlark (codex-rs/execpolicy/README.md); the keyword calls of prefix_rule and host_executable
+    read as Python literals, and anything else (a statement that is not such a call, a positional or ** argument, an argument this tool does not
+    know, a value that is not a literal) is refused rather than guessed."""
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=path.name)
-    count, heads, examples = 0, [], []
+    rules = []
     for node in tree.body:
         call = node.value if isinstance(node, ast.Expr) else None
         if not (isinstance(call, ast.Call) and isinstance(call.func, ast.Name) and not call.args and all(k.arg for k in call.keywords)):
             raise ReviewError(f"line {node.lineno}: not a keyword call of prefix_rule or host_executable")
-        if call.func.id == "host_executable":
+        builtin = call.func.id
+        known = {"prefix_rule": PREFIX_RULE_KEYS, "host_executable": HOST_EXECUTABLE_KEYS}.get(builtin)
+        if known is None:
+            raise ReviewError(f"line {node.lineno}: {builtin}() is not read by this tool")
+        values = {}
+        for keyword in call.keywords:
+            if keyword.arg not in known:
+                raise ReviewError(f"line {node.lineno}: {builtin}() has an argument this tool does not read ({keyword.arg})")
+            values[keyword.arg] = literal(keyword.value, node.lineno, builtin, keyword.arg)
+        if builtin == "host_executable":
             continue
-        if call.func.id != "prefix_rule":
-            raise ReviewError(f"line {node.lineno}: {call.func.id}() is not read by this tool")
-        keywords = {k.arg: k.value for k in call.keywords}
-        pattern = literal(keywords.get("pattern"), node.lineno, "pattern")
-        match = literal(keywords.get("match", ast.List(elts=[], ctx=ast.Load())), node.lineno, "match")
+        pattern = values.get("pattern")
+        decision = values.get("decision", "allow")
         if not (isinstance(pattern, list) and pattern and all(
                 isinstance(element, str) or (isinstance(element, list) and element and all(isinstance(t, str) for t in element))
                 for element in pattern)):
             raise ReviewError(f"line {node.lineno}: pattern is not a list of tokens and lists of alternative tokens")
-        if not (isinstance(match, list) and all(isinstance(e, str) or (isinstance(e, list) and all(isinstance(t, str) for t in e))
-                                                  for e in match)):
-            raise ReviewError(f"line {node.lineno}: match is not a list of strings and token lists")
-        count += 1
-        heads += concretize(pattern)
-        examples += [tuple(shlex.split(e)) if isinstance(e, str) else tuple(e) for e in match]
-    return count, heads, examples
+        if decision not in DECISIONS:
+            raise ReviewError(f"line {node.lineno}: decision is not one of {', '.join(DECISIONS)}")
+        rules.append(Rule(path, node.lineno, pattern, decision))
+    return rules
 
 
 def brief(text: str) -> str:
-    """The error line of a tool's output and, when it has one, the line that says why (codex prints `Error: ...` then `error: ...`)."""
     lines = [line.strip() for line in text.splitlines() if line.strip()]
-    first = next((line for line in lines if line.startswith("Error")), lines[0] if lines else "")
-    cause = next((line for line in lines if line.startswith("error:")), "")
-    return (first + (f" ({cause})" if cause else ""))[:300]
+    return " ".join(lines[:2])[:240]
 
 
-def invoke(command: list[str], runner, env: dict | None = None) -> subprocess.CompletedProcess:
+def invoke(command: list[str], runner) -> subprocess.CompletedProcess:
     try:
-        return runner(command, env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=30, check=False)
+        return runner(command, env={**os.environ, "RTK_TELEMETRY_DISABLED": "1"}, stdin=subprocess.DEVNULL, capture_output=True, text=True,
+                      timeout=30, check=False)
     except (OSError, ValueError, subprocess.SubprocessError) as error:  # ValueError: output that is not text
         raise ReviewError(f"cannot run {command[0]}: {error}") from error
 
 
-def rewrite_of(rtk: str, command: str, runner) -> str | None:
-    """What `rtk hook check --agent codex` says the hook rewrites ``command`` to: the rewritten command on stdout with exit 0, or, for a
-    command it leaves alone, `No rewrite for: ...` on stderr with exit 1 (rtk 0.51.0); None for the second. Anything else is a failure."""
-    done = invoke([rtk, "hook", "check", "--agent", "codex", command], runner, {**os.environ, "RTK_TELEMETRY_DISABLED": "1"})
-    out = (done.stdout or "").strip()
-    if done.returncode == 0 and out:
-        return out
-    if done.returncode == 1 and not out and (done.stderr or "").lstrip().startswith("No rewrite for"):
-        return None
-    raise ReviewError(f"rtk hook check failed for {command!r} (exit {done.returncode}): {brief(done.stderr or out)}")
-
-
-def decision_of(codex: str, env: dict, files: list[Path], argv: tuple[str, ...], runner) -> tuple[str | None, list[list[str]]]:
-    """`codex execpolicy check` over all the files together: the strictest decision (None when no rule matches) and the matched prefixes."""
-    command = [codex, "execpolicy", "check"]
-    for path in files:
-        command += ["--rules", str(path)]
-    done = invoke([*command, "--", *argv], runner, env)
-    if done.returncode != 0:
-        raise ReviewError(f"codex execpolicy check failed for {shlex.join(argv)!r} (exit {done.returncode}): {brief(done.stderr or done.stdout)}")
+def load_heads() -> tuple[dict, list[tuple[re.Pattern, str]]]:
+    """The fixture of the commands rtk can rewrite and its heads compiled (a literal head is matched as written)."""
     try:
-        data = json.loads(done.stdout)
-    except ValueError as error:
-        raise ReviewError(f"codex execpolicy check printed no JSON for {shlex.join(argv)!r}: {error}") from error
-    matched = data.get("matchedRules") if isinstance(data, dict) else None
-    decision = data.get("decision") if isinstance(data, dict) else None
-    if not isinstance(matched, list) or not (decision is None or decision in ("forbidden", "prompt", "allow")) \
-            or (decision is None) != (not matched):
-        raise ReviewError(f"codex execpolicy check answered unexpectedly for {shlex.join(argv)!r}: {brief(done.stdout)}")
-    prefixes = [m.get("prefixRuleMatch", {}).get("matchedPrefix", []) for m in matched if isinstance(m, dict)]
-    return decision, prefixes
+        fixture = json.loads(HEADS_FILE.read_text(encoding="utf-8"))
+        compiled = [(re.compile(entry["head"] if entry["regex"] else re.escape(entry["head"])), entry["from"][0]) for entry in fixture["heads"]]
+    except (OSError, ValueError, KeyError, IndexError, TypeError, re.error) as error:
+        raise ReviewError(f"cannot read {HEADS_FILE.name}: {error}") from error
+    return fixture, compiled
 
 
-def review_rules(home: Path, codex: str, rtk: str | None, runner=None) -> Review:
-    """Review the user layer's execution rules against rtk's rewrite (see the module docstring); fails closed."""
+def filter_heads(path: Path) -> list[tuple[re.Pattern, str]]:
+    """The heads of the user-global TOML filters beside rtk's config (src/core/toml_filter.rs: `~/.config/rtk/filters.toml`; rtk applies one once it is
+    trusted, which is assumed here): the word that each `match_command` starts with. A pattern that is not a plain anchored word (`^name\\b`) is a
+    failure: its head cannot be read without a regex parser."""
+    try:
+        parsed = tomllib.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    except (OSError, ValueError) as error:
+        raise ReviewError(f"cannot read rtk's {path.name} ({error})") from error
+    heads = []
+    for name, definition in sorted((parsed.get("filters") or {}).items()):
+        pattern = definition.get("match_command") if isinstance(definition, dict) else None
+        if pattern is None:
+            continue
+        word = re.match(r"\^([A-Za-z0-9_.+-]+)(?:\\b|\\s|\$|\(|$)", pattern) if isinstance(pattern, str) else None
+        if not word:
+            raise ReviewError(f"rtk's {path.name} filter {name} has a match_command ({pattern!r}) that is not a plain anchored word, so its head is not read")
+        heads.append((re.compile(re.escape(word.group(1)) + r"(?:\W\S*)?"), f"filter {name} in {path.name}"))
+    return heads
+
+
+def rtk_state(rtk: str | None, fixture: dict, runner) -> list[tuple[re.Pattern, str]]:
+    """The version gate and rtk's own configuration: `rtk --version` must report the version the heads were derived for, the first word of each
+    `[hooks].transparent_prefixes` entry of `rtk config` is a head, and so is the word each user-global TOML filter starts with."""
+    rtk = rtk or shutil.which("rtk")
+    if not rtk:
+        raise ReviewError("no rtk executable on PATH (or --rtk): the rules cannot be checked against what rtk rewrites")
+    done = invoke([rtk, "--version"], runner)
+    reported = (done.stdout or "").strip()
+    if done.returncode != 0 or reported != fixture["rtk_version_output"]:
+        raise ReviewError(f"rtk reports {reported!r}, but the head set was derived for {fixture['rtk_version_output']!r}: re-derive "
+                          f"{HEADS_FILE.name} (derive_rtk_rewrite_heads.py) for the pinned rtk, or accept with --allow-exec-rules")
+    done = invoke([rtk, "config"], runner)
+    first, _, body = (done.stdout or "").partition("\n")
+    # `rtk config` prints `Config: <path>`, then the configuration as TOML, after `(default config, file not created)` when there is no file
+    # (src/core/config.rs show_config, rtk v0.51.0).
+    body = "\n".join(line for line in body.splitlines() if line.strip() != "(default config, file not created)")
+    try:
+        config = tomllib.loads(body)
+        prefixes = config.get("hooks", {}).get("transparent_prefixes", [])
+        if done.returncode != 0 or not first.startswith("Config: ") or not isinstance(prefixes, list) or not all(isinstance(p, str) for p in prefixes):
+            raise ValueError("not the expected output")
+    except (ValueError, AttributeError) as error:
+        raise ReviewError(f"cannot read the configuration `rtk config` reports ({error}): {brief(done.stderr or done.stdout)}") from error
+    extra = filter_heads(Path(first[len("Config: "):].strip()).parent / "filters.toml")
+    for prefix in prefixes:
+        words = shlex.split(prefix)
+        if words:
+            extra.append((re.compile(re.escape(words[0].rsplit("/", 1)[-1])), "[hooks].transparent_prefixes of the rtk config"))
+    return extra
+
+
+def head_of(token: str, compiled: list[tuple[re.Pattern, str]]) -> str | None:
+    """The source of the head that ``token`` (a path reduced to its basename) matches, else None."""
+    name = token.rsplit("/", 1)[-1]
+    for pattern, source in compiled:
+        if pattern.fullmatch(name):
+            return source
+    return None
+
+
+def review_rules(home: Path, rtk: str | None, runner=None) -> Review:
+    """Review the user layer's execution rules (see the module docstring); fails closed."""
     runner = runner or subprocess.run
     review = Review()
     try:
@@ -289,52 +324,37 @@ def review_rules(home: Path, codex: str, rtk: str | None, runner=None) -> Review
         return review
     if not review.files:
         return review
-    heads: list[tuple[str, ...]] = []
-    examples: list[tuple[str, ...]] = []
+    rules: list[Rule] = []
     for path in review.files:
         try:
-            count, spelled, shown = read_rules(path)
+            rules += read_rules(path)
         except (OSError, SyntaxError, ValueError, RecursionError, ReviewError) as error:
             review.problems.append(f"cannot read the rules of {path.name}: {error}")
-            continue
-        review.rules += count
-        heads += spelled
-        examples += shown
-    if review.problems or not review.rules:
+    review.rules = len(rules)
+    review.restricting = sum(rule.decision in RESTRICTING for rule in rules)
+    if review.problems or not rules:
         return review
-    rtk = rtk or shutil.which("rtk")
-    if not rtk:
-        review.problems.append("no rtk executable on PATH (or --rtk): the rules cannot be compared with the rewrite")
-        return review
-    # `codex execpolicy check` creates <CODEX_HOME>/tmp/arg0 (measured, codex-cli 0.159.3), so it runs with a throwaway home: the
-    # review writes nothing into the Codex home it reviews. The rules are given to it by path, so the home does not change the answer.
     try:
-        with tempfile.TemporaryDirectory(prefix="codex-hook-trust-") as scratch:
-            settings = lane.codex_env(Path(scratch))
-            for argv in dict.fromkeys([*(tuple(shlex.split(command)) for command in REWRITE_SAMPLE), *heads, *examples]):
-                review.probed += 1
-                rewritten = rewrite_of(rtk, shlex.join(argv), runner)
-                if rewritten is None:
-                    continue
-                review.rewritten += 1
-                try:
-                    after = tuple(shlex.split(rewritten))
-                except ValueError as error:
-                    raise ReviewError(f"rtk rewrites {shlex.join(argv)!r} to {rewritten!r}, which does not split into words ({error})") from error
-                if SHELL_OPERATORS & set(after):
-                    raise ReviewError(f"rtk rewrites {shlex.join(argv)!r} to a compound command ({rewritten!r}), which is not compared")
-                before_decision, before_prefixes = decision_of(codex, settings, review.files, argv, runner)
-                if before_decision is None:
-                    continue
-                after_decision, _ = decision_of(codex, settings, review.files, after, runner)
-                matched = shlex.join(before_prefixes[0]) if before_prefixes and before_prefixes[0] else "?"
-                where = f"`{shlex.join(argv)}` is {before_decision} ({matched})"
-                if before_decision in RESTRICTING and RANK[after_decision] < RANK[before_decision]:
-                    review.exposed.append(f"{where}, its rewrite `{rewritten}` is {after_decision or 'matched by no rule'}")
-                elif before_decision == "allow" and after_decision is None:
-                    review.notes.append(f"{where}, its rewrite `{rewritten}` is matched by no rule (it may need an approval)")
-    except (ReviewError, OSError) as error:
+        fixture, compiled = load_heads()
+        if review.restricting:
+            compiled = compiled + rtk_state(rtk, fixture, runner)
+            review.version = fixture["rtk_version_output"]
+    except ReviewError as error:
         review.problems.append(str(error))
+        return review
+    for rule in rules:
+        first = rule.pattern[0] if isinstance(rule.pattern[0], list) else [rule.pattern[0]]
+        for token in first:
+            source = head_of(token, compiled)
+            if source is None:
+                continue
+            where = f"{rule.path.name}:{rule.line}: {rule.decision} rule {json.dumps(rule.pattern)} starts with `{token}`"
+            if rule.decision in RESTRICTING:
+                review.exposed.append(f"{where}, a command rtk can rewrite ({source}): a command the rule matches can be rewritten out of its "
+                                      f"reach, and an `rtk` twin cannot be shown to cover every rewrite")
+            else:
+                review.notes.append(f"{where}, a command rtk can rewrite ({source}): its rewrite may need an approval")
+            break
     return review
 
 
@@ -376,7 +396,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--cwd", help="the working directory hooks/list is asked for (default: the Codex home)")
     parser.add_argument("--codex-process-name", default="codex", help="the process name --apply refuses to run beside")
     parser.add_argument("--allow-exec-rules", action="store_true",
-                        help="go on although the rewrite would bypass an execution rule, or the rules could not be checked")
+                        help="go on although the rewrite could bypass an execution rule, or the rules could not be checked")
     return parser
 
 
@@ -390,17 +410,16 @@ def run(args: argparse.Namespace) -> int:
     cwd = Path(args.cwd).expanduser() if args.cwd else home
     commands = set(args.command)
     # The rule review needs neither the app-server nor a write, so it comes first: a refusal leaves the Codex home as it was.
-    review = review_rules(home, codex, args.rtk)
+    review = review_rules(home, args.rtk)
     for line in review.lines(home):
         print(line)
     blocked = review.blocked and not args.allow_exec_rules
     if args.apply and blocked:
-        print("refused: the rewrite would bypass the user layer's execution rules, or they could not be checked (above). Trusting "
+        print("refused: the rewrite could bypass the user layer's execution rules, or they could not be checked (above). Trusting "
               "`rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex "
               "matches execution rules against the command words after the rewrite (codex-rs/core/src/tools/registry.rs L603-L660, "
               "codex-rs/core/src/exec_policy.rs L316-L420). Write the rtk form of each exposed rule beside the plain one and check both "
-              "with `codex execpolicy check`, or exclude those commands in rtk's exclude_commands, then run again; "
-              "--allow-exec-rules accepts the exposure", file=sys.stderr)
+              "with `codex execpolicy check`, then run again; --allow-exec-rules accepts the exposure", file=sys.stderr)
         return 2
     # Before the app-server starts: that child is itself a codex process.
     running = lane.codex_processes(args.codex_process_name) if args.apply else []

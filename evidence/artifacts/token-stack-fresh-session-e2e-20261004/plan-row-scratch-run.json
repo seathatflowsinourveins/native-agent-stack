@@ -3,7 +3,7 @@
   "evidence_class": "local_integration: one run, one host, scratch HOMEs, the real rtk and codex (the stream is synthetic)",
   "rtk": "rtk 0.51.0",
   "codex": "codex-cli 0.159.3",
-  "deviation": "6 codex process(es) were running on the host, so the trust command carries --codex-process-name no-such-process-name (the tool would otherwise refuse, exit 2)",
+  "deviation": "5 codex process(es) were running on the host, so the trust command carries --codex-process-name no-such-process-name (the tool would otherwise refuse, exit 2)",
   "steps": [
     {
       "step": "--check before any rtk hook exists",
@@ -60,7 +60,7 @@
       "stdout_tail": [
         "hooks named in <scratch>/fake-home/.codex:",
         "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T040744Z",
+        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T052042Z",
         "trusted 1 hook(s) in <scratch>/fake-home/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -70,14 +70,14 @@
       "exit": 0,
       "expected_exit": 0,
       "stdout_tail": [
-        "Date:   Sun Oct 4 23:27:26 2026 -0400",
-        "    Codex hook trust: --apply refuses while the user layer holds execution rules (review of #705, thread 3)",
-        "    Codex replaces a call with the PreToolUse hook's updatedInput before its handler's approval path (codex-rs/core/src/tools/registry.rs L603-L660, rust-v0.159.3 and",
-        "    rust-v0.160.0) and matches execution rules against the rewritten command's words (codex-rs/core/src/exec_policy.rs L327-L420); rtk's Codex hook rewrites git",
-        "    push to rtk git push and reads no Codex rules (rtk v0.51.0 hooks/codex/README.md L14-L24, src/hooks/permissions.rs L64-L72). So a rule on git push does not",
-        "    match the rewritten command (codex execpolicy check on 0.159.3: forbidden for git push, no decision for rtk git push). Trusting the hook is what activates",
-        "    it, so --apply now refuses (exit 2, before any backup or write) while <codex home>/rules holds a rules file with content, names the files, and proceeds",
-        "    only with --allow-exec-rules; --check and the dry run name the rules and are not refused. Six tests written first (five red); 33 pass.",
+        "    loaded), reads the prefix_rule literals with ast, and compares, with rtk hook check --agent codex and codex execpolicy check, the decision on each command",
+        "    a rule names and on a sample of the 36 commands rtk 0.51.0 rewrites with the decision on the rewrite. It refuses --apply (exit 2, before the app-server",
+        "    starts) only when a forbidden or prompt decision gets weaker or a step could not be done; --check exits 6 for a trusted hook beside such a rule, which the",
+        "    post_install acceptance runs; --allow-exec-rules stays as the explicit acceptance. The plan's trust and check commands pass --rtk.",
+        "    Evidence: plan_row_scratch_run.py (33 steps, real rtk 0.51.0 and codex-cli 0.159.3; the hcom rules proceed, a git push forbid rule without a twin is",
+        "    refused, with its twin it proceeds, an unreadable directory is refused, a rule added after the grant makes --check exit 6); 58 unit tests with local",
+        "    stand-ins for the two programs, checked by 14 mutants that each fail a test (rule_review_mutation_check.py). The decision record's addendum is rewritten,",
+        "    including the correction that approvals off do not switch rules off.",
         "    Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
         "hooks named in <scratch>/fake-home/.codex:",
         "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
@@ -171,8 +171,8 @@
       "exit": 5,
       "expected_exit": 5,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-hcom/.codex/rules: hcom-deny.rules; 4 rule(s); 82 commands probed, 36 rewritten by `rtk hook check --agent codex`",
-        "  every rule keeps its decision under the rewrite",
+        "execution rules in <scratch>/rules-hcom/.codex/rules: hcom-deny.rules; 4 rule(s), 4 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  no forbidden or prompt rule starts with a command rtk 0.51.0 can rewrite",
         "hooks named in <scratch>/rules-hcom/.codex:",
         "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted"
       ],
@@ -185,11 +185,11 @@
       "exit": 0,
       "expected_exit": 0,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-hcom/.codex/rules: hcom-deny.rules; 4 rule(s); 82 commands probed, 36 rewritten by `rtk hook check --agent codex`",
-        "  every rule keeps its decision under the rewrite",
+        "execution rules in <scratch>/rules-hcom/.codex/rules: hcom-deny.rules; 4 rule(s), 4 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  no forbidden or prompt rule starts with a command rtk 0.51.0 can rewrite",
         "hooks named in <scratch>/rules-hcom/.codex:",
         "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-hcom/.codex/config.toml.bak.20261005T040752Z",
+        "backup: <scratch>/rules-hcom/.codex/config.toml.bak.20261005T052044Z",
         "trusted 1 hook(s) in <scratch>/rules-hcom/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -199,8 +199,8 @@
       "exit": 0,
       "expected_exit": 0,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-hcom/.codex/rules: hcom-deny.rules; 4 rule(s); 82 commands probed, 36 rewritten by `rtk hook check --agent codex`",
-        "  every rule keeps its decision under the rewrite",
+        "execution rules in <scratch>/rules-hcom/.codex/rules: hcom-deny.rules; 4 rule(s), 4 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  no forbidden or prompt rule starts with a command rtk 0.51.0 can rewrite",
         "hooks named in <scratch>/rules-hcom/.codex:",
         "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
         "every named hook is trusted at its current hash"
@@ -212,10 +212,8 @@
       "exit": 6,
       "expected_exit": 6,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-hcom/.codex/rules: default.rules, hcom-deny.rules; 5 rule(s); 83 commands probed, 37 rewritten by `rtk hook check --agent codex`",
-        "  exposed: `git push origin main` is forbidden (git push), its rewrite `rtk git push origin main` is matched by no rule",
-        "  exposed: `git push --force origin main` is forbidden (git push), its rewrite `rtk git push --force origin main` is matched by no rule",
-        "  exposed: `git push` is forbidden (git push), its rewrite `rtk git push` is matched by no rule",
+        "execution rules in <scratch>/rules-hcom/.codex/rules: default.rules, hcom-deny.rules; 5 rule(s), 5 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: forbidden rule [\"git\", \"push\"] starts with `git`, a command rtk can rewrite (src/discover/rules.rs:L61): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite",
         "hooks named in <scratch>/rules-hcom/.codex:",
         "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted"
       ],
@@ -228,13 +226,11 @@
       "exit": 2,
       "expected_exit": 2,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-hcom/.codex/rules: default.rules, hcom-deny.rules; 5 rule(s); 83 commands probed, 37 rewritten by `rtk hook check --agent codex`",
-        "  exposed: `git push origin main` is forbidden (git push), its rewrite `rtk git push origin main` is matched by no rule",
-        "  exposed: `git push --force origin main` is forbidden (git push), its rewrite `rtk git push --force origin main` is matched by no rule",
-        "  exposed: `git push` is forbidden (git push), its rewrite `rtk git push` is matched by no rule"
+        "execution rules in <scratch>/rules-hcom/.codex/rules: default.rules, hcom-deny.rules; 5 rule(s), 5 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: forbidden rule [\"git\", \"push\"] starts with `git`, a command rtk can rewrite (src/discover/rules.rs:L61): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite"
       ],
       "stderr_tail": [
-        "refused: the rewrite would bypass the user layer's execution rules, or they could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules a"
+        "refused: the rewrite could bypass the user layer's execution rules, or they could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules a"
       ]
     },
     {
@@ -269,13 +265,11 @@
       "exit": 2,
       "expected_exit": 2,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 1 rule(s); 37 commands probed, 37 rewritten by `rtk hook check --agent codex`",
-        "  exposed: `git push origin main` is forbidden (git push), its rewrite `rtk git push origin main` is matched by no rule",
-        "  exposed: `git push --force origin main` is forbidden (git push), its rewrite `rtk git push --force origin main` is matched by no rule",
-        "  exposed: `git push` is forbidden (git push), its rewrite `rtk git push` is matched by no rule"
+        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 1 rule(s), 1 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: forbidden rule [\"git\", \"push\"] starts with `git`, a command rtk can rewrite (src/discover/rules.rs:L61): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite"
       ],
       "stderr_tail": [
-        "refused: the rewrite would bypass the user layer's execution rules, or they could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules a"
+        "refused: the rewrite could bypass the user layer's execution rules, or they could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules a"
       ]
     },
     {
@@ -283,10 +277,8 @@
       "exit": 5,
       "expected_exit": 5,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 1 rule(s); 37 commands probed, 37 rewritten by `rtk hook check --agent codex`",
-        "  exposed: `git push origin main` is forbidden (git push), its rewrite `rtk git push origin main` is matched by no rule",
-        "  exposed: `git push --force origin main` is forbidden (git push), its rewrite `rtk git push --force origin main` is matched by no rule",
-        "  exposed: `git push` is forbidden (git push), its rewrite `rtk git push` is matched by no rule",
+        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 1 rule(s), 1 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: forbidden rule [\"git\", \"push\"] starts with `git`, a command rtk can rewrite (src/discover/rules.rs:L61): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite",
         "hooks named in <scratch>/rules-exposed/.codex:",
         "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted"
       ],
@@ -299,13 +291,11 @@
       "exit": 0,
       "expected_exit": 0,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 1 rule(s); 37 commands probed, 37 rewritten by `rtk hook check --agent codex`",
-        "  exposed: `git push origin main` is forbidden (git push), its rewrite `rtk git push origin main` is matched by no rule",
-        "  exposed: `git push --force origin main` is forbidden (git push), its rewrite `rtk git push --force origin main` is matched by no rule",
-        "  exposed: `git push` is forbidden (git push), its rewrite `rtk git push` is matched by no rule",
+        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 1 rule(s), 1 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: forbidden rule [\"git\", \"push\"] starts with `git`, a command rtk can rewrite (src/discover/rules.rs:L61): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite",
         "hooks named in <scratch>/rules-exposed/.codex:",
         "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-exposed/.codex/config.toml.bak.20261005T040810Z",
+        "backup: <scratch>/rules-exposed/.codex/config.toml.bak.20261005T052045Z",
         "trusted 1 hook(s) in <scratch>/rules-exposed/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -315,10 +305,8 @@
       "exit": 6,
       "expected_exit": 6,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 1 rule(s); 37 commands probed, 37 rewritten by `rtk hook check --agent codex`",
-        "  exposed: `git push origin main` is forbidden (git push), its rewrite `rtk git push origin main` is matched by no rule",
-        "  exposed: `git push --force origin main` is forbidden (git push), its rewrite `rtk git push --force origin main` is matched by no rule",
-        "  exposed: `git push` is forbidden (git push), its rewrite `rtk git push` is matched by no rule",
+        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 1 rule(s), 1 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: forbidden rule [\"git\", \"push\"] starts with `git`, a command rtk can rewrite (src/discover/rules.rs:L61): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite",
         "hooks named in <scratch>/rules-exposed/.codex:",
         "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted"
       ],
@@ -331,10 +319,8 @@
       "exit": 0,
       "expected_exit": 0,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 1 rule(s); 37 commands probed, 37 rewritten by `rtk hook check --agent codex`",
-        "  exposed: `git push origin main` is forbidden (git push), its rewrite `rtk git push origin main` is matched by no rule",
-        "  exposed: `git push --force origin main` is forbidden (git push), its rewrite `rtk git push --force origin main` is matched by no rule",
-        "  exposed: `git push` is forbidden (git push), its rewrite `rtk git push` is matched by no rule",
+        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 1 rule(s), 1 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: forbidden rule [\"git\", \"push\"] starts with `git`, a command rtk can rewrite (src/discover/rules.rs:L61): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite",
         "hooks named in <scratch>/rules-exposed/.codex:",
         "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
         "every named hook is trusted at its current hash"
@@ -369,31 +355,148 @@
       "stderr_tail": []
     },
     {
-      "step": "rules-twin (the git push rule and its rtk git push twin): the trust command proceeds",
+      "step": "rules-twin (the git push rule and its rtk git push twin): still refused, a twin cannot be shown to cover every rewrite",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-twin/.codex/rules: default.rules; 2 rule(s), 2 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: forbidden rule [\"git\", \"push\"] starts with `git`, a command rtk can rewrite (src/discover/rules.rs:L61): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite"
+      ],
+      "stderr_tail": [
+        "refused: the rewrite could bypass the user layer's execution rules, or they could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules a"
+      ]
+    },
+    {
+      "step": "rules-twin: --allow-exec-rules accepts it",
       "exit": 0,
       "expected_exit": 0,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-twin/.codex/rules: default.rules; 2 rule(s); 38 commands probed, 37 rewritten by `rtk hook check --agent codex`",
-        "  every rule keeps its decision under the rewrite",
+        "execution rules in <scratch>/rules-twin/.codex/rules: default.rules; 2 rule(s), 2 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: forbidden rule [\"git\", \"push\"] starts with `git`, a command rtk can rewrite (src/discover/rules.rs:L61): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite",
         "hooks named in <scratch>/rules-twin/.codex:",
         "  <scratch>/rules-twin/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-twin/.codex/config.toml.bak.20261005T040819Z",
+        "backup: <scratch>/rules-twin/.codex/config.toml.bak.20261005T052047Z",
         "trusted 1 hook(s) in <scratch>/rules-twin/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
     },
     {
-      "step": "rules-twin: --check",
+      "step": "rules-705e-extension: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-extension: plan command 5 (rtk init -g --codex)",
       "exit": 0,
       "expected_exit": 0,
       "stdout_tail": [
-        "execution rules in <scratch>/rules-twin/.codex/rules: default.rules; 2 rule(s); 38 commands probed, 37 rewritten by `rtk hook check --agent codex`",
-        "  every rule keeps its decision under the rewrite",
-        "hooks named in <scratch>/rules-twin/.codex:",
-        "  <scratch>/rules-twin/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
-        "every named hook is trusted at its current hash"
+        "  AGENTS.md: @<scratch>/rules-705e-extension/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705e-extension/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705e-extension/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
       ],
       "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-extension (`git -C .` forbidden; rtk leaves `git -C .` alone but rewrites `git -C . push origin main`): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705e-extension/.codex/rules: default.rules; 1 rule(s), 1 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: forbidden rule [\"git\", \"-C\", \".\"] starts with `git`, a command rtk can rewrite (src/discover/rules.rs:L61): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite"
+      ],
+      "stderr_tail": [
+        "refused: the rewrite could bypass the user layer's execution rules, or they could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules a"
+      ]
+    },
+    {
+      "step": "rules-705e-broad: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-broad: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705e-broad/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705e-broad/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705e-broad/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-broad (broad `uv` and `npx` rules): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705e-broad/.codex/rules: default.rules; 2 rule(s), 2 forbidden or prompt; checked against the commands rtk 0.51.0 can rewrite",
+        "  exposed: default.rules:1: prompt rule [\"uv\"] starts with `uv`, a command rtk can rewrite (src/discover/rules.rs:L537): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite",
+        "  exposed: default.rules:2: forbidden rule [[\"npx\", \"bunx\"]] starts with `npx`, a command rtk can rewrite (src/discover/rules.rs:L120): a command the rule matches can be rewritten out of its reach, and an `rtk` twin cannot be shown to cover every rewrite"
+      ],
+      "stderr_tail": [
+        "refused: the rewrite could bypass the user layer's execution rules, or they could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules a"
+      ]
+    },
+    {
+      "step": "rules-705e-nested: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-nested: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705e-nested/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705e-nested/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705e-nested/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-nested (a prefix_rule nested in host_executable, which the real evaluator registers): refused, not read as zero rules",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705e-nested/.codex/rules: nested.rules; 0 rule(s), 0 forbidden or prompt",
+        "  cannot check: cannot read the rules of nested.rules: line 1: the name argument of host_executable() is not a literal (BoolOp expression)"
+      ],
+      "stderr_tail": [
+        "refused: the rewrite could bypass the user layer's execution rules, or they could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules a"
+      ]
     },
     {
       "step": "rules-unreadable: plan command 3 (the exclusions config)",
@@ -430,7 +533,7 @@
         "cannot check the execution rules: cannot list <scratch>/rules-unreadable/.codex/rules: [Errno 13] Permission denied: '<scratch>/rules-unreadable/.codex/rules'"
       ],
       "stderr_tail": [
-        "refused: the rewrite would bypass the user layer's execution rules, or they could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules a"
+        "refused: the rewrite could bypass the user layer's execution rules, or they could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules a"
       ]
     }
   ],
@@ -486,6 +589,57 @@
       "valid": true,
       "decision": null,
       "matched_prefixes": []
+    }
+  ],
+  "rtk_hook_check": [
+    {
+      "command": "git -C .",
+      "exit": 1,
+      "rewritten_to": null
+    },
+    {
+      "command": "git -C . push origin main",
+      "exit": 0,
+      "rewritten_to": "rtk git -C . push origin main"
+    },
+    {
+      "command": "uv",
+      "exit": 1,
+      "rewritten_to": null
+    },
+    {
+      "command": "uv run harmless.py",
+      "exit": 0,
+      "rewritten_to": "rtk uv run harmless.py"
+    },
+    {
+      "command": "npx",
+      "exit": 1,
+      "rewritten_to": null
+    },
+    {
+      "command": "npx prisma migrate deploy",
+      "exit": 0,
+      "rewritten_to": "rtk prisma migrate deploy"
+    },
+    {
+      "command": "uvx hcom kill luna",
+      "exit": 1,
+      "rewritten_to": null
+    }
+  ],
+  "nested_host_executable_check": [
+    {
+      "command": "git push origin main",
+      "exit": 0,
+      "valid": true,
+      "decision": "forbidden"
+    },
+    {
+      "command": "rtk git push origin main",
+      "exit": 0,
+      "valid": true,
+      "decision": null
     }
   ],
   "all_as_expected": true

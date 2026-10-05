@@ -9,8 +9,10 @@ out at the 0.50.0 pin because it was not qualified, be installed with `rtk init 
 | --- | --- | --- |
 | Fresh-session E2E | `fresh_session_e2e.sh <label>` | `rtk --version`, `rtk init --show`, `rtk gain -f json` before and after, `claude mcp list`, `codex mcp list`, two fresh `claude -p --output-format stream-json --verbose --include-hook-events` sessions (git status, grep -rl), one fresh `codex exec --json --ephemeral` session, all in a new empty project directory, summarised with jq |
 | Codex hook qualification | `codex_hook_qual.py [outdir [arm ...]]` | `rtk init -g --codex`, `rtk init --show --codex`, Codex's own `hooks/list`, `tools/adoption/codex_hook_trust.py`, `codex exec --json --ephemeral` through the loopback OmniRoute gateway (no credential needed or copied), `rtk gain` |
-| Plan row scratch run | `plan_row_scratch_run.py [outfile]` | the install plan's `command-output` Codex steps in a scratch HOME, their text read from `install-plan.json`: the exclusions config, `rtk init -g --codex`, the trust, the post_install program, the after_sign_in jq filter on synthetic streams, and the trust tool's execution-rule review in four more scratch homes with the real rtk and codex (`fixtures/hcom-deny.rules` from #713, a `git push` forbid rule with and without its `rtk` twin, an unreadable rules directory): `plan-row-scratch-run.json` |
-| Rule review mutation check | `rule_review_mutation_check.py` | 14 mutants of the execution-rule review in `tools/adoption/codex_hook_trust.py`, each of which must fail at least one test of `tests/test_codex_hook_trust.py`; works on a temporary copy: `rule-review-mutation-check.txt` |
+| Plan row scratch run | `plan_row_scratch_run.py [outfile]` | the install plan's `command-output` Codex steps in a scratch HOME, their text read from `install-plan.json`: the exclusions config, `rtk init -g --codex`, the trust, the post_install program, the after_sign_in jq filter on synthetic streams, and the trust tool's execution-rule review in more scratch homes with the real rtk and codex (`fixtures/hcom-deny.rules` from #713, a `git push` forbid rule with and without its `rtk` twin, the three counterexamples of the 705e read, an unreadable rules directory), plus `rtk hook check` and `codex execpolicy check` on them: `plan-row-scratch-run.json` |
+| Rewrite heads | `derive_rtk_rewrite_heads.py --source <rtk clone> --write FILE` (`--check`, `--list`) | the command heads rtk 0.51.0 can rewrite, derived from its source at the pin (the leading tokens of the 94 RULES patterns and 62 builtin TOML filters, found by walking the parsed regexes, plus the process and shell wrappers and the env prefix): `tools/adoption/rtk_rewrite_heads.json` |
+| Rewrite heads check | `check_rtk_rewrite_heads.py [outfile]` | that file against the real rtk (upstream defaults, a scratch HOME): a positive control per RULES pattern (94 of 94 rewritten), a scan of 1,449 command names with 9 argument shapes (13,041 commands, 623 rewritten, none outside the heads) and 61 wrapper prefixes in front of `git status`, the 705e counterexamples and the hcom rules' commands (none rewritten): `rtk-rewrite-heads-check.json` |
+| Rule review mutation check | `rule_review_mutation_check.py` | 21 mutants of the execution-rule review in `tools/adoption/codex_hook_trust.py`, each of which must fail at least one test of `tests/test_codex_hook_trust.py`; works on a temporary copy: `rule-review-mutation-check.txt` |
 | rtk init probe | `rtk_init_codex_probe.py [outfile]` | what `rtk init -g --codex` writes, shows and undoes in scratch homes (no host file): `rtk-init-codex-probe.json` |
 | rtk behaviour probe | `rtk_behaviour_probe.py [outfile]` | `rtk rewrite` and rtk's compact forms against the shell, in a scratch repository and scratch homes (no host configuration, no host counter): `rtk-behaviour-probe.json` |
 | Read-back race | `trust_readback_race.py [tool file]` | `tools/adoption/codex_hook_trust.py` against the real `codex app-server` when the hook's definition changes right after the write |
@@ -108,14 +110,19 @@ Mutating commands and execution rules (`rtk-behaviour-probe.json`, `codex_hook_c
 `terraform apply` and 13 others alone; the five `exclude_commands` change none of them. Codex replaces the call with the hook's `updatedInput` before its
 handler's approval path (`registry.rs` L603-L660 at rust-v0.159.3 and rust-v0.160.0) and matches execution rules against the rewritten command's words:
 `codex execpolicy check` on 0.159.3 returns `forbidden` for `git push` and no decision for `rtk git push` under the same rule. The trust tool therefore
-reviews the user layer's rules first, with the upstream tools (`rtk hook check --agent codex` and `codex execpolicy check`) over each rule's pattern heads and
-`match` examples and a sample of the 36 commands above, and refuses `--apply` (exit 2, before the app-server starts) only when a `forbidden` or `prompt`
-decision gets weaker under the rewrite or the rules could not be checked; `--check` exits 6 for a trusted hook beside such a rule, so the post_install
-acceptance catches a rule added later; `--allow-exec-rules` accepts. The scratch run (33 steps, rtk 0.51.0 and codex-cli 0.159.3): #713's four hcom rules
-(`fixtures/hcom-deny.rules`; rtk rewrites none of them) let the trust proceed, a `git push` forbid rule without an `rtk git push` twin is refused (accepted
-with the flag, after which `--check` exits 6), the same rule with its twin passes, an unreadable rules directory is refused, and a rule added after the grant
-makes `--check` exit 6. The decision record's 2026-10-05 addenda on #705 carry the sources, the alternatives, the correction that approvals off do not switch
-execution rules off, and the untested boundary (no live session with a forbidding rule and the hook active).
+reviews the user layer's rules first and refuses `--apply` (exit 2, before the app-server starts) unless every `forbidden` or `prompt` rule starts with a word
+that rtk 0.51.0 cannot route at all: `tools/adoption/rtk_rewrite_heads.json` lists the heads (derived from rtk's source at the pin, with line provenance, and
+checked against the binary: `rtk-rewrite-heads-check.json`), `rtk --version` must report that version, and the first words of the rtk config's
+`transparent_prefixes` and user TOML filters are added. A sample of commands cannot do this (the 705e read: `git -C .` is not rewritten but `git -C . push
+origin main` is, and the native evaluator forbids the original and not the rewrite) and neither can an `rtk` twin (rtk's rewrites also change words after `rtk`: `cat
+f` becomes `rtk read f`, `python3 -m pytest` becomes `rtk pytest`). `--check` exits 6 for a trusted hook beside such a rule, so the post_install acceptance
+catches a rule added later; `--allow-exec-rules` accepts. The scratch run (42 steps, rtk 0.51.0 and codex-cli 0.159.3): #713's four hcom rules
+(`fixtures/hcom-deny.rules`; neither `hcom` nor `uvx` is a head) let the trust proceed, and the rules that rtk can rewrite out of reach are refused: a `git push` forbid
+rule (with or without its twin), `git -C .`, broad `uv` and `npx` rules, a `host_executable(name = prefix_rule(...) or "git", ...)` file that the real codex
+evaluator accepts and that forbids `git push origin main` (refused because every argument must be a literal), and an unreadable rules directory; a rule added
+after the grant makes `--check` exit 6. The decision record's 2026-10-05 addenda on #705 carry the sources, the alternatives, the correction that approvals
+off do not switch execution rules off, the pin-move rule for the heads file and the untested boundary (no live session with a forbidding rule and the hook
+active).
 
 ## What this does not show
 

@@ -5,16 +5,17 @@
 
 The program text of every step is read from evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json (the exact strings the plan runs),
 not retyped here: the config install, `rtk init -g --codex`, the trust command, and the post_install acceptance program (run with bash -euo
-pipefail, as accept.sh does); the `--check` line is the last line of that program. Around them: a `--check` before the hook exists (exit 4), one
-after `rtk init` and before the trust (exit 5), the jq filter and test of the after_sign_in program against synthetic streams of `codex exec
---json` in the shape recorded from a real session (one that passes and five negative fixtures: a failed rewritten command, a non-zero exit, a
-declined command, no rtk prefix, no command item; the model call itself needs the sign-in and is not run), and the execution-rule review of the
-trust tool in four more scratch homes, each with the real rtk and the real codex: the hcom rules of #713 (fixtures/hcom-deny.rules; rtk rewrites
-none of them: the trust proceeds, and a `git push` rule added after the grant makes `--check` exit 6 and the trust refuse), a `git push`
-forbid rule without an `rtk git push` twin (the trust is refused before anything is written; --allow-exec-rules accepts it), the same rule with
-its twin (the trust proceeds), and an unreadable rules directory (the trust is refused: the review fails closed). Codex's own `codex execpolicy
-check` is run on the rule for `git push` and `git commit`, and each answer must be an exit 0 with a valid response before its decision counts.
-Nothing leaves the scratch HOME: rtk and Codex write their files there, and the live ~/.codex and rtk
+pipefail, as accept.sh does); the `--check` line is the last line of that program. Around them: a `--check` before the hook exists (exit 4), one after `rtk init` and before the trust (exit 5), the jq filter and test of the
+after_sign_in program against synthetic streams of `codex exec --json` in the shape recorded from a real session (one that passes and five negative
+fixtures: a failed rewritten command, a non-zero exit, a declined command, no rtk prefix, no command item; the model call itself needs the sign-in and is
+not run), and the execution-rule review of the trust tool in more scratch homes, each with the real rtk and codex: the hcom rules of #713
+(fixtures/hcom-deny.rules; neither `hcom` nor `uvx` is a command rtk can rewrite: the trust proceeds, and a `git push` rule added after the grant makes
+`--check` exit 6 and the trust refuse); a `git push` forbid rule (refused before anything is written; --allow-exec-rules accepts it, after which `--check`
+exits 6); the same rule with its `rtk git push` twin (still refused: a twin cannot be shown to cover every rewrite); the three counterexamples of the 705e
+read (`git -C .` is not rewritten by rtk, `git -C . push origin main` is, and the native evaluator forbids the original and not the rewrite; broad `uv` and
+`npx` rules; a `host_executable(name = prefix_rule(...) or "git", ...)` file that the real codex evaluator accepts and that registers a hidden rule);
+and an unreadable rules directory. Codex's own `codex execpolicy check` is run on the rule for `git push` and `git commit` and on the nested file, and each
+answer must be an exit 0 with a valid response before its decision counts. Nothing leaves the scratch HOME: rtk and Codex write their files there, and the live ~/.codex and rtk
 configuration are not read or written. The scratch ECO_ROOT links the installed rtk instead of running the plan's download and extract steps.
 The trust command refuses while a codex process runs (the tool's own rule); when other codex processes run on the host, the scratch run appends
 `--codex-process-name no-such-process-name` to it and says so, as codex_hook_qual.py does. One run, one host: local_integration evidence.
@@ -36,6 +37,8 @@ ROOT = HERE.parents[2]
 PLAN_DIR = ROOT / "evidence" / "artifacts" / "new-wsl-install-plan-20261002"
 HCOM_RULES = (HERE / "fixtures" / "hcom-deny.rules").read_text(encoding="utf-8")
 GIT_PUSH = 'prefix_rule(pattern = ["git", "push"], decision = "forbidden", justification = "pushes need the owner")\n'
+NESTED_HOST_EXECUTABLE = ('host_executable(name = prefix_rule(pattern = ["git", "push"], decision = "forbidden") or "git", '
+                          'paths = ["/usr/bin/git"])\n')
 GIT_PUSH_TWIN = 'prefix_rule(pattern = ["rtk", "git", "push"], decision = "forbidden", justification = "pushes need the owner")\n'
 
 
@@ -118,6 +121,8 @@ def main() -> int:
         env = make_home("fake-home")
         deviation = None
         execpolicy: list[dict] = []
+        rtk_hook_check: list[dict] = []
+        nested_check: list[dict] = []
         if busy:
             trust_cmd = trust_cmd + " --codex-process-name no-such-process-name"
             deviation = (f"{len(busy)} codex process(es) were running on the host, so the trust command carries "
@@ -156,6 +161,18 @@ def main() -> int:
             execpolicy.append({"command": command, "exit": done.returncode, "valid": valid, "decision": verdict.get("decision"),
                                "matched_prefixes": [m.get("prefixRuleMatch", {}).get("matchedPrefix") for m in verdict.get("matchedRules", [])]})
 
+        for command in ("git -C .", "git -C . push origin main", "uv", "uv run harmless.py", "npx", "npx prisma migrate deploy", "uvx hcom kill luna"):
+            done = subprocess.run(["rtk", "hook", "check", "--agent", "codex", command], env=env, capture_output=True, text=True, timeout=60, check=False,
+                                  stdin=subprocess.DEVNULL)
+            rtk_hook_check.append({"command": command, "exit": done.returncode, "rewritten_to": done.stdout.strip() or None})
+        nested_file = Path(scratch) / "nested.rules"
+        nested_file.write_text(NESTED_HOST_EXECUTABLE, encoding="utf-8")
+        for command in ("git push origin main", "rtk git push origin main"):
+            done = subprocess.run(["codex", "execpolicy", "check", "--rules", str(nested_file), "--", *command.split()], env=env, capture_output=True,
+                                  text=True, timeout=120, check=False, stdin=subprocess.DEVNULL)
+            valid, verdict = evaluator_answer(done)
+            nested_check.append({"command": command, "exit": done.returncode, "valid": valid, "decision": verdict.get("decision")})
+
         def home_with_hook(name: str, rules: dict[str, str]) -> dict:
             settings = make_home(name, rules)
             run(f"{name}: plan command 3 (the exclusions config)", config_cmd, 0, settings)
@@ -178,8 +195,16 @@ def main() -> int:
         run("rules-exposed: --check --allow-exec-rules", check_cmd + " --allow-exec-rules", 0, exposed)
 
         twin = home_with_hook("rules-twin", {"default.rules": GIT_PUSH + GIT_PUSH_TWIN})
-        run("rules-twin (the git push rule and its rtk git push twin): the trust command proceeds", trust_cmd, 0, twin)
-        run("rules-twin: --check", check_cmd, 0, twin)
+        run("rules-twin (the git push rule and its rtk git push twin): still refused, a twin cannot be shown to cover every rewrite", trust_cmd, 2, twin)
+        run("rules-twin: --allow-exec-rules accepts it", trust_cmd + " --allow-exec-rules", 0, twin)
+
+        counter = home_with_hook("rules-705e-extension", {"default.rules": 'prefix_rule(pattern = ["git", "-C", "."], decision = "forbidden")\n'})
+        run("rules-705e-extension (`git -C .` forbidden; rtk leaves `git -C .` alone but rewrites `git -C . push origin main`): refused", trust_cmd, 2, counter)
+        broad = home_with_hook("rules-705e-broad", {"default.rules": 'prefix_rule(pattern = ["uv"], decision = "prompt")\n'
+                                                              'prefix_rule(pattern = [["npx", "bunx"]], decision = "forbidden")\n'})
+        run("rules-705e-broad (broad `uv` and `npx` rules): refused", trust_cmd, 2, broad)
+        nested = home_with_hook("rules-705e-nested", {"nested.rules": NESTED_HOST_EXECUTABLE})
+        run("rules-705e-nested (a prefix_rule nested in host_executable, which the real evaluator registers): refused, not read as zero rules", trust_cmd, 2, nested)
 
         unreadable = home_with_hook("rules-unreadable", {"default.rules": GIT_PUSH})
         rules_dir = Path(unreadable["HOME"]) / ".codex" / "rules"
@@ -196,8 +221,13 @@ def main() -> int:
               "rtk": subprocess.run(["rtk", "--version"], capture_output=True, text=True, check=False).stdout.strip(),
               "codex": subprocess.run(["codex", "--version"], capture_output=True, text=True, check=False).stdout.strip(),
               "deviation": deviation, "steps": steps, "execpolicy_check": execpolicy,
+              "rtk_hook_check": rtk_hook_check, "nested_host_executable_check": nested_check,
               "all_as_expected": all(step["exit"] == step["expected_exit"] for step in steps) and all(e["valid"] for e in execpolicy) and
-              [e["decision"] for e in execpolicy] == ["forbidden", None, "prompt", None, None, None]}
+              [e["decision"] for e in execpolicy] == ["forbidden", None, "prompt", None, None, None] and
+              all(e["valid"] for e in nested_check) and [e["decision"] for e in nested_check] == ["forbidden", None] and
+              [(e["command"], e["exit"], bool(e["rewritten_to"])) for e in rtk_hook_check] ==
+              [("git -C .", 1, False), ("git -C . push origin main", 0, True), ("uv", 1, False), ("uv run harmless.py", 0, True), ("npx", 1, False),
+               ("npx prisma migrate deploy", 0, True), ("uvx hcom kill luna", 1, False)]}
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {target}: {len(steps)} steps, all as expected: {record['all_as_expected']}")
