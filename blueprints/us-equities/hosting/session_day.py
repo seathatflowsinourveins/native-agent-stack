@@ -41,6 +41,10 @@ def eligibility(calendar, now: datetime, events: Path | None = None) -> str:
             return "stale_input"
         if modified > now.timestamp():
             return "future_input"
+        # CPython@v3.12.3:Doc/library/datetime.rst:1249-1258 retains the New York tzinfo.
+        cutoff = now.astimezone(MARKET_ZONE).replace(hour=16, minute=25, second=0, microsecond=0)
+        if modified > cutoff.timestamp():
+            return "late_input"
     return "session"
 
 
@@ -63,7 +67,8 @@ def calendar_for(now: datetime):
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--at", help="optional RFC 3339 instant for an operator drill")
-    parser.add_argument("--events", type=Path, help="require a local input published after this session's close")
+    parser.add_argument("--events", type=Path,
+                        help="require local input published after this session's close and by 16:25 New York")
     args = parser.parse_args(argv)
     # This normal DAG step fails on missing packages, wrong versions or calendar errors.
     if version("exchange-calendars") != CALENDAR_VERSION:
@@ -74,7 +79,7 @@ def main(argv=None) -> int:
     token = eligibility(calendar_for(now), now, args.events)
     print(token)
     # Unavailable session input must be visible to Dagu's failed-run history/handlers.
-    return 1 if token in {"missing_input", "stale_input", "future_input"} else 0
+    return 1 if token in {"missing_input", "stale_input", "future_input", "late_input"} else 0
 
 
 if __name__ == "__main__":

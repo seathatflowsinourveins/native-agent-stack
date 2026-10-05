@@ -367,6 +367,24 @@ downtime/catch-up and duplicate-slot behavior, independent alerts, destination
 and key loss, second-host consumer restore and measured recovery time. These
 feed the next hosting/recovery lifecycle sweep and remain open.
 
+Round 6 on 2026-10-05 corrects six review threads without changing historical
+proof or receipt bytes. The guard now fails visibly with `late_input` when
+publication misses the documented 16:25 New York cutoff; replay uses that same
+cutoff. Oracle publication applies mode 0400 before file fsync and syncs the
+parent directory (`python/cpython@v3.12.3:Doc/library/os.rst:996-1005,1077-1087`).
+Rotation checks the previous cycle origin even when its cursor has returned to
+1; an overdue rollover requires a successful native full read before reset.
+Daily jitter still fits each whole rotation, but can require that full read at
+rollover. The restart drill parses its active file permission with upstream
+PyYAML 6.0.3 (`yaml/pyyaml@6.0.3:lib/yaml/__init__.py:117-125`), including Dagu's
+default and legacy override (`dagucloud/dagu@v2.16.6:internal/cmn/config/loader.go:586-611`).
+Its operator Python therefore additionally needs the documented PyYAML install;
+no YAML parser is rebuilt here. It parses and hashes the same captured native
+status bytes, tolerating a replaced directory entry while polling. The round-3
+receipt is now discoverable in the receipt catalog with its original claim and
+limitations. Focused regressions cover each correction; earlier receipts remain
+dated evidence of the earlier behavior and do not attest these repairs.
+
 ## Overturn and limits
 
 | T overturn row | Reopen when |

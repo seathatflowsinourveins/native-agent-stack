@@ -9,6 +9,7 @@ Sources: systemd/systemd@v255:man/systemd.service.xml:830-836;
 dagucloud/dagu@v2.16.6:internal/cmd/startall.go:32-45;
 internal/cmd/history.go:568-602; internal/persis/file/dagrun/dagrun.go:55-59;
 internal/ir/run_status.go:156-179; internal/ir/status.go:10-18,133-149.
+YAML parsing: yaml/pyyaml@6.0.3:lib/yaml/__init__.py:117-125 (safe_load).
 Process restart is not reboot, missed-run or independent-alert acceptance.
 """
 
@@ -55,16 +56,16 @@ def due_run(status: dict, due: datetime, run_ids: set[str]) -> bool:
     return bool(slot and datetime.fromisoformat(slot) == due)
 
 
-def last_status(path: Path) -> dict:
+def last_status(source: Path | bytes) -> dict:
     # Upstream status.jsonl is appended while running, then compacted after finish.
     # Ignore an incomplete trailing write and retain the last complete native record.
     last = {}
-    with path.open() as stream:
-        for line in stream:
-            try:
-                last = json.loads(line)
-            except json.JSONDecodeError:
-                continue
+    data = source.read_bytes() if isinstance(source, Path) else source
+    for line in data.splitlines():
+        try:
+            last = json.loads(line)
+        except json.JSONDecodeError:
+            continue
     return last
 
 
@@ -115,8 +116,20 @@ def main(argv=None) -> int:
         validate_window(due, now, args.wait_seconds)
         # Normal helper command validates the package pin; do not kill anything on a holiday.
         require_session(due)
-        config = args.config.read_text()
-        if "run_dags: false" not in config or not args.dag_history.is_dir():
+        try:
+            import yaml
+        except ImportError as error:
+            raise ValueError("install upstream PyYAML 6.0.3 for the restart config check; see README") from error
+        try:
+            config = yaml.safe_load(args.config.read_text())
+        except yaml.YAMLError as error:
+            raise ValueError("use a valid YAML read-only UI config") from error
+        permissions = config.get("permissions", {}) if isinstance(config, dict) else {}
+        run_dags = permissions.get("run_dags", True) if isinstance(permissions, dict) else True
+        # Dagu@v2.16.6:internal/cmn/config/loader.go:586-611: legacy value overrides the mapping.
+        if isinstance(config, dict):
+            run_dags = config.get("permissionRunDags", run_dags)
+        if run_dags is not False or not args.dag_history.is_dir():
             raise ValueError("use the deployed read-only UI config and this DAG's history directory")
         before = unit_state(args.unit)
         if (before.get("ActiveState") != "active" or before.get("Restart") != "on-failure" or
@@ -158,13 +171,17 @@ def main(argv=None) -> int:
             # The public history rendering omits triggerType/scheduleTime. Corroborate in
             # the original native status records instead of accepting an unrelated manual run.
             for path in args.dag_history.rglob("status.jsonl"):
-                status = last_status(path)
+                try:
+                    data = path.read_bytes()
+                except FileNotFoundError:
+                    continue  # Compaction can replace the entry after directory enumeration.
+                status = last_status(data)
                 if due_run(status, due, ids):
                     print(json.dumps({"result": "passed", "pid_changed": True,
                                       "automatic_restart_observed": True, "next_due_run": "succeeded",
                                       "scheduler_trigger_observed_with_run_dags_false": True,
                                       "due_at": due.isoformat(), "native_status_sha256":
-                                      hashlib.sha256(path.read_bytes()).hexdigest(),
+                                      hashlib.sha256(data).hexdigest(),
                                       "gate": "same-host process restart only"}, sort_keys=True))
                     return 0
             time.sleep(5)

@@ -4286,6 +4286,29 @@
         "robfig/cron v3.0.1 Next program/module were prepared from tagged source, but go run exited 127 because the compiler was not found; expected DST values are not measured results."
       ],
       "path": "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json"
+    },
+    {
+      "id": "trading-unattended-hosting-recovery-r3-20261005",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu",
+        "restic"
+      ],
+      "claim": "All seven new p2 repairs have red/green regressions; native Dagu executes the six deployed steps and fails unavailable-input runs; native restic verifies WAL recovery and isolated failing controls.",
+      "limitations": [
+        "Local integration and synthetic fixtures, not an unchanged upstream test suite or operating-host acceptance.",
+        "The deployed DAG copy uses a fixed post-close guard clock and a synthetic historical LEAN event; the native trigger remains manual.",
+        "Restart identity/window guards are tested with mocks. No systemctl manager operation, fault or service deployment ran.",
+        "Scheduler dispatch with run_dags:false, reboot, missed slots and independent alerts remain user decision 2.",
+        "Off-host recovery remains user decision 3: independent destination, key recovery and second-host consumer restore.",
+        "The independent final T row at line 102 was reread; it retains restic/Online Backup and does not name Litestream.",
+        "No Go compiler was found in PATH; the historical cron Next probe exit 127 remains unmeasured across DST.",
+        "No separate Python 3.11 interpreter was found in PATH; execution used 3.13.15.",
+        "Per-journal snapshots are consistent separately; there is no cross-journal transaction.",
+        "Native recovery reads subset 1/1; whole seven-part rotation remains behavioral fixture evidence.",
+        "No retention deletion, broker, credentials, live mode, model calls, commit, push or pin move."
+      ],
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json"
     }
   ],
   "files": [
@@ -14587,8 +14610,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/README.md",
-      "sha256": "c1300c39d810ec4b6dfba2a1a3c5e2ad55c9f7c8695616b88b74784a4f2f6bf2",
-      "bytes": 30811
+      "sha256": "b7e52d1b790ea86dceb5a462a4eaaf30840a62504117fb825ac95672933c01f1",
+      "bytes": 31669
     },
     {
       "path": "blueprints/us-equities/hosting/backup/README.md",
@@ -14632,8 +14655,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/drill_process_restart.py",
-      "sha256": "e6f5815515c417a120c356356834c8536201cf584a03383a6580fa34f82e1b7a",
-      "bytes": 9894
+      "sha256": "861416c4fc190c12b3cd915f43cbd753f4227380edc0b3cafc72e659ad92d9b5",
+      "bytes": 10912
     },
     {
       "path": "blueprints/us-equities/hosting/equity-research-evidence.yaml",
@@ -14692,8 +14715,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/journal_recovery.py",
-      "sha256": "f90884e465634a7cbe741e53233294192fc64de5ded499b9337aeb187c1a112b",
-      "bytes": 23753
+      "sha256": "c6ac8ab9d5bc17e1d0be69fc1b023083239787b93d07b8baa8f6cf2f8a177242",
+      "bytes": 23987
     },
     {
       "path": "blueprints/us-equities/hosting/receipt.json",
@@ -14702,8 +14725,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/session_day.py",
-      "sha256": "73969582e6a675f894b681769eb8a99c1a142babb1dd81a5c2a4b377a9272e96",
-      "bytes": 3220
+      "sha256": "624de575e3e829c6086e696a0274dd7c2fc6d802b9343dac8ff8dda5943b4ffc",
+      "bytes": 3540
     },
     {
       "path": "blueprints/us-equities/identity-readiness/README.md",
@@ -16817,8 +16840,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md",
-      "sha256": "c70bfb7988b18a56bf6aa56f4384270dd7ac638f66492ef5e37dddf1596f5a3c",
-      "bytes": 27568
+      "sha256": "b42007c03d9733ccb66a0e5849244d1f6e955a1dc29598b608e966ee31d8f297",
+      "bytes": 28915
     },
     {
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
@@ -54457,8 +54480,8 @@
     },
     {
       "path": "tests/test_us_equities_hosting.py",
-      "sha256": "39bc789787ae09e87dfa288b9fbda8ae9de4f309541708194fe3e98b4c90cac4",
-      "bytes": 48594
+      "sha256": "9b8d49c402fc8c025580b74bfb25ddfb1c3f353dbdb1a40b783f4b5312bf8034",
+      "bytes": 55238
     },
     {
       "path": "tests/test_validate.py",

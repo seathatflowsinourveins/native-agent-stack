@@ -6,7 +6,7 @@ All mutable state belongs to a temporary directory; no service or broker is used
 
 from __future__ import annotations
 
-from contextlib import closing, nullcontext, redirect_stdout
+from contextlib import closing, contextmanager, nullcontext, redirect_stdout
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 import fcntl
@@ -19,6 +19,7 @@ import re
 import shlex
 import shutil
 import sqlite3
+import stat
 import subprocess
 import sys
 import tempfile
@@ -299,6 +300,24 @@ class HostingContractTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "locked exchange-calendars"):
                 SESSION.main([])
 
+    def test_session_cli_enforces_the_1625_new_york_publication_cutoff(self):
+        calendar = mock.Mock()
+        calendar.is_session.return_value = True
+        calendar.session_close.return_value = datetime.fromisoformat("2026-10-05T20:00:00Z")
+        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as temporary:
+            events = Path(temporary) / "events.json"
+            events.write_text("[]")
+            for instant, token, exit_code in (("2026-10-05T20:25:00Z", "session", 0),
+                                               ("2026-10-05T20:25:00.001Z", "late_input", 1),
+                                               ("2026-10-05T20:29:00Z", "late_input", 1)):
+                epoch = datetime.fromisoformat(instant).timestamp()
+                os.utime(events, (epoch, epoch))
+                output = io.StringIO()
+                with self.subTest(instant=instant), mock.patch.object(SESSION, "version", return_value="4.13.2"), \
+                        mock.patch.object(SESSION, "calendar_for", return_value=calendar), redirect_stdout(output):
+                    self.assertEqual(SESSION.main(["--at", "2026-10-05T20:30:00Z", "--events", str(events)]), exit_code)
+                    self.assertEqual(output.getvalue().strip(), token)
+
     def test_session_check_uses_new_york_date_and_skips_a_non_session(self):
         calendar = mock.Mock()
         calendar.is_session.return_value = False
@@ -361,14 +380,28 @@ class HostingContractTests(unittest.TestCase):
             self.assertEqual(artifact["sha256"], hashlib.sha256(data).hexdigest())
             self.assertEqual(artifact["bytes"], len(data))
 
+    def test_round3_acceptance_receipt_is_discoverable_in_the_catalog(self):
+        relative = "evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json"
+        receipt = json.loads((ROOT / relative).read_text())
+        catalog = json.loads((ROOT / "manifests/evidence.json").read_text())
+        matches = [entry for entry in catalog["receipts"] if entry["id"] == receipt["id"]]
+        self.assertEqual(len(matches), 1)
+        entry = matches[0]
+        self.assertEqual(entry["path"], relative)
+        for field in ("kind", "component_ids", "claim", "limitations"):
+            self.assertEqual(entry[field], receipt[field])
+
 
 class DrillGuardTests(unittest.TestCase):
-    def restart_fixture(self, *, restart_at=None, kill_code=0, unit="dagu-equities.service"):
+    def restart_fixture(self, *, restart_at=None, kill_code=0, unit="dagu-equities.service", status_change=None,
+                        config_text="permissions:\n  run_dags: false\n"):
+        if not any(char in unit for char in "*?[]") and importlib.util.find_spec("yaml") is None:
+            self.skipTest("restart config check requires upstream PyYAML (recipe pins 6.0.3)")
         due = datetime.fromisoformat("2026-10-05T16:30:00-04:00")
         with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as temporary:
             root = Path(temporary)
             config = root / "config.yaml"
-            config.write_text("permissions:\n  run_dags: false\n")
+            config.write_text(config_text)
             history = root / "history"
             history.mkdir()
             binary = root / "dagu"
@@ -377,7 +410,22 @@ class DrillGuardTests(unittest.TestCase):
                       "nodes": [{"step": {"id": step}, "status": 4} for step in
                                 ("calendar_check", "nyse_session", "prepare_output", "summarize",
                                  "baseline_evidence", "catalog_evidence")]}
-            (history / "status.jsonl").write_text(json.dumps(status) + "\n")
+            status_path = history / "status.jsonl"
+            status_bytes = (json.dumps(status) + "\n").encode()
+            status_path.write_bytes(status_bytes)
+            self.status_fixture_sha256 = RECOVERY.hashlib.sha256(status_bytes).hexdigest()
+            native_open = Path.open
+
+            @contextmanager
+            def changing_open(path, mode="r", *args, **kwargs):
+                with native_open(path, mode, *args, **kwargs) as stream:
+                    yield stream
+                if path == status_path and mode in ("r", "rb"):
+                    if status_change == "compact":
+                        with native_open(path, "wb") as stream:
+                            stream.write(b"{}\n")
+                    elif status_change == "remove":
+                        path.unlink()
             before = {"ActiveState": "active", "Restart": "on-failure", "MainPID": "10", "NRestarts": "0",
                       "ExecStart": f"{binary} start-all --config {config}"}
             after = {**before, "MainPID": "20", "NRestarts": "1"}
@@ -395,7 +443,9 @@ class DrillGuardTests(unittest.TestCase):
                     mock.patch.object(RESTART, "unit_state", side_effect=[before, after]), \
                     mock.patch.object(RESTART.subprocess, "run", side_effect=run), \
                     mock.patch.object(RESTART.os, "kill") as kill, \
-                    mock.patch.object(RESTART.time, "monotonic", return_value=0), redirect_stdout(output):
+                    mock.patch.object(RESTART.time, "monotonic", return_value=0), \
+                    (mock.patch.object(Path, "open", changing_open) if status_change else nullcontext()), \
+                    redirect_stdout(output):
                 clock.now.side_effect = [due - timedelta(minutes=5), due - timedelta(minutes=5),
                                          restart_at or due - timedelta(minutes=4)]
                 result = RESTART.main(["--dagu-bin", str(binary), "--dagu-home", str(root),
@@ -412,12 +462,35 @@ class DrillGuardTests(unittest.TestCase):
                 self.assertEqual(commands, [])
                 self.assertFalse(pid_signal)
 
+    def test_restart_permission_check_uses_the_active_yaml_value(self):
+        for config in ("# run_dags: false\npermissions:\n  run_dags: true\n",
+                       "inactive:\n  run_dags: false\npermissions:\n  run_dags: true\n",
+                       "# run_dags: false\nhost: 127.0.0.1\n",
+                       "description: |\n  run_dags: false\npermissions:\n  run_dags: true\n",
+                       "permissions:\n  run_dags: false\npermissionRunDags: true\n"):
+            with self.subTest(config=config):
+                result, observed, commands, pid_signal = self.restart_fixture(config_text=config)
+                self.assertEqual(result, 1, observed)
+                self.assertIn("read-only UI config", observed["reason"])
+                self.assertEqual(commands, [])
+                self.assertFalse(pid_signal)
+        result, observed, _, _ = self.restart_fixture(
+            config_text="# run_dags: true\npermissions:\n  run_dags: false\n")
+        self.assertEqual(result, 0, observed)
+
     def test_restart_fault_is_delivered_by_native_unit_addressed_kill(self):
         result, observed, commands, pid_signal = self.restart_fixture()
         self.assertEqual(result, 0, observed)
         self.assertEqual(commands[0], ["systemctl", "--user", "kill", "--kill-whom=main",
                                        "--signal=SIGKILL", "dagu-equities.service"])
         self.assertFalse(pid_signal)
+
+    def test_restart_hashes_the_accepted_status_bytes_despite_compaction(self):
+        for change in ("compact", "remove"):
+            with self.subTest(change=change):
+                result, observed, commands, _ = self.restart_fixture(status_change=change)
+                self.assertEqual(result, 0, observed)
+                self.assertEqual(observed["native_status_sha256"], self.status_fixture_sha256)
 
     def test_restart_time_window_refuses_wrong_slot_past_close_and_short_reserve(self):
         due = datetime.fromisoformat("2026-10-05T16:30:00-04:00")
@@ -578,6 +651,22 @@ class JournalRecoveryTests(unittest.TestCase):
             self.assertEqual(record["integrity_check"], "ok")
         self.assertFalse(list(self.stage.rglob("*-wal")))
 
+    def test_frozen_inventory_syncs_final_mode_and_parent_directory(self):
+        synced = []
+        native_fsync = os.fsync
+
+        def observe(fd):
+            status = os.fstat(fd)
+            synced.append(("directory" if stat.S_ISDIR(status.st_mode) else "file",
+                           stat.S_IMODE(status.st_mode)))
+            native_fsync(fd)
+
+        with mock.patch.object(RECOVERY.os, "fsync", side_effect=observe):
+            RECOVERY.write_new(self.oracle, b"frozen inventory\n")
+        self.assertEqual(self.oracle.read_bytes(), b"frozen inventory\n")
+        self.assertEqual([kind for kind, mode in synced], ["file", "directory"])
+        self.assertEqual(synced[0][1], 0o400)
+
     def test_snapshot_calls_backup_api_and_does_not_copy_source_files(self):
         import ast
         tree = ast.parse((HERE / "journal_recovery.py").read_text())
@@ -725,13 +814,35 @@ class JournalRecoveryTests(unittest.TestCase):
         self.assertEqual(RECOVERY.check_rotation(runner, state, now=later, full_check=True), "1/7")
         self.assertIn(("check", "--read-data"), runner.commands)
 
-    def test_rotation_allows_daily_jitter_over_multiple_whole_cycles(self):
+    def test_completed_rotation_keeps_the_previous_deadline_at_rollover(self):
+        first = datetime(2026, 10, 5, tzinfo=timezone.utc)
+        for gap in (timedelta(days=7, seconds=1), timedelta(days=12)):
+            with self.subTest(gap=gap):
+                runner = self.runner()
+                state = self.root / f"rollover-{gap.total_seconds()}.json"
+                for i in range(7):
+                    RECOVERY.check_rotation(runner, state, now=first + timedelta(days=i))
+                before = state.read_bytes()
+                later = first + gap
+                with self.assertRaisesRegex(RECOVERY.RecoveryError, "overdue"):
+                    RECOVERY.check_rotation(runner, state, now=later)
+                self.assertEqual(state.read_bytes(), before)
+                self.assertEqual(len(runner.commands), 7)
+                self.assertEqual(RECOVERY.check_rotation(runner, state, now=later, full_check=True), "1/7")
+                self.assertIn(("check", "--read-data"), runner.commands)
+
+    def test_rotation_allows_daily_jitter_and_full_read_at_late_rollover(self):
         runner = self.runner()
         state = self.root / "jitter.json"
         first = datetime(2026, 10, 26, 20, 30, tzinfo=timezone.utc)
         times = [first + i * timedelta(hours=24, seconds=60) for i in range(14)]
-        observed = [RECOVERY.check_rotation(runner, state, now=instant) for instant in times]
+        observed = [RECOVERY.check_rotation(runner, state, now=instant) for instant in times[:7]]
+        with self.assertRaisesRegex(RECOVERY.RecoveryError, "overdue"):
+            RECOVERY.check_rotation(runner, state, now=times[7])
+        observed.append(RECOVERY.check_rotation(runner, state, now=times[7], full_check=True))
+        observed.extend(RECOVERY.check_rotation(runner, state, now=instant) for instant in times[8:])
         self.assertEqual(observed, [f"{i}/7" for i in range(1, 8)] * 2)
+        self.assertIn(("check", "--read-data"), runner.commands)
         self.assertEqual(json.loads(state.read_text())["cycle_started_at"], times[7].isoformat())
 
     def test_rotation_across_fall_back_uses_utc_seven_day_cycle(self):

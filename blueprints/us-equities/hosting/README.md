@@ -170,8 +170,9 @@ additional cron or run. Step skip and dependency propagation come from
 ([precondition result](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/runtime/runner.go#L1633)).
 
 On a session after close, `--events "${LEAN_EVENTS}"` also requires the events
-file's mtime to be between that session's actual close and the check instant.
-`missing_input`, `stale_input` or `future_input` are visible normal-step output
+file's mtime to be between that session's actual close and the check instant,
+and no later than **16:25 America/New_York** on that date.
+`missing_input`, `stale_input`, `future_input` or `late_input` are visible normal-step output
 tokens with **exit 1**, so Dagu fails the run and blocks the dependent evidence
 chain. They appear in `dagu history --status failed`; only `non_session` and
 `before_close` retain a successful guard and a skipped research chain.
@@ -203,7 +204,8 @@ In another terminal, cancel that exact active run and inspect its native history
 An aborted or failed run needs inspection and corrected input before replay.
 Replay with another fresh run ID using the start command **on the same New York
 date, after that session's close**, with input mtime after the close and no later
-than the check time. `DAG_RUN_ID` keeps earlier output intact. A later replay
+than both the check time and that date's **16:25 New York** cutoff.
+`DAG_RUN_ID` keeps earlier output intact. A later replay
 evaluates its current New York date: before close or on a non-session day it
 records a succeeded run with skipped research steps; after another session's
 close it processes that other session, subject to the freshness guard. It does
@@ -276,10 +278,12 @@ using one private rotation-state file per repository. Default checks rotate
 advances only after successful native checking. The **whole 1..7 rotation**, from
 its cycle-start timestamp through subset 7's successful completion, has a seven-day
 deadline in UTC. There is no strict per-step 24-hour cutoff: daily execution with
-60 seconds of jitter and the 25-hour fall-back day fit the bound. An incomplete
-cycle older than seven days, a gap since the last success over seven days, reversed
+60 seconds of jitter and the 25-hour fall-back day fit the whole-cycle bound. A
+cycle origin older than seven days, even when subset 7 completed and the cursor
+has returned to 1, a gap since the last success over seven days, reversed
 clock or pre-v2 state requires `--full-check`; only successful full reading can
-restart the cursor. Starting the next rotation resets its origin before subset 1;
+restart the cursor. Check the previous origin before resetting it for subset 1;
+daily jitter can therefore require a full read at rollover after seven days.
 capture the invocation time before snapshot/backup, and check completion time
 again before publishing state. This is an operator execution requirement; no backup timer
 was enabled by PR-4. Every cycle also restores and compares its snapshot.
@@ -341,7 +345,14 @@ restore. Key recovery belongs to user decision 3.
 
 Run [drill_process_restart.py](drill_process_restart.py) **later on the operating
 host**, shortly before the next eligible 16:30 slot, using its locked trading
-Python. Supply `--dagu-bin`, `--dagu-home`, `--config`, this one DAG's
+Python. This drill additionally uses upstream **PyYAML 6.0.3** to parse the
+deployed configuration, rather than treating a comment as an active permission.
+On that host, install it with `uv pip install --python "$SDK_ENV/bin/python" 'PyYAML==6.0.3'`
+before the drill. The parser is `yaml/pyyaml@6.0.3:lib/yaml/__init__.py:117-125`
+([safe_load](https://github.com/yaml/pyyaml/blob/6.0.3/lib/yaml/__init__.py#L117));
+Dagu's mapping/default and legacy override are in
+`dagucloud/dagu@v2.16.6:internal/cmn/config/loader.go:586-611`.
+Supply `--dagu-bin`, `--dagu-home`, `--config`, this one DAG's
 `--dag-history` directory and the exact aware `--due-at` timestamp. The script
 verifies an existing unit's MainPID and executable, then uses native
 `systemctl --user kill --kill-whom=main --signal=SIGKILL <unit>` to address that
@@ -439,7 +450,7 @@ job, and independent alerts still need user decision 2.
 | --- | --- |
 | `session_day.py` | `gerrymanoim/exchange_calendars@4.13.2:pyproject.toml:67-68; exchange_calendars/ecal.py:100-149` ships a calendar renderer; its `exchange_calendar.py:1012-1016,1257-1279` APIs supply session/close queries, leaving our eligibility/freshness token as job policy. |
 | `journal_recovery.py` | `restic/restic@v0.19.1:doc/040_backup.rst:679-703; doc/045_working_with_repos.rst:482-521; doc/050_restore.rst:55-73` supplies stream backup, partition checks and restore, leaving the external frozen oracle, required table contract, bounded rotation and failure controls to the consumer. |
-| `drill_process_restart.py` | `systemd/systemd@v255:man/systemctl.xml:541-549,2377-2388` supplies unit-addressed kill and `man/systemd.service.xml:818-836` supplies restart; Dagu `@v2.16.6:internal/service/frontend/api/v1/transformer.go:362,371` supplies slot/trigger fields, leaving identity/time/holiday guards and exact-slot correlation as acceptance policy. |
+| `drill_process_restart.py` | `yaml/pyyaml@6.0.3:lib/yaml/__init__.py:117-125` supplies YAML parsing; `systemd/systemd@v255:man/systemctl.xml:541-549,2377-2388` supplies unit-addressed kill and `man/systemd.service.xml:818-836` supplies restart; Dagu `@v2.16.6:internal/service/frontend/api/v1/transformer.go:362,371` supplies slot/trigger fields, leaving identity/time/holiday guards and exact-slot correlation as acceptance policy. |
 | `drill_local_recovery.py` | `python/cpython@v3.12.3:Modules/_sqlite/connection.c:2067-2102` supplies Online Backup and restic `@v0.19.1:doc/050_restore.rst:55-73` supplies restore, leaving the concurrent-write fixture, two deliberately failing controls and path-free receipt as our local integration evidence. |
 
 Specifically checked: `restic backup --stdin-from-command -- sqlite3 "$DB"

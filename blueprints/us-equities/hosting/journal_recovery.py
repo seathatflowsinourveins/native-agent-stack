@@ -45,11 +45,17 @@ def json_bytes(value) -> bytes:
 
 
 def write_new(path: Path, data: bytes) -> None:
+    # CPython@v3.12.3:Doc/library/os.rst:996-1005,1077-1087: native fchmod/fsync.
     with path.open("xb") as stream:
         stream.write(data)
         stream.flush()
+        os.fchmod(stream.fileno(), 0o400)
         os.fsync(stream.fileno())
-    path.chmod(0o400)
+    parent = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(parent)
+    finally:
+        os.close(parent)
 
 
 def file_identity(path: Path) -> dict:
@@ -221,7 +227,7 @@ def check_rotation(restic, state_path: Path, *, parts=CHECK_PARTS, now=None,
     """All n/t subsets in at most seven days; advance only after native success.
 
     Run daily, including weekends/holidays; jitter and DST do not impose a per-step
-    24h deadline. An incomplete rotation exceeding seven days requires a full read.
+    24h deadline. A rotation exceeding seven days, including at rollover, requires a full read.
     A separate state file belongs to this repository; concurrent checks fail closed.
     """
     if not 1 <= parts <= CHECK_PARTS:
@@ -254,7 +260,7 @@ def check_rotation(restic, state_path: Path, *, parts=CHECK_PARTS, now=None,
             origin = datetime.fromisoformat(state["cycle_started_at"]).astimezone(timezone.utc) if "cycle_started_at" in state else now
             overdue = (state.get("schema_version") != 2 or (part != 1 and "cycle_started_at" not in state) or
                        now < origin or (previous and (now < previous or now - previous > MAX_ROTATION_AGE)) or
-                       (part != 1 and now - origin > MAX_ROTATION_AGE))
+                       now - origin > MAX_ROTATION_AGE)
             if overdue:
                 if not full_check:
                     raise RecoveryError("rotation overdue or clock reversed; require --full-check")
