@@ -16926,8 +16926,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
-      "sha256": "2859b9a07848be5666856121e1bd350e0c08389826718e96334354dd0ac9ecc7",
-      "bytes": 22114
+      "sha256": "0a14e4a70a68400acdcc7da3e1395d70b7b402e03bea272106a7a4d9fd37bd58",
+      "bytes": 23086
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
