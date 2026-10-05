@@ -18697,6 +18697,11 @@
       "bytes": 2166
     },
     {
+      "path": "evidence/artifacts/disk-headroom-enospc-20261005/receipt.json",
+      "sha256": "c0fc8c156929ec9af44a020753b5175e252ba665e4474e34461ce10ea3691348",
+      "bytes": 25377
+    },
+    {
       "path": "evidence/artifacts/env-freshness-20260924/wsl-ubuntu-main.json",
       "sha256": "45104744c02f09434292e5562689426c76543c8a782cf9e3e491947022094025",
       "bytes": 13084
@@ -52463,8 +52468,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "2f0284939d4ad0c90dfc4d4f6e677d8c2b880a3d73c950b219a60b88b6cd88f4",
-      "bytes": 16292
+      "sha256": "cda25710e34c4235c784d451037e5d8ae614c58139ee827ae6d614a7188702a4",
+      "bytes": 21890
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
@@ -52863,8 +52868,8 @@
     },
     {
       "path": "tests/__init__.py",
-      "sha256": "7207b2b3e0d7ebd7fd3b436ad8bc1c6cef7abc772fd08ef49ec4467ff5d6f23d",
-      "bytes": 3001
+      "sha256": "5f32f38f71e5e8ad9c26bd4c83080b4ce1584802b92dd6a7c860678a241c8461",
+      "bytes": 3802
     },
     {
       "path": "tests/adaptive_paper_hermetic.py",
@@ -53263,8 +53268,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "9138d033a5c8441af3c26905ba27fc3a8726433c6610ee815e1b56864ec60cd2",
-      "bytes": 60024
+      "sha256": "0f18570a5f35701f88770fc702bc9bba815e3a5e17104422264fc2570dbd8b50",
+      "bytes": 60148
     },
     {
       "path": "tests/test_catalogs.py",
@@ -53723,8 +53728,8 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "256a60345e905991852d0500343202436f452623a8e3e5231232533d4969f12c",
-      "bytes": 31542
+      "sha256": "fa3ab3ed890fd3beaa88ea3be0629c5ec8eb7d36556a4777e564926d5d8ed8eb",
+      "bytes": 41001
     },
     {
       "path": "tests/test_observability_run_correlation.py",
