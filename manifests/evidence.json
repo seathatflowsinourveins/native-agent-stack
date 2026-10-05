@@ -4292,8 +4292,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "064d309189054b6f2c6ec37855fd3e3e6c09eee42197865cc1cc86d9233dcc20",
-      "bytes": 26117
+      "sha256": "0153fc7595f7dd64d077366b2b0251cbe78f13a47f90798ab6d3d746624c2aec",
+      "bytes": 25235
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -16572,11 +16572,6 @@
       "bytes": 15230
     },
     {
-      "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
-      "sha256": "97e34f1db2f3ec833bdf3525e7645b9b4bb346006559d583d5ce7b001ee8fe8e",
-      "bytes": 14180
-    },
-    {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
       "sha256": "aa1e7b5ad354b6a86c9dac099053944aaadcfd951c08ec861430812a64552805",
       "bytes": 6304
@@ -16753,8 +16748,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "1e0b26bc02c4e72482576eca7545f6adb7d9ad5be40a7734b407ef06783d322e",
-      "bytes": 191363
+      "sha256": "ca1091c14b65605c72d7aa6fdeb429f80a49c26774c6899dc1d757d1c67f19f7",
+      "bytes": 187468
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -52748,8 +52743,8 @@
     },
     {
       "path": "scripts/freshness_propose.py",
-      "sha256": "2a28545967cf2a84f0de1f392b753b0744d3c269d619f4d415abc12bdf53e5a4",
-      "bytes": 52315
+      "sha256": "c96e99d80e922f257e6c95d8b28c9493e981e4aacd99cfbbe980b4053b55bcd1",
+      "bytes": 51393
     },
     {
       "path": "scripts/git-hooks/pre-commit",
@@ -53267,24 +53262,9 @@
       "bytes": 9953
     },
     {
-      "path": "tests/test_catalog_freshness_pins.py",
-      "sha256": "9fa9d371f765e734ed748008e9106c6accf1f2a956248f8041cb6d23ad9a89ea",
-      "bytes": 6969
-    },
-    {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "0f8f306b5c8ddcbf5f24dfcfddfe6328865c403e57f1a9f6813cf8ac83f26309",
-      "bytes": 62089
-    },
-    {
-      "path": "tests/test_catalog_freshness_runtime.py",
-      "sha256": "8e24af0b02f71d7e16154e2d8297dd566e3c3a3e53f3327c03e42ec9171ecefd",
-      "bytes": 117237
-    },
-    {
-      "path": "tests/test_catalog_freshness_trading.py",
-      "sha256": "d1789f4a67eaf987214c6aff4a9c8c27b9e39f5e4abab04da9c89278a5abb120",
-      "bytes": 35428
+      "sha256": "9138d033a5c8441af3c26905ba27fc3a8726433c6610ee815e1b56864ec60cd2",
+      "bytes": 60024
     },
     {
       "path": "tests/test_catalogs.py",
@@ -53978,8 +53958,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "sha256": "515139bebb6f1662bf1e2cdca6925fdb77f47994951b35eea71c9c8cf4fd0dd4",
-      "bytes": 170766
+      "sha256": "cb197ddbe88b82bfc110bcf77da80ab59197f371407c93674643718b8469dcf1",
+      "bytes": 163940
     },
     {
       "path": "tests/test_sota_sources_gate.py",
@@ -54348,8 +54328,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "27c222565ce12f06f2f2b0de09a6aafb480c922414247af95426ac059fe025e8",
-      "bytes": 124839
+      "sha256": "91af1beac78818d9b414a4de7f099c92133b1f84d7db1ce0715932195122f78c",
+      "bytes": 121534
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -54373,8 +54353,8 @@
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
-      "sha256": "68143ed50b42bcf1fb6ebfdfc5e098813d2b0ecb6ed294bcce32a942520bc3ac",
-      "bytes": 34906
+      "sha256": "aa3964f31cedc9098354d9a4cdbd47170a1358662358b5e55e57d0ff600617b7",
+      "bytes": 27422
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
