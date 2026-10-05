@@ -5918,6 +5918,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-05",
+            "sweep_id": "landscape-sweep-webresearch-20261005-ns2604"
           }
         ],
         "unresolved": [],
@@ -9386,6 +9390,12 @@
             "layers": 20,
             "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-05",
+            "layers": 1,
+            "manifest_ref": "catalogs/sota-convergence/manifest-20261005-webresearch-ns2604.json",
+            "sweep_id": "landscape-sweep-webresearch-20261005-ns2604"
           }
         ],
         "host_e2e_platform": "linux-wsl2-x86_64",

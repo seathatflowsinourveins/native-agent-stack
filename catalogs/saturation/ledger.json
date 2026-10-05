@@ -10913,7 +10913,265 @@
      ]
     }
    ]
+  },
+  {
+   "sweep_id": "landscape-sweep-webresearch-20261005-ns2604",
+   "date": "2026-10-05",
+   "workflow_run": "wf_5d8a2a30-9b5",
+   "status": "completed",
+   "manifest_ref": "catalogs/sota-convergence/manifest-20261005-webresearch-ns2604.json",
+   "manifest_sha256": "e2d3944c73766d49758c0917eb22b7bd2c9e871475bcc07efa1424ab627f6751",
+   "lane": "landscape-sweep-webresearch-20261005-ns2604",
+   "prompts_sha256": "a5736ef7aab9aa7a4a530dc61691dcf56fb1771ea724ec3244ff043a8ff60d97",
+   "usage_ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604-attempts/child-usage-wf_5d8a2a30-9b5.json",
+   "usage_sha256": "40fc65d95aedd966af6c702263178c7de48ded4cb1867a9ed1c51100f5797eb2",
+   "lower_bound_usage": false,
+   "returns_ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json",
+   "returns_sha256": "0a1d06245c958b8de7495793df9e5ee4e15aebe69fbeaa7bb55c2ada322ed646",
+   "prev_sha256": "d6d5695f02c2404b38476be33f5be536e47bbe1c4793ab03ffd4bc0c43abb7b2",
+   "layers": [
+    {
+     "catalog": "foundation",
+     "layer_id": "web-research",
+     "requirement_sha256": "c90c7296603e2905021600b07d55018b752fa8a02b017d57e946a1bc77fc75e6",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/discovery/web-research",
+     "calls": {
+      "web_search": 10,
+      "web_fetch": 11,
+      "gh_api": 50,
+      "gpt6_web_search": 24,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 80
+     },
+     "proposed": [
+      "https://github.com/chromedevtools/chrome-devtools-mcp",
+      "https://github.com/unclecode/crawl4ai",
+      "https://github.com/exa-labs/exa-mcp-server",
+      "https://github.com/adbar/trafilatura",
+      "https://github.com/1broseidon/ketch",
+      "https://github.com/knockoutez/wigolo",
+      "https://github.com/browserbase/stagehand",
+      "https://github.com/d4vinci/scrapling",
+      "https://github.com/krlabsorg/lettucedetect",
+      "https://github.com/commoncrawl/cdx_toolkit",
+      "https://github.com/meridianlabs-ai/inspect_swe",
+      "https://github.com/promptfoo/promptfoo",
+      "https://github.com/ukgovernmentbeis/inspect_evals",
+      "https://github.com/answerdotai/llms-txt",
+      "https://github.com/anthropics/claude-code",
+      "https://github.com/vulcanlab/ipi-proxy"
+     ],
+     "known": [
+      "https://github.com/chromedevtools/chrome-devtools-mcp",
+      "https://github.com/unclecode/crawl4ai",
+      "https://github.com/exa-labs/exa-mcp-server",
+      "https://github.com/adbar/trafilatura",
+      "https://github.com/knockoutez/wigolo",
+      "https://github.com/browserbase/stagehand",
+      "https://github.com/d4vinci/scrapling"
+     ],
+     "new": [
+      "https://github.com/1broseidon/ketch",
+      "https://github.com/krlabsorg/lettucedetect",
+      "https://github.com/commoncrawl/cdx_toolkit",
+      "https://github.com/meridianlabs-ai/inspect_swe",
+      "https://github.com/promptfoo/promptfoo",
+      "https://github.com/ukgovernmentbeis/inspect_evals",
+      "https://github.com/answerdotai/llms-txt",
+      "https://github.com/anthropics/claude-code",
+      "https://github.com/vulcanlab/ipi-proxy"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/exa-labs/exa-mcp-server",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/2/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/2/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/exa-labs-exa-mcp-server.json"
+      },
+      {
+       "repo": "https://github.com/adbar/trafilatura",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/3/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/3/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/adbar-trafilatura.json"
+      },
+      {
+       "repo": "https://github.com/krlabsorg/lettucedetect",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/8/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/krlabsorg-lettucedetect.json"
+      },
+      {
+       "repo": "https://github.com/commoncrawl/cdx_toolkit",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/9/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/9/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/commoncrawl-cdx-toolkit.json"
+      },
+      {
+       "repo": "https://github.com/vulcanlab/ipi-proxy",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/15/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/15/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/vulcanlab-ipi-proxy.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/chromedevtools/chrome-devtools-mcp",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/0/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/unclecode/crawl4ai",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/1/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/1broseidon/ketch",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/4/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/knockoutez/wigolo",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/browserbase/stagehand",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/6/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/d4vinci/scrapling",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/7/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/meridianlabs-ai/inspect_swe",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/10/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/promptfoo/promptfoo",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/11/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/ukgovernmentbeis/inspect_evals",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/12/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/answerdotai/llms-txt",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/13/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/13/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-code",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/14/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json#/votes/web-research/14/fit"
+       }
+      }
+     ],
+     "reopen": []
+    }
+   ]
   }
  ],
- "head_sha256": "d6d5695f02c2404b38476be33f5be536e47bbe1c4793ab03ffd4bc0c43abb7b2"
+ "head_sha256": "5050382d382cdb7b532639501b5b3758db698711802045d7a598b33a109798e5"
 }

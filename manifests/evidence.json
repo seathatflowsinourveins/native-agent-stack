@@ -15895,8 +15895,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "a3d4df9eb0f9cea278deb99a6370eb7f17e46c87e63b2092a649e9831d147519",
-      "bytes": 314853
+      "sha256": "cf84f24e71ed724628f5db4be0417c626a60d131a03ab084b1e2db1473ca30c2",
+      "bytes": 315235
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -15975,13 +15975,13 @@
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "4a37a821f5608da528a8fa1f1774a7ba7ad82b6af17d11815c2d3ac6283b3375",
-      "bytes": 403074
+      "sha256": "3f6301fc85451223ed0085e97254f31d342e9356fa7df7e16728d72caa8fa2f3",
+      "bytes": 413907
     },
     {
       "path": "catalogs/sota-convergence/README.md",
-      "sha256": "76ee44ca2cdb48b6ce62379b6b1b7fd71276b868c5724138751b333331b1106c",
-      "bytes": 16558
+      "sha256": "b4ed86ae8a3d2ce8deb2263a720f25bdaf941d1ad1f8e6e2c8596aece3cd4f38",
+      "bytes": 17771
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
@@ -16007,6 +16007,11 @@
       "path": "catalogs/sota-convergence/manifest-20260929.json",
       "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
       "bytes": 1149103
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261005-webresearch-ns2604.json",
+      "sha256": "e2d3944c73766d49758c0917eb22b7bd2c9e871475bcc07efa1424ab627f6751",
+      "bytes": 261445
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -16430,8 +16435,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "f09a0e803184d4e31e48c534ae6d717774516bc2f42d1f7195fa4bee434eb0cb",
-      "bytes": 32903
+      "sha256": "7ecc7bead33dcc31b3c66884f0ffa4a9fc4820a6094d4133a924c26ae493a737",
+      "bytes": 33010
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -16912,6 +16917,11 @@
       "path": "docs/decisions/2026-10-05-rtk-fold-harbor-phase2.md",
       "sha256": "d7698470de9eb7ed30f0764f8b1b17acd8a926298b08630829e1b955ba177dfe",
       "bytes": 23344
+    },
+    {
+      "path": "docs/decisions/2026-10-05-seeded-web-research-landscape.md",
+      "sha256": "e9cb39a27d5cd92f6dbcf4c82697d1e5c725e3a6e72231b99c57a640f7cad028",
+      "bytes": 9644
     },
     {
       "path": "docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md",
@@ -34277,6 +34287,71 @@
       "path": "evidence/artifacts/landscape-sweep-20260929/vshulcz-deja-vu.json",
       "sha256": "1ecffbbd16d616fe5a3728d23cf16824fd84579c55544c4fc131086486b628d1",
       "bytes": 2160
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604-attempts/child-usage-wf_5d8a2a30-9b5.json",
+      "sha256": "40fc65d95aedd966af6c702263178c7de48ded4cb1867a9ed1c51100f5797eb2",
+      "bytes": 305901
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/adbar-trafilatura.json",
+      "sha256": "148aa30e069e5994ef3cf9d78c90be7a8ac975424b95f1748d1c95debd077286",
+      "bytes": 2252
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/commoncrawl-cdx-toolkit.json",
+      "sha256": "d1245fd461f8574d16a236d0e9cfffd9b2f2f6dc2a4b8e0f27855cb77612529f",
+      "bytes": 1940
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/convert-summary.json",
+      "sha256": "2ae39c777713248e9bac7b8f706cf981999fa3fb49cb60357f38420247946903",
+      "bytes": 1476
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/exa-labs-exa-mcp-server.json",
+      "sha256": "38be68e2d5bb424401981a886bd04dd09e840213188aa63b1d31607cbd09e2c2",
+      "bytes": 1494
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/krlabsorg-lettucedetect.json",
+      "sha256": "dd703130a13ddff64a1d9ac1d5f61fead6a3e897da75efcecf5534542e963b78",
+      "bytes": 1872
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/lanes.json",
+      "sha256": "8f898fd8546bc458d396bf916097b360dbb47a7320229e63b98bd62dfd727f56",
+      "bytes": 133988
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/layers.json",
+      "sha256": "863ac3ce317c6c38d418840aa980db558eef2c6f4e4b1f68555540d3e9e088ef",
+      "bytes": 5364
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json",
+      "sha256": "0a1d06245c958b8de7495793df9e5ee4e15aebe69fbeaa7bb55c2ada322ed646",
+      "bytes": 229049
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/scope.json",
+      "sha256": "45157b7c2090dd28447cec9f3fe793600154fb330490ca3c7a0f2dc87f2e13e9",
+      "bytes": 3403
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/seeds.json",
+      "sha256": "f704f5ff1d058a8173df676af3bbd04ce578fedba9165d4659dc94e0687b83fe",
+      "bytes": 1520
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/survivors.json",
+      "sha256": "bf621a9e856b218500a398925b025341c407bba84ba7f8048fb1a83cf1d23a8b",
+      "bytes": 483
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/vulcanlab-ipi-proxy.json",
+      "sha256": "d14e27823893554dd1a7eaeed829e3676437b40698d224b2b3ea46a067bafc51",
+      "bytes": 1686
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/README.md",
