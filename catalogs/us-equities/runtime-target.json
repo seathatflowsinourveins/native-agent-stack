@@ -91,11 +91,12 @@
         {
           "ref": "https://github.com/nautechsystems/nautilus_trader/issues/4946",
           "state": "closed",
-          "state_checked_at": "2026-10-01",
+          "state_checked_at": "2026-10-05",
           "path": "pre-trade risk: account-scoped checks",
           "reported_against": "2.0.0rc4; the fail-open branch is at crates/risk/src/engine/mod.rs:1218-1234 at tag v2.0.0rc5",
           "effect": "For a broker-routed SMART instrument the account registered under venue IB is not found, so every account-scoped pre-trade check (max_notional_per_order, free balance, cumulative notional) is skipped with only a debug log.",
-          "upstream_fix": "Closed 2026-09-25T11:03:11Z by develop commit ed6fc8bf47fd37dda97d63b9b2df160719ee2bac ('Apply pre-trade risk to the destination execution account'), which is in no release (the newest release is the prerelease v2.0.0rc5; GitHub's releases/latest is v1.231.0; read 2026-10-01); PR #5041 also lists it as covered."
+          "upstream_fix": "Closed 2026-09-25T11:03:11Z by develop commit ed6fc8bf47fd37dda97d63b9b2df160719ee2bac ('Apply pre-trade risk to the destination execution account'). It was in no release at the October 1 check; GitHub now lists v2.0.0rc6, published 2026-10-05T03:03:18Z, and the fix commit is its ancestor (compare reports ahead, behind_by 0). The selected rc5 pin remains affected.",
+          "rerun_trigger": "On an authorized engine-pin change to a release containing ed6fc8bf, re-run a discriminating over-limit native test with zero broker submissions, then the bounded IBKR paper cases and independent flat proof. The rc5 runner uses qty=1 plus timestamped quote admission and USD 10 headroom while stating that its configured engine cap is not enforced on SMART/IB."
         }
       ],
       "rc5_reclassified_reports": [

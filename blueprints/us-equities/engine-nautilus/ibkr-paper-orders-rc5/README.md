@@ -6,12 +6,15 @@ ExecTester**, LiveNode and native Interactive Brokers factories. The four case
 labels mirror the [frozen 1.231.0 trial](../ibkr-paper-orders/README.md): accept a
 resting buy, cancel it, fill a one-share buy, flatten and independently prove flat.
 
-**Current admission result: `refused_unenforced_notional`, exit 3, before any
-connection.** The selected pin supports `max_notional_per_order`, but its risk
-engine can skip that check for broker-routed stock instruments. A configured
-limit cannot establish an enforced limit. There is no command line bypass.
-This is an offline build with a documented source blocker, not a paper run or a
-passed `ibkr-local-acceptance` gate. The coordinator owns review and broker execution.
+Round r2 enables the bounded trial through runner quote admission and quantity
+one while keeping the native risk engine enabled and its cap configured. The
+selected pin skips the cap on the SMART/IB route. The receipt retains the
+requested statement exactly: "engine notional cap configured, not enforced on
+this route (#4946, fixed on develop, unreleased); bound held by qty=1 and quote
+admission". Its adjacent release verification corrects the dated "unreleased"
+clause: v2.0.0rc6 was published on 2026-10-05 and includes the fix. This build
+still pins rc5. The coordinator owns review and broker execution; offline tests
+do not establish the `ibkr-local-acceptance` gate.
 
 ## Source and decision, 2026-10-05
 
@@ -42,20 +45,29 @@ but the missing-account branch remains in this selected tag; closed issue state
 does not establish a fix in the installed pin. This is source evidence, not an
 observed broker failure.
 
-The decision is to preserve the user's rc5 pin and the upstream strategy and
-refuse an unenforced bound. Switching to the frozen 1.231.0 strategy would
-change the destination; selecting a later revision would change the pin;
-reimplementing the entry as a protected limit would duplicate upstream trading
-logic. None is adopted. Overturn this refusal only with original-source and
-native evidence that the selected route checks the notional before dispatch,
-including a discriminating over-limit case with zero broker submissions.
+The command center's r2 decision preserves rc5 and the native strategy and
+holds admission in the runner. Official client 92 requests timestamped
+`reqTickByTickData(..., "BidAsk", 0, False)` followed by `reqCurrentTime()`.
+The installed official ibapi 10.45.1 callback signatures were inspected. A
+positive, uncrossed quote must be at most ten seconds old against the broker
+clock; notices 10089/10167, delayed tick types and delayed data modes refuse.
+One times the ask plus USD 10 headroom must fit the USD 1000 cap. The receipt
+records bid, ask, age, timestamps, headroom and derived offset. The child checks
+the age again and recomputes the cap and offset before constructing the node.
 
-An additional bound needs review before enabling the execution path: the native
-strategy closes the whole position. If both the market entry and the resting
-buy fill, native shutdown can create a SELL of two shares. The runner records an
-unexpected C1 fill as failure, but that observation alone cannot enforce a
-one-share closing-order ceiling. Removing the notional refusal is therefore
-insufficient to establish all of the frozen bounds.
+The resting offset is `floor(0.5 * admitted_bid / 0.01)`, following the frozen
+trial's half-bid placement. A synthetic USD 770.01 bid gives 38500 ticks; the
+native price is its current bid minus USD 385. This keeps the probe far below
+market during the bounded trial. An unexpected resting fill remains a failed
+case. MARKET entry and close retain upstream behavior; quote headroom is
+admission evidence, and observed fill-bound breaches are failures.
+
+Source currency correction, verified through GitHub on 2026-10-05:
+[fix ed6fc8bf](https://github.com/nautechsystems/nautilus_trader/commit/ed6fc8bf47fd37dda97d63b9b2df160719ee2bac)
+is an ancestor of [v2.0.0rc6](https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc6),
+published at 03:03:18 UTC. "Fixed on develop, in no release" was accurate in the
+retained October 1 metadata and is superseded by that release. Pin migration
+and a discriminating native over-limit test are the engine-cap re-run trigger.
 
 The official-ibapi checker, broker `liquidHours` parser and redaction are reused
 directly from [the frozen harness](../ibkr-paper-orders/run.py). Only its pure
@@ -92,9 +104,9 @@ rtk "$orders_env/bin/python" \
   blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/run.py --plan-only
 ```
 
-The second command returns exit 3 at the current pin. Outside the regular-hours
-window it reports the window refusal first. This is an expected refusal and
-places no orders. The order-run recipe, retained for coordinator review, is:
+The second command returns exit 0 inside the window with pinned dependencies,
+and records only structural validation. Outside regular hours it refuses.
+Neither command connects or fetches a quote. The coordinator's order recipe is:
 
 ```sh
 rtk "$orders_env/bin/python" \
@@ -102,8 +114,8 @@ rtk "$orders_env/bin/python" \
   --port 4002 --receipt "$orders_env/../receipt-rc5-orders.json"
 ```
 
-That recipe also refuses before connecting until the source blocker and remaining
-bound gaps are resolved. `7497` is the only alternative port. An account is never
+That recipe performs the flat pre-check and quote admission before starting the
+node. `7497` is the only alternative port. An account is never
 accepted as an argument or loaded from `TWS_ACCOUNT`. After admission, the
 official client 92 discovers exactly one DU account with zero nonzero positions
 and zero open orders. Its account identifier stays in memory and travels to the
@@ -129,20 +141,18 @@ Changes from the upstream example are bounded configuration and observation:
 | --- | --- |
 | Instrument and endpoint | AAPL becomes SPY, using upstream RAW `SPY=STK.SMART`; 7497/101 become 4002/91, with 7497 allowed. |
 | Account discovery | Replace `TWS_ACCOUNT` with the official pre-check's in-memory account. |
-| Risk engine | Set `bypass=False` and `max_notional_per_order={"SPY=STK.SMART": "1000"}`. Constructor support is verified; the source-proven enforcement gap causes refusal. |
+| Risk engine | Set `bypass=False` and `max_notional_per_order={"SPY=STK.SMART": "1000"}`. State the route's cap limitation and hold admission through quantity one and a fresh ask plus USD 10 headroom. |
 | Submit rate | `6/00:07:00` limits native dispatch over the whole run instead of the example's default rate. |
 | Quotes | REALTIME and `batch_quotes=False` replace DELAYED. Delayed data cannot establish bounded current-price admission. |
 | Sell quotes and other orders | Disable limit sells, stops and brackets. Entry quantity and limit quantity remain one; entry stays MARKET IOC on the first quote. |
-| Resting order | Retain upstream `tob_offset_ticks=500`, `use_post_only=True`. At the frozen USD 0.01 tick this rests USD 5 below the bid. |
+| Resting order | Derive `tob_offset_ticks=floor(0.5 * admitted_bid / 0.01)`; pass and validate it through the pipe. Set `use_post_only=False` because rc5's IB adapter denies every post-only submit. |
 | Resting lifetime | Use GTD with seven-minute expiration and explicitly disable modify/cancel-replace. Upstream `limit_order_is_one_shot` treats an expiration as one attempt, preventing repeated rejected or filled limit buys. |
-| Stop | Preserve native cancel-on-stop, close-on-stop and `reduce_only_on_stop=False`. Native close remains MARKET with the upstream default GTC; no custom flatten strategy or retries are introduced. |
+| Stop | Preserve native cancel/close-on-stop and `reduce_only_on_stop=False`; enable `use_individual_cancels_on_stop=True`. Defer requested stops until no strategy order is SUBMITTED or lacks a venue id, with terminal orders excluded and the deadline as the bound. Native close remains MARKET GTC. |
 | Node timeouts | Use `_common.py`'s builder methods with the frozen 60-second connection budget, 5-second reconciliation/portfolio/disconnection timeouts and a 45-second post-stop grace for callbacks. |
 | Runtime control | Host the node with upstream `run_async()`, capture cache/handle first and handle SIGINT, SIGTERM and SIGHUP. A parent process reserves the final 60 seconds for independent observation and requests graceful stop before enforcing the hard deadline. |
-| Logging | Set native stdout/file log levels OFF and `print_config=False` to keep the account/config out of native logs; the receipt reads the cache directly. These installed LoggerConfig parameters were verified offline. |
+| Logging | Set native stdout/file log levels OFF and `print_config=False`; send child stdout/stderr to DEVNULL and remove RUST_LOG, NAUTILUS_LOG and TWS_ACCOUNT from its environment. Read receipt evidence from the shared cache. |
 
-The 500-tick resting offset follows upstream's own execution example rather
-than the frozen harness's half-bid price, which is much farther from market.
-For example, at a **synthetic** USD 770 bid the USD 5 offset is about 0.65%.
+The half-bid placement reuses the frozen harness's distant resting probe.
 IB precautionary settings are configurable; this build has not observed the
 Gateway's actual settings or a current quote, so it cannot certify that this
 price lies inside this account's configured limits. IB documents these controls
@@ -155,6 +165,17 @@ custom strategy's sequential chronology. The wrapper watches until C1 acceptance
 and C3's full fill are present, or a failure, signal, case timeout or deadline
 requests stop. The native strategy then supplies C2 and C4. Native cache events
 with `reconciliation=True` cannot establish venue acceptance or cancellation.
+An observer exception requests native stop and awaits the running task;
+snapshot, receipt, signal removal and disposal each have independent cleanup.
+The handle receives stop only once. Parent deadline enforcement and independent
+flat proof remain in place if graceful shutdown cannot complete.
+
+The captured cache is a **live shared view**, verified in rc5's original
+[node binding](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/live/src/python/node.rs#L911)
+and [cache binding](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/python/cache.rs#L79).
+`py_cache` passes the kernel's `Rc<RefCell<Cache>>` into `PyCache::from_rc`;
+each `orders()` call borrows that same cache and returns cloned order objects.
+The runner re-reads those objects on every poll.
 
 ## Receipts and remaining acceptance
 
@@ -185,8 +206,10 @@ or forced termination, including an incomplete node phase. It places no orders.
 Receipt text uses the frozen account-id pattern `\b(?:D?[UF]|I)\d{5,}\b`, IPv4,
 absolute-path and account-amount redaction, with a final pass over serialized
 text for the in-memory account and id-shaped text. Structured execution prices
-and fees remain available for review. **Console output is unredacted** if native
-clients emit diagnostics; the console is not the sanitized receipt.
+and fees remain available for review. Node child output is discarded. **Console
+output is unredacted** if the parent official clients emit diagnostics; the
+console is not the sanitized receipt. The parent's JSON summary receives the
+final id-shaped-text scrub.
 
 Exit codes: **0** passed, **1** failed/incomplete, **2** not connected, **3** refused
 or cleanup required. A passing C1–C4 subset would still leave the broader
@@ -201,8 +224,8 @@ or cleanup required. A passing C1–C4 subset would still leave the broader
 - Step 4 kill switch and alert exercise: unexercised; #5060 remains an open
   reconciliation issue. Handling a signal is not acceptance of a kill switch.
 
-These states were read from upstream on 2026-10-05. Step 2's frozen-bound
-obligation is additionally blocked by the selected pin's #4946 path. No receipt
+These issue states were read from upstream on 2026-10-05. Step 2 reports runner
+admission separately from the engine's #4946 cap limitation. No offline result
 from this builder advances broker readiness or a strategy gate.
 
 ## Offline checks and completeness review
@@ -210,7 +233,7 @@ from this builder advances broker readiness or a strategy gate.
 Use a scratch directory outside the worktree and outside `/tmp`, with nice 19:
 
 ```sh
-orders_scratch="${XDG_CACHE_HOME:-$HOME/.cache}/rc5-orders-r1/tmp"
+orders_scratch="${XDG_CACHE_HOME:-$HOME/.cache}/rc5-orders-r2/tmp"
 rtk mkdir -p "$orders_scratch"
 rtk env TMPDIR="$orders_scratch" PYTHONDONTWRITEBYTECODE=1 nice -n 19 \
   "$orders_env/bin/python" -m unittest tests.test_ibkr_paper_orders_rc5
@@ -221,24 +244,23 @@ rtk env TMPDIR="$orders_scratch" PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 sc
 rtk env TMPDIR="$orders_scratch" nice -n 19 git diff --check
 ```
 
-The tests cover plan and endpoint violations, whole-run and broker-hours
-refusal, exact pins, redaction, receipt shape, a synthetic C1–C4 event mapping,
-provisional receipt timing, independent proof failures and actual installed
-config/model constructors. Native checks skip when the interpreter lacks rc5.
-Orchestration fixtures replace both the official checker and node process;
-their counterfactual cap resolution exists only in test mocks. No test starts
-a node or connects to a broker. These are local integration checks and synthetic
-fixtures, not unchanged upstream tests or native paper evidence.
+The tests cover plan and endpoint violations, windows, pins, redaction, receipts,
+synthetic C1–C4 mapping, quote age/delay/headroom refusals, offset validation,
+deferred and single stop, observer cleanup failures, provisional receipt timing,
+flat-proof causes and final breach statuses. Installed checks exercise the real
+config/model constructors, post-only and individual-cancel flags and logger
+config and the real builder/cache handle without starting the node. They skip
+without rc5. All network readers and node execution are
+synthetic; no test connects. These are local integration checks and fixtures,
+not unchanged upstream tests or native paper evidence.
 
-Completeness review: original Python examples, installed APIs, tagged Rust risk
-and strategy paths, the official checker and IB preset documentation were
-considered. Config support alone missed the broker account/venue risk boundary;
-that finding produced the mandatory refusal. The source also exposes the
-two-share close edge case and lacks a pre-submit quote-age/loss admission guard
-in ExecTester. The next trading execution sweep must find a maintained native
-guard for those bounds at the chosen pin before authorizing an enabled recipe.
-Actual commission timing, precautionary settings, reconnect, restart, alerts,
-kill switch and paper execution remain unobserved here.
+Completeness review: the cross-family review's post-only denial, late-fill stop
+race, cancellation targeting, cleanup failures and status defects are addressed.
+Original PyO3 source confirms the cache view; the installed official API supplies
+timestamped admission. The upstream release check corrected stale #4946 release
+metadata. Actual commissions, precautionary settings, entitlements, concurrent
+account use, reconnect, restart, alerts, kill switch and paper execution remain
+unobserved here. The coordinator's paper trial supplies native case evidence.
 
 API correction retained from the offline probes: the Python instrument
 provider's `determine_venue` accepts a contract dictionary, not an official
@@ -246,3 +268,8 @@ ibapi `Contract` instance. A proposed `symbol_to_mic_venue={"SPY": "IB"}` does
 not remap this stock's ARCA primary exchange in rc5; the dictionary probe and
 [stock-venue resolver](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/adapters/interactive_brokers/src/providers/instruments.rs#L347)
 confirmed it. That proposed workaround is not used.
+
+Cache probe correction: the installed public `Cache` view does not expose
+`add_order`; that method belongs to the separate mutable Rust binding. Shared
+observation is established by `PyCache::from_rc` and per-call borrows in the
+original binding, rather than by an invented Python mutation method.
