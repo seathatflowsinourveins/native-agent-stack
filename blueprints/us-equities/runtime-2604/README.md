@@ -36,8 +36,15 @@ succeed with that native binary and the identical settings below. The
 records successful installation and offline acceptance. Under
 `mise exec uv@0.12.17`, the install script ran the shared sync vector:
 `uv lock --check`, `uv sync --locked --no-dev` and `uv pip check`, as
-[sync-trading-2604.sh](sync-trading-2604.sh#L14) shows. The relock
-(`uv lock --upgrade-package edgartools`) itself was not run through mise.
+[sync-trading-2604.sh](sync-trading-2604.sh#L14) shows. Both relocks used the
+installed native uv 0.12.17 executable on the packaging worker, with mise
+unavailable: the EdgarTools upgrade (`uv lock --upgrade-package edgartools`)
+produced lock `6b4e6a4d`, as recorded in the
+[lock comparison](../../../evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json);
+the round-c build-constraint relock produced final lock `4c98672d14147a1b`, as
+recorded in the
+[build-constraint proof](../../../evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json).
+Neither relock ran through mise.
 Independent review remains pending. The installer still enforces uv 0.12.17;
 no shim or host-guard bypass is used.
 

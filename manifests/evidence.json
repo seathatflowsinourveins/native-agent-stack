@@ -4174,7 +4174,7 @@
         "Images were pulled by immutable OCI index digest and inspected only. Source-to-image reproducibility, LEAN oracle parity and rc5 broker risk/recovery remain open."
       ],
       "path": "evidence/receipts/native-trading-runtime-2604-20261004.json",
-      "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, with the install script's shared sync under mise exec uv@0.12.17: uv lock --check, uv sync --locked --no-dev and uv pip check, as blueprints/us-equities/runtime-2604/sync-trading-2604.sh:14 shows. The relock (uv lock --upgrade-package edgartools) itself was not run through mise. This supersedes the earlier pending notes for the rerun and destination-host install sync; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical."
+      "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, with the install script's shared sync under mise exec uv@0.12.17: uv lock --check, uv sync --locked --no-dev and uv pip check, as blueprints/us-equities/runtime-2604/sync-trading-2604.sh:14 shows. Both relocks used the installed native uv 0.12.17 executable on the packaging worker, with mise unavailable: the EdgarTools upgrade (uv lock --upgrade-package edgartools) produced lock 6b4e6a4d, as recorded in evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json; the round-c build-constraint relock produced final lock 4c98672d14147a1b, as recorded in evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json. Neither relock ran through mise. This supersedes the earlier pending notes for the rerun and destination-host install sync; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical."
     },
     {
       "id": "native-sec-edgartools-5600-20261004",
@@ -4209,7 +4209,7 @@
         "This worker could not execute the prescribed mise route (exit 127: Linux mise unavailable). Resolution and lock validation used the installed native uv 0.12.17 with identical settings; verification through mise remains pending."
       ],
       "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
-      "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, with the install script's shared sync under mise exec uv@0.12.17: uv lock --check, uv sync --locked --no-dev and uv pip check, as blueprints/us-equities/runtime-2604/sync-trading-2604.sh:14 shows. The relock (uv lock --upgrade-package edgartools) itself was not run through mise. This supersedes the earlier pending notes for the rerun and destination-host install sync; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical."
+      "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, with the install script's shared sync under mise exec uv@0.12.17: uv lock --check, uv sync --locked --no-dev and uv pip check, as blueprints/us-equities/runtime-2604/sync-trading-2604.sh:14 shows. Both relocks used the installed native uv 0.12.17 executable on the packaging worker, with mise unavailable: the EdgarTools upgrade (uv lock --upgrade-package edgartools) produced lock 6b4e6a4d, as recorded in evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json; the round-c build-constraint relock produced final lock 4c98672d14147a1b, as recorded in evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json. Neither relock ran through mise. This supersedes the earlier pending notes for the rerun and destination-host install sync; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical."
     },
     {
       "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
@@ -15085,8 +15085,8 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "14a11ea05b0eb4e54cd11126e250d63c5cac5cb6decbb0e330cb6dc59f267463",
-      "bytes": 22415
+      "sha256": "c737cd4e9ceab2d82a71dd7434c2227729e90e370aeb9e0ce94430edbeea0fd9",
+      "bytes": 22887
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
@@ -16490,8 +16490,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-trading-2604-preparation.md",
-      "sha256": "606cf4fe6a4efbbba05ccc4943959d3ce073003d6f5a1d45bd3d0a28570d61ff",
-      "bytes": 35756
+      "sha256": "b8ab7f8ac4bc1e364431dac4ac9f744acdf0bc00f598cfbf9348b7747131984a",
+      "bytes": 36222
     },
     {
       "path": "docs/direct-results.md",
@@ -50695,8 +50695,8 @@
     },
     {
       "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
-      "sha256": "e6f7c6094cb35ed7476d5ba15e4eb04ff0c7eef5914431bf0d040736f36816e6",
-      "bytes": 6629
+      "sha256": "0159acfe8ce7b1e07f3f67504101cca4d9b692f961123d8e6b64c48ad405684e",
+      "bytes": 7026
     },
     {
       "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json",
@@ -51030,8 +51030,8 @@
     },
     {
       "path": "evidence/receipts/native-trading-runtime-2604-20261004.json",
-      "sha256": "25dbce4c7054954b471688974d853d9e73ba19724bbadc8ccd4469c8f39a14ec",
-      "bytes": 22580
+      "sha256": "b939a526b671b3c43012563e61bf8918324b67f8a9200b94d33bf794c3d74a87",
+      "bytes": 22977
     },
     {
       "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json",

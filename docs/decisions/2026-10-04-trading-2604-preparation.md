@@ -497,9 +497,15 @@ This dated follow-up resolves the rerun and records the install script's shared
 sync under `mise exec uv@0.12.17`: `uv lock --check`,
 `uv sync --locked --no-dev` and `uv pip check`, as
 [sync-trading-2604.sh](../../blueprints/us-equities/runtime-2604/sync-trading-2604.sh#L14)
-shows. The relock (`uv lock --upgrade-package edgartools`) itself was not run
-through mise. Independent review remains pending. The supplied native SEC
-acceptance at 5.60.0 remains separate and valid; catalog selections and gate
+shows. Both relocks used the installed native uv 0.12.17 executable on the
+packaging worker, with mise unavailable: the EdgarTools upgrade
+(`uv lock --upgrade-package edgartools`) produced lock `6b4e6a4d`, as recorded
+in the [lock comparison](../../evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json);
+the round-c build-constraint relock produced final lock `4c98672d14147a1b`, as
+recorded in the
+[build-constraint proof](../../evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json).
+Neither relock ran through mise. Independent review remains pending. The
+supplied native SEC acceptance at 5.60.0 remains separate and valid; catalog selections and gate
 status do not change here.
 Python 3.12.3 versus 3.13 ratification and the earlier independent-receipt-review
 qualification remain open.
