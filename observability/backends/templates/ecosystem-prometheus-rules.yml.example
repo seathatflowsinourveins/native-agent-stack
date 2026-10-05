@@ -77,6 +77,74 @@ groups:
         annotations:
           summary: 'WSL root filesystem observations are missing'
           description: 'Missing data is unknown, not proof of available space.'
+      # Port of prometheus/node_exporter v1.12.1 node-mixin filesystem alerts:
+      # commit 6044da783597cc3b57aef7580ddcdcff58a4ee99, docs/node-mixin/alerts/alerts.libsonnet:7-80
+      # and docs/node-mixin/config.libsonnet:67-91 (annotated tag object fc12f2c0ca65).
+      # OTel contrib v0.161.0 filesystemscraper/metadata.yaml declares free/used/reserved.
+      # Available is free alone; sum without(state) is size, preserving filesystem/owner labels.
+      # group_left retains state="free" so the percentage and prediction vectors match.
+      # mode!="ro" carries the mixin's read-only exclusion using the OTel mount mode.
+      - alert: EcosystemRootFilesystemSpaceFillingUp
+        expr: |
+          (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 40)
+          and predict_linear(ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}[6h], 24*60*60) < 0
+        for: 1h
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem is predicted to run out of space within 24 hours'
+          description: 'Less than 40% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within 24 hours, sustained for one hour. Reserved bytes count toward size, not available space.'
+      - alert: EcosystemRootFilesystemSpaceFillingUp
+        expr: |
+          (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 20)
+          and predict_linear(ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}[6h], 4*60*60) < 0
+        for: 1h
+        labels:
+          severity: critical
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem is predicted to run out of space within four hours'
+          description: 'Less than 20% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within four hours, sustained for one hour. Inspect active scratch writers and stop recursive checkout copies.'
+      - alert: EcosystemRootFilesystemAlmostOutOfSpace
+        expr: |
+          ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 5
+        for: 30m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem has less than 5% available space'
+          description: 'Available bytes have stayed below 5% of total filesystem bytes for 30 minutes. Available is the free state; size includes free, used and reserved states.'
+      - alert: EcosystemRootFilesystemAlmostOutOfSpace
+        expr: |
+          ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 3
+        for: 30m
+        labels:
+          severity: critical
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem has less than 3% available space'
+          description: 'Available bytes have stayed below 3% of total filesystem bytes for 30 minutes. Recover headroom before the Collector and Prometheus fail to persist data.'
+      # Incident-specific short-window companion, not an upstream node-mixin default.
+      # 50 GiB is approximately the mixin's 5% low-space band on this ~1 TiB root.
+      # Forecast semantics: prometheus/prometheus v3.15.0 docs/querying/functions.md:769-781.
+      # Host cadence: collector.yaml (30s collection, 1s batch); Prometheus template (15s scrape/evaluation).
+      - alert: EcosystemRootFilesystemBurstFill
+        expr: |
+          predict_linear(ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}[2m], 120) < 0
+          and ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"} < 53687091200
+        for: 15s
+        labels:
+          severity: critical
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem is predicted to exhaust within two minutes below 50 GiB available'
+          description: 'The two-minute free-space trend predicts exhaustion within two minutes and less than 50 GiB remains, sustained for 15 seconds. For a linear fill at r GiB/s the page leads exhaustion by about min(50/r, 120) s minus the observation delay minus the 15 s pending interval: fills slower than about 50 GiB per two minutes get roughly 120 s minus those delays, while faster fills page within about 76 s of crossing the floor (configured collection/batch/scrape/evaluation/pending budget, plus transport and scheduling) and can exhaust the disk first; prediction requires at least two samples. Faster fills can outrun this alert: the test TMPDIR/copy guard prevents the known recursive cause, and the coordinator runs an independent two-minute headroom guard outside this repository. Stop the offending writer and recover headroom.'
   - name: native-telemetry-integrity
     rules:
       - alert: EcosystemTokenCounterResets
