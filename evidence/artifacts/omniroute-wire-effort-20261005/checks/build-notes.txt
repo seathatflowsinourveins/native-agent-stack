@@ -1,0 +1,59 @@
+# Builds and checks of 2026-10-05 (host paths masked)
+
+## published v3.8.51 + the affinity patch (not deployed)
+13:50:54Z fetch-tag exit=0 seconds=0
+13:50:54Z tag v3.8.51 peels to c1e30b7676975feb298b49eff6ff58923c04b89e (expected c1e30b7676975feb298b49eff6ff58923c04b89e)
+e14d1e8e0 fix(sse): let a reused session pin outrank OAuth session occupancy
+c1e30b767 Release v3.8.51
+13:52:17Z npm-ci exit=0 seconds=83
+13:57:42Z build-release exit=0 seconds=325
+13:59:32Z check-pack-artifact exit=0 seconds=110
+14:01:25Z pack exit=0 seconds=113
+BUILD_SHA e14d1e8e0
+800be5f5f7a17eb3ec1c3bbb26edb4aa8e0f013a452aa118dc876c367b7f61d4  <HOME>/.cache/omniroute-build-20261005/omniroute-3.8.51.tgz
+14:01:25Z BUILD DONE
+14:04:38Z npm install -g built tarball exit=0
+BUILD_SHA e14d1e8e0
+b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854
+2.9G	<HOME>/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity
+patched chunk files: 8
+check:pack-boot exit=0 at 14:10:11Z
+
+## upstream check:pack-boot on that build (tail)
+[pack-boot] boot #2: rebooting on the same DATA_DIR to prove disk persistence…
+[pack-boot] healthy: HTTP 200, version 3.8.51
+[pack-boot] value survived a clean shutdown + restart — disk persistence proven
+[pack-boot] ✅ the packed tarball boots AND persists — #7065 class gate green
+
+## the composition: published v3.8.51 + the affinity patch + PR 15167 (its tarball is kept)
+(the first build's worktree with PR 15167's commit cherry-picked on top; the same upstream scripts)
+5f4b3d577 feat(models): add GPT-6.1 Sol catalogs, pricing, and Copilot routing
+e14d1e8e0 fix(sse): let a reused session pin outrank OAuth session occupancy
+c1e30b767 Release v3.8.51
+14:23:25Z build-release-2 exit=0 seconds=353
+14:25:13Z check-pack-artifact-2 exit=0 seconds=108
+14:27:02Z pack-2 exit=0 seconds=109
+BUILD_SHA 5f4b3d577
+d3fda90c297ed1ecbaa82ca42298735ce0b393db9a07bad0b4b79efce118ebe2  <HOME>/.cache/omniroute-build-20261005/omniroute-3.8.51.tgz   (137,823,643 bytes)
+14:27:02Z BUILD2 DONE
+
+## upstream check:pack-boot on the composition
+first run (started 14:35Z): FAILED at boot #1, before any request: "Port 23940 is already in use by PID <pid>"; the script picked a random port that another process on the host held. Not a defect of the build.
+Its progress line "check-pack-boot-2 exit=0" was wrong (the shell expanded $? after a command substitution); the log, not that line, is the record.
+rerun (started 14:41Z, a new random port), exit code 0 at 14:45:38Z (the command's own exit code):
+[pack-boot] packing v3.8.51…
+[pack-boot] installing omniroute-3.8.51.tgz into a clean prefix (postinstall runs for real)…
+[pack-boot] installed package contains the complete sql.js WASM runtime
+[pack-boot] installed package contains the node-machine-id runtime
+[pack-boot] boot #1: installed CLI on :25368 (DATA_DIR isolated)…
+[pack-boot] healthy: HTTP 200, version 3.8.51
+[pack-boot] machine-token auth passed with no/invalid/valid contrast controls
+[pack-boot] settings write/read succeeded through the forced sql.js driver
+[pack-boot] boot #2: rebooting on the same DATA_DIR to prove disk persistence…
+[pack-boot] healthy: HTTP 200, version 3.8.51
+[pack-boot] value survived a clean shutdown + restart — disk persistence proven
+[pack-boot] ✅ the packed tarball boots AND persists — #7065 class gate green
+
+## the kept tarball against a fresh pack of the tested tree (2026-10-05T14:55Z)
+npm pack --dry-run --json in the build worktree (exit 0): shasum 138b8463b802ba72b07680d671255554a079f81a, size 137823643, 26762 entries.
+The kept tarball: sha1 138b8463b802ba72b07680d671255554a079f81a, same size; the sha512 integrity is equal as well. So the kept file is bit-identical to the pack of the tree that check:pack-boot packs and boots.

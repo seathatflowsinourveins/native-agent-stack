@@ -1,0 +1,26 @@
+// What the Codex executor sends upstream (transformRequest output) for GPT-6.1 Sol requests: the wire model and the wire reasoning object.
+// Pure function call: no network, no credentials, no gateway DB (tests/_setup/isolateDataDir.ts points the data dir at a scratch directory).
+import { CodexExecutor } from "./open-sse/executors/codex.ts";
+
+const executor = new CodexExecutor();
+const cases: Array<{ label: string; model: string; reasoning?: Record<string, unknown> }> = [
+  { label: "gpt-6.1-sol-max, client effort max", model: "gpt-6.1-sol-max", reasoning: { effort: "max" } },
+  { label: "gpt-6.1-sol-max, no client effort", model: "gpt-6.1-sol-max" },
+  { label: "gpt-6.1-sol, client effort max", model: "gpt-6.1-sol", reasoning: { effort: "max" } },
+  { label: "gpt-6.1-sol, client effort xhigh", model: "gpt-6.1-sol", reasoning: { effort: "xhigh" } },
+  { label: "gpt-6.1-sol-ultra, no client effort", model: "gpt-6.1-sol-ultra" },
+  { label: "gpt-6-astra-max, client effort max (control)", model: "gpt-6-astra-max", reasoning: { effort: "max" } },
+  { label: "gpt-6-astra, client effort max (control)", model: "gpt-6-astra", reasoning: { effort: "max" } },
+];
+for (const c of cases) {
+  const body: Record<string, unknown> = { model: c.model, input: [{ role: "user", content: [{ type: "input_text", text: "hi" }] }], stream: true };
+  if (c.reasoning) body.reasoning = c.reasoning;
+  let out: Record<string, unknown> | string;
+  try {
+    out = executor.transformRequest(c.model, body, true, { accessToken: "probe", providerSpecificData: {} } as never) as Record<string, unknown>;
+  } catch (error) {
+    out = "ERROR " + String((error as Error).message).slice(0, 120);
+  }
+  const wire = typeof out === "string" ? out : { model: out.model, reasoning: out.reasoning };
+  console.log("WIRE " + JSON.stringify({ case: c.label, wire }));
+}

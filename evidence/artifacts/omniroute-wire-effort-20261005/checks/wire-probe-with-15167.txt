@@ -1,0 +1,7 @@
+{"case":"gpt-6.1-sol-max, client effort max","wire":{"model":"gpt-6.1-sol","reasoning":{"effort":"max","summary":"auto"}}}
+{"case":"gpt-6.1-sol-max, no client effort","wire":{"model":"gpt-6.1-sol","reasoning":{"effort":"max","summary":"auto"}}}
+{"case":"gpt-6.1-sol, client effort max","wire":{"model":"gpt-6.1-sol","reasoning":{"effort":"max","summary":"auto"}}}
+{"case":"gpt-6.1-sol, client effort xhigh","wire":{"model":"gpt-6.1-sol","reasoning":{"effort":"xhigh","summary":"auto"}}}
+{"case":"gpt-6.1-sol-ultra, no client effort","wire":{"model":"gpt-6.1-sol","reasoning":{"effort":"max","summary":"auto"}}}
+{"case":"gpt-6-astra-max, client effort max (control)","wire":{"model":"gpt-6-astra","reasoning":{"effort":"max","summary":"auto"}}}
+{"case":"gpt-6-astra, client effort max (control)","wire":{"model":"gpt-6-astra","reasoning":{"effort":"max","summary":"auto"}}}
