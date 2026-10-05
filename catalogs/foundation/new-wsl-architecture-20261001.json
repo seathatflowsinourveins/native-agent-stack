@@ -134,7 +134,7 @@
           "component_id": "skills-ref",
           "repository": "https://github.com/agentskills/agentskills",
           "pin": "0.1.0",
-          "pin_source": "manifests/stack.json:1620",
+          "pin_source": "manifests/stack.json:1623",
           "install": {"command": "git clone https://github.com/agentskills/agentskills.git \"$STACK_HOME/tools/agentskills\"; git -C \"$STACK_HOME/tools/agentskills\" checkout --detach 69ef37e9424c0a7ea9dd2293b559e43ec8176379; cd \"$STACK_HOME/tools/agentskills/skills-ref\" && uv sync --locked", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "uv run skills-ref validate \"$SKILL_DIRECTORY\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "no GitHub release; PyPI skills-ref 0.1.1 (2026-01-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://pypi.org/project/skills-ref/"}
@@ -356,7 +356,7 @@
           "component_id": "jcodemunch-mcp",
           "repository": "https://github.com/jgravelle/jcodemunch-mcp",
           "pin": "1.108.319",
-          "pin_source": "manifests/stack.json:1685",
+          "pin_source": "manifests/stack.json:1688",
           "install": {"command": "eco=\"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}\"; UV_TOOL_DIR=\"$eco/python-tools\" UV_TOOL_BIN_DIR=\"$eco/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.319", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "a deliberately scoped local code index, then search_symbols and get_symbol_source through jcodemunch-mcp's native MCP tools (called through mcporter): the exact requested function returned (2026-09-20)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-jcodemunch-20260920.json"},
           "upstream_currency": {"latest_release": "v1.108.320 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/jgravelle/jcodemunch-mcp/releases"}
@@ -423,7 +423,7 @@
           "component_id": "poppler",
           "repository": "https://github.com/tsdgeos/poppler_mirror",
           "pin": "26.09.0",
-          "pin_source": "manifests/stack.json:1818",
+          "pin_source": "manifests/stack.json:1821",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/convergence-practice/document-ingestion/README.md"},
           "acceptance": {"command": "pdftotext -bbox-layout -enc UTF-8 on the frozen source list only", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/document-ingestion/README.md"},
           "upstream_currency": {"latest_release": "26.09.0 on the project's release page (the GitHub mirror lists no tags)", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://poppler.freedesktop.org/"}
@@ -517,7 +517,7 @@
           "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
           "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
           "pin": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
-          "pin_source": "manifests/stack.json:2086",
+          "pin_source": "manifests/stack.json:2089",
           "install": {"command": "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2 --json", "kind": "repo_recipe", "source_path": "manifests/stack.json"},
           "acceptance": {"command": "an embeddings request to the vLLM service with the recipe's request body; the receipt records identical embeddings and identical top-10 code-index results after the switch to vLLM 0.30.0", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/vllm-030-switch-20260925.json"},
           "upstream_currency": {"latest_release": "model revision c0c9fea9 (last modified 2026-08-27) is the current head of the model repository", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"}
@@ -625,7 +625,7 @@
           "component_id": "tavily-cli",
           "repository": "https://github.com/tavily-ai/tavily-cli",
           "pin": "0.1.8",
-          "pin_source": "manifests/stack.json:1926",
+          "pin_source": "manifests/stack.json:1929",
           "install": {"command": "uv tool install 'tavily-cli==0.1.8'", "kind": "repo_recipe", "source_path": "recipes/tavily.md"},
           "acceptance": {"command": "tvly search \"Codex CLI Claude Code native agent harness skills official documentation\" --depth basic --max-results 4 --include-domains developers.openai.com,code.claude.com --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/tavily.md"},
           "upstream_currency": {"latest_release": "no GitHub release; PyPI tavily-cli 0.1.8 (2026-09-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://pypi.org/project/tavily-cli/"}
@@ -801,7 +801,7 @@
           "component_id": "playwright-test",
           "repository": "https://github.com/microsoft/playwright",
           "pin": "1.63.0",
-          "pin_source": "manifests/stack.json:1866",
+          "pin_source": "manifests/stack.json:1869",
           "install": {"command": "the wsl-application blueprint's pinned lock with the measured pnpm, plus the verified Chrome for Testing archive extracted into tools/chrome-linux64", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/wsl-application/README.md"},
           "acceptance": {"command": "taskset -c 0-3 pnpm exec playwright test", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/wsl-application/README.md"},
           "upstream_currency": {"latest_release": "v1.63.0 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/microsoft/playwright/releases"}
@@ -866,7 +866,7 @@
           "component_id": "zizmor",
           "repository": "https://github.com/zizmorcore/zizmor",
           "pin": "1.30.1",
-          "pin_source": "manifests/stack.json:1573",
+          "pin_source": "manifests/stack.json:1576",
           "install": {"command": "uv tool install zizmor==1.30.1", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/ci-security/README.md"},
           "acceptance": {"command": "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/convergence-practice/ci-security/README.md"},
           "upstream_currency": {"latest_release": "v1.30.1 (2026-09-09)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/zizmorcore/zizmor/releases"}
@@ -1005,7 +1005,7 @@
           "component_id": "fastapi",
           "repository": "https://github.com/fastapi/fastapi",
           "pin": "0.141.1",
-          "pin_source": "manifests/stack.json:1769",
+          "pin_source": "manifests/stack.json:1772",
           "install": {"command": "make setup; make postgres-install; make postgres-init; make postgres-start", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "0.142.2 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/fastapi/fastapi/releases"}
@@ -1014,7 +1014,7 @@
           "component_id": "nextjs",
           "repository": "https://github.com/vercel/next.js",
           "pin": "16.3.6",
-          "pin_source": "manifests/stack.json:1723",
+          "pin_source": "manifests/stack.json:1726",
           "install": {"command": "make setup", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "v16.3.8 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/vercel/next.js/releases"}
@@ -1023,7 +1023,7 @@
           "component_id": "postgresql",
           "repository": "https://github.com/postgres/postgres",
           "pin": "18.6",
-          "pin_source": "manifests/stack.json:1791",
+          "pin_source": "manifests/stack.json:1794",
           "install": {"command": "make postgres-install; make postgres-init; make postgres-start", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "18.6 is the current 18.x release on the project's versioning page (the GitHub mirror publishes tags only)", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://www.postgresql.org/support/versioning/"}
@@ -1439,7 +1439,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1552",
+          "pin_source": "manifests/stack.json:1555",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -1525,7 +1525,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1552",
+          "pin_source": "manifests/stack.json:1555",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -1611,7 +1611,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1552",
+          "pin_source": "manifests/stack.json:1555",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -2629,7 +2629,7 @@
           "component_id": "omniroute",
           "repository": "https://github.com/diegosouzapw/OmniRoute",
           "pin": "3.8.52-canary (23a11484 + PR13788 + PR15167)",
-          "pin_source": "manifests/stack.json:1887",
+          "pin_source": "manifests/stack.json:1890",
           "install": {
             "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only gpt-gateway",
             "kind": "repo_recipe",

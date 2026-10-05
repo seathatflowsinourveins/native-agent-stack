@@ -10414,8 +10414,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a0229ad6acc3b1d81857d606bbac02db43a25a8f774540fe826a5f132a2380f7",
-      "bytes": 484781
+      "sha256": "0ccf2cdcaa5dd14b5def15425bbfbc4ac543aa4e807b5ee6259aa87a9f1733c5",
+      "bytes": 485939
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15719,7 +15719,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "7761d5dda549bf386ee5c4c355d3d5b040b0d42c9c0f9e3879ad85c6abe802e2",
+      "sha256": "7e2b0704aa0b2cd7e50058c7e7976048f8f4283005fa43de5fdd6baa17a1e867",
       "bytes": 309377
     },
     {
@@ -15834,8 +15834,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "107c6176702bdc95c586762cf9521c1d91b79bbd4ce6ad9e92c3c08afe063f84",
-      "bytes": 255589
+      "sha256": "aae20aa52e9ce0506cadd77d1accb5f330a1c2967408deb2d5bfdb44629730a4",
+      "bytes": 256820
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -16894,8 +16894,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "ca1091c14b65605c72d7aa6fdeb429f80a49c26774c6899dc1d757d1c67f19f7",
-      "bytes": 187468
+      "sha256": "7eb7c0d5e11593408c7cae68800042e03e0613b864777f4cdc3e56a7937dae59",
+      "bytes": 189059
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -53471,6 +53471,11 @@
       "path": "tests/test_apply_claude_settings.py",
       "sha256": "4c40b74a699fa29a307935c1b309edc7869e7b50e390c5b5d8613ae74ea6a5d3",
       "bytes": 47548
+    },
+    {
+      "path": "tests/test_architecture_pin_source.py",
+      "sha256": "94214e3a06434c71bfc626ba31c6251ba0a9e2067c760609e17e4e87086ff72e",
+      "bytes": 3168
     },
     {
       "path": "tests/test_blind_layer_decisions.py",

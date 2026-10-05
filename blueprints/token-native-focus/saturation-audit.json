@@ -3206,10 +3206,10 @@
     {
       "component_id": "edgartools",
       "repository": "https://github.com/dgunning/edgartools",
-      "version": "5.58.0",
+      "version": "5.60.0",
       "profile": "supporting",
       "role": "Native SEC filing-index acquisition and local parsing; bounded raw-source provenance with historical strategy availability still gated",
-      "installation_assessment": "runtime present at retained native operation date",
+      "installation_assessment": "At 5.58.0: runtime present at retained native operation date. The selected 5.60.0 pin has scoped native SEC acceptance on 2026-10-04 in native-sec-edgartools-5600-20261004 and NativeStack2604 install PASS plus 25/25 offline acceptance on 2026-10-05 in native-trading-runtime-2604-rerun-d02c0827-20261005. Earlier lifecycle stages and artifact baselines below retain their 5.58.0 scopes; this row mirrors the selected stack pin without recertifying the host through this audit. Independent review of the NativeStack2604 rerun remains pending.",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/edgartools",
@@ -3258,12 +3258,22 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-sec-edgartools-5600-20261004",
+            "path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
+            "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
           "fresh-edgar-markdown"
         ],
-        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+        "scope": "At 5.58.0: Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings. The added 5.60.0 receipts record native SEC network acceptance and destination-host install/offline checks within their stated scopes; they do not establish a new token baseline or independent review."
       },
       "artifact_baselines": [
         {
@@ -3287,7 +3297,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "source_pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
