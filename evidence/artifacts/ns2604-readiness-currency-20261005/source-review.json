@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "task": "readiness wf_cfa1d860-ebd currency jobs 1-3",
+  "observed_on": "2026-10-05",
+  "evidence_class": "source_review",
+  "base_commit": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+  "decision": "docs/decisions/2026-10-05-readiness-currency-upkeep.md",
+  "scope": "Official-source review and selected native version/artifact observations. No upstream tests, install, live provider, model or worker execution; no readiness promotion.",
+  "base_distribution": {
+    "decision": "hold: no supported qualifying upstream release found",
+    "wsl_release": "https://github.com/microsoft/WSL/releases/tag/3.0.1",
+    "wsl_commit": "91f161fa240dc355c1a88daabc8aac4273e35ba5",
+    "wsl_published_at": "2026-09-29T17:18:57Z",
+    "native_version_observation": {
+      "evidence_class": "native_operation",
+      "wsl_version_exit_code": 0,
+      "wsl_version": "3.0.1.0",
+      "kernel_version": "6.18.40.1-1",
+      "dpkg_query_exit_code": 0,
+      "wsl_setup_package": "0.6.3ubuntu~26.04.1",
+      "boundary": "Version output only; not fresh systemd assertions or adoption acceptance. Initial UTF-16 output was decoded with native subprocess handling."
+    },
+    "canonical_tag": "https://github.com/ubuntu/wsl-setup/tree/73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8",
+    "canonical_main_at_observation": "86a561d5149a9d76ec3c9b3ce2745e7ebca5f2ad",
+    "canonical_assertions": {
+      "path": "test/systemd-assertions.sh",
+      "bytes": 1354,
+      "sha256_at_tag_and_main": "83f2d89c00e70e994218ed3bed4ae19aee3539934dbe109aff76f9c57cfd2e83",
+      "identical": true,
+      "source": "https://github.com/ubuntu/wsl-setup/blob/73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8/test/systemd-assertions.sh#L6-L8"
+    },
+    "default_binfmt_source": "https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/WslDistributionConfig.h#L62",
+    "lock_source": "https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/init.cpp#L2430-L2435",
+    "native_assertions_rerun": false,
+    "historical_failure": "The roadmap's upstream exit 1 remains a failure; its local exception is a separate evidence class."
+  },
+  "selected_skills": {
+    "decision": "retain all four per-skill pins: whole selected trees unchanged",
+    "release": "https://github.com/mattpocock/skills/releases/tag/v1.3.1",
+    "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+    "published_at": "2026-10-04T12:48:18Z",
+    "comparison_at": "2026-10-05T11:53:08Z",
+    "release_age_gate_until": "2026-10-05T12:48:18Z",
+    "tree_comparison_exit_code": 0,
+    "trees": [
+      {"path": "skills/engineering/diagnosing-bugs", "retained_commit": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60", "tree_at_both_pins": "de4236cf34757c4e9ea7afe78d46c023213ff254"},
+      {"path": "skills/engineering/tdd", "retained_commit": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60", "tree_at_both_pins": "bf1bf5ffcd63aa8abce830f2955a853c121fb463"},
+      {"path": "skills/engineering/codebase-design", "retained_commit": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60", "tree_at_both_pins": "07ba1cd60efc12d0d3a083005c1d9651cf15e39a"},
+      {"path": "skills/productivity/writing-for-agents", "retained_commit": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7", "tree_at_both_pins": "ad2925850efb8973a72d2e666f7a975f9a2d4a9b"}
+    ],
+    "change_source": "https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/CHANGELOG.md#L7",
+    "suite_boundary": "Reviewed workflow performs release automation; no skill-quality suite found there. Native listing/activation remains separate owner work."
+  },
+  "claude_sdk_example": {
+    "decision": "hold at 0.2.162 under the latest-clean release rule",
+    "retained_commit": "f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+    "candidate_release": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.163",
+    "candidate_commit": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+    "published_at": "2026-09-30T19:47:45Z",
+    "bundled_cli_before": "2.1.285",
+    "bundled_cli_after": "2.1.286",
+    "source_comparison_exit_code": 0,
+    "identical_python_source_sha256": {
+      "src/claude_agent_sdk/client.py": "980f956d963338b39f4fd5224e69594eb513bfda37e5b215cf94bb0499ea047c",
+      "src/claude_agent_sdk/_internal/query.py": "0562517de949f4431177f204fe84cda3265f495d0eb0a949b9ced96cc5bd8276",
+      "src/claude_agent_sdk/_internal/transport/subprocess_cli.py": "23c0b35acfcff5426255f1f17433e66fc7f8f6d5b8f339e93e085233c569e11c",
+      "src/claude_agent_sdk/types.py": "b1054473280782ab57b2b0690a49a820a2f97dbd2eb6b2ff1bbd3e6205b71bdb"
+    },
+    "hold_report": "https://github.com/anthropics/claude-code/issues/98747",
+    "report_state_at_read": "open",
+    "applicability": "Reporter observes macOS interactive idle sessions; Linux headless SDK applicability unverified. Conservative hold, not a reproduced worker regression or a global cleanliness claim for 0.2.162.",
+    "existing_boundaries": [
+      "https://github.com/anthropics/claude-code/issues/98843",
+      "https://github.com/anthropics/claude-agent-sdk-python/issues/1340",
+      "https://github.com/anthropics/claude-agent-sdk-python/issues/1349"
+    ],
+    "wheel": {
+      "filename": "claude_agent_sdk-0.2.163-py3-none-manylinux_2_17_x86_64.whl",
+      "registry_metadata": "https://pypi.org/pypi/claude-agent-sdk/0.2.163/json",
+      "bytes": 103197060,
+      "actual_and_published_sha256": "260cb955d237b7e1897f1dbf9ee5efbf815d8622d0c7459a05409c56432d8501",
+      "registry_matches_actual": true,
+      "integrity_check_exit_code": 0
+    },
+    "advisory_scope": "Inspected public SDK/CLI ranges and PyPI metadata supplied no matching advisory for this version pair. Not a full transitive dependency audit.",
+    "historical_receipts": "worker.py, generated lock, README, dated verification.md and the 110-attempt checks.json ledger remain unchanged; no old result relabeled."
+  },
+  "openhands_amendment": {
+    "id": "readiness-openhands-currency-20261005",
+    "kind": "source-only comparison; no runtime convergence claim",
+    "baseline_immutable": "1.50.1@1e1390acc8788346ba4804c34323284009bf3f5e",
+    "arms": [
+      {"version": "1.51.0", "commit": "a955aa5d3188d4b0a44ad7eb4e5c4bba6e6238d9", "published_at": "2026-10-03T07:38:03Z", "decision": "hold pending qualification and advisory disposition"},
+      {"version": "1.52.0", "commit": "229b2b920d4541eab7a34b051a1f6f2bca5ebabf", "published_at": "2026-10-05T04:10:05Z", "release_age_gate_until": "2026-10-06T04:10:05Z", "decision": "hold: age, qualification and advisory disposition"}
+    ],
+    "immutable_lock_observations": [
+      {"version": "1.50.1", "bytes": 1067892, "sha256": "e2c49fee72a61005789eed7b78e363e901b385b979bf3327e098d27a7d96aecb", "package_records": 418},
+      {"version": "1.51.0", "bytes": 1069192, "sha256": "1f7fdc1c6b5df78904a5ed5cb85500806b51ffcafa27a9e81a82d261cf5be500", "package_records": 418},
+      {"version": "1.52.0", "bytes": 1069145, "sha256": "38ab3d886413e598c74aef5e29de1edc064eee3be459d7ad5a8438bd022651e3", "package_records": 418}
+    ],
+    "selected_package_versions_in_all_three_locks": {"litellm": "1.93.0", "pyjwt": "2.14.0"},
+    "advisory_version_matches": [
+      {"url": "https://github.com/advisories/GHSA-3cv6-jpf6-8222", "publisher_url": "https://github.com/BerriAI/litellm/security/advisories/GHSA-3cv6-jpf6-8222", "range": ">=1.93.0,<1.93.2", "branch_patch": "1.93.2", "range_provenance": "Reviewed GitHub advisory normalizes branch ranges; publisher affected-range field is <1.94.0. Version 1.93.0 matches both."},
+      {"url": "https://github.com/jpadilla/pyjwt/security/advisories/GHSA-42vr-xj54-vc7v", "range": ">=2.0.0a1,<=2.14.0", "patch": "2.15.0"}
+    ],
+    "advisory_boundary": "Version matches only. Exact native export membership, deployment reachability and the rest of the 418-package graph unassessed. Retained baseline has the same matches.",
+    "wheel_integrity": [
+      {"package": "openhands-sdk", "version": "1.50.1", "bytes": 890674, "actual_and_published_sha256": "a0a6f11a47802650aa50a68c60deefe3b8ace0dea1838893360358893ea23302"},
+      {"package": "openhands-tools", "version": "1.50.1", "bytes": 198614, "actual_and_published_sha256": "a19da59aa23e4472f1e34e85d2fe987406be7e39e739a35bb9ea844a28b0bc6d"},
+      {"package": "openhands-sdk", "version": "1.51.0", "bytes": 907999, "actual_and_published_sha256": "7757a729e8767816979ae9bb9a0f38c44941c5ec1df9aed1c51b9af3204552b9"},
+      {"package": "openhands-tools", "version": "1.51.0", "bytes": 200330, "actual_and_published_sha256": "6935f6786ce2c065bfd531303a83934a832e49dcdad62a6c17b07dc6b28a25ae"},
+      {"package": "openhands-sdk", "version": "1.52.0", "bytes": 911666, "actual_and_published_sha256": "92f5f03fd596608ca783269bd11a10de98365d8bddeae8a52d0ddccdfb6e2d97"},
+      {"package": "openhands-tools", "version": "1.52.0", "bytes": 200391, "actual_and_published_sha256": "0704f993f00b9b68a15b2131380fa7c439f8d731f12dcd1a6a173ad2517f5962"}
+    ],
+    "wheel_integrity_check_exit_code": 0,
+    "registry_url_pattern": "https://pypi.org/pypi/{package}/{version}/json",
+    "upstream_harness": "OpenHands/software-agent-sdk@a955aa5d3188d4b0a44ad7eb4e5c4bba6e6238d9:.github/workflows/tests.yml:96,117,516",
+    "runtime_boundary": "No suites or worker ran. SDK currency does not repair the srt Linux AF_UNIX restriction. Future qualification runs in an isolated tool root or throwaway host."
+  },
+  "convergence_metadata_handoff": {
+    "applied": false,
+    "selector": {"layer": "cross:convergence-practice", "slot": "convergence-validators"},
+    "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+    "proposed_release_before": "v2026.09.26.2",
+    "proposed_release_after": "v2026.10.05.1",
+    "route_retained": "repository-recipe",
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/releases/tag/v2026.10.05.1",
+    "adoption_release_commit": "77d7516d81a94b1cb0e77a7b6c910c28c8104dc9",
+    "owner_coordination": ["https://github.com/seathatflowsinourveins/native-agent-stack/pull/713", "https://github.com/seathatflowsinourveins/native-agent-stack/pull/723"],
+    "boundary": "Shared live-owned row unchanged pending custody. Metadata observation, not a fresh attestation verification or host installation."
+  },
+  "codex_profile_job": {
+    "started": false,
+    "waiting_on": "#713 landed",
+    "pr_observation_on": "2026-10-05",
+    "state": "OPEN",
+    "merged_at": null,
+    "head": "cde8a0de060ca37fee6a2353f494f15a4bbdede1"
+  },
+  "retained_failed_or_incomplete_reads": [
+    {"operation": "Canonical GitHub releases/latest GET", "exit_code": 1, "returned": "404 Not Found", "correction": "Read the signed tag and original source; do not invent a formal GitHub Release."},
+    {"operation": "rg with guessed scripts/check_plan.py path", "exit_code": 2, "returned": "No such file or directory", "correction": "Exact existing check is evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py."},
+    {"operation": "SDK query.py selected range beyond EOF", "exit_code": 1, "correction": "Bounded original-source read corrected and exited 0; no behavior executed."},
+    {"operation": "OpenHands reviewer selected rg over an absent dated decision", "exit_code": 2, "correction": "Exact roadmap record read instead; no absence claim."},
+    {"operation": "GitHub Contents representation for >1MB workspace locks", "returned": "encoding none; omitted content", "correction": "Raw immutable-pin reads recovered and parsed all 418 package records for each lock."}
+  ],
+  "completeness_next_sweep": [
+    "WSL supported stable releases, Canonical archive package revisions, Store servicing and kernel-only fixes, tied to unchanged default-protectBinfmt target assertions.",
+    "Selected skill trees, new/restored/retired skills, invocation metadata and upstream plugin/documentation reports.",
+    "SDK plus bundled CLI releases, regression dispositions and separate native behavior/SDK-selection qualification.",
+    "OpenHands exported/installed dependency graph, advisory applicability, socket recovery/path length, scratch-policy compatibility and applicable provider/browser/remote-workspace/TypeScript/GHCR modalities."
+  ]
+}
