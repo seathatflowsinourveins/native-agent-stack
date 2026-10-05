@@ -24,8 +24,10 @@ or experiment word while sessions run.
    (prepare.py --claude-completion ... --amendment-ref ...).
 5  collect.py.  6  grade.py trials.
 Resume: --from-stage 2 or 4 runs only tests whose launched trials are fewer than their repeat; a test refused before
-launch (meter, lock, DEFER) is carried forward. A DEFER.claude flag is cleared on resume once the newest meter reading
-allows a start; STOP flags stay until the operator removes them.
+launch (meter, lock, DEFER) is carried forward. --from-stage 2 --rerun-gate0-failures runs once more only the stage-2
+tests whose gate-0 check failed (for example a Claude probe stopped by the meter, in the next 5-hour window), then
+collects and checks gate 0 again. A DEFER.claude flag is cleared on resume once the newest meter reading allows a
+start; STOP flags stay until the operator removes them.
 """
 from __future__ import annotations
 
@@ -91,6 +93,9 @@ def main(argv=None) -> int:
     parser.add_argument("--from-stub", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--no-reexec", action="store_true", help="stay in this process after stage 1 (self-tests)")
     parser.add_argument("--keep-defer", action="store_true", help="do not clear DEFER.claude on resume")
+    parser.add_argument("--rerun-gate0-failures", action="store_true",
+                        help="stage 2 on resume: run once more each stage-2 test whose gate-0 check failed (the failed "
+                        "part only; a Claude one belongs in a later 5-hour window), then collect and gate 0 again")
     for flag in PREPARE_FLAGS:
         parser.add_argument(flag, default=None)
     for switch in PREPARE_SWITCHES:
@@ -144,7 +149,8 @@ def main(argv=None) -> int:
     if not args.from_stub and not args.no_reexec:
         # Session stages run under neutral argv (finding 10): this process becomes bin/py bin/p.py.
         os.execv(neutral_py, [neutral_py, "-B", str(work / "bin" / "p.py"), "--from-stage", str(max(args.from_stage, 2)),
-                              "--to-stage", str(args.to_stage)] + timing + quota + (["--keep-defer"] if args.keep_defer else []))
+                              "--to-stage", str(args.to_stage)] + timing + quota + (["--keep-defer"] if args.keep_defer else [])
+                 + (["--rerun-gate0-failures"] if args.rerun_gate0_failures else []))
     if args.from_stub:
         py = [neutral_py, "-B"]
     stub = py + [str(work / "bin" / "b.py")] if args.from_stub else py + [str(root / "harness" / "block.py"), "--run-root", str(root)]
@@ -164,11 +170,30 @@ def main(argv=None) -> int:
                 return 1
         return 0
 
+    def clear_defer() -> None:
+        if not args.keep_defer and (root / "DEFER.claude").exists():
+            allowed, why = prior_allows(newest_meter_reading())
+            log.append({"at": utc_now(), "step": "DEFER.claude", "cleared": allowed, "why": why})
+            if allowed:
+                (root / "DEFER.claude").unlink()
+
+    def gate_key(test: dict) -> str:
+        return test.get("probe_key") or ("gate0-G1" if test.get("gate_trial") else test.get("test_key"))
+
     if args.from_stage <= 2:
-        for cell in CODEX_STAGE2 + CLAUDE_STAGE2:
-            if cell in cfg["cells"] and run_cell("stage 2", cell):
-                write_log(root, log)
-                return 2
+        clear_defer()
+        if args.rerun_gate0_failures and (root / "gate0.json").exists():
+            failed = {k for k, check in (load_json(root / "gate0.json").get("checks") or {}).items() if not check.get("pass")}
+            for ref, test in (cfg.get("tests_by_ref") or {}).items():
+                if test.get("stage") == 2 and gate_key(test) in failed:
+                    if step(f"stage 2 rerun {gate_key(test)}", block(test["cell"], ref, 1), log):
+                        write_log(root, log)
+                        return 2
+        else:
+            for cell in CODEX_STAGE2 + CLAUDE_STAGE2:
+                if cell in cfg["cells"] and run_cell("stage 2", cell):
+                    write_log(root, log)
+                    return 2
         stage2_refs = {ref for ref, test in (cfg.get("tests_by_ref") or {}).items() if test.get("stage") == 2}
         trial_ids = sorted({r["trial_id"] for r in read_jsonl(root / "ledger.jsonl")
                             if r.get("phase") == "launched" and r.get("ref") in stage2_refs})
@@ -189,11 +214,7 @@ def main(argv=None) -> int:
             print(json.dumps({"refused": refusals}))
             write_log(root, log)
             return 2
-        if not args.keep_defer and (root / "DEFER.claude").exists():
-            allowed, why = prior_allows(newest_meter_reading())
-            log.append({"at": utc_now(), "step": "DEFER.claude", "cleared": allowed, "why": why})
-            if allowed:
-                (root / "DEFER.claude").unlink()
+        clear_defer()
         failures = []
 
         def codex_chain():
