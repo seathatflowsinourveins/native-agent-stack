@@ -4207,26 +4207,6 @@
         "Sanitized projections only; private original hashes, failed cases and corrections retained. The projection step ran no new provider/test/control execution and made no shared edits; registration in manifests/evidence.json is separate from that step."
       ],
       "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json"
-    },
-    {
-      "id": "trading-unattended-hosting-recovery-20261005",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "dagu",
-        "restic"
-      ],
-      "claim": "Native restic 0.19.1 backed up two synthetic SQLite WAL journals copied by the stdlib Online Backup API during committed writes, read subset 1/1 (2/2 packs), restored 802816 identical journal bytes with matching external inventory and required state, and refused both snapshot and restore controls. Dagu 2.16.6 validated the scheduled research DAG offline; operating-host and off-host gates remain open.",
-      "limitations": [
-        "Scratch local integration with synthetic research journals; not an unchanged upstream test suite or a real market/broker journal.",
-        "Per-journal Online Backup is independently consistent; no atomic cross-journal transaction or research consumer application restart was accepted.",
-        "One-part check 1/1 read 2/2 packs; default seven-part daily rotation is covered separately by stdlib tests and requires operator execution every 24 hours.",
-        "Operating host and independent alert path are user decision 2. No systemd unit was installed, enabled or started; no process-restart drill or scheduler was run.",
-        "A process-restart drill is not reboot, missed-run or independent-alert acceptance. permissions.run_dags scheduler behavior is source-reviewed and awaits the later host drill.",
-        "Off-host recovery stays open until user decision 3 chooses an independent destination and key recovery and a consumer restores on a second host against the independent inventory and required state.",
-        "Recovery-time objective, independent alerting and retention deletion remain unaccepted. No broker, credentials, live mode, model calls, commit or push was used.",
-        "The calendar lock lives in the nested PR-1 runtime bundle at the reviewed revision; this base has no runtime-2604/pyproject.toml. No trading runtime installation or calendar native execution is claimed."
-      ],
-      "path": "evidence/receipts/trading-unattended-hosting-recovery-20261005.json"
     }
   ],
   "files": [
@@ -14523,8 +14503,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/README.md",
-      "sha256": "c9acd8b6e87e366a5cd51f2331e2d8a9057a69d9c8d565d356d96e22479315ea",
-      "bytes": 13456
+      "sha256": "77e0264bdcd7cf1dc700d22236f9f3ba3407b5e5f7a76df1d8883aac64992270",
+      "bytes": 7585
     },
     {
       "path": "blueprints/us-equities/hosting/backup/README.md",
@@ -14553,58 +14533,23 @@
     },
     {
       "path": "blueprints/us-equities/hosting/config.yaml.example",
-      "sha256": "46c546745cb2ac2a5fd72642241cb0e82d300ae628c740d7197d73ca80061848",
-      "bytes": 405
+      "sha256": "e411b4c53b531f4c1f44efd0d8c597b5229972bd163f3ba179a29daed4c14d9f",
+      "bytes": 369
     },
     {
       "path": "blueprints/us-equities/hosting/dagu-equities.service.example",
-      "sha256": "327f5500f6d02d96508c35a1e512d7adcb2018427067a286b51603bebdd6bd41",
-      "bytes": 863
-    },
-    {
-      "path": "blueprints/us-equities/hosting/drill_local_recovery.py",
-      "sha256": "fc8549c0178fc23fb04bdd9e247e3313e8613cb764b99cfa1f1563a8af02350c",
-      "bytes": 9193
-    },
-    {
-      "path": "blueprints/us-equities/hosting/drill_process_restart.py",
-      "sha256": "931ef44cc35da41ed8dd3b8c0a2919f9f2d2f98357fb9e5e33fa93dcc379521b",
-      "bytes": 7904
+      "sha256": "b7e1814daa569c7b8484f600c13d98956ac3efb6d955e87a768591a38fa7d855",
+      "bytes": 441
     },
     {
       "path": "blueprints/us-equities/hosting/equity-research-evidence.yaml",
-      "sha256": "cf9fcce2d08b6f0973fa7cf5d1070c5ac7d78befa39ae6a2ff76b03214a6e15d",
-      "bytes": 2336
-    },
-    {
-      "path": "blueprints/us-equities/hosting/evidence/dagu-scheduler-comparison.json",
-      "sha256": "c15ac08f09f324a6c1106f167c21cb013bc6c58fefbb04a3092ec68cc8cf43c7",
-      "bytes": 12307
-    },
-    {
-      "path": "blueprints/us-equities/hosting/evidence/dagu-validation.json",
-      "sha256": "ca499670b89b1dfc19745e1e8e5338196fc03e31a53f53c9dd7fa9bace7feccc",
-      "bytes": 444
-    },
-    {
-      "path": "blueprints/us-equities/hosting/evidence/offline-proof.json",
-      "sha256": "0ce53c85fad755c9ceabe4d8d648493a3877100ce86f65b841157fcc5180f6ac",
-      "bytes": 8610
-    },
-    {
-      "path": "blueprints/us-equities/hosting/journal_recovery.py",
-      "sha256": "aac19598a40fd0c0df85b25174512b25121493bacce192010fed7e019fbfa0a4",
-      "bytes": 16693
+      "sha256": "715f893dc329c40c6db6ffcbe23a308c5696e0ec791e49a4a38adfc627f0886d",
+      "bytes": 770
     },
     {
       "path": "blueprints/us-equities/hosting/receipt.json",
       "sha256": "a7311c35dfb25d6c8f5212435095c1bbc91cde407490a9d61bf895cd1fe9f6cc",
       "bytes": 4873
-    },
-    {
-      "path": "blueprints/us-equities/hosting/session_day.py",
-      "sha256": "2e3e106c9273ab2e0b221d1510481e7d33e9fc33c25a1cabc10c0bf389113945",
-      "bytes": 1997
     },
     {
       "path": "blueprints/us-equities/identity-readiness/README.md",
@@ -16670,11 +16615,6 @@
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
       "sha256": "1389de18bbaf5c41d8f22093a9642d982230a851f954183b7c8254e0b5890bce",
       "bytes": 18701
-    },
-    {
-      "path": "docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md",
-      "sha256": "2a3d1b781ee721d87a651552a147c38a1775219843cb3cd0b4a17abe79020702",
-      "bytes": 14008
     },
     {
       "path": "docs/direct-results.md",
@@ -51857,11 +51797,6 @@
       "bytes": 6386
     },
     {
-      "path": "evidence/receipts/trading-unattended-hosting-recovery-20261005.json",
-      "sha256": "434010eacc107ea7e55d86bebeaced5381be2ecac83c60b1c07c0e07aefb5b04",
-      "bytes": 9015
-    },
-    {
       "path": "evidence/receipts/ultracode-token-routing-20260921.json",
       "sha256": "fcb3b15c9f4657f00b92a6c493b33b851136d416e0dbc0f37a8b67360bdedbcf",
       "bytes": 3204
@@ -54100,11 +54035,6 @@
       "path": "tests/test_upstream_surface_watch.py",
       "sha256": "e60c417abd190f598a9ba1f248a1ea94ced9d1b2e13b265fd494266a9d427bca",
       "bytes": 121324
-    },
-    {
-      "path": "tests/test_us_equities_hosting.py",
-      "sha256": "935d03e8a00320904f414a2db9f958456415f68e4c11009fff78b53fe02ee566",
-      "bytes": 15792
     },
     {
       "path": "tests/test_validate.py",
