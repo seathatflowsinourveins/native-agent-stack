@@ -460,7 +460,7 @@
   "current_practice_20261004": {
     "observed_at": "2026-10-04",
     "source_revision": "3b8f9c8a1b938358d65bf422f61592dc3b89407d",
-    "source": "Read-only gh api GETs of ruleset 23739774, repository settings and #611; strict_required_status_checks describes the accepted in-repository G-11 target, while live_strict_required_status_checks records the observed setting.",
+    "source": "Read-only gh api GETs of ruleset 23739774, repository settings and #611; strict_required_status_checks describes the in-repository G-11 target in the 2026-10-04 convergence record, while live_strict_required_status_checks records the observed setting.",
     "required_checks": [
       "validate",
       "token-report",
@@ -491,7 +491,8 @@
     "description_edits_after_G1": "pr-metadata.yml owns edited, sota-sources and verdict-review-gate, with queue: max and no cancel-in-progress; the gates read current metadata and fail closed on retrieval errors or base drift. validate.yml drops edited. Queue order does not guarantee freshness and runs beyond 100 pending are cancelled.",
     "merge_guard": "docs/lanes.md#labels-and-prs",
     "supersedes": [
-      "current_practice_20261002",
+      "current_practice_20261002.allow_auto_merge",
+      "current_practice_20261002.strict_required_status_checks",
       "active_baseline.target_ruleset_status"
     ],
     "decision_record": "docs/decisions/2026-10-04-github-convergence-workflow.md"

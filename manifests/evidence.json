@@ -5148,8 +5148,8 @@
     },
     {
       "path": "blueprints/convergence-practice/clean-resolution-20261002/open-work.json",
-      "sha256": "207497a89d940714d98848e650c01423bce809d2961cf4d2f64ae518c520befa",
-      "bytes": 7028
+      "sha256": "99fbd00aacdf2add316792d4b165b9521e0d91f1bb7faa50d4a233ce302f2b06",
+      "bytes": 7102
     },
     {
       "path": "blueprints/convergence-practice/container-storage/README.md",
@@ -15429,8 +15429,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "d8b5a54df23bef248e39078fbb143d16aedf80af0c1d8036cc02186d60ebadfe",
-      "bytes": 37617
+      "sha256": "327062c92237cc2e3158759c4bdc4f3ab26d01921032312da55504b012fd6134",
+      "bytes": 37727
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -16429,8 +16429,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-github-convergence-workflow.md",
-      "sha256": "dccb2d17fee7e98a7e2dcf122b4d96f36a0ef4e35650a4f1348a4d9120d49b15",
-      "bytes": 19134
+      "sha256": "8b1a1bd0a492fa51b0ab937a58998062f168d2e329235e84bbc7ca182aa2f5b6",
+      "bytes": 19150
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
@@ -16564,13 +16564,13 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "c7bb325f18e45a5aeda1d8aadfe39d0b4a93ddcb6a2a6b0563c2298d3646f0f4",
-      "bytes": 101415
+      "sha256": "150626a16cfab262fb0d70d2765e358ef7fc9298aee8b7b562200d3ce0e42c12",
+      "bytes": 101718
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "0a6e88cc5c4776c433eb4af0414e30b970388204bb9e1d36ac73ce22f3db6eec",
-      "bytes": 426080
+      "sha256": "dc353584e3fbdcfd2585b414b0682fbf8da733e4eee781d1992a5d9f02540f68",
+      "bytes": 426129
     },
     {
       "path": "docs/harness-defaults.md",

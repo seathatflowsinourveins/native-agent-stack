@@ -21,7 +21,7 @@ implementation records below remain dated observations.
 
 This section is the current practice. The dated sections below are history; where they differ, this section and the
 live settings win. Read-only repository and ruleset GETs on 2026-10-04 confirmed auto-merge off, squash-only
-merges and eight required checks with strict off. The accepted
+merges and eight required checks with strict off. The 2026-10-04
 [convergence record](decisions/2026-10-04-github-convergence-workflow.md) sets strict on through G-11 in
 [`.github/main-ruleset.json`](../.github/main-ruleset.json). After this change lands and the landing queue's
 `BEHIND` refresh change is ready, the coordinator applies the ruleset and records the read-back.
@@ -39,14 +39,17 @@ merges and eight required checks with strict off. The accepted
   [`docs/lanes.md`, "Labels and PRs"](lanes.md#labels-and-prs): read the head SHA, confirm that every required check
   is in bucket `pass`, then squash-merge with that SHA pinned.
 - **Merge skew and queue.** `ecea2865` met the 2026-09-22 strict-mode overturn when two PRs merged 13 seconds
-  apart and left the evidence registry unsorted. Strict up-to-date checks are the interim control through G-11:
-  every lander updates a `BEHIND` branch and waits for the required checks or hands the PR to the landing queue,
+  apart and left the evidence registry unsorted. Strict up-to-date checks as the interim control through G-11 are
+  decided but not yet applied: the coordinator applies them after this change lands and the landing queue's
+  `BEHIND` refresh change is ready. Under that control, every lander updates a `BEHIND` branch and waits for
+  the required checks or hands the PR to the landing queue,
   which refreshes it mechanically. GitHub's native merge queue is the target after the owner's U1 decision;
   this User-owned repository needs an organization before cutover. G-10 acceptance decides the strict flag.
   The queue owner records daily queued and landed counts; more queued than landed on each of 7 consecutive
   days with strict on triggers slot 2's overturn, for the owner's choice between U1 and loose mode with the
   landing check ([record](decisions/2026-10-04-github-convergence-workflow.md#overturn)).
-- **Description edits after G-1.** `validate.yml` drops `edited`; `sota-sources` and `verdict-review-gate` keep
+- **Description edits after G-1.** Until G-1 lands, `edited` starts a new `validate.yml` run on the same head
+  and cancels the older in-progress PR run. Once G-1 lands, `validate.yml` drops `edited`; `sota-sources` and `verdict-review-gate` keep
   their job IDs in `pr-metadata.yml`, on `edited`, pushes to `main` and manual dispatch. Its per-PR concurrency
   group uses `queue: max` without `cancel-in-progress`. This avoids single-pending replacement below 100 pending
   runs; ordering is not a freshness guarantee, and additional runs are cancelled when that queue is full.

@@ -2,10 +2,9 @@
 
 Lane: foundation. North-star action served: every unit that moves the stack toward the north star lands on a
 `main` whose required checks judged it together with the units landed before it, so research and paper-lane
-evidence stays reproducible from `main`. Status: accepted 2026-10-04 (cross-family consensus: Claude Opus synthesis, GPT-6.1 Sol review, Opus reconcile); slot 1 awaits the owner's decision U1. The record was reconciled on 2026-10-04 after an
+evidence stays reproducible from `main`. Status: proposed. Cross-family consensus was reached on 2026-10-04 (Claude Opus synthesis, GPT-6.1 Sol review, Opus reconcile). The record becomes accepted when the command center ACKs this PR and it lands. Slot 1 awaits the owner's decision U1. The record was reconciled on 2026-10-04 after an
 independent cross-family review (GPT-6.1 Sol), which disagreed on slot 2 and refined slots 3, 4, 5 and 9. Each
-point was settled on the sources below. Slot 1 waits on a user decision (moving the repository into an
-organization). The other slots are bounded pull requests. This record changes no workflow, ruleset or setting by
+point was settled on the sources below. The other slots are bounded pull requests. This record changes no workflow, ruleset or setting by
 itself.
 
 ## Decision

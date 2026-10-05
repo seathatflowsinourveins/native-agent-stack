@@ -443,11 +443,12 @@ maintenance design. In brief:
   `.grype.yaml`; it is path-filtered on PRs, so it is a gate but not a required
   check. `dependency-review` fails on high-severity advisories, and
   `security-scan`'s `osv-scanner` fails on any unignored advisory in every
-  tracked lockfile except a reasoned test-fixture exclusion. Neither is required
-  yet: the committed target main ruleset adds `dependency-review`, `osv-scanner`
-  and a CodeQL `code_scanning` rule once the coordinator applies it after merge.
-  It keeps strict up-to-date checks off and leaves `required_signatures` out
-  ([closure record](decisions/2026-09-22-github-automation-closure.md)).
+  tracked lockfile except a reasoned test-fixture exclusion. Both are required
+  checks, observed since 2026-10-02. The committed G-11 target turns strict
+  up-to-date checks on; the coordinator applies it after merge and the landing
+  queue's `BEHIND` refresh change is ready. The target retains the CodeQL
+  `code_scanning` rule and leaves `required_signatures` out
+  ([current practice](github-automation.md#current-practice-2026-10-04)).
 - **Code scanning and updates:** CodeQL default setup is configured (closure
   record); its first-analysis alerts were handled in PR #104
   ([triage record](decisions/2026-09-22-codeql-first-analysis.md)). Dependabot
