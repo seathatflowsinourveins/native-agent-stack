@@ -75,13 +75,26 @@ hook acceptance is not authorization to enable capture on every runtime.
    original implementation before correctness decisions. Lossy retrieval and
    compression can omit necessary information.
 4. Preserve native caching, compaction, tool discovery, accounts and model
-   behavior. Shared PATH is not host acceptance. Do not add hooks or
-   schedulers, override providers, run audits or network checks, or rerun
-   model trials during ordinary startup. One addition is allowed: a read-only
-   SessionStart hook that prints one line of at most 160 characters, the
-   `summary_line` of the due-file a daily user timer writes, and prints nothing
-   when that file is absent or unreadable (fail-open). The checks run in that
-   timer, never at startup ([session currency notice](decisions/2026-09-30-session-currency-notice.md)).
+   behavior. Shared PATH is not host acceptance. Our own SessionStart notices print
+   at most one line of 160 characters or less; they do not add schedulers,
+   override providers, run audits or network checks, or rerun model trials.
+   The read-only currency hook prints the `summary_line` of the due-file a
+   daily user timer writes, and prints nothing when the file is absent or
+   unreadable (fail-open). Its checks run in that timer, never at startup
+   ([session currency notice](decisions/2026-09-30-session-currency-notice.md)).
+   The repository-owned SubagentStart context carrier
+   `adoption/hooks/claude/token-lanes-block.md` is a separate child-launch surface,
+   not a SessionStart notice. The October 5 budget record names its 4,099 bytes
+   and role variants as exempt from the main-session instruction-file ceiling;
+   measure the selected child block separately, without adding it to every startup.
+   Upstream plugins may inject their own documented startup blocks: preserve
+   the native integration and measure its actual bytes separately from our
+   hooks and instruction-file budget. For example, Context Mode documents
+   its SessionStart routing injection in its
+   [upstream README](https://github.com/mksglu/context-mode/blob/v1.0.169/README.md),
+   and Claude documents [plugin hooks](https://code.claude.com/docs/en/plugins-reference#hooks).
+   The [October 5 budget record](decisions/2026-10-05-harness-context-budget.md)
+   separates these surfaces and their observed costs.
 5. Count once at the proper boundary. Missing measurements are unknown.
    Never add cumulative snapshots, cache subsets, provider usage and artifact
    differences, or multiply a measured difference by repository count.

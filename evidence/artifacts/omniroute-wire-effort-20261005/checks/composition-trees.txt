@@ -1,0 +1,10 @@
+# The carried composition rebuilt from public refs and the patch file (2026-10-05; read-only: a temporary git index, no working tree, nothing written to a repository)
+# commands, run in a clone that has the tag and the PR commit:
+#   GIT_INDEX_FILE=<temporary> git read-tree c1e30b7676975feb298b49eff6ff58923c04b89e              # the v3.8.51 tag commit
+#   git apply --cached --check patches/045aa81f3.patch ; git apply --cached patches/045aa81f3.patch ; git write-tree
+#   git diff 0585aba5589d5a1f49243a13a8db249558e7c9e3^ 0585aba5589d5a1f49243a13a8db249558e7c9e3 | git apply --cached ; git write-tree
+patch applies to the tag: yes
+tag + patch tree:        cdbac0178bb18f5043f9cdaf7f90d540595e9061
+e14d1e8e0 tree:          cdbac0178bb18f5043f9cdaf7f90d540595e9061   (e14d1e8e0 = the patch cherry-picked onto the tag; alternative B)
+tag + patch + 15167:     f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f
+5f4b3d577 tree:          f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f   (5f4b3d577 = the composition that was built; tarball in build-notes.txt)

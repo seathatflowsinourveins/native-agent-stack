@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "id": "trading-unattended-hosting-recovery-r3-20261005",
+  "kind": "native_cli_e2e",
+  "round": "t-pr4-r3",
+  "component_ids": [
+    "dagu",
+    "restic"
+  ],
+  "evidence_class": "local_integration",
+  "source_git_commit": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "source_revision": "Working tree after round-3 repairs; tested files pinned by integration_source_sha256.",
+  "observed_at_utc": "2026-10-05T07:58:37.912257+00:00",
+  "claim": "All seven new p2 repairs have red/green regressions; native Dagu executes the six deployed steps and fails unavailable-input runs; native restic verifies WAL recovery and isolated failing controls.",
+  "tool_versions": {
+    "dagu": "2.16.6",
+    "restic": "0.19.1",
+    "python_executed": "3.13.15",
+    "python_minimum": "3.11",
+    "exchange_calendars_executed": "4.13.2",
+    "sqlite_executed": "3.53.1",
+    "systemctl_help_executed": "255.4"
+  },
+  "integration_source_sha256": {
+    "blueprints/us-equities/hosting/config.yaml.example": "a8bfd48d297f783c40338eeea473180144e9ddf5a8a6fe6011010dd9e732a24b",
+    "blueprints/us-equities/hosting/dagu-equities.service.example": "327f5500f6d02d96508c35a1e512d7adcb2018427067a286b51603bebdd6bd41",
+    "blueprints/us-equities/hosting/equity-research-evidence.yaml": "6107eebb77ae8904ff6422b7e86f4c551dde36d35aa5d6e87b8f5d72b0c9397f",
+    "blueprints/us-equities/hosting/session_day.py": "73969582e6a675f894b681769eb8a99c1a142babb1dd81a5c2a4b377a9272e96",
+    "blueprints/us-equities/hosting/journal_recovery.py": "f90884e465634a7cbe741e53233294192fc64de5ded499b9337aeb187c1a112b",
+    "blueprints/us-equities/hosting/drill_process_restart.py": "2262abdbb9a05aefc77eceaeb0503a2053ded179b3825e3fb8e75dfb602c0701",
+    "blueprints/us-equities/hosting/drill_local_recovery.py": "405e1c8cc98876ba50b4ec47b46f9edf297a3bad8e7c429880190f20576ca6dd",
+    "blueprints/us-equities/data/summarize_backtest.py": "24690af7ab7066d041a33d952485ebe5a746fe787ee4fbd97c4369e6b26bed45",
+    "tests/test_us_equities_hosting.py": "06cd7a9ecae755b13001f2aae3bb7cfff0e0218ac4abb044480ab3f56a9c95b2"
+  },
+  "artifacts": [
+    {
+      "path": "blueprints/us-equities/hosting/evidence/native-dagu-probes-r3.json",
+      "sha256": "8119d2a1f7d281ed6309f2a46e552538cfc5250fd0af2d7cdd500a8711b8d43b",
+      "bytes": 3255
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/offline-proof-r3.json",
+      "sha256": "1fb0eebddd33c15c880af008606301364bb62044a123492b86da96af00e83684",
+      "bytes": 11577
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r3.json",
+      "sha256": "79237a01bbe3d7c6997409e910894664aa0a41e8d36240689259e92a9673b5d2",
+      "bytes": 2790
+    }
+  ],
+  "upstream_sources": [
+    {
+      "pin": "sqlite/sqlite@version-3.53.1",
+      "locator": "src/backup.c:321-392",
+      "sha256": "ee4cbfc7d8afb311d12cc106d645764a3e18266694f003438b410bfa33764ef7"
+    },
+    {
+      "pin": "systemd/systemd@v255",
+      "locator": "man/systemctl.xml:541-549,2377-2388",
+      "sha256": "7f06242ce06d9d895bf7445e3d29680f8e6a7284004122b4e209097b8313b6d5"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/service/frontend/api/v1/dagruns.go:2066-2096",
+      "sha256": "f07b1b89d784251594bd68478a1120f88111a7f538081158826f7a99cb62f75f"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/service/frontend/api/v1/transformer.go:362,371",
+      "sha256": "923e6b2e76fa03473cde1c4ed82d9106acfc99f3e95e7fe961d21e0d11849d31"
+    }
+  ],
+  "red_green_regressions": [
+    {
+      "test": "tests.test_us_equities_hosting.HostingContractTests.test_session_cli_fails_unavailable_inputs_but_keeps_calendar_skips",
+      "red_exit": 1,
+      "green_exit": 0,
+      "red_output_sha256": "2764a350eb2781fdb1d6e26f46242a1af1e0bf042ab1b95c1536d1424258c6d0",
+      "green_output_sha256": "2567e3bce9c2d914b3ffb614f0a25e79d0b3c735c43f644116c16d79d759f282"
+    },
+    {
+      "test": "tests.test_us_equities_hosting.DrillGuardTests.test_restart_fault_is_delivered_by_native_unit_addressed_kill",
+      "red_exit": 1,
+      "green_exit": 0,
+      "red_output_sha256": "3b9c82416a5412cbff8ad674baaa0529445ea59035a1e1ea178e1bc2157bbe5c",
+      "green_output_sha256": "2d2a6a9a7cc7832312e68f2516eac3042699194e6abf0c43fa6a1c29cd72cccf"
+    },
+    {
+      "test": "tests.test_us_equities_hosting.DrillGuardTests.test_restart_reserves_150_seconds_before_due_and_refuses_late_restart",
+      "red_exit": 1,
+      "green_exit": 0,
+      "red_output_sha256": "61eaa291535a2d48497576856e87c4f57f5b4dbd621ed01feca09dadad82a337",
+      "green_output_sha256": "0e014d76c9f437c901211c27fe82875265a736ce2f8997f6a1cb6d2ce0e1bc9b"
+    },
+    {
+      "test": "tests.test_us_equities_hosting.JournalRecoveryTests.test_snapshot_cli_refuses_rollback_sources_without_explicit_writer_blocking_opt_in",
+      "red_exit": 1,
+      "green_exit": 0,
+      "red_output_sha256": "183045134a7f336b1a1ed2fd84bd91824fada4e7cf64744c277677b0f020b21c",
+      "green_output_sha256": "d1c27ce79bfa789454e30a9e3e3f37f7d5e681c86dc31d8c029a1a26d824c3cf"
+    },
+    {
+      "test": "tests.test_us_equities_hosting.JournalRecoveryTests.test_control_backups_use_groups_distinct_from_production_retention",
+      "red_exit": 1,
+      "green_exit": 0,
+      "red_output_sha256": "bb99bb2b2a35dbc0c0aba55d1c4a4f1ef1c433212186684fc263acbf2f6c8888",
+      "green_output_sha256": "4501a6447af718dd00f82e5ee56dfeeeb4b792ef0a9c5981d21bfd86835c2158"
+    },
+    {
+      "test": "tests.test_us_equities_hosting.HostingContractTests.test_round2_receipt_names_published_base_and_hash_pinned_working_tree",
+      "red_exit": 1,
+      "green_exit": 0,
+      "red_output_sha256": "021a8a053696b5e53f79eaa355720f24f56263b62ea13052e62df04b7ccbf329",
+      "green_output_sha256": "a3b07f0a76f733c360abf8b82f619260e05e1011fbd63cea308ed03f64fcdc90"
+    },
+    {
+      "test": "tests.test_us_equities_hosting.NativeDaguTests.test_native_probe_uses_its_private_root_when_tmpdir_is_unset",
+      "red_exit": 1,
+      "green_exit": 0,
+      "red_output_sha256": "540ae464d24b6b6421dcdb026ab4421c0b625d5c0003293f60debae25f704d61",
+      "green_output_sha256": "dc6028d9312392b0d83a0c0c8fa2271a7f9d7a80e5a95b8400935582dd82648a"
+    },
+    {
+      "test": "tests.test_us_equities_hosting.NativeDaguTests.test_native_unavailable_input_fails_run_and_blocks_dependents",
+      "red_exit": 1,
+      "green_exit": 0,
+      "red_output_sha256": "77f578f30ed1ecb33126ce28d1b72e5e637e649059b296454ec7ff9e4e9b3af9",
+      "green_output_sha256": "ce3558a584121dee50105bf6ab73148f41923786cac666756327a0e5286baaaa"
+    }
+  ],
+  "commands": [
+    {
+      "command": "python3 -m unittest tests.test_us_equities_hosting -v",
+      "exit": 0,
+      "duration_s": 11.575,
+      "raw_output_sha256": "2cb7120f6c2fc9d644fb8c492849a3990b7f3404ec701dc3f0d77f9457b33188",
+      "summary": [
+        "Ran 50 tests in 11.070s",
+        "OK"
+      ],
+      "skipped": []
+    },
+    {
+      "command": "python3 -m unittest tests.test_us_equities_hosting.RealCalendarTests -v",
+      "exit": 0,
+      "duration_s": 3.996,
+      "raw_output_sha256": "4a5d414c419da8ed4dcbbe35b7d0a4fac4d60a441145ac9f186d32a823c3c0a7",
+      "summary": [
+        "Ran 2 tests in 3.494s",
+        "OK"
+      ],
+      "skipped": []
+    },
+    {
+      "command": "python3 -m unittest tests.test_host_receipts -v",
+      "exit": 0,
+      "duration_s": 5.377,
+      "raw_output_sha256": "db057e871947f955b97cf1945df403c0ca371687f2109f25146e6d34c190f712",
+      "summary": [
+        "Ran 184 tests in 5.269s",
+        "OK"
+      ],
+      "skipped": []
+    },
+    {
+      "command": "python3 -m unittest tests.test_evidence_manifest -v",
+      "exit": 0,
+      "duration_s": 0.058,
+      "raw_output_sha256": "32982b915f671d941f72e021bc50af1338e4e9498ea5424d3934ac7967c329ad",
+      "summary": [
+        "Ran 5 tests in 0.009s",
+        "OK"
+      ],
+      "skipped": []
+    },
+    {
+      "command": "python3 -m unittest tests.test_validate -v",
+      "exit": 0,
+      "duration_s": 0.861,
+      "raw_output_sha256": "30b3852a069223d3bc34533823fcbdc62c5a6111126b7062c62902507d8b32cb",
+      "summary": [
+        "Ran 68 tests in 0.784s",
+        "OK"
+      ],
+      "skipped": []
+    }
+  ],
+  "native_dag_observation": {
+    "schema_version": 1,
+    "round": "t-pr4-r3",
+    "evidence_class": "local_integration",
+    "dagu_pin": "2.16.6",
+    "calendar_pin": "4.13.2",
+    "clock_fixture": "2026-11-27T21:30:00Z",
+    "events_mtime_fixture": "2026-11-27T19:00:00Z",
+    "scope": "Manual native run of all six deployed steps; synthetic historical LEAN input and post-close clock; no scheduler.",
+    "dag_template_sha256": "6107eebb77ae8904ff6422b7e86f4c551dde36d35aa5d6e87b8f5d72b0c9397f",
+    "private_copy_sha256": "e71ebf99aa29a86bf0eb18ab61a054ec24bdfcb67fed5538f2be22c4662884f9",
+    "commands": [
+      {
+        "verb": "validate",
+        "exit": 0,
+        "duration_s": 0.210249,
+        "raw_output_sha256": "e542d658b185d65bc180fbfffc22127516c034643fd63cc45c4045a6f29bdf2c"
+      },
+      {
+        "verb": "start",
+        "exit": 0,
+        "duration_s": 37.141351,
+        "raw_output_sha256": "63b019e05930b07cc64d36140722c96bca5fab3bf913f6506fd768523cc3908d"
+      }
+    ],
+    "native_run_status": 4,
+    "native_node_statuses": {
+      "calendar_check": 4,
+      "nyse_session": 4,
+      "prepare_output": 4,
+      "summarize": 4,
+      "baseline_evidence": 4,
+      "catalog_evidence": 4
+    },
+    "trigger_type": 2,
+    "timeout_sec": 180,
+    "history": {
+      "exit": 0,
+      "context": "local",
+      "from_utc": "2026-10-05T00:00:00Z",
+      "status_filter": "succeeded",
+      "limit": 1000,
+      "matched_run": true,
+      "row_count": 1
+    },
+    "parquet_count": 1,
+    "parquet_sha256": [
+      "bcb285fabdedd0129b0d54dd7097688369695f5ed806fd3a89b26db9d33c65a8"
+    ],
+    "guard_output": "session",
+    "unavailable_input_probes": [
+      {
+        "token": "missing_input",
+        "exit": 1,
+        "run_status": 2,
+        "node_statuses": {
+          "calendar_check": 2,
+          "nyse_session": 3,
+          "evidence": 3
+        },
+        "marker_created": false,
+        "output_token_observed": true,
+        "raw_sanitized_output_sha256": "0b6641cc99565df6e909406e9fc0c1c7aa9000cdb7caed04e00c610efbbc4efb"
+      },
+      {
+        "token": "stale_input",
+        "exit": 1,
+        "run_status": 2,
+        "node_statuses": {
+          "calendar_check": 2,
+          "nyse_session": 3,
+          "evidence": 3
+        },
+        "marker_created": false,
+        "output_token_observed": true,
+        "raw_sanitized_output_sha256": "7fdf89042f9cfc5c0aea90cc9ac85b22f1c4c4d1909b72c2da3d5cb482ca8969"
+      },
+      {
+        "token": "future_input",
+        "exit": 1,
+        "run_status": 2,
+        "node_statuses": {
+          "calendar_check": 2,
+          "nyse_session": 3,
+          "evidence": 3
+        },
+        "marker_created": false,
+        "output_token_observed": true,
+        "raw_sanitized_output_sha256": "452353a4995a5eabdd19bb7a6ec57cbab08ff3b0695a5f36a47d490647ba09a2"
+      }
+    ],
+    "completed_at_utc": "2026-10-05T07:50:43.143067+00:00",
+    "summarizer_returned_json": {
+      "scope": "LEAN bundled historical simulation, not broker fills",
+      "events": 1,
+      "distinct_orders": 1,
+      "statuses": {
+        "Filled": 1
+      },
+      "calendar": "XNYS",
+      "sample_session": "2013-10-07",
+      "session_open_utc": "2013-10-07T13:30:00+00:00",
+      "session_close_utc": "2013-10-07T20:00:00+00:00",
+      "source_sha256": "5d39b6390bf54295d3552923a5bc0ca7848271d300740702182a4c9aa53cad41",
+      "parquet_sha256": "bcb285fabdedd0129b0d54dd7097688369695f5ed806fd3a89b26db9d33c65a8"
+    }
+  },
+  "recovery_observation": {
+    "drill_exit": 0,
+    "returned_json": {
+      "checked_subset": "1/1",
+      "matched_journals": 2,
+      "snapshot_control_exit": 1,
+      "restore_control_exit": 1,
+      "throwaway_password_deleted": true
+    },
+    "independent_observation": [
+      {
+        "bytes": 8265728,
+        "integrity_check": "ok",
+        "path": "journals/evidence.sqlite3",
+        "row_counts": {
+          "runs": 105
+        },
+        "sha256": "c49d676b4b63b431f9be9a7bd3aad252856c1ae1ca4b31dd294bd38671bd65a8"
+      },
+      {
+        "bytes": 8265728,
+        "integrity_check": "ok",
+        "path": "journals/research.sqlite3",
+        "row_counts": {
+          "events": 127
+        },
+        "sha256": "01a99c624a13ea86cba2546191347b9e3b1dd121aee5cbd4e14766d044718f54"
+      }
+    ],
+    "control_groups": {
+      "host": "equity-research-recovery-control",
+      "tag": "journal-recovery-control",
+      "group_by": "host,tags"
+    },
+    "native_snapshot_control_exit": 3,
+    "restore_control_mutation": {
+      "bytes_unchanged": true,
+      "mutation": "SQLite user_version header",
+      "required_state_unchanged": true,
+      "sha256_changed": true
+    }
+  },
+  "operator_documentation": "Native manual start/cancel/history/replay recipes restored; no operator command or service operation executed.",
+  "source_corrections": [
+    "Unavailable-input tokens fail the guard and run; only holidays and before-close skip.",
+    "Signal delivery uses native unit-addressed systemctl kill, with a 150-second reserve and late-slot refusal.",
+    "Source journal_mode is checked before copying; non-WAL needs an explicit writer-blocking opt-in.",
+    "Controls use distinct host/tag groups; historical round-2 source hashes are retained with corrected provenance."
+  ],
+  "limitations": [
+    "Local integration and synthetic fixtures, not an unchanged upstream test suite or operating-host acceptance.",
+    "The deployed DAG copy uses a fixed post-close guard clock and a synthetic historical LEAN event; the native trigger remains manual.",
+    "Restart identity/window guards are tested with mocks. No systemctl manager operation, fault or service deployment ran.",
+    "Scheduler dispatch with run_dags:false, reboot, missed slots and independent alerts remain user decision 2.",
+    "Off-host recovery remains user decision 3: independent destination, key recovery and second-host consumer restore.",
+    "The independent final T row at line 102 was reread; it retains restic/Online Backup and does not name Litestream.",
+    "No Go compiler was found in PATH; the historical cron Next probe exit 127 remains unmeasured across DST.",
+    "No separate Python 3.11 interpreter was found in PATH; execution used 3.13.15.",
+    "Per-journal snapshots are consistent separately; there is no cross-journal transaction.",
+    "Native recovery reads subset 1/1; whole seven-part rotation remains behavioral fixture evidence.",
+    "No retention deletion, broker, credentials, live mode, model calls, commit, push or pin move."
+  ],
+  "invocation_proxy": "Builder shell commands used rtk env through its fallback, with TMPDIR outside the checkout and nice -n 19. Portable recipes use plain env.",
+  "native_command_exits": [
+    {
+      "command": "dagu validate (private deployed DAG copy)",
+      "exit": 0
+    },
+    {
+      "command": "dagu start (private deployed DAG copy)",
+      "exit": 0
+    },
+    {
+      "command": "dagu history --context local --from <UTC Z> --status succeeded --limit 1000 --format json equity-research-evidence",
+      "exit": 0
+    },
+    {
+      "command": "dagu start (real guard, missing_input)",
+      "exit": 1,
+      "expected_failure": true
+    },
+    {
+      "command": "dagu start (real guard, stale_input)",
+      "exit": 1,
+      "expected_failure": true
+    },
+    {
+      "command": "dagu start (real guard, future_input)",
+      "exit": 1,
+      "expected_failure": true
+    },
+    {
+      "command": "drill_local_recovery.py --restic-bin <restic-0.19.1> --output <sanitized-report>",
+      "exit": 0
+    },
+    {
+      "command": "restic backup (snapshot control)",
+      "exit": 3,
+      "expected_failure": true
+    },
+    {
+      "command": "journal_recovery.py cycle --control snapshot",
+      "exit": 1,
+      "expected_failure": true
+    },
+    {
+      "command": "journal_recovery.py cycle --control restore",
+      "exit": 1,
+      "expected_failure": true
+    }
+  ]
+}

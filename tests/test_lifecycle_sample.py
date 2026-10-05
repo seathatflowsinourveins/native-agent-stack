@@ -178,7 +178,7 @@ class LifecycleTests(unittest.TestCase):
     def test_native_edgar_html_parser_and_naive_acceptance(self):
         try: version = importlib.metadata.version("edgartools")
         except importlib.metadata.PackageNotFoundError: self.skipTest("EdgarTools runtime not installed")
-        if version != "5.58.0": self.skipTest("Different EdgarTools runtime")
+        if version != "5.60.0": self.skipTest("Different EdgarTools runtime")
         raw = b"<html><body><p>Synthetic lifecycle document</p></body></html>"
         parsed = self.m.native_parse("meta_release", raw)
         self.assertIn("Synthetic lifecycle document", parsed["text"])

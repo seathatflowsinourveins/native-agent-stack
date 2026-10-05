@@ -4,7 +4,9 @@ config_version: 45
 models:
   - name: gpt-runtime
     use: langchain_openai:ChatOpenAI
-    model: cx/gpt-6.1-sol-max
+    model: cx/gpt-6.1-sol
+    supports_reasoning_effort: true
+    reasoning_effort: xhigh
     base_url: http://127.0.0.1:21128/v1
     api_key: local-loopback
     use_responses_api: true

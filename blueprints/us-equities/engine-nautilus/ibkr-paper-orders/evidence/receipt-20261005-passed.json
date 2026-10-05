@@ -1,0 +1,464 @@
+{
+  "schema_version": 1,
+  "kind": "ibkr_paper_orders_nautilus_1_231",
+  "generated_at": "2026-10-05T14:26:09.438457+00:00",
+  "nautilus_trader_version": "1.231.0",
+  "ibapi_version": "10.45.1",
+  "plan_sha256": "9f2942c49bbd0d783802dd47a9bb2f38b81e54b2a4f4422be1d203fe649105bd",
+  "harness_sha256": "1b697f237275a725a0dcc39ee886c4f07aa27bfba1c2b442982b3c76b02e1012",
+  "evidence_class": "native_paper",
+  "port": 4002,
+  "status": "passed",
+  "plan_bounds": {
+    "max_orders": 6,
+    "max_quantity_per_order": 1,
+    "max_notional_per_order_usd": 1000,
+    "max_roundtrip_loss_usd": 5,
+    "commission_allowance_per_order_usd": 1.0,
+    "marketable_offset_usd": 0.05,
+    "resting_fraction_of_bid": 0.5,
+    "resting_price_floor_usd": 1.0,
+    "max_order_submit_rate": "100/00:00:01",
+    "time_in_force": "DAY",
+    "order_type": "LIMIT",
+    "min_submit_spacing_seconds": 1.5,
+    "max_cancel_attempts_per_order": 3,
+    "submit_rate_note": "Nautilus default risk-engine throttle (drops and denies submits beyond the rate); the run's own spacing is enforced by the harness before every order is created, so the throttle never binds."
+  },
+  "session_check": {
+    "fixed_window": "inside_window",
+    "contract_hours_field": "liquidHours",
+    "liquid_hours_present": true,
+    "liquid_hours_parsed": true,
+    "with_liquid_hours": "inside_window"
+  },
+  "pre_check": {
+    "client": "ibapi",
+    "client_id": 92,
+    "port": 4002,
+    "status": "passed",
+    "observed": {
+      "account_count": 1,
+      "paper_accounts": true,
+      "server_time_epoch": 1791210369,
+      "positions": 0,
+      "spy_position": false,
+      "open_orders": 0,
+      "open_order_statuses": [],
+      "contract": {
+        "secType": "STK",
+        "currency": "USD",
+        "exchange": "SMART",
+        "primaryExchange": "ARCA",
+        "minTick": 0.01,
+        "timeZoneId": "US/Eastern"
+      },
+      "errors": [],
+      "info": [
+        {
+          "reqId": -1,
+          "code": 2104,
+          "text": "Market data farm connection is OK:usfarm"
+        },
+        {
+          "reqId": -1,
+          "code": 2106,
+          "text": "HMDS data farm connection is OK:ushmds"
+        },
+        {
+          "reqId": -1,
+          "code": 2158,
+          "text": "Sec-def data farm connection is OK:secdefil"
+        }
+      ],
+      "server_minus_local_s": -0.54
+    },
+    "requests_completed": {
+      "accounts": true,
+      "time": true,
+      "positions": true,
+      "orders": true,
+      "contract": true
+    },
+    "time_zone_id": "US/Eastern"
+  },
+  "run": {
+    "run_prefix": "NTP-1005-142609-3204d0",
+    "cases": [
+      {
+        "id": "C1",
+        "name": "accept_resting",
+        "expect": "OrderAccepted",
+        "outcome": "passed",
+        "reason": null,
+        "started_at": "2026-10-05T14:26:11.449946+00:00",
+        "ended_at": "2026-10-05T14:26:12.523945+00:00",
+        "orders": [
+          {
+            "client_order_id": "NTP-1005-142609-3204d0-C1",
+            "side": "BUY",
+            "quantity": "1",
+            "limit_price": "386.42",
+            "notional_usd": "386.42",
+            "time_in_force": "DAY",
+            "order_number": 1,
+            "created_at": "2026-10-05T14:26:11.901222+00:00"
+          }
+        ],
+        "events": [
+          {
+            "type": "OrderInitialized",
+            "client_order_id": "NTP-1005-142609-3204d0-C1",
+            "ts_event": "2026-10-05T14:26:11.901148+00:00",
+            "ts_init": "2026-10-05T14:26:11.901148+00:00"
+          },
+          {
+            "type": "OrderSubmitted",
+            "client_order_id": "NTP-1005-142609-3204d0-C1",
+            "ts_event": "2026-10-05T14:26:11.903800+00:00",
+            "ts_init": "2026-10-05T14:26:11.903805+00:00"
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-1005-142609-3204d0-C1",
+            "ts_event": "2026-10-05T14:26:12.522306+00:00",
+            "ts_init": "2026-10-05T14:26:12.522316+00:00"
+          },
+          {
+            "type": "OrderAccepted",
+            "client_order_id": "NTP-1005-142609-3204d0-C1",
+            "ts_event": "2026-10-05T14:26:12.522362+00:00",
+            "ts_init": "2026-10-05T14:26:12.522364+00:00",
+            "venue_order_id_present": true
+          }
+        ],
+        "quote": {
+          "bid": "772.85",
+          "ask": "772.88",
+          "age_s": 0.361
+        },
+        "venue_order_id_present": true
+      },
+      {
+        "id": "C2",
+        "name": "cancel_resting",
+        "expect": "OrderCanceled",
+        "outcome": "passed",
+        "reason": null,
+        "started_at": "2026-10-05T14:26:12.524361+00:00",
+        "ended_at": "2026-10-05T14:26:12.618134+00:00",
+        "orders": [],
+        "events": [
+          {
+            "type": "OrderPendingCancel",
+            "client_order_id": "NTP-1005-142609-3204d0-C1",
+            "ts_event": "2026-10-05T14:26:12.525384+00:00",
+            "ts_init": "2026-10-05T14:26:12.525384+00:00"
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-1005-142609-3204d0-C1",
+            "ts_event": "2026-10-05T14:26:12.530382+00:00",
+            "ts_init": "2026-10-05T14:26:12.530391+00:00"
+          },
+          {
+            "type": "OrderAccepted",
+            "client_order_id": "NTP-1005-142609-3204d0-C1",
+            "ts_event": "2026-10-05T14:26:12.530426+00:00",
+            "ts_init": "2026-10-05T14:26:12.530427+00:00",
+            "venue_order_id_present": true
+          },
+          {
+            "type": "OrderCanceled",
+            "client_order_id": "NTP-1005-142609-3204d0-C1",
+            "ts_event": "2026-10-05T14:26:12.616852+00:00",
+            "ts_init": "2026-10-05T14:26:12.616863+00:00"
+          }
+        ]
+      },
+      {
+        "id": "C3",
+        "name": "fill_buy",
+        "expect": "OrderFilled",
+        "outcome": "passed",
+        "reason": null,
+        "started_at": "2026-10-05T14:26:12.618634+00:00",
+        "ended_at": "2026-10-05T14:26:14.760362+00:00",
+        "orders": [
+          {
+            "client_order_id": "NTP-1005-142609-3204d0-C3",
+            "side": "BUY",
+            "quantity": "1",
+            "limit_price": "772.97",
+            "notional_usd": "772.97",
+            "time_in_force": "DAY",
+            "order_number": 2,
+            "created_at": "2026-10-05T14:26:13.449894+00:00"
+          }
+        ],
+        "events": [
+          {
+            "type": "OrderInitialized",
+            "client_order_id": "NTP-1005-142609-3204d0-C3",
+            "ts_event": "2026-10-05T14:26:13.449821+00:00",
+            "ts_init": "2026-10-05T14:26:13.449821+00:00"
+          },
+          {
+            "type": "OrderSubmitted",
+            "client_order_id": "NTP-1005-142609-3204d0-C3",
+            "ts_event": "2026-10-05T14:26:13.452138+00:00",
+            "ts_init": "2026-10-05T14:26:13.452143+00:00"
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-1005-142609-3204d0-C3",
+            "ts_event": "2026-10-05T14:26:13.543380+00:00",
+            "ts_init": "2026-10-05T14:26:13.543383+00:00"
+          },
+          {
+            "type": "OrderAccepted",
+            "client_order_id": "NTP-1005-142609-3204d0-C3",
+            "ts_event": "2026-10-05T14:26:13.543409+00:00",
+            "ts_init": "2026-10-05T14:26:13.543410+00:00",
+            "venue_order_id_present": true
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-1005-142609-3204d0-C3",
+            "ts_event": "2026-10-05T14:26:13.558872+00:00",
+            "ts_init": "2026-10-05T14:26:13.558884+00:00"
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-1005-142609-3204d0-C3",
+            "ts_event": "2026-10-05T14:26:13.572751+00:00",
+            "ts_init": "2026-10-05T14:26:13.572770+00:00"
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-1005-142609-3204d0-C3",
+            "ts_event": "2026-10-05T14:26:13.796650+00:00",
+            "ts_init": "2026-10-05T14:26:13.796661+00:00"
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-1005-142609-3204d0-C3",
+            "ts_event": "2026-10-05T14:26:14.337221+00:00",
+            "ts_init": "2026-10-05T14:26:14.337233+00:00"
+          },
+          {
+            "type": "OrderFilled",
+            "client_order_id": "NTP-1005-142609-3204d0-C3",
+            "ts_event": "2026-10-05T14:26:14+00:00",
+            "ts_init": "2026-10-05T14:26:14.758778+00:00"
+          }
+        ],
+        "quote": {
+          "bid": "772.90",
+          "ask": "772.92",
+          "age_s": 0.91,
+          "worst_case_roundtrip_loss_usd": "2.12"
+        },
+        "filled_qty": "1",
+        "avg_px": "772.93"
+      },
+      {
+        "id": "C4",
+        "name": "flatten",
+        "expect": "OrderFilled+flat",
+        "outcome": "passed",
+        "reason": null,
+        "started_at": "2026-10-05T14:26:14.763088+00:00",
+        "ended_at": "2026-10-05T14:26:15.288130+00:00",
+        "orders": [
+          {
+            "client_order_id": "NTP-1005-142609-3204d0-C4",
+            "side": "SELL",
+            "quantity": "1",
+            "limit_price": "772.84",
+            "notional_usd": "772.84",
+            "time_in_force": "DAY",
+            "order_number": 3,
+            "created_at": "2026-10-05T14:26:15.177075+00:00"
+          }
+        ],
+        "events": [
+          {
+            "type": "OrderInitialized",
+            "client_order_id": "NTP-1005-142609-3204d0-C4",
+            "ts_event": "2026-10-05T14:26:15.177015+00:00",
+            "ts_init": "2026-10-05T14:26:15.177015+00:00"
+          },
+          {
+            "type": "OrderSubmitted",
+            "client_order_id": "NTP-1005-142609-3204d0-C4",
+            "ts_event": "2026-10-05T14:26:15.180412+00:00",
+            "ts_init": "2026-10-05T14:26:15.180424+00:00"
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-1005-142609-3204d0-C4",
+            "ts_event": "2026-10-05T14:26:15.233266+00:00",
+            "ts_init": "2026-10-05T14:26:15.233276+00:00"
+          },
+          {
+            "type": "OrderAccepted",
+            "client_order_id": "NTP-1005-142609-3204d0-C4",
+            "ts_event": "2026-10-05T14:26:15.233310+00:00",
+            "ts_init": "2026-10-05T14:26:15.233312+00:00",
+            "venue_order_id_present": true
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-1005-142609-3204d0-C4",
+            "ts_event": "2026-10-05T14:26:15.280042+00:00",
+            "ts_init": "2026-10-05T14:26:15.280055+00:00"
+          },
+          {
+            "type": "OrderFilled",
+            "client_order_id": "NTP-1005-142609-3204d0-C4",
+            "ts_event": "2026-10-05T14:26:15+00:00",
+            "ts_init": "2026-10-05T14:26:15.285006+00:00"
+          }
+        ],
+        "quote": {
+          "bid": "772.89",
+          "ask": "772.91",
+          "age_s": 0.637
+        },
+        "filled_qty": "1",
+        "avg_px": "772.9",
+        "flat": true
+      }
+    ],
+    "fills": [
+      {
+        "case": "C3",
+        "client_order_id": "NTP-1005-142609-3204d0-C3",
+        "side": "BUY",
+        "price": "772.93",
+        "quantity": "1",
+        "commission": "1",
+        "commission_currency": "USD",
+        "ts_event": "2026-10-05T14:26:14+00:00"
+      },
+      {
+        "case": "C4",
+        "client_order_id": "NTP-1005-142609-3204d0-C4",
+        "side": "SELL",
+        "price": "772.90",
+        "quantity": "1",
+        "commission": "1.02",
+        "commission_currency": "USD",
+        "ts_event": "2026-10-05T14:26:15+00:00"
+      }
+    ],
+    "position": {
+      "opened": {
+        "side": "LONG",
+        "quantity": "1",
+        "avg_px_open": "772.93",
+        "ts_event": "2026-10-05T14:26:14+00:00"
+      },
+      "closed": {
+        "realized_pnl": "-2.05",
+        "currency": "USD",
+        "ts_event": "2026-10-05T14:26:15+00:00"
+      }
+    },
+    "roundtrip": {
+      "gross_pnl_usd": "-0.03",
+      "commissions_usd": "2.02",
+      "net_pnl_usd": "-2.05",
+      "max_roundtrip_loss_usd": "5",
+      "loss_bound_breached": false,
+      "commission_unresolved": false,
+      "nautilus_realized_pnl": "-2.05",
+      "nautilus_realized_pnl_currency": "USD"
+    },
+    "orders_created": 3,
+    "max_orders": 6,
+    "net_quantity_from_fills": "0",
+    "cleanup": {
+      "triggered": false
+    },
+    "unconfirmed_events": [],
+    "duplicate_events": [],
+    "cancel_requests": [
+      {
+        "client_order_id": "NTP-1005-142609-3204d0-C1",
+        "where": "C2",
+        "action": "cancel",
+        "attempt": 1,
+        "status": "ACCEPTED",
+        "at": "2026-10-05T14:26:12.524868+00:00"
+      }
+    ],
+    "node": {
+      "built": true,
+      "strategy_started": true,
+      "stop_requested_by": "strategy:cases_complete",
+      "strategy_started_at": "2026-10-05T14:26:11.443654+00:00",
+      "instrument": {
+        "id": "SPY.ARCA",
+        "price_increment": "0.01",
+        "size_increment": "1",
+        "quote_currency": "USD"
+      },
+      "finish_reason": "cases_complete"
+    },
+    "notes": [],
+    "errors": []
+  },
+  "flat_proof": {
+    "status": "passed",
+    "positions": 0,
+    "open_orders": 0,
+    "attempts": [
+      {
+        "client": "ibapi",
+        "client_id": 92,
+        "port": 4002,
+        "status": "passed",
+        "observed": {
+          "account_count": 1,
+          "paper_accounts": true,
+          "server_time_epoch": 1791210380,
+          "positions": 0,
+          "spy_position": false,
+          "open_orders": 0,
+          "open_order_statuses": [],
+          "contract": null,
+          "errors": [],
+          "info": [
+            {
+              "reqId": -1,
+              "code": 2104,
+              "text": "Market data farm connection is OK:usfarm"
+            },
+            {
+              "reqId": -1,
+              "code": 2106,
+              "text": "HMDS data farm connection is OK:ushmds"
+            },
+            {
+              "reqId": -1,
+              "code": 2158,
+              "text": "Sec-def data farm connection is OK:secdefil"
+            }
+          ],
+          "server_minus_local_s": -0.724
+        },
+        "requests_completed": {
+          "accounts": true,
+          "time": true,
+          "positions": true,
+          "orders": true,
+          "contract": false
+        }
+      }
+    ]
+  },
+  "elapsed_seconds": 11.544,
+  "exit_code": 0
+}

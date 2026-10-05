@@ -61,7 +61,7 @@ class CatalystDatasetTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.run, self.receipt_hash = make_run(self.root)
         self.native = patch.object(self.m, "native_view", side_effect=native_view)
-        self.provenance = patch.object(self.m, "native_parser_identity", return_value={"version": "5.58.0", "source_files": []})
+        self.provenance = patch.object(self.m, "native_parser_identity", return_value={"version": "5.60.0", "source_files": []})
         self.native.start()
         self.provenance.start()
         self.addCleanup(self.temp.cleanup)

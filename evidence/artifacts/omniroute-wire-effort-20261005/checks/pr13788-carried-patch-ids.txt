@@ -1,0 +1,16 @@
+# PR 13788's two public commits against the local cherry-picks the running builds carry (2026-10-05)
+# restore: git init --bare R; R/objects/info/alternates = <upstream mirror>/objects; git --git-dir=R fetch <carry bundle> 'refs/heads/*:refs/heads/carry/*' 'refs/notes/*:refs/notes/*'
+<HOME>/.local/state/native-agent-stack/omniroute-artifacts-20261005/omniroute-carry-commits-20261005.bundle is okay
+fetch exit=0
+restored refs:
+  refs/heads/carry/local/affinity-over-occupancy-20260928 045aa81f30cb9a1fc4f6b426ed940c1956cceda2
+  refs/heads/carry/ns/rebuild-81c9b6da-20260928-affinity2 5fc47d970abab15d7e8c39ef4cdaeb037acfd872
+  refs/heads/carry/wire-probe-15167 5f4b3d577d247ae86796d47c9db6bfed0efd75ce
+  refs/notes/commits 6267d8509cdff43987419e7d0e9b317aeee5f5c6
+# patch ids: git show <commit> | git patch-id --stable
+24bbadbad15eec0d598c908416e4b01be4e37671 amsjavan | feat(search): implement /v1/alpha/search endpoint for Codex native web search ( | patch-id d6cb98ecd2c4aed3462224f8059454ebff67a2b9
+6c7990058c4ce9677de79452c8cefb10b4bf1b3d diegosouzapw | fix(api): sanitize unexpected internal errors in /v1/alpha/search | patch-id cbb7d8fb78ed0dcf19fa0cef4c701d7cbc69d991
+b9f0d76eb3fc93aa9265af4c769ade80348d024e amsjavan | feat(search): implement /v1/alpha/search endpoint for Codex native web search ( | patch-id d6cb98ecd2c4aed3462224f8059454ebff67a2b9
+46c77c83b0a46fb52c38cb657b0a7065615d624c amsjavan | feat(search): implement /v1/alpha/search endpoint for Codex native web search ( | patch-id d6cb98ecd2c4aed3462224f8059454ebff67a2b9
+dd6e9607e4884ec75c9bc0d96e60b01e9483d84e diegosouzapw | fix(api): sanitize unexpected internal errors in /v1/alpha/search | patch-id cbb7d8fb78ed0dcf19fa0cef4c701d7cbc69d991
+c3fa5a15e1b0da58ae59870488d42ee580ce7fc2 diegosouzapw | fix(api): sanitize unexpected internal errors in /v1/alpha/search | patch-id cbb7d8fb78ed0dcf19fa0cef4c701d7cbc69d991

@@ -1,6 +1,8 @@
 # Trading lane rules
 
-Rules for trading research waves, data readiness and experiments. The north star and the paper-lane authorization are in the root `AGENTS.md`.
+Rules for trading research waves, data readiness and experiments. The north star and the paper-lane authorization are recorded below.
+
+For brokers, engines and data, use the vendor's own maintained repositories at their clean releases: [alpacahq/alpaca-py](https://github.com/alpacahq/alpaca-py), [the official Alpaca MCP server](https://github.com/alpacahq/alpaca-mcp-server) where an MCP is needed, [nautechsystems/nautilus_trader](https://github.com/nautechsystems/nautilus_trader), and [the official IBKR TWS API distribution](https://interactivebrokers.github.io/). For adapters, never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin. [Current release verification](../../docs/decisions/2026-10-05-official-upstream-never-rebuild.md) records the sources; runtime selections stay with the trading lane.
 
 For architecture or research waves, read `blueprints/us-equities/architecture/README.md`
 and the matching source-review supplement. `catalogs/us-equities/decision-index.json`
@@ -40,3 +42,20 @@ output contract. The selected direction is daily/intraday
 catalyst research, including historical +200% mover discovery. Preserve as-known
 candidate universes and source revisions; the current synthetic temporal fixture
 and fixed LEAN schedule are not an accepted historical strategy dataset.
+
+## Trading north star
+
+The north star is US-equities research and historical simulation with the selected
+NautilusTrader 2.0.0rc5/IBKR destination and a separate Alpaca adapter path, followed
+by independently qualified paper operation for each broker. Current selections
+are in `catalogs/us-equities/runtime-target.json`; dated LEAN/Alpaca receipts remain
+comparison evidence rather than overriding that destination.
+Read `catalogs/us-equities/README.md` for selection and `blueprints/us-equities/north-star.md`
+for boundaries. The native worker policy applies to workers launched by its example,
+not automatically to unrelated SDKs or projects. Keep models in research and
+deterministic code in numeric/risk/order state.
+The user has explicitly authorized broker-specific paper-trading E2E after the
+current foundation work. Follow `docs/paper-lane-policy.md`: proceed through native
+paper readiness and measured acceptance without repeated human approval. Missing
+live credentials or live configuration do not gate paper; live trading and paid
+hosting remain separate scopes.

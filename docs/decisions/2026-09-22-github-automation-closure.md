@@ -1507,6 +1507,8 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
 
 ## validate-macos required (2026-09-25)
 
+> Superseded 2026-10-05: macOS CI is advisory; see [docs/decisions/2026-10-05-macos-ci-advisory.md](2026-10-05-macos-ci-advisory.md).
+
 > **Superseded in part 2026-10-03:** flake overturn met 09-30; the prescribed non-required lane was rejected; see
 > [2026-10-03-macos-ci-scope.md](2026-10-03-macos-ci-scope.md). `validate-macos` stays required; on a pull request it
 > now runs in full, runs only the changed test modules, or is skipped, as the `changes` job decides.

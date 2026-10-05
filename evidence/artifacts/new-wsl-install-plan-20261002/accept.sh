@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Current integration: 98 primary acceptance stages and two additional checks, from the merged 80-row plan.
+# Current integration: 110 primary acceptance stages and two additional checks (112 total), from the merged 84-row plan.
 # Historical 64-row revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that distribution's acceptance.
 # Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The checks of skill-discovery and skill-authoring have not run anywhere; research-skill and credential-custody install nothing and have nothing to check; the fix-wave adds native review checks.
 # On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable after their measurement; like their installation, their checks run only with --only, and as plan rows they have not run anywhere.
@@ -33,7 +33,7 @@ case "$stage" in
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;
 esac
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two checks change into repo_root, so the plan runs from a checkout of the repository (README.md).
@@ -58,8 +58,13 @@ check() {
   local slot="$1" program="$3" rc=0
   # Kind/source remain in JSON and beside each command. Suppress stdout, which
   # diagnostics/model examples can fill with private config; retain stderr/status.
-  if prepare_path && bash -euo pipefail -c "$program" >/dev/null; then rc=0; else rc=$?; failed=1; fi
-  printf '%s | %s | %s\n' "$slot" "$stage" "$rc"
+  if prepare_path && bash -euo pipefail -c "$program" >/dev/null; then rc=0; else rc=$?; fi
+  if [[ "$rc" == 78 ]]; then
+    printf '%s | %s | needs_user (78)\n' "$slot" "$stage"
+  else
+    [[ "$rc" == 0 ]] || failed=1
+    printf '%s | %s | %s\n' "$slot" "$stage" "$rc"
+  fi
 }
 skipped() { printf '%s | %s | skipped\n' "$1" "$stage"; }
 
@@ -289,6 +294,53 @@ mcporter() {
   esac
 }
 
+agent-messaging() {
+  # Native upstream CLI smoke assertions; client wiring is a separate integration check.
+  case "$stage" in
+    post_install)
+      # Kind: upstream smoke + native integration; Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129
+      # Source: https://developers.openai.com/codex/rules
+      check agent-messaging 'upstream smoke + native integration' 'smoke="$(mktemp -d)"
+trap '"'"'rm -rf -- "$smoke"'"'"' EXIT
+mkdir -p -- "$smoke/home"
+hcom_binary="$(command -v hcom)"
+isolated=(env -i HOME="$smoke/home" PATH="$PATH" HCOM_DIR="$smoke")
+"${isolated[@]}" "$hcom_binary" status --json > "$smoke/status.json"
+jq -e --arg expected "$smoke" '"'"'.hcom_dir == $expected and .instances.total == 0'"'"' "$smoke/status.json" >/dev/null
+"${isolated[@]}" "$hcom_binary" list --json | jq -e '"'"'type == "array" and length == 0'"'"' >/dev/null
+identity_rc=0
+"${isolated[@]}" "$hcom_binary" send @nobody -- hi > "$smoke/no-identity.out" 2> "$smoke/no-identity.err" || identity_rc=$?
+[[ "$identity_rc" -ne 0 ]]
+rg -Fq "identity not found" "$smoke/no-identity.err"
+"${isolated[@]}" "$hcom_binary" start > "$smoke/sender.txt"
+"${isolated[@]}" "$hcom_binary" start > "$smoke/recipient.txt"
+sender="$(sed -n '"'"'s/^\[hcom:\([^]]*\)\].*/\1/p'"'"' "$smoke/sender.txt")"
+recipient="$(sed -n '"'"'s/^\[hcom:\([^]]*\)\].*/\1/p'"'"' "$smoke/recipient.txt")"
+[[ -n "$sender" && -n "$recipient" && "$sender" != "$recipient" ]]
+"${isolated[@]}" "$hcom_binary" send "@$recipient" --name "$sender" -- "hello there"
+"${isolated[@]}" "$hcom_binary" events --last 10 > "$smoke/events.jsonl"
+jq -s -e --arg sender "$sender" '"'"'[.[] | select(.type == "message")] | length == 1 and .[0].instance == $sender and .[0].data.from == $sender and .[0].data.text == "hello there"'"'"' "$smoke/events.jsonl" >/dev/null
+"${isolated[@]}" "$hcom_binary" list --json | jq -e --arg sender "$sender" --arg recipient "$recipient" '"'"'any(.[]; .name == $recipient and .unread_count == 1) and any(.[]; .name == $sender and .unread_count == 0)'"'"' >/dev/null
+"${isolated[@]}" "$hcom_binary" listen --name "$recipient" --timeout 1 --json > "$smoke/delivered.jsonl"
+jq -s -e --arg sender "$sender" '"'"'length == 1 and .[0].from == $sender and .[0].text == "hello there" and .[0].reply_id == (.[0].event_id | tostring)'"'"' "$smoke/delivered.jsonl" >/dev/null
+"${isolated[@]}" "$hcom_binary" list --json | jq -e --arg recipient "$recipient" '"'"'any(.[]; .name == $recipient and .unread_count == 0)'"'"' >/dev/null
+python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --rules-source "$config_root/hcom-deny.rules" --check'
+      ;;
+    after_sign_in)
+      # Kind: native integration; Source: https://developers.openai.com/codex/rules
+      # Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L1566
+      check agent-messaging 'native integration' 'codex_rules="${CODEX_HOME:-$HOME/.codex}/rules"
+if [[ ! -f "$codex_rules/hcom.rules" ]]; then
+  printf "needs_user: launch hcom codex once before checking its upstream allow rules together with the posture denies.\n" >&2
+  exit 78
+fi
+codex execpolicy check --pretty --rules "$codex_rules/hcom.rules" --rules "$codex_rules/hcom-deny.rules" -- hcom term inject luna hi | jq -e '"'"'.decision == "forbidden"'"'"' >/dev/null
+codex execpolicy check --pretty --rules "$codex_rules/hcom.rules" --rules "$codex_rules/hcom-deny.rules" -- hcom config | jq -e '"'"'.decision == "forbidden"'"'"' >/dev/null'
+      ;;
+    *) skipped agent-messaging ;;
+  esac
+}
+
 sandbox-runtime-srt() {
   # sandbox-runtime (srt); https://github.com/anthropics/sandbox-runtime
   case "$stage" in
@@ -322,7 +374,7 @@ mkdir -p -- "$native_receipts"
 native_probe="$(mktemp -d "$native_receipts/serena.XXXXXX")"
 cd "$repo_root"
 prompt='"'"'Use the configured Serena MCP server. Activate the current directory as the project and follow its session initialization if required. Call find_symbol with name_path_pattern register_file, relative_path scripts/host_receipts.py and include_body true. Then call find_referencing_symbols with name_path register_file and the same relative_path. Both calls must succeed and return the definition and real callers. Do not substitute shell or file-reading tools. Report a failure if either call fails.'"'"'
-claude -p "$prompt" --output-format stream-json --verbose --allowedTools mcp__serena__activate_project,mcp__serena__initial_instructions,mcp__serena__check_onboarding_performed,mcp__serena__find_symbol,mcp__serena__find_referencing_symbols > "$native_probe/claude.jsonl"
+claude -p "$prompt" --output-format stream-json --verbose --allowedTools mcp__serena__activate_project,mcp__serena__initial_instructions,mcp__serena__check_onboarding_performed,mcp__serena__find_symbol,mcp__serena__find_referencing_symbols > "$native_probe/claude.jsonl" </dev/null
 jq -s -e '"'"'def returned($tool):
   [ .[] | select(.type == "assistant") | .message.content[]? |
     select(.type == "tool_use" and .name == $tool) | .id ] as $ids |
@@ -452,7 +504,7 @@ mkdir -p -- "$native_receipts"
 native_probe="$(mktemp -d "$native_receipts/mineru-native.XXXXXX")"
 cd "$repo_root"
 prompt="Use the installed mineru skill to read the public fixture $tool_root/mineru/demo1.pdf locally. Run mineru parse on that absolute path with --tier standard --pages 1 --wait 600 --json in one tool call. Then use a returned doc locator (choose page 1) in a separate mineru read call with --json. Both tool results must contain the first-page text about afforestation. Do not use --remote, another parser, a pipeline, or a model-written summary as a substitute. Report failure if either command fails."
-claude -p "$prompt" --output-format stream-json --verbose --allowedTools Skill,Bash > "$native_probe/claude.jsonl"
+claude -p "$prompt" --output-format stream-json --verbose --allowedTools Skill,Bash > "$native_probe/claude.jsonl" </dev/null
 jq -s -e '"'"'def returned($operation):
   [ .[] | select(.type == "assistant") | .message.content[]? |
     select(.type == "tool_use" and .name == "Bash" and (.input.command | contains($operation))) | .id ] as $ids |
@@ -475,11 +527,68 @@ returned("mineru parse") and returned("mineru read")'"'"' "$native_probe/codex.j
 }
 
 playwright-cli() {
-  # Playwright CLI; https://github.com/microsoft/playwright-cli
+  # Chrome DevTools MCP; https://github.com/ChromeDevTools/chrome-devtools-mcp
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/microsoft/playwright/e8149b8257d32dcf8f72573ecc43e72439da7080/packages/playwright-core/src/tools/mcp/config.ts#L285
-      check playwright-cli smoke 'playwright-cli open https://playwright.dev --browser=chromium && playwright-cli close'
+      # Kind: unchanged upstream test subset; Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/.github/workflows/run-tests.yml#L72
+      check playwright-cli 'upstream tests' 'umask 077
+browser_receipts="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/chrome-devtools"
+mkdir -p -- "$browser_receipts"
+google-chrome-stable --version > "$browser_receipts/google-chrome-stable.version.txt"
+test -s "$browser_receipts/google-chrome-stable.version.txt"
+installed_chrome="$(dpkg-query -W -f='"'"'${Version}'"'"' google-chrome-stable)"
+printf '"'"'%s\n'"'"' "$installed_chrome" > "$browser_receipts/google-chrome-stable.package-version.txt"
+dpkg --compare-versions "$installed_chrome" ge 154.0.8037.97-1
+apt-cache policy google-chrome-stable > "$browser_receipts/google-chrome-stable.apt-policy.txt"
+apt-cache madison google-chrome-stable | awk -F '"'"'|'"'"' -v installed="$installed_chrome" '"'"'
+{ gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2);
+  if ($2 == installed && $3 ~ /https:\/\/dl\.google\.com\/linux\/chrome\/deb\/?[[:space:]]+stable\/main[[:space:]]+amd64[[:space:]]+Packages/) found=1 }
+END { exit !found }'"'"'
+grep -Eq "Signed-By: /etc/apt/keyrings/google-chrome[.]asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796" /etc/apt/sources.list.d/native-stack-google-chrome.sources
+test ! -e /etc/apt/sources.list.d/google-chrome.sources
+test ! -e /etc/apt/sources.list.d/google-chrome.list
+cd "$tool_root/chrome-devtools-mcp-source"
+test "$(git rev-parse HEAD)" = e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df
+browser_run="$(mktemp -d "$browser_receipts/upstream.XXXXXX")"
+PUPPETEER_EXECUTABLE_PATH="$(command -v google-chrome-stable)" npm run test:no-build -- tests/index.test.ts tests/tools/pages.test.ts tests/tools/snapshot.test.ts tests/tools/console.test.ts tests/tools/network.test.ts tests/tools/performance.test.ts > "$browser_run/tests.log" 2>&1'
+      ;;
+    after_sign_in)
+      # Kind: native integration + local synthetic fixture; Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/tool-reference.md#L223
+      # Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/tool-reference.md#L431 (console) and #L462 (snapshot).
+      check playwright-cli smoke 'umask 077
+native_receipts="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/chrome-devtools"
+mkdir -p -- "$native_receipts"
+native_probe="$(mktemp -d "$native_receipts/clients.XXXXXX")"
+fixture_url="file://$plan_dir/config/chrome-devtools-accept.html"
+cd "$repo_root"
+claude mcp get chrome-devtools > "$native_probe/claude-registration.txt"
+grep -Eq '"'"'^[[:space:]]*Command: npx$'"'"' "$native_probe/claude-registration.txt"
+grep -Eq '"'"'^[[:space:]]*Args: -y chrome-devtools-mcp@1\.10\.1 --headless --isolated --no-usage-statistics --no-performance-crux$'"'"' "$native_probe/claude-registration.txt"
+codex mcp get chrome-devtools --json > "$native_probe/codex-registration.json"
+jq -e '"'"'.transport.type == "stdio" and .transport.command == "npx" and .transport.args == ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]'"'"' "$native_probe/codex-registration.json" >/dev/null
+prompt="Use only the configured chrome-devtools MCP server for this browser acceptance. Call navigate_page to $fixture_url. Then call take_snapshot and list_console_messages for that page (use its pageId when returned). The title must be NativeStack Chrome MCP acceptance and the console must include native-stack-chrome-devtools-ready. Report failure if a required call fails. Do not substitute shell tools, file-reading tools, another browser server or another browser registration."
+claude -p "$prompt" --model opus --effort max --max-turns 8 --output-format stream-json --verbose --allowedTools mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__take_snapshot,mcp__chrome-devtools__list_console_messages > "$native_probe/claude.jsonl" </dev/null
+jq -s -e --arg url "$fixture_url" '"'"'def returned($tool; $needle):
+  [ .[] | select(.type == "assistant") | .message.content[]? |
+    select(.type == "tool_use" and .name == $tool) | .id ] as $ids |
+  any(.[] | select(.type == "user") | .message.content[]?;
+    .type == "tool_result" and (.tool_use_id as $id | $ids | index($id) != null) and
+    (.is_error != true) and (.content | tostring | contains($needle)));
+any(.[]; .type == "result" and .subtype == "success" and .is_error == false) and
+returned("mcp__chrome-devtools__navigate_page"; $url) and
+returned("mcp__chrome-devtools__take_snapshot"; "NativeStack Chrome MCP acceptance") and
+returned("mcp__chrome-devtools__list_console_messages"; "native-stack-chrome-devtools-ready")'"'"' "$native_probe/claude.jsonl" >/dev/null
+codex exec --json -C "$repo_root" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' "$prompt" > "$native_probe/codex.jsonl" </dev/null
+jq -s -e --arg url "$fixture_url" '"'"'def returned($tool; $needle):
+  any(.[]; .type == "item.completed" and .item.type == "mcp_tool_call" and
+    .item.server == "chrome-devtools" and .item.tool == $tool and .item.status == "completed" and
+    .item.error == null and .item.result.isError != true and
+    (.item.result.content | tostring | contains($needle)));
+any(.[]; .type == "turn.completed") and
+(all(.[]; .type != "turn.failed" and .type != "error")) and
+returned("navigate_page"; $url) and
+returned("take_snapshot"; "NativeStack Chrome MCP acceptance") and
+returned("list_console_messages"; "native-stack-chrome-devtools-ready")'"'"' "$native_probe/codex.jsonl" >/dev/null'
       ;;
     *) skipped playwright-cli ;;
   esac
@@ -588,7 +697,7 @@ mkdir -p -- "$run"
 chmod 0700 "$run"
 printf -v claude_cmd '"'"'set -o pipefail; %q claude daily --since %q --timezone UTC --offline --no-cost --json | jq -c .totals'"'"' "$meter" "$day"
 printf -v codex_cmd '"'"'set -o pipefail; %q codex daily --since %q --timezone UTC --offline --no-cost --speed standard --json | jq -c .totals'"'"' "$meter" "$day"
-claude -p --effort max --max-turns 4 --tools Bash --allowedTools Bash --verbose --output-format stream-json "Run this exact read-only meter command once: $claude_cmd. Report only its numeric totals; read no authentication or credential files." > "$run/claude.jsonl" 2> "$run/claude.stderr"
+claude -p --effort max --max-turns 4 --tools Bash --allowedTools Bash --verbose --output-format stream-json "Run this exact read-only meter command once: $claude_cmd. Report only its numeric totals; read no authentication or credential files." > "$run/claude.jsonl" 2> "$run/claude.stderr" </dev/null
 codex exec --json -c '"'"'model_reasoning_effort="max"'"'"' --skip-git-repo-check "Run this exact read-only meter command once: $codex_cmd. Report only its numeric totals; read no authentication or credential files." </dev/null > "$run/codex.jsonl" 2> "$run/codex.stderr"
 jq -s -e --arg client claude --arg meter "$meter" -f "$config_root/ccusage-session.jq" "$run/claude.jsonl" >/dev/null
 jq -s -e --arg client codex --arg meter "$meter" -f "$config_root/ccusage-session.jq" "$run/codex.jsonl" >/dev/null
@@ -893,6 +1002,7 @@ curl -fsS http://127.0.0.1:21090/api/v1/rules | jq -e '\''any(.data.groups[]; .n
     after_sign_in)
       local destination_rc=0
       python3 "$config_root/observability_config.py" alerting-ready --config-root "$config_root" --source-root "$plan_dir/config" >/dev/null || destination_rc=$?
+      if [[ "$destination_rc" == 78 ]]; then printf 'alerting | %s | needs_user (78)\n' "$stage"; return; fi
       if [[ "$destination_rc" == 3 ]]; then skipped alerting; return; fi
       if [[ "$destination_rc" != 0 ]]; then failed=1; printf "alerting | %s | %s\n" "$stage" "$destination_rc"; return; fi
       # Kind: smoke; Source: https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/cli/alert_add.go#L46
@@ -932,6 +1042,7 @@ PY
 before="$(mktemp)"
 after="$(mktemp)"
 trap '"'"'printf "[]\n" > "$fixture"; rm -f -- "$before" "$after"'"'"' EXIT
+# Native counters classify Telegram separately; ntfy and on-host use webhook.
 integration=webhook
 [[ "${NATIVE_STACK_ALERT_RECEIVER:-webhook}" != telegram ]] || integration=telegram
 curl -fsS http://127.0.0.1:21093/metrics > "$before"
@@ -1016,7 +1127,7 @@ curl -fsS -H '\''Content-Type: application/json'\'' --data '\''{"from":"now-5m",
     after_sign_in)
       # Kind: smoke; Source: https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657
       check grafana 'smoke' 'export NS2604_OBSERVABILITY_DATA="${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}"
-claude -p --effort max "Reply exactly NS2604_GRAFANA_NATIVE_ACCEPTANCE" >/dev/null
+claude -p --effort max "Reply exactly NS2604_GRAFANA_NATIVE_ACCEPTANCE" >/dev/null </dev/null
 uv run --locked --script "$repo_root/examples/omniroute-codex-sdk/worker.py" --workspace "$repo_root" --sandbox read-only --prompt "Reply exactly NS2604_GRAFANA_SDK_ACCEPTANCE" | python3 -c '\''
 import json, os, pathlib, sys, uuid
 rows = [json.loads(line) for line in sys.stdin if line.strip()]
@@ -1161,12 +1272,17 @@ fi'
 }
 
 harbor-containerized-agent-e2e-runner() {
-  # G5 plan repair 2026-10-04; upstream operations with local artifact assertions.
+  # Round-2 bounded configuration; destination execution remains owed.
   case "$stage" in
     post_install)
-      # Kind: version only; Source: https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/skills/create-adapter/SKILL.md#L30
-      check harbor-containerized-agent-e2e-runner 'version only' 'export HARBOR_TELEMETRY=off
-harbor --version'
+      # Kind: upstream tests; Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/unit/test_trajectory_validator.py#L1
+      check harbor-containerized-agent-e2e-runner 'upstream tests' 'export HARBOR_TELEMETRY=off
+harbor_env="$(uv tool dir)/harbor"
+[[ "$(readlink -f "$(command -v harbor)")" == "$(readlink -f "$harbor_env/bin/harbor")" ]]
+"$harbor_env/bin/python" -c '"'"'from importlib.metadata import version; assert version("harbor") == "0.23.0"'"'"'
+harbor --version
+cd "$tool_root/harbor-v0.23.0"
+uv run --frozen --group dev python -m pytest -q tests/unit/test_trajectory_validator.py'
       ;;
     service_health)
       # Kind: smoke; Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/integration/test_hello_user_e2e.py#L25
@@ -1204,13 +1320,16 @@ else:
     raise AssertionError("nop must fail the same positive reward gate")
 PY'
       ;;
+    after_sign_in)
+      # Kind: native worker telemetry qualification; Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/docs-mintlify/core-concepts/agents/atif.mdx#L121
+      check harbor-containerized-agent-e2e-runner 'native worker telemetry qualification' 'bash "$config_root/harbor-worker-telemetry-accept.sh"'
+      ;;
     *) skipped harbor-containerized-agent-e2e-runner ;;
   esac
 }
 
 promptfoo() {
-  # Promptfoo 0.123.1; https://github.com/promptfoo/promptfoo
-  # UNRUN on every distribution: the 2026-10-04 verified-E2E plan fix.
+  # Round-2 bounded configuration; destination execution remains owed.
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/test/smoke/eval.test.ts#L65
@@ -1218,6 +1337,7 @@ promptfoo() {
 export PROMPTFOO_CONFIG_DIR="$config_root/promptfoo-state" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1
 [[ "$("$pf" --version)" == "0.123.1" ]]
 "$pf" mcp --help >/dev/null
+npm ls --global --prefix "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/promptfoo-0.123.1" --all @anthropic-ai/claude-agent-sdk @openai/codex-sdk
 receipt="$(mktemp -d "${TMPDIR:-/tmp}/new-wsl-promptfoo.XXXXXX")"
 trap '"'"'rm -rf -- "$receipt"'"'"' EXIT
 "$pf" eval --config "$config_root/promptfoo-0.123.1-basic.yaml" --no-cache --no-share --no-write --no-table --no-progress-bar --output "$receipt/pass.json"
@@ -1239,7 +1359,7 @@ gateway="${PROMPTFOO_GATEWAY_CONFIG:-$config_root/promptfoo-gateway.yaml}"
 export GATEWAY_API_KEY="${GATEWAY_API_KEY:-keyless-loopback}"
 if rg -q '"'"'your-gpt-model-id|your-claude-model-id|your-model-id|gateway.example.com'"'"' "$gateway"; then
   printf '"'"'needs_user: select the two exact existing GPT/Claude gateway model IDs and its apiBaseUrl in %s.\n'"'"' "$gateway" >&2
-  exit 1
+  exit 78
 fi
 export PROMPTFOO_CONFIG_DIR="$config_root/promptfoo-state" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1
 run="$config_root/promptfoo-acceptance/$(date -u +%Y%m%dT%H%M%SZ)-$$"
@@ -1249,12 +1369,10 @@ chmod 0700 "$run"
 jq -e '"'"'.results.stats.successes == 2 and .results.stats.failures == 0 and .results.stats.errors == 0 and ([.results.results[].provider.id] | unique | length) == 2 and all(.results.results[]; .success == true and (.provider.id | startswith("openai:chat:")))'"'"' "$run/gateway.json" >/dev/null
 # Supported Promptfoo SDK harness, with unchanged pinned fixtures in paired on/off workspaces.
 python3 - "$config_root/promptfoo-skills.json" "$run/skills" "$tool_root/promptfoo-skill-fixtures" <<'"'"'PY'"'"'
-import json, shutil, sys
+import json, os, shutil, sys
 from pathlib import Path
 root, fixtures = Path(sys.argv[2]), Path(sys.argv[3])
 root.mkdir(mode=0o700)
-for name in ("home", "codex-home"):
-    (root / name).mkdir(mode=0o700)
 for client, skill_dir in (("claude", ".claude"), ("codex", ".agents")):
     for arm in ("on", "off"):
         work = root / f"{client}-{arm}"
@@ -1264,7 +1382,12 @@ for client, skill_dir in (("claude", ".claude"), ("codex", ".agents")):
             skill = work / skill_dir / "skills/review-standards"
             skill.mkdir(parents=True)
             shutil.copyfile(fixtures / "SKILL.md", skill / "SKILL.md")
-config = Path(sys.argv[1]).read_text().replace("@RUN_DIR@", str(root)).replace("@CODEX_BIN@", shutil.which("codex"))
+binaries = {"@CODEX_BIN@": shutil.which("codex"), "@CLAUDE_BIN@": shutil.which("claude")}
+assert all(binaries.values()), "Both pinned native clients must be installed before provider acceptance"
+config = Path(sys.argv[1]).read_text().replace("@RUN_DIR@", str(root))
+for token, binary in binaries.items():
+    config = config.replace(token, binary)
+config = config.replace("@HOST_HOME@", str(Path.home())).replace("@CODEX_HOME@", os.environ.get("CODEX_HOME", str(Path.home() / ".codex")))
 positive = json.loads(config)
 (root / "config.json").write_text(json.dumps(positive))
 # The failure control applies the disabled-skill assertion to both enabled arms.
@@ -1273,15 +1396,15 @@ negative["tests"] = [negative["tests"][0]]
 negative["tests"][0]["assert"] = [{"type": "not-skill-used", "value": "review-standards"}]
 (root / "negative.json").write_text(json.dumps(negative))
 PY
-"$pf" eval --config "$run/skills/config.json" --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output "$run/skills/pass.json"
+env -u OPENAI_API_KEY -u CODEX_API_KEY -u ANTHROPIC_API_KEY "$pf" eval --config "$run/skills/config.json" --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output "$run/skills/pass.json"
 jq -e '"'"'.results.stats | .successes == 4 and .failures == 0 and .errors == 0'"'"' "$run/skills/pass.json" >/dev/null
 skill_rc=0
-"$pf" eval --config "$run/skills/negative.json" --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output "$run/skills/fail.json" || skill_rc=$?
+env -u OPENAI_API_KEY -u CODEX_API_KEY -u ANTHROPIC_API_KEY "$pf" eval --config "$run/skills/negative.json" --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output "$run/skills/fail.json" || skill_rc=$?
 [[ "$skill_rc" == 100 ]]
 jq -e '"'"'.results.stats | .successes == 0 and .failures == 2 and .errors == 0'"'"' "$run/skills/fail.json" >/dev/null
 args="$(jq -cn --arg path "$gateway" '"'"'{configPath:$path,cache:false,write:false,share:false,maxConcurrency:1,resultLimit:20}'"'"')"
 prompt="Call the promptfoo MCP run_evaluation tool once with these exact arguments: $args. Report only the evaluation ID and pass/fail counts. Read no authentication or credential files; use the inherited gateway environment."
-claude -p --effort max --max-turns 4 --allowedTools mcp__promptfoo__run_evaluation --verbose --output-format stream-json "$prompt" > "$run/claude.jsonl" 2> "$run/claude.stderr"
+claude -p --effort max --max-turns 4 --allowedTools mcp__promptfoo__run_evaluation --verbose --output-format stream-json "$prompt" > "$run/claude.jsonl" 2> "$run/claude.stderr" </dev/null
 codex exec --json --sandbox workspace-write -C "$run" -c '"'"'mcp_servers.promptfoo.tools.run_evaluation.approval_mode="approve"'"'"' -c '"'"'model_reasoning_effort="max"'"'"' --skip-git-repo-check "$prompt" </dev/null > "$run/codex.jsonl" 2> "$run/codex.stderr"
 jq -s -e --arg client claude -f "$config_root/promptfoo-session.jq" "$run/claude.jsonl" >/dev/null
 jq -s -e --arg client codex -f "$config_root/promptfoo-session.jq" "$run/codex.jsonl" >/dev/null'
@@ -1444,8 +1567,8 @@ state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptanc
 mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 printf -v task '"'"'Use your shell tool to run exactly: bash %q --only %q --stage post_install. This must execute the functional upstream examples and controls; a version report or a final answer without a tool call is insufficient. Report the command exit status. Modify only the disposable fixture this acceptance program owns.'"'"' "$plan_dir/accept.sh" worktrunk
-claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr"
-codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" < /dev/null > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr"
+claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr" </dev/null
+codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr" </dev/null
 python3 - "$run_dir" worktrunk <<'"'"'PY'"'"'
 import json, pathlib, sys
 directory, slot = pathlib.Path(sys.argv[1]), sys.argv[2]
@@ -1495,8 +1618,8 @@ state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptanc
 mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 printf -v task '"'"'Use your shell tool to run exactly: bash %q --only %q --stage post_install. This must execute the functional upstream examples and controls; a version report or a final answer without a tool call is insufficient. Report the command exit status. Modify only the disposable fixture this acceptance program owns.'"'"' "$plan_dir/accept.sh" difftastic
-claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr"
-codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" < /dev/null > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr"
+claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr" </dev/null
+codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr" </dev/null
 python3 - "$run_dir" difftastic <<'"'"'PY'"'"'
 import json, pathlib, sys
 directory, slot = pathlib.Path(sys.argv[1]), sys.argv[2]
@@ -1534,10 +1657,10 @@ mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 git status --porcelain=v1 -z > "$run_dir/status-before"
 printf '"'"'%s\n'"'"' "$claude_base" "$claude_head" "$gpt_base" "$gpt_head" > "$run_dir/commits.txt"
-codex exec review --commit "$claude_head" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' -c '"'"'sandbox_mode="read-only"'"'"' --ephemeral --json -o "$run_dir/gpt-review.txt" < /dev/null > "$run_dir/gpt-review.jsonl" 2> "$run_dir/gpt-review.stderr"
+codex exec review --commit "$claude_head" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' -c '"'"'sandbox_mode="read-only"'"'"' --ephemeral --json -o "$run_dir/gpt-review.txt" > "$run_dir/gpt-review.jsonl" 2> "$run_dir/gpt-review.stderr" </dev/null
 git diff "$gpt_base" "$gpt_head" > "$run_dir/gpt-authored.diff"
 test -s "$run_dir/gpt-authored.diff"
-claude -p --model opus --effort max --permission-mode plan --max-turns 14 --output-format stream-json --verbose "Review this GPT-authored diff read-only; report file:line correctness findings. The immutable base is $gpt_base and head is $gpt_head. Read the original repository files for each finding. Do not edit or publish." < "$run_dir/gpt-authored.diff" > "$run_dir/claude-review.jsonl" 2> "$run_dir/claude-review.stderr"
+claude -p --model opus --effort max --permission-mode plan --max-turns 14 --output-format stream-json --verbose "Review the GPT-authored diff supplied on stdin read-only; report file:line correctness findings. The immutable base is $gpt_base and head is $gpt_head. Read the original repository files for each finding. Do not edit or publish." > "$run_dir/claude-review.jsonl" 2> "$run_dir/claude-review.stderr" < "$run_dir/gpt-authored.diff"
 git status --porcelain=v1 -z > "$run_dir/status-after"
 cmp -- "$run_dir/status-before" "$run_dir/status-after"
 test -s "$run_dir/gpt-review.txt"
@@ -1592,23 +1715,43 @@ base-distribution() {
 }
 
 gpt-gateway() {
-  # OmniRoute; https://github.com/diegosouzapw/OmniRoute
+  # Round-2 published 3.8.51; carried-prefix verification preserves #704.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/diegosouzapw/OmniRoute/23a11484862b3bb589a55e85b00e4ac53ffeb234/bin/cli/commands/doctor.mjs#L630
-      check gpt-gateway smoke 'python3 "$plan_dir/config/omniroute-canary-check.py" "$HOME/.local/bin/omniroute" "$plan_dir/config/omniroute-canary-evidence.json" "$tool_root"
+      # Kind: smoke; Source: https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/bin/cli/commands/doctor.mjs#L632
+      check gpt-gateway smoke 'case "$(readlink -f "$HOME/.local/bin/omniroute")" in
+  "$tool_root"/omniroute-canary-*)
+    python3 "$plan_dir/config/omniroute-canary-check.py" "$HOME/.local/bin/omniroute" "$plan_dir/config/omniroute-canary-evidence.json" "$tool_root"
+    ;;
+esac
 test -x "$HOME/.local/bin/omniroute"
+[[ "$(readlink -f "$HOME/.local/bin/omniroute")" == "$(readlink -f "$tool_root/omniroute-3.8.51/bin/omniroute")" ]]
+node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$tool_root/omniroute-3.8.51/lib/node_modules/omniroute/package.json"
 DATA_DIR="$HOME/.local/share/omniroute" PORT=21128 OMNIROUTE_SERVER_HOST=127.0.0.1 "$HOME/.local/bin/omniroute" --output json doctor --no-liveness'
       ;;
     service_health)
-      # Kind: health; Source: https://raw.githubusercontent.com/diegosouzapw/OmniRoute/23a11484862b3bb589a55e85b00e4ac53ffeb234/src/app/healthz/route.ts#L17
-      check gpt-gateway health 'python3 "$plan_dir/config/omniroute-canary-check.py" "$HOME/.local/bin/omniroute" "$plan_dir/config/omniroute-canary-evidence.json" "$tool_root"
+      # Kind: health; Source: https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/app/readyz/route.ts#L1
+      check gpt-gateway health 'case "$(readlink -f "$HOME/.local/bin/omniroute")" in
+  "$tool_root"/omniroute-canary-*)
+    python3 "$plan_dir/config/omniroute-canary-check.py" "$HOME/.local/bin/omniroute" "$plan_dir/config/omniroute-canary-evidence.json" "$tool_root"
+    ;;
+esac
+test -x "$HOME/.local/bin/omniroute"
+[[ "$(readlink -f "$HOME/.local/bin/omniroute")" == "$(readlink -f "$tool_root/omniroute-3.8.51/bin/omniroute")" ]]
+node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$tool_root/omniroute-3.8.51/lib/node_modules/omniroute/package.json"
 curl -fsS http://127.0.0.1:21128/readyz
 DATA_DIR="$HOME/.local/share/omniroute" PORT=21128 OMNIROUTE_SERVER_HOST=127.0.0.1 "$HOME/.local/bin/omniroute" --output json doctor --liveness-url http://127.0.0.1:21128/api/monitoring/health'
       ;;
     after_sign_in)
-      # Kind: native client integration; Source: https://developers.openai.com/codex/noninteractive
-      check gpt-gateway 'native client integration' 'python3 "$plan_dir/config/omniroute-canary-check.py" "$HOME/.local/bin/omniroute" "$plan_dir/config/omniroute-canary-evidence.json" "$tool_root"
+      # Kind: native client integration; Source: https://developers.openai.com/codex/noninteractive/
+      check gpt-gateway 'native client integration' 'case "$(readlink -f "$HOME/.local/bin/omniroute")" in
+  "$tool_root"/omniroute-canary-*)
+    python3 "$plan_dir/config/omniroute-canary-check.py" "$HOME/.local/bin/omniroute" "$plan_dir/config/omniroute-canary-evidence.json" "$tool_root"
+    ;;
+esac
+test -x "$HOME/.local/bin/omniroute"
+[[ "$(readlink -f "$HOME/.local/bin/omniroute")" == "$(readlink -f "$tool_root/omniroute-3.8.51/bin/omniroute")" ]]
+node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$tool_root/omniroute-3.8.51/lib/node_modules/omniroute/package.json"
 bash "$config_root/gpt-gateway-client-accept.sh"'
       ;;
     *) skipped gpt-gateway ;;
@@ -1645,9 +1788,9 @@ session="$(mktemp -d "$state/clients.XXXXXXXX")"
 for client in claude codex; do
   prompt="Use your native shell to assert the inherited MCP_AUTO_OPEN_ENABLED is exactly false. Run MCP_INSPECTOR_SECRET_STORE=memory npx -y @modelcontextprotocol/inspector@2.9.0 --cli qmd --index native-agent-stack-catalog mcp -- --method tools/list and save its actual JSON as $session/$client-tools.json. Then boot the published Inspector Web mode with the same QMD positional command: MCP_INSPECTOR_SECRET_STORE=memory HOST=127.0.0.1 CLIENT_PORT=26399 setsid npx -y @modelcontextprotocol/inspector@2.9.0 --web -- qmd --index native-agent-stack-catalog mcp. Poll http://127.0.0.1:26399/ with curl and save the served page to $session/$client-page.html. Stop its process group in a shell trap and wait for it before finishing. Keep its authentication enabled. Write $session/$client-env.txt with the inherited MCP_AUTO_OPEN_ENABLED after the assertion succeeds."
   if [[ "$client" == claude ]]; then
-    (cd "$session" && timeout 600 claude -p --model opus --effort max --max-turns 12 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$session/claude.jsonl"
+    (cd "$session" && timeout 600 claude -p --model opus --effort max --max-turns 12 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$session/claude.jsonl" </dev/null
   else
-    OMNIROUTE_API_KEY=local-loopback timeout 600 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max \
+    OMNIROUTE_API_KEY=local-loopback timeout 600 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max  </dev/null \
       --sandbox workspace-write -c sandbox_workspace_write.network_access=true \
       -c "shell_environment_policy.set.npm_config_cache=\"$session/npm-cache\"" \
       -c "sandbox_workspace_write.writable_roots=[\"$state\"]" \
@@ -1731,7 +1874,7 @@ policy["filesystem"]["allowWrite"] = [str(root)]
 policy["network"]["allowedDomains"] = ["127.0.0.1:21128"]
 (root / "hello-srt.json").write_text(json.dumps(policy))
 PY
-(cd "$run" && HOME="$run/home" OH_PERSISTENCE_DIR="$run/openhands-home" NO_PROXY= no_proxy= LLM_BASE_URL=http://127.0.0.1:21128/v1 LLM_MODEL=openai/cx/gpt-6.1-sol-max LLM_API_KEY=local-loopback \
+(cd "$run" && HOME="$run/home" OH_PERSISTENCE_DIR="$run/openhands-home" NO_PROXY= no_proxy= LLM_BASE_URL=http://127.0.0.1:21128/v1 LLM_MODEL=openai/cx/gpt-6.1-sol-xhigh LLM_API_KEY=local-loopback \
   srt --settings "$run/hello-srt.json" -- env NO_PROXY= no_proxy= "$tool_root/agent-runtime-worker/bin/python" "$tool_root/openhands-source/examples/01_standalone_sdk/01_hello_world.py")
 test -s "$run/FACTS.txt"
 # The closed-port negative preserves its journal and proves no model request occurred.
@@ -1751,9 +1894,9 @@ for client in claude codex; do
   id="$client-$stamp"
   prompt="Use the native-stack-worker skill to prepare job $id with its default Python sum(range(1,11)) task and default owned workspace. Dispatch it with systemctl --user start --wait openhands-job@$id.service, then inspect its run-report.json and result.txt. Complete the real job; a preflight is insufficient."
   if [[ "$client" == claude ]]; then
-    (cd "$run" && timeout 1800 claude -p --model opus --effort max --max-turns 12 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$run/claude.jsonl"
+    (cd "$run" && timeout 1800 claude -p --model opus --effort max --max-turns 12 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$run/claude.jsonl" </dev/null
   else
-    OMNIROUTE_API_KEY=local-loopback timeout 1800 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max \
+    OMNIROUTE_API_KEY=local-loopback timeout 1800 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max  </dev/null \
       --sandbox workspace-write -c sandbox_workspace_write.network_access=true \
       -c "sandbox_workspace_write.writable_roots=[\"$cfg\",\"$worker_state\"]" \
       --skip-git-repo-check -C "$run" --json "$prompt" </dev/null >"$run/codex.jsonl"
@@ -1796,32 +1939,52 @@ done'
 }
 
 research-harnesses() {
+  # Round-2 bounded configuration; destination execution remains owed.
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/tests/test_client.py
       check research-harnesses smoke 'cd "$tool_root/gpt-researcher"
 .venv/bin/python -c '"'"'import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])'"'"'
-bash "$repo_root/tools/research/gpt_researcher.sh" --preflight-only
+bash "$config_root/gpt-researcher.sh" --preflight-only
 "$tool_root/deer-flow/backend/.venv/bin/python" -c '"'"'from deerflow.client import DeerFlowClient'"'"'
 cd "$tool_root/deer-flow/backend"
 uv run --frozen --group dev python -m pytest -q tests/test_client.py
-DEER_FLOW_CONFIG_PATH="$config_root/deer-flow-config.yaml" .venv/bin/python - <<'"'"'PY'"'"'
+env -i HOME="$HOME" PATH="$PATH" JINA_API_KEY= DEER_FLOW_PROJECT_ROOT="$tool_root/deer-flow" DEER_FLOW_CONFIG_PATH="$config_root/deer-flow-config.yaml" .venv/bin/python - <<'"'"'PY'"'"'
 import os
 from deerflow.client import DeerFlowClient
+from deerflow.config.app_config import get_app_config
 client = DeerFlowClient(config_path=os.environ["DEER_FLOW_CONFIG_PATH"], model_name="gpt-runtime")
 assert any(m["name"] == "gpt-runtime" for m in client.list_models()["models"])
+active = get_app_config().model_dump()
+model, = [m for m in active["models"] if m["name"] == "gpt-runtime"]
+assert model["use"] == "langchain_openai:ChatOpenAI"
+assert model["model"] == "cx/gpt-6.1-sol"
+assert model["supports_reasoning_effort"] is True
+assert model["reasoning_effort"] == "xhigh"
+assert model["base_url"] == "http://127.0.0.1:21128/v1"
+search, = [tool for tool in active["tools"] if tool["name"] == "web_search"]
+assert search["use"] == "deerflow.community.ddg_search.tools:web_search_tool"
+print("DeerFlow effective loopback model and keyless search: passed")
 PY
 test -s "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/native-stack-research/SKILL.md"
 test -s "$HOME/.agents/skills/native-stack-research/SKILL.md"'
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md#L1658
-      check research-harnesses smoke 'out="$(bash "$repo_root/tools/research/gpt_researcher.sh" "Ubuntu 26.04 WSL news this month")"
+      check research-harnesses smoke 'gptr_started="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
+out="$(bash "$config_root/gpt-researcher.sh" "Ubuntu 26.04 WSL news this month")"
+gptr_finished="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
 grep -q "^Report written to '"'"'outputs/" <<<"$out"
 run="$(sed -n '"'"'s/^run directory: //p'"'"' <<<"$out")"
 refs="$(awk '"'"'/^#+ *References/{f=1} f'"'"' "$run"/outputs/*.md | grep -oE '"'"'https?://[^) >]+'"'"' | sort -u | wc -l)"
 [[ "$refs" -ge 5 ]]
-bash "$config_root/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs."
+python3 "$config_root/gateway-effort-accept.py" "gptr-${run##*/}" "$gptr_started" "$gptr_finished"
+deer_started="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
+deer_out="$(bash "$config_root/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs.")"
+deer_finished="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
+deer_run="$(sed -n '"'"'s/^run directory: //p'"'"' <<<"$deer_out")"
+[[ -d "$deer_run" ]]
+python3 "$config_root/gateway-effort-accept.py" "deerflow-${deer_run##*/}" "$deer_started" "$deer_finished"
 # Both gatherers are exercised by each fresh native session, with actual outputs observed outside it.
 state="${XDG_STATE_HOME:-$HOME/.local/state}"
 install -d -m 0700 -- "$state/native-agent-stack/research/client-checks"
@@ -1831,9 +1994,9 @@ for client in claude codex; do
   touch "$marker"
   prompt="Use native-stack-research to complete a short public research query about Ubuntu 26.04 WSL this month through BOTH installed gatherers: bash $config_root/gpt-researcher.sh and bash $config_root/deer-flow-research.sh. Include source URLs. Complete both real calls; preflight/import checks do not qualify. Inspect the two resulting reports and print their run directories."
   if [[ "$client" == claude ]]; then
-    (cd "$session" && timeout 3300 claude -p --model opus --effort max --max-turns 16 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$session/claude.jsonl"
+    (cd "$session" && timeout 3300 claude -p --model opus --effort max --max-turns 16 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$session/claude.jsonl" </dev/null
   else
-    OMNIROUTE_API_KEY=local-loopback timeout 3300 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max \
+    timeout 3300 codex exec -m gpt-6.1-sol -c model_provider='"'"'"openai"'"'"' -c model_reasoning_effort=max  </dev/null \
       --sandbox workspace-write -c sandbox_workspace_write.network_access=true \
       -c "sandbox_workspace_write.writable_roots=[\"$state/new-wsl-native-stack/research\",\"$state/native-agent-stack/research\"]" \
       --skip-git-repo-check -C "$session" --json "$prompt" </dev/null >"$session/codex.jsonl"
@@ -1908,6 +2071,176 @@ python3 scripts/validate.py'
   esac
 }
 
+lm-program-optimization() {
+  # Round2 wave5; destination acceptance UNRUN.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/stanfordnlp/dspy/blob/3.4.0/tests/teleprompt/test_gepa.py#L632
+      check lm-program-optimization smoke 'uv run --project "$tool_root/dspy-3.4.0" --frozen --no-sync python - <<'"'"'PY'"'"'
+from importlib.metadata import version
+import dspy
+assert version("dspy") == "3.4.0"
+assert version("gepa") == "0.1.4"
+assert callable(dspy.GEPA)
+PY
+cd "$tool_root/dspy-source-3.4.0"
+uv run --project "$tool_root/dspy-3.4.0" --frozen --no-sync python -P -c '"'"'import dspy, sys; from pathlib import Path; assert Path(dspy.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())'"'"'
+uv run --project "$tool_root/dspy-3.4.0" --frozen --no-sync python -P -m pytest --import-mode=importlib -q tests/teleprompt/test_gepa.py tests/predict/test_predict.py'
+      ;;
+    after_sign_in)
+      # Kind: smoke; Source: https://github.com/stanfordnlp/dspy/blob/3.4.0/docs/docs/learn/programming/language_models.md#L139
+      check lm-program-optimization smoke 'uv run --project "$tool_root/dspy-3.4.0" --frozen --no-sync python - <<'"'"'PY'"'"'
+import os
+import dspy
+lm = dspy.LM("openai/cx/gpt-6.1-sol", api_base="http://127.0.0.1:21128/v1", api_key=os.environ.get("OMNIROUTE_API_KEY", "local-loopback"), cache=False)
+dspy.configure(lm=lm)
+response = lm("Return only the digit 4 as the answer to 2 + 2.")
+assert response and response[0].strip() == "4"
+PY'
+      ;;
+    *) skipped lm-program-optimization ;;
+  esac
+}
+
+skill-vetting() {
+  # Round2 wave5; destination acceptance UNRUN.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/tests/unit/test_cli.py#L17
+      check skill-vetting smoke 'tool_python="$(uv tool dir)/skillspector/bin/python"
+"$tool_python" - <<'"'"'PY'"'"'
+import json
+from importlib.metadata import distribution
+package = distribution("skillspector")
+assert package.version == "2.12.0"
+origin = json.loads(package.read_text("direct_url.json"))
+assert origin["vcs_info"]["commit_id"] == "c7958a3268d9498644b22edb75d0f051bbc8cbfc"
+PY
+cd "$tool_root/skillspector-source-2.12.0"
+"$tool_python" -m pytest -q tests/unit/test_cli.py tests/unit/test_agent_cli.py'
+      ;;
+    after_sign_in)
+      # Kind: smoke; Source: https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/cli.py#L560
+      check skill-vetting smoke 'codex login status >/dev/null
+umask 077
+state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/skill-vetting"
+install -d -m 0700 -- "$state"
+run="$(mktemp -d "$state/semantic.XXXXXXXX")"
+bad_rc=0
+SKILLSPECTOR_PROVIDER=codex_cli skillspector scan "$tool_root/skillspector-source-2.12.0/tests/fixtures/malicious_skill" --format json --output "$run/bad-report.json" --fail-on-findings --fail-on-incomplete || bad_rc=$?
+[[ "$bad_rc" -ne 0 ]]
+jq -e '"'"'.analysis_completeness.is_complete == true and .execution_successful == true and (.findings | length > 0)'"'"' "$run/bad-report.json" >/dev/null
+SKILLSPECTOR_PROVIDER=codex_cli skillspector scan "$tool_root/skillspector-source-2.12.0/tests/fixtures/safe_skill" --format json --output "$run/report.json" --fail-on-incomplete
+"$(uv tool dir)/skillspector/bin/python" - "$run/report.json" <<'"'"'PY'"'"'
+import json, sys
+report = json.load(open(sys.argv[1]))
+assert report["analysis_completeness"]["is_complete"] is True
+assert report["execution_successful"] is True
+assert report["metadata"]["llm_requested"] is True
+assert report["metadata"]["llm_available"] is True
+assert report["metadata"]["meta_analysis_applied"] is True
+PY'
+      ;;
+    *) skipped skill-vetting ;;
+  esac
+}
+
+trajectory-analysis() {
+  # Round2 wave5; destination acceptance UNRUN.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/tests/sources/atif_source/test_integration.py#L44
+      check trajectory-analysis smoke 'tool_python="$(uv tool dir)/inspect-ai/bin/python"
+"$tool_python" - <<'"'"'PY'"'"'
+from importlib.metadata import version
+assert version("inspect-ai") == "0.3.273"
+assert version("openai") == "3.24.0"
+assert version("inspect-scout") == "0.5.3"
+assert version("harbor") == "0.23.0"
+PY
+[[ "$(readlink -f "$(command -v scout)")" == "$(readlink -f "$(uv tool dir)/inspect-ai/bin/scout")" ]]
+cd "$tool_root/inspect-scout-source-0.5.3"
+"$tool_python" -m pytest -q -n 0 tests/grep_scanner/test_grep_scanner.py tests/sources/claude_code_source/test_integration.py tests/sources/atif_source/test_integration.py'
+      ;;
+    after_sign_in)
+      # Kind: smoke; Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_cli/import_command.py#L317
+      check trajectory-analysis smoke 'if [[ -z "${SCOUT_CLAUDE_SESSION_FILE:-}" || -z "${SCOUT_HARBOR_ATIF_FILE:-}" ]]; then
+  printf "needs_user: select a current Claude session with an Agent/Task call and one Harbor ATIF trial, and consent to private local import.\n" >&2
+  exit 78
+fi
+[[ -f "$SCOUT_CLAUDE_SESSION_FILE" && -f "$SCOUT_HARBOR_ATIF_FILE" ]]
+umask 077
+state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/trajectory-analysis"
+install -d -m 0700 -- "$state"
+run="$(mktemp -d "$state/import-scan.XXXXXXXX")"
+cd "$run"
+scout import claude_code -P "path=$SCOUT_CLAUDE_SESSION_FILE" -T "$run/claude/db" --fail-on-error
+scout import atif -P "path=$SCOUT_HARBOR_ATIF_FILE" -T "$run/harbor/db" --fail-on-error
+for source in claude harbor; do
+  scout scan "$config_root/scout-round2-delegation.py" --transcripts "$run/$source/db" --scans "$run/$source/scans" --max-processes 1 --fail-on-error
+  "$(uv tool dir)/inspect-ai/bin/python" - "$run/$source/scans" "$source" "$run/$source-summary.json" <<'"'"'PY'"'"'
+import json, sys
+from pathlib import Path
+from inspect_scout import scan_list, scan_results_df
+locations = scan_list(sys.argv[1])
+assert len(locations) == 1, "Expected exactly one fresh scan"
+results = scan_results_df(locations[0].location)
+assert results.complete
+assert not results.errors
+assert len(results.scanners) == 1
+name, frame = next(iter(results.scanners.items()))
+assert name.split("/")[-1] == "delegation"
+assert not frame.empty, "Selected source produced no transcripts"
+matches = int(frame["value"].sum())
+if sys.argv[2] == "claude":
+    assert matches > 0, "Current Claude positive control produced no Agent/Task match"
+Path(sys.argv[3]).write_text(json.dumps(dict(source=sys.argv[2], complete=True, transcripts=len(frame), delegation_matches=matches)) + "\n")
+PY
+done'
+      ;;
+    *) skipped trajectory-analysis ;;
+  esac
+}
+
+mcp-protocol-conformance() {
+  # Round2 wave5; destination acceptance UNRUN.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/.github/workflows/ci.yml#L33
+      check mcp-protocol-conformance smoke 'cd "$tool_root/mcp-conformance-source-0.2.0-alpha.11"
+npm ci
+npm run check
+npm run build
+npm test
+npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 list --requirements 2026-07-28'
+      ;;
+    after_sign_in)
+      # Kind: smoke; Source: https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#L59
+      check mcp-protocol-conformance smoke 'if [[ -z "${MCP_CONFORMANCE_SERVER_URL:-}" && -z "${MCP_CONFORMANCE_CLIENT_COMMAND:-}" ]]; then
+  printf '"'"'Select MCP_CONFORMANCE_SERVER_URL and/or MCP_CONFORMANCE_CLIENT_COMMAND for on-demand conformance acceptance.\n'"'"' >&2
+  exit 78
+fi
+extra=()
+if [[ -n "${MCP_CONFORMANCE_EXPECTED_FAILURES:-}" ]]; then
+  [[ -f "$MCP_CONFORMANCE_EXPECTED_FAILURES" ]]
+  extra+=(--expected-failures "$MCP_CONFORMANCE_EXPECTED_FAILURES")
+fi
+umask 077
+state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/mcp-protocol-conformance"
+install -d -m 0700 -- "$state"
+run="$(mktemp -d "$state/conformance.XXXXXXXX")"
+cd "$run"
+if [[ -n "${MCP_CONFORMANCE_SERVER_URL:-}" ]]; then
+  npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 server --url "$MCP_CONFORMANCE_SERVER_URL" --requirements 2026-07-28 "${extra[@]}"
+fi
+if [[ -n "${MCP_CONFORMANCE_CLIENT_COMMAND:-}" ]]; then
+  npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 client --command "$MCP_CONFORMANCE_CLIENT_COMMAND" --requirements 2026-07-28 "${extra[@]}"
+fi'
+      ;;
+    *) skipped mcp-protocol-conformance ;;
+  esac
+}
+
 if [[ -z "$only" || "$only" == claude-code ]]; then claude-code; fi
 if [[ -z "$only" || "$only" == codex ]]; then codex; fi
 if [[ -z "$only" || "$only" == claude-agent-sdk ]]; then claude-agent-sdk; fi
@@ -1917,6 +2250,7 @@ if [[ -z "$only" || "$only" == engineering-process-skills ]]; then engineering-p
 if [[ -z "$only" || "$only" == skill-discovery ]]; then skill-discovery; fi
 if [[ -z "$only" || "$only" == skill-authoring ]]; then skill-authoring; fi
 if [[ -z "$only" || "$only" == mcporter ]]; then mcporter; fi
+if [[ -z "$only" || "$only" == agent-messaging ]]; then agent-messaging; fi
 if [[ -z "$only" || "$only" == sandbox-runtime-srt ]]; then sandbox-runtime-srt; fi
 if [[ -z "$only" || "$only" == serena ]]; then serena; fi
 if [[ -z "$only" || "$only" == structural-search ]]; then structural-search; fi
@@ -1940,7 +2274,7 @@ if [[ -z "$only" || "$only" == api-docs ]]; then api-docs; fi
 if [[ -z "$only" || "$only" == trace-viewer ]]; then trace-viewer; fi
 if [[ -z "$only" || "$only" == token-lane-carriers ]]; then token-lane-carriers; fi
 if [[ -z "$only" || "$only" == session-analytics ]]; then session-analytics; fi
-if [[ "$only" == playwright-cli ]]; then playwright-cli; elif [[ -z "$only" ]]; then skipped playwright-cli; fi
+if [[ -z "$only" || "$only" == playwright-cli ]]; then playwright-cli; fi
 if [[ -z "$only" || "$only" == otel-collector-contrib ]]; then otel-collector-contrib; fi
 if [[ -z "$only" || "$only" == prometheus ]]; then prometheus; fi
 if [[ "$only" == loki ]]; then loki; elif [[ -z "$only" ]]; then skipped loki; fi
@@ -1973,7 +2307,11 @@ if [[ -z "$only" || "$only" == research-harnesses ]]; then research-harnesses; f
 if [[ -z "$only" || "$only" == credential-guard ]]; then credential-guard; fi
 if [[ -z "$only" || "$only" == convergence-validators ]]; then convergence-validators; fi
 # Planned. Rows the plan does not install (merged manifest): nothing to check, so each prints its skip.
-for slot in 'research-skill' 'agent-messaging' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'reranker-model' 'trafilatura' 'web-search-provider' 'phoenix' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'credential-custody' 'claude-code-action' 'agent-structural-diff' 'chezmoi'; do
+for slot in 'research-skill' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'reranker-model' 'trafilatura' 'web-search-provider' 'phoenix' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'credential-custody' 'claude-code-action' 'agent-structural-diff' 'chezmoi'; do
   if [[ -z "$only" || "$only" == "$slot" ]]; then skipped "$slot"; fi
 done
+if [[ -z "$only" || "$only" == lm-program-optimization ]]; then lm-program-optimization; fi
+if [[ -z "$only" || "$only" == skill-vetting ]]; then skill-vetting; fi
+if [[ -z "$only" || "$only" == trajectory-analysis ]]; then trajectory-analysis; fi
+if [[ "$only" == mcp-protocol-conformance ]]; then mcp-protocol-conformance; elif [[ -z "$only" ]]; then skipped mcp-protocol-conformance; fi
 exit "$failed"
