@@ -3179,7 +3179,7 @@
           "url": "https://github.com/util-linux/util-linux/blob/v2.41.3/sys-utils/flock.1.adoc"
         }
       ],
-      "needs_user": "On a clean host, sign in natively to Claude Code and Codex if absent; select the two existing provider model IDs in promptfoo-gateway.yaml for the separate gateway A/B gate."
+      "needs_user": "On a clean host, sign in natively to Claude Code and Codex only if absent. Gateway model IDs and the endpoint come from canonical topology; the explicit Claude route is a command-center plan dependency."
     },
     {
       "layer": "ci-supply-chain",
