@@ -162,6 +162,14 @@ def _record(record: dict, path: str, errors: list[str]) -> None:
         _review_ref(record[name], f"{path}.{name}", errors)
     _review_ref(record["qualification"]["negative_control"],
                 f"{path}.qualification.negative_control", errors)
+    availability_failure = (record["qualification"]["rule"] == "U1:61"
+                            and record["client"]["id"] == "codex"
+                            and record["protocol_status"] == "UNAVAILABLE")
+    if availability_failure and record["qualification"]["status"] == "complete":
+        if record["arm"] != "native" or record["evidence_class"] != "native_proven":
+            errors.append(f"{path}.qualification: U1:61 needs native-arm native evidence")
+        if record["context_proof"] is None:
+            errors.append(f"{path}.qualification: U1:61 needs the native failure criterion and owner context proof")
     if record["state"] == "pending":
         if any(record["phases"][phase] is not None for phase in PHASES):
             errors.append(f"{path}.phases: pending records require all metric cells null")
@@ -175,7 +183,8 @@ def _record(record: dict, path: str, errors: list[str]) -> None:
         for phase in PHASES:
             cell = record["phases"][phase]
             if cell is None:
-                errors.append(f"{path}.phases.{phase}: completed observations need a metric cell")
+                if not availability_failure:
+                    errors.append(f"{path}.phases.{phase}: completed observations need a metric cell")
             else:
                 _metric(cell, f"{path}.phases.{phase}", errors)
         if all(record["phases"][phase] is not None for phase in PHASES):
@@ -185,6 +194,12 @@ def _record(record: dict, path: str, errors: list[str]) -> None:
                     errors.append(f"{path}.phases.pooled.{field}: disagrees with phase counts")
 
     verdict = record["verdict"]
+    if (record["qualification"]["rule"] == "U1:61"
+            and (record["client"]["id"] != "codex" or record["protocol_status"] != "UNAVAILABLE")):
+        errors.append(f"{path}.qualification.rule: U1:61 requires an evidenced Codex availability failure")
+    if (record["protocol_status"] in {"UNKNOWN", "DEFERRED"}
+            and (record["qualification"]["status"] == "complete" or verdict is not None)):
+        errors.append(f"{path}.protocol_status: unresolved observations cannot complete qualification or issue a verdict")
     if record["stage"] == "pilot" and verdict is not None:
         errors.append(f"{path}.verdict: the protocol pilot issues no verdicts")
     if verdict is not None:
@@ -210,13 +225,22 @@ def _record(record: dict, path: str, errors: list[str]) -> None:
         if record["phases"]["pooled"] is None or record["phases"]["pooled"]["uses"] == 0:
             errors.append(f"{path}.verdict: READY cannot follow zero or unmeasured organic use")
 
+    if verdict == "NOT-READY":
+        if record["arm"] != "native" or record["evidence_class"] != "native_proven":
+            errors.append(f"{path}.verdict: NOT-READY needs native-arm native evidence")
+        if record["qualification"]["rule"] not in {"T6", "U1:61"} or record["context_proof"] is None:
+            errors.append(f"{path}.qualification: NOT-READY needs a retained native failure criterion and owner context proof")
+
     exclusion = record["exclusion"]
     if verdict == "EXCLUDED" and exclusion is None:
         errors.append(f"{path}.exclusion: EXCLUDED needs rule-c authority and all predicates")
     if verdict == "EXCLUDED":
         pooled = record["phases"]["pooled"]
-        if record["arm"] != "native" or pooled is None or pooled["selections"] != 0:
+        if (record["arm"] != "native" or record["evidence_class"] != "native_proven"
+                or pooled is None or pooled["selections"] != 0):
             errors.append(f"{path}.exclusion: EXCLUDED needs never-selected full native evidence")
+        if record["qualification"]["rule"] != "T6" or record["context_proof"] is None:
+            errors.append(f"{path}.exclusion: EXCLUDED needs retained T6/native-arm context proof")
         if record["protocol_status"] in {"UNAVAILABLE", "WIRING", "UNKNOWN", "DEFERRED"}:
             errors.append(f"{path}.exclusion: unavailable or unknown observations cannot justify exclusion")
     if exclusion is not None:

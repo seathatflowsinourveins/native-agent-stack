@@ -130,7 +130,7 @@
             "type": "object", "additionalProperties": false, "required": ["status", "rule", "ref", "sha256", "negative_control"],
             "properties": {
               "status": {"enum": ["pending", "complete"]},
-              "rule": {"enum": [null, "T6"], "description": "Owner qualification under T6 and U1; the projection never substitutes T8 rate thresholds."},
+              "rule": {"enum": [null, "T6", "U1:61"], "description": "Owner qualification under T6, or U1:61's proven Codex native availability failure; the projection never substitutes T8 rate thresholds."},
               "ref": {"type": ["string", "null"], "minLength": 1}, "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
               "negative_control": {
                 "type": "object", "additionalProperties": false, "required": ["status", "ref", "sha256"],

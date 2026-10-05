@@ -74,8 +74,9 @@ recomputed here. Breakdown categories are not assumed to partition all trials.
 `context_proof` links the complete owner manifest of task/instance identity,
 frozen label vectors, suite, detectors, grader, provenance strata,
 negative/task-outcome and telemetry controls, and usage/cost (unknown stays
-unknown). Completed qualification must cite T6; storing an interval does not
-substitute the out-of-v1 T8 rate policy.
+unknown). Completed organic qualification must cite T6; the explicit proven
+Codex availability-failure path instead cites `U1:61`. Storing an interval does
+not substitute the out-of-v1 T8 rate policy.
 
 Final verdicts are `READY`, `NOT-READY` or `EXCLUDED`. Pilot inventories issue no
 verdicts. U1 makes native-arm evidence the organic gate for model-chosen slots;
@@ -83,6 +84,22 @@ env is comparison evidence. `READY` needs completed qualification, independent
 review and adjudication under the dated method. This optional record cannot
 change catalog acceptance, convergence scores or aggregate readiness. Official
 readiness remains the command center's separate dated verified-E2E result.
+
+`UNKNOWN` and `DEFERRED` observations cannot declare completed qualification or
+any final verdict. Terminal process metadata and metric cells can remain an
+intermediate observation with qualification pending and verdict null. A known
+native failure can support `NOT-READY` with a declared failure criterion,
+native-arm `native_proven` evidence, owner qualification ref/hash and context
+proof, plus review and adjudication. `U1:61` binds the demonstrated Codex
+`UNAVAILABLE` case; it does not require successful use, positive rates or
+READY's passed negative-control condition. Its native callability-probe record
+may retain null organic metric cells rather than inventing P1/P2 trial counts;
+native/context/owner proof is still required when qualification completes before
+a final verdict is assigned. `EXCLUDED` requires declared actual
+native evidence and T6 context proof alongside its existing rule-c authority,
+same-client/task-class covering-tool proof, native-fix rerun and three overturn
+conditions. Synthetic observations cannot supply that final verdict. These are
+declaration checks; the schema does not establish the truth of owner-held proof.
 
 `EXCLUDED` additionally needs the command center's rule (c) record for this
 client: never selected unprompted in the full run, a selected covering component
@@ -186,3 +203,25 @@ Private originals remain with the run owner. This digest preserves declared
 method and process metadata without publishing raw prompts, conversations,
 credential files or host configuration. Independent verification of those
 originals remains an explicit review step.
+
+## Bounded implementation-review correction
+
+The format's carrier, informational projection and recheck/ledger design retain
+the convergence-practice implementation read of `af6427f5`. Two declaration
+boundaries required correction: unresolved telemetry or quota deferral cannot
+become completed negative qualification, and fixture evidence cannot establish
+a final exclusion. The explicit `U1:61` rule reuses the existing qualification
+and owner-proof fields for native Codex availability failures; it adds no runner,
+metric calculator or validator executable. The unchanged rule-c predicates and
+overturn conditions remain required. The corrected head awaits a two-guard delta
+read and the command center's exact-head read; the initial format review does
+not accept this implementation.
+
+Sources: `native-agent-stack@af6427f577601c3b8d77d34fc93d60f389afb896:`
+`scripts/organic_use.py:190–234`, `catalogs/landscape/organic-use.schema.json:133`,
+`tests/test_organic_use.py:93–114,209–231` and
+`docs/acceptance-evidence-policy.md:26–33`. Protocol `1154e174` at
+`/thresholds/5,9,12` distinguishes the T6 positive rule from unrun/deferred and
+telemetry-unknown cells; U1 `db3ca7e1` line61 establishes the separate proven
+availability-failure scope. The private convergence-practice `A-J-FMT2`
+implementation read is a source-review observation, not native qualification.

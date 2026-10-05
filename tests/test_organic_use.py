@@ -177,6 +177,81 @@ class OrganicPayloadTests(unittest.TestCase):
         payload["records"][0]["qualification"]["negative_control"]["status"] = "failed"
         self.assertTrue(self.errors(payload))
 
+    def test_unknown_and_deferred_cannot_complete_qualification_or_issue_verdict(self):
+        for status in ("UNKNOWN", "DEFERRED"):
+            for verdict in (None, "NOT-READY"):
+                with self.subTest(status=status, verdict=verdict):
+                    payload = completed(verdict=verdict, eligible=0, uses=0, selections=0)
+                    row = payload["records"][0]
+                    row.update(protocol_status=status, context_proof=None)
+                    row["qualification"]["rule"] = None
+                    self.assertTrue(any("unresolved observations" in message
+                                        for message in self.errors(payload)))
+
+    def test_unknown_and_deferred_terminal_observations_remain_intermediate(self):
+        for status in ("UNKNOWN", "DEFERRED"):
+            with self.subTest(status=status):
+                payload = completed(eligible=0, uses=0, selections=0)
+                row = payload["records"][0]
+                row.update(protocol_status=status, context_proof=None)
+                row["qualification"] = copy.deepcopy(pending()["records"][0]["qualification"])
+                self.assertEqual(self.errors(payload), [])
+
+    def test_known_native_availability_failure_can_be_not_ready_without_use(self):
+        # U1:61: an evidenced native availability defect is a known negative,
+        # independently of READY's successful-use and negative-control gates.
+        payload = completed(verdict="NOT-READY", eligible=0, uses=0, selections=0)
+        row = payload["records"][0]
+        row.update(protocol_status="UNAVAILABLE", context_proof=proof("native-availability-context"))
+        row["qualification"].update(rule="U1:61", **proof("U1-native-unavailable-owner-proof"))
+        row["qualification"]["negative_control"] = {
+            "status": "pending", "ref": None, "sha256": None,
+        }
+        self.assertEqual(self.errors(payload), [])
+        # The native callability probes need not invent organic-trial counts.
+        row["phases"] = {phase: None for phase in organic_use.PHASES}
+        self.assertEqual(self.errors(payload), [])
+        for field, value in (("arm", "env"), ("evidence_class", "synthetic"),
+                             ("context_proof", None)):
+            with self.subTest(field=field):
+                invalid = copy.deepcopy(payload)
+                invalid["records"][0][field] = value
+                self.assertTrue(self.errors(invalid))
+        invalid = copy.deepcopy(payload)
+        invalid["records"][0]["qualification"]["rule"] = None
+        self.assertTrue(self.errors(invalid))
+
+    def test_completed_availability_qualification_needs_native_proof_before_verdict(self):
+        payload = completed(eligible=0, uses=0, selections=0)
+        row = payload["records"][0]
+        row.update(protocol_status="UNAVAILABLE", context_proof=proof("native-availability-context"))
+        row["qualification"]["rule"] = "U1:61"
+        row["phases"] = {phase: None for phase in organic_use.PHASES}
+        self.assertEqual(self.errors(payload), [])
+        for field, value in (("arm", "env"), ("evidence_class", "synthetic"),
+                             ("context_proof", None)):
+            with self.subTest(field=field):
+                invalid = copy.deepcopy(payload)
+                invalid["records"][0][field] = value
+                self.assertTrue(any("U1:61 needs" in message for message in self.errors(invalid)))
+        for field in ("ref", "sha256"):
+            invalid = copy.deepcopy(payload)
+            invalid["records"][0]["qualification"][field] = None
+            self.assertTrue(self.errors(invalid))
+
+    def test_native_availability_failure_rule_is_bound_to_its_client_and_criterion(self):
+        for field, value in (("protocol_status", "SCREEN_NEVER"), ("client", "claude-code")):
+            with self.subTest(field=field):
+                payload = completed(verdict="NOT-READY", eligible=0, uses=0, selections=0)
+                row = payload["records"][0]
+                row["protocol_status"] = "UNAVAILABLE"
+                row["qualification"]["rule"] = "U1:61"
+                if field == "client":
+                    row["client"]["id"] = value
+                else:
+                    row[field] = value
+                self.assertTrue(any("U1:61 requires" in message for message in self.errors(payload)))
+
     def test_ready_uses_each_clients_applicable_t6_status(self):
         payload = completed(verdict="READY")
         payload["records"][0]["protocol_status"] = "ORGANIC_OBSERVED"
@@ -228,6 +303,21 @@ class OrganicPayloadTests(unittest.TestCase):
         self.assertTrue(self.errors(payload))
         payload = excluded()
         payload["records"][0]["protocol_status"] = "UNAVAILABLE"
+        self.assertTrue(self.errors(payload))
+
+    def test_exclusion_needs_native_observation_and_qualified_context(self):
+        self.assertEqual(self.errors(excluded()), [])
+        for field, value in (("evidence_class", "synthetic"),
+                             ("evidence_class", "source_review"),
+                             ("evidence_class", "local_integration"),
+                             ("evidence_class", "measured_comparison"),
+                             ("context_proof", None)):
+            with self.subTest(field=field, value=value):
+                payload = excluded()
+                payload["records"][0][field] = value
+                self.assertTrue(self.errors(payload))
+        payload = excluded()
+        payload["records"][0]["qualification"]["rule"] = None
         self.assertTrue(self.errors(payload))
 
     def test_canonical_id_receipt_scope_and_observation_identity_are_preserved(self):
