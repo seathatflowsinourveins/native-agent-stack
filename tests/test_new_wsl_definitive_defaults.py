@@ -3320,6 +3320,307 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
                                          capture_output=True, text=True, timeout=20)
                 self.assertEqual(checked.returncode == 0, case == "valid", checked.stderr)
 
+    def test_skill_listing_uses_regular_capture_and_cleans_up_on_failure(self):
+        native_jq = shutil.which("jq")
+        self.assertIsNotNone(native_jq)
+        command = self.row("skill-discovery")["acceptance"]["post_install"]["command"]
+        for case in ("valid", "missing_claude", "missing_codex", "empty", "malformed", "producer_failure", "wrong_hash"):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binaries, scratch, state = root / "bin", root / "tmp", root / "state"
+                for p in (binaries, scratch, state / "skills"):
+                    p.mkdir(parents=True)
+                trace = root / "trace.jsonl"
+                lock = state / "skills/.skill-lock.json"
+                lock.write_text(json.dumps({"skills": {"find-skills": {"skillFolderHash":
+                    "wrong" if case == "wrong_hash" else "76a98a285cb0434f3d39e1a873823556330e398b"}}}))
+                npx = binaries / "npx"
+                npx.write_text("#!" + sys.executable + "\n" + """
+import json, os, stat, sys
+assert sys.argv[1:] == ['--yes', 'skills@1.7.0', 'list', '-g', '-a', 'claude-code', 'codex', '--json']
+assert stat.S_ISREG(os.fstat(1).st_mode), 'listing stdout must be a regular file'
+with open(os.environ['FIXTURE_TRACE'], 'a') as stream:
+    stream.write(json.dumps(['producer', os.readlink('/proc/self/fd/1')]) + '\\n')
+case = os.environ['FIXTURE_CASE']
+agents = ['Claude Code', 'Codex']
+if case == 'missing_claude': agents.remove('Claude Code')
+if case == 'missing_codex': agents.remove('Codex')
+if case == 'malformed': print('{broken')
+elif case != 'empty': print(json.dumps([{'name':'find-skills', 'agents':agents}]))
+sys.exit(42 if case == 'producer_failure' else 0)
+""")
+                npx.chmod(0o755)
+                jq = binaries / "jq"
+                jq.write_text("#!" + sys.executable + "\n" + """
+import json, os, stat, sys
+path = sys.argv[-1]
+assert stat.S_ISREG(os.stat(path).st_mode)
+with open(os.environ['FIXTURE_TRACE'], 'a') as stream:
+    stream.write(json.dumps(['reader', path]) + '\\n')
+os.execv(os.environ['FIXTURE_JQ'], [os.environ['FIXTURE_JQ'], *sys.argv[1:]])
+""")
+                jq.chmod(0o755)
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                    env={"HOME": str(root / "home"), "XDG_STATE_HOME": str(state),
+                         "TMPDIR": str(scratch), "PATH": str(binaries) + os.pathsep + os.environ["PATH"],
+                         "FIXTURE_TRACE": str(trace), "FIXTURE_CASE": case, "FIXTURE_JQ": native_jq},
+                    capture_output=True, text=True, timeout=20)
+                self.assertEqual(result.returncode == 0, case == "valid", result.stderr)
+                observations = [json.loads(s) for s in trace.read_text().splitlines()]
+                capture = observations[0][1]
+                readers = [item[1] for item in observations if item[0] == "reader" and item[1] != str(lock)]
+                self.assertTrue(all(path == capture for path in readers))
+                if case == "valid":
+                    self.assertEqual(readers, [capture, capture])
+                self.assertEqual(list(scratch.iterdir()), [])
+
+    def test_agentsview_sync_wakes_idle_backend_and_health_remains_discriminating(self):
+        cases = ("valid", "sync_failure", "stopped", "unresponsive",
+                 *(f"{issue}:{agent}" for issue in ("empty_sessions", "wrong_agent", "zero_messages", "empty_days", "zero_usage")
+                   for agent in ("claude", "codex")))
+        command = self.row("session-analytics")["acceptance"]["service_health"]["command"]
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binary = root / "eco/bin/agentsview"
+                binary.parent.mkdir(parents=True)
+                trace = root / "trace.jsonl"
+                binary.write_text("#!" + sys.executable + "\n" + """
+import json, os, sys
+from pathlib import Path
+argv = sys.argv[1:]
+case = os.environ['FIXTURE_CASE']
+trace = Path(os.environ['FIXTURE_TRACE'])
+active = trace.with_suffix('.active')
+with trace.open('a') as stream:
+    stream.write(json.dumps(argv) + '\\n')
+if argv == ['sync']:
+    if case == 'sync_failure': sys.exit(42)
+    if case != 'stopped': active.write_text('fixture backend awake')
+elif argv == ['daemon', 'status']:
+    if not active.exists(): print('agentsview not running')
+    elif case == 'unresponsive': print('agentsview running at fixture; not responding')
+    else: print('agentsview running at fixture')
+else:
+    agent = argv[argv.index('--agent') + 1]
+    issue = case.removesuffix(':' + agent) if case.endswith(':' + agent) else ''
+    if argv[:2] == ['session', 'list']:
+        sessions = [{'agent': 'foreign' if issue == 'wrong_agent' else agent,
+                     'message_count': 0 if issue == 'zero_messages' else 1}]
+        print(json.dumps({'sessions': [] if issue == 'empty_sessions' else sessions}))
+    elif argv[:2] == ['usage', 'daily']:
+        totals = dict(inputTokens=1, outputTokens=0, cacheReadTokens=0, cacheCreationTokens=0)
+        if issue == 'zero_usage': totals['inputTokens'] = 0
+        print(json.dumps({'daily': [] if issue == 'empty_days' else [{}], 'totals':totals}))
+    else: sys.exit(8)
+""")
+                binary.chmod(0o755)
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                    env={"PATH": os.environ["PATH"], "HOME": str(root / "home"), "ECO_ROOT": str(root / "eco"),
+                         "XDG_STATE_HOME": str(root / "state"), "TMPDIR": str(root),
+                         "FIXTURE_CASE": case, "FIXTURE_TRACE": str(trace)},
+                    capture_output=True, text=True, timeout=20)
+                self.assertEqual(result.returncode == 0, case == "valid", result.stderr)
+                calls = [json.loads(s) for s in trace.read_text().splitlines()]
+                self.assertEqual(calls[0], ["sync"])
+                if case == "sync_failure":
+                    self.assertEqual(calls, [["sync"]])
+                    self.assertEqual(result.returncode, 42)
+                else:
+                    self.assertEqual(calls[1], ["daemon", "status"])
+                if case == "valid":
+                    self.assertEqual([(a[0], a[1] if len(a) > 1 else "") for a in calls],
+                                                                          [("sync", ""), ("daemon", "status"), ("session", "list"),
+                                      ("usage", "daily"), ("session", "list"), ("usage", "daily")])
+
+    def test_betterleaks_native_test_output_survives_discarded_stdout(self):
+        helper = PLAN / "config/betterleaks-accept.sh"
+        for code in (0, 42):
+            with self.subTest(upstream_exit=code), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binaries = root / "bin"
+                binaries.mkdir()
+                for name, program in {
+                    "git": """import sys
+from pathlib import Path
+if 'clone' in sys.argv: Path(sys.argv[-1]).mkdir()
+elif 'rev-parse' in sys.argv: print('81aff7a638638aae3a659845d089043e1d8fe9ac')
+else: sys.exit(8)
+""",
+                    "mise": """import os,sys
+assert sys.argv[1:5] == ['exec','go@1.25.12','--','make']
+assert sys.argv[-1] == 'test'
+print('=== RUN SyntheticUpstreamOutput')
+print('--- SKIP SyntheticUpstreamSkip')
+sys.exit(int(os.environ['FIXTURE_UPSTREAM_EXIT']))
+""",
+                    "betterleaks": """import os,sys
+from pathlib import Path
+assert sys.argv[1] == 'dir' and '--redact' in sys.argv and '--no-banner' in sys.argv
+Path(os.environ['FIXTURE_SCAN_MARKER']).write_text('native scan reached')
+""",
+                }.items():
+                    binary = binaries / name
+                    binary.write_text("#!" + sys.executable + "\n" + program)
+                    binary.chmod(0o755)
+                marker = root / "scan.txt"
+                result = subprocess.run(["bash", str(helper)],
+                    env={"PATH": str(binaries) + os.pathsep + os.environ["PATH"],
+                         "TMPDIR": str(root), "plan_dir": str(root),
+                         "FIXTURE_UPSTREAM_EXIT": str(code), "FIXTURE_SCAN_MARKER": str(marker)},
+                    stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, timeout=20)
+                self.assertEqual(result.returncode, code, result.stderr)
+                self.assertIn("=== RUN SyntheticUpstreamOutput", result.stderr)
+                self.assertIn("--- SKIP SyntheticUpstreamSkip", result.stderr)
+                self.assertEqual(marker.exists(), code == 0)
+
+    def test_srt_checker_requires_exact_completed_recipe_and_unique_controls(self):
+        import copy
+        import shlex
+        helper = (PLAN / "config/srt-client-accept.sh").read_text()
+        checker = helper.split("<<'PY'\n", 1)[1].rsplit("\nPY", 1)[0]
+        recipe = helper.split("srt_native_recipe=\"$(cat <<'SRT'\n", 1)[1].split("\nSRT\n", 1)[0]
+        positives = ("HELLO", "READ_CONTROL", "WRITE_CONTROL", "NETWORK_CONTROL", "ALLOW_WRITE",
+                     "ALLOW_WRITE_VERIFY", "APPEND_CONTROL", "APPEND_VERIFY", "WRITE_DIGEST_CONTROL")
+        good = ["hello world", *(f"SRT_{p}_EXIT=0" for p in positives),
+                "SRT_DENY_READ_EXIT=13", "SRT_DENY_WRITE_EXIT=13", "SRT_DENY_NETWORK_EXIT=13",
+                "SRT_ALLOW_WRITE_CONTROL=passed", "SRT_DENY_WRITE_PRESERVATION=passed", "SRT_NATIVE_USE_OK"]
+        cases = ("valid", "text_blocks", "wrapped", "zero_deny", "negative_deny", "large_deny", "malformed_deny",
+                 "duplicate_deny", "missing_positive", "duplicate_positive", "nonzero_positive",
+                 "missing_preservation", "missing_terminal", "duplicate_terminal", "native_error",
+                 "native_failure", "missing_result", "tool_error", "wrong_recipe", "unlinked",
+                 "background", "partial", "in_progress", "marker_only_command")
+        for client in ("claude", "codex"):
+            for case in cases:
+                with self.subTest(client=client, case=case), tempfile.TemporaryDirectory() as directory:
+                    path = Path(directory) / "events.jsonl"
+                    output = "\n".join(good) + "\n"
+                    for bad, value in (("zero_deny", "0"), ("negative_deny", "-1"),
+                                       ("large_deny", "256"), ("malformed_deny", "1x")):
+                        if case == bad:
+                            output = output.replace("SRT_DENY_READ_EXIT=13", "SRT_DENY_READ_EXIT=" + value)
+                    if case == "duplicate_deny":
+                        output += "SRT_DENY_READ_EXIT=13\n"
+                    elif case == "missing_positive":
+                        output = output.replace("SRT_HELLO_EXIT=0\n", "")
+                    elif case == "duplicate_positive":
+                        output += "SRT_HELLO_EXIT=0\n"
+                    elif case == "nonzero_positive":
+                        output = output.replace("SRT_HELLO_EXIT=0", "SRT_HELLO_EXIT=42")
+                    elif case == "missing_preservation":
+                        output = output.replace("SRT_DENY_WRITE_PRESERVATION=passed\n", "")
+                    elif case == "partial":
+                        output += "Command running in background with ID: fixture\n"
+                    command = shlex.join(["rtk", "proxy", "bash", "-lc", recipe]) if case == "wrapped" else recipe
+                    if case == "wrong_recipe":
+                        command = command.replace('srt echo "hello world"', 'srt echo "different operation"')
+                    elif case == "marker_only_command":
+                        command = "printf '%s\\n' " + shlex.quote(recipe)
+                    if client == "claude":
+                        use = {"type": "tool_use", "id": "run", "name": "Bash", "input": {
+                            "command": command, "run_in_background": case == "background"}}
+                        returned = {"type": "tool_result", "tool_use_id": "other" if case == "unlinked" else "run",
+                                    "content": [{"type": "text", "text": output}] if case == "text_blocks" else output,
+                                    "is_error": case == "tool_error"}
+                        events = [{"type": "assistant", "message": {"content": [use]}},
+                                  {"type": "user", "message": {"content": [returned]}}]
+                        terminal = {"type": "result", "subtype": "success", "is_error": False}
+                        if case == "native_failure":
+                            terminal.update(subtype="error_max_turns", is_error=True)
+                        if case in ("missing_result", "in_progress"):
+                            events.pop()
+                    else:
+                        item = {"type": "command_execution", "command": command,
+                                "status": "in_progress" if case in ("in_progress", "background", "partial") else "completed",
+                                "exit_code": 42 if case == "tool_error" else 0, "aggregated_output": output}
+                        events = [{"type": "item.started" if case in ("missing_result", "unlinked") else "item.completed",
+                                   "item": item}]
+                        terminal = {"type": "turn.failed" if case == "native_failure" else "turn.completed"}
+                    if case != "missing_terminal":
+                        events.append(terminal)
+                    if case == "duplicate_terminal":
+                        events.append(copy.deepcopy(terminal))
+                    if case == "native_error":
+                        events.append({"type": "error", "error": "Synthetic native failure"})
+                    events[:0] = [{"type": "system", "subtype": "permission_denied", "message": value}
+                                  for value in ("Native notice", None, [], 1, True)]
+                    path.write_text("\n".join(json.dumps(e) for e in events))
+                    result = subprocess.run(["python3", "-c", checker, str(path), client, recipe],
+                                            capture_output=True, text=True, timeout=20)
+                    self.assertEqual(result.returncode == 0, case in ("valid", "text_blocks", "wrapped"), result.stderr)
+
+    def test_srt_recipe_preserves_each_step_exit_when_errexit_is_suppressed(self):
+        helper = (PLAN / "config/srt-client-accept.sh").read_text()
+        recipe = helper.split("srt_native_recipe=\"$(cat <<'SRT'\n", 1)[1].split("\nSRT\n", 1)[0]
+        cases = ("valid", "HELLO", "READ_CONTROL", "WRITE_CONTROL", "NETWORK_CONTROL",
+                 "ALLOW_WRITE", "ALLOW_WRITE_VERIFY", "APPEND_CONTROL", "APPEND_VERIFY",
+                 "WRITE_DIGEST_CONTROL", "AFTER_DIGEST")
+        for case in cases:
+            with self.subTest(failing_step=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binaries, allowed = root / "bin", root / "allowed"
+                binaries.mkdir()
+                allowed.mkdir()
+                protected, read, policy = root / "protected.txt", root / "read.txt", root / "policy.json"
+                protected.write_text("synthetic protected file\n")
+                read.write_text("synthetic readable file\n")
+                policy.write_text("{}\n")
+                program = """
+import hashlib, os, subprocess, sys
+from pathlib import Path
+name, args, case = Path(sys.argv[0]).name, sys.argv[1:], os.environ['FIXTURE_CASE']
+fail = False
+if name == 'srt':
+    if args[0] == 'echo':
+        print('hello world')
+        fail = case == 'HELLO'
+    else:
+        args = args[2:]
+        if args[0] == '--': args = args[1:]
+        if args[0] in ('cat', 'curl') or args[-1] == os.environ['SRT_ACCEPT_DENY_WRITE']:
+            sys.exit(13)
+        label = 'APPEND_CONTROL' if '>>' in args[2] else 'ALLOW_WRITE'
+        if case == label: sys.exit(42)
+        sys.exit(subprocess.run(args).returncode)
+elif name == 'curl':
+    fail = case == 'NETWORK_CONTROL'
+elif name == 'sh':
+    status = subprocess.run(['/bin/sh', *args]).returncode
+    fail = case == 'WRITE_CONTROL' and 'unsandboxed control' in args[1]
+    if not fail: sys.exit(status)
+elif name in ('cat', 'tail'):
+    path = Path(args[-1])
+    text = path.read_text()
+    if name == 'tail': text = text.splitlines()[-1] + '\\n'
+    sys.stdout.write(text)
+    label = 'APPEND_VERIFY' if name == 'tail' else ('READ_CONTROL' if str(path) == os.environ['SRT_ACCEPT_DENY_READ'] else 'ALLOW_WRITE_VERIFY')
+    fail = case == label
+elif name == 'sha256sum':
+    path = Path(args[-1])
+    print(hashlib.sha256(path.read_bytes()).hexdigest() + '  ' + str(path))
+    count = Path(os.environ['FIXTURE_HASH_COUNT'])
+    previous = int(count.read_text()) if count.exists() else 0
+    count.write_text(str(previous + 1))
+    fail = case == ('WRITE_DIGEST_CONTROL' if previous == 0 else 'AFTER_DIGEST')
+sys.exit(42 if fail else 0)
+"""
+                for name in ("srt", "cat", "tail", "curl", "sh", "sha256sum"):
+                    binary = binaries / name
+                    binary.write_text("#!" + sys.executable + "\n" + program)
+                    binary.chmod(0o755)
+                # Calling a function in an if condition suppresses Bash's implicit errexit.
+                # This intentionally challenges each explicit per-step guard.
+                wrapped = "probe() {\n" + recipe + "\n}\nif probe; then exit 0; else exit \"$?\"; fi"
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", wrapped],
+                    env={"PATH": str(binaries) + os.pathsep + os.environ["PATH"],
+                         "SRT_ACCEPT_POLICY": str(policy), "SRT_ACCEPT_DENY_READ": str(read),
+                         "SRT_ACCEPT_DENY_WRITE": str(protected), "SRT_ACCEPT_ALLOWED_DIR": str(allowed),
+                         "SRT_ACCEPT_DENIED_URL": "https://synthetic.invalid",
+                         "FIXTURE_CASE": case, "FIXTURE_HASH_COUNT": str(root / "hash-count")},
+                    capture_output=True, text=True, timeout=20)
+                self.assertEqual(result.returncode, 0 if case == "valid" else 42, result.stderr)
+                self.assertEqual("SRT_NATIVE_USE_OK" in result.stdout, case == "valid")
+
     def test_inspect_example_resolves_from_its_checkout(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

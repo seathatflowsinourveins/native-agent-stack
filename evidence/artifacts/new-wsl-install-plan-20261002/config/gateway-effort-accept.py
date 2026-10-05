@@ -27,7 +27,10 @@ import urllib.request
 
 
 BASE = "http://127.0.0.1:21128/api/usage/call-logs"
-ROUTES = {"cx/gpt-6.1-sol": "xhigh", "cx/gpt-6.1-sol-high": "high"}
+# OmniRoute@c1e30b76: registry/codex/index.ts:9-13; services/model.ts:484-490.
+# Accept only the documented provider ID/alias and these exact model suffixes.
+ROUTES = {"cx/gpt-6.1-sol": "xhigh", "cx/gpt-6.1-sol-high": "high",
+          "codex/gpt-6.1-sol": "xhigh", "codex/gpt-6.1-sol-high": "high"}
 MODELS = {route.split("/", 1)[1] for route in ROUTES}
 
 
@@ -44,7 +47,9 @@ def observed_routes(rows):
         if row.get("status") != 200 or row.get("active"):
             raise ValueError("research run contains an unsuccessful or unfinished gateway call")
         alias = row.get("requestedModel")
-        if row.get("model") not in MODELS or (alias and alias not in ROUTES):
+        if (row.get("model") not in MODELS
+                or (alias and (alias not in ROUTES or alias.split("/", 1)[1] != row["model"]))
+                or (row.get("provider") and row["provider"] != "codex")):
             raise ValueError("research run used an unexpected model route")
         if alias:
             observed.add(alias)

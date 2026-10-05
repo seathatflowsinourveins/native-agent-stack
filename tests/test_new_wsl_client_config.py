@@ -96,6 +96,24 @@ class Round2RepairIntegrationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "no call log"):
             gate.observed_routes([])
 
+    def test_gateway_metadata_accepts_only_documented_codex_id_and_alias(self):
+        gate = self.source_module("gateway-effort-accept.py")
+        for prefix in ("cx", "codex"):
+            for model, effort in (("gpt-6.1-sol", "xhigh"), ("gpt-6.1-sol-high", "high")):
+                route = f"{prefix}/{model}"
+                row = {"status": 200, "path": "/v1/chat/completions", "model": model,
+                       "requestedModel": route, "provider": "codex"}
+                with self.subTest(route=route):
+                    self.assertEqual(gate.observed_routes([row]), {route})
+                    self.assertEqual(gate.ROUTES[route], effort)
+                for field, value in (("requestedModel", f"other/{model}"),
+                                     ("requestedModel", f"{prefix}/{model}-max"),
+                                     ("requestedModel", f"{prefix}/gpt-6.1-sol-high" if model == "gpt-6.1-sol" else f"{prefix}/gpt-6.1-sol"),
+                                     ("provider", "other"), ("status", 503), ("active", True),
+                                     ("path", "/v1/embeddings")):
+                    with self.subTest(route=route, field=field, value=value), self.assertRaises(ValueError):
+                        gate.observed_routes([dict(row, **{field: value})])
+
     def test_gateway_paging_stops_at_old_persisted_rows_and_joins_the_run(self):
         gate = self.source_module("gateway-effort-accept.py")
         started, finished = "2026-10-05T04:00:00+00:00", "2026-10-05T04:01:00+00:00"
@@ -2338,6 +2356,12 @@ class ApplyTests(ApplyCase):
         self.assertEqual((codex / "stack-worker.config.toml").read_text(), "model = 'mine'\n")
         self.assertIn("stack-worker.config.toml: differs from the render and is never overwritten", out)
         self.assertTrue((codex / "omniroute.config.toml").exists())
+        self.assertIn("codex-files applied; differs, not written", out.split("summary: ")[1])
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual((codex / "stack-worker.config.toml").read_text(), "model = 'mine'\n")
+        self.assertIn("codex-files differs, not written", out.split("summary: ")[1])
+        self.assertNotIn("codex-files current", out.split("summary: ")[1])
 
     def test_a_settings_file_of_the_destinations_shape_keeps_its_marketplace_and_theme_and_gains_the_wired_settings(self):
         self.installed_state()
@@ -2495,7 +2519,7 @@ class AuthorizationTests(ApplyCase):
                     "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level of the wired "
                     "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
                     "and a value of theirs that a file has is not touched; --with-authorization-settings adds the ones a "
-                    "file lacks)")
+                    "file lacks, except existing create-only profile files)")
 
     def render(self, *extra: str):
         with tempfile.TemporaryDirectory() as tmp:
@@ -2637,15 +2661,118 @@ class AuthorizationTests(ApplyCase):
             self.assertEqual(config["mcp_servers"][server]["default_tools_approval_mode"], "approve", server)
         # The stack-worker profile is created only when absent, so the profile the plain run created stays as it was.
         line = self.authorization_line(out)
-        self.assertEqual(line, f"authorization settings: applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
-                               f"{self.CODEX_CONFIG}; kept your value: {self.STACK_WORKER})")
-        # A second run with the option has nothing left to add: the settings are the same, and the line says kept.
+        self.assertEqual(line, f"authorization settings: partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
+                               f"{self.CODEX_CONFIG}; not reached, its step codex-files ended differs, not written: "
+                               f"{self.STACK_WORKER})")
+        # Main configuration settings are now present; missing keys in create-only profiles remain not reached.
         code, out, _ = self.apply(self.OPTION)
         self.assertEqual(code, 0, out[-800:])
         line = self.authorization_line(out)
-        self.assertEqual(line, f"authorization settings: kept (--with-authorization-settings; kept your value: "
-                               f"{self.STACK_WORKER}; already the same: {self.ADDED_CLAUDE[len('added: '):]}, "
-                               f"{self.CODEX_CONFIG})")
+        self.assertEqual(line, f"authorization settings: not applied (--with-authorization-settings; already the same: "
+                               f"{self.ADDED_CLAUDE[len('added: '):]}, {self.CODEX_CONFIG}; "
+                               f"not reached, its step codex-files ended differs, not written: {self.STACK_WORKER})")
+
+    def test_profile_formatting_and_model_drift_do_not_change_equal_authorization_values(self):
+        self.seed()
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        profile = self.home / ".codex/stack-worker.config.toml"
+        original = profile.read_text()
+        for text in ("# different formatting\n" + original,
+                     original.replace('default_tools_approval_mode = "approve"',
+                                      "default_tools_approval_mode = 'approve'"),
+                     original.replace('model = "gpt-6.1-sol"', 'model = "local-choice"', 1)):
+            with self.subTest(format_only=text.startswith("# different formatting")):
+                self.assertNotEqual(text, original)
+                parsed, baseline = tomllib.loads(text), tomllib.loads(original)
+                for server in ("ai-memory", "socraticode", "headroom"):
+                    self.assertEqual(parsed["mcp_servers"][server]["default_tools_approval_mode"],
+                                     baseline["mcp_servers"][server]["default_tools_approval_mode"])
+                profile.write_text(text, encoding="utf-8")
+                code, out, _ = self.apply(self.OPTION)
+                self.assertEqual(code, 0, out[-800:])
+                self.assertEqual(profile.read_text(), text)
+                line = self.authorization_line(out)
+                self.assertIn("already the same: ", line)
+                self.assertIn(self.STACK_WORKER, line.split("already the same: ", 1)[1])
+                self.assertNotIn("kept your value:", line)
+                self.assertNotIn("not reached", line)
+                self.assertIn("codex-files differs, not written", out.split("summary: ")[1])
+
+    def test_only_the_changed_profile_authorization_key_is_kept(self):
+        self.seed()
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        profile = self.home / ".codex/stack-worker.config.toml"
+        original = profile.read_text()
+        text = original.replace('[mcp_servers.ai-memory]\ndefault_tools_approval_mode = "approve"',
+                                '[mcp_servers.ai-memory]\ndefault_tools_approval_mode = false', 1)
+        self.assertNotEqual(text, original)
+        self.assertIs(tomllib.loads(text)["mcp_servers"]["ai-memory"]["default_tools_approval_mode"], False)
+        profile.write_text(text, encoding="utf-8")
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(profile.read_text(), text)
+        line = self.authorization_line(out)
+        kept = line.split("kept your value: ", 1)[1].split(";", 1)[0]
+        self.assertEqual(kept, "Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode")
+        self.assertIn("Codex stack-worker profile mcp_servers.socraticode.default_tools_approval_mode",
+                      line.split("already the same: ", 1)[1])
+        self.assertIn("Codex stack-worker profile mcp_servers.headroom.default_tools_approval_mode",
+                      line.split("already the same: ", 1)[1])
+        self.assertNotIn("not reached", line)
+
+    def test_an_absent_key_in_an_existing_profile_is_not_reported_as_kept(self):
+        self.seed()
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        profile = self.home / ".codex/stack-worker.config.toml"
+        original = profile.read_text()
+        text = original.replace('[mcp_servers.ai-memory]\ndefault_tools_approval_mode = "approve"',
+                                '[mcp_servers.ai-memory]', 1)
+        self.assertNotEqual(text, original)
+        self.assertNotIn("default_tools_approval_mode", tomllib.loads(text)["mcp_servers"]["ai-memory"])
+        profile.write_text(text, encoding="utf-8")
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(profile.read_text(), text)
+        line = self.authorization_line(out)
+        self.assertTrue(line.startswith("authorization settings: not applied "), line)
+        self.assertNotIn("kept your value:", line)
+        self.assertIn("not reached, its step codex-files ended differs, not written: "
+                      "Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode", line)
+        self.assertIn("Codex stack-worker profile mcp_servers.socraticode.default_tools_approval_mode",
+                      line.split("already the same: ", 1)[1])
+
+    def test_malformed_profile_authorization_is_failed_and_preserved(self):
+        self.seed()
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        profile = self.home / ".codex/stack-worker.config.toml"
+        for data in (b"[invalid\n", b"\xff"):
+            with self.subTest(data=data):
+                profile.write_bytes(data)
+                code, out, _ = self.apply(self.OPTION)
+                self.assertEqual(code, 1, out[-800:])
+                self.assertEqual(profile.read_bytes(), data)
+                self.assertIn("codex-files failed", out.split("summary: ")[1])
+                line = self.authorization_line(out)
+                self.assertIn("not reached, its step codex-files failed: " + self.STACK_WORKER, line)
+                self.assertNotIn("kept your value:", line)
+
+    def test_dry_run_with_a_stale_profile_reports_both_creation_and_preservation(self):
+        self.seed()
+        profile = self.home / ".codex/stack-worker.config.toml"
+        profile.parent.mkdir(mode=0o700)
+        profile.write_text("model = 'local-choice'\n", encoding="utf-8")
+        before = tree(self.home)
+        code, out, _ = self.apply(self.OPTION, dry=True)
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(tree(self.home), before)
+        self.assertFalse(self.marker.exists())
+        self.assertIn("codex-files planned; differs, not written", out.split("summary: ")[1])
+        self.assertTrue(self.authorization_line(out).startswith("authorization settings: would be partly applied "), out)
+        self.assertIn("not reached, its step codex-files ended planned; differs, not written: " + self.STACK_WORKER, out)
 
     def test_a_new_codex_home_with_the_option_keeps_the_trust_grant_and_a_second_run_finds_it_the_same(self):
         # codex_home.py --keep-project-trust: the grant the render holds survives the creation of config.toml, so the
@@ -2723,11 +2850,12 @@ class AuthorizationTests(ApplyCase):
                     self.assertIn("codex-config merged with conflicts kept", out.split("summary: ")[1])
                     # The person's four values stay; what the files lack (the allow rules and approval modes) is added.
                     line = self.authorization_line(out)
-                    self.assertTrue(line.startswith("authorization settings: applied (--with-authorization-settings; "
+                    self.assertTrue(line.startswith("authorization settings: partly applied (--with-authorization-settings; "
                                                     f"added: {self.ALLOW_LABELS}, "), line)
                     # The stack-worker profile the plain run created is kept too (profiles are created only when absent).
                     self.assertIn("kept your value: Claude Code permissions.defaultMode, Claude Code "
-                                  "skipDangerousModePermissionPrompt, Codex approval_policy, Codex sandbox_mode, "
+                                  "skipDangerousModePermissionPrompt, Codex approval_policy, Codex sandbox_mode", line)
+                    self.assertIn("not reached, its step codex-files ended differs, not written: "
                                   f"{self.STACK_WORKER})", line)
                 else:
                     self.assertNotIn("kept your permissions.defaultMode", out)
