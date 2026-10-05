@@ -347,23 +347,18 @@ coordinator unit's north-star action. `build_inputs.py` now cites
 
 ### Preserving the accepted listing fraction (amended 2026-10-05, round 3)
 
-Removing a template key alone leaves a host's old value because the existing
-[deep_merge_dict](../../tools/adoption/apply_claude_settings.py) keeps unmentioned
-base keys. The first repair added the explicit `--retire-key` mechanism using the
-existing backup, atomic write and read-back; it still refuses retirement of an
-incoming configured key. Keep that generic explicit mechanism, but supersede the
-first repair's automatic `skillListingBudgetFraction` retirement, its absence
-assertion and the name-only exceptions.
+[deep_merge_dict](../../tools/adoption/apply_claude_settings.py) preserves host
+keys that the template does not mention. Repair round 4 restores this settings
+writer byte for byte from main and uses its ordinary merge contract.
 
-[step_claude_settings](../../tools/adoption/new_wsl_client_config.py) now follows
-the accepted September 30 practice: merge `skillListingBudgetFraction: 0.05` and
-full eligible `skillOverrides: on`, while retaining unrelated host keys. It never
-implicitly passes `--retire-key`. The regression seeds 0.05 and an unrelated host
-key, proves dry-run preservation, checks the fraction and unrelated key after
-apply, and checks the backup and identical second apply. Actual 2604 read-back of
-0.05 and the native Skills row remain a coordinator host gate. The native 1%
-default documented by [Claude](https://code.claude.com/docs/en/skills) does not
-supersede the user's invocation directive.
+[step_claude_settings](../../tools/adoption/new_wsl_client_config.py) follows the
+accepted September 30 practice: merge `skillListingBudgetFraction: 0.05` and full
+eligible `skillOverrides: on`, while retaining unrelated host keys. The regression
+seeds 0.05 and an unrelated host key, proves dry-run preservation, checks both
+after apply, and checks the backup and identical second apply. Actual 2604
+read-back of 0.05 and the native Skills row remain a coordinator host gate. The
+native 1% default documented by [Claude](https://code.claude.com/docs/en/skills)
+does not supersede the user's invocation directive.
 
 ### Expanded byte scope and fixed amended ceilings
 
@@ -611,9 +606,8 @@ The [accepted listing record](2026-09-30-skills-llm-native-listing.md) records t
 return to `claude_listing: on` and template `skillOverrides: on`; existing Codex
 eligibility is preserved, including its native `skill-creator` copy exception.
 The map restores `skillListingBudgetFraction: 0.05`, also kept on NativeStack2604.
-The generic explicit retirement mechanism remains available, but no apply step
-retires this key. Related tests again require full eligible descriptions and
-preservation of the fraction. Audit item 8's name-only/default-fraction proposal
+Main's ordinary settings merge preserves unmentioned host keys. Related tests
+require full eligible descriptions and preservation of the fraction. Audit item 8's name-only/default-fraction proposal
 is overturned by this directive. The October 5 workflow-quality quote above does
 not revoke it. The rejected alternative is hiding descriptions to save startup
 context; the skill catalog is governed by the user directive and measured as a
@@ -629,7 +623,7 @@ Its [hooks/rtk-awareness-full.md](https://github.com/rtk-ai/rtk/blob/e001f773f80
 exists and is byte-identical to the existing fixture: 1,121 bytes and SHA-256
 `278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc`.
 
-Restoring that complete body inside the template would make it 8,286 bytes before
+Restoring that complete body inside the template would make it 8,287 bytes before
 any local qualification, exceeding the strict 8,192-byte ceiling. Use the
 coordinator's carrier fallback: vendor those unchanged upstream bytes at
 `adoption/templates/rtk-awareness-full.md`, with a single include marker in the
@@ -657,15 +651,19 @@ two omissions.
 | Codex compact template | 8,186 | 7,307 |
 | Codex vendored native awareness | — | 1,121 |
 | Codex new-WSL rendered carrier | 8,186 | 8,373 |
-| Codex native/gateway lane rendered block | 8,186 | 8,377 |
+| Codex native/gateway lane rendered block | 8,186 | 8,373 |
+| Codex full inline source before local qualification | — | 8,287 |
 | Claude startup scope | 23,566 | 23,566 |
 | Codex startup scope (new-WSL carrier plus root) | 19,145 | 19,332 |
 
-The filter normalizes four separator bytes in the new-WSL carrier; its awareness
-body remains byte-identical. The template limit applies to its compact source;
-the startup gate counts the full rendered carrier, including all native RTK
-bytes. The standalone native/gateway lane block is four bytes larger and also
-fits the current Codex ceiling with the root instructions.
+Both the new-WSL and native/gateway writers produce 8,373-byte Codex carriers:
+7,307 compact-source bytes minus the 55-byte include marker plus the 1,121-byte
+native awareness file. Before the separate 86-byte local qualification, the full
+inline source is 8,287 bytes. Its upstream awareness body remains byte-identical.
+The 8,192-byte local check applies only to the compact source; the startup gate
+counts the complete rendered carrier, including all native RTK bytes. Repair
+round 4 verifies each output with `wc -c`; the earlier four-byte discrepancy was
+an incorrect measurement.
 
 This is the dated measurement and alternative comparison required by the change
 procedure above. The accepted fixed ceilings stay 24,458 Claude and 20,103 Codex,
@@ -684,10 +682,10 @@ the 868-byte root routing paragraph becomes the 188-byte pointer, removing
 680 bytes from both startup scopes. In the same reviewed diff, remeasure and
 lower the fixed ceilings to those actual scopes plus 5%, rounded upward. For
 these new-WSL inputs, that means 22,886/18,652-byte scopes and 24,031/19,585-byte
-ceilings, superseding round 2's projected Codex 19,389 ceiling. If a host instead
-uses the standalone native block, its measured Codex scope is 18,656 and its
-plus-5% ceiling is 19,589; the coordinator must record which carrier is actually
-rendered. Freed routing bytes cannot become permanent growth headroom. No host
+ceilings, superseding round 2's projected Codex 19,389 ceiling. The standalone
+native block produces the same 18,652-byte post-gate Codex scope and 19,585-byte
+plus-5% ceiling. The coordinator records the actual host carrier after read-back.
+Freed routing bytes cannot become permanent growth headroom. No host
 user file or protected stack/evidence manifest is changed by this repair.
 
 ### Round 3 local acceptance
@@ -716,3 +714,89 @@ passed. These are local integration and synthetic-fixture checks. No full CI
 suite, macOS run, provider/model trial or host rollout is claimed here. The
 protected manifests are unchanged; rebase, host rollout and registry refresh
 remain the coordinator's work.
+
+## 2026-10-05 repair round 4: main settings surfaces and measured writer bytes
+
+The Opus gate read of `4f490d3ab` found one adoption-state conflict and three
+remaining inconsistencies. Restore main's two skill-setting disposition rows
+exactly from `origin/main@c148e049efee75f8ea8a9a009e7b96b1e97f5c28`; they are also
+byte-identical at this PR's recorded main base `a11dc5ff3`. Both rows stay
+`adopt-pending`: the October 4 observation records that 2604 has the 0.05 fraction,
+NativeStack lacks it, and both hosts trail the template's overrides. Repository
+unit tests do not turn those historical host observations into completed adoption.
+The coordinator's host render/read-back gate remains pending.
+
+The [September 30 user directive](2026-09-30-skills-llm-native-listing.md) keeps
+every eligible skill listed; the 0.05 fraction prevents listing truncation. Amend
+the remaining anti-pattern row to distinguish unbounded startup instructions
+from that accepted listing setting. Keep listing governed independently of the
+startup byte gate. Restore `tools/adoption/apply_claude_settings.py` byte for byte
+from the same main commit and use its ordinary settings merge, consistent with
+the client-config map and its existing apply-settings tests. The simpler choice
+is direct restoration of maintained main surfaces; adding another settings
+mechanism supplies no required behavior for this accepted design.
+
+Render through `new_wsl_client_config.generate_blocks`, `managed_block.merged_codex_md`
+and `apply_codex_lane.agents_block`, then measure the resulting files with native
+`wc -c`. Both Codex writers produce the same 8,373 bytes. The inline counterfactual
+below removes only the separate 86-byte local qualification; the 1,121-byte
+upstream awareness body remains unchanged. The post-gate projection replaces the
+869-byte routing line (including newline) with the original 189-byte pointer,
+removing exactly 680 bytes. These are temporary measurement outputs, not host
+writes or removal of the pending routing guard.
+
+| Measured output | UTF-8 bytes from `wc -c` |
+| --- | ---: |
+| Compact Codex source | 7,307 |
+| Include marker | 55 |
+| Verbatim RTK awareness | 1,121 |
+| New-WSL rendered Codex carrier | 8,373 |
+| Standalone native/gateway rendered Codex carrier | 8,373 |
+| Full inline source before local qualification | 8,287 |
+| Separate local qualification | 86 |
+| Root AGENTS.md | 10,959 |
+| Repo CLAUDE.md | 766 |
+| Portable Claude source and carrier | 11,575 |
+| Current Claude startup scope | 23,566 |
+| Current Codex startup scope | 19,332 |
+| Root AGENTS.md after the pending host gate | 10,279 |
+| Standalone Codex startup scope after that gate | 18,652 |
+
+The rendered carrier is `7,307 - 55 + 1,121 = 8,373` bytes. It exceeds the local
+8,192-byte check, which covers only the compact source; the fixed startup gate
+counts the complete rendered carrier. The tests and renderer comments now say
+this explicitly. Round 3's inline-size and four-byte normalization claims were
+incorrect; the corresponding comparison and projection paragraphs above
+are corrected from these writer outputs. There is no runtime byte change.
+
+Keep the current ceilings at 24,458 Claude and 20,103 Codex. After the pending
+host gate, the standalone and new-WSL Codex projections both require the same
+19,585-byte ceiling: `ceil(18,652 * 1.05)`. Claude's projected ceiling remains
+24,031. Remeasure the actual host carriers and tighten in the same reviewed diff
+as required above; this correction does not make freed routing bytes permanent
+headroom or authorize a silent re-baseline. No protected manifest or host user
+file is edited by this round.
+
+### Round 4 local acceptance
+
+| Command/group | Exit | Result |
+| --- | ---: | --- |
+| Three regression modules from round 3 | 0 | 421 tests, 7 skipped |
+| Seven harness modules from round 3 | 0 | 655 tests, 22 skipped |
+| `python3 -m unittest tests.test_upstream_surface_watch tests.test_apply_claude_settings` | 0 | 167 tests, 6 skipped; includes the separately requested watch rerun |
+| `node test-envelope.mjs` | 0 | 254 passed, 0 failed |
+| `node test-contract-mutations.mjs` | 0 | 74 passed, 0 failed |
+| `python3 tools/adoption/new_wsl_client_config.py --write-blocks` | 0 | both current carriers retained |
+| `python3 tools/adoption/new_wsl_client_config.py --check` | 0 | passed |
+| `python3 scripts/build_new_wsl_handbook.py --check` | 0 | current outputs; no regeneration needed |
+| `python3 scripts/validate.py` | 1 | registry drift only: 8 SHA-256 and 8 byte-count mismatches |
+| `wc -c` on the rendered measurement files above | 0 | carrier 8,373; inline source 8,287; projected scope 18,652 |
+| `git diff --check` | 0 | clean |
+
+The first comparison reproduced all four gate findings against canonical main
+and the existing writer outputs. After repair, the two disposition entries and
+settings writer match main exactly; the active code, tests and documentation
+follow its ordinary merge contract. This is local
+integration and fixture acceptance, with no full CI suite, host rollout or
+provider/model trial claimed. The coordinator commits, refreshes the registry
+last and owns the pending host read-back and subsequent ceiling tightening.

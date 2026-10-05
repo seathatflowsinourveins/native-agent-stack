@@ -434,7 +434,9 @@ class TemplateTests(unittest.TestCase):
         self.assertNotIn(lane.managed_block.RTK_INCLUDE, rendered)
         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.
         self.assertFalse([line for line in rendered.splitlines() if line.startswith("@")])
-        self.assertLess(len(text.encode("utf-8")), 8192)  # local size budget; the project-doc limit does not cap global instructions
+        # This local 8,192-byte check covers the compact source (7,307 bytes).
+        # The rendered Codex carrier is 8,373 bytes, counted by the startup budget.
+        self.assertLess(len(text.encode("utf-8")), 8192)
 
     def test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source(self):
         top, upstream, _ = template_segments()

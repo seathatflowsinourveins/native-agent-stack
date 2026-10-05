@@ -254,7 +254,7 @@ for current qualification limits.
   [October 5 budget decision](../../docs/decisions/2026-10-05-harness-context-budget.md).
   Skill listing is governed by that directive independently of the startup file
   budget. The new-WSL apply step keeps this fraction, including on NativeStack2604;
-  the generic explicit `--retire-key` mechanism is retained but is not used here.
+  main's ordinary settings merge preserves unmentioned host keys.
 - **Codex** fits its catalog to `[skills] max_context_tokens`, capped at 10,000
   tokens when set; unset, the budget is 2% of the context window, and 8,000
   characters when the window is unknown. Each description is cut at 1,024

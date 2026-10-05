@@ -35,7 +35,7 @@
     },
     "verdict_boundary": "Trial skills are not verdict winners; catalogs/landscape/foundation.json instructions-skills is unchanged until a sealed re-record."
   },
-  "settings_propagation": "adoption/templates/claude.settings.template.json skillOverrides and skillListingBudgetFraction, applied by tools/adoption/apply_claude_settings.py (deep merge; an omitted host key stays unless explicitly retired). The new-WSL apply step keeps the 0.05 listing fraction under the user's 2026-09-30 directive; it does not retire this key (2026-10-05 harness-context-budget repair round 3).",
+  "settings_propagation": "adoption/templates/claude.settings.template.json skillOverrides and skillListingBudgetFraction, applied by tools/adoption/apply_claude_settings.py (deep merge; an omitted host key stays). The new-WSL apply step keeps the 0.05 listing fraction under the user's 2026-09-30 directive; it does not retire this key (2026-10-05 harness-context-budget repair round 3).",
   "skills": [
     {
       "name": "typesafe-ai",

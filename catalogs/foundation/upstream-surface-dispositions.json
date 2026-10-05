@@ -2121,28 +2121,26 @@
   },
   {
    "key": "claude:setting:skillListingBudgetFraction",
-   "disposition": "default-on",
-   "reason": "Remove the repository override: upstream fits skill descriptions to 1% of context by default.",
-   "source": "https://code.claude.com/docs/en/skills",
-   "carrier": null,
-   "value": null,
-   "scope": "repository-default",
-   "overturn": "A dated comparison shows the native default loses required skill matches after scoped name-only overrides.",
-   "reviewed_utc": "2026-10-05T00:00:00Z",
+   "disposition": "adopt-pending",
+   "reason": "Template has 0.05 since #553 (all model-invocable skills listed on); 2604 has it, NativeStack lacks it. Costs up to 5% of context per turn.",
+   "source": "https://code.claude.com/docs/en/settings.md",
+   "carrier": "adoption/templates/claude.settings.template.json",
+   "value": "0.05",
+   "scope": "NativeStack",
+   "overturn": "/doctor shows the listing fits under 1%, or a skill-use A/B shows no gain.",
+   "reviewed_utc": "2026-10-04T16:23:19Z",
    "version": "2.1.289"
   },
   {
    "key": "claude:setting:skillOverrides",
-   "disposition": "enabled",
-   "reason": "Keep specialized audit skills invocable by name while omitting their descriptions from the startup listing.",
-   "source": "https://code.claude.com/docs/en/skills",
+   "disposition": "adopt-pending",
+   "reason": "Both trail the template: NativeStack 10 stale entries (pre-#553 name-only, no skill-creator); 2604 3 (#659 set grill-me, improve-codebase-architecture.",
+   "source": "https://code.claude.com/docs/en/settings.md",
    "carrier": "adoption/templates/claude.settings.template.json",
-   "value": {
-    "record": "docs/decisions/2026-10-05-harness-context-budget.md"
-   },
-   "scope": "repository-default",
-   "overturn": "A native skill-doctor report or task comparison shows a named audit skill must regain its description.",
-   "reviewed_utc": "2026-10-05T00:00:00Z",
+   "value": "template's 29-entry map (template:378-408)",
+   "scope": "both",
+   "overturn": "A manifest change sets a skill back to name-only or on.",
+   "reviewed_utc": "2026-10-04T16:23:19Z",
    "version": "2.1.289"
   },
   {

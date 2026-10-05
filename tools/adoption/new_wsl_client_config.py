@@ -205,9 +205,11 @@ LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
 HEADING = re.compile(r"^(#{1,6})\s")
 SENTENCE_BREAK = re.compile(r"(?<=[.!?])(\s+)(?=[A-Z`\[(<\"'*_])")
 SENTENCE_END = re.compile(r"[.!?][\"')\]`*_]*$")
-# The wrap width of the RTK awareness excerpt that adoption/templates/codex.AGENTS.template.md carries
-# (rtk-ai/rtk hooks/rtk-awareness-full.md): a run of lines that are all this short, with a sentence running on from
-# one line into the next, is one wrapped paragraph; longer lines are one statement each.
+# Wrap width of the verbatim rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md.
+# The rendered Codex carrier is 8,373 bytes; the local 8,192-byte test covers only
+# adoption/templates/codex.AGENTS.template.md's compact source (7,307 bytes).
+# A run of lines this short with a sentence running into the next line is one
+# wrapped paragraph; longer lines are one statement each.
 WRAP_WIDTH = 80
 HOST_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")  # the bootstrap's --host rule
 # What the repository's tools print when they change something (install_claude_profile, apply_claude_settings,
@@ -2163,7 +2165,7 @@ class Apply:
             else:
                 found[verdict.piece.key] = "added"
         # Keep the configured listing fraction under the 2026-09-30 directive.
-        # An omitted host key stays; retirement requires an explicit writer call.
+        # An omitted host key stays through main's ordinary settings merge.
         merged = file_io.merge_settings(current, wanted)
         if target.is_file() and merged == current:
             self.record("claude-settings", "current", f"{target} already holds the wired settings")
