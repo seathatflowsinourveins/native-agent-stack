@@ -4207,27 +4207,6 @@
         "Sanitized projections only; private original hashes, failed cases and corrections retained. The projection step ran no new provider/test/control execution and made no shared edits; registration in manifests/evidence.json is separate from that step."
       ],
       "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json"
-    },
-    {
-      "id": "rtk-fold-harbor-20261004",
-      "kind": "native_model_e2e",
-      "component_ids": [
-        "rtk",
-        "codex"
-      ],
-      "claim": "The retained 2026-10-05 upstream Harbor 0.23.0 study executed 72 live Codex 0.160.0 trials on eight local synthetic grep tasks with three repetitions in A/B/C. Every arm had zero adjudicated wrong-path actions and reward 1.0 in all 24 trials; both confirmatory A-C Holm p-values were 1.0 and remedy_triggered was false. This publication preserves historical model-driven execution and makes no new live-run or saving claim.",
-      "limitations": [
-        "Eight related synthetic task clusters and three repetitions limit power and external validity; zero observed errors does not establish equivalence or universal safety.",
-        "One pinned Codex 0.160.0 client was measured through the local nginx+socat proxy to OmniRoute cx/gpt-6.1-sol-max, configured at max effort; model and effort are route configuration, not per-run provider attestation. D was dropped prospectively and contributes no Claude-client outcome.",
-        "A/B installed RTK at /usr/local/bin/rtk for container login PATH resolution; host PATH and other installation locations are outside this qualification.",
-        "Only the five registered GNU grep spellings, plain ASCII newline-separated paths and one topology were studied; other search and path modalities remain unqualified.",
-        "Blinding was imperfect; six primary model readers and the added 53-row blind negative audit do not establish positive-label sensitivity or eliminate shared systematic errors.",
-        "B hook_fired was 8/24 because the frozen predicate counts ten non-file-list follow-up rewrites, contrary to the marker-matched Amendment 1 intention. All 24 discovery greps skipped rewriting and returned exact unfolded lists; broader exclusion coverage remains unresolved. The retained B fold flag is 0/24.",
-        "The retained A fold flag is 23/24; original inspection found a successful discovery fold in fold-08-r3-A that the frozen nested-result decoder missed. This is an extraction limitation; no frozen result or adjudication label was changed.",
-        "Tokens are secondary exploratory native fields with uncontrolled cache and incomplete enclosing-workflow usage; no token, cost or time saving claim is made.",
-        "This is a sanitized historical native-model study on local fixtures, not an unchanged upstream test suite, a fresh provider run, host-install acceptance or independently attested billing telemetry."
-      ],
-      "path": "evidence/receipts/rtk-fold-harbor-20261004.json"
     }
   ],
   "files": [
@@ -16604,8 +16583,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md",
-      "sha256": "0c37639806c5f419632b1ad30aba2de2e94602aea638f9006b5cfae3bb422373",
-      "bytes": 13573
+      "sha256": "fc93f4173ecd6e21c6b0b2c4fd58be79d24b506698b4441e65bb088c43f762b7",
+      "bytes": 13314
     },
     {
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
@@ -16671,11 +16650,6 @@
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
       "sha256": "976b8e8c3ede42aa2ce26c01dbca5184cf45e329419a065e169bc0936f093051",
       "bytes": 14176
-    },
-    {
-      "path": "docs/decisions/2026-10-05-rtk-fold-harbor-phase2.md",
-      "sha256": "d7698470de9eb7ed30f0764f8b1b17acd8a926298b08630829e1b955ba177dfe",
-      "bytes": 23344
     },
     {
       "path": "docs/direct-results.md",
@@ -44748,96 +44722,6 @@
       "bytes": 3721
     },
     {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/AMENDMENT-2026-10-04.md",
-      "sha256": "03472c19bd031e3854d8fb832343197a73872a556a3632af0bf515f7b09f00f0",
-      "bytes": 6461
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/FREEZE-v4.json",
-      "sha256": "96954eba01557a3e8e2aaeeffc9fc2d25d25a60010a6f16755a6aa636c7bcfde",
-      "bytes": 1675
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/FREEZE-v4.sha256",
-      "sha256": "1596e4176fca1f751f7751764acc88af88443b8034b62f668a0e41122dc80f18",
-      "bytes": 75981
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/FREEZE.json",
-      "sha256": "45c37b631bc66fe2c6cc193f698c61301a930f952bedf75bf2c6ed4625e1682f",
-      "bytes": 1812
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/FREEZE.sha256",
-      "sha256": "a079389d203677444bbac6ea48f0a853ef4e760f125b89808f15471d0be0722d",
-      "bytes": 76783
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/PREREGISTRATION.md",
-      "sha256": "2cc717d1ee3674a463acd30617f59c737a1ae00f5ff638750e840afa4863e6b6",
-      "bytes": 27038
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/PROTOCOL.frozen.md",
-      "sha256": "d8e141c4408fc1693eaacad10c5aa8abf488888dc9c32ffe69f518cd8e39068a",
-      "bytes": 4756
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/README.md",
-      "sha256": "2a8658fcf366021c8cb3d8593df13ecdc835001d7c3aa9364d256ddb9590a848",
-      "bytes": 8729
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/adjudication-summary.json",
-      "sha256": "2ed392122a50a8d279214a622122050707fd6c68b3bc6ee290d474b32d241eb7",
-      "bytes": 1747
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/audit-rows.json",
-      "sha256": "708bd553eac2130f6c6a0014108e41c0dc94b3650029ce45bb82a221704bb626",
-      "bytes": 3657
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/grep-audit.csv",
-      "sha256": "279310f7e1e1c35e044fd5cb87aea2065f9b40cc688fcffd25d1301365d49aa2",
-      "bytes": 4949
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/hook-coverage.md",
-      "sha256": "c7172cd06a09cebb94fa18f5b98960b4e1afe918935b447e07feb0d3a4ca8316",
-      "bytes": 10668
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/per-arm-summary.csv",
-      "sha256": "da7f332e8e1d2c5dc763f8f3883e8e908633ded9a0a8b665056b92498f2fafd6",
-      "bytes": 721
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/phase1-decision-draft.md",
-      "sha256": "8f6e5f1eea82caba80f64aa363d104a3e1821730b4290d9817bc587368576a71",
-      "bytes": 13075
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/phase2-analysis.json",
-      "sha256": "38f72d1cab659af25f055f5a7ed71a6d74bafb8a4b324c5a5ed6818cd6df6d50",
-      "bytes": 50865
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/phase2-measures.adjudications.csv",
-      "sha256": "184f0c26173cf955d2a2869e7c2b639c4e05a19b8814bc4d27c2d4364f1ce9d4",
-      "bytes": 22432
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/premeasurement-acceptance.json",
-      "sha256": "60b065c8ecf013e7bf87f9f822b3c7b4f619664786397092ece6c3a25721a2c6",
-      "bytes": 1918
-    },
-    {
-      "path": "evidence/artifacts/rtk-fold-harbor-20261004/source-hashes.json",
-      "sha256": "9a4c321e0b0e1a36004efab401b05ef3376123d8d36bb01c9f66848242022136",
-      "bytes": 27566
-    },
-    {
       "path": "evidence/artifacts/rtk-native-git256-20261002/receipt.json",
       "sha256": "3746287baeda32c343247eb8f87ecc3b79b6605dfe564f31c2a85ca1f714368a",
       "bytes": 29878
@@ -51911,11 +51795,6 @@
       "path": "evidence/receipts/rtk-051-qualification-20261004.json",
       "sha256": "f35ef95e65d1a8c621c62102eba41f6c05bd39c8c79fc64e6550a04190912d6e",
       "bytes": 23051
-    },
-    {
-      "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
-      "sha256": "add26129b24cbe994b3ba1032b13687102ee3a24bd8af6e7a6d187f894937779",
-      "bytes": 16146
     },
     {
       "path": "evidence/receipts/runtime-sdk-20261003.json",
