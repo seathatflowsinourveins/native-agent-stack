@@ -1073,6 +1073,11 @@ INSTRUCTION_FILE_NAMES = frozenset({"agents.md", "agents.override.md", "agents.t
                                     "token-lanes-block.builder.md", "token-lanes-block.researcher.md",
                                     "token-lanes-block.reviewer.md", "token-lanes-block.scout.md",
                                     "token-lanes-block.verifier.md"})
+# At 0e2610d66, tools/adoption/install_claude_profile.py:152-170 refreshes
+# every Claude definition; tools/adoption/apply_codex_lane.py:595-604,1234-1236
+# installs Codex roles pinned by SHA256SUMS in this same tree. Reserve the
+# component-bounded prefix, including future definitions and pin files.
+INSTRUCTION_PATH_PREFIXES = frozenset({"adoption/agents"})
 RAW_CHANGE = re.compile(rb":(000000|100644|100755|120000|160000) "
                         rb"(000000|100644|100755|120000|160000) "
                         rb"([0-9a-f]{40}) ([0-9a-f]{40}) ([AMDT])")
@@ -1182,7 +1187,8 @@ def path_refusals(path):
         if any(name == ".mailmap" or name.startswith(".git")
                and name not in (".git", ".gitmodules", ".github") for name in semantic_names):
             reasons.add("git_semantic_file")
-        if semantic_names[-1] in INSTRUCTION_FILE_NAMES:
+        if (semantic_names[-1] in INSTRUCTION_FILE_NAMES
+                or path_is_owned("/".join(semantic_names), INSTRUCTION_PATH_PREFIXES)):
             reasons.add("instruction_file")
     return sorted(reasons)
 

@@ -1161,8 +1161,10 @@ The separate validator comparison is
   `AGENTS.template.md` basename stays conservatively reserved; no file at that starting
   head has that basename. These are concrete listed carriers, not a claim that every
   instruction-like file is protected or auto-loaded. The gate does not import the
-  validator's instruction-name list. A newly adopted instruction filename reopens this
-  finite policy; its inventory is also checked against both agent-facing lists.
+  validator's instruction-name list. R5 also reserves the component-bounded
+  `adoption/agents/` prefix, as recorded below. A newly adopted instruction filename
+  outside these basenames and this prefix reopens the policy. Each agent-facing list
+  is parsed and checked for set equality with the basename/prefix inventory.
 - CI's target is CPython **3.12.3**, recorded in `.github/workflows/validate.yml:227-228`
   at the starting head. The host normalizer's 3.13.15 pin is a separate scope. CPython
   `v3.12.3` [Doc/library/importlib.rst:959-970](https://github.com/python/cpython/blob/v3.12.3/Doc/library/importlib.rst#L959)
@@ -1295,3 +1297,55 @@ only `resolver_instruction` and the resolver skill's enumerated refusal list. Do
 and evidence hunks record these corrections and actual returned checks. No import
 guard, startup control, public-entry behavior, advisory enforcement or addition 2
 changes are part of R4. Registration remains the final repository mutation.
+
+### R5 delta corrections (2026-10-05)
+
+The r4 delta verdict accepts with zero P1 and two P2 findings. R5 starts at
+`0e2610d664484f7736ca3ff2ff61a83126520a20` and repairs both.
+
+The first finding exposed instruction definitions that the basename inventory missed.
+At this pin, the [Claude installer:152-170](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/tools/adoption/install_claude_profile.py#L152)
+copies every `adoption/agents/claude/*.md`; [its contract:29-35](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/tools/adoption/install_claude_profile.py#L29)
+states that agent copies are always refreshed. These bodies are instructions, with
+[model/tool frontmatter in the Claude definition:1-9](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/adoption/agents/claude/stack-researcher.md#L1).
+The [Codex installer:595-604](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/tools/adoption/apply_codex_lane.py#L595)
+selects both ordinary and worker roles; [its pins:1234-1236](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/tools/adoption/apply_codex_lane.py#L1234)
+come from `SHA256SUMS` in those same source directories. The
+[role body:14](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/adoption/agents/codex/stack-researcher.toml#L14)
+is `developer_instructions`. The prior policy protected the role addenda while leaving
+these definitions and their source pins editable; that inventory claim was incomplete.
+
+Adopt the reviewer's first option: independently refuse the entire
+component-bounded `adoption/agents/` prefix as `instruction_file`, including its exact
+entry, all descendants, new definitions and pin files. Reuse the gate's existing
+casefold/NFC/NFKC aliases and semantic component normalization for HFS-ignorable
+characters and NTFS trailing-dot/space/ADS forms. This avoids enumerating every
+definition basename or relying on CI parity tests. The alternative of documenting a
+manual never-own precondition leaves a cheap deterministic refusal unimplemented.
+Native add/modify/delete fixtures for a Claude definition, Codex role, new Markdown
+definition and `SHA256SUMS` pass the unchanged r4 gate and refuse after repair; eight
+alias/nested/exact-prefix additions do likewise. Four component-boundary positives
+remain editable, including `adoption/agents-other/`; adoption is not a blanket prefix.
+
+The second finding exposed a vacuous documentation regression:
+`codex.agents.template.md` satisfied substring containment for `agents.template.md`,
+and extra names escaped the one-way check. Parse the skill's backticked instruction
+list and the generated instruction's comma-separated list, then assert set equality
+with `INSTRUCTION_FILE_NAMES` plus `INSTRUCTION_PATH_PREFIXES`. Removing only
+`AGENTS.template.md` from a scratch skill leaves the old test green and makes the new
+test fail. Extra-name and generated-instruction omission controls also fail; restoring
+the complete lists passes. Existing source-derived refusal-rule and receipt-partition
+checks remain in the same test. The prefix retains the existing unnamed receipt
+category and code/count-only projection.
+
+Gate-only hunks are the prefix inventory/predicate in `push_gate.py` and the three
+native fixture tests in `tests/test_runtime_worker_openhands_push_gate.py`.
+Instruction/enablement hunks are only `resolver_instruction`, the resolver skill's
+refusal list, and the parsed-list protocol regression in
+`tests/test_runtime_worker_openhands_resolver.py`. Documentation/evidence hunks are
+RESOLVER.md's inventory, this correction and the appended fail-first receipt.
+The public entry, startup self-test and addition 2 are unchanged. A changed installation
+source outside the protected inventory or a demonstrated false pass reopens this
+boundary under the existing fork-isolation overturn. Registration remains the final
+repository mutation; the receipt distinguishes the sandbox's gitleaks lock failure
+from the passing repair controls.

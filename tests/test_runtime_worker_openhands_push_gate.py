@@ -1453,6 +1453,58 @@ class OwnedPathGateTests(unittest.TestCase):
                 self.observe(control, record)
                 self.assertEqual(record["status"], "pass")
 
+    def test_adoption_agents_add_modify_delete_refuse_even_when_owned(self):
+        # At 0e2610d66, install_claude_profile.py:152-170 installs every
+        # adoption/agents/claude/*.md; apply_codex_lane.py:595-604,1234-1236
+        # installs Codex roles with pins from the same tree. Reserve the
+        # entire prefix, including future definitions and the pin files.
+        paths = {
+            "claude": "adoption/agents/claude/stack-researcher.md",
+            "codex": "adoption/agents/codex/stack-researcher.toml",
+            "new_definition": "adoption/agents/claude/general-purpose.md",
+            "pins": "adoption/agents/codex/SHA256SUMS",
+        }
+        fixture = GateFixture(self.tmp / "adoption-agents-existing", dict.fromkeys(paths.values(), "fixture\n"),
+                              source=self.fixture.trusted)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for carrier, path in paths.items():
+            for operation, current, data in (("add", self.fixture, "added\n"),
+                                              ("modify", fixture, "changed\n"), ("delete", fixture, None)):
+                control = f"adoption_agents_{carrier}_{operation}"
+                with self.subTest(control=control), contextlib.redirect_stderr(io.StringIO()):
+                    clone, head = current.agent_commit({path: data})
+                    selected_gate = self.gate if current is self.fixture else gate
+                    record = selected_gate.check(str(clone), base=current.base, head=head,
+                                                 owned_paths=("adoption/agents",))
+                    self.observe(control, record)
+                    self.assertEqual(record["status"], "fail")
+                    self.assertIn("instruction_file", record["reasons"])
+
+    def test_adoption_agents_prefix_aliases_refuse_even_when_owned(self):
+        paths = (
+            "AdOpTiOn/AgEnTs/claude/new.md",
+            "\uff41doption/\uff41gents/claude/new.md",
+            "adoption\uff0fagents/claude/new.md",
+            "adop\u200ction/ag\u206bents/claude/new.md",
+            "adoption. /agents. /claude/new.md",
+            "adoption:stream/agents::$DATA/claude/new.md",
+            "adoption/agents/codex/workers/new.toml",
+            "adoption/agents",
+        )
+        for path in paths:
+            with self.subTest(path=path):
+                clone, head = self.fixture.agent_commit({path: "fixture\n"})
+                self.refuse("adoption_agents_prefix_alias", clone, head, "instruction_file", (path,))
+
+    def test_adoption_agents_prefix_boundary_remains_editable(self):
+        for path in ("adoption/agents-other/new.md", "adoption/agents.toml", "adoption-other/agents/new.md",
+                     "tools/adoption/agents/new.md"):
+            with self.subTest(path=path):
+                clone, head = self.fixture.agent_commit({path: "fixture\n"})
+                record = self.check(clone, head, (path,))
+                self.observe("adoption_agents_prefix_boundary", record)
+                self.assertEqual(record["status"], "pass")
+
     def test_compiled_module_artifacts_refuse_even_when_owned(self):
         # CI targets CPython v3.12.3 (.github/workflows/validate.yml:227-228).
         # Its Lib/importlib/_bootstrap_external.py:1724-1732 tries extensions

@@ -324,12 +324,22 @@ class IssueSelectionTests(unittest.TestCase):
             phrases.update((gate.AGENT_RULE_PHRASES[rule],) if rule in gate.AGENT_RULE_PHRASES
                            else unnamed_phrases[rule])
         phrases.update(gate.MODULE_ARTIFACT_SUFFIXES)
-        phrases.update(gate.INSTRUCTION_FILE_NAMES)
         skill_refusals = skill.split("## What the push gate refuses\n", 1)[1].split("\n## Workflow", 1)[0]
         for phrase in sorted(phrases):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase.casefold(), " ".join(skill_refusals.split()).casefold())
                 self.assertIn(phrase.casefold(), " ".join(instruction.split()).casefold())
+        # Parse the actual lists: codex.AGENTS.template.md must not satisfy a
+        # missing AGENTS.template.md, and an extra name must fail too.
+        expected = set(gate.INSTRUCTION_FILE_NAMES) | set(gate.INSTRUCTION_PATH_PREFIXES)
+        skill_list = skill_refusals.split("- instruction files (`instruction_file`)", 1)[1].split("\n- ", 1)[0]
+        skill_names = {name.casefold().rstrip("/") for name in re.findall(r"`([^`]+)`", skill_list)}
+        instruction_list = instruction.split("Instruction files (instruction_file)", 1)[1].split(": ", 1)[1]
+        instruction_list = instruction_list.split(". ", 1)[0].replace(" and ", ", ")
+        instruction_names = {name.strip().casefold().rstrip("/") for name in instruction_list.split(",")}
+        for source, names in (("skill", skill_names), ("generated instruction", instruction_names)):
+            with self.subTest(instruction_inventory=source):
+                self.assertEqual(names, expected)
 
 
 # -- Unit 2 helpers: fixture repositories with local git only (no network).

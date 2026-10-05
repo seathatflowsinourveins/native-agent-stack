@@ -65,11 +65,13 @@ unowned path, including either end of a rename. Even inside the owned paths, it 
 - Git semantic dot files (`git_semantic_file`) at any depth: `.git*` names including
   `.gitattributes`, `.gitignore` and `.gitconfig`, plus `.mailmap`; `.git`, `.gitmodules`
   and `.github` keep their existing refusals;
-- instruction files (`instruction_file`) at any depth: `AGENTS.md`, `AGENTS.override.md`,
+- instruction files (`instruction_file`), by basename at any depth or by directory prefix:
+  `AGENTS.md`, `AGENTS.override.md`,
   `AGENTS.template.md`, `codex.AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`, `GEMINI.md`,
   `SKILL.md`, `RTK.md`, `codex-user-instructions.md`, `claude-user-instructions.md`,
   `token-lanes-block.md`, `token-lanes-block.builder.md`, `token-lanes-block.researcher.md`,
-  `token-lanes-block.reviewer.md`, `token-lanes-block.scout.md` and `token-lanes-block.verifier.md`;
+  `token-lanes-block.reviewer.md`, `token-lanes-block.scout.md`, `token-lanes-block.verifier.md`
+  and `adoption/agents/` (all Claude definitions, Codex roles and their pin files);
 - a casefold or NFC/NFKC alias of a protected path, or a collision with another changed path;
 - `.github/`: workflows, local actions, rulesets and CI requirements;
 - a file named `CODEOWNERS`, anywhere;

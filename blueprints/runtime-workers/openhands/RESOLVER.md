@@ -60,6 +60,15 @@ documents. Instruction files (`instruction_file`) also refuse at any depth: `AGE
 and `token-lanes-block.verifier.md`. The actual Codex template and all six carrier blocks
 selected by the repository's SubagentStart hook are included; `AGENTS.template.md`
 remains a conservative reserved basename.
+The component-bounded `adoption/agents/` prefix also refuses with `instruction_file`,
+including Claude definitions, Codex roles, worker roles, new definitions and their
+`SHA256SUMS` files. The
+[Claude installer at 0e2610d66](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/tools/adoption/install_claude_profile.py#L152)
+refreshes every `adoption/agents/claude/*.md`; the
+[Codex installer at the same pin](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/tools/adoption/apply_codex_lane.py#L595)
+installs roles with checksums from the same source tree. Protecting the prefix includes
+future definitions without extending the basename list; `adoption/agents-other/`
+does not match.
 These name checks include case/Unicode forms, NTFS suffix/ADS forms and Git's
 HFS-ignorable characters. So do casefold
 and NFC/NFKC aliases of protected paths and collisions between changed paths. Exceptions
@@ -75,7 +84,9 @@ compiled-artifact, Git-semantic and instruction-file classes deliberately stay u
 in receipts, retaining their refusal codes and counts.
 Their paths may contain unsafe or agent-chosen names. The protocol test derives emitted
 rules from the gate's code and checks both instruction lists for named and unnamed
-classes, the suffix/instruction-name inventories, the partition and the receipt allowlist.
+classes, the suffix inventory, the partition and the receipt allowlist. It parses each
+instruction-name/prefix list and asserts set equality with the gate inventory, detecting
+both omissions and extra names; substring containment cannot satisfy a missing entry.
 
 ### Known limits
 

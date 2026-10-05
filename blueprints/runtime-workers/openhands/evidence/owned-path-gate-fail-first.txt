@@ -335,3 +335,57 @@ Gate-only: push_gate.py instruction inventory/comment and the three native fixtu
 Instruction/enablement: resolver.py resolver_instruction wording and skills/resolver/SKILL.md enumerated refusal list. Startup self-test, import guard and public main are unchanged.
 Docs/evidence: RESOLVER.md's exact inventory; decision record's corrected template/carrier claim, already_covered disposition and R4 entry; this receipt.
 Every changed authored file is registered last. Read-only validate.py, evidence_manifest --check and current diff --check results follow in the handoff.
+
+11. R5 adoption-agent prefix and exact instruction-list regression (2026-10-05)
+
+Starting production pin: 0e2610d664484f7736ca3ff2ff61a83126520a20 (unchanged r4).
+These are local integration checks with synthetic repositories, native Git and unittest, not upstream or live resolver acceptance. No GitHub, model, provider or container call is made by these controls.
+All commands use nice -n 19 and TMPDIR=~/.cache/resr5, outside /tmp and the checkout. Full returned logs remain private in that cache. This receipt contains only control outcomes, counts and refusal codes.
+
+Native selectors (tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests):
+- test_adoption_agents_add_modify_delete_refuse_even_when_owned
+- test_adoption_agents_prefix_aliases_refuse_even_when_owned
+- test_adoption_agents_prefix_boundary_remains_editable
+Run with python3 -B -m unittest <the three selectors> -v.
+Red before production changes: exit 1; returned lines: Ran 3 tests in 6.413s; FAILED (failures=20).
+Green after the prefix predicate: exit 0; returned lines: Ran 3 tests in 2.177s; OK.
+Twelve controls use ownership of adoption/agents: add, modify and delete for a Claude definition, Codex role, new Markdown definition and SHA256SUMS. Eight additions cover case, NFKC letter and separator forms, HFS-ignorable components, NTFS trailing-dot/space and ADS components, a worker-role descendant and the exact prefix entry. Four positive boundary controls remain passing.
+
+Returned paired decisions (aggregate only identical codes/counts/outcomes; 24 native Git fixture decisions; no contents):
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_claude_add", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_claude_delete", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_claude_modify", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_codex_add", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_codex_delete", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_codex_modify", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_new_definition_add", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_new_definition_delete", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_new_definition_modify", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_pins_add", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_pins_delete", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_pins_modify", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_prefix_alias", "fixtures": 8, "owned_path_count": 1}
+{"after_reasons": [], "after_status": "pass", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "adoption_agents_prefix_boundary", "fixtures": 4, "owned_path_count": 1}
+
+Instruction-list selector:
+python3 -B -m unittest tests.test_runtime_worker_openhands_resolver.IssueSelectionTests.test_emitted_gate_path_rules_match_instruction_and_receipt_policy -v
+Scratch source: git archive of 0e2610d66 outside the checkout. Remove only the distinct AGENTS.template.md token from SKILL.md; preserve codex.AGENTS.template.md.
+Old checker on this mutation: exit 0; Ran 1 test in 0.103s; OK. This is the reproduced vacuous check, not passing protection.
+Repaired checker with complete updated lists except the same one-token skill omission: exit 1; Ran 1 test in 0.069s; FAILED (failures=1). The skill set is missing agents.template.md.
+Repaired checker with an extra skill-list token: exit 1; Ran 1 test in 0.070s; FAILED (failures=1).
+Repaired checker with only AGENTS.template.md omitted from the generated instruction: exit 1; Ran 1 test in 0.069s; FAILED (failures=1).
+Restore complete lists in scratch: exit 0; Ran 1 test in 0.067s; OK.
+In the worktree, new equality checks before adding the prefix to either agent-facing list: exit 1; Ran 1 test in 0.035s; FAILED (failures=2).
+After both lists are updated: exit 0; Ran 1 test in 0.038s; OK.
+
+Required targeted acceptance:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver tests.test_runtime_worker_openhands -v
+exit 1; returned lines: Ran 381 tests in 69.232s; FAILED (errors=1, skipped=3). No assertion failures.
+The sole error remains test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment: RuntimeError(gitleaks_failed). A clean synthetic stdin probe using the installed gitleaks wrapper returns exit 1: the runtime scan lock is on a read-only filesystem; no scan starts. The coordinator must rerun with a writable lock. The wrapper/lock is not bypassed and the test is not suppressed.
+Recorded skips remain the unavailable PyYAML parity check and two host-path subcontrols whose home-relative TMPDIR matches PRIVATE_CONTENT first. These are not passes. No new coordinator run is claimed without supplied output.
+
+Landing ownership:
+Gate-only: push_gate.py's instruction-prefix constant/comment and normalized component-boundary predicate; the three native prefix regression methods in test_runtime_worker_openhands_push_gate.py.
+Instruction/enablement: resolver.py's resolver_instruction wording; the resolver SKILL.md refusal list; the parsed-list protocol test in test_runtime_worker_openhands_resolver.py. The import guard, startup self-test and public entry behavior are unchanged.
+Docs/evidence: RESOLVER.md's prefix/inventory explanation, the decision record's R5 correction and this receipt.
+Every changed authored file is registered last. Read-only validate.py, evidence_manifest --check and git diff --check results follow in the handoff.
