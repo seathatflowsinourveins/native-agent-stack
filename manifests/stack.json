@@ -1340,10 +1340,10 @@
     {
       "id": "dagu",
       "repository": "https://github.com/dagucloud/dagu",
-      "version": "2.18.2",
+      "version": "2.16.6",
       "license": "GPL-3.0",
       "role": "Manual native research workflows and private local run history",
-      "source_pin": "v2.18.2",
+      "source_pin": "v2.16.6",
       "commands": [
         "dagu validate --dagu-home \"$RESEARCH_HOME\" \"$DAG\"",
         "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id \"$NEW_RUN_ID\" \"$DAG\"",
@@ -1368,7 +1368,7 @@
       "upstream_sources": [
         "https://github.com/dagucloud/dagu"
       ],
-      "freshness": "Selected 2.18.2 on 2026-10-05; isolated native qualification: evidence/receipts/dagu-mise-pin-qualification-20261005.json. Historical 2.16.6 host/recovery receipts and their limits remain unchanged; this pin move changes no live host."
+      "freshness": "Dated native acceptance on 2026-09-19; pins and limits retained, not an automatic latest-update policy."
     },
     {
       "id": "lean",
