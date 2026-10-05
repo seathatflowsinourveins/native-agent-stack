@@ -29,21 +29,18 @@ on:
       - 'scripts/platform_status.py'
       - 'scripts/validate_convergence.py'
       - 'scripts/release_due.py'
-      # The post-merge net (docs/decisions/2026-10-03-macos-ci-scope.md, D11): nearly every merge to main
-      # touches manifests/evidence.json, so main's push run re-runs validate-macos in full after a pull
-      # request whose validate-macos was skipped or ran only its changed test modules. Keep this entry.
+      # The post-merge net (docs/decisions/2026-10-03-macos-ci-scope.md, D11), retained by the advisory
+      # decision of 2026-10-05: nearly every merge touches manifests/evidence.json, so main's push run
+      # checks macOS portability in full. Nightly runs cover changes outside this filter. Keep this entry.
       - 'manifests/evidence.json'
       - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
       - '.github/workflows/adoption-bootstrap.yml'
       - '.github/requirements-calendar.txt'
-  # No `paths:` filter here: a required check must report on every pull_request. validate-macos reports a
-  # full result, a changed-tests result or SKIPPED, as the `changes` job decides
-  # (docs/decisions/2026-10-03-macos-ci-scope.md). A path-filtered workflow would leave the required check
-  # "Expected -- Waiting for status" instead (docs/decisions/2026-09-22-github-automation-closure.md,
-  # "validate-macos required (2026-09-25)").
+  # Keep pull_request for the changes detector and path-gated Linux bootstrap.
+  # All three macOS jobs skip this event (docs/decisions/2026-10-05-macos-ci-advisory.md).
   pull_request:
   schedule:
-    - cron: '47 6 * * 1' # Weekly Monday 06:47 UTC re-check of live pinned downloads.
+    - cron: '47 6 * * *' # Nightly 06:47 UTC re-check of live pinned downloads and macOS portability.
   workflow_dispatch:
 
 # No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md). cache-mode is set
@@ -61,17 +58,13 @@ jobs:
   # plain git (no third-party action) and writes three outputs (docs/decisions/2026-10-03-macos-ci-scope.md):
   # - bootstrap: a path in PATTERNS changed. PATTERNS must stay identical (up to the `**`-vs-`*` glob
   #   spelling) to the `push:` trigger's `paths:` list; tests/test_workflow_hardening.py asserts that.
-  # - macos: a path in MACOS_PATTERNS changed, or a tests/ path other than a top-level test module (a
-  #   helper, fixture, data file or nested path). validate-macos then runs in full, and bootstrap-macos
-  #   and bootstrap-macos-brew run when bootstrap is also true.
-  # - macos_tests: when macos is false, the top-level test modules (tests.test_*) the PR changed and did
-  #   not delete. validate-macos runs only those. With macos false and macos_tests empty, validate-macos
-  #   is skipped, which records the PR as untested on macOS, not passed.
+  # - macos and macos_tests: retain the historical macOS path classification and changed-test selection
+  #   of the 2026-10-03 decision for its measurements and controls. They no longer enable any macOS job
+  #   on a pull_request; macOS CI is advisory and runs only on push, schedule and workflow_dispatch.
   # It fails safe: every failure path below (a missing payload SHA, mktemp, a failed `git diff`) calls
   # fail_safe, which writes bootstrap=true and macos=true. `macos` is always the last output written, so a
-  # step that stops part way leaves it empty, and the needs-gated jobs below read an empty output as full
-  # (`!= 'false'`, never `== 'true'`). validate-macos also reads `needs.changes.result`: a `changes` job that
-  # did not succeed runs it in full whatever outputs it wrote. The bootstrap-* jobs read the outputs only.
+  # step that stops part way leaves it empty. bootstrap-linux treats an empty bootstrap output as enabled
+  # (`!= 'false'`, never `== 'true'`). The macOS job-level conditions exclude every pull_request outright.
   changes:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
@@ -104,8 +97,8 @@ jobs:
           # so errexit is on unless disabled here. `set +e` turns it off: every
           # failure path below must still reach fail_safe instead of exiting
           # before writing an output, which is what left the three bootstrap-*
-          # jobs silently skipped (dispatch run 36085789483,
-          # "validate-macos required (2026-09-25)" below).
+          # jobs silently skipped (dispatch run 36085789483, recorded in
+          # docs/decisions/2026-09-22-github-automation-closure.md, "validate-macos required (2026-09-25)").
           set +e
           set -uo pipefail
           # The C locale keeps the module-name regex and `tr` ranges below ASCII-only.
@@ -118,10 +111,10 @@ jobs:
               echo "bootstrap=true"
               echo "macos=true"
             } >> "$GITHUB_OUTPUT"
-            echo "validate-macos: full mode (the changes job failed safe; see its warning)." >> "$summary"
+            echo "Historical validate-macos selection: full mode (the changes job failed safe; see its warning). macOS CI is advisory and skipped on pull requests." >> "$summary"
           }
           # Keep in sync with the push trigger's `paths:` list above (also this
-          # job's own file, so an edit to this job re-runs bootstrap-linux/macos).
+          # job's own file, so an edit re-runs Linux on PRs and all bootstraps on main pushes).
           PATTERNS=(
             'adoption/*'
             'tools/adoption/*'
@@ -321,7 +314,7 @@ jobs:
           if [ "$macos" = false ] && [ "$tests_other" = true ]; then macos=true; fi
           macos_tests=""
           if [ "$macos" = false ]; then macos_tests="${test_modules# }"; fi
-          # `macos` last: a step that stops before writing it leaves it empty, which reads as full mode.
+          # `macos` last preserves the historical selector's fail-safe full-mode output.
           {
             echo "macos_tests=$macos_tests"
             echo "bootstrap=$match"
@@ -334,11 +327,12 @@ jobs:
           else
             mode=skip
           fi
-          echo "bootstrap-relevant path changed: $match; validate-macos mode: $mode${macos_tests:+ ($macos_tests)}"
+          echo "bootstrap-relevant path changed: $match; historical validate-macos mode: $mode${macos_tests:+ ($macos_tests)}"
           {
+            echo "macOS CI is advisory: all macOS jobs are skipped on pull requests, untested, not passed (docs/decisions/2026-10-05-macos-ci-advisory.md)."
             case "$mode" in
               full)
-                echo "### validate-macos: full mode"
+                echo "### Historical validate-macos selection: full mode"
                 if [ "$macos_count" -gt 0 ]; then
                   echo "Mac-relevant paths changed (MACOS_PATTERNS, docs/decisions/2026-10-03-macos-ci-scope.md):"
                   printf '%s' "$macos_paths"
@@ -348,13 +342,13 @@ jobs:
                   echo "A tests/ path other than a top-level test module changed (a helper, fixture, data file or nested path)."
                 fi ;;
               changed-tests)
-                echo "### validate-macos: changed-tests mode"
-                echo "No Mac-relevant path changed. validate-macos runs only these changed test modules on macos-15: $macos_tests."
-                echo "The full suite will not run: a pass is a scoped result, not a macOS full-suite pass."
+                echo "### Historical validate-macos selection: changed-tests mode"
+                echo "No Mac-relevant path changed. The historical selector chooses these changed test modules: $macos_tests."
+                echo "This selection does not run a macOS job on the pull request."
                 ;;
               *)
-                echo "### validate-macos: skipped"
-                echo "skipped: no Mac-relevant change; this is not a macOS pass. No listed path and no test module changed (docs/decisions/2026-10-03-macos-ci-scope.md), so validate-macos is skipped: untested, not passed. Main's push run covers it after merge."
+                echo "### Historical validate-macos selection: skipped"
+                echo "No listed Mac-relevant path and no test module changed. Main pushes selected by the workflow's paths filter and nightly runs check macOS portability."
                 ;;
             esac
           } >> "$summary"
@@ -449,18 +443,15 @@ jobs:
   # own log reports" below and adoption/platforms/macos-arm64.md.
   bootstrap-macos:
     needs: changes
-    # See bootstrap-linux's own comment above for why `!cancelled()` and `!= 'false'`
-    # (not a bare `if:` and `== 'true'`) are both required for this job to still run on
-    # push, schedule and workflow_dispatch. On pull_request it also needs `macos != 'false'`:
-    # it runs only when validate-macos runs in full (B+, docs/decisions/2026-10-03-macos-ci-scope.md,
-    # D5), never in changed-tests mode or when validate-macos is skipped.
-    if: ${{ !cancelled() && (github.event_name != 'pull_request' || (needs.changes.outputs.bootstrap != 'false' && needs.changes.outputs.macos != 'false')) }}
+    # Advisory only: no pull_request can enable this job. !cancelled() replaces the implicit success()
+    # from needs: changes, which is skipped on push, schedule and workflow_dispatch.
+    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
     runs-on: macos-15
     timeout-minutes: 30
     permissions:
       contents: read
     # No cache-mode: the save step below runs on push, schedule and workflow_dispatch only, and cache-mode takes no
-    # expression, so the job keeps GitHub's trigger default; a pull_request run only restores.
+    # expression, so the job keeps GitHub's trigger default. The whole job skips pull_request.
     steps:
       # step-security/harden-runner's pinned version supports macOS runners
       # in audit mode (its README: "GitHub-hosted runners (Windows, macOS):
@@ -761,10 +752,9 @@ jobs:
   # no native client.
   bootstrap-macos-brew:
     needs: changes
-    # See bootstrap-linux's own comment above for why `!cancelled()` and `!= 'false'`
-    # (not a bare `if:` and `== 'true'`) are both required for this job to still run on
-    # push, schedule and workflow_dispatch, and bootstrap-macos's for the `macos != 'false'` term (B+).
-    if: ${{ !cancelled() && (github.event_name != 'pull_request' || (needs.changes.outputs.bootstrap != 'false' && needs.changes.outputs.macos != 'false')) }}
+    # Same advisory event rule as bootstrap-macos; the status function keeps non-PR runs reachable
+    # even though changes is skipped there.
+    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
     runs-on: macos-15
     timeout-minutes: 30
     permissions:
@@ -827,18 +817,16 @@ jobs:
   # bootstrap script but never the repository's own Python tooling on macOS.
   # No account sign-in, no live provider call.
   #
-  # Required check (.github/main-ruleset.json). On pull_request it runs full, changed-tests or not at all, as
-  # `changes` decides (docs/decisions/2026-10-03-macos-ci-scope.md); off pull_request it always runs full.
-  # A skipped run is untested, not passed; a changed-tests run is a scoped result, not a full-suite pass.
-  # A job skipped by its own `if:` reports success to a required check, while a workflow skipped by a
-  # `paths:` filter leaves it pending, so the pull_request trigger above keeps no `paths:` filter.
+  # Advisory portability coverage (docs/decisions/2026-10-05-macos-ci-advisory.md), never a PR requirement.
+  # Main pushes matching the workflow's paths filter, nightly schedules and dispatches run in full.
+  # GitHub's job if and schedule semantics:
+  # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idif
+  # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
   validate-macos:
     needs: changes
-    # !cancelled() replaces the implicit success() of `needs` (changes is skipped off pull_request, and a
-    # failed changes job must still run this job). A `changes` result other than success runs the full job
-    # whatever outputs it wrote: outputs and result are separate properties of `needs.<job_id>`, and a job can
-    # write its outputs before it fails. `!= 'false'`, never `== 'true'`: an empty output runs the full job.
-    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.result != 'success' || needs.changes.outputs.macos != 'false' || needs.changes.outputs.macos_tests != '') }}
+    # !cancelled() replaces the implicit success() of needs: changes, which skips off pull_request.
+    # The event guard excludes every PR, including one whose changes job failed or returned full mode.
+    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
     runs-on: macos-15
     # Raised from 30 to 60 on 2026-09-29: after #502 this job took 1148s in run 36572588263 (limit 1800s) and
     # the #381 token-E2E tooling still to merge adds an estimated 900 to 1300s of tests on this slower runner.
@@ -847,8 +835,8 @@ jobs:
       contents: read
     cache-mode: none
     env:
-      # 'full' is the fallback branch: only a pull_request whose changes job succeeded and wrote macos=false runs
-      # changed-tests.
+      # Retain the historical mode selector and guarded steps; every event allowed by the job if chooses full.
+      # Its changed-tests branch is unreachable because the whole job skips pull_request.
       VALIDATE_MACOS_MODE: ${{ (github.event_name == 'pull_request' && needs.changes.result == 'success' && needs.changes.outputs.macos == 'false') && 'changed-tests' || 'full' }}
     steps:
       - name: Harden the runner (audit-only network egress)
