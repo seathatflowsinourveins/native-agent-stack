@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "lane": "foundation",
+  "unit": "J-F9DRIFT",
+  "base_commit": "424b8a778222ae8857aade42c49ae6f7a13b3138",
+  "reported_defect_pin": "2d849ba1fe1b879144cfa470f0514d3ac3b8e487",
+  "decision": "docs/decisions/2026-10-05-codex-profile-drift-check.md",
+  "scope": {
+    "acceptance": "repository comparison and verification with synthetic profiles and client stubs",
+    "host_report": "The co-op reported four OmniRoute profile keys differing from its render; this unit did not reread that host profile.",
+    "host_configuration_reads": false,
+    "host_configuration_writes": false,
+    "new_provider_sessions": 0,
+    "unchanged_upstream_test_suites_run": false,
+    "scratch": "owned private cache outside every checkout and outside shared tmpfs",
+    "test_environment": ["TMPDIR points to the owned cache", "PYTHONDONTWRITEBYTECODE=1"]
+  },
+  "source_review": [
+    {
+      "source": "native-agent-stack@2d849ba1fe1b879144cfa470f0514d3ac3b8e487:tools/adoption/new_wsl_client_config.py:1475-1521",
+      "finding": "Check validates repository wiring without comparing installed profile files."
+    },
+    {
+      "source": "native-agent-stack@2d849ba1fe1b879144cfa470f0514d3ac3b8e487:tools/adoption/new_wsl_client_config.py:2409-2437",
+      "finding": "Profiles are create-only; a differing existing file is preserved, but no creation yields a current outcome."
+    },
+    {
+      "source": "native-agent-stack@2d849ba1fe1b879144cfa470f0514d3ac3b8e487:tools/adoption/new_wsl_client_config.py:2452-2467",
+      "finding": "Apply verification checks login-shell resolution, without profile drift comparison."
+    },
+    {
+      "source": "native-agent-stack@2d849ba1fe1b879144cfa470f0514d3ac3b8e487:tools/adoption/new_wsl_client_config.py:1567-1573,1626-1661",
+      "finding": "Reuse typed equality and missing/conflicting paths from the existing additive merge; its expected tree deliberately preserves operator values."
+    },
+    {
+      "source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/config/src/loader/mod.rs:286-333",
+      "finding": "Profile-v2 loads as an override layer above base user configuration."
+    },
+    {
+      "source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/config/src/merge.rs:96-149",
+      "finding": "Tables merge recursively and non-table values override."
+    },
+    {
+      "source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/app-server-protocol/src/protocol/v2/config.rs:389-407",
+      "finding": "Native config/read has no expected-render input."
+    },
+    {
+      "source": "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+      "finding": "Expected-render comparison not found in these release notes or installed top-level, doctor and debug help."
+    },
+    {
+      "source": "https://docs.python.org/3.11/library/tomllib.html#conversion-table",
+      "finding": "Use maintained stdlib TOML parsing, preserving typed values."
+    },
+    {
+      "source": "python/cpython@v3.11.17:Lib/pathlib.py:1230-1238",
+      "finding": "exists() can propagate permission errors; keep it inside the exception-class-only diagnostic handler."
+    }
+  ],
+  "executions": [
+    {
+      "phase": "installed-client metadata",
+      "evidence_class": "native_proven",
+      "commands": ["codex --version", "codex --help"],
+      "exit_codes": [0, 0],
+      "observation": "codex-cli 0.160.0; profile-v2 override described in top-level help",
+      "limit": "Public CLI metadata only; no login, native session, model call or host acceptance."
+    },
+    {
+      "phase": "scratch placement correction",
+      "evidence_class": "local_integration",
+      "exit_code": 1,
+      "observation": "tests/__init__.py rejected checkout-local TMPDIR before any test ran. Moved scratch to owned external cache."
+    },
+    {
+      "phase": "red defect reproduction",
+      "evidence_class": "synthetic",
+      "command": "python3 -m unittest tests.test_new_wsl_client_config.CodexProfileDriftTests -v",
+      "exit_code": 1,
+      "tests": 3,
+      "failures": 2,
+      "observation": "Both drift check and apply verification returned success against a differing profile; matching case passed."
+    },
+    {
+      "phase": "initial focused repair",
+      "evidence_class": "synthetic",
+      "command": "python3 -m unittest tests.test_new_wsl_client_config.CodexProfileDriftTests -v",
+      "exit_code": 0,
+      "tests": 3
+    },
+    {
+      "phase": "existing expectation correction",
+      "evidence_class": "local_integration",
+      "command": "python3 -m unittest tests.test_new_wsl_client_config -q",
+      "exit_code": 1,
+      "tests": 190,
+      "failures": 4,
+      "duration_seconds": 61.555,
+      "observation": "Four prior assertions expected success after preserving profiles missing rendered keys. Updated exit expectations while retaining preservation assertions."
+    },
+    {
+      "phase": "focused authorization and preservation integration",
+      "evidence_class": "local_integration",
+      "command": "python3 -m unittest tests.test_new_wsl_client_config.CodexProfileDriftTests tests.test_new_wsl_client_config.AuthorizationTests tests.test_new_wsl_client_config.ApplyTests.test_a_differing_profile_file_is_never_overwritten_while_an_existing_config_is_merged -q",
+      "exit_code": 0,
+      "tests": 31,
+      "duration_seconds": 32.769
+    },
+    {
+      "phase": "full module before permission-error regression",
+      "evidence_class": "local_integration",
+      "command": "python3 -m unittest tests.test_new_wsl_client_config -q",
+      "exit_code": 0,
+      "tests": 192,
+      "duration_seconds": 66.681
+    },
+    {
+      "phase": "final module with permission-error regression",
+      "evidence_class": "local_integration",
+      "fixture_class": "synthetic",
+      "command": "python3 -m unittest tests.test_new_wsl_client_config -q",
+      "exit_code": 0,
+      "tests": 193,
+      "duration_seconds": 64.098,
+      "returned_output": "Ran 193 tests in 64.098s\n\nOK"
+    },
+    {
+      "phase": "registry interface correction",
+      "evidence_class": "local_integration",
+      "command": "python3 scripts/host_receipts.py register_file --help",
+      "exit_code": 2,
+      "observation": "register_file is the existing Python API, not a CLI subcommand; use docs/lanes.md:106-107's documented API invocation."
+    },
+    {
+      "phase": "hot-file derived reports",
+      "evidence_class": "local_integration",
+      "commands": ["python3 scripts/component_matrix.py --write", "python3 scripts/new_host_grand_list.py --write"],
+      "exit_codes": [0, 0],
+      "observation": "Both reports remain unchanged; only the four files for this unit alter registry entries."
+    },
+    {
+      "phase": "repository integrity and scope",
+      "evidence_class": "local_integration",
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_output": "{\"components\": 69, \"hashed_files\": 10240, \"profiles\": 4, \"receipts\": 208, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution."
+    }
+  ],
+  "comparison_contract": {
+    "host_check": "--check --host NAME [--home DIR]",
+    "repository_check": "--check without --host remains structural and reads no installed profile",
+    "compared_profiles": ["stack-worker.config.toml", "omniroute.config.toml"],
+    "reported_drift_keys_in_fixture": ["features.standalone_web_search", "model", "model_reasoning_effort", "web_search"],
+    "operator_only_keys": "ignored",
+    "authorization_comparison": "included only with the existing --with-authorization-settings flag",
+    "apply": "create-only profiles retained; codex-files reports drifted and default verify fails on mismatches",
+    "skip": "explicit codex-files skip omits its profile verification",
+    "diagnostics": "profile basenames, render-owned dotted key names, exception classes; no values or host paths",
+    "claims_excluded": ["effective running-session configuration", "MCP availability", "upstream native test acceptance", "provider acceptance", "host repair"]
+  },
+  "independent_review": {
+    "evidence_class": "source_review",
+    "kind": "read-only static review by a separate bounded GPT agent",
+    "finding": "Permission errors from exists() needed to remain inside the sanitizing handler; repaired with a focused regression test. Final completeness critic approved the bounded implementation with no additional candidate-class or behavior gap. Its receipt-link and CLI-wording closure notes were completed before commit.",
+    "cross_family_acceptance": "pending command-center Claude read; PR stays draft"
+  }
+}

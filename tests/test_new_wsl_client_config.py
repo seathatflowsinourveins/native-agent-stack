@@ -1933,6 +1933,108 @@ class ApplyCase(unittest.TestCase):
         write_exe(self.home / ".local/share/mise/shims/qmd", "#!/bin/sh\necho qmd\n")
 
 
+class CodexProfileDriftTests(ApplyCase):
+    """Synthetic profile files exercise the real check and apply verification; no native account is read."""
+
+    def setUp(self):
+        super().setUp()
+        results, manifest, plan, errors, _ = cfg.analyse(ROOT)
+        self.assertEqual(errors, [])
+        values = cfg.host_values(EXAMPLE_HOST, plan, self.home, cfg.wired_path_dirs(results))
+        files = cfg.render(ROOT, results, plan, values, manifest)
+        self.results, self.files = results, files
+        self.profiles = {}
+        for name in ("stack-worker", "omniroute"):
+            target = self.home / ".codex" / f"{name}.config.toml"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(files[f"codex.{name}.config.toml"], encoding="utf-8")
+            self.profiles[name] = target
+
+    def check(self, *extra):
+        return run_main("--check", "--host", EXAMPLE_HOST, "--home", str(self.home), *extra)
+
+    def drift(self):
+        target = self.profiles["omniroute"]
+        data = tomllib.loads(target.read_text())
+        data.update(model="cx/gpt-6-astra", model_reasoning_effort="max", web_search="live")
+        data["features"]["standalone_web_search"] = True
+        target.write_text(cfg.emit_toml(data, "# operator profile\n"), encoding="utf-8")
+        return target.read_bytes()
+
+    def test_check_reports_drifted_profile_keys_without_values_or_writes(self):
+        before = self.drift()
+        for mode in ((), ("--json",), ("--markdown",)):
+            with self.subTest(mode=mode):
+                code, out, err = self.check(*mode)
+                self.assertEqual(code, 1, out[-800:])
+                for key in ("model", "model_reasoning_effort", "web_search", "features.standalone_web_search"):
+                    self.assertIn(key, err)
+                self.assertIn("omniroute.config.toml", err)
+                self.assertNotIn("cx/gpt-6-astra", err)
+                self.assertEqual(self.profiles["omniroute"].read_bytes(), before)
+                if mode == ("--json",):
+                    json.loads(out)  # Diagnostics must leave the existing JSON table parseable.
+        self.assertFalse(self.marker.exists())
+
+    def test_missing_rendered_keys_and_invalid_toml_fail_without_echoing_content(self):
+        target = self.profiles["omniroute"]
+        data = tomllib.loads(target.read_text())
+        del data["web_search"]
+        target.write_text(cfg.emit_toml(data, ""), encoding="utf-8")
+        code, _, err = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("web_search", err)
+        before = "model = 'synthetic-private-sentinel\n"
+        target.write_text(before, encoding="utf-8")
+        code, _, err = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("TOMLDecodeError", err)
+        self.assertNotIn("synthetic-private-sentinel", err)
+        self.assertEqual(target.read_text(), before)
+
+    def test_check_authorization_scope_matches_the_explicit_render_option(self):
+        code, _, err = self.check("--with-authorization-settings")
+        self.assertEqual(code, 1)
+        self.assertIn("mcp_servers.ai-memory.default_tools_approval_mode", err)
+        self.assertIn("mcp_servers.headroom.default_tools_approval_mode", err)
+        self.assertIn("mcp_servers.socraticode.default_tools_approval_mode", err)
+
+    def test_permission_errors_do_not_echo_host_paths_or_os_messages(self):
+        with mock.patch.object(Path, "exists", side_effect=PermissionError("synthetic-private-path")):
+            errors = cfg.codex_profile_errors(self.results, self.files, self.home / ".codex")
+        self.assertEqual(len(errors), 2)
+        for error in errors:
+            self.assertIn("PermissionError", error)
+            self.assertNotIn("synthetic-private-path", error)
+            self.assertNotIn(str(self.home), error)
+
+    def test_matching_profile_keys_pass_with_operator_extras_and_formatting(self):
+        with self.profiles["omniroute"].open("a", encoding="utf-8") as stream:
+            stream.write("\n# Operator-owned extra table is outside the render.\n[operator_only]\nkeep = true\n")
+        before = tree(self.home)
+        code, out, err = self.check()
+        self.assertEqual((code, err), (0, ""), out[-800:])
+        self.assertEqual(tree(self.home), before)
+        self.assertFalse(self.marker.exists())
+
+    def test_apply_verify_reports_profile_drift_while_merge_keeps_operator_values(self):
+        self.installed_state()
+        before = self.drift()
+        config = self.home / ".codex/config.toml"
+        config.write_text("model = 'operator-base-model'\n[features]\ndaemon_auto_start = false\n", encoding="utf-8")
+        code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertEqual(tomllib.loads(config.read_text())["model"], "operator-base-model")
+        self.assertIn("mcp_servers", tomllib.loads(config.read_text()))
+        self.assertEqual(self.profiles["omniroute"].read_bytes(), before)
+        self.assertIn("codex-files drifted", out.split("summary: ")[1])
+        self.assertIn("verify failed", out.split("summary: ")[1])
+        verify = "\n".join(line for line in out.splitlines() if line.startswith("verify:"))
+        self.assertIn("omniroute.config.toml", verify)
+        self.assertIn("model_reasoning_effort", verify)
+        self.assertNotIn("cx/gpt-6-astra", verify)
+
+
 class ApplyTests(ApplyCase):
     def test_apply_keeps_the_owned_skill_listing_fraction_and_host_only_settings(self):
         self.installed_state()
@@ -2198,7 +2300,8 @@ class ApplyTests(ApplyCase):
         (codex / "config.toml").write_text("model = 'mine'\n[features]\ndaemon_auto_start = false\n", encoding="utf-8")
         (codex / "stack-worker.config.toml").write_text("model = 'mine'\n", encoding="utf-8")
         code, out, _ = self.apply()
-        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(code, 1, out[-800:])  # Kept profile values now fail verification instead of passing as current.
+        self.assertIn("verify failed", out.split("summary: ")[1])
         config = tomllib.loads((codex / "config.toml").read_text())
         self.assertEqual(config["model"], "mine")                       # the file's own value stays
         self.assertIs(config["features"]["daemon_auto_start"], False)
@@ -2494,9 +2597,10 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual([name for name, server in config["mcp_servers"].items() if "default_tools_approval_mode" in server],
                          [])
         self.assertEqual(self.authorization_line(out), self.DEFAULT_LINE)
-        # Negative control: the same home with the option gets every one, in both clients and the stack-worker profile.
+        # The same home with the option gains authorization in the merged files, but its create-only profile stays.
         code, out, _ = self.apply(self.OPTION)
-        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(code, 1, out[-800:])
+        self.assertIn("verify failed", out.split("summary: ")[1])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         config = tomllib.loads((self.home / ".codex/config.toml").read_text())
         self.assertEqual(settings["permissions"]["defaultMode"], "bypassPermissions")
@@ -2511,7 +2615,7 @@ class AuthorizationTests(ApplyCase):
                                f"{self.CODEX_CONFIG}; kept your value: {self.STACK_WORKER})")
         # A second run with the option has nothing left to add: the settings are the same, and the line says kept.
         code, out, _ = self.apply(self.OPTION)
-        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(code, 1, out[-800:])  # Missing rendered profile authorization keys remain reported.
         line = self.authorization_line(out)
         self.assertEqual(line, f"authorization settings: kept (--with-authorization-settings; kept your value: "
                                f"{self.STACK_WORKER}; already the same: {self.ADDED_CLAUDE[len('added: '):]}, "
@@ -2555,7 +2659,7 @@ class AuthorizationTests(ApplyCase):
         for extra, present in (((), False), ((self.OPTION,), True)):
             with self.subTest(option=bool(extra)):
                 code, out, _ = self.apply(*extra)
-                self.assertEqual(code, 0, out[-800:])
+                self.assertEqual(code, int(present), out[-800:])  # The pre-existing profile stays without these keys.
                 settings = json.loads((self.home / ".claude/settings.json").read_text())
                 config = tomllib.loads((self.home / ".codex/config.toml").read_text())
                 self.assertEqual("defaultMode" in settings["permissions"], present)
@@ -2576,7 +2680,7 @@ class AuthorizationTests(ApplyCase):
         for extra in ((), (self.OPTION,), ()):
             with self.subTest(option=bool(extra)):
                 code, out, _ = self.apply(*extra)
-                self.assertEqual(code, 0, out[-800:])
+                self.assertEqual(code, int(bool(extra)), out[-800:])
                 settings = json.loads((self.home / ".claude/settings.json").read_text())
                 config = tomllib.loads((self.home / ".codex/config.toml").read_text())
                 self.assertEqual(settings["permissions"]["defaultMode"], "default")
