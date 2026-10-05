@@ -298,6 +298,10 @@ def push_gate_summary(records):
             "trusted_commit": _matching(record.get("trusted_commit"), HEX40),
             "reasons": sorted({reason for reason in record.get("reasons") or [] if _matching(reason, REASON_CODE)})
             if isinstance(record.get("reasons"), list) else [],
+            "changed_path_count": record.get("changed_path_count")
+            if type(record.get("changed_path_count")) is int and record["changed_path_count"] >= 0 else None,
+            "owned_path_count": record.get("owned_path_count")
+            if type(record.get("owned_path_count")) is int and record["owned_path_count"] >= 0 else None,
             "paths": named,
             "advisory_gate_reads": advisory_gate_reads_summary(record.get("advisory_gate_reads")),
             "unnamed_paths": len(entries) - len(named) + (omitted if type(omitted) is int and omitted > 0 else 0),

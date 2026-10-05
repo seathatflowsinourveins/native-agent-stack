@@ -1279,7 +1279,7 @@ class ResolverAttempt:
         if not isinstance(base_sha, str) or not SHA.fullmatch(base_sha):
             raise ValueError("base_sha_required")
         self.number, self.title, self.base_sha, self.branch = number, title, base_sha, branch
-        self.owned_paths = patch_policy.normalize_owned(owned_paths)
+        self.owned_paths = tuple(patch_policy.normalize_owned(owned_paths))
         self.lane, self.instruction, self.run_id = lane, instruction, run_id
         self.gh, self.git, self.gitleaks, self.gitleaks_config = gh, git, gitleaks, gitleaks_config
         # The trusted pre-push gate: by default push_gate.PushGate from this checkout's resolver/
@@ -1293,7 +1293,7 @@ class ResolverAttempt:
         self.harness = self.guard = self.clone = self.pr = self.clone_home = None
 
     def identity(self):
-        return {"issue": self.number, "base_sha": self.base_sha, "owned_paths": self.owned_paths, "lane": self.lane,
+        return {"issue": self.number, "base_sha": self.base_sha, "owned_paths": list(self.owned_paths), "lane": self.lane,
                 "run_id": self.run_id,
                 "instruction_sha256": hashlib.sha256(self.instruction.encode("utf-8")).hexdigest(),
                 "reviewer_argv_sha256": self.reviewer_argv_sha256}
@@ -1315,7 +1315,7 @@ class ResolverAttempt:
         gate = self.gate if self.gate is not None else push_gate.PushGate(git=self.git, zizmor=self.zizmor)
         self.harness = gh_harness.GhHarness(self.gh, git=self.git, base_env=self.base_env,
                                             workdir=gh_harness.private_workdir(str(private)), runner=self.runner,
-                                            guard=self.guard, push_gate=gate)
+                                            guard=self.guard, push_gate=gate, owned_paths=self.owned_paths)
         return private
 
     def _commit_message(self):

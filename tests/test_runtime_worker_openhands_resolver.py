@@ -958,8 +958,9 @@ class PassingGate:
     def __init__(self):
         self.calls = []
 
-    def check(self, clone, *, base, head, agent_trees=()):
-        self.calls.append({"clone": clone, "base": base, "head": head, "agent_trees": tuple(agent_trees)})
+    def check(self, clone, *, base, head, owned_paths=None, agent_trees=()):
+        self.calls.append({"clone": clone, "base": base, "head": head, "owned_paths": owned_paths,
+                           "agent_trees": tuple(agent_trees)})
         return {"commit": head, "base": base, "status": "pass", "reasons": [], "paths": [], "trusted_commit": "f" * 40,
                 "protected": None, "zizmor": {"version": "1.30.1", "findings": 0, "failing": []}}
 
@@ -1003,7 +1004,7 @@ class GhHarnessTests(unittest.TestCase):
 
     def harness(self, runner=subprocess.run, guard=None, base=None, gate=None):
         return self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=base or planted_base(self.home),
-                                workdir=self.workdir, runner=runner, guard=guard, push_gate=gate)
+                                workdir=self.workdir, runner=runner, guard=guard, push_gate=gate, owned_paths=("docs",))
 
     def test_child_environment_is_an_allowlist_that_drops_planted_credentials(self):
         base = planted_base(self.home, xdg=self.tmp / "xdg")
@@ -1402,7 +1403,8 @@ class GhHarnessTests(unittest.TestCase):
         self.assertEqual(harness.push(self.clone, "openhands/issue-12", base=base, head=head).returncode, 0)
         calls = self.fake.calls()
         self.assertEqual([(call["tool"], call["argv"]) for call in calls], [("git", urls[1:]), ("git", push[1:])])
-        self.assertEqual(gate.calls, [{"clone": self.clone, "base": base, "head": head, "agent_trees": ()}])
+        self.assertEqual(gate.calls, [{"clone": self.clone, "base": base, "head": head,
+                                       "owned_paths": ("docs",), "agent_trees": ()}])
         self.assertEqual([(record["status"], record["commit"]) for record in harness.gates], [("pass", head)])
         names = sorted(self.h.child_env(planted_base(self.home), gh_path=self.fake.gh, workdir=self.workdir))
         for call in calls:
@@ -1417,6 +1419,20 @@ class GhHarnessTests(unittest.TestCase):
             self.assertEqual([call["argv"] for call in self.fake.calls()], [urls[1:]])
             self.assertEqual(gate.calls, [])
 
+    def test_owned_paths_use_a_frozen_host_copy_and_ignore_environment(self):
+        base, head = "a" * 40, "c" * 40
+        source = ["docs"]
+        gate = PassingGate()
+        harness = self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=planted_base(self.home),
+                                    workdir=self.workdir, push_gate=gate, owned_paths=source)
+        source[:] = ["src"]
+        self.fake.respond(self.h.op_push_urls(self.clone)[1:], ORIGIN + "\n")
+        self.fake.respond(self.h.op_push(self.clone, "openhands/issue-12", head, gh=self.fake.gh)[1:], "")
+        with mock.patch.dict(os.environ, {"OWNED_PATHS": "src", "OPENHANDS_OWNED_PATHS": "src"}):
+            harness.push(self.clone, "openhands/issue-12", base=base, head=head)
+        self.assertEqual(harness.owned_paths, ("docs",))
+        self.assertEqual(gate.calls[0]["owned_paths"], ("docs",))
+
     def test_a_gate_record_that_is_not_a_pass_for_the_exact_commit_refuses_the_push(self):
         base, head = "a" * 40, "c" * 40
         self.fake.respond(self.h.op_push_urls(self.clone)[1:], ORIGIN + "\n")
@@ -1426,8 +1442,8 @@ class GhHarnessTests(unittest.TestCase):
                 super().__init__()
                 self.record = record
 
-            def check(self, clone, *, base, head, agent_trees=()):
-                super().check(clone, base=base, head=head, agent_trees=agent_trees)
+            def check(self, clone, *, base, head, owned_paths=None, agent_trees=()):
+                super().check(clone, base=base, head=head, owned_paths=owned_paths, agent_trees=agent_trees)
                 return self.record
 
         passing = PassingGate().check(self.clone, base=base, head=head)
@@ -2547,7 +2563,8 @@ class Stage2HarnessTests(unittest.TestCase):
 
     def harness(self, runner=subprocess.run, guard=None, gate=None):
         return self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=planted_base(self.home),
-                                workdir=self.h.private_workdir(self.tmp), runner=runner, guard=guard, push_gate=gate)
+                                workdir=self.h.private_workdir(self.tmp), runner=runner, guard=guard, push_gate=gate,
+                                owned_paths=("docs",))
 
     def test_base_and_repository_reads_are_fixed_read_only_templates(self):
         h = self.h
@@ -3613,7 +3630,7 @@ class ResolverAttemptTests(unittest.TestCase):
         self.assertEqual(github.pushes, [{"refspec": f"{head}:refs/heads/openhands/issue-12", "head": head}])
         # The trusted gate saw the exact pushed commit, its base, and the attempt's result directory.
         self.assertEqual(self.gate.calls, [{"clone": str(attempt.clone), "base": self.base, "head": head,
-                                            "agent_trees": (str(result),)}])
+                                            "owned_paths": ("docs",), "agent_trees": (str(result),)}])
         self.assertEqual([(record["status"], record["commit"]) for record in outcome["push_gate"]], [("pass", head)])
         self.assertEqual({key: outcome[key] for key in ("failure_stage", "branch", "pr", "head", "paths_changed",
                                                          "sota_sources", "patch_sha256", "writes")},

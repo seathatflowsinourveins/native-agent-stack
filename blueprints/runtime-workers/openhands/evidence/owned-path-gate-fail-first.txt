@@ -1,0 +1,141 @@
+Owned-path allowlist gate — resolver-gate-1 — 2026-10-04
+Base/main: 3b8f9c8a1b938358d65bf422f61592dc3b89407d
+Lane: foundation; builder worktree, no worktree commit or push.
+Evidence class: local integration checks and synthetic Git objects. Native git and unittest; fake zizmor for the corpus.
+No live resolver, GitHub mutation, model/provider call or new container start.
+All test commands used nice -n 19 and an absolute TMPDIR below the workspace (.tmp-build/tmp).
+
+Research sources and trusted-writer trace:
+docs/decisions/2026-09-28-openhands-resolver-isolation.md#owned-path-allowlist-adoption-2026-10-04
+Precondition: passes. CLI coordinator scope -> normalized trusted plan -> frozen attempt -> frozen harness -> exact-commit gate.
+Identity/worker artifacts and environment supply no scope input.
+
+1. Main red (the original enforcing source, not a disarmed/generated approximation):
+git archive HEAD blueprints/runtime-workers/openhands/resolver/; original bytes loaded in GateFixture trusted clones.
+OWNED_PATH_GATE_SOURCE=<workspace>/.tmp-build/upstream python3 -m unittest tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests -v
+exit 1; 12 tests; 64 negative-control assertion failures. Positive and existing RuntimeError-refusal tests pass.
+The baseline adapter omits the new owned_paths keyword only for the old signature, allowing observation of its actual pass/fail.
+Malformed path fixtures use hash-object --literally and commit-tree; git add could not safely construct them. No unsafe tree is checked out.
+Unexpected-output controls substitute only the diff-tree return bytes; actual surrounding Git trees and other gate steps stay native.
+Base and candidate commits are fixed arguments; the rename controls expose both names with --no-renames.
+
+2. Green on this change:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests tests.test_runtime_worker_openhands_push_gate.OwnedPathSemanticsTests -v
+exit 0; 15 tests; OK; 65 refusals and one owned-only pass in the returned corpus decisions.
+Both matchers agree on every native changed-path fixture plus all valid/invalid normalization fixtures.
+A planted patch_policy normalizer/matcher defect does not alter the independent gate.
+The exception boundary also refuses record construction, stderr output, KeyboardInterrupt and SystemExit failures.
+
+3. Returned decisions (codes/counts only, no file contents):
+{"after_reasons": ["absolute_path", "invalid_path_component", "unowned_path"], "after_status": "fail", "changed_path_count": 1, "control": "absolute_path", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["changed_path_collision"], "after_status": "fail", "changed_path_count": 2, "control": "case_collision", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["unowned_path"], "after_status": "fail", "changed_path_count": 2, "control": "commit_differs_from_validated_patch", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["diff_output_invalid"], "after_status": "fail", "changed_path_count": null, "control": "diff_bad_mode", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["diff_output_invalid"], "after_status": "fail", "changed_path_count": null, "control": "diff_duplicate_path", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["diff_output_invalid"], "after_status": "fail", "changed_path_count": null, "control": "diff_incomplete_pair", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["diff_output_invalid"], "after_status": "fail", "changed_path_count": null, "control": "diff_missing_nul", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["diff_output_invalid"], "after_status": "fail", "changed_path_count": null, "control": "diff_rename_status", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["diff_output_invalid"], "after_status": "fail", "changed_path_count": null, "control": "diff_unknown_status", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["diff_output_invalid"], "after_status": "fail", "changed_path_count": null, "control": "diff_zero_oid", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["absolute_path", "unowned_path"], "after_status": "fail", "changed_path_count": 1, "control": "dos_drive", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["invalid_path_component", "unowned_path"], "after_status": "fail", "changed_path_count": 1, "control": "dot", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["invalid_path_component", "unowned_path"], "after_status": "fail", "changed_path_count": 1, "control": "dotdot", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["invalid_path_component"], "after_status": "fail", "changed_path_count": 1, "control": "empty_component", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gate_error_runtimeerror"], "after_status": "fail", "changed_path_count": null, "control": "gate_exception", "main_reasons": ["gate_error_runtimeerror"], "main_status": "fail", "owned_path_count": 1}
+{"after_reasons": ["git_component", "invalid_path_component", "unowned_path"], "after_status": "fail", "changed_path_count": 1, "control": "git_backslash", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_case", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_200c", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_200d", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_200e", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_200f", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_202a", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_202b", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_202c", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_202d", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_202e", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_206a", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_206b", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_206c", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_206d", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_206e", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_206f", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_hfs_feff", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_literal", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_ntfs_ads", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_ntfs_index", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_ntfs_short", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_ntfs_short_ads", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_ntfs_short_suffix", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["git_component"], "after_status": "fail", "changed_path_count": 1, "control": "git_ntfs_suffix", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitlink"], "after_status": "fail", "changed_path_count": 1, "control": "gitlink", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "changed_path_count": 1, "control": "gitmodules", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "changed_path_count": 1, "control": "gitmodules_ads", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "changed_path_count": 1, "control": "gitmodules_case", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "changed_path_count": 1, "control": "gitmodules_fallback", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "changed_path_count": 1, "control": "gitmodules_hfs", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "changed_path_count": 1, "control": "gitmodules_ntfs", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "changed_path_count": 1, "control": "gitmodules_short_1", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "changed_path_count": 1, "control": "gitmodules_short_2", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "changed_path_count": 1, "control": "gitmodules_short_3", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "changed_path_count": 1, "control": "gitmodules_short_4", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["mode_change"], "after_status": "fail", "changed_path_count": 1, "control": "mode_change", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["owned_paths_required"], "after_status": "fail", "changed_path_count": null, "control": "owned_list_empty", "main_reasons": [], "main_status": "pass", "owned_path_count": null}
+{"after_reasons": ["invalid_owned_path"], "after_status": "fail", "changed_path_count": null, "control": "owned_list_invalid", "main_reasons": [], "main_status": "pass", "owned_path_count": null}
+{"after_reasons": ["owned_paths_required"], "after_status": "fail", "changed_path_count": null, "control": "owned_list_missing", "main_reasons": [], "main_status": "pass", "owned_path_count": null}
+{"after_reasons": [], "after_status": "pass", "changed_path_count": 1, "control": "owned_only_positive", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["protected_path_alias", "protected_path"], "after_status": "fail", "changed_path_count": 1, "control": "protected_nfkc_alias", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["unowned_path"], "after_status": "fail", "changed_path_count": 2, "control": "rename_unowned_destination", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["unowned_path"], "after_status": "fail", "changed_path_count": 2, "control": "rename_unowned_source", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["symlink"], "after_status": "fail", "changed_path_count": 1, "control": "symlink", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["symlink", "mode_change", "type_change"], "after_status": "fail", "changed_path_count": 1, "control": "type_change", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["changed_path_collision"], "after_status": "fail", "changed_path_count": 2, "control": "unicode_nfc_collision", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["changed_path_collision"], "after_status": "fail", "changed_path_count": 2, "control": "unicode_nfkc_collision", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["unowned_path"], "after_status": "fail", "changed_path_count": 1, "control": "unowned_add", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["unowned_path"], "after_status": "fail", "changed_path_count": 1, "control": "unowned_delete", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+{"after_reasons": ["unowned_path"], "after_status": "fail", "changed_path_count": 1, "control": "unowned_modify", "main_reasons": [], "main_status": "pass", "owned_path_count": 1}
+
+The RuntimeError control is green on main and green after. A red-on-main claim for that retained refusal would be false.
+The positive is pass/pass; main did not report the two new count fields.
+
+4. Preserved first combined attempt:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver tests.test_runtime_worker_openhands
+exit 1; 353 tests in 67.270s; failures=23, errors=16, skipped=3.
+Corrections: keep known protected-path receipt names by using the existing trusted-tree static-category path; update explicit count/scope expectations and public-entry expectations.
+Host private-file fixtures under the mandated in-checkout TMPDIR refuse with outside-checkout requirements (host.py:134,252, unchanged from main).
+The installed-gitleaks control returned RuntimeError(gitleaks_failed); this run alone establishes no scanner cause.
+
+5. Focused gate/driver integration before the final exception-boundary addition:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver.CommandLineTests tests.test_runtime_worker_openhands_resolver.GhHarnessTests tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests
+exit 0; 133 tests in 67.019s; OK (skipped=1).
+This run is preserved as intermediate evidence, not relabelled as final-source acceptance.
+
+6. Source integrity:
+main push_gate.py sha256=268a3b33cfdf9082454f3e5eab9db8db1beb93f5f98d529b0061543eaf7c9ff8
+main patch_policy.py sha256=fba292f3204475e0cc192bb0e30663675ffebcff309b035395fcee53468122ad
+main gate_reads.py sha256=7e5aa4f95f42dd3ad2ef905d7644cd49698b22173b81b0ada73c431891476b89
+main gh_harness.py sha256=feac3c5cd42af57c59e2234265652a7d61bc6d8445f529fffed8b05c8ce36e59
+Continuation correction: source locators were verified using LF-delimited original bytes and native Git diff, rather than general splitlines(), which treats Unicode separator literals in resolver.py as extra lines. The decision trace uses the corrected physical source lines.
+
+7. Required acceptance completed in the continuation:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver tests.test_runtime_worker_openhands
+exit 1; returned summary: Ran 359 tests in 67.631s; FAILED (failures=12, errors=16, skipped=3).
+No push-gate, CommandLineTests, GhHarnessTests or ResolverAttemptTests failures were reported in this run.
+Twenty-seven failures/errors originate in fixtures requiring private host files outside the checkout while TMPDIR is inside it. The unchanged refusals are host.py:134 (owned_mode_0600_file_outside_checkout_required) and :252 (private_host_file_must_be_outside_checkout).
+The remaining error is OutgoingGuardTests.test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment with RuntimeError(gitleaks_failed); the exact test name was verified in the returned log, and the scanner cause remains unverified.
+
+python3 -m unittest discover -s tests
+exit 1. This replacement run had no command timeout and was run once. The previous deadline-interrupted log is preserved separately and supplies no exit code.
+The replacement process returned, but its log ends with two bare "Traceback (most recent call last):" lines after error/failure progress markers. It returned no Ran/FAILED/OK summary. Test, failure and error counts are unknown; no completed unittest-summary or full-suite success is claimed.
+A workspace write probe passed after the process returned. The available log does not establish the full-suite failure's cause.
+
+Full-suite success and live-main enablement remain separate acceptance conditions; the passing fixture corpus does not satisfy them.
+
+python3 scripts/validate.py
+exit 0; returned output: {"components": 69, "hashed_files": 9961, "profiles": 4, "receipts": 199, "status": "passed"}
+Integrity and scope checks only; no live provider or GPU execution.
+python3 scripts/evidence_manifest.py --check
+exit 0; returned output: {"files": 9961, "status": "passed"}
+git diff --check
+exit 0; no output.
+These returned integrity results were recorded, then all ten authored files were registered with scripts.host_receipts.register_file as the final repository mutation. manifests/evidence.json is the generated registration container and excludes its own hash. Read-only checks after that registration are retained in the continuation's structured handoff.
+Run-generated scratch fixtures were removed after the full-suite process exited; all retained acceptance and control logs remain outside TMPDIR under .tmp-build/.
