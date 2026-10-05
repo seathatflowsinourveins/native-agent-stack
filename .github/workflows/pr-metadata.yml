@@ -51,7 +51,7 @@ jobs:
               pull_number: context.issue.number
             });
             const eventBase = context.payload.pull_request.base;
-            if (pullRequest.base.ref !== eventBase.ref || pullRequest.base.sha !== eventBase.sha) {
+            if (pullRequest.base.ref !== eventBase.ref) {
               core.setFailed('verdict-review-gate: the current PR base differs from the event base; failing closed (push a commit or close and reopen the pull request to rebuild its merge commit).');
             }
       - name: Require sealed cross-family review for changed verdict rows

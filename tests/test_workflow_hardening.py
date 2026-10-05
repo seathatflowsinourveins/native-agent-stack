@@ -596,7 +596,7 @@ class VerdictReviewGateTests(unittest.TestCase):
         self.assertNotIn("cancel-in-progress:", self.text)
 
     @unittest.skipUnless(shutil.which("node"), "node unavailable; CI's runner images carry it")
-    def test_the_current_base_check_passes_only_for_this_events_base_and_fails_on_retrieval_error(self):
+    def test_the_current_base_check_allows_sha_drift_and_fails_on_retarget_or_retrieval_error(self):
         from tests.test_sota_sources_gate import inline_script, run_check
         step = step_block(self.job, "Require the current PR base")
         self.assertEqual(block_if(step), "github.event_name == 'pull_request'")
@@ -612,8 +612,8 @@ class VerdictReviewGateTests(unittest.TestCase):
             {**payload, "retrieval_error": "request denied"},
         ])
         self.assertIsNone(same["failed"], same)
-        for outcome in (retargeted, advanced):
-            self.assertIn("current PR base differs from the event base; failing closed", outcome["failed"])
+        self.assertIsNone(advanced["failed"], advanced)
+        self.assertIn("current PR base differs from the event base; failing closed", retargeted["failed"])
         self.assertIn("request denied", unavailable["failed"])
         for outcome in (same, retargeted, advanced, unavailable):
             self.assertEqual(outcome["requests"], [{"owner": "fixture-owner", "repo": "fixture-repo",
@@ -1094,7 +1094,10 @@ class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
         cases = [
             ("Ran 12 tests in 0.123s\n\nOK (skipped=2)\n", "ran 12 tests; skipped 2"),
             ("Ran 1 test in 0.123s\n\nFAILED (failures=1, skipped=1)\n", "ran 1 tests; skipped 1"),
-            ("Ran 4 tests in 0.123s\n\nOK\n", "ran 4 tests; skipped unknown"),
+            ("Ran 4 tests in 0.123s\n\nOK\n", "ran 4 tests; skipped 0"),
+            ("Ran 4 tests in 0.123s\n\nFAILED (errors=1)\n", "ran 4 tests; skipped 0"),
+            ("Ran 0 tests in 0.123s\n\nNO TESTS RAN\n", "ran 0 tests; skipped 0"),
+            ("Ran 4 tests in 0.123s\n", "ran 4 tests; skipped unknown"),
             ("interrupted before unittest's summary\n", "ran unknown tests; skipped unknown"),
             (None, "ran unknown tests; skipped unknown"),
         ]

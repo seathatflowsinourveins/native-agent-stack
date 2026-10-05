@@ -453,7 +453,7 @@ def next_branch(harness, number):
 
 # -- Unit 5: SOTA sources, the draft PR, one review, one repair, residuals (plan steps 9-12)
 
-# validate.yml:544-545 (the sota-sources job), ported from JavaScript. Line breaks are
+# pr-metadata.yml:171-172 (the sota-sources job), ported from JavaScript. Line breaks are
 # made "\n" first, because JavaScript's multiline ^ and $ also break at \r, U+2028 and
 # U+2029; JS_TRIM is String.prototype.trim's set (WhiteSpace plus LineTerminator).
 SOTA_SECTION = re.compile(r"^#{2,3}[ \t]+SOTA sources[ \t]*$([\s\S]*?)(?=^#{2,3}[ \t]|(?![\s\S]))", re.M)

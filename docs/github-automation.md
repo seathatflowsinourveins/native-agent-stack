@@ -1219,12 +1219,14 @@ way this catalog gains evidence; read that chapter for the full flow.
 
 The repository has one maintainer and the main ruleset requires 0 approvals,
 so a PR that changes a layer verdict could merge with no review at all.
-`validate.yml`'s `verdict-review-gate` job is the control instead. It runs
+`pr-metadata.yml`'s `verdict-review-gate` job is the control instead. It runs
 [`scripts/verdict_review_gate.py`](../scripts/verdict_review_gate.py) on every
 pull request (no path filter, so it can be required) and on each push to
-`main`. The job has `contents: read`, starts with harden-runner in audit mode,
-and checks out full history without persisted credentials. The event values
-reach the script only through `env`. On a pull request the job first asserts
+`main`. The job has `contents: read` and `pull-requests: read`, starts with
+harden-runner in audit mode, and checks out full history without persisted
+credentials. On a pull request it first reads the current base branch through
+the API and requires its ref to match the event's base ref. The shell step
+receives event values only through `env`. It then asserts
 that the checked-out HEAD is the PR merge commit: it has exactly two parents
 and the second is the payload's `pull_request.head.sha`, or the job fails
 (otherwise `HEAD^1` could be the PR's own previous commit and the gate would
@@ -1418,9 +1420,10 @@ scaffold caller grants the read permission. Existing callers adopt the
 change only when they update their commit pin
 ([Get a pull request](https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request)).
 
-`verdict-review-gate` first requires the current base branch and SHA to match
-the event's base, failing closed if the PR was retargeted or the base advanced
-while this run waited. It also fails closed when the event's base branch
+`verdict-review-gate` first requires the current base branch ref to match the
+event's base ref, failing closed when a queued run's event predates a retarget.
+Advancing the same base branch's tip does not fail this metadata check. The
+subsequent shell checks fail closed when the event's base branch
 (`GITHUB_BASE_REF`, passed through the step's environment) is not `main`.
 A PR first judged against another branch and then retargeted to `main`
 therefore cannot merge on its earlier green run. The merge commit still must
