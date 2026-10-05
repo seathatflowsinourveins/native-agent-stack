@@ -105,7 +105,9 @@ on 16 commits, called those forms uncapped.
 One run per arm: no variance, no cost comparison, no claim about tokens saved (the A/B of the folding of `grep -l` output is a separate
 measurement). The dynamic arms ran through the loopback gateway route `cx/gpt-6.1-sol-max`, not the host's own ChatGPT sign-in, and in scratch
 Codex homes (CODEX_HOME), with the host's HOME for rtk's configuration; the live `~/.codex` was neither written nor read for
-credentials. The native probes ran on codex-cli 0.159.3 only: no 0.160.0 binary was run here, so 0.160.0 is checked from source
+credentials. The probe's `grep -rl needle .` returns one file, so it does not exercise rtk 0.51.0's file-list fold (a shared path prefix folded into
+`<prefix> (N files)` with the tails listed; `src/cmds/system/search.rs` L612 at e001f773), which the control of
+`docs/decisions/2026-10-04-rtk-file-list-control.md` covers. The native probes ran on codex-cli 0.159.3 only: no 0.160.0 binary was run here, so 0.160.0 is checked from source
 only. The trust tool's dry run makes no trust or config edit but is not read-only: starting the app-server creates its own state
 files in the Codex home. The 2604 after snapshot, the PATH of each real launcher and a hook trust grant on a real host are
 separate, later steps.

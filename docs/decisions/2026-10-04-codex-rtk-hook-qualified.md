@@ -100,8 +100,8 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
 
 ## Residuals
 
-The install edits the Codex instruction file (the inert pointer line) and creates `RTK.md`; whether the user accepts that edit with the rest of the
-install is open. One run per arm, one host, the loopback gateway route and not the host's ChatGPT sign-in; no claim about tokens saved. Native probes ran on
+The install edits the Codex instruction file (the inert pointer line) and creates `RTK.md`; the user approved that edit on 2026-10-05
+(the addendum below). One run per arm, one host, the loopback gateway route and not the host's ChatGPT sign-in; no claim about tokens saved. Native probes ran on
 codex-cli 0.159.3 only: no 0.160.0 binary was run, so 0.160.0 is checked from source only. The hook is skipped
 again whenever its definition or its group index changes (the key carries the index), so the acceptance probe is the check, not the grant. The
 2604 after snapshot, the PATH of each real launcher and the grant on a real host are later steps that this decision schedules and does not
@@ -110,3 +110,16 @@ content differences in rtk's compact `git log` (merge commits dropped, a 10-comm
 the trust tool makes no trust or config edit but is not read-only: starting the app-server creates its own state files in the Codex home.
 The NativeStack counter delta of the snapshot (+33 commands, +297 saved tokens) spans other sessions' commands; the project-scoped block of
 its summary is the E2E's own.
+
+## Addendum (2026-10-05): the pointer line is approved
+
+The upstream command `rtk init -g --codex` appends an inert `@<Codex home>/RTK.md` pointer to the Codex `AGENTS.md` and creates `RTK.md`
+(`rtk-init-codex-probe.json`; there is no hook-only mode with `--codex`). That is an instruction-file edit, which the earlier reply about
+authorization settings does not name, so the command center put it to the user as one yes/no question and relayed the answer at about 00:55Z
+on 2026-10-05: "yes for rtk pointer", together with a standing rule: "for the practice like rtk, always proceed with sota convergence highest
+quality practice with upstream repos". The session that wrote this record heard neither quotation itself; both are the user's words as the
+command center relayed them, and the row's behaviour rests on that reading, which the user may withdraw.
+
+Effect: the install plan's `command-output` row runs `rtk init -g --codex` as upstream implements it, pointer line and `RTK.md` included, and
+the same rule covers future upstream installer side effects of this kind (each still recorded with its measurement). `rtk init -g --codex
+--uninstall` removes the hook, `RTK.md` and the pointer together.
