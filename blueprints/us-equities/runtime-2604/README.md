@@ -33,9 +33,13 @@ The packaging worker has native uv 0.12.17 but no Linux mise executable. The
 requested mise relock route exits 127 here; resolution and `uv lock --check`
 succeed with that native binary and the identical settings below. The
 [destination-host rerun](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
-records successful installation and offline acceptance through
-`mise exec uv@0.12.17`. Independent review remains pending. The installer still
-enforces uv 0.12.17; no shim or host-guard bypass is used.
+records successful installation and offline acceptance. Under
+`mise exec uv@0.12.17`, the install script ran the shared sync vector:
+`uv lock --check`, `uv sync --locked --no-dev` and `uv pip check`, as
+[sync-trading-2604.sh](sync-trading-2604.sh#L14) shows. The relock
+(`uv lock --upgrade-package edgartools`) itself was not run through mise.
+Independent review remains pending. The installer still enforces uv 0.12.17;
+no shim or host-guard bypass is used.
 
 This recipe serves the US-equities research and historical-simulation north star:
 [NautilusTrader 2.0.0rc5](../../../catalogs/us-equities/runtime-target.json), its

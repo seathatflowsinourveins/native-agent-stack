@@ -84,7 +84,7 @@
    "identity_sha256"
   ],
   "committed_copy_sha256": "e87326142c10bbf17ffbbd7854706de338b42c11f53fcab0824e805ee434aa09",
-  "committed_copy_note": "native_output below is the private output with identity_sha256 removed, serialized as native_edgar.py writes it (catalyst.py json_bytes: indent 2, sorted keys, trailing newline); committed_copy_sha256 is over that serialization",
+  "committed_copy_note": "native_output below is the private output with identity_sha256 removed, serialized as native_edgar.py writes it (catalyst.py json_bytes: indent 2, sorted keys, trailing newline); committed_copy_sha256 is over that serialization; 2026-10-05: committed_copy_sha256 was recomputed on 2026-10-05 because the earlier value, c8bca5515b2c7e7e8c966a7ec6aa2e26af89ab293c870c6e3acc74bb8346dcba, was taken over the serialization without the trailing newline",
   "native_output": {
    "automatic_retries": 0,
    "cohort_count": 371,
@@ -150,6 +150,6 @@
    "started_at": "2026-10-04T22:29:40.417432Z",
    "status": "complete"
   },
-  "private_original_note": "the private original's own sha256 and byte count are not published: with every other field committed, they would let a guessed contact be confirmed exactly as the withheld identity_sha256 would"
+  "private_original_note": "2026-10-05: The private original's sha256 and byte count were withdrawn from this receipt on 2026-10-05 after an earlier pushed commit of this PR had carried them; with every other field committed, they would let a guessed contact be confirmed exactly as the withheld identity_sha256 would."
  }
 }

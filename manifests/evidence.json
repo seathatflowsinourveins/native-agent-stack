@@ -4174,7 +4174,7 @@
         "Images were pulled by immutable OCI index digest and inspected only. Source-to-image reproducibility, LEAN oracle parity and rc5 broker risk/recovery remain open."
       ],
       "path": "evidence/receipts/native-trading-runtime-2604-20261004.json",
-      "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, through mise exec uv@0.12.17. This also supersedes the earlier bundle follow-up notes describing the rerun and destination-host mise verification as pending; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical."
+      "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, with the install script's shared sync under mise exec uv@0.12.17: uv lock --check, uv sync --locked --no-dev and uv pip check, as blueprints/us-equities/runtime-2604/sync-trading-2604.sh:14 shows. The relock (uv lock --upgrade-package edgartools) itself was not run through mise. This supersedes the earlier pending notes for the rerun and destination-host install sync; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical."
     },
     {
       "id": "native-sec-edgartools-5600-20261004",
@@ -4208,7 +4208,8 @@
         "The historical NativeStack2604 runtime run used 5.58.0 and its original lock hash; a 5.60.0 rerun must produce its own receipt. No strategy, point-in-time data, paper or broker gate is advanced.",
         "This worker could not execute the prescribed mise route (exit 127: Linux mise unavailable). Resolution and lock validation used the installed native uv 0.12.17 with identical settings; verification through mise remains pending."
       ],
-      "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json"
+      "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
+      "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, with the install script's shared sync under mise exec uv@0.12.17: uv lock --check, uv sync --locked --no-dev and uv pip check, as blueprints/us-equities/runtime-2604/sync-trading-2604.sh:14 shows. The relock (uv lock --upgrade-package edgartools) itself was not run through mise. This supersedes the earlier pending notes for the rerun and destination-host install sync; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical."
     },
     {
       "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
@@ -4229,7 +4230,8 @@
         "The 25 per-row status lines are now retained in the repository artifact evidence/artifacts/trading-runtime-2604-20261004/rows-native-trading-runtime-2604-rerun-d02c0827.json supplied by the operator; per-check logs still stay private on the host.",
         "native_proven applies only to the unchanged nautilus_quickstart row; the other 24 rows are local_integration on the destination host. The aggregate 25/25 result does not promote those rows to upstream acceptance.",
         "Independent review remains pending; the retained outer summary is not independent observation of the per-row results.",
-        "This recorded execution qualifies the offline runtime on NativeStack2604 only; it is not paper, broker, live-trading, SEC network or point-in-time data acceptance."
+        "This recorded execution qualifies the offline runtime on NativeStack2604 only; it is not paper, broker, live-trading, SEC network or point-in-time data acceptance.",
+        "No independent post-run observation and no discriminating controls for the local checks were supplied on NativeStack2604. The only same-check controls in this PR's evidence ran on the packaging worker: the import/version probe expecting 5.58.0 and build-constraint NC-1, NC-2 and NC-3; they do not supply destination-host controls."
       ],
       "evidence_class": "local_integration",
       "evidence_class_scope": {
@@ -13198,8 +13200,8 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
-      "sha256": "27a69c074bcaf6bfccf89a6ba7879549646a1297b666619b6c1014c9c49f0123",
-      "bytes": 8472
+      "sha256": "98372bd88cdb561a832aa8b987ee0c3c002e840e8761f10e84fd77ce77d6ccd8",
+      "bytes": 8788
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/native_document.py",
@@ -15083,8 +15085,8 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "870a7d4e7917585661e05b5742b67e6d9be1fad4b995b30b2000992912c0159b",
-      "bytes": 22158
+      "sha256": "14a11ea05b0eb4e54cd11126e250d63c5cac5cb6decbb0e330cb6dc59f267463",
+      "bytes": 22415
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
@@ -15823,8 +15825,8 @@
     },
     {
       "path": "catalogs/us-equities/data-research.json",
-      "sha256": "b24f69ddc59b1ae3971e0416b9a5c0dc7ca52f0f95b6aaa8956cb4d2edfd41cf",
-      "bytes": 97252
+      "sha256": "cf86149e3433fde6f38ac5cdc216503de7de02ad6de2f537164dfe3be98628fe",
+      "bytes": 97470
     },
     {
       "path": "catalogs/us-equities/data-research.md",
@@ -16488,8 +16490,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-trading-2604-preparation.md",
-      "sha256": "d43c664800eb2a759bbffde37dc82d4b6a7871e8b8886362f4e712738ab8816a",
-      "bytes": 35409
+      "sha256": "606cf4fe6a4efbbba05ccc4943959d3ce073003d6f5a1d45bd3d0a28570d61ff",
+      "bytes": 35756
     },
     {
       "path": "docs/direct-results.md",
@@ -49668,8 +49670,8 @@
     },
     {
       "path": "evidence/hosts/native-stack-2604-20261004/native-stack-2604-20261004--nautilustrader--use--20261004.json",
-      "sha256": "67f8dda4be09b3644e10727656e012d300cf9f51349eabe8b7b074ab2942c605",
-      "bytes": 5382
+      "sha256": "97aa0f8b4c3a3e6a69da2eed7a199daa9689cfde724ada35e0c95abdec074f1c",
+      "bytes": 4526
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--affaan-m%2FECC--install--20260926-2.json",
@@ -50693,8 +50695,8 @@
     },
     {
       "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
-      "sha256": "ed3519109bf38499367edb2c6d2642d92123d79248bd22a08f346931b9f3d3be",
-      "bytes": 5560
+      "sha256": "e6f7c6094cb35ed7476d5ba15e4eb04ff0c7eef5914431bf0d040736f36816e6",
+      "bytes": 6629
     },
     {
       "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json",
@@ -51028,13 +51030,13 @@
     },
     {
       "path": "evidence/receipts/native-trading-runtime-2604-20261004.json",
-      "sha256": "c675da25419a0bac5878ed66223431462f2bf93fc4bc556dff07001669c8736f",
-      "bytes": 22367
+      "sha256": "25dbce4c7054954b471688974d853d9e73ba19724bbadc8ccd4469c8f39a14ec",
+      "bytes": 22580
     },
     {
       "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json",
-      "sha256": "34d79d66295041b9d11a24c5ffe4a5cf3c43e9d99622c3b544aa8bb6f87a0f91",
-      "bytes": 6751
+      "sha256": "72873471784d12f3ffe92234a2a24094192dbff1806f93baf7d1404132f13160",
+      "bytes": 7090
     },
     {
       "path": "evidence/receipts/native-ultracode-20260921.json",

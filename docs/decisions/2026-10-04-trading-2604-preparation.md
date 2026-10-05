@@ -440,7 +440,9 @@ are retained. No other package may move under this change.
 
 [tests.test_trading_2604_lock](../../tests/test_trading_2604_lock.py) validates
 the normalized manifest/project constraint, its exact runtime-backend pin and
-archive hashes, and the one-sdist census, excluding virtual project metadata.
+archive hashes, and the census of packages without any wheel, excluding virtual
+project metadata. The test does not check target-compatible wheel coverage
+under Linux markers.
 Four planted fixtures each fail: a second package without a wheel, a different
 backend version, missing hashes and a mismatched manifest. The host/CI vector
 is now defined once in
@@ -491,10 +493,14 @@ in [native-trading-runtime-2604-rerun-d02c0827-20261005](../../evidence/receipts
 install PASS and 25/25 offline acceptance PASS at `d02c0827`, lock
 `4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2`,
 on **2026-10-05, 01:00:17Z–01:01:07Z**, through `mise exec uv@0.12.17`.
-This dated follow-up resolves the rerun and target-host mise verification
-pending in the earlier preparation sections. Independent review remains
-pending. The supplied native SEC acceptance at 5.60.0 remains separate and
-valid; catalog selections and gate status do not change here.
+This dated follow-up resolves the rerun and records the install script's shared
+sync under `mise exec uv@0.12.17`: `uv lock --check`,
+`uv sync --locked --no-dev` and `uv pip check`, as
+[sync-trading-2604.sh](../../blueprints/us-equities/runtime-2604/sync-trading-2604.sh#L14)
+shows. The relock (`uv lock --upgrade-package edgartools`) itself was not run
+through mise. Independent review remains pending. The supplied native SEC
+acceptance at 5.60.0 remains separate and valid; catalog selections and gate
+status do not change here.
 Python 3.12.3 versus 3.13 ratification and the earlier independent-receipt-review
 qualification remain open.
 
