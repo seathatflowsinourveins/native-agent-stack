@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "evidence_class": "unchanged_upstream_default_source_tests",
+  "projection": "Selected qualification fields and subsequent independent verdicts; private path and process identifiers omitted. No original test stream or provider task is recreated by this projection.",
+  "claude_sdk": {
+    "source": {
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "tag": "v0.2.163",
+      "commit": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+      "workflow": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/.github/workflows/test.yml#L18",
+      "workflow_sha256": "c8b998911705f3fd82de1d8844499f12455ed0b60d3bbaf60c87ddec76ef8a83",
+      "source_status_after": "Only untracked coverage.xml; no tracked source modification."
+    },
+    "toolchain": {
+      "host": "Linux x86_64",
+      "python": "3.13.15",
+      "environment": "private venv, full source checkout",
+      "resolved_dependencies": "pip-freeze.stdout.txt; upstream loose dev bounds resolved at install time; no invented lock"
+    },
+    "command": "python -m pytest tests/ -v --cov=claude_agent_sdk --cov-report=xml",
+    "exit_code": 0,
+    "native_summary": "1587 passed, 6 skipped in 24.68s",
+    "environment_scope": {
+      "install": {
+        "removed": [
+          "PIP_EXTRA_INDEX_URL"
+        ],
+        "set": {
+          "PIP_CONFIG_FILE": "/dev/null",
+          "PIP_INDEX_URL": "https://pypi.org/simple",
+          "PIP_DISABLE_PIP_VERSION_CHECK": "1",
+          "PIP_CACHE_DIR": "<private>/pip-cache",
+          "NETRC": "/dev/null"
+        }
+      },
+      "test": {
+        "removed": [
+          "SESSION_STORE_POSTGRES_URL",
+          "SESSION_STORE_REDIS_URL",
+          "SESSION_STORE_S3_ENDPOINT",
+          "SESSION_STORE_S3_BUCKET",
+          "SESSION_STORE_S3_ACCESS_KEY",
+          "SESSION_STORE_S3_SECRET_KEY",
+          "ANTHROPIC_API_KEY",
+          "ANTHROPIC_AUTH_TOKEN",
+          "ANTHROPIC_BASE_URL",
+          "ANTHROPIC_CUSTOM_HEADERS",
+          "CLAUDE_CODE_OAUTH_TOKEN",
+          "OPENAI_API_KEY",
+          "OPENROUTER_API_KEY",
+          "PYTHONPATH",
+          "PYTHONHOME",
+          "PYTEST_ADDOPTS",
+          "PYTEST_PLUGINS",
+          "PYTEST_DISABLE_PLUGIN_AUTOLOAD"
+        ],
+        "set": {
+          "CLAUDE_CONFIG_DIR": "<private>/claude-config",
+          "TMPDIR": "<private>/tmp",
+          "PYTHONNOUSERSITE": "1",
+          "COVERAGE_FILE": "<private>/.coverage",
+          "VIRTUAL_ENV": "<private>/venv",
+          "PATH": "private venv/bin prepended; inherited remainder"
+        },
+        "home": "unchanged",
+        "config_directory": "owned empty directory before run"
+      },
+      "rationale": "Pinned native resolver supports CLAUDE_CONFIG_DIR; unit fixtures redirect synthetic auth to temporary files and stub credential lookup. Optional storage selectors cleared and extras absent. This does not certify Darwin Keychain isolation for optional live tests."
+    },
+    "coverage": {
+      "native_tool": "coverage 7.16.2",
+      "lines_valid": 4648,
+      "lines_covered": 4269,
+      "line_rate": 0.9185,
+      "branch_coverage": "not enabled"
+    },
+    "independent_review": {
+      "schema_version": 1,
+      "reviewer": "sdk_remaining_oracles (independent Sol/max read-only source/output inspection)",
+      "verdict": "PASS for artifact/source bindings; PARTIAL for native skip enumeration",
+      "reviewed_receipt": {
+        "path": "qualification.json",
+        "sha256": "16b24280da9e350056428ea5f9fa6415bcd5102d17f19f0c0f76f7d444a40661"
+      },
+      "observed": {
+        "source": "HEAD and v0.2.163 both 1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7; tracked source unchanged; untracked coverage.xml only",
+        "artifact_binding": "All nine retained artifact sizes/hashes and workflow hash match the receipt.",
+        "collection": "Native stdout line 7: collected 1588 items / 5 skipped",
+        "outcome": "Native stdout contains 1587 PASSED nodes, one SKIPPED node, no failed/error nodes; line 1602 reports 1587 passed, 6 skipped in 24.68s; stderr empty",
+        "dependencies": "Native freeze binds official editable repository/commit; MCP 2.2.0, pytest 9.1.1, AnyIO 4.15.1, Trio 0.34.0",
+        "coverage": "4269/4648 lines; 0.9185; 26 files; branch coverage disabled"
+      },
+      "skips": [
+        {
+          "identity": "tests/test_build_wheel.py::TestRecompressWheel::test_zopfli_keeps_every_member",
+          "identity_evidence": "observed native output",
+          "reason": "Missing zopfli explains source importorskip; reason is source/dependency inference",
+          "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/tests/test_build_wheel.py#L216"
+        },
+        {
+          "identity": "tests/test_example_postgres_session_store.py",
+          "identity_evidence": "inferred, not enumerated in retained native output",
+          "reason": "Absent asyncpg before live-service gate",
+          "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/tests/test_example_postgres_session_store.py#L29"
+        },
+        {
+          "identity": "tests/test_example_redis_session_store.py",
+          "identity_evidence": "inferred, not enumerated in retained native output",
+          "reason": "Absent redis; fakeredis also absent",
+          "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/tests/test_example_redis_session_store.py#L33"
+        },
+        {
+          "identity": "tests/test_example_redis_session_store_live.py",
+          "identity_evidence": "inferred, not enumerated in retained native output",
+          "reason": "Cleared URL selector, as coordinator-recorded",
+          "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/tests/test_example_redis_session_store_live.py#L26"
+        },
+        {
+          "identity": "tests/test_example_s3_session_store.py",
+          "identity_evidence": "inferred, not enumerated in retained native output",
+          "reason": "Absent boto3; moto also absent",
+          "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/tests/test_example_s3_session_store.py#L27"
+        },
+        {
+          "identity": "tests/test_example_s3_session_store_live.py",
+          "identity_evidence": "inferred, not enumerated in retained native output",
+          "reason": "Cleared required selectors, as coordinator-recorded",
+          "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/tests/test_example_s3_session_store_live.py#L25"
+        }
+      ],
+      "limits": [
+        "Five inferred modules consistently explain the collection count, but their native identities/reasons remain unobserved in the retained output.",
+        "Reviewer did not rerun tests, edit files or recreate the launch.",
+        "Invocation, native exits, launch environment and untouched-host statements remain coordinator observations.",
+        "Default source suite only; target, provider, useful-task and lifecycle acceptance remain open."
+      ],
+      "receipt_note": "The reviewed qualification.json remains frozen with its historical pending-review field. This companion records the subsequent independent verdict without changing the reviewed bytes."
+    },
+    "limits": [
+      "Default source unit suite only; six skipped scopes require separate accounting.",
+      "No minimum-MCP compatibility matrix run.",
+      "No authenticated e2e-tests, examples, provider task, useful-task trial, role routing, lifecycle recovery or target installation acceptance.",
+      "No claim of new-host status, comparative winner, default promotion or token savings.",
+      "Shared installations, target distributions, native sign-ins and configuration untouched."
+    ],
+    "private_originals": [
+      {
+        "name": "qualification.json",
+        "bytes": 6010,
+        "sha256": "16b24280da9e350056428ea5f9fa6415bcd5102d17f19f0c0f76f7d444a40661"
+      },
+      {
+        "name": "independent-review.json",
+        "bytes": 4080,
+        "sha256": "65451965601dc1332e7ec4be84afd188351547dc3b54abe530de970368dba1c4"
+      },
+      {
+        "name": "pytest.stdout.txt",
+        "bytes": 176235,
+        "sha256": "3dfbac6e782d014cdb55118980ba0fd2fdf826f98e9ed086eeedfb49a4087a65"
+      },
+      {
+        "name": "pytest.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "pip-freeze.stdout.txt",
+        "bytes": 943,
+        "sha256": "3928085c5fec0ff1d89e60497054db53cc96f94ca1ace0e936caf65dd5c26059"
+      }
+    ]
+  },
+  "openhands_sdk": {
+    "scope": "Passing local unchanged default OpenHands SDK source-suite evidence under a declared disposable filesystem boundary",
+    "source": {
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "tag": "v1.50.1",
+      "commit": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "tracked_status_after": "clean",
+      "status_exit": 0
+    },
+    "command": "CI=true uv run python -m pytest -vvs -n auto --cov=openhands-sdk --cov-report=term-missing --cov-fail-under=0 --cov-config=pyproject.toml tests/sdk",
+    "upstream_command_source": "https://github.com/OpenHands/software-agent-sdk/blob/1e1390acc8788346ba4804c34323284009bf3f5e/.github/workflows/tests.yml#L110",
+    "returned_coverage": {
+      "statements": 26542,
+      "missed": 2814,
+      "percentage_displayed": 89
+    },
+    "runtime": {
+      "python": "3.13.15",
+      "uv": "0.12.17",
+      "bubblewrap": "0.9.0",
+      "pytest": "9.0.3",
+      "xdist": "3.8.0",
+      "litellm": "1.93.0"
+    },
+    "environment": "Base environment.json allow-list, unchanged HOME/CODEX_HOME values with native trees unmounted; full-suite-boundary.json and corrected full-suite-repair.json describe mounts and deviations. Explicit supported PYTEST_XDIST_AUTO_NUM_WORKERS=2; OH_PERSISTENCE_DIR absent, TMPDIR=/tmp backed by owned directory, forced local model map absent. No native credential or client-config directories mounted. Network is shared for upstream public metadata and plugin repositories, including host-loopback reachability.",
+    "preserved_failed_attempt": {
+      "exit_code": 1,
+      "passed": 6605,
+      "failed": 16,
+      "skipped": 7,
+      "xfailed": 12,
+      "warnings": 82,
+      "seconds": 182.64,
+      "stdout": "full-suite.stdout.txt",
+      "stdout_sha256": "4d30dd539dbfac9b23170e8915fb0986adb66a247dc3c8996898a44022660430",
+      "stderr": "full-suite.stderr.txt",
+      "stderr_sha256": "6ac0dd1a8ef82554d879294a5e85f1703313d59491e925a5e925cf871d0f6168"
+    },
+    "repair_evidence": "Independent reviewer matched every one of the16 previous failing node IDs to explicit PASSED status in the repaired run. Thirteen depended on current model metadata and three on temporary-path topology/length. One bounded environment repair; implementation/tests/lock unchanged.",
+    "artifacts": [
+      {
+        "path": "full-suite-repaired.stdout.txt",
+        "bytes": 1445766,
+        "sha256": "dfc06c9c550c1de9a42e31f9a6f4a4df6839e0baef25a600023e9399e68aba32"
+      },
+      {
+        "path": "full-suite-repaired.stderr.txt",
+        "bytes": 1800264,
+        "sha256": "a0490ef99f4fb850d40898197680c1e6d8b8ecbe68c818bb0fc24a50dc2c0b6d"
+      },
+      {
+        "path": "source/uv.lock",
+        "bytes": 1067892,
+        "sha256": "e2c49fee72a61005789eed7b78e363e901b385b979bf3327e098d27a7d96aecb"
+      },
+      {
+        "path": "source/pyproject.toml",
+        "bytes": 4393,
+        "sha256": "7fd52ea2cbde781d18b7556710fbd75055b033461ed7f1d1eecefe22b9a94fba"
+      }
+    ],
+    "skip_evidence": {
+      "native_identities_explicit": true,
+      "native_reasons_printed": false,
+      "source_inference": "All7 ToolShield analyzer cases are guarded by the missing optional toolshield extra; unchanged guard inspected and distribution metadata absent.",
+      "source": "https://github.com/OpenHands/software-agent-sdk/blob/1e1390acc8788346ba4804c34323284009bf3f5e/tests/sdk/security/test_toolshield_llm_analyzer.py#L29"
+    },
+    "independent_review": {
+      "role": "Sol/max independent source and artifact review",
+      "verdict": "ACCEPT passing local default SDK source-suite evidence",
+      "receipt": {
+        "path": "full-suite-qualification.json",
+        "bytes": 4335,
+        "sha256": "831c9698f30d03e30fe1fd9748a1c752b02caab758626b2bcb957c77464adc78"
+      },
+      "verified": "Exact repaired output hashes/sizes, native summary6621PASS/7SKIP/12XFAIL/83warnings,2workers/6640items, all16previous failing node IDs nowPASS, native coverage26542statements/2814missed/89%, seven named skips, source guard versus unprinted reason distinction, exactcleanHEAD and unchanged lock/pyproject.",
+      "source_correction": {
+        "corrected_repair_sha256": "87b9397ae231ddfe786cbce9edcd5b06419dc8a4eb44ce4d7dd8966ba3331f8c",
+        "preserved_original_sha256": "5d9277be5e0cd7b52719cab83a504b2de227f87d50ef1466078991629dd80863",
+        "finding": "Corrected LiteLLM implementation path matches inspected installed source; no command/environment/test/output change."
+      },
+      "limits": "Native terminal exit and environment are coordinator-observed. No independent rerun. Warning-bearing pass; exact fetched remote map bytes not retained; no target/provider/useful-task/lifecycle acceptance."
+    },
+    "limits": [
+      "stress and acp_live excluded by upstream defaults; optional ToolShield tests skipped",
+      "83warnings remain, including deprecations, unknown network markers, cost/serialization warnings and unawaited coroutine warnings",
+      "Exact remotely fetched model-map bytes were not separately retained; no frozen-map claim",
+      "No target/provider/useful-task/role/lifecycle acceptance; fixtures and source tests are distinct from real model execution",
+      "Native model/provider usage for source tests is not an acceptance measurement and is not inferred from fixture counters"
+    ],
+    "native_result": {
+      "exit_code": 0,
+      "passed": 6621,
+      "skipped": 7,
+      "xfailed": 12,
+      "warnings": 83,
+      "seconds": 164.42,
+      "workers": 2,
+      "collected_items": 6640
+    },
+    "private_originals": [
+      {
+        "name": "full-suite-qualification.json",
+        "bytes": 4335,
+        "sha256": "831c9698f30d03e30fe1fd9748a1c752b02caab758626b2bcb957c77464adc78"
+      },
+      {
+        "name": "full-suite-independent-review.json",
+        "bytes": 1173,
+        "sha256": "28c3a66a709a3581fb763562d6294a931631408484bc05c9c4c782783b1d664d"
+      },
+      {
+        "name": "full-suite-boundary.json",
+        "bytes": 2743,
+        "sha256": "5db089ca98bdd6cccecc0c163ac5555a1017578898c7886580dad2ed7adf1b72"
+      },
+      {
+        "name": "full-suite-repair.json",
+        "bytes": 2651,
+        "sha256": "87b9397ae231ddfe786cbce9edcd5b06419dc8a4eb44ce4d7dd8966ba3331f8c"
+      },
+      {
+        "name": "full-suite-repair.before-source-correction.json",
+        "bytes": 2212,
+        "sha256": "5d9277be5e0cd7b52719cab83a504b2de227f87d50ef1466078991629dd80863"
+      },
+      {
+        "name": "full-suite.stdout.txt",
+        "bytes": 1478589,
+        "sha256": "4d30dd539dbfac9b23170e8915fb0986adb66a247dc3c8996898a44022660430"
+      },
+      {
+        "name": "full-suite.stderr.txt",
+        "bytes": 1895056,
+        "sha256": "6ac0dd1a8ef82554d879294a5e85f1703313d59491e925a5e925cf871d0f6168"
+      },
+      {
+        "name": "full-suite-repaired.stdout.txt",
+        "bytes": 1445766,
+        "sha256": "dfc06c9c550c1de9a42e31f9a6f4a4df6839e0baef25a600023e9399e68aba32"
+      },
+      {
+        "name": "full-suite-repaired.stderr.txt",
+        "bytes": 1800264,
+        "sha256": "a0490ef99f4fb850d40898197680c1e6d8b8ecbe68c818bb0fc24a50dc2c0b6d"
+      }
+    ],
+    "preparation_failure": "RTK was not resolved in the filtered PATH before the native child launched; corrected once by explicit existing RTK resolution. This was not a test run.",
+    "collection_limit": "stress and acp_live are excluded by the unchanged upstream defaults. npm/npx were absent from the recorded PATH; ACP collection-time registry probes therefore short-circuited."
+  },
+  "codex_sdk": "Default source suite remains with the separate coordinator; no result is claimed by this bundle."
+}

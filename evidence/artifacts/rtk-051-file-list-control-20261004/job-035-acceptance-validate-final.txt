@@ -1,0 +1,8 @@
+Publication validation failed:
+evidence/receipts/rtk-051-qualification-20261004.json: SHA-256 mismatch
+evidence/receipts/rtk-051-qualification-20261004.json: byte count mismatch
+scripts/native_token_ci.py: SHA-256 mismatch
+scripts/native_token_ci.py: byte count mismatch
+tests/test_native_token_ci.py: SHA-256 mismatch
+tests/test_native_token_ci.py: byte count mismatch
+receipt rtk-051-qualification-20261004: payload limitations differs from manifest

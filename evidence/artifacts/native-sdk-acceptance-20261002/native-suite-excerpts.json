@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "evidence_class": "exact_selected_native_output_lines",
+  "excerpts": [
+    {
+      "label": "Claude default suite",
+      "private_original": {
+        "name": "pytest.stdout.txt",
+        "bytes": 176235,
+        "sha256": "3dfbac6e782d014cdb55118980ba0fd2fdf826f98e9ed086eeedfb49a4087a65"
+      },
+      "selection": "One exact native summary line, including surrounding pytest separators. Line number is one-based.",
+      "lines": [
+        {
+          "line": 1602,
+          "text": "======================= 1587 passed, 6 skipped in 24.68s ======================="
+        }
+      ]
+    },
+    {
+      "label": "OpenHands failed attempt",
+      "private_original": {
+        "name": "full-suite.stdout.txt",
+        "bytes": 1478589,
+        "sha256": "4d30dd539dbfac9b23170e8915fb0986adb66a247dc3c8996898a44022660430"
+      },
+      "selection": "One exact native summary line, including surrounding pytest separators. Line number is one-based.",
+      "lines": [
+        {
+          "line": 13832,
+          "text": "= 16 failed, 6605 passed, 7 skipped, 12 xfailed, 82 warnings in 182.64s (0:03:02) ="
+        }
+      ]
+    },
+    {
+      "label": "OpenHands repaired attempt",
+      "private_original": {
+        "name": "full-suite-repaired.stdout.txt",
+        "bytes": 1445766,
+        "sha256": "dfc06c9c550c1de9a42e31f9a6f4a4df6839e0baef25a600023e9399e68aba32"
+      },
+      "selection": "One exact native summary line, including surrounding pytest separators. Line number is one-based.",
+      "lines": [
+        {
+          "line": 13688,
+          "text": "===== 6621 passed, 7 skipped, 12 xfailed, 83 warnings in 164.42s (0:02:44) ====="
+        }
+      ]
+    }
+  ]
+}

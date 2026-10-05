@@ -29,7 +29,9 @@ REQUIRED_LANES = {
 UUID_SHAPE = re.compile(r"\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b", re.I)
 # A client project-directory prefix for any user under /home or /Users (-home-<user>-..., -Users-<user>-...),
 # so no host's user name is published here. Conservative: ordinary text such as "take-home-task" also matches.
-# Not covered: a project at the home directory itself (-home-<user> with no separator) or other roots (-root-).
+# This independent preregistration check requires an encoded separator after the name.
+# scripts.validate also covers bare homes, Windows drives and WSL-mounted profiles;
+# other roots (-root-) remain outside both rules.
 PROJECT_DIR_SHAPE = re.compile(r"-(?:home|Users)-[A-Za-z0-9_]+-")
 # Amendment 2 literals, independent of the manifest. Models: #402's definitions
 # at d022295a (adoption/agents/claude/{stack-verifier,isolated-builder}.md:5 say
