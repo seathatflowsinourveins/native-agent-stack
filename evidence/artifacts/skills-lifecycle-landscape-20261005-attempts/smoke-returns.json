@@ -1,0 +1,1159 @@
+{
+ "sweep_id": "landscape-sweep-skills-20261005-ns2604-smoke",
+ "discovery": {
+  "skills-research": {
+   "catalog": "skills",
+   "layer_id": "skills-research",
+   "proposed": [
+    "bgauryy/octocode@octocode-research",
+    "GeiserX/agent-skills@research",
+    "addyosmani/agent-skills@source-driven-development",
+    "mattpocock/skills@research",
+    "github/awesome-copilot@build-evidence-map",
+    "affaan-m/ECC@research-ops",
+    "affaan-m/ECC@skill-scout",
+    "muratcankoylan/Agent-Skills-for-Context-Engineering@filesystem-context"
+   ],
+   "requirement_sha256": "eaad1541c73c4ae3d83bde6b6740e4e12e1ff9466d20be5c677df04d5e8fd944",
+   "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+   "families": {
+    "bgauryy/octocode@octocode-research": [
+     "claude",
+     "gpt6"
+    ],
+    "GeiserX/agent-skills@research": [
+     "claude"
+    ],
+    "addyosmani/agent-skills@source-driven-development": [
+     "claude"
+    ],
+    "mattpocock/skills@research": [
+     "gpt6"
+    ],
+    "github/awesome-copilot@build-evidence-map": [
+     "claude"
+    ],
+    "affaan-m/ECC@research-ops": [
+     "gpt6"
+    ],
+    "affaan-m/ECC@skill-scout": [
+     "claude"
+    ],
+    "muratcankoylan/Agent-Skills-for-Context-Engineering@filesystem-context": [
+     "claude"
+    ]
+   },
+   "families_returned": {
+    "first": [
+     "claude",
+     "gpt6"
+    ]
+   }
+  }
+ },
+ "votes": {
+  "skills-research": [
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "bgauryy/octocode@octocode-research",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.9,
+     "reasoning": "All facts checked out. The pin c265e3f9 is the default-branch HEAD, committed 2026-08-25T19:36:19Z, and the REST commits?since=2026-07-07 call returns it. skills/octocode-research/SKILL.md exists with name octocode-research. Its sha256 0dd7a864... matches, and the bytes were confirmed against git blob 50080c4c. The description is 651 code points and the frontmatter has no disable-model-invocation. agents/openai.yaml holds only an interface block (display_name, short_description, default_prompt) and no policy block, so model_invocable and codex_implicit are both correctly true. The L54 quote matches, apart from the bold markup around 'MCP tools'. L57-59 are the three unversioned 'npx octocode' commands, and no version pin appears anywhere in the file. The description does contain 'plan a coding flow' and 'before writing'. Repository: MIT, not archived, 947 stars, pushed_at 2026-10-03T16:43:40Z (from a non-default branch), latest release 9.1.1 at 2025-12-15T20:10:38Z out of 12 releases. The host claim was rerun read-only and holds: no octocode on PATH, 0 npm global entries, and no octocode string in ~/.claude.json, the user or project settings.json, or ~/.codex/config.toml.",
+     "refs": [
+      "https://github.com/bgauryy/octocode/blob/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research/SKILL.md",
+      "https://github.com/bgauryy/octocode/blob/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research/agents/openai.yaml",
+      "https://github.com/bgauryy/octocode/tree/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research",
+      "https://api.github.com/repos/bgauryy/octocode/commits?since=2026-07-07T00:00:00Z&per_page=1",
+      "https://github.com/bgauryy/octocode/releases/tag/9.1.1",
+      "https://api.github.com/graphql (repository bgauryy/octocode: isArchived, licenseInfo, stargazerCount, pushedAt, latestRelease, defaultBranchRef history)"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "bgauryy/octocode@octocode-research",
+     "refuted": false,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.83,
+      "reasoning": "The not_adopted label holds. At pin c265e3f9 the SKILL.md sha256 (0dd7a864…) matches. L54 says 'Prefer Octocode MCP tools when exposed. Otherwise `npx octocode tools <name>`', and L57-59 are npx commands with no version. The proposal did not read references/octocode.md (sha256 fc3ff811…), and it strengthens the case. Its L5 calls the npx CLI 'a full substitute, not a degraded one', and L10-15 add more unversioned commands: `npx octocode auth status`, `npx octocode clone` and `npx octocode cache fetch`. Neither file pins a version anywhere. npx fetches and runs the latest npm release, so this is the 'tells the model to install unpinned code' conflict. Devil's advocate (fp-check): a pinned Octocode MCP install would skip the fallback only where its MCP tools are exposed, which is not every client or subagent, and the instruction stays in the skill. Maintenance is not a reason: the latest default-branch commit is c265e3f9 on 2026-08-25, inside 90 days. Its description also triggers on 'research this', so it would compete with search-first with no measured advantage. Consistency note, which is about incumbency and does not flip this vote: the installed find-skills tells the model to run unversioned `npx skills find` (installed SKILL.md L27, L56). The installed search-first's decision matrix maps 'MIT/Apache' to Adopt (L58), and its Example 1 says 'ADOPT — npm install textlint-rule-no-dead-link'. Those incumbents carry the same kind of conflict, and their standing rests on the 2026-09-25 verdict record, not on a paired benchmark.",
+      "refs": [
+       "https://github.com/bgauryy/octocode/blob/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research/SKILL.md#L54-L59",
+       "https://github.com/bgauryy/octocode/blob/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research/references/octocode.md#L5-L15",
+       "https://api.github.com/repos/bgauryy/octocode/commits?since=2026-07-07T00:00:00Z&per_page=1",
+       "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md#L38-L58",
+       "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills/SKILL.md"
+      ],
+      "skills_used": [
+       "fp-check",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.93,
+      "reasoning": "The not_adopted label holds. Both the skill and its transport reference prescribe unversioned npx commands without enforcing pinned or no-install resolution. Correction: npm can reuse a local dependency, so fetching the latest release is not inevitable; the reported host configuration was not independently verified here. Those qualifications do not remove the published fallback's installation conflict. The proposed paired benchmark provides a bounded reopening condition.",
+      "refs": [
+       "[Pinned skill](https://github.com/bgauryy/octocode/blob/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research/SKILL.md)",
+       "[Transport reference](https://github.com/bgauryy/octocode/blob/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research/references/octocode.md)",
+       "[npm package-resolution behavior](https://docs.npmjs.com/cli/v11/commands/npm-exec/)"
+      ],
+      "skills_used": [
+       "search-first",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "fp-check"
+      ]
+     }
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "GeiserX/agent-skills@research",
+     "refuted": true,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.6,
+     "reasoning": "Refuted only on the codex_implicit field; every other fact checked out. Verified facts: the repository was created 2026-07-08T16:29:16Z, 89 days ago, so the TOO NEW prefix is correct. It is GPL-3.0, has 4 stars and is not archived. v1.0.0 (2026-09-29T22:26:54Z) is its only release. The pin is HEAD 2335f15e, committed 2026-10-04T20:46:50Z. skills/research holds only SKILL.md. That file's sha256 64438d03... matches (bytes confirmed against git blob 4fac176d), name is research, the description is 230 code points and disable-model-invocation is true, so model_invocable=false is correct. The Codex copy codex/skills/research/SKILL.md is 4627 bytes with sha256 9a796eec... (matches), and its agents/openai.yaml sets a plain false for allow_implicit_invocation. bdaf1441 (2026-09-29) is the last change to skills/research/SKILL.md. The cited sections are at the stated lines: L15-20, L22-33 (4-7 and 8-12+ specialists, never spawn another agent, strongest model, pinned model), L37-45 and L49/L53. README L11 matches. L41 only says 'rebuilding the Codex copies'; the words 'from the Claude skills' are an inference. The claims about the installed search-first (L40, L58, L88-93, no citation or evidence wording) match its local copy, sha 76835db4. The problem: skill_md_sha256 identifies skills/research/SKILL.md, and that folder has no agents/openai.yaml. Under the task's definition, codex_implicit is therefore true for this SKILL.md, not false. The false value comes from a different folder, codex/skills/research. adoption/skills/lifecycle.md records one path per skill and the openai.yaml of that skill's own folder, so this row would record skills/research as explicit-only in Codex when it is not. The proposal discloses both copies. To fix it, either list the Codex copy as its own entry (codex/skills/research, sha256 9a796eec..., codex_implicit false) or set codex_implicit to true for skills/research.",
+     "refs": [
+      "https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/skills/research/SKILL.md",
+      "https://github.com/GeiserX/agent-skills/tree/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/skills/research",
+      "https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/codex/skills/research/SKILL.md",
+      "https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/codex/skills/research/agents/openai.yaml",
+      "https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/README.md",
+      "https://github.com/GeiserX/agent-skills/commit/bdaf14413ab173bbae966b91db6bdcb84bbb970f",
+      "https://api.github.com/repos/GeiserX/agent-skills/commits?since=2026-07-07T00:00:00Z&per_page=1",
+      "https://github.com/GeiserX/agent-skills/releases/tag/v1.0.0",
+      "https://api.github.com/graphql (repository GeiserX/agent-skills: createdAt, licenseInfo, stargazerCount, isArchived)",
+      "<repo>/adoption/skills/lifecycle.md:52-60",
+      "~/.claude/skills/search-first/SKILL.md (installed, sha256 76835db4...)"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "GeiserX/agent-skills@research",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.77,
+      "reasoning": "Fit fails on invocation. At pin 2335f15e the sha256 (64438d03…) matches. Frontmatter L4 sets 'disable-model-invocation: true', and L3 says 'Use when invoked explicitly'. This layer's requirement is the AGENTS.md:3 research-first rule: the coordinator, which is a model session, invokes the research skill before custom code or a tool choice. That needs a model-invocable skill. The Claude Code docs (code.claude.com/docs/en/skills, read 2026-10-05) say that with this flag 'Claude can't invoke the skill on its own', and 'If Claude tries anyway, Claude Code blocks the call and instructs it not to reproduce the ... steps another way'. A coordinator therefore can neither invoke the skill nor follow it by reading the file; only a human typing /research can. The Codex docs say allow_implicit_invocation false leaves only explicit $skill invocation. The proposal's claim that explicit-only use 'matches the AGENTS.md rule that the coordinator invokes the research-first skill' is therefore false in Claude Code. This repository reached the same conclusion for the session that drives the stages (docs/decisions/2026-09-25-skills-trial-and-usage.md L619-621). adoption/skills/manifest.json:30 also keeps skills listed 'so the model can invoke it'. A second problem: its adaptive panel (L26-29) uses 4-7 specialists for a normal question and 8-12+ for a broad one, more than the canonical 'two to four for a comparison' (examples/claude-native/CLAUDE.md:46). TOO NEW TO ASSESS: created 2026-07-08T16:29:16Z, 89 days ago. Its default branch is active (2335f15e, 2026-10-04); GPL-3.0 and 4 stars are information only. The paired benchmark itself is feasible, because skill-creator's with-skill run reads the skill by path. Its evidence contract (L37-47) is a sound reference for a future search-first re-record, but as proposed the skill cannot serve this requirement. Incumbency note: search-first scores 'community' and 'license' (L38-40) and maps 'MIT/Apache' to Adopt (L58), which conflicts with licence-as-information. Its winner standing rests on the 2026-09-25 verdict, not on a benchmark.",
+      "refs": [
+       "https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/skills/research/SKILL.md#L1-L33",
+       "https://code.claude.com/docs/en/skills",
+       "https://developers.openai.com/codex/skills#optional-metadata",
+       "https://api.github.com/repos/GeiserX/agent-skills",
+       "https://api.github.com/repos/GeiserX/agent-skills/commits?since=2026-07-07T00:00:00Z&per_page=1",
+       "AGENTS.md:3",
+       "docs/decisions/2026-09-25-skills-trial-and-usage.md:619-621",
+       "adoption/skills/manifest.json:30",
+       "examples/claude-native/CLAUDE.md:46",
+       "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md#L38-L58"
+      ],
+      "skills_used": [
+       "fp-check",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.91,
+      "reasoning": "The evidence contract offers a plausible advantage, but the proposed integration conflicts with this layer's coordinator-driven invocation. Claude's copy disables model invocation and Codex's policy requires explicit invocation; an explicitly invoked benchmark bypasses that integration gap. Additionally, the skill mandates pinning every agent and selecting the strongest critic model, whereas canonical instructions require pinned launches to preserve inherited model and effort. Its young age and license are not rejection grounds.",
+      "refs": [
+       "[Claude skill](https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/skills/research/SKILL.md)",
+       "[Codex skill](https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/codex/skills/research/SKILL.md)",
+       "[Codex invocation policy](https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/codex/skills/research/agents/openai.yaml)",
+       "[Canonical invocation and model rules](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/adoption/templates/codex.AGENTS.template.md)",
+       "[Native skill lifecycle](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/adoption/skills/lifecycle.md)"
+      ],
+      "skills_used": [
+       "search-first",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "fp-check"
+      ]
+     }
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "addyosmani/agent-skills@source-driven-development",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.9,
+     "reasoning": "All facts checked out. The pin 1401c8b8 is the default-branch HEAD, committed 2026-10-03T18:21:09Z, and the REST since call returns it. skills/source-driven-development holds only SKILL.md. Its sha256 c59faf85... matches (bytes confirmed against git blob 2704f0e1), name matches, the description is 308 code points, and there is no disable-model-invocation and no openai.yaml, so both flags are correctly true. The cited lines match: L30 (DETECT, FETCH, IMPLEMENT, CITE, drawn with box-drawing arrows), L40, L61, L76, L97-99, L174 (UNVERIFIED), and L204 '## Verification' through L215. The source ranking at L71-74 (docs, then blog or changelog, then standards, then compatibility) has no --help or source-at-tag step, which supports the 'omits' claim. The exclusions at L78-81 (Stack Overflow, blogs, training data) match. cda4542a, committed 2026-09-07T20:46:11Z and authored 2026-07-30, is the last change to the file. Latest release 0.6.12 at 2026-10-03T06:42:02Z, MIT, not archived, 101271 stars now against 101270 claimed, which is ordinary drift.",
+     "refs": [
+      "https://github.com/addyosmani/agent-skills/blob/1401c8b8030e023baeebb31781a6653fe8e93026/skills/source-driven-development/SKILL.md",
+      "https://github.com/addyosmani/agent-skills/tree/1401c8b8030e023baeebb31781a6653fe8e93026/skills/source-driven-development",
+      "https://github.com/addyosmani/agent-skills/commit/cda4542ade0f3c532494b9a48837eb01d39925f1",
+      "https://api.github.com/repos/addyosmani/agent-skills/commits?since=2026-07-07T00:00:00Z&per_page=1",
+      "https://github.com/addyosmani/agent-skills/releases/tag/0.6.12"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "addyosmani/agent-skills@source-driven-development",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.66,
+      "reasoning": "At pin 1401c8b8 the sha256 (c59faf85…) matches, and the repository is maintained (HEAD 2026-10-03). The skill grounds the implementation of a framework that has already been chosen: L3 says 'Grounds every implementation decision in official documentation... Use when building with any framework or library', and L30 gives DETECT, FETCH, IMPLEMENT, CITE. It does not survey upstream tools, skills or prior decisions before a component is adopted, which is this layer's requirement, so its gap belongs to an implementation task. Where it does overlap this repository's rules, it conflicts with them. Its source hierarchy (L67-74) puts official docs first, then blog or changelog, then web standards. It never consults the installed client or the upstream source at a tag. That reverses the canonical check order: installed client, changelog for that version, source at that tag, then official docs (docs/harness-defaults.md:23, AGENTS.md:5). DETECT reads only package manifests (L40-49), and L61 then says to 'ask the user' when versions are missing. This repository's pinned components can be discovered (manifests/stack.json, client --version), and the canonical rule settles discoverable facts before asking. The proposed trial would mostly measure how well the repository's rules override the skill's own order. Its broad trigger would also add tokens to ordinary coding turns. The trial is feasible, but the skill sits in the wrong layer and conflicts with the canonical order.",
+      "refs": [
+       "https://github.com/addyosmani/agent-skills/blob/1401c8b8030e023baeebb31781a6653fe8e93026/skills/source-driven-development/SKILL.md#L3",
+       "https://github.com/addyosmani/agent-skills/blob/1401c8b8030e023baeebb31781a6653fe8e93026/skills/source-driven-development/SKILL.md#L40-L74",
+       "https://api.github.com/repos/addyosmani/agent-skills/commits?since=2026-07-07T00:00:00Z&per_page=1",
+       "docs/harness-defaults.md:23",
+       "AGENTS.md:5"
+      ],
+      "skills_used": [
+       "fp-check",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.97,
+      "reasoning": "The proposal overlooks a mandatory preference question beyond ambiguous versions: Step 3 tells the agent to obtain the user's choice when documentation conflicts with existing code. That blanket instruction can interrupt bounded work without establishing a material unresolved decision. Its prescribed authority order also places official documentation before changelogs and omits installed-client and tagged-source checks, contradicting the canonical capability-check order. The proposed benchmark does not resolve these instruction conflicts.",
+      "refs": [
+       "[Pinned skill, Steps 1–3](https://github.com/addyosmani/agent-skills/blob/1401c8b8030e023baeebb31781a6653fe8e93026/skills/source-driven-development/SKILL.md)",
+       "[Bounded-work rule](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/AGENTS.md)",
+       "[Capability-check order](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/adoption/templates/codex.AGENTS.template.md)"
+      ],
+      "skills_used": [
+       "search-first",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "fp-check"
+      ]
+     }
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "mattpocock/skills@research",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.8,
+     "reasoning": "The facts check out. The pin 24fe0ef7 is the default-branch HEAD, committed 2026-10-04T12:48:05Z, and the REST since call returns it. skills/engineering/research/SKILL.md exists at the pin with name research and a 238-code-point description, and has no disable-model-invocation. Its agents/openai.yaml has only interface labels (display_name, short_description), so both flags are correctly true. skill_md_sha256 is null, which counts as unknown; the actual value is 985569f15739c713d6784887c3d186d4ef9ac85bec5ad9c068d25bf0739928e4 (794 bytes). The content claims match the file: a background agent (L6), every claim traced to primary sources (L10), and one Markdown file saved by the repository's own convention (L11-12). Repository: created 2026-02-03T11:15:53Z, MIT, not archived, v1.3.1 at 2026-10-04T12:48:18Z, 276316 stars now against 276307 claimed, which is drift. The REST path history since 2026-09-07 is empty; the last change was 3216582 on 2026-08-19, 'Remove all em-dashes'. Note for the fit lane, not counted against the facts: this exact skill is excluded in adoption/skills/manifest.json:711-714 for writing findings .md into the repo and duplicating search-first and iterative-retrieval. The proposal presents that same behaviour as its gap, and upstream has not changed the skill since the exclusion.",
+     "refs": [
+      "https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/research/SKILL.md",
+      "https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/research/agents/openai.yaml",
+      "https://api.github.com/repos/mattpocock/skills/commits?since=2026-07-07T00:00:00Z&per_page=1",
+      "https://api.github.com/repos/mattpocock/skills/commits?path=skills/engineering/research/SKILL.md&since=2026-09-07T00:00:00Z&per_page=5",
+      "https://api.github.com/graphql (repository mattpocock/skills: createdAt, licenseInfo, isArchived, latestRelease, stargazerCount)",
+      "<repo>/adoption/skills/manifest.json:711-714"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "mattpocock/skills@research",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.92,
+      "reasoning": "It duplicates an excluded skill without new evidence. known_skills.excluded lists mattpocock/skills research. adoption/skills/manifest.json excluded[4] gives the reason 'Writes findings .md into the repo; duplicates search-first and iterative-retrieval' and the overturn condition 'Kept research skills show a gap on a frozen research task'. The pinned SKILL.md at 24fe0ef7 is 794 bytes with sha256 985569f15739c713d6784887c3d186d4ef9ac85bec5ad9c068d25bf0739928e4; the proposal left that field null. It still says to 'capture the findings as a Markdown file in the repo' (L3, L11-12) and to 'Spin up a background agent' (L6). Its path history shows the file was added on 2026-07-01 and last changed on 2026-08-19 (321658273cb1, em-dash removal), so these bytes predate the 2026-09-25/30 exclusion. The proposal's gap is the exclusion reason restated as a feature, and it concedes 'No superiority or recent substantive revision was established'. The promptfoo design is well formed, but no gap calls for it. Maintenance is fine (24fe0ef7, 2026-10-04).",
+      "refs": [
+       "https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/research/SKILL.md#L1-L12",
+       "https://api.github.com/repos/mattpocock/skills/commits?path=skills/engineering/research/SKILL.md&per_page=5",
+       "https://api.github.com/repos/mattpocock/skills/commits?since=2026-07-07T00:00:00Z&per_page=1",
+       "adoption/skills/manifest.json excluded[4] (mattpocock/skills research)"
+      ],
+      "skills_used": [
+       "fp-check",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.98,
+      "reasoning": "The claimed primary-source and cited-artifact contract already existed at the layer's earlier pin. This is the same known excluded alternative, with no newly demonstrated failure of the installed pair or comparative result. A future benchmark is an overturn plan, not new evidence supporting reopening. Writing a Markdown artifact is not itself disqualifying. Standing note: the supplied winner labels likewise do not establish measured superiority; the installed pair remains a provisional control.",
+      "refs": [
+       "[Proposed skill](https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/research/SKILL.md)",
+       "[Earlier skill with the same contract](https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/research/SKILL.md)",
+       "[Recorded exclusion and installed controls](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/adoption/skills/manifest.json)"
+      ],
+      "skills_used": [
+       "search-first",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "fp-check"
+      ]
+     }
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "github/awesome-copilot@build-evidence-map",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.9,
+     "reasoning": "All facts checked out. The pin 143a3d97 is the HEAD of main, committed 2026-10-01T22:21:25Z, and the REST since call returns it. skills/build-evidence-map holds SKILL.md, references/ and scripts/, and no agents/openai.yaml. Its sha256 fb104196... matches (bytes confirmed against git blob 3d0ff938), name matches, the description is 293 code points and names Copilot, and there is no disable-model-invocation, so both flags are correctly true. The content matches: four node types at L26-30 (position, claim, evidence, unknown); four edge types at L31-32 (supports, contradicts, qualifies, missing); Step 8 'Validate fail-closed' with the Node.js built-ins and no npm or network wording at L51; doubt-ai@0.8.0 only when the user has already installed it, at L58-59; Step 9 needs explicit network permission (L64); and the Quality gates section starts at L80. 37ade4b5 (2026-08-05) is the only commit, and so the last change, to the file. Repository: MIT, not archived, 0 releases, 39703 stars, pushed_at 2026-10-04T23:45:13Z.",
+     "refs": [
+      "https://github.com/github/awesome-copilot/blob/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/build-evidence-map/SKILL.md",
+      "https://github.com/github/awesome-copilot/tree/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/build-evidence-map",
+      "https://github.com/github/awesome-copilot/commit/37ade4b521000f4f7d74f0f7eb510a781b5ec6d5",
+      "https://api.github.com/repos/github/awesome-copilot/commits?since=2026-07-07T00:00:00Z&per_page=1",
+      "https://api.github.com/graphql (repository github/awesome-copilot: licenseInfo, isArchived, releases totalCount 0, stargazerCount, pushedAt)"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "github/awesome-copilot@build-evidence-map",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.6,
+      "reasoning": "At pin 143a3d97 the sha256 (fb104196…) matches, and the repository is maintained (2026-10-01). The supply chain is clean. scripts/validate.mjs (2886 bytes) imports only node:crypto, node:fs/promises, node:path and node:url (L3-6). doubt-ai@0.8.0 is used only if it is already installed (L58-59), and network verification needs explicit permission (L64-74). Fit fails. The skill records one contested decision as a .doubt.json graph (L18-42); it does not survey upstream tools, skills or prior decisions, which is this layer's requirement. The gap it claims, a decision artifact, is already met here by docs/decisions records and scripts/validate_convergence.py (AGENTS.md:18). That is an already-known alternative, and the proposal gives no evidence that the evidence map beats it. The skill also writes a second artifact format into the workspace, the same trait that got mattpocock research excluded. Its description is written for Copilot ('Use when Copilot must…', L3), and it hands simple claims to a `doublecheck` skill that is not installed (L12-14), so whether it triggers in Claude Code and Codex is unproven. If it is kept at all, it belongs in a decision-record comparison outside this research layer.",
+      "refs": [
+       "https://github.com/github/awesome-copilot/blob/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/build-evidence-map/SKILL.md#L1-L74",
+       "https://github.com/github/awesome-copilot/blob/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/build-evidence-map/scripts/validate.mjs#L3-L6",
+       "https://api.github.com/repos/github/awesome-copilot/commits?since=2026-07-07T00:00:00Z&per_page=1",
+       "AGENTS.md:18"
+      ],
+      "skills_used": [
+       "fp-check",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.91,
+      "reasoning": "The keep_but_compare label holds. Typed counterevidence, explicit unknowns, bounded source regions and graph-integrity checks provide a concrete complement. Reading validate.mjs and contract.mjs confirms local validation using built-ins and bundled code, without package installation or network requests. The stack's existing validator checks experiment-record consistency rather than this claim graph. The frozen six-task comparison is bounded; cross-client triggering, semantic quality and total cost remain unproven, appropriately preventing promotion.",
+      "refs": [
+       "[Pinned skill](https://github.com/github/awesome-copilot/blob/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/build-evidence-map/SKILL.md)",
+       "[Offline validator](https://github.com/github/awesome-copilot/blob/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/build-evidence-map/scripts/validate.mjs)",
+       "[Graph contract](https://github.com/github/awesome-copilot/blob/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/build-evidence-map/scripts/contract.mjs)",
+       "[Existing experiment validator](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/scripts/validate_convergence.py)"
+      ],
+      "skills_used": [
+       "search-first",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "fp-check"
+      ]
+     }
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "affaan-m/ECC@research-ops",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.85,
+     "reasoning": "The facts check out. The pin ef648e01 is the HEAD of main, committed 2026-10-02T02:01:14Z, and the REST since call returns it. skills/research-ops holds only SKILL.md, with no agents/openai.yaml. Name matches, the description is 204 code points, and there is no disable-model-invocation, so both flags are correctly true. skill_md_sha256 is null, which counts as unknown; the actual value is 114d0e5480ce3ad263316c639ce0c401396e1d9fbec3cf15b3c962ae16f376db. The content claims match the file. Evidence classes appear at L34-37 and L71-75 (sourced fact, user-provided evidence, inference), and the output format at L87-99 adds a RECOMMENDATION section. Concrete dates are required at L78. Lightweight research comes first (L39, L62). It routes to the other ECC skills exa-search, deep-research, market-research, lead-intelligence and knowledge-ops (L14-22, L64-67). Repository: created 2026-01-18T00:51:51Z, MIT, not archived, v2.2.3 at 2026-10-01T23:00:36Z, 273062 stars, which is drift. For information: this SKILL.md last changed on 2026-06-11 (db7f2a6f). The proposal does not claim a recent revision.",
+     "refs": [
+      "https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/research-ops/SKILL.md",
+      "https://github.com/affaan-m/ECC/tree/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/research-ops",
+      "https://api.github.com/repos/affaan-m/ECC/commits?since=2026-07-07T00:00:00Z&per_page=1",
+      "https://github.com/affaan-m/ECC/releases/tag/v2.2.3",
+      "https://api.github.com/graphql (repository affaan-m/ECC: createdAt, licenseInfo, isArchived, latestRelease)"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "affaan-m/ECC@research-ops",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.8,
+      "reasoning": "At pin ef648e01 the SKILL.md is 3605 bytes with sha256 114d0e5480ce3ad263316c639ce0c401396e1d9fbec3cf15b3c962ae16f376db; the proposal left that field null. It calls itself 'the operator wrapper around the repo's research stack' (L12) and routes to ECC skills that are not installed here: exa-search, deep-research, market-research, lead-intelligence and knowledge-ops (L14-22). Its lightest path starts with exa-search (L62-64). exa-search at the same pin needs an Exa MCP server started as unpinned `npx -y exa-mcp-server`, with an EXA_API_KEY from exa.ai (exa-search SKILL.md L25-37). That adds a new credential, a SaaS dependency and unpinned code, and no gap justifies them. Its scope is people and company enrichment, leads and monitors (L10, L26-29), not the research-first survey before code or adoption. Its controls are generic: labelling facts, user evidence, inference and recommendation, and dating fresh claims (L31-39, L69-78). No measured advantage is shown. The proposal's comparison runs only 'when its dependencies are already supported', so no bounded trial is feasible now. Maintained (ef648e01, 2026-10-02).",
+      "refs": [
+       "https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/research-ops/SKILL.md#L10-L78",
+       "https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/exa-search/SKILL.md#L25-L37",
+       "https://api.github.com/repos/affaan-m/ECC/commits?since=2026-07-07T00:00:00Z&per_page=1"
+      ],
+      "skills_used": [
+       "fp-check",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.94,
+      "reasoning": "The dependency problem is stronger than the proposal acknowledges. Its ordinary discovery workflow explicitly routes through exa-search. At the same pin, that dependency instructs configuration using unversioned npx -y exa-mcp-server and API-key provisioning. The proposal establishes neither a supported pinned integration nor an Exa-specific gap justifying that dependency. Evidence classification is useful, but a comparison conditional on future dependency support or revised upstream instructions does not make the current workflow compatible.",
+      "refs": [
+       "[Research-ops routing](https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/research-ops/SKILL.md)",
+       "[Exa dependency setup](https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/exa-search/SKILL.md)",
+       "[Canonical source and installation rules](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/adoption/templates/codex.AGENTS.template.md)"
+      ],
+      "skills_used": [
+       "search-first",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "fp-check"
+      ]
+     }
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "affaan-m/ECC@skill-scout",
+     "refuted": true,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.75,
+     "reasoning": "The skill fields are correct: sha256 73ac1437... matches (bytes confirmed against git blob 8a55c548), name is skill-scout, the description is 174 code points, the folder holds only SKILL.md, and there is no disable-model-invocation, so both flags are true. The content claims also match: L10, Steps 2-6, the vetting list at L77-78, stars used only to sort search results (L60), and 'salvaged from stale community PR #1232' (L14). The provenance claims are false. The REST path history for skills/skill-scout/SKILL.md lists three commits: 65c1502e on 2026-05-12, 'feat: salvage cost tracking and skill scout (#1815)'; db7f2a6f on 2026-06-11; and c05b2d66 on 2026-10-01, 'chore: retire the Everything Claude Code name, ECC only (#3330)'. c05b2d66 is the last change but not the introducing change, so the evidence item 'last (and introducing) change ... 2026-10-01' and the gap's 'New in ECC on 2026-10-01 (c05b2d66)' are both wrong. The skill was present by 2026-05-12, well before the 2026-09-30 catalog check. 'Not renamed' is also inaccurate: the GraphQL repository affaan-m/everything-claude-code resolves to affaan-m/ECC with the same createdAt, 2026-01-18T00:51:51Z. affaan-m/ECC is still the correct canonical URL. These provenance errors do not by themselves decide the fit question of not_adopted.",
+     "refs": [
+      "https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/skill-scout/SKILL.md",
+      "https://api.github.com/repos/affaan-m/ECC/commits?path=skills/skill-scout/SKILL.md&per_page=20",
+      "https://github.com/affaan-m/ECC/commit/c05b2d6614f62f6db0047669aa4eefb223d478f9",
+      "https://github.com/affaan-m/ECC/commit/65c1502ecd",
+      "https://api.github.com/repos/affaan-m/ECC/commits?since=2026-07-07T00:00:00Z&per_page=1",
+      "https://api.github.com/graphql (repository affaan-m/everything-claude-code -> nameWithOwner affaan-m/ECC)"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "affaan-m/ECC@skill-scout",
+     "refuted": true,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.72,
+      "reasoning": "The not_adopted label holds for this layer. At pin ef648e01 the sha256 (73ac1437…) matches. Its description reads 'Search existing local, marketplace, GitHub, and web skill sources before creating a new skill. Use when the user wants to create, build, fork, or find a skill', and L10 says 'Use this skill before creating a new skill'. That trigger belongs to the skill-lifecycle task. The skills part of the research survey is served by the installed find-skills (adoption/skills/manifest.json, status trial). Devil's advocate: its GitHub code search for SKILL.md files (L55-61) reaches further than find-skills' registry search, which could improve discovery. The proposal sends that search and the vetting checklist (L72-81) to the skill-lifecycle sweep with a named skill-creator comparison, which is the right place for them. It also fits poorly here: Step 6 offers 'Fork or extend: Copy the closest skill and modify it' (L95-106), and an edited copy fails the installer's SKILL.md pin hash check (docs/decisions/2026-09-25-skills-trial-and-usage.md L1658-1659). Sorting search results by stars (L60) is discovery only. The repository is maintained and MIT; this skill was added upstream on 2026-10-01.",
+      "refs": [
+       "https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/skill-scout/SKILL.md#L1-L24",
+       "https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/skill-scout/SKILL.md#L55-L106",
+       "https://api.github.com/repos/affaan-m/ECC/commits?since=2026-07-07T00:00:00Z&per_page=1",
+       "docs/decisions/2026-09-25-skills-trial-and-usage.md:1658-1659",
+       "adoption/skills/manifest.json skills[find-skills]"
+      ],
+      "skills_used": [
+       "fp-check",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "refuted": true,
+      "confidence": 0.9,
+      "reasoning": "The not_adopted justification draws an unsupported lifecycle boundary: this requirement explicitly includes surveying skills before adoption or custom work. Scout's external-source vetting checklist adds concrete checks for commands, writes, network access, credentials and installations beyond find-skills' discovery workflow. Canonical overrides already neutralize find-skills' popularity criteria, but do not supply that explicit checklist. This supports comparison within research as well as skill-lifecycle work. Refuting the rejection does not establish superiority or authorize adoption.",
+      "refs": [
+       "[Scout discovery and vetting workflow](https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/skill-scout/SKILL.md)",
+       "[Installed find-skills](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills/SKILL.md)",
+       "[Canonical discovery overrides](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/adoption/skills/lifecycle.md)"
+      ],
+      "skills_used": [
+       "search-first",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "fp-check"
+      ]
+     }
+    }
+   },
+   {
+    "facts": {
+     "role": "facts",
+     "repository": "muratcankoylan/Agent-Skills-for-Context-Engineering@filesystem-context",
+     "refuted": false,
+     "round": "first",
+     "family": "anthropic",
+     "model": "claude-opus-5-5",
+     "effort": "max",
+     "confidence": 0.9,
+     "reasoning": "All facts checked out. The pin 58b55a89 is the HEAD of main, committed 2026-10-01T05:58:33Z, and the REST since call returns it. skills/filesystem-context holds SKILL.md, references/ and scripts/, and no agents/openai.yaml. Its sha256 91cd7f07... matches (bytes confirmed against git blob d80eec51), name matches, the description is 242 code points, and there is no disable-model-invocation, so both flags are correctly true. The line ranges match the file: Pattern 1 runs L51-69 (grep-back at L69), Pattern 3 L94-98, Pattern 4 L114-125, Pattern 5 L127-137, Pattern 6 L139-151 (agents write their own instruction files, a yaml example at L145-148, 'Treat it as experimental' at L151), and '~2000 tokens' is at L171. 7638f30c (2026-10-01T02:47:58Z) is the last change to the file. Repository: v2.3.0 at 2026-05-22T04:31:12Z, 18077 stars, MIT, not archived. The local exclusion quote for addyosmani context-engineering matches adoption/skills/manifest.json:825-827 word for word.",
+     "refs": [
+      "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/blob/58b55a8921758d13453b440704fb1b5b208c0b0e/skills/filesystem-context/SKILL.md",
+      "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/tree/58b55a8921758d13453b440704fb1b5b208c0b0e/skills/filesystem-context",
+      "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/commit/7638f30c4b59b09fcebe915fda4b5bd1e3999d35",
+      "https://api.github.com/repos/muratcankoylan/Agent-Skills-for-Context-Engineering/commits?since=2026-07-07T00:00:00Z&per_page=1",
+      "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/releases/tag/v2.3.0",
+      "<repo>/adoption/skills/manifest.json:825-827"
+     ],
+     "skills_used": [
+      "fp-check",
+      "supply-chain-risk-auditor"
+     ]
+    },
+    "fit": {
+     "role": "fit",
+     "repository": "muratcankoylan/Agent-Skills-for-Context-Engineering@filesystem-context",
+     "refuted": false,
+     "round": "first",
+     "rule": "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted",
+     "claude": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.78,
+      "reasoning": "The not_adopted label holds. At pin 58b55a89 the sha256 (91cd7f07…) matches, and the repository is maintained (2026-10-01). Patterns 1-5 restate lanes this stack already runs: offloading tool output over about 2,000 tokens to scratch files and grepping it back (L51-69, L171), plan persistence, sub-agent file workspaces, dynamic skill loading and terminal log persistence. These map to context-mode indexing with ctx_search, iterative-retrieval, the scratchpad and worktree conventions, native progressive disclosure of skills and docs/token-practice.md. That matches the recorded exclusion of addyosmani context-engineering (adoption/skills/manifest.json excluded[23]). The proposal brings no measured evidence: the skill asks for token accounting (L202-219) but reports no measurement. The proposal underrates one point. 'When to Activate' includes 'Building agents that learn and update their own instructions' (L12-20), and Pattern 6 says 'Have agents write learned preferences and patterns to their own instruction files' (L139-151). For Claude Code or Codex agents those files are CLAUDE.md and AGENTS.md, so the pattern points to the agent writing its own instruction files. That conflicts with the canonical instructions and is a further reason for rejection. The skill is also general guidance for building agents, not the research-first survey.",
+      "refs": [
+       "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/blob/58b55a8921758d13453b440704fb1b5b208c0b0e/skills/filesystem-context/SKILL.md#L12-L69",
+       "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/blob/58b55a8921758d13453b440704fb1b5b208c0b0e/skills/filesystem-context/SKILL.md#L139-L151",
+       "https://api.github.com/repos/muratcankoylan/Agent-Skills-for-Context-Engineering/commits?since=2026-07-07T00:00:00Z&per_page=1",
+       "adoption/skills/manifest.json excluded[23] (addyosmani/agent-skills context-engineering)"
+      ],
+      "skills_used": [
+       "fp-check",
+       "supply-chain-risk-auditor",
+       "skill-creator"
+      ]
+     },
+     "gpt6": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "refuted": false,
+      "confidence": 0.92,
+      "reasoning": "The not_adopted label holds. Output offloading, selective recovery, progressive skill loading and bounded context handling overlap existing token lanes and the previously excluded context-engineering alternative. The proposal supplies no measured improvement or concrete failure those existing mechanisms cannot address. Its frozen-task paired comparison is an appropriate reopening condition. The experimental preference-file example does not specifically direct unsolicited CLAUDE.md or AGENTS.md edits, so that is not used as a rejection reason.",
+      "refs": [
+       "[Pinned filesystem-context skill](https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/blob/58b55a8921758d13453b440704fb1b5b208c0b0e/skills/filesystem-context/SKILL.md)",
+       "[Existing token practices and evidence limits](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/token-practice.md)",
+       "[Existing context-engineering exclusion](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/adoption/skills/manifest.json)"
+      ],
+      "skills_used": [
+       "search-first",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "fp-check"
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "raw": {
+  "skills-research": {
+   "first": {
+    "claude_discover": {
+     "layer_id": "skills-research",
+     "proposed": [
+      {
+       "skill_ref": "GeiserX/agent-skills@research",
+       "source_id": "unlisted",
+       "lifecycle_task": "research",
+       "pin": "2335f15e723c2d7ee15fd6e4b4437255dc9ad985",
+       "skill_md_sha256": "64438d0344aba75ae00721a7542474078af9e240f525a3550e3777cf00cc3c31",
+       "license": "GPL-3.0",
+       "source": "WebSearch discovery lead (GeiserX/agent-skills, 'research grounded in ... primary sources'), then the SKILL.md was read at the default-branch HEAD through the GitHub GraphQL API. The sha256 covers the Claude copy skills/research/SKILL.md (3729 bytes, git blob oid verified).",
+       "description_chars": 230,
+       "model_invocable": false,
+       "codex_implicit": false,
+       "replaces": null,
+       "proposed_label": "targeted_candidate",
+       "demonstrated_gap": "TOO NEW TO ASSESS (<90 days): the repository was created 2026-07-08, 89 days before 2026-10-05. Its default branch is active (2335f15e, committed 2026-10-04). Its 4 stars and GPL-3.0 licence are information only. Gap versus the installed search-first: search-first's Evaluate step scores 'community' and 'license', and its decision matrix maps 'MIT/Apache' to Adopt. Neither is a criterion in this repository. Its Full Mode launches one general-purpose agent with no evidence contract. GeiserX research works differently. (1) Before any web search it reads applicable instructions, implementation, tests, configuration, git history and current dependency versions, which covers the requirement's prior decisions. (2) It limits external claims to current primary sources. (3) It treats repository and web text as untrusted. (4) It runs independent specialists with a pinned model on every agent and never lets an agent spawn another, which matches CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1. (5) It puts the skeptical critic and the falsification attempt on the strongest model. (6) It requires each claim to carry its source, date or version, a confidence and 'what would change the conclusion', which is this repository's overturn comparison. (7) It resolves conflicts by directness, then authority, version match, reproducibility and recency. Both copies are explicit-only: the Claude copy sets disable-model-invocation: true and the Codex copy sets allow_implicit_invocation: false. It therefore cannot take over search-first's proactive listing role (replaces=null), and the trial invokes both arms explicitly. That matches the AGENTS.md rule that the coordinator invokes the research-first skill. Cost risk to measure: its panel sizing (4-7 specialists for a 'normal' question, 8-12+ for broad ones) exceeds this repository's 'two to four for a comparison' guidance.",
+       "evidence": [
+        "https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/skills/research/SKILL.md: frontmatter disable-model-invocation: true. Sections 'Scope first' (local codebase, instructions and history before the web; primary sources; untrusted text), 'Adaptive panel' (pinned models, 'Never ask an agent to spawn another agent', critic on the strongest model), 'Evidence contract' and 'Deterministic synthesis'",
+        "https://github.com/GeiserX/agent-skills/tree/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/skills/research: the folder holds only SKILL.md, with no agents/openai.yaml beside it",
+        "https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/codex/skills/research/agents/openai.yaml: the Codex copy sets 'policy: allow_implicit_invocation: false' (plain false). The Codex copy's SKILL.md (4627 bytes) has sha256 9a796eec255a79ca0da1e72e3c5145f098a47575497850444fe4a4c172bf70f5",
+        "https://github.com/GeiserX/agent-skills/blob/2335f15e723c2d7ee15fd6e4b4437255dc9ad985/README.md: L11 'Skills for Claude Code and Codex'; L41 says the Codex copies are rebuilt from the Claude skills",
+        "https://api.github.com/repos/GeiserX/agent-skills/commits?since=2026-07-07T00:00:00Z&per_page=1: returned 2335f15e committed 2026-10-04T20:46:50Z (active default branch)",
+        "https://api.github.com/repos/GeiserX/agent-skills (read through the GraphQL API): createdAt 2026-07-08T16:29:16Z, GPL-3.0, 4 stars, not archived",
+        "https://github.com/GeiserX/agent-skills/commit/bdaf14413ab173bbae966b91db6bdcb84bbb970f: last change to skills/research/SKILL.md, 2026-09-29 (inside the 4-week window)",
+        "https://github.com/GeiserX/agent-skills/releases/tag/v1.0.0: latest release, 2026-09-29"
+       ],
+       "upstream_now": {
+        "latest_release": "v1.0.0",
+        "released_at": "2026-09-29T22:26:54Z",
+        "stars": 4,
+        "pushed_at": "2026-10-04T20:46:53Z",
+        "archived": false,
+        "license": "GPL-3.0"
+       },
+       "comparison_that_would_overturn": "skill-creator paired benchmark in Claude Code at equal model and effort (Opus, max). Arms: A = explicit '/research <prompt>' with GeiserX research at 2335f15e; B = explicit '/search-first <prompt>' with the installed search-first and iterative-retrieval at their manifest pins, as the old_skill baseline. Both arms are spawned in the same turn, 3 runs per prompt. Prompts: a frozen set of 8 research-first prompts from this repository's adopt-or-build decisions, such as the OmniRoute 3.8.51 pin selection and the 2026-09-25 skills-trial verdicts. Metric: grader pass rate on assertions, plus total_tokens and duration_ms from timing.json, aggregated by scripts.aggregate_benchmark. The assertions check that every claim carries a primary-source URL or a repo@pin:path:line; relevant docs/decisions records are found and cited; maintenance is established from commits?since, never from stars or pushed_at; licence and stars are not used as criteria; and an overturn comparison is named. The Codex arm repeats this as a promptfoo config on the same prompts and grader, with the Codex copy invoked as $research. Decision rule: adopt as the explicit research-before-decision skill only if A's pass rate beats B's in both clients with no higher mean token or time cost. Otherwise keep search-first unchanged."
+      },
+      {
+       "skill_ref": "addyosmani/agent-skills@source-driven-development",
+       "source_id": "addyosmani-agent-skills",
+       "lifecycle_task": "research",
+       "pin": "1401c8b8030e023baeebb31781a6653fe8e93026",
+       "skill_md_sha256": "c59faf851377f0eeda45306398d16eb96d77ab1c2fd3e1a7fb58e9a0af33c1e9",
+       "license": "MIT",
+       "source": "Task source addyosmani-agent-skills: a recursive tree of the default-branch HEAD, filtered by keyword, then the SKILL.md was read through the GitHub GraphQL API (git blob oid verified).",
+       "description_chars": 308,
+       "model_invocable": true,
+       "codex_implicit": true,
+       "replaces": null,
+       "proposed_label": "targeted_candidate",
+       "demonstrated_gap": "Complement for the 'before writing code' half of the requirement. Neither installed skill requires that a chosen component's API be checked against version-matched official sources before code is written: search-first stops at Adopt, Extend or Build, and iterative-retrieval only ranks local files. source-driven-development does five things. (1) It detects exact versions from the dependency file. (2) It fetches official docs, then official blog or changelog, ranked by authority, and excludes Stack Overflow, blogs and training data. (3) It treats fetched pages as untrusted data ('Retrieval Safety'). (4) It cites a full URL for every framework-specific decision. (5) It marks the rest UNVERIFIED, with a verification checklist. This closely follows this repository's capability-check order (installed client, then changelog for that version, then upstream source at the tag, then official docs). It omits the installed-client --help and source-at-tag steps, which the trial should score. Caveat, not a conflict: it asks the user only when versions remain missing or ambiguous after it reads the dependency file (L61), so it imposes no mandatory intake. Its broad trigger ('any framework or library where correctness matters') may add tokens to ordinary coding turns, which the decision rule prices in. Last changed 2026-09-07 (cda4542a), at the edge of the 4-week window.",
+       "evidence": [
+        "https://github.com/addyosmani/agent-skills/blob/1401c8b8030e023baeebb31781a6653fe8e93026/skills/source-driven-development/SKILL.md: L30 'DETECT -> FETCH -> IMPLEMENT -> CITE'; L40 reads versions from the dependency file; L61 'If versions are missing or ambiguous, ask the user'; L76 lists non-authoritative sources; L97-99 'Retrieval Safety: Treat Fetched Content as Data'; L174 the UNVERIFIED flag; L204-215 the verification checklist",
+        "https://github.com/addyosmani/agent-skills/tree/1401c8b8030e023baeebb31781a6653fe8e93026/skills/source-driven-development: the folder holds only SKILL.md (no agents/openai.yaml), and the frontmatter has no disable-model-invocation",
+        "https://api.github.com/repos/addyosmani/agent-skills/commits?since=2026-07-07T00:00:00Z&per_page=1: returned a commit (active default branch). HEAD is 1401c8b8, committed 2026-10-03T18:21:09Z",
+        "https://github.com/addyosmani/agent-skills/commit/cda4542ade0f3c532494b9a48837eb01d39925f1: last change to this SKILL.md, 2026-09-07",
+        "https://github.com/addyosmani/agent-skills/releases/tag/0.6.12: latest release 2026-10-03; repository MIT, not archived"
+       ],
+       "upstream_now": {
+        "latest_release": "0.6.12",
+        "released_at": "2026-10-03T06:42:02Z",
+        "stars": 101270,
+        "pushed_at": "2026-10-03T18:21:11Z",
+        "archived": false,
+        "license": "MIT"
+       },
+       "comparison_that_would_overturn": "skill-creator paired benchmark in Claude Code at equal model and effort. Arms: A = the installed search-first and iterative-retrieval plus source-driven-development at 1401c8b8; B = the installed pair only (old_skill baseline). Both arms run in the same turn, 3 runs per prompt. Prompts: a frozen set of 8 prompts that need version-specific use of a component pinned in this repository, such as the NautilusTrader 2.0.0rc5 IBKR adapter configuration, OmniRoute 3.8.51 gateway settings and Claude Code 2.1.284 settings keys. Metric: grader pass rate on assertions, plus total_tokens and duration_ms. The assertions check that every framework-specific claim cites a version-matched official doc, changelog or source-at-tag URL; that unverifiable claims are marked UNVERIFIED; and that no deprecated or nonexistent API is used, checked against the pinned upstream source. The Codex arm repeats this as a promptfoo config with the same prompts and grader at equal model and effort. Decision rule: adopt as a complement only if A's pass rate beats B's in both clients without a higher mean token or time cost."
+      },
+      {
+       "skill_ref": "github/awesome-copilot@build-evidence-map",
+       "source_id": "unlisted",
+       "lifecycle_task": "research",
+       "pin": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+       "skill_md_sha256": "fb104196d94a0530eb5b86c56edfdaac0954a842f7cc71dfd4dcf87b20675fc9",
+       "license": "MIT",
+       "source": "Beyond the task sources: a listing of the skills/ folder in the vendor repository github/awesome-copilot (426 skills) at HEAD through the GitHub GraphQL API, filtered by keyword. The SKILL.md was read at the pin (git blob oid verified).",
+       "description_chars": 293,
+       "model_invocable": true,
+       "codex_implicit": true,
+       "replaces": null,
+       "proposed_label": "keep_but_compare",
+       "demonstrated_gap": "Complement for the decision-record side of research-first adoption. The installed pair produces no artifact for a contested adopt-or-build choice, while this repository requires a dated record naming the alternatives and the comparison that would overturn it. build-evidence-map frames one falsifiable question and builds a typed graph. The graph has four node types (position, claim, evidence, unknown) and four edge types (supports, contradicts, qualifies, missing). It records dated, bounded source locators and keeps counterevidence. A bundled validator that uses only Node.js built-ins checks the graph fail-closed, with no npm or network access. The skill never installs doubt-ai@0.8.0 implicitly and runs network source verification only with explicit permission, so it passes the unpinned-install test. Reasons to compare rather than trial now: it overlaps this repository's docs/decisions records and scripts/validate_convergence.py, and its description is written for Copilot, so whether it triggers in Claude Code and Codex is untested. Its scripts/validate.mjs and references/ were not read.",
+       "evidence": [
+        "https://github.com/github/awesome-copilot/blob/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/build-evidence-map/SKILL.md: workflow steps 1-10. Step 8 says the validator 'uses only Node.js built-ins and does not require npm or network access'; it renders with doubt-ai@0.8.0 only 'when the user has already installed' it; Step 9 runs network verification only with explicit permission; the Quality gates section",
+        "https://github.com/github/awesome-copilot/tree/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/build-evidence-map: the folder holds SKILL.md, references/ and scripts/, with no agents/openai.yaml",
+        "https://api.github.com/repos/github/awesome-copilot/commits?since=2026-07-07T00:00:00Z&per_page=1: returned 143a3d97 committed 2026-10-01T22:21:25Z (active default branch)",
+        "https://github.com/github/awesome-copilot/commit/37ade4b521000f4f7d74f0f7eb510a781b5ec6d5: last change to this SKILL.md, 2026-08-05",
+        "https://api.github.com/repos/github/awesome-copilot (read through the GraphQL API): MIT, not archived, no GitHub releases"
+       ],
+       "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": 39703,
+        "pushed_at": "2026-10-04T23:45:13Z",
+        "archived": false,
+        "license": "MIT"
+       },
+       "comparison_that_would_overturn": "skill-creator paired benchmark in Claude Code at equal model and effort. Arms: A = the installed pair plus build-evidence-map at 143a3d97; B = the installed pair plus this repository's existing decision-record path (docs/decisions with scripts/validate_convergence.py). Prompts: 6 frozen contested adopt-or-build questions from this repository's decision records. Metric: grader pass rate on assertions, the trigger rate when the skill is not named, total_tokens and duration_ms. The assertions check that counterevidence and decision-changing unknowns are kept with dated, bounded locators; that the validator exits 0; and that an overturn condition is named. The Codex arm repeats this as a promptfoo config on the same prompts. Decision rule: promote to targeted_candidate only if A beats B's pass rate in both clients with no higher token or time cost, and the skill triggers in both clients."
+      },
+      {
+       "skill_ref": "bgauryy/octocode@octocode-research",
+       "source_id": "bgauryy-octocode",
+       "lifecycle_task": "research",
+       "pin": "c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+       "skill_md_sha256": "0dd7a864064c5ac3dd7122343aad312dba13baf1b5e66b0ac82766377fb9d2d3",
+       "license": "MIT",
+       "source": "Task source bgauryy-octocode: a recursive tree at the default-branch HEAD (which equals the layer pin), then the SKILL.md and its agents/openai.yaml were read through the GitHub GraphQL API (git blob oid verified).",
+       "description_chars": 651,
+       "model_invocable": true,
+       "codex_implicit": true,
+       "replaces": null,
+       "proposed_label": "not_adopted",
+       "demonstrated_gap": "Rejected on the SKILL.md text alone; references/octocode.md was not read. L54-59 tell the model, whenever Octocode MCP tools are not exposed, to run 'npx octocode context --minimal', 'npx octocode tools <name> --scheme --json --compact' and 'npx octocode tools <name> --queries ...' with no version. That fetches and executes the latest npm release, which is unpinned code and conflicts with this repository's canonical instructions. The SKILL.md names no pinned version anywhere. The fallback is the path that would run on this host: a read-only check found no octocode binary on PATH, no npm global package and no Octocode MCP entry in the Claude or Codex configuration (fp-check: true positive, reachable). Without that conflict, the capability (evidence-first research with file:line, PR and commit citations over local code, GitHub, packages and prior art, 'plan a coding flow before writing') would be a credible complement to search-first.",
+       "evidence": [
+        "https://github.com/bgauryy/octocode/blob/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research/SKILL.md: L54 'Prefer Octocode MCP tools when exposed. Otherwise `npx octocode tools <name>`'; L57-59 are the unversioned npx commands",
+        "https://github.com/bgauryy/octocode/blob/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research/agents/openai.yaml: only an interface block (display_name, short_description, default_prompt) and no policy block, so implicit invocation stays allowed",
+        "https://api.github.com/repos/bgauryy/octocode/commits?since=2026-07-07T00:00:00Z&per_page=1: returned a commit (maintained). HEAD is c265e3f9, committed 2026-08-25T19:36:19Z, which equals the layer pin, so nothing has changed since the catalog check",
+        "https://github.com/bgauryy/octocode/releases/tag/9.1.1: the latest release is 2025-12-15, which is old, but the default branch is active, so the repository is not stale"
+       ],
+       "upstream_now": {
+        "latest_release": "9.1.1",
+        "released_at": "2025-12-15T20:10:38Z",
+        "stars": 947,
+        "pushed_at": "2026-10-03T16:43:40Z",
+        "archived": false,
+        "license": "MIT"
+       },
+       "comparison_that_would_overturn": "Reopen only if upstream pins the CLI (for example npx octocode@<version>) or drops the npx fallback. Then run a skill-creator paired benchmark in Claude Code, with the Octocode MCP installed at a pinned release through the stack's adoption lifecycle. Arms: A = the installed pair plus octocode-research; B = the installed pair. Prompts: 8 frozen upstream-survey prompts from this repository's adopt-or-build decisions. Metric: grader pass rate on assertions that require file:line or commit-cited evidence and the maintenance rule, plus total_tokens and duration_ms. The Codex arm repeats this as a promptfoo config at equal model and effort. Decision rule: adopt only if A beats B's pass rate in both clients with no higher token or time cost."
+      },
+      {
+       "skill_ref": "affaan-m/ECC@skill-scout",
+       "source_id": "affaan-m-ecc",
+       "lifecycle_task": "research",
+       "pin": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+       "skill_md_sha256": "73ac14373108c29e35f6f950b43762e3e50848d693b712f7c3e989ec21e7abe8",
+       "license": "MIT",
+       "source": "Task source affaan-m-ecc: a recursive tree at the default-branch HEAD (1027 SKILL.md files), filtered by keyword. The skill is new in the 4-week window, and its SKILL.md was read through the GitHub GraphQL API (git blob oid verified).",
+       "description_chars": 174,
+       "model_invocable": true,
+       "codex_implicit": true,
+       "replaces": null,
+       "proposed_label": "not_adopted",
+       "demonstrated_gap": "Not adopted for the research task. Its triggers are creating, building, forking or finding a skill, which belongs to the skill-lifecycle task. Its discovery also overlaps the installed find-skills (vercel-labs/skills) and this sweep's registry and GitHub search. The research-relevant part, a skills channel beyond search-first's '~/.claude/skills' check, is already covered by find-skills. Its genuine addition is a vetting checklist for external SKILL.md files: unexpected shell commands, file writes, network calls, credential handling, package installs and maintenance. That checklist should be judged in the skill-lifecycle sweep, not here. Using stars to sort search results is discovery only and is not a conflict. New in ECC on 2026-10-01 (c05b2d66), salvaged from community PR #1232.",
+       "evidence": [
+        "https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/skill-scout/SKILL.md: 'Use this skill before creating a new skill'. Steps 2-3 search local, marketplace, GitHub code and web sources; Step 4 'Vet External Matches'; Step 6 decision options",
+        "https://github.com/affaan-m/ECC/commit/c05b2d6614f62f6db0047669aa4eefb223d478f9: last (and introducing) change to this SKILL.md, 2026-10-01",
+        "https://github.com/affaan-m/ECC/tree/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/skill-scout: the folder holds only SKILL.md (no agents/openai.yaml), and the frontmatter has no disable-model-invocation",
+        "https://api.github.com/repos/affaan-m/ECC/commits?since=2026-07-07T00:00:00Z&per_page=1: returned ef648e01 committed 2026-10-02T02:01:14Z (maintained)",
+        "https://github.com/affaan-m/ECC/releases/tag/v2.2.3: latest release 2026-10-01; repository MIT, not archived, not renamed (nameWithOwner affaan-m/ECC)"
+       ],
+       "upstream_now": {
+        "latest_release": "v2.2.3",
+        "released_at": "2026-10-01T23:00:36Z",
+        "stars": 273057,
+        "pushed_at": "2026-10-02T02:01:14Z",
+        "archived": false,
+        "license": "MIT"
+       },
+       "comparison_that_would_overturn": "Reassess in the skill-lifecycle sweep with a skill-creator paired benchmark in Claude Code at equal model and effort. Arms: A = find-skills plus skill-scout at ef648e01; B = find-skills alone. Prompts: 8 frozen 'is there a skill for X' prompts taken from this repository's 2026-09-25 skills trial. Metric: grader pass rate, plus total_tokens and duration_ms. The assertions check recall of the maintained candidates this sweep found, that the SKILL.md was read before any recommendation, and that install, network and credential lines are flagged. The Codex arm repeats this as a promptfoo config on the same prompts. Decision rule: adopt only if A beats B's pass rate in both clients with no higher token or time cost."
+      },
+      {
+       "skill_ref": "muratcankoylan/Agent-Skills-for-Context-Engineering@filesystem-context",
+       "source_id": "unlisted",
+       "lifecycle_task": "research",
+       "pin": "58b55a8921758d13453b440704fb1b5b208c0b0e",
+       "skill_md_sha256": "91cd7f071e38dbeee15dbebd9dd549c9116affae939702f05409ed1952355f50",
+       "license": "MIT",
+       "source": "WebSearch for context-engineering skills, then a listing of the skills/ folder at HEAD and a read of the SKILL.md through the GitHub GraphQL API (git blob oid verified). Revised in the 4-week window.",
+       "description_chars": 242,
+       "model_invocable": true,
+       "codex_implicit": true,
+       "replaces": null,
+       "proposed_label": "not_adopted",
+       "demonstrated_gap": "Not adopted because it duplicates lanes this stack already runs, the 'staged, bounded retrieval' half of the requirement. Its core patterns overlap existing lanes: offloading tool output over about 2000 tokens to scratch files and grepping it back, persisting terminal logs, giving sub-agents file workspaces, and loading skills dynamically. These restate the installed context-mode lane (ctx_execute and ctx_batch_execute indexing with ctx_search), native skill progressive disclosure and docs/token-practice.md. The same duplicate reason excluded addyosmani context-engineering in adoption/skills/manifest.json. Pattern 6, where agents write learned preferences to their own instruction files, is fenced as experimental and its example writes a yaml file, so it is a caution only and not the reason for rejection. Revised 2026-10-01 (7638f30c).",
+       "evidence": [
+        "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/blob/58b55a8921758d13453b440704fb1b5b208c0b0e/skills/filesystem-context/SKILL.md: Pattern 1 'Filesystem as Scratch Pad' (L51-69), Pattern 3 sub-agent file workspaces (L94-98), Pattern 4 dynamic skill loading (L114-125), Pattern 5 terminal and log persistence (L127-137), Pattern 6 experimental self-modification (L139-151), 'Tool outputs exceed ~2000 tokens' (L171)",
+        "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/commit/7638f30c4b59b09fcebe915fda4b5bd1e3999d35: last change to this SKILL.md, 2026-10-01",
+        "https://api.github.com/repos/muratcankoylan/Agent-Skills-for-Context-Engineering/commits?since=2026-07-07T00:00:00Z&per_page=1: returned 58b55a89 committed 2026-10-01T05:58:33Z (maintained)",
+        "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/tree/58b55a8921758d13453b440704fb1b5b208c0b0e/skills/filesystem-context: the folder holds SKILL.md, references/ and scripts/, with no agents/openai.yaml",
+        "Local adoption/skills/manifest.json (excluded entry): addyosmani context-engineering was excluded as 'Context-setup guidance that duplicates docs/token-practice.md and the kept iterative-retrieval and search-first winners'"
+       ],
+       "upstream_now": {
+        "latest_release": "v2.3.0",
+        "released_at": "2026-05-22T04:31:12Z",
+        "stars": 18077,
+        "pushed_at": "2026-10-01T05:58:33Z",
+        "archived": false,
+        "license": "MIT"
+       },
+       "comparison_that_would_overturn": "This follows the overturn rule of the context-engineering exclusion, tested with a skill-creator paired benchmark in Claude Code at equal model and effort. Arms: A = the installed iterative-retrieval and context-mode lanes plus filesystem-context; B = the installed lanes only. Prompts: a frozen context task, namely subagent research briefs over this repository's catalogs with tool outputs over 20 KB. Metric: grader pass rate on answer-correctness assertions, plus total_tokens and duration_ms. The Codex arm repeats this as a promptfoo config on the same prompts. Decision rule: adopt only if A beats B's pass rate in both clients with no higher token or time cost."
+      }
+     ],
+     "calls": {
+      "web_search": 9,
+      "web_fetch": 0,
+      "gh_api": 23
+     },
+     "notes": "HEALTH OF THE INSTALLED SKILLS (unchanged). At ECC HEAD ef648e01 (2026-10-02; https://api.github.com/repos/affaan-m/ECC/commits?since=2026-07-07T00:00:00Z&per_page=1 is non-empty), skills/search-first/SKILL.md has sha256 76835db4... and skills/iterative-retrieval/SKILL.md has b453b16d.... Both equal the manifest pins. The paths are unchanged, neither has an agents/openai.yaml beside it, and neither sets disable-model-invocation. The last content commits are 0765f7a2 (2026-09-27) and d29cf651 (2026-08-12). The repository is not archived or renamed (affaan-m/ECC), its licence is MIT and its latest release is v2.2.3 (2026-10-01).\n\nWINNERS STAND ON INCUMBENCY, NOT MEASUREMENT. The installed gap fields say 'Verdict winner (ECC)'. The catalogs/landscape/foundation.json instructions-skills rationale cites matching hashes, native discovery and fit. The adoption/skills/manifest.json trial measures invocation counts (skill-doctor, skill_usage.py), not a paired quality benchmark. No measured comparison against alternatives was found. search-first's own Evaluate step scores 'community' and 'license', and its decision matrix maps 'MIT/Apache' to Adopt. Neither is a criterion in this repository, and this is the concrete incumbent gap the proposed comparisons test.\n\nOPENAI/SKILLS IS STALE BY THE RULE (other layers). https://api.github.com/repos/openai/skills/commits?since=2026-07-07T00:00:00Z&per_page=1 returned empty. The default-branch HEAD is 49f948fa, committed 2026-06-24. pushed_at 2026-09-08 counts other branches, so it does not change this. This affects four installed skills: gh-address-comments, gh-fix-ci, security-best-practices and security-threat-model. Flag it for the ci-pr and security sweeps; it changes no label in this layer.\n\nTASK SOURCES ARE ALL MAINTAINED. Default-branch commit since 2026-07-07 for each:\n- ECC: ef648e01, 2026-10-02.\n- mattpocock/skills: 24fe0ef7, 2026-10-04.\n- bgauryy/octocode: c265e3f9, 2026-08-25. Equals the layer pin; activity is slowing.\n- microsoft/skills: ce7edea9, 2026-10-02.\n- addyosmani/agent-skills: 1401c8b8, 2026-10-03.\n- ComposioHQ/awesome-claude-skills: be2a4069, 2026-07-24. Equals the layer pin, inside the window but slowing.\nThe skills-sh-registry entry was queried through 'DISABLE_TELEMETRY=1 npx skills@1.7.0 find' with five queries (research, search first, deep research, context retrieval, prior art). Its results rank by install count, and its only on-task hit was mattpocock research. Also: seeded_candidates and previous_sweep were empty, and open_gaps was empty.\n\nNEW OR REVISED IN THE LAST 4 WEEKS: ECC skill-scout (2026-10-01), muratcankoylan filesystem-context (2026-10-01), GeiserX research (2026-09-29), cursor/plugins pstack principle-guard-the-context-window and show-me-your-work (2026-09-23), and addyosmani source-driven-development (2026-09-07, at the boundary).\n\nCHECKED AND NOT PROPOSED:\n- mattpocock/skills@research (sha256 985569f1..., last change 32165827 on 2026-08-19): it still writes a findings .md into the repository through a background agent. The manifest exclusion (writes .md into the repo; duplicates the installed pair) stands, and there is no new overturn evidence.\n- GeiserX/agent-skills@kb-research: TOO NEW TO ASSESS (<90 days), and disable-model-invocation: true. It answers 'whether a plan contradicts an earlier decision' through a knowledge-base adapter the user fills in. That needs self-written adapter glue for docs/decisions and ai-memory. Keep it in view for the 'prior decisions' part of the requirement.\n- ECC research-ops (last change 2026-06-11): an ECC-specific router into exa-search, deep-research and market-research.\n- ECC deep-research and exa-search: these need Exa and Firecrawl MCPs, which means paid SaaS and new credentials with no demonstrated gap, since the stack already has the native-stack-research (GPT Researcher/DeerFlow) lane. The evidence labels in research-ops are covered more fully by GeiserX research's evidence contract.\n- ECC documentation-lookup: depends on the Context7 MCP. source-driven-development covers official-docs grounding without being tied to a tool.\n- ECC knowledge-ops: knowledge-base sync, which belongs to the memory lane.\n- microsoft/skills wiki-researcher: Step 2 asks the user whether the repository is local-only, which makes intake a workflow step. It is also off-task (codebase wiki).\n- microsoft/skills microsoft-docs: limited to Microsoft documentation, with an unpinned 'npx @microsoft/learn-cli' fallback.\n- bytedance/deer-flow github-deep-research (last change 2026-03-17) and deep-research: both follow DeerFlow-runtime methods. deep-research's description says 'Use this skill instead of WebSearch for ANY question', an overbroad trigger.\n- github/awesome-copilot context-map: 'Do not proceed with implementation until this map is reviewed' is a mandatory review gate.\n- github/awesome-copilot what-context-needed: a user-in-the-loop prompt template.\n- github/awesome-copilot create-technical-spike: a spike-document workflow; not read in full.\n- cursor/plugins pstack principle-guard-the-context-window: 939 bytes, disable-model-invocation: true, and repeats the token-practice delegation rule. The repository has no SPDX licence (information only).\n- cursor/plugins pstack show-me-your-work: a decision-trail log that belongs to the agent-docs or review lane.\n- addyosmani doubt-driven-development: belongs to the review lane, and its Step 1 asks the user which CLI to use.\n- muratcankoylan multi-agent-patterns: belongs to the architecture lane.\n- trailofbits audit-context-building: belongs to the security lane.\n- anthropics/skills (8a1541c4) and obra/superpowers (8ca22dba): no research skill at HEAD.\n- 199-biotechnologies/claude-deep-research-skill: STALE. https://api.github.com/repos/199-biotechnologies/claude-deep-research-skill/commits?since=2026-07-07T00:00:00Z&per_page=1 returned empty, and the last default-branch commit was 2026-04-11.\n- Web leads not checked for maintenance (unknown, not refuted): lingzhi227, wanshuiyin ARIS, GGGODLIN, daymade deep-research and K-Dense scientific skills (the repository has moved to K-Dense-AI/scientific-agent-skills). All are academic, ML or web-report research, off-task for research-first adoption decisions.\n\nMETHOD AND LIMITS:\n- gh_api 23: each GraphQL query counts as one call, and a parse failure forced one rerun that counts twice.\n- web_search 9: 4 WebSearch plus 5 registry queries. web_fetch 0.\n- supply-chain-risk-auditor: its collector was not run, because SKILL.md sources are not npm, PyPI or Go manifests (an unsupported ecosystem for the skill). Its rule that unavailable data is never evidence of risk was applied.\n- fp-check verdicts: octocode's unpinned npx fallback is a true positive and reachable on this host. The instruction-file-write claim against filesystem-context was dropped; that rejection rests on duplication.\n- skill-creator was read, not run. It is Claude-only, so every Codex arm is a promptfoo config.\n- Not read: the body of GeiserX's Codex copy beyond its header, build-evidence-map's scripts/validate.mjs and references/, and octocode's references/octocode.md.\n- Licences were recorded as information only.",
+     "skills_used": [
+      "search-first",
+      "iterative-retrieval",
+      "supply-chain-risk-auditor",
+      "fp-check",
+      "skill-creator"
+     ]
+    },
+    "gpt6_discover": {
+     "status": "ok",
+     "output": {
+      "layer_id": "skills-research",
+      "proposed": [
+       {
+        "skill_ref": "mattpocock/skills@research",
+        "source_id": "mattpocock-skills",
+        "lifecycle_task": "research",
+        "pin": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+        "skill_md_sha256": null,
+        "license": "MIT",
+        "source": "Default-branch GitHub API folder sweep of [mattpocock/skills](https://github.com/mattpocock/skills), reopening a previously excluded skill.",
+        "description_chars": 238,
+        "model_invocable": true,
+        "codex_implicit": true,
+        "replaces": null,
+        "proposed_label": "targeted_candidate",
+        "demonstrated_gap": "A compact complement worth testing: it explicitly requires tracing every claim to its primary source and saving one cited Markdown artifact using the repository's existing convention. The installed skills describe ecosystem discovery and retrieval refinement without this explicit artifact contract. It requires a background agent, so coordination cost must be measured. No superiority or recent substantive revision was established.",
+        "evidence": [
+         "[Pinned SKILL.md](https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/research/SKILL.md): primary-source investigation, background delegation, and one repository-convention research artifact.",
+         "[Pinned invocation metadata](https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/research/agents/openai.yaml): interface labels only; no implicit-invocation restriction.",
+         "[Repository API](https://api.github.com/repos/mattpocock/skills): canonical name, creation date 2026-02-03, MIT license, archived=false, stars and pushed_at.",
+         "[Default-branch activity](https://api.github.com/repos/mattpocock/skills/commits?since=2026-07-07T00:00:00Z&per_page=1): latest returned commit is the proposed pin, dated 2026-10-04.",
+         "[Latest release](https://api.github.com/repos/mattpocock/skills/releases/latest): v1.3.1, published 2026-10-04T12:48:18Z.",
+         "[Four-week path history](https://api.github.com/repos/mattpocock/skills/commits?path=skills/engineering/research/SKILL.md&since=2026-09-07T00:00:00Z&per_page=5): empty result for this exact path; not evidence of a September substantive revision."
+        ],
+        "upstream_now": {
+         "latest_release": "v1.3.1",
+         "released_at": "2026-10-04T12:48:18Z",
+         "stars": 276307,
+         "pushed_at": "2026-10-04T13:44:59Z",
+         "archived": false,
+         "license": "MIT"
+        },
+        "comparison_that_would_overturn": "Planned promptfoo paired evaluation: freeze 24 adopt-or-build prompts from this repository's decisions. Compare installed search-first plus iterative-retrieval against that same pair plus this skill, separately in Claude Code and Codex with identical model, effort, tools and source snapshots. Measure complete-task pass rate, verified primary-source citations, artifact correctness, total parent-plus-worker tokens and elapsed time. Promote only with at least 10 percentage points higher pass rate in each client, no higher median tokens or time, and zero forbidden actions."
+       },
+       {
+        "skill_ref": "affaan-m/ECC@research-ops",
+        "source_id": "affaan-m-ecc",
+        "lifecycle_task": "research",
+        "pin": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+        "skill_md_sha256": null,
+        "license": "MIT",
+        "source": "Default-branch GitHub API folder sweep of [affaan-m/ECC](https://github.com/affaan-m/ECC).",
+        "description_chars": 204,
+        "model_invocable": true,
+        "codex_implicit": true,
+        "replaces": null,
+        "proposed_label": "keep_but_compare",
+        "demonstrated_gap": "Adds explicit separation of supplied evidence, verified facts, inference and recommendations, dates freshness-sensitive findings, and avoids heavyweight research when local material answers the question. These controls are more explicit than in the installed pair. Its workflow routes through additional ECC research skills, including exa-search, which this layer's installed set does not include; that dependency weakens the case for an immediate trial.",
+        "evidence": [
+         "[Pinned SKILL.md](https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/research-ops/SKILL.md): evidence classification, freshness dates, lightweight-first routing and additional ECC skill dependencies.",
+         "[Complete pinned tree](https://api.github.com/repos/affaan-m/ECC/git/trees/ef648e01899ba3e8dc6371642deaaf64b4477775?recursive=1): this folder has no adjacent agents/openai.yaml.",
+         "[Repository API](https://api.github.com/repos/affaan-m/ECC): created 2026-01-18, MIT, archived=false, stars and pushed_at.",
+         "[Default-branch activity](https://api.github.com/repos/affaan-m/ECC/commits?since=2026-07-07T00:00:00Z&per_page=1): proposed pin dated 2026-10-02 satisfies the maintenance floor.",
+         "[Latest release](https://api.github.com/repos/affaan-m/ECC/releases/latest): v2.2.3, published 2026-10-01T23:00:36Z."
+        ],
+        "upstream_now": {
+         "latest_release": "v2.2.3",
+         "released_at": "2026-10-01T23:00:36Z",
+         "stars": 273055,
+         "pushed_at": "2026-10-02T02:01:14Z",
+         "archived": false,
+         "license": "MIT"
+        },
+        "comparison_that_would_overturn": "When its dependencies are already supported or upstream makes routing tool-neutral, use a planned promptfoo comparison of the installed pair versus the pair plus research-ops on 24 frozen decisions containing stale notes, conflicting sources and locally answerable questions. Hold client, model, effort and tools fixed. Require at least 10 percentage points higher complete-task pass rate in both clients, fewer unsupported or undated claims, no higher median total tokens or elapsed time, and no new credentials or installations."
+       },
+       {
+        "skill_ref": "affaan-m/ECC@search-first",
+        "source_id": "affaan-m-ecc",
+        "lifecycle_task": "research",
+        "pin": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+        "skill_md_sha256": null,
+        "license": "MIT",
+        "source": "Installed-control health comparison against current [affaan-m/ECC](https://github.com/affaan-m/ECC) through the GitHub API.",
+        "description_chars": 328,
+        "model_invocable": true,
+        "codex_implicit": true,
+        "replaces": null,
+        "proposed_label": "not_adopted",
+        "demonstrated_gap": "Re-adoption of the unchanged upstream instructions fails the same policy applied to challengers: implementation examples direct package installation without version pins, including npm install textlint-rule-no-dead-link and installation of ajv-cli. Its ecosystem survey remains relevant, but incumbency does not exempt these instructions from the user's unpinned-code exclusion. This is an existing instruction conflict, not a newly introduced health regression or an instruction to uninstall the current control.",
+        "evidence": [
+         "[Current pinned SKILL.md](https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/search-first/SKILL.md): useful package/MCP/skill/GitHub survey, followed by unpinned installation examples.",
+         "[Installed-pin SKILL.md](https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md): its fetched text equals the current-pin text.",
+         "[Complete current tree](https://api.github.com/repos/affaan-m/ECC/git/trees/ef648e01899ba3e8dc6371642deaaf64b4477775?recursive=1): original folder remains present without adjacent agents/openai.yaml.",
+         "[Repository metadata](https://api.github.com/repos/affaan-m/ECC) and [default-branch activity](https://api.github.com/repos/affaan-m/ECC/commits?since=2026-07-07T00:00:00Z&per_page=1): active, nonarchived MIT source; exclusion concerns instructions, not maintenance.",
+         "[Latest release](https://api.github.com/repos/affaan-m/ECC/releases/latest): v2.2.3 and its publication timestamp."
+        ],
+        "upstream_now": {
+         "latest_release": "v2.2.3",
+         "released_at": "2026-10-01T23:00:36Z",
+         "stars": 273055,
+         "pushed_at": "2026-10-02T02:01:14Z",
+         "archived": false,
+         "license": "MIT"
+        },
+        "comparison_that_would_overturn": "First require a maintained upstream revision that removes unpinned installation directions. Then plan a promptfoo three-arm test on 24 frozen decisions: repository instructions alone, current installed pair, and corrected search-first plus iterative-retrieval. Require zero unpinned installation attempts, maintained ecosystem coverage, and a higher complete-task pass rate than the current pair without higher median total tokens or elapsed time in either client."
+       },
+       {
+        "skill_ref": "bgauryy/octocode@octocode-research",
+        "source_id": "bgauryy-octocode",
+        "lifecycle_task": "research",
+        "pin": "c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+        "skill_md_sha256": null,
+        "license": "MIT",
+        "source": "Default-branch GitHub API folder sweep of [bgauryy/octocode](https://github.com/bgauryy/octocode).",
+        "description_chars": 651,
+        "model_invocable": true,
+        "codex_implicit": true,
+        "replaces": "affaan-m/ECC@search-first",
+        "proposed_label": "not_adopted",
+        "demonstrated_gap": "Offers exact-source evidence tracking, explicit uncertainty, progressive reference loading and bounded investigation, making it a plausible research-first challenger. However, its fallback directs npx octocode execution without a package version. That conflicts with the explicit unpinned-code exclusion. The source passes the maintenance floor; its August default-branch commit must not be confused with its October pushed_at.",
+        "evidence": [
+         "[Pinned SKILL.md](https://github.com/bgauryy/octocode/blob/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research/SKILL.md): exact-read workflow, bounded iterations, progressive references and unversioned npx fallback.",
+         "[Pinned invocation metadata](https://github.com/bgauryy/octocode/blob/c265e3f9413161c900cbf4aa70d451b8e6b3920a/skills/octocode-research/agents/openai.yaml): interface fields only; no implicit-invocation restriction.",
+         "[Repository API](https://api.github.com/repos/bgauryy/octocode): created 2025-06-05, MIT, archived=false, stars and October pushed_at.",
+         "[Default-branch activity](https://api.github.com/repos/bgauryy/octocode/commits?since=2026-07-07T00:00:00Z&per_page=1): proposed pin dated 2026-08-25, within the required 90-day window."
+        ],
+        "upstream_now": {
+         "latest_release": null,
+         "released_at": null,
+         "stars": 947,
+         "pushed_at": "2026-10-03T16:43:40Z",
+         "archived": false,
+         "license": "MIT"
+        },
+        "comparison_that_would_overturn": "Require an upstream revision that pins its fallback or exclusively uses an already configured supported transport. Plan a promptfoo comparison of installed search-first plus iterative-retrieval versus corrected octocode-research plus iterative-retrieval on 24 frozen upstream-selection and source-verification prompts. Require at least 10 percentage points higher complete-task pass rate, exact-source citation correctness, zero unpinned execution attempts, and no higher median total tokens or elapsed time in both clients."
+       },
+       {
+        "skill_ref": "microsoft/skills@wiki-researcher",
+        "source_id": "microsoft-skills",
+        "lifecycle_task": "research",
+        "pin": "ce7edea90860e0c69fa36db164584c87908e09f5",
+        "skill_md_sha256": null,
+        "license": "MIT",
+        "source": "Official-vendor default-branch GitHub API folder sweep of [microsoft/skills](https://github.com/microsoft/skills).",
+        "description_chars": 304,
+        "model_invocable": true,
+        "codex_implicit": true,
+        "replaces": "affaan-m/ECC@iterative-retrieval",
+        "proposed_label": "not_adopted",
+        "demonstrated_gap": "Its code-path evidence standards could strengthen deep investigation, but the workflow explicitly requires asking the user about repository context before proceeding. That mandatory intake conflicts with bounded, already specified work. Five prescribed iterations, each with a diagram and table, also fit poorly with the requirement to keep retrieval and worker context small.",
+        "evidence": [
+         "[Pinned SKILL.md](https://github.com/microsoft/skills/blob/ce7edea90860e0c69fa36db164584c87908e09f5/.github/plugins/deep-wiki/skills/wiki-researcher/SKILL.md): mandatory repository-context intake, five iterations, diagram/table requirements, evidence standards and MIT frontmatter.",
+         "[Complete pinned tree](https://api.github.com/repos/microsoft/skills/git/trees/ce7edea90860e0c69fa36db164584c87908e09f5?recursive=1): no adjacent agents/openai.yaml for this folder.",
+         "[Repository API](https://api.github.com/repos/microsoft/skills): created 2026-01-16, MIT, archived=false, stars and pushed_at.",
+         "[Default-branch activity](https://api.github.com/repos/microsoft/skills/commits?since=2026-07-07T00:00:00Z&per_page=1): proposed pin dated 2026-10-02."
+        ],
+        "upstream_now": {
+         "latest_release": null,
+         "released_at": null,
+         "stars": 3081,
+         "pushed_at": "2026-10-02T16:39:30Z",
+         "archived": false,
+         "license": "MIT"
+        },
+        "comparison_that_would_overturn": "Require upstream to make intake conditional on genuinely missing information and scale investigation depth to the task. Plan a promptfoo paired test of search-first plus installed iterative-retrieval versus search-first plus the corrected skill on 24 frozen bounded repository questions. Require zero unnecessary intake blocks, at least 10 percentage points higher evidence-complete pass rate, and no higher retrieved-context size, median total tokens or elapsed time in either client."
+       },
+       {
+        "skill_ref": "addyosmani/agent-skills@context-engineering",
+        "source_id": "addyosmani-agent-skills",
+        "lifecycle_task": "research",
+        "pin": "1401c8b8030e023baeebb31781a6653fe8e93026",
+        "skill_md_sha256": null,
+        "license": "MIT",
+        "source": "Default-branch GitHub API recheck of the previously excluded skill in [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills).",
+        "description_chars": 198,
+        "model_invocable": true,
+        "codex_implicit": true,
+        "replaces": "affaan-m/ECC@iterative-retrieval",
+        "proposed_label": "not_adopted",
+        "demonstrated_gap": "Contains useful selective-context and compression guidance, but its session-start workflow directs creation of a persistent rules file, supplies CLAUDE.md content, and names AGENTS.md as the Codex equivalent. This instruction is not limited to an explicit agent-document editing request, so it conflicts with the prohibition on autonomous rules-file writes. The earlier exclusion remains justified by current content.",
+        "evidence": [
+         "[Pinned SKILL.md](https://github.com/addyosmani/agent-skills/blob/1401c8b8030e023baeebb31781a6653fe8e93026/skills/context-engineering/SKILL.md): broad session-start activation, rules-file creation directions, CLAUDE.md template, AGENTS.md equivalent and selective-context guidance.",
+         "[Complete pinned tree](https://api.github.com/repos/addyosmani/agent-skills/git/trees/1401c8b8030e023baeebb31781a6653fe8e93026?recursive=1): no adjacent agents/openai.yaml.",
+         "[Repository API](https://api.github.com/repos/addyosmani/agent-skills): created 2026-02-15, MIT, archived=false, stars and pushed_at.",
+         "[Default-branch activity](https://api.github.com/repos/addyosmani/agent-skills/commits?since=2026-07-07T00:00:00Z&per_page=1): proposed pin dated 2026-10-03."
+        ],
+        "upstream_now": {
+         "latest_release": null,
+         "released_at": null,
+         "stars": 101270,
+         "pushed_at": "2026-10-03T18:21:11Z",
+         "archived": false,
+         "license": "MIT"
+        },
+        "comparison_that_would_overturn": "Require an upstream revision limiting rules-file creation to explicit user requests. Plan a promptfoo paired comparison of installed iterative-retrieval versus corrected context-engineering, retaining search-first and identical repository instructions in both arms. Use 24 frozen context-retrieval tasks with irrelevant files and conflicting notes. Require zero unauthorized rules-file writes, at least 10 percentage points higher evidence-complete pass rate, and no higher median context size, total tokens or elapsed time in both clients."
+       }
+      ],
+      "calls": {
+       "web_search": 12,
+       "web_fetch": 8,
+       "gh_api": 40
+      },
+      "notes": "North-star action: improve evidence-grounded component selection for US-equities historical simulation and later independently qualified paper trading; no live-trading work. All comparisons above are proposed, not executed. Run them through existing native accounts on the supplied Linux and macOS hosts, holding model and effort fixed within each client's paired arms.\n\nInstalled health: current ECC search-first and iterative-retrieval fetched texts exactly match their supplied installed-pin texts. Their original folders, names and descriptions remain present, with description lengths 328 and 183; neither current folder has adjacent agents/openai.yaml or a disabling frontmatter flag. See [current iterative-retrieval](https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/iterative-retrieval/SKILL.md), [installed iterative-retrieval](https://github.com/affaan-m/ECC/blob/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/iterative-retrieval/SKILL.md), and the ECC sources cited above. Current repository license is MIT; historical license continuity was not independently established. The search-first rejection records an existing policy conflict, not a newly changed file. The supplied winner labels contain no comparative measurements available to this worker: both installed skills remain retained controls, not demonstrated best performers.\n\nAdditional checked sources: [ECC deep-research](https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/deep-research/SKILL.md) starts with clarifying intake except when explicitly waived and requires Firecrawl or Exa, so it was not advanced for this bounded workflow. [Composio content-research-writer](https://github.com/ComposioHQ/awesome-claude-skills/blob/be2a406907dbc61b73e6827ded415c96139d13a2/content-research-writer/SKILL.md) targets article drafting, outlining and writing feedback rather than adopt-or-build decisions. Its [default-branch query](https://api.github.com/repos/ComposioHQ/awesome-claude-skills/commits?since=2026-07-07T00:00:00Z&per_page=1) returned a July 24 commit; archived status was not checked, so no complete maintenance verdict is claimed.\n\nBeyond supplied sources, [hec-ovi/research-skill](https://github.com/hec-ovi/research-skill) was investigated at 109589751168ab42f929f3cd1741bd2946b4880b. Its [repository metadata](https://api.github.com/repos/hec-ovi/research-skill) and [default-branch query](https://api.github.com/repos/hec-ovi/research-skill/commits?since=2026-07-07T00:00:00Z&per_page=1) establish a nonarchived MIT source created April 25 with a July 23 commit, passing the maintenance floor. Its [research skill](https://github.com/hec-ovi/research-skill/blob/109589751168ab42f929f3cd1741bd2946b4880b/skills/research/SKILL.md) provides progressive persistent retrieval and contrarian research, but explicitly permits answering from a stored summary without reopening underlying evidence. Its [Codex variant](https://github.com/hec-ovi/research-skill/blob/109589751168ab42f929f3cd1741bd2946b4880b/plugins/research-codex/skills/research/SKILL.md) repeats that rule and prescribes a specific child model/effort. These conflict with canonical-source verification and preserving launch pins; it was not advanced. Its benchmark claim was not verified. Official-vendor discovery also located [OpenAI product-design research](https://github.com/openai/plugins/blob/main/plugins/product-design/skills/research/SKILL.md), whose stated scope is UX complaints rather than component adoption; it was not pinned or fully assessed. No seeded candidates were supplied.\n\nCoverage limits: the September 7–October 5 window was searched, but comprehensive skill-level revision coverage was not achieved. Recent repository commits and releases were not treated as proof of recent substantive skill changes. The exact Matt research path query returned no commits in that window. The [skills.sh listing request](https://skills.sh/?q=research) failed, and registry searches yielded no usable listing evidence. ECC context-budget and the hec benchmark page were fetched but their bodies were omitted from the returned batch, so neither was judged. Null release fields mean unverified within budget, not absence of releases. No repository was excluded for unknown maintenance, license, stars or install counts; all proposed sources predate the 90-day cutoff.\n\nCompleteness critic / next sweep: recover registry coverage; inspect context-budget and other task-relevant retrieval candidates; verify per-skill changes within the four-week window; finish release metadata and benchmark-source reads; and test prior-decision retrieval plus original-source verification explicitly. No inspected candidate establishes a measured replacement for the installed pair across both clients.\n\nMethod: no shell commands, installs, candidate scripts, benchmarks or filesystem writes were executed. SHA-256 values are therefore null. Description lengths were counted as Unicode code points from fetched frontmatter. Selected evidence/unknown-data principles from supply-chain-risk-auditor and fp-check were applied; their executable audit and vulnerability-verification workflows were not run. The supplied skill-installer was used only as discovery guidance. Counts include failed requests: API URL attempts are classified as gh_api, including four failed web-transport attempts; the registry request counts as both a search query and a page-fetch attempt. All three research budgets are exhausted.",
+      "skills_used": [
+       "search-first",
+       "iterative-retrieval",
+       "supply-chain-risk-auditor",
+       "fp-check",
+       "skill-installer"
+      ]
+     },
+     "usage": {
+      "input_tokens": 1447058,
+      "cached_input_tokens": 1310208,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 20066,
+      "reasoning_output_tokens": 9436
+     },
+     "started": "2026-10-05T04:23:38Z",
+     "finished": "2026-10-05T04:34:31Z",
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "codex_version": "codex-cli 0.160.0",
+     "limit": false,
+     "usage_status": "reported",
+     "inputs": {
+      "effort": "max",
+      "model": "gpt-6-astra",
+      "prompt_sha256": "4f50944eac0ae94ddd4cbb9b17c9f80f3fb0e4dd8bd046cfd970d31fca4854c3",
+      "request_effort": "max",
+      "schema_sha256": "6aa61da98dd6080dde4810cd8176d7806b88db86d9905b463a32079eb6e8670c"
+     },
+     "attempts": []
+    },
+    "dropped": [
+     {
+      "repository": "affaan-m/ECC@search-first",
+      "families": [
+       "gpt6"
+      ],
+      "proposed_label": "not_adopted"
+     },
+     {
+      "repository": "microsoft/skills@wiki-researcher",
+      "families": [
+       "gpt6"
+      ],
+      "proposed_label": "not_adopted"
+     },
+     {
+      "repository": "addyosmani/agent-skills@context-engineering",
+      "families": [
+       "gpt6"
+      ],
+      "proposed_label": "not_adopted"
+     }
+    ],
+    "fit_gpt6_meta": {
+     "status": "ok",
+     "usage": {
+      "input_tokens": 1285811,
+      "cached_input_tokens": 1150848,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 17392,
+      "reasoning_output_tokens": 11496
+     },
+     "started": "2026-10-05T04:44:40Z",
+     "finished": "2026-10-05T04:54:37Z",
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "codex_version": "codex-cli 0.160.0",
+     "limit": false,
+     "usage_status": "reported",
+     "inputs": {
+      "effort": "max",
+      "model": "gpt-6-astra",
+      "prompt_sha256": "163a02ed0bfcf03050f69e0fd1f7faa819b4ec1ca1575ebddd79f7aee4757eb0",
+      "request_effort": "max",
+      "schema_sha256": "dfc181ebdcadc82015344a37bbb3083c46d0e3c38c49ccd0d4e171483647ad0f"
+     },
+     "attempts": []
+    },
+    "followup_reason": null,
+    "gpt6_copy_check": {
+     "discover": "match",
+     "fit": "match"
+    }
+   }
+  }
+ },
+ "failures": {},
+ "workflow_run": "wf_59d42fb7-8dc",
+ "skills_usage": {
+  "discover_claude": {
+   "search-first": 1,
+   "iterative-retrieval": 1,
+   "supply-chain-risk-auditor": 1,
+   "fp-check": 1,
+   "skill-creator": 1
+  },
+  "discover_gpt6": {
+   "search-first": 1,
+   "iterative-retrieval": 1,
+   "supply-chain-risk-auditor": 1,
+   "fp-check": 1,
+   "skill-installer": 1
+  },
+  "facts": {
+   "fp-check": 1,
+   "supply-chain-risk-auditor": 1
+  },
+  "fit_claude": {
+   "fp-check": 1,
+   "supply-chain-risk-auditor": 1,
+   "skill-creator": 1
+  },
+  "fit_gpt6": {
+   "search-first": 1,
+   "iterative-retrieval": 1,
+   "supply-chain-risk-auditor": 1,
+   "fp-check": 1
+  }
+ },
+ "gpt6_usage": {
+  "jobs": 2,
+  "by_status": {
+   "ok": 2
+  },
+  "usage": {
+   "input_tokens": 2732869,
+   "cached_input_tokens": 2461056,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 37458,
+   "reasoning_output_tokens": 20932
+  },
+  "usage_unavailable": 0,
+  "earlier_attempts": {
+   "attempts": 0,
+   "usage": {},
+   "usage_unavailable": 0
+  }
+ }
+}

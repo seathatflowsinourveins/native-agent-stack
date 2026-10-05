@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-github-awesome-copilot-agent-skill-stack",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "github/awesome-copilot@agent-skill-stack",
+ "reviewed_commit": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+ "readme_path": "skills/agent-skill-stack/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-skill-lifecycle"
+ ],
+ "claim": "Source review of the skill agent-skill-stack in github/awesome-copilot at commit 143a3d976b3c1603cc8932984d5e1f28501cb5fc (the adjudicated pin; license MIT), read from skills/agent-skill-stack/SKILL.md and skills/agent-skill-stack/agents/openai.yaml at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for agent-skill-stack; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 1eb1086a047b65b10db61c57e1cf00ddd58c690f. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 39713,
+  "pushed_at": "2026-10-04T23:45:13Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named agent-skill-stack",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "d75ed95177dab5ddb5ca96c87fed93842e7d3221b4b5c9f2d8ebb72d33cde5e2",
+  "skill_md_bytes": 10340,
+  "survivor_skill_md_sha256": "d75ed95177dab5ddb5ca96c87fed93842e7d3221b4b5c9f2d8ebb72d33cde5e2",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "1eb1086a047b65b10db61c57e1cf00ddd58c690f",
+  "disable_model_invocation": false,
+  "openai_yaml_path": "skills/agent-skill-stack/agents/openai.yaml",
+  "openai_yaml_reader": "PyYAML 6.0.3 compose_all with CSafeLoader",
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no policy mapping: Codex defaults allow_implicit_invocation to true"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/agent-skill-stack/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "Build the smallest useful stack for the user's actual outcome. Never force a domain example or a fixed lifecycle onto a different request."
+  },
+  {
+   "source": "skills/agent-skill-stack/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "Default to **plain-language mode**. Assume the user does not need to understand paths, revisions, hashes, manifests, static analysis, or runtime details."
+  },
+  {
+   "source": "skills/agent-skill-stack/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "- what the user is trying to accomplish; - the steps in everyday language; - which capabilities are already available; - which Skills are recommended, optional, overlapping, or unsuitable; - how widely each candidate is used; - whether it passed an installation safety check and a safe trial; - what account access or external actions it may require."
+  }
+ ]
+}

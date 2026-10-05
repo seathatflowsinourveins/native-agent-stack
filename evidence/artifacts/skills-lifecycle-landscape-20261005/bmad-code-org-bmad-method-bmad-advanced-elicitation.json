@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-bmad-code-org-bmad-method-bmad-advanced-elicitation",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "bmad-code-org/BMAD-METHOD@bmad-advanced-elicitation",
+ "reviewed_commit": "8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+ "readme_path": "skills/bmad-advanced-elicitation/SKILL.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "skills-design-intake"
+ ],
+ "claim": "Source review of the skill bmad-advanced-elicitation in bmad-code-org/BMAD-METHOD at commit 8f2c13dd0e0073cad84168a679e5c553b2fb30b6 (the adjudicated pin; license NOASSERTION), read from skills/bmad-advanced-elicitation/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for bmad-advanced-elicitation; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is b1419fb8dc482d11b3211444a4c1826408771e9d. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 53794,
+  "pushed_at": "2026-10-05T06:14:29Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "NOASSERTION",
+  "adjudicated_pin": "8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named bmad-advanced-elicitation",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "225a59e2a5377cfa66a4c96a58195134401b356ae3f80b3ca1306e4859141e9a",
+  "skill_md_bytes": 5371,
+  "survivor_skill_md_sha256": "225a59e2a5377cfa66a4c96a58195134401b356ae3f80b3ca1306e4859141e9a",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "b1419fb8dc482d11b3211444a4c1826408771e9d",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/bmad-advanced-elicitation/SKILL.md@8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+   "text": "You are BMad's shared refinement checkpoint: other skills invoke you at natural pauses to pressure the piece of work they just produced, and users call you directly on anything recent. The target is the most recent output in the conversation — a section, plan, draft, or decision — unless the caller or user points at something else. You offer a short menu of elicitation methods, run the chosen ones against the target, and hand back the improved version so the invoking flow resumes exactly where i"
+  },
+  {
+   "source": "skills/bmad-advanced-elicitation/SKILL.md@8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+   "text": "- Bare paths (e.g. `assets/methods.csv`) resolve from `{skill-root}` (where `customize.toml` lives); `{project-root}`-prefixed paths from the project working directory. - `{workflow.<name>}` resolves to fields in the merged `customize.toml` `[workflow]` table."
+  },
+  {
+   "source": "skills/bmad-advanced-elicitation/SKILL.md@8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+   "text": "1. Resolve customization: `uv run {project-root}/_bmad/scripts/resolve_customization.py --skill {skill-root} --project-root {project-root} --key workflow`. - Script not found: BMad is not set up here. Offer to run the `bmad` skill's setup, installing `bmad` first if you do not have it (`npx skills add bmad-code-org/BMAD-METHOD --skill bmad`), then run the command again. - Any other failure: read `{skill-root}/customize.toml` directly and use defaults. 2. Hold every `{workflow.preferences}` entry"
+  }
+ ]
+}

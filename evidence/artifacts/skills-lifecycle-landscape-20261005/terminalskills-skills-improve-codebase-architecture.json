@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-terminalskills-skills-improve-codebase-architecture",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "TerminalSkills/skills@improve-codebase-architecture",
+ "reviewed_commit": "a021875c0f1bd906248e3784ce470faa65055201",
+ "readme_path": "skills/improve-codebase-architecture/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-architecture"
+ ],
+ "claim": "Source review of the skill improve-codebase-architecture in TerminalSkills/skills at commit a021875c0f1bd906248e3784ce470faa65055201 (the adjudicated pin; license Apache-2.0), read from skills/improve-codebase-architecture/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for improve-codebase-architecture; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is c949914c1dfed432e3e4d94171950899694f7f3a. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 160,
+  "pushed_at": "2026-10-03T22:46:17Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "a021875c0f1bd906248e3784ce470faa65055201",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named improve-codebase-architecture",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "cadb445fd847bc01228e5e5e4b48bd8b1d95639fa019e157312a7fd708034aa8",
+  "skill_md_bytes": 17258,
+  "survivor_skill_md_sha256": "cadb445fd847bc01228e5e5e4b48bd8b1d95639fa019e157312a7fd708034aa8",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "c949914c1dfed432e3e4d94171950899694f7f3a",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/improve-codebase-architecture/SKILL.md@a021875c0f1bd906248e3784ce470faa65055201",
+   "text": "Architecture work fails in two ways: opinions without evidence, and plans too large to ship. This skill replaces both with a procedure: measure the repository, name a handful of candidates with the numbers that support them, let the user choose, design the new boundary, and deliver it as steps that each keep the build green. Two kinds of problem repay the effort most:"
+  },
+  {
+   "source": "skills/improve-codebase-architecture/SKILL.md@a021875c0f1bd906248e3784ce470faa65055201",
+   "text": "- **Shallow module**: its interface is nearly as large as what it does. Pass-through wrappers, one-function files and layers that only forward mean a reader opens five files to follow one idea and a caller gains nothing. - **Tangled cluster**: modules that cannot be understood, tested or changed apart. Import cycles, files in different folders that always change together, and modules that import half the codebase."
+  },
+  {
+   "source": "skills/improve-codebase-architecture/SKILL.md@a021875c0f1bd906248e3784ce470faa65055201",
+   "text": "The output is an evidence table, three to five candidate cards, and one proposal with a staged plan. Code changes only after the user approves a step."
+  }
+ ]
+}

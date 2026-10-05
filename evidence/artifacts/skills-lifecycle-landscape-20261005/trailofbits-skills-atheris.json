@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-trailofbits-skills-atheris",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "trailofbits/skills@atheris",
+ "reviewed_commit": "82fe8226252622fa807643bdca1710901198553a",
+ "readme_path": "plugins/testing-handbook-skills/skills/atheris/SKILL.md",
+ "license": "CC-BY-SA-4.0",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill atheris in trailofbits/skills at commit 82fe8226252622fa807643bdca1710901198553a (the adjudicated pin; license CC-BY-SA-4.0), read from plugins/testing-handbook-skills/skills/atheris/SKILL.md and plugins/testing-handbook-skills/skills/atheris/agents/openai.yaml at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for atheris; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 9744f0e8577b76e27f017d4c0f6bfcf7e30b7675. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 7370,
+  "pushed_at": "2026-10-02T10:05:35Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "CC-BY-SA-4.0",
+  "adjudicated_pin": "82fe8226252622fa807643bdca1710901198553a",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "plugins/testing-handbook-skills/skills/, the first location the CLI searches that holds a valid folder named atheris",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "133306875d88bb063636a9165c56141ac8b30d3b993db3740f166693dfeecbb5",
+  "skill_md_bytes": 14732,
+  "survivor_skill_md_sha256": "133306875d88bb063636a9165c56141ac8b30d3b993db3740f166693dfeecbb5",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "9744f0e8577b76e27f017d4c0f6bfcf7e30b7675",
+  "disable_model_invocation": false,
+  "openai_yaml_path": "plugins/testing-handbook-skills/skills/atheris/agents/openai.yaml",
+  "openai_yaml_reader": "PyYAML 6.0.3 compose_all with CSafeLoader",
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no policy mapping: Codex defaults allow_implicit_invocation to true"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "plugins/testing-handbook-skills/skills/atheris/SKILL.md@82fe8226252622fa807643bdca1710901198553a",
+   "text": "Atheris is a coverage-guided Python fuzzer built on libFuzzer. It enables fuzzing of both pure Python code and Python C extensions with integrated AddressSanitizer support for detecting memory corruption issues."
+  },
+  {
+   "source": "plugins/testing-handbook-skills/skills/atheris/SKILL.md@82fe8226252622fa807643bdca1710901198553a",
+   "text": "**Choose Atheris when:** - Fuzzing pure Python code with coverage guidance - Testing Python C extensions for memory corruption - Integration with libFuzzer ecosystem is desired - AddressSanitizer support is needed"
+  },
+  {
+   "source": "plugins/testing-handbook-skills/skills/atheris/SKILL.md@82fe8226252622fa807643bdca1710901198553a",
+   "text": "@atheris.instrument_func def TestOneInput(data: bytes): if len(data) == 4: if data[0] == 0x46: # \"F\" if data[1] == 0x55: # \"U\" if data[2] == 0x5A: # \"Z\" if data[3] == 0x5A: # \"Z\" raise RuntimeError(\"You caught me\")"
+  }
+ ]
+}

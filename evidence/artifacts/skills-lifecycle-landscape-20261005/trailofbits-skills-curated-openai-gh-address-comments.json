@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-trailofbits-skills-curated-openai-gh-address-comments",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "trailofbits/skills-curated@openai-gh-address-comments",
+ "reviewed_commit": "6d05be4889017b06fb15069f371afd220daffb62",
+ "readme_path": "plugins/openai-gh-address-comments/skills/openai-gh-address-comments/SKILL.md",
+ "license": "CC-BY-SA-4.0",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill openai-gh-address-comments in trailofbits/skills-curated at commit 6d05be4889017b06fb15069f371afd220daffb62 (the adjudicated pin; license CC-BY-SA-4.0), read from plugins/openai-gh-address-comments/skills/openai-gh-address-comments/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for openai-gh-address-comments; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is d2cc6c954ee663ad8c8588287865459666f221b8. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 512,
+  "pushed_at": "2026-07-14T17:53:18Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "CC-BY-SA-4.0",
+  "adjudicated_pin": "6d05be4889017b06fb15069f371afd220daffb62",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "plugins/openai-gh-address-comments/skills/, the first location the CLI searches that holds a valid folder named openai-gh-address-comments",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "fcd5e5cf7b7e1f5abf4fc56d4b935e4e0ee7f2ca1b9ccb0f744a7c711a743391",
+  "skill_md_bytes": 1112,
+  "survivor_skill_md_sha256": "fcd5e5cf7b7e1f5abf4fc56d4b935e4e0ee7f2ca1b9ccb0f744a7c711a743391",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "d2cc6c954ee663ad8c8588287865459666f221b8",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "plugins/openai-gh-address-comments/skills/openai-gh-address-comments/SKILL.md@6d05be4889017b06fb15069f371afd220daffb62",
+   "text": "Guide to find the open PR for the current branch and address its comments with gh CLI. Run all `gh` commands with elevated network access."
+  },
+  {
+   "source": "plugins/openai-gh-address-comments/skills/openai-gh-address-comments/SKILL.md@6d05be4889017b06fb15069f371afd220daffb62",
+   "text": "## 1) Inspect comments needing attention - Run scripts/fetch_comments.py which will print out all the comments and review threads on the PR"
+  },
+  {
+   "source": "plugins/openai-gh-address-comments/skills/openai-gh-address-comments/SKILL.md@6d05be4889017b06fb15069f371afd220daffb62",
+   "text": "## 2) Ask the user for clarification - Number all the review threads and comments and provide a short summary of what would be required to apply a fix for it - Ask the user which numbered comments should be addressed"
+  }
+ ]
+}

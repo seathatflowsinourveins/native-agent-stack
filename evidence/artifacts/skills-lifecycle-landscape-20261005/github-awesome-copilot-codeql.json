@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-github-awesome-copilot-codeql",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "github/awesome-copilot@codeql",
+ "reviewed_commit": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+ "readme_path": "skills/codeql/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-security"
+ ],
+ "claim": "Source review of the skill codeql in github/awesome-copilot at commit 143a3d976b3c1603cc8932984d5e1f28501cb5fc (the adjudicated pin; license MIT), read from skills/codeql/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for codeql; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is bbbd09572c265f3a57b2dfbe958f1c64e1828ee1. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 39713,
+  "pushed_at": "2026-10-04T23:45:13Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named codeql",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "81503394c7c0595756d18a47e0b626dfd1dc6cf4673d40e9be23349a66fa5d27",
+  "skill_md_bytes": 13489,
+  "survivor_skill_md_sha256": "81503394c7c0595756d18a47e0b626dfd1dc6cf4673d40e9be23349a66fa5d27",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "bbbd09572c265f3a57b2dfbe958f1c64e1828ee1",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/codeql/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "This skill provides procedural guidance for configuring and running CodeQL code scanning — both through GitHub Actions workflows and the standalone CodeQL CLI."
+  },
+  {
+   "source": "skills/codeql/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "- Creating or customizing a `codeql.yml` GitHub Actions workflow - Choosing between default setup and advanced setup for code scanning - Configuring CodeQL language matrix, build modes, or query suites - Running CodeQL CLI locally (`codeql database create`, `database analyze`, `github upload-results`) - Understanding or interpreting SARIF output from CodeQL - Troubleshooting CodeQL analysis failures (build modes, compiled languages, runner requirements) - Setting up CodeQL for monorepos with per"
+  },
+  {
+   "source": "skills/codeql/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "> Alternative identifiers are equivalent to the standard identifier (e.g., `javascript` does not exclude TypeScript analysis)."
+  }
+ ]
+}

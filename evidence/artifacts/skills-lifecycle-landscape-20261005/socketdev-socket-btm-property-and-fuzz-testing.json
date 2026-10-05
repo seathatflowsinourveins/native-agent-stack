@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-socketdev-socket-btm-property-and-fuzz-testing",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "SocketDev/socket-btm@property-and-fuzz-testing",
+ "reviewed_commit": "f1555cdf9bedcaf04c824c6bb4d1768736bcd077",
+ "readme_path": ".claude/skills/fleet/property-and-fuzz-testing/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill property-and-fuzz-testing in SocketDev/socket-btm at commit f1555cdf9bedcaf04c824c6bb4d1768736bcd077 (the adjudicated pin; license MIT), read from .claude/skills/fleet/property-and-fuzz-testing/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for property-and-fuzz-testing; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 27ec1c66ff5fe14e11b4d46662392ed8e4c7e56d. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 3,
+  "pushed_at": "2026-09-13T07:28:36Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "f1555cdf9bedcaf04c824c6bb4d1768736bcd077",
+  "pin_lookup": "ok",
+  "skill_md_found_by": ".claude/skills/, the first location the CLI searches that holds a valid folder named property-and-fuzz-testing",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "b826d6b931e550bf4d96279a9883486f591bcaa408bee8750cfc256c4765dfb4",
+  "skill_md_bytes": 7432,
+  "survivor_skill_md_sha256": "b826d6b931e550bf4d96279a9883486f591bcaa408bee8750cfc256c4765dfb4",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "27ec1c66ff5fe14e11b4d46662392ed8e4c7e56d",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": ".claude/skills/fleet/property-and-fuzz-testing/SKILL.md@f1555cdf9bedcaf04c824c6bb4d1768736bcd077",
+   "text": "Three tiers, each for a different shape of bug. Pick the tier by what you're testing, then open the per-language reference for the harness."
+  },
+  {
+   "source": ".claude/skills/fleet/property-and-fuzz-testing/SKILL.md@f1555cdf9bedcaf04c824c6bb4d1768736bcd077",
+   "text": "Property/fuzz tests **complement** example tests — they don't replace them. Keep a few concrete `test('…')` cases as living documentation; add a property or fuzz test for the \"for all inputs\" claim."
+  },
+  {
+   "source": ".claude/skills/fleet/property-and-fuzz-testing/SKILL.md@f1555cdf9bedcaf04c824c6bb4d1768736bcd077",
+   "text": "**Correctness vs safety are different fuzzers, both wanted.** A property test checks *correctness* against a property you write (finds wrong answers); a coverage-guided fuzzer finds *crashes / memory / security* violations with **no spec**, using coverage feedback to reach deep paths random sampling misses. A function can be crash-free but wrong (property catches) or correct-on-samples but crash on a deep-path input (fuzzer catches). For a **native parser do both**: libFuzzer + ASan on the nativ"
+  }
+ ]
+}

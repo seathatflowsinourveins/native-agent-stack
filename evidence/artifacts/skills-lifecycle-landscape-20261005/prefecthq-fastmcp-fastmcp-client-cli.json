@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-prefecthq-fastmcp-fastmcp-client-cli",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "PrefectHQ/fastmcp@fastmcp-client-cli",
+ "reviewed_commit": "5baeacfe20eca735cb949564b4915f93a622b916",
+ "readme_path": "skills/fastmcp-client-cli/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-mcp-build"
+ ],
+ "claim": "Source review of the skill fastmcp-client-cli in PrefectHQ/fastmcp at commit 5baeacfe20eca735cb949564b4915f93a622b916 (the adjudicated pin; license Apache-2.0), read from skills/fastmcp-client-cli/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for fastmcp-client-cli; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 00b56986e52cc6c844daadc72ced6249cdcf4eeb. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 27981,
+  "pushed_at": "2026-10-05T01:45:00Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "5baeacfe20eca735cb949564b4915f93a622b916",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named fastmcp-client-cli",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "d1984daf0f157651a0aa9825666e307e9e238440d21cbe19ec2d754fb9182d96",
+  "skill_md_bytes": 3290,
+  "survivor_skill_md_sha256": "d1984daf0f157651a0aa9825666e307e9e238440d21cbe19ec2d754fb9182d96",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "00b56986e52cc6c844daadc72ced6249cdcf4eeb",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/fastmcp-client-cli/SKILL.md@5baeacfe20eca735cb949564b4915f93a622b916",
+   "text": "Use `fastmcp list` and `fastmcp call` to interact with any MCP server from the command line."
+  },
+  {
+   "source": "skills/fastmcp-client-cli/SKILL.md@5baeacfe20eca735cb949564b4915f93a622b916",
+   "text": "```bash # Remote server fastmcp list http://localhost:8000/mcp"
+  },
+  {
+   "source": "skills/fastmcp-client-cli/SKILL.md@5baeacfe20eca735cb949564b4915f93a622b916",
+   "text": "# Local Python file (runs via fastmcp run automatically) fastmcp list server.py"
+  }
+ ]
+}

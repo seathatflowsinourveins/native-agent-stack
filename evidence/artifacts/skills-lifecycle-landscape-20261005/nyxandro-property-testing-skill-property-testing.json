@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nyxandro-property-testing-skill-property-testing",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "nyxandro/property-testing-skill@property-testing",
+ "reviewed_commit": "786d52b3211e3ccbd7fe8727e1d9ae9b9bad16de",
+ "readme_path": "property-testing/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill property-testing in nyxandro/property-testing-skill at commit 786d52b3211e3ccbd7fe8727e1d9ae9b9bad16de (the adjudicated pin; license MIT), read from property-testing/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for property-testing; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 816dccfce1e3d237e1544074009a395ad7d625e3. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 4,
+  "pushed_at": "2026-09-13T16:26:34Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "786d52b3211e3ccbd7fe8727e1d9ae9b9bad16de",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "the repository root, the first location the CLI searches that holds a valid folder named property-testing",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "8c70748629f0401f5f22352b6128cb75144cb0a26c2f9458639383bf3ec11a19",
+  "skill_md_bytes": 21283,
+  "survivor_skill_md_sha256": "8c70748629f0401f5f22352b6128cb75144cb0a26c2f9458639383bf3ec11a19",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "816dccfce1e3d237e1544074009a395ad7d625e3",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "property-testing/SKILL.md@786d52b3211e3ccbd7fe8727e1d9ae9b9bad16de",
+   "text": "An example test checks the inputs someone thought of. A property test states what must hold for every input, lets the library generate hundreds of inputs it would take a person weeks to think of, and when one breaks the statement, shrinks it to the smallest case that still breaks it: not a list of three hundred elements but `[0]` with `n = 2`. That minimal case points at the bug directly."
+  },
+  {
+   "source": "property-testing/SKILL.md@786d52b3211e3ccbd7fe8727e1d9ae9b9bad16de",
+   "text": "Property tests complement example tests, they do not replace them. One property test per function that has a clear property; everything else stays example-based. Do not convert existing example tests, do not add properties to glue code. Code with no property gets example tests, and saying so is a valid outcome."
+  },
+  {
+   "source": "property-testing/SKILL.md@786d52b3211e3ccbd7fe8727e1d9ae9b9bad16de",
+   "text": "A green property test is not a proof. It says the generator found no counterexample in the runs it made, over the domain you described; it does not say none exists. Its strength is exactly the honesty of the generator. Report it that way: \"no counterexample in a hundred runs over inputs of this shape\", never \"correct for all inputs\"."
+  }
+ ]
+}

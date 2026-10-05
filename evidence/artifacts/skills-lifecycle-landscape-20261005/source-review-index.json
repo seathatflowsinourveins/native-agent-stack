@@ -1,0 +1,371 @@
+[
+ {
+  "repository": "addyosmani/agent-skills@spec-driven-development",
+  "path": "addyosmani-agent-skills-spec-driven-development.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "addyosmani/agent-skills@test-driven-development",
+  "path": "addyosmani-agent-skills-test-driven-development.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "affaan-m/ECC@intent-driven-development",
+  "path": "affaan-m-ecc-intent-driven-development.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "affaan-m/ECC@skill-comply",
+  "path": "affaan-m-ecc-skill-comply.json",
+  "layers": [
+   "skills-skill-lifecycle"
+  ]
+ },
+ {
+  "repository": "affaan-m/ECC@tdd-workflow",
+  "path": "affaan-m-ecc-tdd-workflow.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "agent-sh/agnix@agnix",
+  "path": "agent-sh-agnix-agnix.json",
+  "layers": [
+   "skills-skill-lifecycle"
+  ]
+ },
+ {
+  "repository": "bgauryy/octocode@octocode-skills",
+  "path": "bgauryy-octocode-octocode-skills.json",
+  "layers": [
+   "skills-skill-lifecycle"
+  ]
+ },
+ {
+  "repository": "bmad-code-org/BMAD-METHOD@bmad-advanced-elicitation",
+  "path": "bmad-code-org-bmad-method-bmad-advanced-elicitation.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "bmad-code-org/BMAD-METHOD@bmad-forge-idea",
+  "path": "bmad-code-org-bmad-method-bmad-forge-idea.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "codybrom/clairvoyance@design-review",
+  "path": "codybrom-clairvoyance-design-review.json",
+  "layers": [
+   "skills-architecture"
+  ]
+ },
+ {
+  "repository": "Cure-Consulting-Group/ProductEngineeringSkills@mcp-server-builder",
+  "path": "cure-consulting-group-productengineeringskills-mcp-server-builder.json",
+  "layers": [
+   "skills-mcp-build"
+  ]
+ },
+ {
+  "repository": "dmoka/skills@mutation-testing",
+  "path": "dmoka-skills-mutation-testing.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "endavis/pyproject-template@property-tests",
+  "path": "endavis-pyproject-template-property-tests.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "EveryInc/compound-engineering-plugin@ce-brainstorm",
+  "path": "everyinc-compound-engineering-plugin-ce-brainstorm.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+  "path": "everyinc-compound-engineering-plugin-ce-resolve-pr-feedback.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "Fission-AI/OpenSpec@openspec-explore",
+  "path": "fission-ai-openspec-openspec-explore.json",
+  "layers": [
+   "skills-design-intake"
+  ]
+ },
+ {
+  "repository": "getsentry/skills@secret-serialization",
+  "path": "getsentry-skills-secret-serialization.json",
+  "layers": [
+   "skills-security"
+  ]
+ },
+ {
+  "repository": "getsentry/skills@skill-writer",
+  "path": "getsentry-skills-skill-writer.json",
+  "layers": [
+   "skills-skill-lifecycle"
+  ]
+ },
+ {
+  "repository": "github/awesome-copilot@agent-skill-stack",
+  "path": "github-awesome-copilot-agent-skill-stack.json",
+  "layers": [
+   "skills-skill-lifecycle"
+  ]
+ },
+ {
+  "repository": "github/awesome-copilot@codeql",
+  "path": "github-awesome-copilot-codeql.json",
+  "layers": [
+   "skills-security"
+  ]
+ },
+ {
+  "repository": "github/awesome-copilot@test-gap-audit",
+  "path": "github-awesome-copilot-test-gap-audit.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "InternationalColorConsortium/iccDEV@clusterfuzzlite",
+  "path": "internationalcolorconsortium-iccdev-clusterfuzzlite.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "levnikolaevich/claude-code-skills@ln-56-architecture-auditor",
+  "path": "levnikolaevich-claude-code-skills-ln-56-architecture-auditor.json",
+  "layers": [
+   "skills-architecture"
+  ]
+ },
+ {
+  "repository": "lgtm-hq/ai-skills@scorecard",
+  "path": "lgtm-hq-ai-skills-scorecard.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "NousResearch/hermes-agent@python-debugpy",
+  "path": "nousresearch-hermes-agent-python-debugpy.json",
+  "layers": [
+   "skills-debug"
+  ]
+ },
+ {
+  "repository": "NVIDIA/SkillSpector@skill-inspector",
+  "path": "nvidia-skillspector-skill-inspector.json",
+  "layers": [
+   "skills-skill-lifecycle"
+  ]
+ },
+ {
+  "repository": "nyxandro/property-testing-skill@property-testing",
+  "path": "nyxandro-property-testing-skill-property-testing.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "PrefectHQ/fastmcp@fastmcp-client-cli",
+  "path": "prefecthq-fastmcp-fastmcp-client-cli.json",
+  "layers": [
+   "skills-mcp-build"
+  ]
+ },
+ {
+  "repository": "SocketDev/socket-btm@property-and-fuzz-testing",
+  "path": "socketdev-socket-btm-property-and-fuzz-testing.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "tenequm/skills@mcp-best-practices",
+  "path": "tenequm-skills-mcp-best-practices.json",
+  "layers": [
+   "skills-mcp-build"
+  ]
+ },
+ {
+  "repository": "TerminalSkills/skills@improve-codebase-architecture",
+  "path": "terminalskills-skills-improve-codebase-architecture.json",
+  "layers": [
+   "skills-architecture"
+  ]
+ },
+ {
+  "repository": "trailofbits/skills-curated@openai-gh-address-comments",
+  "path": "trailofbits-skills-curated-openai-gh-address-comments.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "trailofbits/skills@atheris",
+  "path": "trailofbits-skills-atheris.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "trailofbits/skills@ossfuzz",
+  "path": "trailofbits-skills-ossfuzz.json",
+  "layers": [
+   "skills-test"
+  ]
+ },
+ {
+  "repository": "trailofbits/skills@semgrep-rule-creator",
+  "path": "trailofbits-skills-semgrep-rule-creator.json",
+  "layers": [
+   "skills-security"
+  ]
+ },
+ {
+  "repository": "warpdotdev/common-skills@diagnose-ci-failures",
+  "path": "warpdotdev-common-skills-diagnose-ci-failures.json",
+  "layers": [
+   "skills-debug"
+  ]
+ },
+ {
+  "repository": "yigitkonur/skills-by-yigitkonur@build-mcp-server-sdk-v2",
+  "path": "yigitkonur-skills-by-yigitkonur-build-mcp-server-sdk-v2.json",
+  "layers": [
+   "skills-mcp-build"
+  ]
+ },
+ {
+  "repository": "alchaincyf/darwin-skill@darwin-skill",
+  "layers": [
+   "skills-skill-lifecycle"
+  ],
+  "status": "stopped",
+  "pin": "8a8b66258e3c45d6ae4aea39719468c6428fcb0a",
+  "pin_lookup": "ok",
+  "reason": "the git tree listing does not hash to the id it gives the repository root (8a8b66258e3c45d6ae4aea39719468c6428fcb0a), so the folder's id would not cover the bytes read"
+ },
+ {
+  "repository": "AlpayC/mcp-migration-check@mcp-migration",
+  "layers": [
+   "skills-mcp-build"
+  ],
+  "status": "stopped",
+  "pin": "560d1f4fef6fdc1580b68c8a92b5714499fcfcd8",
+  "pin_lookup": null,
+  "reason": "AlpayC/mcp-migration-check@mcp-migration: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "davila7/claude-code-templates@gh-address-comments",
+  "layers": [
+   "skills-ci-pr"
+  ],
+  "status": "stopped",
+  "pin": "19bfc4e8841bd653d0e653d7671851eb7658c8f0",
+  "pin_lookup": null,
+  "reason": "davila7/claude-code-templates@gh-address-comments: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "davila7/claude-code-templates@gh-fix-ci",
+  "layers": [
+   "skills-ci-pr"
+  ],
+  "status": "stopped",
+  "pin": "19bfc4e8841bd653d0e653d7671851eb7658c8f0",
+  "pin_lookup": null,
+  "reason": "davila7/claude-code-templates@gh-fix-ci: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "garrytan/gstack@office-hours",
+  "layers": [
+   "skills-design-intake"
+  ],
+  "status": "stopped",
+  "pin": "857466ff8b93c0575bc9e46cf2838d1962077d8f",
+  "pin_lookup": "ok",
+  "reason": "garrytan/gstack@office-hours: the root SKILL.md at 857466ff8b93c0575bc9e46cf2838d1962077d8f is the skill 'gstack', the only one the skills CLI discovers in this repository without --full-depth"
+ },
+ {
+  "repository": "mattpocock/skills@tdd",
+  "layers": [
+   "skills-test"
+  ],
+  "status": "stopped",
+  "pin": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+  "pin_lookup": null,
+  "reason": "mattpocock/skills@tdd: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "openai/plugins@evaluate-skill",
+  "layers": [
+   "skills-skill-lifecycle"
+  ],
+  "status": "stopped",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "pin_lookup": "ok",
+  "reason": "openai/plugins@evaluate-skill at 5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f: no folder named evaluate-skill in the locations the CLI searches without --full-depth"
+ },
+ {
+  "repository": "openai/plugins@improve-skill",
+  "layers": [
+   "skills-skill-lifecycle"
+  ],
+  "status": "stopped",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "pin_lookup": "ok",
+  "reason": "openai/plugins@improve-skill at 5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f: no folder named improve-skill in the locations the CLI searches without --full-depth"
+ },
+ {
+  "repository": "openai/plugins@threat-model",
+  "layers": [
+   "skills-security"
+  ],
+  "status": "stopped",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "pin_lookup": "ok",
+  "reason": "openai/plugins@threat-model at 5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f: no folder named threat-model in the locations the CLI searches without --full-depth"
+ },
+ {
+  "repository": "promptfoo/promptfoo@promptfoo-evals",
+  "layers": [
+   "skills-skill-lifecycle"
+  ],
+  "status": "stopped",
+  "pin": "3233b37e6869a0d9f97bda5a99ce9c52c21f0bc6",
+  "pin_lookup": "ok",
+  "reason": "promptfoo/promptfoo@promptfoo-evals: .claude/skills/promptfoo-evals/SKILL.md at 3233b37e6869a0d9f97bda5a99ce9c52c21f0bc6 has sha256 40d2426fa520133b276d1efa888254f1e9a649c18289da18a75bfc2c75ea48c5, not the survivor's skill_md_sha256 897473f598d1b96816f08c755fa83c9cbf85b4012ba0ce28213faaa5f5df63e3: the review would describe other bytes than the refuters judged"
+ },
+ {
+  "repository": "SunChJ/skillbench@skillbench",
+  "layers": [
+   "skills-skill-lifecycle"
+  ],
+  "status": "stopped",
+  "pin": "d05557e1370704fda56aebf587bd7ca51cc8571f",
+  "pin_lookup": null,
+  "reason": "SunChJ/skillbench@skillbench: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ }
+]

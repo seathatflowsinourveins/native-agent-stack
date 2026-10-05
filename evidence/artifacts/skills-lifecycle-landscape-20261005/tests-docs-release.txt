@@ -1,0 +1,29 @@
+..................s........................................
+12 new-machine file(s) differ between main and v2026.10.05.1; a pinned host runs the v2026.10.05.1 copies.
+Cut a new release and re-pin adoption/manifest.json source.release_tag/release_commit.
+..
+----------------------------------------------------------------------
+Ran 61 tests in 34.299s
+
+OK (skipped=1)
+{
+ "release_tag": "v2026.10.05.1",
+ "release_commit": "77d7516d81a94b1cb0e77a7b6c910c28c8104dc9",
+ "due": [],
+ "changed": [
+  ".github/workflows/catalog-freshness.yml",
+  "blueprints/token-native-focus/saturation-audit.json",
+  "catalogs/us-equities/decision-index.json",
+  "catalogs/us-equities/runtime-target.json",
+  "docs/harness-defaults.md",
+  "manifests/stack.json",
+  "tests/test_catalog_freshness_propose.py",
+  "tools/adoption/install_skills.py",
+  "tools/sota-convergence/README.md",
+  "tools/sota-convergence/build_manifest.py",
+  "tools/sota-convergence/github_freshness.py",
+  "tools/sota-convergence/landscape-sweep/README.md"
+ ],
+ "strict": false,
+ "status": "content_changed"
+}

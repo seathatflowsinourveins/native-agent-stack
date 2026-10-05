@@ -1,0 +1,1999 @@
+[
+ {
+  "catalog": "skills",
+  "layer_id": "skills-research",
+  "votes": "retained",
+  "votes_note": "4 of 6 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: bgauryy/octocode@octocode-research, bgauryy/octocode@octocode-subagent, upstash/context7@find-docs, affaan-m/ecc@deep-research.",
+  "discovery_ref": "@RETURNS@#/discovery/skills-research",
+  "calls": {
+   "web_search": 9,
+   "web_fetch": 1,
+   "gh_api": 27
+  },
+  "proposed": [
+   "addyosmani/agent-skills@source-driven-development",
+   "ZhongHanLoo/deep-research-skill@deep-research",
+   "bgauryy/octocode@octocode-research",
+   "bgauryy/octocode@octocode-subagent",
+   "upstash/context7@find-docs",
+   "affaan-m/ECC@deep-research"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "addyosmani/agent-skills@source-driven-development",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/0/fit"
+    }
+   },
+   {
+    "repo": "ZhongHanLoo/deep-research-skill@deep-research",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/1/fit"
+    }
+   },
+   {
+    "repo": "bgauryy/octocode@octocode-research",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/2/fit"
+    }
+   },
+   {
+    "repo": "bgauryy/octocode@octocode-subagent",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/3/fit"
+    }
+   },
+   {
+    "repo": "upstash/context7@find-docs",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/4/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@deep-research",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/5/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-research"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-skill-lifecycle",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-skill-lifecycle",
+  "calls": {
+   "web_search": 13,
+   "web_fetch": 3,
+   "gh_api": 54,
+   "gpt6_web_search": 24,
+   "gpt6_web_fetch": 16,
+   "gpt6_gh_api": 80
+  },
+  "proposed": [
+   "getsentry/skills@skill-writer",
+   "bgauryy/octocode@octocode-skills",
+   "getsentry/skills@skill-scanner",
+   "affaan-m/ECC@skill-comply",
+   "github/awesome-copilot@agent-skill-stack",
+   "trailofbits/skills@skill-improver",
+   "openai/codex@skill-installer",
+   "SunChJ/skillbench@skillbench",
+   "NVIDIA/SkillSpector@skill-inspector",
+   "openai/plugins@evaluate-skill",
+   "promptfoo/promptfoo@promptfoo-evals",
+   "agent-sh/agnix@agnix",
+   "openai/plugins@improve-skill",
+   "openai/plugins@metric-pack-designer",
+   "alchaincyf/darwin-skill@darwin-skill"
+  ],
+  "survived": [
+   {
+    "repo": "getsentry/skills@skill-writer",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/0/fit"
+    }
+   },
+   {
+    "repo": "bgauryy/octocode@octocode-skills",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/1/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/1/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@skill-comply",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/3/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/3/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@agent-skill-stack",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/4/fit"
+    }
+   },
+   {
+    "repo": "SunChJ/skillbench@skillbench",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/7/fit"
+    }
+   },
+   {
+    "repo": "NVIDIA/SkillSpector@skill-inspector",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/8/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@evaluate-skill",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/9/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/9/fit"
+    }
+   },
+   {
+    "repo": "promptfoo/promptfoo@promptfoo-evals",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/10/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/10/fit"
+    }
+   },
+   {
+    "repo": "agent-sh/agnix@agnix",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/11/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/11/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@improve-skill",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/12/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/12/fit"
+    }
+   },
+   {
+    "repo": "alchaincyf/darwin-skill@darwin-skill",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/14/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/14/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "getsentry/skills@skill-scanner",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/2/fit"
+    }
+   },
+   {
+    "repo": "trailofbits/skills@skill-improver",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/5/fit"
+    }
+   },
+   {
+    "repo": "openai/codex@skill-installer",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/6/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@metric-pack-designer",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/13/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-skill-lifecycle/13/fit"
+    }
+   }
+  ],
+  "reopen": []
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-design-intake",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-design-intake",
+  "calls": {
+   "web_search": 15,
+   "web_fetch": 0,
+   "gh_api": 40,
+   "gpt6_web_search": 6,
+   "gpt6_web_fetch": 6,
+   "gpt6_gh_api": 39
+  },
+  "proposed": [
+   "affaan-m/ECC@intent-driven-development",
+   "addyosmani/agent-skills@interview-me",
+   "mattpocock/skills@grilling",
+   "EveryInc/compound-engineering-plugin@ce-brainstorm",
+   "bgauryy/octocode@octocode-brainstorming",
+   "addyosmani/agent-skills@spec-driven-development",
+   "EveryInc/compound-engineering-plugin@ce-doc-review",
+   "bmad-code-org/BMAD-METHOD@bmad-forge-idea",
+   "bmad-code-org/BMAD-METHOD@bmad-advanced-elicitation",
+   "Fission-AI/OpenSpec@openspec-explore",
+   "garrytan/gstack@office-hours",
+   "xurble/mad-skills@clarify-requirements"
+  ],
+  "survived": [
+   {
+    "repo": "affaan-m/ECC@intent-driven-development",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/0/fit"
+    }
+   },
+   {
+    "repo": "EveryInc/compound-engineering-plugin@ce-brainstorm",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/3/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/3/fit"
+    }
+   },
+   {
+    "repo": "addyosmani/agent-skills@spec-driven-development",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/5/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/5/fit"
+    }
+   },
+   {
+    "repo": "bmad-code-org/BMAD-METHOD@bmad-forge-idea",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/7/fit"
+    }
+   },
+   {
+    "repo": "bmad-code-org/BMAD-METHOD@bmad-advanced-elicitation",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/8/fit"
+    }
+   },
+   {
+    "repo": "Fission-AI/OpenSpec@openspec-explore",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/9/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/9/fit"
+    }
+   },
+   {
+    "repo": "garrytan/gstack@office-hours",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/10/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/10/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "addyosmani/agent-skills@interview-me",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/1/fit"
+    }
+   },
+   {
+    "repo": "mattpocock/skills@grilling",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/2/fit"
+    }
+   },
+   {
+    "repo": "bgauryy/octocode@octocode-brainstorming",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/4/fit"
+    }
+   },
+   {
+    "repo": "EveryInc/compound-engineering-plugin@ce-doc-review",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/6/fit"
+    }
+   },
+   {
+    "repo": "xurble/mad-skills@clarify-requirements",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-design-intake/11/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-design-intake"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-architecture",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-architecture",
+  "calls": {
+   "web_search": 5,
+   "web_fetch": 1,
+   "gh_api": 33
+  },
+  "proposed": [
+   "codybrom/clairvoyance@design-review",
+   "levnikolaevich/claude-code-skills@ln-56-architecture-auditor",
+   "hyhmrright/brooks-lint@brooks-audit",
+   "wondelai/skills@software-design-philosophy",
+   "TerminalSkills/skills@improve-codebase-architecture",
+   "addyosmani/agent-skills@api-and-interface-design"
+  ],
+  "survived": [
+   {
+    "repo": "codybrom/clairvoyance@design-review",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/0/fit"
+    }
+   },
+   {
+    "repo": "levnikolaevich/claude-code-skills@ln-56-architecture-auditor",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/1/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/1/fit"
+    }
+   },
+   {
+    "repo": "TerminalSkills/skills@improve-codebase-architecture",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/4/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "hyhmrright/brooks-lint@brooks-audit",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/2/fit"
+    }
+   },
+   {
+    "repo": "wondelai/skills@software-design-philosophy",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/3/fit"
+    }
+   },
+   {
+    "repo": "addyosmani/agent-skills@api-and-interface-design",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-architecture/5/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-architecture"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-implement",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-implement",
+  "calls": {
+   "web_search": 6,
+   "web_fetch": 0,
+   "gh_api": 37,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "pbakaus/impeccable@impeccable",
+   "addyosmani/agent-skills@frontend-ui-engineering",
+   "Leonxlnx/taste-skill@redesign-existing-projects",
+   "nextlevelbuilder/ui-ux-pro-max-skill@ui-ux-pro-max",
+   "affaan-m/ECC@design-system",
+   "addyosmani/agent-skills@incremental-implementation",
+   "openai/plugins@frontend-app-builder",
+   "astral-sh/claude-code-plugins@uv"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "pbakaus/impeccable@impeccable",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/0/fit"
+    }
+   },
+   {
+    "repo": "addyosmani/agent-skills@frontend-ui-engineering",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/1/fit"
+    }
+   },
+   {
+    "repo": "Leonxlnx/taste-skill@redesign-existing-projects",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/2/fit"
+    }
+   },
+   {
+    "repo": "nextlevelbuilder/ui-ux-pro-max-skill@ui-ux-pro-max",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/3/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@design-system",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/4/fit"
+    }
+   },
+   {
+    "repo": "addyosmani/agent-skills@incremental-implementation",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/5/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@frontend-app-builder",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/6/fit"
+    }
+   },
+   {
+    "repo": "astral-sh/claude-code-plugins@uv",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-implement/7/fit"
+    }
+   }
+  ],
+  "reopen": []
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-test",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-test",
+  "calls": {
+   "web_search": 13,
+   "web_fetch": 7,
+   "gh_api": 76,
+   "gpt6_web_search": 5,
+   "gpt6_web_fetch": 3,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "addyosmani/agent-skills@test-driven-development",
+   "nyxandro/property-testing-skill@property-testing",
+   "trailofbits/skills@atheris",
+   "affaan-m/ECC@tdd-workflow",
+   "endavis/pyproject-template@property-tests",
+   "dmoka/skills@mutation-testing",
+   "github/awesome-copilot@test-gap-audit",
+   "trailofbits/skills@ossfuzz",
+   "InternationalColorConsortium/iccDEV@clusterfuzzlite",
+   "SocketDev/socket-btm@property-and-fuzz-testing",
+   "lgtm-hq/ai-skills@scorecard",
+   "mattpocock/skills@tdd"
+  ],
+  "survived": [
+   {
+    "repo": "addyosmani/agent-skills@test-driven-development",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/0/fit"
+    }
+   },
+   {
+    "repo": "nyxandro/property-testing-skill@property-testing",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/1/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/1/fit"
+    }
+   },
+   {
+    "repo": "trailofbits/skills@atheris",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/2/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/2/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@tdd-workflow",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/3/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/3/fit"
+    }
+   },
+   {
+    "repo": "endavis/pyproject-template@property-tests",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/4/fit"
+    }
+   },
+   {
+    "repo": "dmoka/skills@mutation-testing",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/5/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/5/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@test-gap-audit",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/6/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/6/fit"
+    }
+   },
+   {
+    "repo": "trailofbits/skills@ossfuzz",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/7/fit"
+    }
+   },
+   {
+    "repo": "InternationalColorConsortium/iccDEV@clusterfuzzlite",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/8/fit"
+    }
+   },
+   {
+    "repo": "SocketDev/socket-btm@property-and-fuzz-testing",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/9/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/9/fit"
+    }
+   },
+   {
+    "repo": "lgtm-hq/ai-skills@scorecard",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/10/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/10/fit"
+    }
+   },
+   {
+    "repo": "mattpocock/skills@tdd",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/11/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-test/11/fit"
+    }
+   }
+  ],
+  "refuted": [],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-test"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-debug",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-debug",
+  "calls": {
+   "web_search": 19,
+   "web_fetch": 3,
+   "gh_api": 73,
+   "gpt6_web_search": 5,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "tw93/Waza@hunt",
+   "obra/superpowers@systematic-debugging",
+   "addyosmani/agent-skills@debugging-and-error-recovery",
+   "wshobson/agents@parallel-debugging",
+   "getsentry/skills@iterate-pr",
+   "warpdotdev/common-skills@diagnose-ci-failures",
+   "EveryInc/compound-engineering-plugin@ce-debug",
+   "NousResearch/hermes-agent@python-debugpy",
+   "garrytan/gstack@investigate",
+   "microsoft/DebugMCP@debug-live",
+   "clay584/nautilus-trader-skill@nautilus-trader",
+   "Jeffallan/claude-skills@debugging-wizard",
+   "dotnet/skills@dump-collect"
+  ],
+  "survived": [
+   {
+    "repo": "warpdotdev/common-skills@diagnose-ci-failures",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/5/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/5/fit"
+    }
+   },
+   {
+    "repo": "NousResearch/hermes-agent@python-debugpy",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/7/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "tw93/Waza@hunt",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/0/fit"
+    }
+   },
+   {
+    "repo": "obra/superpowers@systematic-debugging",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/1/fit"
+    }
+   },
+   {
+    "repo": "addyosmani/agent-skills@debugging-and-error-recovery",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/2/fit"
+    }
+   },
+   {
+    "repo": "wshobson/agents@parallel-debugging",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/3/fit"
+    }
+   },
+   {
+    "repo": "getsentry/skills@iterate-pr",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/4/fit"
+    }
+   },
+   {
+    "repo": "EveryInc/compound-engineering-plugin@ce-debug",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/6/fit"
+    }
+   },
+   {
+    "repo": "garrytan/gstack@investigate",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/8/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/8/fit"
+    }
+   },
+   {
+    "repo": "microsoft/DebugMCP@debug-live",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/9/fit"
+    }
+   },
+   {
+    "repo": "clay584/nautilus-trader-skill@nautilus-trader",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/10/fit"
+    }
+   },
+   {
+    "repo": "Jeffallan/claude-skills@debugging-wizard",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/11/fit"
+    }
+   },
+   {
+    "repo": "dotnet/skills@dump-collect",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-debug/12/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-debug"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-review",
+  "votes": "retained",
+  "votes_note": "3 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: trailofbits/skills@post-patch-validation, mattpocock/skills@code-review, affaan-m/ecc@santa-method.",
+  "discovery_ref": "@RETURNS@#/discovery/skills-review",
+  "calls": {
+   "web_search": 7,
+   "web_fetch": 6,
+   "gh_api": 25,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "trailofbits/skills@post-patch-validation",
+   "mattpocock/skills@code-review",
+   "K-Dense-AI/scientific-agent-skills@scientific-critical-thinking",
+   "github/awesome-copilot@build-evidence-map",
+   "addyosmani/agent-skills@code-review-and-quality",
+   "trailofbits/skills@trailmark-variant-neighborhood",
+   "getsentry/skills@find-bugs",
+   "affaan-m/ECC@santa-method"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "trailofbits/skills@post-patch-validation",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/0/fit"
+    }
+   },
+   {
+    "repo": "mattpocock/skills@code-review",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/1/fit"
+    }
+   },
+   {
+    "repo": "K-Dense-AI/scientific-agent-skills@scientific-critical-thinking",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/2/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@build-evidence-map",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/3/fit"
+    }
+   },
+   {
+    "repo": "addyosmani/agent-skills@code-review-and-quality",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/4/fit"
+    }
+   },
+   {
+    "repo": "trailofbits/skills@trailmark-variant-neighborhood",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/5/fit"
+    }
+   },
+   {
+    "repo": "getsentry/skills@find-bugs",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/6/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@santa-method",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-review"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-security",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-security",
+  "calls": {
+   "web_search": 10,
+   "web_fetch": 1,
+   "gh_api": 53,
+   "gpt6_web_search": 2,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "getsentry/skills@security-review",
+   "alpha-omega-security/threat-model@threat-model",
+   "trailofbits/skills@semgrep-rule-creator",
+   "trailofbits/skills@vulnerability-triage-brocards",
+   "getsentry/skills@secret-serialization",
+   "github/awesome-copilot@codeql",
+   "openai/plugins@threat-model",
+   "openai/plugins@triage-finding",
+   "anthropics/claude-plugins-official@claude-security",
+   "garrytan/gstack@cso",
+   "github/awesome-copilot@threat-model-analyst",
+   "openai/plugins@security-scan",
+   "openai/plugins@validation",
+   "openai/plugins@security-diff-scan"
+  ],
+  "survived": [
+   {
+    "repo": "trailofbits/skills@semgrep-rule-creator",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/2/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/2/fit"
+    }
+   },
+   {
+    "repo": "getsentry/skills@secret-serialization",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/4/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@codeql",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/5/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/5/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@threat-model",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/6/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/6/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "getsentry/skills@security-review",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-security/0/fit"
+    }
+   },
+   {
+    "repo": "alpha-omega-security/threat-model@threat-model",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-security/1/fit"
+    }
+   },
+   {
+    "repo": "trailofbits/skills@vulnerability-triage-brocards",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-security/3/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@triage-finding",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-security/7/fit"
+    }
+   },
+   {
+    "repo": "anthropics/claude-plugins-official@claude-security",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/8/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-security/8/fit"
+    }
+   },
+   {
+    "repo": "garrytan/gstack@cso",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-security/9/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@threat-model-analyst",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-security/10/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@security-scan",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-security/11/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@validation",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-security/12/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@security-diff-scan",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-security/13/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-security/13/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-security"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-ci-pr",
+  "votes": "retained",
+  "votes_note": "5 of 13 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: getsentry/skills@iterate-pr, openhands/extensions@iterate, warpdotdev/common-skills@resolve-merge-conflicts, neolabhq/context-engineering-kit@resolve-fixed-pr-comments, warpdotdev/common-skills@diagnose-ci-failures.",
+  "discovery_ref": "@RETURNS@#/discovery/skills-ci-pr",
+  "calls": {
+   "web_search": 8,
+   "web_fetch": 7,
+   "gh_api": 78,
+   "gpt6_web_search": 6,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "getsentry/skills@iterate-pr",
+   "OpenHands/extensions@iterate",
+   "warpdotdev/common-skills@resolve-merge-conflicts",
+   "cameroncooke/skills@reconcile-merge-conflicts",
+   "NeoLabHQ/context-engineering-kit@resolve-fixed-pr-comments",
+   "warpdotdev/common-skills@diagnose-ci-failures",
+   "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+   "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+   "trailofbits/skills-curated@openai-gh-fix-ci",
+   "trailofbits/skills-curated@openai-gh-address-comments",
+   "github/awesome-copilot@copilot-pr-autopilot",
+   "davila7/claude-code-templates@gh-fix-ci",
+   "davila7/claude-code-templates@gh-address-comments"
+  ],
+  "survived": [
+   {
+    "repo": "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/6/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/6/fit"
+    }
+   },
+   {
+    "repo": "trailofbits/skills-curated@openai-gh-address-comments",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/9/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/9/fit"
+    }
+   },
+   {
+    "repo": "davila7/claude-code-templates@gh-fix-ci",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/11/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/11/fit"
+    }
+   },
+   {
+    "repo": "davila7/claude-code-templates@gh-address-comments",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/12/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/12/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "getsentry/skills@iterate-pr",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/0/fit"
+    }
+   },
+   {
+    "repo": "OpenHands/extensions@iterate",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/1/fit"
+    }
+   },
+   {
+    "repo": "warpdotdev/common-skills@resolve-merge-conflicts",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/2/fit"
+    }
+   },
+   {
+    "repo": "cameroncooke/skills@reconcile-merge-conflicts",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/3/fit"
+    }
+   },
+   {
+    "repo": "NeoLabHQ/context-engineering-kit@resolve-fixed-pr-comments",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/4/fit"
+    }
+   },
+   {
+    "repo": "warpdotdev/common-skills@diagnose-ci-failures",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/5/fit"
+    }
+   },
+   {
+    "repo": "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/7/fit"
+    }
+   },
+   {
+    "repo": "trailofbits/skills-curated@openai-gh-fix-ci",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/8/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/8/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@copilot-pr-autopilot",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/10/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-ci-pr"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-agent-docs",
+  "votes": "retained",
+  "votes_note": "4 of 13 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: x0c/agents-md-edit-skill@agents-md-edit, mblode/agent-skills@agents-md, anthropics/claude-plugins-official@claude-md-improver, juliusbrussee/caveman@caveman-learn.",
+  "discovery_ref": "@RETURNS@#/discovery/skills-agent-docs",
+  "calls": {
+   "web_search": 13,
+   "web_fetch": 10,
+   "gh_api": 49,
+   "gpt6_web_search": 7,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "x0c/agents-md-edit-skill@agents-md-edit",
+   "affaan-m/ECC@living-docs-governance",
+   "mblode/agent-skills@agents-md",
+   "getsentry/skills@agents-md",
+   "anthropics/claude-plugins-official@claude-md-improver",
+   "JuliusBrussee/caveman@caveman-learn",
+   "agent-sh/agnix@agnix",
+   "github/awesome-copilot@create-agentsmd",
+   "agent-sh/enhance@enhance-claude-memory",
+   "tw93/Waza@health",
+   "SteveVitali/agent-skills@agent-docs",
+   "affaan-m/ECC@context-budget",
+   "Jane-o-O-o-O/agent-pulse-skill@agent-pulse"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "x0c/agents-md-edit-skill@agents-md-edit",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/0/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@living-docs-governance",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/1/fit"
+    }
+   },
+   {
+    "repo": "mblode/agent-skills@agents-md",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/2/fit"
+    }
+   },
+   {
+    "repo": "getsentry/skills@agents-md",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/3/fit"
+    }
+   },
+   {
+    "repo": "anthropics/claude-plugins-official@claude-md-improver",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/4/fit"
+    }
+   },
+   {
+    "repo": "JuliusBrussee/caveman@caveman-learn",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/5/fit"
+    }
+   },
+   {
+    "repo": "agent-sh/agnix@agnix",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/6/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@create-agentsmd",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/7/fit"
+    }
+   },
+   {
+    "repo": "agent-sh/enhance@enhance-claude-memory",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/8/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/8/fit"
+    }
+   },
+   {
+    "repo": "tw93/Waza@health",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/9/fit"
+    }
+   },
+   {
+    "repo": "SteveVitali/agent-skills@agent-docs",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/10/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@context-budget",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/11/fit"
+    }
+   },
+   {
+    "repo": "Jane-o-O-o-O/agent-pulse-skill@agent-pulse",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/12/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-agent-docs"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-browser",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-browser",
+  "calls": {
+   "web_search": 7,
+   "web_fetch": 1,
+   "gh_api": 17
+  },
+  "proposed": [
+   "openai/plugins@frontend-testing-debugging",
+   "microsoft/playwright-cli@playwright-cli",
+   "ChromeDevTools/chrome-devtools-mcp@chrome-devtools-cli",
+   "browser-use/browser-use@browser-use",
+   "brettdavies/crawl4ai-skill@crawl4ai",
+   "affaan-m/ECC@browser-qa"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "openai/plugins@frontend-testing-debugging",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/0/fit"
+    }
+   },
+   {
+    "repo": "microsoft/playwright-cli@playwright-cli",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/1/fit"
+    }
+   },
+   {
+    "repo": "ChromeDevTools/chrome-devtools-mcp@chrome-devtools-cli",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/2/fit"
+    }
+   },
+   {
+    "repo": "browser-use/browser-use@browser-use",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/3/fit"
+    }
+   },
+   {
+    "repo": "brettdavies/crawl4ai-skill@crawl4ai",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/4/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@browser-qa",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-browser/5/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-browser"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-mcp-build",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-mcp-build",
+  "calls": {
+   "web_search": 11,
+   "web_fetch": 3,
+   "gh_api": 51,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "github/awesome-copilot@mcp-release-qa",
+   "anthropics/claude-plugins-official@build-mcp-server",
+   "affaan-m/ECC@mcp-server-patterns",
+   "microsoft/skills@mcp-builder",
+   "mcp-use/mcp-use@mcp-builder",
+   "NousResearch/hermes-agent@fastmcp",
+   "PrefectHQ/fastmcp@fastmcp-client-cli",
+   "hiadamhere/skills@mcp-sdk",
+   "modelcontextprotocol/kotlin-sdk@mcp-docs",
+   "modelcontextprotocol/modelcontextprotocol@search-mcp-github",
+   "Cure-Consulting-Group/ProductEngineeringSkills@mcp-server-builder",
+   "tenequm/skills@mcp-best-practices",
+   "yigitkonur/skills-by-yigitkonur@build-mcp-server-sdk-v2",
+   "AlpayC/mcp-migration-check@mcp-migration"
+  ],
+  "survived": [
+   {
+    "repo": "PrefectHQ/fastmcp@fastmcp-client-cli",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/6/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/6/fit"
+    }
+   },
+   {
+    "repo": "Cure-Consulting-Group/ProductEngineeringSkills@mcp-server-builder",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/10/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/10/fit"
+    }
+   },
+   {
+    "repo": "tenequm/skills@mcp-best-practices",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/11/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/11/fit"
+    }
+   },
+   {
+    "repo": "yigitkonur/skills-by-yigitkonur@build-mcp-server-sdk-v2",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/12/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/12/fit"
+    }
+   },
+   {
+    "repo": "AlpayC/mcp-migration-check@mcp-migration",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/13/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/13/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "github/awesome-copilot@mcp-release-qa",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/0/fit"
+    }
+   },
+   {
+    "repo": "anthropics/claude-plugins-official@build-mcp-server",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/1/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@mcp-server-patterns",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/2/fit"
+    }
+   },
+   {
+    "repo": "microsoft/skills@mcp-builder",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/3/fit"
+    }
+   },
+   {
+    "repo": "mcp-use/mcp-use@mcp-builder",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/4/fit"
+    }
+   },
+   {
+    "repo": "NousResearch/hermes-agent@fastmcp",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/5/fit"
+    }
+   },
+   {
+    "repo": "hiadamhere/skills@mcp-sdk",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/7/fit"
+    }
+   },
+   {
+    "repo": "modelcontextprotocol/kotlin-sdk@mcp-docs",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/8/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/8/fit"
+    }
+   },
+   {
+    "repo": "modelcontextprotocol/modelcontextprotocol@search-mcp-github",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-mcp-build/9/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-mcp-build"
+   }
+  ]
+ }
+]

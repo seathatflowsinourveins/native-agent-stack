@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-agent-sh-agnix-agnix",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "agent-sh/agnix@agnix",
+ "reviewed_commit": "1306ce5e302b8295c5c8e4865cbac5929caa67f4",
+ "readme_path": "skills/agnix/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-skill-lifecycle"
+ ],
+ "claim": "Source review of the skill agnix in agent-sh/agnix at commit 1306ce5e302b8295c5c8e4865cbac5929caa67f4 (the adjudicated pin; license Apache-2.0), read from skills/agnix/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for agnix; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is ffd973a2ff6c4e906234b49386d71a02b0ef4572. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 440,
+  "pushed_at": "2026-10-04T04:29:42Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "1306ce5e302b8295c5c8e4865cbac5929caa67f4",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named agnix",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "4a4b14023eabb627d0e827cf417546086e412d106431bf7738d3f1903f94a5d3",
+  "skill_md_bytes": 2341,
+  "survivor_skill_md_sha256": "4a4b14023eabb627d0e827cf417546086e412d106431bf7738d3f1903f94a5d3",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "ffd973a2ff6c4e906234b49386d71a02b0ef4572",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/agnix/SKILL.md@1306ce5e302b8295c5c8e4865cbac5929caa67f4",
+   "text": "Lint agent configurations before they break your workflow. Validates Skills, Hooks, MCP, Memory, Plugins across Claude Code, Cursor, GitHub Copilot, and Codex CLI."
+  },
+  {
+   "source": "skills/agnix/SKILL.md@1306ce5e302b8295c5c8e4865cbac5929caa67f4",
+   "text": "Invoke when user asks to: - \"Lint my agent configs\" - \"Validate my skills\" - \"Check my CLAUDE.md\" - \"Validate hooks\" - \"Lint MCP configs\" - \"Fix agent configuration issues\""
+  },
+  {
+   "source": "skills/agnix/SKILL.md@1306ce5e302b8295c5c8e4865cbac5929caa67f4",
+   "text": "``` CLAUDE.md:15:1 warning: Generic instruction 'Be helpful' [fixable] help: Remove generic instructions. Claude already knows this."
+  }
+ ]
+}

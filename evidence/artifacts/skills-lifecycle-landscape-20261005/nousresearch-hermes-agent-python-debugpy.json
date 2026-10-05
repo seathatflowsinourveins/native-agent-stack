@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nousresearch-hermes-agent-python-debugpy",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "NousResearch/hermes-agent@python-debugpy",
+ "reviewed_commit": "f2555a8dfcacc6413d8a8e2718fbf0df3148fdab",
+ "readme_path": "skills/software-development/python-debugpy/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-debug"
+ ],
+ "claim": "Source review of the skill python-debugpy in NousResearch/hermes-agent at commit f2555a8dfcacc6413d8a8e2718fbf0df3148fdab (the adjudicated pin; license MIT), read from skills/software-development/python-debugpy/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for python-debugpy; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 8cce9e927dbfac33489fe48cae243494c9821aea. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 251286,
+  "pushed_at": "2026-10-05T09:08:34Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "f2555a8dfcacc6413d8a8e2718fbf0df3148fdab",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named python-debugpy",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "cb1b8b0795a56fa0fd79f80f3363f1ad79d404a6757d6cf547971cf89f21155e",
+  "skill_md_bytes": 14984,
+  "survivor_skill_md_sha256": "cb1b8b0795a56fa0fd79f80f3363f1ad79d404a6757d6cf547971cf89f21155e",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "8cce9e927dbfac33489fe48cae243494c9821aea",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/software-development/python-debugpy/SKILL.md@f2555a8dfcacc6413d8a8e2718fbf0df3148fdab",
+   "text": "**Start with `breakpoint()`.** It's the cheapest thing that works."
+  },
+  {
+   "source": "skills/software-development/python-debugpy/SKILL.md@f2555a8dfcacc6413d8a8e2718fbf0df3148fdab",
+   "text": "- A test fails and the traceback doesn't reveal why a value is wrong - You need to step through a function and watch a collection mutate - A long-running process (hermes gateway, tui_gateway) misbehaves and you can't restart it - Post-mortem: an exception fired in prod-ish code and you want to inspect locals at the crash site - A subprocess / child (Python `_SlashWorker`, PTY bridge worker) is the actual bug site"
+  },
+  {
+   "source": "skills/software-development/python-debugpy/SKILL.md@f2555a8dfcacc6413d8a8e2718fbf0df3148fdab",
+   "text": "**Don't use for:** things `print()` / `logging.debug` solve in under a minute, or things `pytest -vv --tb=long --showlocals` already reveals."
+  }
+ ]
+}

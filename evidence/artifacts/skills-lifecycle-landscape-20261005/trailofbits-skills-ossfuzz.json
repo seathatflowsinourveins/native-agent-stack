@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-trailofbits-skills-ossfuzz",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "trailofbits/skills@ossfuzz",
+ "reviewed_commit": "82fe8226252622fa807643bdca1710901198553a",
+ "readme_path": "plugins/testing-handbook-skills/skills/ossfuzz/SKILL.md",
+ "license": "CC-BY-SA-4.0",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill ossfuzz in trailofbits/skills at commit 82fe8226252622fa807643bdca1710901198553a (the adjudicated pin; license CC-BY-SA-4.0), read from plugins/testing-handbook-skills/skills/ossfuzz/SKILL.md and plugins/testing-handbook-skills/skills/ossfuzz/agents/openai.yaml at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for ossfuzz; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is f37245b8db07b0703e81e40ee52878c877ad0225. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 7370,
+  "pushed_at": "2026-10-02T10:05:35Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "CC-BY-SA-4.0",
+  "adjudicated_pin": "82fe8226252622fa807643bdca1710901198553a",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "plugins/testing-handbook-skills/skills/, the first location the CLI searches that holds a valid folder named ossfuzz",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "aeb1abbcac5ae5e4a73be4bb923fc9cca20d8d1073630c2e0a1ff37fccbec598",
+  "skill_md_bytes": 16740,
+  "survivor_skill_md_sha256": "aeb1abbcac5ae5e4a73be4bb923fc9cca20d8d1073630c2e0a1ff37fccbec598",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "f37245b8db07b0703e81e40ee52878c877ad0225",
+  "disable_model_invocation": false,
+  "openai_yaml_path": "plugins/testing-handbook-skills/skills/ossfuzz/agents/openai.yaml",
+  "openai_yaml_reader": "PyYAML 6.0.3 compose_all with CSafeLoader",
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no policy mapping: Codex defaults allow_implicit_invocation to true"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "plugins/testing-handbook-skills/skills/ossfuzz/SKILL.md@82fe8226252622fa807643bdca1710901198553a",
+   "text": "[OSS-Fuzz](https://google.github.io/oss-fuzz/) is an open-source project developed by Google that provides free distributed infrastructure for continuous fuzz testing. It streamlines the fuzzing process and facilitates simpler modifications. While only select projects are accepted into OSS-Fuzz, the project's core is open-source, allowing anyone to host their own instance for private projects."
+  },
+  {
+   "source": "plugins/testing-handbook-skills/skills/ossfuzz/SKILL.md@82fe8226252622fa807643bdca1710901198553a",
+   "text": "OSS-Fuzz provides a simple CLI framework for building and starting harnesses or calculating their coverage. Additionally, OSS-Fuzz can be used as a service that hosts static web pages generated from fuzzing outputs such as coverage information."
+  },
+  {
+   "source": "plugins/testing-handbook-skills/skills/ossfuzz/SKILL.md@82fe8226252622fa807643bdca1710901198553a",
+   "text": "**Apply this technique when:** - Setting up continuous fuzzing for an open-source project - Need distributed fuzzing infrastructure without managing servers - Want coverage reports and bug tracking integrated with fuzzing - Testing existing OSS-Fuzz harnesses locally - Reproducing crashes from OSS-Fuzz bug reports"
+  }
+ ]
+}

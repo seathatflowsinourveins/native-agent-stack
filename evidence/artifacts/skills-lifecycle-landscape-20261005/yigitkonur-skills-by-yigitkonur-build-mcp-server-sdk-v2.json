@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-yigitkonur-skills-by-yigitkonur-build-mcp-server-sdk-v2",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "yigitkonur/skills-by-yigitkonur@build-mcp-server-sdk-v2",
+ "reviewed_commit": "fd8b771f7a4bccdb9db92bfee396a0f045041fb9",
+ "readme_path": "skills/build-mcp-server-sdk-v2/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-mcp-build"
+ ],
+ "claim": "Source review of the skill build-mcp-server-sdk-v2 in yigitkonur/skills-by-yigitkonur at commit fd8b771f7a4bccdb9db92bfee396a0f045041fb9 (the adjudicated pin; license MIT), read from skills/build-mcp-server-sdk-v2/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for build-mcp-server-sdk-v2; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is ce88327b2662d282dee87bbb4654b70cf8af6177. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 13,
+  "pushed_at": "2026-10-05T00:14:59Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "fd8b771f7a4bccdb9db92bfee396a0f045041fb9",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named build-mcp-server-sdk-v2",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "e70dfe67b629db6cc2ca746c066c8883a1d00844654500f073637cf44f1daae9",
+  "skill_md_bytes": 14141,
+  "survivor_skill_md_sha256": "e70dfe67b629db6cc2ca746c066c8883a1d00844654500f073637cf44f1daae9",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "ce88327b2662d282dee87bbb4654b70cf8af6177",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/build-mcp-server-sdk-v2/SKILL.md@fd8b771f7a4bccdb9db92bfee396a0f045041fb9",
+   "text": "Build and maintain MCP servers on the v2 alpha **split-package SDK**: `@modelcontextprotocol/server`, `@modelcontextprotocol/client`, `@modelcontextprotocol/core`, plus `/node`, `/express`, `/hono` adapters. ESM-only, Node 20+, Zod v4. Status as of 2026-05-09: latest npm tag is `2.0.0-alpha.2` — pin exact, plan rollback."
+  },
+  {
+   "source": "skills/build-mcp-server-sdk-v2/SKILL.md@fd8b771f7a4bccdb9db92bfee396a0f045041fb9",
+   "text": "- *Building a brand-new MCP server and the user picks v2, \"the alpha\", or split packages.* - *`package.json` already depends on `@modelcontextprotocol/server`, `@modelcontextprotocol/client`, or `@modelcontextprotocol/core`.* - *Existing code uses `new McpServer(...)` from `@modelcontextprotocol/server` and `server.registerTool(...)` with the high-level API.* - *Tool/resource/prompt handlers use `(args, ctx)` with `ctx.mcpReq.signal`, `ctx.mcpReq.log()`, `ctx.mcpReq.notify()`, or `ctx.http?.auth"
+  },
+  {
+   "source": "skills/build-mcp-server-sdk-v2/SKILL.md@fd8b771f7a4bccdb9db92bfee396a0f045041fb9",
+   "text": "- *`package.json` depends on the single-package `@modelcontextprotocol/sdk` (v1) — use **`build-mcp-server-sdk-v1`** instead.* - *Handlers use `(args, extra)` with `extra.sendNotification`, `extra.authInfo`, or `extra.signal` — that is v1; use **`build-mcp-server-sdk-v1`**.* - *The job is **porting** an existing v1 server to v2 — use **`convert-mcp-sdk-v1-to-v2`** (covers package split, import rewrite, `extra → ctx` mapping, OAuth replacement, staging strategy).* - *The project uses the `mcp-use"
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-addyosmani-agent-skills-test-driven-development",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "addyosmani/agent-skills@test-driven-development",
+ "reviewed_commit": "1401c8b8030e023baeebb31781a6653fe8e93026",
+ "readme_path": "skills/test-driven-development/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill test-driven-development in addyosmani/agent-skills at commit 1401c8b8030e023baeebb31781a6653fe8e93026 (the adjudicated pin; license MIT), read from skills/test-driven-development/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for test-driven-development; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is b812b07dc0c5084dbffe58a1cc856de2fdd99116. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 101348,
+  "pushed_at": "2026-10-03T18:21:11Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "1401c8b8030e023baeebb31781a6653fe8e93026",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named test-driven-development",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "7c0c6ac057c19d7f8be65d9f49c3a638703b868f4625c78b70da5439d5d74fca",
+  "skill_md_bytes": 16517,
+  "survivor_skill_md_sha256": "7c0c6ac057c19d7f8be65d9f49c3a638703b868f4625c78b70da5439d5d74fca",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "b812b07dc0c5084dbffe58a1cc856de2fdd99116",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/test-driven-development/SKILL.md@1401c8b8030e023baeebb31781a6653fe8e93026",
+   "text": "Write a failing test before writing the code that makes it pass. For bug fixes, reproduce the bug with a test before attempting a fix. Tests are proof — \"seems right\" is not done. A codebase with good tests is an AI agent's superpower; a codebase without tests is a liability."
+  },
+  {
+   "source": "skills/test-driven-development/SKILL.md@1401c8b8030e023baeebb31781a6653fe8e93026",
+   "text": "- Implementing any new logic or behavior - Fixing any bug (the Prove-It Pattern) - Modifying existing functionality - Adding edge case handling - Any change that could break existing behavior"
+  },
+  {
+   "source": "skills/test-driven-development/SKILL.md@1401c8b8030e023baeebb31781a6653fe8e93026",
+   "text": "**When NOT to use:** Pure configuration changes, documentation updates, or static content changes that have no behavioral impact."
+  }
+ ]
+}

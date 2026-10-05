@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-everyinc-compound-engineering-plugin-ce-resolve-pr-feedback",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+ "reviewed_commit": "030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+ "readme_path": "skills/ce-resolve-pr-feedback/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill ce-resolve-pr-feedback in EveryInc/compound-engineering-plugin at commit 030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c (the adjudicated pin; license MIT), read from skills/ce-resolve-pr-feedback/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for ce-resolve-pr-feedback; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 46c854584bbcf9af8d3cf5a293e24d64bd673a33. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 25393,
+  "pushed_at": "2026-10-05T07:01:52Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named ce-resolve-pr-feedback",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "c1f7d4d14e932fd6b51d758bd7e25e3673fa380dd13546679af3a45debc5cffc",
+  "skill_md_bytes": 6684,
+  "survivor_skill_md_sha256": "c1f7d4d14e932fd6b51d758bd7e25e3673fa380dd13546679af3a45debc5cffc",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "46c854584bbcf9af8d3cf5a293e24d64bd673a33",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/ce-resolve-pr-feedback/SKILL.md@030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+   "text": "Judge fresh PR review feedback centrally, then dispatch generic subagents seeded with the bundled fixer prompt only for approved fixes. Publish the fixes before replying and resolving. Resume completes saved judgments without another fix pass."
+  },
+  {
+   "source": "skills/ce-resolve-pr-feedback/SKILL.md@030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+   "text": "**Done:** Every selected item has a verdict and verified conversation completion or a reported residual. Completed threads have a visible submitted reply with quoted context and authoritative resolution; `needs-human` threads stay open. Ordinary and pipeline runs publish valid fixes before completion. Return-to-caller preserves its local fix commit and exact pending actions in a readable validated handoff, or records actual no-change completion. Resume verifies fresh publication and returns chec"
+  },
+  {
+   "source": "skills/ce-resolve-pr-feedback/SKILL.md@030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+   "text": "**Escalations never block.** Return `needs-human` with structured `decision_context` for the caller to show the user; leave its threads open with natural replies when the execution mode permits publication. Never pause mid-run to ask. A decision needing judgment rather than missing authority goes through `ce-pov` before escalation, as the rubric's \"Adjudicate before escalating\" section defines."
+  }
+ ]
+}

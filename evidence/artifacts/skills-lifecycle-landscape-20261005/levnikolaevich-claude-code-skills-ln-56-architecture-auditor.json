@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-levnikolaevich-claude-code-skills-ln-56-architecture-auditor",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "levnikolaevich/claude-code-skills@ln-56-architecture-auditor",
+ "reviewed_commit": "a5d6eabb550ac95d4d9a1ae08ab6006d1ef508f1",
+ "readme_path": "plugins/quality-assurance-suite/skills/ln-56-architecture-auditor/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-architecture"
+ ],
+ "claim": "Source review of the skill ln-56-architecture-auditor in levnikolaevich/claude-code-skills at commit a5d6eabb550ac95d4d9a1ae08ab6006d1ef508f1 (the adjudicated pin; license MIT), read from plugins/quality-assurance-suite/skills/ln-56-architecture-auditor/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for ln-56-architecture-auditor; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 737483abffad5676039ea4fa903af2297fd71c1b. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 569,
+  "pushed_at": "2026-10-02T11:09:47Z",
+  "archived": false,
+  "default_branch": "master",
+  "repository_license": "MIT",
+  "adjudicated_pin": "a5d6eabb550ac95d4d9a1ae08ab6006d1ef508f1",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "plugins/quality-assurance-suite/skills/, the first location the CLI searches that holds a valid folder named ln-56-architecture-auditor",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "0cbe75a3e45f1f6626096f62e9d0e8ae71fb7956846cb571a3863bf1999260ab",
+  "skill_md_bytes": 14852,
+  "survivor_skill_md_sha256": "0cbe75a3e45f1f6626096f62e9d0e8ae71fb7956846cb571a3863bf1999260ab",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "737483abffad5676039ea4fa903af2297fd71c1b",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "plugins/quality-assurance-suite/skills/ln-56-architecture-auditor/SKILL.md@a5d6eabb550ac95d4d9a1ae08ab6006d1ef508f1",
+   "text": "**Goal:** Perform a read-only audit of the architecture the system actually executes. Evaluate whether structure, dependencies, contracts, and cross-component ownership fit current product needs without rewarding pattern names or speculative modernization. Judge where atomicity and resource ownership belong; leave local query, transaction, and data-resource correctness to a persistence-focused review."
+  },
+  {
+   "source": "plugins/quality-assurance-suite/skills/ln-56-architecture-auditor/SKILL.md@a5d6eabb550ac95d4d9a1ae08ab6006d1ef508f1",
+   "text": "**Execution contract:** The checklist defines completion. Track each item internally as `PENDING`, `PROVEN` with evidence, `CLEARED` with evidence its condition is absent, or `UNPROVEN` with a gap; reading, delegation, tool failure, a zero exit status, or a self-reported success is not proof; only the observed outcome is. Reconcile after each section. Before returning, resolve all `PENDING`, count only `PROVEN` and `CLEARED`, and apply verdict and approval rules to every gap. Preserve intent, sc"
+  },
+  {
+   "source": "plugins/quality-assurance-suite/skills/ln-56-architecture-auditor/SKILL.md@a5d6eabb550ac95d4d9a1ae08ab6006d1ef508f1",
+   "text": "Use diagrams only when they clarify a relationship that prose cannot. Do not generate a diagram as a substitute for evidence, and do not modify code or architecture documents during the audit."
+  }
+ ]
+}

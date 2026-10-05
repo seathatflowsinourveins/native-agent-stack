@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-dmoka-skills-mutation-testing",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "dmoka/skills@mutation-testing",
+ "reviewed_commit": "3f89040672649309429ebd4d1127af8f537aa330",
+ "readme_path": "skills/mutation-testing/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill mutation-testing in dmoka/skills at commit 3f89040672649309429ebd4d1127af8f537aa330 (the adjudicated pin; license MIT), read from skills/mutation-testing/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for mutation-testing; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 8f7f6de76ba1a3a2800474a361131e3d73a14bab. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 1,
+  "pushed_at": "2026-10-05T08:11:57Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "3f89040672649309429ebd4d1127af8f537aa330",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named mutation-testing",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "e6e9cf6f51d141f0d93f54f463adf52a2a7bb0d6c2eb3a10def2920038407e5a",
+  "skill_md_bytes": 8446,
+  "survivor_skill_md_sha256": "e6e9cf6f51d141f0d93f54f463adf52a2a7bb0d6c2eb3a10def2920038407e5a",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "8f7f6de76ba1a3a2800474a361131e3d73a14bab",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/mutation-testing/SKILL.md@3f89040672649309429ebd4d1127af8f537aa330",
+   "text": "Coverage tells you code was executed. Mutation testing tells you whether the tests would notice that code being wrong. A tool plants one small bug at a time (a mutant: `>=` becomes `>`, `+` becomes `-`, a condition is deleted), reruns the suite, and records the verdict. A test failure kills the mutant. A suite that stays green let the bug through — every surviving mutant is a lie the test suite tells."
+  },
+  {
+   "source": "skills/mutation-testing/SKILL.md@3f89040672649309429ebd4d1127af8f537aa330",
+   "text": "Reference files sit beside this file. If you fetched this over HTTP instead of from disk, fetch them from `https://raw.githubusercontent.com/dmoka/skills/main/skills/mutation-testing/references/tools.md` and `https://raw.githubusercontent.com/dmoka/skills/main/skills/mutation-testing/references/gotchas.md`."
+  },
+  {
+   "source": "skills/mutation-testing/SKILL.md@3f89040672649309429ebd4d1127af8f537aa330",
+   "text": "**Fetch raw text, not a summary.** Many agents have a fetch tool that runs a page through a summarizing model. It will paraphrase this file, drop the numbered steps, and mangle the config snippets you are about to copy. If your fetch returns prose rather than the literal markdown below, refetch with `curl -sSL <url>` and work from that."
+  }
+ ]
+}
