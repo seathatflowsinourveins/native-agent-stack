@@ -1,0 +1,80 @@
+{
+  "slot": "instructions-skills/research-skill",
+  "bounded_nonadoption_can_close": true,
+  "blocking_omissions": [],
+  "findings": [
+    {
+      "kind": "evidence_scope",
+      "finding": "On the supplied evidence, no omitted alternative is established to pass A–C and demonstrate an owner-overlap win. Both Sol decisions and Astra agree on non-adoption; conditional Opus verification was therefore not run.",
+      "effect": "The bounded non-adoption and ownership-registration recommendation can close. This does not establish exhaustive candidate coverage, certify the incumbent, or satisfy the north-star research requirement.",
+      "source": "INPUT#/blind_deciders; INPUT#/astra_critic"
+    },
+    {
+      "kind": "source",
+      "finding": "Successful root observations and additional original-source checks are supplied source-review evidence. Sol/Astra fetching failures remain failures, and this critic's cited-source retrieval attempts also failed. Historical-input references absent from this input remain reported summaries.",
+      "effect": "Neither unavailable fetching nor successful root source review constitutes model-side independent verification, native invocation, useful research, or lifecycle acceptance.",
+      "source": "INPUT#/root_source_observations; INPUT#/additional_original_source_checks; INPUT#/astra_critic/historical_input_limits"
+    },
+    {
+      "kind": "candidate_class",
+      "finding": "The set distinguishes official GPT Researcher skill/plugin/MCP entry, DeerFlow HTTP entry, and DeerFlow research methodology. It lacks a verified assessment of shipped headless CLI/SDK entry paths and their relationship to existing owner glue.",
+      "effect": "CLI/SDK coverage is a scoped next-sweep gap: a different shipped entry could change the required components. MCP freshness/startup findings and HTTP service requirements cannot automatically disqualify that separate route. No qualifying alternative is established here.",
+      "source": "INPUT#/factual_packet/candidates; INPUT#/factual_packet/incumbent"
+    },
+    {
+      "kind": "integration",
+      "finding": "Required gptr-mcp fails the 90/180-day freshness limits on the supplied dated observations. The root plugin's uvx entry has reused no-executable failures for distributions 0.16.1 and 0.16.0. Source-level STDIO startup hazards were observed separately.",
+      "effect": "These support withholding the recorded entries. They establish neither distribution/tag byte equivalence nor failure of every CLI/SDK route. No MCP handshake, five-tool discovery, research result, or lifecycle pass occurred.",
+      "source": "INPUT#/root_source_observations; INPUT#/additional_original_source_checks/0; INPUT#/factual_packet/candidates/0/facts"
+    },
+    {
+      "kind": "evidence_scope",
+      "finding": "Tag-to-pin identity and tag-specific tests/CI, releases, installation/integration documentation, maintenance, and published evaluation remain incomplete. The cited gptr-mcp tester concerns SSE; the six-task comparison is a design, distinct from paired-skill qualification.",
+      "effect": "C remains unestablished. Failed fetching does not prove absent engineering work, and neither repository metadata nor an evaluation design supplies a passing result.",
+      "source": "INPUT#/factual_packet/candidates; INPUT#/blind_deciders"
+    },
+    {
+      "kind": "integration",
+      "finding": "No useful-result and lifecycle receipts from both Claude Code and Codex, or qualified worker research handoff, are supplied. Embedded chat does not establish gateway/thread/stream acceptance; methodology frontmatter does not establish a native entry. HTTP mode comparisons must preserve pro versus ultra behavior.",
+      "effect": "Client installation, transport claims, and worker accessibility remain separate. Do not transfer acceptance between embedded, HTTP, MCP, methodology, or worker paths.",
+      "source": "INPUT#/factual_packet/incumbent; INPUT#/factual_packet/candidates/1; INPUT#/additional_original_source_checks/1; INPUT#/additional_original_source_checks/2"
+    },
+    {
+      "kind": "modality",
+      "finding": "No executed evidence establishes primary-paper/PDF reading, page-level citation accuracy, table or numerical extraction, or useful foundation-engineering and US-equities research. Software/repository task coverage alone would leave these modalities unresolved.",
+      "effect": "Document and table tasks belong in a scoped evaluation sweep. This round cannot certify domain usefulness or authorize a new trial.",
+      "source": "INPUT#/factual_packet/requirement; INPUT#/factual_packet/unknowns; INPUT#/astra_critic/acceptance_limits"
+    },
+    {
+      "kind": "integration",
+      "finding": "Existing-owner registration is separate from choosing between the installed embedded contract and another owner's draft native-CLI contract. The source-freeze question remains pending; the draft's exact immutable locator is not supplied.",
+      "effect": "Registration may record the reported current owner and provenance. This disposition selects no source revision, changes no installed bytes, authorizes no installation, and waives no qualification gate.",
+      "source": "User-supplied source-freeze constraint; INPUT#/factual_packet/incumbent; INPUT#/astra_critic/registration_scope"
+    }
+  ],
+  "next_sweep_inputs": [
+    "CLI/SDK and owner glue: begin with native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:evidence/artifacts/new-wsl-install-plan-20261002/config/research-harnesses-skill.md and assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4:pyproject.toml. Obtain exact shipped CLI/SDK source, invocation, worker-handoff, and draft-contract locators; do not guess paths or freeze a revision.",
+    "Vendor route qualification: inspect assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4:skills/gpt-researcher/SKILL.md, .mcp.json, and .codex-plugin/plugin.json separately from assafelovic/gptr-mcp@63884773685b1f12c7f0d9e283b3d71a5b9b5fda:server.py and tests/test_mcp_server.py. Any freshness update requires dated commit/release evidence from the supplied API endpoints.",
+    "DeerFlow coverage: use bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:skills/public/claude-to-deerflow/SKILL.md, skills/public/claude-to-deerflow/scripts/chat.sh, and skills/public/deep-research/SKILL.md. Establish each path's own entry documentation; obtain exact tag-specific test/CI/release/evaluation locators before claiming C passes.",
+    "Existing evaluation and acceptance evidence: use native-agent-stack@cb55ae1c69674b43d5e4a52b31044566c5d906bf:docs/decisions/2026-10-05-research-skill-round-2-input-pack.md and evidence/artifacts/research-skill-round2-20261005/probe.json as provenance anchors. Seek separately qualified receipts for both clients, applicable workers, primary papers/PDFs/tables, paired skills, and mode-matched owner overlap; the packet supplies no executed comparison."
+  ],
+  "closing_limits": [
+    "Closure covers bounded non-adoption and the administrative ownership/provenance recommendation only; no registration was performed.",
+    "The incumbent remains uncertified. Historical No results found and GraphRecursionError remain historical failures; unchanged executable probes are reused observations.",
+    "The source freeze remains pending. No installed or draft contract is selected, replaced, or authorized for installation.",
+    "Opus verification, native activation, paired-skill qualification, and useful domain research have no newly returned passes. The no-new-local-trial constraint remains in force."
+  ],
+  "overturn_conditions": [
+    "Reopen candidate completeness if exact pinned primary evidence identifies an overlooked shipped CLI/SDK, vendor entry, or methodology integration that satisfies every A–C gate, including required-component freshness and a demonstrated owner-overlap win; then apply D.",
+    "A changed adoption verdict or material selection split triggers the required live-upstream refute-by-default Opus verification. Installation and acceptance still require separately authorized native lifecycle and paired-skill gates.",
+    "Reconsider registration if authoritative evidence disproves the supplied installed-owner/provenance assertions. Resolve source freeze through its owner process without treating registration as source approval."
+  ],
+  "sources": [
+    "Supplied INPUT, including dated root observations and additional original-source checks; cited-source fetching failed during this review.",
+    "[Quality rule, supplied primary locator](https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/docs/decisions/2026-10-04-repository-quality-rule.md#L17)",
+    "[Recorded activation gate](https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/docs/decisions/2026-10-02-new-wsl-layer-consensus.md#L122)",
+    "[Existing owner contract locator](https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/evidence/artifacts/new-wsl-install-plan-20261002/config/research-harnesses-skill.md)",
+    "[Factual input-pack provenance](https://github.com/seathatflowsinourveins/native-agent-stack/blob/cb55ae1c69674b43d5e4a52b31044566c5d906bf/docs/decisions/2026-10-05-research-skill-round-2-input-pack.md)",
+    "[Unchanged probe provenance](https://github.com/seathatflowsinourveins/native-agent-stack/blob/cb55ae1c69674b43d5e4a52b31044566c5d906bf/evidence/artifacts/research-skill-round2-20261005/probe.json)"
+  ]
+}

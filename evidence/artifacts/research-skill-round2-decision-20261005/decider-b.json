@@ -1,0 +1,122 @@
+{
+  "slot": "instructions-skills/research-skill",
+  "decision": "configure_existing_owner",
+  "adopt_new_candidate": false,
+  "chosen_candidate": null,
+  "candidate_assessments": [
+    {
+      "candidate_id": "deerflow-vendor-internal-research-skill",
+      "eligible": false,
+      "gates": [
+        {
+          "gate": "A.requirement",
+          "result": "pass",
+          "evidence": "Explicitly named for the stated foundation and US-equities research requirement.",
+          "source": "Supplied packet and quality rule."
+        },
+        {
+          "gate": "B.candidate",
+          "result": "unknown",
+          "evidence": "Commit/release dates, Linux/WSL2 installation, self-hosting and a documented standalone both-client entry path remain unverified. Another skill's transport cannot establish this candidate's qualification; no owner-overlap win is supplied.",
+          "source": "[Pinned internal skill](https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/deep-research/SKILL.md), unavailable for verification."
+        },
+        {
+          "gate": "C.engineering_quality",
+          "result": "unknown",
+          "evidence": "No verified tag-specific tests/CI, release discipline, integration documentation, maintenance assessment or published evaluation.",
+          "source": "Supplied packet; cited upstream source unavailable."
+        },
+        {
+          "gate": "D.and_additional_activation",
+          "result": "unknown",
+          "evidence": "No all-gate qualification, Opus live-upstream verification, both-client useful result, lifecycle acceptance or paired skill benchmark is supplied.",
+          "source": "Supplied activation constraints."
+        }
+      ],
+      "quality": "Unqualified for adoption on the available evidence; internal workflow status does not establish native entry or acceptance."
+    },
+    {
+      "candidate_id": "deerflow-vendor-http-entry",
+      "eligible": false,
+      "gates": [
+        {
+          "gate": "A.requirement",
+          "result": "pass",
+          "evidence": "Explicitly named for entry into the existing research runtime.",
+          "source": "Supplied packet and quality rule."
+        },
+        {
+          "gate": "B.candidate",
+          "result": "unknown",
+          "evidence": "Freshness, supported installation and both-client documentation remain unverified. No matched win over the installed owner is supplied.",
+          "source": "[Pinned HTTP-entry skill](https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/claude-to-deerflow/SKILL.md#L8), unavailable for verification."
+        },
+        {
+          "gate": "C.engineering_quality",
+          "result": "unknown",
+          "evidence": "Tag-specific engineering quality is unverified. The packet supplies a comparison design, without executed results; the pro/ultra script distinction also requires exact-source verification.",
+          "source": "[Pinned chat script](https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/claude-to-deerflow/scripts/chat.sh#L26), unavailable for verification."
+        },
+        {
+          "gate": "D.and_additional_activation",
+          "result": "unknown",
+          "evidence": "No gateway health/thread/stream result, both-client lifecycle acceptance, paired skill benchmark or Opus verification is supplied. Embedded chat cannot substitute for the recorded HTTP gate.",
+          "source": "Supplied packet and activation constraints."
+        }
+      ],
+      "quality": "HTTP entry remains conditional; neither native acceptance nor superiority over the owner is established."
+    },
+    {
+      "candidate_id": "gpt-researcher-vendor-mcp-entry",
+      "eligible": false,
+      "gates": [
+        {
+          "gate": "A.requirement",
+          "result": "pass",
+          "evidence": "Explicitly named for native research entry.",
+          "source": "Supplied packet and quality rule."
+        },
+        {
+          "gate": "B.required_transport_freshness",
+          "result": "fail",
+          "evidence": "The packet's October 5 API observations place required gptr-mcp's latest commit at 332 days and release at 554 days, exceeding both limits. This verdict uses the recorded observations; no current upstream recheck succeeded.",
+          "source": "Supplied API observations; [commits endpoint](https://api.github.com/repos/assafelovic/gptr-mcp/commits?per_page=1) and [releases endpoint](https://api.github.com/repos/assafelovic/gptr-mcp/releases?per_page=100)."
+        },
+        {
+          "gate": "B.remaining_candidate_and_C.quality",
+          "result": "unknown",
+          "evidence": "The packet records unsuccessful uvx entry probes. Exact plugin/startup source, tag-specific engineering quality and an overlap win remain unverified; source-level startup and tester claims remain leads.",
+          "source": "Supplied probe observations; [pinned vendor skill](https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/skills/gpt-researcher/SKILL.md), unavailable for verification."
+        },
+        {
+          "gate": "D.and_additional_activation",
+          "result": "unknown",
+          "evidence": "No pinned-environment acceptance, clean STDIO handshake, five-tool discovery, useful result in each client, bounded lifecycle, paired benchmark or Opus verification is supplied.",
+          "source": "Supplied activation constraints."
+        }
+      ],
+      "quality": "Fails required-component freshness on the recorded evidence and lacks native activation evidence."
+    }
+  ],
+  "reasoning": "Recommend ownership/provenance registration and configuration repair for existing-research-harnesses-owner. The packet identifies an installed owner for the requested runtime, while no replacement demonstrates every gate or an overlap win. This decision grants no native activation acceptance: installed bytes, configuration and registration do not establish useful research from both clients. No new trial or installation was performed.",
+  "unknowns": [
+    "Cited upstream sources could not be fetched through the available web and shell access routes; repository-source claims remain unverified leads.",
+    "DeerFlow and GPT Researcher parent commit/release dates and tag-specific engineering quality remain unverified.",
+    "Any upstream change since the packet's API/probe observations remains unknown.",
+    "Existing-owner useful research, both-client invocation and lifecycle acceptance remain unproven.",
+    "Opus live-upstream verification, paired skill benchmark and matched empirical overlap results are absent."
+  ],
+  "overturn_conditions": [
+    "A replacement must have exact-source evidence passing A–C, including freshness of required components, supported Linux/WSL2 self-hosted installation, both-client integration and a demonstrated owner-overlap win.",
+    "Before installation, that replacement must also pass Opus live-upstream refute-by-default verification and the recorded native lifecycle/paired-skill gates. A source review or skipped stage cannot substitute."
+  ],
+  "completeness_inputs": [
+    "Only the supplied 2026-10-05 packet and unchanged A–D quality rule informed this decision.",
+    "The additional activation constraints were applied separately from repository quality.",
+    "No provenance documents, other decisions, local accounts, settings, credentials or environment variables were read; no helpers or artifacts were created."
+  ],
+  "sources": [
+    "[Quality rule, supplied criteria](https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/docs/decisions/2026-10-04-repository-quality-rule.md#L17)",
+    "[Activation constraint, supplied packet](https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/docs/decisions/2026-10-02-new-wsl-layer-consensus.md#L122)"
+  ]
+}

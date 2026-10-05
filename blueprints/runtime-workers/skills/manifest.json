@@ -4022,6 +4022,21 @@
       "upstream_disable_model_invocation": false,
       "reason": "Main retired it on 2026-10-03 (adoption/skills/manifest.json, excluded, retired 2026-10-03; wave-2 skills ruling, evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json): its plan-approval gate (SKILL.md lines 5, 14, 24 and 184) conflicts with AGENTS.md's no separate planning approval for bounded work. The reuse_ref entry and its coverage selections left with it, as adoption/skills/lifecycle.md (Retire and remove) asks; its scenarios were security and its roles coding, orchestration. Main no longer lists it among its skills, so this exclusion carries no adoption_ref; the pin fields record the revision main read.",
       "overturn": "Main re-admits it, that is adoption/skills/manifest.json lists it under skills again; then replace this exclusion with a reuse_ref entry at main's pin and restore its scenarios and roles."
+    },
+    {
+      "name": "native-stack-research",
+      "source": "seathatflowsinourveins/native-agent-stack",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/05e3ead094d09a55e4652296d3d305edc2d10888/adoption/skills/native-stack-research",
+      "ref": "05e3ead094d09a55e4652296d3d305edc2d10888",
+      "path": "adoption/skills/native-stack-research",
+      "tree_sha": "2d233cad78ad1d2da70721fd46fbe20088909558",
+      "skill_md_sha256": "313f41cbbb7ba5cbe9733d7b9c4caf85bd4fabf4c7a4cb5b40731f5449b941eb",
+      "skill_md_bytes": 1602,
+      "description_chars": 153,
+      "upstream_disable_model_invocation": false,
+      "adoption_ref": "adoption/skills/manifest.json",
+      "reason": "Native-client host entry: SKILL.md at 05e3ead094d09a55e4652296d3d305edc2d10888:8-24 calls plan-owned scripts under the native host's XDG config. An unchanged central registration does not qualify that host runtime or a worker bridge. Keep this entry explicitly excluded from worker copying until supported invocation, environment ownership and worker research output are qualified; no worker runtime failure or universal absence is claimed. docs/decisions/2026-10-05-research-skill-round2.md records the separate gate.",
+      "overturn": "A reviewed worker integration proves a supported route to the plan-owned research runtime with useful returned research and native worker discovery/invocation/lifecycle evidence; then replace this exclusion with a reuse_ref entry at the central pin. A changed skill contract also requires the repository's paired skill gate."
     }
   ],
   "openhands_inventory": [

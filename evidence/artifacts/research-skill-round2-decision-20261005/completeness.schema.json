@@ -1,0 +1,89 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "slot": {
+      "type": "string",
+      "enum": [
+        "instructions-skills/research-skill"
+      ]
+    },
+    "bounded_nonadoption_can_close": {
+      "type": "boolean"
+    },
+    "blocking_omissions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "source",
+              "candidate_class",
+              "modality",
+              "integration",
+              "evidence_scope"
+            ]
+          },
+          "finding": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "finding",
+          "effect",
+          "source"
+        ]
+      }
+    },
+    "next_sweep_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "closing_limits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "overturn_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "slot",
+    "bounded_nonadoption_can_close",
+    "blocking_omissions",
+    "findings",
+    "next_sweep_inputs",
+    "closing_limits",
+    "overturn_conditions",
+    "sources"
+  ]
+}

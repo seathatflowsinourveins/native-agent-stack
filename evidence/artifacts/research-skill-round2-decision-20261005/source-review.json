@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "observations": [
+    {
+      "observed_utc": "2026-10-05 13:42:18 UTC",
+      "source": "https://api.github.com/repos/assafelovic/gptr-mcp/commits?per_page=1",
+      "exit_code": 0,
+      "head": "63884773685b1f12c7f0d9e283b3d71a5b9b5fda",
+      "commit_date": "2025-11-07T07:46:52Z"
+    },
+    {
+      "observed_utc": "2026-10-05 13:42:18 UTC",
+      "source": "https://api.github.com/repos/assafelovic/gptr-mcp/releases?per_page=100",
+      "exit_code": 0,
+      "releases": [
+        {
+          "tag": "v0.0.1",
+          "published": "2025-03-30T17:55:52Z"
+        }
+      ]
+    },
+    {
+      "observed_utc": "2026-10-05 13:43:14 UTC",
+      "source": "assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4:.mcp.json",
+      "blob": "417e483bde56cf8a2d8de76e0ca26f7e876137c6",
+      "exit_code": 0,
+      "command": "uvx",
+      "args": [
+        "gpt-researcher"
+      ]
+    },
+    {
+      "observed_utc": "2026-10-05 13:43:14 UTC",
+      "source": "assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4:.codex-plugin/plugin.json",
+      "blob": "28497e1ec8d673f24fec1855a8d2595b1eb70825",
+      "exit_code": 0,
+      "mcpServers": "./.mcp.json"
+    },
+    {
+      "observed_utc": "2026-10-05 13:43:14 UTC",
+      "source": "assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4:pyproject.toml",
+      "blob": "037171e623b822b3e2282dbf9545b033e7887614",
+      "exit_code": 0,
+      "version": "0.16.0",
+      "requires_python": ">=3.12",
+      "project_scripts": null
+    },
+    {
+      "observed_utc": "2026-10-05 13:47:03 UTC",
+      "source": "bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:skills/public/claude-to-deerflow/SKILL.md",
+      "blob": "969a292c1ee27c29a3f58e4a52e155a9d74909bf",
+      "exit_code": 0,
+      "scope": "HTTP runtime entry requires reachable gateway/threads/stream; source review only"
+    },
+    {
+      "observed_utc": "2026-10-05 13:47:03 UTC",
+      "source": "bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:skills/public/claude-to-deerflow/scripts/chat.sh",
+      "blob": "a2c27dedaac73b88a7c03c80e30fba6620a342a3",
+      "exit_code": 0,
+      "scope": "HTTP health/stream entry, source review only"
+    }
+  ],
+  "boundary": "Root source observations do not turn a failed source fetch into a model-side source pass or constitute native protocol/research/lifecycle acceptance.",
+  "additional_original_source_checks": [
+    {
+      "source": "assafelovic/gptr-mcp@63884773685b1f12c7f0d9e283b3d71a5b9b5fda:server.py:277-312",
+      "blob": "592dbf699fff7c240644d4ae45d143d60a6badc3",
+      "exit_code": 0,
+      "observed_utc": "2026-10-05 14:16:41 UTC",
+      "finding": "Explicit provider-key environment lookup, ordinary stdout startup messages before STDIO mcp.run, and a busy loop after return; source review, not protocol execution"
+    },
+    {
+      "source": "bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:skills/public/deep-research/SKILL.md:1-15",
+      "blob": "55f1481c8e5feacaa9bce267a4724e10bf0ad8fa",
+      "exit_code": 0,
+      "observed_utc": "2026-10-05 14:16:41 UTC",
+      "finding": "Source exists and frontmatter names deep-research; overview describes a systematic research methodology. This limited source check does not establish a native runtime entry or client acceptance"
+    },
+    {
+      "source": "bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:skills/public/claude-to-deerflow/scripts/chat.sh:55-59",
+      "blob": "a2c27dedaac73b88a7c03c80e30fba6620a342a3",
+      "exit_code": 0,
+      "observed_utc": "2026-10-05 14:16:41 UTC",
+      "finding": "pro sets subagent_enabled=false; ultra sets true. Source mode claim confirmed"
+    }
+  ],
+  "source_reuse": {
+    "input_pack_pin": "cb55ae1c69674b43d5e4a52b31044566c5d906bf",
+    "decision_path": "docs/decisions/2026-10-05-research-skill-round-2-input-pack.md",
+    "native_probe_results": "Existing isolated uvx probes retained in that input pack were reused, not rerun. Current PyPI 0.16.1 and explicit 0.16.0 expose no executable; pinned Python 3.12.3 control passes. Historical probes have their original evidence classes."
+  },
+  "corrections": [
+    {
+      "claim": "Vendor MCP locator is .codex-plugin/.mcp.json",
+      "correction": "Pinned plugin metadata names ./.mcp.json at repository root; verified original root .mcp.json and plugin.json."
+    },
+    {
+      "claim": "DeerFlow pro mode enables subagents",
+      "correction": "Original chat.sh lines 55-59 set pro subagent_enabled=false and ultra=true; do not broaden HTTP skill prose into a runtime result."
+    }
+  ],
+  "assessment_boundary": "Engineering-quality source judgments only. No upstream native suite, new skill A/B, MCP handshake, useful research run, lifecycle install or model discovery was executed in this round."
+}

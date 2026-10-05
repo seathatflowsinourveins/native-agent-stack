@@ -1,0 +1,106 @@
+{
+  "slot": "instructions-skills/research-skill",
+  "decision": "configure_existing_owner",
+  "adopt_new_candidate": false,
+  "chosen_candidate": "existing-research-harnesses-owner",
+  "material_split": false,
+  "opus_verification_required": false,
+  "differences": [
+    {
+      "subject": "Existing-owner registration versus the historical vendor-hold default",
+      "classification": "factual_disagreement",
+      "reason": "The supplied ownership facts support registering native-stack-research, already reported installed in both clients. Both Sol decisions recommend this action. This changes the slot's administrative disposition while preserving the historical GPT Researcher vendor activation hold. The historical 'not installed' disposition concerned that vendor entry; it did not establish that no existing research owner was installed.",
+      "sources": [
+        "INPUT#/historical_context/initial_direct_consensus",
+        "INPUT#/factual_packet/incumbent",
+        "INPUT#/blind_deciders/0/reasoning",
+        "INPUT#/blind_deciders/1/reasoning",
+        "[Existing owner source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/evidence/artifacts/new-wsl-install-plan-20261002/config/research-harnesses-skill.md)"
+      ]
+    },
+    {
+      "subject": "Repository-quality selection and round-2 verification requirements",
+      "classification": "rule_change",
+      "reason": "Relative to the supplied historical activation-based disposition, round 2 applies commit <=90 days, release <=180 days, upstream Linux/WSL installation, self-hosting, documented client integration, an overlap win, and tag-specific tests/CI, releases, documentation, maintenance and published evaluation. D selects the strongest passing choice, breaks ties by fewer parts and authorizes no new local trial. Adoption or a material split additionally triggers live-upstream refute-by-default Opus verification. These requirements cannot be retroactively treated as historical findings.",
+      "sources": [
+        "[Quality method](https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/docs/decisions/2026-10-04-repository-quality-rule.md#L17)",
+        "INPUT#/historical_context/initial_direct_consensus/resolution/deciding_measurement",
+        "User-supplied A–D criteria and Opus trigger"
+      ]
+    },
+    {
+      "subject": "Required gptr-mcp maintenance and the Sol evidence-label difference",
+      "classification": "factual_disagreement",
+      "reason": "The October 5 observations report a 332-day-old commit and 554-day-old release, failing both freshness limits. Sol 2 correctly records failure on that supplied evidence; Sol 1 leaves it unknown pending independent confirmation. I accept the dated observation as supplied, while leaving subsequent upstream changes unknown. This is an evidentiary difference, not a material selection split: both reject adoption. The historical record did not claim this dependency passed those freshness limits.",
+      "sources": [
+        "INPUT#/root_source_observations/observations/0",
+        "INPUT#/root_source_observations/observations/1",
+        "INPUT#/blind_deciders/0/candidate_assessments/0",
+        "INPUT#/blind_deciders/1/candidate_assessments/2",
+        "[Commit endpoint](https://api.github.com/repos/assafelovic/gptr-mcp/commits?per_page=1)",
+        "[Release endpoint](https://api.github.com/repos/assafelovic/gptr-mcp/releases?per_page=100)"
+      ]
+    },
+    {
+      "subject": "Additional evidence about the vendor package entry",
+      "classification": "factual_disagreement",
+      "reason": "The packet identifies the Codex plugin's root .mcp.json command as unversioned 'uvx gpt-researcher' and records no-executable failures for distributions 0.16.1 and 0.16.0, with a successful Python control. This strengthens the present case against that entry. It neither proves distribution/tag byte equivalence nor establishes failure of the separate gptr-mcp route. The historical consensus already withheld native acceptance; these observations do not refute an earlier successful handshake.",
+      "sources": [
+        "INPUT#/root_source_observations/observations/2",
+        "INPUT#/root_source_observations/observations/3",
+        "INPUT#/root_source_observations/observations/4",
+        "INPUT#/factual_packet/candidates/0/facts",
+        "[Supplied probe provenance](https://github.com/seathatflowsinourveins/native-agent-stack/blob/cb55ae1c69674b43d5e4a52b31044566c5d906bf/evidence/artifacts/research-skill-round2-20261005/probe.json)"
+      ]
+    },
+    {
+      "subject": "DeerFlow candidate coverage and transport distinctions",
+      "classification": "factual_disagreement",
+      "reason": "The historical comparator was deep-research. The current set separately includes claude-to-deerflow HTTP entry, which the packet says requires gateway health, thread creation and streaming; embedded chat cannot establish that path. The script reportedly enables subagents only in ultra, with planning but no subagents in pro. These additional distinctions affect qualification and comparison; they do not establish an error in the historical comparator or a standalone both-client path for deep-research.",
+      "sources": [
+        "INPUT#/historical_context/initial_direct_consensus/resolution/comparison_source",
+        "INPUT#/factual_packet/candidates/1/facts",
+        "INPUT#/factual_packet/candidates/2/facts",
+        "[HTTP-entry skill](https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/claude-to-deerflow/SKILL.md#L8)",
+        "[Mode and transport script](https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/claude-to-deerflow/scripts/chat.sh#L26)",
+        "[Internal research skill](https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/deep-research/SKILL.md)"
+      ]
+    }
+  ],
+  "reasoning": "Configure the existing owner for ownership/provenance registration only. A is satisfied by the explicitly named research requirement. Under B, required gptr-mcp fails freshness on the supplied dated observations; the other mandatory candidate properties and an overlap win are not established across the challengers. C's tag-specific engineering and published-evaluation evidence remains unverified. D therefore has no established gate-passing vendor to select; its fewer-parts tie-break cannot waive missing gates or certify the incumbent. Both actual Sol decisions reach the same substantive action despite reversed order. Sol 2's null chosen_candidate represents no new candidate selection: its rationale explicitly names the same existing owner as Sol 1. The freshness-label difference also leaves adoption unchanged. There is no material split among those decisions and this review, so this non-adoption verdict does not trigger Opus verification. None was performed. Useful verified research from both native clients for foundation engineering and US-equities R&D remains unproven.",
+  "historical_input_limits": [
+    "The supplied October 2 disposition is direct consensus of both model families on primary sources, with measurement returned=false and no receipts. It is not a blind round-1 decision or an original Opus raw verification.",
+    "The packet reports no research-skill verdict in the scoped historical blind layer and critic artifacts. Missing original inputs remain missing; this does not establish universal absence outside that scope.",
+    "This review obtained no live source content: web opening returned an unsupported-operation error and source search returned a timeout/502. Exact method text, vendor files and subsequent upstream changes were not independently verified; the supplied criteria and dated observations are the evidentiary basis.",
+    "Root's successful source observations do not retroactively turn either Sol's failed fetching into independent verification, and do not constitute protocol, research or lifecycle acceptance."
+  ],
+  "registration_scope": "Recommend recording the existing installed name native-stack-research and its supplied ownership/provenance. Registration is distinct from activating a new vendor skill and from replacing or changing the installed source. It grants neither action nor any qualification waiver. This read-only review made no registration or configuration change; it relies on the packet's installation and manifest assertions.",
+  "acceptance_limits": [
+    "Neither installed skill bytes, runtime configuration nor registration proves both-client invocation, useful cited research or lifecycle acceptance. The incumbent is not certified as passing repository-quality or native acceptance gates.",
+    "The historical 'No results found' and GraphRecursionError observations remain historical failures; no new runtime, model or search outcome was observed.",
+    "The recorded GPT vendor activation gate remains outstanding: pinned environment, protocol-clean STDIO handshake, five-tool discovery, useful results in each client and bounded start/stop/removal. SSE testing and failed package startup do not establish those results.",
+    "DeerFlow HTTP acceptance requires its own gateway/thread/stream and both-client receipts. Neither embedded chat nor another skill's transport transfers acceptance to HTTP entry or deep-research.",
+    "Native activation and skill lifecycle/paired-skill qualification remain separate from A–D. The six-task promptfoo/entry-route comparison is a design, not an executed evaluation or the paired skill benchmark. No new local trial, install, build, test, service, source repair, helper/model call or filesystem inspection was performed."
+  ],
+  "completeness_leads": [
+    "GPT Researcher: verify the v3.7.0-to-pin relationship, parent and required-server freshness, tag-specific quality and published evaluation. Reconcile the skill's separate gptr-mcp path with the plugin's root uvx entry, executable availability and package/tag provenance without transferring evidence between routes.",
+    "DeerFlow HTTP entry: verify v2.1.0-to-pin identity, dated maintenance/release evidence, upstream Linux/WSL self-hosting, documentation for both clients and tag-specific quality. Seek existing published or authorized evidence of an overlap win using the actual pro/ultra behavior.",
+    "DeerFlow deep-research: inspect its own pinned skill and documentation for a complete native-client start-to-useful-result path. Do not infer integration from claude-to-deerflow, embedded DeerFlowClient or the repository's general capabilities.",
+    "Across the non-adopted set, identify existing evaluation evidence relevant to useful cited foundation and US-equities research, and distinguish report quality, entry-route comparisons, paired skill benchmarks and native lifecycle receipts. Missing evidence remains a lead for the completeness critic, not permission for a new trial."
+  ],
+  "overturn_conditions": [
+    "Reconsider vendor selection when exact dated upstream evidence establishes every A–C requirement, including required dependencies, supported installation/integration and an overlap win; then apply D's strongest-choice and fewer-parts rules.",
+    "Any adopt-true verdict or material selection split requires live-upstream refute-by-default Opus verification before accepting the changed decision. This review supplies no such verification.",
+    "Activation, installed-source changes and acceptance promotion still require their applicable separately authorized native and skill lifecycle gates. Repository evidence, registration or a decision vote cannot substitute.",
+    "If authoritative evidence disproves the packet's existing-owner installation or provenance assertions, reconsider registration; do not automatically promote a vendor candidate."
+  ],
+  "sources": [
+    "INPUT#/factual_packet",
+    "INPUT#/blind_deciders",
+    "INPUT#/historical_context",
+    "INPUT#/root_source_observations",
+    "Historical source identifier: native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json:add_rows[2]",
+    "[Supplied factual-pack provenance; not independently fetched](https://github.com/seathatflowsinourveins/native-agent-stack/blob/cb55ae1c69674b43d5e4a52b31044566c5d906bf/docs/decisions/2026-10-05-research-skill-round-2-input-pack.md)",
+    "[Recorded activation gate; not independently fetched](https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/docs/decisions/2026-10-02-new-wsl-layer-consensus.md#L122)"
+  ]
+}

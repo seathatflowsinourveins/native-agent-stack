@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-05",
+  "requirement": "Entry from a native Claude Code or Codex session into the existing research runtime, then a useful cited result, without installing an overlapping runtime.",
+  "sources": {
+    "quality_rule": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/docs/decisions/2026-10-04-repository-quality-rule.md#L17",
+    "activation_gate": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/docs/decisions/2026-10-02-new-wsl-layer-consensus.md#L122",
+    "factual_input_pack": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/cb55ae1c69674b43d5e4a52b31044566c5d906bf/docs/decisions/2026-10-05-research-skill-round-2-input-pack.md",
+    "native_probe_receipt": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/cb55ae1c69674b43d5e4a52b31044566c5d906bf/evidence/artifacts/research-skill-round2-20261005/probe.json"
+  },
+  "incumbent": {
+    "id": "existing-research-harnesses-owner",
+    "entry": "native-stack-research already installed in both clients by the native plan, with an existing GPT Researcher CLI and DeerFlow route. Central adoption manifest does not yet register its name. Registration is an ownership/provenance repair, separate from a new vendor-candidate adoption.",
+    "existing_skill_source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/c148e049efee75f8ea8a9a009e7b96b1e97f5c28/evidence/artifacts/new-wsl-install-plan-20261002/config/research-harnesses-skill.md",
+    "qualification_boundary": "Installed skill bytes and a configured runtime do not prove useful research, both-client invocation or lifecycle acceptance. Historical No results found/GraphRecursionError remains a historical failed observation; this packet makes no new runtime or model-side discovery claim."
+  },
+  "candidates": [
+    {
+      "id": "gpt-researcher-vendor-mcp-entry",
+      "repository": "assafelovic/gpt-researcher",
+      "pin": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "release": "v3.7.0",
+      "skill": "skills/gpt-researcher/SKILL.md",
+      "primary_sources": [
+        "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/skills/gpt-researcher/SKILL.md",
+        "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/.mcp.json#L4",
+        "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/.codex-plugin/plugin.json#L15",
+        "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/pyproject.toml#L23",
+        "https://github.com/assafelovic/gptr-mcp/blob/63884773685b1f12c7f0d9e283b3d71a5b9b5fda/server.py#L277",
+        "https://github.com/assafelovic/gptr-mcp/blob/63884773685b1f12c7f0d9e283b3d71a5b9b5fda/tests/test_mcp_server.py#L5",
+        "https://api.github.com/repos/assafelovic/gptr-mcp/commits?per_page=1",
+        "https://api.github.com/repos/assafelovic/gptr-mcp/releases?per_page=100"
+      ],
+      "facts": [
+        "The skill names a separate assafelovic/gptr-mcp server pinned at 63884773685b1f12c7f0d9e283b3d71a5b9b5fda. October 5 API observations returned last commit 2025-11-07T07:46:52Z and one release v0.0.1 at 2025-03-30T17:55:52Z: 332 and 554 days old. Repository updated_at is not a source commit.",
+        "The vendor Codex plugin references root .mcp.json; .codex-plugin/.mcp.json is not the startup file at this pin. Root command is unversioned uvx gpt-researcher. Source pyproject declares 0.16.0 and Python >=3.12 with no project.scripts.",
+        "Unchanged isolated upstream uvx probes: current PyPI 0.16.1 exit 1, no executables; explicit 0.16.0 exit 1, no executables; same 0.16.1 isolated environment Python control exit 0. Distribution/tag byte equivalence was not claimed. Guessed binary path and wheel-only failures were retained separately. No MCP handshake or research ran.",
+        "The separate gptr-mcp startup checks OPENAI_API_KEY, emits ordinary stdout before STDIO startup and has a busy loop after a returned mcp.run. Its checked tester exercises SSE, not STDIO.",
+        "Recorded activation requires a pinned environment, protocol-clean STDIO handshake, five-tool discovery, a useful research result in each native client and bounded start/stop/removal. These conditions have no fresh pass in this packet."
+      ]
+    },
+    {
+      "id": "deerflow-vendor-http-entry",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "release": "v2.1.0",
+      "skill": "skills/public/claude-to-deerflow/SKILL.md",
+      "primary_sources": [
+        "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/claude-to-deerflow/SKILL.md#L8",
+        "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/claude-to-deerflow/scripts/chat.sh#L26",
+        "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/claude-to-deerflow/scripts/chat.sh#L55"
+      ],
+      "facts": [
+        "The HTTP entry requires reachable gateway health, thread creation and a streamed run. The native plan keeps HTTP conditional on this skill gate. Embedded DeerFlowClient.chat does not start an HTTP service and cannot prove those conditions.",
+        "Script mode details: only ultra enables subagents; pro enables planning without subagents. A comparison must match the actual mode rather than the broader prose claim.",
+        "No both-client lifecycle/HTTP result, paired skill benchmark or matched overlap win is supplied here. Six-task promptfoo report/entry-route comparison is a design only, distinct from Claude skill-creator's paired skill benchmark. No new local trial is authorized by this quality round."
+      ]
+    },
+    {
+      "id": "deerflow-vendor-internal-research-skill",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "release": "v2.1.0",
+      "skill": "skills/public/deep-research/SKILL.md",
+      "primary_sources": [
+        "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/deep-research/SKILL.md"
+      ],
+      "facts": [
+        "The original layer record lists this as a research workflow alternative. It is distinct from the HTTP client-entry skill and the existing native plan's entry glue. Whether its own tag documents a standalone Claude Code and Codex start-to-useful-result path must be established from its source; do not transfer another skill's transport or acceptance to it."
+      ]
+    }
+  ],
+  "unknowns": [
+    "Any change since the October 5 API/probe observation requires exact current source verification.",
+    "Installed native owner acceptance remains separate from this repository-quality decision.",
+    "Runtime/model/search task inputs for an empirical comparison remain unexecuted and require their owner gates."
+  ],
+  "excluded_work": [
+    "No installation or client setting change.",
+    "No broad landscape sweep, new research runtime, HTTP service or source repair.",
+    "No credential or environment inspection.",
+    "No native acceptance promotion from metadata, a skipped stage, or a decision vote."
+  ]
+}

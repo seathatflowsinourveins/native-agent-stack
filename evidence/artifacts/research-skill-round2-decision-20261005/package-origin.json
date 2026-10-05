@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "name": "native-stack-research",
+  "operation": "Unchanged administrative lifecycle registration",
+  "original_plan_source": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "ref": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+    "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/research-harnesses-skill.md",
+    "skill_md_sha256": "313f41cbbb7ba5cbe9733d7b9c4caf85bd4fabf4c7a4cb5b40731f5449b941eb",
+    "relationship": "Unchanged lifecycle snapshot of the landed plan-of-record file; the original plan file remains authoritative."
+  },
+  "package_source": {
+    "ref": "05e3ead094d09a55e4652296d3d305edc2d10888",
+    "path": "adoption/skills/native-stack-research",
+    "tree_sha": "2d233cad78ad1d2da70721fd46fbe20088909558",
+    "skill_md_sha256": "313f41cbbb7ba5cbe9733d7b9c4caf85bd4fabf4c7a4cb5b40731f5449b941eb",
+    "skill_md_bytes": 1602,
+    "license": "MIT",
+    "license_origin": "native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:LICENSE"
+  },
+  "byte_comparison": {
+    "original_plan_matches_package": true,
+    "installed_claude_matches_package": true,
+    "installed_codex_matches_package": true,
+    "description_chars": 153,
+    "comparison_scope": "Exact file bytes only; installed locations remain private. Does not prove an installer lock/tree match, model visibility or useful research."
+  },
+  "client_manifest_proposal": {
+    "claude_listing": "on",
+    "codex_enabled": true,
+    "upstream_disable_model_invocation": false,
+    "upstream_allow_implicit_invocation": true,
+    "claude_description_chars": 9637,
+    "codex_catalog_description_chars": 9318,
+    "codex_catalog_eligible_count": 25,
+    "live_configuration_applied": false
+  },
+  "audit_boundary": "Three audit fields Unknown. skills.sh URL is a prospective locator only; no returned listing or audit was observed.",
+  "metadata_validation": {
+    "source": "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/scripts/quick_validate.py",
+    "source_sha256": "67cf5703402013936c8fb75ad6a1afecd8841d45cc5e606b634eb05825fde365",
+    "command": "python3 <installed pinned skill-creator>/scripts/quick_validate.py adoption/skills/native-stack-research",
+    "exit_code": 0,
+    "stdout_line": "Skill is valid!",
+    "scope": "Unchanged upstream metadata validator; not a behavioral benchmark or runtime acceptance."
+  },
+  "worker_disposition": {"state": "excluded", "adoption_ref": "adoption/skills/manifest.json", "reason": "Frozen source calls host-owned XDG scripts; a supported worker bridge and useful worker research are not qualified here.", "worker_skill_rows_unchanged": 134, "worker_description_budget_unchanged": true, "scope": "Explicit central-contract disposition only; not a new worker adoption or a claim of worker failure."},
+  "lifecycle_boundary": "Central manifest now owns a pin proposal; no shared-host install/plan apply or live settings mutation occurred. Co-op/readiness-runner is sole plan-apply writer. Fresh discovery proof waits for reviewed installation.",
+  "update_condition": "When #723's native-headless contract lands, update the normal lifecycle pin/hash and validate changed skill behavior; never source unlanded draft bytes."
+}

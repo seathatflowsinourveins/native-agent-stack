@@ -160,9 +160,8 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
         runtime["excluded"].append({"name": double["name"], "source": double["source"],
                                     "adoption_ref": double["reuse_ref"], "reason": "r", "overturn": "o"})
         restating["codex_enabled"] = True
-        # The runtime manifest has no adoption_ref exclusion of its own since main promoted security-audit
-        # (2026-09-30), so the bare exclusion is built here: one reused skill claimed only by an exclusion
-        # without an overturn condition.
+        # Build a bare exclusion independently of the host-research exclusion: one reused skill claimed
+        # only by an exclusion without an overturn condition must still fail.
         runtime["skills"].remove(bare_skill)
         bare = {"name": bare_skill["name"], "source": bare_skill["source"], "adoption_ref": ADOPTION_REF,
                 "reason": "r"}

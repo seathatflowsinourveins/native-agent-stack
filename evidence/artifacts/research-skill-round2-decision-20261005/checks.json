@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "base": "095d4fad89c7896c7f1766fdaa9981554a19403a",
+  "source_package_pin": "05e3ead094d09a55e4652296d3d305edc2d10888",
+  "commands": [
+    {
+      "command": "python3 -m unittest tests.test_skills_manifest tests.test_install_skills tests.test_skills_status tests.test_render_config tests.test_adoption_docs_consistency tests.test_runtime_worker_skills",
+      "attempt": "initial",
+      "exit_code": 1,
+      "tests": 272,
+      "failures": 4,
+      "skips": 1,
+      "reason": "Old hard-coded catalog count and missing explicit worker central-contract disposition.",
+      "retained_log": {
+        "path": "touched-tests.txt",
+        "sha256": "86e02daea5bf4f376452021fe35a0558ed06f3177b5748550428593f630aa909",
+        "bytes": 4576,
+        "summary": [
+          "FAIL: test_real_manifest_codex_catalog_fits_the_configured_token_budget (tests.test_skills_status.SkillsStatusTests.test_real_manifest_codex_catalog_fits_the_configured_token_budget)",
+          "FAIL: test_contract_rejects_a_future_main_skill_in_neither_set (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_rejects_a_future_main_skill_in_neither_set)",
+          "FAIL: test_contract_survives_main_reordering_its_skills (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_survives_main_reordering_its_skills)",
+          "FAIL: test_every_adoption_skill_is_reused_or_explicitly_excluded (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_every_adoption_skill_is_reused_or_explicitly_excluded)",
+          "Ran 272 tests in 37.440s",
+          "FAILED (failures=4, skipped=1)"
+        ]
+      }
+    },
+    {
+      "command": "python3 -m unittest tests.test_skills_manifest tests.test_install_skills tests.test_skills_status tests.test_render_config tests.test_adoption_docs_consistency tests.test_runtime_worker_skills",
+      "attempt": "corrected metadata and worker disposition",
+      "exit_code": 0,
+      "tests": 272,
+      "failures": 0,
+      "skips": 1,
+      "retained_log": {
+        "path": "touched-tests-rerun.txt",
+        "sha256": "a23217686bb2cfd0b8fc1a69a712c22414644176e0c8ad12c6411d94bc58f044",
+        "bytes": 550,
+        "summary": [
+          "Ran 272 tests in 37.023s",
+          "OK (skipped=1)"
+        ]
+      },
+      "scope": "Local manifest, installer, listing, template and worker-contract checks; synthetic subprocess controls retain their class."
+    },
+    {
+      "command": "python3 -m unittest tests.test_runtime_worker_openhands tests.test_runtime_worker_openhands_resolver tests.test_runtime_worker_openhands_push_gate tests.test_codex_worker_skill",
+      "exit_code": 0,
+      "retained_log": {
+        "path": "worker-consumer-tests.txt",
+        "sha256": "3785dad8ae5aabfd8f85e50e0614e01519fa5ebe22b1af61f02717afade9c9b6",
+        "bytes": 110100,
+        "summary": [
+          "Ran 392 tests in 59.832s",
+          "OK (skipped=1)"
+        ]
+      },
+      "scope": "Local worker consumers and synthetic worker/native-job fixtures; not a new real worker E2E.",
+      "tests": 392,
+      "skips": 1
+    },
+    {
+      "command": "python3 tools/adoption/install_skills.py --print-codex-config",
+      "exit_code": 0,
+      "stdout_bytes": 1,
+      "new_skill_disable_rule": false,
+      "scope": "Nonmutating planned rule rendering; not active client configuration or model discovery."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "attempt": "source package pre-commit",
+      "exit_code": 0,
+      "result": {
+        "components": 69,
+        "hashed_files": 10264,
+        "profiles": 4,
+        "receipts": 203,
+        "status": "passed"
+      },
+      "retained_log": {
+        "path": "package-validate.txt",
+        "sha256": "8326802abd7d1017b2560510c396e07e55ef11b4f3ed64367f839373a0b2f250",
+        "bytes": 162,
+        "summary": [
+          "{\"components\": 69, \"hashed_files\": 10264, \"profiles\": 4, \"receipts\": 203, \"status\": \"passed\"}"
+        ]
+      },
+      "scope": "Before main rebase and central registration; integrity only."
+    },
+    {
+      "command": "python3 -m unittest tests.test_skills_manifest tests.test_install_skills tests.test_skills_status tests.test_render_config tests.test_adoption_docs_consistency tests.test_runtime_worker_skills",
+      "attempt": "post-rebase final package pin",
+      "exit_code": 0,
+      "tests": 272,
+      "failures": 0,
+      "skips": 1,
+      "retained_log": {
+        "path": "post-rebase-touched-tests.txt",
+        "sha256": "96f19b6a5149db87ca23713a0f314cd3bd7700ecba0894dacb1acdc991fc314a",
+        "bytes": 550,
+        "summary": [
+          "OK (skipped=1)"
+        ]
+      },
+      "scope": "Required manifest/template checks rerun because rebase changed immutable ref."
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "attempt": "incomplete registry rebuild against moving origin/main",
+      "exit_code": 1,
+      "retained_log": {
+        "path": "final-validate.txt",
+        "sha256": "4fb46657cd02f844f0f8ee4279a6c272d8637f245630000dd6958679204dcac4",
+        "bytes": 16849,
+        "summary": []
+      },
+      "reason": "Registration stopped on a newer-main file absent from the fixed checkout; missing lane hash entries remain in this failed attempt. No publication from this attempt."
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "attempt": "fixed-base registry rebuild",
+      "exit_code": 0,
+      "result": {
+        "components": 69,
+        "hashed_files": 10293,
+        "profiles": 4,
+        "receipts": 204,
+        "status": "passed"
+      },
+      "retained_log": {
+        "path": "fixed-base-validate.txt",
+        "sha256": "8dfe01efea7f45d0432ee468800a6ec3e0bb0706e8e92f1115386b1f03d433a3",
+        "bytes": 162,
+        "summary": []
+      },
+      "scope": "Integrity and scope only; no model/provider/GPU runtime qualification."
+    }
+  ],
+  "source_and_privacy_checks": {
+    "package_tree_unchanged_after_rebase": true,
+    "package_matches_original_plan_and_both_installed_client_files": true,
+    "model_json_values_equal_native_final_messages": true,
+    "public_model_results_add_only_terminal_lf": true,
+    "private_home_or_auth_pattern_flags": 0,
+    "final_pinned_blob_matches_package": true
+  },
+  "review": {
+    "kind": "Independent bounded read-only source/decision review",
+    "result": "No substantive pre-rebase blocker; wording and pending checks publication corrections applied.",
+    "scope": "Pre-rebase package pin68aa2f1 provenance and source facts; root verifies post-rebase pin/tree. Does not replace command-center Claude cross-family read.",
+    "corrections_applied": [
+      "Declared catalog eligibility wording",
+      "JSON-value equality with terminal-LF normalization",
+      "Pending checks artifact publication"
+    ]
+  },
+  "registry_protocol": "Fixed base095d4fad89c7896c7f1766fdaa9981554a19403a taken verbatim; 151 owned changed files registered through scripts.host_receipts.register_file. The earlier moving-ref registration failed and is retained. Registry committed last; no merge or shared-host install.",
+  "acceptance_boundary": "Local checks and immutable source/byte observations only. Native quality-decision exits are in execution.json; upstream metadata validation in package-origin.json. No new vendor upstream acceptance, paired benchmark, runtime qualification or fresh discovery proof."
+}

@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "slot": "instructions-skills/research-skill",
+  "state": "BY_DESIGN",
+  "evidence_classes": {
+    "native_model_decision_execution": "native_proven",
+    "quality_of_candidate_source": "source_review",
+    "manifest_consistency": "local_integration",
+    "useful_research_runtime": "not_proven",
+    "model_side_discovery": "not_proven",
+    "new_candidate_skill_quality": "not_benchmarked"
+  },
+  "method": "Two blind Sol deciders, candidate order reversed; Astra difference adjudication; conditional Opus not triggered; separate final completeness critic over non-adopted candidates.",
+  "native_client": {
+    "name": "Codex",
+    "version": "0.160.0",
+    "source": "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+    "requested_route": "OmniRoute",
+    "served_model_independently_attested": false,
+    "served_effort_independently_attested": false,
+    "provider_billing_usage": null
+  },
+  "invocation_controls": {
+    "subcommand": "exec",
+    "profile": "omniroute",
+    "json": true,
+    "skip_git_repo_check": true,
+    "sandbox": "read-only",
+    "output_schema": true,
+    "output_last_message": true,
+    "stdin_frozen_task": true,
+    "non_git_cwd": true,
+    "isolated_codex_home": true,
+    "timeout_seconds": 1500,
+    "execution": "Sequential after paper window; one heavy step at a time"
+  },
+  "decider_blinding": {
+    "same_factual_packet": true,
+    "same_rule": true,
+    "candidate_order_reversed": true,
+    "decider_profiles_byte_equal": true,
+    "no_peer_or_prior_verdict_given": true,
+    "worker_guardrails": "Read-only, no mutation, no nested agents, no credential/environment inspection. Native command events reviewed for scope."
+  },
+  "stages": [
+    {
+      "stage": "decider-a",
+      "native_final_equals_export": true,
+      "terminal_turns": [
+        {
+          "input_tokens": 140784,
+          "cached_input_tokens": 118016,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 6703,
+          "reasoning_output_tokens": 3233
+        }
+      ],
+      "failed_turns": 0,
+      "item_types": {
+        "error": 1,
+        "command_execution": 7,
+        "reasoning": 1,
+        "agent_message": 1
+      },
+      "files": {
+        "last.json": {
+          "sha256": "a10706306d1825af7029bf67e16ed71a1a0a0e63d0dd483140d7d382d0d1f7b1",
+          "bytes": 7748
+        },
+        "events.jsonl": {
+          "sha256": "f21ee1681cd71578f8ddab346ac7ba86c974d321e959ff785ce88a811593a75e",
+          "bytes": 15556
+        },
+        "stderr.txt": {
+          "sha256": "11bf33310a880d6df6b2503fd2e76204bbf0e5e936a7737da31ac40c65411d70",
+          "bytes": 1207
+        },
+        "task.txt": {
+          "sha256": "f40f26b939ab30840d09d280ed2fafd0e05ecf61cd0a9ddccf6d330d23489fab",
+          "bytes": 9610
+        }
+      },
+      "profile_sha256": "9121c7b79bc388d6093dfcf548589e7e91ab817067f31f3eace2ee5cd11556de",
+      "semantic_controls": {
+        "model": null,
+        "effort": "max",
+        "profiles": {}
+      },
+      "observed_started_utc": "2026-10-05T13:52:41Z",
+      "observed_finished_utc": "2026-10-05T13:59:11Z",
+      "exit_code": 0,
+      "exit_code_source": "Native exec_command/write_stdin completion",
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "usage_scope": "One native turn.completed terminal counter snapshot; cached input is a subset of input, reasoning output a subset of output; no provider-billing total inferred.",
+      "independent_primary_source_access": "Failed in isolated native session; retained as source-access limits, not candidate runtime failures."
+    },
+    {
+      "stage": "decider-b",
+      "native_final_equals_export": true,
+      "terminal_turns": [
+        {
+          "input_tokens": 131967,
+          "cached_input_tokens": 110720,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7183,
+          "reasoning_output_tokens": 4166
+        }
+      ],
+      "failed_turns": 0,
+      "item_types": {
+        "error": 1,
+        "command_execution": 4,
+        "reasoning": 1,
+        "agent_message": 1
+      },
+      "files": {
+        "last.json": {
+          "sha256": "e953fa1addc2dc8b6e479e1bb47605bd14922da08b6e7eee274e6367cac56660",
+          "bytes": 8030
+        },
+        "events.jsonl": {
+          "sha256": "346bb3b656019ef12a40cbbb91306172957fd26ed4d4ded7b53347982c45a1fd",
+          "bytes": 13352
+        },
+        "stderr.txt": {
+          "sha256": "c01fb779d0b80eb443ee643c350d8ae671f71aea4f713f6e4ae60dbe1fed9289",
+          "bytes": 509
+        },
+        "task.txt": {
+          "sha256": "7c79f1cba3c5da22df2af4f2e072d653f47c8d818ca8500799fc6220c0551950",
+          "bytes": 9610
+        }
+      },
+      "profile_sha256": "9121c7b79bc388d6093dfcf548589e7e91ab817067f31f3eace2ee5cd11556de",
+      "semantic_controls": {
+        "model": null,
+        "effort": "max",
+        "profiles": {}
+      },
+      "observed_running_utc": "2026-10-05T14:00:46Z",
+      "exact_start_utc": null,
+      "observed_finished_utc": "2026-10-05T14:05:27Z",
+      "exit_code": 0,
+      "exit_code_source": "Native exec_command/write_stdin completion",
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "usage_scope": "One native turn.completed terminal counter snapshot; cached input is a subset of input, reasoning output a subset of output; no provider-billing total inferred.",
+      "independent_primary_source_access": "Failed in isolated native session; retained as source-access limits, not candidate runtime failures."
+    },
+    {
+      "stage": "astra",
+      "native_final_equals_export": true,
+      "terminal_turns": [
+        {
+          "input_tokens": 118863,
+          "cached_input_tokens": 93056,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 11019,
+          "reasoning_output_tokens": 7375
+        }
+      ],
+      "failed_turns": 0,
+      "item_types": {
+        "error": 1,
+        "reasoning": 16,
+        "agent_message": 1
+      },
+      "files": {
+        "last.json": {
+          "sha256": "0a03a94f10ea91e3dfb49c1bf6e393f6036a01decfeda4e102b5388139b39c52",
+          "bytes": 12727
+        },
+        "events.jsonl": {
+          "sha256": "2f7c09fba5ced0fab87dcd611243901d79d016edd5939f9cddcac14aab951e12",
+          "bytes": 16757
+        },
+        "stderr.txt": {
+          "sha256": "57f1031ce922935010bd0198660d649eb72d53e8dd53635e6c771f2b7f331688",
+          "bytes": 509
+        },
+        "task.txt": {
+          "sha256": "84c83b02c6e8d6525d78ceb07a8a8145cae8c7bcf4bde0bf39f518231291b01d",
+          "bytes": 32988
+        }
+      },
+      "profile_sha256": "2ef12296263c0f1f3e05eadf97d42fda096a03a17d98db6674bbaa7701feab2a",
+      "semantic_controls": {
+        "model": null,
+        "effort": "max",
+        "profiles": {}
+      },
+      "observed_started_utc": "2026-10-05T14:09:25Z",
+      "observed_finished_utc": "2026-10-05T14:17:50Z",
+      "exit_code": 0,
+      "exit_code_source": "Native exec_command/write_stdin completion",
+      "requested_model": "cx/gpt-6-astra-max",
+      "requested_effort": "max",
+      "usage_scope": "One native turn.completed terminal counter snapshot; cached input is a subset of input, reasoning output a subset of output; no provider-billing total inferred.",
+      "independent_primary_source_access": "Failed in isolated native session; retained as source-access limits, not candidate runtime failures."
+    },
+    {
+      "stage": "completeness",
+      "native_final_equals_export": true,
+      "terminal_turns": [
+        {
+          "input_tokens": 159695,
+          "cached_input_tokens": 129792,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 8773,
+          "reasoning_output_tokens": 5213
+        }
+      ],
+      "failed_turns": 0,
+      "item_types": {
+        "error": 1,
+        "reasoning": 2,
+        "command_execution": 4,
+        "agent_message": 1
+      },
+      "files": {
+        "last.json": {
+          "sha256": "45ce9ee5d5d80e2b91cd0098458f375a55b4920027ccca8192250daf1ceaab4d",
+          "bytes": 9633
+        },
+        "events.jsonl": {
+          "sha256": "ab0254bd5471cf009383333c120bdc3c2d6be75f3b163d62fb38c0b45d64529d",
+          "bytes": 15767
+        },
+        "stderr.txt": {
+          "sha256": "82b52981dfd4ae34a2efed04664891123c57cd0aea9b468a3d61c43ae62b8740",
+          "bytes": 1018
+        },
+        "task.txt": {
+          "sha256": "571b243b3ba9372453c328a396d49c7a1894acfbaa334e52b18435034053fcd3",
+          "bytes": 43575
+        }
+      },
+      "profile_sha256": "9121c7b79bc388d6093dfcf548589e7e91ab817067f31f3eace2ee5cd11556de",
+      "semantic_controls": {
+        "model": null,
+        "effort": "max",
+        "profiles": {}
+      },
+      "observed_started_utc": "2026-10-05T14:21:47Z",
+      "observed_finished_utc": "2026-10-05T14:28:04Z",
+      "exit_code": 0,
+      "exit_code_source": "Native exec_command/write_stdin completion",
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "usage_scope": "One native turn.completed terminal counter snapshot; cached input is a subset of input, reasoning output a subset of output; no provider-billing total inferred.",
+      "independent_primary_source_access": "Failed in isolated native session; retained as source-access limits, not candidate runtime failures."
+    }
+  ],
+  "profile_correction": {
+    "finding": "Astra's profile copy has one extra trailing newline; all parsed TOML controls match, and the two blind decider profile bytes match exactly.",
+    "scope": "Whitespace-only critic input difference; original used profile hash preserved. Exact-byte reuse wording corrected after hash verification."
+  },
+  "opus": {
+    "required": false,
+    "reason": "Both deciders adopt_new_candidate=false; Astra material_split=false and opus_verification_required=false. No fresh Opus verification was run or claimed."
+  },
+  "completeness": {
+    "bounded_nonadoption_can_close": true,
+    "blocking_omissions": [],
+    "native_returned_report": "completeness.json"
+  },
+  "source_freeze_resolution": {
+    "at_model_run": "Pending Q9 in original frozen reports",
+    "after_model_run": "Coordinator A9/A10 actual text resolved to landed c148e049 embedded plan source. Original reports are retained unchanged; package-origin.json records the later administrative source freeze."
+  },
+  "retained_limits": [
+    "Public-source fetches failed inside each isolated model session (unsupported open, timeout/502 and shell DNS failures). Root source observations remain separately classified.",
+    "Standalone web-search unstable-feature warning retained in stderr; each native turn still completed and CLI exited 0.",
+    "Historical direct-consensus activation hold is not a retained blind round-1 or Opus verdict; no research-skill result was found in the scoped old blind layer/critic artifacts.",
+    "Bounded internal preparation worker was interrupted without a returned conclusion; not counted as a completed critic."
+  ],
+  "public_export_normalization": "Each result export adds exactly one terminal LF to the raw last.json file. JSON values and final native message agree; raw and public file hashes are intentionally distinct. Factual packet, plan and schemas retain their original terminal LF.",
+  "guardrail_audit": {"command_counts": {"decider-a": 7, "decider-b": 4, "astra": 0, "completeness": 4}, "flagged_credential_environment_mutation_or_nested_execution_commands": 0, "scope": "Native command events, independently checked; not an upstream security audit."},
+  "retention": "Returned result JSON values and factual inputs are committed, with the terminal-LF normalization recorded. Raw private event streams, prompts, stderr, isolated profiles and native session stores remain outside Git; their hashes are retained here.",
+  "acceptance_boundary": "These are native model decisions about primary-source facts, not a paired skill benchmark, independent published vendor evaluation, upstream acceptance, runtime acceptance or visibility proof."
+}

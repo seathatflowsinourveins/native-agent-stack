@@ -1065,11 +1065,11 @@ class SkillsStatusTests(unittest.TestCase):
     def test_real_manifest_codex_catalog_fits_the_configured_token_budget(self):
         # The Codex template configures [skills] max_context_tokens = 6000; its 8,000-character fallback applies
         # only when the context window is unknown (render.rs L19-22 and L126-152 at rust-v0.159.2), so the
-        # 10,048 Codex-enabled description characters are not measured against it.
+        # 9,318 Codex catalog description characters are not measured against it.
         real = ss.load_manifest(ROOT / "adoption" / "skills" / "manifest.json")
         budget = ss.inspect(real, self.home, self.env)["budget"]
         self.assertEqual(budget["codex_configured_budget_tokens"], 6000)
-        self.assertEqual(budget["codex_catalog_skills"], 24)  # 25 until semgrep was retired on 2026-10-03
+        self.assertEqual(budget["codex_catalog_skills"], 25)  # Unchanged native-stack-research registered on 2026-10-05.
         self.assertTrue(budget["codex_catalog_description_chars"]["matches_manifest"])
         self.assertLess(budget["codex_catalog_estimated_tokens"], 6000)
         self.assertTrue(budget["codex_within_budget"])

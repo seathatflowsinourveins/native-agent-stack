@@ -1,0 +1,121 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "slot": {
+      "type": "string",
+      "enum": [
+        "instructions-skills/research-skill"
+      ]
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "configure_existing_owner",
+        "retain_hold",
+        "adopt_candidate"
+      ]
+    },
+    "adopt_new_candidate": {
+      "type": "boolean"
+    },
+    "chosen_candidate": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "material_split": {
+      "type": "boolean"
+    },
+    "opus_verification_required": {
+      "type": "boolean"
+    },
+    "differences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "subject": {
+            "type": "string"
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "rule_change",
+              "factual_disagreement"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "subject",
+          "classification",
+          "reason",
+          "sources"
+        ]
+      }
+    },
+    "reasoning": {
+      "type": "string"
+    },
+    "historical_input_limits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "registration_scope": {
+      "type": "string"
+    },
+    "acceptance_limits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "completeness_leads": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "overturn_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "slot",
+    "decision",
+    "adopt_new_candidate",
+    "chosen_candidate",
+    "material_split",
+    "opus_verification_required",
+    "differences",
+    "reasoning",
+    "historical_input_limits",
+    "registration_scope",
+    "acceptance_limits",
+    "completeness_leads",
+    "overturn_conditions",
+    "sources"
+  ]
+}
