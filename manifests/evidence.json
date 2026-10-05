@@ -17408,12 +17408,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "1c4d4b498b100ef6c4a666f9335851d05f0d13576235f0b5c79f3514ef980e05",
+      "sha256": "d569771bf8e8e73538758c68e43045973b9b7010fb32cec8ad2f170cce0cea12",
       "bytes": 689754
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "f34e1fda47736ad0ddf7c7b0e4dba2d937b85b6e5896541bacc7254aeef23247",
+      "sha256": "90d4fa2e4d46eaaf8a2ede82f29fe864100c837f966c9df1a61746c1ea481c30",
       "bytes": 366781
     },
     {
@@ -39548,8 +39548,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "19dc3a3507246b8c07aa59edc8262ae011cb627f78858416735c9437e63a9182",
-      "bytes": 23305
+      "sha256": "9e554499da934142892033c734730d2ee0c76658e5e111692b2595c53910102b",
+      "bytes": 24163
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -40613,7 +40613,7 @@
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
-      "sha256": "5bf74e9e6efb2e904ee5ad7f6f7f0c2572735d8a1ab5881a7f043d15aef78cdc",
+      "sha256": "a8ac18ecfb4b714e95224f1aac127b1ccb548cd3b1714d0cb4b9353a258baaa9",
       "bytes": 17270
     },
     {

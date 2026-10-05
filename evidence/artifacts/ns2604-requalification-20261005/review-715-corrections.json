@@ -334,7 +334,7 @@
     "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
   },
   "bounded_repair_rulings": {
-    "amended_at_utc": "2026-10-05T17:08:27Z",
+    "amended_at_utc": "2026-10-05T19:12:17Z",
     "amendment_source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
     "source": {
       "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
@@ -381,7 +381,7 @@
     "publication_review": "2432f951 exact-head read returned findings; repaired head awaits CC delta read."
   },
   "micro_repair_rulings": {
-    "amended_at_utc": "2026-10-05T18:18:52Z",
+    "amended_at_utc": "2026-10-05T19:28:40Z",
     "amendment_source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T181852Z.md",
     "source": {
       "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T181852Z.md",
