@@ -98,7 +98,11 @@ so that native setting is limited to skills exposed through the supported local
 skill paths. [Claude skills documentation](https://code.claude.com/docs/en/skills)
 defines the default, visibility states, plugin limitation and usage report.
 
-The root skill-discovery instruction now names installed `find-skills` or Skills
+**Amended by [Required startup behavior and accepted-record amendments](#required-startup-behavior-and-accepted-record-amendments):**
+the following paragraph describes the initial job 075 wording. The common repair
+conditional delegates the client-copy and user-only details to the lifecycle guide.
+
+The initial root skill-discovery instruction names installed `find-skills` or Skills
 CLI `find`, and installed `skill-creator`, while distinguishing Codex's bundled
 copy from Claude's selected Anthropic copy. Check actual client exposure, including
 user-only invocation, and follow `adoption/skills/lifecycle.md` when a capability
@@ -401,18 +405,29 @@ file or unconditional rule from the instruction-file gate.
 | Claude | 23,062 | 23,293 | 24,458 | 1,165 |
 | Codex | 19,102 | 19,145 | 20,103 | 958 |
 
-The explicit coordinator restorations exceed the old constants. This dated
-amendment freezes the required repaired sizes plus 5%, rounded upward; the tests
-use constants 24,458/20,103 and never recompute them from current file size. Keeping
-the old ceilings would require dropping requested behavior, including an A/B-backed
-guard, or trimming unrelated rules. Those alternatives are rejected for this repair.
-The original baseline still shows reductions of 5,501 Claude bytes and 3,031 Codex
-bytes. The Codex template remains 8,186 bytes, strictly below 8,192 with five usable
+The first repair's ceiling raise is caused by adopted co-op sentences S1–S3,
+which add 350 Claude bytes and 349 Codex bytes. Without them, the restored scopes
+are 22,943/18,796 bytes, inside the old 23,062/19,102 ceilings with 119/306 bytes
+to spare. The StructuredOutput and routing restorations therefore do not cause
+that raise. The actual alternative at that decision was to put S1 and S3 on
+demand and keep the old ceilings. The coordinator instead adopted S1–S3 at their
+specified startup locations; the A/B-backed guard does not need to be dropped.
+This dated amendment freezes that first repaired scope plus 5%, rounded upward.
+The tests use constants 24,458/20,103 and never recompute them from current file
+size. Repair round 2 adds the literal clauses under these existing ceilings, as
+recorded below, without another ceiling increase.
+The first-repair comparison with the original baseline shows reductions of
+5,501 Claude bytes and 3,031 Codex bytes. The Codex template remains 8,186 bytes, strictly below 8,192 with five usable
 bytes. Its top-rule/lanes pin is now
 `568ee365aeef3455fc901e648eb72d28cc3b49c39f1bfba7f5e39beed20479a8`.
-Future budget changes still require the dated comparison procedure above. After
-the host gate, removing temporary root routing needs a new measured comparison;
-it does not authorize raising ceilings silently.
+Future budget changes still require the dated comparison procedure above. When
+both hosts pass the gate, replace the temporary full root routing with its
+188-byte task pointer, removing 680 bytes. In that same reviewed diff, record
+the post-gate scopes and reduce both fixed constants to those measured sizes
+plus 5%, rounded upward. Freed routing bytes cannot become permanent headroom.
+With round 2's 273-byte Claude clauses and no other scope change, the post-gate
+scopes are 22,886 Claude and 18,465 Codex bytes; the required tightened ceilings
+are 24,031 and 19,389. A different measured scope needs its own dated comparison.
 
 The installed `claude doctor --help` was read again on 2.1.289: exit 0, only
 `-h, --help`, no machine-readable prompt-audit option. The reviewed upstream
@@ -466,3 +481,110 @@ remain in the repair's authorized external TMPDIR. Protected stack and evidence
 manifests remain unchanged; the coordinator refreshes the evidence registry last.
 The commit message is `.bounded-job-075/msg-repair.txt`. The pending two-host
 re-render and actual-context read-back gate above remains open.
+
+## Addendum (2026-10-05): PR #726 repair round 2
+
+The Claude recheck identifies two local contract regressions and two record defects
+at `5096e547c47b052db287c1268c55a6569ab7fcc2`. Both executable failures were
+reproduced before changing their inputs. This serves the foundation north-star
+workflow: preserve executable dispatch contracts while reducing startup context.
+
+The workflow envelope suite returned exit 1, `SUMMARY passed=252 failed=2 total=254`:
+the portable instructions lacked the effort literal and unrestricted-size guideline.
+Its [test-envelope.mjs](../../examples/claude-native/workflows/test-envelope.mjs)
+reads the portable source named by
+[contract.config.json](../../examples/claude-native/workflows/contract.config.json).
+That config is checksum-locked by the example's SHA256SUMS. Restore only the two
+literal-bearing clauses from frozen passage 10, adding 273 UTF-8 bytes including
+newlines to the portable source and its carrier. The complete 1,668-byte reference
+passage remains unchanged in its relocated workflow section. Repointing the config
+or restoring the entire 1,131-byte pair of original lines is unnecessary for these
+two contracts. The existing workflow README, original pinned effort decisions and
+unchanged contract suites remain the sources; no new workflow runner is added.
+
+With TMPDIR under a symlink, the 12 PortableTopRuleTests returned exit 1 with three
+failures and one error: four relative-key checks received absolute paths. `add()`
+resolved the imported paths while the mocked ROOT remained unresolved. Each of the
+five scratch tests now uses `Path(tmp).resolve()`, and startup_files resolves its
+root once before discovery and relative-key comparison. The existing CI gotcha's
+macOS `/var` to `/private/var` example prescribes exactly this Linux reproduction.
+The same command through the same symlink then returned exit 0: 12 tests in 0.028s,
+OK. This is evidence for the path-layout failure on Linux; no macOS CI result or
+full Python-suite result is claimed. Production filesystem policy is unchanged.
+
+The prior ceiling explanation was wrong. Removing S1–S3 from the first repaired
+scope removes 350 Claude bytes and 349 Codex bytes, yielding 22,943/18,796 under
+23,062/19,102. Direct replacement of the three adopted clauses reproduces that
+arithmetic: root contributes 253 bytes, plus 97 Claude or 96 Codex S1 bytes.
+The first raise was the explicit decision to carry co-op guidance at startup,
+not a requirement of the A/B-backed schema and routing restorations. Its real
+alternative was S1 and S3 on demand with the old ceilings kept. That alternative
+is now named in the amended first-repair paragraph; the chosen startup locations
+remain the coordinator's instruction. Round 2's distinct 273-byte literal restore
+fits the already accepted ceilings and does not increase them. The first-repair
+counterfactual predates this literal restore; with the restore but without S1–S3,
+Claude would be 23,216 bytes and Codex 18,796 bytes.
+
+| File/scope | First repair bytes | Round 2 bytes |
+| --- | ---: | ---: |
+| Root AGENTS.md | 10,959 | 10,959 |
+| Repository CLAUDE.md | 766 | 766 |
+| Portable Claude source and carrier | 11,302 | 11,575 |
+| Claude rendered user block | 11,568 | 11,841 |
+| Codex template and carrier | 8,186 | 8,186 |
+| Claude startup scope | 23,293 | 23,566 |
+| Codex startup scope | 19,145 | 19,145 |
+
+The constants remain 24,458/20,103, leaving 892/958 bytes. After both hosts pass
+the recorded routing gate, replacing the 868-byte root paragraph with its 188-byte
+pointer removes 680 bytes from both scopes. Re-tightening is mandatory in the same
+reviewed diff: measure the actual scopes, record the comparison, and lower each
+constant to post-gate bytes plus 5%, rounded upward. With current inputs that means
+22,886/18,465-byte scopes and 24,031/19,389-byte ceilings. Further additions require
+an independently reviewed dated comparison; the removed routing bytes cannot be
+absorbed into a permanent growth allowance. This corrects the earlier omission of
+a required reduction after the gate.
+
+The initial discovery paragraph above is explicitly marked as amended by
+[Required startup behavior and accepted-record amendments](#required-startup-behavior-and-accepted-record-amendments).
+The common conditional stays on all current instruction surfaces, with client-copy
+and user-only exposure details in `adoption/skills/lifecycle.md`. This change does
+not rewrite the accepted historical discovery wording as if it were current.
+
+The post-fix Node suites return `SUMMARY passed=254 failed=0 total=254` and
+`SUMMARY passed=74 failed=0 total=74`, both exit 0. These are the same local workflow
+contract and mutation checks used by CI, not live model execution. A scoped
+ai-memory query with pin_first and limit 2 was again rejected by the approval-never
+policy; canonical tests, frozen original clauses, the gotcha snapshot and direct
+reproduction supplied the evidence. Failed and passing logs remain in the repair's
+authorized external TMPDIR. The config/checksum lock, stack and evidence manifests,
+standing delegation and host user files are unchanged.
+
+Completeness check: both executable failure classes and both record findings are
+fixed without new trimming, runner code or a ceiling raise. The next verification
+remains the coordinator's host render/read-back gate and registry refresh; when the
+gate passes, its reviewed change must also tighten the constants. An upstream change
+to the workflow literals, import discovery or native byte-audit capabilities reopens
+the corresponding contract through the existing surface watch and dated comparison.
+The commit message is `.bounded-job-075/msg-repair2.txt`.
+
+### Repair round 2 acceptance
+
+| Command | Exit | Actual returned result |
+| --- | ---: | --- |
+| `python3 tools/adoption/new_wsl_client_config.py --write-blocks` | 0 | Both carriers current; zero units dropped |
+| `python3 tools/adoption/new_wsl_client_config.py --check` | 0 | `check passed`; the two existing MCP_AUTO_OPEN_ENABLED plan warnings remain |
+| `python3 scripts/build_new_wsl_handbook.py --check` | 0 | `passed`; regeneration unnecessary |
+| `python3 -m unittest tests.test_install_claude_profile tests.test_codex_worker_lane tests.test_scaffold_repo tests.test_new_wsl_client_config tests.test_new_wsl_handbook tests.test_managed_block tests.test_upstream_surface_watch` | 0 | Ran 654 tests in 152.912s; OK (skipped=22) |
+| `TMPDIR=<symlinked temporary directory> python3 -m unittest tests.test_install_claude_profile.PortableTopRuleTests` | 0 | Ran 12 tests in 0.028s; OK; the same directory reproduced three failures and one error before repair |
+| From `examples/claude-native/workflows`: `node test-envelope.mjs` | 0 | `SUMMARY passed=254 failed=0 total=254` |
+| From that directory: `node test-contract-mutations.mjs` | 0 | `SUMMARY passed=74 failed=0 total=74` |
+| `python3 scripts/validate.py` | 1 | Registry drift only: 8 SHA-256/byte-count mismatches across 4 registered files; no other findings |
+| `wc -c adoption/templates/codex.AGENTS.template.md` | 0 | 8,186 bytes; strictly below 8,192 |
+| `git diff --check` | 0 | No whitespace errors |
+
+Only the seven requested Python modules and focused path reproduction were run;
+no full-repository Python acceptance is claimed. The unchanged workflow config and
+checksum lock were read back through git diff. Full returned outputs, including
+the failed reproductions, remain in the authorized repair TMPDIR. The coordinator
+commits and refreshes the registry last; both protected manifests remain unchanged.

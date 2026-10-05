@@ -1006,3 +1006,21 @@ These are repository integration changes, not a new destination installation.
 
 ```text
 ```
+
+## Addendum 2026-10-05: PR #726 repair round 2 contract literals
+
+The [round 2 budget addendum](2026-10-05-harness-context-budget.md#addendum-2026-10-05-pr-726-repair-round-2)
+restores the portable effort and unrestricted-size clauses that the checksum-locked
+workflow contract reads. The carrier retains both clauses. Existing projections
+remain historical; the current generator output follows. This is local repository
+projection and workflow-contract evidence, not a new destination host acceptance.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 67 of 67 lines stay):
+
+```text
+```

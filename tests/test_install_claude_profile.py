@@ -1875,7 +1875,7 @@ class PortableTopRuleTests(unittest.TestCase):
 
     def test_imports_outside_code_are_counted_once_and_resolve_from_the_importing_file(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
+            root = Path(tmp).resolve()
             self.scratch_startup(root)
             (root / "reference.md").write_text("imported context\n")
             with mock.patch(__name__ + ".ROOT", root):
@@ -1886,7 +1886,7 @@ class PortableTopRuleTests(unittest.TestCase):
 
     def test_unfiltered_rules_are_counted_and_codex_prefers_the_root_override(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
+            root = Path(tmp).resolve()
             self.scratch_startup(root)
             rules = root / ".claude/rules"
             rules.mkdir(parents=True)
@@ -1902,7 +1902,7 @@ class PortableTopRuleTests(unittest.TestCase):
 
     def test_import_discovery_skips_code_and_quotes_and_handles_nested_duplicate_paths(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
+            root = Path(tmp).resolve()
             self.scratch_startup(root)
             (root / "nested").mkdir()
             (root / "Design Docs").mkdir()
@@ -1924,7 +1924,7 @@ class PortableTopRuleTests(unittest.TestCase):
 
     def test_imports_are_bounded_to_four_hops_and_codex_leaves_them_literal(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
+            root = Path(tmp).resolve()
             self.scratch_startup(root)
             (root / "CLAUDE.md").write_text("@hop1.md\n")
             for hop in range(1, 5):
@@ -1938,7 +1938,7 @@ class PortableTopRuleTests(unittest.TestCase):
 
     def test_only_nonempty_frontmatter_paths_filters_exempt_rules(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
+            root = Path(tmp).resolve()
             self.scratch_startup(root)
             rules = root / ".claude/rules/nested"
             rules.mkdir(parents=True)
@@ -2049,12 +2049,13 @@ class PortableTopRuleTests(unittest.TestCase):
         prefers a root override and does not expand imports. Plugin blocks, native
         RTK and the named SubagentStart child carrier are separate measured scopes.
         """
+        root = ROOT.resolve()
         files = {}
         visited = {}
 
         def add(path: Path, depth: int = 0) -> None:
             path = path.resolve()
-            key = str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path)
+            key = str(path.relative_to(root)) if path.is_relative_to(root) else str(path)
             content = path.read_bytes()  # A missing import fails; it cannot hide context.
             files[key] = content
             if client == "claude" and depth < 4 and visited.get(path, 5) > depth:
@@ -2063,20 +2064,20 @@ class PortableTopRuleTests(unittest.TestCase):
                     add(path.parent / Path(imported).expanduser(), depth + 1)
 
         if client == "claude":
-            carrier = (ROOT / "adoption/new-wsl/claude-user-instructions.md").read_text(encoding="utf-8")
+            carrier = (root / "adoption/new-wsl/claude-user-instructions.md").read_text(encoding="utf-8")
             files["claude-block"] = managed_block.merged_claude_md("", carrier).encode("utf-8")
             # Project the user block's relative imports from its native .claude directory.
             for imported in cls.imports(carrier):
-                add(ROOT / ".claude" / Path(imported).expanduser(), 1)
-            add(ROOT / "AGENTS.md")
-            add(ROOT / "CLAUDE.md")
-            for rule in sorted((ROOT / ".claude/rules").rglob("*.md")):
+                add(root / ".claude" / Path(imported).expanduser(), 1)
+            add(root / "AGENTS.md")
+            add(root / "CLAUDE.md")
+            for rule in sorted((root / ".claude/rules").rglob("*.md")):
                 if not cls.path_filtered(rule.read_text(encoding="utf-8")):
                     add(rule)
         else:
-            carrier = (ROOT / "adoption/new-wsl/codex-user-instructions.md").read_text(encoding="utf-8")
+            carrier = (root / "adoption/new-wsl/codex-user-instructions.md").read_text(encoding="utf-8")
             files["codex-block"] = managed_block.merged_codex_md("", carrier).encode("utf-8")
-            add(ROOT / ("AGENTS.override.md" if (ROOT / "AGENTS.override.md").is_file() else "AGENTS.md"))
+            add(root / ("AGENTS.override.md" if (root / "AGENTS.override.md").is_file() else "AGENTS.md"))
         return files
 
     @classmethod

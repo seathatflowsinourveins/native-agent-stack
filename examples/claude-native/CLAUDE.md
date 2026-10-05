@@ -50,6 +50,8 @@ Decide by evidence and research convergence: a choice stands when current primar
 - Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a delegated child, starts a cross-family lane.
 - For Codex model routing and pinned launches, consult the Codex instruction block and its `2026-09-30-sol-primary-quality-defaults` decision in the portable foundation.
 - Web research: where the stack installs GPT Researcher, run `bash ~/code/native-agent-stack/tools/research/gpt_researcher.sh "<short current-month query>"` (tool timeout over 1,500 s); its report gives leads, so re-read each fact from primary sources.
+- In Ultracode, pass an explicit task-matched `model` and `effort: 'max'` on each `agent()` call.
+- Size each workflow to its task under the `unrestricted` size guideline and within the runtime limits (4,096 items per `parallel()`/`pipeline()` call, 1,000 agents per run).
 - Before an Ultracode workflow, read `examples/claude-native/workflows/README.md#native-workflow-mechanics-relocated-2026-10-05` in the portable foundation for effort, inheritance, limits and concurrency.
 - Consult the installed native Ultracode recipe only for dispatch, messaging or dashboard setup.
 - For cross-client messaging or an incomplete worker return, read `examples/claude-native/workflows/README.md#native-workflow-mechanics-relocated-2026-10-05` in the portable foundation.
