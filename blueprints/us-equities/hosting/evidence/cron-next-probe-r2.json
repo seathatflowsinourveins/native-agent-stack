@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "round": "t-pr4-r2",
+  "evidence_class": "local_integration",
+  "pin": "robfig/cron@v3.0.1",
+  "command": "env GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local go run main.go",
+  "exit": 127,
+  "result": "not_run",
+  "returned_output": "nice: \u2018go\u2019: No such file or directory\n",
+  "reason": "No go compiler found in PATH, the task ecosystem directory or checked standard toolchain locations. Network use is limited to pinned source reads; no compiler installation performed.",
+  "schedule": "CRON_TZ=America/New_York 30 16 * * 1-5",
+  "expected_cases": [
+    {
+      "from": "2026-10-30T21:00:00Z",
+      "expected_next": "2026-11-02T21:30:00Z"
+    },
+    {
+      "from": "2027-03-12T21:00:00Z",
+      "expected_next": "2027-03-15T20:30:00Z"
+    }
+  ],
+  "source_program": "package main\nimport (\n \"fmt\"\n \"time\"\n \"github.com/robfig/cron/v3\"\n)\nfunc main() {\n schedule, err := cron.NewParser(cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow).Parse(\"CRON_TZ=America/New_York 30 16 * * 1-5\")\n if err != nil { panic(err) }\n cases := [][2]string{{\"2026-10-30T21:00:00Z\",\"2026-11-02T21:30:00Z\"},{\"2027-03-12T21:00:00Z\",\"2027-03-15T20:30:00Z\"}}\n for _, c := range cases {\n  from, err := time.Parse(time.RFC3339,c[0]); if err != nil { panic(err) }\n  next := schedule.Next(from).UTC().Format(time.RFC3339)\n  fmt.Printf(\"%s -> %s expected %s\\n\",c[0],next,c[1])\n  if next != c[1] { panic(\"unexpected Next time\") }\n }\n}\n",
+  "go_mod": "module tpr4-cron-probe\n\ngo 1.18\n\nrequire github.com/robfig/cron/v3 v3.0.1\nreplace github.com/robfig/cron/v3 => ./cron-3.0.1\n",
+  "module_source_archive_sha256": "ef97328622b5eac7adfb1aa47ddab7b3f68271b9a9b76e5bc07bf2ad65bb051a",
+  "source_locators": [
+    "dagucloud/dagu@v2.16.6:go.mod:65",
+    "robfig/cron@v3.0.1:parser.go:93-103",
+    "robfig/cron@v3.0.1:spec.go:58-175"
+  ],
+  "limitations": [
+    "The expected Next values are reviewer expectations, not measured results.",
+    "The record-why-it-cannot-run alternative is used; Next execution remains unavailable."
+  ]
+}
