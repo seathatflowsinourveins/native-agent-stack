@@ -35,3 +35,25 @@ Sources and method:
 - native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/acceptance-evidence-policy.md:19 distinguishes upstream tests/native operations, local integration, synthetic fixtures, independent observation and structural validation.
 
 Sanitization omits host paths, local account/session identities, credentials, active configuration and raw conversations. Source hashes establish byte identity only. Missing observations mean missing selected evidence, not a capability absence claim.
+
+The later [roadmap documentary supplement](../../receipts/ns2604-roadmap-evidence-20261005.json)
+links current observation/tool proofs, documented dispositions and memory/skill
+corrections. Its source-review statuses are provisional and supply no new
+readiness numerator. The original capture, all failed/skipped attempts and the
+historical 80-slot baseline remain intact. The command center's final dated
+80-slot independent qualification is the readiness authority.
+
+Supplement source locators use `coord:` or `coordination:` for the private co-op
+tree, `scratch:` for selected retained originals/archival mirrors, and `repo:`
+for repository evidence. `native-state:acceptance/` names the plan-produced
+acceptance state; the observation artifact records its exact plan-command
+resolver. These aliases disclose no personal base path. Capture hashes bind
+selected bytes, not the truth or current state of a component. The source
+critic matched 22 selected tool hashes and 19 observation hashes; eight
+native-state references were not separately resolved by that critic. They
+remain a source-verification requirement for the independent publication read.
+
+The tool artifact distinguishes a stdout footer's `reported_stage_result` from
+a separately retained process exit. The memory/skills artifact distinguishes
+actual scalar records from adjudicator-reported operations whose original
+scalar outputs were not located in the bounded selected sources.

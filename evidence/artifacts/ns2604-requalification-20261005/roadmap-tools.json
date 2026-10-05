@@ -1,0 +1,1413 @@
+{
+  "schema_version": 1,
+  "kind": "roadmap_tools_source_review",
+  "as_of": "2026-10-05",
+  "source_revision": "03e4833c",
+  "source_workflow": {
+    "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+    "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078",
+    "evidence_class": "source_review",
+    "field": "records[].final.slots[]"
+  },
+  "qualification_method": {
+    "source": "repo:evidence/artifacts/ns2604-e2e-20261004/method.md",
+    "sha256": "c166003013dcd1dd7f786977da74013e4987896958c2bba2344b5abbea049f5f",
+    "lines": [
+      58,
+      72
+    ],
+    "scope": "Frozen PR #700 four-condition method; this artifact reviews selected original source leads without deriving aggregate readiness."
+  },
+  "claim_boundary": "All roadmap READY verdicts remain provisional source_review. Recipe wrapper result lines are local_integration. Official GitHub run metadata is native_proven only for the stated hosted-activity scope. Source review, wrapper success, model adjudication and synthetic fixtures never become unchanged upstream test or provider acceptance. Each reported_yes condition is a source-review lead pending original-output qualification; its scope is the enclosing slot.scope.",
+  "sanitization": "No raw conversations, credential files/values, active client configuration, or private host paths copied. coord:/scratch:/repo: locators identify original witnesses; hashes describe original bytes, not a recreated summary.",
+  "slots": [
+    {
+      "slot_id": "git-github-automation/gh-github-cli",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=git-github-automation/gh-github-cli]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "sweep",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/sweep.post_install.out",
+            "sha256": "7e281521926f565057cafaac37b51bf6619531a430f3715bf7be17fc80def923",
+            "line": 52
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "result": "0",
+          "scope": "Plan wrapper emitted success; underlying native stdout is not retained in this output."
+        }
+      ],
+      "retained_failures": [],
+      "scope": "Fresh client use and repository workflow success remain roadmap reports; version and the plan's repository-view probe are narrower than upstream CLI test-suite acceptance.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "cli/cli",
+          "pin": "v2.102.0",
+          "path": "README.md",
+          "line": 1,
+          "url": "https://github.com/cli/cli/blob/v2.102.0/README.md#L1",
+          "sha256": "5816da6f27253e6e5544e9c8d7b0f652e03200a0345fae1693e50d72fabb8cc4",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "git-github-automation/difftastic",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "later-e2e"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=git-github-automation/difftastic]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "fixwave",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/difftastic.json",
+            "sha256": "ad55281be2588ea1fe63c16783ef6b48b34a6883fe8220fbbe0770bc59f4078a",
+            "field": "stages/status"
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "status": "fail",
+          "stages": {
+            "post_install": 0,
+            "after_sign_in": 1
+          },
+          "scope": "Existing recipe wrapper receipt, not an unchanged upstream test transcript."
+        },
+        {
+          "id": "wrapper-after_sign_in",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/difftastic.accept.after_sign_in.out",
+            "sha256": "79fb1687721be32a59c21942cc3b6b4478c89b504825e5aa296535ec632fa29a",
+            "line": 1
+          },
+          "scope": "Original stage-status output contains wrapper result lines only; native_proven is not asserted.",
+          "reported_stage_result": 1
+        },
+        {
+          "id": "later-e2e",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:e2e-part2-4c897418f.json",
+            "sha256": "5b1bfa189147a9b99d777ed95855e7c4303cde8024e3ff4a3ffb7adcc77f2a94",
+            "field": "slots[slot=difftastic].acceptance/claude_session/codex_session/extra_checks"
+          },
+          "claim": "Later receipt records post_install exit 0 and successful expected tool use in fresh Claude and Codex sessions.",
+          "scope": "Recorded installed version 0.71.0; Claude's first shell paste failed with syntax error exit 2, then the later difft invocation succeeded. A literal echoed rc=0 is not the tool's exit status."
+        }
+      ],
+      "retained_failures": [
+        {
+          "observation": "wrapper-after_sign_in",
+          "disposition": "Retain the earlier reported stage failure. The selected .out footer alone is not a separately observed process exit; later success has its own observation.",
+          "reported_stage_result": 1
+        }
+      ],
+      "scope": "Upstream test covers requested exit status for changed files. Later client observations support use of the installed command; the defective after_sign_in wrapper was not rerun.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict.",
+        "Repair/requalify the after_sign_in command separately; preserve shell/prompt errors and use the native difft_exit status."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "Wilfred/difftastic",
+          "pin": "0.71.0",
+          "path": "tests/cli.rs",
+          "line": 85,
+          "url": "https://github.com/Wilfred/difftastic/blob/0.71.0/tests/cli.rs#L85",
+          "sha256": "13d3ecb09b9e3147480dd2cacf3cc327c940f8af4c7d9afb4fc15fa8a3be18ed",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "ci-supply-chain/zizmor",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_not_applicable",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=ci-supply-chain/zizmor]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "sweep",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/sweep.post_install.out",
+            "sha256": "7e281521926f565057cafaac37b51bf6619531a430f3715bf7be17fc80def923",
+            "line": 44
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "result": "0",
+          "scope": "Plan wrapper emitted success; underlying native stdout is not retained in this output."
+        }
+      ],
+      "retained_failures": [],
+      "scope": "Documented help/version and configured workflow invocation are installation/integration observations, not upstream regression-suite or comprehensive workflow acceptance.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "zizmorcore/zizmor",
+          "pin": "v1.30.1",
+          "path": "docs/quickstart.md",
+          "line": 3,
+          "url": "https://github.com/zizmorcore/zizmor/blob/v1.30.1/docs/quickstart.md#L3",
+          "sha256": "0647c314693a82eeac2184f68a990b3223046d707be03917ed8650992ac213ef",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "ci-supply-chain/attest",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "wiring"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_not_applicable",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=ci-supply-chain/attest]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "sweep",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/sweep.post_install.out",
+            "sha256": "7e281521926f565057cafaac37b51bf6619531a430f3715bf7be17fc80def923",
+            "line": 73
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "result": "skipped",
+          "scope": "Hosted check intentionally skipped locally; no local acceptance claim."
+        },
+        {
+          "id": "hosted-run",
+          "evidence_class": "native_proven",
+          "source": {
+            "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37275867893",
+            "repository_revision": "77d7516d81a94b1cb0e77a7b6c910c28c8104dc9"
+          },
+          "verification": {
+            "command": "gh api repos/seathatflowsinourveins/native-agent-stack/actions/runs/37275867893",
+            "exit_code": 0
+          },
+          "claim": "Run metadata: Publish attested catalog archive, event push, conclusion success, 2026-10-05T07:06:21Z.",
+          "scope": "Only official GitHub run metadata was observed; individual action steps and artifact verification were not independently inspected in this bounded review."
+        },
+        {
+          "id": "wiring",
+          "evidence_class": "source_review",
+          "source": {
+            "locator": "repo:.github/workflows/publish-catalog.yml",
+            "sha256": "5b52e3f50cf6ecb26cfe36f8ca54c577b5ff07ec4027a20102bc731c066cf4e5",
+            "line": 133
+          },
+          "claim": "Three uses at lines 133,140,247 pin actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6, annotated v4.2.2."
+        }
+      ],
+      "retained_failures": [],
+      "scope": "GitHub-hosted action. Successful publisher run is retained separately from local skips; this review did not independently verify a downloaded artifact's attestation.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "actions/attest",
+          "pin": "v4.2.2",
+          "path": "README.md",
+          "line": 1,
+          "url": "https://github.com/actions/attest/blob/v4.2.2/README.md#L1",
+          "sha256": "c513a2a22ce3fa07b67216d36db2c1552be51f7391fe81266f6f1a4cee8da5d6",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "ci-supply-chain/dependabot",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "wiring"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_not_applicable",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=ci-supply-chain/dependabot]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "sweep",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/sweep.post_install.out",
+            "sha256": "7e281521926f565057cafaac37b51bf6619531a430f3715bf7be17fc80def923",
+            "line": 74
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "result": "skipped",
+          "scope": "Hosted check intentionally skipped locally; no local acceptance claim."
+        },
+        {
+          "id": "hosted-run",
+          "evidence_class": "native_proven",
+          "source": {
+            "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37208567898",
+            "repository_revision": "15cb14841938493906509e4cd66cf23eb0a9808e"
+          },
+          "verification": {
+            "command": "gh api repos/seathatflowsinourveins/native-agent-stack/actions/runs/37208567898",
+            "exit_code": 0
+          },
+          "claim": "Run metadata: github_actions in /. - Update #1607781390, event dynamic, conclusion success, 2026-10-04T14:15:13Z.",
+          "scope": "Update-service activity only; no resulting PR acceptance or deployed dependabot-core version inferred."
+        },
+        {
+          "id": "wiring",
+          "evidence_class": "source_review",
+          "source": {
+            "locator": "repo:.github/dependabot.yml",
+            "sha256": "40d7f3bcf927a13088a126f70c71da3dba2e6181f52de2c451ab9f31193b8554",
+            "line": 26
+          },
+          "claim": "github-actions at repository root, weekly schedule, open-PR limit 2 and seven-day cooldown, lines26-43."
+        }
+      ],
+      "retained_failures": [
+        {
+          "evidence_class": "source_review",
+          "source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078",
+            "evidence_class": "source_review",
+            "field": "records[].final.slots[]"
+          },
+          "claim": "Roadmap retains Dependabot PR #690 failing validate and sota-sources checks; this bounded review did not independently rerun those checks."
+        }
+      ],
+      "scope": "GitHub-hosted update service. Core tag is a reference pin, not an asserted deployed GitHub service version. Completed update activity does not imply resulting PR acceptance.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "dependabot/dependabot-core",
+          "pin": "v0.398.0",
+          "path": "README.md",
+          "line": 44,
+          "url": "https://github.com/dependabot/dependabot-core/blob/v0.398.0/README.md#L44",
+          "sha256": "1a6bc301fe8095e9b8acfdaed5b7f5f455c47571ad78d40ab5640f5b0e7a65b1",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "ci-supply-chain/actionlint-kjanat",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_not_applicable",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=ci-supply-chain/actionlint-kjanat]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "sweep",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/sweep.post_install.out",
+            "sha256": "7e281521926f565057cafaac37b51bf6619531a430f3715bf7be17fc80def923",
+            "line": 46
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "result": "0",
+          "scope": "Plan wrapper emitted success; underlying native stdout is not retained in this output."
+        }
+      ],
+      "retained_failures": [],
+      "scope": "Vendor-documented installation/version check is narrower than full workflow lint acceptance or upstream tests. Fresh client use is not applicable to the hosted CI gate.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "kjanat/actionlint",
+          "pin": "v1.17.0",
+          "path": "docs/install.md",
+          "line": 223,
+          "url": "https://github.com/kjanat/actionlint/blob/v1.17.0/docs/install.md#L223",
+          "sha256": "da673959e636bd9e74a9687948e5a98f55900dbff4aea1d195911f2c699cfc7c",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "code-navigation/serena",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=code-navigation/serena]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "fixwave",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/serena.json",
+            "sha256": "5cb8602919741221a63c6d28773e0759c5d6ac201ca63e95c4bbb9c622dda596",
+            "field": "stages/status"
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "status": "pass",
+          "stages": {
+            "post_install": 0,
+            "after_sign_in": 0
+          },
+          "scope": "Existing recipe wrapper receipt, not an unchanged upstream test transcript."
+        },
+        {
+          "id": "wrapper-after_sign_in",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/serena.accept.after_sign_in.out",
+            "sha256": "3231aabf93f849219abf8d123ab5d4db29cc5f818e41a908d7d57d0c742597a2",
+            "line": 1
+          },
+          "scope": "Original stage-status output contains wrapper result lines only; native_proven is not asserted.",
+          "reported_stage_result": 0
+        }
+      ],
+      "retained_failures": [],
+      "scope": "Initialization and native MCP tool observations are scoped to the exercised project/language. Current canonical slot disposition assigns Serena to both native clients; stale handbook ownership text cannot establish actual wiring.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "oraios/serena",
+          "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+          "path": "README.md",
+          "line": 234,
+          "url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md#L234",
+          "sha256": "80f529a79a5e33686e0db325d74b6dc26217aa0e19ee86778b16a9c86c6a6e01",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "code-navigation/structural-search",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=code-navigation/structural-search]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "fixwave",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/structural-search.json",
+            "sha256": "a05610cd1f23c8e0c0477e93003141b7001bec035316b4d5d88240b27947e469",
+            "field": "stages/status"
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "status": "pass",
+          "stages": {
+            "post_install": 0
+          },
+          "scope": "Existing recipe wrapper receipt, not an unchanged upstream test transcript."
+        },
+        {
+          "id": "wrapper-post_install",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/structural-search.accept.post_install.out",
+            "sha256": "a11d1c42d2b2a0e1e344b3e4447a4a69eeeb3ece03ad61558a278773ba754def",
+            "line": 1
+          },
+          "scope": "Original stage-status output contains wrapper result lines only; native_proven is not asserted.",
+          "reported_stage_result": 0
+        }
+      ],
+      "retained_failures": [],
+      "scope": "The README's TypeScript structural rewrite is the reference exercise. Local wrapper output alone does not demonstrate every language or fresh-client invocation.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "ast-grep/ast-grep",
+          "pin": "0.45.3",
+          "path": "README.md",
+          "line": 84,
+          "url": "https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#L84",
+          "sha256": "c2b6f0d19696fcb6ef2a0d7711bdaf49d39cc7c9fbbf63b0a3f674eda3c2a2c7",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "mcp-surfaces/mcporter",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_not_applicable",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=mcp-surfaces/mcporter]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "sweep",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/sweep.post_install.out",
+            "sha256": "7e281521926f565057cafaac37b51bf6619531a430f3715bf7be17fc80def923",
+            "line": 10
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "result": "0",
+          "scope": "Plan wrapper emitted success; underlying native stdout is not retained in this output."
+        }
+      ],
+      "retained_failures": [],
+      "scope": "Documented list/version probes establish command availability and selected discovery scope; they do not accept every registered MCP endpoint.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "openclaw/mcporter",
+          "pin": "v0.14.2",
+          "path": "docs/install.md",
+          "line": 52,
+          "url": "https://github.com/openclaw/mcporter/blob/v0.14.2/docs/install.md#L52",
+          "sha256": "64e76fad5e9cdf679cffde6f60a8d94525a80398d1439f2b7acefe7885097fa4",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "document-retrieval/mineru",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=document-retrieval/mineru]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "fixwave",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/mineru.json",
+            "sha256": "8a747346055ce7bf1301972e57030dd8ee3be9a784e5b6b66d1cc9ba54b47ef2",
+            "field": "stages/status"
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "status": "pass",
+          "stages": {
+            "post_install": 0,
+            "service_health": 0,
+            "after_sign_in": 0
+          },
+          "scope": "Existing recipe wrapper receipt, not an unchanged upstream test transcript."
+        },
+        {
+          "id": "wrapper-after_sign_in",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/mineru.accept.after_sign_in.out",
+            "sha256": "0cf623b9023ce74d726be3fd57ce6d00050ca473f73bd6532ceb8599349a5908",
+            "line": 1
+          },
+          "scope": "Original stage-status output contains wrapper result lines only; native_proven is not asserted.",
+          "reported_stage_result": 0
+        },
+        {
+          "id": "wrapper-service_health",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/mineru.accept.service_health.out",
+            "sha256": "a2bd4b27f5575b747f5876dbc2b5235b36cbaac688cb5ea5abdb0a799d95640f",
+            "line": 1
+          },
+          "scope": "Original stage-status output contains wrapper result lines only; native_proven is not asserted.",
+          "reported_stage_result": 1
+        },
+        {
+          "id": "wrapper-service_health.retry1",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/mineru.accept.service_health.retry1.out",
+            "sha256": "85fce0ec12829f0eaff2318e606bd8dff90a2471ee5734af9055d78b6b7dd5d3",
+            "line": 1
+          },
+          "scope": "Original stage-status output contains wrapper result lines only; native_proven is not asserted.",
+          "reported_stage_result": 0
+        }
+      ],
+      "retained_failures": [
+        {
+          "observation": "wrapper-service_health",
+          "disposition": "Retain the earlier reported stage failure. The selected .out footer alone is not a separately observed process exit; later success has its own observation.",
+          "reported_stage_result": 1
+        }
+      ],
+      "scope": "Installed release mineru-4.0.10-released. Conversion and health receipts apply to their selected document and service, not every supported format, OCR mode, GPU or model route.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "opendatalab/MinerU",
+          "pin": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+          "path": "README.md",
+          "line": 360,
+          "url": "https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L360",
+          "sha256": "69c967e98536be101b5dc3420703d28cc1e0250eeca3b5bf156b060ac4ccfacb",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "quality-evaluation/inspect-ai",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "later-e2e"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=quality-evaluation/inspect-ai]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "fixwave",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/inspect-ai.json",
+            "sha256": "17682e2d84f24242e272cf2150f6229ad874d48f9f5f4e89401d59ea0db20b86",
+            "field": "stages/status"
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "status": "fail",
+          "stages": {
+            "post_install": 0,
+            "after_sign_in": 1
+          },
+          "scope": "Existing recipe wrapper receipt, not an unchanged upstream test transcript."
+        },
+        {
+          "id": "wrapper-after_sign_in",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/inspect-ai.accept.after_sign_in.out",
+            "sha256": "7b10e816bc1478befc302cc90e0d56ae18ea9191252d6d15c860f607440569ea",
+            "line": 1
+          },
+          "scope": "Original stage-status output contains wrapper result lines only; native_proven is not asserted.",
+          "reported_stage_result": 1
+        },
+        {
+          "id": "later-e2e",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:e2e-part2-4c897418f.json",
+            "sha256": "5b1bfa189147a9b99d777ed95855e7c4303cde8024e3ff4a3ffb7adcc77f2a94",
+            "field": "slots[slot=inspect-ai].acceptance/claude_session/codex_session/extra_checks"
+          },
+          "claim": "Later receipt records post_install exit 0 and successful expected tool use in fresh Claude and Codex sessions.",
+          "scope": "Both log-header checks report success, total_samples=completed_samples=1, one scorer, theory_of_mind on the recorded loopback provider route. No score values or raw conversation were read. Absent-model negative control was not run."
+        }
+      ],
+      "retained_failures": [
+        {
+          "observation": "wrapper-after_sign_in",
+          "disposition": "Retain the earlier reported stage failure. The selected .out footer alone is not a separately observed process exit; later success has its own observation.",
+          "reported_stage_result": 1
+        }
+      ],
+      "scope": "Installed release 0.3.273. Later one-sample theory_of_mind provider logs are scoped native exercise observations, not containerized-agent acceptance, model quality, or a passed absent-model negative control.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict.",
+        "Preserve earlier absolute-path Python failure; demonstrate a discriminating absent-model negative control before recording provider acceptance."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "UKGovernmentBEIS/inspect_ai",
+          "pin": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+          "path": "examples/theory_of_mind.py",
+          "line": 7,
+          "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/examples/theory_of_mind.py#L7",
+          "sha256": "a9b031194890dead679de332b590d27e37d760252411cb5191002577c0be1b8c",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "quality-evaluation/harbor-containerized-agent-e2e-runner",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_not_applicable",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=quality-evaluation/harbor-containerized-agent-e2e-runner]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "fixwave",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/harbor-containerized-agent-e2e-runner.json",
+            "sha256": "536df72009faeb5565b2bc6c312103cbf6c718e666a132998ee9f65197ada012",
+            "field": "stages/status"
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "status": "pass",
+          "stages": {
+            "post_install": 0,
+            "service_health": 0
+          },
+          "scope": "Existing recipe wrapper receipt, not an unchanged upstream test transcript."
+        },
+        {
+          "id": "wrapper-service_health",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/harbor-containerized-agent-e2e-runner.accept.service_health.out",
+            "sha256": "190a97692e46b21e04d62e3f4b9300b6ac70426cba113e487327820c1957a051",
+            "line": 1
+          },
+          "scope": "Original stage-status output contains wrapper result lines only; native_proven is not asserted.",
+          "reported_stage_result": 0
+        }
+      ],
+      "retained_failures": [],
+      "scope": "Installed release v0.23.0. Service-health wrapper success does not establish the unchanged upstream hello-user containerized-agent test passed; that test's actual retained output is still required.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict.",
+        "Retain original unchanged upstream hello-user integration-test output and the relevant Docker/container lifecycle result before calling containerized-agent acceptance native_proven."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "harbor-framework/harbor",
+          "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+          "path": "tests/integration/test_hello_user_e2e.py",
+          "line": 25,
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/integration/test_hello_user_e2e.py#L25",
+          "sha256": "b156b2ada849d01f21dadd1e96240d62d5f1b2f524cee20fbd3703ab33b478e6",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "agent-sdks/claude-agent-sdk",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "sweep",
+            "sdk-example"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=agent-sdks/claude-agent-sdk]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "sweep",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/sweep.post_install.out",
+            "sha256": "7e281521926f565057cafaac37b51bf6619531a430f3715bf7be17fc80def923",
+            "line": 3
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "result": "0",
+          "scope": "Plan wrapper emitted success; underlying native stdout is not retained in this output."
+        },
+        {
+          "id": "sdk-example",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:accept-after_sign_in-3e343ba6.json",
+            "sha256": "e05a5179295932286fed09cb660f0c3939165849ecb9e2fd8031e4230ef009b7",
+            "field": "rows[slot=claude-agent-sdk]"
+          },
+          "result": "0",
+          "scope": "README Python quickstart executed through repository wrapper; native client history is not copied or read here."
+        }
+      ],
+      "retained_failures": [],
+      "scope": "Python SDK quickstart scope only. Native SDK-owned client history is a roadmap lead and was not opened here; it does not establish TypeScript SDK or a separately fresh interactive client session.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict.",
+        "Recover a sanitized native SDK result from an authorized original witness; do not treat SDK-owned session history as a separately fresh interactive-client acceptance."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "anthropics/claude-agent-sdk-python",
+          "pin": "v0.2.163",
+          "path": "README.md",
+          "line": 22,
+          "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/README.md#L22",
+          "sha256": "c38a933bf8fef26316ea38635989b254e69a26d21d80b96bf5731cba4e88bcc6",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    },
+    {
+      "slot_id": "agent-sdks/codex-sdk-and-codex-exec-app-server",
+      "roadmap_verdict": {
+        "status": "READY",
+        "evidence_class": "source_review",
+        "provisional": true
+      },
+      "conditions": {
+        "present": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "upstream_acceptance": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap",
+            "fixwave"
+          ]
+        },
+        "wired": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        },
+        "fresh_session_use": {
+          "status": "reported_yes",
+          "proof": [
+            "roadmap"
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "roadmap",
+          "evidence_class": "source_review",
+          "source": {
+            "workflow_ref": "source_workflow",
+            "field": "records[].final.slots[slot=agent-sdks/codex-sdk-and-codex-exec-app-server]"
+          },
+          "claim": "Model-adjudicated roadmap lead; not independent native acceptance.",
+          "provisional": true
+        },
+        {
+          "id": "fixwave",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/codex-sdk-and-codex-exec-app-server.json",
+            "sha256": "73755eaf0cd98050ddc9ee7d71fd783bfbd6bce3e01843ebac970cdb2f6d9cd2",
+            "field": "stages/status"
+          },
+          "repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+          "status": "pass",
+          "stages": {
+            "post_install": 0,
+            "after_sign_in": 0
+          },
+          "scope": "Existing recipe wrapper receipt, not an unchanged upstream test transcript."
+        },
+        {
+          "id": "wrapper-after_sign_in",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/codex-sdk-and-codex-exec-app-server.accept.after_sign_in.out",
+            "sha256": "d41d12ea71234903a5a2a030e542c079e85551ee732f6f0de219d5a56bddc444",
+            "line": 1
+          },
+          "scope": "Original stage-status output contains wrapper result lines only; native_proven is not asserted.",
+          "reported_stage_result": 0
+        }
+      ],
+      "retained_failures": [],
+      "scope": "Separate TypeScript SDK, codex exec, and app-server scopes. Two successful after_sign_in wrapper lines do not identify which protocols were exercised or demonstrate full protocol/lifecycle acceptance.",
+      "open_items": [
+        "Independently join original native output and wiring/fresh-session evidence to all applicable frozen four-condition gates before promoting this provisional source-review verdict.",
+        "Disaggregate native exec, TypeScript SDK, and app-server-test-client witnesses, including their actual returned result and any lifecycle limitations."
+      ],
+      "upstream_sources": [
+        {
+          "repository": "openai/codex",
+          "pin": "rust-v0.160.0",
+          "path": "sdk/typescript/README.md",
+          "line": 1,
+          "url": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/README.md#L1",
+          "sha256": "bc454b26a6920efb1826912be6b6ba96348ab39d9f4e70078465deb586dbbfe7",
+          "evidence_class": "source_review",
+          "verification": {
+            "command": "gh api repos/<repository>/contents/<path>?ref=<pin>",
+            "exit_code": 0
+          },
+          "scope": "Original official source read at the specified revision; source availability and documented recipe only."
+        }
+      ]
+    }
+  ],
+  "completeness_critic": [
+    "Native test transcripts and fresh-session join are not independently available for every reported gate.",
+    "Hosted run success needs step/artifact scope; local skips are preserved.",
+    "Inspect provider evaluation, Harbor containerized-agent tests, Python Claude SDK and Codex exec/TypeScript SDK/app-server remain separate scopes.",
+    "No new acceptance runs, installs, configuration, services, registry changes, aggregate readiness claim, or synthetic tests were performed.",
+    "Source critic checked22selected hashes; output-only wrapper footer results are reported_stage_result, not independently retained process exits."
+  ]
+}

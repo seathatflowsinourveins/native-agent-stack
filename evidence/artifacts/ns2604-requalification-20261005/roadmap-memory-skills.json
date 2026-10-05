@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "kind": "roadmap-memory-and-skill-corrections",
+  "as_of_utc": "2026-10-05T10:34:00Z",
+  "source_workflow": "wf_cfa1d860-ebd",
+  "roadmap_source": {
+    "locator": "coordination:readiness-20261005/readiness-roadmap-20261005.json",
+    "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+  },
+  "claim_boundary": "Retained scalar proof and separately attributed review reports only. No new readiness numerator, capture qualification, upstream test or fresh skill creation/evaluation. Independent public projection review is pending.",
+  "slots": [
+    {
+      "slot_id": "durable-memory/memory-owner",
+      "baseline_status": "INTERIM",
+      "reported_status": "INTERIM",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:175-182",
+      "roadmap_pointer": "#/records/13/final/slots/0",
+      "upstream_source": "akitaonrails/ai-memory@7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83:crates/ai-memory-cli/src/commands/doctor.rs (v2.5.2)",
+      "reported_hook_trust_gap": "closed according to the adjudicator; publisher verifies the retained report only",
+      "trust_entry_authorship": "unverified",
+      "observations": [
+        {
+          "evidence_class": "source_review",
+          "reported_operation_class": "local_integration",
+          "source_pointer": "#/records/13/final/slots/0/evidence/2",
+          "reported_at_utc": "2026-10-05T08:03Z (approximately)",
+          "reported_command": "python3 -B scripts/adoption_status.py --client-wiring --json",
+          "reported_exit_code": 0,
+          "reported_codex_ai_memory_hook_events": 7,
+          "reported_trusted_hook_events": 7,
+          "returned_scalar_artifact_located_by_publisher": false
+        },
+        {
+          "evidence_class": "source_review",
+          "reported_operation_class": "native_proven",
+          "source_pointer": "#/records/13/final/slots/0/evidence/4",
+          "reported_at_utc": "2026-10-05T08:09:23Z",
+          "reported_command": "ai-memory doctor --json",
+          "reported_exit_code": 0,
+          "reported_capture_counts": {
+            "claude": {
+              "captured": 42,
+              "eligible": 72
+            },
+            "codex": {
+              "captured": 22,
+              "eligible": 34
+            },
+            "uncaptured_clients": []
+          },
+          "scope": "Project-level30-day capture report, not proof of any particular canary session or all sessions captured.",
+          "returned_scalar_artifact_located_by_publisher": false
+        },
+        {
+          "evidence_class": "source_review",
+          "reported_operation_class": "native_proven",
+          "source": "repo:evidence/artifacts/new-wsl-layer-reviews-20261001/ai-memory-252-upstream-hooks.json",
+          "reported_upstream_test": "tests/hooks/test_lib.sh",
+          "reported_passes": 137,
+          "scope": "Historical unchanged upstream hook-suite result on a different host; new_host_execution is none. Not a NativeStack2604 rerun."
+        }
+      ],
+      "open_items": [
+        "D3r4 has not bound a final memory owner; interim status remains.",
+        "Interim bidirectional canary, lifecycle/handoff and sole-owner gates remain separate. No restart or cold boot performed.",
+        "Retain actual returned adoption-status/doctor scalar outputs for independent source verification; current closure is adjudicator-reported.",
+        "Current trust-entry authorship remains unverified; this publication reads no client configuration or trust values."
+      ]
+    },
+    {
+      "slot_id": "instructions-skills/skill-authoring",
+      "baseline_status": "PARTIAL",
+      "reported_status": "PARTIAL",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "roadmap_pointer": "#/records/6/final/slots/3",
+      "upstream_source": "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md:163,229,247",
+      "chronology_correction": "The failed sweep ended04:00:01Z, before PyYAML provisioning04:05:41Z. The isolated04:05:46–49Z wrapper returned process0 and two stage-result0 rows. The07:12Z rerun0/0 is reported in the adjudicated roadmap; its scalar output/time siblings were not located in the bounded selected sources. The old later-failure wording was wrong.",
+      "observations": [
+        {
+          "evidence_class": "local_integration",
+          "attempt": "retained failed sweep and subsequent provisioning/post-install",
+          "originals": [
+            {
+              "source": "scratch:fixwave/sweep.post_install.end",
+              "sha256": "b0577bd23c392f99def8bfa91aeca07c1d0fb1f46826eb1e66e74403a2f0f507",
+              "returned_scalar": "2026-10-05T04:00:01Z"
+            },
+            {
+              "source": "scratch:fixwave/skill-authoring.install.start",
+              "sha256": "79f523ec039d9da7899fe6d0df580db6d6dc48e20c56d634a7cf650db2f7bb7d",
+              "returned_scalar": "2026-10-05T04:05:41Z"
+            },
+            {
+              "source": "scratch:fixwave/skill-authoring.install.end",
+              "sha256": "3835cdd7895a20fe690f1d54ea91d2d1239a135651543a572a24524e3b335c8c",
+              "returned_scalar": "2026-10-05T04:05:46Z"
+            },
+            {
+              "source": "scratch:fixwave/skill-authoring.install.rc",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "returned_scalar": "0"
+            },
+            {
+              "source": "scratch:fixwave/skill-authoring.accept.post_install.start",
+              "sha256": "3835cdd7895a20fe690f1d54ea91d2d1239a135651543a572a24524e3b335c8c",
+              "returned_scalar": "2026-10-05T04:05:46Z"
+            },
+            {
+              "source": "scratch:fixwave/skill-authoring.accept.post_install.end",
+              "sha256": "a05f7d0d891807f82e71d6927d0aeefe82f316b2bcc371c72ffd2ed184410079",
+              "returned_scalar": "2026-10-05T04:05:49Z"
+            },
+            {
+              "source": "scratch:fixwave/skill-authoring.accept.post_install.rc",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "returned_scalar": "0"
+            },
+            {
+              "source": "scratch:fixwave/skill-authoring.accept.post_install.out",
+              "sha256": "94f5076887f83f558a107b31a98c53408b353168eae74b44623a3bbbdf8d20b0",
+              "returned_scalar": "skill-authoring | post_install | 0\nskill-authoring | post_install | 0"
+            },
+            {
+              "source": "scratch:fixwave/skill-authoring.accept.post_install.err",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "returned_scalar": ""
+            }
+          ],
+          "scope": "Actual scalar plan-wrapper records. Failed sweep rows0/1 are preserved in the historical slot map. Declared upstream quick validators inside the wrapper are not promoted into independently retained upstream-test output."
+        },
+        {
+          "evidence_class": "source_review",
+          "reported_operation_class": "local_integration",
+          "source_pointer": "#/records/6/final/slots/3/evidence/0",
+          "reported_at_utc": "2026-10-05T07:12Z",
+          "reported_process_exit_code": 0,
+          "reported_stage_results": [
+            0,
+            0
+          ],
+          "returned_scalar_artifact_located_by_publisher": false
+        }
+      ],
+      "retained_failure_disposition": "Keep the pre-provisioning failure as a chronological control; wrapper success does not establish fresh skill creation or evaluation.",
+      "open_items": [
+        "Fresh headless skill creation and evaluation in both clients remain unqualified by this record.",
+        "Paired skill-creator with-skill/baseline benchmark and review artifacts belong to the skills owner; no duplicate runner/validator is written.",
+        "The owner must retain a discriminating after_sign_in authoring stage and the native returned streams; this publication changes no owned acceptance plan."
+      ]
+    }
+  ],
+  "completeness_critic": "Report testimony and actual returned scalar artifacts remain distinct. Preserve all failed attempts, unknown authorship, project-level capture scope, historical different-host tests and the interim owner/skill-use gates. No session identity, raw conversation, active configuration or credential is copied."
+}

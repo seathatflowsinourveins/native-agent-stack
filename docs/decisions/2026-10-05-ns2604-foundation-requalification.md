@@ -7,11 +7,13 @@ with the last fully adjudicated baseline and the new provisional scenarios
 shown separately. This serves complex engineering, US-equities research and
 historical simulation before independently qualified paper operation.
 
-The current scenario is **40/80 (50%), provisional**. The conditional scenario
+The co-op's reported scenario is **40/80 (50%), provisional**. The conditional scenario
 is **44/80 (55%), provisional**, only if four disputed token slots adjudicate
 READY. These are the co-op projections supplied in this lane's brief. The
-available fresh records do not identify a complete 80-slot status chain or
-the ten promotions deriving 40. Consequently this publication does not assert
+initial capture did not identify a complete 80-slot status chain or
+the ten promotions deriving 40. The co-op subsequently named those ten host-plan
+passes; the supplement below records that observation without qualifying a new
+aggregate. Consequently this publication does not assert
 that 40 independently qualified slots have been demonstrated.
 
 The last fully adjudicated aggregate remains the historical **30/80 (37.5%)**
@@ -167,12 +169,13 @@ rendering. Keep historical architecture winner pins, evidence classes and
 closure judgments intact; append dated host observations with source links.
 No main checkout or host configuration is changed.
 
-Two retained-source conflicts remain open: session-analytics' later summary
+At the initial capture, two retained-source conflicts were open: session-analytics' later summary
 claims success while its complete rerun exit files report failure, and later
 output-only attempts lack exit/time siblings. Alerting's zero exit accompanies
 an explicit `needs_user` sink disposition. The slot artifact preserves both
 the reported claims and the stronger raw-attempt boundaries without inventing
-a successful whole-slot acceptance.
+a successful whole-slot acceptance. Later attempts and source corrections are
+recorded separately in the documentary supplement below.
 
 Independent source comparison checked all 513 originals: 512 matched and none
 were missing. The research-harnesses after-sign-in stderr file had changed
@@ -228,3 +231,44 @@ The completeness review also feeds two concrete next-sweep requirements:
 freeze or recover incomplete mutable command outputs, and retain resolved
 reviewer/provider model and effort metadata when a claim depends on that
 identity. Requested gateway routes alone do not identify the resolved backend.
+
+## Roadmap evidence supplement, 2026-10-05
+
+The separately registered [documentary receipt](../../evidence/receipts/ns2604-roadmap-evidence-20261005.json)
+refreshes retained per-slot proof for review. It preserves the original receipt
+as an initial-capture record and leaves its generated projection intact while
+PR #713 owns the overlapping catalog/generated paths. This is source evidence,
+not a new qualification. Every roadmap status remains provisional pending the
+independent read of this public projection.
+
+The only authority for a new readiness number is the command center's final,
+dated qualification of the same 80 slots with independent review and
+adjudication: native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-04-ns2604-verified-e2e.md:114–121.
+The wf_cfa1d860-ebd roadmap's blind Claude/GPT analyses and Opus adjudication
+are recorded as `source_review`. They do not establish upstream acceptance or
+authorize adoption of the roadmap's projected readiness figures.
+
+The co-op's ten reported host-plan passes were base-distribution,
+codex-sdk-and-codex-exec-app-server, structural-search, syft, betterleaks,
+serena, harbor-containerized-agent-e2e-runner, ccusage, otel-collector-contrib
+and session-analytics. Their reported completion of plan stages and fresh
+sessions supports the co-op scenario's provenance. It does not form a frozen
+80-slot status chain. The four token disputes remain separately recorded;
+their Opus READY and GPT PARTIAL reviews have no READY adjudication here.
+
+Job1's observation and tool records retain native operations, wrapper results,
+fixtures and model judgments separately. Job2 carries documented BY_DESIGN
+dispositions with their decision citations. Job3 retains memory's INTERIM
+hold and corrects the skill-validator chronology without claiming fresh skill
+creation/evaluation. Their exact proofs and limitations are in the receipt's
+linked artifacts. No fresh alert, provider call, native test or session was
+run for this supplement.
+
+The builder correction uses the definitive code-navigation slots: Serena
+provides symbols/references for both clients, and the official Claude LSP
+plugins are not installed. Source:
+native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:68–69, :528.
+The source patch and its local integration checks remain isolated until the
+generated paths are released. Job4 waits for each slot's stages2–5, independent
+review and adjudication; cite the #723 receipt only by its merged commit and
+JSON path when available. Job5 waits for #713 to land.

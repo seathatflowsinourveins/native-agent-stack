@@ -1,0 +1,1065 @@
+{
+  "schema_version": 1,
+  "kind": "sanitized readiness-roadmap Job1 observation evidence projection",
+  "source_workflow": {
+    "name": "ns2604-coop/readiness-20261005:Job1-observation",
+    "owner": "grand-catalog",
+    "north_star_action": "Source-backed observability for the portable foundation and qualified research workflows.",
+    "repository_revision": "03e4833c3051c90a23d37c0904f3d401756a6024",
+    "host_receipt_repository_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+    "roadmap": {
+      "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+      "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+    },
+    "dispatch_source": {
+      "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+      "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078",
+      "json_pointer": "/synthesis/dispatch/2/jobs/0",
+      "scope": "Observation subset of the grand-catalog Job1 assignment; other slots are outside this artifact."
+    },
+    "method": {
+      "locator": "repo:evidence/artifacts/ns2604-e2e-20261004/method.md",
+      "sha256": "c166003013dcd1dd7f786977da74013e4987896958c2bba2344b5abbea049f5f",
+      "definition_lines": [
+        58,
+        67
+      ],
+      "policy": "repo:docs/acceptance-evidence-policy.md"
+    },
+    "plan_binding": [
+      {
+        "locator": "repo:evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "sha256": "44b2175638441c59b6fe3a46c6c5e5ce1d72fa5b8393dccd769cb82b2aad22a3",
+        "hash_identical_to_recorded_4c": true
+      },
+      {
+        "locator": "repo:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+        "sha256": "719c3386ff4e4edda10dbe3d23e7599d097b0a27dee92c061d92ebc438a26d79",
+        "hash_identical_to_recorded_4c": true
+      }
+    ],
+    "locator_roots": {
+      "repo": "Repository files at repository_revision, with original byte hashes.",
+      "coord": "Selected original ns2604-coop coordination records; same coord: alias as the existing source manifest.",
+      "scratch": "Selected original co-op execution archive; same scratch: alias as the existing source manifest.",
+      "native-state": "Selected plan-owned native outputs outside co-op, with host paths omitted: acceptance/session-analytics resolves to the XDG_STATE_HOME/new-wsl-native-stack/acceptance/session-analytics root declared by repo:install-plan.json#/owners/47/acceptance/service_health/command; alerting receipt/confirmation resolves to the config_root declared by repo:accept.sh:883-884; agentsview/debug.log resolves to the archive root selected by repo:config/agentsview.sh:5-8. All repo short paths refer to evidence/artifacts/new-wsl-install-plan-20261002 at repository_revision. These aliases expose neither credential files nor active client configuration."
+    },
+    "scope": "Read-only inspection and one compact artifact. No new acceptance, native probe, provider, Telegram, configuration, credential, install, service, restart, container, build or test operation.",
+    "classification": "source_review: documentation/model summaries; local_integration: authored wrappers and predicates over native operations; synthetic: authored rule fixture. No summary-only native_proven or unchanged-upstream acceptance claim.",
+    "source_hash_lookup": "Every selected source locator resolves to the original byte SHA-256 in source_hashes. Inline source objects also retain the primary hash; bundle output locators share the canonical lookup."
+  },
+  "observed_at": "2026-10-05T10:19:00Z",
+  "inspection_window_utc": {
+    "start": "2026-10-05T10:05:45Z",
+    "end": "2026-10-05T10:19:00Z"
+  },
+  "no_aggregate_readiness_derivation": true,
+  "slots": [
+    {
+      "slot_id": "prometheus",
+      "catalog_slot": "observation-inference/prometheus",
+      "roadmap_verdict": {
+        "verdict": "READY",
+        "evidence_class": "source_review",
+        "provisional": true,
+        "source": {
+          "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+          "json_pointer": "/records/2/final/slots/1",
+          "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+        },
+        "reported_cross_family_agreement": true,
+        "confidence": "high",
+        "independent_publication_read": "pending"
+      },
+      "four_condition_evidence": {
+        "present": {
+          "status": "reported_version_match; retained_native_version_output_not_located",
+          "evidence_class": "source_review",
+          "reported_release": "v3.15.0",
+          "reported_revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "json_pointer": "/records/2/final/slots/1/evidence/0",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+          }
+        },
+        "upstream_acceptance": {
+          "status": "post-G4_supported_operations_reported; wrapper_execution_only_in_roadmap",
+          "evidence_class": "source_review",
+          "reported_at": "2026-10-05T07:11:45Z",
+          "reported_stages": {
+            "post_install": 0,
+            "service_health": 0
+          },
+          "native_operations": [
+            "promtool check config",
+            "GET /-/ready"
+          ],
+          "source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "json_pointer": "/records/2/final/slots/1/evidence/1",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+          },
+          "boundary": "The cited plan is local integration over upstream operations. No direct returned post-G4 promtool/readiness output was located in the selected non-conversation inputs."
+        },
+        "wired": {
+          "status": "reported_post-G4_targets_rules_and_client_series",
+          "evidence_class": "source_review",
+          "reported_up_targets": [
+            "prometheus",
+            "otel-native",
+            "otel-collector"
+          ],
+          "reported_rule_group": "nativestack2604-services",
+          "reported_metric_families": [
+            "claude_code_*",
+            "codex_*"
+          ],
+          "source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "json_pointer": "/records/2/final/slots/1/evidence/3",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+          }
+        },
+        "fresh_session_use": {
+          "status": "not_applicable",
+          "evidence_class": "source_review",
+          "basis": "Frozen PR #700 method requires fresh headless use only for client-facing tools; native clients export telemetry through the Collector.",
+          "source": {
+            "locator": "repo:evidence/artifacts/ns2604-e2e-20261004/method.md",
+            "sha256": "c166003013dcd1dd7f786977da74013e4987896958c2bba2344b5abbea049f5f"
+          },
+          "lines": [
+            58,
+            60
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "post-G4-config-binding",
+          "evidence_class": "source_review",
+          "source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "json_pointer": "/records/2/final/slots/1/evidence/2",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+          },
+          "fact": "Roadmap reports host prometheus/rule config bytes match repository config; no active configuration was read or copied by this writer."
+        },
+        {
+          "id": "supported-plan-and-pins",
+          "evidence_class": "source_review",
+          "sources": [
+            "repo:evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json#/owners/40",
+            "repo:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh"
+          ],
+          "upstream_sources": [
+            "promtool",
+            "prometheus-management",
+            "prometheus-feature-flags"
+          ],
+          "fact": "Plan and acceptance source hashes at this worktree match the existing 4c source capture; native command semantics are verified in original pinned official documentation."
+        }
+      ],
+      "retained_failures": [
+        {
+          "kind": "accuracy/open-service-flags",
+          "evidence_class": "source_review",
+          "source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "json_pointer": "/records/2/final/slots/1/evidence/4",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+          },
+          "fact": "Roadmap reports the service lacks created-timestamp-zero-ingestion and promql-extended-range-selectors; G4 assigns these to the service owner. This record neither reads nor changes the unit."
+        }
+      ],
+      "scope": "Dated post-G4 telemetry observations; no new runtime observation or verdict.",
+      "open_items": [
+        "Retain or bind the actual non-conversation version/promtool/readiness/target/query outputs underlying the later A/B probes.",
+        "Owner-native decision and application for the documented flags, accounting for upstream start-timestamp-native-storage guidance.",
+        "Independent review of this source projection before any catalog promotion."
+      ]
+    },
+    {
+      "slot_id": "loki",
+      "catalog_slot": "observation-inference/loki",
+      "roadmap_verdict": {
+        "verdict": "READY",
+        "evidence_class": "source_review",
+        "provisional": true,
+        "source": {
+          "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+          "json_pointer": "/records/2/final/slots/2",
+          "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+        },
+        "reported_cross_family_agreement": true,
+        "confidence": "high",
+        "independent_publication_read": "pending"
+      },
+      "four_condition_evidence": {
+        "present": {
+          "status": "reported_version_match; retained_native_version_output_not_located",
+          "evidence_class": "source_review",
+          "reported_release": "v3.7.8",
+          "reported_revision": "09e6ce2f",
+          "source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "json_pointer": "/records/2/final/slots/2/evidence/0",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+          }
+        },
+        "upstream_acceptance": {
+          "status": "retained_explicit_slot_wrapper_pass; later_post-G4_probe_reported",
+          "evidence_class": "local_integration",
+          "sources": [
+            {
+              "locator": "scratch:fixwave/loki.accept.post_install.out",
+              "sha256": "c12c8954bc72b3e199deaacdc17735b150b8a4f2451f755f48044109ef1aa3d4"
+            },
+            {
+              "locator": "scratch:fixwave/loki.accept.service_health.out",
+              "sha256": "a785ff7af5ffd35cf33348a4dea615c5ecaf4dd6e8b0fc7ab9184a5e01cad2a0"
+            }
+          ],
+          "returned_stage_lines": [
+            "loki | post_install | 0",
+            "loki | service_health | 0"
+          ],
+          "native_operations": [
+            "loki -verify-config",
+            "GET /ready"
+          ],
+          "boundary": "Actual retained wrapper output is distinct from the default sweep's skip. Direct native verifier/readiness stdout and the later 07:11 probe output are not retained in these selected files."
+        },
+        "wired": {
+          "status": "reported_G4_client_log_queries",
+          "evidence_class": "source_review",
+          "reported_service_names": [
+            "claude-code",
+            "codex-sdk-receipt",
+            "codex_cli_rs",
+            "codex_exec"
+          ],
+          "source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "json_pointer": "/records/2/final/slots/2/evidence/2",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+          },
+          "boundary": "Roadmap loopback query reports; not a fresh query."
+        },
+        "fresh_session_use": {
+          "status": "not_applicable",
+          "evidence_class": "source_review",
+          "basis": "Frozen PR #700 method requires fresh headless use only for client-facing tools; native clients export telemetry through the Collector.",
+          "source": {
+            "locator": "repo:evidence/artifacts/ns2604-e2e-20261004/method.md",
+            "sha256": "c166003013dcd1dd7f786977da74013e4987896958c2bba2344b5abbea049f5f"
+          },
+          "lines": [
+            58,
+            60
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "explicit-only-pass",
+          "evidence_class": "local_integration",
+          "sources": [
+            "scratch:fixwave/loki.accept.post_install.out",
+            "scratch:fixwave/loki.accept.service_health.out"
+          ],
+          "fact": "The two retained explicit-slot outputs contain stage result 0. They are plan-authored integration results over the pinned native operations."
+        },
+        {
+          "id": "default-sweep-skip",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/summary.json",
+            "json_pointer": "/full_sweeps",
+            "sha256": "827c3c19ba46d073c8da5a11fc2d37cc57e73043bd9fad1ef75d31066d1acf70"
+          },
+          "fact": "Both retained default sweeps skip Loki. This is not a native Loki failure or a passing Loki execution.",
+          "default_sweep": {
+            "post_install": "skipped",
+            "service_health": "skipped"
+          }
+        },
+        {
+          "id": "measurement-only-plan",
+          "evidence_class": "source_review",
+          "source": {
+            "locator": "repo:evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+            "json_pointer": "/owners/41",
+            "sha256": "44b2175638441c59b6fe3a46c6c5e5ce1d72fa5b8393dccd769cb82b2aad22a3"
+          },
+          "installed": false,
+          "measurement_only": true,
+          "upstream_sources": [
+            "loki-verify-config",
+            "loki-http-api"
+          ]
+        },
+        {
+          "id": "configuration-drift",
+          "evidence_class": "source_review",
+          "source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "json_pointer": "/records/2/final/slots/2/evidence/3",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+          },
+          "fact": "Roadmap reports deployed/repository drift in log level and structured-metadata/OTLP settings. No deployed configuration was read or copied by this writer."
+        }
+      ],
+      "retained_failures": [
+        {
+          "kind": "default-skip",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/summary.json",
+            "json_pointer": "/full_sweeps",
+            "sha256": "827c3c19ba46d073c8da5a11fc2d37cc57e73043bd9fad1ef75d31066d1acf70"
+          },
+          "disposition": "Retained as skip; not converted to pass."
+        }
+      ],
+      "scope": "Explicit --only acceptance is kept separate from measurement-only/default-sweep disposition.",
+      "open_items": [
+        "Bind direct native verifier/readiness and client-log query outputs from the later post-G4 A/B probes.",
+        "Owner-native reconciliation of the measurement-only declaration and config drift.",
+        "Loki ruler qualification remains the documented measurement-only owner item.",
+        "Independent review before catalog promotion."
+      ]
+    },
+    {
+      "slot_id": "alerting",
+      "catalog_slot": "observation-inference/alerting",
+      "roadmap_verdict": {
+        "verdict": "READY",
+        "evidence_class": "source_review",
+        "provisional": true,
+        "source": {
+          "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+          "json_pointer": "/records/2/final/slots/4",
+          "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+        },
+        "reported_cross_family_agreement": true,
+        "confidence": "medium",
+        "independent_publication_read": "pending"
+      },
+      "four_condition_evidence": {
+        "present": {
+          "status": "reported_version_match; retained_native_version_output_not_located",
+          "evidence_class": "source_review",
+          "reported_release": "v0.34.1",
+          "reported_revision": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+          "source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "json_pointer": "/records/2/final/slots/4/evidence/0",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+          }
+        },
+        "upstream_acceptance": {
+          "status": "retained_local_stage_passes_with_modified_delivery_and_cached_confirmation",
+          "evidence_class": "local_integration",
+          "sources": [
+            {
+              "locator": "scratch:fixwave/alerting.telegram.post_install.out",
+              "sha256": "b9f22540189d36f263b592b7cd3ff90e68697ccef6cf4da06d174cfeadb137f8"
+            },
+            {
+              "locator": "scratch:fixwave/alerting.telegram.service_health.retry1.out",
+              "sha256": "ac1d1e14b222501733d3ce00562bd597fc76e7581d191d2309edee6d11768555"
+            },
+            {
+              "locator": "scratch:fixwave/alerting.telegram.after_sign_in.attested.out",
+              "sha256": "cc995c37bc0ea0e2346cfce29d8423a413898196769ae879b4c1409f65ac496e"
+            }
+          ],
+          "native_operations": [
+            "amtool check-config",
+            "promtool check rules",
+            "GET /-/ready",
+            "Prometheus discovery/rule queries"
+          ],
+          "synthetic_component": {
+            "operation": "promtool test rules",
+            "evidence_class": "synthetic",
+            "source": {
+              "locator": "repo:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+              "sha256": "719c3386ff4e4edda10dbe3d23e7599d097b0a27dee92c061d92ebc438a26d79"
+            },
+            "boundary": "Locally authored rule fixture; not unchanged upstream tests."
+          },
+          "boundary": "06:58 cached confirmation is not an unmodified fresh delivery pass; initial exit-0 skip remains below."
+        },
+        "wired": {
+          "status": "delivery_receipt_and_confirmation_join_verified; current_receiver/counters_reported",
+          "evidence_class": "local_integration",
+          "receipt_join": {
+            "receipt_and_confirmation_acceptance_id_equal": true,
+            "receipt_observed_at": "2026-10-05T06:46:35.253Z",
+            "confirmation_at": "2026-10-05T06:58:29Z",
+            "cache_age_seconds": 713.7461667480469
+          },
+          "config_sha256": "e141c47d83040eec66e45695d7ea07a99d88b6102a08b2f5d781ec000c15efdd",
+          "source": {
+            "locator": "native-state:alerting/alerting-delivery-receipt.json",
+            "sha256": "5994801fa9e440c9c9e44eadc669a24e30dda5503a2c19701fa3992c1c49dfe2"
+          },
+          "boundary": "The unmodified cached check's retained exit 0 and unchanged source assert the config hash matched at 06:58. This writer did not rehash/read active configuration. The later current-hash/counter reports remain source_review."
+        },
+        "fresh_session_use": {
+          "status": "not_applicable",
+          "evidence_class": "source_review",
+          "basis": "Frozen PR #700 method requires fresh headless use only for client-facing tools; native clients export telemetry through the Collector.",
+          "source": {
+            "locator": "repo:evidence/artifacts/ns2604-e2e-20261004/method.md",
+            "sha256": "c166003013dcd1dd7f786977da74013e4987896958c2bba2344b5abbea049f5f"
+          },
+          "lines": [
+            58,
+            60
+          ]
+        }
+      },
+      "observations": [
+        {
+          "id": "initial-attempt",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/alerting.json",
+            "json_pointer": "/stages",
+            "sha256": "5b29adac6afc59b3275b6d2ed99bbcab733e2d6bed59baea3b79743fa4f7525e"
+          },
+          "stages": {
+            "post_install": {
+              "rc": 0,
+              "started": "2026-10-05T03:25:52Z",
+              "ended": "2026-10-05T03:25:52Z",
+              "line": "alerting | post_install | 0"
+            },
+            "service_health": {
+              "rc": 1,
+              "started": "2026-10-05T03:25:52Z",
+              "ended": "2026-10-05T03:25:52Z",
+              "line": "alerting | service_health | 1",
+              "stderr_tail": ""
+            },
+            "after_sign_in": {
+              "rc": 0,
+              "started": "2026-10-05T03:25:52Z",
+              "ended": "2026-10-05T03:25:52Z",
+              "line": "alerting | after_sign_in | skipped"
+            }
+          },
+          "boundary": "after_sign_in returned wrapper rc 0 with a skipped line; it is not a delivery pass."
+        },
+        {
+          "id": "telegram-stage-sequence",
+          "evidence_class": "local_integration",
+          "sources": [
+            "scratch:fixwave/alerting.telegram.post_install.out",
+            "scratch:fixwave/alerting.telegram.service_health.out",
+            "scratch:fixwave/alerting.telegram.service_health.retry1.out",
+            "scratch:fixwave/alerting.telegram.after_sign_in.out",
+            "scratch:fixwave/alerting.telegram.after_sign_in.mirrored.out",
+            "scratch:fixwave/alerting.telegram.after_sign_in.attested.out"
+          ],
+          "stages": {
+            "post_install": 0,
+            "service_health_initial": 1,
+            "service_health_retry1": 0,
+            "after_sign_in_unmodified_initial": 1,
+            "after_sign_in_attested_cache": 0
+          },
+          "observed_window": "2026-10-05T06:43Z/2026-10-05T06:58Z",
+          "boundary": "Window and attempt times come from the retained co-op receipt/roadmap; wrapper stdout lines independently preserve success/failure. Mirrored stdout is empty, so that file is not a native success proof."
+        },
+        {
+          "id": "retained-delivery",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "native-state:alerting/alerting-delivery-receipt.json",
+            "sha256": "5994801fa9e440c9c9e44eadc669a24e30dda5503a2c19701fa3992c1c49dfe2"
+          },
+          "observed_at": "2026-10-05T06:46:35.253Z",
+          "rule_fired": true,
+          "rule_resolved": true,
+          "notification_delta": 4,
+          "config_sha256": "e141c47d83040eec66e45695d7ea07a99d88b6102a08b2f5d781ec000c15efdd",
+          "variant": {
+            "locator": "scratch:fixwave/alerting-after-sign-in-mirrored.sh",
+            "sha256": "388cbc8b78c2493abb69a084627db840e51cfe781042facc0dd3bc18dffed37a"
+          },
+          "boundary": "Co-op receipt produced by the plan-derived mirrored-network variant. Its nonzero closed-port assertion differs from the native plan's errno-111 assertion; not an unmodified upstream/fresh acceptance."
+        },
+        {
+          "id": "cached-attestation",
+          "evidence_class": "user_attestation",
+          "source": {
+            "locator": "native-state:alerting/alerting-receiver-confirmation.json",
+            "sha256": "0b6cb3ce9faa4e02064c3e18972597b6a901bfddc7f107513828c80c2f775ab4"
+          },
+          "confirmed_at": "2026-10-05T06:58:29Z",
+          "firing_received": true,
+          "resolved_received": true,
+          "provenance": "not_verified",
+          "acceptance_id_join": true,
+          "cache_age_seconds": 714,
+          "boundary": "User attribution is a field in the retained confirmation, not an independently authenticated assertion. The 1800-second cache is expired at this inspection."
+        },
+        {
+          "id": "later-counters-and-current-config-hash",
+          "evidence_class": "source_review",
+          "sources": [
+            "coord:readiness-20261005/readiness-roadmap-20261005.json#/records/2/final/slots/4/evidence/3",
+            "coord:readiness-20261005/readiness-roadmap-20261005.json#/records/2/final/slots/4/adjudication_note"
+          ],
+          "reported_telegram_notifications_total": 6,
+          "reported_telegram_notifications_failed_total": 0,
+          "reported_current_config_hash_matches_receipt": true,
+          "boundary": "A/B loopback counter reads and later recomputation are reported in the roadmap. Their original non-conversation outputs were not located; notification_delta 4 in the actual receipt is separately verified."
+        },
+        {
+          "id": "cache-code-binding",
+          "evidence_class": "source_review",
+          "source": {
+            "locator": "repo:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+            "sha256": "719c3386ff4e4edda10dbe3d23e7599d097b0a27dee92c061d92ebc438a26d79"
+          },
+          "lines": [
+            883,
+            900
+          ],
+          "upstream_sources": [
+            "alertmanager-configuration"
+          ],
+          "fact": "Hash-identical 4c source checks receipt age, config SHA, matching acceptance IDs, firing/resolved receipt flags and user confirmation before its cache return."
+        }
+      ],
+      "retained_failures": [
+        {
+          "stage": "install",
+          "rc": 1,
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/alerting.json",
+            "json_pointer": "/install",
+            "sha256": "5b29adac6afc59b3275b6d2ed99bbcab733e2d6bed59baea3b79743fa4f7525e"
+          },
+          "cause": "Pre-G4 operator Prometheus configuration retained; plan defect 15."
+        },
+        {
+          "stage": "service_health",
+          "rc": 1,
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/alerting.json",
+            "json_pointer": "/stages/service_health",
+            "sha256": "5b29adac6afc59b3275b6d2ed99bbcab733e2d6bed59baea3b79743fa4f7525e"
+          },
+          "cause": "Before G4 rules."
+        },
+        {
+          "stage": "after_sign_in",
+          "rc": 0,
+          "disposition": "skipped",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/alerting.json",
+            "json_pointer": "/stages/after_sign_in",
+            "sha256": "5b29adac6afc59b3275b6d2ed99bbcab733e2d6bed59baea3b79743fa4f7525e"
+          }
+        },
+        {
+          "stage": "service_health",
+          "attempt": "telegram-1",
+          "rc": 1,
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/alerting.telegram.service_health.out",
+            "sha256": "fb62bb93552635d9ac9c552a4dd17e3115093c170b5ad0e3e3e9887f279b5205"
+          },
+          "cause": "Before first rule evaluation; retry returned 0."
+        },
+        {
+          "stage": "after_sign_in",
+          "attempt": "telegram-unmodified",
+          "rc": 1,
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "scratch:fixwave/alerting.telegram.after_sign_in.out",
+            "sha256": "47148fdf87c91c14784ade6b486c5fcac45fc73fe5109647b116f95adc6fbc42"
+          },
+          "cause": "Mirrored-network closed-port errno precondition; defect 14."
+        }
+      ],
+      "scope": "Telegram firing/resolved receipt plus cached confirmation, no new delivery and no current receiver/configuration read.",
+      "open_items": [
+        "Defect 14 still prevents an unmodified fresh acceptance under the recorded network condition; preserve modified-run/cache distinctions.",
+        "Roadmap reports a #713 receiver-policy conflict and undeclared destination files. Owner/current-lane status must be checked before claiming these fixed; this writer neither inventories credentials nor reads settings.",
+        "Retain original A/B counters and later config-hash recomputation outputs if needed for stronger provenance.",
+        "Authenticate/review the attestation provenance independently; do not equate it with a native Telegram receipt.",
+        "Independent review/adjudication before catalog promotion."
+      ]
+    },
+    {
+      "slot_id": "session-analytics",
+      "catalog_slot": "observation-inference/session-analytics",
+      "roadmap_verdict": {
+        "verdict": "READY",
+        "evidence_class": "source_review",
+        "provisional": true,
+        "source": {
+          "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+          "json_pointer": "/records/3/final/slots/3",
+          "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+        },
+        "reported_cross_family_agreement": true,
+        "confidence": "medium",
+        "independent_publication_read": "pending"
+      },
+      "four_condition_evidence": {
+        "present": {
+          "status": "retained_daemon_version_matches_plan_release; later_version_command_reported",
+          "evidence_class": "local_integration",
+          "release": "v0.43.0",
+          "source": {
+            "locator": "native-state:acceptance/session-analytics/service.8yU0G1/daemon.txt",
+            "sha256": "73f83249b26f610c4f4ca3e4398e18d0efb12a7d94362cf8ee35f94b257ea2cd"
+          },
+          "upstream_pin": "kenn-io/agentsview@9be7745ad1906ee24e04eb05bb86c872ef0939a1",
+          "boundary": "Original daemon output contains v0.43.0. The roadmap reports --version commit 9be7745a; that standalone output was not located. No binary was executed here."
+        },
+        "upstream_acceptance": {
+          "status": "retained_native_outputs_support_plan_predicates; wrapper_acceptance_is_local_integration",
+          "evidence_class": "local_integration",
+          "sources": [
+            {
+              "locator": "scratch:fixwave/session-analytics.rerun2.service_health.out",
+              "sha256": "b7b0137803fe9a051bb75d3a7fe2d47f557d0b24f8a93e96e6529aa7a673e965"
+            },
+            {
+              "locator": "scratch:fixwave/session-analytics.rerun2.after_sign_in.out",
+              "sha256": "6e7577d182bd5a7e7597273e8734d854fcff16b8e95b5beb24519d2858610dd7"
+            }
+          ],
+          "boundary": "Original plan runs native daemon/sync/session/usage operations, but its predicates and fresh-session controls are locally authored. No unchanged upstream suite claim."
+        },
+        "wired": {
+          "status": "retained_owned-archive_daemon_sync_and_usage_outputs; launcher/link_state_reported",
+          "evidence_class": "local_integration",
+          "sources": [
+            {
+              "locator": "native-state:acceptance/session-analytics/service.8yU0G1/daemon.txt",
+              "sha256": "73f83249b26f610c4f4ca3e4398e18d0efb12a7d94362cf8ee35f94b257ea2cd"
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.8yU0G1/sync.txt",
+              "sha256": "8a0e79cdd3fb3bedb4ccfafdea729865d42d7269e6ab41f51c9007b53c935684"
+            }
+          ],
+          "reported_launcher_binding_source": {
+            "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+            "json_pointer": "/records/3/final/slots/3/evidence/1",
+            "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078"
+          },
+          "boundary": "Native retained outputs support the dated archive use. This writer does not read active config or current links and does not start a daemon."
+        },
+        "fresh_session_use": {
+          "status": "retained_two_family_metadata_after_T0_with_failing_absent_control",
+          "evidence_class": "local_integration",
+          "started_at_utc": "2026-10-05T03:31:56Z",
+          "families": [
+            {
+              "agent": "claude",
+              "message_count": 2,
+              "started_at": "2026-10-05T03:31:57.547Z",
+              "source": "native-state:acceptance/session-analytics/fresh.ZZKWtL/claude.json"
+            },
+            {
+              "agent": "codex",
+              "message_count": 2,
+              "started_at": "2026-10-05T03:32:02.699Z",
+              "source": "native-state:acceptance/session-analytics/fresh.ZZKWtL/codex.json"
+            }
+          ],
+          "absent_control": {
+            "returned_exit": 1,
+            "source": {
+              "locator": "native-state:acceptance/session-analytics/fresh.ZZKWtL/absent-exit.txt",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+            }
+          },
+          "boundary": "Only metadata is projected; session IDs, messages and personal paths are omitted. Both timestamps are after T0 and both message counts are positive. This is the retained 03:32 run, not a new model call."
+        }
+      },
+      "observations": [
+        {
+          "id": "retained-service-predicates",
+          "evidence_class": "local_integration",
+          "observed_runs": [
+            {
+              "run": "service.VVvuXY",
+              "recorded_at": "2026-10-05T03:31:47Z"
+            },
+            {
+              "run": "service.8yU0G1",
+              "recorded_at": "2026-10-05T07:27:02Z"
+            }
+          ],
+          "native_commands": [
+            "agentsview daemon status",
+            "agentsview sync",
+            "agentsview session list",
+            "agentsview usage daily --offline --no-sync"
+          ],
+          "outputs": [
+            {
+              "locator": "native-state:acceptance/session-analytics/service.8yU0G1/daemon.txt",
+              "running": true,
+              "version": "v0.43.0"
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.VVvuXY/daemon.txt",
+              "running": true,
+              "version": "v0.43.0"
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.1oXbUf/daemon.txt",
+              "running": false
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.RWPdsW/daemon.txt",
+              "running": false
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.0yeyEx/daemon.txt",
+              "running": false
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.8yU0G1/claude-sessions.json",
+              "metadata": {
+                "sessions": 1,
+                "agent_matches": true,
+                "positive_message_counts": true
+              }
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.8yU0G1/claude-usage.json",
+              "metadata": {
+                "daily_entries": 4,
+                "positive_token_total": true
+              }
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.8yU0G1/codex-sessions.json",
+              "metadata": {
+                "sessions": 1,
+                "agent_matches": true,
+                "positive_message_counts": true
+              }
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.8yU0G1/codex-usage.json",
+              "metadata": {
+                "daily_entries": 4,
+                "positive_token_total": true
+              }
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.8yU0G1/sync.txt",
+              "synced": 3
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.VVvuXY/claude-sessions.json",
+              "metadata": {
+                "sessions": 1,
+                "agent_matches": true,
+                "positive_message_counts": true
+              }
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.VVvuXY/claude-usage.json",
+              "metadata": {
+                "daily_entries": 3,
+                "positive_token_total": true
+              }
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.VVvuXY/codex-sessions.json",
+              "metadata": {
+                "sessions": 1,
+                "agent_matches": true,
+                "positive_message_counts": true
+              }
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.VVvuXY/codex-usage.json",
+              "metadata": {
+                "daily_entries": 3,
+                "positive_token_total": true
+              }
+            },
+            {
+              "locator": "native-state:acceptance/session-analytics/service.VVvuXY/sync.txt",
+              "synced": 1
+            }
+          ],
+          "boundary": "Original native output hashes and predicate metadata support success and failure states at their recorded runs. Timestamps come from the roadmap; file contents are independently inspected. Provider totals are reduced to positive/zero predicates and are not aggregated."
+        },
+        {
+          "id": "attempt-order-and-footer-conflict",
+          "evidence_class": "local_integration",
+          "sources": [
+            "coord:fixwave-4c897418f/session-analytics.json#/reruns",
+            "scratch:fixwave/session-analytics.rerun.service_health.out",
+            "scratch:fixwave/session-analytics.rerun.after_sign_in.out",
+            "scratch:fixwave/session-analytics.rerun2.service_health.out",
+            "scratch:fixwave/session-analytics.rerun2.after_sign_in.out"
+          ],
+          "fact": "The receipt's final stages are all 0. First-rerun stdout actually contains service_health 1 and after_sign_in 1; second-rerun stdout contains 0/0. Both are retained. The final summary does not replace earlier failed attempts."
+        },
+        {
+          "id": "idle-exit-cause",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "native-state:agentsview/debug.log",
+            "sha256": "27cb0485ff0e8a5fa051a81b02e74e8a812f2d26dc2248e40b6a265606a48728"
+          },
+          "line": 1883,
+          "observed_at_utc": "2026-10-05T03:52:14Z",
+          "event": "idle timeout elapsed; shutting down daemon",
+          "subsequent_failed_run": "service.1oXbUf",
+          "failed_run_reported_at": "2026-10-05T04:05:27Z",
+          "upstream_sources": [
+            "agentsview-configuration",
+            "agentsview-readme"
+          ],
+          "boundary": "Selected log event independently exists. The subsequent failed daemon.txt and sweep failure are retained. No live process-state check is made."
+        },
+        {
+          "id": "record-conflict-resolution",
+          "evidence_class": "source_review",
+          "sources": [
+            "coord:fixwave-4c897418f/session-analytics.json#/final_stages",
+            "coord:fixwave-4c897418f/summary.json#/full_sweeps/service_health",
+            "coord:readiness-20261005/readiness-roadmap-20261005.json#/records/3/final/slots/3/evidence/9"
+          ],
+          "resolution": "Dated success and failure coexist. The operator final summary describes a successful run; the later default sweep observed an idle-exited daemon and failed. Successful retained 07:27 run data supports a later recovery state, not continuous liveness. Resolve the historical conflict as attempt/time scope; keep persistence risk open.",
+          "boundary": "This source reconciliation does not itself adjudicate READY or prove daemon liveness now."
+        },
+        {
+          "id": "partial-GPT-fresh-leg",
+          "evidence_class": "source_review",
+          "source": {
+            "locator": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json"
+          },
+          "fact": "The preexisting GPT leg review was PARTIAL with scope Codex fresh-session leg only. It is not overwritten by the roadmap's whole-slot READY verdict.",
+          "open_scope": "Original later standalone GPT query output not read from conversation streams."
+        }
+      ],
+      "retained_failures": [
+        {
+          "kind": "alias/install-and-initial-stages",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/session-analytics.json",
+            "json_pointer": "/stages",
+            "sha256": "4cc30acaac09677834d472001048d91d511707423eefc69aae8bb024225fa755"
+          },
+          "fact": "Initial install and stage failures predate owned-alias remediation; retain actual inner/outer rc distinction from the receipt."
+        },
+        {
+          "kind": "before-daemon",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "native-state:acceptance/session-analytics/service.0yeyEx/daemon.txt",
+            "sha256": "6b6e23c6319403c1e59eab8b87ccd8112e12258300564e8103547dc2ae41752a"
+          },
+          "daemon_running": false
+        },
+        {
+          "kind": "idle-exit",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "native-state:acceptance/session-analytics/service.1oXbUf/daemon.txt",
+            "sha256": "6b6e23c6319403c1e59eab8b87ccd8112e12258300564e8103547dc2ae41752a"
+          },
+          "daemon_running": false
+        },
+        {
+          "kind": "default-sweep-service_health",
+          "evidence_class": "local_integration",
+          "source": {
+            "locator": "coord:fixwave-4c897418f/summary.json",
+            "json_pointer": "/full_sweeps/service_health",
+            "sha256": "827c3c19ba46d073c8da5a11fc2d37cc57e73043bd9fad1ef75d31066d1acf70"
+          },
+          "rc": 1,
+          "window_utc": "2026-10-05T04:00:01Z/2026-10-05T04:06:34Z"
+        },
+        {
+          "kind": "first-rerun",
+          "evidence_class": "local_integration",
+          "sources": [
+            {
+              "locator": "scratch:fixwave/session-analytics.rerun.service_health.out",
+              "sha256": "c41cc6ba8b879e8665a8675371a0a3ad2e3cd79fdf614b6d964dea31c80e69f6"
+            },
+            {
+              "locator": "scratch:fixwave/session-analytics.rerun.after_sign_in.out",
+              "sha256": "1d5ead9aadf5fb19d417bac9e85e5c4d394a68ed93e1c62d797d266a8334e43d"
+            }
+          ],
+          "stages": {
+            "service_health": 1,
+            "after_sign_in": 1
+          }
+        }
+      ],
+      "scope": "Dated archive/daemon/session evidence and a bounded record-conflict correction; no current daemon or model acceptance.",
+      "open_items": [
+        "Owner-native durable lifecycle decision for the detached daemon's idle timeout; upstream documents supervised/foreground versus background behavior.",
+        "Retain exact standalone installed version and launcher/link outputs if required to bind revision and wiring beyond the dated metadata.",
+        "Independent whole-slot readiness review/adjudication at the final qualification head; preserve the prior GPT partial-leg scope.",
+        "Do not claim #723 fixed the daemon lifecycle: the roadmap reports alias migration only and no idle-timeout change."
+      ]
+    }
+  ],
+  "upstream_sources": [
+    {
+      "id": "promtool",
+      "evidence_class": "source_review",
+      "pin": "prometheus/prometheus@5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "docs/command-line/promtool.md",
+      "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/docs/command-line/promtool.md",
+      "verification": "Original pinned official file fetched; documents promtool check operations. Documentation is not execution."
+    },
+    {
+      "id": "prometheus-management",
+      "evidence_class": "source_review",
+      "pin": "prometheus/prometheus@5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "docs/management_api.md",
+      "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/docs/management_api.md",
+      "verification": "Original pinned official file fetched; /-/ready readiness semantics verified."
+    },
+    {
+      "id": "prometheus-feature-flags",
+      "evidence_class": "source_review",
+      "pin": "prometheus/prometheus@5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "docs/feature_flags.md",
+      "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/docs/feature_flags.md",
+      "verification": "Original pinned official file fetched for the documented service-owner accuracy flags; no flags applied."
+    },
+    {
+      "id": "loki-verify-config",
+      "evidence_class": "source_review",
+      "pin": "grafana/loki@09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "path": "pkg/loki/config_wrapper.go",
+      "line": 54,
+      "url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/pkg/loki/config_wrapper.go#L54",
+      "verification": "Original pinned source fetched; RegisterFlags binds verify-config."
+    },
+    {
+      "id": "loki-http-api",
+      "evidence_class": "source_review",
+      "pin": "grafana/loki@09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "path": "docs/sources/reference/loki-http-api.md",
+      "url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/docs/sources/reference/loki-http-api.md",
+      "verification": "Original pinned official API file fetched; readiness/query operations are documented."
+    },
+    {
+      "id": "alertmanager-configuration",
+      "evidence_class": "source_review",
+      "pin": "prometheus/alertmanager@73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+      "path": "docs/configuration.md",
+      "url": "https://github.com/prometheus/alertmanager/blob/73c6bfe7393929211294c1954f30d8ed78e4d0ad/docs/configuration.md",
+      "verification": "Original pinned official configuration file fetched; receiver configuration semantics only."
+    },
+    {
+      "id": "agentsview-readme",
+      "evidence_class": "source_review",
+      "pin": "kenn-io/agentsview@9be7745ad1906ee24e04eb05bb86c872ef0939a1",
+      "path": "README.md",
+      "url": "https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/README.md",
+      "verification": "Original canonical pinned README fetched; native CLI and background daemon behavior documented. Installed plan names kenn-io, so that is the retained source namespace."
+    },
+    {
+      "id": "agentsview-configuration",
+      "evidence_class": "source_review",
+      "pin": "kenn-io/agentsview@9be7745ad1906ee24e04eb05bb86c872ef0939a1",
+      "path": "docs/configuration.md",
+      "url": "https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/docs/configuration.md",
+      "verification": "Original pinned configuration guide fetched; background idle timeout, 0s and supervised-daemon behavior are source claims only."
+    }
+  ],
+  "source_hashes": {
+    "coord:readiness-20261005/readiness-roadmap-20261005.json": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078",
+    "coord:fixwave-4c897418f/alerting.json": "5b29adac6afc59b3275b6d2ed99bbcab733e2d6bed59baea3b79743fa4f7525e",
+    "coord:fixwave-4c897418f/session-analytics.json": "4cc30acaac09677834d472001048d91d511707423eefc69aae8bb024225fa755",
+    "coord:fixwave-4c897418f/summary.json": "827c3c19ba46d073c8da5a11fc2d37cc57e73043bd9fad1ef75d31066d1acf70",
+    "coord:row-session-analytics-3e343ba6.json": "f70f6bc865299d59f84fc6291a320e393e08c0aad7ab13e99566c41dbc417135",
+    "coord:agentsview-daemon-start.log": "db93d9fc0239478727e391274a4963218196f5aae00801b76db0b39de1f8dd12",
+    "repo:AGENTS.md": "40595dfcde0dea50175380e773d78ff5aca00be901a290ea634fef8b84fe64a1",
+    "repo:docs/acceptance-evidence-policy.md": "38ddfb80673ae86cad110a65a9cc938bb974d65a34bb9638b7a0f96d3e2ef508",
+    "repo:evidence/artifacts/ns2604-e2e-20261004/method.md": "c166003013dcd1dd7f786977da74013e4987896958c2bba2344b5abbea049f5f",
+    "repo:evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json": "44b2175638441c59b6fe3a46c6c5e5ce1d72fa5b8393dccd769cb82b2aad22a3",
+    "repo:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh": "719c3386ff4e4edda10dbe3d23e7599d097b0a27dee92c061d92ebc438a26d79",
+    "repo:evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md": "073b250d7d55f038979a9921e6599a7f5fcf8e3557129ed1f0f8ba61b6766d0c",
+    "repo:docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md": "9624d0106adc05891f91f6552a9e97a66795f9fdc579f95ee785007ba8fef99d",
+    "scratch:fixwave/alerting.telegram.post_install.out": "b9f22540189d36f263b592b7cd3ff90e68697ccef6cf4da06d174cfeadb137f8",
+    "scratch:fixwave/alerting.telegram.service_health.out": "fb62bb93552635d9ac9c552a4dd17e3115093c170b5ad0e3e3e9887f279b5205",
+    "scratch:fixwave/alerting.telegram.service_health.retry1.out": "ac1d1e14b222501733d3ce00562bd597fc76e7581d191d2309edee6d11768555",
+    "scratch:fixwave/alerting.telegram.after_sign_in.out": "47148fdf87c91c14784ade6b486c5fcac45fc73fe5109647b116f95adc6fbc42",
+    "scratch:fixwave/alerting.telegram.after_sign_in.mirrored.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch:fixwave/alerting.telegram.after_sign_in.attested.out": "cc995c37bc0ea0e2346cfce29d8423a413898196769ae879b4c1409f65ac496e",
+    "scratch:fixwave/loki.accept.post_install.out": "c12c8954bc72b3e199deaacdc17735b150b8a4f2451f755f48044109ef1aa3d4",
+    "scratch:fixwave/loki.accept.service_health.out": "a785ff7af5ffd35cf33348a4dea615c5ecaf4dd6e8b0fc7ab9184a5e01cad2a0",
+    "scratch:fixwave/session-analytics.rerun.after_sign_in.out": "1d5ead9aadf5fb19d417bac9e85e5c4d394a68ed93e1c62d797d266a8334e43d",
+    "scratch:fixwave/session-analytics.rerun.service_health.out": "c41cc6ba8b879e8665a8675371a0a3ad2e3cd79fdf614b6d964dea31c80e69f6",
+    "native-state:acceptance/session-analytics/service.8yU0G1/daemon.txt": "73f83249b26f610c4f4ca3e4398e18d0efb12a7d94362cf8ee35f94b257ea2cd",
+    "native-state:acceptance/session-analytics/service.VVvuXY/daemon.txt": "6e7b8219d07465cc4883b64380fb6d198b48b32c4143ac3ffde93152426a987a",
+    "native-state:acceptance/session-analytics/service.1oXbUf/daemon.txt": "6b6e23c6319403c1e59eab8b87ccd8112e12258300564e8103547dc2ae41752a",
+    "native-state:acceptance/session-analytics/service.RWPdsW/daemon.txt": "6b6e23c6319403c1e59eab8b87ccd8112e12258300564e8103547dc2ae41752a",
+    "native-state:acceptance/session-analytics/service.0yeyEx/daemon.txt": "6b6e23c6319403c1e59eab8b87ccd8112e12258300564e8103547dc2ae41752a",
+    "native-state:acceptance/session-analytics/fresh.ZZKWtL/claude.json": "08722f4811c13f8a7b8827f8234dce877bace1a97c8e05e8f9a49e48668ef187",
+    "native-state:acceptance/session-analytics/fresh.ZZKWtL/codex.json": "a32aee6ff82f9c4a58123e7ed9d1a21e2c981db96e2bf8c975ced158c4d4c3e8",
+    "native-state:acceptance/session-analytics/fresh.ZZKWtL/absent-exit.txt": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "native-state:acceptance/session-analytics/service.8yU0G1/claude-sessions.json": "ad17d3eb8de0ffe8d5ca4fa5605c95d280aef0a33b9fd630d70b310b1a7c0217",
+    "native-state:acceptance/session-analytics/service.8yU0G1/claude-usage.json": "c7a2240cc18d984a36d6028ed7ae9f89cadc7a2a275dc920c06bb30ecfa7c18c",
+    "native-state:acceptance/session-analytics/service.8yU0G1/codex-sessions.json": "e14ebc4827089006e7a87c12612425ef86046c1fcac5f029529d25bdd51f04b1",
+    "native-state:acceptance/session-analytics/service.8yU0G1/codex-usage.json": "c0b1c4bf0761e4389048c91d532dde5f4284d16cf6bdaf42e2e6c1586d412603",
+    "native-state:acceptance/session-analytics/service.8yU0G1/sync.txt": "8a0e79cdd3fb3bedb4ccfafdea729865d42d7269e6ab41f51c9007b53c935684",
+    "native-state:acceptance/session-analytics/service.VVvuXY/claude-sessions.json": "c6d38f12d58a258aa8c2486df2884e0c8cf3d4c51111a0478917429f0871e745",
+    "native-state:acceptance/session-analytics/service.VVvuXY/claude-usage.json": "354a7ad447a6028c92daa6dd903f63b34ce172a6819f78fc178357f15ca2a4e5",
+    "native-state:acceptance/session-analytics/service.VVvuXY/codex-sessions.json": "d7bdaa57c5ce830bf3ef19ea0bf21c8341320fcdadea0ea686ee1f5b1ed605e5",
+    "native-state:acceptance/session-analytics/service.VVvuXY/codex-usage.json": "da3068eb66ed926c8d75321b1a37cb8b48a69d1b40592cce4407e7e0f11e2793",
+    "native-state:acceptance/session-analytics/service.VVvuXY/sync.txt": "ed7710d9fa7e5b418180f59ead24c6029943596bf4ffee3f044f6842fbc0bcdf",
+    "native-state:alerting/alerting-delivery-receipt.json": "5994801fa9e440c9c9e44eadc669a24e30dda5503a2c19701fa3992c1c49dfe2",
+    "native-state:alerting/alerting-receiver-confirmation.json": "0b6cb3ce9faa4e02064c3e18972597b6a901bfddc7f107513828c80c2f775ab4",
+    "scratch:fixwave/alerting-after-sign-in-mirrored.sh": "388cbc8b78c2493abb69a084627db840e51cfe781042facc0dd3bc18dffed37a",
+    "scratch:obs-a-alerting-plan-after-sign-in.sh": "f9159dad1ecfe942bb0d256d977a2c879dca5f0348651c92e2b89e510268a50c",
+    "scratch:fixwave/alerting.telegram.after_sign_in.attested.err": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch:fixwave/alerting.telegram.after_sign_in.mirrored.err": "09d84da749b5ecbc88a607d036aac5a77d65728489d67d996b8bfc5197097067",
+    "scratch:fixwave/session-analytics.rerun2.service_health.out": "b7b0137803fe9a051bb75d3a7fe2d47f557d0b24f8a93e96e6529aa7a673e965",
+    "scratch:fixwave/session-analytics.rerun2.after_sign_in.out": "6e7577d182bd5a7e7597273e8734d854fcff16b8e95b5beb24519d2858610dd7",
+    "native-state:agentsview/debug.log": "27cb0485ff0e8a5fa051a81b02e74e8a812f2d26dc2248e40b6a265606a48728"
+  },
+  "sanitization": {
+    "raw_conversations_copied": false,
+    "credential_files_read": false,
+    "active_client_configuration_read": false,
+    "service_configuration_read": false,
+    "personal_paths_copied": false,
+    "session_ids_copied": false,
+    "method": "Inspect selected original bytes outside model context; retain hashes, stage lines and metadata predicates. Source aliases replace host paths. Attestation attribution is explicitly unverified; no credential values or user message text is emitted."
+  },
+  "limitations": [
+    "Missing direct post-G4 native probe outputs remain explicit. Roadmap A/B observations and counter/hash recomputations are leads unless original outputs are retained.",
+    "Native acceptance sources are plan-authored wrappers; no wrapper footer, synthetic rule fixture, source review or model verdict is promoted into unchanged upstream acceptance.",
+    "Source files are mutable private originals, hashed at inspection; this artifact does not make them immutable archives or prove current host state.",
+    "No readiness numerator, denominator or percentage is derived."
+  ]
+}

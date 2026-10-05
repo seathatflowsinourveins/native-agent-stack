@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-roadmap-evidence-20261005",
+  "kind": "historical_inventory",
+  "recorded_at_utc": "2026-10-05T10:57:55Z",
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "omniroute"
+  ],
+  "claim": "Documentary supplement to the 2026-10-05 NativeStack2604 source capture. Retained observations, documented exclusions and memory/skill chronology are presented for independent review. Roadmap judgments are provisional source review, not a final dated 80-slot qualification or upstream acceptance. This publication executes no native acceptance, provider request or upstream test and supplies no new readiness numerator.",
+  "limitations": [
+    "This historical documentary capture is not live verification or a new host execution. Its independent public projection review remains pending.",
+    "The command center's final verified E2E remains the sole source for new readiness. Selected model reviews and their adjudication do not replace the full 80-slot qualification.",
+    "Retained native operations, unchanged upstream tests, local wrappers, synthetic fixtures, source review and structural checks retain separate classes and host/attempt scopes.",
+    "Old failures and skips remain historical observations. Later success is tied to its own source, time and inputs; it does not rewrite an earlier process result.",
+    "The original host receipt remains an initial-capture record. This separate supplement does not change its handbook projection while catalog/generated paths await PR #713.",
+    "Job4 awaits each owner's stages2–5, independent review and adjudication. The PR #723 receipt will be cited only after merge by merged commit and JSON path. Job5 awaits PR #713.",
+    "This receipt's public projection awaits the command center's independent cross-family read. A same-family source critic and local validator establish source consistency only."
+  ],
+  "data": {
+    "host": "NativeStack2604",
+    "source_workflow": "wf_cfa1d860-ebd",
+    "source_class": "historical_inventory",
+    "north_star_action": "Give portable complex engineering and later broker-specific research/paper qualification an accurate inventory of retained foundation evidence and open gates.",
+    "new_qualification": false,
+    "new_readiness_numerator": null,
+    "roadmap_statuses_are_provisional": true,
+    "independent_publication_review": "pending command-center cross-family read",
+    "original_receipt": "evidence/receipts/ns2604-requalification-20261005.json",
+    "artifacts": [
+      "evidence/artifacts/ns2604-requalification-20261005/roadmap-observation.json",
+      "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "evidence/artifacts/ns2604-requalification-20261005/roadmap-memory-skills.json"
+    ],
+    "decision_record": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
+    "method_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:evidence/artifacts/ns2604-e2e-20261004/method.md:56-72",
+    "readiness_authority": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-04-ns2604-verified-e2e.md:114-121",
+    "evidence_policy": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/acceptance-evidence-policy.md:19",
+    "sanitization": "No raw conversations, session/account identities, host paths, credential values or active client configuration. Private proof locators use documented logical prefixes and byte hashes."
+  }
+}
