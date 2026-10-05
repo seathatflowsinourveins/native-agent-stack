@@ -644,8 +644,11 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
     RUNTIME_TAG_KEYS) takes its upstream latest from the tags github_freshness.py
     listed for the declared prefix (``apply_tag_declaration``), before the pin is
     compared, so a tag-only or monorepo upstream is compared by its own version
-    tags. A missing or failed tag list only sets ``latest_source``
-    RUNTIME_TAG_PATTERN_UNFETCHED. A cut tag list sets RUNTIME_TAG_PATTERN_TRUNCATED,
+    tags. A missing or failed tag list sets ``latest_source``
+    RUNTIME_TAG_PATTERN_UNFETCHED; no matching tag sets RUNTIME_TAG_PATTERN_UNMATCHED.
+    On either miss, a prerelease-shaped pin is ``not_compared`` with that reason:
+    the displayed release fallback can belong to another package. A cut tag list
+    sets RUNTIME_TAG_PATTERN_TRUNCATED,
     and a pinned row with it is ``not_compared`` with the reason
     RUNTIME_TAG_LIST_TRUNCATED (an unresolved or watch-only row keeps its own reason).
     Every other row's upstream is compute_upstream's, unchanged."""
@@ -668,6 +671,12 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
             # among the names github_freshness.py did not keep.
             pin_fields = {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
                           "pin_comparison_reason": RUNTIME_TAG_LIST_TRUNCATED}
+        elif (upstream.get("latest_source") in (RUNTIME_TAG_PATTERN_UNFETCHED, RUNTIME_TAG_PATTERN_UNMATCHED)
+              and _load_release_currency().is_prerelease_pin(pin.get("pin"))):
+            # A declared package's tags did not establish its version. The
+            # repository's release fallback may belong to another package.
+            pin_fields = {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
+                          "pin_comparison_reason": upstream["latest_source"]}
         else:
             pin_fields = pin_comparison_fields(classify_pin(
                 pin.get("pin"), repository, upstream.get("latest"),

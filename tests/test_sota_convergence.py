@@ -4,6 +4,7 @@ Modules are loaded by file path (tools/sota-convergence is not a dotted-import
 package name) and skipped cleanly if a required stdlib module is unexpectedly
 absent from the interpreter under test.
 """
+import ast
 import importlib.util
 import json
 import re
@@ -87,13 +88,31 @@ class FreshnessReviewThreadTests(unittest.TestCase):
             table.append(line)
         expected = (
             ("Executing a freshness sibling while importing a verdict helper", "tests/test_catalog_freshness_trading.py",
-             "test_import_does_not_load_currency_or_call_network_or_file_helpers"),
+             ("BuildManifestImportTests.test_import_does_not_load_currency_or_call_network_or_file_helpers",)),
             ("Reporting an unknown release stream as an empty release history", "tests/test_catalog_freshness_propose.py",
-             "test_truncated_prerelease_list_is_unknown_in_drift_report"),
+             ("BuildDriftReportTests.test_truncated_prerelease_list_is_unknown_in_drift_report",
+              "BuildDriftReportTests.test_no_release_in_pinned_major_is_unknown_in_drift_report")),
             ("Applying the release-stream parser to a declared prefixed tag", "tests/test_catalog_freshness_runtime.py",
-             "test_prerelease_pin_keeps_numeric_comparison_for_a_prefixed_tag_declaration"),
+             ("RuntimeTagPatternRowTests.test_prerelease_pin_keeps_numeric_comparison_for_a_prefixed_tag_declaration",)),
+            ("Fetching unused release metadata for a declared-tag row", "tests/test_catalog_freshness_runtime.py",
+             ("GithubFreshnessReadsRuntimePinsTests.test_tag_declared_prerelease_does_not_fetch_unused_list_or_suppress_shared_drift",
+              "RuntimeTagPatternRowTests.test_tag_declared_prerelease_keeps_release_fallback_when_the_tag_list_is_missing")),
+            ("Ignoring selected prerelease activity when reporting dormancy", "tests/test_sota_convergence.py",
+             ("FreshnessReviewThreadTests.test_selected_rc_publication_prevents_false_dormancy_in_trading_and_runtime",)),
+            ("Ranking version currency by publication time", "tests/test_sota_convergence.py",
+             ("FreshnessReviewThreadTests.test_republished_lower_rc_does_not_hide_higher_version_drift",)),
+            ("Retaining stale alias records after a repository refetch", "tests/test_sota_convergence.py",
+             ("FreshnessReviewThreadTests.test_refetch_replaces_every_stale_alias_and_resume_reads_the_fresh_record",)),
+            ("Assuming retained snapshot values are dictionaries during alias cleanup", "tests/test_sota_convergence.py",
+             ("FreshnessReviewThreadTests.test_refetch_skips_unrelated_non_dict_records_and_normalizes_alias_urls",)),
+            ("Claiming anti-pattern verification beyond the checked rows and methods", "tests/test_sota_convergence.py",
+             ("FreshnessReviewThreadTests.test_prior_repairs_have_unique_anti_pattern_rows_with_prevention_and_verification",
+              "FreshnessReviewThreadTests.test_anti_pattern_verification_rejects_missing_rows_and_invalid_citations")),
+            ("Comparing a prerelease package pin against an unrelated release fallback", "tests/test_catalog_freshness_runtime.py",
+             ("RuntimeTagPatternRowTests.test_prerelease_tag_misses_do_not_compare_another_packages_release",
+              "RuntimeTagPatternRowTests.test_tag_declared_prerelease_keeps_release_fallback_when_the_tag_list_is_missing")),
         )
-        for mistake, path, method in expected:
+        for mistake, path, methods in expected:
             with self.subTest(mistake=mistake):
                 rows = [line for line in table if line.split("|")[2].strip() == mistake]
                 self.assertEqual(len(rows), 1, f"missing or duplicate anti-pattern row: {mistake}")
@@ -101,8 +120,91 @@ class FreshnessReviewThreadTests(unittest.TestCase):
                 self.assertEqual(len(columns), 5)
                 self.assertTrue(all(columns))
                 self.assertIn(path, columns[4])
-                self.assertIn(method, columns[4])
-                self.assertIn(f"def {method}(", (ROOT / path).read_text())
+                citations = re.findall(r"\b([A-Za-z_]\w*\.test_\w+)\b", columns[4])
+                self.assertTrue(set(methods).issubset(citations), f"missing cited Class.method: {methods}")
+                definitions = {node.name: {method.name for method in node.body
+                                           if isinstance(method, (ast.FunctionDef, ast.AsyncFunctionDef))}
+                               for node in ast.parse((ROOT / path).read_text()).body
+                               if isinstance(node, ast.ClassDef)}
+                for citation in citations:
+                    class_name, method_name = citation.split(".")
+                    self.assertIn(class_name, definitions, f"missing cited class: {citation}")
+                    self.assertIn(method_name, definitions[class_name], f"missing cited method: {citation}")
+
+    def test_anti_pattern_verification_rejects_missing_rows_and_invalid_citations(self):
+        log_path = ROOT / "docs/harness-defaults.md"
+        original_read = Path.read_text
+        original_log = original_read(log_path)
+        thread_mistakes = (
+            "Fetching unused release metadata for a declared-tag row",
+            "Ignoring selected prerelease activity when reporting dormancy",
+            "Ranking version currency by publication time",
+            "Retaining stale alias records after a repository refetch",
+        )
+        mutations = {}
+        for mistake in thread_mistakes:
+            row = next(line for line in original_log.splitlines(keepends=True)
+                       if f"| {mistake} |" in line)
+            mutations[f"missing {mistake}"] = {log_path: original_log.replace(row, "")}
+            mutations[f"duplicate {mistake}"] = {log_path: original_log.replace(row, row + row)}
+        for method in (
+            "test_no_release_in_pinned_major_is_unknown_in_drift_report",
+            "test_tag_declared_prerelease_keeps_release_fallback_when_the_tag_list_is_missing",
+        ):
+            mutations[f"invalid second method {method}"] = {
+                log_path: original_log.replace(method, "test_missing_verification_method")}
+        mutations["wrong cited class"] = {log_path: original_log.replace(
+            "BuildManifestImportTests.", "MissingImportTests.")}
+        source = ROOT / "tests/test_catalog_freshness_trading.py"
+        mutations["missing declaring class"] = {source: original_read(source).replace(
+            "class BuildManifestImportTests(", "class RenamedImportTests(")}
+
+        for label, changed in mutations.items():
+            with self.subTest(mutation=label):
+                def read_text(path, *args, **kwargs):
+                    return changed[path] if path in changed else original_read(path, *args, **kwargs)
+
+                case = FreshnessReviewThreadTests(
+                    "test_prior_repairs_have_unique_anti_pattern_rows_with_prevention_and_verification")
+                result = unittest.TestResult()
+                with mock.patch.object(Path, "read_text", read_text):
+                    case.run(result)
+                self.assertFalse(result.errors, result.errors)
+                self.assertTrue(result.failures, f"accepted invalid verification: {label}")
+
+    def test_refetch_skips_unrelated_non_dict_records_and_normalizes_alias_urls(self):
+        import tempfile
+        from contextlib import redirect_stdout
+        from io import StringIO
+        malformed = {"https://github.com/example/null": None,
+                     "https://github.com/example/string": "not a record",
+                     "https://github.com/example/list": ["not", "a", "record"]}
+        aliases = ["https://github.com/" + self.SLUG.upper() + "/tree/main?view=1",
+                   self.REPOSITORY + ".git/releases/tag/v2.0.0rc6"]
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            (work / "foundation-layers.json").write_text(json.dumps({"layers": [{"components": [
+                {"repository": self.REPOSITORY, "version": "2.0.0rc6"}]}]}))
+            retained = {**malformed, aliases[0]: None,
+                        aliases[1]: {"latest_release": {"tag": "v1.231.0"}}}
+            (work / "github-freshness.json").write_text(json.dumps({"repositories": retained}))
+            fresh = self._record([{"tag": "v2.0.0rc7", "published_at": "2026-10-01T00:00:00Z"}])
+            args = ["--work-dir", str(work), "--workers", "1"]
+            with mock.patch.object(github_freshness, "fetch_repository", return_value=fresh) as fetch, \
+                    redirect_stdout(StringIO()):
+                self.assertEqual(github_freshness.main(args), 0)
+            fetch.assert_called_once_with(self.SLUG, tag_prefixes=(), include_prereleases=True)
+            repositories = json.loads((work / "github-freshness.json").read_text())["repositories"]
+            self.assertEqual(repositories, {**malformed, self.REPOSITORY: fresh})
+            with mock.patch.object(github_freshness, "fetch_repository") as fetch, redirect_stdout(StringIO()):
+                self.assertEqual(github_freshness.main(args), 0)
+            fetch.assert_not_called()
+            resumed = json.loads((work / "github-freshness.json").read_text())["repositories"]
+            self.assertEqual(resumed, repositories)
+            for url in (self.REPOSITORY, *aliases):
+                with self.subTest(url=url):
+                    self.assertEqual(build_manifest_mod.compute_upstream(
+                        url, resumed, pin="2.0.0rc6")["latest"], "v2.0.0rc7")
 
     def test_refetch_replaces_every_stale_alias_and_resume_reads_the_fresh_record(self):
         import tempfile

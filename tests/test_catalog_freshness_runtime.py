@@ -1131,6 +1131,27 @@ class RuntimeTagPatternRowTests(unittest.TestCase):
         self.assertEqual(row["upstream"]["latest_source"], "tag_pattern_unfetched")
         self.assertEqual(row["upstream"]["latest"], "v1.1.0")
         self.assertNotIn("latest_flag", row["upstream"])
+        self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"], row.get("pin_comparison_reason")),
+                         ("not_compared", None, "tag_pattern_unfetched"))
+
+    def test_prerelease_tag_misses_do_not_compare_another_packages_release(self):
+        cases = (
+            ("missing", {"matching_tags": {}}, "tag_pattern_unfetched"),
+            ("failed", {"matching_tags": {}, "matching_tags_errors": {"": "HTTP 503"}},
+             "tag_pattern_unfetched"),
+            ("empty", {"matching_tags": {"": []}}, "tag_pattern_unmatched"),
+            ("other package", {"matching_tags": {"": ["other-package-9.9.9"]}},
+             "tag_pattern_unmatched"),
+        )
+        for label, fields, reason in cases:
+            with self.subTest(case=label):
+                record = _inspect_record(**fields, latest_release={
+                    "tag": "v0.3.999", "published_at": "2026-10-01T00:00:00Z"})
+                row = self._row(_inspect_entry(pin="1.1.0rc5"), {INSPECT_REPOSITORY: record})
+                self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
+                                 ("v0.3.999", reason))
+                self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"],
+                                  row.get("pin_comparison_reason")), ("not_compared", None, reason))
 
     def test_prerelease_pin_keeps_numeric_comparison_for_a_prefixed_tag_declaration(self):
         prefix = "inspect-tool-support-"

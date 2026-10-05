@@ -50,9 +50,20 @@ URLs and older records without a slug field, before storing the new representati
 
 Runtime entries with declared tag patterns use the tag path and require no release
 list unless another entry of the same slug uses the release stream. A tag-list miss
-retains the ordinary release fallback. Trading and runtime dormancy include the
+retains the ordinary release fallback as display metadata; a prerelease-shaped pin
+is not compared against it because it may belong to another package. Stable pins
+keep their previous fallback comparison, and matched tags keep numeric comparison.
+Trading and runtime dormancy include the
 selected release-stream publication alongside the stable release and default-branch
 head; unknown or capped selections supply no additional activity date.
+
+Known limitation: dormancy is per row. A stable-pinned or tag-declared row ignores
+a fresh RC in a release list fetched for another row, so the same repository can
+appear dormant in one row and active in another. This preserves those rows'
+existing stable-release activity channel and uses only a row's selected stream
+evidence, excluding unused or withheld candidates. The t1 dormancy regression
+deliberately keeps the stable-pin case dormant; t2 documents that limit without
+changing its computation.
 
 A short page establishes exhaustion. A full third page reports **unknown beyond
 cap**, even if a candidate appeared among the records read or the history happens
@@ -196,7 +207,8 @@ lookups persisting through resume. No network read was needed for this repair.
 The collector now excludes tag-declared runtime entries from release-stream
 requirements, while foundation, trading and untagged runtime stream pins of the
 same slug still require the bounded list. Tag-declared rows also bypass stream
-selection, retaining the documented stable-release fallback on a tag-list miss.
+selection, retaining the documented stable-release fallback on a tag-list miss
+(t2 below withholds comparison for prerelease-shaped pins on that fallback).
 Dormancy receives the definitively selected publication date for trading and
 runtime rows; stable pins keep their previous dates. Candidate ranking now uses
 version before publication time, with the latter only a tie-breaker. A refetch
@@ -205,8 +217,11 @@ preserving unrelated repositories and leaving every alias on the fresh snapshot.
 
 The anti-pattern log records the three freshness-r1 mistakes individually, and
 also records the four code defects proven in this thread repair. Its regression
-checks unique rows within the contiguous Markdown table, non-empty prevention
-and verification fields, and existing test methods at the cited paths.
+now checks all seven freshness-r1/thread-repair rows within the contiguous Markdown
+table, non-empty prevention and verification fields, and every cited class and
+method at its cited path. The t1 version checked only the three freshness-r1 rows
+and their first methods without verifying class ownership; t2 closes that evidence
+gap and rejects removed or duplicated thread rows and invalid citations.
 
 The first focused run exited **1** (seven tests); after refining the alias fixture
 to make the canonical URL the new representative and adding the tag-miss fallback
@@ -218,3 +233,37 @@ Targeted acceptance is `tests.test_catalog_freshness_runtime`,
 `scripts/validate.py`, `scripts/evidence_manifest.py --check` and `git diff --check`.
 Scratch files use the authorized cache outside both the worktree and `/tmp`, under
 `nice -n 19`; CI owns the full suite.
+
+## Follow-up round freshness-t2 — 2026-10-05
+
+The four p2 premises were confirmed against `048dc5696`, with no network read.
+Alias cleanup now uses the existing URL slug normalizer and consults a retained
+value's slug field only when it is a dictionary. A regression retains unrelated
+null, string and list values while refetching and resuming the engine, and checks
+mixed-case owner/repository and `.git` release aliases against the fresh record.
+
+The anti-pattern check covers the seven earlier repair rows and the three new t2
+mistakes. It verifies every cited `Class.method` against the class's definitions
+in the named test file. Negative controls remove or duplicate each of the four
+thread rows, corrupt both second-method citations, change a cited class, or rename
+the declaring class in the source; every control is rejected. The uncertainty row
+now qualifies its second method with its class name.
+
+The per-row dormancy rule and its deliberate stable-pin guard remain unchanged.
+The README and rendered trading/runtime explanations now state which activity
+each row considers; the known limitation is documented above. For tag-declared
+prerelease pins, missing, failed, empty or unrelated tag lists keep the fallback
+release visible but publish `not_compared`, null `pin_behind_upstream`, and reason
+`tag_pattern_unfetched` or `tag_pattern_unmatched`. This prevents another package's
+release from claiming currency. Matched tags, stable pins and the existing
+watch/unresolved/truncated precedence retain their previous behavior.
+
+Four focused tests first exited **1**: alias cleanup raised `AttributeError`, the
+checker accepted all twelve invalid metadata controls, and both tag-miss fixtures
+reported `compared`. The first post-fix run exited **1** because the alias fixture
+also uppercased the URL scheme and host, outside the existing parser's supported
+form; it now varies only owner/repository case. The final run passed all four
+tests, exit **0**. These are synthetic/local integration checks. Acceptance remains
+the three requested freshness modules and the validate, evidence-manifest and diff
+checks named above; CI owns the full suite. Scratch stays outside the checkout and
+`/tmp`, under `nice -n 19`.

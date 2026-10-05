@@ -16573,8 +16573,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
-      "sha256": "97e34f1db2f3ec833bdf3525e7645b9b4bb346006559d583d5ce7b001ee8fe8e",
-      "bytes": 14180
+      "sha256": "6b10125f848acd0233bd07a1b40584a7ae51e09d51f87d205cf687dd5c0399d1",
+      "bytes": 17447
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
@@ -16753,8 +16753,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "1e0b26bc02c4e72482576eca7545f6adb7d9ad5be40a7734b407ef06783d322e",
-      "bytes": 191363
+      "sha256": "f197348cbc5c5a8b86826dc35e5d028e9a13a49a330ef3fa7e182b59837409b6",
+      "bytes": 193226
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -52748,8 +52748,8 @@
     },
     {
       "path": "scripts/freshness_propose.py",
-      "sha256": "2a28545967cf2a84f0de1f392b753b0744d3c269d619f4d415abc12bdf53e5a4",
-      "bytes": 52315
+      "sha256": "b948678e659f6eb653395aedad38990b8db40a476cabaa855e608521a62acf2e",
+      "bytes": 52517
     },
     {
       "path": "scripts/git-hooks/pre-commit",
@@ -53278,8 +53278,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_runtime.py",
-      "sha256": "8e24af0b02f71d7e16154e2d8297dd566e3c3a3e53f3327c03e42ec9171ecefd",
-      "bytes": 117237
+      "sha256": "739cbcc79e6f60b85fbf9098b87a6e3837fbec7fa644db82baa54f40750fb341",
+      "bytes": 118596
     },
     {
       "path": "tests/test_catalog_freshness_trading.py",
@@ -53978,8 +53978,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "sha256": "515139bebb6f1662bf1e2cdca6925fdb77f47994951b35eea71c9c8cf4fd0dd4",
-      "bytes": 170766
+      "sha256": "5733db8807749eaf6a4fb474acda2bd4d089754d0dadbb868c1a285305d96740",
+      "bytes": 178372
     },
     {
       "path": "tests/test_sota_sources_gate.py",
@@ -54328,8 +54328,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "20c70c09d8b293c23caccb1086f5a379f2f9c823f37555d17bfb202038f9a4b2",
-      "bytes": 188578
+      "sha256": "d74fac1613c59d6b4abe629d87758d672b50f19efda520b7fe444c7a5932b10a",
+      "bytes": 189511
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -54348,8 +54348,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "27c222565ce12f06f2f2b0de09a6aafb480c922414247af95426ac059fe025e8",
-      "bytes": 124839
+      "sha256": "4529b138b7ea110bafc6db472c43aa152a3e2ed50db812bf365730d3d063c957",
+      "bytes": 125546
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -54373,8 +54373,8 @@
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
-      "sha256": "68143ed50b42bcf1fb6ebfdfc5e098813d2b0ecb6ed294bcce32a942520bc3ac",
-      "bytes": 34906
+      "sha256": "4bc8cf58a7c9dc5346b79b4dc6a2a6082e9c06cc11535cad75120d8e00c3aa44",
+      "bytes": 34972
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",

@@ -642,7 +642,8 @@ def main(argv=None) -> int:
                     # Exact URL lookups must not retain an older alias after a
                     # refetch. Older records can omit slug, so check the URL too.
                     for alias, retained in list(results.items()):
-                        if github_slug(alias) == slug or str(retained.get("slug") or "").lower() == slug:
+                        if github_slug(alias) == slug or (
+                                isinstance(retained, dict) and str(retained.get("slug") or "").lower() == slug):
                             del results[alias]
                     results[pending[slug]] = record
                     fetched_count = i
