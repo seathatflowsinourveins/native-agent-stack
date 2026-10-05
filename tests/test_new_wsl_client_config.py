@@ -921,19 +921,16 @@ class RenderTests(unittest.TestCase):
             self.assertTrue(source.is_file(), name)
             self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(), icp.expected_sha256(source), name)
 
-    def test_the_token_lane_carriers_are_held_out_of_the_clean_default(self):
+    def test_the_token_lane_carriers_are_held_out_of_the_shared_template_and_the_default_install(self):
         # The carriers are this repository's own adaptation, not a feature of an upstream tool, so the owner's directive of
-        # 2026-10-04 (a clean install: upstream installers with upstream defaults) holds them out of the new distribution:
-        # the two hook entries and the nine files install_claude_profile.py copies are unwired, and no rendered file other
-        # than the wiring record runs or names one.
-        carriers = [v for v in cfg.analyse(ROOT)[0] if "token-lanes" in v.piece.key]
-        self.assertEqual(len(carriers), 11, [v.piece.key for v in carriers])
-        for v in carriers:
-            self.assertFalse(v.wired, v.piece.key)
-            self.assertIn("own adaptation", v.reason)
+        # 2026-10-04 (a clean install: upstream installers with upstream defaults) holds them out of every host's default
+        # (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md): the shared Claude settings template
+        # registers neither hook and install_claude_profile.py copies none of the nine files unless a caller names it, so
+        # the builder has no carrier piece to wire or to leave unwired, and no rendered file, the wiring record included,
+        # runs or names one.
+        self.assertEqual([v.piece.key for v in cfg.analyse(ROOT)[0] if "token-lanes" in v.piece.key], [])
         for name, text in self.files.items():
-            if name != "wiring.json":
-                self.assertNotIn("token-lanes", text, name)
+            self.assertNotIn("token-lanes", text, name)
 
     def test_a_checksum_that_does_not_match_fails_the_check_and_the_install(self):
         def wrong_for_the_guard(source):

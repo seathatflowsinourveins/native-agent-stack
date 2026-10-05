@@ -70,3 +70,11 @@ The command center's A/B on the frozen Harbor 0.23.0 setup at the operating poin
 2.1.289, current tool releases) decides which tools stay default. If it measures a net saving for a carrier arm under
 that upstream protocol, the entry goes back to `practice` in one edit and the eleven pieces are wired again; the new
 test then states the opposite.
+
+## Addendum (2026-10-04): the shared template follows
+
+The "Not changed" bullet above left the shared Claude settings template with both hook entries, so NativeStack and every other
+host that renders it kept the carriers. The command center decided later the same day that NativeStack follows
+NativeStack2604: `docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md` removes both entries from the
+shared template, makes the default install copy none of the carrier files, and lets a settings re-apply retire the hook entries a
+host already has. The builder therefore has no carrier piece at all, and this record's map entry is gone with them.

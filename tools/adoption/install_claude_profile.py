@@ -4,13 +4,14 @@
   guard   -- sha256-checked copies of the user-scope hooks to ~/.claude/hooks/:
              adoption/hooks/claude/effort-default-guard.py (effort self-heal) and
              scripts/hooks/secret_path_guard.py (PreToolUse Bash secret guard;
-             the same file the project .claude/settings.json runs), plus
-             token-lanes-subagent-start.py and its sibling token-lanes-block.md
-             plus the five role blocks token-lanes-block.<role>.md from
-             adoption/hooks/claude/ (role-matched non-blind child context),
-             token-lanes-session-start.py and its sibling
-             token-lanes-block.main.md (SessionStart main-session context),
-             and currency-due-notice.py (SessionStart stack-currency due line)
+             the same file the project .claude/settings.json runs), and
+             currency-due-notice.py (SessionStart stack-currency due line).
+             The token-lane carriers of adoption/hooks/claude/ (the
+             SubagentStart hook with its default block and five role blocks, and
+             the SessionStart hook with its main-session block) are this
+             repository's own adaptation and are held out of the default
+             (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md):
+             they stay checksum-pinned and install only when `--hook NAME` names them
   agents  -- verbatim copies of adoption/agents/claude/*.md to ~/.claude/agents/
   workflows -- opt-in (--only workflows), checksum-checked, create-only copies of
              the three reviewed scripts in examples/claude-native/workflows/ to
@@ -24,7 +25,7 @@
              (reported) when it differs unless --replace-mcp is given
 
 A caller that wires only part of the profile narrows each step without changing its defaults:
-`--hook NAME` (repeatable) installs only the named files of the hook map in the guard step, `--agent NAME`
+`--hook NAME` (repeatable) installs only the named files of the hook map (or of the held-out carriers) in the guard step, `--agent NAME`
 (repeatable) only the named files of adoption/agents/claude/ in the agents step, and `--mcp-template PATH` registers
 the servers of another file in the template's `{"mcpServers": {...}}` shape instead of adoption/mcp/claude-user.json
 (tools/adoption/new_wsl_client_config.py passes the three).
@@ -62,11 +63,16 @@ SECRET_GUARD_SRC = ROOT / "scripts" / "hooks" / "secret_path_guard.py"
 TOKEN_LANES_BLOCK_SRC = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
 TOKEN_LANES_HOOK_SRC = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-subagent-start.py"
 SHA256SUMS = ROOT / "adoption" / "hooks" / "claude" / "SHA256SUMS"
-# Installed name under ~/.claude/hooks/ -> checked-in source; includes both carriers' sibling blocks.
+# Installed name under ~/.claude/hooks/ -> checked-in source: the files the guard step installs by default.
 HOOKS = {
     "currency-due-notice.py": GUARD_SRC.with_name("currency-due-notice.py"),  # SessionStart currency due line
     "effort-default-guard.py": GUARD_SRC,
     "secret_path_guard.py": SECRET_GUARD_SRC,
+}
+# The token-lane carriers and their sibling blocks: this repository's own adaptation, held out of the default pending
+# the upstream A/B (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md). They stay
+# checksum-pinned in SHA256SUMS and install only when `--hook NAME` names them.
+HELD_OUT_HOOKS = {
     "token-lanes-block.md": TOKEN_LANES_BLOCK_SRC,
     "token-lanes-block.builder.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.builder.md"),
     "token-lanes-block.main.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.main.md"),  # SessionStart text
@@ -77,6 +83,7 @@ HOOKS = {
     "token-lanes-session-start.py": TOKEN_LANES_HOOK_SRC.with_name("token-lanes-session-start.py"),  # SessionStart
     "token-lanes-subagent-start.py": TOKEN_LANES_HOOK_SRC,
 }
+ALL_HOOKS = {**HOOKS, **HELD_OUT_HOOKS}
 AGENTS_SRC_DIR = ROOT / "adoption" / "agents" / "claude"
 MCP_TEMPLATE = ROOT / "adoption" / "mcp" / "claude-user.json"
 WORKFLOWS_SRC_DIR = ROOT / "examples" / "claude-native" / "workflows"
@@ -115,7 +122,7 @@ def sha256_of(path: Path) -> str:
 
 
 def install_guard(home: Path, dry_run: bool, name: str = "effort-default-guard.py") -> str:
-    source = HOOKS[name]
+    source = ALL_HOOKS[name]
     if not source.is_file():
         raise InstallError(f"missing source: {source}")
     expected = expected_sha256(source)
@@ -141,13 +148,14 @@ def install_guard(home: Path, dry_run: bool, name: str = "effort-default-guard.p
 
 
 def install_guards(home: Path, dry_run: bool, names: list[str] | None = None) -> dict[str, str]:
-    """Every user-scope hook in HOOKS, or only the files in `names`; all are checked before any is copied."""
+    """Every user-scope hook in HOOKS, or only the files in `names` (which may name a held-out carrier file); all are
+    checked before any is copied."""
     selected = list(HOOKS) if names is None else list(dict.fromkeys(names))
-    unknown = [name for name in selected if name not in HOOKS]
+    unknown = [name for name in selected if name not in ALL_HOOKS]
     if unknown:
-        raise InstallError(f"no such hook file in the hook map: {', '.join(unknown)} (known: {', '.join(HOOKS)})")
+        raise InstallError(f"no such hook file in the hook map: {', '.join(unknown)} (known: {', '.join(ALL_HOOKS)})")
     for name in selected:
-        source = HOOKS[name]
+        source = ALL_HOOKS[name]
         if sha256_of(source) != expected_sha256(source):
             raise InstallError(f"refusing to install {source}: sha256 does not match {SHA256SUMS}")
     return {name: install_guard(home, dry_run, name) for name in selected}
@@ -443,7 +451,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--remove-workflows", action="store_true",
                          help="With --only workflows, remove selected byte-matching scripts; preserve edits and custom entries")
     parser.add_argument("--hook", action="append", metavar="NAME",
-                         help="Guard step: install only this file of the hook map (repeatable; default: every file)")
+                         help="Guard step: install only this file of the hook map (repeatable; default: every file of the "
+                              "default map; a held-out token-lane carrier file installs only when named)")
     parser.add_argument("--agent", action="append", metavar="NAME",
                          help="Agents step: install only this file of adoption/agents/claude/ (repeatable; "
                               "default: every file)")
