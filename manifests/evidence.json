@@ -16696,8 +16696,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md",
-      "sha256": "998b2fa725652d923d5a5715e0371093770ad8f1876ed94bdafb87abf2de5db4",
-      "bytes": 38315
+      "sha256": "5cf4c39ec5c38dafedf48a651738e46b0a718cfbd224dcc0c5dc468d45139233",
+      "bytes": 39899
     },
     {
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
