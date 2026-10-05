@@ -3,7 +3,7 @@
   "evidence_class": "local_integration: one run, one host, scratch HOMEs, the real rtk and codex (the stream is synthetic)",
   "rtk": "rtk 0.51.0",
   "codex": "codex-cli 0.159.3",
-  "deviation": "8 codex process(es) were running on the host, so the trust command carries --codex-process-name no-such-process-name (the tool would otherwise refuse, exit 2)",
+  "deviation": "4 codex process(es) were running on the host, so the trust command carries --codex-process-name no-such-process-name (the tool would otherwise refuse, exit 2)",
   "steps": [
     {
       "step": "--check before any rtk hook exists",
@@ -60,7 +60,7 @@
       "stdout_tail": [
         "hooks named in <scratch>/fake-home/.codex:",
         "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T064909Z",
+        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T065930Z",
         "trusted 1 hook(s) in <scratch>/fake-home/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -189,7 +189,7 @@
         "  every rule file is accepted",
         "hooks named in <scratch>/rules-hcom/.codex:",
         "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-hcom/.codex/config.toml.bak.20261005T064911Z",
+        "backup: <scratch>/rules-hcom/.codex/config.toml.bak.20261005T065932Z",
         "trusted 1 hook(s) in <scratch>/rules-hcom/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -266,7 +266,7 @@
       "expected_exit": 2,
       "stdout_tail": [
         "execution rules in <scratch>/rules-hcom-modified/.codex/rules: hcom-deny.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
-        "  exposed: hcom-deny.rules (sha256 bfec4c902432) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the"
+        "  exposed: hcom-deny.rules (sha256 4eda6b7e402e) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the"
       ],
       "stderr_tail": [
         "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
@@ -308,7 +308,7 @@
         "  every rule file is accepted",
         "hooks named in <scratch>/rules-allow-only/.codex:",
         "  <scratch>/rules-allow-only/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-allow-only/.codex/config.toml.bak.20261005T064912Z",
+        "backup: <scratch>/rules-allow-only/.codex/config.toml.bak.20261005T065933Z",
         "trusted 1 hook(s) in <scratch>/rules-allow-only/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -466,7 +466,7 @@
         "  exposed: default.rules (sha256 f481703c6aec) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
         "hooks named in <scratch>/rules-exposed/.codex:",
         "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-exposed/.codex/config.toml.bak.20261005T064913Z",
+        "backup: <scratch>/rules-exposed/.codex/config.toml.bak.20261005T065935Z",
         "trusted 1 hook(s) in <scratch>/rules-exposed/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -546,7 +546,7 @@
         "  exposed: default.rules (sha256 84a079dfaa1a) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
         "hooks named in <scratch>/rules-twin/.codex:",
         "  <scratch>/rules-twin/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-twin/.codex/config.toml.bak.20261005T064915Z",
+        "backup: <scratch>/rules-twin/.codex/config.toml.bak.20261005T065936Z",
         "trusted 1 hook(s) in <scratch>/rules-twin/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []

@@ -4,8 +4,8 @@
   "entries": [
     {
       "name": "hcom-deny.rules",
-      "sha256": "845f06b0ca31d03956df813ea7ab426e42ab784de7f39010c4a70cc91e3bc0e1",
-      "source": "native-agent-stack #713, evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-deny.rules at head 5f295f254; the copy kept for this review is evidence/artifacts/token-stack-fresh-session-e2e-20261004/fixtures/hcom-deny.rules",
+      "sha256": "ac6254ee9bb7ac20deca69bb03bead76dacbe4e53a41cbc563a8b3614fa6a6aa",
+      "source": "native-agent-stack #713, evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-deny.rules at head 7fbe586f3 (repair round 2 narrowed the comments and the justification strings of 5f295f254's file, sha256 845f06b0ca31d03956df813ea7ab426e42ab784de7f39010c4a70cc91e3bc0e1; every other line, the patterns, decisions, match and not_match lists, is identical, checked by comparing the two files without their comment and justification lines); the copy kept for this review is evidence/artifacts/token-stack-fresh-session-e2e-20261004/fixtures/hcom-deny.rules",
       "first_tokens": ["hcom", "uvx"],
       "reviewed_for": {
         "rtk_version_output": "rtk 0.51.0",

@@ -393,7 +393,7 @@ class CheckTests(Case):
 E2E = ROOT / "evidence" / "artifacts" / "token-stack-fresh-session-e2e-20261004"
 REVIEWED = ROOT / "tools" / "adoption" / "exec_rules_reviewed.json"
 PLAN_CONFIG = ROOT / "evidence" / "artifacts" / "new-wsl-install-plan-20261002" / "config"
-# The one file on the reviewed list: #713's config/hcom-deny.rules at head 5f295f254 (a copy; #713 is not merged yet). Every rule is a prefix rule on
+# The one file on the reviewed list: #713's config/hcom-deny.rules at head 7fbe586f3 (a copy; #713 is not merged yet). Every rule is a prefix rule on
 # `hcom ...` or `uvx hcom ...`.
 HCOM_DENY_RULES = (E2E / "fixtures" / "hcom-deny.rules").read_bytes()
 GIT_PUSH_FORBIDDEN = b'prefix_rule(pattern = ["git", "push"], decision = "forbidden")\n'

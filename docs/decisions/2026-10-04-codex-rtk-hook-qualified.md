@@ -194,8 +194,9 @@ recommended after 705f and the command center accepted: the tool no longer decid
     beside the plain one and both are checked with `codex execpolicy check`. Any step that cannot be done (a listing or read error, a broken list, an rtk that does not
     answer) is an exposure as well. With no rule file nothing is read and rtk is not run.
   - **The reviewed list.** An entry is the review of one exact file for one rtk version: the sha256, the first tokens of its rules, the rtk version and commit it was
-    reviewed for, and its evidence. Today it has one entry, #713's `config/hcom-deny.rules` at head 5f295f254 (a copy is kept as
-    `fixtures/hcom-deny.rules`): every rule is a prefix rule on `hcom ...` or `uvx hcom ...`, neither word is a command rtk 0.51.0 can route, so no
+    reviewed for, and its evidence. Today it has one entry, #713's `config/hcom-deny.rules` at head 7fbe586f3 (a copy is kept as
+    `fixtures/hcom-deny.rules`; #713's repair round 2 narrowed the comments and justification strings of the 5f295f254 file, and the 25 other lines, the patterns, decisions and
+    match lists, are identical, so the first review of 2026-10-05 carries over; the entry follows the shipped bytes and a later edit of the file needs a new entry): every rule is a prefix rule on `hcom ...` or `uvx hcom ...`, neither word is a command rtk 0.51.0 can route, so no
     command that a rule matches is rewritten, and a command behind a wrapper (`time hcom ...`) is outside a prefix rule's reach with or without the rewrite. The review rests on `rtk-rewrite-heads.json` (the heads derived from
     rtk's 94 `RULES` patterns and 62 builtin TOML filters, the wrappers and the env prefix, with line provenance) and on `check_rtk_rewrite_heads.py`, whose section 6
     ran the entry's first tokens in 22 spellings and 8 shapes, alone and behind each wrapper (352 commands) against the real binary: none is rewritten. Both are review
