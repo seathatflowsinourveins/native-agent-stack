@@ -1,0 +1,437 @@
+{
+  "date": "2026-10-05",
+  "round": "t-parity-r2",
+  "lane": "trading",
+  "repository_base": "f946c6d4ca988a17b6fa4392ecb488909f147883",
+  "evidence_scope": "Optional synthetic parity; no change to controls, frozen protocols, strategy gates or market qualification.",
+  "upstream": {
+    "repository": "https://github.com/RiskLabAI/RiskLabAI.py",
+    "revision": "7d5aa11271c70d83a7069d5900d80bb08b29e481",
+    "installed_distribution": "RiskLabAI",
+    "installed_version": "3.2.0",
+    "wheel": "risklabai-3.2.0-py3-none-any.whl",
+    "wheel_sha256": "dca6e15b06524e47d553e89252015c51dd1e746c4ae7844f49d5c2a726b1c28c",
+    "python_requirement": ">=3.12,<3.15",
+    "source_matches_installed_bytes": [
+      {
+        "path": "src/RiskLabAI/backtest/probabilistic_sharpe_ratio.py",
+        "sha256": "3cd56f7c02e0d42ce04e395737db6039faea617b367e6bfbc2f0a74768fa7b49",
+        "byte_identical": true
+      },
+      {
+        "path": "src/RiskLabAI/backtest/probability_of_backtest_overfitting.py",
+        "sha256": "c14bb1e1179aac1d61d56acf6bf282bf2b9593b143a43e357dc7d9181c7da373",
+        "byte_identical": true
+      },
+      {
+        "path": "src/RiskLabAI/backtest/backtest_statistics.py",
+        "sha256": "d6365c332c46be6e6a176b39d3cc70da170301362a974609613fa370d710e643",
+        "byte_identical": true
+      },
+      {
+        "path": "src/RiskLabAI/backtest/test_set_overfitting.py",
+        "sha256": "2c813d80e85ed2717f4c3b991244b23dee1253807c8ffa9ea71a36f37e9dded0",
+        "byte_identical": true
+      },
+      {
+        "path": "src/RiskLabAI/backtest/validation/leakage_aware_hpo.py",
+        "sha256": "ff0040f22c4710918cd39cf3a08bc48293ed48a70a8f46898b3c4686122b6d2c",
+        "byte_identical": true
+      }
+    ],
+    "installed_signatures_inspected": [
+      "probabilistic_sharpe_ratio",
+      "benchmark_sharpe_ratio",
+      "probability_of_backtest_overfitting",
+      "sharpe_ratio",
+      "expected_max_sharpe_ratio",
+      "deflated_sharpe_gate"
+    ]
+  },
+  "local": {
+    "path": "blueprints/us-equities/overfitting-controls/overfitting.py",
+    "sha256": "1747e058c0a5830db4ae43f4101cdd4a6825422f4b5b386fd8eb7e51f803811a",
+    "behavior_unchanged": true
+  },
+  "environment": {
+    "python": "CPython 3.12.3",
+    "platform": "Linux x86_64",
+    "uv": "0.12.17",
+    "scratch_only": true,
+    "outside_worktree_and_tmp": true,
+    "niceness": 19,
+    "lock": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock",
+    "lock_sha256": "d0e1dbf620c58d7763ee4a12929dc109b7739d5aa4759092b03b7dd8003b8e12",
+    "package_count": 19,
+    "hashes_required_at_install": true,
+    "binary_wheels_only": true,
+    "compile_exit": 0,
+    "sync_exit": 0,
+    "dependency_check_exit": 0,
+    "dependency_check_output": "Checked 19 packages in 0.70ms\nAll installed packages are compatible\n",
+    "working_research_environment_modified": false,
+    "repair_clean_install_exit": 0
+  },
+  "regular_case": {
+    "relative_tolerance": 1e-12,
+    "absolute_tolerance": 1e-12,
+    "psr_cases": 4,
+    "sharpe_cases": 1,
+    "cscv_cases": [
+      {
+        "partitions": 4,
+        "metric": "mean",
+        "every_logit_compared": true
+      },
+      {
+        "partitions": 4,
+        "metric": "sharpe",
+        "every_logit_compared": true
+      },
+      {
+        "partitions": 8,
+        "metric": "mean",
+        "every_logit_compared": true
+      },
+      {
+        "partitions": 8,
+        "metric": "sharpe",
+        "every_logit_compared": true
+      }
+    ],
+    "uses_population_variance": true,
+    "network_during_tests": false,
+    "supplied_n_benchmark_relative_tolerance": 1e-11,
+    "native_dsr_relative_tolerance": 1e-11,
+    "rounding_reason": "Upstream expected_max_sharpe_ratio uses euler_gamma=0.5772156649 (test_set_overfitting.py:49); at N=2 and variance=1 the observed relative gap is about 2.66e-12.",
+    "list_benchmark_cases": 3,
+    "supplied_n_benchmark_cases": 12,
+    "native_dsr_cases": 24
+  },
+  "known_differences": {
+    "confirmed": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "list_api_only": [
+      2
+    ],
+    "explicit_numbered_tests": 6,
+    "upstream_already_supports": {
+      "2": [
+        "expected_max_sharpe_ratio(n_trials, mean_sharpe_ratio, std_sharpe_ratio)",
+        "deflated_sharpe_gate(out_of_sample_returns, n_trials, trial_sharpe_std)"
+      ]
+    },
+    "caller_side_glue": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "remaining_cscv_gaps": [
+      "Average-rank option in performance_evaluation",
+      "Required additional selection, loss and degradation diagnostics"
+    ],
+    "qualifications": [
+      "Difference 2 is confined to the list-based benchmark_sharpe_ratio API; independent trial count and dispersion already work through the native expected-max and DSR functions.",
+      "Ordinal tie rank is 2 or 3 depending on tie order; averaged local rank is 2.5. Both valid ordinal orders are covered.",
+      "Local standalone zero-variance Sharpe raises only for nonzero mean; constant zero returns agree.",
+      "Local CSCV scores std <= 1e-12 * max(1, abs(mean)) as zero; constant and near-constant nonzero columns raise locally while upstream PBO is finite.",
+      "Local trial count is a positive integer, not a fractional effective count."
+    ]
+  },
+  "negative_control": {
+    "scope": "Scratch copy of the local test only; installed upstream and worktree test unchanged.",
+    "mutation": "Difference 3 expected upstream PBO changed from 1.0 to 0.5; ROOT in the scratch copy points to the worktree.",
+    "returned_assertion": "AssertionError: np.float64(1.0) != 0.5",
+    "expected_exit": 1
+  },
+  "failed_discovery_attempts": [
+    {
+      "command": "uv python list --only-installed --offline",
+      "exit": 2,
+      "cause": "Default uv cache was outside writable roots.",
+      "correction": "Set UV_CACHE_DIR under the requested scratch root; installed-interpreter listing, venv creation, compile and sync then exited 0."
+    },
+    {
+      "command": "sed -n 1,210p <UPSTREAM>/RiskLabAI/backtest/pbo.py",
+      "exit": 2,
+      "cause": "The adjudication used a shortened PBO filename.",
+      "correction": "Read the packaged src/RiskLabAI/backtest/probability_of_backtest_overfitting.py and matched it byte-for-byte to the installed module."
+    }
+  ],
+  "retention": {
+    "commands_normalized": "Successful environment and test commands were prefixed with rtk and ran with nice -n 19; TMPDIR and the uv cache were under the requested private scratch root. Interpreter, source and scratch locators above replace private absolute paths. Failed discovery attempts retain their corrections separately.",
+    "output": "Returned output tails are exact, without private path lines. Full stdout/stderr logs, install/compile logs and the wrong-oracle scratch copy remain private under the scratch job directory; hashes identify the test logs.",
+    "upstream_test_scope": "Twelve unchanged selected upstream PSR/PBO, expected-max-Sharpe and DSR tests; two Optuna HPO tests deselected. Optional acceleration and the remainder of the upstream suite were not run.",
+    "structural_checks": "Final validate, evidence ordering, publication scans and diff checks are reported in the builder handoff after file registration."
+  },
+  "repair_base": "6b060b14022756781498b352658186abc21c69eb",
+  "prior_round_observations": [
+    {
+      "kind": "unchanged-upstream-tests",
+      "command": "python -m pytest -q -p no:cacheprovider <UPSTREAM>/test/backtest/test_probabilistic_sharpe_ratio.py <UPSTREAM>/test/backtest/test_probability_of_backtest_overfitting.py",
+      "exit": 0,
+      "tests_executed": 8,
+      "tests_skipped": 0,
+      "returned_output_tail": "........                                                                 [100%]\n8 passed in 2.56s\n",
+      "private_log_name": "upstream-tests.log",
+      "private_log_sha256": "c3a2fd67d6bc12ac055562afc2b08379bebe6e2c7cca1203d69a4030a84522ce"
+    },
+    {
+      "kind": "local-integration-check-fixed-synthetic-inputs",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest tests.test_overfitting_riskl_parity -v",
+      "exit": 0,
+      "tests_executed": 10,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 10 tests in 0.024s\n\nOK\n",
+      "private_log_name": "parity-present.log",
+      "private_log_sha256": "d4a7e6581ff75664567e7ad7a52e1e3e10f4078622599b63a8c297b0f35ec048"
+    },
+    {
+      "kind": "optional-dependency-absent-control",
+      "command": "<PARITY_DIR>/without-riskl/bin/python -m unittest tests.test_overfitting_riskl_parity -v",
+      "exit": 0,
+      "tests_executed": 0,
+      "tests_skipped": 10,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 10 tests in 0.000s\n\nOK (skipped=10)\n",
+      "private_log_name": "parity-absent.log",
+      "private_log_sha256": "eb862ff9fa3f2b4bef1dda9829f280736a615cfe046bb97a77b9e206efcc8a7d"
+    },
+    {
+      "kind": "discriminating-control-wrong-oracle",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest discover -s <PARITY_DIR>/negative-tests -p test_overfitting_riskl_parity.py -k difference_3 -v",
+      "exit": 1,
+      "tests_executed": 1,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n",
+      "private_log_name": "negative-control.log",
+      "private_log_sha256": "0933c593900faecb84832029e6f532e3fa4958416ff76390788a9f37c0b3df5f"
+    },
+    {
+      "kind": "existing-local-overfitting-tests",
+      "command": "python3 -m unittest tests.test_overfitting_controls -v",
+      "exit": 0,
+      "tests_executed": 14,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 14 tests in 1.711s\n\nOK\n",
+      "private_log_name": "existing-tests.log",
+      "private_log_sha256": "e6df0b9bf8484f48fde1caa716823daa16ad25f9223156d937429269a33d3975"
+    }
+  ],
+  "observations": [
+    {
+      "kind": "red-against-original-comparison-behavior",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest tests.test_overfitting_riskl_parity.RiskLabParityTests.test_regular_effective_trial_benchmark_parity tests.test_overfitting_riskl_parity.ParityRegressionTests -v",
+      "exit": 1,
+      "tests_executed": 4,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 4 tests in 0.006s\n\nFAILED (failures=4)\n",
+      "private_log_name": "regressions-red.log",
+      "private_log_sha256": "3a33831b3e6794c5a0b9aab7c2eb6231a61a4a1ba7611a5251fa7f6bf6e98fe2"
+    },
+    {
+      "kind": "intermediate-failed-repair",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest tests.test_overfitting_riskl_parity -v",
+      "exit": 1,
+      "tests_executed": 14,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 14 tests in 0.067s\n\nFAILED (errors=1)\n",
+      "private_log_name": "parity-green.log",
+      "private_log_sha256": "5a29f21e7028397ede86ec33231ae5a801ea226128955f18018eb3ae9e1d9989"
+    },
+    {
+      "kind": "local-integration-check-fixed-synthetic-inputs",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest tests.test_overfitting_riskl_parity -v",
+      "exit": 0,
+      "tests_executed": 14,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 14 tests in 0.047s\n\nOK\n",
+      "private_log_name": "parity-present.log",
+      "private_log_sha256": "2a06cb3969889da9c66fec3dbcd70efb949ce9e952dced96737905b4644e625d"
+    },
+    {
+      "kind": "optional-dependency-absent-control",
+      "command": "<PARITY_DIR>/without-riskl/bin/python -m unittest tests.test_overfitting_riskl_parity -v",
+      "exit": 0,
+      "tests_executed": 0,
+      "tests_skipped": 14,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 14 tests in 0.000s\n\nOK (skipped=14)\n",
+      "private_log_name": "parity-absent.log",
+      "private_log_sha256": "86b8cb9cd436cf1e591aea2e08dd1be77d282d9369ddefdd5a588ee57aafb1c5"
+    },
+    {
+      "kind": "cpu-features-disabled-local-integration-check",
+      "command": "NPY_DISABLE_CPU_FEATURES='AVX512_SKX AVX512F AVX2' <PARITY_DIR>/venv/bin/python -m unittest tests.test_overfitting_riskl_parity -v",
+      "exit": 0,
+      "tests_executed": 14,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 14 tests in 0.050s\n\nOK\n",
+      "private_log_name": "parity-cpu-disabled.log",
+      "private_log_sha256": "bedb82cee53198abe139f102c94db537ffb67ceb040e7f9f75b596b8ba0faf63"
+    },
+    {
+      "kind": "unchanged-upstream-tests",
+      "command": "<PARITY_DIR>/venv/bin/python -m pytest -q -p no:cacheprovider <UPSTREAM>/test/backtest/test_probabilistic_sharpe_ratio.py <UPSTREAM>/test/backtest/test_probability_of_backtest_overfitting.py <UPSTREAM>/test/backtest/test_test_set_overfitting.py::test_expected_max_sharpe_ratio <UPSTREAM>/test/backtest/validation/test_leakage_aware_hpo.py -k \"not leakage_aware_hpo_runs and not rejects_bad_sampler\"",
+      "exit": 0,
+      "tests_executed": 12,
+      "tests_skipped": 0,
+      "returned_output_tail": "............                                                             [100%]\n12 passed, 2 deselected in 1.27s\n",
+      "private_log_name": "upstream-tests.log",
+      "private_log_sha256": "d6e52956309b5c7c8fb7df35985f3fbd4fbd14c0f4d423061351bd6a13dbf987"
+    },
+    {
+      "kind": "existing-local-overfitting-tests",
+      "command": "python3 -m unittest tests.test_overfitting_controls -v",
+      "exit": 0,
+      "tests_executed": 14,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 14 tests in 1.725s\n\nOK\n",
+      "private_log_name": "existing-tests.log",
+      "private_log_sha256": "941a0b0d993047d8688e151dbe8c0ae7e19c21bc0008e8ee3dac7b0129b9ba84"
+    },
+    {
+      "kind": "osv-lockfile-coverage-tests",
+      "command": "python3 -m unittest tests.test_osv_lockfile_coverage -v",
+      "exit": 0,
+      "tests_executed": 57,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 57 tests in 6.191s\n\nOK\n",
+      "private_log_name": "osv-coverage.log",
+      "private_log_sha256": "744500d13f7018130a6df7c792c4c18853cfe144d9cc78e7862732ac2fef83bd"
+    }
+  ],
+  "red_before_green": {
+    "original_parity_source_sha256": "d04b4453cd58b259987d2d83867c29db19d1c9a5fffc322434f132a76832c015",
+    "original_methods_unchanged_at_red": true,
+    "red_exit": 1,
+    "red_tests": 4,
+    "red_failures": 4,
+    "green_exit": 0,
+    "regressions": [
+      "Supplied-N benchmark tolerance at N=2, variance=1",
+      "Native DSR oracle result must be observed",
+      "Both valid ordinal tie orders must be accepted",
+      "Degenerate-Sharpe CSCV oracle result must be observed"
+    ],
+    "intermediate_failure": "The native DSR oracle mutation recursed after first wiring it into the parity check; capture the unpatched native function before applying the mutation. Intermediate exit 1 and final exit 0 are both retained."
+  },
+  "local_side_mutations": [
+    {
+      "case": "1",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest discover -s <PARITY_DIR>/mutation-1 -p test_overfitting_riskl_parity.py -k RiskLabParityTests.test_difference_1 -v",
+      "exit": 1,
+      "expected_exit": 1,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nFAILED (failures=2)\n",
+      "private_log_name": "mutation-1.log",
+      "private_log_sha256": "258730e8955e21b61fc4ec3606d0710c129887255845666db9690ca42f049121"
+    },
+    {
+      "case": "2",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest discover -s <PARITY_DIR>/mutation-2 -p test_overfitting_riskl_parity.py -k RiskLabParityTests.test_difference_2 -v",
+      "exit": 1,
+      "expected_exit": 1,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nFAILED (failures=1)\n",
+      "private_log_name": "mutation-2.log",
+      "private_log_sha256": "1b5aa20c8ec1bb98496c38f4b263683d0376540f0972e2e2bdab24b968e11a1b"
+    },
+    {
+      "case": "3",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest discover -s <PARITY_DIR>/mutation-3 -p test_overfitting_riskl_parity.py -k RiskLabParityTests.test_difference_3 -v",
+      "exit": 1,
+      "expected_exit": 1,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 1 test in 0.004s\n\nFAILED (failures=1)\n",
+      "private_log_name": "mutation-3.log",
+      "private_log_sha256": "b2221a4bd336eef9003fe3df6de2985da2d1740814622411f1cf49c55b8340b8"
+    },
+    {
+      "case": "4",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest discover -s <PARITY_DIR>/mutation-4 -p test_overfitting_riskl_parity.py -k RiskLabParityTests.test_difference_4 -v",
+      "exit": 1,
+      "expected_exit": 1,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 1 test in 0.004s\n\nFAILED (failures=1)\n",
+      "private_log_name": "mutation-4.log",
+      "private_log_sha256": "c23eaa7ad1cd86b45895dd025a035387da7f1a4cf8ed6cdd1eecf5a097b3b362"
+    },
+    {
+      "case": "5",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest discover -s <PARITY_DIR>/mutation-5 -p test_overfitting_riskl_parity.py -k RiskLabParityTests.test_difference_5 -v",
+      "exit": 1,
+      "expected_exit": 1,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 1 test in 0.004s\n\nFAILED (failures=1)\n",
+      "private_log_name": "mutation-5.log",
+      "private_log_sha256": "103b82fed3a05ee20ee075d9e74c1e707c8367d71404aea1f9ee10a42590cf7f"
+    },
+    {
+      "case": "6",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest discover -s <PARITY_DIR>/mutation-6 -p test_overfitting_riskl_parity.py -k RiskLabParityTests.test_difference_6 -v",
+      "exit": 1,
+      "expected_exit": 1,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 1 test in 0.004s\n\nFAILED (failures=2)\n",
+      "private_log_name": "mutation-6.log",
+      "private_log_sha256": "e623fed02c58eee61608eb964e8f8360b52807cb5669e517862e457e8dcbb576"
+    },
+    {
+      "case": "6_threshold",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest discover -s <PARITY_DIR>/mutation-6_threshold -p test_overfitting_riskl_parity.py -k RiskLabParityTests.test_difference_6 -v",
+      "exit": 1,
+      "expected_exit": 1,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 1 test in 0.005s\n\nFAILED (failures=1)\n",
+      "private_log_name": "mutation-6_threshold.log",
+      "private_log_sha256": "c214046e000443c6cf7d92df69c1b8d55d6013044a75bd940b2bc323c80f4ac6"
+    }
+  ],
+  "independent_pinned_fetches": [
+    {
+      "path": "src/RiskLabAI/backtest/test_set_overfitting.py",
+      "exit": 0,
+      "returned_sha256sum": "2c813d80e85ed2717f4c3b991244b23dee1253807c8ffa9ea71a36f37e9dded0  -"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/probabilistic_sharpe_ratio.py",
+      "exit": 0,
+      "returned_sha256sum": "3cd56f7c02e0d42ce04e395737db6039faea617b367e6bfbc2f0a74768fa7b49  -"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/probability_of_backtest_overfitting.py",
+      "exit": 0,
+      "returned_sha256sum": "c14bb1e1179aac1d61d56acf6bf282bf2b9593b143a43e357dc7d9181c7da373  -"
+    },
+    {
+      "path": "src/RiskLabAI/backtest/backtest_statistics.py",
+      "exit": 0,
+      "returned_sha256sum": "d6365c332c46be6e6a176b39d3cc70da170301362a974609613fa370d710e643  -"
+    }
+  ],
+  "osv_scan": {
+    "version": "2.6.0",
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "command": "osv-scanner scan source --config .github/osv-scanner.toml --no-resolve --lockfile=requirements.txt:blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock",
+    "exit": 0,
+    "packages_scanned": 19,
+    "returned_result": "No issues found",
+    "unused_global_ignores": [
+      "GHSA-8mgp-746c-j5xp",
+      "GHSA-h35f-9h28-mq5c",
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ],
+    "maintenance_owner": "trading lane; re-qualify updated pins or record a reasoned, time-limited ignore under repository OSV policy"
+  },
+  "correction_to_prior_adjudication": {
+    "item": "job-073 overfitting adjudication, lines 46 and 69",
+    "correction": "RiskLabAI 3.2.0 already ships expected_max_sharpe_ratio and deflated_sharpe_gate with independent trial count and dispersion. Difference 2 is list-API-specific, not an upstream capability gap.",
+    "verification_paths": [
+      "src/RiskLabAI/backtest/test_set_overfitting.py:12-56",
+      "src/RiskLabAI/backtest/validation/leakage_aware_hpo.py:177-240"
+    ],
+    "private_record_update": "Owner must propagate this verified correction; the private adjudication is outside the builder writable scope."
+  },
+  "unverified": [
+    "arm64 Mac execution; no such host is available in this sandbox"
+  ]
+}
