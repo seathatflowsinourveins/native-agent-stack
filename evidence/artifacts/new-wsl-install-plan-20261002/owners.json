@@ -1,6 +1,6 @@
 {
  "generated_at_utc": "2026-10-02T02:12:15Z",
- "revised_at_utc": "2026-10-03T18:26:54Z",
+ "revised_at_utc": "2026-10-04T14:22:30Z",
  "source": "origin/main definitive manifest, one row per foundation row",
  "owners": [
   {
@@ -184,10 +184,10 @@
   {
    "layer": "semantic-rag",
    "slot": "code-search",
-   "owner": "semble 0.6.1",
-   "repository": "https://github.com/MinishLab/semble",
+   "owner": "semble 0.6.1 + SocratiCode 1.15.0",
+   "repository": "https://github.com/MinishLab/semble; https://github.com/giancarloerra/SocratiCode",
    "installed": true,
-   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pins are the wave-2 code-search ruling's, in install-plan.json; repository metadata was not read for this row"
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03), widened to both arms under amendment 4 (wave 3, 2026-10-04); the pins are in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "semantic-rag",
@@ -269,10 +269,10 @@
   {
    "layer": "token-efficiency",
    "slot": "ccusage",
-   "owner": "Not installed: the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it",
-   "repository": "",
-   "installed": false,
-   "note": "the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it"
+   "owner": "ccusage 20.0.26",
+   "repository": "https://github.com/ccusage/ccusage",
+   "installed": true,
+   "note": "owner default under amendment 4 (wave 3, 2026-10-04); the pins are in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "token-efficiency",
@@ -280,7 +280,7 @@
    "owner": "context-mode 1.0.169",
    "repository": "https://github.com/mksglu/context-mode",
    "installed": true,
-   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pins are the wave-2 context ruling's, in install-plan.json; repository metadata was not read for this row"
+   "note": "owner default under amendment 4 (wave 3, 2026-10-04), replacing the wave-2 interim; the pins are the wave-2 context ruling's, in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "token-efficiency",
@@ -289,6 +289,86 @@
    "repository": "https://github.com/jarrodwatts/claude-hud",
    "installed": true,
    "note": "added by the wave-2 batch of the layer consensus (2026-10-03); the pin is the wave-2 usage ruling's, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "command-output",
+   "owner": "RTK 0.51.0",
+   "repository": "https://github.com/rtk-ai/rtk",
+   "installed": true,
+   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "output-compression",
+   "owner": "Headroom 0.37.0 (headroom-ai[mcp], MCP server only)",
+   "repository": "https://github.com/headroomlabs-ai/headroom",
+   "installed": true,
+   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "code-index",
+   "owner": "jcodemunch-mcp 1.108.327",
+   "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+   "installed": true,
+   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "code-graph",
+   "owner": "codebase-memory-mcp 0.11.0",
+   "repository": "https://github.com/DeusData/codebase-memory-mcp",
+   "installed": true,
+   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "repo-packing",
+   "owner": "Repomix 1.18.1",
+   "repository": "https://github.com/yamadashy/repomix",
+   "installed": true,
+   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "structured-data",
+   "owner": "TOON 4.1.1 (@toon-format/cli)",
+   "repository": "https://github.com/toon-format/toon",
+   "installed": true,
+   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "doc-conversion",
+   "owner": "MarkItDown 0.1.8",
+   "repository": "https://github.com/microsoft/markitdown",
+   "installed": true,
+   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "api-docs",
+   "owner": "Context Hub 0.1.4 (context-hub, the chub CLI)",
+   "repository": "https://github.com/andrewyng/context-hub",
+   "installed": true,
+   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "trace-viewer",
+   "owner": "otel-tui 0.7.5",
+   "repository": "https://github.com/ymtdzzz/otel-tui",
+   "installed": true,
+   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "token-lane-carriers",
+   "owner": "token-lanes carriers: the SubagentStart block and a SessionStart main-session block (Claude Code hooks)",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "installed": true,
+   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "observation-inference",
@@ -383,10 +463,10 @@
   {
    "layer": "observation-inference",
    "slot": "session-analytics",
-   "owner": "Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set",
-   "repository": "",
-   "installed": false,
-   "note": "both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set"
+   "owner": "agentsview 0.43.0 (local archive only)",
+   "repository": "https://github.com/kenn-io/agentsview",
+   "installed": true,
+   "note": "owner default under amendment 4 (wave 3, 2026-10-04); the pins are in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "quality-evaluation",

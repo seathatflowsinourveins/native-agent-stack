@@ -20,7 +20,7 @@ import asyncio
 from collections import Counter
 from dataclasses import asdict, replace
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import hashlib
 import json
 import math
@@ -752,6 +752,26 @@ def command_paper(args):
                 now = time.time()  # trial must start after its checkpoint's reserved GETs
                 scan = load_scan(raw, settings, now=now)  # freshness again, at trial start
                 before = ledger.accounting()
+                # As runner.main: book legitimate fees, then compare cash with the
+                # lineage's original baseline before consuming a new trial identity.
+                if previous is not None:
+                    stored_baseline = previous.get("baseline_cash")
+                    if stored_baseline is None:
+                        raise SafetyError("next_trial_baseline_missing")
+                    if type(stored_baseline) not in (str, int, float):
+                        raise SafetyError("next_trial_baseline_invalid")
+                    try:
+                        baseline = Decimal(stored_baseline)
+                    except (InvalidOperation, TypeError, ValueError):
+                        raise SafetyError("next_trial_baseline_invalid") from None
+                    if not baseline.is_finite():
+                        raise SafetyError("next_trial_baseline_invalid")
+                else:
+                    baseline = Decimal(checkpoint["account"]["cash"]) - before.cash_delta_usd
+                inter_trial = (None if previous is None else Decimal(checkpoint["account"]["cash"])
+                               - (baseline + before.cash_delta_usd))
+                if inter_trial is not None and abs(inter_trial) > Decimal("0.01"):
+                    raise SafetyError("next_trial_cash_mismatch")
                 equity = limits.capital_usd + before.realized_pnl_usd
                 session_plan = plan_session((previous or {}).get("lane_state"), equity=equity,
                                             rung_schedule=settings.rung_schedule)
@@ -766,13 +786,6 @@ def command_paper(args):
             except (SafetyError, TransportError) as exc:
                 return not_started(args.output, evidence_class="PAPER", reason=str(exc), stage="trial_start",
                                    config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
-            baseline = Decimal(checkpoint["account"]["cash"]) - before.cash_delta_usd
-            # The engine's next_trial_cash_mismatch quantity, kept as an observation: the
-            # baseline is per trial, so activity between mover trials (e.g. another lane on
-            # a shared account) is recorded here instead of refusing the trial.
-            inter_trial = (None if previous is None or previous.get("baseline_cash") is None else
-                           Decimal(checkpoint["account"]["cash"])
-                           - (Decimal(previous["baseline_cash"]) + before.cash_delta_usd))
             history = list((previous or {}).get("history", []))
             metadata = {"lane": "mover", "protocol": PROTOCOL_ID, "trial_id": args.trial, "config_sha256": config_sha,
                         "scan_sha256": scan_sha, "symbols": list(plan.symbol_names()),
@@ -804,6 +817,7 @@ def command_paper(args):
                     before_submit=controller.before_submit, sink_observation=controller.observe,
                     sink_status=controller.trading_status,
                     request_observer=responses.append, quote_timeout=settings.stream_quote_timeout_seconds,
+                    order_quote_max_age_seconds=config["quote_max_age_seconds"],
                     feed=config["feed"],
                     required_quote_symbols=list(settings.benchmarks),
                     # As runner.main: from the lane's first trial, so reconcile sees every owned intent.
@@ -870,6 +884,7 @@ def command_recover(args):
     LAST_EVIDENCE_CLASS = "PAPER"
     from transport import AlpacaPaperTransport, TransportError, preflight
     config, limits, settings = load_mover_config(args.config)
+    config_sha = _sha256(args.config.read_bytes())
     session_policy = validate_session_policy(config)
     key, secret = credentials(args.env_file)
     attempts, responses = [], []
@@ -892,6 +907,10 @@ def command_recover(args):
         if not metadata_path.exists():
             raise SafetyError("no_owned_trial_to_recover")
         metadata = json.loads(metadata_path.read_text())
+        # Identity discovery above is read-only. Bind the retained trial under
+        # its account mutex before Ledger initialization or durable reservations.
+        if not isinstance(metadata, dict) or metadata.get("config_sha256") != config_sha:
+            raise SafetyError("recovery_config_differs_from_frozen_trial")
         ledger = Ledger(state_dir / "ledger.sqlite3", limits)
         try:
             for attempt in attempts:
@@ -914,6 +933,7 @@ def command_recover(args):
                 before_submit=controller.before_submit, sink_observation=controller.observe,
                 sink_status=controller.trading_status,
                 request_observer=responses.append, quote_timeout=settings.stream_quote_timeout_seconds,
+                order_quote_max_age_seconds=config["quote_max_age_seconds"],
                 feed=config["feed"], required_quote_symbols=list(settings.benchmarks),
                 history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
                 fee_history_start=fee_window,

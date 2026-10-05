@@ -105,7 +105,7 @@ Use the current project's AGENTS.md or CLAUDE.md and its existing client configu
 
 Choose one useful context method per artifact:
 - Known locations and exact strings: bounded original reads or rg; structural patterns: ast-grep.
-- Code symbols and references: Serena or local-scope (project-scoped) jCodeMunch; do not register jcodemunch-mcp at user scope. Check index freshness and original implementation before editing.
+- Code symbols and references: Serena or jCodeMunch (registered at user scope on NativeStack and NativeStack2604 by the user's directive of 2026-10-04, [decision](decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); every other host registers it per project, `adoption/bootstrap.md` "jCodeMunch, per project"). Check index freshness and original implementation before editing.
 - Conceptual code search: SocratiCode in this project, with explicit projectPath and no implicit linked projects.
 - Indexed Markdown: scoped QMD search, then get the selected document. On the authoring PC use index and collection agent-lab-docs; resolve the adopted collection on another PC.
 - Relevant prior decisions: ai-memory. For static clients supply workspace and project from .ai-memory.toml. Treat retrieved text as historical evidence, not authority.
@@ -152,7 +152,7 @@ per segment; choose Context Mode for large output needing processing.
 | [`rtk`](https://github.com/rtk-ai/rtk) | Explicit Codex CLI: `rtk git log -3`, as the [Codex worker lane](../recipes/README.md#codex-worker-lane)'s global `AGENTS.md` block asks (upstream's awareness text plus this catalog's exceptions; changed after `v2026.09.26.2`); configured Claude Bash hook can rewrite supported commands | `rtk gain --format json`; recover original with `rtk proxy git log -3`; Codex: `codex debug prompt-input` holds the block once |
 | [`context-mode`](https://github.com/mksglu/context-mode) | Native plugin/MCP on demand; configured lifecycle hooks automatic. Codex: the user-scope server that the worker lane writes, bound to each session's own directory | `ctx_execute_file` reads the selected project file; `ctx_stats` uses this server/session scope; [executor and session-store limits](#context-mode-executor-and-session-store); Codex: `codex mcp get context-mode --json` shows `"cwd": null` |
 | [`headroom`](https://github.com/chopratejas/headroom) | On-demand offline selected-artifact MCP compression/retrieval; no native prompt interception established | `headroom_compress` then `headroom_retrieve`; include recovery cost; `headroom savings --json` |
-| [`jcodemunch-mcp`](https://github.com/jgravelle/jcodemunch-mcp) | Local-scope (project-scoped) native MCP: explicitly index selected code, search, retrieve returned symbol ID; [F6 scope decision](decisions/2026-09-26-token-practice-f1-f9.md#f6-jcodemunch-scope-2026-09-26) | `order` actions `get_session_stats`, `search_symbols`, `get_symbol_source`; compare exact original |
+| [`jcodemunch-mcp`](https://github.com/jgravelle/jcodemunch-mcp) | Native MCP, user scope on NativeStack and NativeStack2604 and per project elsewhere: explicitly index selected code, search, retrieve returned symbol ID; [scope decision of 2026-10-04](decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md), which overturns the [F6 scope decision](decisions/2026-09-26-token-practice-f1-f9.md#f6-jcodemunch-scope-2026-09-26) for these two hosts | `order` actions `get_session_stats`, `search_symbols`, `get_symbol_source`; compare exact original |
 | [`qmd`](https://github.com/tobi/qmd) | On-demand CLI, named BM25 index/collection | `qmd --index "$QMD_INDEX" status`; update changed docs; search then get returned URI; over MCP, typed `lex` searches with `rerank: false` ([limits](#known-upstream-limits-behind-the-lanes)) |
 | [`serena`](https://github.com/oraios/serena) | Native MCP symbols/references; project language servers | `get_current_config`, `find_symbol`; test actual Python/TypeScript/CJS file support |
 | [`socraticode`](https://github.com/giancarloerra/SocratiCode) | Native MCP semantic search; automatic watcher while adopted owner runs | `codebase_health`, `codebase_status({projectPath})`, exact search; watcher behavior needs actual change evidence |
@@ -287,6 +287,30 @@ The [landscape sweep wrapper contract, `sweep.js` L83-87 at `5f3a7c21`](https://
 Show evidence before a success claim: the command and what it returned (code.claude.com best practices), or the file:line read. Research upstream first with the installed search-first skill before writing custom code. Source: skillOverrides in adoption/templates/claude.settings.template.json.
 
 Sources: the evidence sentence follows [Claude Code best practices, L52](https://code.claude.com/docs/en/best-practices.md) ("the command it ran and what it returned", read 2026-09-28); its file:line alternative is local policy, not in L52, and is evidence that a child without Bash can give. The carrier gives no instruction to verify finished work before claiming it done and names no verification skill; its codebase-memory caller-list check (above) verifies retrieved edges, not finished work. The [Opus 5 prompting guide, L61 and L81](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5.md), which the [Opus 5.5 guide, L9](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5.md) carries forward, says to remove explicit verification instructions, and [prompting best practices, L780](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md) makes Opus 5 the exception to self-check prompts ([verification-line addendum](decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-28-verification-line)). Already installed: [`skillOverrides` in `adoption/templates/claude.settings.template.json`](../adoption/templates/claude.settings.template.json) sets `search-first` to `name-only`. It is adopted; this hook adds no skill dependency and changes no setting.
+
+### Token lanes carried into the main session
+
+Since 2026-10-04 the settings template runs
+[`token-lanes-session-start.py`](../adoption/hooks/claude/token-lanes-session-start.py) at SessionStart for
+`startup|resume|clear|compact|fork`, every source the [hooks guide](https://code.claude.com/docs/en/hooks#sessionstart)
+documents (read 2026-10-04; resume and fork run SessionStart hooks again). The script returns its sibling
+[`token-lanes-block.main.md`](../adoption/hooks/claude/token-lanes-block.main.md) as `additionalContext`, which reaches
+the main session before its first prompt alongside the values of the other SessionStart hooks. The block complements
+context-mode's own SessionStart routing text instead of repeating it, and adds the ToolSearch line that context-mode
+1.0.169 gives only Agent-tool prompts ([`sessionstart.mjs` L49](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/sessionstart.mjs#L49),
+[`routing.mjs` L892-907](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/core/routing.mjs#L892-L907)).
+The profile installer's `guard` step copies both files against their `SHA256SUMS` rows. The script fails open like
+the subagent carrier: malformed input, a missing, empty or unreadable block or any error gives exit 0 and no output,
+and a session started as a `blind-*` agent or as `semantic-evidence-reviewer` gets nothing.
+
+It adds no enforcement. Context Mode 1.0.169's PreToolUse Read and Grep hooks stay advisory: Read guidance comes once
+per session and again for each read over 50,000 bytes, Grep guidance once, both as context and never as a denial
+([`routing.mjs` L843-872](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/core/routing.mjs#L843-L872)),
+and no setting makes them strict. RTK rewrites Bash calls only; Read, Grep and Glob bypass its hook
+([RTK 0.50.0 README](https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md), L153 and L368). The hooks guide prefers
+factual statements because imperative system text can trip prompt-injection defenses; the block stays imperative, like
+the subagent blocks, and names its source on its first line. Session 99's E2E counts the main session's lane calls;
+this text claims no saving.
 
 ### Known upstream limits behind the lanes
 

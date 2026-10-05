@@ -51,34 +51,57 @@
         "first_round": 53,
         "judged": 11,
         "no_blind_default_today": 2,
+        "owner_decision": 10,
         "pinned": 6,
         "project_practice": 2
       },
       "by_state": {
-        "definitive": 31,
+        "definitive": 30,
         "measurement": 6,
         "open": 25,
-        "resolved": 23,
+        "resolved": 34,
         "split": 5
       },
-      "definitive": 31,
-      "installed": 59,
-      "interim": 3,
+      "definitive": 30,
+      "installed": 72,
+      "interim": 2,
       "layers": 37,
       "measurements_pending": 8,
       "measurements_returned": 3,
-      "not_installed": 31,
-      "slots": 90
+      "not_installed": 28,
+      "owner_amendments": 4,
+      "slots": 100
     },
     "metadata": {
       "consensus_wave2": {
-        "acknowledgements": [],
-        "acknowledgements_owed": [
-          "claude",
-          "gpt"
+        "acknowledgements": [
+          {
+            "at": "2026-10-04T21:59:16Z",
+            "covers": "the Claude lane's acknowledgement of the wave-2 batch as a selection record over wave2-records.json sha256 c091152f…: the statusline addition, the credential-guard amendment, the credential-custody amendment's decision (custody change 15) and the three amendment-3 interim installs (memory-owner ai-memory 2.5.2, code-search semble 0.6.1, context-supply context-mode 1.0.169) on the owner's decisions of 2026-10-03; it excludes, until the hashed records carry them, the custody amendment's eligibility-gate criteria and systemd-creds sentences (custody changes 1-3) and the memory backup line's attribution to synthesis X6",
+            "family": "claude",
+            "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5984844347"
+          },
+          {
+            "at": "2026-10-04T21:59:16Z",
+            "covers": "the GPT family's acknowledgement (bounded GPT-6.1 Sol review) of the wave-2 batch: amendment 3 and its no-install-rule exception, the statusline addition, the credential-custody and credential-guard amendments, and the owner-authorized memory-owner, code-search and context-supply interims, with its recorded GPT conditions and open acceptance gates; no objections",
+            "family": "gpt",
+            "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5984844445"
+          }
         ],
+        "acknowledgements_owed": [],
         "date_utc": "2026-10-03",
         "meaning": "the wave-2 batch of 2026-10-03: one row added and two amendments recorded by direct consensus of both model families, and three interim installs under amendment 3 on the owner's decisions of that day; selection records only: no comparison named here has run, and this record changes nothing on any host"
+      },
+      "consensus_wave3": {
+        "acknowledgements": [],
+        "acknowledgements_owed": [],
+        "authority": {
+          "date_utc": "2026-10-04",
+          "kind": "owner_decision",
+          "relayed_by": "docs/decisions/2026-10-04-token-full-stack-owner-default.md"
+        },
+        "date_utc": "2026-10-04",
+        "meaning": "the wave-3 batch of 2026-10-04: the owner's decision that the full token-efficiency stack installs by default on the new distribution, recorded under amendment 4: ten rows added, owner defaults on three rows whose decided default installs nothing, and the code-search interim widened to both arms of its confirmatory; selection records only: no comparison named here has run, net provider savings stay unmeasured, and this record changes nothing on any host"
       },
       "counts": {
         "by_row_kind": {
@@ -87,24 +110,25 @@
           "first_round": 53,
           "judged": 11,
           "no_blind_default_today": 2,
+          "owner_decision": 10,
           "pinned": 6,
           "project_practice": 2
         },
         "by_state": {
-          "definitive": 31,
+          "definitive": 30,
           "measurement": 6,
           "open": 25,
-          "resolved": 23,
+          "resolved": 34,
           "split": 5
         },
-        "definitive": 31,
-        "installed": 59,
-        "interim": 3,
+        "definitive": 30,
+        "installed": 72,
+        "interim": 2,
         "layers": 37,
-        "slots": 90
+        "slots": 100
       },
       "date_utc": "2026-10-01",
-      "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name. A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides. Amendment 3 (wave 2, 2026-10-03): a row whose decided default installs nothing may carry an interim install, recorded in the row's interim field beside the fields the rounds decided, which stay as they were. The interim names what it installs and at which pin, the measurement or comparison that replaces or removes it, the authority that installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision, as the record that relays it states it, or a direct consensus with both families' acknowledgements on record. On the owner's decision an interim may sit on a definitive row whose default installs nothing: the definitive verdict stays recorded beside it, and the named measurement reports to the owner instead of removing the interim by itself. An interim is never definitive and is neither a blind result nor a measurement; no other installed row may own its job; its label starts with 'interim install', names its authority and says what decides it. The install plan installs it as the row's owner, and the client configuration wires what it installs while the row carries it.",
+      "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name. A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides. Amendment 3 (wave 2, 2026-10-03): a row whose decided default installs nothing may carry an interim install, recorded in the row's interim field beside the fields the rounds decided, which stay as they were. The interim names what it installs and at which pin, the measurement or comparison that replaces or removes it, the authority that installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision, as the record that relays it states it, or a direct consensus with both families' acknowledgements on record. On the owner's decision an interim may sit on a definitive row whose default installs nothing: the definitive verdict stays recorded beside it, and the named measurement reports to the owner instead of removing the interim by itself. An interim is never definitive and is neither a blind result nor a measurement; no other installed row may own its job; its label starts with 'interim install', names its authority and says what decides it. The install plan installs it as the row's owner, and the client configuration wires what it installs while the row carries it. Amendment 4 (wave 3, 2026-10-04): on the owner's dated decision, as the record that relays it states it, a batch may add rows of kind owner_decision and give a row whose decided default installs nothing an owner default. An owner row or an owner default names what it installs and at which pin, the job it owns and the comparison that would remove it; that comparison reports to the owner and removes nothing by itself. The fields an owner default replaces, and an interim it drops, stay recorded on the row under overturned. Neither is definitive, a blind result, a consensus or a measurement, and no other installed row may own its job; its label starts with 'owner decision' and names its authority. The relaying record is hashed in the batch, quotes the owner's words and names every slot the batch changes. The install plan installs it as the row's owner, and the client configuration wires what it installs.",
       "decision_rule_before_amendment_2": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
       "kind": "new-wsl-definitive-manifest",
       "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, agreed by both model families, and is not a merit acceptance",
@@ -123,7 +147,7 @@
         ]
       },
       "no_install_rule": "an option that installs nothing extra is the default unless measured evidence shows a challenger's gain on the requirement's own metric with an interval that excludes zero",
-      "no_install_rule_exception": "Amendment 3 makes one exception to the no-install rule: an interim install puts something extra on the destination before measured evidence shows a gain, on documented fit and the authority it names, and only until its named measurement decides; the row's decided default, which installs nothing, stays recorded beside it.",
+      "no_install_rule_exception": "Amendment 3 makes one exception to the no-install rule: an interim install puts something extra on the destination before measured evidence shows a gain, on documented fit and the authority it names, and only until its named measurement decides; the row's decided default, which installs nothing, stays recorded beside it. Amendment 4 makes a second exception to the no-install rule: an owner row or an owner default installs on the owner's decision before measured evidence shows a gain; net provider savings stay unmeasured, and the decision it replaces stays recorded beside it.",
       "not_claimed": "no candidate is installed or measured by these rounds; a default decided on documented fit says so; a definitive default is the slot's install decision, not a merit acceptance: the full-field re-vote, the measured comparison and new-host acceptance stay separate",
       "pinned_requirements": {
         "us-equities": [
@@ -164,7 +188,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "e6897728fd866a4d17583109f0d48bcd578c59b237e7186e31ec8ff09e83abf4"
+          "sha256": "791d949e53168e2f61f9bc13fbe246097d03cebd3a634e10d21da6ece5455934"
         },
         "convergence": {
           "file": "convergence.json",
@@ -1376,24 +1400,25 @@
                 "transport": "stdio MCP server 'semble', CPU only, no port and no GPU"
               },
               "date_utc": "2026-10-03",
-              "decided_by": "the frozen code-search confirmatory (its section 6): semble selected, it becomes final once its pins equal the executable annex's; SocratiCode or ColGREP selected, that one replaces it; no selection, semble is removed and the slot returns to empty",
-              "default": "semble 0.6.1",
-              "label": "interim install on the owner's decision (amendment 3); not a blind result and not a measurement; the frozen code-search confirmatory decides, and its result replaces or removes it",
+              "decided_by": "the frozen code-search confirmatory (its section 6) decides between the two installed arms: semble selected, SocratiCode is removed and semble becomes final once its pins equal the executable annex's; SocratiCode selected, semble is removed; ColGREP selected, it replaces both; no selection, both are removed and the slot returns to empty",
+              "default": "semble 0.6.1 + SocratiCode 1.15.0",
+              "label": "interim install on the owner's decisions (amendment 3 on 2026-10-03 for semble, amendment 4 on 2026-10-04 for SocratiCode); not a blind result and not a measurement; the frozen code-search confirmatory decides, and its result removes the arm it does not select",
               "open_acceptance_gates": [
                 "each client's cache holds <sha256>/index/metadata.json whose model_path is the local snapshot",
                 "Codex lists both tools, and a codex exec --json search completes without 'requires approval'",
                 "a fresh Claude Code session's mcp__semble__search shows no prompt",
                 "an edit is returned after waiting longer than three times the first build's duration",
-                "no new listener and no GPU process"
+                "no new listener and no GPU process",
+                "the SocratiCode package is installed at 1.15.0 under ${ECO_ROOT}/tools/socraticode-1.15.0; its MCP server answers codebase_health only once the client configuration names a Qdrant store and an embedding endpoint, which no row of the new distribution installs yet"
               ],
-              "pin": "tag v0.6.1 = commit 24497845460960db1839c8485319df189a889225; PyPI semble-0.6.1-py3-none-any.whl sha256 fea96cf60d93555966d57f26604b8ef935bf3f876757568cec9fe655dd651256; model minishlab/potion-code-16M-v2 at revision e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b, loaded from a local snapshot",
+              "pin": "semble: tag v0.6.1 = commit 24497845460960db1839c8485319df189a889225; PyPI semble-0.6.1-py3-none-any.whl sha256 fea96cf60d93555966d57f26604b8ef935bf3f876757568cec9fe655dd651256; model minishlab/potion-code-16M-v2 at revision e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b, loaded from a local snapshot. SocratiCode: npm socraticode@1.15.0, tarball sha256 f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1, source f6191f076a42405f0d5508139f3a8b505cfef93a, installed with --ignore-scripts --before=2026-09-24T12:00:00Z",
               "records": [
                 {
                   "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
                   "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
                 }
               ],
-              "repository": "https://github.com/MinishLab/semble",
+              "repository": "https://github.com/MinishLab/semble; https://github.com/giancarloerra/SocratiCode",
               "reviews": {
                 "claude": "the wave-2 ruling for the code-search layer: nothing in the slot until amendment 3 exists, then semble 0.6.1 as the interim engine, MCP only, with the model pinned and one cache per client",
                 "gpt": "the GPT family's check agreed with conditions (gpt-6-astra). The whole-wave read (https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965501630), before the owner's decision, recommended keeping the search hold with the clients' built-in search"
@@ -1413,6 +1438,34 @@
             "measurement": {
               "receipts": [],
               "returned": false
+            },
+            "overturned": {
+              "amendment": {
+                "by": "the owner's decision of 2026-10-04 (wave 3, amendment 4)",
+                "date_utc": "2026-10-04",
+                "decision": "the interim installs both arms of the frozen code-search confirmatory, semble 0.6.1 and SocratiCode 1.15.0, until it removes one",
+                "sources": [
+                  "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                  "docs/token-efficiency-stack.json (rows[component_id=socraticode].upstream_commands)",
+                  "recipes/README.md (the socraticode row)",
+                  "https://github.com/giancarloerra/SocratiCode"
+                ],
+                "text": "The owner's order installs the token-efficiency repositories by default, and SocratiCode is a core row of docs/token-efficiency-stack.json. The slot stays a split row of the decision round. Its interim, semble on the owner's decision of 2026-10-03, adds SocratiCode, the other arm of the slot's frozen confirmatory, which still decides. The interim keeps its install gate, the wave-2 acknowledgements. SocratiCode needs a Qdrant store and an embedding endpoint that no row of the new distribution installs; until the client configuration names both, the installed package serves nothing."
+              },
+              "interim": {
+                "decided_by": "the frozen code-search confirmatory (its section 6): semble selected, it becomes final once its pins equal the executable annex's; SocratiCode or ColGREP selected, that one replaces it; no selection, semble is removed and the slot returns to empty",
+                "default": "semble 0.6.1",
+                "label": "interim install on the owner's decision (amendment 3); not a blind result and not a measurement; the frozen code-search confirmatory decides, and its result replaces or removes it",
+                "open_acceptance_gates": [
+                  "each client's cache holds <sha256>/index/metadata.json whose model_path is the local snapshot",
+                  "Codex lists both tools, and a codex exec --json search completes without 'requires approval'",
+                  "a fresh Claude Code session's mcp__semble__search shows no prompt",
+                  "an edit is returned after waiting longer than three times the first build's duration",
+                  "no new listener and no GPU process"
+                ],
+                "pin": "tag v0.6.1 = commit 24497845460960db1839c8485319df189a889225; PyPI semble-0.6.1-py3-none-any.whl sha256 fea96cf60d93555966d57f26604b8ef935bf3f876757568cec9fe655dd651256; model minishlab/potion-code-16M-v2 at revision e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b, loaded from a local snapshot",
+                "repository": "https://github.com/MinishLab/semble"
+              }
             },
             "repository": "",
             "resolution": {
@@ -2003,43 +2056,89 @@
       },
       "default_slots": [
         {
-          "installed": false,
-          "not_installed_reason": "the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it",
+          "installed": true,
+          "not_installed_reason": null,
           "record": {
             "catalog": "foundation",
-            "claude": "returned",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
             "coincides_with_lane_record": null,
-            "default": "Not installed: the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it",
+            "default": "ccusage 20.0.26",
             "definitive": false,
-            "gpt": "returned: 0 of 2 blind GPT samples",
-            "installs_nothing_extra": true,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
             "job": "token and cost usage meter",
-            "label": "not installed: resolved by the rule or a blind critic",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): the owner default replaces the rounds' not-installed resolution, which stays recorded under overturned; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
             "layer_id": "token-efficiency",
             "measurement": null,
-            "repository": "",
-            "resolution": {
-              "by": "one blind Claude critic",
-              "covered_by": [
-                "claude-code",
-                "codex",
-                "otel-collector-contrib"
-              ],
-              "evidence": {
-                "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
-                "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+            "overturned": {
+              "amendment": {
+                "by": "the owner's decision of 2026-10-04 (wave 3, amendment 4)",
+                "date_utc": "2026-10-04",
+                "decision": "ccusage 20.0.26 becomes the slot's owner default, a read-only usage meter",
+                "sources": [
+                  "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                  "recipes/README.md (the ccusage row)"
+                ],
+                "text": "The owner's order asks that token use be monitored. ccusage reads the clients' own usage logs; it is a meter and never a saving, and native finalized accounting stays authoritative. The rounds' resolution, not installed and covered by the two clients and the collector, stays recorded on the row under overturned."
               },
-              "first_round_record": {
+              "fields": {
                 "claude": "returned",
-                "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
-                "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call"
-              },
-              "former_default": {
-                "name": "ccusage",
-                "repository": "https://github.com/ccusage/ccusage"
-              },
-              "outcome": "not_installed",
-              "reason": "the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it"
+                "default": "Not installed: the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it",
+                "definitive": false,
+                "gpt": "returned: 0 of 2 blind GPT samples",
+                "installs_nothing_extra": true,
+                "label": "not installed: resolved by the rule or a blind critic",
+                "measurement": null,
+                "repository": "",
+                "resolution": {
+                  "by": "one blind Claude critic",
+                  "covered_by": [
+                    "claude-code",
+                    "codex",
+                    "otel-collector-contrib"
+                  ],
+                  "evidence": {
+                    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+                    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+                  },
+                  "first_round_record": {
+                    "claude": "returned",
+                    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+                    "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call"
+                  },
+                  "former_default": {
+                    "name": "ccusage",
+                    "repository": "https://github.com/ccusage/ccusage"
+                  },
+                  "outcome": "not_installed",
+                  "reason": "the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it"
+                },
+                "state": "resolved"
+              }
+            },
+            "repository": "https://github.com/ccusage/ccusage",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's ccusage function: the npm tarball, checked against its digest, installed with npm install --global --prefix ${ECO_ROOT}/tools/ccusage-20.0.26 and linked into ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/ccusage reports 20.0.26",
+                "ccusage daily --offline --no-cost --json and ccusage codex daily --offline --no-cost --json read the clients' logs without a network call"
+              ],
+              "outcome": "owner_default",
+              "overturn": "the fresh-session invocation census or the owner's monitoring finds that the native clients' own usage records answer every monitoring question ccusage answers; the result goes to the owner and removes nothing by itself",
+              "pin": "npm ccusage@20.0.26, tarball sha256 b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2 (adoption/pins-linux-x86_64.json); source d9821088b98aa536c7a385aa1a4579d6fa02269b (manifests/stack.json)",
+              "reason": "the owner's order asks that token use and the token tools' invocations be monitored; ccusage is the usage reader of docs/token-efficiency-stack.json (read existing native provider usage logs)",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=ccusage].upstream_commands)",
+                "recipes/README.md (the ccusage row)",
+                "https://github.com/ccusage/ccusage/releases/tag/v20.0.26"
+              ],
+              "usage_rules": [
+                "a meter, never a saving: native finalized accounting stays authoritative; pull request #627 (an open draft at 083c9f5428a8e422701180fa58fe69677f9fcd06) reports that the supplemental ccusage run omits 653,816 tokens across three natural-compaction records",
+                "token-only reports (--no-cost) unless every model is priced (recipes/README.md, the ccusage row)"
+              ]
             },
             "row_kind": "first_round",
             "slot_id": "ccusage",
@@ -2048,34 +2147,101 @@
           "state": "resolved"
         },
         {
-          "installed": false,
-          "not_installed_reason": "decided by both families in the decision round on a measured comparison: no context-supply layer",
+          "installed": true,
+          "not_installed_reason": null,
           "record": {
             "catalog": "foundation",
-            "claude": "converged",
+            "claude": "the wave-2 ruling for the context layer adopted the owner's pin as the slot's interim; this owner default is not judged by a family",
             "coincides_with_lane_record": null,
-            "default": "No context-supply layer: the usage meter only",
-            "definitive": true,
-            "gpt": "converged",
-            "installs_nothing_extra": true,
-            "interim": {
-              "authority": {
-                "date_utc": "2026-10-03",
-                "decision": "use context-mode in both clients of the destination (the owner's pin that the wave-2 ruling for the context layer adopts)",
-                "kind": "owner_decision",
-                "relayed_by": "wave2-records.json owner_decisions[1]",
-                "verbatim": "please always use the sota gpt powered sota sdks, runtime for the research, context mode etc, we are evolve beyond simple action of web search"
+            "default": "context-mode 1.0.169",
+            "definitive": false,
+            "gpt": "the GPT family's wave-2 check disagreed (gpt-6-astra): its alternative was no additional context-supply layer, with context-mode kept as the user-mandated exception; this owner default is not judged by a family",
+            "installs_nothing_extra": false,
+            "job": "context-supply layer between tools and the model",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): the owner default replaces the definitive no-install default and the wave-2 interim, which stay recorded under overturned; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "overturned": {
+              "amendment": {
+                "by": "the owner's decision of 2026-10-04 (wave 3, amendment 4)",
+                "date_utc": "2026-10-04",
+                "decision": "context-mode 1.0.169 becomes the slot's owner default; its wave-2 interim is dropped",
+                "sources": [
+                  "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                  "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.token-context; owner_decisions[1])"
+                ],
+                "text": "The owner's order installs the token-efficiency stack by default, context-mode first among its core rows. The slot's definitive no-install default and its wave-2 interim stay recorded on the row under overturned. The interim's pins, configuration and acceptance gates carry over to the owner default, which no longer waits for the wave-2 acknowledgements, because its authority is the owner's decision of 2026-10-04 and not amendment 3."
               },
+              "fields": {
+                "claude": "converged",
+                "default": "No context-supply layer: the usage meter only",
+                "definitive": true,
+                "gpt": "converged",
+                "installs_nothing_extra": true,
+                "label": "no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero",
+                "measurement": null,
+                "repository": "",
+                "resolution": {
+                  "outcome": "kept",
+                  "reason": "decided by both families in the decision round on a measured comparison: no context-supply layer"
+                },
+                "state": "definitive"
+              },
+              "interim": {
+                "authority": {
+                  "date_utc": "2026-10-03",
+                  "decision": "use context-mode in both clients of the destination (the owner's pin that the wave-2 ruling for the context layer adopts)",
+                  "kind": "owner_decision",
+                  "relayed_by": "wave2-records.json owner_decisions[1]",
+                  "verbatim": "please always use the sota gpt powered sota sdks, runtime for the research, context mode etc, we are evolve beyond simple action of web search"
+                },
+                "configuration": {
+                  "claude": "the plugin from the marketplace at the reviewed revision, with the compare gate (only stats.json changed) before every update",
+                  "codex_hooks": "the six plugin hooks trusted by their hashes, read back through codex app-server hooks/list and rendered by the client configuration; never --dangerously-bypass-hook-trust",
+                  "codex_plugin": "marketplace add --ref 6f0cc6841c687e754059f36714a11233fda1a02b, then plugin add; its own MCP server stays off",
+                  "codex_server": "one session-bound MCP server running start.mjs from the verified npm tarball, installed with npm install --global --prefix ${ECO_ROOT}/tools/context-mode-1.0.169"
+                },
+                "date_utc": "2026-10-03",
+                "decided_by": "a preregistered multi-agent end-to-end comparison against the clients' native output limits (none is on file yet): if the paired ratio interval of raw tool-output tokens entering context per agent does not lie wholly below 1, or the one-sided 95% lower bound of the task-success difference is below -0.10, the recommendation reverts to the native base and the result goes to the owner; the pin is never removed automatically",
+                "default": "context-mode 1.0.169",
+                "label": "interim install on the owner's pin (amendment 3), beside the definitive no-install default; not a measured selection and not a blind result, with no saving or superiority claim; a preregistered end-to-end comparison decides and reports to the owner",
+                "open_acceptance_gates": [
+                  "the Claude plugin shows 1.0.169, its compare against 6f0cc684 lists only stats.json, /mcp shows it connected and ctx-doctor passes",
+                  "stream-json shows ctx_* tool_use counts in a parent and a subagent, and one ctx_search recall",
+                  "on Codex only the user-config context-mode server is enabled; hooks/list shows the six hooks trusted without the bypass flag",
+                  "an mcp_tool_call to ctx_execute completes; two concurrent sessions and one older than six minutes each get their own directory",
+                  "one compaction completes in each client with no repeated PreCompact or SessionStart cycle"
+                ],
+                "pin": "Claude Code plugin context-mode@context-mode at commit 6f0cc6841c687e754059f36714a11233fda1a02b, or a descendant whose compare against it lists only stats.json; Codex plugin hooks and skills at --ref 6f0cc684 with the plugin's own MCP server off; the Codex session server from the npm tarball context-mode@1.0.169, sha256 09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
+                "records": [
+                  {
+                    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
+                    "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+                  }
+                ],
+                "repository": "https://github.com/mksglu/context-mode",
+                "reviews": {
+                  "claude": "the wave-2 ruling for the context layer adopts the owner's pin as the slot's interim, status interim_until_measurement, and keeps the decision round's verdict and the Harbor result as the reason the slot waits on a measurement",
+                  "gpt": "the GPT family's check disagreed (gpt-6-astra): its alternative is no additional context-supply layer, with context-mode kept as the user-mandated exception until the client acceptance tests and a comparison support promotion. The whole-wave read (https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965501630): preserve the explicit user pin; bind the actual plugin, npm, source and hook identities and fresh-session behaviour"
+                },
+                "sources": [
+                  "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.token-context: the dossier default, the GPT check and its alternative, the ruling's changes 1-3, 6-10 and 17; owner_decisions[1])",
+                  "https://github.com/mksglu/context-mode/commit/6f0cc6841c687e754059f36714a11233fda1a02b",
+                  "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/start.mjs",
+                  "https://www.npmjs.com/package/context-mode/v/1.0.169"
+                ]
+              }
+            },
+            "repository": "https://github.com/mksglu/context-mode",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
               "configuration": {
                 "claude": "the plugin from the marketplace at the reviewed revision, with the compare gate (only stats.json changed) before every update",
                 "codex_hooks": "the six plugin hooks trusted by their hashes, read back through codex app-server hooks/list and rendered by the client configuration; never --dangerously-bypass-hook-trust",
                 "codex_plugin": "marketplace add --ref 6f0cc6841c687e754059f36714a11233fda1a02b, then plugin add; its own MCP server stays off",
                 "codex_server": "one session-bound MCP server running start.mjs from the verified npm tarball, installed with npm install --global --prefix ${ECO_ROOT}/tools/context-mode-1.0.169"
               },
-              "date_utc": "2026-10-03",
-              "decided_by": "a preregistered multi-agent end-to-end comparison against the clients' native output limits (none is on file yet): if the paired ratio interval of raw tool-output tokens entering context per agent does not lie wholly below 1, or the one-sided 95% lower bound of the task-success difference is below -0.10, the recommendation reverts to the native base and the result goes to the owner; the pin is never removed automatically",
-              "default": "context-mode 1.0.169",
-              "label": "interim install on the owner's pin (amendment 3), beside the definitive no-install default; not a measured selection and not a blind result, with no saving or superiority claim; a preregistered end-to-end comparison decides and reports to the owner",
               "open_acceptance_gates": [
                 "the Claude plugin shows 1.0.169, its compare against 6f0cc684 lists only stats.json, /mcp shows it connected and ctx-doctor passes",
                 "stream-json shows ctx_* tool_use counts in a parent and a subagent, and one ctx_search recall",
@@ -2083,39 +2249,26 @@
                 "an mcp_tool_call to ctx_execute completes; two concurrent sessions and one older than six minutes each get their own directory",
                 "one compaction completes in each client with no repeated PreCompact or SessionStart cycle"
               ],
+              "outcome": "owner_default",
+              "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without context-mode against the full stack and the lean base), or the preregistered comparison the wave-2 interim named (the paired ratio interval of raw tool-output tokens entering context per agent not wholly below 1, or the one-sided 95% lower bound of the task-success difference below -0.10), reports against it; the result goes to the owner and the pin is never removed automatically",
               "pin": "Claude Code plugin context-mode@context-mode at commit 6f0cc6841c687e754059f36714a11233fda1a02b, or a descendant whose compare against it lists only stats.json; Codex plugin hooks and skills at --ref 6f0cc684 with the plugin's own MCP server off; the Codex session server from the npm tarball context-mode@1.0.169, sha256 09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
-              "records": [
-                {
-                  "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-                  "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
-                }
-              ],
-              "repository": "https://github.com/mksglu/context-mode",
-              "reviews": {
-                "claude": "the wave-2 ruling for the context layer adopts the owner's pin as the slot's interim, status interim_until_measurement, and keeps the decision round's verdict and the Harbor result as the reason the slot waits on a measurement",
-                "gpt": "the GPT family's check disagreed (gpt-6-astra): its alternative is no additional context-supply layer, with context-mode kept as the user-mandated exception until the client acceptance tests and a comparison support promotion. The whole-wave read (https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5965501630): preserve the explicit user pin; bind the actual plugin, npm, source and hook identities and fresh-session behaviour"
-              },
+              "reason": "the owner's order installs the token-efficiency repositories by default, context-mode first among the core rows of docs/token-efficiency-stack.json (local execution, file processing, indexed retrieval, native context hooks); the owner pinned it in both clients on 2026-10-03 (wave2-records.json owner_decisions[1])",
               "sources": [
-                "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.token-context: the dossier default, the GPT check and its alternative, the ruling's changes 1-3, 6-10 and 17; owner_decisions[1])",
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.token-context: the ruling's changes 1-3, 6-10 and 17; owner_decisions[1])",
                 "https://github.com/mksglu/context-mode/commit/6f0cc6841c687e754059f36714a11233fda1a02b",
-                "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/start.mjs",
                 "https://www.npmjs.com/package/context-mode/v/1.0.169"
+              ],
+              "usage_rules": [
+                "ctx_stats is a connection-level estimate, never an exact provider saving (recipes/README.md, the context-mode row)",
+                "record the npm tarball digest and each client's installed plugin commit separately; the shared 1.0.169 label is not a source pin"
               ]
-            },
-            "job": "context-supply layer between tools and the model",
-            "label": "no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero",
-            "layer_id": "token-efficiency",
-            "measurement": null,
-            "repository": "",
-            "resolution": {
-              "outcome": "kept",
-              "reason": "decided by both families in the decision round on a measured comparison: no context-supply layer"
             },
             "row_kind": "judged",
             "slot_id": "context-supply",
-            "state": "definitive"
+            "state": "resolved"
           },
-          "state": "definitive"
+          "state": "resolved"
         },
         {
           "installed": true,
@@ -2129,7 +2282,7 @@
             "gpt": "agreed with conditions on 2026-10-03 after its own primary-source check (gpt-6-astra); the whole-wave read keeps the row conditional on the destination's readback",
             "installs_nothing_extra": false,
             "job": "the interactive status line of the two clients (context and plan usage at a glance)",
-            "label": "both families by direct consensus on primary sources (wave 2, 2026-10-03; both pull-request acknowledgements owed); not a blind round, not a measurement",
+            "label": "both families by direct consensus on primary sources (wave 2, 2026-10-03; both pull-request acknowledgements recorded on #608, 2026-10-04); not a blind round, not a measurement",
             "layer_id": "token-efficiency",
             "measurement": null,
             "repository": "https://github.com/jarrodwatts/claude-hud",
@@ -2162,6 +2315,459 @@
             },
             "row_kind": "consensus",
             "slot_id": "statusline",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "coincides_with_lane_record": null,
+            "default": "RTK 0.51.0",
+            "definitive": false,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
+            "job": "condensing supported shell command output before it enters an agent's context, with raw recovery",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): installed by default on the owner's order; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/rtk-ai/rtk",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's command-output function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/rtk-0.51.0 and linked into ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/rtk reports 0.51.0, and rtk git log -3 and rtk proxy git log -3 both return in a checkout",
+                "a Claude Code Bash call to a supported command is rewritten by the hook, and rtk gain --format json reads back the session's counters"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without RTK against the full stack and the lean base), or the fresh-session invocation census, reports that RTK adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
+              "pin": "tag v0.51.0; release asset rtk-x86_64-unknown-linux-musl.tar.gz, sha256 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 (adoption/pins-linux-x86_64.json; the release's checksums.txt and the GitHub asset digest read 2026-10-04 state the same digest)",
+              "reason": "the owner's order installs the token-efficiency repositories by default; RTK is the first core row of docs/token-efficiency-stack.json (compact supported command outputs, keep failure and raw recovery). Claude Code's Bash hook rewrites supported commands; Codex calls rtk explicitly at this pin",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=rtk].upstream_commands)",
+                "recipes/README.md (Official release archives; the rtk row)",
+                "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+                "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt",
+                "https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs#L119-L123",
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md (Refresh onto main after PR #693)"
+              ],
+              "usage_rules": [
+                "the pin follows main 14048b840 after PR #693: v0.51.0 requires --shell for executable positional scripts that need shell expansion; the plan uses direct git/proxy arguments and hook-check inspection strings",
+                "retain explicit rtk commands for Codex; this plan never runs rtk init --global --codex (docs/token-session-handbook.md:397)",
+                "RTK_TELEMETRY_DISABLED=1 in both clients; rtk proxy returns the raw output when a condensed result is unusable"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "command-output",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "coincides_with_lane_record": null,
+            "default": "Headroom 0.37.0 (headroom-ai[mcp], MCP server only)",
+            "definitive": false,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
+            "job": "on-demand compression and exact retrieval of selected content through an MCP server, with no proxy interception",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): installed by default on the owner's order; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/headroomlabs-ai/headroom",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's output-compression function: uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0' with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/headroom runs from the uv tool and its MCP server lists headroom_compress and headroom_retrieve",
+                "a headroom_compress call returns a hash that headroom_retrieve resolves to the original content"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without Headroom against the full stack and the lean base), or the fresh-session invocation census, reports that Headroom adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
+              "pin": "PyPI headroom-ai[mcp]==0.37.0; wheel headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl, sha256 2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46 (adoption/pins-linux-x86_64.json)",
+              "reason": "the owner's order installs the token-efficiency repositories by default; Headroom is a core row of docs/token-efficiency-stack.json (on-demand MCP compression and retrieval)",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=headroom].upstream_commands)",
+                "recipes/README.md (the headroom row)",
+                "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0"
+              ],
+              "usage_rules": [
+                "the [mcp] extra only, never [all]; the server runs as headroom mcp serve --proxy-url http://127.0.0.1:1, a dead proxy URL that reroutes no model traffic (docs/decisions/2026-09-25-codex-mcp-scope.md:73-74)",
+                "HEADROOM_OFFLINE=1, HF_HUB_OFFLINE=1, TRANSFORMERS_OFFLINE=1 and DO_NOT_TRACK=1 in its MCP environment (adoption/templates/codex.config.template.toml)",
+                "0.39.1 is not qualified: the omission-count defect that kept 0.39.0 out stands (recipes/README.md, the headroom row)"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "output-compression",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "coincides_with_lane_record": null,
+            "default": "jcodemunch-mcp 1.108.327",
+            "definitive": false,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
+            "job": "an explicitly scoped code index with exact symbol retrieval through an MCP surface",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): installed by default on the owner's order; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.327 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/jcodemunch-mcp runs from the uv tool",
+                "a project-scoped registration indexes a selected folder, and order search_symbols then get_symbol_source returns the requested definition"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without jcodemunch-mcp against the full stack and the lean base), or the fresh-session invocation census, reports that it adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
+              "pin": "PyPI jcodemunch-mcp==1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
+              "reason": "the owner's order installs the token-efficiency repositories by default; jcodemunch-mcp is a core row of docs/token-efficiency-stack.json (explicitly scoped code index and exact symbol retrieval)",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=jcodemunch-mcp].upstream_commands)",
+                "docs/token-session-handbook.md (uv tool specifications, line 334)",
+                "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
+                "manifests/stack.json (components[id=jcodemunch-mcp])",
+                "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
+              ],
+              "usage_rules": [
+                "registered per project, never at user scope (docs/token-session-handbook.md:108)",
+                "index only the selected code; sharing, AI summaries, watchers, cross-repository defaults and external context providers off (manifests/stack.json, jcodemunch-mcp command_scope)"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "code-index",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "coincides_with_lane_record": null,
+            "default": "codebase-memory-mcp 0.11.0",
+            "definitive": false,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
+            "job": "a persistent static code graph with call tracing, built only on an explicit index_repository call",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): installed by default on the owner's order; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/DeusData/codebase-memory-mcp",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's code-graph function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/codebase-memory-mcp-0.11.0 and linked into ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/codebase-memory-mcp is the archive's binary",
+                "an index_repository call on a selected folder, then search_graph and trace_path, return the expected function"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without codebase-memory-mcp against the full stack and the lean base), or the fresh-session invocation census, reports that it adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
+              "pin": "release v0.11.0 asset codebase-memory-mcp-linux-amd64.tar.gz, sha256 032b33c1833919a2d1de67ff6367fa6ea46aee8689c86ef223c88fae3b6e4536 (recipes/README.md; the GitHub asset digest read 2026-10-04 states the same digest)",
+              "reason": "the owner's order installs the token-efficiency repositories by default; codebase-memory-mcp is a core row of docs/token-efficiency-stack.json (persistent static code graph and call tracing)",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=codebase-memory-mcp].upstream_commands)",
+                "recipes/README.md (the codebase-memory-mcp row)",
+                "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+              ],
+              "usage_rules": [
+                "indexes only on an explicit index_repository call, with auto_index=false and ui_enabled=false; never run its install subcommand, which edits client configurations (docs/decisions/2026-09-25-codex-mcp-scope.md:74-76)"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "code-graph",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "coincides_with_lane_record": null,
+            "default": "Repomix 1.18.1",
+            "definitive": false,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
+            "job": "explicit packing of selected repository files into one artifact, with optional structural compression",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): installed by default on the owner's order; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/yamadashy/repomix",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's repo-packing function: the npm tarball, checked against its digest, installed with npm install --global --prefix ${ECO_ROOT}/tools/repomix-1.18.1 and linked into ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/repomix reports 1.18.1",
+                "a two-file pack of a scratch folder lists both files"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without Repomix against the full stack and the lean base), or the fresh-session invocation census, reports that it adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
+              "pin": "npm repomix@1.18.1, tarball sha256 d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f (adoption/pins-linux-x86_64.json)",
+              "reason": "the owner's order installs the token-efficiency repositories by default; Repomix is a core row of docs/token-efficiency-stack.json (explicit repository packing and structural compression)",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=repomix].upstream_commands)",
+                "recipes/README.md (the repomix row)",
+                "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+              ],
+              "usage_rules": [
+                "--compress keeps a Python definition only when the first line of its signature matches, so a multi-line signature drops the definition without notice; read the originals before editing, and check the pack's file list and exit status (recipes/README.md, the repomix row)"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "repo-packing",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "coincides_with_lane_record": null,
+            "default": "TOON 4.1.1 (@toon-format/cli)",
+            "definitive": false,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
+            "job": "compact encoding of uniform flat JSON arrays, kept only when a strict decode is value-equal",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): installed by default on the owner's order; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/toon-format/toon",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's structured-data function: the npm tarball, checked against its digest, installed with npm install --global --prefix ${ECO_ROOT}/tools/toon-4.1.1 and linked into ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/toon reports 4.1.1",
+                "a uniform record array round-trips through toon and toon --decode --strict to an equal JSON value"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without TOON against the full stack and the lean base), or the fresh-session invocation census, reports that it adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
+              "pin": "npm @toon-format/cli@4.1.1, tarball sha256 93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6 (adoption/pins-linux-x86_64.json)",
+              "reason": "the owner's order installs the token-efficiency repositories by default; TOON is a core row of docs/token-efficiency-stack.json (compact suitable structured data with explicit decode)",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=toon].upstream_commands)",
+                "recipes/README.md (the toon row)",
+                "https://github.com/toon-format/toon/releases/tag/v4.1.1"
+              ],
+              "usage_rules": [
+                "only for uniform arrays of flat records; compact JSON otherwise: pull request #627 (an open draft at 083c9f5428a8e422701180fa58fe69677f9fcd06) reports that TOON's three BOM string roundtrips fail, and 4.1.1 strips a leading U+FEFF on decode (open toon-format/toon#339)",
+                "keep the original JSON unless the strict decode is value-equal, including numeric precision (recipes/README.md, the toon row)"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "structured-data",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "coincides_with_lane_record": null,
+            "default": "MarkItDown 0.1.8",
+            "definitive": false,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
+            "job": "conversion of HTML and other supported source documents to Markdown for agent context",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): installed by default on the owner's order; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/microsoft/markitdown",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's doc-conversion function: uv tool install --python 3.13 markitdown==0.1.8 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/markitdown runs from the uv tool",
+                "a small HTML file converts to Markdown that keeps its text and has no raw tags"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without MarkItDown against the full stack and the lean base), or the fresh-session invocation census, reports that it adds nothing beside MinerU at equal task success; the result goes to the owner and removes nothing by itself",
+              "pin": "PyPI markitdown==0.1.8, sdist sha256 17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed (adoption/pins-linux-x86_64.json)",
+              "reason": "the owner's order installs the token-efficiency repositories by default; MarkItDown is a core row of docs/token-efficiency-stack.json (convert supported source documents to readable Markdown). It overlaps MinerU (mineru, document parsing to text), which the decision record names",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=markitdown].upstream_commands)",
+                "recipes/README.md (the markitdown row)",
+                "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+              ],
+              "usage_rules": [
+                "give the input type (-x html or -m text/html) and check that the output keeps the required facts; only the base converter is installed, and other extras are separate decisions (recipes/README.md, the markitdown row)"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "doc-conversion",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "coincides_with_lane_record": null,
+            "default": "Context Hub 0.1.4 (context-hub, the chub CLI)",
+            "definitive": false,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
+            "job": "retrieval of curated third-party developer documentation",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): installed by default on the owner's order; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/andrewyng/context-hub",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's api-docs function: the npm tarball, checked against its digest, installed with npm install --global --prefix ${ECO_ROOT}/tools/context-hub-0.1.4 and linked into ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/chub reports 0.1.4 with --cli-version",
+                "with telemetry and feedback off, chub search returns a document id that chub get retrieves"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without Context Hub against the full stack and the lean base), or the fresh-session invocation census, reports that it adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
+              "pin": "npm @aisuite/chub@0.1.4, tarball sha256 ca9fb94a21d3b5ae3025923ded305dd11f189626da5adab48a8b947bc523888f (adoption/pins-linux-x86_64.json)",
+              "reason": "the owner's order installs the token-efficiency repositories by default; Context Hub is a core row of docs/token-efficiency-stack.json (retrieve selected curated developer documentation)",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=context-hub].upstream_commands)",
+                "recipes/README.md (the context-hub row and Context Hub opt-out)",
+                "https://github.com/andrewyng/context-hub"
+              ],
+              "usage_rules": [
+                "telemetry: false and feedback: false in ~/.chub/config.yaml, and CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 where HOME or CHUB_DIR is overridden (recipes/README.md, Context Hub opt-out)",
+                "check a document's metadata.versions against the version the task targets; use the current primary documentation for newer APIs"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "api-docs",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "coincides_with_lane_record": null,
+            "default": "otel-tui 0.7.5",
+            "definitive": false,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
+            "job": "an on-demand terminal viewer of OTLP traces, metrics and logs on loopback ports",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): installed by default on the owner's order; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/ymtdzzz/otel-tui",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's trace-viewer function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/otel-tui-0.7.5 and linked into ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/otel-tui reports 0.7.5",
+                "a synthetic trace sent to its loopback OTLP port shows in the viewer"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the fresh-session invocation census shows otel-tui unused across the census window, or the owner's monitoring reads come only from the collector's stores; the result goes to the owner and removes nothing by itself",
+              "pin": "release v0.7.5 asset otel-tui_Linux_x86_64.tar.gz, sha256 dd10bfa12b6713a2d51d7a094644ff61a2467856fc93d3acecfe741a124ca896 (recipes/README.md, otel-tui telemetry inspection; the GitHub asset digest read 2026-10-04 states the same digest); source 3b25779a083469b732e3c628b4a412ee05cf9948 (manifests/stack.json)",
+              "reason": "the owner's order asks that token use be monitored; otel-tui is the on-demand OTLP viewer of docs/token-efficiency-stack.json (an observation row). It sits beside Phoenix (phoenix, not installed) and Grafana (a measurement row), which the decision record names",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=otel-tui].upstream_commands)",
+                "recipes/README.md (otel-tui telemetry inspection)",
+                "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5"
+              ],
+              "usage_rules": [
+                "run on demand on unused loopback ports and close it afterward; it is no service and holds no port (manifests/stack.json, otel-tui command_scope)"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "trace-viewer",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "coincides_with_lane_record": null,
+            "default": "token-lanes carriers: the SubagentStart block and a SessionStart main-session block (Claude Code hooks)",
+            "definitive": false,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
+            "installs_nothing_extra": false,
+            "job": "naming the installed token tools to each main session and subagent when it starts",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): installed by default on the owner's order; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
+            "layer_id": "token-efficiency",
+            "measurement": null,
+            "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+            "resolution": {
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "written by the client configuration (tools/adoption/new_wsl_client_config.py and tools/adoption/install_claude_profile.py), not by the install plan, whose token-lane-carriers function only says so",
+              "open_acceptance_gates": [
+                "the client configuration writes the SubagentStart hook and its role blocks, and a fresh subagent's start context carries the block",
+                "a fresh main session's SessionStart context carries the main-session block once that unit lands"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the fresh-session invocation census shows that sessions started with the carriers invoke the named token tools no more often than sessions without them; the result goes to the owner and removes nothing by itself",
+              "pin": "the repository's adoption/hooks/claude/token-lanes-subagent-start.py and its role blocks, byte-pinned in adoption/hooks/claude/SHA256SUMS at the checkout the client configuration runs from; the SessionStart main-session block is a separate unit of session native-agent-stack-99 and is not on main at f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5",
+              "reason": "the owner's order makes the token tools the default every future session launches and invokes, a main session and its subagents alike; the carrier is the in-repository practice for that (adoption/hooks/claude/token-lanes-subagent-start.py and docs/token-session-handbook.md, token lanes carried into subagents). The wave-2 code-search ruling's change 7 kept it unwired because the destination did not install the tools it names; this batch installs them",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "adoption/hooks/claude/token-lanes-subagent-start.py",
+                "adoption/new-wsl/client-config-map.json (the token-lanes entry)",
+                "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.code-search: the ruling's change 7)"
+              ],
+              "usage_rules": [
+                "a carrier names only tools the distribution installs and wires",
+                "the carriers' text follows docs/token-session-handbook.md, whose owner unit edits it"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "token-lane-carriers",
             "state": "resolved"
           },
           "state": "resolved"
@@ -2227,6 +2833,14 @@
       "tools": [
         "c5b338e36ff85e30",
         "d84254df4394d981",
+        "241665cdd8a01f24",
+        "857277b3c0a29324",
+        "249bdf3269fe042a",
+        "23a366ec99f1a56c",
+        "0e3bccb32f167d87",
+        "77934cfb38792513",
+        "b1792c80223f5e43",
+        "43a02148a156e2e1",
         "3feb79d1f2c17e4d",
         "7269fb0e08063570",
         "8f7ad86d17493bd4"
@@ -3592,37 +4206,83 @@
           "state": "measurement"
         },
         {
-          "installed": false,
-          "not_installed_reason": "both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set",
+          "installed": true,
+          "not_installed_reason": null,
           "record": {
             "catalog": "foundation",
-            "claude": "not judged in the first round",
+            "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
             "coincides_with_lane_record": null,
-            "default": "Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set",
+            "default": "agentsview 0.43.0 (local archive only)",
             "definitive": false,
-            "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
-            "installs_nothing_extra": true,
+            "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); both blind GPT orders had picked agentsview in the added-slot round",
+            "installs_nothing_extra": false,
             "job": "analytics over past agent sessions",
-            "label": "not installed: resolved by the rule or a blind critic",
+            "label": "owner decision of 2026-10-04 (wave 3, amendment 4): the owner default replaces the rounds' not-installed resolution, which stays recorded under overturned; not a blind round, not a consensus and not a measurement; its removal check reports to the owner",
             "layer_id": "observation-inference",
             "measurement": null,
-            "repository": "",
+            "overturned": {
+              "amendment": {
+                "by": "the owner's decision of 2026-10-04 (wave 3, amendment 4)",
+                "date_utc": "2026-10-04",
+                "decision": "agentsview 0.43.0 becomes the slot's owner default, reading a local archive only",
+                "sources": [
+                  "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                  "recipes/README.md (the agentsview row)"
+                ],
+                "text": "The owner's order asks that token use and the token tools' invocation rates be monitored across new sessions. agentsview searches and summarizes past Claude Code and Codex sessions from a local archive. The rounds' resolution, not installed with agentsview as the named challenger of a measurement that has not run, stays recorded on the row under overturned."
+              },
+              "fields": {
+                "claude": "not judged in the first round",
+                "default": "Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set",
+                "definitive": false,
+                "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
+                "installs_nothing_extra": true,
+                "label": "not installed: resolved by the rule or a blind critic",
+                "measurement": null,
+                "repository": "",
+                "resolution": {
+                  "by": "one refuting Claude critic",
+                  "covered_by": [
+                    "claude-code",
+                    "codex"
+                  ],
+                  "evidence": {
+                    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-critics-result.json",
+                    "sha256": "ed444353fae463da52f5f461fb5975eb5d607260d6c219407e77567255b69622"
+                  },
+                  "former_default": {
+                    "name": "No additional component",
+                    "repository": ""
+                  },
+                  "outcome": "not_installed",
+                  "reason": "both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set"
+                },
+                "state": "resolved"
+              }
+            },
+            "repository": "https://github.com/kenn-io/agentsview",
             "resolution": {
-              "by": "one refuting Claude critic",
-              "covered_by": [
-                "claude-code",
-                "codex"
+              "batch": "wave3",
+              "by": "the owner's decision of 2026-10-04",
+              "install": "the install plan's session-analytics function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/agentsview-0.43.0 and linked into ${ECO_ROOT}/bin",
+              "open_acceptance_gates": [
+                "${ECO_ROOT}/bin/agentsview reports v0.43.0",
+                "with telemetry and the update check off, agentsview sync into an owned data directory, then session search, returns a known session"
               ],
-              "evidence": {
-                "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-critics-result.json",
-                "sha256": "ed444353fae463da52f5f461fb5975eb5d607260d6c219407e77567255b69622"
-              },
-              "former_default": {
-                "name": "No additional component",
-                "repository": ""
-              },
-              "outcome": "not_installed",
-              "reason": "both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set"
+              "outcome": "owner_default",
+              "overturn": "the measurement on a fixed question set that the rounds named, or the fresh-session invocation census, reports that the clients' own transcripts, session pickers and usage commands answer the same questions; the result goes to the owner and removes nothing by itself",
+              "pin": "release v0.43.0 asset agentsview_0.43.0_linux_amd64.tar.gz, sha256 4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9 (the GitHub asset digest read 2026-10-04); the release's SHA256SUMS lists the asset, as the workstation's install receipt of 2026-09-25 checked (evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--agentsview--install--20260925.json)",
+              "reason": "the owner's order asks for monitored token use and invocation rates across new sessions; agentsview is the scoped historical transcript search of docs/token-efficiency-stack.json, and both blind GPT orders had picked it for this slot",
+              "sources": [
+                "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+                "docs/token-efficiency-stack.json (rows[component_id=agentsview].upstream_commands)",
+                "recipes/README.md (the agentsview row)",
+                "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
+              ],
+              "usage_rules": [
+                "a local archive only: AGENTSVIEW_DATA_DIR on an owned directory, AGENTSVIEW_TELEMETRY_ENABLED=0 and AGENTSVIEW_DISABLE_UPDATE_CHECK=1 on every call (docs/token-efficiency-stack.json, the agentsview use commands)",
+                "a blank archive is not evidence of zero historical usage (recipes/README.md, the agentsview row)"
+              ]
             },
             "row_kind": "added",
             "slot_id": "session-analytics",
@@ -3699,6 +4359,7 @@
         "6675b653d883a32b",
         "c296de6529c9176c",
         "fb80703c19d625df",
+        "5057dffbf7139d01",
         "37e83655e806c145"
       ],
       "uses": []
@@ -4094,7 +4755,7 @@
           "record": {
             "amendments": [
               {
-                "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements owed)",
+                "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements recorded on #608, 2026-10-04; the Claude acknowledgement excludes custody changes 1-3 (the eligibility-gate criteria and systemd-creds sentences) until the hashed records carry them)",
                 "date_utc": "2026-10-03",
                 "decision": "keep the measurement; gate each arm on eligibility before it is scored; HASP 1.0.44 is ineligible on Linux as documented; systemd-creds --user becomes the deciding storage comparison",
                 "sources": [
@@ -6549,7 +7210,7 @@
                 "text": "HOL Guard 3.17.1 declares native interception and managed launches beyond the guard's text check of Claude Code shell commands; the managed launch is declared for Codex only, and for Claude Code it declares hooks alone, in the project's local settings file. Its support matrix is a source claim: native client compatibility, failure behaviour and the preservation of existing hooks are not qualified. The comparison is about enforcement and stays separate from the custody comparison; the two are not merged into one winner."
               },
               {
-                "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements owed)",
+                "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements recorded on #608, 2026-10-04)",
                 "date_utc": "2026-10-03",
                 "decision": "cover the destination gateway's ports 21128 and 21129 with the guard's gateway rule before that gateway holds accounts",
                 "sources": [
@@ -6828,7 +7489,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "381645d1470125614137eef39a3b802e0a91ec480f6453a45051fbe99c743f21"
+      "sha256": "e5d642448e19c0bd02d643febf7d2491fe45e789e81dd966cf883f46f0b66fa2"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -6836,7 +7497,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "84c65a395145efe884a70b561205a3359b2b21022bd6fd4107d35d18016efdf6"
+      "sha256": "35306c969c85d2cd3234d0dae17fcdc31673e729f1c7d2cfe625d5fcd7fd4813"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -6948,7 +7609,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "ee6aa8f87396528de2157270bb50d523524879c4e86196b535784f259eccea28"
+      "sha256": "626064fb8cb11c468bab83c6c1087cf68278cd918b98b31a46d18028840944fd"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -6972,7 +7633,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "e6897728fd866a4d17583109f0d48bcd578c59b237e7186e31ec8ff09e83abf4"
+      "sha256": "791d949e53168e2f61f9bc13fbe246097d03cebd3a634e10d21da6ece5455934"
     }
   ],
   "stage_order": [
@@ -7411,7 +8072,7 @@
       "acceptance": {
         "command": "pnpm test",
         "evidence_class": "upstream_test_command_not_executed",
-        "source": "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md"
+        "source": "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md"
       },
       "aliases": [
         "mcporter"
@@ -7420,8 +8081,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://registry.npmjs.org/mcporter/0.14.1",
-        "value": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2"
+        "source": "https://registry.npmjs.org/mcporter/0.14.2",
+        "value": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b"
       },
       "documented_install": [
         {
@@ -7434,20 +8095,25 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/mcp-surfaces.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
-        "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md"
+        "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md",
+        "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md",
+        "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md"
       ],
       "install": {
-        "command": "npm install -g mcporter@0.14.1",
+        "command": "npm install -g mcporter@0.14.2",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "prerequisites": [
+          "Node 24 or newer; ps on the daemon launch PATH."
+        ],
         "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md"
+        "source": "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md"
       },
       "name": "mcporter",
       "owner_layer_id": "mcp-surfaces",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "npm:mcporter",
-      "pin": "0.14.1",
+      "pin": "0.14.2",
       "position": 1,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/openclaw/mcporter",
@@ -7904,8 +8570,7 @@
       ],
       "blocking_gaps": [
         "Package pin is verified; Codex/Claude plugin pinning, Docker and embedding-provider configuration remain comparison prerequisites.",
-        "The source recommendation installs a native plugin. A pin-matching plugin install is unresolved; a global npm install is not established by the reviewed primary README.",
-        "install: upstream-documented command and source pending in W-PROF"
+        "The source recommendation installs a native plugin. A pin-matching plugin install is unresolved; a global npm install is not established by the reviewed primary README."
       ],
       "checksum": {
         "algorithm": "sha256",
@@ -7925,10 +8590,14 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
-        "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md"
+        "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json"
       ],
       "install": {
-        "command": null,
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.15.0\" --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0",
         "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md"
       },
       "name": "SocratiCode",
@@ -8601,19 +9270,19 @@
     },
     {
       "acceptance": {
-        "command": null,
-        "evidence_class": null,
-        "source": null
+        "command": "ccusage claude daily",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "The clients' local usage logs."
+        ],
+        "scope": "Upstream's daily report of Claude Code's local usage logs (ccusage codex daily for Codex, line 67); a meter, never a saving: native finalized accounting stays authoritative, and reports stay token-only (--no-cost) unless every model is priced.",
+        "source": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/apps/ccusage/README.md#L66"
       },
       "aliases": [
         "ccusage"
       ],
-      "blocking_gaps": [
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "install: upstream-documented command and source pending in W-PROF",
-        "acceptance: upstream test or documented example and source pending in W-PROF"
-      ],
+      "blocking_gaps": [],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
@@ -8631,11 +9300,20 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/README.md"
+        "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/README.md",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json"
       ],
       "install": {
-        "command": null,
-        "source": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/README.md"
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.26\" ccusage@20.0.26",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Node 24 and npm."
+        ],
+        "scope": "The pinned npm package into its own prefix (docs/token-efficiency-stack.json, upstream_commands.install); the install plan installs the same version from the registry tarball checked against this sha256, into ${ECO_ROOT}/tools/<tool>-<version>, and links the command into ${ECO_ROOT}/bin. The tarball digest does not pin the dependencies npm resolves. The tarball carries the JavaScript launcher; npm resolves the @ccusage/ccusage-linux-x64 native build at install time, outside this digest.",
+        "source": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/apps/ccusage/README.md#L62"
       },
       "name": "ccusage",
       "owner_layer_id": "token-efficiency",
@@ -8661,14 +9339,14 @@
     },
     {
       "acceptance": {
-        "command": "cargo test",
-        "evidence_class": "upstream_test_command_not_executed",
+        "command": "rtk git log -n 10",
+        "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Selected upstream source checkout and its Rust build/test dependencies."
+          "A git checkout."
         ],
-        "scope": "Upstream unit/snapshot tests from the selected source checkout only. The separately documented ignored integration tests, installed CLI/hook behavior and new-host acceptance are not covered.",
-        "source": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/CONTRIBUTING.md#L258"
+        "scope": "Upstream's one-line commit example in a checkout; rtk proxy git log -n 10 returns the raw output when a condensed result is unusable (README line 313).",
+        "source": "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L193"
       },
       "aliases": [
         "rtk-ai/rtk",
@@ -8678,8 +9356,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://api.github.com/repos/rtk-ai/rtk/releases/tags/v0.50.0",
-        "value": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89"
+        "source": "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt",
+        "value": "5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5"
       },
       "documented_install": [
         {
@@ -8693,24 +9371,30 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md",
+        "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt"
       ],
       "install": {
-        "command": "cargo install --git https://github.com/rtk-ai/rtk --tag v0.50.0 --locked",
+        "command": "gh release download v0.51.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-0.51.0\" && (cd \"$STACK_HOME/downloads/rtk-0.51.0\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")",
         "execution_status": "UNRUN",
-        "pinning_source": "https://doc.rust-lang.org/cargo/commands/cargo-install.html",
+        "pinning_source": "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L113",
         "prerequisites": [
-          "Supported Rust/Cargo toolchain and source build prerequisites."
+          "tar and sha256sum."
         ],
-        "scope": "Upstream Git install form with Cargo documented --tag and --locked. This builds the tagged source; the published binary archive checksum above does not identify the resulting local build.",
-        "source": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md#L106"
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. This replaces the UNRUN cargo build of the tagged source: the release binary is the asset the recorded sha256 identifies. The Claude Code hook and its exclude_commands are the client configuration's; rtk init --global --codex is never run at 0.51.0.",
+        "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L41"
       },
       "name": "RTK",
       "owner_layer_id": "token-efficiency",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "0.50.0",
-      "position": 1,
-      "provisioning_status": "unprovisioned_comparison_arm",
+      "pin": "0.51.0",
+      "position": 14,
+      "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/rtk-ai/rtk",
       "selection_sources": [
         {
@@ -8724,8 +9408,8 @@
           "source": "adoption/new-wsl-profile.json"
         }
       ],
-      "stage": "compression-comparison",
-      "status": "head-to-head-arm",
+      "stage": "native-extensions",
+      "status": "picked",
       "tool_id": "d84254df4394d981",
       "used_by": [
         "token-efficiency"
@@ -10967,6 +11651,549 @@
     },
     {
       "acceptance": {
+        "command": "/context-mode:ctx-doctor",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "A Claude Code session with the plugin enabled."
+        ],
+        "scope": "Upstream's verify step inside a Claude Code session: every check shows [x] (runtimes, hooks, FTS5, plugin registration). Not a provider-savings measurement.",
+        "source": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L81"
+      },
+      "aliases": [
+        "context-mode"
+      ],
+      "blocking_gaps": [],
+      "checksum": {
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://registry.npmjs.org/context-mode/1.0.169",
+        "value": "09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L72"
+      ],
+      "install": {
+        "command": "claude plugin marketplace add mksglu/context-mode --scope user && claude plugin install context-mode@context-mode --scope user && codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json && codex plugin add context-mode@context-mode --json",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Claude Code and Codex installed and signed in.",
+          "The client configuration's hook trust entries for Codex."
+        ],
+        "scope": "Both clients' plugins at the reviewed commit 6f0cc6841c687e754059f36714a11233fda1a02b (Codex by --ref; Claude Code takes the marketplace's default branch, so the installed gitCommitSha is compared with the reviewed commit), and the Codex session server from the verified npm tarball under ${ECO_ROOT}/tools/context-mode-1.0.169 (the install plan's context-supply row). The npm digest covers the server package only, not either plugin.",
+        "source": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L72"
+      },
+      "name": "context-mode",
+      "owner_layer_id": "token-efficiency",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "package_id": "npm:context-mode",
+      "pin": "1.0.169",
+      "position": 16,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/mksglu/context-mode",
+      "selection_sources": [
+        {
+          "layer_id": "token-efficiency",
+          "name": "context-mode",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "241665cdd8a01f24",
+      "used_by": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "acceptance": {
+        "command": "order({\"action\":\"get_session_stats\",\"args\":{}})",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "A project-scoped registration and an index of the selected code."
+        ],
+        "scope": "Upstream's confirmation after a search_symbols and get_symbol_source answer, in a project that registered the server; its counter is an upstream estimate in its own scope, not a provider saving.",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L141"
+      },
+      "aliases": [
+        "jcodemunch-mcp"
+      ],
+      "blocking_gaps": [
+        "This profile records source identity only (manifests/stack.json); the W1 receipt evidence/receipts/jcodemunch-1108327-qualification-20261003.json records the qualified wheel digest and its limitations. uv checks its index hashes.",
+        "checksum: real SHA-256 and its source pending in W-PROF",
+        "checksum: source identity does not verify an install artifact or lockfile"
+      ],
+      "checksum": {
+        "algorithm": "git-sha1",
+        "kind": "source",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
+        "value": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
+        "manifests/stack.json (components[id=jcodemunch-mcp])",
+        "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
+      ],
+      "install": {
+        "command": "uv tool install jcodemunch-mcp==1.108.327",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "uv with CPython 3.13."
+        ],
+        "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91"
+      },
+      "name": "jcodemunch-mcp",
+      "owner_layer_id": "token-efficiency",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "pin": "1.108.327",
+      "position": 17,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "selection_sources": [
+        {
+          "layer_id": "token-efficiency",
+          "name": "jcodemunch-mcp",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "857277b3c0a29324",
+      "used_by": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "acceptance": {
+        "command": "codebase-memory-mcp cli index_repository --repo-path \"$PROJECT_ROOT\" && codebase-memory-mcp cli list_projects",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "A selected project checkout."
+        ],
+        "scope": "Upstream's CLI form of the explicit index call and the project listing, on a selected checkout.",
+        "source": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L648"
+      },
+      "aliases": [
+        "codebase-memory-mcp"
+      ],
+      "blocking_gaps": [],
+      "checksum": {
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://api.github.com/repos/DeusData/codebase-memory-mcp/releases/tags/v0.11.0",
+        "value": "032b33c1833919a2d1de67ff6367fa6ea46aee8689c86ef223c88fae3b6e4536"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L88"
+      ],
+      "install": {
+        "command": "gh release download v0.11.0 --repo DeusData/codebase-memory-mcp --pattern codebase-memory-mcp-linux-amd64.tar.gz --dir \"$DOWNLOAD_DIR\" && tar -xf \"$DOWNLOAD_DIR/codebase-memory-mcp-linux-amd64.tar.gz\" -C \"$PREFIX\"",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "tar."
+        ],
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. Neither the archive's install.sh nor the binary's install subcommand runs: both configure the detected clients. Indexes only on an explicit index_repository call.",
+        "source": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L88"
+      },
+      "name": "codebase-memory-mcp",
+      "owner_layer_id": "token-efficiency",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "pin": "0.11.0",
+      "position": 18,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "selection_sources": [
+        {
+          "layer_id": "token-efficiency",
+          "name": "codebase-memory-mcp",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "249bdf3269fe042a",
+      "used_by": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "acceptance": {
+        "command": "repomix --include \"src/**/*.ts,**/*.md\"",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "A selected checkout."
+        ],
+        "scope": "Upstream's selected-file pack; with --compress a Python definition whose signature spans lines can drop without notice, so a pack is checked against its file list.",
+        "source": "https://github.com/yamadashy/repomix/blob/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L204"
+      },
+      "aliases": [
+        "Repomix"
+      ],
+      "blocking_gaps": [],
+      "checksum": {
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://registry.npmjs.org/repomix/1.18.1",
+        "value": "d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/yamadashy/repomix/blob/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L109"
+      ],
+      "install": {
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/repomix-1.18.1\" repomix@1.18.1",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Node 24 and npm."
+        ],
+        "scope": "The pinned npm package into its own prefix (docs/token-efficiency-stack.json, upstream_commands.install); the install plan installs the same version from the registry tarball checked against this sha256, into ${ECO_ROOT}/tools/<tool>-<version>, and links the command into ${ECO_ROOT}/bin. The tarball digest does not pin the dependencies npm resolves.",
+        "source": "https://github.com/yamadashy/repomix/blob/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L109"
+      },
+      "name": "Repomix",
+      "owner_layer_id": "token-efficiency",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "package_id": "npm:repomix",
+      "pin": "1.18.1",
+      "position": 19,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/yamadashy/repomix",
+      "selection_sources": [
+        {
+          "layer_id": "token-efficiency",
+          "name": "Repomix",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "23a366ec99f1a56c",
+      "used_by": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "acceptance": {
+        "command": "cat data.toon | toon --decode",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "A TOON file."
+        ],
+        "scope": "Upstream's decode example. Use only for uniform arrays of flat records and keep the original JSON unless a strict decode is value-equal: 4.1.1 strips a leading U+FEFF (recipes/README.md).",
+        "source": "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md#L53"
+      },
+      "aliases": [
+        "TOON"
+      ],
+      "blocking_gaps": [],
+      "checksum": {
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://registry.npmjs.org/@toon-format/cli/4.1.1",
+        "value": "93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md#L11"
+      ],
+      "install": {
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/toon-4.1.1\" @toon-format/cli@4.1.1",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Node 24 and npm."
+        ],
+        "scope": "The pinned npm package into its own prefix (docs/token-efficiency-stack.json, upstream_commands.install); the install plan installs the same version from the registry tarball checked against this sha256, into ${ECO_ROOT}/tools/<tool>-<version>, and links the command into ${ECO_ROOT}/bin. The tarball digest does not pin the dependencies npm resolves.",
+        "source": "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md#L11"
+      },
+      "name": "TOON",
+      "owner_layer_id": "token-efficiency",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "package_id": "npm:@toon-format/cli",
+      "pin": "4.1.1",
+      "position": 20,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/toon-format/toon",
+      "selection_sources": [
+        {
+          "layer_id": "token-efficiency",
+          "name": "TOON",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "0e3bccb32f167d87",
+      "used_by": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "acceptance": {
+        "command": "markitdown fixtures/greeting.html -o \"$STACK_HOME/output/greeting.md\"",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "This checkout's fixtures/greeting.html."
+        ],
+        "scope": "Upstream's -o form on an HTML input, which the base converter handles (the README's PDF example needs the [pdf] extra, not installed); give the input type with -x html when it is read from stdin.",
+        "source": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#L81"
+      },
+      "aliases": [
+        "MarkItDown"
+      ],
+      "blocking_gaps": [],
+      "checksum": {
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://pypi.org/pypi/markitdown/0.1.8/json",
+        "value": "17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#L62"
+      ],
+      "install": {
+        "command": "uv tool install markitdown==0.1.8",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "uv with CPython 3.13."
+        ],
+        "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. The base converter only, not the README's [all]; other extras are separate decisions.",
+        "source": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#L62"
+      },
+      "name": "MarkItDown",
+      "owner_layer_id": "token-efficiency",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "package_id": "pypi:markitdown",
+      "pin": "0.1.8",
+      "position": 21,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/microsoft/markitdown",
+      "selection_sources": [
+        {
+          "layer_id": "token-efficiency",
+          "name": "MarkItDown",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "77934cfb38792513",
+      "used_by": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "acceptance": {
+        "command": "chub search openai",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Network access to the Context Hub registry."
+        ],
+        "scope": "Upstream's search example with telemetry and feedback off; check a document's metadata.versions against the version a task targets.",
+        "source": "https://github.com/andrewyng/context-hub/blob/v0.1.4/README.md#L13"
+      },
+      "aliases": [
+        "Context Hub"
+      ],
+      "blocking_gaps": [],
+      "checksum": {
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://registry.npmjs.org/@aisuite/chub/0.1.4",
+        "value": "ca9fb94a21d3b5ae3025923ded305dd11f189626da5adab48a8b947bc523888f"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/andrewyng/context-hub/blob/v0.1.4/README.md#L12"
+      ],
+      "install": {
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/context-hub-0.1.4\" @aisuite/chub@0.1.4",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Node 24 and npm."
+        ],
+        "scope": "The pinned npm package into its own prefix (docs/token-efficiency-stack.json, upstream_commands.install); the install plan installs the same version from the registry tarball checked against this sha256, into ${ECO_ROOT}/tools/<tool>-<version>, and links the command into ${ECO_ROOT}/bin. The tarball digest does not pin the dependencies npm resolves. Telemetry and feedback off in ~/.chub/config.yaml (recipes/README.md, Context Hub opt-out).",
+        "source": "https://github.com/andrewyng/context-hub/blob/v0.1.4/README.md#L12"
+      },
+      "name": "Context Hub",
+      "owner_layer_id": "token-efficiency",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "package_id": "npm:@aisuite/chub",
+      "pin": "0.1.4",
+      "position": 22,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/andrewyng/context-hub",
+      "selection_sources": [
+        {
+          "layer_id": "token-efficiency",
+          "name": "Context Hub",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "b1792c80223f5e43",
+      "used_by": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "acceptance": {
+        "command": "otel-tui --host 127.0.0.1 --grpc 24317 --http 24318",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "A producer configured to send OTLP there."
+        ],
+        "scope": "Upstream's host and port flags on unused loopback ports, for a deliberate diagnostic session that is closed afterward; it changes no collector or client telemetry setting.",
+        "source": "https://github.com/ymtdzzz/otel-tui/blob/3b25779a083469b732e3c628b4a412ee05cf9948/README.md#L43"
+      },
+      "aliases": [
+        "otel-tui"
+      ],
+      "blocking_gaps": [],
+      "checksum": {
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://api.github.com/repos/ymtdzzz/otel-tui/releases/tags/v0.7.5",
+        "value": "dd10bfa12b6713a2d51d7a094644ff61a2467856fc93d3acecfe741a124ca896"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/ymtdzzz/otel-tui/blob/3b25779a083469b732e3c628b4a412ee05cf9948/README.md#L131"
+      ],
+      "install": {
+        "command": "gh release download v0.7.5 --repo ymtdzzz/otel-tui -p otel-tui_Linux_x86_64.tar.gz -p otel-tui_0.7.5_checksums.txt --dir \"$STACK_HOME/downloads/otel-tui-0.7.5\"",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "tar."
+        ],
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. An on-demand viewer: no service and no port held.",
+        "source": "https://github.com/ymtdzzz/otel-tui/blob/3b25779a083469b732e3c628b4a412ee05cf9948/README.md#L131"
+      },
+      "name": "otel-tui",
+      "owner_layer_id": "token-efficiency",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "pin": "0.7.5",
+      "position": 23,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/ymtdzzz/otel-tui",
+      "selection_sources": [
+        {
+          "layer_id": "token-efficiency",
+          "name": "otel-tui",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "43a02148a156e2e1",
+      "used_by": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "acceptance": {
+        "command": "AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview session list",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "An owned AGENTSVIEW_DATA_DIR and a prior agentsview sync."
+        ],
+        "scope": "Upstream's session listing from the local archive, with telemetry off (README line 695) and the update check off (docs/token-efficiency-stack.json); a blank archive is not evidence of zero usage.",
+        "source": "https://github.com/kenn-io/agentsview/blob/v0.43.0/README.md#L48"
+      },
+      "aliases": [
+        "agentsview"
+      ],
+      "blocking_gaps": [],
+      "checksum": {
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://api.github.com/repos/kenn-io/agentsview/releases/tags/v0.43.0",
+        "value": "4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/kenn-io/agentsview/blob/v0.43.0/README.md#L25"
+      ],
+      "install": {
+        "command": "gh release download v0.43.0 --repo kenn-io/agentsview --pattern agentsview_0.43.0_linux_amd64.tar.gz --dir \"$STACK_HOME/downloads/agentsview-0.43.0\" && tar -xf \"$STACK_HOME/downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz\" -C \"$PREFIX\"",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "tar."
+        ],
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. The asset is the one gh release view v0.43.0 --json assets lists for Linux x86_64 (docs/token-efficiency-stack.json). A local archive only: telemetry and the update check off, no hosted or remote sync.",
+        "source": "https://github.com/kenn-io/agentsview/blob/v0.43.0/README.md#L25"
+      },
+      "name": "agentsview",
+      "owner_layer_id": "observation-inference",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "pin": "0.43.0",
+      "position": 24,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/kenn-io/agentsview",
+      "selection_sources": [
+        {
+          "layer_id": "observation-inference",
+          "name": "agentsview",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "5057dffbf7139d01",
+      "used_by": [
+        "observation-inference"
+      ]
+    },
+    {
+      "acceptance": {
         "command": "pnpm install --frozen-lockfile && pnpm -r --filter ./sdk/typescript run build && pnpm -r --filter ./sdk/typescript run test",
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
@@ -11519,19 +12746,28 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md",
-        "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md"
+        "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json"
       ],
       "install": {
-        "command": "uv tool install --python 3.13 \"headroom-ai[all]==0.37.0\"",
-        "source": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md"
+        "command": "uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "uv with CPython 3.13."
+        ],
+        "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. The [mcp] extra (adoption/pins-linux-x86_64.json), not the README's [all]; MCP server only, headroom mcp serve --proxy-url http://127.0.0.1:1 with its offline variables, and no proxy mode.",
+        "source": "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md#L92"
       },
       "name": "Headroom",
       "owner_layer_id": "token-efficiency",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "pypi:headroom-ai",
       "pin": "0.37.0",
-      "position": 3,
-      "provisioning_status": "unprovisioned_comparison_arm",
+      "position": 15,
+      "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/headroomlabs-ai/headroom",
       "selection_sources": [
         {
@@ -11540,8 +12776,8 @@
           "source": "adoption/new-wsl-profile.json"
         }
       ],
-      "stage": "compression-comparison",
-      "status": "head-to-head-arm",
+      "stage": "native-extensions",
+      "status": "picked",
       "tool_id": "7269fb0e08063570",
       "used_by": [
         "token-efficiency"

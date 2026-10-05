@@ -2450,6 +2450,7 @@ def main():
                     sink_observation=controller.observe, sink_status=controller.trading_status,
                     request_observer=responses.append,
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
+                    order_quote_max_age_seconds=config["quote_max_age_seconds"],
                     required_quote_symbols=needed if recovering and needed else config["benchmarks"],
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
                     # This lane keeps its first checkpoint baseline and fee window; legacy
