@@ -22,12 +22,14 @@ import sys
 import tempfile
 import threading
 import time
+import uuid
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from functools import lru_cache
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[3]
 PLAN_PATH = HERE / "plan.json"
 FROZEN_RUN = HERE.parent / "ibkr-paper-orders" / "run.py"
 KIND = "ibkr_paper_orders_nautilus_2_0_0rc5"
@@ -100,6 +102,14 @@ def frozen():
     No frozen strategy is used; the node uses rc5's built-in ExecTester.
     """
     spec = importlib.util.spec_from_file_location("ibkr_frozen_readonly", FROZEN_RUN)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@lru_cache(maxsize=1)
+def safety():
+    spec = importlib.util.spec_from_file_location("ibkr_orders_rc5_safety", HERE / "safety.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -249,7 +259,17 @@ def admit_quote(plan, quote, server_time_epoch, *, elapsed_seconds=0, delayed=Fa
             headroom = decimal(plan["risk"]["notional_headroom_usd"])
             result.update(ask_notional_usd=str(notional), headroom_usd=str(headroom),
                           tob_offset_ticks=resting_offset_ticks(bid, plan))
-            result["status"] = "passed" if notional + headroom <= decimal(plan["bounds"]["max_notional_per_order_usd"]) and result["tob_offset_ticks"] > 0 else "refused_quote_notional"
+            spread_loss = (ask - bid) * plan["bounds"]["max_quantity_per_order"]
+            commissions = 2 * decimal(plan["bounds"]["commission_allowance_per_order_usd"])
+            loss_bound = decimal(plan["bounds"]["max_roundtrip_loss_usd"])
+            result.update(spread_loss_usd=str(spread_loss), expected_roundtrip_commissions_usd=str(commissions),
+                          expected_roundtrip_loss_usd=str(spread_loss + commissions), max_roundtrip_loss_usd=str(loss_bound))
+            if notional + headroom > decimal(plan["bounds"]["max_notional_per_order_usd"]) or result["tob_offset_ticks"] <= 0:
+                result.update(status="refused_quote_notional", stage="notional")
+            elif spread_loss + commissions > loss_bound:
+                result.update(status="refused_quote_loss_bound", stage="spread_and_commissions")
+            else:
+                result.update(status="passed", stage="admitted")
     except (KeyError, TypeError, ValueError, InvalidOperation):
         result["status"] = "refused_invalid_quote"
     return result
@@ -637,10 +657,11 @@ def new_receipt(plan, plan_path, versions):
     return {"schema_version": 1, "kind": KIND, "evidence_class": "native_paper",
             "started_at": datetime.now(timezone.utc).isoformat(), "versions": versions,
             "plan_sha256": plan_hash, "harness_sha256": sha256(__file__),
-            "source_hashes": {"frozen_checker_sha256": sha256(FROZEN_RUN)},
+            "source_hashes": {"frozen_checker_sha256": sha256(FROZEN_RUN), "safety_sha256": sha256(HERE / "safety.py")},
             "upstream_commit": UPSTREAM_COMMIT, "pre_check": None, "quote_admission": None,
             "cases": case_outcomes([]), "events": [], "reconciled_external": [], "fills": [], "roundtrip": None,
             "flat_proof": None, "node": {"started": False, "stop_ns": None},
+            "account_lease": {"acquired": False, "lock_name": None}, "journal": None,
             "risk": {"bypass": False, "max_notional_per_order_usd": cap,
                      "enforcement": "runner_quantity_and_quote_admission", "note": RISK_NOTE,
                      "engine_route": RISK_ROUTE, "submit_budget_enforcement": "engine_throttle",
@@ -651,7 +672,7 @@ def new_receipt(plan, plan_path, versions):
 
 def finish(receipt, status, *, reason=None, step=2, cases=CASE_IDS):
     receipt["status"] = status
-    receipt["exit_code"] = frozen().exit_code_for(status)
+    receipt["exit_code"] = 3 if status == "not_started" else frozen().exit_code_for(status)
     receipt["ended_at"] = datetime.now(timezone.utc).isoformat()
     if reason:
         receipt["failures"].append({"acceptance_step": step, "cases_blocked": list(cases), "reason": reason})
@@ -706,13 +727,18 @@ def build_node(plan, port, account_id, *, tob_offset_ticks):
 
 
 class RunOrderScope:
-    """In-memory client-order-id lineage for this ExecTester's submissions.
+    """In-memory client-order-id lineage, including pending local intents.
 
     Pinned upstream: crates/execution/src/engine/mod.rs materializes and claims
     external orders using this strategy id and the current initialization time.
     Neither alone proves ownership. IB execution/core_orders.rs emits a local
     OrderSubmitted with the original client_order_id on this run's submit path.
-    Require its matching non-reconciled initialization after run_async launch;
+    The supported factory's O-date-time-trader_tag-strategy_tag-counter identity
+    identifies local intents before submission; its creation second must belong
+    to this launch and match initialization. This excludes old orders whose
+    cache initialization is reconstructed with reconciliation=False. Source:
+    crates/common/src/generators/client_order_id.rs write_fixed_prefix/generate.
+    Also retain the matching local submission lineage for already sent orders.
     retain ownership if later events reconcile, so the never-pass rule applies.
     Raw identifiers stay here; receipts use stable O/X aliases only.
     """
@@ -722,10 +748,20 @@ class RunOrderScope:
         self.owned = {}
         self.external = {}
 
-    def submitted_here(self, order):
+    def generated_here(self, event):
+        parts = str(event.client_order_id).split("-")
+        if len(parts) != 6 or parts[0] != "O" or parts[3:5] != ["001", "001"] or not parts[5].isdigit() or int(parts[5]) <= 0:
+            return False
+        try:
+            second = int(datetime.strptime(parts[1] + parts[2], "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc).timestamp())
+        except ValueError:
+            return False
+        return second >= self.started_ns // 1_000_000_000 and 0 <= event.ts_init // 1_000_000_000 - second <= 1
+
+    def initialized_here(self, order):
         if str(order.strategy_id) != "EXEC_TESTER-001" or str(order.trader_id) != "TESTER-001":
             return False
-        initialized = submitted = False
+        initialized = submitted = generated = False
         for event in order.events():
             if (str(event.client_order_id) != str(order.client_order_id)
                     or str(event.strategy_id) != str(order.strategy_id)
@@ -735,13 +771,15 @@ class RunOrderScope:
                 continue
             initialized |= type(event).__name__ == "OrderInitialized"
             submitted |= type(event).__name__ == "OrderSubmitted"
-        return initialized and submitted
+            if type(event).__name__ == "OrderInitialized":
+                generated |= self.generated_here(event)
+        return initialized and (generated or submitted)
 
     def partition(self, orders):
         own, other = [], []
         for order in sorted(orders, key=lambda order: (order.ts_init, str(order.client_order_id))):
             key = str(order.client_order_id)
-            if key not in self.owned and self.submitted_here(order):
+            if key not in self.owned and self.initialized_here(order):
                 self.owned[key] = f"O{len(self.owned) + 1}"
             if key in self.owned:
                 own.append(order)
@@ -824,6 +862,33 @@ def stop_ready(orders, now, node_stop_at):
     return now >= node_stop_at or not orders_in_flight(orders)
 
 
+def journal_order_events(cache, scope, journal, account_id):
+    """Retain original native identities privately; cache events preserve intent order.
+
+    This is observation after native dispatch, not a pre-dispatch fsync barrier.
+    rc5's Rust BusTap provides that barrier (common/src/msgbus/mod.rs), but is
+    not exposed by the selected Python surface. Do not wrap ExecTester submits.
+    """
+    for order in tester_orders(cache, scope):
+        for event in order.events():
+            kind = type(event).__name__
+            venue_id = None if kind == "OrderInitialized" else getattr(event, "venue_order_id", None) or order.venue_order_id
+            record = {"kind": kind, "event_id": str(event.event_id), "client_order_id": str(order.client_order_id),
+                      "venue_order_id": str(venue_id) if venue_id is not None else None,
+                      "order_type": order.order_type.name, "side": order.side.name, "quantity": str(order.quantity),
+                      "price": str(order.price) if getattr(order, "price", None) is not None else None,
+                      "ts_init": int(event.ts_init), "ts_event": int(event.ts_event),
+                      "reconciliation": bool(getattr(event, "reconciliation", False))}
+            if kind == "OrderFilled":
+                commission = event.commission
+                record.update(fill_price=str(event.last_px), fill_quantity=str(event.last_qty),
+                              commission=str(commission.as_decimal()) if commission is not None else None,
+                              commission_currency=str(commission.currency) if commission is not None else None)
+            if hasattr(event, "reason"):
+                record["reason"] = frozen().scrub_serialized(frozen().redact(event.reason), (account_id,))
+            journal.event(record)
+
+
 async def node_phase(plan, port, receipt_path, payload):
     """Hosted upstream run: cache + thread-safe handle captured before run_async.
 
@@ -833,6 +898,12 @@ async def node_phase(plan, port, receipt_path, payload):
     if not validate_child_admission(plan, payload):
         return persist_child_refusal(receipt_path, payload, "refused_child_quote_admission")
     receipt, account_id = payload["receipt"], payload["account_id"]
+    journal = None
+    try:
+        if payload.get("journal_path"):
+            journal = safety().Journal(Path(payload["journal_path"]).parent, payload["run_id"], ROOT, create=False)
+    except (safety().SafetyError, OSError, TypeError, ValueError):
+        return persist_child_refusal(receipt_path, payload, "refused_child_journal")
     node = build_node(plan, port, account_id, tob_offset_ticks=payload["tob_offset_ticks"])
     # Live view: node.rs py_cache uses PyCache::from_rc(kernel.cache());
     # common/src/python/cache.rs PyCache(Rc<RefCell<Cache>>) borrows on each
@@ -845,13 +916,23 @@ async def node_phase(plan, port, receipt_path, payload):
     scope = RunOrderScope(time.time_ns())
 
     def observe():
+        if journal is not None:
+            journal_order_events(cache, scope, journal, account_id)
         update_observations(receipt, snapshot_events(cache, scope), plan)
         receipt["reconciled_external"] = snapshot_events(cache, scope, external=True)
+        if journal is not None:
+            receipt["journal"] = journal.summary()
 
     def stop(reason):
         if receipt["node"]["stop_ns"] is None:
             receipt["node"].update(stop_ns=time.time_ns(), stop_reason=reason)
-            handle.stop()
+            try:
+                if journal is not None:
+                    journal.append("stop_request", reason=reason, stop_ns=receipt["node"]["stop_ns"])
+            except Exception as exc:
+                record_error("journal_stop", exc)
+            finally:
+                handle.stop()
 
     def request_stop(reason):
         nonlocal pending_stop
@@ -927,6 +1008,15 @@ async def node_phase(plan, port, receipt_path, payload):
             node.dispose()
         except Exception as exc:
             record_error("node_dispose", exc)
+        if journal is not None:
+            try:
+                receipt["journal"] = journal.summary()
+            except Exception as exc:
+                record_error("journal_summary", exc)
+            try:
+                journal.close()
+            except Exception as exc:
+                record_error("journal_close", exc)
         # Persist cleanup errors independently, without skipping disposal.
         write_receipt(receipt_path, receipt, (account_id,))
     return receipt
@@ -1068,8 +1158,47 @@ def run_trial(args, *, now=None, versions=None):
     # Command-center r2 decision: runner quantity + quote admission hold the
     # bound; the engine cap remains configured with its route limitation stated.
     deadline = started_monotonic + plan["timeouts"]["overall_deadline_seconds"]
+    expected_account = os.environ.get("TWS_ACCOUNT")
+    private_accounts = [expected_account]
+    lease = journal = None
+    try:
+        receipt["account_lease"]["lock_name"] = safety().account_lock_name(expected_account)
+        lease = safety().AccountLease(expected_account)
+        receipt["account_lease"]["acquired"] = True
+        run_id = args.run_id or uuid.uuid4().hex
+        output = args.private_output_dir or Path(args.receipt).resolve().parent / ("private-" + run_id)
+        journal = safety().Journal(output, run_id, ROOT, create=True,
+                                   hashes={"plan_sha256": receipt["plan_sha256"], "harness_sha256": receipt["harness_sha256"]})
+        receipt["journal"] = journal.summary()
+        receipt = run_admitted_trial(args, plan, receipt, deadline, expected_account, lease, journal, now, private_accounts)
+    except (safety().SafetyError, OSError) as exc:
+        status = "not_started" if not receipt["node"]["started"] else "cleanup_required"
+        if receipt.get("flat_proof") and receipt["flat_proof"].get("status") == "passed":
+            status = "failed"
+        finish(receipt, status, reason=str(exc) if isinstance(exc, safety().SafetyError) else "lease_or_journal_storage_error")
+    finally:
+        try:
+            if journal is not None:
+                try:
+                    receipt["journal"] = journal.summary()
+                finally:
+                    journal.close()
+        except Exception as exc:
+            finish(receipt, "failed" if receipt.get("flat_proof", {}) and receipt["flat_proof"].get("status") == "passed" else "cleanup_required",
+                   reason="private_journal: " + frozen().redact(exc))
+        finally:
+            try:
+                write_receipt(args.receipt, receipt, private_accounts)
+            finally:
+                if lease is not None:
+                    lease.close()
+    return receipt
+
+
+def run_admitted_trial(args, plan, receipt, deadline, expected_account, lease, journal, now, private_accounts):
     port = args.port if args.port is not None else plan["default_port"]
     pre, account_id, admitted = official_admission(plan, port, deadline=deadline)
+    private_accounts.append(account_id)
     liquid = pre.pop("liquid_hours", "")
     pre.pop("trading_hours", None)
     zone = pre.pop("time_zone_id", "America/New_York")
@@ -1078,6 +1207,10 @@ def run_trial(args, *, now=None, versions=None):
     if pre["status"] != "passed" or not account_id:
         finish(receipt, pre["status"] if pre["status"] != "passed" else "refused_account_scope", reason="pre_check")
         write_receipt(args.receipt, receipt, (account_id,))
+        return receipt
+    if account_id != expected_account:
+        finish(receipt, "refused_changed_account", reason="pre_check_expected_account")
+        write_receipt(args.receipt, receipt, (account_id, expected_account))
         return receipt
     sessions = frozen().parse_liquid_hours(liquid, zone, now.astimezone(frozen().ZoneInfo("America/New_York")).date())
     if sessions is None or not frozen().rth_check(datetime.now(timezone.utc), plan, sessions, horizon_s=deadline - time.monotonic())[0]:
@@ -1108,10 +1241,11 @@ def run_trial(args, *, now=None, versions=None):
         child_env = {key: value for key, value in os.environ.items()
                      if key not in ("RUST_LOG", "NAUTILUS_LOG", "TWS_ACCOUNT")}
         child = subprocess.Popen(command, stdin=subprocess.PIPE, text=True,
-                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=child_env)
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=child_env, pass_fds=(lease.fd,))
         # Anonymous pipe only: no account in argv, environment, file or receipt.
         child.stdin.write(json.dumps({"account_id": account_id, "receipt": receipt, "node_stop_at": stop_at,
-                                     "quote_admission": admitted, "tob_offset_ticks": admitted["tob_offset_ticks"]}))
+                                     "quote_admission": admitted, "tob_offset_ticks": admitted["tob_offset_ticks"],
+                                     "journal_path": str(journal.path), "run_id": journal.run_id}))
         child.stdin.close()
         try:
             child.wait(timeout=max(0, stop_at - time.monotonic()))
@@ -1141,9 +1275,15 @@ def run_trial(args, *, now=None, versions=None):
         except (OSError, ValueError):
             pass  # Preserve provisional state; a corrupt receipt can never pass.
         proof, proof_account = official_check(plan, port, with_session=False, deadline=deadline)
+        private_accounts.append(proof_account)
         if proof["status"] == "passed" and proof_account != account_id:
             proof["status"] = "refused_changed_account"
         receipt["flat_proof"] = proof
+        try:
+            journal.append("flat_proof", status=proof["status"], positions=proof.get("observed", {}).get("positions"),
+                           open_orders=proof.get("observed", {}).get("open_orders"))
+        except Exception as exc:
+            receipt["failures"].append({"acceptance_step": 4, "cases_blocked": ["C4"], "reason": "journal_flat_proof: " + frozen().redact(exc)})
         update_observations(receipt, receipt["events"], plan)
         status, reason, step, cases = final_status(receipt, interrupted=bool(interrupted),
                                                  child_returncode=child.returncode if child is not None else None)
@@ -1162,6 +1302,8 @@ def parser():
     result.add_argument("--plan", type=Path, default=PLAN_PATH)
     result.add_argument("--receipt", type=Path, help="sanitized, atomically replaced receipt; required for an order run")
     result.add_argument("--plan-only", action="store_true", help="validate plan, pins and window WITHOUT connecting; quote admission is not exercised")
+    result.add_argument("--private-output-dir", type=Path, help="0700 directory outside the repository for the private journal; defaults beside receipt")
+    result.add_argument("--run-id", help="stable private journal identity; reuse refuses before connection; default is a new UUID")
     result.add_argument("--port", type=int, help="4002 (default) or 7497 only")
     result.add_argument("--node-client-id", type=int, help="91 only")
     result.add_argument("--check-client-id", type=int, help="92 only")
@@ -1210,6 +1352,15 @@ def run_child(args):
             reason = "refused_child_payload"
     if reason is None and not validate_child_admission(plan, payload):
         reason = "refused_child_quote_admission"
+    if reason is None:
+        try:
+            journal_path = Path(payload["journal_path"]).resolve()
+            if journal_path.name != payload["run_id"] + ".jsonl" or ROOT in journal_path.parents:
+                reason = "refused_child_journal"
+            elif not journal_path.is_file():
+                reason = "refused_child_journal"
+        except (KeyError, TypeError, ValueError):
+            reason = "refused_child_journal"
     if reason:
         persist_child_refusal(args.receipt, payload, reason)
         return 3

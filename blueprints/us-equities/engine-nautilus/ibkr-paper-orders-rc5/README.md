@@ -92,6 +92,13 @@ connectivity failures and delayed-data codes refuse quote admission; unrelated
 farm notices remain information. The original trial's exact timeout cause is
 unproven, so the next coordinator run can distinguish the remaining callbacks.
 
+Admission also checks `(ask - bid) * quantity + 2 * commission_allowance_per_order_usd`
+against the existing `max_roundtrip_loss_usd`. A bid of 770 and ask of 990
+therefore refuses with `refused_quote_loss_bound`: the spread loss is 220 USD
+and the plan's expected round-trip commissions add 2 USD to the 5 USD bound.
+The quote receipt retains that stage and all the compared numbers. No node starts
+after this refusal. The plan numbers are unchanged.
+
 ## Environment and commands
 
 Use the prepared Python 3.12 environment. To reproduce its three pins with uv:
@@ -126,17 +133,64 @@ and records only structural validation. Outside regular hours it refuses.
 Neither command connects or fetches a quote. The coordinator's order recipe is:
 
 ```sh
+orders_run_id="rc5-paper-orders-unique-run-id"
+orders_output="${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/ibkr-paper/runs/$orders_run_id"
+umask 077
+rtk install -d -m 700 "$orders_output"
+# TWS_ACCOUNT must already contain the intended DU paper account, as in upstream.
 rtk "$orders_env/bin/python" \
   blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/run.py \
-  --port 4002 --receipt "$orders_env/../receipt-rc5-orders.json"
+  --port 4002 --receipt "$orders_env/../receipt-rc5-orders.json" \
+  --run-id "$orders_run_id" --private-output-dir "$orders_output" \
+  > "$orders_output/console-redacted.log"
+rtk chmod 600 "$orders_output/console-redacted.log"
 ```
 
 That recipe performs the flat pre-check and quote admission before starting the
-node. `7497` is the only alternative port. An account is never
-accepted as an argument or loaded from `TWS_ACCOUNT`. After admission, the
-official client 92 discovers exactly one DU account with zero nonzero positions
+node. `7497` is the only alternative port. The parent reads upstream's
+`TWS_ACCOUNT` environment variable to identify the account lease before any
+broker request. It is never accepted as an argument or copied into the child
+environment. Official client 92 must then discover exactly that one DU account
+with zero nonzero positions
 and zero open orders. Its account identifier stays in memory and travels to the
 node process only over an anonymous pipe, then into the native execution config.
+
+Before the client-92 pre-check, the parent acquires a non-blocking exclusive
+`fcntl.flock` on
+`${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/ibkr-paper/locks/<sha256(account_id)>.lock`.
+The directory is 0700 and the file 0600. This follows
+`account_lock_fingerprint` in the frozen Alpaca safety module at
+`dca821cca85dce3647fa7b488d5a23fbe5b85d4a`; [safety.py](safety.py) contains the
+bounded IBKR adaptation. A held lease returns `not_started`, exit 3, before any
+client connects. The lease lasts through the independent flat proof; the child
+inherits its file descriptor so an orphaned child retains the lock until exit.
+The receipt retains acquired/not-acquired and only the hash-based lock filename.
+The lock is host-local: it cannot exclude a writer on another host or the WSL
+distro that hosts the Gateway.
+
+Each order run creates `<run_id>.jsonl` in its private output directory outside
+the repository, beside `console-redacted.log`. The default run id is a fresh
+UUID; the default directory is `private-<run_id>` beside the receipt. Supply the
+same run id and directory for a retry: an existing journal refuses before
+admission. Creation uses `O_EXCL`; appends use `O_APPEND`, mode 0600, flush and
+`os.fsync` after every record. The parent records `run_start` with plan/harness
+hashes, then the child records owned native order events, client/venue identity
+mappings and the stop request. The parent resumes appending after child exit to
+record the independent flat proof. No account is written. The sanitized receipt
+contains only the journal's SHA-256, record count and record kinds.
+
+The journal preserves `OrderInitialized` before `OrderSubmitted` in native
+event-history order, including pre-submission denials. Its capture is through
+the public live cache. **The pre-venue fsync barrier remains unimplemented:**
+polling cannot guarantee that intent reaches disk before the native adapter
+sends it. The installed rc5 Python APIs and its release notes do not expose the
+native persistence factory; upstream's Rust
+[BusTap](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/msgbus/mod.rs#L222)
+and [with_event_store](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/live/src/node/builder.rs#L390)
+provide the relevant pre-dispatch seam. `add_stream_processor` handles external
+ingress, and Python `subscribe_topic` handles Python messages; neither observes
+these native outbound events. Satisfying that part of the paper-lane policy
+needs a native persistence integration beyond the unchanged Python node/configuration.
 
 ## Frozen bounds and deviations
 
@@ -183,9 +237,15 @@ and C3's full fill are present, or a failure, signal, case timeout or deadline
 requests stop. The native strategy then supplies C2 and C4. Native cache events
 with `reconciliation=True` cannot establish venue acceptance or cancellation.
 Case outcomes, fills, the round trip and stop decisions use only this run's
-ExecTester submissions. An in-memory client-order-id registry requires matching
-non-reconciled `OrderInitialized` and `OrderSubmitted` events for `EXEC_TESTER-001`
-and `TESTER-001` after node launch. Strategy identity and initialization time alone
+ExecTester intents. An in-memory client-order-id registry requires matching
+non-reconciled `OrderInitialized` events for `EXEC_TESTER-001` and `TESTER-001`
+after node launch. The native factory's client-order-id date/time, trader tag,
+strategy tag and counter establish that an initialized intent belongs to this
+run before it reaches `OrderSubmitted`. Its native generated identity follows
+[client_order_id.rs](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/generators/client_order_id.rs#L51).
+Pending intents defer stop; a denied intent stays owned, counts toward the order
+budget and records its denial in the case. Terminal denials release deferral.
+Strategy identity and initialization time alone
 are insufficient: startup reconciliation can claim external SPY orders for the
 same strategy. The submission lineage follows upstream's
 [IB submit path](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/adapters/interactive_brokers/src/execution/core_orders.rs#L142)
@@ -208,6 +268,19 @@ and [cache binding](https://github.com/nautechsystems/nautilus_trader/blob/1b0a4
 `py_cache` passes the kernel's `Rc<RefCell<Cache>>` into `PyCache::from_rc`;
 each `orders()` call borrows that same cache and returns cloned order objects.
 The runner re-reads those objects on every poll.
+
+PR #754 submission-time notional disposition: rc5 does not enforce the engine
+cap on the SMART/IB route affected by #4946. The fix ships in v2.0.0rc6;
+qualifying rc6 moves the bound to the engine. This selected rc5 trial holds its
+bound through quantity one and quote admission without wrapping or modifying
+upstream ExecTester's submission. For one SPY share to exceed USD 1000 after
+admission around USD 775, its price must rise about 29% between the admission
+recheck and submission, within the roughly 60-second startup budget. Under the
+National Market System Plan to Address Extraordinary Market Volatility (the
+Limit Up-Limit Down Plan), a Tier 1 NMS security such as SPY has 5% price bands
+during the core session and 10% bands in the opening and closing windows.
+Trading pauses rather than trading through those bands. The independent
+client-92 flat proof still runs at the end.
 
 ## Receipts and remaining acceptance
 
@@ -270,7 +343,7 @@ from this builder advances broker readiness or a strategy gate.
 Use a scratch directory outside the worktree and outside `/tmp`, with nice 19:
 
 ```sh
-orders_scratch="${XDG_CACHE_HOME:-$HOME/.cache}/rc5-orders-r3/tmp"
+orders_scratch="${XDG_CACHE_HOME:-$HOME/.cache}/rc5-orders-r5/tmp"
 rtk mkdir -p "$orders_scratch"
 rtk env TMPDIR="$orders_scratch" PYTHONDONTWRITEBYTECODE=1 nice -n 19 \
   "$orders_env/bin/python" -m unittest tests.test_ibkr_paper_orders_rc5
