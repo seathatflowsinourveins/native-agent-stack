@@ -1,0 +1,423 @@
+{
+  "schema_version": 1,
+  "job": "job-062",
+  "recorded_on": "2026-10-05",
+  "base_revision": "43005a9f86ae6e5fcf0e4774ccf0cc3e7135e1d3",
+  "evidence_class": "local integration checks and synthetic fixtures; separately attributed coordinator/peer incident observations",
+  "upstream_tests_claimed": false,
+  "live_disk_exhaustion_reproduced": false,
+  "live_alert_delivery_tested": false,
+  "committed": false,
+  "source_artifacts": {
+    "observability/backends/templates/ecosystem-prometheus-rules.yml.example": {
+      "sha256": "4d8db31fb611506059138ee30babb2fa83e6ee41a1f5418815cc2c8a949ce1e8",
+      "bytes": 21656
+    },
+    "tests/__init__.py": {
+      "sha256": "5f32f38f71e5e8ad9c26bd4c83080b4ce1584802b92dd6a7c860678a241c8461",
+      "bytes": 3802
+    },
+    "tests/test_catalog_freshness_propose.py": {
+      "sha256": "0f18570a5f35701f88770fc702bc9bba815e3a5e17104422264fc2570dbd8b50",
+      "bytes": 60148
+    },
+    "tests/test_observability_backends_alerts.py": {
+      "sha256": "fa3ab3ed890fd3beaa88ea3be0629c5ec8eb7d36556a4777e564926d5d8ed8eb",
+      "bytes": 41001
+    },
+    "tests/test_wsl_retrieval.py": {
+      "sha256": "68c197dbba04ef3f15786166d557a5b4fd00ef1fd976240f5d5ee70bdbb0fcbb",
+      "bytes": 26486
+    },
+    "tests/repository_copy.py": {
+      "sha256": "83c560926cb36a5fa767db2b0bc2180f018435b053c2a407635a1c492d646b9d",
+      "bytes": 879
+    },
+    "tests/test_tmpdir_guard.py": {
+      "sha256": "36263b6a675b849f92cd10d4ea9d03828082888978facf5f467ee6ea0fd16cba",
+      "bytes": 7347
+    },
+    "docs/decisions/2026-10-05-disk-headroom-enospc.md": {
+      "sha256": "b879064bd3babc4491383751c60980250c6d2b0e37489ecdb7adfbfe6f208349",
+      "bytes": 30425
+    }
+  },
+  "sources": [
+    {
+      "repository": "prometheus/node_exporter",
+      "tag": "v1.12.1",
+      "annotated_tag_object": "fc12f2c0ca65e65f046a5583bbcaf996a578afb4",
+      "commit": "6044da783597cc3b57aef7580ddcdcff58a4ee99",
+      "files": [
+        "docs/node-mixin/alerts/alerts.libsonnet:7-80",
+        "docs/node-mixin/config.libsonnet:67-91"
+      ]
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "tag": "v0.161.0",
+      "commit": "3f8455d8038a985398861171e5310bc9b4e988b2",
+      "files": [
+        "receiver/hostmetricsreceiver/go.mod:14",
+        "receiver/hostmetricsreceiver/internal/scraper/filesystemscraper/metadata.yaml:29-62",
+        "receiver/hostmetricsreceiver/internal/scraper/filesystemscraper/filesystem_scraper_unix.go:15-36",
+        "receiver/hostmetricsreceiver/internal/scraper/filesystemscraper/filesystem_scraper.go:135-142 (mount mode only)"
+      ]
+    },
+    {
+      "repository": "prometheus/prometheus",
+      "tag": "v3.15.0",
+      "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "files": [
+        "docs/configuration/unit_testing_rules.md",
+        "docs/querying/operators.md",
+        "promql/engine.go:3438-3457",
+        "docs/querying/functions.md:174-185,769-781"
+      ]
+    },
+    {
+      "repository": "python/cpython",
+      "tag": "v3.13.15",
+      "files": [
+        "Lib/tempfile.py",
+        "Doc/library/pathlib.rst",
+        "Lib/unittest/loader.py:265-280",
+        "Lib/shutil.py:550-596"
+      ]
+    },
+    {
+      "repository": "shirou/gopsutil",
+      "tag": "v4.26.8",
+      "commit": "7d254a02800683e5a322b09e1843d3399f66f307",
+      "files": [
+        "disk/disk_unix.go:21-30"
+      ],
+      "dependency_pin_source": "open-telemetry/opentelemetry-collector-contrib@3f8455d8038a985398861171e5310bc9b4e988b2:receiver/hostmetricsreceiver/go.mod:14"
+    }
+  ],
+  "coordinator_and_peer_report": {
+    "source": "job-062 incident brief; coordinator and peer observations, not newly inspected host journal",
+    "root_filesystem": {
+      "type": "ext4",
+      "device": "/dev/sdd",
+      "capacity_as_reported": "1007G"
+    },
+    "zero_free_at_utc_approx": "2026-10-04T23:55:00Z",
+    "near_full_again_at_utc_approx": "2026-10-05T00:10:00Z",
+    "journal_symptoms": [
+      "Collector export failures",
+      "Prometheus Scrape commit failed"
+    ],
+    "root_cause": {
+      "reported_by": "peer session 5f",
+      "cause": "TMPDIR inside a worktree; checkout copied into a destination within itself and recursively included that destination",
+      "approx_gib_consumed": 128,
+      "elapsed_as_reported": "within minutes"
+    },
+    "recovered_free_gib_as_reported": [
+      128,
+      129
+    ],
+    "interim_host_guard": {
+      "name": "disk-headroom-guard.timer",
+      "sample_interval": "2m",
+      "alert_below_gib": 60,
+      "prune_below_gib": 30,
+      "prune_cmd": "uv cache prune",
+      "builder_executed": false
+    }
+  },
+  "sanitized_observations": {
+    "source": "disk-headroom-samples.csv",
+    "source_sha256": "2958923efb52ce7dcb15304b1870084c4226a824679ca7632d1e913729648129",
+    "retained_fields": [
+      "utc",
+      "free_gib"
+    ],
+    "samples": [
+      {
+        "utc": "2026-10-05T00:40:10Z",
+        "free_gib": 128
+      },
+      {
+        "utc": "2026-10-05T00:40:12Z",
+        "free_gib": 128
+      },
+      {
+        "utc": "2026-10-05T00:42:12Z",
+        "free_gib": 128
+      },
+      {
+        "utc": "2026-10-05T00:44:12Z",
+        "free_gib": 128
+      },
+      {
+        "utc": "2026-10-05T00:46:12Z",
+        "free_gib": 127
+      }
+    ],
+    "sanitization": "Only UTC and numeric free-space observations retained; source-directory and personal paths omitted."
+  },
+  "archive": {
+    "source": "archive-log.jsonl",
+    "source_available": false,
+    "transferred_amount_as_reported": "about 117G",
+    "destination_as_reported": "Z:",
+    "owner_as_reported": "coordinator's own finished state",
+    "evidence_class": "coordinator-reported only; original archive log absent at builder inspection",
+    "independently_verified_bytes": null,
+    "archive_integrity_verified": false,
+    "sanitization": "No archive paths, private state names, credentials, or active client configuration copied."
+  },
+  "failed_attempts": [
+    {
+      "check": "guard absent control",
+      "exit": 1,
+      "tests_run": 4,
+      "failed_assertions": 4,
+      "summary": "Actual package setup reached the scratch sentinel instead of rejecting repository and symlink tempdirs; no unsafe scratch allocated."
+    },
+    {
+      "check": "initial focused acceptance with requested TMPDIR",
+      "exit": 1,
+      "tests_run": 12,
+      "failures": 8,
+      "guard_tests_passed": 4,
+      "summary": "Native promtool: opening test directory: mkdir <requested-job-TMPDIR>/test_storage...: read-only file system. Python tempfile fell back to /tmp."
+    },
+    {
+      "check": "first full acceptance with writable external scratch",
+      "exit": 1,
+      "tests_run": 40,
+      "failures": 5,
+      "skipped": 3,
+      "summary": "One old 21-rule count and four filesystem fixtures failed. One-to-one ignoring(state) dropped state from ratios; the forecast conjunction matched no series. group_left preserves the numerator label."
+    },
+    {
+      "check": "round-2 call-site guard absent control",
+      "exit": 1,
+      "tests_run": 2,
+      "failures": 2,
+      "summary": "Eight direct ROOT copies were unprotected; both actual top-level catalog setUpClass calls could reach the harmless native-copy sentinel. No recursive copy was executed."
+    },
+    {
+      "check": "round-2 full changed-module working-tree attempt",
+      "cmd": "python3 -m unittest tests.test_observability_backends_alerts tests.test_tmpdir_guard tests.test_catalog_freshness_propose tests.test_wsl_retrieval",
+      "exit": 1,
+      "tests_run": 175,
+      "skipped": 3,
+      "scope": "working tree with requested external TMPDIR",
+      "returned_output": "Rendered five native service configurations. Grafana credentials remain in the private environment file.\ns..s...............................s.....................................................................................F.....................................................\n======================================================================\nFAIL: test_general_publication_validator_passes_after_the_run (tests.test_catalog_freshness_propose.RebuildExplorerSubprocessTests.test_general_publication_validator_passes_after_the_run)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_catalog_freshness_propose.py\", line 761, in test_general_publication_validator_passes_after_the_run\n    self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 1 != 0 : Publication validation failed:\nobservability/backends/templates/ecosystem-prometheus-rules.yml.example: SHA-256 mismatch\nobservability/backends/templates/ecosystem-prometheus-rules.yml.example: byte count mismatch\ntests/__init__.py: SHA-256 mismatch\ntests/__init__.py: byte count mismatch\ntests/test_catalog_freshness_propose.py: SHA-256 mismatch\ntests/test_catalog_freshness_propose.py: byte count mismatch\ntests/test_observability_backends_alerts.py: SHA-256 mismatch\ntests/test_observability_backends_alerts.py: byte count mismatch\ntests/test_wsl_retrieval.py: SHA-256 mismatch\ntests/test_wsl_retrieval.py: byte count mismatch\nevidence/artifacts/disk-headroom-enospc-20261005/receipt.json: evidence file is not hash-listed\n\n\n----------------------------------------------------------------------\nRan 175 tests in 84.628s\n\nFAILED (failures=1, skipped=3)\n",
+      "failures": 1,
+      "classification": "only expected coordinator-owned registry drift in the catalog freshness scratch publication-validator assertion"
+    }
+  ],
+  "checks": {
+    "unittest": {
+      "cmd": "python3 -m unittest tests.test_observability_backends_alerts tests.test_tmpdir_guard tests.test_wsl_retrieval",
+      "exit": 0,
+      "tests_run": 91,
+      "skipped": 3,
+      "scope": "working tree with requested external TMPDIR",
+      "returned_output": "Rendered five native service configurations. Grafana credentials remain in the private environment file.\ns..s...............................s.......................................................\n----------------------------------------------------------------------\nRan 91 tests in 22.672s\n\nOK (skipped=3)\n",
+      "passed": 88
+    },
+    "full_changed_module_unittest": {
+      "cmd": "python3 -m unittest tests.test_observability_backends_alerts tests.test_tmpdir_guard tests.test_catalog_freshness_propose tests.test_wsl_retrieval",
+      "exit": 0,
+      "tests_run": 175,
+      "skipped": 3,
+      "scope": "copied sandbox: unchanged source bytes; only the scratch registry reconciled",
+      "returned_output": "Rendered five native service configurations. Grafana credentials remain in the private environment file.\ns..s...............................s...........................................................................................................................................\n----------------------------------------------------------------------\nRan 175 tests in 84.525s\n\nOK (skipped=3)\n",
+      "passed": 172,
+      "baseline_validation_exit": 0,
+      "scratch_registry_paths": [
+        "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
+        "tests/__init__.py",
+        "tests/test_catalog_freshness_propose.py",
+        "tests/test_observability_backends_alerts.py",
+        "tests/test_wsl_retrieval.py",
+        "evidence/artifacts/disk-headroom-enospc-20261005/receipt.json"
+      ],
+      "source_bytes_verified_identical": true,
+      "working_tree_registry_verified_unchanged": true,
+      "preparation_source": "native-agent-stack@43005a9f86ae6e5fcf0e4774ccf0cc3e7135e1d3:scripts/host_receipts.py:710-729; scratch-only register_file"
+    },
+    "top_level_guard_discovery": {
+      "cmd": "python3 -m unittest discover -s tests -p test_tmpdir_guard.py",
+      "exit": 0,
+      "tests_run": 9,
+      "passed": 9,
+      "skipped": 0,
+      "returned_output": ".........\n----------------------------------------------------------------------\nRan 9 tests in 3.526s\n\nOK\n"
+    },
+    "promtool_check": {
+      "cmd": "promtool check rules <external-job-scratch>/round-2-promtool/config/ecosystem-prometheus-rules.yml",
+      "version": "3.15.0",
+      "revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "exit": 0,
+      "returned_output": "Checking <external-job-scratch>/round-2-promtool/config/ecosystem-prometheus-rules.yml\n  SUCCESS: 26 rules found\n\n"
+    },
+    "promtool_test": {
+      "cmd": "promtool test rules <external-job-scratch>/round-2-promtool/test_*.test.yml",
+      "version": "3.15.0",
+      "revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "exit": 0,
+      "fixture_documents": 9,
+      "test_cases": 13,
+      "returned_output": "  SUCCESS\n\n  SUCCESS\n\n  SUCCESS\n\n  SUCCESS\n\n  SUCCESS\n\n  SUCCESS\n\n  SUCCESS\n\n  SUCCESS\n\n  SUCCESS\n\n"
+    },
+    "publication_validation": {
+      "cmd": "python3 scripts/validate.py",
+      "exit": 1,
+      "classification": "expected coordinator-owned registry drift only: five changed registered file hashes/byte counts and the unlisted job receipt",
+      "expected_messages_verified_exactly": 11,
+      "returned_output": "Publication validation failed:\nobservability/backends/templates/ecosystem-prometheus-rules.yml.example: SHA-256 mismatch\nobservability/backends/templates/ecosystem-prometheus-rules.yml.example: byte count mismatch\ntests/__init__.py: SHA-256 mismatch\ntests/__init__.py: byte count mismatch\ntests/test_catalog_freshness_propose.py: SHA-256 mismatch\ntests/test_catalog_freshness_propose.py: byte count mismatch\ntests/test_observability_backends_alerts.py: SHA-256 mismatch\ntests/test_observability_backends_alerts.py: byte count mismatch\ntests/test_wsl_retrieval.py: SHA-256 mismatch\ntests/test_wsl_retrieval.py: byte count mismatch\nevidence/artifacts/disk-headroom-enospc-20261005/receipt.json: evidence file is not hash-listed\n"
+    },
+    "diff_check": {
+      "cmd": "git diff --check",
+      "exit": 0,
+      "returned_output": ""
+    }
+  },
+  "alert_route": {
+    "source": "observability/backends/templates/ecosystem-alertmanager.yml.example",
+    "current_receiver": "local-ntfy",
+    "current_url": "http://127.0.0.1:18080/ecosystem-alerts?template=alertmanager",
+    "send_resolved": true,
+    "hosted_plan_as_reported": "ntfy.sh once alerting slot 2604 lands",
+    "live_delivery_verified_by_builder": false
+  },
+  "open": [
+    "Original archive-log.jsonl was absent. Obtain and sanitize it before independently claiming transferred bytes or archive integrity.",
+    "Coordinator owns manifests/evidence.json reconciliation, registration of new files, and host rollout.",
+    "Hosted ntfy.sh route and firing/resolved delivery remain pending slot 2604."
+  ],
+  "repair_round": 2,
+  "round_1_source_artifacts": {
+    "observability/backends/templates/ecosystem-prometheus-rules.yml.example": {
+      "sha256": "e3720dd00dfd37ed03d2373fbb748a7ddf960803e05e6726bc062c09b86839e2",
+      "bytes": 21040
+    },
+    "tests/__init__.py": {
+      "sha256": "5f32f38f71e5e8ad9c26bd4c83080b4ce1584802b92dd6a7c860678a241c8461",
+      "bytes": 3802
+    },
+    "tests/test_observability_backends_alerts.py": {
+      "sha256": "4c10fc070e774d5fc850c067380d6da948e5c3533680d62568c01b4cbee974dd",
+      "bytes": 39218
+    },
+    "tests/test_tmpdir_guard.py": {
+      "sha256": "b83c58bf27abdd01b969e129b6e296d02d24f9ffa0074f370aaf577e4b252712",
+      "bytes": 3188
+    },
+    "docs/decisions/2026-10-05-disk-headroom-enospc.md": {
+      "sha256": "9ed7bc62703ec53f383cb12f1c3fbccf316d18e4e12c032e0e299d609ab63958",
+      "bytes": 18003
+    }
+  },
+  "round_1_checks": {
+    "unittest": {
+      "cmd": "TMPDIR=/tmp/job-062-disk-headroom rtk proxy python3 -m unittest tests.test_observability_backends_alerts tests.test_tmpdir_guard",
+      "exit": 0,
+      "tests_run": 40,
+      "passed": 37,
+      "skipped": 3,
+      "skip_reason": "optional PyYAML structural checks; all eight filesystem tests and four guard tests executed",
+      "returned_output": "s..s..............................s.....\n----------------------------------------------------------------------\nRan 40 tests in 7.926s\n\nOK (skipped=3)\nRendered five native service configurations. Grafana credentials remain in the private environment file.\n"
+    },
+    "promtool_check": {
+      "cmd": "TMPDIR=/tmp/job-062-disk-headroom promtool check rules /tmp/job-062-disk-headroom/render/config/ecosystem-prometheus-rules.yml",
+      "version": "3.15.0",
+      "revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "exit": 0,
+      "returned_output": "Checking /tmp/job-062-disk-headroom/render/config/ecosystem-prometheus-rules.yml\n  SUCCESS: 26 rules found\n\n"
+    },
+    "disarmed_rule_control": {
+      "native_cmd": "promtool test rules <owned-temporary-fixture>/root-filesystem.test.yml",
+      "mutation": "Remove only EcosystemRootFilesystemBurstFill from the rendered rules; retain original fixture expectations.",
+      "exit": 1,
+      "expected_exit": 1,
+      "returned_output": "Disarmed-rule control: expected promtool failure\n1 != 0 : \n\n  FAILED:\n    alertname: EcosystemRootFilesystemBurstFill, time: 6h5m, \n        exp:[\n            0:\n              Labels:{alertname=\"EcosystemRootFilesystemBurstFill\", device=\"root-test\", instance=\"host-test\", job=\"otelcol\", mode=\"rw\", mountpoint=\"/\", scope=\"local-ecosystem\", severity=\"critical\", state=\"free\", type=\"ext4\"}\n              Annotations:{description=\"The 15-minute free-space trend predicts exhaustion within one hour and less than 100 GiB remains, sustained for two minutes. The 2026-10-04 recursive TMPDIR copy consumed about 128 GiB within minutes; stop the offending writer and keep test TMPDIR outside every checkout.\", summary=\"WSL root filesystem is filling rapidly with less than 100 GiB available\"}\n            ], \n        got:[]\n\n"
+    },
+    "publication_validation": {
+      "cmd": "TMPDIR=/tmp/job-062-disk-headroom python3 scripts/validate.py",
+      "exit": 1,
+      "classification": "expected coordinator-owned registry drift: three changed file hashes/byte counts and the new unlisted receipt",
+      "returned_output": "Publication validation failed:\nobservability/backends/templates/ecosystem-prometheus-rules.yml.example: SHA-256 mismatch\nobservability/backends/templates/ecosystem-prometheus-rules.yml.example: byte count mismatch\ntests/__init__.py: SHA-256 mismatch\ntests/__init__.py: byte count mismatch\ntests/test_observability_backends_alerts.py: SHA-256 mismatch\ntests/test_observability_backends_alerts.py: byte count mismatch\nevidence/artifacts/disk-headroom-enospc-20261005/receipt.json: evidence file is not hash-listed\n"
+    },
+    "diff_check": {
+      "cmd": "git diff --check",
+      "exit": 0,
+      "returned_output": ""
+    }
+  },
+  "repair_policy": {
+    "forecast_range": "2m",
+    "forecast_ahead_seconds": 120,
+    "free_space_floor_gib": 50,
+    "pending": "15s",
+    "threshold_basis": "Approximately node-mixin v1.12.1 5% available-space band on this approximately 1 TiB root, critical only with predicted exhaustion within two minutes.",
+    "configured_seconds": {
+      "collection": 30,
+      "batch_timeout": 1,
+      "scrape": 15,
+      "evaluation": 15,
+      "pending": 15
+    },
+    "configured_phase_budget_seconds": 76,
+    "budget_limit": "Assumes established falling trend; not measured latency. At least two float samples needed; transport, scheduling and regression history can add delay. Faster fills can outrun both this route and the separate two-minute host timer.",
+    "synthetic_runaway": [
+      {
+        "initial_free_gib": 128,
+        "physical_exhaustion_seconds": 240,
+        "firing_seconds": 225
+      },
+      {
+        "initial_free_gib": 128,
+        "physical_exhaustion_seconds": 300,
+        "firing_seconds": 285
+      }
+    ],
+    "synthetic_observations": {
+      "update_interval_seconds": 30,
+      "scrape_evaluation_seconds": 15,
+      "deliberate_observation_lag_seconds": 60
+    },
+    "synthetic_legitimate_burst": {
+      "written_gib": 30,
+      "writer_duration_seconds": 60,
+      "initial_free_gib": [
+        151,
+        128
+      ],
+      "ending_free_gib": [
+        121,
+        98
+      ],
+      "alerts": 0
+    },
+    "causal_guards": [
+      "package effective-tempdir check",
+      "resolved source/destination containment at all eight direct ROOT tree-copy sites"
+    ],
+    "live_exhaustion_reproduced": false
+  },
+  "ci_limitations": {
+    "source": ".github/workflows/validate.yml:233-239; tests/test_observability_backends_alerts.py native-binary skip decorators",
+    "promtool_provisioning": "not found in inspected .github/workflows files; no CI install added",
+    "when_missing": "native rule tests skip; green CI does not establish native alert evaluation",
+    "sandbox_native_tests_skipped": false,
+    "sandbox_optional_skips": "three PyYAML structural checks"
+  },
+  "repair_open": [],
+  "handoff": {
+    "folder_untracked": true,
+    "message": ".bounded-job-062/msg-2.txt",
+    "previous_message_retained": true,
+    "head_unchanged": "43005a9f86ae6e5fcf0e4774ccf0cc3e7135e1d3",
+    "working_tree_registry_unchanged": true,
+    "untracked_status_source": "https://github.com/git/git/blob/v2.55.0/Documentation/git-status.adoc#L201-L204",
+    "installed_git_version": "2.43.0"
+  }
+}

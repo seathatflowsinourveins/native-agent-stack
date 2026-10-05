@@ -15,6 +15,11 @@ from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
+if __package__:
+    from .repository_copy import guarded_copytree
+else:
+    from repository_copy import guarded_copytree
+
 ROOT = Path(__file__).resolve().parents[1]/'blueprints/convergence-practice/wsl-retrieval'
 SPEC = importlib.util.spec_from_file_location('wsl_retrieval_audit', ROOT/'audit.py')
 assert SPEC is not None and SPEC.loader is not None
@@ -207,7 +212,7 @@ class WslRetrievalEvidenceTests(unittest.TestCase):
     def test_changed_frozen_input_rejected(self):
         with tempfile.TemporaryDirectory() as folder:
             target = Path(folder)/'leaf'
-            shutil.copytree(ROOT, target)
+            guarded_copytree(ROOT, target)
             (target/'seed/planner.py').write_text('pass\n')
             with self.assertRaises(ValueError):
                 self.audit(target)
@@ -215,7 +220,7 @@ class WslRetrievalEvidenceTests(unittest.TestCase):
     def test_original_manifest_is_resolved_without_rewriting_receipt_names(self):
         with tempfile.TemporaryDirectory() as folder:
             target = Path(folder)/'leaf'
-            shutil.copytree(ROOT, target)
+            guarded_copytree(ROOT, target)
             archive = target/'package-original.json.txt'
             (target/'package.json').write_text('{"private": true}\n')
             try:
@@ -227,7 +232,7 @@ class WslRetrievalEvidenceTests(unittest.TestCase):
     def test_changed_original_manifest_archive_rejected(self):
         with tempfile.TemporaryDirectory() as folder:
             target = Path(folder)/'leaf'
-            shutil.copytree(ROOT, target)
+            guarded_copytree(ROOT, target)
             archive = target/'package-original.json.txt'
             archive.write_bytes(archive.read_bytes()+b'\n')
             with self.assertRaisesRegex(ValueError, 'changed frozen input: package.json'):
@@ -317,7 +322,7 @@ class RetiredRunnerTests(unittest.TestCase):
     def test_offline_cli_rejects_changed_recording_aid_archive(self):
         with tempfile.TemporaryDirectory() as folder:
             target = Path(folder)/'leaf'
-            shutil.copytree(ROOT, target)
+            guarded_copytree(ROOT, target)
             archive = target/'run-recording-aid.py.txt'
             archive.write_bytes(archive.read_bytes()+b'\n')
             result = subprocess.run([sys.executable, str(target/'audit.py')],
@@ -347,7 +352,7 @@ class RetiredRunnerTests(unittest.TestCase):
         for change in ['missing-runtime-guard', 'restored-dependency', 'restored-script']:
             with self.subTest(change=change), tempfile.TemporaryDirectory() as folder:
                 target = Path(folder)/'leaf'
-                shutil.copytree(ROOT, target)
+                guarded_copytree(ROOT, target)
                 manifest = {
                     'name': 'retired-wsl-retrieval', 'version': '1.0.0', 'private': True,
                     'devEngines': {'runtime': {'name': 'retired-wsl-retrieval', 'onFail': 'error'}},
@@ -386,7 +391,7 @@ class LockDiscoveryGuardTests(unittest.TestCase):
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
         root = Path(folder.name)/'wsl-retrieval'
-        shutil.copytree(ROOT, root)
+        guarded_copytree(ROOT, root)
         if tracked:
             self.git(root, 'init', '-q')
             self.git(root, 'add', '-A')
