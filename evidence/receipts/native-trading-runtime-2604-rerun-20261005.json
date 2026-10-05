@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
+  "kind": "host-run-receipt",
+  "claim": "On NativeStack2604, PR #703's own install-trading-2604.sh and accept-trading-2604.sh ran at head d02c0827 against its final lock: install PASS; acceptance 25/25 PASS, 0 FAIL, 0 BLOCKED.",
+  "host": "NativeStack2604",
+  "pr": 703,
+  "commit": "d02c0827",
+  "lock": {
+    "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+    "sha256_prefix": "4c98672d14147a1b"
+  },
+  "run": {
+    "started_utc": "2026-10-05T01:00:17Z",
+    "finished_utc": "2026-10-05T01:01:07Z",
+    "runner": "mise exec uv@0.12.17; TMPDIR outside the checkout; nice 19; a separate worktree at the PR head (the main checkout stayed on main)"
+  },
+  "results": {
+    "install": "PASS (exit 0)",
+    "acceptance": {
+      "pass": 25,
+      "fail": 0,
+      "blocked": 0,
+      "exit": 0
+    },
+    "observed": [
+      "edgartools 5.58.0 -> 5.60.0 by the locked sync; import_edgartools PASS",
+      "quantconnect/lean image already present at its pinned digest"
+    ]
+  },
+  "evidence_class": "native_proven (actual execution on the destination host)",
+  "limitations": [
+    "Per-check logs stay private on the host; this receipt carries the outer status lines only.",
+    "One run; no unchanged upstream test suite was run."
+  ],
+  "operator": "Claude coordinator (wsl-architecture-design lane)"
+}
