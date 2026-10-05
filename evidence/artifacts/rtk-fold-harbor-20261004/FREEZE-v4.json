@@ -1,0 +1,47 @@
+{
+  "version": 4,
+  "frozen_at": "2026-10-04T23:49:49.785660+00:00",
+  "prereg_sha256": "fe71d649f56fc462b41418c2e81e246fbcf25497ba373d143b61e3838ebf2968",
+  "freeze_sha256": "6522f2289afb28360aae14b5d51f5b37e29cd9c6ee63c11e01d545e6ea5961f8",
+  "freeze_sha256_definition": "SHA256 of FREEZE.sha256 manifest",
+  "input_files": 596,
+  "amended": true,
+  "amendment_number": 2,
+  "amendment": "PREREGISTRATION.md#amendment-2--2026-10-04-system-path-installation-and-removal-of-d",
+  "previous_freeze": "FREEZE-v3.json",
+  "previous_manifest": "FREEZE-v3.sha256",
+  "previous_manifest_sha256": "12651193dd867817be0d8af05aa17ca9c78933c97fee0ba4bd40ba09a53389e4",
+  "preserved_coordinator_requested_freeze": "FREEZE-v2.json",
+  "changed_v3_inputs": [
+    "PREREGISTRATION.md",
+    "README.md",
+    "docs/decisions/2026-10-04-rtk-fold-harbor-phase1.md",
+    "run_smoke2.sh",
+    "scan_tokens.py"
+  ],
+  "v2_archived_inputs_verified": 569,
+  "v3_archived_inputs_verified": 582,
+  "measured_trials_before_freeze": 0,
+  "expected_measured_trials": 72,
+  "measured_arms": [
+    "A",
+    "B",
+    "C"
+  ],
+  "dropped_arms": [
+    "D"
+  ],
+  "new_amendment2_smoke_trials_before_final_reporting_freeze": 1,
+  "new_A_completed_under_installation_freeze": "FREEZE-v3.json",
+  "A_experimental_inputs_unchanged_since_v3": true,
+  "new_B_trials_before_freeze": 0,
+  "completed_historical_smoke_trials_before_this_freeze": 3,
+  "incomplete_historical_smoke_attempts_before_this_freeze": 1,
+  "required_smoke_jobs": [
+    "smoke2-A",
+    "smoke2-B",
+    "smoke-C"
+  ],
+  "ready_for_phase2": false,
+  "readiness_state_at_freeze": "pending B and final gate; use smoke2-acceptance.json afterward"
+}

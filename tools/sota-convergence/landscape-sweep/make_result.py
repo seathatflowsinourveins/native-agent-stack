@@ -17,8 +17,9 @@ optional {"<layer_id>": [{"trigger": ..., "ref": ...}]} of reopen entries (recip
 added to the retained_failure entries convert.py wrote, never replacing them.
 Computed fields (prev_sha256, the hashes, known, new) are left to --append. A stopped run is recorded by hand
 (recipe section 4). This tool refuses: usage that is not complete, a usage measurement whose child-usage.mjs exit
-code is not 0 (1 is accepted only for effort mismatches that the returns cover), a child or superseded attempt that
-did not run at effort max only unless the returns list it as an effort_deviation retained failure (convert.py
+code is not 0 (1 is accepted for recovered superseded attempts or effort mismatches that the returns cover), an
+attempt that did not run at effort max only unless its same-label re-run completed at max or the returns list it
+as an effort_deviation retained failure (convert.py
 --usage), a child or superseded attempt without a measured web_search (child-usage.mjs before the WebSearch count), a
 worker with a capped WebSearch call that the returns do not list as a web_search_capped retained failure, and a layer
 whose retained failures (returns.json failures/<layer>) lack their retained_failure reopen entry. Both retained
@@ -58,6 +59,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from sweep_common import (REPO_ROOT, canon, deviation_rounds, ledger_module, load_json, pointer_token,  # noqa: E402
                           private_content, private_findings, slug)
+from usage_record import superseded_at_required_effort  # noqa: E402
 
 PLACEHOLDER = "@RETURNS@"
 HEX40, HEX64 = re.compile(r"[0-9a-f]{40}"), re.compile(r"[0-9a-f]{64}")
@@ -113,19 +115,23 @@ def missing_failures(items: list, cause: str, returns: dict | None, layer_ids) -
 
 def check_usage(usage: dict, usage_ref: str, returns: dict | None = None, layer_ids=()) -> dict:
     """The usage record's child_usage, when it shows a complete run measured at effort max throughout, or whose
-    every worker measured at another effort is an effort_deviation retained failure in the returns (convert.py
-    --usage records one per worker and layer, and the layer is reopened). layer_ids are the record's layers."""
+    every uncovered worker measured at another effort is an effort_deviation retained failure in the returns
+    (convert.py --usage records one per worker and layer, and the layer is reopened). A superseded attempt is
+    covered only by its complete same-label max-effort re-run. layer_ids are the record's layers."""
     child_usage = usage.get("child_usage") or {}
     if child_usage.get("status") != "complete":
         raise ValueError(f"{usage_ref}: child_usage.status is {child_usage.get('status')!r}; a completed sweep needs "
                          "complete usage (record a stopped run by hand, recipe section 4)")
     attempts = [*(child_usage.get("children") or []), *(child_usage.get("superseded_attempts") or [])]
     off = [worker_item(child) for child in attempts
-           if isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]]
-    listed = [worker_item(item) for item in child_usage.get("effort_mismatches") or []]
+           if isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]
+           and not superseded_at_required_effort(child, child_usage, REQUIRED_EFFORT)]
+    listed = [worker_item(item) for item in child_usage.get("effort_mismatches") or []
+              if not superseded_at_required_effort(item, child_usage, REQUIRED_EFFORT)]
+    recovered = any(superseded_at_required_effort(child, child_usage, REQUIRED_EFFORT) for child in attempts)
     exit_code = (usage.get("measurement") or {}).get("exit_code")
-    # child-usage.mjs exits 1 for incomplete usage or an effort mismatch; with complete usage only a mismatch is left.
-    if exit_code != 0 and not (exit_code == 1 and (off or listed)):
+    # Keep the raw tool exit: the wrapper may have recovered changed-key incomplete children or covered mismatches.
+    if exit_code != 0 and not (exit_code == 1 and (off or listed or recovered)):
         raise ValueError(f"{usage_ref}: measurement.exit_code is {exit_code!r}; child-usage.mjs reported incomplete "
                          "usage or an effort mismatch")
     uncovered = missing_failures(listed, "effort_deviation", returns, layer_ids)

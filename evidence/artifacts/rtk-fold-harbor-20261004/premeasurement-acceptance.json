@@ -1,0 +1,66 @@
+{
+  "evidence_class": "Independent observation of retained premeasurement gate, driver log and freeze-check log; no new execution",
+  "sources": [
+    "<state>/smoke2-receipt.json",
+    "<state>/smoke2-acceptance.json",
+    "<state>/logs/phase2-run.log",
+    "<state>/logs/phase2-freeze-check.txt"
+  ],
+  "readiness": {
+    "readiness_exit": 0,
+    "ready_for_phase2": true,
+    "expected_trials": 72,
+    "measured_trials": 0,
+    "phase2_started": false,
+    "final_validated_at": "2026-10-05T01:09:35.305388+00:00",
+    "freeze_sha256": "819f87338f079bded755071bba299244fa2d63dda2884d258e9eb8a64c4bed3f"
+  },
+  "schedule_valid": true,
+  "first_measured_trial_started_at_utc": "2026-10-05T01:13:29.537098Z",
+  "gate_validated_before_first_measured_trial": true,
+  "driver_log_smoke_gate_matches_acceptance": true,
+  "smoke": [
+    {
+      "arm": "A",
+      "job": "smoke2-A",
+      "accepted": true,
+      "reward": 1.0,
+      "coverage_reconciled": true,
+      "first_grep_default_login": true,
+      "first_grep_exit": 0,
+      "hook_fired": true,
+      "grep_hook_invoked": true,
+      "fold_observed": true
+    },
+    {
+      "arm": "B",
+      "job": "smoke2-B",
+      "accepted": true,
+      "reward": 1.0,
+      "coverage_reconciled": true,
+      "first_grep_default_login": true,
+      "first_grep_exit": 0,
+      "hook_fired": false,
+      "grep_hook_invoked": true,
+      "fold_observed": false
+    },
+    {
+      "arm": "C",
+      "job": "smoke-C",
+      "accepted": true,
+      "reward": 1.0,
+      "coverage_reconciled": true,
+      "first_grep_default_login": true,
+      "first_grep_exit": 0,
+      "hook_fired": false,
+      "grep_hook_invoked": false,
+      "fold_observed": false
+    }
+  ],
+  "freeze_check": {
+    "manifest_version": 5,
+    "entries": 604,
+    "ok": 604
+  },
+  "sanitization": "Only gate metadata, smoke counters and timing; no commands, raw returns, host paths or login names."
+}

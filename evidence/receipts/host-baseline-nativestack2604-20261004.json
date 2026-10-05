@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "host-baseline-nativestack2604-20261004",
+  "kind": "host_baseline",
+  "claim": "PR-0 host-local launcher, client and selected rendered user-settings observation on NativeStack2604 (Ubuntu 26.04); every native field exit and UTC stamp remains in the bound artifact.",
+  "limitations": [
+    "Field exits and dates are observations, not client installation acceptance, a guard replay, a model workload or a fresh-session effective-settings check.",
+    "Passwordless sudo is unknown. The generic recipe link in the probe is a criterion, not per-host acceptance. Root reachability requires separate evidence and remains status-unknown.",
+    "Only selected user configuration files are observed; managed and project settings, profiles and environment overrides are not resolved.",
+    "The coordinator captured this artifact using the r0 probe source now archived and independently hashed. The capture was supplied to this repair; the remote distribution was not invoked again.",
+    "The r0 capture lacks gdb, launcher-family package versions and bwrap version. Those added fields remain unobserved here and are not filled with 24.04 data.",
+    "Native client startup may have incidental writes; absence of a stderr warning does not establish side-effect-free startup.",
+    "This is the post-F9 NativeStack2604 state, not a pre-apply comparison.",
+    "probe.output is a self-reported canonical-source hash matching the independently hashed archived source. It does not attest the bytes delivered to Python on stdin; no coordinator-side input hash was recorded for this run.",
+    "The retained dpkg-query rows lack db:Status-Status. Their recorded values remain unchanged; exit 0 and an empty version do not establish installation."
+  ],
+  "recorded_at_utc": "2026-10-05T01:47:45Z",
+  "host": {
+    "host_id": "nativestack2604",
+    "distribution": "NativeStack2604",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "release": "26.04",
+    "architecture": "x86_64"
+  },
+  "evidence_class": "local_integration",
+  "execution_context": {
+    "collector": "coordinator-supplied capture; not re-executed by this builder",
+    "shell": "bash -lc login shell",
+    "sandbox": "native distribution outside builder sandbox",
+    "command": "nice -n 19 /mnt/c/Windows/System32/wsl.exe -d NativeStack2604 -- bash -lc 'nice -n 19 python3 -' < tools/adoption/host_baseline_probe.py",
+    "state": "after command-center F9 apply"
+  },
+  "reachability": {
+    "passwordless_sudo": "unknown",
+    "gdb": "unobserved",
+    "launcher_package_versions": "unobserved",
+    "bwrap_version": "unobserved"
+  },
+  "artifacts": [
+    {
+      "role": "observation",
+      "path": "evidence/artifacts/host-baseline-20261004/nativestack2604.json",
+      "sha256": "a9ef297bef7ad864cee212ca34c30e76e0da7770fd3d746ab344edf2bd2e1b46"
+    },
+    {
+      "role": "probe_source",
+      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r0.txt",
+      "sha256": "21f3d8e96d1f4b9d24b7b30f280dba2f44af14135fdd0852468444c25d86bedf"
+    }
+  ],
+  "probe_identity": {
+    "basis": "self_reported_canonical_source",
+    "executed_input_sha256": null,
+    "executed_input_verified": false
+  },
+  "package_query_status": "unrecorded",
+  "amendments": [
+    {
+      "amended_at_utc": "2026-10-05T05:02:52Z",
+      "ref": "PR #710 t1 (7ec3f2a5f) and t2",
+      "changed_fields": [
+        "limitations",
+        "probe_identity",
+        "package_query_status"
+      ],
+      "prior_values": {},
+      "note": "Retrospective record of t1 metadata corrections, dated when this entry was added in t2; original receipt and artifact timestamps are unchanged."
+    }
+  ]
+}

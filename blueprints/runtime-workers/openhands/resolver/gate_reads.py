@@ -2,8 +2,8 @@
 
 The static evaluator's files, prefixes, globs, computed execution/unresolved locations
 and unclassified entries are advisory. They provide no protection, refuse no commit and
-make no completeness claim. The resolver entry point is disabled pending a separate
-owned-path allowlist gate. Known gaps and superseded enforcement claims are recorded in
+make no completeness claim. The public resolver proceeds after the separate owned-path
+gate's startup negative control succeeds. Known gaps and superseded claims are recorded in
 RESOLVER.md and docs/decisions/2026-09-28-openhands-resolver-isolation.md.
 
 The existing bounded evaluator is retained unchanged: literals and imported containers,
