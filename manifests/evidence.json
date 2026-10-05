@@ -4209,6 +4209,23 @@
       "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json"
     },
     {
+      "id": "dagu-mise-pin-qualification-20261005",
+      "kind": "compatibility_attempt",
+      "component_ids": [
+        "dagu"
+      ],
+      "claim": "The published checksum-verified Dagu 2.18.2 and mise 2026.10.1 Linux release archives were extracted only into an owned isolated root. Native dagu version, all 23 tracked DAG validations (16 pass / 7 baseline-invalid historical archives), coordinator-enabled start-all with HTTP 200 and coordinator connection plus clean native exit/closed listeners, and mise --version/doctor with shims on PATH were observed. Only the independent new-WSL profile and install-plan pins move; the workstation/trading stack remains held at Dagu 2.16.6. Existing historical recovery/model receipts retain their bytes and scopes.",
+      "limitations": [
+        "Isolated Linux x86_64 binary qualification only; no live host service/timer/config, system mise, destination WSL, model/provider/GPU or broker operation was changed or qualified.",
+        "All 23 tracked YAML DAGs were validated unchanged: 16 passed, including all four current DAGs; seven archived fixtures failed with entrypoint document must not define name. Verified Dagu 2.16.6 rejects the same seven, so these failures are retained pre-existing evidence.",
+        "The start-all smoke uses an empty owned DAG directory and no scheduled/job/model execution. Its coordinator is enabled as the repository template and upstream default require; shutdown logged one not registered service-registry update error while the native process returned 0 and both owned listeners closed.",
+        "Upstream make test and mise unit/E2E suites, installed-client route activation, real job retry/SIGKILL/reboot recovery and production data downgrade were not run.",
+        "No published advisory found applies to the selected versions; historical advisories exist, including one affecting old mise 2026.9.18. Dagu has no tag CHANGELOG. Release notes contain migration-relevant #2784, #2776 and #2858 storage changes; conditional rollback for a generic existing-home upgrade requires a pre-upgrade DAGU_HOME copy and restores that copy plus the prior binary/unit/environment together. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9e6ab1c8948d9c94f7a034f4ae27c63bbab9a7f7/docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). The trading stack stays held at 2.16.6.",
+        "Version output and checksum matching do not prove the full integration, deployed host, source-build reproducibility, dependency-tree security or model quality."
+      ],
+      "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
+    },
+    {
       "id": "rtk-fold-harbor-20261004",
       "kind": "native_model_e2e",
       "component_ids": [
@@ -4658,13 +4675,13 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "8be6b5bb2981843c3beca082169211fb0bd7071abf0e5abccdc9f31632152841",
-      "bytes": 254949
+      "sha256": "4a86d142e1a629f6c806a036cce46ac4298b595d48d57505b1bd3cd852cb41f2",
+      "bytes": 255958
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "97d9e6c805216dc15e0b7a0d315635f7e6f21855bc353a5bc0d9b3692359cb6b",
-      "bytes": 24089
+      "sha256": "9c2e7898753a8bfc87970efa088a130898ca577deb51f4af196d9d69defc2eac",
+      "bytes": 24671
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
@@ -10334,8 +10351,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "469a3121f6b68cfcadad8d130f01c62412b09a8cd7e4f0509f83f0e089b5242c",
-      "bytes": 484819
+      "sha256": "1b1e73fb375bca9983d8e6227637b0d03070d2114a2d21e5832617bf9325f62f",
+      "bytes": 485120
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15624,8 +15641,8 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "0cd26fdab18ab685ea2fb0f5d996416befbade4e3bcefb0fcb0c5b2f904cc2bc",
-      "bytes": 308538
+      "sha256": "8bac735580fade3d1ba750fd6f9e19763878dc72e78e881c7515b5c74dd6a6cc",
+      "bytes": 308666
     },
     {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -15739,8 +15756,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "5db67d6ba8c7e0f14863661e25db8f8eebd8a2dbe32f6f62b173bc5fecff3a7c",
-      "bytes": 255625
+      "sha256": "0d35173c6f8a1432bc275bd051cc5736c40eb6ee4cfbd27bec2a91a89cafb728",
+      "bytes": 257058
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -16673,6 +16690,11 @@
       "bytes": 18701
     },
     {
+      "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
+      "sha256": "ebdfe7f631960c6eebf403e79d5d8be94013713790dda1dc9380e1d3accac807",
+      "bytes": 134932
+    },
+    {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
       "sha256": "976b8e8c3ede42aa2ce26c01dbca5184cf45e329419a065e169bc0936f093051",
       "bytes": 14176
@@ -16819,8 +16841,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "c4100622c2d925f1675ecd0dae543494c8cda03cde13db770420e09433962fd4",
-      "bytes": 194054
+      "sha256": "6f6a7e54101c4b720c58a116b1c675ccccac3b10a06e455556c7da021a7bfe77",
+      "bytes": 196524
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16949,13 +16971,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "97360d359377f9eedbbc9c580e3080038b326eab09fba6a2e627d8401e97041e",
-      "bytes": 651950
+      "sha256": "3a900090ef89ff7f9c77610feedede73fc084f6442582119aaefb4fe0d16be27",
+      "bytes": 652785
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "b72ec0299a300da82d9f35bc7ed98658bd167c9ee156a5ef5a7466f59e277149",
-      "bytes": 354116
+      "sha256": "b9d88fb6d21704da1d89d7fde3f07fcbbb278af18206103285ca369204912aad",
+      "bytes": 354809
     },
     {
       "path": "docs/next-host-stages.md",
@@ -39009,8 +39031,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "30669b9f6f5ef26003a1e9f32cfb6ebdf998c199a1db4bcf18557079e40a2551",
-      "bytes": 5760
+      "sha256": "aa6329ccd178facde3e2c34b5b6e6eacdfcfa74d1596cfbff2fda5759de7d9e7",
+      "bytes": 9625
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -39024,8 +39046,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "073b250d7d55f038979a9921e6599a7f5fcf8e3557129ed1f0f8ba61b6766d0c",
-      "bytes": 140617
+      "sha256": "3bdea3300edade0d89cf4a3ca89170e81d4f494f5b15c3431860fbcb4d1476ba",
+      "bytes": 144115
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -39034,7 +39056,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "719c3386ff4e4edda10dbe3d23e7599d097b0a27dee92c061d92ebc438a26d79",
+      "sha256": "d8d14f7276fa0d7da73cc575412526dcfa32de9e4f5158f56f4f47c5e35ab447",
       "bytes": 127896
     },
     {
@@ -39299,12 +39321,12 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "44b2175638441c59b6fe3a46c6c5e5ce1d72fa5b8393dccd769cb82b2aad22a3",
-      "bytes": 313874
+      "sha256": "2407724b609d15ef7272642468527ad91c9b817746f6e63b6c31e773f5d91bbc",
+      "bytes": 314658
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "b1707542184300681cce017aa3f383552d4b9ae8d3d3c06e222f8a4d5784ec3c",
+      "sha256": "3262e5dd300f6321481863e0b8652c9664108fc3265f5f15acc5a329da520321",
       "bytes": 102158
     },
     {
@@ -39329,8 +39351,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "c9e701881f70752c06dbf6e2db6024268712b8df70bba0b77e52c6d6f253361c",
-      "bytes": 33121
+      "sha256": "a68b41e10140006afcb987353577d541bb82f42f7de42d4f8807f4c507b03cdc",
+      "bytes": 33379
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
@@ -51408,6 +51430,11 @@
       "bytes": 55987
     },
     {
+      "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json",
+      "sha256": "27f02ff8261683b2889e72ac01fc24d5ea8d293fb35fc509038ddfd88dc50e49",
+      "bytes": 75391
+    },
+    {
       "path": "evidence/receipts/dashboard-gap-resolution-20260921.json",
       "sha256": "d0c871acf3f0f56959ad1670e744bccd6674a9fa18d1aaacce84dc0de70dfdb3",
       "bytes": 3390
@@ -52389,8 +52416,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
-      "sha256": "1b0a88e60146c295bbed76ce6797e3dd9efa9ef090c69c6cf51e191592fbb1fc",
-      "bytes": 2615
+      "sha256": "4c037b03e5b89295834eb49d3a04eb65a72f8203017c630bfbd70729912576df",
+      "bytes": 3014
     },
     {
       "path": "examples/omniroute-codex-sdk/agents/runtime-judge.toml",
