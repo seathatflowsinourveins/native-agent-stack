@@ -48,8 +48,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    config (`adoption/new-wsl/templates/`, the 2026-10-03 addendum); the two instruction blocks; and six steps of the tool
    itself (the launcher, the login-shell PATH block, the skills step, the two PATH directories and the remote plugin
    rules). A piece goes to the first entry that matches it. A piece no entry
-   matches, and an entry no piece reaches, fail the check. Today: 393 pieces, 354 wired (207 practice, 147 through a slot),
-   24 not wired (0 through a slot that does not install, 24 by their own entry) and 15 authorization pieces (the five
+   matches, and an entry no piece reaches, fail the check. Today: 397 pieces, 357 wired (207 practice, 150 through a slot),
+   24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces (the five
    settings, the main checkout's Codex trust grant of the 2026-10-04 addendum, the seven tool approval modes of Decision 14
    and semble's two allow rules, which also wait for their slots),
    each listed below; a slot whose install is another owner (an interim install, the 2026-10-03 addendum) counts as one
@@ -305,7 +305,7 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
       install those owners as interim installs; SocratiCode's and headroom's wait, because their slots install another
       owner. Since the 2026-10-04 addendum the option also writes the main checkout's Codex trust grant, and since the
       changelog-parity record Claude Code's `crossSessionInbound = "accept"`. Fifteen pieces
-      are in the class (`--check` counts `authorization: 15`, and 24 pieces are not wired).
+      are in the class (`--check` counts `authorization: 16`, and 24 pieces are not wired).
     - **The default.** `--render` and `--apply` neither render nor write the five, and an existing value of those keys in a
       person's files is never touched: the render lacks the keys, so the Claude merge leaves the file's keys as they are,
       and so does the Codex merge.
@@ -853,7 +853,7 @@ unchanged.
   2026-10-04 (~15:10Z): the user changed the advisor to Opus 5.5; the template now carries `advisorModel: "opus"` (see [Advisor model](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model)).
   when the shared template moves. `advisorModel` is `opus` (Opus 5.5) too, by its own override entry: the user's decision of
   2026-10-04 and the value NativeStack carries (`docs/decisions/2026-10-04-new-wsl-changelog-parity.md`).
-- **Counts.** 393 pieces, 354 wired, 24 not wired and 15 authorization pieces (Decisions 2 and 14 above).
+- **Counts.** 393 pieces, 354 wired, 24 not wired and 16 authorization pieces (Decisions 2 and 14 above).
 
 What would overturn it: Codex matching a project's trust by a parent directory or by another key form; a decision that
 the repository's root should ask again (the entry returns to `not_wired`); the user choosing another main model, or the
@@ -911,6 +911,7 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `codex/config/mcp_servers.context-mode.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `context-supply` installing `context-mode` |
 | `codex/config/mcp_servers.jcodemunch.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-index` installing `jcodemunch` |
 | `codex/config/mcp_servers.semble.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-search` installing `semble` |
+| `codex/config/mcp_servers.chrome-devtools.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of the chrome-devtools MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `playwright-cli` installing `Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, in both clients; it also serves browser diagnostics)` |
 | `codex/config/projects."${PROJECT_ROOT}".trust_level` | `"trusted"` | no | a trusted project's own .codex/config.toml layers load and Codex asks nothing about the folder, so the grant is written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
 | `codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-search` installing `SocratiCode` |
@@ -919,48 +920,15 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |
 | --- | --- | --- |
 
-`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (1 unit(s) left out; 57 of 58 lines stay):
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
 
 ```text
-line 17, bullet; names Promptfoo
-- A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
-
 ```
 
-`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (1 unit(s) left out; 65 of 66 lines stay):
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 65 of 65 lines stay):
 
 ```text
-line 11, sentence; names Promptfoo
-A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
-
 ```
-
-## Addendum 2026-10-04: RTK 0.51.0 guidance projection
-
-The maintained RTK exception guidance now follows v0.51.0's unreadable-file
-diff exit 2 ([bf23cff](https://github.com/rtk-ai/rtk/commit/bf23cff467aa3b4aa314d6a4b956630f1e275a5f)).
-The generated WSL instruction block and the current dropped-unit projection
-below follow that source change. Earlier dated statements and dropped-unit
-snapshots above retain their original content. This is a documentation
-projection; it establishes no new WSL installation, client execution or
-qualification. The byte-pinned upstream awareness block stays at v0.50.0.
-
-`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (1 unit(s) left out; 57 of 58 lines stay):
-
-```text
-line 17, bullet; names Promptfoo
-- A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
-
-```
-
-`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (1 unit(s) left out; 64 of 65 lines stay):
-
-```text
-line 11, sentence; names Promptfoo
-A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
-
-```
-
 
 ## Addendum 2026-10-04: integrated Promptfoo owner default
 
@@ -975,3 +943,15 @@ The [fix-wave integration](2026-10-04-2604-e2e-fix-wave.md) canonicalizes the wa
 
 ```text
 ```
+
+## Addendum 2026-10-05: round-2 browser registration
+
+The wave-5 browser owner adds one chrome-devtools stdio registration to each
+native client, with --headless --isolated --no-usage-statistics --no-performance-crux and pin 1.10.1.
+The Codex approval mode remains a scoped authorization piece. The map is the
+sole writer; install-row CLI registration commands are removed. The generated
+tables and the counts above include these four pieces (three wired and one
+authorization). Source: this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24;
+ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:
+docs/client-configurations.md:71,109. No destination runtime acceptance is
+claimed by this projection.

@@ -805,6 +805,22 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
             tool["_entries"].append(entry)
             tool["status"] = entry["status"]
 
+    # Keep the judged selection bytes intact. An owner default can supersede a
+    # historical pick; bind that replacement to the manifest and profile rather
+    # than emitting a second picked tool with invented missing metadata.
+    superseded_picks = set()
+    if default_decisions is not None:
+        records = {slot["record"]["slot_id"]: slot["record"]
+                   for slots in default_decisions["slots"].values() for slot in slots}
+        for entry in entries:
+            record = records.get(entry.get("component_id"), {})
+            previous_name = entry.get("source_selection_name", entry["name"])
+            if (record.get("overturned")
+                    and record.get("resolution", {}).get("outcome") == "owner_default"
+                    and previous_name != entry["name"]
+                    and entry["name"] in str(record.get("default", ""))):
+                superseded_picks.add((entry.get("source_selection_layer", entry["layer_id"]), previous_name))
+
     for layer_id, row in selected.items():
         require(row["status"] in {"recommended", "compare"}, f"unknown selection status: {row['status']}")
         names = set()
@@ -812,6 +828,8 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
             require(choice["name"] not in names, f"duplicate selected tool in {layer_id}: {choice['name']}")
             names.add(choice["name"])
             key = (layer_id, choice["name"])
+            if key in superseded_picks:
+                continue
             entry = entry_map.get(key)
             consumed.add(key)
             add_tool(layer_id, choice, "picked" if row["status"] == "recommended" else "head-to-head-arm", entry)

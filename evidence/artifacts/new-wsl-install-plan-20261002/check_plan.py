@@ -2,7 +2,8 @@
 """Consistency checker for the new-WSL install plan. Standard library only (Python 3.11 or newer, for tomllib).
 
 Reads install-plan.json, owners.json, install.sh, accept.sh, mise.toml, config/ and the merged definitive manifest, names every
-disagreement and exits 1; prints one summary line and exits 0 when they agree. It runs `bash install.sh --list` (read-only) and
+disagreement and exits 1; prints actual installed, measurement-only, excluded, command and acceptance counts
+and exits 0 when they agree. It runs `bash install.sh --list` (read-only) and
 installs nothing.
 
 usage: python3 -B check_plan.py [--plan-dir DIR] [--manifest PATH]
@@ -153,6 +154,48 @@ def client_additional_checks(row, funcs, bad):
         if any(token not in entry["command"] for token in required):
             bad("acceptance", f"row {slot}: initialize the native embedded cache, then run both upstream validators through python with bytecode disabled")
 
+def agent_messaging_contract(plan_dir, by_slot, bad):
+    """Round-2 hcom pin and mapped posture; no new model trial.
+
+    Sources: aannoo/hcom@2c5f343:tests/cli_smoke.rs:129,140;
+    https://developers.openai.com/codex/rules; this PR: config/hcom-client-config.py.
+    """
+    row = by_slot.get("agent-messaging", {})
+    if not row.get("installed") or row.get("release") != "v0.7.27":
+        bad("agent-messaging", "round 2 adopts the pinned hcom 0.7.27 transport")
+        return
+    try:
+        # --plan-dir supports a standalone copied plan in the existing tests.
+        # Its native map stays beside this checker in the source checkout;
+        # check the rules and adapter from the selected plan, including copies.
+        source_root = pathlib.Path(__file__).resolve().parents[3]
+        mapping = json.loads((source_root / "adoption/new-wsl/client-config-map.json").read_text())
+        spec = mapping["slot_configs"]["agent-messaging"]
+        posture = spec["hcom_config"]
+        if (posture["terminal"]["title_mode"] != "off" or posture["relay"]["enabled"] is not False
+                or posture["launch"]["auto_trust_workspace"] is not False
+                or posture["preferences"]["auto_approve"] is not True):
+            bad("agent-messaging", "mapped hcom configuration differs from the accepted posture")
+        deny = set(spec["claude_settings"]["permissions"]["deny"])
+        for prefix in ("hcom", "uvx hcom"):
+            for tail in ("term *", "relay *", "config *", "hooks *", "run *", "kill *", "stop *", "reset *",
+                         "update *", "claude-pty *", "* claude-pty *", "--name *", "--go *",
+                         "send -b *", "send --from *", "send --from=*"):
+                if f"Bash({prefix} {tail})" not in deny:
+                    bad("agent-messaging", f"mapped Claude deny is missing: {prefix} {tail}")
+        rules = (plan_dir / "config" / pathlib.Path(spec["codex_rule_file"]).name).read_text()
+        if rules.count('decision = "forbidden"') != 4 or "not_match =" not in rules:
+            bad("agent-messaging", "Codex requires all four forbidden rules and their native inline examples")
+        adapter = (plan_dir / "config/hcom-client-config.py").read_text()
+        if '"execpolicy", "check", "--pretty", "--rules"' not in adapter:
+            bad("agent-messaging", "the configuration adapter must run the mandatory native rule check")
+    except (OSError, ValueError, KeyError, TypeError):
+        bad("agent-messaging", "mapped native posture or rules are missing")
+    acceptance = row.get("acceptance", {}).get("post_install", {}).get("command", "")
+    if not all(token in acceptance for token in ("status --json", "list --json", "send @nobody -- hi", "listen --name", "events --last 10", "env -i", "--check")):
+        bad("agent-messaging", "post-install must check upstream CLI smoke behavior and installed client posture")
+
+
 def code_docs_contract(plan_dir, by_slot, bad):
     """The three g3 fixes: selected Serena pin, search AND rewrite, and local MinerU skill/quality wiring."""
     serena = by_slot.get("serena", {})
@@ -200,6 +243,76 @@ def code_docs_contract(plan_dir, by_slot, bad):
     if not {"service_health", "after_sign_in"}.issubset(mineru.get("acceptance", {})):
         bad("mineru", "local Standard parse/read and fresh native client use are required")
 
+def browser_contract(by_slot, install_funcs, bad):
+    """Wave-5 browser owner; existing slot ID, one upstream stdio server in each client.
+
+    ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:
+    docs/client-configurations.md:71,109; docs/troubleshooting.md:103-105;
+    docs/advanced-usage.md:22-25; README.md:45,65; scripts/test.js:28-38.
+    This is structural consistency, never destination acceptance or a new trial.
+    """
+    row = by_slot.get("playwright-cli", {})
+    pin = "e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df"
+    if (not row.get("installed") or row.get("measurement_only")
+            or row.get("release") != "chrome-devtools-mcp-v1.10.1" or row.get("source_pin") != pin):
+        bad("playwright-cli", "the wave-5 Chrome DevTools MCP 1.10.1 owner must install by default at its release commit")
+    commands = row.get("commands", [])
+    # The destination map is the sole registration writer (round-2 G2 handoff).
+    # Like hcom's posture check, read the source map even for --plan-dir copies.
+    source_root = pathlib.Path(__file__).resolve().parents[3]
+    args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]
+    try:
+        additions = source_root / "adoption/new-wsl/templates"
+        claude = json.loads((additions / "claude-user.mcp.additions.json").read_text())["mcpServers"]["chrome-devtools"]
+        codex = tomllib.loads((additions / "codex.config.additions.toml").read_text())["mcp_servers"]["chrome-devtools"]
+        mapping = json.loads((source_root / "adoption/new-wsl/client-config-map.json").read_text())
+        for client, server in (("Claude Code", claude), ("Codex", codex)):
+            if server.get("command") != "npx" or server.get("args") != args or server.get("type", "stdio") != "stdio":
+                bad("playwright-cli", f"one mapped {client} stdio server with the required pin and flags is required")
+        for piece in ("claude/mcp/server/chrome-devtools", "codex/config/mcp_servers.chrome-devtools.*"):
+            entries = [e for e in mapping["entries"] if piece in e["match"]]
+            if len(entries) != 1 or entries[0]["wiring"] != "slot:playwright-cli" or entries[0].get("owner") != row["owner"]:
+                bad("playwright-cli", f"the destination map must wire {piece} through its wave-5 owner")
+    except (OSError, ValueError, KeyError, TypeError):
+        bad("playwright-cli", "mapped Chrome stdio server or client additions are missing")
+    if any("mcp add chrome-devtools" in command for command in commands):
+        bad("playwright-cli", "the client map owns registration; installer CLI registrations would add a second writer")
+    if any("sudo" in command or "@playwright/cli" in command or "claude plugin" in command for command in commands):
+        bad("playwright-cli", "privilege belongs to a declared prerequisite helper; no second browser/Claude plugin install")
+    expected_integrity = "sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw=="
+    if (row.get("checksum", {}).get("integrity") != expected_integrity
+            or not any("npm view chrome-devtools-mcp@1.10.1 dist.integrity" in command for command in commands)):
+        bad("playwright-cli", "the published npm SHA512 must be retained and compared with the native npx registry pin; no unused archive implies runtime verification")
+    steps = row.get("prerequisite_steps", [])
+    helper = install_funcs.get("chrome_devtools_linux_chrome", "")
+    if (row.get("needs", {}).get("sudo") is not True
+            or not any(step.get("name") == "chrome_devtools_linux_chrome"
+                       and step.get("needs", {}).get("sudo") is True for step in steps)
+            or "sudo apt-get install" not in helper
+            or "sudo apt-get install -y --no-install-recommends google-chrome-stable ||" not in helper
+            or "--with-colons --show-keys" not in helper
+            or "Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796" not in helper
+            or "chrome_devtools_linux_chrome ||" not in install_funcs.get("playwright-cli", "")):
+        bad("playwright-cli", "Linux-side Google Chrome requires a declared and invoked privileged prerequisite")
+    if (len(steps) != 1 or steps[0].get("command") != "chrome_devtools_linux_chrome"
+            or steps[0].get("program") != helper):
+        bad("playwright-cli", "privileged prerequisite declaration differs from the actual Chrome helper")
+    if ("native-stack-google-chrome.sources" not in helper or 'repo_add_once="false"' not in helper
+            or "google-chrome-stable=$" in helper):
+        bad("playwright-cli", "current stable must use the separate restricted source with package repo creation disabled")
+    post = row.get("acceptance", {}).get("post_install", {})
+    if (post.get("kind") != "upstream tests" or "npm run test:no-build -- tests/index.test.ts" not in post.get("command", "")
+            or "google-chrome-stable --version >" not in post.get("command", "")
+            or 'dpkg --compare-versions "$installed_chrome" ge 154.0.8037.97-1' not in post.get("command", "")
+            or "apt-cache madison google-chrome-stable" not in post.get("command", "")):
+        bad("playwright-cli", "unchanged upstream browser tests and the installed Chrome version record are required")
+    native = row.get("acceptance", {}).get("after_sign_in", {})
+    if (not native.get("needs_user")
+            or not all(name in native.get("command", "") for name in
+                       ("navigate_page", "take_snapshot", "list_console_messages", "claude.jsonl", "codex.jsonl"))):
+        bad("playwright-cli", "fresh native-client navigation/snapshot/console checks must remain gated on native sign-in")
+
+
 def main():
     here = pathlib.Path(__file__).resolve().parent
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -235,7 +348,9 @@ def main():
                 or r["route"] != "none" or r["commands"] or set(r["acceptance"]) != {"after_sign_in"}):
             bad("rows", f"row {r['slot']}: acceptance_only is reserved for native cross-family-review after sign-in")
     by_slot = {r["slot"]: r for r in rows}
+    agent_messaging_contract(plan_dir, by_slot, bad)
     code_docs_contract(plan_dir, by_slot, bad)
+    browser_contract(by_slot, install_funcs, bad)
 
     # Node rows must receive the runtime bootstrap even when selected alone.
     for flag in ("needs_execution", "needs_runtime"):
@@ -392,7 +507,19 @@ def main():
             bad("dispatch", f"{script}: the --only slot list is not the slots of install-plan.json, in order")
     for r in selected + measured:
         slot = r["slot"]
-        if not re.search(r"(run_slot|measured_slot) '?" + re.escape(slot) + r"'?(;|$)|^\s+" + re.escape(slot) + r"$", install_text, re.M):
+        dispatch = (r"^if (?:selected|named) '" + re.escape(slot)
+                    + r"'; then run_slot '" + re.escape(slot) + r"';(?: |$)"
+                    + r"|^measured_slot '?" + re.escape(slot) + r"'?(?:;|$)")
+        # Existing native bootstrap/dependency guards also name the exact slot
+        # they invoke. Keep these bounded forms; another slot's selector cannot
+        # satisfy them (the original hcom-under-srt failure).
+        dependency_dispatch = {
+            "container-engine": r"^if \$needs_docker \|\| selected container-engine; then\n  run_slot container-engine(?:\n|$)",
+            "docker-compose": r"^if \$needs_docker \|\| selected docker-compose; then run_slot docker-compose; fi$",
+            "mise": r"^if \$needs_runtime \|\| selected mise; then\n(?:  #[^\n]*\n)*  mise\n",
+        }.get(slot)
+        if not re.search(dispatch, install_text, re.M) and not (
+                dependency_dispatch and re.search(dependency_dispatch, install_text, re.M)):
             bad("dispatch", f"install.sh never runs row {slot}")
     for r in selected + measured + acceptance_only:
         slot = r["slot"]
@@ -498,7 +625,19 @@ def main():
         bad("base-distribution", "base-image acceptance must consume config/base-distribution-accept.sh")
     for name in sorted(copied - config):
         bad("config", f"install.sh copies config/{name}, which does not exist")
-    for name in sorted(config - copied):
+    # Round-2 gpt-gateway-topology excludes local carries from the clean default.
+    # Source: https://github.com/diegosouzapw/OmniRoute/pull/15167
+    # These retained historical artifacts still support the canary regression
+    # tests, but the published release row must neither install nor accept them.
+    historical_gateway_configs = set()
+    gateway = by_slot.get("gpt-gateway", {})
+    if gateway.get("release") == "3.8.51" and not gateway.get("source_build"):
+        historical_gateway_configs = {
+            "omniroute-canary-check.py", "omniroute-canary-evidence.json", "omniroute-canary-install.sh",
+        }
+        if historical_gateway_configs & copied:
+            bad("gpt-gateway", "published clean release must not install historical canary assets")
+    for name in sorted(config - copied - historical_gateway_configs):
         bad("config", f"config/{name} is copied by no install function")
     claims = collections.defaultdict(set)
     # G4 configs wire existing listeners. Scrape/datasource/exporter targets and synthetic

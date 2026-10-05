@@ -989,11 +989,11 @@
       "source_pin_kind": "release_or_artifact_version"
     },
     {
-      "name": "Playwright CLI",
-      "repository": "https://github.com/microsoft/playwright-cli",
+      "name": "Chrome DevTools MCP",
+      "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
       "layer_id": "web-research",
       "owner_layer_id": "web-research",
-      "pin": "0.1.21",
+      "pin": "1.10.1",
       "component_id": "playwright-cli",
       "source_selection_layer": "web-research",
       "source_selection_name": "Playwright CLI",
@@ -1002,58 +1002,61 @@
       "position": 7,
       "comparison_group": null,
       "default_precedence": null,
-      "default_install": false,
+      "default_install": true,
       "blocking_gaps": [],
       "artifact": {
-        "name": "cli-0.1.21.tgz",
-        "url": "https://registry.npmjs.org/@playwright/cli/-/cli-0.1.21.tgz"
+        "name": "chrome-devtools-mcp-1.10.1.tgz",
+        "url": "https://registry.npmjs.org/chrome-devtools-mcp/-/chrome-devtools-mcp-1.10.1.tgz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "46d0b66061dd4a84c287e36965fd3f1a8c6a49cbcf3b3f90f842023833d5234c",
-        "source": "https://registry.npmjs.org/%40playwright%2Fcli/0.1.21",
-        "kind": "artifact"
+        "value": "012cbcf6e832d4f6709dad0c21d7bef17089e94adee9cf33179d15ea0a9adf2b",
+        "source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
+        "kind": "artifact",
+        "integrity": "sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw=="
       },
-      "integrity_observation": "downloaded_and_rehashed",
+      "integrity_observation": "repair_builder_download_sha256_and_frozen_npm_sri_match_not_destination_acceptance",
       "install": {
-        "command": "npm install -g @playwright/cli@0.1.21",
-        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/README.md",
-        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "command": "claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux && codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux",
+        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71",
+        "pinning_source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
+        "scope": "Release-pinned documented npx stdio route and Linux-side WSL Chrome prerequisites; single browser owner for both clients and diagnostics.",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Node/npm and the selected package installation target must be available."
+          "NativeStack2604 amd64, Linux-side Google Chrome 154.0.8037.97-1 through the signed apt repository and fingerprint-restricted keyring; privilege is declared by its helper.",
+          "Plan Node 24.21.0; destination client templates must include the prepared chrome-devtools entries."
         ],
-        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "source_review_ref": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
       },
       "acceptance": {
-        "command": "npm ci && npm run test",
-        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/.github/workflows/ci.yml",
+        "command": "PUPPETEER_EXECUTABLE_PATH=\"$(command -v google-chrome-stable)\" npm run test:no-build -- tests/index.test.ts tests/tools/pages.test.ts tests/tools/snapshot.test.ts tests/tools/console.test.ts tests/tools/network.test.ts tests/tools/performance.test.ts",
+        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/.github/workflows/run-tests.yml#L72",
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the v0.1.21 source checkout; the workflow selects Node.js 20 and npm ci.",
-          "A working browser/runtime required by the upstream CLI tests must be available. The source integration fixture launches playwright-cli.js in a test output directory and opens a persistent data:text/html,hello page; npm test has not been run and no browser availability was checked."
+          "At the exact release source commit, git submodule update --init, PUPPETEER_SKIP_DOWNLOAD=true npm ci, npm run bundle.",
+          "After native client sign-ins, the plan additionally requires both clients to navigate the local fixture and return its snapshot title and console marker.",
+          "Puppeteer 25.11.0 getConfiguration.ts:140-145 supports the explicit Linux Chrome executable override; no CI AppArmor-disable step is applied to the host."
         ],
-        "scope": "Source CI test command including the upstream data-URL fixture; not acceptance of an installed browser, MCP surface or destination WSL.",
-        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "scope": "Six unchanged upstream files through the published test runner; separate synthetic native-client integration. Neither is a new host pass or a comparative trial.",
+        "source_review_ref": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
       "evidence_refs": [
-        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
-        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/web-research.json",
-        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "docs/decisions/2026-10-04-final-architecture-round2.md",
+        "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
+        "docs/decisions/2026-10-04-round2-plan-g2-browser.md",
+        "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71",
+        "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/tests/index.test.ts#L38"
       ],
       "release": {
-        "tag": "0.1.21",
-        "source": "https://registry.npmjs.org/%40playwright%2Fcli/0.1.21",
+        "tag": "chrome-devtools-mcp-v1.10.1",
+        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/releases/tag/chrome-devtools-mcp-v1.10.1",
         "kind": "native_package_release"
       },
-      "source_pin_kind": "release_or_artifact_version"
+      "source_pin_kind": "release_or_artifact_version",
+      "source_pin": "e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df"
     },
     {
       "name": "ccusage",

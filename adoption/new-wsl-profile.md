@@ -219,7 +219,7 @@ have no default-install precedence.
 | Worktrunk | 0.80.0 | [exact release installer and shell setup](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0) |
 | Serena | c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | [local install from the exact source checkout](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70) |
 | trafilatura | 2.2.0 | [tagged installation guide](https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73) |
-| Playwright CLI | 0.1.21 | [reviewed install source](https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md) |
+| Chrome DevTools MCP | 1.10.1 | [reviewed install source](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71); one `chrome-devtools` stdio server in both clients, also for diagnostics |
 | Inspect AI | 0321960a92aa52390413ce011d67ffb5962a2b11 | [reviewed install source](https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md) |
 | Harbor | 0.23.0 | [reviewed install source](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md) |
 | promptfoo | 0.123.1 | [reviewed install source](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md) |
