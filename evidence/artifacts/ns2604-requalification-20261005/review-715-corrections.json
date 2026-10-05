@@ -54,6 +54,16 @@
       "line": 5,
       "evidence_class": "source_review",
       "scope": "Codex profile work waits for #713 and prerequisite Job2; no D04 owner acceptance is supplied."
+    },
+    "exact_head_ruling": {
+      "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "sha256": "5119fcb6518fc162cdd348870758545ec57710bd929ed64b4203473b4aa7f911",
+      "lines": [
+        14,
+        33
+      ],
+      "reviewed_head": "2432f95192a2204b0393a327e3d3134ba01b8aec",
+      "evidence_class": "source_review"
     }
   },
   "readiness_reporting": {
@@ -61,36 +71,43 @@
       "numerator": 30,
       "denominator": 80,
       "source": "PR #700 historical adjudicated receipt",
-      "new_qualification": false
+      "new_qualification": false,
+      "bar": "old-bar"
     },
     "superseded_reported_scenarios": [
       {
         "numerator": 40,
         "denominator": 80,
         "status": "superseded",
-        "basis": "CC ruling line16; later roadmap proposal is different."
+        "basis": "CC ruling line16; later roadmap proposal is different.",
+        "superseded_by": "bounded_repair_rulings"
       },
       {
         "numerator": 44,
         "denominator": 80,
         "status": "superseded_conditional_scenario",
-        "basis": "Underlying 40 scenario is superseded and roadmap already counts command-output READY; no current-plus-four derivation remains."
+        "basis": "Underlying 40 scenario is superseded and roadmap already counts command-output READY; no current-plus-four derivation remains.",
+        "superseded_by": "bounded_repair_rulings"
       }
     ],
     "roadmap_proposal": {
       "reported_numerator": 37,
       "reported_denominator": 80,
       "evidence_class": "source_review",
-      "status": "provisional_roadmap_proposal",
+      "status": "superseded historical source-review proposal",
       "source": "roadmap",
-      "confirmed_as_reported_by": "command_center_ruling:16"
+      "confirmed_as_reported_by": "command_center_ruling:16",
+      "superseded_by": "bounded_repair_rulings",
+      "bar": "old-bar"
     },
     "command_center_proposal": {
       "reported_numerator": 32,
       "reported_denominator": 80,
       "evidence_class": "source_review",
-      "status": "provisional_pending_coordinator_final_verified_e2e",
-      "source": "command_center_ruling:16-18"
+      "status": "superseded historical source-review proposal",
+      "source": "command_center_ruling:16-18",
+      "superseded_by": "bounded_repair_rulings",
+      "bar": "old-bar"
     },
     "generated_values": {
       "current": null,
@@ -98,7 +115,18 @@
       "pointer": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md"
     },
     "lift_condition": "Only the command center's own new dated final verified E2E of the same 80 slots, followed by independent review and adjudication; an independent PR/publication review does not lift provisional.",
-    "method_source": "native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-04-ns2604-verified-e2e.md:114-121"
+    "method_source": "native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-04-ns2604-verified-e2e.md:114-121",
+    "old_bar_provisional": {
+      "source": "command_center_exact_head_ruling",
+      "reported_numerator": 30,
+      "reported_denominator": 80,
+      "evidence_class": "source_review",
+      "status": "provisional pending the coordinator's final verified E2E",
+      "bar": "old-bar",
+      "as_of_utc": "2026-10-05T11:44:00Z",
+      "custody_1302_by_design_included": false,
+      "ruling": "review-715-corrections.json#/bounded_repair_rulings"
+    }
   },
   "roadmap_partial_reported_passes": [
     {
@@ -182,7 +210,17 @@
       "open_items": [
         "D04/stack-worker profile qualification remains open; latest selected currency owner status defers profile work until #713 and prerequisites."
       ],
-      "roadmap_source_pointer": "/records/12/final/slots/1"
+      "roadmap_source_pointer": "/records/12/final/slots/1",
+      "landing_application_correction": {
+        "merged_at_utc": "2026-10-05T15:58:00Z",
+        "merged_commit": "1796303f957c522e78b92667e553c06840fae3a2",
+        "applied_on_2604_start_utc": "2026-10-05T16:01:00Z",
+        "applied_on_2604_end_utc": "2026-10-05T16:46:00Z",
+        "scope": "The merge/application ends the ownership hold; it does not close D04 or qualify changed pins."
+      },
+      "open_items_before_merge": [
+        "D04/stack-worker profile qualification remains open; latest selected currency owner status defers profile work until #713 and prerequisites."
+      ]
     },
     {
       "slot": "observation-inference/session-analytics",
@@ -210,6 +248,26 @@
         "Keep the initial exit0skip, modified-network delivery and cached unmodified pass distinct."
       ],
       "roadmap_source_pointer": "/records/2/final/slots/4"
+    },
+    {
+      "slot": "code-navigation/serena",
+      "disposition": "PARTIAL; excluded from old-bar READY",
+      "source": "exact_head_ruling:21-22",
+      "open_items": [
+        "Condition-absent controls remain open; same demotion standard as ccusage."
+      ],
+      "evidence_class": "source_review",
+      "provisional": true
+    },
+    {
+      "slot": "document-retrieval/mineru",
+      "disposition": "PARTIAL; excluded from old-bar READY",
+      "source": "exact_head_ruling:21-22",
+      "open_items": [
+        "Condition-absent controls remain open; same demotion standard as ccusage."
+      ],
+      "evidence_class": "source_review",
+      "provisional": true
     }
   ],
   "alerting_attestation": {
@@ -266,5 +324,56 @@
     "credential_files": false,
     "raw_conversations": false,
     "active_configuration": false
+  },
+  "qualification_bar": {
+    "old_bar": "installed, with its checks passing",
+    "scope": "All retained counts and READY verdicts are old-bar. Original labels and reviews remain historical.",
+    "new_bar": "Organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; introduced around15:12Z.",
+    "new_bar_count": null,
+    "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
+  },
+  "bounded_repair_rulings": {
+    "source": {
+      "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "sha256": "5119fcb6518fc162cdd348870758545ec57710bd929ed64b4203473b4aa7f911",
+      "lines": [
+        14,
+        33
+      ],
+      "reviewed_head": "2432f95192a2204b0393a327e3d3134ba01b8aec",
+      "evidence_class": "source_review"
+    },
+    "old_bar_provisional": {
+      "source": "command_center_exact_head_ruling",
+      "reported_numerator": 30,
+      "reported_denominator": 80,
+      "evidence_class": "source_review",
+      "status": "provisional pending the coordinator's final verified E2E",
+      "bar": "old-bar",
+      "as_of_utc": "2026-10-05T11:44:00Z",
+      "custody_1302_by_design_included": false,
+      "ruling": "review-715-corrections.json#/bounded_repair_rulings"
+    },
+    "demotions": [
+      "code-navigation/serena",
+      "document-retrieval/mineru"
+    ],
+    "fresh_session_use_not_evidenced": [
+      "git-github-automation/difftastic",
+      "code-navigation/structural-search",
+      "quality-evaluation/inspect-ai",
+      "quality-evaluation/harbor-containerized-agent-e2e-runner",
+      "agent-sdks/codex-sdk-and-codex-exec-app-server"
+    ],
+    "landing_application": {
+      "merged_at_utc": "2026-10-05T15:58:00Z",
+      "merged_commit": "1796303f957c522e78b92667e553c06840fae3a2",
+      "applied_on_2604_start_utc": "2026-10-05T16:01:00Z",
+      "applied_on_2604_end_utc": "2026-10-05T16:46:00Z",
+      "scope": "The merge/application ends the ownership hold; it does not close D04 or qualify changed pins."
+    },
+    "new_execution": false,
+    "new_aggregate_derivation": false,
+    "publication_review": "2432f951 exact-head read returned findings; repaired head awaits CC delta read."
   }
 }

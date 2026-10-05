@@ -19,7 +19,7 @@
     ],
     "scope": "Frozen PR #700 four-condition method; this artifact reviews selected original source leads without deriving aggregate readiness."
   },
-  "claim_boundary": "All roadmap READY verdicts remain provisional source_review. Recipe wrapper result lines are local_integration. Official GitHub run metadata is native_proven only for the stated hosted-activity scope. Source review, wrapper success, model adjudication and synthetic fixtures never become unchanged upstream test or provider acceptance. Each reported_yes condition is a source-review lead pending original-output qualification; its scope is the enclosing slot.scope.",
+  "claim_boundary": "All retained READY verdicts are historical old-bar source-review leads. Dated corrections supersede current status/fresh-use claims without rewriting observations. All roadmap READY verdicts remain provisional source_review. Recipe wrapper result lines are local_integration. Official GitHub run metadata is native_proven only for the stated hosted-activity scope. Source review, wrapper success, model adjudication and synthetic fixtures never become unchanged upstream test or provider acceptance. Each reported_yes condition is a source-review lead pending original-output qualification; its scope is the enclosing slot.scope.",
   "sanitization": "No raw conversations, credential files/values, active client configuration, or private host paths copied. coord:/scratch:/repo: locators identify original witnesses; hashes describe original bytes, not a recreated summary.",
   "slots": [
     {
@@ -27,7 +27,9 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -108,7 +110,9 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -132,11 +136,15 @@
           ]
         },
         "fresh_session_use": {
-          "status": "reported_yes",
+          "status": "fresh-session use not evidenced",
           "proof": [
             "roadmap",
             "later-e2e"
-          ]
+          ],
+          "reported_status_at_capture": "reported_yes",
+          "evidence_class": "source_review",
+          "correction_source": "exact_head_ruling",
+          "scope": "Historical roadmap/limited Codex-leg proof leads do not establish fresh-session use. Installation-time checks retain original classes."
         }
       },
       "observations": [
@@ -223,7 +231,9 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -304,7 +314,9 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -410,7 +422,9 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -527,7 +541,9 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -608,7 +624,10 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use.",
+        "superseded_by": "exact_head_ruling"
       },
       "conditions": {
         "present": {
@@ -697,14 +716,24 @@
           },
           "scope": "Original official source read at the specified revision; source availability and documented recipe only."
         }
-      ]
+      ],
+      "dated_command_center_disposition": {
+        "status": "PARTIAL",
+        "evidence_class": "source_review",
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Condition-absent controls remain open; excluded from READY consistently with ccusage.",
+        "source": "exact_head_ruling"
+      }
     },
     {
       "slot_id": "code-navigation/structural-search",
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -728,10 +757,14 @@
           ]
         },
         "fresh_session_use": {
-          "status": "reported_yes",
+          "status": "fresh-session use not evidenced",
           "proof": [
             "roadmap"
-          ]
+          ],
+          "reported_status_at_capture": "reported_yes",
+          "evidence_class": "source_review",
+          "correction_source": "exact_head_ruling",
+          "scope": "Historical roadmap/limited Codex-leg proof leads do not establish fresh-session use. Installation-time checks retain original classes."
         }
       },
       "observations": [
@@ -799,7 +832,9 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -880,7 +915,10 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use.",
+        "superseded_by": "exact_head_ruling"
       },
       "conditions": {
         "present": {
@@ -998,14 +1036,24 @@
           },
           "scope": "Original official source read at the specified revision; source availability and documented recipe only."
         }
-      ]
+      ],
+      "dated_command_center_disposition": {
+        "status": "PARTIAL",
+        "evidence_class": "source_review",
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Condition-absent controls remain open; excluded from READY consistently with ccusage.",
+        "source": "exact_head_ruling"
+      }
     },
     {
       "slot_id": "quality-evaluation/inspect-ai",
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -1029,11 +1077,15 @@
           ]
         },
         "fresh_session_use": {
-          "status": "reported_yes",
+          "status": "fresh-session use not evidenced",
           "proof": [
             "roadmap",
             "later-e2e"
-          ]
+          ],
+          "reported_status_at_capture": "reported_yes",
+          "evidence_class": "source_review",
+          "correction_source": "exact_head_ruling",
+          "scope": "Historical roadmap/limited Codex-leg proof leads do not establish fresh-session use. Installation-time checks retain original classes."
         }
       },
       "observations": [
@@ -1120,7 +1172,9 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -1144,10 +1198,14 @@
           ]
         },
         "fresh_session_use": {
-          "status": "reported_not_applicable",
+          "status": "fresh-session use not evidenced",
           "proof": [
             "roadmap"
-          ]
+          ],
+          "reported_status_at_capture": "reported_not_applicable",
+          "evidence_class": "source_review",
+          "correction_source": "exact_head_ruling",
+          "scope": "Historical roadmap/limited Codex-leg proof leads do not establish fresh-session use. Installation-time checks retain original classes."
         }
       },
       "observations": [
@@ -1217,7 +1275,9 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -1311,7 +1371,9 @@
       "roadmap_verdict": {
         "status": "READY",
         "evidence_class": "source_review",
-        "provisional": true
+        "provisional": true,
+        "bar": "old-bar",
+        "scope": "Retained historical roadmap lead; not qualified current readiness or organic use."
       },
       "conditions": {
         "present": {
@@ -1335,10 +1397,14 @@
           ]
         },
         "fresh_session_use": {
-          "status": "reported_yes",
+          "status": "fresh-session use not evidenced",
           "proof": [
             "roadmap"
-          ]
+          ],
+          "reported_status_at_capture": "reported_yes",
+          "evidence_class": "source_review",
+          "correction_source": "exact_head_ruling",
+          "scope": "Historical roadmap/limited Codex-leg proof leads do not establish fresh-session use. Installation-time checks retain original classes."
         }
       },
       "observations": [
@@ -1410,5 +1476,22 @@
     "Inspect provider evaluation, Harbor containerized-agent tests, Python Claude SDK and Codex exec/TypeScript SDK/app-server remain separate scopes.",
     "No new acceptance runs, installs, configuration, services, registry changes, aggregate readiness claim, or synthetic tests were performed.",
     "Source critic checked22selected hashes; output-only wrapper footer results are reported_stage_result, not independently retained process exits."
-  ]
+  ],
+  "qualification_bar": {
+    "old_bar": "installed, with its checks passing",
+    "scope": "All retained counts and READY verdicts are old-bar. Original labels and reviews remain historical.",
+    "new_bar": "Organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; introduced around15:12Z.",
+    "new_bar_count": null,
+    "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
+  },
+  "exact_head_ruling": {
+    "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+    "sha256": "5119fcb6518fc162cdd348870758545ec57710bd929ed64b4203473b4aa7f911",
+    "lines": [
+      14,
+      33
+    ],
+    "reviewed_head": "2432f95192a2204b0393a327e3d3134ba01b8aec",
+    "evidence_class": "source_review"
+  }
 }

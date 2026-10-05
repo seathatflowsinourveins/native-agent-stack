@@ -5,7 +5,7 @@
   "evidence_class": "source_review",
   "provisional": true,
   "new_execution": false,
-  "publication_reconciliation": {"base":"9e955327702e6b7a8dd1909b2884196726a15ba5","released_by":"#713 merged1796303f; co-op J-GC2026-10-05T16:11:01Z","previous_ownership_fields":"Retained pre-merge preparation-phase observations. The generated paths are now released; merge does not establish any host/client acceptance."},
+  "publication_reconciliation": {"base":"2d849ba1fe1b879144cfa470f0514d3ac3b8e487","released_by":"#713 merged1796303f; co-op J-GC2026-10-05T16:11:01Z","previous_ownership_fields":"Retained pre-merge preparation-phase observations. The generated paths are now released; merge does not establish any host/client acceptance.","landing_application":{"merged_at_utc":"2026-10-05T15:58:00Z","merged_commit":"1796303f957c522e78b92667e553c06840fae3a2","applied_on_2604_start_utc":"2026-10-05T16:01:00Z","applied_on_2604_end_utc":"2026-10-05T16:46:00Z","scope":"The merge/application ends the ownership hold; it does not close D04 or qualify changed pins."}},
   "aggregate_derivation_performed": false,
   "claim_boundary": "Apply the adopted criterion-2 reading to all17 affected slots in one documentary pass. Eligibility of an upstream example/native operation is separate from retaining and independently joining its actual pinned output, controls, wiring and fresh-client use. No historical label or qualified whole-slot status changes under this reading alone. Custody/base dispositions are dated source review pending the coordinator's final verified same80-slot E2E. Official readiness remains30/80; no new aggregate is derived.",
   "sources": {
@@ -14,7 +14,17 @@
     "roadmap": {"locator":"coord:readiness-20261005/readiness-roadmap-20261005.json","sha256":"d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078","scope":"Original blind model analyses and adjudication are source review; status_now labels are reported proposals."},
     "method": "seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:evidence/artifacts/ns2604-e2e-20261004/method.md:60–64",
     "policy": "seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/acceptance-evidence-policy.md:28–53",
-    "readiness_authority": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-04-ns2604-verified-e2e.md:114–121"
+    "readiness_authority": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-04-ns2604-verified-e2e.md:114–121",
+    "exact_head_ruling": {
+      "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "sha256": "5119fcb6518fc162cdd348870758545ec57710bd929ed64b4203473b4aa7f911",
+      "lines": [
+        14,
+        33
+      ],
+      "reviewed_head": "2432f95192a2204b0393a327e3d3134ba01b8aec",
+      "evidence_class": "source_review"
+    }
   },
   "criterion_2": {
     "reading": "An unchanged pinned upstream test, or a supported pinned upstream example/native operation with retained returned output, can satisfy criterion2. A plan check qualifies only when its body executes that operation. Require a particular unchanged suite when the frozen slot names it; do not impose a suite on every slot. A version-only option-list probe or passing wrapper footer alone is insufficient. Discriminating controls remain governed by policy42–53.",
@@ -169,8 +179,8 @@
   },
   "controls": [
     {"slot":"token-efficiency/ccusage","status":"open","source":"roadmap:/records/0/final/slots/0/evidence/5","scope":"No-meter-call and empty-home failures are reported only in transcriptT; retain original returned failure/provenance beside the passing runs."},
-    {"slot":"code-navigation/serena","status":"open","source":"roadmap:/records/7/final/slots/0/evidence/6","scope":"Eight rejection controls are synthetic fixtures, not contemporaneous native condition-absent results beside the4c pass.","fixture_source":"seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md:166–171"},
-    {"slot":"document-retrieval/mineru","status":"open","sources":["roadmap:/records/8/final/slots/1/evidence/1","roadmap:/records/8/final/slots/1/evidence/2","roadmap:/records/8/final/slots/1/evidence/3","roadmap:/records/8/final/slots/1/evidence/4"],"scope":"An earlier service failure and later success remain retained; specify the removed acceptance condition and the same predicate's failing return before treating that failure as a discriminating control."}
+    {"slot":"code-navigation/serena","status":"open","source":"roadmap:/records/7/final/slots/0/evidence/6","scope":"Eight rejection controls are synthetic fixtures, not contemporaneous native condition-absent results beside the4c pass.","fixture_source":"seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md:166–171","dated_disposition":"PARTIAL; excluded from old-bar READY","ruling":"sources.exact_head_ruling"},
+    {"slot":"document-retrieval/mineru","status":"open","sources":["roadmap:/records/8/final/slots/1/evidence/1","roadmap:/records/8/final/slots/1/evidence/2","roadmap:/records/8/final/slots/1/evidence/3","roadmap:/records/8/final/slots/1/evidence/4"],"scope":"An earlier service failure and later success remain retained; specify the removed acceptance condition and the same predicate's failing return before treating that failure as a discriminating control.","dated_disposition":"PARTIAL; excluded from old-bar READY","ruling":"sources.exact_head_ruling"}
   ],
   "dated_disposition_changes": [
     {
@@ -198,8 +208,44 @@
     }
   ],
   "preservation":{"historical_slots":80,"baseline_labels_changed":false,"original_declared_acceptance_changed":false,"original_attempt_fields_changed":false,"original_model_reviews_changed":false,"current_comment_correction":"Initial-capture open-item wording is corrected/superseded only by this separately dated source review."},
-  "ownership":{"generator_outputs_architecture_original_receipt":"Held for#713 merge or explicit owner release; A7 resolvesQ7 as option1.","full_rebased_candidate":"Prepared and checked separately; not published.","plan_apply_writer":"Co-op readiness-runner only. This lane runs no install.sh, pin qualification or shared-host plan application."},
+  "ownership":{"generator_outputs_architecture_original_receipt":"Released: #713 landed15:58Z at1796303f9; applied16:01-16:46Z. Reconciled publication does not establish native acceptance.","full_rebased_candidate":"Reconciled current main after748; bounded draft repair awaits exact-head delta read.","plan_apply_writer":"Co-op readiness-runner only. This lane runs no install.sh, pin qualification or shared-host plan application.","previous_ownership_hold":"Held for#713 merge or explicit owner release; A7 resolvesQ7 as option1."},
   "publication_review":"Command-center exact-head Claude re-check pending. Same-family documentary checks do not qualify readiness.",
   "locator_roots":{"coord":"Private co-op coordination tree","coordination-root":"Private common coordination root","roadmap":"sources.roadmap.locator plus the following exact JSON pointer","scratch":"Selected retained original/archive tree declared in sources.json","repo":"Repository-relative source"},
-  "sanitization":"No credential values/files, raw conversations, host paths, account/session identities or active client configuration copied. Private originals remain private; hashes prove byte identity only."
+  "sanitization":"No credential values/files, raw conversations, host paths, account/session identities or active client configuration copied. Private originals remain private; hashes prove byte identity only.",
+  "qualification_bar": {
+    "old_bar": "installed, with its checks passing",
+    "scope": "All retained counts and READY verdicts are old-bar. Original labels and reviews remain historical.",
+    "new_bar": "Organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; introduced around15:12Z.",
+    "new_bar_count": null,
+    "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
+  },
+  "old_bar_provisional": {
+    "source": "command_center_exact_head_ruling",
+    "reported_numerator": 30,
+    "reported_denominator": 80,
+    "evidence_class": "source_review",
+    "status": "provisional pending the coordinator's final verified E2E",
+    "bar": "old-bar",
+    "as_of_utc": "2026-10-05T11:44:00Z",
+    "custody_1302_by_design_included": false,
+    "ruling": "review-715-corrections.json#/bounded_repair_rulings"
+  },
+  "dated_control_demotions": [
+    {
+      "slot": "code-navigation/serena",
+      "dated_status": "PARTIAL",
+      "scope": "Condition-absent controls remain open; excluded from old-bar READY.",
+      "evidence_class": "source_review",
+      "provisional": true,
+      "source": "exact_head_ruling:21-22"
+    },
+    {
+      "slot": "document-retrieval/mineru",
+      "dated_status": "PARTIAL",
+      "scope": "Condition-absent controls remain open; excluded from old-bar READY.",
+      "evidence_class": "source_review",
+      "provisional": true,
+      "source": "exact_head_ruling:21-22"
+    }
+  ]
 }

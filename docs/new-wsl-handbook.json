@@ -281,8 +281,9 @@
       "status": "pending"
     },
     "publication_date_utc": "2026-10-05",
-    "qualification_scope": "Historical observations on one WSL distribution. Publication does not execute native acceptance or change upstream, broker or final qualification status. Official readiness 30/80 remains; separately reported proposals do not qualify a new aggregate.",
+    "qualification_scope": "Historical old-bar publication: installed, with checks passing. CC provisional30/80 is asof11:44Z and excludes custody13:02Z BY_DESIGN; earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. The new bar requires organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; no new-bar count is supplied until final verified E2E S4, independent review and adjudication. Native outputs, local checks and source review remain distinct; no new acceptance or execution.",
     "readiness": {
+      "bar": "old-bar",
       "baseline": {
         "denominator": 80,
         "numerator": 30,
@@ -293,6 +294,8 @@
       "current": null,
       "derivation_gap": "Final readiness awaits the command center own new dated same-80-slot qualification with independent review and adjudication. A complete public projection review alone never lifts provisional.",
       "formula": "(READY + BY_DESIGN) / all 80 PR #700 foundation slots; PARTIAL, FAIL, INTERIM and UNJUDGED contribute zero; BY_DESIGN is an intentional disposition, not execution",
+      "new_bar_count": null,
+      "new_bar_count_authority": "Final verified E2E S4",
       "official_source": "evidence/receipts/ns2604-e2e-20261004.json",
       "provisional": true,
       "rounding": "Exact percentages shown; baseline PR #700 rounded 37.5% half up to 38%."
@@ -7839,7 +7842,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "b57eeb220ae905ca23f0869bb5f211a01e6ecc05de5cb90986e56002255db215"
+      "sha256": "8c674e80c62bd843b5b89e020211d43a6083999dd0d5b7a147c9809cb782cc49"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7851,7 +7854,7 @@
     },
     {
       "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
-      "sha256": "639878602e15dd96673a8d2787af74c5491536addc5eca1ece5ea6ec272c8f4f"
+      "sha256": "59085b3087ade23723f68235fe312a29154e28a4e2828b5022f59f9a9e6f43db"
     },
     {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
@@ -7983,7 +7986,7 @@
     },
     {
       "path": "evidence/receipts/ns2604-requalification-20261005.json",
-      "sha256": "b2e703eb60ce1b55131961d9e9edbf72f8d1f29711b621a0415341052b47156c"
+      "sha256": "f5c2b445bdb83ad4292b3849d8647557ce616865c5443c3a689b70685b168ba4"
     }
   ],
   "stage_order": [

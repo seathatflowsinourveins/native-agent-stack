@@ -8,25 +8,26 @@
     "codex",
     "omniroute"
   ],
-  "claim": "Historical NativeStack2604 evidence publication corrected after Claude review. Official readiness remains the qualified 2026-10-04 receipt, 30/80 (37.5%). Old 40/44 scenarios are superseded. Roadmap 37/80 and command-center 32/80 are separately reported source-review proposals; 32 remains provisional pending the coordinator final verified E2E. Native outputs, local integrations and reviews remain distinct; this publication performs no new acceptance or aggregate derivation.",
+  "claim": "Historical NativeStack2604 documentary publication. All counts and READY verdicts are old-bar: installed, with checks passing. Official readiness remains PR#700 historical30/80. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. CC old-bar provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. The new bar requires organic native-arm use in fresh sessions with no prompt/harness rules naming the tool; its count comes only from final verified E2E S4, independent review and adjudication. No new execution, acceptance or aggregate derivation.",
   "limitations": [
     "This is historical inventory, not live verification or a new host execution. The historical 30/80 receipt remains the official readiness until the command center own new dated same-80-slot qualification, independent review and adjudication. Reviewing this PR or projection never lifts provisional.",
-    "The old40/80 scenario is superseded by the roadmap 37/80 proposal. The command center reports 32/80 provisionally; neither proposal is a qualified aggregate or a new derivation by this publication.",
+    "Earlier37/40/44/32proposals are superseded by the exact-head ruling; reported old-bar provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN.",
     "The former44/80 conditional scenario is superseded; no current-plus-four relationship is assumed. Original Opus READY/GPT PARTIAL token reviews and native acceptance gaps remain retained.",
     "The first post-install census has 80 rows: 50 exit-zero, 28 skipped and two failures. The later raw census has a duplicate skill-authoring attempt; attempt rows are not distinct slots. Omitted stages and held slots remain in the denominator.",
     "The later observations at 4c897418f are retained private source files, not a completed persistent co-op census in fixwave-4c897418f at publication. Sources and observation scope are inventoried by hash without copying raw session streams.",
     "Session-analytics summary claims conflict with retained rerun exit-code files; later output files lack complete exit/time siblings. Alerting exit zero coexists with an explicit needs_user/sink disposition. Preserve these attempts and reported claims separately; neither implies READY.",
     "The fixwave-defects and currency lanes were in progress at the publication boundary. No slot is declared repaired, installed or accepted by their planned changes. Their future receipts require a separate follow-up.",
-    "This publication does not execute upstream tests, host acceptance commands, provider requests, GPU checks or broker operations. Structural checks verify the documents and generators, not capability acceptance."
+    "This publication does not execute upstream tests, host acceptance commands, provider requests, GPU checks or broker operations. Structural checks verify the documents and generators, not capability acceptance.",
+    "Serena and MinerU are excluded from old-bar READY while condition-absent controls remain open. Difftastic, structural-search, inspect-ai, harbor and codex-sdk: fresh-session use not evidenced; installation-time checks retain original classes."
   ],
   "data": {
-    "publication_reconciliation": {"base":"9e955327702e6b7a8dd1909b2884196726a15ba5","released_by":"#713 merged1796303f and co-op J-GC direction2026-10-05T16:11:01Z","host_execution":false,"claim_scope":"Generated projection/source integration only; official30 unchanged, current/conditional null, reported32 provisional. Old host attempts do not qualify changed plan/profile pins."},
+    "publication_reconciliation": {"base":"2d849ba1fe1b879144cfa470f0514d3ac3b8e487","released_by":"#713 merged1796303f and co-op J-GC direction2026-10-05T16:11:01Z","host_execution":false,"claim_scope":"Source/generator integration only: official old-bar30 unchanged, current/conditional null; CC old-bar provisional30asof11:44Z excludes custody13:02Z. Old attempts do not qualify changed plan pins or organic use.","landing_application":{"merged_at_utc":"2026-10-05T15:58:00Z","merged_commit":"1796303f957c522e78b92667e553c06840fae3a2","applied_on_2604_start_utc":"2026-10-05T16:01:00Z","applied_on_2604_end_utc":"2026-10-05T16:46:00Z","scope":"The merge/application ends the ownership hold; it does not close D04 or qualify changed pins."}},
     "publication_date_utc": "2026-10-05",
     "publication_base_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
     "host": "NativeStack2604",
     "source_class": "Historical native client outputs, local plan-integration checks and source review. Official readiness 30/80 is retained from receipt #700; current/conditional are null. New proposals are attributed in the decision record.",
     "north_star_action": "Keep foundation readiness recoverable for complex engineering, US-equities research and historical simulation before independently qualified paper operation.",
-    "qualification_scope": "Historical observations on one WSL distribution. Publication does not execute native acceptance or change upstream, broker or final qualification status. Official readiness 30/80 remains; separately reported proposals do not qualify a new aggregate.",
+    "qualification_scope": "Historical old-bar publication: installed, with checks passing. CC provisional30/80 is asof11:44Z and excludes custody13:02Z BY_DESIGN; earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. The new bar requires organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; no new-bar count is supplied until final verified E2E S4, independent review and adjudication. Native outputs, local checks and source review remain distinct; no new acceptance or execution.",
     "readiness": {
       "provisional": true,
       "formula": "(READY + BY_DESIGN) / all 80 PR #700 foundation slots; PARTIAL, FAIL, INTERIM and UNJUDGED contribute zero; BY_DESIGN is an intentional disposition, not execution",
@@ -40,7 +41,10 @@
       "conditional": null,
       "rounding": "Exact percentages shown; baseline PR #700 rounded 37.5% half up to 38%.",
       "derivation_gap": "Final readiness awaits the command center own new dated same-80-slot qualification with independent review and adjudication. A complete public projection review alone never lifts provisional.",
-      "official_source": "evidence/receipts/ns2604-e2e-20261004.json"
+      "official_source": "evidence/receipts/ns2604-e2e-20261004.json",
+      "bar": "old-bar",
+      "new_bar_count": null,
+      "new_bar_count_authority": "Final verified E2E S4"
     },
     "disputed_slot_ids": [
       "token-efficiency/code-index",
@@ -171,6 +175,34 @@
       "as_of_utc": "2026-10-05T11:44:16Z",
       "source": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
       "new_qualification": false
+    },
+    "qualification_bar": {
+      "old_bar": "installed, with its checks passing",
+      "scope": "All retained counts and READY verdicts are old-bar. Original labels and reviews remain historical.",
+      "new_bar": "Organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; introduced around15:12Z.",
+      "new_bar_count": null,
+      "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
+    },
+    "old_bar_provisional": {
+      "source": "command_center_exact_head_ruling",
+      "reported_numerator": 30,
+      "reported_denominator": 80,
+      "evidence_class": "source_review",
+      "status": "provisional pending the coordinator's final verified E2E",
+      "bar": "old-bar",
+      "as_of_utc": "2026-10-05T11:44:00Z",
+      "custody_1302_by_design_included": false,
+      "ruling": "review-715-corrections.json#/bounded_repair_rulings"
+    },
+    "exact_head_ruling": {
+      "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "sha256": "5119fcb6518fc162cdd348870758545ec57710bd929ed64b4203473b4aa7f911",
+      "lines": [
+        14,
+        33
+      ],
+      "reviewed_head": "2432f95192a2204b0393a327e3d3134ba01b8aec",
+      "evidence_class": "source_review"
     }
   }
 }

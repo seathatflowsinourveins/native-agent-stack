@@ -152,5 +152,12 @@
       ]
     }
   ],
-  "completeness_critic": "Report testimony and actual returned scalar artifacts remain distinct. Preserve all failed attempts, unknown authorship, project-level capture scope, historical different-host tests and the interim owner/skill-use gates. No session identity, raw conversation, active configuration or credential is copied."
+  "completeness_critic": "Report testimony and actual returned scalar artifacts remain distinct. Preserve all failed attempts, unknown authorship, project-level capture scope, historical different-host tests and the interim owner/skill-use gates. No session identity, raw conversation, active configuration or credential is copied.",
+  "qualification_bar": {
+    "old_bar": "installed, with its checks passing",
+    "scope": "All retained counts and READY verdicts are old-bar. Original labels and reviews remain historical.",
+    "new_bar": "Organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; introduced around15:12Z.",
+    "new_bar_count": null,
+    "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
+  }
 }

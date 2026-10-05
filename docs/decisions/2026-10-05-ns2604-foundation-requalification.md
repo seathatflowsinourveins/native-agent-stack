@@ -7,14 +7,25 @@ with the last fully adjudicated baseline and the new provisional scenarios
 shown separately. This serves complex engineering, US-equities research and
 historical simulation before independently qualified paper operation.
 
-The earlier co-op **40/80** and conditional **44/80** scenarios are superseded.
-The cited roadmap proposes **37/80**; the command center reports **32/80,
-provisional, pending the coordinator's final verified E2E**. Both figures are
-recorded source-review proposals, not an aggregate derived or qualified by
-this publication. The command center's correction excludes ccusage,
-command-output, native-clients/codex, session-analytics and alerting from READY.
-Its source and the exact review objections are retained in
-`evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json`.
+The earlier **40/80**, conditional **44/80**, roadmap **37/80** and command-center
+**32/80** proposals are superseded by the command center's exact-head rulings
+for #715 at `2432f951`. Its old-bar provisional result is **30/80 (37.5%),
+pending the coordinator's final verified E2E**. This is the command center's
+reported result as of **11:44Z**, excluding credential custody's **13:02Z**
+BY_DESIGN change; no new numerator is derived here. The correction excludes
+ccusage, command-output, native-clients/codex, session-analytics, alerting,
+Serena and MinerU from READY. Serena and MinerU have the same open
+condition-absent controls as ccusage. The sources and dated objections are in
+`evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json`,
+including its `bounded_repair_rulings` record.
+
+Every count and READY verdict retained in this publication uses the **old bar**:
+installed, with its checks passing. The user's new bar, introduced around
+15:12Z, requires organic **native-arm** use in fresh sessions whose prompts
+and harness rules do not name the tool. No new-bar count is published here;
+it comes only from the command center's final verified E2E (**S4**), with
+independent review and adjudication. Old-bar labels and installation-time
+checks do not establish organic use.
 
 The last fully adjudicated aggregate remains the historical **30/80 (37.5%)**
 from 2026-10-04, reported as 38% after half-up rounding in PR #700. That record
@@ -25,8 +36,9 @@ final verified E2E of the same 80 slots, followed by independent review and
 adjudication. A review of this PR or its public projection does not lift
 provisional status. The generated correction sets current/conditional values to
 null with this decision as its pointer. Its earlier #713 ownership hold ended
-when #713 landed as1796303f. The publication is reconciled with current main
-9e955327; older coupled projections supply no current readiness authority.
+when #713 landed at15:58Z as1796303f9; its application on2604 ran16:01–16:46Z.
+The publication is reconciled with current main2d849ba1, after #748;
+older coupled projections supply no current readiness authority.
 
 ## Sources and reuse
 
@@ -88,8 +100,8 @@ raw conversations or host paths.
 | Retained native client command outputs | `native_proven` | The client command, host, revision and result actually retained; not whole-slot acceptance |
 | Plan-wrapper census/stage checks and locally authored probes | `local_integration` | Our integration only; not unchanged upstream tests |
 | Opus/GPT judgments and drift review | `source_review` | Review of retained evidence; not independent execution |
-| Earlier 40/80 and 44/80 projections | superseded reported scenarios | Historical proposals retained; not current readiness |
-| Roadmap 37/80 and CC 32/80 proposals | `source_review`, provisional | Reported figures only; coordinator's final verified E2E remains pending |
+| Earlier 40/80, 44/80, roadmap37/80 and CC32/80 projections | superseded `source_review` scenarios | Exact-head ruling task-ns2604-coop-20261005T170827Z; not current readiness |
+| CC old-bar30/80 as of11:44Z | `source_review`, provisional | Excludes custody13:02Z; final verified E2E remains pending |
 | Early invocation snapshot | `historical_inventory` | Install exposure window and native counter scope only |
 | Skipped stages or missing raw proof | `none_recorded` | No successful operation inferred |
 | Generators, hashes, tests and validator | `structural_validation` | Publication consistency; not host or provider acceptance |
@@ -161,8 +173,8 @@ the unchanged baseline preserves useful progress and its actual limitations.
 Only the command center's own new dated, final verified E2E of the same 80
 slots, followed by independent review and adjudication, can replace the
 official historical result. A PR/source-projection review alone cannot lift
-provisional. The earlier 40/44 scenarios and current-plus-four calculation are
-superseded; the reported roadmap37 and CC32 proposals are not derived here.
+provisional. The earlier37/40/44/32proposals and current-plus-four calculation
+are superseded by exact-head ruling task-ns2604-coop-20261005T170827Z.
 New failures, pin changes or client-leg limitations may lower a later qualified
 result, so publication validation must not require monotonic readiness.
 
@@ -292,8 +304,10 @@ confirms that the attestation is the user's own; the original receipt's
 not_verified field remains historical. User authorship is no longer an open
 authenticity question. Fresh unmodified delivery remains blocked by defect 14,
 and the plan check's printed result line remains unconfirmed. The currency
-owner's status still defers Codex profile work pending #713; it supplies no
-owner acceptance closing D04. Neither defect is declared fixed here.
+owner's selected earlier status deferred Codex profile work pending #713.
+That merge hold ended at15:58Z (1796303f9), followed by application16:01–16:46Z;
+the historical status supplies no owner acceptance closing D04. Neither defect
+is declared fixed here.
 
 These corrections follow the original Claude review of #715 head ec7dbc2d0,
 SHA-256 cf54816c12d77a705b1d278f332d18166bfc8e926e65c3ecaac7eb2921bde5c8,
@@ -314,10 +328,11 @@ The builder correction uses the definitive code-navigation slots: Serena
 provides symbols/references for both clients, and the official Claude LSP
 plugins are not installed. Source:
 native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:68–69, :528.
-The source patch and its local integration checks remain isolated until the
-generated paths are released. Job4 waits for each slot's stages2–5, independent
+The source patch and its local integration checks were held until #713 landed;
+the generated correction is now reconciled with main. Job4 waits for each slot's stages2–5, independent
 review and adjudication; cite the #723 receipt only by its merged commit and
-JSON path when available. Job5 waits for #713 to land.
+JSON path when available. Job5's #713 merge hold ended at15:58Z; the merge and
+host application alone do not execute or qualify those deferred jobs.
 
 ## Dated reading of criterion 2 and custody/base rulings
 
@@ -342,8 +357,25 @@ version-only plan smoke supplies no result or superseding adjudication. Source:
 native-agent-stack@76647ef0bfd5a52dce97234a93a0b8bc802fd92b:evidence/artifacts/ns2604-e2e-20261004/slots.json:687,
 and ymtdzzz/otel-tui@3b25779a083469b732e3c628b4a412ee05cf9948:Makefile:10–12.
 Ccusage, Serena and MinerU need their retained condition-absent controls beside
-the applicable passing operations. Their gaps remain open rather than being
-filled by this documentary reading.
+the applicable passing operations. All three are excluded from old-bar READY;
+Serena and MinerU are demoted under the exact-head ruling, with provisional
+PARTIAL dispositions. Their passing installation checks retain their original
+classes and do not close the control gaps.
+
+Difftastic, structural-search, inspect-ai, harbor and codex-sdk each have
+**fresh-session use not evidenced**. Roadmap claims are source-review leads;
+their installation-time checks, wrapper results, retained failures and scoped
+Codex-leg examples remain separately recorded. No missing fresh-session proof
+or organic native-arm use is inferred from those checks.
+
+The bounded repair follows command-center item
+`task-ns2604-coop-20261005T170827Z`, original SHA256
+`5119fcb6518fc162cdd348870758545ec57710bd929ed64b4203473b4aa7f911`.
+Its source-review ruling is retained in `review-715-corrections.json`; it
+changes reported proposals, not the frozen #700 baseline or original verdicts.
+For command-output, the retained `/owners/29` acceptance locator describes
+the historical plan row. #705 (0ce95369) changed that row; old attempts do not
+qualify its changed hook/trust operation.
 
 Credential custody's dated disposition is **BY_DESIGN**, replacing its prior
 INTERIM policy hold. The drafted alternative retains one private 0600 file per

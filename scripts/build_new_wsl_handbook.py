@@ -1153,11 +1153,11 @@ def render_markdown(data):
         readiness = host["readiness"]
         lines += ["## NativeStack2604 host re-qualification", "",
                   f"Published {host['publication_date_utc']}; source: {link(host['source'])}.", "",
-                  "Official readiness remains the qualified 2026-10-04 baseline; current and conditional figures, "
+                  "Official old-bar readiness remains the qualified 2026-10-04 baseline: installed, with its checks passing. Current and conditional figures, "
                   "when supplied, are provisional source projections without an independently verified 80-slot join.", ""]
-        for key, label in (("baseline", "Official readiness (qualified 2026-10-04)"),
-                           ("current", "Supplied current projection (provisional)"),
-                           ("conditional", "Conditional projection (provisional)")):
+        for key, label in (("baseline", "Official old-bar readiness (qualified 2026-10-04)"),
+                           ("current", "Supplied old-bar current projection (provisional)"),
+                           ("conditional", "Old-bar conditional projection (provisional)")):
             value = readiness[key]
             if value is not None:
                 lines += [f"- {label}: **{value['numerator']}/{value['denominator']} ({value['percent']:g}%)**."]
@@ -1168,6 +1168,8 @@ def render_markdown(data):
                   "An updated official readiness figure requires the command center's new dated qualification "
                   "of the same 80 slots, followed by independent review and adjudication. "
                   "This receipt projection or its public review alone does not change the official figure.", "",
+                  "The new bar requires organic native-arm use in fresh sessions without prompts or harness rules "
+                  "naming the tool. Its count comes only from the final verified E2E (S4), independent review and adjudication.", "",
                   f"Formula: {cell(readiness['formula']).rstrip('.')}.", "",
                   f"Source class: {cell(host['source_class']).rstrip('.')}.", "",
                   f"Qualification scope: {cell(host['qualification_scope']).rstrip('.')}.", "",

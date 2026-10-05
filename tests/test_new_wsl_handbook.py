@@ -136,12 +136,12 @@ class NewWslHandbookTests(unittest.TestCase):
         source = next(source for source in data["sources"] if source["path"] == handbook.HOST_REQUALIFICATION)
         self.assertEqual(source["sha256"], handbook.digest((self.root / handbook.HOST_REQUALIFICATION).read_bytes()))
         page = (self.root / handbook.OUTPUTS[0]).read_text()
-        for text in ("Official readiness (qualified 2026-10-04): **30/80 (37.5%)**",
-                     "Supplied current projection (provisional): **27/80 (33.75%)**",
-                     "Conditional projection (provisional): **29/80 (36.25%)**",
+        for text in ("Official old-bar readiness (qualified 2026-10-04): **30/80 (37.5%)**",
+                     "Supplied old-bar current projection (provisional): **27/80 (33.75%)**",
+                     "Old-bar conditional projection (provisional): **29/80 (36.25%)**",
                      receipt["data"]["source_class"], receipt["data"]["qualification_scope"],
                      "without an independently verified 80-slot join", "Independent review: pending",
-                     "Official readiness remains the qualified 2026-10-04 baseline", receipt["data"]["decision_record"],
+                     "Official old-bar readiness remains the qualified 2026-10-04 baseline", receipt["data"]["decision_record"],
                      "command center's new dated qualification", "followed by independent review and adjudication"):
             self.assertIn(text, page)
         decision = next(source for source in data["sources"] if source["path"] == receipt["data"]["decision_record"])
@@ -160,6 +160,9 @@ class NewWslHandbookTests(unittest.TestCase):
                 receipt = self.host_requalification_fixture()
                 for key in unavailable:
                     receipt["data"]["readiness"][key] = None
+                receipt["data"]["qualification_scope"] = (
+                    "Synthetic old-bar30/80 source-review proposal asof11:44Z; "
+                    "excludes custody13:02Z BY_DESIGN. No organic qualification.")
                 self.write(handbook.HOST_REQUALIFICATION, receipt)
                 result = self.public_cli()
                 self.assertEqual(result.returncode, 0, result.stderr)
@@ -173,12 +176,17 @@ class NewWslHandbookTests(unittest.TestCase):
                             for key in ("baseline", "current", "conditional") if key not in unavailable]
                 self.assertEqual(re.findall(r"\*\*(\d+)/80", section), expected)
                 if unavailable == ("current", "conditional"):
-                    self.assertIn("Official readiness (qualified 2026-10-04): **30/80 (37.5%)**", section)
+                    self.assertIn("Official old-bar readiness (qualified 2026-10-04): **30/80 (37.5%)**", section)
                     self.assertEqual(re.findall(r"\*\*(\d+)/80", section), ["30"])
                     self.assertNotIn("37/80", section)
                     self.assertNotIn("32/80", section)
                 self.assertIn("No aggregate established for: " + ", ".join(unavailable), section)
                 self.assertIn(receipt["data"]["decision_record"], section)
+                self.assertIn(receipt["data"]["qualification_scope"], section)
+                self.assertIn("installed, with its checks passing", section)
+                self.assertIn("organic native-arm use", section)
+                self.assertIn("without prompts or harness rules naming the tool", section)
+                self.assertIn("final verified E2E (S4)", section)
                 self.assertIn("command center's new dated qualification", section)
                 self.assertIn("public review alone does not change the official figure", section)
                 self.assertNotIn("four-slot adjudication pending", section)

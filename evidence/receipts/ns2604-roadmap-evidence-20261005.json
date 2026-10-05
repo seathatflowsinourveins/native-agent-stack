@@ -8,17 +8,18 @@
     "codex",
     "omniroute"
   ],
-  "claim": "Documentary supplement and #715 source corrections. Official readiness remains the historical30/80. Earlier40/44 scenarios are superseded; roadmap37 and command-center32 are separately reported source_review proposals, provisional pending the coordinator's final verified E2E. No aggregate is derived. Retained observations and review corrections do not establish a new dated80-slot qualification or upstream acceptance. This publication executes no native acceptance, provider request or upstream test and supplies no new readiness numerator.",
+  "claim": "Historical NativeStack2604 documentary publication. All counts and READY verdicts are old-bar: installed, with checks passing. Official readiness remains PR#700 historical30/80. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. CC old-bar provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. The new bar requires organic native-arm use in fresh sessions with no prompt/harness rules naming the tool; its count comes only from final verified E2E S4, independent review and adjudication. No new execution, acceptance or aggregate derivation.",
   "limitations": [
     "This historical documentary capture is not live verification or a new host execution. The Claude publication review of head ec7dbc2d0ce4782a5157e5f9d14c7e5ce39863e8 requested changes; review of this corrected candidate's exact head remains pending.",
     "Only the command center's own dated final verified E2E of the same80slots, followed by independent review and adjudication, can change official readiness. A PR or publication review cannot lift provisional status.",
     "Retained native operations, unchanged upstream tests, local wrappers, synthetic fixtures, source review and structural checks retain separate classes and host/attempt scopes.",
     "Old failures and skips remain historical observations. Later success is tied to its own source, time and inputs; it does not rewrite an earlier process result.",
-    "The historical host capture remains distinct. The generated correction reports official30 with current/conditional null and a decision pointer. Its pre-merge#713 hold is released after1796303f; the publication is reconciled with main9e955327. Older coupled projections are superseded context, not readiness authority. Neither reported37 nor32 is promoted.",
-    "Job4 still requires each owner's stages2–5, independent review and adjudication. Its #723 receipt must use the merged commit and JSON path when available. The earlier Job5#713 merge hold is released after1796303f; merge itself executes or qualifies no deferred job.",
+    "The historical host capture remains distinct. The generated correction reports official30 with current/conditional null and a decision pointer. Its pre-merge#713 hold is released after1796303f; the publication is reconciled with main2d849ba1. Older coupled projections are superseded context, not readiness authority. Both reported37 and32 are superseded.",
+    "Job4 still requires each owner's stages2\u20135, independent review and adjudication. Its #723 receipt must use the merged commit and JSON path when available. The earlier Job5#713 merge hold is released after1796303f; merge itself executes or qualifies no deferred job.",
     "This corrected candidate awaits the command center's exact-head re-check. The ec7 publication review is preserved as an earlier review, not acceptance of these corrections. Local validation remains source consistency only.",
     "Ccusage condition-absent controls remain transcript-only; session-analytics requires a complete owner-native idle-period rerun with argv, stdout/stderr, rc, times, pin and hashes. Retained rerun2/service.8yU0G1 gaps are not inferred away.",
-    "The command center confirms user authorship of the Alerting attestation. The receipt's original not_verified field remains historical; fresh unmodified delivery stays blocked by defect14 and the printed plan result line is unconfirmed."
+    "The command center confirms user authorship of the Alerting attestation. The receipt's original not_verified field remains historical; fresh unmodified delivery stays blocked by defect14 and the printed plan result line is unconfirmed.",
+    "Serena and MinerU are excluded from old-bar READY while condition-absent controls remain open. Difftastic, structural-search, inspect-ai, harbor and codex-sdk: fresh-session use not evidenced; installation-time checks retain original classes."
   ],
   "data": {
     "host": "NativeStack2604",
@@ -30,12 +31,39 @@
     "roadmap_statuses_are_provisional": true,
     "review_correction": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
     "reported_proposals": [
-      {"source": "roadmap", "reported_numerator": 37, "reported_denominator": 80, "evidence_class": "source_review", "status": "provisional roadmap proposal"},
-      {"source": "command_center", "reported_numerator": 32, "reported_denominator": 80, "evidence_class": "source_review", "status": "provisional pending the coordinator's final verified E2E"}
+      {
+        "source": "roadmap",
+        "reported_numerator": 37,
+        "reported_denominator": 80,
+        "evidence_class": "source_review",
+        "status": "superseded historical source-review proposal",
+        "superseded_by": "review-715-corrections.json#/bounded_repair_rulings",
+        "bar": "old-bar"
+      },
+      {
+        "source": "command_center",
+        "reported_numerator": 32,
+        "reported_denominator": 80,
+        "evidence_class": "source_review",
+        "status": "superseded historical source-review proposal",
+        "superseded_by": "review-715-corrections.json#/bounded_repair_rulings",
+        "bar": "old-bar"
+      },
+      {
+        "source": "command_center_exact_head_ruling",
+        "reported_numerator": 30,
+        "reported_denominator": 80,
+        "evidence_class": "source_review",
+        "status": "provisional pending the coordinator's final verified E2E",
+        "bar": "old-bar",
+        "as_of_utc": "2026-10-05T11:44:00Z",
+        "custody_1302_by_design_included": false,
+        "ruling": "review-715-corrections.json#/bounded_repair_rulings"
+      }
     ],
-    "superseded_reported_scenarios": [40, 44],
+    "superseded_reported_scenarios": [40,44,37,32],
     "aggregate_derivation_performed": false,
-    "publication_reconciliation": {"base":"9e955327702e6b7a8dd1909b2884196726a15ba5","released_by":"#713 merged1796303f and co-op J-GC direction2026-10-05T16:11:01Z","host_execution":false,"previous_hold_descriptions":"Historical preparation-phase observations; owner paths are now released.","changed_plan_pin_boundary":"Old4c host attempts do not qualify new #740 Dagu/Mise plan/profile pins."},
+    "publication_reconciliation": {"base":"2d849ba1fe1b879144cfa470f0514d3ac3b8e487","released_by":"#713 merged1796303f and co-op J-GC direction2026-10-05T16:11:01Z","host_execution":false,"previous_hold_descriptions":"Historical preparation-phase observations; owner paths are now released.","changed_plan_pin_boundary":"Old4c host attempts do not qualify new #740 Dagu/Mise plan/profile pins.","landing_application":{"merged_at_utc":"2026-10-05T15:58:00Z","merged_commit":"1796303f957c522e78b92667e553c06840fae3a2","applied_on_2604_start_utc":"2026-10-05T16:01:00Z","applied_on_2604_end_utc":"2026-10-05T16:46:00Z","scope":"The merge/application ends the ownership hold; it does not close D04 or qualify changed pins."}},
     "dated_rulings": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
     "independent_publication_review": "changes_requested_recheck_pending",
     "independent_publication_review_scope": "The retained Claude review covers the earlier ec7 head. The command center's exact-head recheck of this corrected candidate remains pending; neither review qualifies new readiness.",
@@ -61,6 +89,34 @@
     "method_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:evidence/artifacts/ns2604-e2e-20261004/method.md:56-72",
     "readiness_authority": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-04-ns2604-verified-e2e.md:114-121",
     "evidence_policy": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/acceptance-evidence-policy.md:19",
-    "sanitization": "No raw conversations, session/account identities, host paths, credential values or active client configuration. Private proof locators use documented logical prefixes and byte hashes."
+    "sanitization": "No raw conversations, session/account identities, host paths, credential values or active client configuration. Private proof locators use documented logical prefixes and byte hashes.",
+    "qualification_bar": {
+      "old_bar": "installed, with its checks passing",
+      "scope": "All retained counts and READY verdicts are old-bar. Original labels and reviews remain historical.",
+      "new_bar": "Organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; introduced around15:12Z.",
+      "new_bar_count": null,
+      "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
+    },
+    "old_bar_provisional": {
+      "source": "command_center_exact_head_ruling",
+      "reported_numerator": 30,
+      "reported_denominator": 80,
+      "evidence_class": "source_review",
+      "status": "provisional pending the coordinator's final verified E2E",
+      "bar": "old-bar",
+      "as_of_utc": "2026-10-05T11:44:00Z",
+      "custody_1302_by_design_included": false,
+      "ruling": "review-715-corrections.json#/bounded_repair_rulings"
+    },
+    "exact_head_ruling": {
+      "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "sha256": "5119fcb6518fc162cdd348870758545ec57710bd929ed64b4203473b4aa7f911",
+      "lines": [
+        14,
+        33
+      ],
+      "reviewed_head": "2432f95192a2204b0393a327e3d3134ba01b8aec",
+      "evidence_class": "source_review"
+    }
   }
 }

@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "kind": "new-wsl-handbook-profile-integration",
-  "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+  "source_main": "2d849ba1fe1b879144cfa470f0514d3ac3b8e487",
   "evidence_class": "local_integration",
-  "generator_sha256": "adea10c08a4d909c5bddac8d30fa01b48a9080c6379c1cb1eed9b802d1cb0bb8",
+  "generator_sha256": "5988ddf8737a3b613d8c0babc2d3aa72a4977feec8fc5f755cba840e5ef1b363",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "d402e9b2e438916cf49723764aa6d60302c5e644b06247347198ac3b49e16b3c",
-    "docs/new-wsl-handbook.json": "cce0832baa0a5a5d683a40751dcc003590e6987edf31ff943c17af406b60041f"
+    "docs/new-wsl-handbook.md": "d5a8f9c9481c8fe139a3ab2bd9f759bb97d7e42e01718e670222d9d2d7228318",
+    "docs/new-wsl-handbook.json": "7f4c6c7aaf06f5c0513d5d8619021015271956703c19a4fb7117c48145484e75"
   },
   "inventory": {
     "layers": 37,
@@ -72,6 +72,16 @@
       "returned_output": "Ran 85 tests in 32.468s; FAILED (failures=1): generator_sha256 receipt mismatch.",
       "evidence_class": "local_integration",
       "correction": "Refresh the existing receipt generator/profile/output hashes and inventory from actual files; preserve the failed check and rerun the native suite."
+    },
+    {
+      "condition": "J-715R first86-test suite found stale publication receipt generator/output hashes after native builder regeneration.",
+      "command": "python3 -m unittest tests.test_new_wsl_handbook",
+      "native_exit_code": 1,
+      "tests": 86,
+      "failures": 1,
+      "returned_output": "Ran86tests in36.581s; FAILED(failures=1): generator_sha256 receipt mismatch.",
+      "evidence_class": "local_integration",
+      "correction": "Refresh actual generator/output hashes; retain failure and rerun suite."
     }
   ],
   "derived_catalog_correction": {
@@ -307,6 +317,25 @@
         "docs/new-wsl-handbook.json": "cce0832baa0a5a5d683a40751dcc003590e6987edf31ff943c17af406b60041f"
       },
       "source": "seathatflowsinourveins/native-agent-stack@1796303f:evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T17:55:00Z",
+      "source_main": "2d849ba1fe1b879144cfa470f0514d3ac3b8e487",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "J-715R exact-head source corrections: old-bar official30/null/decision; superseded37/40/44/32; reported provisionaloldbar30asof11:44 excludes custody13:02; no organicnewbarcount untilS4. Owner fields and prior histories preserved.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "d402e9b2e438916cf49723764aa6d60302c5e644b06247347198ac3b49e16b3c",
+        "docs/new-wsl-handbook.json": "cce0832baa0a5a5d683a40751dcc003590e6987edf31ff943c17af406b60041f"
+      },
+      "output_sha256": {
+        "docs/new-wsl-handbook.md": "d5a8f9c9481c8fe139a3ab2bd9f759bb97d7e42e01718e670222d9d2d7228318",
+        "docs/new-wsl-handbook.json": "7f4c6c7aaf06f5c0513d5d8619021015271956703c19a4fb7117c48145484e75"
+      },
+      "source": "seathatflowsinourveins/native-agent-stack@2d849ba1:scripts/build_new_wsl_handbook.py",
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ]
