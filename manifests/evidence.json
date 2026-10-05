@@ -16642,6 +16642,11 @@
       "bytes": 18701
     },
     {
+      "path": "docs/decisions/2026-10-05-filesd-registration-test-flake.md",
+      "sha256": "866fb67a29403b92b482914b057e2bc499df63d6b9cd13ae5da85ab78070c95f",
+      "bytes": 4416
+    },
+    {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
       "sha256": "976b8e8c3ede42aa2ce26c01dbca5184cf45e329419a065e169bc0936f093051",
       "bytes": 14176
@@ -53113,8 +53118,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
-      "sha256": "aeee74bd789ff2687b32095138446cb00103bf45a46858a4bab89280aaedbc55",
-      "bytes": 35428
+      "sha256": "eaeb416047c69d63bb2feda7ecef1a886293eede4e964a566872b03454f13b2c",
+      "bytes": 35752
     },
     {
       "path": "tests/test_adaptive_paper_mover.py",

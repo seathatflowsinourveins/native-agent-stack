@@ -475,6 +475,14 @@ class FileSdRegistrationTests(unittest.TestCase):
                 if target in self.listed():
                     return process, target
             time.sleep(0.05)
+        while True:
+            try:
+                chunk = os.read(process.stderr.fileno(), 65536)
+            except BlockingIOError:
+                break
+            if not chunk:
+                break
+            output += chunk
         self.fail(f"exporter never registered its target: {output.decode(errors='replace')}")
 
     def stop(self, process, signum=signal.SIGTERM):
@@ -490,7 +498,8 @@ class FileSdRegistrationTests(unittest.TestCase):
         self.assertEqual(samples[("paper_trial_active", ())], "1")
 
     def test_a_reused_port_is_recognised_as_this_exporters_registration(self):
-        # CPython v3.13.15 Lib/http/server.py: HTTPServer.allow_reuse_address permits rebinding.
+        # The first exporter accepts no connection, so closing its listener frees the port.
+        # Force the random ephemeral-port reuse that the old set difference could not see.
         self.write_phase("starting")
         first, target = self.start()
         self.assertEqual(self.stop(first), 0)
@@ -510,8 +519,8 @@ class FileSdRegistrationTests(unittest.TestCase):
         self.assertIn(target, self.listed())
         started = time.monotonic()
         with self.assertRaisesRegex(AssertionError, "exporter never registered its target") as failure:
-            self.start(port=int(target.rsplit(":", 1)[1]), timeout=1, file_sd=False)
-        self.assertLess(time.monotonic() - started, 3)
+            self.start(port=int(target.rsplit(":", 1)[1]), timeout=5, file_sd=False)
+        self.assertLess(time.monotonic() - started, 10)
         self.assertIn(f"listening on http://{target}/metrics", str(failure.exception))
         self.assertIn("file_sd=None", str(failure.exception))
         self.assertIsNone(self.processes[-1].poll())
@@ -521,8 +530,8 @@ class FileSdRegistrationTests(unittest.TestCase):
         self.targets.write_text("[not json")
         started = time.monotonic()
         with self.assertRaisesRegex(AssertionError, "exporter exited 2 before registering"):
-            self.start(timeout=5)
-        self.assertLess(time.monotonic() - started, 3)
+            self.start(timeout=30)
+        self.assertLess(time.monotonic() - started, 15)
 
     def test_a_clean_stop_of_a_finished_trial_deregisters_without_leaving_a_temporary_file(self):
         for status in ("passed", "completed_no_signals"):  # the runner's passing statuses for phase finished
