@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "frozen_task_and_evaluation_design",
+  "comparison_scope": "Research report and entry-route A/B; a separate native skill benchmark remains an adoption gate.",
+  "date": "2026-10-05",
+  "executed": false,
+  "harness": {"repository": "promptfoo/promptfoo", "pin": "0.123.1", "native_command": "promptfoo eval --no-cache --repeat 3 --max-concurrency 1", "source": "https://www.promptfoo.dev/docs/guides/test-agent-skills/"},
+  "arms": [
+    {"id": "existing_owner", "entry_point": "installed native-stack-research skill; embedded DeerFlow route", "runtime_pin": "bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e", "adoption_status": "existing owner"},
+    {"id": "http_skill_candidate", "entry_point": "unchanged claude-to-deerflow skill and native chat.sh", "runtime_pin": "bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e", "mode": "ultra", "adoption_status": "held; requires owner decision and HTTP gate"}
+  ],
+  "clients": ["fresh Claude headless session", "fresh Codex headless session from non-git scratch with --skip-git-repo-check"],
+  "repeats": 3,
+  "max_concurrency": 1,
+  "cache": false,
+  "required_matched_context": {"thinking_enabled": true, "is_plan_mode": true, "subagent_enabled": true},
+  "mode_preregistration_rule": "Require these exact context flags on both embedded and HTTP arms before execution; unequal orchestration modes cannot establish an entry-route or skill win.",
+  "next_sweep_seed": "A primary-paper/PDF/table research task; these software-only inputs do not qualify those modalities.",
+  "execution_prerequisites": ["Command-center round-2 disposition and explicit route ownership", "Approved native install-plan rows; HTTP health/thread/stream/lifecycle gate", "Repaired research-harnesses foreground completion and search failure", "Freeze exact client versions, model routes and matching DeerFlow configuration", "Same search backend for both arms after the separate provider comparison", "Scoped convergence preregistration with artifact hashes before execution"],
+  "separate_adoption_gate": "Claude skill-creator native paired benchmark, as required by AGENTS.md; promptfoo report/route A/B alone does not qualify a skill adoption.",
+  "tasks": [
+    {"id": "runtime-release", "query": "October 2026: verify the current GPT Researcher release, packaging and documented MCP startup from primary sources."},
+    {"id": "embedded-http", "query": "October 2026: compare DeerFlow's embedded and HTTP research interfaces using current official source and documentation."},
+    {"id": "agent-evals", "query": "October 2026: research supported promptfoo and Inspect agent evaluation inputs and native result formats from primary sources."},
+    {"id": "search-backends", "query": "October 2026: verify current documented keyless search backends for self-hosted research agents and state their measured limitations."},
+    {"id": "sdk-lifecycle", "query": "October 2026: research current official agent SDK cancellation, lifecycle and tool-result contracts, with pinned primary citations."},
+    {"id": "citation-method", "query": "October 2026: research primary methods for evaluating research-report citation accuracy and completeness; separate published scores from current runtime evidence."}
+  ],
+  "oracle": {"completion": "Foreground native completion with retained return code and report", "citation_floor": "At least five distinct source URLs; independently reread citations for support", "quality": "Blind assessment through upstream promptfoo llm-rubric, followed by independent primary-source verification", "rubric": "Pass only if the report answers every requested task part, provides at least five distinct source URLs, attributes each version/interface/lifecycle claim to a supporting primary source, separates executed evidence from source review, and states unresolved facts without inventing outcomes. Any unsupported factual claim or missing task part fails. Compare anonymous outputs without arm identity; independently reread every decisive citation before counting a pass.", "cost_and_latency": "Native timings and usage when returned; unknown counters remain null", "fault_controls": "Same evaluation must fail an empty report, unsupported citation and missing native completion", "win_rule": "Only an independently verified improvement with no loss of completion, primary-source support or lifecycle qualifies overlap adoption; equal quality favors fewer moving parts"},
+  "limits": ["Frozen design is not execution acceptance", "Material environment/model/provider inputs remain gated and must be frozen in the executable preregistration", "Search-provider benchmark outcomes do not qualify skill/client/HTTP behavior", "The non-executable vendor MCP route cannot enter this comparison until its own activation prerequisites return"]
+}

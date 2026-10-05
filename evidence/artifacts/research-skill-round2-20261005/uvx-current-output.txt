@@ -1,0 +1,2 @@
+Installed 194 packages in 623ms
+Package `gpt-researcher` does not provide any executables.

@@ -29,6 +29,12 @@ The existing runner stays on version 1. `build_args.py` refuses V2-marked inputs
 inputs, full-field screens, replicated judgments and expanded field hash before V2 can run.
 `sweep.js` and `make_prompt.py` still use the V1 shared input and proposal projection.
 
+The controlling requirements for the future runner are now
+[U11 revision 5](../../../docs/decisions/2026-10-01-u11-merit-neutral-selection.md#revision-5-2026-10-01).
+The revision 4 citation above identifies the historical source-preparation contract,
+not the complete activation contract. The [October 5 practice review](../../../docs/decisions/2026-10-05-convergence-practice-upstream-review.md#v2-runner-suggestion-and-activation-conditions)
+records the remaining screens, provenance, accounting and measurement conditions.
+
 Prepare source inputs with the existing frozen scope and manifest arguments, adding:
 
 ```sh
@@ -169,7 +175,7 @@ They are synthetic/local integration checks, not unchanged upstream model accept
 
 ### Part 2 review queue
 
-Notes 4–11 from the [PR #590 source review](https://github.com/seathatflowsinourveins/native-agent-stack/pull/590#issuecomment-5942837180)
+Notes 4–10 from the [PR #590 source review](https://github.com/seathatflowsinourveins/native-agent-stack/pull/590#issuecomment-5942837180)
 remain open for part 2. This repair does not qualify the future V2 runner.
 
 4. Reconcile the historical receipt's source revisions, unretained 1,135-count script and earlier
@@ -187,9 +193,10 @@ remain open for part 2. This repair does not qualify the future V2 runner.
    replace the fact-word pattern with deterministic API evidence before launch.
 10. Treat an expected missing GitHub latest release as an observation instead of a whole-source
     failure, using the maintained `github_freshness.py` missing-response policy.
-11. Reconcile the inferred `alpacahq/alpaca-py` pin with the user's separate Alpaca adapter-path
-    requirement; the user has not pinned that repository. Preserve the acknowledged trading
-    acceptance summaries and exact section hashes while resolving this input policy.
+11. Resolved by the [October 5 projection repair](../../../docs/decisions/2026-10-05-convergence-practice-upstream-review.md):
+    the separate Alpaca adapter-path requirement carries no repository pin. `alpacahq/alpaca-py`
+    remains an eligible comparison candidate. The acknowledged trading acceptance summaries and
+    exact section hashes are preserved; this source correction does not qualify the V2 runner.
 
 ## Files
 

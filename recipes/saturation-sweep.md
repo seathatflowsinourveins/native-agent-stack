@@ -3,6 +3,13 @@
 This recipe runs one landscape sweep over the layers that are due, keeps its evidence, and
 appends its record to the [saturation ledger](../catalogs/saturation/README.md).
 
+The current repository runner uses V1. Its source survey does not establish a
+merit-neutral quality ranking; V2 preparation is guarded against launch while the
+[revision 5 activation conditions](../docs/decisions/2026-10-05-convergence-practice-upstream-review.md#v2-runner-suggestion-and-activation-conditions)
+remain open. Keep saturation counts, documented-fit defaults and measured comparisons
+as separate evidence. Reuse an in-flight sweep's frozen inputs and returns instead of
+starting another sweep for the same layers.
+
 A person starts each sweep. The weekly `saturation-tracking` workflow only reports what is due.
 Nothing schedules a model run: `research-state.json` keeps `execution_policy.automatic_model_calls`
 set to `false`, and changing that is a separate decision for the landscape owners.

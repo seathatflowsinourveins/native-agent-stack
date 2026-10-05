@@ -4,6 +4,19 @@ The operating recipe for keeping [`catalogs/sota-convergence/`](../catalogs/sota
 current using [`tools/sota-convergence/`](../tools/sota-convergence/README.md). It replaces the
 2026-09-22 wave's two hardcoded, host-path scripts with CLI-driven steps.
 
+The [October 5 upstream practice review](../docs/decisions/2026-10-05-convergence-practice-upstream-review.md)
+inventories the practice's source pins, released runtimes, evaluation harnesses and SDKs,
+with comparisons and overturn conditions. For a task's selected component, check its
+installed capability, version-specific changelog, pinned source and official documentation;
+read repository and package advisories separately. A freshness snapshot, source-survey
+survivor or documented-fit default does not establish a measured merit winner.
+
+The landscape runner remains V1. Its opt-in V2 inputs are source preparation only;
+[U11 revision 5](../docs/decisions/2026-10-01-u11-merit-neutral-selection.md#revision-5-2026-10-01)
+controls the future runner's full-field screens, paid-service scope, replicated judgments
+and observed provenance. Preserve the staging refusal until those conditions are implemented
+and qualified. A written contract or synthetic fixture alone does not qualify execution.
+
 ## When to rerun
 
 - **Monthly**, as a bounded freshness check (steps 1, 2, 4 -- skip a full lane

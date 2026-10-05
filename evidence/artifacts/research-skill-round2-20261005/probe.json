@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "round_2_input_pack_native_probe",
+  "date": "2026-10-05",
+  "execution_window_utc": ["2026-10-05T10:03:54Z", "2026-10-05T10:09:53Z"],
+  "individual_process_times": null,
+  "timing_note": "Window bounded by directly observed UTC tool clocks; individual process UTC times were not captured.",
+  "source": {"repository": "assafelovic/gpt-researcher", "pin": "0957c301ed06c2a5857b834358c7227c739041d4", "startup_path": ".mcp.json", "source_package_version": "0.16.0"},
+  "uv_version": "0.12.22",
+  "python_version": "3.12.3",
+  "working_directory": "<private-lane-cache>/readiness-research-skill/uvx-probe",
+  "isolation": {"inherited_environment": "empty", "xdg_cache_config_data": "owned isolated paths", "uv_cache_and_tool_dirs": "owned isolated paths", "tmpdir": "owned isolated path outside /tmp", "netrc": "/dev/null", "python_downloads": "never", "shared_host_configuration_changed": false},
+  "common_argv": ["uvx", "--no-config", "--isolated", "--no-build-package", "gpt-researcher", "--python", "<installed-cpython-3.12.3>"],
+  "timeout_seconds": 900,
+  "native_dependency_builds": "Supported uv installer built dependency sdists lacking wheels; GPT Researcher itself used a published wheel.",
+  "attempts": [
+    {"id": "guessed_binary_path", "exit_code": 127, "decisive": false, "correction": "Use exact installed binary returned by mise which uvx.", "private_log_sha256": "eb5b3f71cf1f7572c48b628683b898b09ee577c6dbb249cbc8397dd4ef127dfc"},
+    {"id": "all_wheels_unversioned", "argv_difference": ["--no-build"], "resolved_package_version": "0.13.3", "exit_code": 1, "decisive": false, "reason": "All-wheels restriction selected an older package; cannot establish current executable behavior.", "private_log_sha256": "0d600d2a07317e0007c78493b7c56fe3c7dbfb53ecc5fb0e70176849f0deb237"},
+    {"id": "all_wheels_source_version", "argv_difference": ["--no-build", "--from", "gpt-researcher==0.16.0"], "exit_code": 1, "decisive": false, "reason": "Dependency resolution failed because docopt has no usable wheel.", "private_log_sha256": "6ed60dac3669942d8e3a34e3b2ad98512c4e48522b2440ebe90f0281adc1ee45"},
+    {"id": "all_wheels_python_control", "argv_difference": ["--no-build", "--from", "gpt-researcher==0.16.1", "python", "--version"], "exit_code": 1, "decisive": false, "reason": "Dependency resolution failed before control execution; this is not a passing control.", "private_log_sha256": "8de8925351b8f6a6c06c37cc74a321c8769c90a6e29199f6b30e7e0a06e31b72"},
+    {"id": "current_native_command", "argv_tail": ["gpt-researcher", "--help"], "resolved_package_version": "0.16.1", "exit_code": 1, "decisive": true, "outcome": "package provides no executables", "output": "uvx-current-output.txt", "output_scope": "Unmodified final two returned lines; full dependency-install output retained privately.", "private_log_sha256": "671ed63be7ff088ea0d4b321bf1ce77f6c899be079d9bb56abbb931485b7f2a8"},
+    {"id": "source_version_native_command", "argv_tail": ["--from", "gpt-researcher==0.16.0", "gpt-researcher", "--help"], "resolved_package_version": "0.16.0", "exit_code": 1, "decisive": true, "outcome": "package provides no executables", "output": "uvx-source-version-output.txt", "output_scope": "Complete unmodified returned output.", "private_log_sha256": "1eb8816d9887394bad8a7d4ad25d69c29c68d2708e9af5e8732273ef0806cfb7"},
+    {"id": "native_python_control", "argv_tail": ["--from", "gpt-researcher==0.16.1", "python", "--version"], "exit_code": 0, "decisive": true, "outcome": "same package environment executes Python", "output": "uvx-python-control-output.txt", "output_scope": "Complete unmodified returned output.", "private_log_sha256": "5b3e43dc38ca01e3f5a7854ba50d4330864b0c1e0f646650b2c78cf072acc366"}
+  ],
+  "independent_observation": "Resolved package dist-info METADATA identifies versions and contains no entry_points.txt.",
+  "evidence_class": "native_proven",
+  "claim_boundary": "Executable discovery and isolated-environment control only; no MCP handshake, useful research result, client wiring or lifecycle acceptance.",
+  "provider_native_usage": null,
+  "model_or_research_command_executed": false,
+  "pypi_current_wheel": {"version": "0.16.1", "sha256": "1c0fe74a1c3319b2ac2caa910808c61b638634d2b75361521e8c4627a8b5a8cf", "uploaded_at": "2026-09-26T17:37:59.731813Z", "metadata_url": "https://pypi.org/pypi/gpt-researcher/json"}
+}

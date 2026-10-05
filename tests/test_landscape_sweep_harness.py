@@ -1117,6 +1117,8 @@ urllib.request.urlopen = urlopen
         catalog["layers"][0]["candidates"] = [
             {"name": "NautilusTrader", "repository": "https://github.com/nautechsystems/nautilus_trader",
              "disposition": "selected"},
+            {"name": "alpaca-py", "repository": "https://github.com/alpacahq/alpaca-py",
+             "disposition": "not_adopted"},
             {"name": "LEAN", "repository": "https://github.com/QuantConnect/Lean", "disposition": "not_adopted"}]
         write_json(path, catalog)
         write_json(self.repo / "catalogs/us-equities/runtime-target.json", {
@@ -1135,6 +1137,12 @@ urllib.request.urlopen = urlopen
             "preserve the fixed LEAN oracle and reconcile numeric accounting."))
         self.assertEqual({pin["name"] for pin in screen["pinned_requirements"]},
                          {"NautilusTrader", "IBKR", "Alpaca", "LEAN"})
+        self.assertEqual({pin["name"]: pin["repository"] for pin in screen["pinned_requirements"]}, {
+            "NautilusTrader": "https://github.com/nautechsystems/nautilus_trader",
+            "IBKR": None, "Alpaca": None, "LEAN": "https://github.com/quantconnect/lean",
+        })
+        self.assertIn("https://github.com/alpacahq/alpaca-py",
+                      {candidate["repository"] for candidate in screen["candidates"]})
         self.assertEqual(screen["acceptance_gates"][0]["id"], "broker-state-failures")
         self.assertIn("durable", screen["acceptance_gates"][0]["requirement"])
         for signal in ("EXECUTED_ONLY_MARKER", "executed_evidence_ref", "incumbent-receipt.json",
