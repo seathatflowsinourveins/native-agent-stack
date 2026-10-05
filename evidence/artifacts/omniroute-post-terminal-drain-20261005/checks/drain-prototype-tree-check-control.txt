@@ -1,0 +1,23 @@
+# Control for the tree check of scripts/drain-prototype.sh.txt (2026-10-05): the script run with EXPECT_TREE=0000000000000000000000000000000000000000 instead of the real tree id b7c6869001ce8bdd23e2e2352f48ce3058bc13d2
+# Expected: the script prints the patched tree id, reports that it differs, and stops with exit 3 before the P, A2 and B2 stages. Observed: the wrapper's `control run exit=3` and the progress log below, which has no P, A2 or B2 line.
+# The progress log is byte for byte except that the home directory is written $HOME.
+
+21:36:39Z clone exit=0
+21:36:39Z fetch pr15167 exit=0
+21:36:43Z checkout tag exit=0
+21:37:41Z npm ci exit=0
+21:37:41Z apply affinity patch exit=0
+21:37:41Z apply pr15167 diff exit=0
+21:37:41Z commit composition exit=0
+21:37:41Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
+21:37:41Z stream-related test files: 239
+21:38:49Z A-baseline exit=1 tests=1746 pass=1745 fail=1
+21:38:51Z N-new-test-unpatched exit=1 tests=6 pass=3 fail=3
+21:38:51Z apply the first version's streamHandler.ts hunk exit=0
+21:38:52Z N2-new-test-first-version exit=1 tests=6 pass=4 fail=2
+21:38:52Z restore streamHandler.ts exit=0
+21:38:52Z apply patch under test exit=0
+21:38:52Z commit patch under test exit=0
+21:38:52Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 DIFFERS from the expected tree 0000000000000000000000000000000000000000: stopping before the patched test stages
+
+control run exit=3

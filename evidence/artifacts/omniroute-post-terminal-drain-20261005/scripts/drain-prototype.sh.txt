@@ -1,36 +1,44 @@
 #!/bin/bash
 # Validation of the post-terminal client-disconnect drain patch in a scratch tree built from public refs (nothing is deployed).
-# Patch under test: $D/drain-after-terminal.patch (one commit: the streamHandler.ts change plus tests/unit/stream-terminal-seen-client-disconnect.test.ts).
-# Reference implementation: drainCompletedToolHandoff in open-sse/utils/streamHandler.ts at upstream 0585aba5589d5a1f49243a13a8db249558e7c9e3 (L660-690), reused from cancel() for the terminal-seen case.
-# Steps (each logs its exit code to $OUT/progress.txt):
-#   composition C (v3.8.51 tag + affinity patch + PR 15167), npm ci, then
+# Patch under test: $DRAIN_DIR/drain-after-terminal.patch (one commit: the streamHandler.ts change plus tests/unit/stream-terminal-seen-client-disconnect.test.ts).
+# Reference implementation: drainCompletedToolHandoff in open-sse/utils/streamHandler.ts at upstream 0585aba5589d5a1f49243a13a8db249558e7c9e3 (L665-688), reused from cancel() for the terminal-seen case.
+# Steps (each logs its exit code to $OUT/progress.txt; a failed setup step or a tree-id mismatch stops the script with exit 3):
+#   composition C (v3.8.51 tag + affinity patch + PR 15167; its tree id is checked), npm ci, then
 #   A   baseline: the stream-related test files (name globs plus every unit test that mentions streamHandler), unchanged, on the unpatched tree
 #   N   the new test file on the unpatched tree (negative control: three of its six tests must fail)
 #   N2  the new test file with only the streamHandler.ts hunk of the first version of the patch, superseded after review (two tests must fail:
 #       the tool-handoff drain that never starts, and the pending request that stays after the grace period)
-#   P   the patch under test applied (its tree id must equal EXPECT_TREE), then the new test file alone
+#   P   the patch under test applied: its tree id must equal EXPECT_TREE, or the script stops here, before any patched test stage; then the new test file alone
 #   A2  the same stream-related files plus the new test file on the patched tree; B2 the call-log, usage-history and chat-pipeline tests
-# usage: EV=<evidence folder of omniroute-wire-effort-20261005> EXPECT_TREE=<tree id of the patched tree> omniroute-drain-prototype-20261005.sh
+# The script owns only the directory it creates (mktemp under $WORK_ROOT, default ~/.cache) and deletes nothing, so it cannot touch another session's directories.
+# usage: DRAIN_DIR=<directory with drain-after-terminal.patch, superseded-first-version.patch and the test file> EV=<evidence folder of omniroute-wire-effort-20261005> EXPECT_TREE=<tree id of the patched tree> omniroute-drain-prototype-20261005.sh
 set -u
-M=$HOME/.cache/omniroute-upstream-mirror-20261005.git
-T=$HOME/.cache/omniroute-drain-proto
-OUT=$HOME/.cache/omniroute-drain-proto-out
-D=${DRAIN_DIR:?the directory holding drain-after-terminal.patch, superseded-first-version.patch and stream-terminal-seen-client-disconnect.test.ts}
+set -o pipefail
+M=${MIRROR:-$HOME/.cache/omniroute-upstream-mirror-20261005.git}
+D=${DRAIN_DIR:?set DRAIN_DIR to the directory holding drain-after-terminal.patch, superseded-first-version.patch and stream-terminal-seen-client-disconnect.test.ts}
 TAG=c1e30b7676975feb298b49eff6ff58923c04b89e
 PR=0585aba5589d5a1f49243a13a8db249558e7c9e3
+COMPOSITION_TREE=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f
 EV=${EV:?set EV to the evidence folder of the gateway-composition record}
 EXPECT_TREE=${EXPECT_TREE:?set EXPECT_TREE to the tree id of the composition with the patch applied}
 export PATH="$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
-rm -rf "$OUT" "$T"; mkdir -p "$OUT"
+WORK=$(mktemp -d "${WORK_ROOT:-$HOME/.cache}/omniroute-drain-validate-XXXXXX") || exit 2
+T=$WORK/tree
+OUT=$WORK/out
+mkdir -p "$OUT"
 log() { echo "$(date -u +%H:%M:%SZ) $*" | tee -a "$OUT/progress.txt"; }
 G() { git -c user.name=Scout -c user.email=scout@local -c core.hooksPath=/dev/null -C "$T" "$@"; }
-git clone -q --shared --no-checkout "$M" "$T"; log "clone exit=$?"
-G fetch -q "$M" "+refs/pull/15167/head:refs/pull/15167/head"; log "fetch pr15167 exit=$?"
-G checkout -q --detach $TAG; log "checkout tag exit=$?"
-( cd "$T" && nice -n 19 npm ci --no-audit --no-fund > "$OUT/npm-ci.log" 2>&1 ); rc=$?; log "npm ci exit=$rc"; [ $rc -eq 0 ] || exit 1
-G apply --index "$EV/patches/045aa81f3.patch"; log "apply affinity patch exit=$?"
-git --git-dir="$M" diff $PR^ $PR | G apply --index; log "apply pr15167 diff exit=$?"
-G commit -q -m "composition"; log "composition tree=$(G rev-parse 'HEAD^{tree}') (expected f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f)"
+step() { local label=$1; shift; "$@"; local rc=$?; log "$label exit=$rc"; [ $rc -eq 0 ] || exit 3; }
+apply_pr_diff() { git --git-dir="$M" diff $PR^ $PR | G apply --index; }
+step clone git clone -q --shared --no-checkout "$M" "$T"
+step "fetch pr15167" G fetch -q "$M" "+refs/pull/15167/head:refs/pull/15167/head"
+step "checkout tag" G checkout -q --detach $TAG
+( cd "$T" && nice -n 19 npm ci --no-audit --no-fund > "$OUT/npm-ci.log" 2>&1 ); rc=$?; log "npm ci exit=$rc"; [ $rc -eq 0 ] || exit 3
+step "apply affinity patch" G apply --index "$EV/patches/045aa81f3.patch"
+step "apply pr15167 diff" apply_pr_diff
+step "commit composition" G commit -q -m "composition"
+ACTUAL_TREE=$(G rev-parse 'HEAD^{tree}')
+if [ "$ACTUAL_TREE" = "$COMPOSITION_TREE" ]; then log "composition tree=$ACTUAL_TREE equals the expected tree"; else log "composition tree=$ACTUAL_TREE DIFFERS from the expected tree $COMPOSITION_TREE: stopping"; exit 3; fi
 FLAGS="--import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts"
 run() {
   local label=$1; shift
@@ -45,13 +53,15 @@ CALLUSE_TESTS="tests/unit/call-log-artifact-worker.test.ts tests/unit/call-log-s
 run A-baseline $STREAM_TESTS
 cp "$D/stream-terminal-seen-client-disconnect.test.ts" $NEWTEST
 run N-new-test-unpatched $NEWTEST
-G apply --include=open-sse/utils/streamHandler.ts "$D/superseded-first-version.patch"; log "apply the first version's streamHandler.ts hunk exit=$?"
+step "apply the first version's streamHandler.ts hunk" G apply --include=open-sse/utils/streamHandler.ts "$D/superseded-first-version.patch"
 run N2-new-test-first-version $NEWTEST
-G checkout -q -- open-sse/utils/streamHandler.ts; log "restore streamHandler.ts exit=$?"
+step "restore streamHandler.ts" G checkout -q -- open-sse/utils/streamHandler.ts
 rm -f $NEWTEST
-G apply --index "$D/drain-after-terminal.patch"; log "apply patch under test exit=$?"
-G commit -q -m "drain patch under test"; log "patched tree=$(G rev-parse 'HEAD^{tree}') (expected $EXPECT_TREE)"
+step "apply patch under test" G apply --index "$D/drain-after-terminal.patch"
+step "commit patch under test" G commit -q -m "drain patch under test"
+PATCHED_TREE=$(G rev-parse 'HEAD^{tree}')
+if [ "$PATCHED_TREE" = "$EXPECT_TREE" ]; then log "patched tree=$PATCHED_TREE equals the expected tree"; else log "patched tree=$PATCHED_TREE DIFFERS from the expected tree $EXPECT_TREE: stopping before the patched test stages"; exit 3; fi
 run P-new-test-patched $NEWTEST
 run A2-stream-tests-patched $STREAM_TESTS $NEWTEST
 run B2-calllog-usage-chat-pipeline $CALLUSE_TESTS
-log "DONE"
+log "DONE; the scratch tree and the logs stay in $WORK (remove it with rm -rf after reading)"

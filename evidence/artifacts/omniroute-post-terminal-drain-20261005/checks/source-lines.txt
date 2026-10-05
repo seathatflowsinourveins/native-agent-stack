@@ -254,7 +254,7 @@
 189:       // Best-effort fallback state update only.
 190:     }
 
-## open-sse/handlers/chatCore.ts createStreamController wiring (L3085-3115: onDisconnect, onError, the grace period at L3113-3114); onStreamComplete (L6025) calls finalizeStreamRequestLog (L6088, request log and pending bookkeeping), recordStreamingUsageStats (L6112, the usage row) and persistAttemptLogs (L6174); the 499 grace handler (L6281-6291)
+## open-sse/handlers/chatCore.ts createStreamController wiring (L3085-3115: onDisconnect, onError, the grace period at L3113-3114); onStreamComplete (L6025) calls finalizeStreamRequestLog (L6088, finalizes the pending-request entry), recordStreamingUsageStats (L6112, the usage row) and persistAttemptLogs (L6174); the 499 grace handler (L6281-6291)
 3085:   const streamController = createStreamController({
 3086:     onDisconnect: (event) => {
 3087:       let finalized = false;
