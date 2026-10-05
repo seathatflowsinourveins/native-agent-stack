@@ -54,15 +54,26 @@ Two isolated environments, created with the same uv recipe as
 
 ```
 uv venv --python /usr/bin/python3.12 "$IBAPI_ENV"
-uv pip install --python "$IBAPI_ENV/bin/python" --index-url https://pypi.org/simple nautilus-ibapi==10.45.1
+uv pip install --python "$IBAPI_ENV/bin/python" --index-url https://pypi.org/simple nautilus-ibapi==10.45.1 protobuf==5.29.6
 uv venv --python /usr/bin/python3.12 "$NAUTILUS_ENV"
 uv pip install --python "$NAUTILUS_ENV/bin/python" --index-url https://pypi.org/simple --pre nautilus_trader==2.0.0rc5
 ```
 
 `nautilus-ibapi` is the PyPI distribution of IB's official TWS API Python
 client used by NautilusTrader (import name `ibapi`; its project URLs point to
-IB's tws-api; version 10.45.1 in the published run). With a signed-in
-paper IB Gateway on this host, run the two probes back to back:
+IB's tws-api; version 10.45.1 in the published run).
+
+The `protobuf` pin is needed (added 2026-10-05):
+
+- The 10.45.1 wheel declares no dependencies; its PyPI metadata has no `Requires-Dist`.
+- Its generated `ibapi/protobuf/*_pb2.py` modules were built for protobuf 5.29.5. They call
+  `ValidateProtobufRuntimeVersion(5, 29, 5, …)` at import. The installed runtime's check (protobuf
+  `runtime_version.py`) rejects any runtime older than that, so at least 5.29.5 is required.
+- Without `protobuf`, `import ibapi.client` fails with `ModuleNotFoundError: No module named 'google'`.
+- `protobuf==5.29.6` is the pin that NautilusTrader 1.231.0's own `ib` extra declares for the same nautilus-ibapi
+  10.45.1 (`https://pypi.org/pypi/nautilus_trader/1.231.0/json`).
+
+With a signed-in paper IB Gateway on this host, run the two probes back to back:
 
 ```
 "$IBAPI_ENV/bin/python" ibapi_probe.py --receipt ibapi.json
