@@ -15985,6 +15985,11 @@
       "bytes": 21449
     },
     {
+      "path": "catalogs/landscape/skills-lifecycle.json",
+      "sha256": "bf097a01542034aa13a9ec0f698249a350349583cc85905ae00bdc03a1a58552",
+      "bytes": 26221
+    },
+    {
       "path": "catalogs/landscape/upstream-snapshot.json",
       "sha256": "0d35173c6f8a1432bc275bd051cc5736c40eb6ee4cfbd27bec2a91a89cafb728",
       "bytes": 257058
@@ -16001,8 +16006,8 @@
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "dcfa26e699f584337fd3486bd5da2a92d5f22c913d76a445d464c83dae7135e2",
-      "bytes": 492683
+      "sha256": "6290a70eb9f04486e3baabf9c11b2db27b1a457ce94025378a11794ddf773800",
+      "bytes": 513182
     },
     {
       "path": "catalogs/sota-convergence/README.md",
@@ -16033,6 +16038,11 @@
       "path": "catalogs/sota-convergence/manifest-20260929.json",
       "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
       "bytes": 1149103
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu1.json",
+      "sha256": "2ec1e936f8bb65dd5c6594049c7d5da0ada64b54da0cbab6b1bfa0dcd8b5f09a",
+      "bytes": 343467
     },
     {
       "path": "catalogs/sota-convergence/manifest-20261005-skills-ns2604.json",
@@ -16958,6 +16968,11 @@
       "path": "docs/decisions/2026-10-05-rtk-fold-harbor-phase2.md",
       "sha256": "d7698470de9eb7ed30f0764f8b1b17acd8a926298b08630829e1b955ba177dfe",
       "bytes": 23344
+    },
+    {
+      "path": "docs/decisions/2026-10-05-skills-landscape-sweep-fu1.md",
+      "sha256": "85b6abd51cc5e088c4063c3fada035df2d82127f463c257cdddb0f8ff3024ebf",
+      "bytes": 8229
     },
     {
       "path": "docs/decisions/2026-10-05-skills-landscape-sweep.md",
@@ -45803,6 +45818,106 @@
       "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-attempts/smoke-survivors.json",
       "sha256": "a6d90a556d524df1552037d819179818f2223210dbe589e0cbdd6437e21a33db",
       "bytes": 509
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1-attempts/child-usage-wf_c2f7dbc8-129.json",
+      "sha256": "bcb5d9dcb6680e35294da6f1b02c6192a658361e8981fc35e85c60086722e2ac",
+      "bytes": 519387
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1-attempts/convert-wf_c2f7dbc8-129.log",
+      "sha256": "f1c1ad55a2a50516ba92dc13cc550c38192a9869cb50fc6616cae901d7f5d05b",
+      "bytes": 1657
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1-attempts/make-result.stderr",
+      "sha256": "838230e7052cf95431e57f652f7f2f3e5c2627d48f676cdbff7f47a6aada4717",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/README.md",
+      "sha256": "a604f17d4ccc577a5a0997bf79ae61174188c489b86aea833ad61494ea6ce7ce",
+      "bytes": 1461
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/RESULT-input.json",
+      "sha256": "de6042f0c589deeb712d2451ab547946d91f13700e58eb29509a25345421163c",
+      "bytes": 19407
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/akitaonrails-ai-memory-ai-memory-retrieval.json",
+      "sha256": "f9b81d0b53241c62aa4c432ad6b83dd4b95b09ac04115a8f321014073e961372",
+      "bytes": 4032
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/bgauryy-octocode-octocode-research.json",
+      "sha256": "a8dbbb40959444b5c0498c1d4959aed87a1218bb9be3e6e7b75792ba1285f25d",
+      "bytes": 3331
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/checks.json",
+      "sha256": "8d62099b386eadc93daf6a40aaf3698917858f9d8c7e8ee5213eea179581fc8a",
+      "bytes": 4173
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/cursor-plugins-fix-merge-conflicts.json",
+      "sha256": "d051ec4cd1f533d596006f136a16308f5665eebe5d2829854e7d0b4774eb1273",
+      "bytes": 3493
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/cursor-plugins-loop-on-ci.json",
+      "sha256": "f7fe57d4b8930c3f9db764abf1197196b6b6b62b87892a9a3118f303b6d98cd4",
+      "bytes": 3244
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/lanes.json",
+      "sha256": "112a1efbffe1a130c3ad0a2d5f75c8e4bcd547875d23ce9a61c76128d15a275d",
+      "bytes": 244523
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/layers.json",
+      "sha256": "56f7ad12f4c28e74adfa60ffb37042b1785c90f7188305ce034530235ef92132",
+      "bytes": 9722
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/openai-codex-babysit-pr.json",
+      "sha256": "636154b33b2a6bc16bec547effea56123181a0ebca2749a5b72cf995d5703b08",
+      "bytes": 3446
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/publication.json",
+      "sha256": "9dd3639d41b3be55619f9ba5562996023ea81f646650866b27eb9c906a7561dd",
+      "bytes": 4780
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json",
+      "sha256": "01e0f5e30850efd7ceee6496f83e5ef13e3eb2f3bc20e3a288cfd368411fcf57",
+      "bytes": 426549
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/source-review-index.json",
+      "sha256": "f17fc30b41e554b60175b77a334f6bd6d9ea6d2623353c4667cfbd4efc809d47",
+      "bytes": 2029
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/survivors.json",
+      "sha256": "e257613e8abe74176d94e1b9f38e181ca4383f1aed5d85b156ae1e4ff90dec1d",
+      "bytes": 2316
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/upstash-context7-find-docs.json",
+      "sha256": "c8e5663565768dd39375daf0ff66836541480f4abf167794320f356e5df34be5",
+      "bytes": 2909
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/warpdotdev-common-skills-diagnose-ci-failures.json",
+      "sha256": "eb3635fa3b41e4b87e6d2b85ec747cadc608afe3a279e36dfefb5c328ed25f78",
+      "bytes": 3208
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/warpdotdev-common-skills-resolve-merge-conflicts.json",
+      "sha256": "efd7c722bd055041dd4d7eada1184641c13e507fdc684765cc8e6802816c8226",
+      "bytes": 3200
     },
     {
       "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/README.md",
