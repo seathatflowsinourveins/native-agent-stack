@@ -244,6 +244,11 @@ daemon_auto_start = false
 # README.md). Without it each command runs as `shell -lc`, the same login shell the snapshot would have captured
 # (core/src/tools/runtimes/mod.rs L268-276), at the cost of starting that shell per command.
 shell_snapshot = false
+# Experimental and off by default (`codex features list`): adds the seven-day five-hour and weekly allowance history to
+# /analytics through one ChatGPT-backend request, not a model call (codex-rs/features/src/lib.rs at rust-v0.160.0). On
+# both hosts on the user's directive of 2026-10-04 to enable the latest changelog features; the history stays empty
+# (the request returns nothing) on an account whose plan has none.
+analytics_plan_history = true
 
 # Notify only when Codex needs a decision: an approval (approval-requested), a plan-mode prompt or a `request_user_input` question (both
 # reported as plan-mode-prompt, tui/src/chatwidget/tool_requests.rs L449-458 at rust-v0.155.1 and rust-v0.157.1) or an asynchronous question

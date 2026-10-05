@@ -5,7 +5,7 @@
     "date_utc": "2026-10-01",
     "base_commit": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
     "close_only_when_sha256": "fe472bda74bd861d732a83948477386fd25605018d81560463c01b8ecd175d3c",
-    "scope": "The install manifest for a new WSL2 distribution: one row per layer of the two maintained catalogs (the 20 foundation layers of catalogs/foundation/manifest.json and the 12 us-equities layers of catalogs/landscape/research-state.json) plus cross-cutting rows for the distribution itself, the runtime workers, the GPT-6 harnesses, the credential practice and the convergence practice. Each row carries the source host's selection of record at its pin of record (what the catalogs select and this host's stack pins or installs: a record of the source host, not a merit result), or a layer's verdict selection that the source host never installed, the verdict under the rules below, the row's evidence class (none_recorded when any winner's acceptance is none_recorded; otherwise a class that at least one winner's acceptance carries, and where the winners carry several, the one listed last in the policy table; stronger evidence for one winner stays in the reasons), the reasons with their sources, and the ordered steps a session runs on the new distribution. The new distribution's selection is decided by the repositories' own quality, not by this host's installed state, pins or integration holds: where the verdict is comparison_required the merit winner is undetermined, the row names the arms, each arm installs fresh by its upstream command, and the comparison's result selects. A winner's acceptance class describes a run that the cited source, or one file that source links, shows was run on a host and what it returned; a check that is only prescribed, planned, not run or failed is none_recorded. Every evidence class describes historical evidence from the source host: a new distribution collects its own evidence, and nothing in this edition is acceptance on it. Upstream currency was read on 2026-10-01 with one bounded read per pinned winner (the GitHub releases page, or the named registry page where the project publishes no GitHub release). Paths not yet on main are cited through their pull request and are not hashed.",
+    "scope": "The install manifest for a new WSL2 distribution: one row per layer of the two maintained catalogs (the 20 foundation layers of catalogs/foundation/manifest.json and the 12 us-equities layers of catalogs/landscape/research-state.json) plus cross-cutting rows for the distribution itself, the runtime workers, the GPT-6 harnesses, the credential practice and the convergence practice. Each row carries the source host's selection of record at its pin of record (what the catalogs select and this host's stack pins or installs: a record of the source host, not a merit result), or a layer's verdict selection that the source host never installed, the verdict under the rules below, the row's evidence class (none_recorded when any winner's acceptance is none_recorded; otherwise a class that at least one winner's acceptance carries, and where the winners carry several, the one listed last in the policy table; stronger evidence for one winner stays in the reasons), the reasons with their sources, and the ordered steps a session runs on the new distribution. The new distribution's selection is decided by the repositories' own quality, not by this host's installed state, pins or integration holds: where the verdict is comparison_required the merit winner is undetermined, the row names the arms, each arm installs fresh by its upstream command, and the comparison's result selects. A winner's acceptance class describes a run that the cited source, or one file that source links, shows was run on a host and what it returned; a check that is only prescribed, planned, not run or failed is none_recorded. Every evidence class describes historical evidence from the source host: a new distribution collects its own evidence, and nothing in this edition is acceptance on it. Upstream currency was read on 2026-10-01 with one bounded read per pinned winner (the GitHub releases page, or the named registry page where the project publishes no GitHub release). Paths not yet on main are cited through their pull request and are not hashed. Citation refresh of 2026-10-04: the pin_source locators resolve the current component entries at main 14048b840; this edition retains its dated pins, which may differ from those entries and are displayed as pin drift. Original sources for the changed dated pins: codex: https://github.com/seathatflowsinourveins/native-agent-stack/blob/5597f9fae2c6148037a74b4e73d2c55fc11c9ff6/manifests/stack.json#L297; rtk: https://github.com/seathatflowsinourveins/native-agent-stack/blob/5597f9fae2c6148037a74b4e73d2c55fc11c9ff6/manifests/stack.json#L822; mcporter: https://github.com/seathatflowsinourveins/native-agent-stack/blob/5597f9fae2c6148037a74b4e73d2c55fc11c9ff6/manifests/stack.json#L625; nextjs: https://github.com/seathatflowsinourveins/native-agent-stack/blob/5597f9fae2c6148037a74b4e73d2c55fc11c9ff6/manifests/stack.json#L1715.",
     "verdict_rules": [
       "a layer is \"closed\" only when all five close_only_when items of research-state.json hold; otherwise \"selection_of_record_open\" with the missing items named",
       "the winner cell carries the source host's selection of record at its pin of record (manifests/stack.json or adoption/pins-linux-x86_64.json for stack components; catalogs/us-equities/runtime-target.json for the engine and brokers; the adoption profile recipes for install commands), or a layer's verdict selection the source host never installed at the verdict's baseline version; neither is a merit result",
@@ -72,7 +72,7 @@
           "component_id": "codex",
           "repository": "https://github.com/openai/codex",
           "pin": "0.159.2",
-          "pin_source": "manifests/stack.json:297",
+          "pin_source": "manifests/stack.json:298",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "codex exec -C \"$PROJECT_ROOT\" --json - < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
@@ -134,7 +134,7 @@
           "component_id": "skills-ref",
           "repository": "https://github.com/agentskills/agentskills",
           "pin": "0.1.0",
-          "pin_source": "manifests/stack.json:1612",
+          "pin_source": "manifests/stack.json:1620",
           "install": {"command": "git clone https://github.com/agentskills/agentskills.git \"$STACK_HOME/tools/agentskills\"; git -C \"$STACK_HOME/tools/agentskills\" checkout --detach 69ef37e9424c0a7ea9dd2293b559e43ec8176379; cd \"$STACK_HOME/tools/agentskills/skills-ref\" && uv sync --locked", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "uv run skills-ref validate \"$SKILL_DIRECTORY\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "no GitHub release; PyPI skills-ref 0.1.1 (2026-01-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://pypi.org/project/skills-ref/"}
@@ -210,7 +210,7 @@
           "component_id": "worktrunk",
           "repository": "https://github.com/max-sixty/worktrunk",
           "pin": "0.79.0",
-          "pin_source": "manifests/stack.json:1059",
+          "pin_source": "manifests/stack.json:1067",
           "install": {"command": "gh release view v0.79.0 --repo max-sixty/worktrunk --json assets; gh release download v0.79.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
           "acceptance": {"command": "wt list --format json", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/max-sixty/worktrunk/releases"}
@@ -260,7 +260,7 @@
           "component_id": "worktrunk",
           "repository": "https://github.com/max-sixty/worktrunk",
           "pin": "0.79.0",
-          "pin_source": "manifests/stack.json:1059",
+          "pin_source": "manifests/stack.json:1067",
           "install": {"command": "gh release view v0.79.0 --repo max-sixty/worktrunk --json assets; gh release download v0.79.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
           "acceptance": {"command": "wt list --format json", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/max-sixty/worktrunk/releases"}
@@ -269,7 +269,7 @@
           "component_id": "sandbox-runtime",
           "repository": "https://github.com/anthropics/sandbox-runtime",
           "pin": "0.0.77",
-          "pin_source": "manifests/stack.json:857",
+          "pin_source": "manifests/stack.json:865",
           "install": {"command": "npm install --global --prefix \"$STACK_HOME/tools/sandbox-runtime-0.0.77\" --ignore-scripts @anthropic-ai/sandbox-runtime@0.0.77", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "env -i HOME=\"$HOME\" PATH=\"$PATH\" srt --settings \"$SANDBOX_POLICY\" -- cat \"$FIXTURE_ROOT/blocked/marker.txt\" (must be denied)", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.0.78 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/anthropics/sandbox-runtime/releases"}
@@ -316,7 +316,7 @@
           "component_id": "serena",
           "repository": "https://github.com/oraios/serena",
           "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
-          "pin_source": "manifests/stack.json:880",
+          "pin_source": "manifests/stack.json:888",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd (then find_symbol and find_referencing_symbols through the client)", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.7.0 (2026-08-09); the pin is a 2.0.0.dev0 development commit 123 commits ahead of that release, so release currency does not apply", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "unknown", "url": "https://github.com/oraios/serena/releases"}
@@ -334,7 +334,7 @@
           "component_id": "codebase-memory-mcp",
           "repository": "https://github.com/DeusData/codebase-memory-mcp",
           "pin": "0.11.0",
-          "pin_source": "manifests/stack.json:275",
+          "pin_source": "manifests/stack.json:276",
           "install": {"command": "official v0.11.0 asset codebase-memory-mcp-linux-amd64.tar.gz, verified against the recorded SHA-256 032b33c1833919a2d1de67ff6367fa6ea46aee8689c86ef223c88fae3b6e4536", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.11.0 (2026-09-15)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/DeusData/codebase-memory-mcp/releases"}
@@ -343,7 +343,7 @@
           "component_id": "jcodemunch-mcp",
           "repository": "https://github.com/jgravelle/jcodemunch-mcp",
           "pin": "1.108.319",
-          "pin_source": "manifests/stack.json:1677",
+          "pin_source": "manifests/stack.json:1685",
           "install": {"command": "eco=\"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}\"; UV_TOOL_DIR=\"$eco/python-tools\" UV_TOOL_BIN_DIR=\"$eco/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.319", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "a deliberately scoped local code index, then search_symbols and get_symbol_source through jcodemunch-mcp's native MCP tools (called through mcporter): the exact requested function returned (2026-09-20)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-jcodemunch-20260920.json"},
           "upstream_currency": {"latest_release": "v1.108.320 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/jgravelle/jcodemunch-mcp/releases"}
@@ -392,7 +392,7 @@
           "component_id": "qmd",
           "repository": "https://github.com/tobi/qmd",
           "pin": "2.8.3",
-          "pin_source": "manifests/stack.json:758",
+          "pin_source": "manifests/stack.json:765",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "qmd --index \"$QMD_INDEX\" search 'local code' -c \"$QMD_COLLECTION\" -n 2 --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v2.8.3 (2026-08-16)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/tobi/qmd/releases"}
@@ -401,7 +401,7 @@
           "component_id": "markitdown",
           "repository": "https://github.com/microsoft/markitdown",
           "pin": "0.1.8",
-          "pin_source": "manifests/stack.json:575",
+          "pin_source": "manifests/stack.json:581",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "markitdown fixtures/greeting.html -o \"$STACK_HOME/output/greeting.md\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.1.8 (2026-09-21)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/microsoft/markitdown/releases"}
@@ -410,7 +410,7 @@
           "component_id": "poppler",
           "repository": "https://github.com/tsdgeos/poppler_mirror",
           "pin": "26.09.0",
-          "pin_source": "manifests/stack.json:1809",
+          "pin_source": "manifests/stack.json:1818",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/convergence-practice/document-ingestion/README.md"},
           "acceptance": {"command": "pdftotext -bbox-layout -enc UTF-8 on the frozen source list only", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/document-ingestion/README.md"},
           "upstream_currency": {"latest_release": "26.09.0 on the project's release page (the GitHub mirror lists no tags)", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://poppler.freedesktop.org/"}
@@ -419,7 +419,7 @@
           "component_id": "context-hub",
           "repository": "https://github.com/andrewyng/context-hub",
           "pin": "0.1.4",
-          "pin_source": "manifests/stack.json:381",
+          "pin_source": "manifests/stack.json:387",
           "install": {"command": "npm install --global --prefix \"$STACK_HOME/tools/context-hub-0.1.4\" @aisuite/chub@0.1.4", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "chub search 'python pytest' --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.1.4 (2026-04-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/andrewyng/context-hub/releases"}
@@ -468,7 +468,7 @@
           "component_id": "socraticode",
           "repository": "https://github.com/giancarloerra/SocratiCode",
           "pin": "1.15.0",
-          "pin_source": "manifests/stack.json:962",
+          "pin_source": "manifests/stack.json:970",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "mcporter --config \"$MCPORTER_CONFIG\" call socraticode.codebase_health --args '{}' --output text --no-oauth", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.16.0 (2026-09-28)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/giancarloerra/SocratiCode/releases"}
@@ -477,7 +477,7 @@
           "component_id": "qdrant",
           "repository": "https://github.com/qdrant/qdrant",
           "pin": "1.19.1",
-          "pin_source": "manifests/stack.json:727",
+          "pin_source": "manifests/stack.json:734",
           "install": {"command": "official v1.19.1 archive qdrant-x86_64-unknown-linux-musl.tar.gz, verified against SHA-256 70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "GET / on the running Qdrant server: it answered with version 1.19.1 at commit 6ab21ca, the catalog pin (host receipt, stage use, result pass)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--qdrant--use--20260925.json"},
           "upstream_currency": {"latest_release": "v1.19.1 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/qdrant/qdrant/releases"}
@@ -486,7 +486,7 @@
           "component_id": "vllm",
           "repository": "https://github.com/vllm-project/vllm",
           "pin": "0.30.0",
-          "pin_source": "manifests/stack.json:1029",
+          "pin_source": "manifests/stack.json:1037",
           "install": {"command": "uv venv --python 3.13 \"$STACK_HOME/tools/vllm-0.30.0\"; uv pip install --python \"$STACK_HOME/tools/vllm-0.30.0/bin/python\" vllm==0.30.0", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "curl --fail --silent --show-error http://127.0.0.1:8231/v1/embeddings with the recipe's request body (the new host file moves the port)", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.30.0 (2026-09-22)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/vllm-project/vllm/releases"}
@@ -495,7 +495,7 @@
           "component_id": "huggingface-hub-native",
           "repository": "https://github.com/huggingface/huggingface_hub",
           "pin": "1.32.0",
-          "pin_source": "manifests/stack.json:551",
+          "pin_source": "manifests/stack.json:557",
           "install": {"command": "uv tool install huggingface-hub==1.32.0", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v2.0.0 (2026-09-24)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/huggingface/huggingface_hub/releases"}
@@ -504,7 +504,7 @@
           "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
           "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
           "pin": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
-          "pin_source": "manifests/stack.json:2072",
+          "pin_source": "manifests/stack.json:2081",
           "install": {"command": "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2 --json", "kind": "repo_recipe", "source_path": "manifests/stack.json"},
           "acceptance": {"command": "an embeddings request to the vLLM service with the recipe's request body; the receipt records identical embeddings and identical top-10 code-index results after the switch to vLLM 0.30.0", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/vllm-030-switch-20260925.json"},
           "upstream_currency": {"latest_release": "model revision c0c9fea9 (last modified 2026-08-27) is the current head of the model repository", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"}
@@ -612,7 +612,7 @@
           "component_id": "tavily-cli",
           "repository": "https://github.com/tavily-ai/tavily-cli",
           "pin": "0.1.8",
-          "pin_source": "manifests/stack.json:1912",
+          "pin_source": "manifests/stack.json:1921",
           "install": {"command": "uv tool install 'tavily-cli==0.1.8'", "kind": "repo_recipe", "source_path": "recipes/tavily.md"},
           "acceptance": {"command": "tvly search \"Codex CLI Claude Code native agent harness skills official documentation\" --depth basic --max-results 4 --include-domains developers.openai.com,code.claude.com --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/tavily.md"},
           "upstream_currency": {"latest_release": "no GitHub release; PyPI tavily-cli 0.1.8 (2026-09-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://pypi.org/project/tavily-cli/"}
@@ -630,7 +630,7 @@
           "component_id": "openresearch",
           "repository": "https://github.com/alphaXiv/OpenResearch",
           "pin": "0.2.7",
-          "pin_source": "manifests/stack.json:650",
+          "pin_source": "manifests/stack.json:657",
           "install": {"command": "gh release download v0.2.7 --repo alphaXiv/OpenResearch (openresearch-cli-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
           "acceptance": {"command": "orx --no-telemetry discover keyword 'agent memory' --published-after 2026-06-21 --published-before 2026-09-19 --limit 3", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.2.14 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/alphaXiv/OpenResearch/releases"}
@@ -680,7 +680,7 @@
           "component_id": "rtk",
           "repository": "https://github.com/rtk-ai/rtk",
           "pin": "0.50.0",
-          "pin_source": "manifests/stack.json:822",
+          "pin_source": "manifests/stack.json:829",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "rtk git log -6; rtk proxy git log -6", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.50.0 (2026-09-24)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/rtk-ai/rtk/releases"}
@@ -689,7 +689,7 @@
           "component_id": "context-mode",
           "repository": "https://github.com/mksglu/context-mode",
           "pin": "1.0.169",
-          "pin_source": "manifests/stack.json:403",
+          "pin_source": "manifests/stack.json:409",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency (the npm CLI), then the Claude plugin from its SHA-pinned source 6f0cc6841c687e754059f36714a11233fda1a02b", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "compare the installed plugin's gitCommitSha with 6f0cc6841c687e754059f36714a11233fda1a02b, then read ctx_stats in a fresh session", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.0.169 (2026-06-29)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/mksglu/context-mode/releases"}
@@ -698,7 +698,7 @@
           "component_id": "headroom",
           "repository": "https://github.com/headroomlabs-ai/headroom",
           "pin": "0.37.0",
-          "pin_source": "manifests/stack.json:515",
+          "pin_source": "manifests/stack.json:521",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "HEADROOM_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 DO_NOT_TRACK=1 headroom mcp serve --proxy-url http://127.0.0.1:1", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.39.1 (2026-09-26); 0.39.0 was qualified but not switched, and 0.39.1 changes only the proxy rate limiter", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/headroomlabs-ai/headroom/releases"}
@@ -707,7 +707,7 @@
           "component_id": "repomix",
           "repository": "https://github.com/yamadashy/repomix",
           "pin": "1.18.1",
-          "pin_source": "manifests/stack.json:793",
+          "pin_source": "manifests/stack.json:800",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "repomix \"$PROJECT_ROOT\" --include 'fixtures/before.py,fixtures/after.py' --style xml --parsable-style --compress --token-count-encoding o200k_base --output \"$STACK_HOME/output/selected-code.xml\"", "evidence_class": "local_integration_check", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.18.1 (2026-09-21)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/yamadashy/repomix/releases"}
@@ -716,7 +716,7 @@
           "component_id": "toon",
           "repository": "https://github.com/toon-format/toon",
           "pin": "4.1.1",
-          "pin_source": "manifests/stack.json:999",
+          "pin_source": "manifests/stack.json:1007",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "toon fixtures/records.json --stats -o \"$STACK_HOME/output/records.toon\"; toon \"$STACK_HOME/output/records.toon\" --decode --strict -o \"$STACK_HOME/output/records.recovered.json\"", "evidence_class": "local_integration_check", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v4.1.1 (2026-08-05)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/toon-format/toon/releases"}
@@ -768,7 +768,7 @@
         {"text": "Savings stay 'not shown' until the multi-agent adoption E2E (the #381 Gate A plan) runs on the new distribution. The re-aimed E2E (Amendment 4, not yet written) has to carry per-component arms next to the lean base and the full profile, otherwise it can say whether the profile beats the lean base but not which components it keeps; its arm set is bounded by the E2E's capacity budget. The Harbor E2E covers four of the layer protocol's five arms in the short single-session regime; the Repomix outline arm and the multi-agent regime are open.", "kind": "lane", "source_path": "examples/claude-native/workflows/README.md"}
       ],
       "owner_lane": "foundation: Gate A",
-      "notes": "MERIT UNDETERMINED. The 14-component profile (#540) is the source host's selection of record and one arm, not a merit result: it carries this host's pins and wiring. The lean base (Claude Code's native defaults, no token tool) is an arm with equal standing. The only upstream-harness evidence so far, Harbor v0.23.0 on short single-session tasks (receipt evidence/receipts/harbor-e2e-token-tools-20260930.json), established no cost reduction for any tool: context-mode, jcodemunch and the full stack raised whole-task cost by 30 to 39%, headroom, rtk and serena are inconclusive, and headroom used 13% fewer tokens without a cost effect (headroom 0.39.1 was measured, the profile pins 0.37.0). The Gate A E2E on the new distribution, on an upstream harness with the lean base and the components as arms, decides which components the profile keeps."
+      "notes": "MERIT UNDETERMINED. The 14-component profile (#540) is the source host's selection of record and one arm, not a merit result: it carries this host's pins and wiring. The lean base (Claude Code's native defaults, no token tool) is an arm with equal standing. The only upstream-harness evidence so far, Harbor v0.23.0 on short single-session tasks (receipt evidence/receipts/harbor-e2e-token-tools-20260930.json), established no cost reduction for any tool: context-mode, jcodemunch and the full stack raised whole-task cost by 30 to 39%, headroom, rtk and serena are inconclusive, and headroom used 13% fewer tokens without a cost effect (headroom 0.39.1 was measured, the profile pins 0.37.0). The Gate A E2E on the new distribution, on an upstream harness with the lean base and the components as arms, decides which components the profile keeps. Superseded for the new distribution's install, not rewritten: on 2026-10-04 the owner's decision (docs/decisions/2026-10-04-token-full-stack-owner-default.md; the definitive manifest's wave-3 batch, amendment 4) installs the components by default as owner rows and owner defaults, including context-mode on the manifest's context-supply row; the F-token ablation of that E2E reports to the owner which components to keep, and removes none by itself."
     },
     {
       "layer_id": "quality-evaluation",
@@ -779,7 +779,7 @@
           "component_id": "promptfoo",
           "repository": "https://github.com/promptfoo/promptfoo",
           "pin": "0.123.1",
-          "pin_source": "manifests/stack.json:701",
+          "pin_source": "manifests/stack.json:708",
           "install": {"command": "npm install --global --prefix \"$STACK_HOME/tools/promptfoo-0.123.1\" promptfoo@0.123.1", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval --config \"$EVAL_CONFIG\" --no-cache --no-table --no-progress-bar --no-share --no-write --output \"$EVAL_RESULT\"", "evidence_class": "local_integration_check", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "0.123.1 (2026-09-18)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/promptfoo/promptfoo/releases"}
@@ -788,7 +788,7 @@
           "component_id": "playwright-test",
           "repository": "https://github.com/microsoft/playwright",
           "pin": "1.63.0",
-          "pin_source": "manifests/stack.json:1857",
+          "pin_source": "manifests/stack.json:1866",
           "install": {"command": "the wsl-application blueprint's pinned lock with the measured pnpm, plus the verified Chrome for Testing archive extracted into tools/chrome-linux64", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/wsl-application/README.md"},
           "acceptance": {"command": "taskset -c 0-3 pnpm exec playwright test", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/wsl-application/README.md"},
           "upstream_currency": {"latest_release": "v1.63.0 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/microsoft/playwright/releases"}
@@ -853,7 +853,7 @@
           "component_id": "zizmor",
           "repository": "https://github.com/zizmorcore/zizmor",
           "pin": "1.30.1",
-          "pin_source": "manifests/stack.json:1565",
+          "pin_source": "manifests/stack.json:1573",
           "install": {"command": "uv tool install zizmor==1.30.1", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/ci-security/README.md"},
           "acceptance": {"command": "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/convergence-practice/ci-security/README.md"},
           "upstream_currency": {"latest_release": "v1.30.1 (2026-09-09)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/zizmorcore/zizmor/releases"}
@@ -862,7 +862,7 @@
           "component_id": "syft",
           "repository": "https://github.com/anchore/syft",
           "pin": "1.52.0",
-          "pin_source": "manifests/stack.json:1396",
+          "pin_source": "manifests/stack.json:1404",
           "install": {"command": "gh release download v1.52.0 --repo anchore/syft (the linux_amd64 archive and its checksums); verify, then tar --no-same-owner -xzf into a versioned prefix", "kind": "repo_recipe", "source_path": "blueprints/us-equities/supply-chain/README.md"},
           "acceptance": {"command": "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk (inside the recipe's read-only bubblewrap)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/supply-chain/README.md"},
           "upstream_currency": {"latest_release": "v1.52.0 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/anchore/syft/releases"}
@@ -919,7 +919,7 @@
           "component_id": "dagu",
           "repository": "https://github.com/dagucloud/dagu",
           "pin": "2.16.6",
-          "pin_source": "manifests/stack.json:1335",
+          "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary (the recipe omits this step)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
           "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
@@ -928,7 +928,7 @@
           "component_id": "systemd",
           "repository": "https://github.com/systemd/systemd",
           "pin": "255.4-1ubuntu8.17",
-          "pin_source": "manifests/stack.json:1448",
+          "pin_source": "manifests/stack.json:1456",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
           "acceptance": {"command": "systemd 255 user units on the historical host: the timer started paper-ext-20260929.service at 16:00:05 ET on 2026-09-29, and journalctl --user -o json USER_UNIT=<unit>.service and systemctl --user show recorded its exit (status 3, Result=exit-code) and the run of its OnFailure alert unit", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"},
           "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version; upstream v255 source is cited for semantics only", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
@@ -979,7 +979,7 @@
           "component_id": "fastapi",
           "repository": "https://github.com/fastapi/fastapi",
           "pin": "0.141.1",
-          "pin_source": "manifests/stack.json:1760",
+          "pin_source": "manifests/stack.json:1769",
           "install": {"command": "make setup; make postgres-install; make postgres-init; make postgres-start", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "0.142.2 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/fastapi/fastapi/releases"}
@@ -988,7 +988,7 @@
           "component_id": "nextjs",
           "repository": "https://github.com/vercel/next.js",
           "pin": "16.3.6",
-          "pin_source": "manifests/stack.json:1715",
+          "pin_source": "manifests/stack.json:1723",
           "install": {"command": "make setup", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "v16.3.8 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/vercel/next.js/releases"}
@@ -997,7 +997,7 @@
           "component_id": "postgresql",
           "repository": "https://github.com/postgres/postgres",
           "pin": "18.6",
-          "pin_source": "manifests/stack.json:1782",
+          "pin_source": "manifests/stack.json:1791",
           "install": {"command": "make postgres-install; make postgres-init; make postgres-start", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "18.6 is the current 18.x release on the project's versioning page (the GitHub mirror publishes tags only)", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://www.postgresql.org/support/versioning/"}
@@ -1045,7 +1045,7 @@
           "component_id": "restic",
           "repository": "https://github.com/restic/restic",
           "pin": "0.19.1",
-          "pin_source": "manifests/stack.json:1307",
+          "pin_source": "manifests/stack.json:1315",
           "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
           "acceptance": {"command": "restic check and restore of two synthetic snapshots on a GitHub-hosted runner, after seven unchanged upstream restic tests passed there", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"},
           "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
@@ -1100,7 +1100,7 @@
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
           "pin": "0.161.0",
-          "pin_source": "manifests/stack.json:1087",
+          "pin_source": "manifests/stack.json:1095",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"; python3 observability/backends/configure.py --tools-root \"$STACK_TOOLS_ROOT\" --config-root \"$STACK_CONFIG_ROOT\" --data-root \"$STACK_DATA_ROOT\" --unit-root \"$HOME/.config/systemd/user\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "structural_validation", "source_path": "observability/README.md"},
           "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
@@ -1109,7 +1109,7 @@
           "component_id": "prometheus",
           "repository": "https://github.com/prometheus/prometheus",
           "pin": "3.15.0",
-          "pin_source": "manifests/stack.json:1118",
+          "pin_source": "manifests/stack.json:1126",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "promtool check config and check rules (14 rules) on the live files, systemd-analyze --user verify of the rendered unit, then daemon-reload and restart of ecosystem-prometheus.service: /-/ready answered 0.86 s after the restart, buildinfo read 3.15.0, the seven targets were up and the 14 rules evaluated with health ok (2026-09-26)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/prometheus-3150-qualification-20260926.json"},
           "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
@@ -1118,7 +1118,7 @@
           "component_id": "loki",
           "repository": "https://github.com/grafana/loki",
           "pin": "3.7.8",
-          "pin_source": "manifests/stack.json:1156",
+          "pin_source": "manifests/stack.json:1164",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true (exit 0: the final native Loki OTLP structured-metadata configuration accepted)", "evidence_class": "structural_validation", "source_path": "observability/receipt.json"},
           "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
@@ -1170,7 +1170,7 @@
           "component_id": "codex",
           "repository": "https://github.com/openai/codex",
           "pin": "0.159.2",
-          "pin_source": "manifests/stack.json:297",
+          "pin_source": "manifests/stack.json:298",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "codex exec -C \"$PROJECT_ROOT\" --json - < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
@@ -1227,7 +1227,7 @@
           "component_id": "mcporter",
           "repository": "https://github.com/openclaw/mcporter",
           "pin": "0.14.1",
-          "pin_source": "manifests/stack.json:625",
+          "pin_source": "manifests/stack.json:631",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "mcporter --config \"$MCPORTER_CONFIG\" list socraticode --brief --no-oauth", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.14.1 (2026-09-24)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/openclaw/mcporter/releases"}
@@ -1236,7 +1236,7 @@
           "component_id": "mcp-inspector",
           "repository": "https://github.com/modelcontextprotocol/inspector",
           "pin": "2.8.0",
-          "pin_source": "manifests/stack.json:600",
+          "pin_source": "manifests/stack.json:606",
           "install": {"command": "npm install --global --prefix \"$STACK_HOME/tools/mcp-inspector-2.8.0\" @modelcontextprotocol/inspector@2.8.0", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "mcp-inspector --cli --config \"$PROJECT_ROOT/.mcp.json\" --server socraticode --method tools/list --format json --stored-auth-only --cwd \"$PROJECT_ROOT\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "2.9.0 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/modelcontextprotocol/inspector/releases"}
@@ -1281,7 +1281,7 @@
           "component_id": "gitleaks",
           "repository": "https://github.com/gitleaks/gitleaks",
           "pin": "8.30.1",
-          "pin_source": "manifests/stack.json:491",
+          "pin_source": "manifests/stack.json:497",
           "install": {"command": "curl -fsSLO \"$base/gitleaks_8.30.1_linux_x64.tar.gz\"; curl -fsSLO \"$base/gitleaks_8.30.1_checksums.txt\"; sha256sum --check --ignore-missing gitleaks_8.30.1_checksums.txt; tar -xzf gitleaks_8.30.1_linux_x64.tar.gz -C \"$ECO_INSTALL_ROOT/tools/gitleaks-8.30.1\" gitleaks", "kind": "repo_recipe", "source_path": "docs/secret-storage.md"},
           "acceptance": {"command": "the pre-commit hook passes a clean staged file (exit 0) and fails a planted, generated AWS-style key (exit 1)", "evidence_class": "none_recorded", "source_path": "docs/acceptance-evidence-policy.md"},
           "upstream_currency": {"latest_release": "v8.30.1 (2026-03-21)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gitleaks/gitleaks/releases"}
@@ -1330,7 +1330,7 @@
           "component_id": "worktrunk",
           "repository": "https://github.com/max-sixty/worktrunk",
           "pin": "0.79.0",
-          "pin_source": "manifests/stack.json:1059",
+          "pin_source": "manifests/stack.json:1067",
           "install": {"command": "gh release view v0.79.0 --repo max-sixty/worktrunk --json assets; gh release download v0.79.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
           "acceptance": {"command": "wt list --format json", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/max-sixty/worktrunk/releases"}
@@ -1348,7 +1348,7 @@
           "component_id": "difftastic",
           "repository": "https://github.com/Wilfred/difftastic",
           "pin": "0.71.0",
-          "pin_source": "manifests/stack.json:468",
+          "pin_source": "manifests/stack.json:474",
           "install": {"command": "official 0.71.0 archive difft-0.71.0-x86_64-unknown-linux-gnu.tar.gz, verified against SHA-256 61aea5394a53c56f144637cf39b3a0c0dafa27769731745e5851ff276e6478da", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "difft --exit-code --color never fixtures/before.py fixtures/after.py (exit 1 means differences)", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "0.71.0 (2026-09-18)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/Wilfred/difftastic/releases"}
@@ -1404,7 +1404,7 @@
           "component_id": "edgartools",
           "repository": "https://github.com/dgunning/edgartools",
           "pin": "5.58.0",
-          "pin_source": "manifests/stack.json:1516",
+          "pin_source": "manifests/stack.json:1524",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
           "acceptance": {"command": "native_edgar.py with the private SEC contact as EDGAR_IDENTITY: upstream edgar.get_filings and native bounded Filings.to_context completed the full quarterly-index request (EdgarTools 5.58.0; 371 8-K/8-K/A index rows for 2020-03-02; repeated on a second WSL2 host on 2026-09-24)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/access-resolution.md"},
           "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
@@ -1413,7 +1413,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1544",
+          "pin_source": "manifests/stack.json:1552",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -1422,7 +1422,7 @@
           "component_id": "duckdb",
           "repository": "https://github.com/duckdb/duckdb",
           "pin": "1.5.5",
-          "pin_source": "manifests/stack.json:1275",
+          "pin_source": "manifests/stack.json:1283",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "v1.5.6 (2026-09-28)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/duckdb/duckdb/releases"}
@@ -1481,7 +1481,7 @@
           "component_id": "edgartools",
           "repository": "https://github.com/dgunning/edgartools",
           "pin": "5.58.0",
-          "pin_source": "manifests/stack.json:1516",
+          "pin_source": "manifests/stack.json:1524",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
           "acceptance": {"command": "native_edgar.py with the private SEC contact as EDGAR_IDENTITY: upstream edgar.get_filings and native bounded Filings.to_context completed the full quarterly-index request (EdgarTools 5.58.0; 371 8-K/8-K/A index rows for 2020-03-02; repeated on a second WSL2 host on 2026-09-24)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/access-resolution.md"},
           "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
@@ -1490,7 +1490,7 @@
           "component_id": "duckdb",
           "repository": "https://github.com/duckdb/duckdb",
           "pin": "1.5.5",
-          "pin_source": "manifests/stack.json:1275",
+          "pin_source": "manifests/stack.json:1283",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "v1.5.6 (2026-09-28)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/duckdb/duckdb/releases"}
@@ -1499,7 +1499,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1544",
+          "pin_source": "manifests/stack.json:1552",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -1558,7 +1558,7 @@
           "component_id": "duckdb",
           "repository": "https://github.com/duckdb/duckdb",
           "pin": "1.5.5",
-          "pin_source": "manifests/stack.json:1275",
+          "pin_source": "manifests/stack.json:1283",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "v1.5.6 (2026-09-28)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/duckdb/duckdb/releases"}
@@ -1576,7 +1576,7 @@
           "component_id": "edgartools",
           "repository": "https://github.com/dgunning/edgartools",
           "pin": "5.58.0",
-          "pin_source": "manifests/stack.json:1516",
+          "pin_source": "manifests/stack.json:1524",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
           "acceptance": {"command": "native_edgar.py with the private SEC contact as EDGAR_IDENTITY: upstream edgar.get_filings and native bounded Filings.to_context completed the full quarterly-index request (EdgarTools 5.58.0; 371 8-K/8-K/A index rows for 2020-03-02; repeated on a second WSL2 host on 2026-09-24)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/access-resolution.md"},
           "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
@@ -1585,7 +1585,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1544",
+          "pin_source": "manifests/stack.json:1552",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -1632,7 +1632,7 @@
           "component_id": "dagu",
           "repository": "https://github.com/dagucloud/dagu",
           "pin": "2.16.6",
-          "pin_source": "manifests/stack.json:1335",
+          "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
           "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
@@ -1641,7 +1641,7 @@
           "component_id": "codex",
           "repository": "https://github.com/openai/codex",
           "pin": "0.159.2",
-          "pin_source": "manifests/stack.json:297",
+          "pin_source": "manifests/stack.json:298",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "codex exec -C \"$PROJECT_ROOT\" --json - < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
@@ -1659,7 +1659,7 @@
           "component_id": "systemd",
           "repository": "https://github.com/systemd/systemd",
           "pin": "255.4-1ubuntu8.17",
-          "pin_source": "manifests/stack.json:1448",
+          "pin_source": "manifests/stack.json:1456",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
           "acceptance": {"command": "systemd 255 user units on the historical host: the timer started paper-ext-20260929.service at 16:00:05 ET on 2026-09-29, and journalctl --user -o json USER_UNIT=<unit>.service and systemctl --user show recorded its exit (status 3, Result=exit-code) and the run of its OnFailure alert unit", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"},
           "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
@@ -1668,7 +1668,7 @@
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
           "pin": "0.161.0",
-          "pin_source": "manifests/stack.json:1087",
+          "pin_source": "manifests/stack.json:1095",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "structural_validation", "source_path": "observability/README.md"},
           "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
@@ -1677,7 +1677,7 @@
           "component_id": "prometheus",
           "repository": "https://github.com/prometheus/prometheus",
           "pin": "3.15.0",
-          "pin_source": "manifests/stack.json:1118",
+          "pin_source": "manifests/stack.json:1126",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "promtool check config and check rules (14 rules) on the live files, systemd-analyze --user verify of the rendered unit, then daemon-reload and restart of ecosystem-prometheus.service: /-/ready answered 0.86 s after the restart, buildinfo read 3.15.0, the seven targets were up and the 14 rules evaluated with health ok (2026-09-26)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/prometheus-3150-qualification-20260926.json"},
           "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
@@ -1686,7 +1686,7 @@
           "component_id": "loki",
           "repository": "https://github.com/grafana/loki",
           "pin": "3.7.8",
-          "pin_source": "manifests/stack.json:1156",
+          "pin_source": "manifests/stack.json:1164",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true (exit 0: the final native Loki OTLP structured-metadata configuration accepted)", "evidence_class": "structural_validation", "source_path": "observability/receipt.json"},
           "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
@@ -1695,7 +1695,7 @@
           "component_id": "grafana",
           "repository": "https://github.com/grafana/grafana",
           "pin": "13.2.2",
-          "pin_source": "manifests/stack.json:1193",
+          "pin_source": "manifests/stack.json:1201",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "systemd-analyze --user verify of the rendered ecosystem units, then systemctl --user enable --now ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
           "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-01T08:17Z", "pin_is_latest": "no", "url": "https://github.com/grafana/grafana/releases"}
@@ -1704,7 +1704,7 @@
           "component_id": "restic",
           "repository": "https://github.com/restic/restic",
           "pin": "0.19.1",
-          "pin_source": "manifests/stack.json:1307",
+          "pin_source": "manifests/stack.json:1315",
           "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
           "acceptance": {"command": "restic check and restore of two synthetic snapshots on a GitHub-hosted runner, after seven unchanged upstream restic tests passed there", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"},
           "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
@@ -1763,7 +1763,7 @@
           "role": "SEC filing acquisition and parsing",
           "repository": "https://github.com/dgunning/edgartools",
           "pin": "5.58.0",
-          "pin_source": "manifests/stack.json:1516",
+          "pin_source": "manifests/stack.json:1524",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
           "acceptance": {"command": "native_edgar.py with the private SEC contact as EDGAR_IDENTITY: upstream edgar.get_filings and native bounded Filings.to_context completed the full quarterly-index request (EdgarTools 5.58.0; 371 8-K/8-K/A index rows for 2020-03-02; repeated on a second WSL2 host on 2026-09-24)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/access-resolution.md"},
           "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
@@ -1773,7 +1773,7 @@
           "role": "portfolio models and chronological evaluation",
           "repository": "https://github.com/skfolio/skfolio",
           "pin": "1.2.9",
-          "pin_source": "manifests/stack.json:1493",
+          "pin_source": "manifests/stack.json:1501",
           "install": {"command": "uv venv --python \"$PYTHON\" \"$WAVE_DIR/venv\"; uv pip sync --python \"$WAVE_DIR/venv/bin/python\" --require-hashes blueprints/us-equities/research-evaluation/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/research-evaluation/README.md"},
           "acceptance": {"command": "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\" (the receipt: native skfolio 1.2.9 produced 20 chronological development folds and one reserved 2021Q1 evaluation)", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/research-evaluation/receipt.json"},
           "upstream_currency": {"latest_release": "v1.4.10 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/skfolio/skfolio/releases"}
@@ -1833,7 +1833,7 @@
           "role": "frozen comparison oracle, not the destination",
           "repository": "https://github.com/QuantConnect/Lean",
           "pin": "985ef30 with documented dependency remediation",
-          "pin_source": "manifests/stack.json:1368",
+          "pin_source": "manifests/stack.json:1376",
           "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
           "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
           "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
@@ -1928,7 +1928,7 @@
           "role": "frozen comparison oracle",
           "repository": "https://github.com/QuantConnect/Lean",
           "pin": "985ef30 with documented dependency remediation",
-          "pin_source": "manifests/stack.json:1368",
+          "pin_source": "manifests/stack.json:1376",
           "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
           "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
           "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
@@ -1993,7 +1993,7 @@
           "role": "comparison oracle",
           "repository": "https://github.com/QuantConnect/Lean",
           "pin": "985ef30 with documented dependency remediation",
-          "pin_source": "manifests/stack.json:1368",
+          "pin_source": "manifests/stack.json:1376",
           "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
           "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
           "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
@@ -2013,7 +2013,7 @@
           "role": "walk-forward splitter only; winner in one place of the layer entry and conditional in another",
           "repository": "https://github.com/skfolio/skfolio",
           "pin": "1.2.9",
-          "pin_source": "manifests/stack.json:1493",
+          "pin_source": "manifests/stack.json:1501",
           "install": {"command": "uv venv --python \"$PYTHON\" \"$WAVE_DIR/venv\"; uv pip sync --python \"$WAVE_DIR/venv/bin/python\" --require-hashes blueprints/us-equities/research-evaluation/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/research-evaluation/README.md"},
           "acceptance": {"command": "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\"", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/research-evaluation/receipt.json"},
           "upstream_currency": {"latest_release": "v1.4.10 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/skfolio/skfolio/releases"}
@@ -2058,7 +2058,7 @@
           "component_id": "codex",
           "repository": "https://github.com/openai/codex",
           "pin": "0.159.2",
-          "pin_source": "manifests/stack.json:297",
+          "pin_source": "manifests/stack.json:298",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "codex exec -C \"$PROJECT_ROOT\" --json - < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
@@ -2076,7 +2076,7 @@
           "component_id": "dagu",
           "repository": "https://github.com/dagucloud/dagu",
           "pin": "2.16.6",
-          "pin_source": "manifests/stack.json:1335",
+          "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
           "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
@@ -2085,7 +2085,7 @@
           "component_id": "systemd",
           "repository": "https://github.com/systemd/systemd",
           "pin": "255.4-1ubuntu8.17",
-          "pin_source": "manifests/stack.json:1448",
+          "pin_source": "manifests/stack.json:1456",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
           "acceptance": {"command": "systemd 255 user units on the historical host: the timer started paper-ext-20260929.service at 16:00:05 ET on 2026-09-29, and journalctl --user -o json USER_UNIT=<unit>.service and systemctl --user show recorded its exit (status 3, Result=exit-code) and the run of its OnFailure alert unit", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"},
           "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
@@ -2094,7 +2094,7 @@
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
           "pin": "0.161.0",
-          "pin_source": "manifests/stack.json:1087",
+          "pin_source": "manifests/stack.json:1095",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "structural_validation", "source_path": "observability/README.md"},
           "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
@@ -2103,7 +2103,7 @@
           "component_id": "prometheus",
           "repository": "https://github.com/prometheus/prometheus",
           "pin": "3.15.0",
-          "pin_source": "manifests/stack.json:1118",
+          "pin_source": "manifests/stack.json:1126",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "promtool check config and check rules (14 rules) on the live files, systemd-analyze --user verify of the rendered unit, then daemon-reload and restart of ecosystem-prometheus.service: /-/ready answered 0.86 s after the restart, buildinfo read 3.15.0, the seven targets were up and the 14 rules evaluated with health ok (2026-09-26)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/prometheus-3150-qualification-20260926.json"},
           "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
@@ -2112,7 +2112,7 @@
           "component_id": "loki",
           "repository": "https://github.com/grafana/loki",
           "pin": "3.7.8",
-          "pin_source": "manifests/stack.json:1156",
+          "pin_source": "manifests/stack.json:1164",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true (exit 0: the final native Loki OTLP structured-metadata configuration accepted)", "evidence_class": "structural_validation", "source_path": "observability/receipt.json"},
           "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
@@ -2121,7 +2121,7 @@
           "component_id": "grafana",
           "repository": "https://github.com/grafana/grafana",
           "pin": "13.2.2",
-          "pin_source": "manifests/stack.json:1193",
+          "pin_source": "manifests/stack.json:1201",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "systemd-analyze --user verify of the rendered ecosystem units, then systemctl --user enable --now ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
           "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-01T08:17Z", "pin_is_latest": "no", "url": "https://github.com/grafana/grafana/releases"}
@@ -2130,7 +2130,7 @@
           "component_id": "restic",
           "repository": "https://github.com/restic/restic",
           "pin": "0.19.1",
-          "pin_source": "manifests/stack.json:1307",
+          "pin_source": "manifests/stack.json:1315",
           "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
           "acceptance": {"command": "restic check and restore of two synthetic snapshots on a GitHub-hosted runner, after seven unchanged upstream restic tests passed there", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"},
           "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
@@ -2207,7 +2207,7 @@
           "component_id": "codex",
           "repository": "https://github.com/openai/codex",
           "pin": "0.159.2",
-          "pin_source": "manifests/stack.json:297",
+          "pin_source": "manifests/stack.json:298",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "codex exec -C \"$PROJECT_ROOT\" --json - < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
@@ -2225,7 +2225,7 @@
           "component_id": "socraticode",
           "repository": "https://github.com/giancarloerra/SocratiCode",
           "pin": "1.15.0",
-          "pin_source": "manifests/stack.json:962",
+          "pin_source": "manifests/stack.json:970",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "mcporter --config \"$MCPORTER_CONFIG\" call socraticode.codebase_health --args '{}' --output text --no-oauth", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.16.0 (2026-09-28)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/giancarloerra/SocratiCode/releases"}
@@ -2234,7 +2234,7 @@
           "component_id": "qmd",
           "repository": "https://github.com/tobi/qmd",
           "pin": "2.8.3",
-          "pin_source": "manifests/stack.json:758",
+          "pin_source": "manifests/stack.json:765",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "qmd --index \"$QMD_INDEX\" search 'local code' -c \"$QMD_COLLECTION\" -n 2 --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v2.8.3 (2026-08-16)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/tobi/qmd/releases"}
@@ -2243,7 +2243,7 @@
           "component_id": "serena",
           "repository": "https://github.com/oraios/serena",
           "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
-          "pin_source": "manifests/stack.json:880",
+          "pin_source": "manifests/stack.json:888",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd (then find_symbol and find_referencing_symbols through the client)", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.7.0 (2026-08-09); the pin is a 2.0.0.dev0 development commit 123 commits ahead of that release, so release currency does not apply", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "unknown", "url": "https://github.com/oraios/serena/releases"}
@@ -2252,7 +2252,7 @@
           "component_id": "qdrant",
           "repository": "https://github.com/qdrant/qdrant",
           "pin": "1.19.1",
-          "pin_source": "manifests/stack.json:727",
+          "pin_source": "manifests/stack.json:734",
           "install": {"command": "official v1.19.1 archive qdrant-x86_64-unknown-linux-musl.tar.gz, verified against SHA-256 70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "GET / on the running Qdrant server: it answered with version 1.19.1 at commit 6ab21ca, the catalog pin (host receipt, stage use, result pass)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--qdrant--use--20260925.json"},
           "upstream_currency": {"latest_release": "v1.19.1 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/qdrant/qdrant/releases"}
@@ -2261,7 +2261,7 @@
           "component_id": "context-mode",
           "repository": "https://github.com/mksglu/context-mode",
           "pin": "1.0.169",
-          "pin_source": "manifests/stack.json:403",
+          "pin_source": "manifests/stack.json:409",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency (the npm CLI), then the Claude plugin from its SHA-pinned source 6f0cc6841c687e754059f36714a11233fda1a02b", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "compare the installed plugin's gitCommitSha with 6f0cc6841c687e754059f36714a11233fda1a02b, then read ctx_stats in a fresh session", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.0.169 (2026-06-29)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/mksglu/context-mode/releases"}
@@ -2270,7 +2270,7 @@
           "component_id": "rtk",
           "repository": "https://github.com/rtk-ai/rtk",
           "pin": "0.50.0",
-          "pin_source": "manifests/stack.json:822",
+          "pin_source": "manifests/stack.json:829",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "rtk git log -6; rtk proxy git log -6", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.50.0 (2026-09-24)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/rtk-ai/rtk/releases"}
@@ -2319,7 +2319,7 @@
           "component_id": "codex",
           "repository": "https://github.com/openai/codex",
           "pin": "0.159.2",
-          "pin_source": "manifests/stack.json:297",
+          "pin_source": "manifests/stack.json:298",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "codex exec -C \"$PROJECT_ROOT\" --json - < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
@@ -2337,7 +2337,7 @@
           "component_id": "dagu",
           "repository": "https://github.com/dagucloud/dagu",
           "pin": "2.16.6",
-          "pin_source": "manifests/stack.json:1335",
+          "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
           "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
@@ -2346,7 +2346,7 @@
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
           "pin": "0.161.0",
-          "pin_source": "manifests/stack.json:1087",
+          "pin_source": "manifests/stack.json:1095",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "structural_validation", "source_path": "observability/README.md"},
           "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
@@ -2355,7 +2355,7 @@
           "component_id": "prometheus",
           "repository": "https://github.com/prometheus/prometheus",
           "pin": "3.15.0",
-          "pin_source": "manifests/stack.json:1118",
+          "pin_source": "manifests/stack.json:1126",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "promtool check config and check rules (14 rules) on the live files, systemd-analyze --user verify of the rendered unit, then daemon-reload and restart of ecosystem-prometheus.service: /-/ready answered 0.86 s after the restart, buildinfo read 3.15.0, the seven targets were up and the 14 rules evaluated with health ok (2026-09-26)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/prometheus-3150-qualification-20260926.json"},
           "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
@@ -2364,7 +2364,7 @@
           "component_id": "loki",
           "repository": "https://github.com/grafana/loki",
           "pin": "3.7.8",
-          "pin_source": "manifests/stack.json:1156",
+          "pin_source": "manifests/stack.json:1164",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true (exit 0: the final native Loki OTLP structured-metadata configuration accepted)", "evidence_class": "structural_validation", "source_path": "observability/receipt.json"},
           "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
@@ -2373,7 +2373,7 @@
           "component_id": "grafana",
           "repository": "https://github.com/grafana/grafana",
           "pin": "13.2.2",
-          "pin_source": "manifests/stack.json:1193",
+          "pin_source": "manifests/stack.json:1201",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "systemd-analyze --user verify of the rendered ecosystem units, then systemctl --user enable --now ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
           "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-01T08:17Z", "pin_is_latest": "no", "url": "https://github.com/grafana/grafana/releases"}
@@ -2382,7 +2382,7 @@
           "component_id": "restic",
           "repository": "https://github.com/restic/restic",
           "pin": "0.19.1",
-          "pin_source": "manifests/stack.json:1307",
+          "pin_source": "manifests/stack.json:1315",
           "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
           "acceptance": {"command": "restic check and restore of two synthetic snapshots on a GitHub-hosted runner, after seven unchanged upstream restic tests passed there", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"},
           "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
@@ -2425,7 +2425,7 @@
           "component_id": "syft",
           "repository": "https://github.com/anchore/syft",
           "pin": "1.52.0",
-          "pin_source": "manifests/stack.json:1396",
+          "pin_source": "manifests/stack.json:1404",
           "install": {"command": "gh release download v1.52.0 --repo anchore/syft (the linux_amd64 archive and its checksums); verify, then tar --no-same-owner -xzf into a versioned prefix", "kind": "repo_recipe", "source_path": "blueprints/us-equities/supply-chain/README.md"},
           "acceptance": {"command": "syft scan of the NautilusTrader 2.0.0rc5 virtual environment with the binary catalogers selected by exact name (venv-syft exit 0; 21 packages), then grype over that SBOM (exit 0)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/3-syft-binary-os-coverage.json"},
           "upstream_currency": {"latest_release": "v1.52.0 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/anchore/syft/releases"}
@@ -2434,7 +2434,7 @@
           "component_id": "gitleaks",
           "repository": "https://github.com/gitleaks/gitleaks",
           "pin": "8.30.1",
-          "pin_source": "manifests/stack.json:491",
+          "pin_source": "manifests/stack.json:497",
           "install": {"command": "curl -fsSLO \"$base/gitleaks_8.30.1_linux_x64.tar.gz\"; curl -fsSLO \"$base/gitleaks_8.30.1_checksums.txt\"; sha256sum --check --ignore-missing gitleaks_8.30.1_checksums.txt; tar -xzf gitleaks_8.30.1_linux_x64.tar.gz -C \"$ECO_INSTALL_ROOT/tools/gitleaks-8.30.1\" gitleaks", "kind": "repo_recipe", "source_path": "docs/secret-storage.md"},
           "acceptance": {"command": "gitleaks on a temporary control repository of 6 synthetic secret-shaped files: 6 findings and exit 1 under the default rules and again under the repository's configuration", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/5-gitleaks-current-history.json"},
           "upstream_currency": {"latest_release": "v8.30.1 (2026-03-21)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gitleaks/gitleaks/releases"}
@@ -2594,7 +2594,7 @@
           "component_id": "codex",
           "repository": "https://github.com/openai/codex",
           "pin": "0.159.2",
-          "pin_source": "manifests/stack.json:297",
+          "pin_source": "manifests/stack.json:298",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "python3 tools/adoption/prove_codex_lane.py (add --live only when worker runs are intended)", "evidence_class": "none_recorded", "source_path": "tools/adoption/prove_codex_lane.py"},
           "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30), the candidate for the new distribution", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
@@ -2603,7 +2603,7 @@
           "component_id": "omniroute",
           "repository": "https://github.com/diegosouzapw/OmniRoute",
           "pin": "3.8.50",
-          "pin_source": "manifests/stack.json:1878",
+          "pin_source": "manifests/stack.json:1887",
           "install": {"command": "npm install --global --prefix \"$OMNIROUTE_PREFIX\" omniroute@3.8.50 --include=optional --no-audit --no-fund, then the recipe's npm rebuild with its allow-scripts list", "kind": "repo_recipe", "source_path": "docs/foundation-stack.md"},
           "acceptance": {"command": "npm install --global --prefix \"$OMNIROUTE_PREFIX\" omniroute@3.8.50 into a clean prefix, then the scoped checks: 14 service checks passed on an isolated loopback port, a native restart and the native plaintext backup restore (2026-09-20)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/foundation-native-20260920.json"},
           "upstream_currency": {"latest_release": "v3.8.51 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/diegosouzapw/OmniRoute/releases"}
