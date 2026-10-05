@@ -16771,8 +16771,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md",
-      "sha256": "24fd4a6cb9a1ec08edf647429fa13cb52ec796487a6eb0ffb8094ec7043ce539",
-      "bytes": 72024
+      "sha256": "ee1be570505451fc5810c05e0d5ecca768ab0968b55a085b5682f7e25b2919fd",
+      "bytes": 75057
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -39146,8 +39146,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "4336055e4ab72dfaf92a23ac1ebeee9c4750d3374c30b721f1bb51c901db1488",
-      "bytes": 197494
+      "sha256": "99aaeb8c6b6c1666ce8091a3cf07c37fd91d6a59b35b74ac9c277cc39383cd26",
+      "bytes": 202621
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -39156,8 +39156,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "5e3728075e074f7908687aa099fc68492a3a61a475c01d13a8b37c5150c7fc0c",
-      "bytes": 188499
+      "sha256": "322bba3ddeb6dd33ca7f30d74df500afca3c6a8fe6c83209bda6fc7c6b4f11da",
+      "bytes": 188556
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
@@ -39206,8 +39206,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/betterleaks-accept.sh",
-      "sha256": "5d6214bdbf37b67f87771d94f266e5f2e7cd300f4fc725208e49b72783184d9f",
-      "bytes": 1107
+      "sha256": "702270a1a29c68a79fee0541edb8e3f2938e25330a6f9427b220302564c12f7b",
+      "bytes": 1111
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ccusage-20.0.26-claude-alpha.jsonl.fixture",
@@ -39266,8 +39266,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/gateway-effort-accept.py",
-      "sha256": "31eeb4c45f9f5c3d53c5294438ee0ad8a749e705035db8db57a1782bf235e6e5",
-      "bytes": 5672
+      "sha256": "7c0031f9788256be51ba7be77e2e75f32c8628e97581ffdd0d11e48f5841c26b",
+      "bytes": 6038
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-client-accept.sh",
@@ -39476,8 +39476,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
-      "sha256": "a576bbf8bac443cc9f38678a77edd17a5fe3b30b7993f6b0197307dcb2231ef5",
-      "bytes": 9124
+      "sha256": "1004ef72ec7902897deb539707f7d679a065f8bfae8e39883be45c6023a5bbfa",
+      "bytes": 12159
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/container-validation.json",
@@ -39496,8 +39496,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/fixwave-20261005-followup-receipt.json",
-      "sha256": "6c5a2657d4acc73570e9683fa649879953fab05a542f8bae0ee1709faff3c36a",
-      "bytes": 48063
+      "sha256": "e0aed318d21d3e8fef9435d03ab5f41266063368d42275e037cef83e157af01f",
+      "bytes": 52359
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/fixwave-20261005-lock-review-receipt.json",
@@ -39536,8 +39536,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "0e496a1e98b23ed227be88debdb92081547f09b9b47f2ffd1835aa1716bbf930",
-      "bytes": 442242
+      "sha256": "6057740ebcfb5e05593514652af197f46f6d1a423d62622b1b0580def4ee561b",
+      "bytes": 444360
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -54261,13 +54261,13 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "1f6c948d979ee50a8a52a9f5f21f66e95fb80aed3bed8852dc8522a0d2e60065",
-      "bytes": 292986
+      "sha256": "04a7d07b7f92df9659159642f49baa1df94afd353641f58b858e54bea8fb8d4f",
+      "bytes": 301253
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "74c09eefdb5cf73308e2606d6bcd951cc180027c20fb07acc07eef48cfa69721",
-      "bytes": 250655
+      "sha256": "16109c37fa76be5914f0b156cb8cc2088e9f47bd85cf8672fb3c5f463ac1ee81",
+      "bytes": 269108
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
@@ -54731,8 +54731,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "0117ba82c06edfde2900c6feeeb800b181c11252f223993485bfd291d72e6062",
-      "bytes": 154316
+      "sha256": "5b18f9ce8ed40d57daae91a0a3936c89e567ea88b86fc9d60661dcb3ba730dfa",
+      "bytes": 155480
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
