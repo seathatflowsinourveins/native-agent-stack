@@ -103,7 +103,7 @@ class NewWslHandbookTests(unittest.TestCase):
                         "conditional": {"numerator": 44, "denominator": 80, "percent": 55.0,
                                         "status": "conditional_pending_four_slot_adjudication"}},
                     "disputed_slot_ids": [f"token-efficiency/{slot}" for slot in
-                                          ("context-supply", "command-output", "output-compression", "code-index")],
+                                          ("repo-packing", "command-output", "output-compression", "code-index")],
                     "independent_review": {"status": "pending", "scope": "Review the retained native evidence and projections."},
                     "source_class": "supplied co-op/user projection, not independently derived verified labels",
                     "qualification_scope": "The fresh 80-slot join and ten promoted slots behind 40/80 are not retained."}}
@@ -131,11 +131,12 @@ class NewWslHandbookTests(unittest.TestCase):
         source = next(source for source in data["sources"] if source["path"] == handbook.HOST_REQUALIFICATION)
         self.assertEqual(source["sha256"], handbook.digest((self.root / handbook.HOST_REQUALIFICATION).read_bytes()))
         page = (self.root / handbook.OUTPUTS[0]).read_text()
-        for text in ("Last fully reviewed baseline: **30/80 (37.5%)**",
+        for text in ("Last fully reviewed baseline (2026-10-04): **30/80 (37.5%)**",
                      "Supplied current projection (provisional): **40/80 (50%)**",
                      "Conditional projection (four-slot adjudication pending): **44/80 (55%)**",
                      receipt["data"]["source_class"], receipt["data"]["qualification_scope"],
-                     "without an independently verified 80-slot join", "Independent review: pending"):
+                     "without an independently verified 80-slot join", "Independent review: pending",
+                     "historical 2026-10-04 baseline is fully adjudicated"):
             self.assertIn(text, page)
         for slot in receipt["data"]["disputed_slot_ids"]:
             self.assertIn(slot, page)
@@ -155,6 +156,8 @@ class NewWslHandbookTests(unittest.TestCase):
             ("data.readiness.conditional", {"numerator": 45, "denominator": 80, "percent": 56.25,
                                           "status": "conditional_pending_four_slot_adjudication"}),
             ("data.disputed_slot_ids", ["token-efficiency/context-supply"] * 4),
+            ("data.disputed_slot_ids", [f"token-efficiency/{slot}" for slot in
+                                       ("context-supply", "command-output", "output-compression", "code-index")]),
             ("data.independent_review.status", "agreed"), ("data.independent_review.scope", ""),
             ("data.qualification_scope", ""), ("data.source_class", ""),
         ]
@@ -182,7 +185,7 @@ class NewWslHandbookTests(unittest.TestCase):
 
     def test_host_requalification_rejects_private_omitted_metadata_before_publication(self):
         receipt = self.host_requalification_fixture()
-        receipt["private_omitted_metadata"] = "/home/private-user/coordination/source.json"
+        receipt["private_omitted_metadata"] = "/home/" + "private-user/coordination/source.json"
         self.write(handbook.HOST_REQUALIFICATION, receipt)
         result = self.public_cli()
         self.assertEqual(result.returncode, 1)

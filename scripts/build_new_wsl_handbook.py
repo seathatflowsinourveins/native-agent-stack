@@ -245,7 +245,7 @@ def read_host_requalification(inputs):
     require(isinstance(disputed, list) and len(disputed) == 4
             and all(isinstance(slot, str) for slot in disputed)
             and set(disputed) == {f"token-efficiency/{slot}" for slot in
-                                 ("context-supply", "command-output", "output-compression", "code-index")},
+                                 ("repo-packing", "command-output", "output-compression", "code-index")},
             "host requalification needs the four disputed token slots")
     require(readiness["current"]["numerator"] >= readiness["baseline"]["numerator"]
             and readiness["conditional"]["numerator"] == readiness["current"]["numerator"] + len(disputed),
@@ -1130,20 +1130,20 @@ def render_markdown(data):
         readiness = host["readiness"]
         lines += ["## NativeStack2604 host re-qualification", "",
                   f"Published {host['publication_date_utc']}; source: {link(host['source'])}.", "",
-                  "All figures in this re-qualification remain provisional pending independent review. "
-                  "The reviewed baseline is the last fully reviewed qualification; the current and conditional "
+                  "Today's current and conditional scenarios remain provisional pending independent review. "
+                  "The historical 2026-10-04 baseline is fully adjudicated; the current and conditional "
                   "figures are supplied projections, without an independently verified 80-slot join.", ""]
-        for key, label in (("baseline", "Last fully reviewed baseline"),
+        for key, label in (("baseline", "Last fully reviewed baseline (2026-10-04)"),
                            ("current", "Supplied current projection (provisional)"),
                            ("conditional", "Conditional projection (four-slot adjudication pending)")):
             value = readiness[key]
             lines += [f"- {label}: **{value['numerator']}/{value['denominator']} ({value['percent']:g}%)**."]
-        lines += ["", f"Formula: {cell(readiness['formula'])}.", "",
-                  f"Source class: {cell(host['source_class'])}.", "",
-                  f"Qualification scope: {cell(host['qualification_scope'])}.", "",
+        lines += ["", f"Formula: {cell(readiness['formula']).rstrip('.')}.", "",
+                  f"Source class: {cell(host['source_class']).rstrip('.')}.", "",
+                  f"Qualification scope: {cell(host['qualification_scope']).rstrip('.')}.", "",
                   "Disputed slots: " + ", ".join(f"`{slot}`" for slot in host["disputed_slot_ids"]) + ".", "",
                   f"Independent review: {cell(host['independent_review']['status'])}; "
-                  f"{cell(host['independent_review']['scope'])}.", "",
+                  f"{cell(host['independent_review']['scope']).rstrip('.')}.", "",
                   "This receipt projection supplies no new upstream acceptance, independently replicated host "
                   "execution, recommendation status or finality gate.", ""]
     lines += ["## Stage 1 and stage 2", ""]

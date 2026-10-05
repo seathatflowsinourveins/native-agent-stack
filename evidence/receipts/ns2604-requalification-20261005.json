@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-requalification-20261005",
+  "kind": "historical_inventory",
+  "recorded_at_utc": "2026-10-05T04:23:07Z",
+  "component_ids": ["claude-code", "codex", "omniroute"],
+  "claim": "Documentary re-qualification of retained NativeStack2604 foundation observations on 2026-10-05. The last fully adjudicated 80-slot baseline remains 30/80 (37.5%) on 2026-10-04. The co-op supplied a provisional 40/80 (50%) scenario and a conditional 44/80 (55%) scenario. Four fresh token-slot judgments disagree. The retained sources do not yet supply a complete independently reviewed 80-slot join or the ten promoted slots deriving 40; neither scenario is published as a verified aggregate or upstream acceptance. Native stage results, limited client-leg reviews, intentional dispositions and structural publication checks remain separate.",
+  "limitations": [
+    "All 2026-10-05 readiness scenarios remain provisional until their per-slot derivation and independent review are retained. The 2026-10-04 baseline is historical; it is not a new host run.",
+    "The 40/80 numerator is supplied in the lane brief, not derived from an available fresh 80-slot adjudication. A post-install exit of zero, a version check, a model READY label and a Codex-only use check do not close the PR #700 whole-slot contract.",
+    "The conditional 44/80 assumes READY adjudications for token-efficiency/code-index, command-output, output-compression and repo-packing. Opus judged these READY; GPT judged them PARTIAL. Their missing native or upstream acceptance remains open.",
+    "The first post-install census has 80 rows: 50 exit-zero, 28 skipped and two failures. The later raw census has a duplicate skill-authoring attempt; attempt rows are not distinct slots. Omitted stages and held slots remain in the denominator.",
+    "The later observations at 4c897418f are retained private source files, not a completed persistent co-op census in fixwave-4c897418f at publication. Sources and observation scope are inventoried by hash without copying raw session streams.",
+    "Session-analytics summary claims conflict with retained rerun exit-code files; later output files lack complete exit/time siblings. Alerting exit zero coexists with an explicit needs_user/sink disposition. Preserve these attempts and reported claims separately; neither implies READY.",
+    "The fixwave-defects and currency lanes were in progress at the publication boundary. No slot is declared repaired, installed or accepted by their planned changes. Their future receipts require a separate follow-up.",
+    "This publication does not execute upstream tests, host acceptance commands, provider requests, GPU checks or broker operations. Structural checks verify the documents and generators, not capability acceptance."
+  ],
+  "data": {
+    "publication_date_utc": "2026-10-05",
+    "publication_base_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+    "host": "NativeStack2604",
+    "source_class": "Retained native client outputs, local plan-integration stage checks and source review; 40/80 and 44/80 are supplied co-op projections, not recomputed whole-slot readiness.",
+    "north_star_action": "Keep foundation readiness recoverable for complex engineering, US-equities research and historical simulation before independently qualified paper operation.",
+    "qualification_scope": "Retained native observations on one WSL distribution, published through artifact inspection. 40/80 and 44/80 are supplied co-op scenarios with an incomplete retained per-slot derivation, not verified readiness aggregates. This record changes no source-selection, finality, broker readiness or upstream acceptance status.",
+    "readiness": {
+      "provisional": true,
+      "formula": "(READY + BY_DESIGN) / all 80 PR #700 foundation slots; PARTIAL, FAIL, INTERIM and UNJUDGED contribute zero; BY_DESIGN is an intentional disposition, not execution",
+      "baseline": {"numerator": 30, "denominator": 80, "percent": 37.5, "status": "historical_adjudicated_2026-10-04"},
+      "current": {"numerator": 40, "denominator": 80, "percent": 50.0, "status": "provisional_pending_independent_review", "source_class": "supplied_coop_projection_not_recomputed", "promoted_slot_ids": null},
+      "conditional": {"numerator": 44, "denominator": 80, "percent": 55.0, "status": "conditional_pending_four_slot_adjudication", "source_class": "supplied_coop_projection_not_recomputed"},
+      "rounding": "Exact percentages shown; baseline PR #700 rounded 37.5% half up to 38%.",
+      "derivation_gap": "No retained fresh 80-slot status chain identifies the ten baseline-to-current promotions. Keep all historical slot labels intact; do not infer readiness from a native stage exit code."
+    },
+    "disputed_slot_ids": [
+      "token-efficiency/code-index",
+      "token-efficiency/command-output",
+      "token-efficiency/output-compression",
+      "token-efficiency/repo-packing"
+    ],
+    "independent_review": {
+      "status": "pending",
+      "scope": "Retained Opus and GPT reviews cover selected fresh sessions and client legs. They are source review, not independent host replication or a complete fresh aggregate review. Request an independent review of this public projection and a complete 80-slot derivation before lifting provisional status."
+    },
+    "observations": {
+      "revision_3e343ba6": {
+        "evidence_class": "local_integration",
+        "revision": "3e343ba6c7fc391a54f8780c87df65231f24c276",
+        "clients": {"claude_code": "2.1.289", "codex_cli": "0.160.0"},
+        "post_install": {"rows": 80, "exit_zero": 50, "skipped": 28, "failures": [{"slot": "session-analytics", "exit": 127}, {"slot": "otel-collector-contrib", "exit": 1}], "wrapper_exit": 1},
+        "after_sign_in": {"rows": 6, "exit_zero": 6, "not_run": ["local-model-server"]},
+        "service_health": {"rows": 8, "exit_zero": 7, "failures": [{"slot": "local-model-server", "exit": 1}], "wrapper_exit": 1},
+        "scope": "Plan stage observations from the retained census. Exact attempts and original hash provenance appear in the linked artifacts; zero exits are not whole-slot readiness."
+      },
+      "client_drift": {
+        "evidence_class": "source_review",
+        "original_items": 21,
+        "independent_verifier_counts": {"real_drift": 11, "by_design": 8, "refuted": 1, "unclear": 0},
+        "missed_by_adjudicator": 6,
+        "count_boundary": "The 21 original items include 20 Dxx verdict rows and C01, whose real_drift disposition overlaps D02/D03. The 11 + 8 + 1 verifier categories cover those 20 Dxx rows. Six missed candidates form another view; no aggregate sum is inferred.",
+        "correction": "D20 missing-skills claim refuted: the native initial listing contained 55 skills; the later two-skill listing was incremental. Verification path: client-drift-3e343ba6.json correction.D20 and clients-native-3e343ba6.json."
+      },
+      "invoke_rate_baseline": {
+        "evidence_class": "historical_inventory",
+        "T0": "2026-10-05T01:37:41Z",
+        "items": 220,
+        "never_invoked": 107,
+        "scope": "Early install exposure window. Most token and interim MCP entries had about 38 minutes of exposure. Zero invocations do not establish failure, quality or lack of usefulness. Native counter scopes remain distinct."
+      },
+      "peer_lanes": {
+        "fixwave_defects": {"status": "in_progress", "accepted_slot_closures_claimed": false},
+        "currency": {"status": "in_progress", "accepted_slot_closures_claimed": false},
+        "coordination": "Private lane status files were read before publication. No peer plan, launch prompt or unmerged change is treated as acceptance evidence."
+      }
+    },
+    "evidence_classes": [
+      {"class": "native_proven", "scope": "Only the named native client command outputs actually retained from prior host execution; per-slot limitations remain explicit. Plan-wrapper stage checks are local_integration."},
+      {"class": "source_review", "scope": "Model judgments, comparison with upstream recipes, drift review and adjudication leads; not new execution."},
+      {"class": "historical_inventory", "scope": "This receipt and early invoke-rate snapshot; no acceptance status implied."},
+      {"class": "local_integration", "scope": "Plan-wrapper census/stage checks and locally authored probes identified in per-slot records; never unchanged upstream acceptance."},
+      {"class": "structural_validation", "scope": "Publication-time hashes, source projection, generator tests and repository validation only."},
+      {"class": "none_recorded", "scope": "Skipped stages, absent raw proof and missing fresh whole-slot qualification."}
+    ],
+    "artifacts": [
+      "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "evidence/artifacts/ns2604-requalification-20261005/sources.json",
+      "evidence/artifacts/ns2604-requalification-20261005/README.md"
+    ],
+    "baseline_method": "evidence/artifacts/ns2604-e2e-20261004/method.md",
+    "source_capture_boundary": "All 513 original-source hashes describe capture-time bytes. Independent comparison matched 512 originals; one still-written research-harnesses after-sign-in stderr source changed after capture and lacks complete exit/end evidence. Preserve its original hash and incomplete disposition; no currently recoverable immutable copy is claimed.",
+    "baseline_receipt": "evidence/receipts/ns2604-e2e-20261004.json",
+    "fixwave_source": "evidence/artifacts/new-wsl-fix-wave-20261004/README.md",
+    "decision_record": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
+    "sanitization": "Keep machine label and portable technical paths; omit concrete home paths, local identities, account values, raw conversations and native session streams. Private source-relative filenames and sha256 values support recovery. Credential stores were not read.",
+    "completeness_critic": "Preserve all 80 denominator slots, all attempts including duplicates and failures, both revision scopes, client-leg boundaries, four disagreements, source gaps, early invocation exposure and independent review limits. Missing modalities for the next qualification are a complete fresh 80-slot derivation, independent replication of unresolved native operations, upstream token acceptance and GPU/local-model acceptance after the authorized window. Skills follow-up is keyed to install, activate, recover and use lifecycle tasks."
+  }
+}

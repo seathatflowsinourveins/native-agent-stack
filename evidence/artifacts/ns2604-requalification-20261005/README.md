@@ -1,5 +1,15 @@
 # NativeStack2604 re-qualification evidence map — 2026-10-05
 
+The 513 source hashes describe capture-time bytes. Independent comparison matched
+512 originals; the research-harnesses after-sign-in stderr source changed while
+its attempt remained incomplete. Its original capture hash is preserved alongside
+an explicitly dated changed snapshot in sources.json. No immutable recovery or
+successful acceptance is claimed for that source.
+
+In census metadata, reported_result_counts counts result rows, including skipped
+rows. separately_listed_skipped counts a source's additional skipped array outside
+those rows; it is not the total skipped count for that stage.
+
 This map preserves all 80 PR #700 identifiers and historical labels, and attaches selected Oct 5 native stage/process records and scoped model reviews. It supports research and historical-simulation tooling. It does not rerun commands, install components or adjudicate whole-slot readiness.
 
 slots.json contains every baseline slot, original 3e343ba6 census row, selected 4c897418f sweep/individual attempts, relevant reviews and open items. sources.json hashes original files with repository, coordination and scratch aliases. Private originals are not distributed here.
@@ -25,4 +35,3 @@ Sources and method:
 - native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/acceptance-evidence-policy.md:19 distinguishes upstream tests/native operations, local integration, synthetic fixtures, independent observation and structural validation.
 
 Sanitization omits host paths, local account/session identities, credentials, active configuration and raw conversations. Source hashes establish byte identity only. Missing observations mean missing selected evidence, not a capability absence claim.
-

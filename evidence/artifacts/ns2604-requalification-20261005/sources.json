@@ -1,5 +1,15 @@
 {
   "schema_version": 1,
+  "capture_verification": {
+    "checked_at_utc": "2026-10-05T04:23:07Z",
+    "evidence_class": "independent source observation; no host acceptance",
+    "originals_checked": 513,
+    "matching_at_independent_check": 512,
+    "missing_at_independent_check": 0,
+    "changed_source": "scratch:fixwave/research-harnesses.accept.after_sign_in.err",
+    "observed_after_capture": {"sha256": "eaa7e92ec209503c633b851f831376a7f213edf7b43d0fac20de9fd6f16af8ae", "bytes": 5319},
+    "boundary": "Preserve the original capture hash in sources. The live stderr file changed after capture; the attempt lacks complete rc/end records and remains incomplete. The current observation is another snapshot, not an immutable archived copy or a successful acceptance."
+  },
   "kind": "sanitized original-source hash manifest",
   "date": "2026-10-05",
   "captured_at_utc": "2026-10-05T04:18:14.006Z",
@@ -525,4 +535,3 @@
     "scratch:e2e-gpt-review/failed-attempt-1/memory-owner.start": {"sha256":"d930b4925d45239ff936ffe06a2be7994cc131535476f82161acb873ef39f62a","bytes":21,"evidence_class":"incomplete review attempt; not acceptance","content_copied":false}
   }
 }
-
