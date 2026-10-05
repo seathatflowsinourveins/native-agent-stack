@@ -27,8 +27,8 @@ sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 SOURCE = ROOT / "adoption" / "agents" / "codex"
 NAMES = ("stack-researcher.toml", "stack-verifier.toml")
 GOOD_ROWS = {
-    "stack-researcher.toml": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
-    "stack-verifier.toml": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
+    "stack-researcher.toml": "f531430b620c852228365ddfc43deec11a5d942ea3c988487ca44464954c6a82",
+    "stack-verifier.toml": "55d021a13430980c0acbea1fdecfa87c62f874947de1f3ab6525602692c9f7dc",
 }
 # The worker roles: their own folder and SHA256SUMS, so the carriers' folder keeps exactly the two files the frozen
 # E2E pinned (tests/test_codex_agents.py test_stack_role_files_rows_and_mirrors).
@@ -419,21 +419,21 @@ class WorkerSentenceTests(unittest.TestCase):
 
 class RuleSourceCitationTests(unittest.TestCase):
     """The passage a rule's source cites holds what the source says it holds. The exact_shapes source cites the Codex
-    AGENTS template's six RTK exceptions by their marker, not by line: the rule text above them moved them from lines
+    AGENTS template's five RTK exceptions by their marker, not by line: the rule text above them moved them from lines
     41-46 to 49-54 (unit F1, #557; docs/decisions/2026-09-30-rule-text-every-layer.md, "Stale line citation") and to
     50-55 a day later (#568), so a line range there goes stale with each edit of that text."""
 
-    def test_the_exact_shapes_source_cites_the_templates_six_exceptions_by_marker(self):
+    def test_the_exact_shapes_source_cites_the_templates_five_exceptions_by_marker(self):
         module = roles(self)
         [source] = [source for rule, _roles, source, _check in module.RULES if rule == "exact_shapes"]
-        self.assertIn("adoption/templates/codex.AGENTS.template.md, the six exceptions after its rtk-exceptions marker",
+        self.assertIn("adoption/templates/codex.AGENTS.template.md, the five exceptions after its rtk-exceptions marker",
                       source)
         self.assertIsNone(re.search(r"codex\.AGENTS\.template\.md:\d", source), source)
         text = (ROOT / "adoption" / "templates" / "codex.AGENTS.template.md").read_text(encoding="utf-8")
         self.assertEqual(text.count(module.EXCEPTIONS_MARKER), 1)
         block = text.split(module.EXCEPTIONS_MARKER, 1)[1].split(module.END_MARKER, 1)[0]
         bullets = [line for line in block.splitlines() if line.startswith("- ")]
-        commands = ("`git show REV:path`", "`diff`", "`git branch`", "`git log`", "`jq`", "`find`")
+        commands = ("`git show REV:path`", "`diff`", "`git branch`", "`jq`", "`git log`")
         self.assertEqual(len(bullets), len(commands), bullets)
         for command, line in zip(commands, bullets):
             with self.subTest(command=command):

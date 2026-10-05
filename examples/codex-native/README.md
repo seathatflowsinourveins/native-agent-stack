@@ -102,7 +102,7 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
   spawn, message or follow up with other agents); working directory (a task's own instruction wins, and `cwd` goes to context-mode only for a
   directory other than the launch directory, which the server is already bound to: the "Codex workers" bullet of
   [the handbook](../../docs/token-session-handbook.md#context-mode-executor-and-session-store); the frozen M13 leg reads sentinel files with
-  no explicit `cwd`); and `jq` output among the exact command shapes (the F4 exceptions list six commands). The verifier also says that it
+  no explicit `cwd`); and `jq` output among the exact command shapes (the F4 exceptions list five commands). The verifier also says that it
   does not use web search.
 - **Registration.** Discovery only. Codex loads every `*.toml` under `$CODEX_HOME/agents/` (`load_agent_roles` in
   [`loader.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs)), so the roles carry no
@@ -143,12 +143,31 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 
 | File | SHA-256 |
 | --- | --- |
-| `stack-researcher.toml` | `48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77` |
-| `stack-verifier.toml` | `18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b` |
+| `stack-researcher.toml` | `f531430b620c852228365ddfc43deec11a5d942ea3c988487ca44464954c6a82` |
+| `stack-verifier.toml` | `55d021a13430980c0acbea1fdecfa87c62f874947de1f3ab6525602692c9f7dc` |
 
 ### 2026-10-04: RTK pin guidance amendment
 
 The maintained carriers now describe RTK 0.51.0's missing-file diff exit 2 ([bf23cff](https://github.com/rtk-ai/rtk/commit/bf23cff467aa3b4aa314d6a4b956630f1e275a5f)). Both installed versions reject environment assignments and shell builtins after `proxy` with exit 1, so verifier guidance places assignments before the prefix or invokes `env`, and leaves builtins in the calling shell. The upstream v0.50.0 awareness block remains byte-identical; the earlier freeze digests were ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00 (researcher) and 281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd (verifier). The table above carries current carrier digests, not a new frozen E2E or spawned-role acceptance.
+
+### 2026-10-04: F4 exceptions at RTK 0.51.0
+
+The five-exception block now conditions the four leave-alone commands on the
+bootstrap-installed rtk exclusions config. Defaults rewrite them, and an explicit
+prefix bypasses exclusions ([src/discover/registry.rs:1553](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/discover/registry.rs#L1553),
+[src/discover/registry.rs:1704](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/discover/registry.rs#L1704), [src/hooks/decision.rs:143](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/decision.rs#L143)).
+The log guidance distinguishes the silent bare cap, the stat cap notice and
+merge retention with an explicit count ([src/cmds/git/git_cmd.rs:1550](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/git_cmd.rs#L1550),
+[src/cmds/git/git_cmd.rs:1784](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/git_cmd.rs#L1784), [src/cmds/git/git_cmd.rs:1842](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/git_cmd.rs#L1842)).
+Both exact-command sentences retire find ([src/cmds/system/find_cmd.rs:417](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L417)).
+The table above and both SHA256SUMS files pin the revised carriers and mirrors.
+
+Our [probe rerun](../../evidence/artifacts/rtk-f4-remeasurement-20261004/rtk-behaviour-probe.json)
+and [hook/prefix remeasurement](../../evidence/artifacts/rtk-f4-remeasurement-20261004/hook-and-prefix-probe.json)
+are recorded beside [PR #701 README](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md#L67), [peer probe](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk_behaviour_probe.py), [peer JSON](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-behaviour-probe.json), [exclusions fixture](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/fixtures/rtk-hook-exclusions.toml).
+The [decision](../../docs/decisions/2026-10-04-rtk-051-f4-exceptions.md) records
+the configuration correction, fixture limits, bare-name find distinction and
+8,190-byte template. These are CLI fixture and structural observations.
 
 
 The adoption source and its mirror hold these bytes; a later change to either needs a new dated section here, new rows in `SHA256SUMS` and new rows in the test.

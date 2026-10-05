@@ -1,0 +1,911 @@
+{
+  "schema": "rtk-f4-scratch-supplement/1",
+  "probe_source": "PR #701@e3ed1fe36:rtk_behaviour_probe.py",
+  "exclusions_sha256": "0e788d025386c9a97c0adcda270e3c0ce39c679a22b90462599a31805bd81edd",
+  "records": [
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"git show HEAD:a/x/util.py\"}}",
+      "stdout_bytes": 188,
+      "stdout_lines": 1,
+      "stdout_sha256": "060e20c74d178881823b93827b9bca857ddf72a13b72f6a6a218bc51196d5d72",
+      "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk git show HEAD:a/x/util.py\"},\"permissionDecision\":\"allow\"}}\n"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"git -C <scratch>/repo show HEAD:a/x/util.py\"}}",
+      "stdout_bytes": 206,
+      "stdout_lines": 1,
+      "stdout_sha256": "67e9cbff16a364c0f496861d967dc2ebe4074bec39ee953d0ab2df07245e0f4e",
+      "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk git -C <scratch>/repo show HEAD:a/x/util.py\"},\"permissionDecision\":\"allow\"}}\n"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"diff /nonexistent a/x/util.py\"}}",
+      "stdout_bytes": 192,
+      "stdout_lines": 1,
+      "stdout_sha256": "a60f21c9b8f13aae5e7653a62d692709353ee2b7e91d1c089aabf8c204fe76f8",
+      "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk diff /nonexistent a/x/util.py\"},\"permissionDecision\":\"allow\"}}\n"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"jq . data.json\"}}",
+      "stdout_bytes": 177,
+      "stdout_lines": 1,
+      "stdout_sha256": "8997a12bd9b0919923ea1cd724a49947eca94e5222137778f05c3154ad280362",
+      "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk jq . data.json\"},\"permissionDecision\":\"allow\"}}\n"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"git branch\"}}",
+      "stdout_bytes": 173,
+      "stdout_lines": 1,
+      "stdout_sha256": "9a6c1339e476b5e2917af909b9b247472a198d97fb1e37cb0b52f1bee6bc93c7",
+      "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk git branch\"},\"permissionDecision\":\"allow\"}}\n"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"echo hi\"}}",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"bash -c 'git status'\"}}",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"git diff --exit-code\"}}",
+      "stdout_bytes": 183,
+      "stdout_lines": 1,
+      "stdout_sha256": "a949b6bc6a99ae6ce2952d0a1ce3852d223d65bcf7b03bb7e43d127581258e23",
+      "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk git diff --exit-code\"},\"permissionDecision\":\"allow\"}}\n"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"git log\"}}",
+      "stdout_bytes": 170,
+      "stdout_lines": 1,
+      "stdout_sha256": "017c6ffd0f39afcfa7eab2adae5c404f4cc9dc704f99f13ba64297d52bca0b5a",
+      "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk git log\"},\"permissionDecision\":\"allow\"}}\n"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "rewrite",
+        "rtk git show HEAD:a/x/util.py"
+      ],
+      "exit": 3,
+      "stderr": "",
+      "stdout_bytes": 29,
+      "stdout_lines": 1,
+      "stdout_sha256": "01f2c424445a27708cf4a8a87b4894c4c621dd219d770b93dc2b850ac24227b6",
+      "stdout": "rtk git show HEAD:a/x/util.py"
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"git show HEAD:a/x/util.py\"}}",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"git -C <scratch>/repo show HEAD:a/x/util.py\"}}",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"diff /nonexistent a/x/util.py\"}}",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"jq . data.json\"}}",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"git branch\"}}",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"echo hi\"}}",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"bash -c 'git status'\"}}",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"git diff --exit-code\"}}",
+      "stdout_bytes": 183,
+      "stdout_lines": 1,
+      "stdout_sha256": "a949b6bc6a99ae6ce2952d0a1ce3852d223d65bcf7b03bb7e43d127581258e23",
+      "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk git diff --exit-code\"},\"permissionDecision\":\"allow\"}}\n"
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "hook",
+        "codex"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdin": "{\"hook_event_name\": \"PreToolUse\", \"tool_name\": \"Bash\", \"permission_mode\": \"default\", \"tool_input\": {\"command\": \"git log\"}}",
+      "stdout_bytes": 170,
+      "stdout_lines": 1,
+      "stdout_sha256": "017c6ffd0f39afcfa7eab2adae5c404f4cc9dc704f99f13ba64297d52bca0b5a",
+      "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk git log\"},\"permissionDecision\":\"allow\"}}\n"
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "rewrite",
+        "rtk git show HEAD:a/x/util.py"
+      ],
+      "exit": 3,
+      "stderr": "",
+      "stdout_bytes": 29,
+      "stdout_lines": 1,
+      "stdout_sha256": "01f2c424445a27708cf4a8a87b4894c4c621dd219d770b93dc2b850ac24227b6",
+      "stdout": "rtk git show HEAD:a/x/util.py"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "git",
+        "show",
+        "HEAD:a/x/util.py"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 48000,
+      "stdout_lines": 500,
+      "stdout_sha256": "7a15d7b84cae8e2a23ec4f6070f882717a83c8de1fbeed57b6aafee1c060cd0c",
+      "blob_content_lines": 500,
+      "blob_content_bytes": 48000
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "git",
+        "show",
+        "HEAD:a/x/util.py"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 8246,
+      "stdout_lines": 86,
+      "stdout_sha256": "8959bfa8751457f2dda9f3ff43aff2b979ce04585f191d4c1a0d96d906742256",
+      "blob_content_lines": 85,
+      "blob_content_bytes": 8160
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "git",
+        "show",
+        "HEAD:a/x/util.py"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 8246,
+      "stdout_lines": 86,
+      "stdout_sha256": "8959bfa8751457f2dda9f3ff43aff2b979ce04585f191d4c1a0d96d906742256",
+      "blob_content_lines": 85,
+      "blob_content_bytes": 8160
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "git",
+        "-C",
+        "<scratch>/repo",
+        "show",
+        "HEAD:a/x/util.py"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 48000,
+      "stdout_lines": 500,
+      "stdout_sha256": "7a15d7b84cae8e2a23ec4f6070f882717a83c8de1fbeed57b6aafee1c060cd0c",
+      "blob_content_lines": 500,
+      "blob_content_bytes": 48000
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "git",
+        "-C",
+        "<scratch>/repo",
+        "show",
+        "HEAD:a/x/util.py"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 8268,
+      "stdout_lines": 86,
+      "stdout_sha256": "51c72b27361a09640adf162def19a4c607970bac2d75c1d3e12e0a981a48da82",
+      "blob_content_lines": 85,
+      "blob_content_bytes": 8160
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "git",
+        "-C",
+        "<scratch>/repo",
+        "show",
+        "HEAD:a/x/util.py"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 8268,
+      "stdout_lines": 86,
+      "stdout_sha256": "51c72b27361a09640adf162def19a4c607970bac2d75c1d3e12e0a981a48da82",
+      "blob_content_lines": 85,
+      "blob_content_bytes": 8160
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "diff",
+        "/nonexistent",
+        "a/x/util.py"
+      ],
+      "exit": 2,
+      "stderr": "diff: /nonexistent: No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "diff",
+        "/nonexistent",
+        "a/x/util.py"
+      ],
+      "exit": 2,
+      "stderr": "rtk diff: /nonexistent: No such file or directory (os error 2)\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "diff",
+        "/nonexistent",
+        "a/x/util.py"
+      ],
+      "exit": 2,
+      "stderr": "rtk diff: /nonexistent: No such file or directory (os error 2)\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "git",
+        "branch",
+        "-a"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 1558,
+      "stdout_lines": 54,
+      "stdout_sha256": "5458b1a864e7b80fb4ffe2bf6a89b6c308af2512d780412df2316a1c7a2c2e4e",
+      "branch_observation": [
+        "+ aa-sibling",
+        "  remotes/origin/aa-sibling"
+      ]
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "git",
+        "branch",
+        "-a"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 237,
+      "stdout_lines": 15,
+      "stdout_sha256": "509c186cc2c0cb1e82a0ff0f5c7f3859504d31342758746643bc42c1b2a5d6bf",
+      "stdout": "* main\n  + aa-sibling\n  feature\n  remote-only (51):\n    aa-sibling\n    unrelated-00\n    unrelated-01\n    unrelated-02\n    unrelated-03\n    unrelated-04\n    unrelated-05\n    unrelated-06\n    unrelated-07\n    unrelated-08\n    ... +41 more\n"
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "git",
+        "branch",
+        "-a"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 237,
+      "stdout_lines": 15,
+      "stdout_sha256": "509c186cc2c0cb1e82a0ff0f5c7f3859504d31342758746643bc42c1b2a5d6bf",
+      "stdout": "* main\n  + aa-sibling\n  feature\n  remote-only (51):\n    aa-sibling\n    unrelated-00\n    unrelated-01\n    unrelated-02\n    unrelated-03\n    unrelated-04\n    unrelated-05\n    unrelated-06\n    unrelated-07\n    unrelated-08\n    ... +41 more\n"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "jq",
+        ".[]",
+        "long-data.json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 18300,
+      "stdout_lines": 100,
+      "stdout_sha256": "1cb8a19eb0ff3a12f1d514ab4447ef7912c46060a979a9ed3d92f83db7e5b638",
+      "jq_content_lines": 100,
+      "jq_max_content_width": 182
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "jq",
+        ".[]",
+        "long-data.json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 4904,
+      "stdout_lines": 42,
+      "stdout_sha256": "c7da77df2d2a1a6f34b272b57772a78c3cb2d73388ec936e296aba2254bf5696",
+      "jq_content_lines": 40,
+      "jq_max_content_width": 120
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "jq",
+        ".[]",
+        "long-data.json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 4904,
+      "stdout_lines": 42,
+      "stdout_sha256": "c7da77df2d2a1a6f34b272b57772a78c3cb2d73388ec936e296aba2254bf5696",
+      "jq_content_lines": 40,
+      "jq_max_content_width": 120
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "find",
+        "./missing"
+      ],
+      "exit": 1,
+      "stderr": "find: './missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "find",
+        "./missing"
+      ],
+      "exit": 1,
+      "stderr": "find: './missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "find",
+        "./missing"
+      ],
+      "exit": 1,
+      "stderr": "find: './missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "find",
+        "<scratch>/missing"
+      ],
+      "exit": 1,
+      "stderr": "find: '<scratch>/missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "find",
+        "<scratch>/missing"
+      ],
+      "exit": 1,
+      "stderr": "find: '<scratch>/missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "find",
+        "<scratch>/missing"
+      ],
+      "exit": 1,
+      "stderr": "find: '<scratch>/missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "find",
+        "./missing",
+        "-name",
+        "*.txt"
+      ],
+      "exit": 1,
+      "stderr": "find: './missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "find",
+        "./missing",
+        "-name",
+        "*.txt"
+      ],
+      "exit": 1,
+      "stderr": "find: './missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "find",
+        "./missing",
+        "-name",
+        "*.txt"
+      ],
+      "exit": 1,
+      "stderr": "find: './missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "find",
+        "./missing",
+        "-maxdepth",
+        "1",
+        "-type",
+        "f"
+      ],
+      "exit": 1,
+      "stderr": "find: './missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "find",
+        "./missing",
+        "-maxdepth",
+        "1",
+        "-type",
+        "f"
+      ],
+      "exit": 1,
+      "stderr": "find: './missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "find",
+        "./missing",
+        "-maxdepth",
+        "1",
+        "-type",
+        "f"
+      ],
+      "exit": 1,
+      "stderr": "find: './missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "find",
+        "missing"
+      ],
+      "exit": 1,
+      "stderr": "find: 'missing': No such file or directory\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "find",
+        "missing"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "find",
+        "missing"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "cd"
+      ],
+      "exit": 127,
+      "stderr": "[rtk: No such file or directory (os error 2)]\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "export"
+      ],
+      "exit": 127,
+      "stderr": "[rtk: No such file or directory (os error 2)]\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "source"
+      ],
+      "exit": 127,
+      "stderr": "[rtk: No such file or directory (os error 2)]\n",
+      "stdout_bytes": 0,
+      "stdout_lines": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": ""
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "test",
+        "--help"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 474,
+      "stdout_lines": 12,
+      "stdout_sha256": "3c879632e13b8fc67736ececbc3530784bbfea6a69857ad2a0c213a30694aa44",
+      "stdout": "Run tests and show only failures\n\nUsage: rtk test [OPTIONS] [COMMAND]...\n\nArguments:\n  [COMMAND]...  Test command (e.g. cargo test)\n\nOptions:\n      --shell <SHELL>  Execute one quoted command string with this shell instead of direct argv execution\n      --ultra-compact  Ultra-compact mode: ASCII icons, inline format (Level 2 optimizations)\n      --skip-env       Set SKIP_ENV_VALIDATION=1 for child processes (Next.js, tsc, lint, prisma)\n  -h, --help           Print help\n"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "git",
+        "log"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 409,
+      "stdout_lines": 10,
+      "stdout_sha256": "16de955ddd4736dc79bc9e7563170c76b700011edf8f76b366abb51cf4210cda",
+      "stdout": "7f89c90 commit 14 (9 months ago) <probe>\n601cd7f feature work (9 months ago) <probe>\n76da057 commit 13 (9 months ago) <probe>\ne2019f8 commit 12 (9 months ago) <probe>\nce6b3ce commit 11 (9 months ago) <probe>\nd61c9da commit 10 (9 months ago) <probe>\n5521ebe commit 9 (9 months ago) <probe>\n7f0c719 commit 8 (9 months ago) <probe>\n09a289f commit 7 (9 months ago) <probe>\n629bc0a commit 6 (9 months ago) <probe>\n"
+    },
+    {
+      "config": "upstream_defaults",
+      "argv": [
+        "rtk",
+        "init",
+        "-g",
+        "--codex",
+        "--no-trust-filters"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "hooks": {
+        "hooks": {
+          "PreToolUse": [
+            {
+              "matcher": "Bash",
+              "hooks": [
+                {
+                  "type": "command",
+                  "command": "rtk hook codex"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "stdout_bytes": 899,
+      "stdout_lines": 24,
+      "stdout_sha256": "3b1bb0b241463dabe605fba4a4ae60d8cd4460774df94b93e095d9f7d33ead99",
+      "stdout": "\nRTK configured for Codex CLI.\n\n  RTK.md:    <scratch>/home-defaults/.codex/RTK.md\n  Hook:      <scratch>/home-defaults/.codex/hooks.json (registered)\n  AGENTS.md: @<scratch>/home-defaults/.codex/RTK.md reference added\n\n  Codex global instructions path: <scratch>/home-defaults/.codex/AGENTS.md\n\n  Restart Codex. For a project hook, approve it when Codex asks you to trust it.\n\n  Optional: if history recording fails with SQLITE_CANTOPEN in the\n  workspace-write sandbox, grant write access to the tracking directory:\n\nsandbox_mode = \"workspace-write\"\n\n[sandbox_workspace_write]\nwritable_roots = [\"<scratch>/home-defaults/.local/share/rtk\"]\n\n  Merge this into Codex config.toml only if you want persistent history.\n  Keep existing writable_roots; do not add a duplicate table.\n  This grants access to the directory, including SQLite sidecar files.\n  No Codex permission settings have been changed.\n\n"
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "git",
+        "log"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout_bytes": 409,
+      "stdout_lines": 10,
+      "stdout_sha256": "16de955ddd4736dc79bc9e7563170c76b700011edf8f76b366abb51cf4210cda",
+      "stdout": "7f89c90 commit 14 (9 months ago) <probe>\n601cd7f feature work (9 months ago) <probe>\n76da057 commit 13 (9 months ago) <probe>\ne2019f8 commit 12 (9 months ago) <probe>\nce6b3ce commit 11 (9 months ago) <probe>\nd61c9da commit 10 (9 months ago) <probe>\n5521ebe commit 9 (9 months ago) <probe>\n7f0c719 commit 8 (9 months ago) <probe>\n09a289f commit 7 (9 months ago) <probe>\n629bc0a commit 6 (9 months ago) <probe>\n"
+    },
+    {
+      "config": "repository_exclusions",
+      "argv": [
+        "rtk",
+        "init",
+        "-g",
+        "--codex",
+        "--no-trust-filters"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "hooks": {
+        "hooks": {
+          "PreToolUse": [
+            {
+              "matcher": "Bash",
+              "hooks": [
+                {
+                  "type": "command",
+                  "command": "rtk hook codex"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "stdout_bytes": 909,
+      "stdout_lines": 24,
+      "stdout_sha256": "b54b9f67544d0c30bdb5752e61624ff3b27b796254d49cf6e54e2ba4c5d646bb",
+      "stdout": "\nRTK configured for Codex CLI.\n\n  RTK.md:    <scratch>/home-exclusions/.codex/RTK.md\n  Hook:      <scratch>/home-exclusions/.codex/hooks.json (registered)\n  AGENTS.md: @<scratch>/home-exclusions/.codex/RTK.md reference added\n\n  Codex global instructions path: <scratch>/home-exclusions/.codex/AGENTS.md\n\n  Restart Codex. For a project hook, approve it when Codex asks you to trust it.\n\n  Optional: if history recording fails with SQLITE_CANTOPEN in the\n  workspace-write sandbox, grant write access to the tracking directory:\n\nsandbox_mode = \"workspace-write\"\n\n[sandbox_workspace_write]\nwritable_roots = [\"<scratch>/home-exclusions/.local/share/rtk\"]\n\n  Merge this into Codex config.toml only if you want persistent history.\n  Keep existing writable_roots; do not add a duplicate table.\n  This grants access to the directory, including SQLite sidecar files.\n  No Codex permission settings have been changed.\n\n"
+    }
+  ],
+  "evidence_class": "local_integration: scratch HOME/XDG, original peer fixture helpers and native RTK commands",
+  "sanitization": "The absolute temporary-directory prefix is replaced with <scratch>. Large synthetic stdout is represented by its sanitized hash and observed content counts; exact returned output stays in .tmp-build/rtk-f4-scratch-supplement.json."
+}

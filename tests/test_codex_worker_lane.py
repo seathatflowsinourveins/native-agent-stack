@@ -469,8 +469,16 @@ class TemplateTests(unittest.TestCase):
     def test_exceptions_name_every_raw_sensitive_form(self):
         _, _, exceptions = template_segments()
         for needle in ("`git show REV:path`", "git -C DIR show REV:path", "`diff`", "`git branch`", "`git log`",
-                       "`jq`", "`find`", "`rtk proxy <command>`", "`cd`", "`export`", "`source`", "127"):
+                       "`jq`", "`rtk proxy <command>`", "`cd`", "`export`", "`source`", "127"):
             self.assertIn(needle, exceptions)
+        self.assertNotIn("`find`", exceptions)
+        self.assertIn("With the bootstrap-installed rtk exclusions config", exceptions)
+        self.assertIn("otherwise it rewrites them", exceptions)
+        self.assertIn("An explicit `rtk` prefix bypasses exclusions: never prefix them", exceptions)
+        self.assertIn("bare: at most 10 one-line commits, drops merges, no notice", exceptions)
+        self.assertIn("`--stat`: at most 10, keeps merges, cap notice", exceptions)
+        self.assertIn("`--oneline`, `--format=%s`, `--graph --oneline` drop merges", exceptions)
+        self.assertIn("For full history or merges, use `-n <count>` or native git", exceptions)
 
     def test_adoption_status_finds_the_rtk_text_inline(self):
         # scripts/adoption_status.py (#368) counts RTK as wired only when RTK.md's text is inline in what Codex

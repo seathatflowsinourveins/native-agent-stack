@@ -1073,6 +1073,15 @@ snapshots above retain their original content. This is a documentation
 projection; it establishes no new WSL installation, client execution or
 qualification. The byte-pinned upstream awareness block stays at v0.50.0.
 
+The current projection follows the [conditional F4 correction](2026-10-04-rtk-051-f4-exceptions.md):
+five exceptions, configured hook exclusions and explicit log-count guidance
+([src/discover/registry.rs:1704](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/discover/registry.rs#L1704), [src/hooks/decision.rs:143](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/decision.rs#L143),
+[src/cmds/git/git_cmd.rs:1842](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/git_cmd.rs#L1842), [src/cmds/system/find_cmd.rs:417](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L417)).
+Our [probe rerun](../../evidence/artifacts/rtk-f4-remeasurement-20261004/rtk-behaviour-probe.json) and
+[hook/prefix remeasurement](../../evidence/artifacts/rtk-f4-remeasurement-20261004/hook-and-prefix-probe.json) are recorded beside
+[PR #701 README](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md#L67), [peer probe](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk_behaviour_probe.py), [peer JSON](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-behaviour-probe.json), [exclusions fixture](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/fixtures/rtk-hook-exclusions.toml). RTK is unwired in this distribution's map, so --write-blocks finishes
+with byte-identical generated Codex instructions while the dropped-unit list changes.
+
 `examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (2 unit(s) left out; 57 of 58 lines stay):
 
 ```text
@@ -1084,7 +1093,7 @@ Preserve the existing RTK-managed import when that component is installed.
 
 ```
 
-`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (24 unit(s) left out; 24 of 65 lines stay):
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (23 unit(s) left out; 24 of 64 lines stay):
 
 ```text
 line 11, sentence; names Promptfoo
@@ -1139,33 +1148,30 @@ line 54, marker; names rtk
 <!-- native-agent-stack:rtk-exceptions -->
 
 line 56, sentence; names rtk
-rtk 0.51.0 positional expansion needs `--shell`.
+With the bootstrap-installed rtk exclusions config, the hook leaves the first four commands native; otherwise it rewrites them.
 
 line 56, sentence; names rtk
-An explicit `rtk` prefix bypasses rtk's own exclusion list, so "the prefix is always safe" does not hold for these commands: rtk changes their output or exit status.
+An explicit `rtk` prefix bypasses exclusions: never prefix them.
 
 line 56, sentence; names rtk
-Run them natively, or as `rtk proxy <command>` to keep the call tracked:
+Run natively or as `rtk proxy <command>`. rtk 0.51.0 positional expansion needs `--shell`.
 
 line 57, bullet; names rtk
-- `git show REV:path` in any form, including `git -C DIR show REV:path`: rtk keeps about 8 KiB of the blob.
+- `git show REV:path` (also `git -C DIR show REV:path`): rtk keeps about 8 KiB of the blob.
 
 line 58, bullet; names rtk
 - `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
 
 line 59, bullet; names rtk
-- `git branch`: rtk can list a branch checked out in another worktree as remote-only.
+- `git branch`: rtk may list a branch in another worktree as remote-only.
 
 line 60, bullet; names rtk
-- `git log` when the complete history matters: rtk stops at 10 commits without a notice and drops merge commits.
-
-line 61, bullet; names rtk
 - `jq`: rtk keeps 40 lines of at most 120 characters.
 
-line 62, bullet; names rtk
-- `find` on a path that may not exist: rtk exits 0 with no output.
+line 61, bullet; names rtk; its first sentence names the tool, so the item goes with its other sentences
+- `git log` via rtk: bare: at most 10 one-line commits, drops merges, no notice; `--stat`: at most 10, keeps merges, cap notice. `--oneline`, `--format=%s`, `--graph --oneline` drop merges. For full history or merges, use `-n <count>` or native git.
 
-line 64, sentence; names rtk
-Never put `rtk` in front of a shell builtin such as `cd`, `export` or `source`: rtk exits 127 and the rest of a `&&` chain does not run.
+line 63, sentence; names rtk
+Shell builtins (`cd`, `export`, `source`) stay in the calling shell: `rtk` exits 127 and halts a `&&` chain.
 
 ```
