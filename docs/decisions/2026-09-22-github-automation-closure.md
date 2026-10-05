@@ -1070,7 +1070,8 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   so a decoy ledger cannot be validated in place of the published one. The job runs the base
   commit's copy of the gate against the PR checkout. A PR that changes verdict rows, waves or
   sealed artifacts together with the gate's trust base (the gate, the modules it imports and
-  runs, the verdict tools, `validate.yml`) fails. `.github/main-ruleset.json` adds the
+  runs, the verdict tools, `.github/workflows/pr-metadata.yml`) fails (`validate.yml`
+  was the wrapper before PR #706). `.github/main-ruleset.json` adds the
   check. The coordinator applies the ruleset after merge, and until then the check reports but
   does not block.
 - **Review of the gate (2026-09-23).** An independent review found a decoy-ledger bypass (the
@@ -1486,7 +1487,8 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     executes the base branch's copy of the gate script, and that copy imports the base's trusted
     modules. A PR that leaves the job running therefore cannot change the rules that judge it.
     Second, the trust-base rule fails a PR that changes gate-trust files (which include
-    `validate.yml`) together with verdict data, as long as the job still runs the base's gate. To
+    `.github/workflows/pr-metadata.yml`, formerly `validate.yml`) together with verdict data,
+    as long as the job still runs the base's gate. To
     get past it, a PR has to rewrite the job's own step, a visible edit of a workflow file. That
     was not the only path: until the review of #135 (H1, in the "Review of #135" entry above), retargeting a PR whose gate had
     passed against another base branch reused that green run with no workflow edit at all. The

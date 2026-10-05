@@ -1377,7 +1377,8 @@ the gate script, every repository module the gate and its validators import
 (transitively, which brings in `scripts/validate.py` through
 `scripts/host_receipts.py`), the rule inputs they read (the lane-provenance
 registry `tools/sota-convergence/lane-provenance.json`, the host-receipt and
-lane-return schemas) and `validate.yml`. A rule input held inside a data file
+lane-return schemas) and the gate wrapper `.github/workflows/pr-metadata.yml`.
+A rule input held inside a data file
 counts too: `adoption/manifest.json#/platform_profiles` (which host
 os/architecture a receipt's platform binds) changed together with verdict
 data fails the same way (`RULE_INPUT_FIELDS`). The tests derive the list

@@ -78,8 +78,9 @@ are compared on parsed values without duplicate keys, so a pure reformat is not 
 
 The sealed files are self-attested: the gate checks that a row is consistent with the sealed returns
 its wave registers and that their declared model families differ, not that a cross-family review
-actually ran (the decision record's accepted residual). The gate's own rules are trusted only from the base: CI runs the base commit's copy of this script
-against the head checkout (``--root``), and a change to a verdict row, wave or sealed artifact fails
+actually ran (the decision record's accepted residual). The gate's own rules are trusted only from
+the base: ``.github/workflows/pr-metadata.yml`` runs the base commit's copy of this script against
+the head checkout (``--root``), and a change to a verdict row, wave or sealed artifact fails
 when the same comparison also changes a ``TRUST_PATHS`` file, so a weakening of the rules has to land
 (and be seen) in its own pull request first. Exit 0 prints one line when nothing of that changed;
 otherwise every violation is printed with its row key and the exit code is 1 (2 for an unresolvable
@@ -176,7 +177,7 @@ TRUST_PATHS = (
     # The Claude family's read-boundary audit (round 9, BR9-1).
     "tools/sota-convergence/transcript_audit.py",
     "tools/sota-convergence/lane-return.schema.json", "tools/sota-convergence/lane-provenance.json",
-    "adoption/host-receipt.schema.json", ".github/workflows/validate.yml",
+    "adoption/host-receipt.schema.json", ".github/workflows/pr-metadata.yml",
 )
 # Any change under these paths runs the repository validators even when no row changed: a PR
 # that only deletes or rewrites a sealed lane file must still meet scripts/landscape.py.

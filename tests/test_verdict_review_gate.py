@@ -729,11 +729,22 @@ class TrustBaseTests(GateFixture):
     def test_workflow_change_with_a_sealed_artifact_change_fails(self):
         self.record()
         self.rebase()
-        self.write(".github/workflows/validate.yml", b"name: weakened\n")
+        self.write(".github/workflows/pr-metadata.yml", b"name: weakened\n")
         path = f"{SEALED}/codex/foundation-beta-{RUN}.json"
         (self.root / path).unlink()
         self.registered.discard(path)
-        self.assertFails(self.report(), "also the gate's trust base (.github/workflows/validate.yml)")
+        self.assertFails(self.report(), "also the gate's trust base (.github/workflows/pr-metadata.yml)")
+
+    def test_metadata_workflow_change_with_a_verdict_row_change_fails(self):
+        workflow = ".github/workflows/pr-metadata.yml"
+        self.write(workflow, b"name: PR metadata gates\n")
+        self.rebase()
+        self.record()
+        self.assertPasses(self.report())
+        self.write(workflow, b"name: weakened\n")
+        report = self.report()
+        self.assertFails(report, "also the gate's trust base (.github/workflows/pr-metadata.yml)")
+        self.assertEqual(report["trust_paths_changed"], [workflow])
 
     def test_rules_change_alone_passes(self):
         self.write("scripts/verdict_review_gate.py", b"# rules change on its own\n")
