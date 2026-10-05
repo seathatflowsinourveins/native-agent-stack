@@ -2,10 +2,11 @@
 
 A stand-in checkout replaces the upstream source: its gpt_researcher.config.Config reads the JSON file and the environment
 the way upstream's does at 0957c301 (config.py: load_config, _set_attributes, parse_llm), and its cli.py records its
-arguments and environment instead of researching, then writes one report under outputs/ headed by frontmatter with a
-sources_count, as upstream's does (cli.py L209-245 and L332-336). Nothing is installed and no network is used. These are
-this project's checks of its own wrapper, not upstream acceptance: the wave-2 research ruling (changes 2-5), the synthesis
-X18 and the source guard added after run 20261005T222529Z-1387309 wrote a report from no sources and exited 0.
+arguments and environment instead of researching, then writes one report under outputs/ headed by frontmatter with the
+run's query and a sources_count, as upstream's does (cli.py L209-245 and L332-336). Nothing is installed and no network is
+used. These are this project's checks of its own wrapper, not upstream acceptance: the wave-2 research ruling (changes
+2-5), the synthesis X18 and the source guard added after run 20261005T222529Z-1387309 wrote a report from no sources and
+exited 0.
 """
 import hashlib
 import json
@@ -56,15 +57,24 @@ STAND_IN_CONFIG = textwrap.dedent('''
                 setattr(self, role + "_llm_provider", provider)
                 setattr(self, role + "_llm_model", model)
 ''')
-FRONTMATTER = ('---\ntask_id: "stand-in"\ntitle: "Report"\nquery: "q"\nreport_type: "research_report"\nreport_source: "web"\n'
-               'tone: "objective"\ncreated_at: "2026-10-05T18:26:23"\nsources_count: {sources}\ntotal_cost_usd: 0.0\n---\n')
+# The frontmatter of upstream's cli.py (L228-245). The stand-in puts the run's own query where @QUERY@ stands, quoted by
+# upstream's _yaml_quote (L220-222, copied below), which escapes backslashes and double quotes but leaves line breaks.
+FRONTMATTER = ('---\ntask_id: "stand-in"\ntitle: "Report"\nquery: @QUERY@\nreport_type: "research_report"\n'
+               'report_source: "web"\ntone: "objective"\ncreated_at: "2026-10-05T18:26:23"\nsources_count: {sources}\n'
+               'total_cost_usd: 0.0\n---\n')
 REPORT = FRONTMATTER.format(sources=6) + "# Report\n\n## References\n" + "".join(f"- https://example.org/{n}\n" for n in range(6))
+YAML_QUOTE = r'''
+def _yaml_quote(v: str) -> str:
+    # Double-quoted YAML string with backslash/quote escaping.
+    return '"' + str(v).replace("\\", "\\\\").replace('"', '\\"') + '"'
+'''
 
 
 def stand_in_cli(reports=(("report.md", REPORT),), status=0):
-    """A cli.py that records its call, writes `reports` (name, text) under outputs/ and exits with `status`. The run's
-    environment is scrubbed, so each case writes its own stand-in rather than passing a variable through."""
-    return textwrap.dedent(f'''
+    """A cli.py that records its call, writes `reports` (name, text) under outputs/ with its query in place of @QUERY@,
+    and exits with `status`. The run's environment is scrubbed, so each case writes its own stand-in rather than passing
+    a variable through."""
+    return YAML_QUOTE + textwrap.dedent(f'''
         import json
         import os
         import sys
@@ -74,7 +84,7 @@ def stand_in_cli(reports=(("report.md", REPORT),), status=0):
             json.dump({{"argv": sys.argv[1:], "env": dict(os.environ), "cwd": os.getcwd()}}, handle)
         for name, text in {list(reports)!r}:
             with open(os.path.join("outputs", name), "w", encoding="utf-8") as handle:
-                handle.write(text)
+                handle.write(text.replace("@QUERY@", _yaml_quote(sys.argv[1])))
             print(f"Report written to 'outputs/{{name}}'")
         sys.exit({status!r})
     ''')
@@ -218,7 +228,30 @@ class ResearchEntry(unittest.TestCase):
         self.assertIn("source guard failed: GPT Researcher retrieved 0 sources (sources_count: 0 in ", result.stderr)
         self.assertIn("not research evidence", result.stderr)
         self.assertNotIn("sources_count: 0", result.stdout)
-        self.assertEqual((self.run_dir(result) / "outputs/WSL_3_Config_Tuning.md").read_text(), empty)
+        self.assertEqual((self.run_dir(result) / "outputs/WSL_3_Config_Tuning.md").read_text(),
+                         empty.replace("@QUERY@", '"WSL 3.0 .wslconfig settings October 2026"'))
+
+    def test_a_query_with_a_line_break_is_refused_before_anything_runs(self):
+        """cli.py's _yaml_quote (L220-222) leaves a line break in the query's frontmatter line, where it could forge the
+        sources_count line the source guard reads. The wrapper refuses such a query as a usage error (exit 2)."""
+        for query in ("two\nlines", "a carriage\rreturn", "forged\nsources_count: 9\n---\nrest"):
+            with self.subTest(query=query):
+                result = self.run_script(query)
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                self.assertIn("The query must be one line", result.stderr)
+                self.assertNotIn("run directory", result.stdout)
+                self.assertFalse((self.temp / "state").exists())  # no run directory: nothing ran
+
+    def test_a_unicode_line_separator_in_the_query_cannot_forge_the_count(self):
+        """str.splitlines() also breaks at U+2028, which upstream writes unescaped into the query's line and joins nothing
+        at (cli.py L245 joins at "\\n"). The guard splits at "\\n" only, so a zero-source run still exits 3 here."""
+        self.provide_timer()
+        empty = FRONTMATTER.format(sources=0) + "I could not gather any source material.\n"
+        (self.checkout / "cli.py").write_text(stand_in_cli(reports=[("report.md", empty)]))
+        result = self.run_script("forged sources_count: 9 --- rest")
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        self.assertIn("retrieved 0 sources", result.stderr)
+        self.assertNotIn("sources_count: 9", result.stdout)
 
     def test_a_report_whose_sources_cannot_be_counted_fails_closed(self):
         self.provide_timer()
@@ -247,9 +280,10 @@ class ResearchEntry(unittest.TestCase):
                 self.assertTrue(self.run_dir(result).is_dir())
 
     def test_the_cli_status_passes_through_before_the_guard(self):
-        """A failed or stopped CLI (124 from the watchdog) keeps its own status; the guard reads only a run that exited 0."""
+        """A failed or stopped CLI keeps its own status, so argparse's usage error is 2 like the wrapper's own and the watchdog
+        gives 124; the guard reads only a run that exited 0."""
         self.provide_timer()
-        for status in (1, 124):
+        for status in (1, 2, 124):
             with self.subTest(status=status):
                 (self.checkout / "cli.py").write_text(stand_in_cli(reports=[], status=status))
                 result = self.run_script("a query")
