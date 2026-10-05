@@ -355,5 +355,68 @@ class CheckTests(Case):
         self.assertEqual(self.run_tool(server, "--check")[0], 0)
 
 
+class ExecutionRuleTests(Case):
+    """The hook rewrites a command to `rtk <command>` before Codex matches execution rules (codex-rs/core/src/tools/registry.rs L603-L660 at rust-v0.160.0;
+    codex-rs/core/src/exec_policy.rs L316-L420 matches the rules against the rewritten command's words), so a rule on `git push` does not match
+    `rtk git push`. Trusting the hook is what activates it, so --apply refuses while the user layer's rules directory holds a rules file."""
+
+    def rules(self, name="default.rules", body='prefix_rule(pattern = ["git", "push"], decision = "forbidden")\n'):
+        directory = self.home / "rules"
+        directory.mkdir(exist_ok=True)
+        (directory / name).write_text(body, encoding="utf-8")
+
+    def test_a_rules_file_refuses_the_apply_before_any_write_or_backup(self):
+        self.rules()
+        server = FakeServer([hook(KEY, RTK)])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 2)
+        self.assertIn("default.rules", err)
+        self.assertIn("rtk git push", err)
+        self.assertIn("--allow-exec-rules", err)
+        self.assertEqual(server.writes(), [])
+        self.assertEqual(sorted(p.name for p in self.home.iterdir()), ["config.toml", "rules"])  # no backup
+
+    def test_the_flag_lets_the_apply_through(self):
+        self.rules()
+        server = FakeServer([hook(KEY, RTK)])
+        code, out, err = self.run_tool(server, "--apply", "--allow-exec-rules")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(len(server.writes()), 1)
+        self.assertIn("trusted 1 hook(s)", out)
+
+    def test_a_dry_run_and_a_check_name_the_rules_and_are_not_refused(self):
+        self.rules()
+        for extra in ((), ("--check",)):
+            with self.subTest(extra=extra):
+                server = FakeServer([hook(KEY, RTK)])
+                code, out, err = self.run_tool(server, *extra)
+                self.assertEqual(code, 0 if not extra else 5, err)
+                self.assertIn("default.rules", out + err)
+                self.assertEqual(server.writes(), [])
+
+    def test_no_rules_directory_an_empty_one_and_other_files_do_not_refuse(self):
+        (self.home / "rules").mkdir()
+        (self.home / "rules" / "notes.txt").write_text("not a rules file\n", encoding="utf-8")
+        (self.home / "rules" / "empty.rules").write_text("  \n", encoding="utf-8")
+        server = FakeServer([hook(KEY, RTK)])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+
+    def test_every_rules_file_is_named(self):
+        self.rules("default.rules")
+        self.rules("team.rules", 'prefix_rule(pattern = ["git", "commit"], decision = "prompt")\n')
+        code, _, err = self.run_tool(FakeServer([hook(KEY, RTK)]), "--apply")
+        self.assertEqual(code, 2)
+        self.assertIn("default.rules", err)
+        self.assertIn("team.rules", err)
+
+    def test_an_already_trusted_hook_is_nothing_to_do_even_with_rules(self):
+        self.rules()
+        server = FakeServer([hook(KEY, RTK, "trusted")])
+        code, out, err = self.run_tool(server, "--apply")
+        self.assertEqual(code, 0, err)
+        self.assertIn("nothing to do", out)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -14,6 +14,14 @@ hooks of the base user layer whose command equals one named with --command, neve
   python3 tools/adoption/codex_hook_trust.py --command "rtk hook codex" --apply    # back up config.toml (0600), trust, read back
   python3 tools/adoption/codex_hook_trust.py --command "rtk hook codex" --check    # verify: exit 0 only while every match is trusted
 
+Trusting the hook is what activates it, and an activated hook changes what Codex's execution rules see. Codex runs a PreToolUse hook before the
+tool handler and replaces the call with the hook's `updatedInput` (codex-rs/core/src/tools/registry.rs L603-L660, rust-v0.159.3 and rust-v0.160.0), and the
+handler's approval path matches execution rules against the command words of the rewritten call (codex-rs/core/src/exec_policy.rs L316-L420); RTK's hook
+rewrites `git push` to `rtk git push` and has no Codex rule source (rtk-ai/rtk v0.51.0 hooks/codex/README.md L14-L24, src/hooks/permissions.rs L64-L72), so a
+rule on `git push` does not match the rewritten command (`codex execpolicy check` shows it). --apply therefore refuses while the user layer's rules
+directory (<codex home>/rules) holds a rules file with content, and names the files; --allow-exec-rules is the explicit acceptance, after writing the rtk forms
+of the rules or excluding the commands in rtk's exclude_commands. Rules in a project's .codex/rules or a managed layer are not visible here.
+
 A dry run makes no trust or config edit and no backup. It is not read-only: starting the app-server creates its own state files in
 the Codex home (SQLite databases, an installation id, the bundled skills; measured on a scratch home, 2026-10-04).
 
@@ -30,7 +38,7 @@ it had, and `trusted`; a hook that vanished, moved or changed during the write, 
 the write, are failures. It is idempotent: with every match already trusted it makes no edit.
 --check verifies and nothing else (the install plan's acceptance runs it): it makes no edit and no backup, and takes no part in the
 refusal beside a running codex, which only --apply has. Exit status: 0 done, nothing to do, or --check found every match trusted,
-2 refused before any write, 3 a write or the read-back failed, 4 no hook of the user layer has a named command (register it first),
+2 refused before any write (a running codex, or execution rules without --allow-exec-rules), 3 a write or the read-back failed, 4 no hook of the user layer has a named command (register it first),
 5 --check found a named hook that is not trusted (untrusted or modified), 1 unexpected.
 """
 
@@ -81,6 +89,18 @@ def read_back_problems(named: list[dict], listed: list[dict]) -> list[str]:
     return problems
 
 
+def rule_files(home: Path) -> list[Path]:
+    """The user layer's execution-rule files (<codex home>/rules/*.rules) that hold anything but whitespace."""
+    found = []
+    for path in sorted((home / "rules").glob("*.rules")):
+        try:
+            if path.is_file() and path.read_text(encoding="utf-8", errors="replace").strip():
+                found.append(path)
+        except OSError:
+            found.append(path)  # unreadable: count it, the safe reading
+    return found
+
+
 def describe(hook: dict) -> str:
     where = hook.get("matcher") or "(any)"
     return f"  {hook.get('key')}: {hook.get('eventName')} {where} {hook.get('command')!r} is {hook.get('trustStatus')}"
@@ -116,6 +136,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--codex", help="the codex executable (default: codex on PATH)")
     parser.add_argument("--cwd", help="the working directory hooks/list is asked for (default: the Codex home)")
     parser.add_argument("--codex-process-name", default="codex", help="the process name --apply refuses to run beside")
+    parser.add_argument("--allow-exec-rules", action="store_true",
+                        help="apply although the user layer holds execution rules (their rtk forms are written or the commands excluded)")
     return parser
 
 
@@ -145,6 +167,10 @@ def run(args: argparse.Namespace) -> int:
             for path, message in errors_before:
                 print(f"  note: hooks/list reports a discovery error before any write: {path}: {message}")
             todo = [hook for hook in found if hook.get("trustStatus") != "trusted"]
+            rules = rule_files(home)
+            if rules and todo:
+                print(f"  note: execution rules in {', '.join(p.name for p in rules)}: the hook rewrites `git push` to `rtk git push` before Codex matches "
+                      f"rules, so a rule on `git push` does not match it")
             if args.check:
                 if todo:
                     print("not trusted: " + "; ".join(describe(hook).strip() for hook in todo), file=sys.stderr)
@@ -158,6 +184,13 @@ def run(args: argparse.Namespace) -> int:
                 print(f"dry run: {len(todo)} hook(s) would be trusted at their current hash through config/batchWrite "
                       f"(hooks.state, upsert); run with --apply (no codex process running) to do it")
                 return 0
+            if rules and not args.allow_exec_rules:
+                print(f"refused: the user layer holds execution rules ({', '.join(str(p) for p in rules)}). Trusting `rtk hook codex` activates a hook "
+                      f"that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against the command "
+                      f"words after the rewrite, so a rule on `git push` does not match `rtk git push` (codex execpolicy check shows it; "
+                      f"codex-rs/core/src/tools/registry.rs L603-L660 and codex-rs/core/src/exec_policy.rs L316-L420). Write the rtk forms of the rules, or "
+                      f"exclude those commands in rtk's exclude_commands, then run again with --allow-exec-rules", file=sys.stderr)
+                return 2
             if running:
                 print(f"refused: {len(running)} codex processes running (pids {', '.join(running)})", file=sys.stderr)
                 return 2
