@@ -12,7 +12,7 @@ The user's words at 2026-10-05T04:26:41Z, verbatim:
 
 Carry the user's official-upstream rule into the existing-host, portable, scaffold and new-WSL instructions, including the trading lane. This serves the north-star action of building the research harness for US-equities research, historical simulation and independently qualified broker paper operation using maintained upstream components.
 
-Add this exact sentence after the source-naming sentence in the root top rule, and after the corresponding upstream reuse/source-naming sentence in the client and scaffold surfaces:
+The original job 072 sentence below was superseded by the October 5 PR #726 repair addendum. It records that job's wording, not the user's verbatim instruction:
 
 > Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) and their clean releases, and never rebuild, fork or wrap what an upstream already ships.
 
@@ -86,4 +86,33 @@ Completeness check: the rule reaches repository, both client templates, scaffold
 
 ## Overturn condition
 
-Revisit a named source when the vendor supersedes it, stops maintaining it or publishes a better native distribution. Replace its citation only after official release/source review and the lane's applicable native compatibility checks establish the successor. Glue must shrink or disappear when upstream ships its capability. A documented, pinned missing capability can justify limited glue; it does not overturn the prohibition on duplicating shipped functionality. Relaxing the user's never-rebuild/fork/wrap rule itself requires a new explicit user instruction, not popularity or a community-wrapper preference.
+Revisit a named source when the vendor supersedes it, stops maintaining it or publishes a better native distribution. Replace its citation only after official release/source review and the lane's applicable native compatibility checks establish the successor. Glue must shrink or disappear when upstream ships its capability. A documented, pinned missing capability can justify limited glue; it does not overturn the prohibition on duplicating shipped functionality. The user's rebuilding and self-building instruction is quoted verbatim above. The original blanket fork/wrap ban was our interpretation and is superseded below; it must not be attributed to the user.
+
+## Addendum (2026-10-05): PR #726 wording and clean releases
+
+The coordinator adopts this sentence on the root, both client sources, scaffold,
+trading adapter clause and generated instruction carriers:
+
+> Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) and their clean releases, and never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin.
+
+Only the 2026-10-05T04:26:41Z words under User instruction are attributed to the
+user. They say "not rebuilt,self built" and "never rebuilt that is already sota";
+they do not say fork or wrap. The explicit fork rule is the coordinator's adopted
+implementation. The glue allowance reconciles the rule with required upstream
+installers, the ecosystem launcher and `gpt_researcher.sh`, rather than treating
+their presence as authority to duplicate a shipped capability.
+
+Here, a **clean release** is the maintainer's published release or tag, installed
+by its documented installer. A prerelease counts only where the lane's selection
+explicitly names it, as `catalogs/us-equities/runtime-target.json` does for rc5.
+The stable and prerelease observations above remain dated source evidence, not
+an instruction to upgrade rc5. The pinned Alpaca README installers and Nautilus
+IBKR integration source above support reuse of the shipped SDKs and adapter.
+
+The alternative blanket wrap ban contradicted the existing integrations; retaining
+unbounded local wrappers would contradict the demonstrated-gap requirement. The
+selected wording keeps native reuse and limits glue by a cited pin. Remove glue
+when upstream closes its named gap. Reopen the instruction if a primary-source
+comparison shows it prevents a required native workflow. Byte changes and the
+temporary routing rollout gate are in
+[the context-budget record](2026-10-05-harness-context-budget.md).

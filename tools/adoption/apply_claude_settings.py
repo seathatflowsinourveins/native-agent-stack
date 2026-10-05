@@ -313,7 +313,8 @@ def deep_merge_dict(base: dict, incoming: dict) -> dict:
     return merged
 
 
-def merge_settings(base: dict, template: dict, keep_held_out: bool = False, home: str | None = None) -> dict:
+def merge_settings(base: dict, template: dict, keep_held_out: bool = False, home: str | None = None,
+                   retire_keys: tuple[str, ...] = ()) -> dict:
     """Merge `template` (the rendered adoption template) into `base` (the
     live settings), returning a new dict. Rules:
       - `hooks`: combined per event, de-duplicated by command (merge_hooks), after the hook objects that
@@ -326,7 +327,8 @@ def merge_settings(base: dict, template: dict, keep_held_out: bool = False, home
       - lists: union; host entries keep their order and a missing template
         entry joins next to its template neighbours (union_in_template_order)
       - scalars: template wins
-      - keys the template does not mention: kept from base
+      - keys the template does not mention: kept from base, except an explicitly
+        retired owned skillListingBudgetFraction (upstream skills docs, 1% default)
     """
     if not isinstance(base, dict):
         raise ApplyError("live settings file does not contain a JSON object")
@@ -337,6 +339,10 @@ def merge_settings(base: dict, template: dict, keep_held_out: bool = False, home
     if hooks is not None:
         live = base.get("hooks") if keep_held_out else retire_held_out_hooks(base.get("hooks"), hooks, home)
         merged["hooks"] = merge_hooks(live, hooks)
+    for key in retire_keys:
+        if key != "skillListingBudgetFraction" or key in template:
+            raise ApplyError(f"cannot retire an unowned or explicitly configured setting: {key}")
+        merged.pop(key, None)
     return merged
 
 
@@ -399,7 +405,8 @@ def host_home(target_path: Path) -> str | None:
     return None
 
 
-def apply(template_path: Path, target_path: Path, dry_run: bool, keep_held_out: bool = False) -> dict:
+def apply(template_path: Path, target_path: Path, dry_run: bool, keep_held_out: bool = False,
+          retire_keys: tuple[str, ...] = ()) -> dict:
     if not template_path.is_file():
         raise ApplyError(f"template not found: {template_path}")
     template = load_json(template_path)
@@ -415,7 +422,7 @@ def apply(template_path: Path, target_path: Path, dry_run: bool, keep_held_out: 
         base = {}
         original_mode = 0o600
 
-    merged = merge_settings(base, template, keep_held_out, host_home(target_path))
+    merged = merge_settings(base, template, keep_held_out, host_home(target_path), retire_keys)
     rendered = json.dumps(merged, indent=2, ensure_ascii=False) + "\n"
 
     if dry_run:
@@ -444,6 +451,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--keep-held-out-hooks", action="store_true",
                          help="Keep the live hook entries that run a held-out token-lane carrier file instead of "
                               "removing them (for a host that opted in; adoption/hooks/claude/README.md)")
+    parser.add_argument("--retire-key", choices=("skillListingBudgetFraction",), action="append", default=[],
+                         help="Retire this owned override when the template omits it, restoring the native 1%% default "
+                              "(https://code.claude.com/docs/en/skills); other host-only keys remain")
     parser.add_argument("--dry-run", action="store_true",
                          help="Print the merged result to stdout; write nothing, back up nothing")
     return parser
@@ -453,7 +463,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
-        apply(Path(args.template), Path(args.target), args.dry_run, args.keep_held_out_hooks)
+        apply(Path(args.template), Path(args.target), args.dry_run, args.keep_held_out_hooks, tuple(args.retire_key))
     except ApplyError as error:
         print(f"apply failed: {error}", file=sys.stderr)
         return 1

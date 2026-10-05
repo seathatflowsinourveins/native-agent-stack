@@ -35,7 +35,7 @@
     },
     "verdict_boundary": "Trial skills are not verdict winners; catalogs/landscape/foundation.json instructions-skills is unchanged until a sealed re-record."
   },
-  "settings_propagation": "adoption/templates/claude.settings.template.json skillOverrides, applied by tools/adoption/apply_claude_settings.py (deep merge; a key removed here is never removed from a host, so demotion writes an explicit state).",
+  "settings_propagation": "adoption/templates/claude.settings.template.json skillOverrides, applied by tools/adoption/apply_claude_settings.py (deep merge; an omitted host key stays unless explicitly retired, so demotion writes an explicit state). The new-WSL apply step retires the owned skillListingBudgetFraction override with --retire-key and reads back its absence; no other host-only setting is removed (2026-10-05 harness-context-budget repair).",
   "skills": [
     {
       "name": "typesafe-ai",

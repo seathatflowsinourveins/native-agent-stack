@@ -49,7 +49,7 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # The canonical routing move is recorded in 2026-10-05-harness-context-budget.md.
 # RTK's unchanged 0.51.0 awareness fixture is pinned to e001f773 and checked
 # separately from the qualified excerpt, which omits only its two false assurances.
-TOP_RULE_SHA256 = "aeb3cf728f0f4116a063b0d7408f0a0aa5dab4920d12d7aac7873545fe12f196"
+TOP_RULE_SHA256 = "568ee365aeef3455fc901e648eb72d28cc3b49c39f1bfba7f5e39beed20479a8"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = '<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, qualified excerpt -->\n'
 
@@ -447,7 +447,7 @@ class TemplateTests(unittest.TestCase):
     # with the Sol-primary routing of docs/decisions/2026-09-30-sol-primary-quality-defaults.md and skill matching.
     STANDING_PHRASES = (
         "`search-first`", "`find-skills`", "`skill-creator`", "`$skill-name`", "its description", "SKILL.md",
-        "native workflow", "A coordinator, not a bounded worker, invokes", "when no listed skill fits the task",
+        "native workflow", "A coordinator, not a bounded worker, invokes", "when no skill fits",
         "promptfoo", "paired benchmark", "Harbor or Inspect", "never a self-written runner", "completeness critic",
         "next landscape sweep", "lifecycle task", "each coordinator unit names the north-star action",
         "For unpinned work, `gpt-6.1-sol` at ultra", "`gpt-6-astra` at ultra", "complex workflow that needs Astra",

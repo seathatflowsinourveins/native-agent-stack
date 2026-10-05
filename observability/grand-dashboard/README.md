@@ -126,6 +126,6 @@ Primary interfaces: [Loki push/query API](https://grafana.com/docs/loki/latest/r
 
 ## Checkpoint and observation rules
 
-- Keep the public grand-dashboard checkpoint current when accepted work changes a lane, worker or gate. Its timer publishes bounded metadata; emitter freshness is distinct from checkpoint age and process liveness. Read `observability/grand-dashboard/README.md` only when operating that feature.
+- Keep the public grand-dashboard checkpoint current when accepted work changes a lane, worker or gate. Its timer publishes bounded metadata; emitter freshness is distinct from checkpoint age and process liveness.
 
 - Normal local observation uses Grafana anonymous Viewer on loopback; native model clients retain their own sign-ins. Keep Dagu operator authentication distinct from the passwordless observation path; auth:none is not a global Viewer role.

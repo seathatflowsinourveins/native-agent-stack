@@ -2,7 +2,7 @@
 
 Rules for trading research waves, data readiness and experiments. The north star and the paper-lane authorization are recorded below.
 
-For brokers, engines and data, use the vendor's own maintained repositories at their clean releases: [alpacahq/alpaca-py](https://github.com/alpacahq/alpaca-py), [the official Alpaca MCP server](https://github.com/alpacahq/alpaca-mcp-server) where an MCP is needed, [nautechsystems/nautilus_trader](https://github.com/nautechsystems/nautilus_trader), and [the official IBKR TWS API distribution](https://interactivebrokers.github.io/). No self-built adapter where upstream ships one; glue covers only what upstream lacks and cites its source at a pin. [Current release verification](../../docs/decisions/2026-10-05-official-upstream-never-rebuild.md) records the sources; runtime selections stay with the trading lane.
+For brokers, engines and data, use the vendor's own maintained repositories at their clean releases: [alpacahq/alpaca-py](https://github.com/alpacahq/alpaca-py), [the official Alpaca MCP server](https://github.com/alpacahq/alpaca-mcp-server) where an MCP is needed, [nautechsystems/nautilus_trader](https://github.com/nautechsystems/nautilus_trader), and [the official IBKR TWS API distribution](https://interactivebrokers.github.io/). For adapters, never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin. [Current release verification](../../docs/decisions/2026-10-05-official-upstream-never-rebuild.md) records the sources; runtime selections stay with the trading lane.
 
 For architecture or research waves, read `blueprints/us-equities/architecture/README.md`
 and the matching source-review supplement. `catalogs/us-equities/decision-index.json`
@@ -59,5 +59,3 @@ current foundation work. Follow `docs/paper-lane-policy.md`: proceed through nat
 paper readiness and measured acceptance without repeated human approval. Missing
 live credentials or live configuration do not gate paper; live trading and paid
 hosting remain separate scopes.
-
-Trading-lane rules for research waves, data readiness and experiments live in `blueprints/us-equities/AGENTS.md`; read it before any trading research wave, experiment, data acquisition, strategy-gate change or registration of a decision array under `catalogs/us-equities/`.

@@ -2161,16 +2161,26 @@ class Apply:
                 drop_path(wanted, tuple(path))
             else:
                 found[verdict.piece.key] = "added"
-        merged = file_io.merge_settings(current, wanted)
+        # This map owns the removed override. Generic settings merge preserves
+        # unknown host keys; use its explicit retirement path for this key only.
+        # https://code.claude.com/docs/en/skills: unset means the native 1% budget.
+        retired = () if "skillListingBudgetFraction" in wanted else ("skillListingBudgetFraction",)
+        merged = file_io.merge_settings(current, wanted, retire_keys=retired)
         if target.is_file() and merged == current:
             self.record("claude-settings", "current", f"{target} already holds the wired settings")
         elif self.dry:
-            changed = sorted(key for key in merged if merged.get(key) != current.get(key))
+            changed = sorted(key for key in merged.keys() | current.keys() if merged.get(key) != current.get(key))
             self.record("claude-settings", "planned", f"would merge into {target}: {', '.join(changed)}")
         else:
             (self.stage / "settings.merged.json").write_text(json.dumps(wanted, indent=2) + "\n", encoding="utf-8")
-            ok = self.tool("claude-settings", [str(ROOT / "tools/adoption/apply_claude_settings.py"), "--template",
-                                               str(self.stage / "settings.merged.json"), "--target", str(target)])
+            argv = [str(ROOT / "tools/adoption/apply_claude_settings.py"), "--template",
+                    str(self.stage / "settings.merged.json"), "--target", str(target)]
+            for key in retired:
+                argv += ["--retire-key", key]
+            ok = self.tool("claude-settings", argv)
+            if ok and any(key in json.loads(target.read_text(encoding="utf-8")) for key in retired):
+                self.say("claude-settings", "  read-back failed: retired skill listing override remains")
+                ok = False
             self.done("claude-settings", ok)
         if self.outcomes[-1][1] != "failed":
             self.authorization.update({key: status for key, status in found.items() if is_authorization_piece(key)})

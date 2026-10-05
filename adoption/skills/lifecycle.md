@@ -35,8 +35,8 @@ refresh and the cross-family review, lands with unit F1.
    [`search-first`](https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md),
    which checks installed skill roots, packages, MCP servers and repositories
    before any custom code is written.
-3. **`find-skills`.** For a gap that remains, the model invokes `find-skills` for
-   registry discovery: its steps 1-3 read the skills.sh leaderboard and run
+3. **Discovery.** The common rule is: when no skill fits, use installed `find-skills` or Skills CLI `find` and `skill-creator` for verification or A/B; check client exposure and the skills lifecycle.
+   For registry discovery, `find-skills` steps 1-3 read the skills.sh leaderboard and run
    `"$SKILLS_BIN" find <query>`. Its install-count, source and star thresholds
    (step 4) guide discovery only; popularity is not evidence. Its step-6
    `skills add <owner/repo@skill> -g -y` is replaced by a pin in the manifest:
@@ -244,11 +244,14 @@ for current qualification limits.
 - **Claude** fits the listing to `skillListingBudgetFraction` of the model's
   context window (default 0.01, with an 8,000-character fallback) and cuts each
   entry at 1,536 characters. On overflow it drops descriptions, starting with the
-  least-invoked skills, and writes a warning to the debug log. The template sets
-  0.05; never also set `SLASH_COMMAND_TOOL_CHAR_BUDGET`, which pins a fixed count.
+  least-invoked skills, and writes a warning to the debug log. The template leaves
+  the fraction unset for the native 1% default; never also set
+  `SLASH_COMMAND_TOOL_CHAR_BUDGET`, which pins a fixed count.
   Check a host with `claude --debug -p ok` on a 200k and a 1M-context model, the
   `/doctor` estimate and the `/context` Skills row, then follow the
-  measure-then-lower plan in the listing record.
+  [October 5 budget decision](../../docs/decisions/2026-10-05-harness-context-budget.md).
+  The new-WSL apply step explicitly retires the owned fraction override and reads
+  back its absence; generic settings merge continues to preserve other host keys.
 - **Codex** fits its catalog to `[skills] max_context_tokens`, capped at 10,000
   tokens when set; unset, the budget is 2% of the context window, and 8,000
   characters when the window is unknown. Each description is cut at 1,024

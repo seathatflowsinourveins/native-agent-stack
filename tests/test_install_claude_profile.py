@@ -1736,9 +1736,12 @@ class StandingRuleSurfacesTests(unittest.TestCase):
                 "codex": ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"}
     SHARED = (
         "Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) "
-        "and their clean releases, and never rebuild, fork or wrap what an upstream already ships.",
+        "and their clean releases, and never rebuild or fork what an upstream already ships; glue only fills a "
+        "demonstrated gap, cited at a pin.",
         "A coordinator, not a delegated child, invokes `search-first` before custom code or a tool choice; when no "
-        "listed skill fits the task, it discovers one with `find-skills` and verifies or A/B-tests it with `skill-creator`.",
+        "skill fits, use installed `find-skills` or Skills CLI `find` and `skill-creator` for verification or A/B; "
+        "check client exposure and the skills lifecycle.",
+        "Prompts fix the objective, scope and authorization; improve the approach from current evidence.",
         "A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired "
         "benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.",
         "A coordinator ends every substantive research or adoption unit with a completeness critic (missed modality, "
@@ -1755,6 +1758,8 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
         "delegated child, starts a cross-family lane.",
         # AGENTS.md follows this clause with the path of its decision record.
+        "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
+        "delegated child, starts a cross-family lane.",
         "No audits, trials or network at startup; the daily currency timer's one read-only due-file line is allowed",
     )
     CODEX_VARIANT = ("A coordinator, not a delegated child,", "A coordinator, not a bounded worker,")
@@ -1766,17 +1771,10 @@ class StandingRuleSurfacesTests(unittest.TestCase):
             for sentence in self.SHARED:
                 expected = sentence.replace(*self.CODEX_VARIANT) if name == "codex" else sentence
                 with self.subTest(surface=name, sentence=sentence[:48]):
-                    if sentence.startswith("Codex CLI") and name != "codex":
-                        pointer = ("adoption/templates/codex.AGENTS.template.md" if name == "AGENTS.md"
-                                   else "Codex instruction block")
-                        self.assertIn(pointer, text)
+                    if sentence.startswith("Codex CLI") and name == "portable":
+                        self.assertIn("Codex instruction block", text)
                         self.assertNotIn(sentence, text)
                         self.assertIn(sentence, self.SURFACES["codex"].read_text(encoding="utf-8"))
-                    elif sentence.startswith("A coordinator, not a delegated child, invokes") and name == "AGENTS.md":
-                        self.assertIn("uses the installed `find-skills` or Skills CLI `find`", text)
-                        self.assertIn("installed `skill-creator`", text)
-                        self.assertIn("Check client exposure, including user-only invocation", text)
-                        self.assertIn("adoption/skills/lifecycle.md", text)
                     else:
                         self.assertIn(expected, text)
             for phrase in self.DROPPED:
@@ -1795,15 +1793,16 @@ class PortableTopRuleTests(unittest.TestCase):
     """
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    # Fixed UTF-8 ceilings: trimmed rendered bytes + 5% rounded upward, set once.
-    STARTUP_BUDGET_BYTES = {"claude": 23062, "codex": 19102}
+    # Fixed UTF-8 ceilings: repaired scope + 5%, rounded upward. The dated PR #726
+    # addendum records 23062/19102 -> 24458/20103 and the required restorations.
+    STARTUP_BUDGET_BYTES = {"claude": 24458, "codex": 20103}
     MECHANICS = ROOT / "examples" / "claude-native" / "workflows" / "README.md"
     ROUTING = ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (
         "never self-write without a SOTA source",
-        "never rebuild, fork or wrap what an upstream already ships",
+        "never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin",
         "source of truth",
         "orchestration patterns",
         "installed client",
@@ -1831,7 +1830,7 @@ class PortableTopRuleTests(unittest.TestCase):
         "`SKILL.md`",
         "completeness critic", "next landscape sweep", "lifecycle task",
         "`search-first`", "`find-skills`", "`skill-creator`", "A coordinator, not a delegated child, invokes",
-        "when no listed skill fits the task", "children inherit that pin", "a spawn call names neither",
+        "when no skill fits", "children inherit that pin", "a spawn call names neither",
         "never a delegated child, starts a cross-family lane", "each coordinator unit names the north-star action",
         "promptfoo", "paired benchmark", "Harbor or Inspect", "never a self-written runner",
         "audits, trials or network at startup", "due-file line",
@@ -1861,6 +1860,100 @@ class PortableTopRuleTests(unittest.TestCase):
     def test_the_template_states_the_upstream_verification_procedure(self):
         self.assertEqual(self.errors(self.TEMPLATE.read_text(encoding="utf-8")), [])
 
+    def test_the_ab_backed_schema_rule_and_cross_family_dispatch_are_in_the_user_block(self):
+        text = self.TEMPLATE.read_text(encoding="utf-8")
+        self.assertIn("When you return through StructuredOutput, put the schema fields at the top level of the call arguments; never wrap them in an input, output or result key.", text)
+        self.assertIn("Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a delegated child, starts a cross-family lane.", text)
+
+    def scratch_startup(self, root):
+        (root / "AGENTS.md").write_text("repository instructions\n")
+        (root / "CLAUDE.md").write_text("@AGENTS.md\n")
+        carriers = root / "adoption/new-wsl"
+        carriers.mkdir(parents=True)
+        (carriers / "claude-user-instructions.md").write_text("# Synthetic user instructions\n")
+        (carriers / "codex-user-instructions.md").write_bytes((ROOT / "adoption/new-wsl/codex-user-instructions.md").read_bytes())
+
+    def test_imports_outside_code_are_counted_once_and_resolve_from_the_importing_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.scratch_startup(root)
+            (root / "reference.md").write_text("imported context\n")
+            with mock.patch(__name__ + ".ROOT", root):
+                before = sum(map(len, self.startup_files("claude").values()))
+                (root / "CLAUDE.md").write_text("@AGENTS.md\n@reference.md\n")
+                after = sum(map(len, self.startup_files("claude").values()))
+            self.assertEqual(after - before, len("@reference.md\n".encode()) + len("imported context\n".encode()))
+
+    def test_unfiltered_rules_are_counted_and_codex_prefers_the_root_override(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.scratch_startup(root)
+            rules = root / ".claude/rules"
+            rules.mkdir(parents=True)
+            with mock.patch(__name__ + ".ROOT", root):
+                before = sum(map(len, self.startup_files("claude").values()))
+                (rules / "always.md").write_text("always loaded\n")
+                after = sum(map(len, self.startup_files("claude").values()))
+                self.assertEqual(after - before, len("always loaded\n".encode()))
+                (root / "AGENTS.override.md").write_text("preferred override\n")
+                files = self.startup_files("codex")
+            self.assertNotIn("AGENTS.md", files)
+            self.assertEqual(files["AGENTS.override.md"], b"preferred override\n")
+
+    def test_import_discovery_skips_code_and_quotes_and_handles_nested_duplicate_paths(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.scratch_startup(root)
+            (root / "nested").mkdir()
+            (root / "Design Docs").mkdir()
+            (root / "nested/one.md").write_text("@two.md\n")
+            (root / "nested/two.md").write_text("@one.md\n")  # cycle, counted once
+            (root / "Design Docs/brief.md").write_text("design reference\n")
+            (root / "CLAUDE.md").write_text(
+                '@AGENTS.md @nested/one.md @nested/one.md\n@Design\\ Docs/brief.md\n'
+                '`@not-loaded.md` ``@also-not-loaded.md``\n'
+                '```text\n@fenced.md\n```\n~~~\n@tilde-fenced.md\n~~~\n'
+                '@"quoted.md" user@example.com repo@pin:path\n')
+            with mock.patch(__name__ + ".ROOT", root):
+                files = self.startup_files("claude")
+                self.assertEqual(set(files), {"claude-block", "AGENTS.md", "CLAUDE.md", "nested/one.md",
+                                              "nested/two.md", "Design Docs/brief.md"})
+                (root / "CLAUDE.md").write_text("@missing.md\n")
+                with self.assertRaises(FileNotFoundError):
+                    self.startup_files("claude")
+
+    def test_imports_are_bounded_to_four_hops_and_codex_leaves_them_literal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.scratch_startup(root)
+            (root / "CLAUDE.md").write_text("@hop1.md\n")
+            for hop in range(1, 5):
+                (root / f"hop{hop}.md").write_text(f"@hop{hop + 1}.md\n")
+            with mock.patch(__name__ + ".ROOT", root):
+                files = self.startup_files("claude")
+                self.assertIn("hop4.md", files)
+                self.assertNotIn("hop5.md", files)
+                (root / "AGENTS.md").write_text("@missing.md\n")
+                self.assertEqual(set(self.startup_files("codex")), {"codex-block", "AGENTS.md"})
+
+    def test_only_nonempty_frontmatter_paths_filters_exempt_rules(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.scratch_startup(root)
+            rules = root / ".claude/rules/nested"
+            rules.mkdir(parents=True)
+            content = {"plain.md": "always loaded\npaths: [example]\n",
+                       "empty.md": "---\npaths: []\n---\nalways loaded\n",
+                       "other.md": "---\ntitle: unscoped\n---\nalways loaded\n",
+                       "scoped.md": '---\npaths:\n  - "src/**/*.py"\n---\n@unloaded.md\n',
+                       "inline.md": '---\npaths: ["src/**/*.py"]\n---\n@unloaded.md\n'}
+            for name, text in content.items():
+                (rules / name).write_text(text)
+            with mock.patch(__name__ + ".ROOT", root):
+                files = self.startup_files("claude")
+            loaded = {path.removeprefix(".claude/rules/nested/") for path in files if path.startswith(".claude/rules/")}
+            self.assertEqual(loaded, {"plain.md", "empty.md", "other.md"})
+
     def test_the_template_carries_the_standing_clauses_and_the_user_level_rules(self):
         # Relocated mechanics stay verbatim and reachable; dispatch rules stay in the template.
         text = self.TEMPLATE.read_text(encoding="utf-8")
@@ -1868,8 +1961,32 @@ class PortableTopRuleTests(unittest.TestCase):
         self.assertIn("Codex instruction block", text)
         for mode in ("**Solo coordinator:**", "**One subagent:**", "**Ultracode workflow:**", "**Agent team**"):
             self.assertIn(mode, text)
-        text += self.MECHANICS.read_text(encoding="utf-8") + self.ROUTING.read_text(encoding="utf-8")
+        text += self.section(self.MECHANICS.read_bytes(), "## Native workflow mechanics relocated (2026-10-05)").decode()
+        text += self.ROUTING.read_text(encoding="utf-8").split("<!-- native-agent-stack:session-lanes -->")[0]
         self.assertEqual([phrase for phrase in self.STANDING_PHRASES if phrase not in text], [])
+
+    @staticmethod
+    def section(content: bytes, heading: str) -> bytes:
+        """Bound a passage check to its destination heading and child headings."""
+        marker = heading.encode()
+        start = content.index(marker + b"\n")
+        level = len(heading.split(" ", 1)[0])
+        end = re.search(rb"(?m)^#{1," + str(level).encode() + rb"} ", content[start + len(marker) + 1:])
+        return content[start:start + len(marker) + 1 + end.start()] if end else content[start:]
+
+    def test_each_relocated_passage_is_byte_bound_to_its_destination_section(self):
+        fixtures = ROOT / "tests/fixtures/harness-context-moves"
+        contracts = json.loads((fixtures / "contracts.json").read_text())
+        for contract in contracts:
+            with self.subTest(passage=contract["fixture"], destination=contract["to"]):
+                passage = (fixtures / contract["fixture"]).read_bytes()
+                content = (ROOT / contract["to"]).read_bytes()
+                if contract["heading"].startswith("<!--"):
+                    content = content.split(contract["heading"].encode(), 1)[1].split(b"<!-- native-agent-stack:session-lanes -->", 1)[0]
+                else:
+                    content = self.section(content, contract["heading"])
+                self.assertEqual(len(passage), contract["bytes"])
+                self.assertIn(passage, content)
 
     def test_the_check_rejects_a_missing_step_and_a_repository_path(self):
         text = self.TEMPLATE.read_text(encoding="utf-8")
@@ -1879,19 +1996,87 @@ class PortableTopRuleTests(unittest.TestCase):
 
 
     @staticmethod
-    def startup_files(client: str) -> dict[str, bytes]:
+    def imports(text: str) -> list[str]:
+        """Native memory docs: imports outside code, escaped spaces, four hops.
+
+        This budget check only discovers files; it does not render client prompts.
+        """
+        lines = []
+        fence = None
+        for line in text.splitlines(keepends=True):
+            mark = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+            if fence:
+                if mark and mark[1][0] == fence[0] and len(mark[1]) >= len(fence) and not line[mark.end():].strip():
+                    fence = None
+                lines.append("\n")
+            elif mark:
+                fence = mark[1]
+                lines.append("\n")
+            else:
+                lines.append(line)
+        text = "".join(lines)
+        text = re.sub(r"(?<!`)(`+)(?!`)[\s\S]*?(?<!`)\1(?!`)", "", text)
+        return [path.replace("\\ ", " ").replace("\\\t", "\t") for path in
+                re.findall(r'''(?<![\w@\\"'])@((?:\\[ \t]|[^\s`<>"'(),;])+)''', text)]
+
+    @staticmethod
+    def path_filtered(content: str) -> bool:
+        """Exempt only a clear nonempty paths list; ambiguous YAML still counts."""
+        frontmatter = re.match(r"\A---\r?\n(.*?)\r?\n---(?:\r?\n|$)", content, re.S)
+        if not frontmatter:
+            return False
+        field = re.search(r"(?m)^paths:[ \t]*(.*)$", frontmatter[1])
+        if not field:
+            return False
+        value = field[1].split(" #", 1)[0].strip()
+        if value:
+            try:
+                paths = json.loads(value)
+            except ValueError:
+                return False
+            return isinstance(paths, list) and bool(paths) and all(isinstance(p, str) and p.strip() for p in paths)
+        tail = frontmatter[1][field.end():]
+        tail = re.split(r"\n\S", tail, maxsplit=1)[0]
+        items = [line.strip()[2:].split(" #", 1)[0].strip().strip("\"'")
+                 for line in tail.splitlines() if re.match(r"^[ \t]+-[ \t]+", line)]
+        return bool(items) and all(item and item not in ("null", "~", "[]", "{}") for item in items)
+
+    @classmethod
+    def startup_files(cls, client: str) -> dict[str, bytes]:
         """The renderer's committed carriers, wrapped by its actual native block merger.
         Count raw UTF-8 bytes including markers; Claude's @AGENTS.md import loads the
-        repository AGENTS once, alongside CLAUDE.md. Plugin blocks are measured separately.
+        repository AGENTS once, alongside CLAUDE.md and unconditional rules. Codex
+        prefers a root override and does not expand imports. Plugin blocks, native
+        RTK and the named SubagentStart child carrier are separate measured scopes.
         """
-        files = {"AGENTS.md": (ROOT / "AGENTS.md").read_bytes()}
+        files = {}
+        visited = {}
+
+        def add(path: Path, depth: int = 0) -> None:
+            path = path.resolve()
+            key = str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path)
+            content = path.read_bytes()  # A missing import fails; it cannot hide context.
+            files[key] = content
+            if client == "claude" and depth < 4 and visited.get(path, 5) > depth:
+                visited[path] = depth
+                for imported in cls.imports(content.decode("utf-8")):
+                    add(path.parent / Path(imported).expanduser(), depth + 1)
+
         if client == "claude":
             carrier = (ROOT / "adoption/new-wsl/claude-user-instructions.md").read_text(encoding="utf-8")
             files["claude-block"] = managed_block.merged_claude_md("", carrier).encode("utf-8")
-            files["CLAUDE.md"] = (ROOT / "CLAUDE.md").read_bytes()
+            # Project the user block's relative imports from its native .claude directory.
+            for imported in cls.imports(carrier):
+                add(ROOT / ".claude" / Path(imported).expanduser(), 1)
+            add(ROOT / "AGENTS.md")
+            add(ROOT / "CLAUDE.md")
+            for rule in sorted((ROOT / ".claude/rules").rglob("*.md")):
+                if not cls.path_filtered(rule.read_text(encoding="utf-8")):
+                    add(rule)
         else:
             carrier = (ROOT / "adoption/new-wsl/codex-user-instructions.md").read_text(encoding="utf-8")
             files["codex-block"] = managed_block.merged_codex_md("", carrier).encode("utf-8")
+            add(ROOT / ("AGENTS.override.md" if (ROOT / "AGENTS.override.md").is_file() else "AGENTS.md"))
         return files
 
     @classmethod

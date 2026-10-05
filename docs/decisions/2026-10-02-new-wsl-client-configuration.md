@@ -986,3 +986,23 @@ Today: 393 pieces, 354 wired (206 practice, 148 through a slot), 24 not wired (0
 
 ```text
 ```
+
+## Addendum 2026-10-05: PR #726 required startup restorations
+
+The [context-budget repair](2026-10-05-harness-context-budget.md) restores the
+user-level StructuredOutput guard and common cross-family sentence, carries the
+uniform discovery and pinned-glue wording, and makes the existing settings apply
+retire the owned listing fraction with absence read-back. Root routing remains
+until both hosts pass the post-landing render gate. This current projection is
+the generator's dropped-unit output; earlier projections remain historical.
+These are repository integration changes, not a new destination installation.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 56 of 56 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 67 of 67 lines stay):
+
+```text
+```

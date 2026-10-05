@@ -1934,6 +1934,28 @@ class ApplyCase(unittest.TestCase):
 
 
 class ApplyTests(ApplyCase):
+    def test_apply_retires_the_owned_skill_listing_fraction_and_preserves_host_only_settings(self):
+        self.installed_state()
+        target = self.home / ".claude/settings.json"
+        target.parent.mkdir()
+        original = {"skillListingBudgetFraction": 0.05, "hostOnly": {"keep": 1}}
+        target.write_text(json.dumps(original) + "\n", encoding="utf-8")
+        before = target.read_bytes()
+        code, out, _ = self.apply(dry=True)
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(target.read_bytes(), before)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        settings = json.loads(target.read_text())
+        self.assertNotIn("skillListingBudgetFraction", settings)
+        self.assertEqual(settings["hostOnly"], {"keep": 1})
+        backups = list(target.parent.glob("settings.json.bak.*"))
+        self.assertEqual([p.read_bytes() for p in backups], [before])
+        once = tree(self.home)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(tree(self.home), once)
+
     def test_a_dry_run_writes_nothing_and_runs_no_client(self):
         self.installed_state()
         before = tree(self.home)
