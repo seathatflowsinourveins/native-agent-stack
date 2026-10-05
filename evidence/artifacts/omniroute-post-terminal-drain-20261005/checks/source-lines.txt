@@ -1,4 +1,58 @@
-# Upstream OmniRoute at 0585aba5589d5a1f49243a13a8db249558e7c9e3 (the composition's tree): the lines that cause and bound the dropped call_logs and usage_history rows (verbatim, line-numbered; read from a bare mirror of diegosouzapw/OmniRoute)
+# Upstream OmniRoute at 0585aba5589d5a1f49243a13a8db249558e7c9e3 (the composition's tree): the lines that cause and bound the dropped call_logs and usage_history rows, and the other routes to onStreamComplete (verbatim, line-numbered; read from a bare mirror of diegosouzapw/OmniRoute)
+
+
+## open-sse/utils/streamHandler.ts L326-362: the stream controller's handleDisconnect (a client that has the terminal event goes to handleComplete and never reaches onDisconnect) and handleComplete
+326:     handleDisconnect: (reason = "client_closed") => {
+327:       if (disconnected) return;
+328:       if (clientTerminalSeen) {
+329:         controller.handleComplete();
+330:         return;
+331:       }
+332:       disconnected = true;
+333:       cleanupClientAbortListener();
+334:
+335:       logStream(`disconnect: ${reason}`);
+336:
+337:       // Decrement pending request counter — the TransformStream flush() won't
+338:       // fire when the client aborts mid-stream, so we must clean up here.
+339:       clearPendingRequest();
+340:
+341:       const deferUpstreamAbort =
+342:         allowCompletedToolHandoffGrace &&
+343:         clientDisconnectGracePeriodMs > 0 &&
+344:         completedToolHandoffSeen &&
+345:         completedToolHandoffDrain !== null;
+346:       if (deferUpstreamAbort) {
+347:         completedToolHandoffDrain?.();
+348:       } else {
+349:         abortController.abort(reason);
+350:       }
+351:
+352:       onDisconnect?.({ reason, duration: Date.now() - startTime });
+353:     },
+354:
+355:     // Call when stream completes normally
+356:     handleComplete: () => {
+357:       if (disconnected) return;
+358:       disconnected = true;
+359:       cleanupClientAbortListener();
+360:
+361:       logStream("complete");
+362:     },
+
+## open-sse/utils/streamHandler.ts L383-394: handleError skips onError once the controller is disconnected
+383:     handleError: (error: unknown) => {
+384:       cleanupClientAbortListener();
+385:
+386:       // A client disconnect is not a provider failure. If the client already went away
+387:       // (disconnected) or the error is a client abort / "Controller is already closed",
+388:       // skip the onError failover/cooldown path — otherwise one cancelled request marks
+389:       // the upstream connection unavailable.
+390:       if (disconnected || isClientDisconnectError(error)) {
+391:         clearPendingRequest(error);
+392:         logStream(disconnected ? "client_disconnect (post-abort)" : "client_disconnect");
+393:         return;
+394:       }
 
 ## open-sse/utils/streamHandler.ts L842-852: cancel() of the disconnect-aware stream, the code the patch changes
 842:       async cancel(reason) {
@@ -18,7 +72,7 @@
 661:   let clientTerminalSeen = false;
 662:   let bytesWereForwarded = false;
 663:   let completedToolHandoffDrainStarted = false;
-664: 
+664:
 665:   const drainCompletedToolHandoff = () => {
 666:     if (completedToolHandoffDrainStarted) return;
 667:     completedToolHandoffDrainStarted = true;
@@ -28,7 +82,7 @@
 671:       streamController.abort();
 672:       void Promise.allSettled([reader.cancel(timeoutReason), writer.abort(timeoutReason)]);
 673:     }, gracePeriodMs);
-674: 
+674:
 675:     void (async () => {
 676:       try {
 677:         while (true) {
@@ -44,10 +98,10 @@
 687:     })();
 688:   };
 689:   streamController.registerCompletedToolHandoffDrain?.(drainCompletedToolHandoff);
-690: 
+690:
 
 ## open-sse/utils/streamHandler.ts L704-717: where the terminal marker is noted after the chunk is enqueued to the client
-704: 
+704:
 705:     terminalTail += terminalDecoder.decode(chunk, { stream: true });
 706:     // Scan before bounding retained state: a compaction terminal frame can
 707:     // exceed the tail budget because encrypted_content is carried inline.
@@ -62,28 +116,293 @@
 716:       streamController.markClientTerminalSeen?.();
 717:     }
 
-## open-sse/utils/stream.ts: onComplete is called only inside the transform's flush() (L2510 flush start; call sites below); cancel() at L3214 only clears the idle timer
+## open-sse/utils/stream.ts flush() starts at L2510 and calls onComplete at L2872 and L3160, which is the normal completion; the failure routes call it too (notifyComplete at L1354 and L2995); cancel() at L3214 only clears the idle timer
+1340:
+1341:   const emitTranslatedFailureAndAbort = (
+1342:     controller: TransformStreamDefaultController<Uint8Array>,
+1343:     payload: unknown
+1344:   ): boolean => {
+1345:     const failure = prepareTranslatedStreamFailure(payload);
+1346:     if (!failure) return false;
+1347:     providerPayloadCollector.push(failure.providerPayload);
+1348:     const output = formatTranslatedStreamError(failure.record, sourceFormat);
+1349:     reqLogger?.appendConvertedChunk?.(output);
+1350:     forward(controller, encoder.encode(output));
+1351:     upstreamErrorForwarded = true;
+1352:     doneSent = true;
+1353:     abortStreamFailure(controller, failure.internalFailure, failure.publicMessage, {
+1354:       notifyComplete: true,
+1355:     });
+1356:     return true;
+...
 2510:       async flush(controller) {
 2511:         // Clean up idle watchdog timer
 2512:         if (idleTimer) {
-2806:             if (onComplete) {
-2807:               try {
+...
 2872:                 onComplete({
 2873:                   status: 200,
-3100:           if (onComplete) {
-3101:             try {
+...
+2993:             const errorBody = buildErrorBody(err.status, err.message);
+2994:             const publicErrorMessage = errorBody.error.message;
+2995:             abortStreamFailure(controller, err, publicErrorMessage, { notifyComplete: true });
+2996:             return;
+...
 3160:               onComplete({
 3161:                 status: 200,
+...
 3214:       cancel(reason) {
 3215:         clearIdleTimer();
 3216:       },
 
-## open-sse/handlers/chatCore.ts: onStreamComplete (L6025) is the only route to the call log and the usage row; the grace period is passed at L3113-3114
-6025:   const onStreamComplete = ({
-6026:     status: streamStatus,
-6112:     recordStreamingUsageStats(streamUsage, {
+## open-sse/utils/streamFailureBoundary.ts L36-72: a stream failure that asks for completion (notifyComplete) calls onComplete at L52
+36:     options: { notifyComplete?: boolean } = {}
+37:   ): void => {
+38:     let handled = false;
+39:     context.timing.markInterrupted();
+40:     if (context.onFailure) {
+41:       try {
+42:         handled = context.onFailure(failure) === true;
+43:       } catch (error) {
+44:         console.debug("[STREAM] onFailure callback error:", error);
+45:       }
+46:     }
+47:     let safeMessage = publicMessage || "Upstream failure";
+48:     if (options.notifyComplete && context.onComplete) {
+49:       const body = buildErrorBody(failure.status, failure.message);
+50:       safeMessage = body.error.message;
+51:       try {
+52:         context.onComplete({
+53:           status: failure.status,
+54:           usage: context.getUsage(),
+55:           responseBody: body,
+56:           ttft: context.timing.ttftMs(),
+57:           itlMs: context.timing.avgItlMs(),
+58:           interrupted: context.timing.interrupted,
+59:           error: safeMessage,
+60:           errorCode: failure.code,
+61:           providerPayload: context.buildProviderPayload(),
+62:           clientPayload: context.buildClientPayload(body),
+63:         });
+64:         handled = true;
+65:       } catch (error) {
+66:         console.debug(
+67:           `[STREAM] onComplete callback error in error path (${context.model || "unknown"}):`,
+68:           error
+69:         );
+70:       }
+71:     }
+72:     context.clearIdleTimer();
+
+## open-sse/utils/streamFailureFinalization.ts L56-82 and L160-190: the 499 grace handler that onDisconnect starts, and handleStreamFailure, which calls onStreamComplete at L173
+56: export function createClientDisconnectGraceHandler({
+57:   isStreamCompletionRecorded,
+58:   gracePeriodMs,
+59:   finalize,
+60:   pollIntervalMs = 250,
+61:   setTimeoutFn = setTimeout,
+62: }: {
+63:   isStreamCompletionRecorded: () => boolean;
+64:   gracePeriodMs: number;
+65:   finalize: (event: ClientDisconnectEvent) => unknown;
+66:   pollIntervalMs?: number;
+67:   setTimeoutFn?: (callback: () => void, ms: number) => unknown;
+68: }): (event: ClientDisconnectEvent) => boolean {
+69:   return (event) => {
+70:     if (isStreamCompletionRecorded()) return true;
+71:     if (gracePeriodMs <= 0) {
+72:       finalize(event);
+73:       return true;
+74:     }
+75:
+76:     const deadline = Date.now() + gracePeriodMs;
+77:     const poll = () => {
+78:       if (isStreamCompletionRecorded()) return;
+79:       if (Date.now() >= deadline) {
+80:         finalize(event);
+81:         return;
+82:       }
+...
+160:   const handleStreamFailure = (failure: StreamFailurePayload) => {
+161:     if (isStreamCompletionRecorded()) {
+162:       return true;
+163:     }
+164:
+165:     const status = failure.status || HTTP_STATUS.BAD_GATEWAY;
+166:     const message = failure.message || "Upstream stream error";
+167:     const classification =
+168:       failure.code || failure.type ? { code: failure.code, type: failure.type } : undefined;
+169:     const errorBody = buildErrorBody(status, message, undefined, classification);
+170:     const projectedCode = errorBody.error.code || String(status);
+171:
+172:     if (!isFailureCompletionRecorded()) {
+173:       onStreamComplete({
+174:         status,
+175:         usage: null,
+176:         responseBody: errorBody,
+177:         providerPayload: errorBody,
+178:         clientPayload: errorBody,
+179:         error: message,
+180:         errorCode: projectedCode,
+181:         ttft: 0,
+182:       });
+183:     }
+184:
+185:     persistFailureUsage(status, projectedCode);
+186:     try {
+187:       onStreamFailure?.(failure);
+188:     } catch {
+189:       // Best-effort fallback state update only.
+190:     }
+
+## open-sse/handlers/chatCore.ts createStreamController wiring (L3085-3115: onDisconnect, onError, the grace period at L3113-3114); onStreamComplete (L6025) calls finalizeStreamRequestLog (L6088, request log and pending bookkeeping), recordStreamingUsageStats (L6112, the usage row) and persistAttemptLogs (L6174); the 499 grace handler (L6281-6291)
+3085:   const streamController = createStreamController({
+3086:     onDisconnect: (event) => {
+3087:       let finalized = false;
+3088:       try {
+3089:         finalized = onClientDisconnectFinalize?.(event) === true;
+3090:       } catch {}
+3091:       if (!finalized) {
+3092:         try {
+3093:           finalizePendingScope(pendingScope, {
+3094:             status: 499,
+3095:             error: `Client disconnected: ${event.reason}`,
+3096:             errorCode: "client_disconnected",
+3097:           });
+3098:           finalized = true;
+3099:         } catch {}
+3100:       }
+3101:       try {
+3102:         onDisconnect?.(event);
+3103:       } catch {}
+3104:       return finalized;
+3105:     },
+3106:     onError: (event) => onPipelineStreamError?.(event),
+3107:     provider,
+3108:     model,
+3109:     connectionId,
+3110:     pendingRequestId,
+3111:     clientResponseFormat,
+3112:     clientAbortSignal: clientRawRequest?.signal,
 3113:     allowCompletedToolHandoffGrace: isCodexResponsesEcho,
 3114:     clientDisconnectGracePeriodMs: STREAM_DISCONNECT_GRACE_PERIOD_MS,
+3115:   });
+...
+6025:   const onStreamComplete = ({
+6026:     status: streamStatus,
+...
+6088:     streamFailure.finalizeStreamRequestLog({
+6089:       pendingRequestId,
+...
+6112:     recordStreamingUsageStats(streamUsage, {
+6113:       provider,
+...
+6174:     persistAttemptLogs({
+6175:       status: normalizedStreamStatus,
+...
+6281:   onClientDisconnectFinalize = streamFailure.createClientDisconnectGraceHandler({
+6282:     isStreamCompletionRecorded: () => streamCompletionRecorded,
+6283:     gracePeriodMs: STREAM_DISCONNECT_GRACE_PERIOD_MS,
+6284:     finalize: (event) =>
+6285:       handleStreamFailure({
+6286:         status: 499,
+6287:         message: `Client disconnected: ${event.reason}`,
+6288:         code: "client_disconnected",
+6289:         type: "client_disconnected",
+6290:       }),
+6291:   });
+
+## open-sse/handlers/chatCore/attemptLogging.ts persistAttemptLogs (L397) calls saveCallLog (L565), the call log
+397: export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAttemptLogsContext) {
+...
+565:   saveCallLog({
+
+## bin/cli/runtime/processSupervisor.mjs the serve supervisor: the child's stdio when OMNIROUTE_SHOW_LOG is not 1 (L92), the 50-line buffer (L22 CRASH_LOG_LINES, L99-107), what is printed at once (L108-127: the Android hint and a `[STARTUP] Fatal:` diagnostic), and what is printed later (dumpCrashLog L191 and L209, getRecentLog L221)
+22: const CRASH_LOG_LINES = 50;
+...
+77:     const showLog = process.env.OMNIROUTE_SHOW_LOG === "1";
+78:     // #6321: stdout used to be discarded (`"ignore"`) whenever `--log`/OMNIROUTE_SHOW_LOG
+79:     // wasn't set (the default) — any debug/pino output written to stdout vanished
+80:     // silently, so a boot that never becomes ready looked like a dead hang with zero
+81:     // output even at APP_LOG_LEVEL=debug. Pipe stdout too and buffer it alongside
+82:     // stderr so a readiness timeout can surface what the child actually printed.
+83:     // #9156: always spawn via process.execPath (absolute path to the running
+84:     // runtime — node or bun). Bare "node" is unresolvable under macOS launchd's
+85:     // minimal PATH; #9761's Bun ternary accidentally regressed the Node branch.
+86:     // Node args come from buildNodeRuntimeArgs (#9209 IPv4-first DNS + #5238
+87:     // heap flag handling); the Bun branch keeps #9761's polyfill preload —
+88:     // Bun does not accept the Node-only flags.
+89:     this.child = spawn(process.execPath, buildServerSpawnArgs(this.serverPath, this.memoryLimit), {
+90:       cwd: dirname(this.serverPath),
+91:       env: this.env,
+92:       stdio: showLog ? "inherit" : ["ignore", "pipe", "pipe"],
+...
+99:     writePidFile("server", this.child.pid);
+100:
+101:     const bufferOutput = (data) => {
+102:       const text = data.toString();
+103:       const lines = text.split("\n").filter(Boolean);
+104:       this.crashLog.push(...lines);
+105:       if (this.crashLog.length > CRASH_LOG_LINES) {
+106:         this.crashLog = this.crashLog.slice(-CRASH_LOG_LINES);
+107:       }
+108:       // Surface Android/Termux instrumentation-hook failures even when --log is
+109:       // off (output is only buffered otherwise).
+110:       if (!this.instrumentationFailureHintPrinted && isFatalInstrumentationHookFailure(text)) {
+111:         this.instrumentationFailureHintPrinted = true;
+112:         process.stderr.write(
+113:           formatAndroidInstrumentationFailureHint(
+114:             this.env?.XDG_CACHE_HOME || process.env.XDG_CACHE_HOME
+115:           )
+116:         );
+117:       }
+118:       // #13314: surface any `[STARTUP] Fatal:`-guarded boot diagnostic
+119:       // immediately, even without --log — otherwise it is only buffered and
+120:       // reaches the operator on exit/crash, which never happens when the
+121:       // HTTP listener still comes up after the fatal failure (every route
+122:       // then 500s with zero visible diagnostic anywhere).
+123:       if (!this.fatalStartupDiagnosticPrinted && isFatalStartupDiagnostic(text)) {
+124:         this.fatalStartupDiagnosticPrinted = true;
+125:         process.stderr.write(text.endsWith("\n") ? text : `${text}\n`);
+126:       }
+127:     };
+128:
+...
+186:           this.restartCount = 0;
+187:           this.start();
+188:           return;
+189:         }
+190:       }
+191:       this.dumpCrashLog();
+...
+207:       `\n⚠ Server exited (code=${code ?? "?"}). Restarting in ${delay / 1000}s... (${this.restartCount}/${this.maxRestarts})`
+208:     );
+209:     if (this.crashLog.length) this.dumpCrashLog();
+210:     // #4425: after a crash the OS may not have released the listen socket yet — restarting
+211:     // immediately produced the EADDRINUSE cascade that exhausted the restart budget. Wait
+212:     // (bounded) for the port to free up before respawning.
+213:     setTimeout(async () => {
+214:       await waitUntilPortFree(process.env.PORT || 20128);
+215:       this.start();
+216:     }, delay);
+217:   }
+218:
+219:   // #6321: exposes the buffered stdout+stderr lines so a caller (e.g. a readiness
+220:   // timeout) can print what the child actually said instead of silence.
+221:   getRecentLog() {
+222:     return [...this.crashLog];
+223:   }
+224:
+225:   dumpCrashLog() {
+226:     console.error("\n--- Server crash log ---");
+227:     this.crashLog.forEach((l) => console.error(l));
+228:     console.error("--- End crash log ---\n");
+
+## bin/cli/commands/serve.mjs L600-604: a readiness timeout reads the supervisor's buffer
+600:   console.error(`  Or:   rerun with \x1b[36m--log\x1b[0m to see live server output.\n`);
+601:
+602:   const recentLog = supervisor?.getRecentLog?.() ?? [];
+603:   if (recentLog.length) {
+604:     console.error("--- Recent server output ---");
 
 ## release/v3.8.52 head 23a114848 (fetched 2026-10-05): the same files
 open-sse/utils/streamHandler.ts tarball-tree cef58650b1a5 release/v3.8.52 cef58650b1a5

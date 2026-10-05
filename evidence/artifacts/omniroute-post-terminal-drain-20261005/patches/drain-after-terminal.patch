@@ -1,4 +1,4 @@
-From 75f728781775b3ae3b2417f478454212c43da993 Mon Sep 17 00:00:00 2001
+From 310c21c9d773cd6c960953ccf20961a606627977 Mon Sep 17 00:00:00 2001
 From: Scout <scout@local>
 Date: Mon, 5 Oct 2026 16:18:57 -0400
 Subject: [PATCH] fix(sse): drain the upstream after the client has the
@@ -6,46 +6,83 @@ Subject: [PATCH] fix(sse): drain the upstream after the client has the
 
 A client that closes the connection right after response.completed (codex exec does when it exits) made cancel() cancel the reader and abort the writer, so the SSE
 transform's flush() never ran onComplete and the request got no call_logs and no usage_history row. Drain the tail as drainCompletedToolHandoff does, bounded by
-STREAM_DISCONNECT_GRACE_PERIOD_MS.
+STREAM_DISCONNECT_GRACE_PERIOD_MS, also for a completed tool handoff that already received its terminal event (handleDisconnect() does not start the drain once the
+terminal event was seen). When the grace period expires flush() never runs, so the drain clears the request's pending-request entry.
 ---
- open-sse/utils/streamHandler.ts               |   8 +
- ...am-terminal-seen-client-disconnect.test.ts | 155 ++++++++++++++++++
- 2 files changed, 163 insertions(+)
+ open-sse/utils/streamHandler.ts               |  24 +-
+ ...am-terminal-seen-client-disconnect.test.ts | 301 ++++++++++++++++++
+ 2 files changed, 324 insertions(+), 1 deletion(-)
  create mode 100644 tests/unit/stream-terminal-seen-client-disconnect.test.ts
 
 diff --git a/open-sse/utils/streamHandler.ts b/open-sse/utils/streamHandler.ts
-index cef58650b..fd87eeca8 100644
+index cef58650b..c3cfb7019 100644
 --- a/open-sse/utils/streamHandler.ts
 +++ b/open-sse/utils/streamHandler.ts
-@@ -848,6 +848,14 @@ export function createDisconnectAwareStream(
+@@ -431,6 +431,10 @@ export function createStreamController({
+       cleanupClientAbortListener();
+       abortController.abort();
+     },
++
++    // Drops this request's pending-request entry when no completion path will
++    // (idempotent, like the disconnect and error paths)
++    clearPendingRequest: () => clearPendingRequest(),
+     clientResponseFormat,
+     clientDisconnectGracePeriodMs,
+   };
+@@ -669,6 +673,9 @@ export function createDisconnectAwareStream(
+     const timeoutReason = "completed_tool_handoff_grace_expired";
+     const timeout = setTimeout(() => {
+       streamController.abort();
++      // The reader is cancelled below, so flush() never runs and no completion
++      // path would clear this request's pending entry.
++      streamController.clearPendingRequest?.();
+       void Promise.allSettled([reader.cancel(timeoutReason), writer.abort(timeoutReason)]);
+     }, gracePeriodMs);
+ 
+@@ -844,10 +851,25 @@ export function createDisconnectAwareStream(
+           streamController.shouldDeferCompletedToolHandoff?.() === true;
+         if (clientTerminalSeen) {
+           streamController.handleComplete();
++          // The client already has the terminal marker, so its response is
++          // complete. Cancelling the reader and aborting the writer would stop
++          // the transform before its flush() runs onComplete, which on a stream
++          // that completes normally records the call log and the usage row (a
++          // client such as `codex exec` closes the socket right after
++          // response.completed). Drain the tail the way a completed tool handoff
++          // does (drainCompletedToolHandoff above), bounded by the same
++          // disconnect grace period. handleDisconnect() never starts that drain
++          // once the terminal event was seen, so this is its only starter on
++          // this path, including a completed tool handoff that already received
++          // its terminal event.
++          if (Number(streamController.clientDisconnectGracePeriodMs) > 0) {
++            drainCompletedToolHandoff();
++            return;
++          }
+         } else {
            streamController.handleDisconnect(reason || "cancelled");
++          if (deferCompletedToolHandoff) return;
          }
-         if (deferCompletedToolHandoff) return;
-+        // The client already has the terminal marker, so its response is complete. Cancelling the reader and aborting the writer here stops the
-+        // transform before its flush() runs onComplete, the only path to the call log and the usage row (a client such as `codex exec` closes the
-+        // socket right after response.completed). Drain the tail the way a completed tool handoff does (drainCompletedToolHandoff above),
-+        // bounded by the same disconnect grace period.
-+        if (clientTerminalSeen && Number(streamController.clientDisconnectGracePeriodMs) > 0) {
-+          drainCompletedToolHandoff();
-+          return;
-+        }
+-        if (deferCompletedToolHandoff) return;
          await Promise.allSettled([reader.cancel(reason), writer.abort(reason)]);
        },
      },
 diff --git a/tests/unit/stream-terminal-seen-client-disconnect.test.ts b/tests/unit/stream-terminal-seen-client-disconnect.test.ts
 new file mode 100644
-index 000000000..25891fc2d
+index 000000000..d2f94e212
 --- /dev/null
 +++ b/tests/unit/stream-terminal-seen-client-disconnect.test.ts
-@@ -0,0 +1,155 @@
+@@ -0,0 +1,301 @@
 +/**
 + * A client that closes the connection right after it received the terminal Responses event (response.completed) must not stop the
-+ * upstream transform before its flush() runs: flush() is the only caller of onComplete, which records the call log and the usage row.
-+ * `codex exec` does exactly this when it exits, so before this change the session-final request of such a client, and every
-+ * single-request session, left no call_logs and no usage_history row (cancel() cancelled the reader and aborted the writer).
++ * upstream transform before its flush() runs: on a stream that completes normally, flush() is where onComplete records the call log and
++ * the usage row (the failure finalizers run only when the upstream fails). `codex exec` closes the socket right after
++ * response.completed when it exits, so before this change the session-final request of such a client, and every single-request session,
++ * left no call_logs and no usage_history row (cancel() cancelled the reader and aborted the writer).
 + *
 + * The drain is the one OmniRoute already uses for a completed tool handoff (drainCompletedToolHandoff in streamHandler.ts), bounded by
-+ * the same STREAM_DISCONNECT_GRACE_PERIOD_MS, and it is not limited to Codex-originated clients (allowCompletedToolHandoffGrace stays false here).
++ * the same STREAM_DISCONNECT_GRACE_PERIOD_MS. It is not limited to Codex-originated clients (allowCompletedToolHandoffGrace stays false
++ * in the first tests) and it also covers a completed tool handoff whose terminal event was already delivered. When the grace period
++ * expires the drain cancels the reader, so flush() never runs: the request's pending-request entry is then cleared by the drain itself.
 + */
 +import test from "node:test";
 +import assert from "node:assert/strict";
@@ -57,6 +94,12 @@ index 000000000..25891fc2d
 +  createNoopAbortWritable,
 +  createStreamController,
 +} from "../../open-sse/utils/streamHandler.ts";
++import {
++  clearPendingRequests,
++  getPendingById,
++  getPendingRequests,
++  trackPendingRequest,
++} from "../../src/lib/usage/usageHistory.ts";
 +
 +const encoder = new TextEncoder();
 +const decoder = new TextDecoder();
@@ -86,16 +129,64 @@ index 000000000..25891fc2d
 +  },
 +});
 +
++// A complete client-side tool call (the frames of a completed Codex tool handoff), as in codex-tool-handoff-disconnect-499.test.ts.
++const TOOL_CALL_FRAMES =
++  sse("response.output_item.added", {
++    output_index: 0,
++    item: {
++      id: "ctc_1",
++      type: "custom_tool_call",
++      call_id: "call_1",
++      name: "apply_patch",
++      input: "",
++      status: "in_progress",
++    },
++  }) +
++  sse("response.custom_tool_call_input.done", {
++    item_id: "ctc_1",
++    output_index: 0,
++    input: "*** Begin Patch\n*** End Patch",
++  }) +
++  sse("response.output_item.done", {
++    output_index: 0,
++    item: {
++      id: "ctc_1",
++      type: "custom_tool_call",
++      call_id: "call_1",
++      name: "apply_patch",
++      input: "*** Begin Patch\n*** End Patch",
++      status: "completed",
++    },
++  });
++
++type BuildOptions = {
++  allowCompletedToolHandoffGrace?: boolean;
++  pendingRequestId?: string;
++  connectionId?: string;
++};
++
 +type Harness = {
 +  reader: ReadableStreamDefaultReader<Uint8Array>;
 +  upstream: () => ReadableStreamDefaultController<Uint8Array> | null;
-+  state: { upstreamCancelled: boolean; completionRecorded: boolean; completionStatus: number | null };
++  state: {
++    upstreamCancelled: boolean;
++    completionRecorded: boolean;
++    completionStatus: number | null;
++  };
 +  streamController: ReturnType<typeof createStreamController>;
 +};
 +
-+function build(gracePeriodMs: number, firstChunk: string): Harness {
++const PROVIDER = "codex";
++const MODEL = "gpt-5.6-sol";
++
++function build(gracePeriodMs: number, firstChunk: string, options: BuildOptions = {}): Harness {
++  const connectionId = options.connectionId ?? "connection-1";
 +  let upstreamController: ReadableStreamDefaultController<Uint8Array> | null = null;
-+  const state = { upstreamCancelled: false, completionRecorded: false, completionStatus: null as number | null };
++  const state = {
++    upstreamCancelled: false,
++    completionRecorded: false,
++    completionStatus: null as number | null,
++  };
 +  const providerStream = new ReadableStream<Uint8Array>({
 +    start(controller) {
 +      upstreamController = controller;
@@ -106,16 +197,21 @@ index 000000000..25891fc2d
 +    },
 +  });
 +  const streamController = createStreamController({
++    provider: PROVIDER,
++    model: MODEL,
++    connectionId,
++    pendingRequestId: options.pendingRequestId,
 +    clientResponseFormat: FORMATS.OPENAI_RESPONSES,
++    allowCompletedToolHandoffGrace: options.allowCompletedToolHandoffGrace ?? false,
 +    clientDisconnectGracePeriodMs: gracePeriodMs,
 +  });
 +  const transformStream = createPassthroughStreamWithLogger(
-+    "codex",
++    PROVIDER,
 +    null,
 +    null,
-+    "gpt-5.6-sol",
-+    "connection-1",
-+    { model: "gpt-5.6-sol", stream: true },
++    MODEL,
++    connectionId,
++    { model: MODEL, stream: true },
 +    (payload) => {
 +      state.completionRecorded = true;
 +      state.completionStatus = payload.status;
@@ -128,10 +224,18 @@ index 000000000..25891fc2d
 +    { readable: providerStream.pipeThrough(transformStream), writable: createNoopAbortWritable() },
 +    streamController
 +  );
-+  return { reader: clientStream.getReader(), upstream: () => upstreamController, state, streamController };
++  return {
++    reader: clientStream.getReader(),
++    upstream: () => upstreamController,
++    state,
++    streamController,
++  };
 +}
 +
-+async function readUntil(reader: ReadableStreamDefaultReader<Uint8Array>, marker: string): Promise<string> {
++async function readUntil(
++  reader: ReadableStreamDefaultReader<Uint8Array>,
++  marker: string
++): Promise<string> {
 +  let received = "";
 +  while (!received.includes(marker)) {
 +    const chunk = await reader.read();
@@ -156,7 +260,11 @@ index 000000000..25891fc2d
 +  await cancelPromise;
 +  await wait(70);
 +
-+  assert.equal(h.state.upstreamCancelled, false, "the completed response must be drained, not aborted");
++  assert.equal(
++    h.state.upstreamCancelled,
++    false,
++    "the completed response must be drained, not aborted"
++  );
 +  assert.equal(h.state.completionRecorded, true, "onComplete (call log and usage) must run");
 +  assert.equal(h.state.completionStatus, 200);
 +});
@@ -172,19 +280,39 @@ index 000000000..25891fc2d
 +  assert.equal(h.state.completionRecorded, false);
 +});
 +
-+test("the drain is bounded: an upstream that never ends is cancelled when the grace period expires", async () => {
-+  const h = build(30, COMPLETED);
++test("the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared", async () => {
++  clearPendingRequests();
++  const connectionId = "connection-expiry";
++  const modelKey = `${MODEL} (${PROVIDER})`;
++  const pendingRequestId = trackPendingRequest(MODEL, PROVIDER, connectionId, true);
++  assert.ok(pendingRequestId, "the request is listed as pending");
++  const h = build(30, COMPLETED, { connectionId, pendingRequestId });
 +  await readUntil(h.reader, "response.completed");
++  assert.equal(getPendingRequests().byModel[modelKey], 1);
 +
 +  await h.reader.cancel("request_signal_aborted");
 +  await wait(120); // the upstream stays open and silent after its terminal event
 +
 +  assert.equal(h.state.upstreamCancelled, true, "the grace period must end the drain");
 +  assert.equal(h.state.completionRecorded, false);
++  assert.equal(
++    getPendingRequests().byModel[modelKey],
++    0,
++    "flush() never runs, so the drain must clear the pending request"
++  );
++  assert.equal(getPendingById().has(pendingRequestId), false);
 +});
 +
 +test("a disconnect before the terminal event is unchanged: the upstream is cancelled right away", async () => {
-+  const h = build(50, sse("response.output_text.delta", { delta: "o", output_index: 0, content_index: 0, item_id: "msg_1" }));
++  const h = build(
++    50,
++    sse("response.output_text.delta", {
++      delta: "o",
++      output_index: 0,
++      content_index: 0,
++      item_id: "msg_1",
++    })
++  );
 +  await readUntil(h.reader, "response.output_text.delta");
 +
 +  await h.reader.cancel("request_signal_aborted");
@@ -192,6 +320,58 @@ index 000000000..25891fc2d
 +
 +  assert.equal(h.state.upstreamCancelled, true);
 +  assert.equal(h.state.completionRecorded, false);
++});
++
++test("a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run", async () => {
++  const h = build(50, TOOL_CALL_FRAMES + COMPLETED, { allowCompletedToolHandoffGrace: true });
++  await readUntil(h.reader, "response.completed");
++
++  const cancelPromise = h.reader.cancel("request_signal_aborted");
++  setTimeout(() => {
++    try {
++      h.upstream()?.close();
++    } catch {
++      // the upstream was cancelled before it ended
++    }
++  }, 0);
++  await cancelPromise;
++  await wait(70);
++
++  assert.equal(
++    h.state.upstreamCancelled,
++    false,
++    "the completed response must be drained, not aborted"
++  );
++  assert.equal(h.state.completionRecorded, true, "onComplete (call log and usage) must run");
++  assert.equal(h.state.completionStatus, 200);
++});
++
++test("a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared", async () => {
++  clearPendingRequests();
++  const connectionId = "connection-handoff-expiry";
++  const modelKey = `${MODEL} (${PROVIDER})`;
++  const pendingRequestId = trackPendingRequest(MODEL, PROVIDER, connectionId, true);
++  assert.ok(pendingRequestId, "the request is listed as pending");
++  const h = build(30, TOOL_CALL_FRAMES + COMPLETED, {
++    allowCompletedToolHandoffGrace: true,
++    connectionId,
++    pendingRequestId,
++  });
++  await readUntil(h.reader, "response.completed");
++  assert.equal(
++    h.streamController.shouldDeferCompletedToolHandoff?.(),
++    true,
++    "the handoff case is the one under test"
++  );
++
++  await h.reader.cancel("request_signal_aborted");
++  await wait(120); // the upstream stays open and silent after its terminal event
++
++  assert.equal(h.state.upstreamCancelled, true, "the grace period must end the drain");
++  assert.equal(h.streamController.signal.aborted, true);
++  assert.equal(h.state.completionRecorded, false);
++  assert.equal(getPendingRequests().byModel[modelKey], 0);
++  assert.equal(getPendingById().has(pendingRequestId), false);
 +});
 -- 
 2.43.0
