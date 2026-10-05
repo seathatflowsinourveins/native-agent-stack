@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "experiment_id": "betterleaks-p1-20261005",
+  "frozen_at": "2026-10-05T12:37:00Z",
+  "deadline": "2026-10-20",
+  "purpose": "Qualify a replacement for the existing required CI secret scanner; add no gate or local hook.",
+  "base": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+  "arms": [
+    {"id": "gitleaks", "version": "8.30.1", "pin": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e", "archive_sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"},
+    {"id": "betterleaks", "version": "1.9.0", "pin": "81aff7a638638aae3a659845d089043e1d8fe9ac", "archive_sha256": "f8b185a39ffcece2a1ca82bf3a4e7435cd81963ffd16b7a9128daf75f35f6de7", "validation": false}
+  ],
+  "corpora": {
+    "creddata": {
+      "repository": "Samsung/CredData",
+      "pin": "0b1940e171725ad8937311120b191602608a4801",
+      "snapshot_sha256": "7b5a022c449460a7daf955b9d114e5ce49d7fa73f1f4adb98e7057555e2ce4ee",
+      "snapshot_repositories": 337,
+      "metadata_rows": 67896,
+      "acquisition": "python download_data.py --jobs 1 --noise 0",
+      "acquisition_timeout_seconds": 1800,
+      "partial_corpus_is_acceptance": false,
+      "status": "held_until_native_scoring_contract_is_settled",
+      "configs": "Each arm's release default; exclude no labelled class and use identical scan limits. No author's modified-config arm.",
+      "harness": "Samsung/CredData native benchmark; no replacement scorer/runner.",
+      "scoring_blocker": "Current legacy Gitleaks adapter passes empty rule; current scorer requires native Category equality. Field-only conversion is invalid. Metadata-category projection or historical scorer needs an explicit contract decision."
+    },
+    "repository_history": {
+      "revision": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+      "commits": 1039,
+      "log_options": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+      "config": ".gitleaks.toml",
+      "config_sha256": "36d8049cef393b9786c912975cbad5eddf676d1e357f2773ed47afee0dc7d342",
+      "ignore": ".gitleaksignore",
+      "ignore_sha256": "b17156d26a9041d78135927b08fc45bd892d0c603e9484966f8c47c3d8d41721",
+      "classification": "Native location differences; unknown findings are not false positives until reviewed."
+    },
+    "controls": {
+      "source": "tests/test_gitleaks_config.py",
+      "sha256": "af4fcd8fc06c207a0fed3ceafdfafff46092278e733c0ad29309c59da538ec2d",
+      "selection": "GitleaksConfigContextRestrictionTests, unchanged for both native binaries; isolated alias gitleaks for Betterleaks.",
+      "separate_class": "Unprefixed 40-hex controls d2, d4, d5; preserve all failures/errors/skips; accept none silently.",
+      "class": "synthetic/local integration; not upstream scanner acceptance"
+    }
+  },
+  "scan_envelope": {
+    "redact": "--redact=100",
+    "exit_code": 0,
+    "completion": "Exit0 plus newly written nonempty valid JSON report; retain crashes/errors/timeouts. Findings are not inferred from exit status alone.",
+    "max_archive_depth": 0,
+    "max_target_megabytes": 2,
+    "follow_symlinks": false,
+    "gomaxprocs": 2,
+    "history_timeout_seconds": 600,
+    "fixture_timeout_seconds": 180,
+    "measurements": "GNU time wall/max RSS; strace network syscall observations of each scanner child. Configuration-off is not zero-network evidence.",
+    "observer": "Ubuntu strace 6.19+ds-0ubuntu5 package extracted to isolated cache, no host installation.",
+    "paper_windows_utc": ["2026-10-05T10:35:00Z/2026-10-05T10:55:00Z", "2026-10-05T13:20:00Z/2026-10-05T13:45:00Z"],
+    "concurrency": "One heavy step at a time. Dataset attempt starts only with a settled scoring route, outer resource envelope and sufficient time before paper window."
+  },
+  "matching": {
+    "identity": "Path, exact start/end lines, native columns; git history also full commit. Never rule ID. Preserve line-span collapse separately.",
+    "adapter": "tools/qualification/creddata_locations.py validates/projects modern native JSON to location metadata only. It does not score or invoke scanners.",
+    "limitations": "Column units are retained, not converted to CredData offsets. Native scorer's unknown/lost findings do not enter FP; same-span value/label ambiguity and class weighting need explicit accounting. No tolerance/fallback/category oracle."
+  },
+  "acceptance": {
+    "required": ["No unaccepted class loss", "No additional blocking false positives", "Complete pinned corpus and valid unchanged upstream scoring contract", "Observed network/time/memory and retained failures"],
+    "unknown_is_pass": false,
+    "gate_swap": "Separate lane:shared PR after owner decision and cross-family read; this foundation draft changes no required workflow/hook/settings.",
+    "interim": "CI secret scan only; no local hook"
+  },
+  "sources": [
+    "native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/decisions/2026-10-02-github-automation-practice.md:40-55",
+    "Samsung/CredData@0b1940e171725ad8937311120b191602608a4801:benchmark/scanner/scanner.py:276-396",
+    "Samsung/CredData@0b1940e171725ad8937311120b191602608a4801:benchmark/scanner/gitleaks.py:26-39",
+    "Samsung/CredData@0b1940e171725ad8937311120b191602608a4801:benchmark/__main__.py:18-20",
+    "Samsung/CredData@0b1940e171725ad8937311120b191602608a4801:download_data.py:81-107,249-280",
+    "betterleaks/betterleaks@81aff7a638638aae3a659845d089043e1d8fe9ac:cmd/root.go:94-112,588-611",
+    "https://github.com/betterleaks/betterleaks/releases/tag/v1.9.0",
+    "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "experiment_id": "betterleaks-p1-20261005",
+  "review_date": "2026-10-05",
+  "reviewer": "Independent bounded read-only Codex child; inherited parent runtime, no model selection changed.",
+  "review_scope": "Source contracts, freeze/config/control hashes, report-glue limits, public artifacts and privately derived receipt metadata; no test/scanner/install/download or write by reviewer.",
+  "result": "no_material_inconsistency_after_corrections",
+  "verified": [
+    "Original preregistration retained at SHA2565191f057bf6b8708c39b08c6a7f2a42d74099f831778c698d9f00bae875b54c3; config/ignore/unchanged control hashes agree.",
+    "Private native history report hashes agree with run-record; public projections equal native commit/path/line/column sets at0 and99 unique locations, with quality_scored=false.",
+    "Four private GNU-time wall/maxRSS/exit tuples agree with run-record.",
+    "Four present nonempty trace files derive no network syscall and no IPv4/IPv6 address-family observation, matching scope declared.",
+    "Unittest summaries match23/23 methods, failures0/4, errors/skips0; Betterleaks failure IDs ared2,d4,d4,d5.",
+    "Parser rejects lexical root ambiguity and duplicate raw JSON keys; no native scorer/category assignment/scanner invocation introduced."
+  ],
+  "corrected_findings": [
+    "Unchanged synthetic controls use their own native flag envelope, with unredacted inert temporary reports private/deleted; original history envelope not attributed to controls.",
+    "Labelled size/archive skips and100 merge-resolution patches remain completeness prerequisites.",
+    "Lexical data roots and duplicate JSON keys fail closed, including empty reports.",
+    "Both native report schema pins cited; fixture calls clear both scanners' config override variables without reading values."
+  ],
+  "next_sweep": [
+    "Supported current native CredData scoring contract under Q5 before2026-10-20",
+    "Same-span value/label ambiguity and unknown/lost finding accounting",
+    "Labelled target-size/archive/symlink skip coverage",
+    "100 merge-resolution patches in frozen history graph",
+    "99 novel history locations and failed40-hex class controls"
+  ],
+  "boundaries": "Receipt consistency and independent review do not establish complete CredData quality, unchanged upstream tests or gateway/provider acceptance. Command-center Claude read remains required; PR stays draft and scanner gate/settings/hooks stay unchanged."
+}

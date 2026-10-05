@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "scope": "history_locations",
+  "quality_scored": false,
+  "finding_count": 0,
+  "unique_location_count": 0,
+  "unique_line_span_count": 0,
+  "duplicate_location_count": 0,
+  "locations": []
+}

@@ -1,0 +1,39 @@
+Sanitized returned native output. No finding values, authors or operator paths.
+
+Gitleaks history (scanner stderr):
+8:41AM INF 939 commits scanned.
+8:41AM INF scanned ~1223660906 bytes (1.22 GB) in 2m33s
+8:41AM INF no leaks found
+GNU time:
+wall_seconds=153.59
+max_rss_kib=428044
+exit_status=0
+
+Betterleaks history (scanner stderr):
+8:48AM INF scanned ~1223461122 bytes (1.22 GB) in 6m50s
+8:48AM WRN leaks found: 99
+GNU time:
+wall_seconds=410.35
+max_rss_kib=2391676
+exit_status=0
+
+Gitleaks unchanged controls (unittest stderr):
+Ran 23 tests in 10.926s
+OK
+GNU time:
+wall_seconds=11.21
+max_rss_kib=64168
+exit_status=0
+
+Betterleaks unchanged controls (unittest stderr):
+Ran 23 tests in 5.820s
+FAILED (failures=4)
+GNU time:
+Command exited with non-zero status 1
+wall_seconds=6.07
+max_rss_kib=52140
+exit_status=1
+
+Glue and scan-error checks (unittest stderr):
+Ran 18 tests in 0.023s
+OK

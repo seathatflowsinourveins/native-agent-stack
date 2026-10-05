@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "experiment_id": "betterleaks-p1-20261005",
+  "execution_date": "2026-10-05",
+  "evidence_class": "local_integration",
+  "preregistration_sha256": "5191f057bf6b8708c39b08c6a7f2a42d74099f831778c698d9f00bae875b54c3",
+  "status": "partial_execution_no_swap",
+  "accepted_replacement": false,
+  "upstream_native_tests_executed": false,
+  "native_test_limit": "Upstream source/CI reviewed; Go executable unavailable (go version exit1). No rebuilt scanner or new upstream-suite acceptance claim.",
+  "release_integrity": {
+    "both_archive_checksums_match": true,
+    "betterleaks_gh_release_verify_asset_exit": 0,
+    "attestation_scope": "GitHub immutable release identity/assets, not builder provenance",
+    "versions": {"gitleaks": "8.30.1", "betterleaks": "1.9.0"},
+    "both_native_version_exits": 0
+  },
+  "history": {
+    "command": "rtk proxy env GOMAXPROCS=2 timeout --kill-after=10s 600s /usr/bin/time -f 'wall_seconds=%e\\nmax_rss_kib=%M\\nexit_status=%x' -o $P1_ROOT/native-runs/ARM-history.time $P1_ROOT/observer/usr/bin/strace -f -qq -e trace=network -o $P1_ROOT/native-runs/ARM-history.network $P1_ROOT/ARM-release/ARM git . --log-opts=c148e049efee75f8ea8a9a009e7b96b1e97f5c28 --config=.gitleaks.toml --max-target-megabytes=2 --max-archive-depth=0 --redact=100 --exit-code=0 --no-banner --report-format=json --report-path=$P1_ROOT/native-runs/ARM-history.json",
+    "betterleaks_extra_flag": "--validation=false",
+    "cwd": "owned fresh worktree from preregistered base",
+    "stdout_stderr": "Captured privately; safe native count/timing lines retained in returned-summary.txt.",
+    "gitleaks": {
+      "exit_code": 0, "native_report_valid": true,
+      "findings": 0, "unique_locations": 0,
+      "wall_seconds": 153.59, "max_rss_kib": 428044,
+      "native_scanned_bytes": 1223660906, "native_reported_commits": 939,
+      "network_syscall_counts": {}, "ipv4_ipv6_observations": 0,
+      "private_native_report_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    "betterleaks": {
+      "exit_code": 0, "native_report_valid": true,
+      "findings": 99, "unique_locations": 99,
+      "wall_seconds": 410.35, "max_rss_kib": 2391676,
+      "native_scanned_bytes": 1223461122, "native_reported_commits": null,
+      "network_syscall_counts": {}, "ipv4_ipv6_observations": 0,
+      "private_native_report_sha256": "f0662ed1cb86ada8c42f967ba176c15690580641b0a43e206b846ab10b97e581"
+    },
+    "comparison": {"shared_locations": 0, "gitleaks_only": 0, "betterleaks_only": 99, "new_location_truth_labels": "unreviewed; not called false positives"},
+    "coverage": "Frozen graph1039/nonmerge939/merge100. Native log options do not establish merge-resolution coverage. Reported scanned byte totals also differ; no complete-equivalent-scan claim.",
+    "measurement_scope": "Each native process tree under identical strace/time envelope. Tracing overhead is included. One run per arm, no population performance claim. No network syscall observed; no retry or provider-usage inference outside these processes."
+  },
+  "controls": {
+    "source_unchanged": "tests/test_gitleaks_config.py@c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+    "command": "rtk proxy env -u GITLEAKS_CONFIG -u GITLEAKS_CONFIG_TOML -u BETTERLEAKS_CONFIG -u BETTERLEAKS_CONFIG_TOML PATH=$ARM_BIN:/usr/bin:/bin TMPDIR=$P1_ROOT/fixtures GOMAXPROCS=2 GITLEAKS_TESTS_REQUIRED=1 timeout --kill-after=10s 180s /usr/bin/time -f 'wall_seconds=%e\\nmax_rss_kib=%M\\nexit_status=%x' -o $P1_ROOT/native-runs/ARM-controls.time $P1_ROOT/observer/usr/bin/strace -f -qq -e trace=network -o $P1_ROOT/native-runs/ARM-controls.network python3 -m unittest -v tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests",
+    "binary_alias": "Betterleaks unchanged release executable exposed as gitleaks through a private symlink, no wrapper/rebuild.",
+    "gitleaks": {"exit_code": 0, "tests_run": 23, "failures": 0, "errors": 0, "skips": 0, "wall_seconds": 11.21, "max_rss_kib": 64168, "network_syscall_counts": {}, "ipv4_ipv6_observations": 0},
+    "betterleaks": {"exit_code": 1, "tests_run": 23, "failures": 4, "affected_test_methods": 3, "errors": 0, "skips": 0, "wall_seconds": 6.07, "max_rss_kib": 52140, "network_syscall_counts": {}, "ipv4_ipv6_observations": 0,
+      "failure_ids": ["test_d2_other_fields_and_other_paths_stay_detected", "test_d4_unreviewed_values_and_other_paths_stay_detected", "test_d4_unreviewed_values_and_other_paths_stay_detected", "test_d5_retained_sweep_input_pin_lines_only"]},
+    "class_loss": "Unprefixed40-hex d2/d4/d5 assertions fail with Betterleaks; d4 has two failed subtests. No exception is accepted.",
+    "class": "Synthetic repository integration, not unchanged upstream tests. Native fixture flags/privacy are in envelope-clarifications.json."
+  },
+  "adapter_checks": {
+    "command": "rtk proxy python3 -m unittest tests.test_creddata_locations tests.test_gitleaks_config.ScannerErrorTests",
+    "exit_code": 0, "tests_run": 18,
+    "scope": "12 new glue invariants/invalid-shape checks plus6 existing scan-error/completion checks; neither scanner quality nor upstream acceptance."
+  },
+  "creddata": {"acquisition_started": false, "native_quality_run_started": false, "quality_scores": null, "blocker": "Q5 native category/scoring contract unresolved; no guessed crosswalk, oracle category projection, historical corpus substitution or custom scorer."},
+  "decision": "Retain required Gitleaks CI scanner, no local hook and no gate swap. Partial P1 disqualifies an automatic swap on known fixture class loss and leaves CredData/current full-history completeness pending.",
+  "next": "Owner settles Q5/current native scoring contract before2026-10-20; triage99 novel history locations and merge/size/archive coverage. Command center's Claude read before draft leaves draft."
+}

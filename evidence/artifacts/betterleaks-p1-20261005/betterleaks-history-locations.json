@@ -1,0 +1,804 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "scope": "history_locations",
+  "quality_scored": false,
+  "finding_count": 99,
+  "unique_location_count": 99,
+  "unique_line_span_count": 99,
+  "duplicate_location_count": 0,
+  "locations": [
+    {
+      "commit": "03f0ad44ba5e78bc3620b648cc5f73b7e4cc09f5",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "07a2bb5226cc5c518d49fc93a1b194fe76c23b9a",
+      "path": "tests/test_ecosystem_manifest.py",
+      "start_line": 162,
+      "end_line": 162,
+      "start_column": 45,
+      "end_column": 88
+    },
+    {
+      "commit": "0809dc2e28e30b0cfebea8077de9faf462f8be59",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "096d295bf57b3240596cf9620f670a5103c20c6a",
+      "path": "tests/test_codex_lane.py",
+      "start_line": 959,
+      "end_line": 959,
+      "start_column": 45,
+      "end_column": 110
+    },
+    {
+      "commit": "0e850e867b3ad85da50b61fd93c622e027ea8e85",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 104,
+      "end_line": 104,
+      "start_column": 3161925,
+      "end_column": 3162002
+    },
+    {
+      "commit": "156800324069df4168df002fa50b141d8b4a46f2",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "1585a40a44423ccade74e9b20b708e2ff3415067",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3984692,
+      "end_column": 3984769
+    },
+    {
+      "commit": "168a3a863b365c29ec3b4b009df0ab90ef082f84",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3983130,
+      "end_column": 3983207
+    },
+    {
+      "commit": "1a5778229996de2d1082be085b14fd9c569a284d",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3984692,
+      "end_column": 3984769
+    },
+    {
+      "commit": "1b8d63349e5c82277b2faa6155356478fda727bf",
+      "path": "tests/test_overnight_volume.py",
+      "start_line": 460,
+      "end_line": 460,
+      "start_column": 21,
+      "end_column": 71
+    },
+    {
+      "commit": "1fd4ff3863bc33f891a4f1d941056342dc737288",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 105,
+      "end_line": 105,
+      "start_column": 3423100,
+      "end_column": 3423177
+    },
+    {
+      "commit": "231077d095511391e7dd8a5ab25c451331332c5e",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "23fe3d68d9f4b3acafc334b34b967aa9fb09c186",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2640791,
+      "end_column": 2640868
+    },
+    {
+      "commit": "248ca4faaaf6af509bfa4b63d910a5a4f813954b",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 105,
+      "end_line": 105,
+      "start_column": 3423100,
+      "end_column": 3423177
+    },
+    {
+      "commit": "2ace72241fe8ac9888be0f8e4bd614d85fdc94ea",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3983130,
+      "end_column": 3983207
+    },
+    {
+      "commit": "34e295908af69d88b9a2e8ff68b0a66561680555",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 106,
+      "end_line": 106,
+      "start_column": 3977271,
+      "end_column": 3977348
+    },
+    {
+      "commit": "3940805c8037e16a1b6055e5e00e28cd7a53e3d2",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "3a45e7dc1ba062381d96dc316a77aebe397e38a6",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2509925,
+      "end_column": 2510002
+    },
+    {
+      "commit": "3bb8cb3eb91189286fffe5a1618769a63afa74b4",
+      "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/rerun-isolated.sh",
+      "start_line": 9,
+      "end_line": 9,
+      "start_column": 15,
+      "end_column": 55
+    },
+    {
+      "commit": "3f6ad5fcb1e59c515d6115f088c308cc5ac26cf1",
+      "path": "blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/auth_none_with_basic_block.sh",
+      "start_line": 10,
+      "end_line": 10,
+      "start_column": 114,
+      "end_column": 141
+    },
+    {
+      "commit": "3f6ad5fcb1e59c515d6115f088c308cc5ac26cf1",
+      "path": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh",
+      "start_line": 24,
+      "end_line": 24,
+      "start_column": 50,
+      "end_column": 83
+    },
+    {
+      "commit": "3f6ad5fcb1e59c515d6115f088c308cc5ac26cf1",
+      "path": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh",
+      "start_line": 32,
+      "end_line": 32,
+      "start_column": 50,
+      "end_column": 83
+    },
+    {
+      "commit": "3f6ad5fcb1e59c515d6115f088c308cc5ac26cf1",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/osv-positive.json",
+      "start_line": 1980,
+      "end_line": 1980,
+      "start_column": 617,
+      "end_column": 653
+    },
+    {
+      "commit": "3f6ad5fcb1e59c515d6115f088c308cc5ac26cf1",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/pip-audit-positive.json",
+      "start_line": 1,
+      "end_line": 1,
+      "start_column": 1536,
+      "end_column": 1572
+    },
+    {
+      "commit": "43bb931f3f20d70d8369c3f6b0867bdf5303f213",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3983130,
+      "end_column": 3983207
+    },
+    {
+      "commit": "4400d893f1b19214a68cd137eb78c1ea6ea3d80b",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2657502,
+      "end_column": 2657579
+    },
+    {
+      "commit": "445bc83c942d2521cbc526565128d76c78f394bc",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "44a1cf7c84b5225505f4a7632df695bca8b5e65c",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "4519fd4f509f72b86cdec701576bf5147aa9e90f",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3984692,
+      "end_column": 3984769
+    },
+    {
+      "commit": "45a0218555bd0a8d83a1000fb1be3d09ce94c37b",
+      "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
+      "start_line": 5091,
+      "end_line": 5091,
+      "start_column": 169,
+      "end_column": 272
+    },
+    {
+      "commit": "48c3b54cef6e622d6a88e9c8efb81c89b6a966ab",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 104,
+      "end_line": 104,
+      "start_column": 2915493,
+      "end_column": 2915570
+    },
+    {
+      "commit": "4ba8ac9a52c8cfc5b11b99eac364e383a1229c87",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "54896e7621bcacd2f4e062645302f3d9db1390d4",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2286489,
+      "end_column": 2286566
+    },
+    {
+      "commit": "5dcf451d6d8b2e6543c58de3d83791ac0f3ddb70",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3983130,
+      "end_column": 3983207
+    },
+    {
+      "commit": "61cabb79b04896c1be0d3c8b455de728e755c40e",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 106,
+      "end_line": 106,
+      "start_column": 3977271,
+      "end_column": 3977348
+    },
+    {
+      "commit": "6568523f27e718a86251d041106c53e765a8325d",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3984692,
+      "end_column": 3984769
+    },
+    {
+      "commit": "66043ed0c147a397789381b0633dd899008e08c4",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 116,
+      "end_line": 116,
+      "start_column": 3419916,
+      "end_column": 3419993
+    },
+    {
+      "commit": "68d760c19ddb785db3bf0c85dce522417c45d5c0",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 105,
+      "end_line": 105,
+      "start_column": 3419916,
+      "end_column": 3419993
+    },
+    {
+      "commit": "6fd56b96ef09e725a6d69369d2ace9215458936a",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2657502,
+      "end_column": 2657579
+    },
+    {
+      "commit": "710ea0f2253bc4561535bc291c078c83490750fd",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 116,
+      "end_line": 116,
+      "start_column": 3419916,
+      "end_column": 3419993
+    },
+    {
+      "commit": "7190f5cf2a5c4429a9b48fec0652d26b79cf2e1e",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3984692,
+      "end_column": 3984769
+    },
+    {
+      "commit": "73f4334919f5450cd3d30f5e2e1f9e58ec94c03d",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 105,
+      "end_line": 105,
+      "start_column": 3419916,
+      "end_column": 3419993
+    },
+    {
+      "commit": "7e7eefe28315f3de3aa4dc75cc8b6524f70829cb",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2657502,
+      "end_column": 2657579
+    },
+    {
+      "commit": "7f13863282836450f84e4c49660d0fc826d04c7b",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "802cfadeaeafcef391f974c9f423550867a70f1e",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 104,
+      "end_line": 104,
+      "start_column": 2915493,
+      "end_column": 2915570
+    },
+    {
+      "commit": "825bb455ffa3ee6fdc62228935592c04a41ae55b",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "826d8875ac69f88dceb43094d382e5021d2eef53",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2286489,
+      "end_column": 2286566
+    },
+    {
+      "commit": "84a64b131927fb53d015bf23bdb5c45fcdda3be2",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 104,
+      "end_line": 104,
+      "start_column": 2915493,
+      "end_column": 2915570
+    },
+    {
+      "commit": "8504e11272afa9d771a62a69ce0aa736d5afaef6",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 105,
+      "end_line": 105,
+      "start_column": 3419916,
+      "end_column": 3419993
+    },
+    {
+      "commit": "853ca4479fb0ec2b6be576ad2c869b282bc127d5",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3984692,
+      "end_column": 3984769
+    },
+    {
+      "commit": "86bc4be4a53b5c73d1d6aeec44d3b8b2254012c3",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "8889cf0f019d0a02123e9dc9296d624869e737a6",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3983130,
+      "end_column": 3983207
+    },
+    {
+      "commit": "8d1be2833dd70afe4a24d3f90be40ec592e26c8f",
+      "path": "tests/test_freeze_snapshot.py",
+      "start_line": 1516,
+      "end_line": 1516,
+      "start_column": 91,
+      "end_column": 117
+    },
+    {
+      "commit": "906857509c49e7b017e8a6082acccb73d49080be",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2286489,
+      "end_column": 2286566
+    },
+    {
+      "commit": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3983130,
+      "end_column": 3983207
+    },
+    {
+      "commit": "96adc9bb19d22c3f7a46bd0ef73cb21d1b9ff24e",
+      "path": "blueprints/us-equities/hosting/config.yaml.example",
+      "start_line": 14,
+      "end_line": 14,
+      "start_column": 5,
+      "end_column": 52
+    },
+    {
+      "commit": "99f580c187100d064853b977376697394decbefe",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 122,
+      "end_line": 122,
+      "start_column": 3424368,
+      "end_column": 3424445
+    },
+    {
+      "commit": "9b13473fa2f16c0c4e400a6e1ac7b30750091b0c",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 105,
+      "end_line": 105,
+      "start_column": 3419916,
+      "end_column": 3419993
+    },
+    {
+      "commit": "9b998048b637d51043d3959af7dc44a3f49e2357",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 105,
+      "end_line": 105,
+      "start_column": 3419916,
+      "end_column": 3419993
+    },
+    {
+      "commit": "a10de9f6a270f5d2802476f93f0c23ed4b43bfe0",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3983130,
+      "end_column": 3983207
+    },
+    {
+      "commit": "a3dcba87e07bfe90719ce9d80c51185a4b7a1ead",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "a405e3eb5911f70dff72e1fc4ffe59168691f8d5",
+      "path": "observability/backends/configure.py",
+      "start_line": 43,
+      "end_line": 43,
+      "start_column": 40,
+      "end_column": 79
+    },
+    {
+      "commit": "a7f251353db44e6fa5637238eb653ef4ce5a9d9d",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3983130,
+      "end_column": 3983207
+    },
+    {
+      "commit": "a8816f6930cc9777d5e5fb32d4d540416feaf6a2",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2509925,
+      "end_column": 2510002
+    },
+    {
+      "commit": "aad9ed7b3d0d760b891fe3889fa44dc0e00ef33f",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2509925,
+      "end_column": 2510002
+    },
+    {
+      "commit": "ae30f94b796591760fc92b4a6d252f8e19e88caa",
+      "path": "tests/test_host_requests.py",
+      "start_line": 422,
+      "end_line": 422,
+      "start_column": 60,
+      "end_column": 90
+    },
+    {
+      "commit": "aeff2489786c6d147a50b091759fa2af4ea4d86f",
+      "path": "tests/test_native_worker_route.py",
+      "start_line": 35,
+      "end_line": 35,
+      "start_column": 14,
+      "end_column": 51
+    },
+    {
+      "commit": "af342147468ed94733435562f57ede3459a30083",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2657502,
+      "end_column": 2657579
+    },
+    {
+      "commit": "b122312db6e84f3a921647bd96e9060d102aa784",
+      "path": "tests/test_codex_lane.py",
+      "start_line": 833,
+      "end_line": 833,
+      "start_column": 44,
+      "end_column": 108
+    },
+    {
+      "commit": "b122312db6e84f3a921647bd96e9060d102aa784",
+      "path": "tests/test_codex_lane.py",
+      "start_line": 834,
+      "end_line": 834,
+      "start_column": 40,
+      "end_column": 104
+    },
+    {
+      "commit": "b122312db6e84f3a921647bd96e9060d102aa784",
+      "path": "tests/test_codex_lane.py",
+      "start_line": 923,
+      "end_line": 923,
+      "start_column": 46,
+      "end_column": 111
+    },
+    {
+      "commit": "b122312db6e84f3a921647bd96e9060d102aa784",
+      "path": "tests/test_codex_lane.py",
+      "start_line": 949,
+      "end_line": 949,
+      "start_column": 46,
+      "end_column": 112
+    },
+    {
+      "commit": "b3ab8ef97243a8ef8e34e60c088bcaca7608abb4",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2640791,
+      "end_column": 2640868
+    },
+    {
+      "commit": "b608fc8fc784fb200817a6dcd3c858fb359ec4b2",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 105,
+      "end_line": 105,
+      "start_column": 3419916,
+      "end_column": 3419993
+    },
+    {
+      "commit": "b6cec8b18c084356fef291e46298354c690f89a3",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 104,
+      "end_line": 104,
+      "start_column": 2898782,
+      "end_column": 2898859
+    },
+    {
+      "commit": "b75b8b108ba5eb42b6dcf3b3a12d4d04354bc82e",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3983130,
+      "end_column": 3983207
+    },
+    {
+      "commit": "bdd04ca50eb781f8366c955f481479b7a7f57cbd",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "c0e90237d9dda3df1d97e81fe004f971d00483ae",
+      "path": "observability/backends/configure.py",
+      "start_line": 128,
+      "end_line": 128,
+      "start_column": 40,
+      "end_column": 79
+    },
+    {
+      "commit": "c2785a735b352857f7ab7bad3e6be08f6e47728e",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "c97335857d612f6d331218015da62315267b0f74",
+      "path": "tests/test_ecosystem_manifest.py",
+      "start_line": 625,
+      "end_line": 625,
+      "start_column": 47,
+      "end_column": 81
+    },
+    {
+      "commit": "d093a4c4f522c27d0179144cf4b57630a2f3f3d9",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "d3d3e1b672c664a1b83d646c511c36552b896013",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3981975,
+      "end_column": 3982052
+    },
+    {
+      "commit": "d468bc903ca3f9b7fc2acbbc58f118735930086d",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2639931,
+      "end_column": 2640008
+    },
+    {
+      "commit": "d509fa03e7befdff90caaafe0792fd5172b200d8",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 105,
+      "end_line": 105,
+      "start_column": 3419916,
+      "end_column": 3419993
+    },
+    {
+      "commit": "dac2d1a3f880c04f6afadebe8bf3a251a64ab605",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 122,
+      "end_line": 122,
+      "start_column": 3419916,
+      "end_column": 3419993
+    },
+    {
+      "commit": "db708809824ae78c87186bf27def4acb3b85a0da",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3984692,
+      "end_column": 3984769
+    },
+    {
+      "commit": "dbb1a0c0cd5f4cad6278d2d655f8764b6639ba4d",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3983130,
+      "end_column": 3983207
+    },
+    {
+      "commit": "e3149121f4b3337d1aab02684b5ea7972217e4f1",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 1981502,
+      "end_column": 1981579
+    },
+    {
+      "commit": "ea29576d1069f1baaa9553f18f32aa16b0f360c3",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 2286489,
+      "end_column": 2286566
+    },
+    {
+      "commit": "ecc50b20149f3e419021816fc7e68f63808e3b1f",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "ecea28654a835fff2cc3651bab77ca0e46b9bec5",
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-claude-test_worker.py.source.txt",
+      "start_line": 141,
+      "end_line": 141,
+      "start_column": 14,
+      "end_column": 56
+    },
+    {
+      "commit": "ecea28654a835fff2cc3651bab77ca0e46b9bec5",
+      "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
+      "start_line": 1273,
+      "end_line": 1273,
+      "start_column": 630,
+      "end_column": 672
+    },
+    {
+      "commit": "ecea28654a835fff2cc3651bab77ca0e46b9bec5",
+      "path": "examples/claude-runtime-sdk/tests/test_worker.py",
+      "start_line": 141,
+      "end_line": 141,
+      "start_column": 14,
+      "end_column": 56
+    },
+    {
+      "commit": "ecea28654a835fff2cc3651bab77ca0e46b9bec5",
+      "path": "examples/omniroute-codex-sdk/checks.json",
+      "start_line": 1244,
+      "end_line": 1244,
+      "start_column": 630,
+      "end_column": 672
+    },
+    {
+      "commit": "f4a6cb1b9ec0cb38f11ce6a7c907548397c8d01e",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 105,
+      "end_line": 105,
+      "start_column": 3423100,
+      "end_column": 3423177
+    },
+    {
+      "commit": "f74e933b2f369cf5942ce5d95854f35fdc0adb8f",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "fe0ed404dedde8633158e1de24f876d12a37833f",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 123,
+      "end_line": 123,
+      "start_column": 3987960,
+      "end_column": 3988037
+    },
+    {
+      "commit": "ff033b372bbdc43b001973e7cf1f9a259abdc91f",
+      "path": "docs/ecosystem/index.html",
+      "start_line": 103,
+      "end_line": 103,
+      "start_column": 1869915,
+      "end_column": 1869992
+    },
+    {
+      "commit": "ff2ac50ac2a24209d832bf95ed9bfe6f00f6b9f5",
+      "path": "tests/test_codex_lane.py",
+      "start_line": 1125,
+      "end_line": 1125,
+      "start_column": 54,
+      "end_column": 83
+    }
+  ]
+}

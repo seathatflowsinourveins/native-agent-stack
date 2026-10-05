@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-05T12:46:00Z",
+  "original_preregistration_sha256": "5191f057bf6b8708c39b08c6a7f2a42d74099f831778c698d9f00bae875b54c3",
+  "original_unchanged": true,
+  "reason": "Source-review completeness corrections, before either fixture arm or any CredData arm; no outcome-selected replacement.",
+  "history": {
+    "reachable_graph_commits": 1039,
+    "nonmerge_commits": 939,
+    "merge_commits": 100,
+    "native_patch_scope": "git log on frozen revision with native scanner defaults; do not claim merge-resolution patch coverage from a 939-commit scan.",
+    "full_history_acceptance": "Merge-resolution coverage remains a completeness prerequisite unless a supplementary native log-options arm observes it."
+  },
+  "controls": {
+    "flags": "dir . --config REPOSITORY_CONFIG --no-banner --exit-code 0 --report-format json --report-path PRIVATE_TEMP_REPORT",
+    "redact_flag": false,
+    "max_target_flag": false,
+    "max_archive_flag": false,
+    "betterleaks_archive_default": 8,
+    "gitleaks_archive_default": 0,
+    "validation": "Betterleaks native default false; unchanged tests pass no validation flag.",
+    "privacy": "Unchanged fixtures use inert synthetic strings, create reports under an owned mode0700 TMPDIR, and delete them. Captured unittest output stays private; export test IDs/counts only. No claim of redacted fixture reports.",
+    "limits_scope": "The common explicit redaction/archive/size flags in the original scan envelope apply to history/anticipated corpus commands, not unchanged fixture tests."
+  },
+  "creddata": {
+    "coverage": "Before acceptance, account for labelled files skipped by target-size/archive/symlink limits; acquisition completeness alone is not complete scan coverage. Any unaccounted labelled skip/ambiguity remains unknown, never a pass.",
+    "status": "Scoring and acquisition remain held under Q5."
+  },
+  "environment": "Explicit history/fixture CLI config wins native priority. Clear GITLEAKS_CONFIG, GITLEAKS_CONFIG_TOML, BETTERLEAKS_CONFIG and BETTERLEAKS_CONFIG_TOML before fixture/corpus calls, without reading values.",
+  "sources": [
+    "native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:tests/test_gitleaks_config.py:115-138",
+    "betterleaks/betterleaks@81aff7a638638aae3a659845d089043e1d8fe9ac:cmd/root.go:94-112",
+    "gitleaks/gitleaks@83d9cd684c87d95d656c1458ef04895a7f1cbd8e:cmd/root.go:90-94",
+    "betterleaks/betterleaks@81aff7a638638aae3a659845d089043e1d8fe9ac:report/finding.go:20-23,70",
+    "gitleaks/gitleaks@83d9cd684c87d95d656c1458ef04895a7f1cbd8e:report/finding.go:19-22,32"
+  ]
+}
