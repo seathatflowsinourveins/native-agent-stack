@@ -538,6 +538,23 @@ service and reads no private destination values. The original alerting
 adjudication corrects the unit assignment to observe-eval-2. The user chooses
 webhook, Telegram or on-host delivery; the sink remains until safe files exist.
 
+Receiver support is restored from main `f946c6d4c` / `77d7516d8`:
+`config/observability_config.py:65-78` selects the native webhook or Telegram
+pointer files, and `accept.sh` selects the matching native notification counters.
+The upstream Alertmanager v0.34.1 file fields are documented at
+`docs/configuration.md:1875-1882,1947-1950`. The round-2 handling of exit 78 as
+`needs_user` remains.
+
+The coordinator's 2026-10-05 round-3 brief corrects the choice record: ntfy.sh
+was the coordinator's delegated pick on 2026-10-04; the user personally configured
+and accepted Telegram on NativeStack2604 at about 06:58Z on 2026-10-05. The user
+supplied firing and resolved messages for acceptance
+`9e6f4a70b5874573aff1d22b40e87a32`; main `4c897418f`'s unmodified
+`accept.sh --only alerting --stage after_sign_in` returned 0 with
+`receiver_evidence=user_attestation`. The plan supports webhook/ntfy, Telegram
+and on-host; nothing was overturned. These are coordinator-supplied host facts,
+not a new live run by this PR. Only pointer names are retained.
+
 ## G5 analytics and evaluation sources (2026-10-04)
 
 The bounded builder re-read the original pinned source. The private `review-observe-eval-2.json` supplies the session-analytics repair; `adjudication.json` overrides the two evaluation reviews. The supplied `fixes.json` was absent at the input location when checked. The earlier install-repair patch contains no hunks for these three slots. The existing primary tool pins remain unchanged.

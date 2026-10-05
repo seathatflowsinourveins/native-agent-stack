@@ -65,9 +65,13 @@ def private_file(path):
 def destination():
     store = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "native-agent-stack"
     mode = os.environ.get("NATIVE_STACK_ALERT_RECEIVER", "webhook")
-    if mode != "webhook":
-        raise ValueError("Telegram and on-host destinations were overturned; select the approved ntfy.sh webhook")
-    pointers = {"@URL_FILE@": Path(os.environ.get("NATIVE_STACK_ALERT_URL_FILE", str(store / "alertmanager-webhook-url")))}
+    if mode not in ("webhook", "telegram", "on-host"):
+        raise ValueError("NATIVE_STACK_ALERT_RECEIVER must be webhook, telegram or on-host")
+    if mode == "telegram":
+        pointers = {"@BOT_TOKEN_FILE@": Path(os.environ.get("NATIVE_STACK_ALERT_BOT_TOKEN_FILE", str(store / "alertmanager-telegram-token"))),
+                    "@CHAT_ID_FILE@": Path(os.environ.get("NATIVE_STACK_ALERT_CHAT_ID_FILE", str(store / "alertmanager-telegram-chat-id")))}
+    else:
+        pointers = {"@URL_FILE@": Path(os.environ.get("NATIVE_STACK_ALERT_URL_FILE", str(store / "alertmanager-webhook-url")))}
     states = [private_file(p) for p in pointers.values()]
     if "unsafe" in states:
         raise ValueError("alert destination metadata is unsafe; require owned 0600 files in a 0700 directory outside Git worktrees")
@@ -187,7 +191,7 @@ def main():
             publish("prometheus.yaml", (source / "prometheus.yaml").read_text())
         mode, pointers, ready = destination()
         if not ready:
-            print("needs_user: supply the selected ntfy.sh topic URL with ?template=alertmanager in its owned 0600 URL file; the disarmed placeholder cannot accept delivery", file=sys.stderr)
+            print("needs_user: choose the alert destination and supply its private destination file(s); disarmed placeholder retained", file=sys.stderr)
             return 78 if args.action == "alerting-ready" else 0
         template = (source / ("alertmanager-telegram.yaml" if mode == "telegram" else "alertmanager-webhook.yaml")).read_text()
         rendered = template

@@ -88,7 +88,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "13aa5ee540f91454a07e0f05ad97fbf616e4747370f835902c2543ef4a190942"
+   "sha256": "a34fb8c01429177cd2787a07a1edf0a0668d31898ff35fd798056964d5dab82e"
   }
  },
  "counts": {

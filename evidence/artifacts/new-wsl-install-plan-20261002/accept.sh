@@ -1042,6 +1042,7 @@ PY
 before="$(mktemp)"
 after="$(mktemp)"
 trap '"'"'printf "[]\n" > "$fixture"; rm -f -- "$before" "$after"'"'"' EXIT
+# Native counters classify Telegram separately; ntfy and on-host use webhook.
 integration=webhook
 [[ "${NATIVE_STACK_ALERT_RECEIVER:-webhook}" != telegram ]] || integration=telegram
 curl -fsS http://127.0.0.1:21093/metrics > "$before"

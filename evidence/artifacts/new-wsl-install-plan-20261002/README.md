@@ -276,14 +276,17 @@ alone do not certify dashboard readiness. The maintained Prometheus startup
 feature flags for first counter samples are recorded in the G4 decision and
 must be carried by the service owner.
 
-Alerting retains the sink until a private destination file exists. The user
-chooses ntfy.sh (recommended; alert text leaves the host), Telegram or an on-host
-destination. The plan never reads or prints those private files. The default
+Alerting supports webhook/ntfy, Telegram and an on-host destination, retaining
+the disarmed sink until the selected receiver's private files exist. ntfy.sh was
+the coordinator's delegated pick on 2026-10-04. The user personally configured
+and accepted Telegram on NativeStack2604 at about 06:58Z on 2026-10-05; that live
+choice supersedes the delegated pick, and no supported receiver was overturned.
+The plan never reads or prints those private files. The default
 webhook pointer is
 `${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/alertmanager-webhook-url`;
 `NATIVE_STACK_ALERT_URL_FILE` may supply another absolute pointer. The file must
 be owned, regular, singly linked and `0600`, in an owned `0700` directory outside
-every worktree. The user writes the ntfy URL with `?template=alertmanager` through
+every worktree. For ntfy, the user writes the URL with `?template=alertmanager` through
 their own terminal; do not put a URL/topic value in repository configuration or
 an agent prompt. `NATIVE_STACK_ALERT_RECEIVER=telegram` instead uses
 `alertmanager-telegram-token` and `alertmanager-telegram-chat-id` in that store,
@@ -301,7 +304,7 @@ reported for its owner to merge. This installer starts no service.
 Alerting post-install acceptance uses upstream amtool and native promtool rule
 validation/unit tests; install the Prometheus owner before selecting that check.
 Native delivery acceptance is `--only alerting --stage after_sign_in`. It prints
-`needs_user` and skips when the destination files are absent. Once wired, it
+`needs_user (78)` when the destination files are absent. Once wired, it
 posts an expiring tagged alert, exercises the empty file-SD fixture using a
 confirmed closed loopback port, restores the empty target list and observes
 notification counters plus rule firing/resolution. It returns pending until
@@ -318,6 +321,13 @@ without sending another test. A local readiness result or notification counter
 does not substitute for this receiver attestation. This CLI checks the attestation fields and binding; it cannot independently verify who wrote the file. Stale or mismatched pairs are archived and a fresh delivery test runs automatically. Loki ruler evaluation remains
 explicitly deferred to that slot's owner. The synthetic promtool inputs are
 separate from these real delivery observations.
+
+The coordinator reports that the user supplied both firing and resolved
+Telegram messages for acceptance `9e6f4a70b5874573aff1d22b40e87a32` on
+NativeStack2604. Main `4c897418f`'s unmodified delivery check returned 0 with
+`receiver_evidence=user_attestation`. This is the reported 2026-10-05 host
+acceptance, separate from this PR's local checks; no message contents or
+destination values are recorded here.
 
 ## G5 analytics and evaluation acceptance (2026-10-04)
 

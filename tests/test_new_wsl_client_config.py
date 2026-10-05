@@ -240,6 +240,63 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                 self.assertIn("auth-store upload is forbidden", done.stderr)
 
 
+class Round3AlertReceiverRepairTests(unittest.TestCase):
+    """Local receiver controls; no credential values or live delivery are used."""
+
+    def test_selected_receivers_use_native_templates_without_reading_private_files(self):
+        adapter = Round2RepairIntegrationTests.source_module("observability_config.py")
+        for mode in ("webhook", "telegram", "on-host"):
+            with self.subTest(receiver=mode), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                store = root / "private/native-agent-stack"
+                store.mkdir(parents=True, mode=0o700)
+                names = ({"@BOT_TOKEN_FILE@": "alertmanager-telegram-token",
+                          "@CHAT_ID_FILE@": "alertmanager-telegram-chat-id"}
+                         if mode == "telegram" else {"@URL_FILE@": "alertmanager-webhook-url"})
+                pointers = {marker: store / name for marker, name in names.items()}
+                for pointer in pointers.values():
+                    pointer.touch(mode=0o600)  # Empty synthetic metadata fixtures.
+                config = root / "config"
+                config.mkdir()
+                template_name = "alertmanager-telegram.yaml" if mode == "telegram" else "alertmanager-webhook.yaml"
+                rendered = (PLAN / "config" / template_name).read_text()
+                for marker, pointer in pointers.items():
+                    rendered = rendered.replace(marker, json.dumps(str(pointer)))
+                (config / "alertmanager.yaml").write_text(rendered)
+                read_text, read_bytes = Path.read_text, Path.read_bytes
+
+                def guarded_text(path, *args, **kwargs):
+                    self.assertNotIn(path, pointers.values(), "private destination contents must remain unread")
+                    return read_text(path, *args, **kwargs)
+
+                def guarded_bytes(path, *args, **kwargs):
+                    self.assertNotIn(path, pointers.values(), "private destination contents must remain unread")
+                    return read_bytes(path, *args, **kwargs)
+
+                environment = {"PATH": os.environ["PATH"], "HOME": str(root),
+                               "XDG_CONFIG_HOME": str(root / "private"),
+                               "NATIVE_STACK_ALERT_RECEIVER": mode, "GIT_OPTIONAL_LOCKS": "0"}
+                argv = ["observability_config.py", "alerting-ready", "--config-root", str(config),
+                        "--source-root", str(PLAN / "config")]
+                with mock.patch.dict(os.environ, environment, clear=True), mock.patch.object(sys, "argv", argv), \
+                        mock.patch.object(Path, "read_text", guarded_text), mock.patch.object(Path, "read_bytes", guarded_bytes):
+                    self.assertEqual(adapter.destination(), (mode, pointers, True))
+                    self.assertEqual(adapter.main(), 0)
+
+    def test_missing_receiver_pointers_remain_needs_user_for_every_mode(self):
+        adapter = Round2RepairIntegrationTests.source_module("observability_config.py")
+        for mode in ("webhook", "telegram", "on-host"):
+            with self.subTest(receiver=mode), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                environment = {"HOME": str(root), "XDG_CONFIG_HOME": str(root / "private"),
+                               "NATIVE_STACK_ALERT_RECEIVER": mode}
+                argv = ["observability_config.py", "alerting-ready", "--config-root", str(root / "config")]
+                with mock.patch.dict(os.environ, environment, clear=True), mock.patch.object(sys, "argv", argv), \
+                        contextlib.redirect_stderr(io.StringIO()) as returned:
+                    self.assertEqual(adapter.main(), 78)
+                self.assertIn("needs_user", returned.getvalue())
+
+
 class ObservabilityMigrationRepairTests(unittest.TestCase):
     """Synthetic integration control; does not claim native collector acceptance."""
 

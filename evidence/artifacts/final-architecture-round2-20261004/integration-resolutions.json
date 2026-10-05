@@ -606,7 +606,8 @@
       {
         "id": "R2-22",
         "severity": "P3",
-        "change": "Restrict destination alert configuration to the selected ntfy webhook; keep the disarmed sink only as an unresolved bootstrap placeholder and preserve native delivery acceptance."
+        "change": "Restrict destination alert configuration to the selected ntfy webhook; keep the disarmed sink only as an unresolved bootstrap placeholder and preserve native delivery acceptance.",
+        "amended_by": "repair_round_3; the original ntfy-only repair is reversed, not the supported receivers. Original description retained as history."
       },
       {
         "id": "R2-23",
@@ -1167,8 +1168,9 @@
       {
         "id": "R2-22",
         "severity": "P3",
-        "status": "fixed",
-        "reason": "Remove Telegram/on-host alternatives from the selected ntfy-only destination metadata; keep owned 0600 destination files and independent receiver confirmation."
+        "status": "reversed",
+        "reason": "Remove Telegram/on-host alternatives from the selected ntfy-only destination metadata; keep owned 0600 destination files and independent receiver confirmation.",
+        "amended_by": "repair_round_3; the original ntfy-only disposition is historical and superseded by the user's accepted Telegram choice."
       },
       {
         "id": "R2-23",
@@ -1466,5 +1468,131 @@
     },
     "git_index_unchanged": true,
     "hcom_executable_policy_unchanged": true
+  },
+  "repair_round_3": {
+    "date_utc": "2026-10-05",
+    "job": "r2-repair3",
+    "scope": "One-finding, working-tree-only repair of PR #713. Preserve every other round-1 and round-2 change, including N3 needs_user (78).",
+    "north_star_action": "Preserve the user's accepted NativeStack2604 alert receiver while providing portable configuration and acceptance for complex systems and the north-star R&D.",
+    "input": "Coordinator round-3 brief for PR #713, supplied 2026-10-05 with measured host evidence.",
+    "findings": [
+      {
+        "id": "R2-22",
+        "status": "fixed",
+        "reverses": [
+          "repair_round.fixed:R2-22",
+          "repair_round_2.findings:R2-22"
+        ],
+        "reason": "ntfy.sh was the coordinator's delegated 2026-10-04 pick. At about 06:58Z on 2026-10-05 the user personally configured and accepted Telegram on NativeStack2604, superseding the delegated pick. The plan supports webhook/ntfy, Telegram and on-host; nothing was overturned. Restore main's mode validation, private pointer mapping and template selection; preserve native acceptance, independent user attestation and N3 exit-78 handling.",
+        "pointer_names": [
+          "alertmanager-webhook-url",
+          "alertmanager-telegram-token",
+          "alertmanager-telegram-chat-id"
+        ],
+        "source": [
+          "main f946c6d4c/77d7516d8:evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py:65-78,192-207",
+          "main 77d7516d8:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh:alerting",
+          "prometheus/alertmanager v0.34.1:docs/configuration.md:1875-1882,1947-1950",
+          "Coordinator round-3 brief, 2026-10-05: personal receiver choice and accepted host evidence"
+        ]
+      }
+    ],
+    "host_evidence": {
+      "provenance": "Coordinator-supplied host facts; no live host or credential inspection by this repair.",
+      "host": "NativeStack2604",
+      "observed_at_utc": "2026-10-05 about 06:58Z",
+      "receiver": "Telegram",
+      "acceptance_id": "9e6f4a70b5874573aff1d22b40e87a32",
+      "user_supplied_notifications": [
+        "firing",
+        "resolved"
+      ],
+      "command": "accept.sh --only alerting --stage after_sign_in",
+      "main_commit": "4c897418f",
+      "exit": 0,
+      "receiver_evidence": "user_attestation"
+    },
+    "local_controls": {
+      "command": "python3 -B -m unittest tests.test_new_wsl_client_config.Round3AlertReceiverRepairTests",
+      "before": {
+        "exit": 1,
+        "counts": "2 tests; 4 receiver subtest errors: Telegram/on-host rejected as overturned."
+      },
+      "after": {
+        "exit": 0,
+        "counts": "3 tests, OK; includes existing N3 needs_user control.",
+        "command": "python3 -B -m unittest tests.test_new_wsl_client_config.Round3AlertReceiverRepairTests tests.test_new_wsl_client_config.Round2RepairIntegrationTests.test_alerting_without_destination_reports_needs_user"
+      },
+      "boundary": "Synthetic metadata fixtures with no credential values. Native template selection is checked for all three modes without reading private pointer files; absent pointers remain exit 78."
+    },
+    "source_access": {
+      "ai_memory": "Scoped pin_first=true, limit=2 lookup required approval under policy never and was unavailable; exact main source and pinned Alertmanager documentation were read.",
+      "upstream": "prometheus/alertmanager v0.34.1 docs/configuration.md fetched from the official repository and retained outside the checkout."
+    },
+    "completeness_critic": {
+      "coverage": "All three supported modes, Telegram token/chat-id pointer names, native template and counter selection, metadata safety, missing-pointer needs_user handling, receiver-choice wording and historical R2-22 dispositions are covered.",
+      "evidence_boundary": "Coordinator-reported host acceptance remains distinct from local structural checks; the user's Telegram messages and private values are not copied."
+    },
+    "acceptance": {
+      "check_plan": {
+        "cmd": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+        "exit": 0,
+        "problems": 0
+      },
+      "bash_n": {
+        "cmd": "bash -n on install.sh, accept.sh and config/*.sh (one file per invocation)",
+        "exit": 0,
+        "files": {
+          "evidence/artifacts/new-wsl-install-plan-20261002/install.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/agentsview.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/base-distribution-accept.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/betterleaks-accept.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/deer-flow-research.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-client-accept.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-accept.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-install.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh": 0
+        }
+      },
+      "build_ecosystem": {
+        "cmd": "python3 scripts/build_ecosystem.py --check",
+        "exit": 0
+      },
+      "handbook": {
+        "cmd": "python3 scripts/build_new_wsl_handbook.py --check",
+        "exit": 0
+      },
+      "tests": {
+        "cmd": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config tests.test_new_wsl_handbook tests.test_new_wsl_profile tests.test_wsl_new_distro_recipe",
+        "exit": 0,
+        "counts": "Ran 463 tests in 97.088s; OK"
+      },
+      "validate": {
+        "cmd": "python3 scripts/validate.py",
+        "exit": 1,
+        "registry_drift_only": true
+      }
+    },
+    "regeneration": {
+      "source": "Coordinator job-050-fix-wave-integrate/regen.sh; existing repository generators and handbook receipt refreeze",
+      "exit": 0
+    },
+    "protected_files": {
+      "manifests/evidence.json": {
+        "unchanged": true
+      },
+      "manifests/stack.json": {
+        "unchanged": true
+      },
+      "catalogs/landscape/upstream-snapshot.json": {
+        "unchanged": true
+      }
+    },
+    "git_index": {
+      "staged_changes": 0,
+      "byte_hash_unchanged": false,
+      "note": "No staging, commit or index-writing command was run. The cached diff is empty, but the index byte hash changed during the job; the origin of the refresh is not established. No index restoration was attempted."
+    }
   }
 }
