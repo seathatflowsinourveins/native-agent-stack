@@ -4188,8 +4188,8 @@
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "892a896c667ec2815b59d20a3d481281d01f6fb431c34f3e7b231bc97d550d20",
-      "bytes": 1762
+      "sha256": "5b6a1543053c995222fb0b6de9e213fa9446aa86e20aaa6086e6289bf1e97013",
+      "bytes": 1763
     },
     {
       "path": ".github/osv-scanner-frozen-macos.toml",
@@ -5145,11 +5145,6 @@
       "path": "blueprints/convergence-practice/ci-security/receipt.json",
       "sha256": "218dca2e923462c85c08cd7ff07edeb20f1e784cd409988f2e201ad2351c8b31",
       "bytes": 787
-    },
-    {
-      "path": "blueprints/convergence-practice/clean-resolution-20261002/open-work.json",
-      "sha256": "207497a89d940714d98848e650c01423bce809d2961cf4d2f64ae518c520befa",
-      "bytes": 7028
     },
     {
       "path": "blueprints/convergence-practice/container-storage/README.md",
@@ -15429,8 +15424,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "d8b5a54df23bef248e39078fbb143d16aedf80af0c1d8036cc02186d60ebadfe",
-      "bytes": 37617
+      "sha256": "ccf259a9b7bca8cf81cfa0ddfbe5f54e7bc95a073defebc74a28877bfee5f084",
+      "bytes": 34986
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -16084,8 +16079,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "e5e2ba1e4aec9245106743456cc001f8592133d509d353a71c3465ba0261022e",
-      "bytes": 155948
+      "sha256": "e7a04ffd9489c038674637c89e799d8bcc14265d3b6dbdf76148ef9327b305c4",
+      "bytes": 155413
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -16428,11 +16423,6 @@
       "bytes": 15230
     },
     {
-      "path": "docs/decisions/2026-10-04-github-convergence-workflow.md",
-      "sha256": "dccb2d17fee7e98a7e2dcf122b4d96f36a0ef4e35650a4f1348a4d9120d49b15",
-      "bytes": 19134
-    },
-    {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
       "sha256": "635fb536fb82377c4f1dd8d1acefe73d4fa6cc9298ce578164c372142ac36a8a",
       "bytes": 16799
@@ -16564,8 +16554,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "c7bb325f18e45a5aeda1d8aadfe39d0b4a93ddcb6a2a6b0563c2298d3646f0f4",
-      "bytes": 101415
+      "sha256": "506dab27e1618ac53a688b38eb21e3219f56acd65940f1315a77a588bcdae035",
+      "bytes": 98818
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -16619,8 +16609,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "227b32712c5077faa5a2d39b7796b022ece213ca16ba4699379110106edb24f9",
-      "bytes": 14239
+      "sha256": "c7bacc23aa75a860dc3a8a0957a4c74aac135d5a03bc1187e76a86cc630c0c84",
+      "bytes": 13335
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
@@ -52763,11 +52753,6 @@
       "bytes": 9965
     },
     {
-      "path": "tests/test_github_automation_practice.py",
-      "sha256": "83579b207bf1abb41efe59c1048061b669070804627510721d5249aea7d340cb",
-      "bytes": 4700
-    },
-    {
       "path": "tests/test_gitleaks_config.py",
       "sha256": "af4fcd8fc06c207a0fed3ceafdfafff46092278e733c0ad29309c59da538ec2d",
       "bytes": 61987
@@ -53354,8 +53339,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "6ade99c8c5900ab1fca1ad69eb45fea85a814dc7c5012f478432f0ade8e3f730",
-      "bytes": 149804
+      "sha256": "7ca88af08d96e204497140ced03e8fb66400ca7443a6945ca8891471e9531964",
+      "bytes": 149809
     },
     {
       "path": "tests/test_workflow_policy.py",
