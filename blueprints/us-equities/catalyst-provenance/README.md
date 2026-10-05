@@ -20,9 +20,12 @@ at 5,218 characters. This is local offline-fixture evidence.
 fix and the initial failure receipts below retain their original dates, versions
 and scope. The separate
 [NativeStack2604 rerun receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
-records installation PASS and 25/25 offline acceptance at 5.60.0 on the final
-lock, at `d02c0827` on 2026-10-05, 01:00:17Z–01:01:07Z. Independent review
-remains pending.
+records historical installation PASS and 25/25 offline acceptance at 5.60.0 on
+lock `4c98672d14147a1b` (before the 2026-10-05 DVC removal), at `d02c0827` on
+2026-10-05, 01:00:17Z–01:01:07Z. Independent review remains pending. The current
+lock `1fb9f8ca6fef9c47` is not yet qualified on NativeStack2604. The 2604 co-op
+will re-run installation and `accept-trading-2604.sh` for the current 24 checks
+and write a separate receipt.
 
 ## Initial wave
 

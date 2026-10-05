@@ -84,7 +84,7 @@ Add tools when an observed need justifies them:
 | [Kafka](https://github.com/apache/kafka) | 4.3.1 | Conditional | Durable partitioned log. |
 | [Redpanda](https://github.com/redpanda-data/redpanda) | 26.2.2 | Alternative | Kafka-compatible log; BSL/RCL terms. |
 | [dlt](https://github.com/dlt-hub/dlt) | 1.30.0 | Conditional | Incremental ingestion/loading. |
-| [DVC](https://github.com/treeverse/dvc) | 3.67.1 | Default | Private artifacts linked to Git metadata. |
+| [DVC](https://github.com/treeverse/dvc) | 3.67.1 | Default; advisory follow-up open | Private artifacts linked to Git metadata; prospective install on hold. |
 | [lakeFS](https://github.com/treeverse/lakeFS) | Server 1.86.0; Python 0.16.0 | Alternative | Object-storage branches/snapshots. |
 | [MLflow](https://github.com/mlflow/mlflow) | 3.16.1 | Conditional | Experiment metadata/artifacts. |
 | [OpenLineage](https://github.com/OpenLineage/OpenLineage) | 1.53.0 | Conditional | Job/run/dataset lineage events. |
@@ -168,6 +168,24 @@ selected CIK/accession rows on NativeStack, CPython 3.12.3. Earlier 5.58.0
 receipts remain historical. The separate offline document/index fixture results
 qualify local parsing only. The separate
 [NativeStack2604 rerun receipt](../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
-records installation PASS and 25/25 offline acceptance at 5.60.0 on the final
-lock, at `d02c0827` on 2026-10-05, 01:00:17Z–01:01:07Z. Independent review
-remains pending; point-in-time data and strategy gates remain unchanged.
+records historical installation PASS and 25/25 offline acceptance at 5.60.0 on
+lock `4c98672d14147a1b` (before the 2026-10-05 DVC removal), at `d02c0827` on
+2026-10-05, 01:00:17Z–01:01:07Z. Independent review remains pending;
+point-in-time data and strategy gates remain unchanged. The current lock
+`1fb9f8ca6fef9c47` is not yet qualified on NativeStack2604. The 2604 co-op will
+re-run installation and `accept-trading-2604.sh` for the current 24 checks and
+write a separate receipt.
+
+## DVC advisory disposition — 2026-10-05
+
+The `data-dvc` source-reviewed default remains recorded at 3.67.1, with its
+prospective install workflow on hold and a data-versioning re-judgement open.
+It pulls `dvc-data -> diskcache 5.6.3`, affected by
+[PYSEC-2026-2447](https://osv.dev/vulnerability/PYSEC-2026-2447)
+([GHSA-w8v5-vhqr-4h9v](https://github.com/advisories/GHSA-w8v5-vhqr-4h9v)):
+attacker-writable cache data can reach unsafe pickle deserialization. No fixed
+release was listed in the
+[2026-10-05 removal evidence](../../evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json).
+That evidence records removal of unused DVC and its dependency closure from the
+NativeStack2604 runtime bundle, without an OSV ignore. It does not select a
+replacement or establish safe use of the catalog's prospective DVC workflow.

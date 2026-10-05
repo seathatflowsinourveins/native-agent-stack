@@ -235,7 +235,8 @@
     "host_receipt": "evidence/hosts/native-stack-2604-20261004/native-stack-2604-20261004--nautilustrader--use--20261004.json",
     "open": [
       "Ratify CPython 3.12.3 against 3.13 and the complete canonical runtime matrix.",
-      "Independent post-run host-receipt review, per-check outputs and all existing data, strategy, oracle and broker gates remain separate."
+      "Independent post-run host-receipt review, per-check outputs and all existing data, strategy, oracle and broker gates remain separate.",
+      "Re-run installation and the 24 offline checks on NativeStack2604 against current lock 1fb9f8ca6fef9c47 and record a new receipt; this lock is not yet qualified on that host. The 2604 co-op will run install-trading-2604.sh and accept-trading-2604.sh."
     ],
     "edgartools_pin_move_20261004": {
       "runtime_pin": "5.60.0",
@@ -247,7 +248,7 @@
       "receipt_id": "native-sec-edgartools-5600-20261004",
       "evidence_ref": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
       "historical_2604_run_edgartools": "5.58.0",
-      "native_stack_2604_rerun": "recorded: native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json); install PASS and 25/25 offline acceptance at d02c0827 on final lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, through mise exec uv@0.12.17; independent review pending",
+      "native_stack_2604_rerun": "recorded historical qualification: native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json); install PASS and 25/25 offline acceptance at d02c0827 on lock 4c98672d14147a1b (before the 2026-10-05 DVC removal), 2026-10-05T01:00:17Z-01:01:07Z, through mise exec uv@0.12.17; independent review pending. Current lock 1fb9f8ca6fef9c47 is not yet qualified on NativeStack2604; the 2604 co-op will re-run installation and accept-trading-2604.sh and write a separate receipt.",
       "scope": "Bounded SEC index acceptance on NativeStack; no strategy, point-in-time data, paper or broker gate changes."
     }
   }

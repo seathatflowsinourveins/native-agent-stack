@@ -200,14 +200,17 @@ Both images were pulled for `linux/amd64` and inspected, without container
 creation or execution. LEAN's retained source-built oracle at
 `985ef30ad3ac774218c5ac516b4cb0aa2655730f` remains a separate reference.
 
-## What the acceptance establishes
+## What the recorded historical acceptance establishes
 
-The 25 recorded PASS rows cover isolation, Python, 14 package imports/versions,
+The recorded 25-check runs (locks `c6b5f25c` and `4c98672d`) covered isolation,
+Python, 14 package imports/versions,
 IBKR config-class exports, separate Alpaca source integrity and import, the
 unchanged Nautilus quickstart's checksum and execution, and four example checks.
 The host receipt's `native_proven` claim is scoped to actual native engine use;
 the companion receipt labels each local probe and adapted example separately.
 No complete unchanged upstream test suite was run.
+The current recipe has 24 checks with 13 import probes and no DVC import;
+its NativeStack2604 qualification is pending.
 
 Each check uses [Bubblewrap 0.9.0's options](https://github.com/containers/bubblewrap/blob/v0.9.0/bubblewrap.c)
 with a cleared environment, fresh network/process/user namespaces and read-only

@@ -13370,8 +13370,8 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/README.md",
-      "sha256": "41811e9e70600c7685cba01e990f7571c89c004c6d8ada5556c2259e2d3ed31e",
-      "bytes": 9324
+      "sha256": "9c49080c900c5c8101f6c0208cc923d499959099664a914741b58be97a29968e",
+      "bytes": 9582
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json",
@@ -15310,8 +15310,8 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "bc79b7f5c16b26be638a0c73b16b99c527b076369c466ad5927271e45faa1304",
-      "bytes": 26069
+      "sha256": "9fc77cb8e74405aa38e396fc29dd06f35659bb591e2dab1dcb6001c8119bf1df",
+      "bytes": 26246
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
@@ -16060,13 +16060,13 @@
     },
     {
       "path": "catalogs/us-equities/data-research.json",
-      "sha256": "cf86149e3433fde6f38ac5cdc216503de7de02ad6de2f537164dfe3be98628fe",
-      "bytes": 97470
+      "sha256": "e3342e010f4e380c05897268592d85fbf9263c973053fcab7b283c336b459242",
+      "bytes": 98443
     },
     {
       "path": "catalogs/us-equities/data-research.md",
-      "sha256": "7c229dc67d85e8ca73fb0ab1a5ce494ef773929cc2538a1f7d17fcd7e2f25c97",
-      "bytes": 24169
+      "sha256": "59af2f6f3ae7fb5969174116d71464ce8408bf80be695afe3c21a43ce16557ac",
+      "bytes": 25330
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
@@ -16185,8 +16185,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "0e72a4e1db42c30588d15ae2d2461b13eb2a7b0897c6204d9bc8edaae09f93b5",
-      "bytes": 25062
+      "sha256": "110b4c884323b0ead55981925bdb0645fedcff1ed02af375a5f12be0e3a2c617",
+      "bytes": 25545
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -16785,8 +16785,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-trading-2604-preparation.md",
-      "sha256": "5202c9c3c0d31124f61d0914b9d43fd2c80ec0cc0df22f81303f9f08652094aa",
-      "bytes": 41875
+      "sha256": "4bd38b223e97278fcb1e5ef8d67ba048647bcf450c253c1800d20278336df985",
+      "bytes": 41880
     },
     {
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",

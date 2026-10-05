@@ -501,7 +501,7 @@ shows. Both relocks used the installed native uv 0.12.17 executable on the
 packaging worker, with mise unavailable: the EdgarTools upgrade
 (`uv lock --upgrade-package edgartools`) produced lock `6b4e6a4d`, as recorded
 in the [lock comparison](../../evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json);
-the round-c build-constraint relock produced final lock `4c98672d14147a1b`, as
+the round-c build-constraint relock produced then-final lock `4c98672d14147a1b`, as
 recorded in the
 [build-constraint proof](../../evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json).
 Neither relock ran through mise. Independent review remains pending. The
