@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "host-baseline-coreutils-2604-upgrade-20261004",
+  "kind": "host_baseline",
+  "claim": "Historical NativeStack2604 rust-coreutils upgrade observation from 0.8.0-0ubuntu3 to 0.10.0-1ubuntu2~26.04.1 between 2026-10-04T08:04:47Z and 2026-10-04T08:05:03Z; the logged apt exit is 0.",
+  "limitations": [
+    "Historical coordination evidence, not a new upgrade or current host baseline; no package installation was re-executed.",
+    "Only versions, stamps and the logged apt exit are retained in the artifact. Exit codes absent from the originals remain unknown.",
+    "This upgrade record belongs to NativeStack2604. StackMeasure2604 current versions are observed separately in its coordinator-supplied baseline artifact.",
+    "This is inspection and sanitization of historical native coordination records under the policy's Independent observation class; no integration or upgrade command ran during receipt assembly."
+  ],
+  "recorded_at_utc": "2026-10-05T01:47:45Z",
+  "host": {
+    "host_id": "nativestack2604",
+    "distribution": "NativeStack2604",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "release": "26.04",
+    "architecture": "x86_64"
+  },
+  "evidence_class": "Independent observation",
+  "source": {
+    "kind": "historical_coordination",
+    "record": "wave2-20261004/coreutils-2604",
+    "files": [
+      "run.log",
+      "versions-before.txt",
+      "versions-after.txt"
+    ],
+    "read_in_full": true,
+    "reexecuted": false
+  },
+  "artifacts": [
+    {
+      "role": "historical_upgrade",
+      "path": "evidence/artifacts/host-baseline-20261004/coreutils-2604-upgrade.json",
+      "sha256": "5869c88fa349ed59bea95887ca5596e0f6f482ba8b8c3cd4ff406342accd6130"
+    }
+  ],
+  "evidence_policy": "docs/acceptance-evidence-policy.md#identify-what-each-check-proves",
+  "amendments": [
+    {
+      "amended_at_utc": "2026-10-05T05:02:52Z",
+      "ref": "PR #710 t1 (7ec3f2a5f) and t2",
+      "changed_fields": [
+        "limitations",
+        "evidence_class",
+        "evidence_policy"
+      ],
+      "prior_values": {
+        "evidence_class": "local_integration"
+      },
+      "note": "Retrospective record of t1 metadata corrections, dated when this entry was added in t2; original receipt and artifact timestamps are unchanged."
+    }
+  ]
+}

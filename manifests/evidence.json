@@ -4278,8 +4278,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "2be9f85160b9f3f6ac9f4fb11cc3ebb25c960aea20a72a6ffe6e32d7b3b30eef",
-      "bytes": 12367
+      "sha256": "167d60a2b8feb571602dbf78b4af15c5fa9aa0ebae6c75c1839928dba5879917",
+      "bytes": 12705
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4313,8 +4313,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "0153fc7595f7dd64d077366b2b0251cbe78f13a47f90798ab6d3d746624c2aec",
-      "bytes": 25235
+      "sha256": "064d309189054b6f2c6ec37855fd3e3e6c09eee42197865cc1cc86d9233dcc20",
+      "bytes": 26117
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -14923,6 +14923,26 @@
       "bytes": 10588
     },
     {
+      "path": "blueprints/us-equities/overfitting-controls/README.md",
+      "sha256": "59ee9b0d6c761506962f3100ba60654c4cade71326fc1ef7efab76c95034eed6",
+      "bytes": 6941
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.in",
+      "sha256": "bf09321accc61be05ccace59d7eb7c9fb2c1642da06c4c4b19287cc3e615d43e",
+      "bytes": 172
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock",
+      "sha256": "d0e1dbf620c58d7763ee4a12929dc109b7739d5aa4759092b03b7dd8003b8e12",
+      "bytes": 30346
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/riskl-parity-receipt.json",
+      "sha256": "fa231acbc5fbb766c30cd33f3ab01faeb571bc08f6d4ff55ca2670d1785fa570",
+      "bytes": 21645
+    },
+    {
       "path": "blueprints/us-equities/overnight-volume/runs/20260929/README.md",
       "sha256": "f10be4a53c43bdef7fb9d9a0393a1c2104647b365b3b64721726b0c49f99315a",
       "bytes": 17022
@@ -16593,6 +16613,16 @@
       "bytes": 15230
     },
     {
+      "path": "docs/decisions/2026-10-04-host-baseline-recorder.md",
+      "sha256": "9ef55a32757e36e65f54fadf3360943c885f3bf51031130aa106ebd8760cf5c7",
+      "bytes": 25010
+    },
+    {
+      "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
+      "sha256": "d2970fdbec345d22375f1c42a20449ce6dae4073555464a6a5ff330005877616",
+      "bytes": 20018
+    },
+    {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
       "sha256": "aa1e7b5ad354b6a86c9dac099053944aaadcfd951c08ec861430812a64552805",
       "bytes": 6304
@@ -16636,6 +16666,11 @@
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
       "sha256": "1389de18bbaf5c41d8f22093a9642d982230a851f954183b7c8254e0b5890bce",
       "bytes": 18701
+    },
+    {
+      "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
+      "sha256": "976b8e8c3ede42aa2ce26c01dbca5184cf45e329419a065e169bc0936f093051",
+      "bytes": 14176
     },
     {
       "path": "docs/decisions/2026-10-05-rtk-fold-harbor-phase2.md",
@@ -16774,8 +16809,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "ca1091c14b65605c72d7aa6fdeb429f80a49c26774c6899dc1d757d1c67f19f7",
-      "bytes": 187468
+      "sha256": "c4100622c2d925f1675ecd0dae543494c8cda03cde13db770420e09433962fd4",
+      "bytes": 194054
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -33006,6 +33041,36 @@
       "path": "evidence/artifacts/hf-memory-models-20260921/native-results.json",
       "sha256": "01263899ad06977b5fc855f9667f2c29bdffd13d2036705485b24bb7095c5e50",
       "bytes": 17286
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/coreutils-2604-upgrade.json",
+      "sha256": "5869c88fa349ed59bea95887ca5596e0f6f482ba8b8c3cd4ff406342accd6130",
+      "bytes": 597
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r0.txt",
+      "sha256": "21f3d8e96d1f4b9d24b7b30f280dba2f44af14135fdd0852468444c25d86bedf",
+      "bytes": 11784
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r1.txt",
+      "sha256": "33fb4dd8199cf251b09d92afd50cdef678bd5383411447ea52877d269cb31435",
+      "bytes": 12326
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/nativestack-2404.json",
+      "sha256": "f12c983de1cafdec4f9ee318fc4ae5ca62492ab23b371f457bbf785d70eb1e7c",
+      "bytes": 13783
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/nativestack2604.json",
+      "sha256": "a9ef297bef7ad864cee212ca34c30e76e0da7770fd3d746ab344edf2bd2e1b46",
+      "bytes": 11954
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/stackmeasure2604.json",
+      "sha256": "0d771af61bf75d07cbc6bf428b82652b0d5cd3a030ff3a4e83e28439b5ea66c6",
+      "bytes": 11952
     },
     {
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
@@ -51433,6 +51498,26 @@
       "bytes": 3678
     },
     {
+      "path": "evidence/receipts/host-baseline-coreutils-2604-upgrade-20261004.json",
+      "sha256": "834593fa86965850d7c94abb7ab1893e0388960140f383f6dad178cca4de2143",
+      "bytes": 2310
+    },
+    {
+      "path": "evidence/receipts/host-baseline-nativestack-20261004.json",
+      "sha256": "71be13bbfb7dfe9e698e92eb462ed64b2d62b60008fe2d1f39a14b6690766a50",
+      "bytes": 3443
+    },
+    {
+      "path": "evidence/receipts/host-baseline-nativestack2604-20261004.json",
+      "sha256": "ec3ab7856c602ab8c497ed1cb00a9a423c8d79a8e4c686ec4043ee9c52eaeea1",
+      "bytes": 3694
+    },
+    {
+      "path": "evidence/receipts/host-baseline-stackmeasure2604-20261004.json",
+      "sha256": "168fcd1842f19b85e90ca4d5ee0e967b582d5067e856d8d7e954ddd18b148d41",
+      "bytes": 3576
+    },
+    {
       "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
       "sha256": "0d32534357501c011298420c07161c59940929cabd00a9b71d5d7817126f88c9",
       "bytes": 17126
@@ -52869,8 +52954,8 @@
     },
     {
       "path": "scripts/freshness_propose.py",
-      "sha256": "c96e99d80e922f257e6c95d8b28c9493e981e4aacd99cfbbe980b4053b55bcd1",
-      "bytes": 51393
+      "sha256": "b948678e659f6eb653395aedad38990b8db40a476cabaa855e608521a62acf2e",
+      "bytes": 52517
     },
     {
       "path": "scripts/git-hooks/pre-commit",
@@ -53388,9 +53473,24 @@
       "bytes": 9953
     },
     {
+      "path": "tests/test_catalog_freshness_pins.py",
+      "sha256": "9fa9d371f765e734ed748008e9106c6accf1f2a956248f8041cb6d23ad9a89ea",
+      "bytes": 6969
+    },
+    {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "0f18570a5f35701f88770fc702bc9bba815e3a5e17104422264fc2570dbd8b50",
-      "bytes": 60148
+      "sha256": "e6779fe4339908a1173ff4351da75e6b816fd4b6cd94ec34c3a0acbba259b65a",
+      "bytes": 62213
+    },
+    {
+      "path": "tests/test_catalog_freshness_runtime.py",
+      "sha256": "1eff93310ff8c4ee6589a9864940e01c911e8aca2eceb342eeb727a381a0b0c0",
+      "bytes": 119415
+    },
+    {
+      "path": "tests/test_catalog_freshness_trading.py",
+      "sha256": "5de4a7a8de9d860c541e1649b005e55bccca18b76ba8bdffbcd61474c644d4ea",
+      "bytes": 35494
     },
     {
       "path": "tests/test_catalogs.py",
@@ -53626,6 +53726,11 @@
       "path": "tests/test_historical_simulation.py",
       "sha256": "05359d5a861e3eeed3ebbcbf87a8f805332a1ba9cd10b213a4de0703604090fa",
       "bytes": 5155
+    },
+    {
+      "path": "tests/test_host_baseline_probe.py",
+      "sha256": "495b8d02036f5240f88edc5b1a2abfdbef010fbd73d82f7f4bee840e81e6f4a6",
+      "bytes": 31719
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -53908,6 +54013,11 @@
       "bytes": 75839
     },
     {
+      "path": "tests/test_overfitting_riskl_parity.py",
+      "sha256": "ed2dbdc9108109a50da5ffca6561ef0a7695f36fef4784d754cc2420f40e9d94",
+      "bytes": 15821
+    },
+    {
       "path": "tests/test_path_safety.py",
       "sha256": "3ef5408df71c98eca31ddfd8e065594ee0bb09d61b37108df9d73c8e66c4acaf",
       "bytes": 7047
@@ -54084,8 +54194,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "sha256": "cb197ddbe88b82bfc110bcf77da80ab59197f371407c93674643718b8469dcf1",
-      "bytes": 163940
+      "sha256": "e95a6683694382ff58ef71fe2c031aef877de19f46de06fd3360a8ca77f56a0a",
+      "bytes": 182187
     },
     {
       "path": "tests/test_sota_sources_gate.py",
@@ -54251,6 +54361,16 @@
       "path": "tools/adoption/embed_acceptance.py",
       "sha256": "b567a3ce64d66f0798bd5fc73cf78d8a12074d583177c204d5465050873258b1",
       "bytes": 8209
+    },
+    {
+      "path": "tools/adoption/host-baseline.md",
+      "sha256": "7bed0cbee248b9700ec34f736d2fa1909497f2b63b7093b350f3bc6b512ee992",
+      "bytes": 16100
+    },
+    {
+      "path": "tools/adoption/host_baseline_probe.py",
+      "sha256": "a3dcf5d27e29587101818f71a99cd0acfeed75fcfad3d13aacbeb4778dfabb55",
+      "bytes": 17646
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
@@ -54434,8 +54554,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "20c70c09d8b293c23caccb1086f5a379f2f9c823f37555d17bfb202038f9a4b2",
-      "bytes": 188578
+      "sha256": "d74fac1613c59d6b4abe629d87758d672b50f19efda520b7fe444c7a5932b10a",
+      "bytes": 189511
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -54454,8 +54574,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "91af1beac78818d9b414a4de7f099c92133b1f84d7db1ce0715932195122f78c",
-      "bytes": 121534
+      "sha256": "4529b138b7ea110bafc6db472c43aa152a3e2ed50db812bf365730d3d063c957",
+      "bytes": 125546
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -54479,8 +54599,8 @@
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
-      "sha256": "aa3964f31cedc9098354d9a4cdbd47170a1358662358b5e55e57d0ff600617b7",
-      "bytes": 27422
+      "sha256": "4bc8cf58a7c9dc5346b79b4dc6a2a6082e9c06cc11535cad75120d8e00c3aa44",
+      "bytes": 34972
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",

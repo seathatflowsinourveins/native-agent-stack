@@ -386,6 +386,38 @@ class BuildDriftReportTests(unittest.TestCase):
         self.assertEqual((self.work_dir / "drift-status.txt").read_text().strip(), "false")
         self.assertIn(fp.md_cell("tavily-cli"), (self.work_dir / "drift.md").read_text())
 
+    def _assert_prerelease_unknown_report(self, reason):
+        for old_latest in ("v1.231.0", None):
+            for reason_field in ("latest_flag", "pin_comparison_reason"):
+                with self.subTest(old_latest=old_latest, reason_field=reason_field):
+                    self._write_manifest(self.published_dir / "manifest-20260922.json",
+                                         [("nautilustrader", "2.0.0rc5", old_latest,
+                                           False if old_latest else None)])
+                    rebuilt_path = self.work_dir / "manifest-20260923.json"
+                    self._write_manifest(rebuilt_path, [("nautilustrader", "2.0.0rc5", None, None)])
+                    rebuilt = json.loads(rebuilt_path.read_text())
+                    row = rebuilt["foundation"][0]["components"][0]
+                    if reason_field == "latest_flag":
+                        row["upstream"]["latest_flag"] = {"tag": None, "reason": reason}
+                    else:
+                        row["pin_comparison_reason"] = reason
+                    rebuilt_path.write_text(json.dumps(rebuilt))
+                    result = fp.build_drift_report(self.work_dir)
+                    self.assertEqual(result["drifted"], [])
+                    self.assertEqual(result["unfetched"], ["nautilustrader"])
+                    self.assertEqual(result["no_release"], [])
+                    markdown = (self.work_dir / "drift.md").read_text()
+                    self.assertIn("unknown", markdown.lower())
+                    self.assertIn(reason, markdown)
+                    self.assertNotIn("no GitHub release or tag at all", markdown)
+                    self.assertEqual((self.work_dir / "drift-status.txt").read_text().strip(), "false")
+
+    def test_truncated_prerelease_list_is_unknown_in_drift_report(self):
+        self._assert_prerelease_unknown_report("unknown beyond cap")
+
+    def test_no_release_in_pinned_major_is_unknown_in_drift_report(self):
+        self._assert_prerelease_unknown_report("no published release in pinned major")
+
     def test_upstream_error_count_reads_the_freshness_document(self):
         self._write_freshness_document({"errors": 3, "partial_errors": 0, "repositories": {}})
         self._write_manifest(self.published_dir / "manifest-20260922.json", [])
