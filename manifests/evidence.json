@@ -4727,8 +4727,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "0ce2e9b995ada2a316a4a8abdd94f161297e8101f7ff099491c27520ba355b13",
-      "bytes": 65341
+      "sha256": "d500961c71dc2aec4b944780480ee4216980ab6ef1d7529891b24f1d8ea7ac73",
+      "bytes": 65350
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -52813,8 +52813,8 @@
     },
     {
       "path": "scripts/release_due.py",
-      "sha256": "690e855c0eb680e7b0541f8dcb7f09c97e11ac0b2fc7ff4adb6b6fd5473bfc71",
-      "bytes": 13776
+      "sha256": "c6de7480f2fe7f68a6ebe389f1d73990ba4ac2880d5ed5c829e4d9b244f5c31d",
+      "bytes": 14662
     },
     {
       "path": "scripts/saturation_ledger.py",
@@ -53838,8 +53838,8 @@
     },
     {
       "path": "tests/test_release_pin_contents.py",
-      "sha256": "d354bfc35e2403779bbfdb2d71784a84e11b7187d45153b79a3e67c292676216",
-      "bytes": 12926
+      "sha256": "cc79f9bf73b53f5304fe0b14059bcd8c089040d93960df8bba4ed51aa8157d8f",
+      "bytes": 15007
     },
     {
       "path": "tests/test_render_config.py",
