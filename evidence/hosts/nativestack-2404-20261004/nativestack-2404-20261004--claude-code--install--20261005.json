@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-2404-20261004--claude-code--install--20261005",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-2404-20261004",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "3b8f9c8a1b938358d65bf422f61592dc3b89407d",
+  "recorded_by": {
+    "identity_sha256": "8b41e168f9725dd2538bdc6908537a26c06b2deba0ca64618e015544a4b2ca0c"
+  },
+  "component_id": "claude-code",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "nice -n 19 python3 - < tools/adoption/host_baseline_probe.py > evidence/artifacts/host-baseline-20261004/nativestack-2404.json\nprobe_exit=$?\nif [ \"$probe_exit\" -ne 0 ]; then\n    exit \"$probe_exit\"\nfi\npython3 -c 'import hashlib, json; from pathlib import Path; p=Path(\"evidence/artifacts/host-baseline-20261004/nativestack-2404.json\"); data=json.loads(p.read_text()); print(json.dumps({\"artifact\":str(p),\"sha256\":hashlib.sha256(p.read_bytes()).hexdigest(),\"probe_sha256\":data[\"probe\"][\"output\"]},separators=(\",\",\":\")))'\n",
+      "exit": 0,
+      "duration_s": 0.415,
+      "output_sha256": "5493b92ce5a8fd4132c2277a1a9c0e0a6f8d60b81b0332d6c152cb1d1b471975",
+      "output_excerpt": "{\"artifact\":\"evidence/artifacts/host-baseline-20261004/nativestack-2404.json\",\"sha256\":\"65334b8940654e64b05448795f47b431e9c41e173cc185f9df43293d58c4bbf5\",\"probe_sha256\":\"21f3d8e96d1f4b9d24b7b30f280dba2f44af14135fdd0852468444c25d86bedf\"}\n"
+    }
+  ],
+  "tool_versions": {
+    "claude-code": "2.1.289"
+  },
+  "observed_at_utc": "2026-10-05T00:22:46Z",
+  "result": "pass",
+  "claim": "Read-only native PR-0 Ubuntu 24.04 host baseline; the full probe output is in the artifact named and hashed by the command excerpt.",
+  "limitations": [
+    "Individual probe failures and absences are retained in the artifact; recorder success means collection completed.",
+    "Version and settings observation only; no credential access, guard replay, model workload or passwordless operation was exercised.",
+    "Rendered user settings are observed without resolving managed or project settings, profiles or environment overrides."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T00:22:46Z",
+      "reviewer": {
+        "identity_sha256": "8b41e168f9725dd2538bdc6908537a26c06b2deba0ca64618e015544a4b2ca0c"
+      }
+    }
+  ]
+}
