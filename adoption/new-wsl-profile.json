@@ -252,7 +252,7 @@
       },
       "upstream_install": {
         "command": "mise install node@24.21.0",
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/cli/install.md",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/install.md",
         "scope": "Reproduction route only; the minimal native bootstrap directly extracts the pinned official Node archive."
       },
       "acceptance": {
@@ -3737,7 +3737,7 @@
       "repository": "https://github.com/dagucloud/dagu",
       "layer_id": "scheduling-supervision",
       "owner_layer_id": "scheduling-supervision",
-      "pin": "2.16.6",
+      "pin": "2.18.2",
       "component_id": "dagu",
       "source_selection_layer": "scheduling-supervision",
       "source_selection_name": "Dagu",
@@ -3749,25 +3749,25 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "dagu_2.16.6_linux_amd64.tar.gz",
-        "url": "https://github.com/dagucloud/dagu/releases/download/v2.16.6/dagu_2.16.6_linux_amd64.tar.gz"
+        "name": "dagu_2.18.2_linux_amd64.tar.gz",
+        "url": "https://github.com/dagucloud/dagu/releases/download/v2.18.2/dagu_2.18.2_linux_amd64.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717",
-        "source": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.16.6",
+        "value": "5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b",
+        "source": "https://github.com/dagucloud/dagu/releases/download/v2.18.2/checksums.txt",
         "kind": "artifact"
       },
-      "integrity_observation": "published_digest_not_rehashed",
+      "integrity_observation": "upstream_checksums_matched_by_sha256sum",
       "install": {
-        "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.16.6",
-        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+        "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.18.2",
+        "source": "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version. Independent new-WSL pin only; the workstation/trading stack remains held at 2.16.6. For a future upgrade of any existing owned Dagu installation, stop its owned unit and retain a complete pre-upgrade DAGU_HOME copy plus the prior binary, unit and environment. Conditional rollback restores that copy and the prior binary/unit/environment together. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](../docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b)."
       },
       "acceptance": {
         "command": "make test",
-        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+        "source": "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
         "evidence_class": "upstream_test_command_not_executed"
       },
       "provisioning_status": "unprovisioned_optional_service",
@@ -3777,13 +3777,14 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/scheduling-supervision.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
-        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
+        "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
+        "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
+        "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
       ],
       "release": {
-        "tag": "v2.16.6",
-        "source": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
-        "published_at": "2026-09-14T14:45:57Z"
+        "tag": "v2.18.2",
+        "source": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2",
+        "published_at": "2026-10-04T03:54:02Z"
       },
       "source_pin_kind": "release_or_artifact_version"
     },
@@ -3847,7 +3848,7 @@
       "repository": "https://github.com/jdx/mise",
       "layer_id": "recovery-portability",
       "owner_layer_id": "recovery-portability",
-      "pin": "2026.9.18",
+      "pin": "2026.10.1",
       "component_id": null,
       "source_selection_layer": "recovery-portability",
       "source_selection_name": "mise",
@@ -3859,33 +3860,33 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "mise-v2026.9.18-linux-x64.tar.gz",
-        "url": "https://github.com/jdx/mise/releases/download/v2026.9.18/mise-v2026.9.18-linux-x64.tar.gz"
+        "name": "mise-v2026.10.1-linux-x64.tar.gz",
+        "url": "https://github.com/jdx/mise/releases/download/v2026.10.1/mise-v2026.10.1-linux-x64.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "4312f8fd72a8d6a869cd2aca7444929e2a0ef6f45d2c6f2866a1eacc5bdc2e84",
-        "source": "https://api.github.com/repos/jdx/mise/releases/tags/v2026.9.18",
+        "value": "9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a",
+        "source": "https://github.com/jdx/mise/releases/download/v2026.10.1/SHASUMS256.txt",
         "kind": "artifact"
       },
-      "integrity_observation": "published_digest_not_rehashed",
+      "integrity_observation": "upstream_checksums_matched_by_sha256sum",
       "install": {
-        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.9.18 sh",
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.10.1 sh",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md",
         "execution_status": "UNRUN",
         "prerequisites": [
           "curl, sh and a chosen owned installation target; no installer was executed.",
-          "The selected installer source's resolve_release function removes the leading v from MISE_VERSION at line 300. The live mise.run endpoint is the guide's installer route, not an independently frozen installer-byte artifact."
+          "The selected release asset install.sh resolves the pinned MISE_VERSION after removing one leading v; its API digest was verified during the pin review. The live mise.run endpoint is the guide's installer route, not the archive installation used for isolated qualification."
         ],
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
         "command": "mise run test:unit && mise run test:e2e '^test_use$'",
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/contributing.md",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/contributing.md",
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the v2026.9.18 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
+          "Run from the v2026.10.1 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
           "The E2E selector is the documented basename regex ^test_use$; it does not select the full suite."
         ],
         "scope": "Documented unit suite plus one selected upstream E2E case, both UNRUN. No host installation, lifecycle or new-host acceptance.",
@@ -3898,10 +3899,15 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+        "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
       ],
-      "release": null,
+      "release": {
+        "tag": "v2026.10.1",
+        "source": "https://github.com/jdx/mise/releases/tag/v2026.10.1",
+        "published_at": "2026-10-03T14:12:48Z"
+      },
       "source_pin_kind": "release_or_artifact_version"
     },
     {

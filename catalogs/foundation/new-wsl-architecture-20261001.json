@@ -948,7 +948,7 @@
           "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary (the recipe omits this step)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
-          "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+          "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
         },
         {
           "component_id": "systemd",
@@ -1661,7 +1661,7 @@
           "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
-          "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+          "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
         },
         {
           "component_id": "codex",
@@ -2105,7 +2105,7 @@
           "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
-          "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+          "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
         },
         {
           "component_id": "systemd",
@@ -2366,7 +2366,7 @@
           "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
-          "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+          "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
         },
         {
           "component_id": "opentelemetry-collector-contrib",

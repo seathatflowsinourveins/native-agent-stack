@@ -1332,11 +1332,11 @@ dagu() {
   # Dagu; https://github.com/dagucloud/dagu
   case "$stage" in
     post_install)
-      # Kind: version only; Source: https://raw.githubusercontent.com/dagucloud/dagu/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/internal/cmd/version.go#L15
+      # Kind: version only; Source: https://raw.githubusercontent.com/dagucloud/dagu/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/internal/cmd/version.go#L13
       check dagu 'version only' 'dagu version'
       ;;
     service_health)
-      # Kind: health; Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh#L1997
+      # Kind: health; Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh#L1989
       check dagu health 'curl -fsS http://127.0.0.1:21080/api/v1/health'
       ;;
     *) skipped dagu ;;
@@ -1561,7 +1561,7 @@ mise() {
   # mise; https://github.com/jdx/mise
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/jdx/mise/bc11f90c74eba23bf0d7350efb540e62fb7d9ffd/src/cli/doctor/mod.rs#L532
+      # Kind: smoke; Source: https://raw.githubusercontent.com/jdx/mise/050ce5a20287a0aafd872b1191699a5fdafff5ac/src/cli/doctor/mod.rs#L532
       check mise smoke 'cd "$tool_root"
 PATH="${MISE_SHIMS_DIR:-${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/shims}:$PATH" mise doctor'
       ;;

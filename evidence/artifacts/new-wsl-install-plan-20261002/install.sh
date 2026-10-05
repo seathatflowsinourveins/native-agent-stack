@@ -696,8 +696,8 @@ actionlint-kjanat() {
 
 dagu() {
   # Dagu | native-installer | planned
-  # Planned. Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/README.md#L105
-  run_command 'curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh | bash -s -- --version v2.18.1 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/README.md#L105
+  run_command 'curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no' || return "$?"
 }
 
 docker-compose() {
@@ -771,8 +771,8 @@ difftastic() {
 
 mise() {
   # mise | native-installer | planned
-  # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/installing-mise.md#L82
-  run_command 'curl -fsSL https://mise.run | MISE_VERSION=v2026.10.0 sh' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.1/docs/installing-mise.md#L82
+  run_command 'curl -fsSL https://mise.run | MISE_VERSION=v2026.10.1 sh' || return "$?"
 }
 
 restic() {
