@@ -16771,8 +16771,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md",
-      "sha256": "ee1be570505451fc5810c05e0d5ecca768ab0968b55a085b5682f7e25b2919fd",
-      "bytes": 75057
+      "sha256": "06f3810a73a0b7e4c1fe470fd3ed0da569aba1e069cc5bd2eebcfb2901d26868",
+      "bytes": 77059
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -39146,8 +39146,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "99aaeb8c6b6c1666ce8091a3cf07c37fd91d6a59b35b74ac9c277cc39383cd26",
-      "bytes": 202621
+      "sha256": "8475dfadeee7afc0fcd730ee70fb87216f8c59c84bf678c104cc12d1050d1b9d",
+      "bytes": 204424
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -39496,8 +39496,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/fixwave-20261005-followup-receipt.json",
-      "sha256": "e0aed318d21d3e8fef9435d03ab5f41266063368d42275e037cef83e157af01f",
-      "bytes": 52359
+      "sha256": "53311286e9cab8820d02ca18cf93e64eb11b28167cc185d17db07de10dc7bf95",
+      "bytes": 79413
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/fixwave-20261005-lock-review-receipt.json",
@@ -39536,8 +39536,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "6057740ebcfb5e05593514652af197f46f6d1a423d62622b1b0580def4ee561b",
-      "bytes": 444360
+      "sha256": "a87011004d8b3a1f5daead8324d09328d1e548b60210adce0e31a1881e5e7611",
+      "bytes": 444389
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
