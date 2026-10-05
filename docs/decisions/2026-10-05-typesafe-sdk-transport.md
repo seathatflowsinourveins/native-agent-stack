@@ -29,6 +29,26 @@ All three prerequisite gates pass by source review:
    Native `model_dump(mode="json")` supplies the existing `validate()` input.
    Reading the raw header retains the prior optional request ID; the SDK's
    stricter `request_id` property would reject a missing header.
+   A strict SDK schema now sits between the wire response and `validate()`
+   and the ledger. The [base schema:21](https://github.com/typesafe-ai/typesafe-sdk-python/blob/f078f1e208a0d885154dc758344ae4fce77ac168/src/typesafe_sdk/_core/schemas/base.py#L21)
+   uses `extra="ignore"` and `strict=True`; the
+   [ChoiceAnswer schema:19-24](https://github.com/typesafe-ai/typesafe-sdk-python/blob/f078f1e208a0d885154dc758344ae4fce77ac168/src/typesafe_sdk/_schemas/models.py#L19)
+   requires `confidence`. The
+   [response preparation:86-93](https://github.com/typesafe-ai/typesafe-sdk-python/blob/f078f1e208a0d885154dc758344ae4fce77ac168/src/typesafe_sdk/_core/response_types.py#L86)
+   drops answers of unknown type from the parsed response. This loses nothing
+   on every retained successful recorded row:
+   [eval judgments](../../evidence/artifacts/gap-crosswalk-92bb279/typesafe-eval.json)
+   contain 315 rows / 1,039 answers and
+   [current judgments](../../evidence/artifacts/gap-crosswalk-92bb279/typesafe-current.json)
+   contain 380 rows / 1,215 answers. All 695 rows contain modeled usage fields
+   and all 2,254 answers contain exactly the four modeled Choice
+   fields, including confidence. This static artifact census is source review,
+   not a new SDK or model run. For a future response that does not match the
+   schema, the boundary can change acceptance and drops extra fields before our
+   unchanged validator and ledger. Raw HTTP data remains available through the
+   SDK, but the ledger receives its parsed model dump. This schema boundary was
+   omitted from the initial decision and is now explicit following cross-family
+   source review.
 3. [RetryPolicy:52-123](https://github.com/typesafe-ai/typesafe-sdk-python/blob/f078f1e208a0d885154dc758344ae4fce77ac168/src/typesafe_sdk/_core/retry.py#L52)
    supports both 429 and 529 and explicit backoff configuration.
 
@@ -38,6 +58,15 @@ the distribution metadata is available at
 [PyPI 0.7.2](https://pypi.org/pypi/typesafe-sdk/0.7.2/json).
 Acceptance installs the published wheel in a private uv cache with source builds
 disabled. It does not install a new host-stack component.
+
+Dependency-resolution limitation: the install hint pins the SDK only, while its
+[dependency declarations:35-40](https://github.com/typesafe-ai/typesafe-sdk-python/blob/f078f1e208a0d885154dc758344ae4fce77ac168/pyproject.toml#L35)
+allow dependency ranges. The tested environment used `httpx2==2.13.1`,
+`pydantic==2.13.5` and `tenacity==9.1.4`, as retained in
+`evidence/artifacts/typesafe-sdk-transport-20261005/checks.json`. Pinning that
+tested dependency set in the hint is deferred; another resolution may select
+versions outside this observed set. This task does not qualify every supported
+dependency resolution.
 
 ## Retry and response metadata contract
 
@@ -85,7 +114,8 @@ another transport change.
 [MockTransport seam:33](https://github.com/typesafe-ai/typesafe-sdk-python/blob/f078f1e208a0d885154dc758344ae4fce77ac168/tests/conftest.py#L33)
 and the vendor's unchanged parser and retry implementation. These are synthetic
 integration checks, not an unchanged upstream suite or a live judgment. They
-cover structured questions, usage/probabilities/request metadata, both retry
+comprise six MockTransport tests plus three offline import and version checks.
+They cover structured questions, usage/probabilities/request metadata, both retry
 statuses, exhaustion, a non-retried 500, absent request ID and missing usage.
 Wrong probability keys still fail the unchanged validator. Streamed mock
 responses exercise the native client's HTTP elapsed metadata. The first fixture
