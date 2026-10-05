@@ -20,6 +20,8 @@ const env = {
   CODEX_HOME: arg("codex-home"),
   OMNIROUTE_API_KEY: "local-loopback",
   OTEL_RESOURCE_ATTRIBUTES: arg("otel"),
+  // §8.3: every trial runs with GH_CONFIG_DIR (the clone's config also sets it for the shell tool and MCP servers).
+  GH_CONFIG_DIR: arg("gh-config-dir"),
 };
 const codex = new sdk.Codex({
   codexPathOverride: arg("codex-path"),

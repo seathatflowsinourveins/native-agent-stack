@@ -38,8 +38,23 @@ CODEX_HOME_REAL = HOME / ".codex"
 
 LANE = "organic-e2e"                  # R10: prompted runs use LANE_PROMPTED
 LANE_PROMPTED = "organic-e2e-prompted"
-T_SECONDS = 900                       # §4.4 / §9.1
+T_SECONDS = 900                       # §4.4 / §9.1 (run.json claude_completion.t_seconds overrides it only by amendment)
 KILL_AFTER = "30s"
+CLAUDE_SESSION_CAP = 14               # §9.1 Cap: every Claude session of one run counts (CL2, CL6, env, probe, canary)
+POST_RESULT_GRACE_S = 30              # complete-at-result policy: grace between a result event and the group kill
+# The stack-currency timer's due file (read by a harness SessionStart hook; hashed in S7, never read for content here).
+CURRENCY_DUE_FILE = Path(os.environ.get("XDG_STATE_HOME") or HOME / ".local/state") / "native-agent-stack" / "currency-due.json"
+# User-level harness instruction and definition files (G13 and the watcher log reads of these; §2.1 lists them).
+USER_HARNESS_PATHS = (HOME / ".claude/CLAUDE.md", HOME / ".claude/RTK.md", HOME / ".codex/AGENTS.md", HOME / ".codex/RTK.md",
+                      HOME / ".claude/agents", HOME / ".claude/hooks")
+# Host checkout roots outside the fixture (G13: a trial reading the real repository reads its instruction files).
+HOST_CHECKOUT_ROOTS = (HOME / "code", HOME / "projects")
+
+
+def stop_flag_names(client: str) -> tuple[str, ...]:
+    """Flags that refuse a client's launches: STOP (any client), STOP.<client>, and DEFER.<client> (a meter or lock
+    refusal: the remaining tests wait for the next window and are carried forward, never consumed)."""
+    return ("STOP", f"STOP.{client}", f"DEFER.{client}")
 
 # §9.1 Claude meter. The prior is the pilot's start rule; the kill rule censors a running trial.
 PRIOR_FIVE_HOUR = 0.50
@@ -323,6 +338,8 @@ def s7_snapshot(extra_files: dict | None = None) -> dict:
         snap["files"][label] = sha256_file(path) if path.exists() else None
     agents = sorted((claude_dir / "agents").glob("*.md"))
     snap["files"]["claude/agents/*.md"] = sha256_json({p.name: sha256_file(p) for p in agents})
+    # The currency due file feeds a harness SessionStart hook's additionalContext (finding 16): its presence and hash.
+    snap["files"]["state/currency-due.json"] = sha256_file(CURRENCY_DUE_FILE) if CURRENCY_DUE_FILE.is_file() else None
     rules = CODEX_HOME_REAL / "rules"
     snap["files"]["codex/rules/"] = sha256_json({p.name: sha256_file(p) for p in sorted(rules.glob("*"))}) if rules.exists() else None
     snap["claude_json"] = claude_json_parts(HOME / ".claude.json")

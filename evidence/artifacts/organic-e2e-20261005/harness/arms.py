@@ -4,7 +4,9 @@ Claude: a per-trial --settings file holding the §8.1 deny list; the native arm 
 CLAUDE.md, the env arm does not (one factor).
 Codex: a per-trial CODEX_HOME clone of the host home (U1 recipe, amended): copied config files, symlinked shared
 directories, fresh state databases. The native clone has no AGENTS.md; the env clone keeps a copy of the host's. Both
-add GH_CONFIG_DIR inside the existing [shell_environment_policy.set] table and rules/organic-e2e.rules.
+add GH_CONFIG_DIR inside the existing [shell_environment_policy.set] table and in the env of every stdio MCP server
+(those run outside the sandbox, with HOME, so context-mode's ctx_* commands would otherwise reach the host gh login),
+plus rules/organic-e2e.rules.
 """
 from __future__ import annotations
 
@@ -181,9 +183,108 @@ def insert_gh_config_dir(config_text: str, gh_dir: str) -> str:
     return config_text.rstrip("\n") + "\n\n[shell_environment_policy.set]\n" + line + "\n"
 
 
+_TABLE_HEADER = re.compile(r"^\s*\[([^\[\]]+)\]\s*(#.*)?$")
+
+
+def _split_key(key: str) -> list[str]:
+    """A TOML dotted key as its parts (bare or double-quoted parts; enough for the host's table headers)."""
+    parts, buf, quoted, i = [], "", False, 0
+    while i < len(key):
+        ch = key[i]
+        if quoted:
+            if ch == "\\" and i + 1 < len(key):
+                buf += key[i + 1]
+                i += 2
+                continue
+            if ch == '"':
+                quoted = False
+            else:
+                buf += ch
+        elif ch == '"':
+            quoted = True
+        elif ch == ".":
+            parts.append(buf.strip())
+            buf = ""
+        else:
+            buf += ch
+        i += 1
+    parts.append(buf.strip())
+    return parts
+
+
+def _toml_key(part: str) -> str:
+    return part if re.fullmatch(r"[A-Za-z0-9_-]+", part) else json.dumps(part)
+
+
+def stdio_mcp_servers(config: dict) -> list[str]:
+    """MCP servers that Codex starts as local processes (a `command` key); URL servers run elsewhere."""
+    return sorted(name for name, srv in (config.get("mcp_servers") or {}).items() if isinstance(srv, dict) and srv.get("command"))
+
+
+def insert_mcp_gh_config_dir(config_text: str, gh_dir: str) -> tuple[str, list[str]]:
+    """GH_CONFIG_DIR into the env of every stdio MCP server (finding 6): Codex starts MCP servers outside the sandbox
+    with their own env table and HOME, so a server that runs commands (context-mode's ctx_execute, ctx_batch_execute)
+    would otherwise reach the host gh login. A server with an [mcp_servers.<name>.env] table gets the line in that
+    table; a server without env gets a new [mcp_servers.<name>.env] table at the end; an inline env is refused (the
+    clone gate then fails and the trial is censored, never guessed)."""
+    import tomllib
+    parsed = tomllib.loads(config_text)
+    servers = stdio_mcp_servers(parsed)
+    lines = config_text.splitlines()
+    line = f"GH_CONFIG_DIR = {json.dumps(gh_dir)}"
+    with_table, patched = set(), []
+    for index in range(len(lines) - 1, -1, -1):
+        match = _TABLE_HEADER.match(lines[index])
+        if not match:
+            continue
+        parts = _split_key(match.group(1))
+        if len(parts) == 3 and parts[0] == "mcp_servers" and parts[2] == "env" and parts[1] in servers:
+            for later in lines[index + 1:]:
+                if re.match(r"^\s*\[", later):
+                    break
+                if re.match(r"^\s*GH_CONFIG_DIR\s*=", later):
+                    raise ValueError(f"GH_CONFIG_DIR already set for MCP server {parts[1]}")
+            lines.insert(index + 1, line)
+            with_table.add(parts[1])
+            patched.append(parts[1])
+    for name in servers:
+        if name in with_table:
+            continue
+        if "env" in parsed["mcp_servers"][name]:
+            raise ValueError(f"MCP server {name} has an inline env; not patched")
+        lines += ["", f"[mcp_servers.{_toml_key(name)}.env]", line]
+        patched.append(name)
+    text = "\n".join(lines) + ("\n" if config_text.endswith("\n") or len(patched) > len(with_table) else "")
+    return text, sorted(patched)
+
+
+def config_patch_check(original_text: str, patched_text: str, gh_dir: str) -> dict:
+    """The clone's config.toml differs from the host's only by GH_CONFIG_DIR in [shell_environment_policy.set] and in
+    each stdio MCP server's env (an env table created for it alone is removed before the comparison)."""
+    import copy
+    import tomllib
+    original, patched = tomllib.loads(original_text), tomllib.loads(patched_text)
+    servers = stdio_mcp_servers(original)
+    shell_ok = ((patched.get("shell_environment_policy") or {}).get("set") or {}).get("GH_CONFIG_DIR") == gh_dir
+    mcp_ok = {name: ((patched["mcp_servers"][name].get("env") or {}).get("GH_CONFIG_DIR") == gh_dir) for name in servers}
+    reduced = copy.deepcopy(patched)
+    reduced.get("shell_environment_policy", {}).get("set", {}).pop("GH_CONFIG_DIR", None)
+    if "set" not in (original.get("shell_environment_policy") or {}) and not reduced.get("shell_environment_policy", {}).get("set", 1):
+        reduced["shell_environment_policy"].pop("set")
+        if "shell_environment_policy" not in original and not reduced["shell_environment_policy"]:
+            reduced.pop("shell_environment_policy")
+    for name in servers:
+        env = reduced["mcp_servers"][name].get("env")
+        if isinstance(env, dict):
+            env.pop("GH_CONFIG_DIR", None)
+            if not env and "env" not in original["mcp_servers"][name]:
+                reduced["mcp_servers"][name].pop("env")
+    return {"shell_environment_policy": shell_ok, "mcp_servers": mcp_ok, "only_these_additions": reduced == original,
+            "pass": shell_ok and all(mcp_ok.values()) and reduced == original}
+
+
 def build_clone(dest: Path, arm: str, gh_dir: Path, rules_text: str) -> dict:
     """Create one CODEX_HOME clone. Returns its record: manifest digest, gate result and the diff against the host."""
-    import tomllib
     if dest.exists():
         raise FileExistsError(str(dest))
     dest.mkdir(parents=True, mode=0o700)
@@ -207,17 +308,20 @@ def build_clone(dest: Path, arm: str, gh_dir: Path, rules_text: str) -> dict:
         os.chmod(dest / "AGENTS.md", 0o600)
         copied["AGENTS.md"] = sha256_file(host / "AGENTS.md")
     original = (dest / "config.toml").read_text(encoding="utf-8")
-    patched = insert_gh_config_dir(original, str(gh_dir))
+    mcp_patched = []
+    try:
+        patched, mcp_patched = insert_mcp_gh_config_dir(insert_gh_config_dir(original, str(gh_dir)), str(gh_dir))
+        check = config_patch_check(original, patched, str(gh_dir))
+    except ValueError as error:
+        patched, check = original, {"pass": False, "error": str(error)[:200]}
     (dest / "config.toml").write_text(patched, encoding="utf-8")
-    parsed = tomllib.loads(patched)
-    gh_ok = ((parsed.get("shell_environment_policy") or {}).get("set") or {}).get("GH_CONFIG_DIR") == str(gh_dir)
     (dest / "rules").mkdir(exist_ok=True)
     (dest / "rules" / "organic-e2e.rules").write_text(rules_text, encoding="utf-8")
-    added_lines = [l for l in patched.splitlines() if l not in original.splitlines()]
     gate = {
         "agents_md_absent": not (dest / "AGENTS.md").exists() if arm == "native" else None,
         "agents_md_matches_host": (sha256_file(dest / "AGENTS.md") == sha256_file(host / "AGENTS.md")) if arm == "env" else None,
-        "config_only_adds_gh_config_dir": added_lines == [f'GH_CONFIG_DIR = {json.dumps(str(gh_dir))}'] and gh_ok,
+        # GH_CONFIG_DIR in [shell_environment_policy.set] and in every stdio MCP server's env, nothing else (finding 6).
+        "config_only_adds_gh_config_dir": bool(check.get("pass")),
         "copies_match_host": all(sha256_file(dest / n) == sha256_file(host / n) for n in COPY if n != "config.toml" and (host / n).exists()),
         "symlinks": sorted(linked) == sorted(n for n in SYMLINK if (host / n).exists()),
         "no_login_or_state": not any((dest / n).exists() for n in ("auth.json", "history.jsonl", "state_5.sqlite",
@@ -225,5 +329,11 @@ def build_clone(dest: Path, arm: str, gh_dir: Path, rules_text: str) -> dict:
     }
     gate["pass"] = all(v for v in gate.values() if v is not None)
     manifest = tree_manifest(dest)
+    import tomllib
+    try:
+        servers = sorted((tomllib.loads(patched).get("mcp_servers") or {}).keys())
+    except Exception:  # noqa: BLE001 - the gate already failed on an unparsable config
+        servers = None
     return {"arm": arm, "copied": copied, "linked": linked, "gate": gate, "manifest_sha256": sha256_json(manifest),
-            "config_sha256": sha256_bytes(patched.encode()), "rules_sha256": sha256_bytes(rules_text.encode())}
+            "config_sha256": sha256_bytes(patched.encode()), "rules_sha256": sha256_bytes(rules_text.encode()),
+            "config_check": check, "mcp_servers": servers, "mcp_servers_with_gh_config_dir": mcp_patched}

@@ -16,7 +16,6 @@ import re
 import secrets
 import shutil
 import subprocess
-import tarfile
 from pathlib import Path
 
 from common import (EXPERIMENT_BASE, FIXTURE_CACHE, FREEZE_COMMIT, GATE_NAMES, HOME, KEPT_AGENTS_PATHS, NEUTRAL_ROOT,
@@ -28,9 +27,12 @@ GIT_IDENTITY = {"GIT_AUTHOR_NAME": "Ledger Maintainer", "GIT_AUTHOR_EMAIL": "mai
 ROUTING_PATTERN = re.compile(r"\b(use|prefer|route|routing|lane|lanes|through|instead of|before|"
                              r"for (exact|conceptual|symbols?|docs?|large))\b", re.I)
 # §4.2 examples of files whose purpose is to instruct an agent; the provisional registry keeps candidates under these.
+# Finding 9 adds the user-level instruction sources (the env arm's harness files are rendered from them) and every
+# agent definition under adoption/agents/ (Claude markdown and Codex TOML, workers included).
 REVIEW_GLOBS = ("adoption/hooks/claude/token-lanes-block*.md", "docs/token-session-handbook.md", "docs/token-practice.md",
-                "examples/claude-native/agents/*.md", "adoption/agents/claude/*.md", "adoption/templates/*",
-                "recipes/README.md", "examples/claude-native/workflows/*.js")
+                "examples/claude-native/agents/*.md", "adoption/agents/*", "adoption/templates/*",
+                "recipes/README.md", "examples/claude-native/workflows/*.js",
+                "adoption/new-wsl/claude-user-instructions.md", "adoption/new-wsl/codex-user-instructions.md")
 TRADING_RECEIPT = re.compile(r"(alpaca|ibkr|nautilus|adaptive-paper|trading)", re.I)
 
 
@@ -326,10 +328,14 @@ def extract_fixture(tar_path: Path, expected_sha256: str, *, verify: bool = True
 
 def routing_registry(template: Path, lex_names: list[str]) -> dict:
     """§4.2 pattern candidates: a line that names an item and matches the routing pattern. The provisional reviewed list
-    keeps candidates under the protocol's example globs; the hint reader's review replaces it before the freeze."""
+    keeps candidates under the protocol's example globs (fnmatch: * crosses directories, so adoption/agents/* covers
+    the workers too); the hint reader's review replaces it before the freeze. marker_files lists every template file
+    that carries a §2.1 harness marker, for that review (receipts and tests among them are data, not routing files);
+    the grader tags a use after any tool result carrying a marker regardless of the registry."""
+    from common import MARKERS
     names = [n for n in lex_names if len(n) >= 3]
     name_re = re.compile(r"(?<![a-z0-9])(" + "|".join(re.escape(n) for n in sorted(names, key=len, reverse=True)) + r")(?![a-z0-9])", re.I)
-    candidates = {}
+    candidates, marker_files = {}, {}
     for dirpath, dirnames, filenames in os.walk(template):
         dirnames[:] = [d for d in dirnames if d not in (".git", "node_modules")]
         for name in filenames:
@@ -341,6 +347,9 @@ def routing_registry(template: Path, lex_names: list[str]) -> dict:
             except (UnicodeDecodeError, OSError):
                 continue
             rel = path.relative_to(template).as_posix()
+            markers = sorted(m for m in MARKERS if m in text)
+            if markers:
+                marker_files[rel] = markers
             for number, line in enumerate(text.splitlines(), 1):
                 if ROUTING_PATTERN.search(line):
                     found = name_re.findall(line)
@@ -352,6 +361,7 @@ def routing_registry(template: Path, lex_names: list[str]) -> dict:
     provisional = sorted(rel for rel in candidates if any(fnmatch.fnmatch(rel, glob) for glob in REVIEW_GLOBS))
     return {"candidates": {rel: {"lines": v["lines"], "items": sorted(v["items"])} for rel, v in sorted(candidates.items())},
             "provisional_reviewed": provisional, "review_globs": list(REVIEW_GLOBS),
+            "marker_files": dict(sorted(marker_files.items())),
             "status": "provisional: pattern candidates under the protocol's example globs; the cross-family hint "
                       "reader's review must replace this list before the full-run freeze"}
 
@@ -503,7 +513,8 @@ def build(repo: Path, *, commit_ref: str = FREEZE_COMMIT, lex_names=(), run_test
     record["tar"] = make_tar(template, out_dir / "fixture.tar", commit_time)
     registry = routing_registry(template, list(lex_names))
     record["registry_sha256"] = write_json(out_dir / "routing-registry.json", registry, 0o600)
-    record["registry_counts"] = {"candidates": len(registry["candidates"]), "provisional_reviewed": len(registry["provisional_reviewed"])}
+    record["registry_counts"] = {"candidates": len(registry["candidates"]), "provisional_reviewed": len(registry["provisional_reviewed"]),
+                                 "marker_files": len(registry["marker_files"])}
     work = out_dir / "oracle-work"
     extract_tar(out_dir / "fixture.tar", work)
     oracles = compute_oracles(work, run_tests=run_tests)

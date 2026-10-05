@@ -1,42 +1,46 @@
 #!/usr/bin/env python3
 """Stage 4 block: the gates around one promptfoo eval, then the eval itself (§4.1 CL1, §9).
 
-  python3 -B block.py --run-root <root> --cell <cell> [--test-key <key>] [--repeat K] [-j J] [--allow-timing]
+  python3 -B <trial_root>/bin/b.py --cell <cell code or name> [--ref <test ref>] [--repeat K] [-j J] [--allow-timing]
+  python3 -B block.py --run-root <root> --cell <cell> ...         (the same, from the run root's frozen harness)
 
-Before: no STOP flag; the host S7 view equals the stage-1 baseline (a change needs a reviewed new baseline); outside
-the blackout windows; Claude blocks also need the host configuration settled for 30 minutes; Codex blocks run
-`scripts/codex_quota.py --gate 70` under the real CODEX_HOME and check the gateway build is unchanged.
-The eval: `PROMPTFOO_DISABLE_ADAPTIVE_SCHEDULER=true promptfoo eval -c cells/<cell>/promptfooconfig.yaml --repeat <k>
--j <j> --no-cache --no-write --no-share -o cells/<cell>/results.json` from the run root, in a clean login shell (env -i,
-bash -l), with telemetry and update checks off and promptfoo's state directory inside the run root.
+Before: no STOP, STOP.<client> or DEFER.<client> flag; the host S7 view equals the stage-1 baseline (a change needs a
+reviewed new baseline); outside the blackout windows; Claude blocks also need the host configuration settled for 30
+minutes; Codex blocks run `scripts/codex_quota.py --gate 70` under the real CODEX_HOME and check the gateway build is
+unchanged.
+The eval: `PROMPTFOO_DISABLE_ADAPTIVE_SCHEDULER=true promptfoo eval -c <config> --repeat <k> -j <j> --no-cache --no-write
+--no-share -o <results>` in a clean login environment (env -i semantics, the login shell's PATH), with telemetry and
+update checks off. Every argv on the way is neutral (finding 10): promptfoo runs as `node <trial_root>/bin/r eval ...`
+(a neutral link to its entry point), from the trial root, on configs and results under opaque names there; the results
+are then copied into the run root. One test is selected with --filter-metadata ref=<opaque ref>.
 After: the S7 view again, promptfoo's attempts per test (G9), and for Codex the gateway's requests and limit errors in
-the block window. One row per block is appended to blocks.jsonl.
+the block window. One row per block is appended to blocks.jsonl. CL7b (promptfoo's own app-server provider, no
+launcher) gets its launched and exit ledger rows here.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
-import shlex
+import shutil
 import subprocess
 import sys
-import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (append_jsonl, clean_login_env, gateway_build, gateway_get, load_json, read_jsonl, run,  # noqa: E402
-                    s7_compare, s7_snapshot, sha256_file, utc_now, utc_stamp, write_json)
+from common import (append_jsonl, clean_login_env, gateway_build, gateway_get, load_json, run, s7_compare,  # noqa: E402
+                    s7_snapshot, sha256_file, stop_flag_names, trial_dir, utc_now, utc_stamp, write_json)
 
 
 def stop_flags(root: Path, client: str) -> list[str]:
-    return [name for name in ("STOP", f"STOP.{client}") if (root / name).exists()]
+    return [name for name in stop_flag_names(client) if (root / name).exists()]
 
 
 def quota_gate(script: Path) -> dict:
     """scripts/codex_quota.py (frozen into the run root at stage 1) under the real CODEX_HOME (§9.2)."""
-    import os
     env = {k: v for k, v in os.environ.items() if k != "CODEX_HOME"}
     proc = run(["python3", "-B", str(script), "--json", "--gate", "70"], timeout=120, env=env)
     try:
@@ -75,7 +79,8 @@ def promptfoo_attempts(results_path: Path) -> dict:
     rows = (data.get("results") or {}).get("results") or []
     per_test, trials, errors = {}, [], 0
     for row in rows:
-        key = ((row.get("testCase") or {}).get("metadata") or {}).get("test_key") or (row.get("testCase") or {}).get("description")
+        case = row.get("testCase") or {}
+        key = (case.get("metadata") or {}).get("ref") or (case.get("metadata") or {}).get("test_key") or case.get("description")
         per_test[key] = per_test.get(key, 0) + 1
         output = (row.get("response") or {}).get("output")
         if row.get("error"):
@@ -84,20 +89,52 @@ def promptfoo_attempts(results_path: Path) -> dict:
             parsed = json.loads(output) if isinstance(output, str) else None
         except ValueError:
             parsed = None
-        if isinstance(parsed, dict):
+        if isinstance(parsed, dict) and "trial_id" in parsed:
             trials.append({k: parsed.get(k) for k in ("trial_id", "rc", "censored", "reason")})
-        elif output is not None:
+        elif output is not None or row.get("error"):
             trials.append({"provider_output_sha256": __import__("hashlib").sha256(str(output).encode()).hexdigest(),
-                           "app_server": True})
+                           "app_server": True, "error": bool(row.get("error"))})
     return {"rows": len(rows), "per_test": per_test, "trials": trials, "provider_errors": errors,
             "eval_id": data.get("evalId")}
+
+
+def resolve_cell(cfg: dict, name_or_code: str) -> str:
+    codes = cfg.get("cell_codes") or {}
+    if name_or_code in codes:
+        return codes[name_or_code]
+    if name_or_code in cfg["cells"]:
+        return name_or_code
+    raise SystemExit(f"unknown cell: {name_or_code}")
+
+
+def resolve_ref(cfg: dict, cell: str, ref: str | None, test_key: str | None) -> str | None:
+    if ref:
+        return ref
+    if test_key:
+        for candidate, test in (cfg.get("tests_by_ref") or {}).items():
+            if test.get("test_key") == test_key and test.get("cell") == cell:
+                return candidate
+        raise SystemExit(f"unknown test key for {cell}: {test_key}")
+    return None
+
+
+def runner_argv(cfg: dict, config: Path, results: Path, repeat: int, jobs: int, ref: str | None, work: Path) -> list[str]:
+    """node <trial_root>/bin/r eval ... with paths relative to the trial root (neutral argv)."""
+    node = cfg["binaries"].get("node_neutral") or cfg["binaries"]["node_real"]
+    argv = [node, str(work / "bin" / "r"), "eval", "-c", str(config.relative_to(work)),
+            "--repeat", str(repeat), "-j", str(jobs), "--no-cache", "--no-write", "--no-share",
+            "-o", str(results.relative_to(work)), "--no-progress-bar", "--no-table"]
+    if ref:
+        argv += ["--filter-metadata", f"ref={ref}"]
+    return argv
 
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--run-root", required=True)
-    parser.add_argument("--cell", required=True)
-    parser.add_argument("--test-key", default=None, help="run one test of the cell (--filter-metadata test_key=...)")
+    parser.add_argument("--cell", required=True, help="cell code (neutral) or cell name")
+    parser.add_argument("--ref", default=None, help="run one test of the cell (its opaque ref)")
+    parser.add_argument("--test-key", default=None, help="run one test by its clear key (operator use; mapped to its ref)")
     parser.add_argument("--repeat", type=int, default=None)
     parser.add_argument("-j", type=int, default=None)
     parser.add_argument("--allow-timing", action="store_true")
@@ -106,13 +143,17 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     root = Path(args.run_root)
     cfg = load_json(root / "run.json")
-    cell = cfg["cells"][args.cell]
+    cell_name = resolve_cell(cfg, args.cell)
+    cell = cfg["cells"][cell_name]
+    code = cell.get("code") or cell_name
     client = cell["client"]
+    ref = resolve_ref(cfg, cell_name, args.ref, args.test_key)
     repeat = args.repeat or cell["repeat"]
     jobs = args.j or cell["j"]
     if client == "claude":
         jobs = 1
-    row = {"cell": args.cell, "client": client, "test_key": args.test_key, "repeat": repeat, "j": jobs, "planned_at": utc_now()}
+    work = trial_dir(cfg, root)
+    row = {"cell": cell_name, "client": client, "ref": ref, "repeat": repeat, "j": jobs, "planned_at": utc_now()}
     refusals = []
     flags = stop_flags(root, client)
     if flags:
@@ -147,38 +188,54 @@ def main(argv=None) -> int:
         print(json.dumps({"refused": refusals}))
         return 2
     configs = []
+    (work / "o").mkdir(parents=True, exist_ok=True)
+    stamp = utc_stamp()
     if cell["kind"] == "app-server":
         for trial in cell.get("trials", []):
-            if args.test_key and trial["test_key"] != args.test_key:
+            if ref and trial["ref"] != ref:
                 continue
-            configs.append((Path(trial["config"]), Path(trial["config"]).parent / "results.json", trial["trial_id"]))
+            config = work / "p" / Path(trial["config_neutral"]).name
+            configs.append((config, work / "o" / f"{config.stem}-{stamp}.json", trial))
     else:
-        suffix = "" if not args.test_key else "-" + re.sub(r"[^A-Za-z0-9_.-]", "_", args.test_key)
-        configs.append((root / "cells" / args.cell / "promptfooconfig.yaml",
-                        root / "cells" / args.cell / f"results{suffix}.json", None))
+        suffix = f"-{ref}" if ref else ""
+        configs.append((work / "p" / f"{code}.yaml", work / "o" / f"{code}{suffix}-{stamp}.json", None))
+    env = clean_login_env({"PATH": cfg.get("login_path") or os.environ.get("PATH", ""),
+                           "PROMPTFOO_DISABLE_ADAPTIVE_SCHEDULER": "true", "PROMPTFOO_DISABLE_TELEMETRY": "1",
+                           "PROMPTFOO_DISABLE_UPDATE": "1", "PROMPTFOO_CONFIG_DIR": str(work / "h")})
     outcomes = []
-    for config, results, trial_id in configs:
-        command = ["promptfoo", "eval", "-c", str(config.relative_to(root)), "--repeat", str(repeat), "-j", str(jobs),
-                   "--no-cache", "--no-write", "--no-share", "-o", str(results.relative_to(root)), "--no-progress-bar",
-                   "--no-table"]
-        if args.test_key and cell["kind"] != "app-server":
-            command += ["--filter-metadata", f"test_key={args.test_key}"]
-        line = ("PROMPTFOO_DISABLE_ADAPTIVE_SCHEDULER=true PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1 "
-                f"PROMPTFOO_CONFIG_DIR={shlex.quote(str(root / 'promptfoo-home'))} " + " ".join(shlex.quote(c) for c in command))
-        log = root / "cells" / args.cell / f"eval-{utc_stamp()}.log"
+    for config, results, trial in configs:
+        command = runner_argv(cfg, config, results, repeat, jobs, ref if cell["kind"] != "app-server" else None, work)
+        log = root / "cells" / cell_name / f"eval-{stamp}{'-' + trial['ref'] if trial else ''}.log"
+        log.parent.mkdir(parents=True, exist_ok=True)
         started = utc_now()
         if args.dry_run:
-            outcomes.append({"command": line, "dry_run": True})
+            outcomes.append({"command": command, "dry_run": True})
             continue
+        if trial:
+            append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
+                                                 "client": "codex", "arm": cell["arm"], "ref": trial["ref"],
+                                                 "test_key": trial["test_key"], "phase": "launched", "at": started,
+                                                 "launched_by": "block.py (CL7b: promptfoo's own provider, no launcher)"})
         with open(log, "wb") as handle:
-            proc = subprocess.run(["bash", "-lc", f"cd {shlex.quote(str(root))} && {line}"], env=clean_login_env(),
-                                  stdout=handle, stderr=subprocess.STDOUT)
+            proc = subprocess.run(command, cwd=str(work), env=env, stdout=handle, stderr=subprocess.STDOUT)
         ended = utc_now()
-        outcome = {"command": line, "rc": proc.returncode, "started": started, "ended": ended, "log": str(log),
-                   "results": str(results), "results_sha256": sha256_file(results) if results.exists() else None,
-                   "attempts": promptfoo_attempts(results) if results.exists() else None}
-        if trial_id:
-            outcome["trial_id"] = trial_id
+        kept = root / "cells" / cell_name / results.name
+        if results.exists():
+            shutil.copy2(results, kept)
+        attempts = promptfoo_attempts(kept) if kept.exists() else None
+        outcome = {"command": [c.replace(str(Path.home()), "~") for c in command], "rc": proc.returncode, "started": started,
+                   "ended": ended, "log": str(log), "results": str(kept), "results_sha256": sha256_file(kept) if kept.exists() else None,
+                   "attempts": attempts}
+        if trial:
+            outcome["trial_id"] = trial["trial_id"]
+            provider = (attempts or {}).get("trials") or [{}]
+            failed = proc.returncode not in (0, 100) or not kept.exists() or any(t.get("error") for t in provider)
+            append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
+                                                 "client": "codex", "arm": cell["arm"], "ref": trial["ref"],
+                                                 "test_key": trial["test_key"], "phase": "exit", "at": ended,
+                                                 "rc": proc.returncode, "censored": bool(failed),
+                                                 "reason": "app_server_provider_error" if failed else None,
+                                                 "provider_output_sha256": provider[0].get("provider_output_sha256")})
         if client == "codex":
             outcome["gateway_window"] = gateway_window(started, ended)
         outcomes.append(outcome)
@@ -186,9 +243,9 @@ def main(argv=None) -> int:
     within = s7_compare(pre, post)
     row.update({"outcomes": outcomes, "post_vs_pre": {k: v for k, v in within.items() if k != "new_trust_paths_private"},
                 "at": utc_now()})
-    write_json(root / "s7" / f"block-{args.cell}-{utc_stamp()}.after.json", post, 0o600)
+    write_json(root / "s7" / f"block-{cell_name}-{utc_stamp()}.after.json", post, 0o600)
     append_jsonl(root / "blocks.jsonl", row)
-    print(json.dumps({"cell": args.cell, "outcomes": [{k: o.get(k) for k in ("rc", "results", "attempts", "dry_run")} for o in outcomes],
+    print(json.dumps({"cell": cell_name, "outcomes": [{k: o.get(k) for k in ("rc", "results", "attempts", "dry_run")} for o in outcomes],
                       "host_unchanged": within["equal"], "new_trust": within["new_trust"]}, default=str))
     return 0
 

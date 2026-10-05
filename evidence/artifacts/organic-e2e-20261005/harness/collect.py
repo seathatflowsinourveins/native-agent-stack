@@ -16,7 +16,6 @@ import calendar
 import json
 import os
 import shutil
-import subprocess
 import sys
 import time
 import urllib.parse
@@ -97,18 +96,30 @@ def codex_thread(stream_path: Path) -> str | None:
     return None
 
 
-def rollouts_for(thread_id: str, start: str, end: str) -> list[Path]:
-    """The thread's rollout and the rollouts of threads it spawned (their session_meta names it), written in the window."""
-    sessions = HOME / ".codex" / "sessions"
-    days = {start[:10], end[:10]}
-    found = []
-    for day in sorted(days):
+def rollout_days(start: str, end: str) -> list[str]:
+    """Date folders a rollout of this window can sit in. Codex files a rollout under the LOCAL date of its start (this
+    host runs America/New_York, so 00:00-04:00Z is the previous local day), so the folders cover the local and the UTC
+    dates of the window, one day either side."""
+    days = set()
+    for stamp in (start, end):
+        epoch = calendar.timegm(time.strptime(stamp[:19], "%Y-%m-%dT%H:%M:%S"))
+        for shift in (-86400, 0, 86400):
+            days.add(time.strftime("%Y-%m-%d", time.gmtime(epoch + shift)))
+            days.add(time.strftime("%Y-%m-%d", time.localtime(epoch + shift)))
+    return sorted(days)
+
+
+def rollouts_for(thread_id: str, start: str, end: str, sessions: Path | None = None) -> list[Path]:
+    """The thread's rollout, found by its id in the file name across every date folder, and the rollouts of threads it
+    spawned (their session_meta names it), searched in the window's local and UTC date folders."""
+    sessions = sessions or HOME / ".codex" / "sessions"
+    found = sorted(sessions.glob(f"*/*/*/rollout-*{thread_id}.jsonl"))
+    for day in rollout_days(start, end):
         folder = sessions / day[:4] / day[5:7] / day[8:10]
         if not folder.exists():
             continue
         for path in sorted(folder.glob("rollout-*.jsonl")):
-            if thread_id in path.name:
-                found.append(path)
+            if path in found or thread_id in path.name:
                 continue
             try:
                 with open(path, encoding="utf-8", errors="replace") as handle:
@@ -124,10 +135,17 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--run-root", required=True)
     parser.add_argument("--flush-wait", type=int, default=60)
+    parser.add_argument("--trials", default=None, help="comma-separated trial ids (gate 0 collects stage 2 only)")
+    parser.add_argument("--out", default="collect.json", help="summary file name in the run root")
     args = parser.parse_args(argv)
     root = Path(args.run_root)
     cfg = load_json(root / "run.json")
     all_trials = trials(root)
+    if args.trials:
+        wanted = {t for t in args.trials.split(",") if t}
+        all_trials = [t for t in all_trials if t["trial_id"] in wanted]
+    # A trial that never launched (refused before its client started) has nothing to collect.
+    all_trials = [t for t in all_trials if "launched" in t["phases"] or t.get("cell") == "codex-app-server"]
     ends = [t["phases"].get("exit", {}).get("at") for t in all_trials if t["phases"].get("exit")]
     if ends:
         newest = max(iso_to_ns(e) for e in ends) / 1e9
@@ -264,7 +282,13 @@ def main(argv=None) -> int:
                         continue
             else:
                 record["agentsview"] = {"id_matched": False}
-    write_json(root / "collect.json", summary, 0o600)
+    # Merge into an existing summary (gate 0 collects stage 2 first; stage 5 collects everything).
+    out = root / args.out
+    if out.exists():
+        previous = load_json(out)
+        previous.get("trials", {}).update(summary["trials"])
+        summary = {**previous, "collected_at": summary["collected_at"]}
+    write_json(out, summary, 0o600)
     print(json.dumps({"trials": len(summary["trials"]), "collected_at": summary["collected_at"]}))
     return 0
 

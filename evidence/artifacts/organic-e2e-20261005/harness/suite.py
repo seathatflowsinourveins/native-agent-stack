@@ -88,7 +88,14 @@ CELLS = {
                    "repeat": 1, "j": 1, "pilot_block": "A2"},
     "claude-sdk": {"client": "claude", "arm": "native", "kind": "sdk", "cl": "CL6", "effort": "max", "tasks": A3_TASKS,
                    "repeat": 1, "j": 1, "pilot_block": "A3"},
+    # Stage 2's gate-0 trial: one CL3 native trial on G1 in a fresh fixture, on the organic lane (pilot spec stage 2).
+    # Its own cell, so C1's twelve G1 repeats stay three and a resume never counts the gate trial among them.
+    "codex-native-gate0": {"client": "codex", "arm": "native", "kind": "cli", "cl": "CL3", "effort": "max",
+                           "tasks": (("control/both/G1", "N", "read-only"),), "repeat": 1, "j": 1, "pilot_block": "gate0",
+                           "gate_trial": True, "stage": 2},
 }
+# Prompted runs (stage 2 probes and canaries, stage 3 oracle runs) take one of these base cells.
+PROMPTED_BASE_CELLS = ("codex-native", "codex-env", "claude-native", "claude-env")
 UNAVAILABLE_CELLS = {"CL5": "interactive arms: trust is the user's call (needs_user)",
                      "CL8": "OpenHands: WIRING until the wiring check passes (slots.json:241)"}
 
