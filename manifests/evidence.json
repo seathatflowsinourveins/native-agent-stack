@@ -4432,51 +4432,6 @@
         "artifact_path": "evidence/artifacts/trading-runtime-2604-20261004/rows-native-trading-runtime-2604-rerun-d02c0827.json"
       },
       "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json"
-    },
-    {
-      "id": "ns2604-requalification-20261005",
-      "kind": "historical_inventory",
-      "component_ids": [
-        "claude-code",
-        "codex",
-        "omniroute"
-      ],
-      "claim": "Historical NativeStack2604 documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. Captured-status counts and model READY leads remain source_review. Official readiness remains PR#700 historical30/80. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. CC captured-status provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. its count comes only from final verified E2E S4, independent review and adjudication. No new execution, acceptance or aggregate derivation.",
-      "limitations": [
-        "This is historical inventory, not live verification or a new host execution. The historical 30/80 receipt remains the official readiness until the command center own new dated same-80-slot qualification, independent review and adjudication. Reviewing this PR or projection never lifts provisional.",
-        "Earlier37/40/44/32proposals are superseded by the exact-head ruling; reported old-bar provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. The official baseline uses the #700 bar. Captured-status counts and model READY leads remain source_review; they are not measured qualification at that bar.",
-        "The former44/80 conditional scenario is superseded; no current-plus-four relationship is assumed. Original Opus READY/GPT PARTIAL token reviews and native acceptance gaps remain retained.",
-        "The first post-install census has 80 rows: 50 exit-zero, 28 skipped and two failures. The later raw census has a duplicate skill-authoring attempt; attempt rows are not distinct slots. Omitted stages and held slots remain in the denominator.",
-        "The later observations at 4c897418f are retained private source files, not a completed persistent co-op census in fixwave-4c897418f at publication. Sources and observation scope are inventoried by hash without copying raw session streams.",
-        "Session-analytics summary claims conflict with retained rerun exit-code files; later output files lack complete exit/time siblings. Alerting exit zero coexists with an explicit needs_user/sink disposition. Preserve these attempts and reported claims separately; neither implies READY.",
-        "The fixwave-defects and currency lanes were in progress at the publication boundary. No slot is declared repaired, installed or accepted by their planned changes. Their future receipts require a separate follow-up.",
-        "This publication does not execute upstream tests, host acceptance commands, provider requests, GPU checks or broker operations. Structural checks verify the documents and generators, not capability acceptance.",
-        "Serena and MinerU are excluded from old-bar READY while condition-absent controls remain open. Difftastic, structural-search, inspect-ai, harbor and codex-sdk: fresh-session use not evidenced; installation-time checks retain original classes."
-      ],
-      "path": "evidence/receipts/ns2604-requalification-20261005.json"
-    },
-    {
-      "id": "ns2604-roadmap-evidence-20261005",
-      "kind": "historical_inventory",
-      "component_ids": [
-        "claude-code",
-        "codex",
-        "omniroute"
-      ],
-      "claim": "Historical NativeStack2604 documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. Captured-status counts and model READY leads remain source_review. Official readiness remains PR#700 historical30/80. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. CC captured-status provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. its count comes only from final verified E2E S4, independent review and adjudication. No new execution, acceptance or aggregate derivation.",
-      "limitations": [
-        "This historical documentary capture is not live verification or a new host execution. The Claude publication review of head ec7dbc2d0ce4782a5157e5f9d14c7e5ce39863e8 requested changes; review of this corrected candidate's exact head remains pending.",
-        "Only the command center's own dated final verified E2E of the same80slots, followed by independent review and adjudication, can change official readiness. A PR or publication review cannot lift provisional status.",
-        "Retained native operations, unchanged upstream tests, local wrappers, synthetic fixtures, source review and structural checks retain separate classes and host/attempt scopes.",
-        "Old failures and skips remain historical observations. Later success is tied to its own source, time and inputs; it does not rewrite an earlier process result.",
-        "The historical host capture remains distinct. The generated correction reports official30 with current/conditional null and a decision pointer. Its pre-merge#713 hold is released after1796303f; the publication is reconciled with main424b8a77. Older coupled projections are superseded context, not readiness authority. Both reported37 and32 are superseded.",
-        "Job4 still requires each owner's stages2\u20135, independent review and adjudication. Its #723 receipt must use the merged commit and JSON path when available. The earlier Job5#713 merge hold is released after1796303f; merge itself executes or qualifies no deferred job.",
-        "This corrected candidate awaits the command center's exact-head re-check. The ec7 publication review is preserved as an earlier review, not acceptance of these corrections. Local validation remains source consistency only.",
-        "Ccusage condition-absent controls remain transcript-only; session-analytics requires a complete owner-native idle-period rerun with argv, stdout/stderr, rc, times, pin and hashes. Retained rerun2/service.8yU0G1 gaps are not inferred away.",
-        "The command center confirms user authorship of the Alerting attestation. The receipt's original not_verified field remains historical; fresh unmodified delivery stays blocked by defect14 and the printed plan result line is unconfirmed.",
-        "Serena and MinerU are excluded from old-bar READY while condition-absent controls remain open. Difftastic, structural-search, inspect-ai, harbor and codex-sdk: fresh-session use not evidenced; installation-time checks retain original classes."
-      ],
-      "path": "evidence/receipts/ns2604-roadmap-evidence-20261005.json"
     }
   ],
   "files": [
@@ -16048,8 +16003,8 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "3a8081049976785e320cfd99bc93bd3dcefa0a8a351fcc4f3cab1d8022a6b1cd",
-      "bytes": 325006
+      "sha256": "8420f58ef2f613bab8da7a4486e907a9118b178d9d8e5eb8c70e4d84950c6c73",
+      "bytes": 322942
     },
     {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -17117,11 +17072,6 @@
       "bytes": 129176
     },
     {
-      "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
-      "sha256": "44d667b2b63de07784aa8816c65bd8949ed91bfb83a8cc77b69c52516663fc6d",
-      "bytes": 30081
-    },
-    {
       "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
       "sha256": "2859b9a07848be5666856121e1bd350e0c08389826718e96334354dd0ac9ecc7",
       "bytes": 22114
@@ -17408,13 +17358,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "d569771bf8e8e73538758c68e43045973b9b7010fb32cec8ad2f170cce0cea12",
-      "bytes": 689754
+      "sha256": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e",
+      "bytes": 685881
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "90d4fa2e4d46eaaf8a2ede82f29fe864100c837f966c9df1a61746c1ea481c30",
-      "bytes": 366781
+      "sha256": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
+      "bytes": 362513
     },
     {
       "path": "docs/next-host-stages.md",
@@ -39548,8 +39498,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "9e554499da934142892033c734730d2ee0c76658e5e111692b2595c53910102b",
-      "bytes": 24163
+      "sha256": "36385bc3af6e6cfdaac4dc6fbdfad33eb8f149a80ec726dcc8a130c8689b8749",
+      "bytes": 12145
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -40600,51 +40550,6 @@
       "path": "evidence/artifacts/ns2604-e2e-20261004/summary.json",
       "sha256": "e8347f73a917c7efb9b2a72050ca6c4f104e8f7a2fb9c89d53ee58b49d0aeffd",
       "bytes": 4589
-    },
-    {
-      "path": "evidence/artifacts/ns2604-requalification-20261005/README.md",
-      "sha256": "52e6f98e6e2af67941770b84a314cd9fc5673a016f986cc5cb8a2c5e3dc8bac4",
-      "bytes": 11175
-    },
-    {
-      "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
-      "sha256": "0a1923311e64f4430163e153189a0fcec16c491da64f360d8ef6cfdfe952d5fe",
-      "bytes": 30725
-    },
-    {
-      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
-      "sha256": "a8ac18ecfb4b714e95224f1aac127b1ccb548cd3b1714d0cb4b9353a258baaa9",
-      "bytes": 17270
-    },
-    {
-      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
-      "sha256": "c0a45b983d33217b84a40169884c19a09ef55b24e02edf2b8aeef53fffa3061c",
-      "bytes": 14755
-    },
-    {
-      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-memory-skills.json",
-      "sha256": "6b4ff69012c71b9592a33a2795f133fc07f0b24c2ad3a27876764b9a8efda357",
-      "bytes": 9240
-    },
-    {
-      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-observation.json",
-      "sha256": "57a1e2e41c4cff99aa76a98db869ef7127baab96b3863298088371a3a137bbe5",
-      "bytes": 58845
-    },
-    {
-      "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
-      "sha256": "e49223b190d905cc362c2c4c568570cb6536b6be9e36647288899130f5929a51",
-      "bytes": 60126
-    },
-    {
-      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
-      "sha256": "e545be05b199d5afcda50a03afa2e9120cb5edf192f94d26b6680658f4e56fef",
-      "bytes": 248462
-    },
-    {
-      "path": "evidence/artifacts/ns2604-requalification-20261005/sources.json",
-      "sha256": "00677f5b1c5c7ad3f687e2a81bce64ccb8ec6822680a34a08feb03b1b7ea02ff",
-      "bytes": 114093
     },
     {
       "path": "evidence/artifacts/observability-dashboard.png",
@@ -52727,16 +52632,6 @@
       "bytes": 22000
     },
     {
-      "path": "evidence/receipts/ns2604-requalification-20261005.json",
-      "sha256": "1d0afd73a954e448eb00bac14dbe0f2c7384d65a51efd0ad0c5e990f7ae3273b",
-      "bytes": 16469
-    },
-    {
-      "path": "evidence/receipts/ns2604-roadmap-evidence-20261005.json",
-      "sha256": "a01e1b8b9a4d4a917b891ecbb6df3076c72fef06588628f127772ec51683466e",
-      "bytes": 11795
-    },
-    {
       "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
       "sha256": "0f6a0c171872cde9689d9d5f2ff60b881ae2328b96769dc78613f625cf9d1017",
       "bytes": 16128
@@ -53848,8 +53743,8 @@
     },
     {
       "path": "scripts/build_new_wsl_handbook.py",
-      "sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
-      "bytes": 86393
+      "sha256": "6e6ee9cfb4d697b3bea2d7684e042e638be20634792f43e517b205463b1967f9",
+      "bytes": 76978
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -54898,8 +54793,8 @@
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "7a151c05cccf4a0b0f96ae27302497be6035850fbe0272c35a3438a58d5ab0b9",
-      "bytes": 104637
+      "sha256": "96ceabacbf72fef962f7430083f4da44b4db2599104cf9587c8c83dabaeed8f6",
+      "bytes": 88265
     },
     {
       "path": "tests/test_new_wsl_profile.py",
