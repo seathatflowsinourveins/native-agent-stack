@@ -11,6 +11,7 @@ import argparse
 import contextlib
 import fnmatch
 import hashlib
+import importlib.util
 from datetime import datetime, timezone
 import json
 import io
@@ -383,7 +384,7 @@ def preflight(prefix, state, *, resolver=False):
 
 
 def install_workspace_skills(stack_root, workspace, manifest=RUNTIME_SKILLS_MANIFEST):
-    """Pending shared skills PR: no copy/symlink/global-install fallback.
+    """Use the shared project installer, with no copy/symlink/global-install fallback.
 
     Resolver mode passes its own project-scope manifest (install_resolver_skills).
     """
@@ -402,7 +403,17 @@ def install_workspace_skills(stack_root, workspace, manifest=RUNTIME_SKILLS_MANI
 
 def workspace_skills(stack_root, workspace):
     manifest = stack_root / "blueprints/runtime-workers/skills/manifest.json"
-    entries = read_json(manifest)["skills"]
+    # Use the installer's reader and exclusion policy: a central hold must also disappear
+    # from the worker's expected discovery set. Use Python's documented direct-file
+    # import pattern (docs.python.org/3/library/importlib.html#importing-a-source-file-directly).
+    spec = importlib.util.spec_from_file_location(
+        "native_stack_skill_installer", stack_root / "tools/adoption/install_skills.py")
+    if spec is None or spec.loader is None:
+        raise ValueError("skill_installer_module_unavailable")
+    installer = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(installer)
+    resolved = installer.load_manifest(manifest, root=stack_root)["skills"]
+    entries = [entry for entry in resolved if entry.get("status") not in installer.SKIPPED_STATUSES]
     installed = workspace / ".agents/skills"
     names = [entry["name"] for entry in entries]
     # verification-before-completion is excluded: the runtime manifest lists it under
@@ -419,7 +430,9 @@ def workspace_skills(stack_root, workspace):
             raise ValueError("skills_must_be_project_local")
         if digest(path) != entry["skill_md_sha256"]:
             raise ValueError("installed_project_skill_pin_mismatch")
-    return {"names": sorted(names), "manifest_sha256": digest(manifest)}
+    return {"names": sorted(names), "manifest_sha256": digest(manifest),
+            "adoption_manifest_sha256": digest(stack_root / "adoption/skills/manifest.json")
+            if any("reuse_ref" in entry for entry in resolved) else None}
 
 
 SHA1 = re.compile(r"[0-9a-f]{40}")

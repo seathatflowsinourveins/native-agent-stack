@@ -1479,6 +1479,46 @@ class ReuseRefGateTests(InstallSkillsTestCase):
         self.assertIn("restates main's codex_enabled", result.stderr)
         self.assertNotIn("[[skills.config]]", result.stdout)
 
+    def test_reused_skill_cannot_bypass_a_central_install_hold_or_prune(self):
+        installer = load_installer_module()
+        old = json.loads(ADOPTION_MANIFEST.read_text())["skills"][0]
+        root = self.tmp_path / "blocked-reuse-root"
+        base_path = root / ADOPTION_REF
+        base_path.parent.mkdir(parents=True)
+        entry = {key: old[key] for key in REUSE_PIN_KEYS}
+        entry.update(status="trial", reuse_ref=ADOPTION_REF)
+        runtime = self.write_manifest([entry])
+        for status in ("held", "pruned"):
+            with self.subTest(status=status):
+                blocked = dict(old, status=status)
+                if status == "held":
+                    blocked["held_for"] = "synthetic qualification gate"
+                base_path.write_text(json.dumps({"skills": [blocked]}))
+                resolved = installer.load_manifest(runtime, root=root)
+                self.assertEqual(resolved["skills"][0]["status"], status)
+                if status == "held":
+                    self.assertEqual(resolved["skills"][0]["held_for"], blocked["held_for"])
+                with mock.patch.object(installer, "load_manifest", return_value=resolved), \
+                        mock.patch.object(installer.subprocess, "run") as run:
+                    result = installer.main(["--manifest", str(runtime), "--only", entry["name"]])
+                self.assertEqual(result, 1)
+                run.assert_not_called()
+
+    def test_reuse_preserves_a_stricter_worker_hold_and_does_not_promote_a_trial(self):
+        installer = load_installer_module()
+        old = json.loads(ADOPTION_MANIFEST.read_text())["skills"][0]
+        root = self.tmp_path / "eligible-reuse-root"
+        base_path = root / ADOPTION_REF
+        base_path.parent.mkdir(parents=True)
+        base_path.write_text(json.dumps({"skills": [dict(old, status="kept")]}))
+        for status in ("trial", "held"):
+            with self.subTest(status=status):
+                entry = {key: old[key] for key in REUSE_PIN_KEYS}
+                entry.update(status=status, reuse_ref=ADOPTION_REF)
+                runtime = self.write_manifest([entry])
+                resolved = installer.load_manifest(runtime, root=root)
+                self.assertEqual(resolved["skills"][0]["status"], status)
+
     def test_reuse_ref_that_drifted_from_main_is_refused_before_any_install(self):
         entry = self.reuse(lambda s: s.get("codex_enabled") is False)
         entry["tree_sha"] = tree_sha("drifted")

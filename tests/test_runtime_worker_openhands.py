@@ -708,6 +708,37 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
                 run.assert_not_called()
                 self.assertEqual((workspace / reserved).read_text(), "preexisting task content\n")
 
+    def test_workspace_discovery_uses_the_installers_resolved_hold_gate(self):
+        host = load_recipe_module("host.py")
+        stack = self.result / "skill-stack"
+        installer = stack / "tools/adoption/install_skills.py"
+        installer.parent.mkdir(parents=True)
+        shutil.copyfile(ROOT / "tools/adoption/install_skills.py", installer)
+        body = b"---\nname: tdd\ndescription: synthetic active skill\n---\nfixture\n"
+        active = {"name": "tdd", "status": "trial",
+                  "skill_md_sha256": hashlib.sha256(body).hexdigest()}
+        held = {"name": "browser-fixture", "status": "held", "held_for": "synthetic gate",
+                "skill_md_sha256": hashlib.sha256(b"absent held skill").hexdigest()}
+        adoption = stack / "adoption/skills/manifest.json"
+        adoption.parent.mkdir(parents=True)
+        adoption.write_text(json.dumps({"skills": [active, held]}))
+        runtime = stack / "blueprints/runtime-workers/skills/manifest.json"
+        runtime.parent.mkdir(parents=True)
+        runtime.write_text(json.dumps({"skills": [
+            active, dict(held, status="trial", reuse_ref="adoption/skills/manifest.json"),
+        ]}))
+        workspace = self.result / "skill-workspace"
+        installed = workspace / ".agents/skills/tdd/SKILL.md"
+        installed.parent.mkdir(parents=True)
+        installed.write_bytes(body)
+        discovered = host.workspace_skills(stack, workspace)
+        self.assertEqual(discovered["names"], ["tdd"])
+        self.assertEqual(discovered["manifest_sha256"], host.digest(runtime))
+        self.assertEqual(discovered["adoption_manifest_sha256"], host.digest(adoption))
+        installed.write_bytes(b"wrong active skill")
+        with self.assertRaisesRegex(ValueError, "installed_project_skill_pin_mismatch"):
+            host.workspace_skills(stack, workspace)
+
     def test_official_grader_container_transport_preserves_upstream_settings(self):
         module = load_recipe_module("e2e/docker_grader.py")
         original = {"name": "sweb.eval.django__django-11333.attempt", "image": "swebench/example:latest",

@@ -178,7 +178,9 @@ def load_manifest(path: Path, root: Path = ROOT) -> dict:
     """Read a manifest and resolve each `reuse_ref` entry against root's adoption manifest.
 
     The reused entry is matched there by name and must carry that pin unchanged; it then takes
-    the adoption entry's current codex_enabled/claude_listing, so the two manifests cannot drift."""
+    the adoption entry's current codex_enabled/claude_listing. Central held/pruned states also
+    block installation, while an eligible adoption entry never promotes a worker trial or
+    removes a stricter worker hold."""
     with open(path, "r", encoding="utf-8") as handle:
         manifest = json.load(handle)
     skills = manifest.get("skills") if isinstance(manifest, dict) else None
@@ -206,6 +208,10 @@ def load_manifest(path: Path, root: Path = ROOT) -> dict:
         if restated:
             raise InstallError(f"{skill.get('name')}: reuse_ref entry restates main's {', '.join(restated)}")
         skill.update({key: old[key] for key in REUSE_GATE_KEYS if key in old})
+        if old.get("status") in SKIPPED_STATUSES:
+            skill["status"] = old["status"]
+            if old.get("held_for"):
+                skill["held_for"] = old["held_for"]
     return manifest
 
 
