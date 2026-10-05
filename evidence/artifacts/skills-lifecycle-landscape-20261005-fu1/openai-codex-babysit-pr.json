@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-openai-codex-babysit-pr",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "openai/codex@babysit-pr",
+ "reviewed_commit": "84aa75204ad604bcf498df180d128181c89b2f0b",
+ "readme_path": ".codex/skills/babysit-pr/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill babysit-pr in openai/codex at commit 84aa75204ad604bcf498df180d128181c89b2f0b (the adjudicated pin; license Apache-2.0), read from .codex/skills/babysit-pr/SKILL.md and .codex/skills/babysit-pr/agents/openai.yaml at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for babysit-pr; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 930db390730c900f644d054e4a322fc865437c34. Survived the landscape-sweep-skills-20261005-fu1-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and native GPT-6 (requested route; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 127922,
+  "pushed_at": "2026-10-05T17:00:06Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "84aa75204ad604bcf498df180d128181c89b2f0b",
+  "pin_lookup": "ok",
+  "skill_md_found_by": ".codex/skills/, the first location the CLI searches that holds a valid folder named babysit-pr",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "8e4b149a345eca77207cb061209eed500924695c9d5547c99f0a42215597de2e",
+  "skill_md_bytes": 16861,
+  "survivor_skill_md_sha256": "8e4b149a345eca77207cb061209eed500924695c9d5547c99f0a42215597de2e",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "930db390730c900f644d054e4a322fc865437c34",
+  "disable_model_invocation": false,
+  "openai_yaml_path": ".codex/skills/babysit-pr/agents/openai.yaml",
+  "openai_yaml_reader": "PyYAML 6.0.3 compose_all with CSafeLoader",
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no policy mapping: Codex defaults allow_implicit_invocation to true"
+ },
+ "documentation_excerpts": [
+  {
+   "source": ".codex/skills/babysit-pr/SKILL.md@84aa75204ad604bcf498df180d128181c89b2f0b",
+   "text": "## Objective Babysit a PR persistently until one of these terminal outcomes occurs:"
+  },
+  {
+   "source": ".codex/skills/babysit-pr/SKILL.md@84aa75204ad604bcf498df180d128181c89b2f0b",
+   "text": "- The PR is merged or closed. - A situation requires user help (for example CI infrastructure issues, repeated flaky failures after retry budget is exhausted, permission problems, or ambiguity that cannot be resolved safely). - Optional handoff milestone: the PR is currently green + mergeable + review-clean. Treat this as a progress state, not a watcher stop, so late-arriving review comments are still surfaced promptly while the PR remains open."
+  },
+  {
+   "source": ".codex/skills/babysit-pr/SKILL.md@84aa75204ad604bcf498df180d128181c89b2f0b",
+   "text": "Do not stop merely because a single snapshot returns `idle` while checks are still pending."
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-cursor-plugins-loop-on-ci",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "cursor/plugins@loop-on-ci",
+ "reviewed_commit": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+ "readme_path": "cursor-team-kit/skills/loop-on-ci/SKILL.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill loop-on-ci in cursor/plugins at commit 4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536 (the adjudicated pin; license NOASSERTION), read from cursor-team-kit/skills/loop-on-ci/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for loop-on-ci; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 2fc5e4bdb8c0924137377af7cf9d6b7585e092ec. Survived the landscape-sweep-skills-20261005-fu1-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and native GPT-6 (requested route; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 9925,
+  "pushed_at": "2026-10-05T16:57:16Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "NOASSERTION",
+  "adjudicated_pin": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "the recursive search the CLI runs when no location it searches holds a valid skill",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "66b85dbd2bc3700386283539292a55438652bbe227271fd90b73b74525b9b9de",
+  "skill_md_bytes": 1611,
+  "survivor_skill_md_sha256": "66b85dbd2bc3700386283539292a55438652bbe227271fd90b73b74525b9b9de",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "2fc5e4bdb8c0924137377af7cf9d6b7585e092ec",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "cursor-team-kit/skills/loop-on-ci/SKILL.md@4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+   "text": "Need to watch a branch or pull request and iterate on CI failures until all required checks are green."
+  },
+  {
+   "source": "cursor-team-kit/skills/loop-on-ci/SKILL.md@4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+   "text": "Use `gh pr checks` as the source of truth. It includes all PR-attached checks, while `gh run list` only covers GitHub Actions."
+  },
+  {
+   "source": "cursor-team-kit/skills/loop-on-ci/SKILL.md@4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+   "text": "1. Resolve the PR for the current branch. 2. Inspect current PR checks before waiting. 3. If checks already failed, diagnose those failures first. 4. If checks are pending, watch with `gh pr checks --watch --fail-fast`. 5. After each push, re-check the full PR check set and repeat until green."
+  }
+ ]
+}

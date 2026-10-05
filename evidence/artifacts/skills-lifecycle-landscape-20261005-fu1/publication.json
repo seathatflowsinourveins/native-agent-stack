@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "evidence_class": "repository integration/provenance publication; not upstream behavioral or host/model acceptance",
+  "workflow_run": "wf_c2f7dbc8-129",
+  "sweep_id": "landscape-sweep-skills-20261005-fu1-ns2604",
+  "status": "stopped",
+  "fixed_main": "e7d94e7bcc074edba093994c8853e59b650ce7e0",
+  "prompts_sha256": "1c99d1c9a01a5b0d1e0d96408246767dd5e2c994b130e8ba9ae2e902f1cea302",
+  "raw_run_sha256": "2b8202f69995037490274ef12781f6740b8d3b861f3480102aa00b18d0fe3acc",
+  "immutable_inputs": {
+    "lanes.json": {
+      "bytes": 244523,
+      "sha256": "112a1efbffe1a130c3ad0a2d5f75c8e4bcd547875d23ce9a61c76128d15a275d"
+    },
+    "returns.json": {
+      "bytes": 426549,
+      "sha256": "01e0f5e30850efd7ceee6496f83e5ef13e3eb2f3bc20e3a288cfd368411fcf57"
+    },
+    "layers.json": {
+      "bytes": 9722,
+      "sha256": "56f7ad12f4c28e74adfa60ffb37042b1785c90f7188305ce034530235ef92132"
+    },
+    "survivors.json": {
+      "bytes": 2316,
+      "sha256": "e257613e8abe74176d94e1b9f38e181ca4383f1aed5d85b156ae1e4ff90dec1d"
+    },
+    "child-usage-wf_c2f7dbc8-129.json": {
+      "bytes": 519387,
+      "sha256": "bcb5d9dcb6680e35294da6f1b02c6192a658361e8981fc35e85c60086722e2ac"
+    },
+    "convert-wf_c2f7dbc8-129.log": {
+      "bytes": 1657,
+      "sha256": "f1c1ad55a2a50516ba92dc13cc550c38192a9869cb50fc6616cae901d7f5d05b"
+    }
+  },
+  "freshness": {
+    "sha256": "c47a93310ebdbe09bc4b657427eb210b12ec611f158d656e4665649b40a35b19",
+    "bytes": 511668,
+    "source": "coordination scratch archive / landscape-sweep-20261005 / work/github-freshness.json",
+    "reuse": true,
+    "observed_utc": "2026-10-05T02:31:02.310498Z through 2026-10-05T02:32:24.946120Z"
+  },
+  "source_review_stderr_bytes": 497,
+  "raw_run_retained_privately": true,
+  "raw_run_public_export": false,
+  "counts": {
+    "layers": 2,
+    "proposals": 29,
+    "vote_survivors": 10,
+    "source_bound": 8,
+    "source_stopped": 2,
+    "refuted": 19,
+    "selected": 0
+  },
+  "privacy": {
+    "method": "scripts/validate.py PRIVATE_CONTENT on serialized and decoded six retained inputs",
+    "patterns": 11,
+    "hits": 0
+  },
+  "requested_gpt_route": {
+    "provider": "native GPT-6",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "codex_cli": "0.160.0",
+    "provider_served_independent_attestation": "unknown"
+  },
+  "usage": {
+    "gpt_current_jobs": 8,
+    "gpt_ok": 7,
+    "gpt_timeout_exit_124": 1,
+    "gpt_copy_matches": 7,
+    "gpt_lost": 0,
+    "gpt_current_usage_unavailable": 1,
+    "gpt_earlier_usage_unavailable": 3,
+    "claude_complete_children": 21,
+    "claude_requests": 641,
+    "claude_effort_deviations": 0,
+    "claude_capped_searches": 0,
+    "counter_scopes_summed": false
+  },
+  "native_commands": [
+    {
+      "command": "python3 tools/sota-convergence/extract_layers.py --repo-root . --out <owned-cache>/work",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 tools/sota-convergence/build_manifest.py --work-dir <owned-cache>/work --freshness <retained-snapshot> --lanes <converted>/lanes.json --out catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu1.json --checked-at 2026-10-05 --id sota-convergence-20261005-skills-ns2604-fu1 --scope <recorded manifest scope>",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 tools/sota-convergence/landscape-sweep/source_reviews.py --survivors <converted>/survivors.json --out evidence/artifacts/skills-lifecycle-landscape-20261005-fu1 --lane landscape-sweep-skills-20261005-fu1-ns2604 --fit-models <requested route label>",
+      "exit_code": 1
+    },
+    {
+      "command": "python3 tools/sota-convergence/landscape-sweep/make_result.py --layers <artifact>/layers.json --reviews <artifact>/source-review-index.json --sweep-id landscape-sweep-skills-20261005-fu1-ns2604 --lane skills-lifecycle-landscape-20261005-fu1 --returns-ref <artifact>/returns.json --usage-ref <attempts>/child-usage-wf_c2f7dbc8-129.json --manifest-ref catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu1.json --prompts-sha256 1c99d1c9a01a5b0d1e0d96408246767dd5e2c994b130e8ba9ae2e902f1cea302",
+      "exit_code": 2,
+      "stderr_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1-attempts/make-result.stderr"
+    }
+  ],
+  "limits": [
+    "Missing judged hash and default CLI folder scope stop two CI/PR source reviews; no merit refutation inferred.",
+    "Converted and source-reviewed research closure is scoped to three leads; the global stopped run does not count saturation.",
+    "Mutable shared scratch prompt digest belongs to a later staged run. Frozen A.T digest was recomputed using native README:529 and retained here.",
+    "No adoption, installation, client settings apply, fresh model run or independently attested served model in this publication."
+  ]
+}

@@ -13,6 +13,7 @@
     "Microsoft's product-scoped skill repositories (azure-skills, skills-for-fabric, power-platform-skills, skills-for-copilot-studio, Dataverse-skills, win-dev-skills, aspire-skills, agent365-skills and others; gh api search 'skills in:name org:microsoft', 2026-09-30) are off-domain for these tasks; microsoft-skills is Microsoft's general skill repository.",
     "alpacahq-alpaca-skills and vercel-labs-agent-skills serve no task: the paper-trading skills have the model submit orders, which deterministic code owns here, and the React/Vercel skills have no code here (the manifest's excluded reasons).",
     "Install counts, registry rank and stars are discovery guides, never evidence of quality or fit.",
+    "On 2026-10-05, native-stack-research's existing embedded research contract was registered in the lifecycle and mapped to skills-research (docs/decisions/2026-10-05-research-skill-round2.md). The native-agent-stack source is its published immutable directory-package commit 05e3ead094d09a55e4652296d3d305edc2d10888, not a new default-branch freshness observation or one of the 22 sources checked on 2026-09-30. The source bytes originated in the landed config/research-harnesses-skill.md plan; its adoption manifest owns the SKILL.md hash. Retained sweeps keep their frozen earlier task inputs; this catalog mapping does not retroactively change their discovery scope.",
     "The installed lists and open gaps follow adoption/skills/manifest.json as unit F3 (#553) left it on 2026-09-30: skill-creator is pinned and serves skills-skill-lifecycle, resolving-merge-conflicts is retired, every skill is listed on in Claude except the user-invocable-only grill-me and improve-codebase-architecture, and every skill but skill-creator is enabled in Codex. Each layer input carries the installed skills' claude_listing and codex_enabled from the manifest itself (build_inputs.py). On 2026-10-03 the wave-2 skills ruling retired grill-me, improve-codebase-architecture and semgrep (changes 1 and 3) and held agent-browser (change 6); the installed lists follow the manifest, and the design-intake task has no installed skill."
   ],
   "sources": [
@@ -29,6 +30,7 @@
     {"source_id": "mattpocock-skills", "kind": "github-skills-repo", "url": "https://github.com/mattpocock/skills", "pin": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"},
     {"source_id": "microsoft-playwright-cli", "kind": "github-skills-repo", "url": "https://github.com/microsoft/playwright-cli", "pin": "b85c7a736bb473bf55b584e54a09ffa698d6d871"},
     {"source_id": "microsoft-skills", "kind": "github-skills-repo", "url": "https://github.com/microsoft/skills", "pin": "3495f50ae0d7b69dcb19c6922db9f80aab6cf79c"},
+    {"source_id": "native-agent-stack", "kind": "github-skills-repo", "url": "https://github.com/seathatflowsinourveins/native-agent-stack", "pin": "05e3ead094d09a55e4652296d3d305edc2d10888"},
     {"source_id": "obra-superpowers", "kind": "github-skills-repo", "url": "https://github.com/obra/superpowers", "pin": "8ca22dba9a94f28898bbce59f2537ff4d87c747d"},
     {"source_id": "openai-skills", "kind": "github-skills-repo", "url": "https://github.com/openai/skills", "pin": "49f948faa9258a0c61caceaf225e179651397431", "maintenance": {"status": "stale", "checked_at": "2026-09-30", "evidence": "gh api 'repos/openai/skills/commits?sha=main&since=2026-07-02T00:00:00Z&per_page=1' returned no commit; the last main commit, 49f948faa9258a0c61caceaf225e179651397431, is dated 2026-06-24T02:36:12Z, 98 days before 2026-09-30. The repository is not archived, and its pushed_at of 2026-09-08 counts a push to another branch."}},
     {"source_id": "semgrep-skills", "kind": "github-skills-repo", "url": "https://github.com/semgrep/skills", "pin": "68177b8830f96cd9d10dacbb14dde2566360503d"},
@@ -45,9 +47,9 @@
       "layer_id": "skills-research",
       "lifecycle_task": "research",
       "requirement": "Research first, before acting: survey maintained upstream tools, skills and prior decisions before writing code or adopting a component (the AGENTS.md research-first rule), with staged, bounded retrieval that keeps subagent context small.",
-      "installed": ["search-first", "iterative-retrieval"],
-      "source_ids": ["affaan-m-ecc", "mattpocock-skills", "bgauryy-octocode", "microsoft-skills", "addyosmani-agent-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
-      "open_gaps": [],
+      "installed": ["search-first", "iterative-retrieval", "native-stack-research"],
+      "source_ids": ["affaan-m-ecc", "mattpocock-skills", "bgauryy-octocode", "microsoft-skills", "addyosmani-agent-skills", "native-agent-stack", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "open_gaps": ["native-stack-research registers the existing embedded research contract without a new candidate or quality-promotion claim. Reviewed lifecycle installation and fresh client discovery remain with the sole host writer; the host-specific skill is excluded from workers pending a qualified bridge (docs/decisions/2026-10-05-research-skill-round2.md)."],
       "overturn_when": "A skill-creator paired with-skill/without-skill benchmark (or a promptfoo config) on a frozen set of research-first prompts from this repository's adopt-or-build decisions, in Claude Code and in Codex at equal model and effort, shows a candidate beating the installed skills' pass rate without a higher token or time cost; or an installed skill's upstream is archived, removed, relicensed or changes its invocation flags."
     },
     {

@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-akitaonrails-ai-memory-ai-memory-retrieval",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "akitaonrails/ai-memory@ai-memory-retrieval",
+ "reviewed_commit": "fc4da03ac5268aa44d18894685818eab2f9ecdea",
+ "readme_path": "crates/ai-memory-core/src/routing_skills/ai-memory-retrieval/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-research"
+ ],
+ "claim": "Source review of the skill ai-memory-retrieval in akitaonrails/ai-memory at commit fc4da03ac5268aa44d18894685818eab2f9ecdea (the adjudicated pin; license MIT), read from crates/ai-memory-core/src/routing_skills/ai-memory-retrieval/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for ai-memory-retrieval; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 388acb746b6d28618e206b36a99e08b11fc4f1d6. Survived the landscape-sweep-skills-20261005-fu1-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and native GPT-6 (requested route; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 8836,
+  "pushed_at": "2026-10-05T16:48:32Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "fc4da03ac5268aa44d18894685818eab2f9ecdea",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "the recursive search the CLI runs when no location it searches holds a valid skill",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "819d0682a3a882db024d4727ee699db9a5d8352a328d475a43342698c4905f90",
+  "skill_md_bytes": 9976,
+  "survivor_skill_md_sha256": "819d0682a3a882db024d4727ee699db9a5d8352a328d475a43342698c4905f90",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "388acb746b6d28618e206b36a99e08b11fc4f1d6",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "crates/ai-memory-core/src/routing_skills/ai-memory-retrieval/SKILL.md@fc4da03ac5268aa44d18894685818eab2f9ecdea",
+   "text": "Use this skill for read-only ai-memory lookups, catch-up, and evaluating remembered project knowledge before you design, debug, or edit."
+  },
+  {
+   "source": "crates/ai-memory-core/src/routing_skills/ai-memory-retrieval/SKILL.md@fc4da03ac5268aa44d18894685818eab2f9ecdea",
+   "text": "- `memory_query` searches the current project's wiki for prior decisions, gotchas, procedures, rules, and session notes. - `memory_recent` lists the most recently updated pages when the user wants a light activity check. - `memory_read_page` fetches a full page body after a search hit or direct path lookup. Pass `include_related: true` (optional `related_depth`, default 1, hard cap 3) to also walk the link graph outward and return a `related` array of reachable pages, each with its hop `depth` a"
+  },
+  {
+   "source": "crates/ai-memory-core/src/routing_skills/ai-memory-retrieval/SKILL.md@fc4da03ac5268aa44d18894685818eab2f9ecdea",
+   "text": "- **Session-aware MCP clients** that forward the real lifecycle-hook session id on every request should use automatic current-project routing. Omit `workspace`, `project`, and `cwd` for the current repository; pass explicit scope only when the user names a different project. - **Static MCP clients** (including clients with lifecycle hooks but no bridge connecting that hook session id to MCP requests) must pass `workspace` and `project` together on every project-scoped call, including requests ab"
+  }
+ ]
+}
