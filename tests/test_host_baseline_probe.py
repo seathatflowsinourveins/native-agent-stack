@@ -38,7 +38,7 @@ elif name == "id":
     print("fixture-owner")
 elif name == "readlink" and "--version" not in sys.argv:
     print("/usr/bin/sudo")
-elif name == "bwrap":
+elif name == "bwrap" and "--version" not in sys.argv:
     print("this output must be discarded", file=sys.stderr)
     sys.exit(1)
 elif name == "git":
@@ -47,6 +47,11 @@ elif name == "cat":
     print("1")
 elif name == "env" and (Path(sys.argv[0]).parent / "planted-output").exists():
     print((Path(sys.argv[0]).parent / "planted-output").read_text())
+elif name == "codex":
+    print("codex-cli 0.159.3")
+    print("this stderr must stay outside the version value", file=sys.stderr)
+    if (Path(sys.argv[0]).parent / "codex-failure").exists():
+        sys.exit(9)
 else:
     print(name + " (fixture native) 1.2.3")
 '''
@@ -74,7 +79,7 @@ class HostBaselineProbeTests(unittest.TestCase):
         commands = (
             "date dpkg-query env timeout readlink find xargs stat getent id git cat "
             "sudo sudo-rs bwrap claude codex systemd-run ionice watch script flock "
-            "chrt taskset unshare nsenter runuser busybox"
+            "chrt taskset unshare nsenter runuser busybox gdb"
         ).split()
         for name in commands:
             (self.bin / name).symlink_to(fixture)
@@ -106,13 +111,15 @@ class HostBaselineProbeTests(unittest.TestCase):
         self.assertEqual(set(data), {
             "schema_version", "probe", "host_checkout", "os_release", "architecture",
             "coreutils", "findutils", "sudo", "passwordless_sudo", "launchers",
+            "launcher_packages", "debuggers",
             "optional_commands", "kernel", "passwd_shell", "clients", "rendered_config",
         })
         self.assertEqual(data["schema_version"], 1)
         records = list(observations(data))
         self.assertGreater(len(records), 40)
         for record in records:
-            self.assertEqual(set(record), {"command", "exit", "output", "date_utc"})
+            self.assertTrue({"command", "exit", "output", "date_utc"} <= set(record))
+            self.assertTrue(set(record) <= {"command", "exit", "output", "date_utc", "stderr"})
             self.assertIsInstance(record["command"], str)
             self.assertIsInstance(record["exit"], int)
             self.assertEqual(set(record["date_utc"]), {"command", "exit", "output"})
@@ -122,6 +129,12 @@ class HostBaselineProbeTests(unittest.TestCase):
         self.assertIn("absent", data["coreutils"]["packages"]["rust-coreutils"]["output"])
         self.assertEqual(data["kernel"]["bwrap"]["exit"], 1)
         self.assertEqual(data["kernel"]["bwrap"]["output"], "")
+        self.assertEqual(data["kernel"]["bwrap_version"]["exit"], 0)
+        self.assertEqual(data["clients"]["codex"]["version"]["output"], "codex-cli 0.159.3")
+        self.assertEqual(data["clients"]["codex"]["version"]["stderr"], "this stderr must stay outside the version value")
+        self.assertEqual(set(data["launcher_packages"]), {"time", "util-linux", "procps", "systemd", "gdb"})
+        self.assertEqual(data["debuggers"]["gdb"]["version"]["exit"], 0)
+        self.assertEqual(data["passwordless_sudo"]["status"], "unknown")
         self.assertEqual(data["host_checkout"]["output"], "1" * 40)
         self.assertEqual(data["passwd_shell"]["output"], "/bin/bash")
         self.assertEqual(data["passwordless_sudo"]["marker"]["output"], {"exists": True, "mode": "440", "size_bytes": 42})
@@ -159,6 +172,33 @@ class HostBaselineProbeTests(unittest.TestCase):
                     self.assertEqual(result.stdout, b"")
                     self.assertEqual(result.stderr, b"")
 
+    def test_codex_failure_retains_exit_and_stderr_separately(self):
+        (self.bin / "codex-failure").touch()
+        result = self.run_probe(stdin=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        version = json.loads(result.stdout)["clients"]["codex"]["version"]
+        self.assertEqual(version["exit"], 9)
+        self.assertEqual(version["output"], "codex-cli 0.159.3")
+        self.assertEqual(version["stderr"], "this stderr must stay outside the version value")
+
+    def test_unexpected_exceptions_are_silent_exit_three(self):
+        for exception in ("KeyError", "KeyboardInterrupt"):
+            for optimized in (False, True):
+                with self.subTest(exception=exception, optimized=optimized):
+                    bootstrap = (
+                        "import runpy; from unittest.mock import patch; "
+                        f"failure = {exception}({str(self.home)!r}); "
+                        "guard = patch('pwd.getpwuid', side_effect=failure); "
+                        f"guard.start(); runpy.run_path({str(PROBE)!r}, run_name='__main__')"
+                    )
+                    result = subprocess.run(
+                        [sys.executable] + (["-O"] if optimized else []) + ["-c", bootstrap],
+                        capture_output=True, env=self.env, timeout=30, check=False,
+                    )
+                    self.assertEqual(result.returncode, 3)
+                    self.assertEqual(result.stdout, b"")
+                    self.assertEqual(result.stderr, b"")
+
     def test_no_field_invokes_sudo_static(self):
         text = PROBE.read_text()
         outer = ast.parse(text)
@@ -174,6 +214,38 @@ class HostBaselineProbeTests(unittest.TestCase):
                     self.assertNotIn(Path(head.value).name, {"sudo", "sudo-rs"})
             if isinstance(node, ast.Constant) and isinstance(node.value, str) and " " in node.value:
                 self.assertIsNone(re.search(r"(?:^|[;&|]|\$\()\s*(?:[\w/.-]*/)?sudo(?:-rs)?(?:\s|$)", node.value))
+
+    def test_plain_receipts_bind_original_artifacts(self):
+        required = {"id", "kind", "claim", "limitations", "recorded_at_utc", "host", "evidence_class", "artifacts"}
+        for name in ("nativestack", "nativestack2604", "stackmeasure2604", "coreutils-2604-upgrade"):
+            with self.subTest(receipt=name):
+                receipt = json.loads((ROOT / f"evidence/receipts/host-baseline-{name}-20261004.json").read_text())
+                self.assertTrue(required <= set(receipt))
+                self.assertEqual(receipt["kind"], "host_baseline")
+                self.assertEqual(receipt["evidence_class"], "local_integration")
+                self.assertTrue({"component_id", "component_ids", "stage", "result"}.isdisjoint(receipt))
+                for artifact in receipt["artifacts"]:
+                    self.assertEqual(artifact["sha256"], hashlib.sha256((ROOT / artifact["path"]).read_bytes()).hexdigest())
+                if name == "coreutils-2604-upgrade":
+                    self.assertEqual(receipt["host"]["distribution"], "NativeStack2604")
+                    self.assertFalse(receipt["source"]["reexecuted"])
+                    self.assertEqual(receipt["source"]["files"], ["run.log", "versions-before.txt", "versions-after.txt"])
+                else:
+                    self.assertEqual(receipt["reachability"]["passwordless_sudo"], "unknown")
+                    source = next(a for a in receipt["artifacts"] if a["role"] == "probe_source")
+                    observation = next(a for a in receipt["artifacts"] if a["role"] == "observation")
+                    data = json.loads((ROOT / observation["path"]).read_text())
+                    self.assertEqual(data["probe"]["output"], source["sha256"])
+                    if name == "nativestack":
+                        self.assertEqual(receipt["host"]["host_id"], "nativestack-5975wx-20260925")
+                    else:
+                        self.assertEqual(receipt["reachability"]["gdb"], "unobserved")
+                        expected = {
+                            "nativestack2604": "a9ef297bef7ad864cee212ca34c30e76e0da7770fd3d746ab344edf2bd2e1b46",
+                            "stackmeasure2604": "0d771af61bf75d07cbc6bf428b82652b0d5cd3a030ff3a4e83e28439b5ea66c6",
+                        }
+                        self.assertEqual(observation["sha256"], expected[name])
+        self.assertFalse((ROOT / "evidence/hosts/nativestack-2404-20261004").exists())
 
 
 if __name__ == "__main__":

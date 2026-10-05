@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "host-baseline-stackmeasure2604-20261004",
+  "kind": "host_baseline",
+  "claim": "PR-0 host-local launcher, client and selected rendered user-settings observation on StackMeasure2604 (Ubuntu 26.04); every native field exit and UTC stamp remains in the bound artifact.",
+  "limitations": [
+    "Field exits and dates are observations, not client installation acceptance, a guard replay, a model workload or a fresh-session effective-settings check.",
+    "Passwordless sudo is unknown. The generic recipe link in the probe is a criterion, not per-host acceptance. Root reachability requires separate evidence and remains status-unknown.",
+    "Only selected user configuration files are observed; managed and project settings, profiles and environment overrides are not resolved.",
+    "The coordinator captured this artifact using the r0 probe source now archived and independently hashed. The capture was supplied to this repair; the remote distribution was not invoked again.",
+    "The r0 capture lacks gdb, launcher-family package versions and bwrap version. Those added fields remain unobserved here and are not filled with 24.04 data.",
+    "Native client startup may have incidental writes; absence of a stderr warning does not establish side-effect-free startup."
+  ],
+  "recorded_at_utc": "2026-10-05T01:47:45Z",
+  "host": {
+    "host_id": "stackmeasure2604",
+    "distribution": "StackMeasure2604",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "release": "26.04",
+    "architecture": "x86_64"
+  },
+  "evidence_class": "local_integration",
+  "execution_context": {
+    "collector": "coordinator-supplied capture; not re-executed by this builder",
+    "shell": "bash -lc login shell",
+    "sandbox": "native distribution outside builder sandbox",
+    "command": "nice -n 19 /mnt/c/Windows/System32/wsl.exe -d StackMeasure2604 -- bash -lc 'nice -n 19 python3 -' < tools/adoption/host_baseline_probe.py"
+  },
+  "reachability": {
+    "passwordless_sudo": "unknown",
+    "gdb": "unobserved",
+    "launcher_package_versions": "unobserved",
+    "bwrap_version": "unobserved"
+  },
+  "artifacts": [
+    {
+      "role": "observation",
+      "path": "evidence/artifacts/host-baseline-20261004/stackmeasure2604.json",
+      "sha256": "0d771af61bf75d07cbc6bf428b82652b0d5cd3a030ff3a4e83e28439b5ea66c6"
+    },
+    {
+      "role": "probe_source",
+      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r0.txt",
+      "sha256": "21f3d8e96d1f4b9d24b7b30f280dba2f44af14135fdd0852468444c25d86bedf"
+    }
+  ]
+}
