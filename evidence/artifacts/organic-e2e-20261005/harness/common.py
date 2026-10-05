@@ -386,7 +386,7 @@ def s7_gate_view(snap: dict) -> dict:
     return view
 
 
-def stable_s7_snapshot(extra_files: dict | None = None, tries: int = 5, wait_s: float = 2.0) -> tuple[dict, dict]:
+def stable_s7_snapshot(extra_files: dict | None = None, tries: int = 8, wait_s: float = 2.0) -> tuple[dict, dict]:
     """A snapshot whose gated view held still across two consecutive reads (at most `tries`, `wait_s` apart). Codex
     sessions re-sync the remote curated plugins into the shared ~/.codex/plugins/cache at start (a clone symlinks
     plugins, §4.3), so a single read can catch another session's sync half done. Returns (snapshot, {stable, reads})."""
