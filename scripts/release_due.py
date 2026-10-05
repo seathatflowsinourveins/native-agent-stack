@@ -94,8 +94,16 @@ def ignored(rel: str) -> bool:
     return git("check-ignore", "-q", rel).returncode == 0  # host-local files (adoption/hosts/*.json)
 
 
+SCAFFOLD = "adoption/scaffold/"
+
+
 def at_commit(commit: str, rel: str) -> bool:
-    return git("cat-file", "-e", f"{commit}:{rel}").returncode == 0
+    """Whether the commit holds the path. A path that a document names as a file scaffold_repo.py writes into another
+    repository (adoption/bootstrap.md's "File in the new repository" table, adoption/update.md's --force example) is held
+    when its source under adoption/scaffold/ is, as the file itself or as its .template (tools/adoption/scaffold_repo.py)."""
+    if git("cat-file", "-e", f"{commit}:{rel}").returncode == 0:
+        return True
+    return any(git("cat-file", "-e", f"{commit}:{SCAFFOLD}{rel}{suffix}").returncode == 0 for suffix in ("", ".template"))
 
 
 def worktree_paths() -> set[str]:

@@ -60,6 +60,15 @@ class ReleasePinContentsTests(unittest.TestCase):
 
 
 class ReleaseDueUnitTests(unittest.TestCase):
+    def test_a_scaffold_output_path_is_held_by_its_scaffold_source(self):
+        # adoption/bootstrap.md names the files scaffold_repo.py writes into another repository; their sources live under
+        # adoption/scaffold/, as the file or as its .template. A path that is neither tracked nor scaffolded stays missing.
+        head = rd.git("rev-parse", "HEAD").stdout.strip()
+        self.assertEqual(rd.git("cat-file", "-e", f"{head}:.github/workflows/sota-sources.yml").returncode != 0, True)
+        self.assertTrue(rd.at_commit(head, ".github/workflows/sota-sources.yml"))
+        self.assertTrue(rd.at_commit(head, "adoption/bootstrap.md"))
+        self.assertFalse(rd.at_commit(head, ".github/workflows/no-such-scaffold-output.yml"))
+
     def test_path_pattern_covers_templates_workflows_and_tests(self):
         text = ("run adoption/launchd/agent.plist.template and .github/workflows/validate.yml, "
                 "tests/test_x.py, tools/adoption/render_launchd.py, docs/notes.txt")
