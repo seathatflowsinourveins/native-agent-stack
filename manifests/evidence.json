@@ -16563,8 +16563,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md",
-      "sha256": "79f09b6041b4886cf6662570d46952e6d7924310bf092307fd192d9c8973f01d",
-      "bytes": 34672
+      "sha256": "8929c8d8a44507812a748c8e6fb7ee0eae35779b34203082c3f04b8ac7724493",
+      "bytes": 35322
     },
     {
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
@@ -39193,8 +39193,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "97a4e5a93e090d3a2af91d883eb4b7df0df15416127f190ad0c28f38c67116b6",
-      "bytes": 318078
+      "sha256": "ba11776ca4f73ea475ac1b04b1894953c3dc2be789a4ba6676f63ad5d4b9bdd0",
+      "bytes": 318166
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -48823,8 +48823,8 @@
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md",
-      "sha256": "6a8e85ed983686df874aad21b0f1389a6cfdf6776c443842af72c59223576230",
-      "bytes": 17225
+      "sha256": "05fbff90b9ea7692c4b0f1c53fb27cd0b46ec870c77989e668470d32400a4a5d",
+      "bytes": 17375
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/check_rtk_rewrite_heads.py",
@@ -48858,13 +48858,13 @@
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/plan-row-scratch-run.json",
-      "sha256": "ecb4ba9168d3d8f75ad44b1497760288f79f031a0a2ac6abf0a4789ca7382478",
-      "bytes": 50805
+      "sha256": "5a2eceda99fc21a9f8caa882174a491c312404c9135344e44270924151488b8c",
+      "bytes": 56893
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/plan_row_scratch_run.py",
-      "sha256": "7b61a4434bfbdcc924af008502487985b8a856598be1d4b1024e3e4b00775ff1",
-      "bytes": 24803
+      "sha256": "ad2ae45b8b1b56ff46af207878d9013f1cc93a5d3e36a2533b6da1e9d1189fb0",
+      "bytes": 28343
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/receipt.json",
@@ -48903,13 +48903,13 @@
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rule-review-mutation-check.txt",
-      "sha256": "979b7c77ab8005c832157e60d3c2fe1aeb770e88f338ba4f68a9a0ff6bb14c70",
-      "bytes": 4029
+      "sha256": "f2a58851f6a86d82f0e46ed614079c9accf121235e5230b89e9d634c5acba2e9",
+      "bytes": 4411
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rule_review_mutation_check.py",
-      "sha256": "81d16e36773dbc8fd2dff191c77a4a97068ee7c8b9d5bbd64d43449e29297205",
-      "bytes": 13324
+      "sha256": "a2b82145fb2ff4fb78285c0f38b60e456ef7448edddb92f9d83854c9f0f169d5",
+      "bytes": 14160
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/trust_readback_race.py",
