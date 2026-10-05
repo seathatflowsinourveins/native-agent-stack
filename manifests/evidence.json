@@ -4170,27 +4170,6 @@
         "Historical Claude task binding is CLI2.1.287. Current release2.1.288 reconciliation remains with the configuration owner and cannot retroactively change these captures."
       ],
       "path": "evidence/receipts/native-sdk-acceptance-20261002.json"
-    },
-    {
-      "id": "ns2604-e2e-20261004",
-      "kind": "native_model_e2e",
-      "component_ids": [
-        "claude-code",
-        "codex",
-        "omniroute"
-      ],
-      "claim": "The historical 2026-10-04 foundation E2E covered 15 units and 80 slots through native executor observations, independent model review and 22 adjudications. Final labels are READY 18, PARTIAL 31, FAIL 2, BY_DESIGN 12 and INTERIM 17, with zero unjudged slots. Readiness is (18 + 12) / 80 = 37.5%, rounded half up to 38%; all 22 executor/reviewer disagreements were adjudicated, with 14 keeping the reviewer's status and 8 taking the executor's. This publication independently checks and sanitizes the retained status chains; it does not repeat host or provider execution. The adjudication prompt as run, claude-opus-5-5 at max effort with evidence-reviewer run records and timestamps, and the separate 33-slot fix list are retained.",
-      "limitations": [
-        "Host state is as of 2026-10-04 19:10\u201320:10Z only; later adjudication and source merge timestamp 2026-10-04T20:26:16Z do not extend that observation window. Publication and repair perform artifact inspection and structural checks in the owned sandbox; they do not repeat native host probes.",
-        "Fixes are pending. The 33 PARTIAL/FAIL slots after adjudication are not accepted as ready: 25 repository-plan and 8 host fixes (evidence/artifacts/ns2604-e2e-20261004/fixes.json). Four INTERIM token slots (context-supply, command-output, output-compression, code-index) are held for PR #684, which has not merged. The two open token slots have separate fixes: ccusage (FAIL, plan) and statusline (PARTIAL, host).",
-        "This is not an upstream benchmark. Native executor observations, independent model judgments and adjudication are separate from upstream tests, structural checks, independent host replication and measured quality or token improvement.",
-        "The 17 INTERIM slots are held by design. They remain in the denominator and contribute zero to the readiness numerator; the 12 BY_DESIGN slots are intentional dispositions rather than proof that their tools executed.",
-        "Adjudication: claude-opus-5-5 at effort max (evidence-reviewer), prompt template as run in evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md. Run wf_8bf450a9-d1e (17 agents) started 2026-10-04T20:06:45Z and completed 2026-10-04T20:20:30Z; run wf_cdbf70a0-02c (5 agents) started 2026-10-04T20:08:29Z and completed 2026-10-04T20:19:31Z.",
-        "Historical source command excerpts and raw conversations remain private. Public reasons are bounded to 60 words, fixes preserve the merge's 900-character bound before sanitization, and citations are limited to four per slot. Hashes establish byte identity, not success or adequacy of every native acceptance claim.",
-        "Reviewer records report the requested gateway model cx/gpt-6.1-sol-max and max effort; no resolved backend model identity is inferred. Independent model review is review of retained evidence, not independent execution on the host.",
-        "The coordinator registers all eight published files in manifests/evidence.json in the PR's final registry-only commit, and full repository validation passes at that head. Per-file scans and local receipt tests are structural evidence only."
-      ],
-      "path": "evidence/receipts/ns2604-e2e-20261004.json"
     }
   ],
   "files": [
@@ -16564,11 +16543,6 @@
       "path": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md",
       "sha256": "51bb422d713c5df21d6228f7e83440dafa48a576e424a02db5e867dfd8d7b2c5",
       "bytes": 10057
-    },
-    {
-      "path": "docs/decisions/2026-10-04-ns2604-verified-e2e.md",
-      "sha256": "5c4f4c17c4e101a13f3167fc82973c1de4b2a3ab7b7d68741f9504dfecad8a93",
-      "bytes": 6659
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
@@ -39621,36 +39595,6 @@
       "bytes": 23333
     },
     {
-      "path": "evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md",
-      "sha256": "2905791626d06cc9ba44215cecd1a346482ba2c718dcbc0b00e567bba7101843",
-      "bytes": 2111
-    },
-    {
-      "path": "evidence/artifacts/ns2604-e2e-20261004/fixes.json",
-      "sha256": "9c27909616706d6a5dfc1fd2abb1c7f921e9b7b675d2ea4beea5d73bc894e861",
-      "bytes": 31505
-    },
-    {
-      "path": "evidence/artifacts/ns2604-e2e-20261004/method.md",
-      "sha256": "c166003013dcd1dd7f786977da74013e4987896958c2bba2344b5abbea049f5f",
-      "bytes": 9421
-    },
-    {
-      "path": "evidence/artifacts/ns2604-e2e-20261004/review-prompt.txt",
-      "sha256": "3d09e4ad82274f0dd1be60be2231bdd95f9d395832e4641dfdffa4fbab40876a",
-      "bytes": 2067
-    },
-    {
-      "path": "evidence/artifacts/ns2604-e2e-20261004/slots.json",
-      "sha256": "24c0d3504b367ae1b2897a27a983e5891adc4ad8f33c8d50b4c9abd274408735",
-      "bytes": 123276
-    },
-    {
-      "path": "evidence/artifacts/ns2604-e2e-20261004/summary.json",
-      "sha256": "e8347f73a917c7efb9b2a72050ca6c4f104e8f7a2fb9c89d53ee58b49d0aeffd",
-      "bytes": 4589
-    },
-    {
       "path": "evidence/artifacts/observability-dashboard.png",
       "sha256": "3fd996f22320f31bd54decff339374be80f7d20fed07d83a66fa7eabaee59cd2",
       "bytes": 80748
@@ -51339,11 +51283,6 @@
       "path": "evidence/receipts/notification-types-20260929.json",
       "sha256": "7f5422e2b4d7c60801b48d735619689802b3b353199e149c2667c586cc90cf5d",
       "bytes": 24695
-    },
-    {
-      "path": "evidence/receipts/ns2604-e2e-20261004.json",
-      "sha256": "4f88b17d529372fd140bb723e58539effc2a9970204a1faf5ab632c113909705",
-      "bytes": 22000
     },
     {
       "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
