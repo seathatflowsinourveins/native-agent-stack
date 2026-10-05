@@ -9,6 +9,7 @@ out at the 0.50.0 pin because it was not qualified, be installed with `rtk init 
 | --- | --- | --- |
 | Fresh-session E2E | `fresh_session_e2e.sh <label>` | `rtk --version`, `rtk init --show`, `rtk gain -f json` before and after, `claude mcp list`, `codex mcp list`, two fresh `claude -p --output-format stream-json --verbose --include-hook-events` sessions (git status, grep -rl), one fresh `codex exec --json --ephemeral` session, all in a new empty project directory, summarised with jq |
 | Codex hook qualification | `codex_hook_qual.py [outdir [arm ...]]` | `rtk init -g --codex`, `rtk init --show --codex`, Codex's own `hooks/list`, `tools/adoption/codex_hook_trust.py`, `codex exec --json --ephemeral` through the loopback OmniRoute gateway (no credential needed or copied), `rtk gain` |
+| Plan row scratch run | `plan_row_scratch_run.py [outfile]` | the install plan's `command-output` Codex steps in a scratch HOME, their text read from `install-plan.json`: the exclusions config, `rtk init -g --codex`, the trust, the post_install program, and the after_sign_in jq filter on a synthetic stream: `plan-row-scratch-run.json` |
 | rtk init probe | `rtk_init_codex_probe.py [outfile]` | what `rtk init -g --codex` writes, shows and undoes in scratch homes (no host file): `rtk-init-codex-probe.json` |
 | rtk behaviour probe | `rtk_behaviour_probe.py [outfile]` | `rtk rewrite` and rtk's compact forms against the shell, in a scratch repository and scratch homes (no host configuration, no host counter): `rtk-behaviour-probe.json` |
 | Read-back race | `trust_readback_race.py [tool file]` | `tools/adoption/codex_hook_trust.py` against the real `codex app-server` when the hook's definition changes right after the write |
@@ -18,7 +19,7 @@ second from the repository (about 5 min for seven arms of one or two sessions ea
 repository under `~/.cache/native-agent-stack-e2e`, never writes the live `~/.codex` (it hashes the live hooks.json before and
 after), and deletes its work directory. Files here: `receipt.json` (the sanitized results below),
 `nativestack-before-snapshot.summary.md` (the E2E's own summary, home paths replaced), `rtk-behaviour-probe.json` and
-`rtk-init-codex-probe.json` (the probes' output).
+`rtk-init-codex-probe.json` and `plan-row-scratch-run.json` (the probes' and the scratch run's output).
 
 ## NativeStack before snapshot (2026-10-04 21:44Z, before the NativeStack host steps of docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md)
 
